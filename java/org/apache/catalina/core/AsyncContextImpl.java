@@ -171,7 +171,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
     }
 
-    public boolean timeout() throws IOException {
+    public boolean timeout() {
         AtomicBoolean result = new AtomicBoolean();
         request.getCoyoteRequest().action(ActionCode.ASYNC_TIMEOUT, result);
 
@@ -181,22 +181,19 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             ClassLoader newCL = request.getContext().getLoader().getClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(newCL);
-                boolean listenerInvoked = false;
                 List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
                 listenersCopy.addAll(listeners);
                 for (AsyncListenerWrapper listener : listenersCopy) {
-                    listener.fireOnTimeout(event);
-                    listenerInvoked = true;
+                    try {
+                        listener.fireOnTimeout(event);
+                    } catch (IOException ioe) {
+                        log.warn("onTimeout() failed for listener of type [" +
+                                listener.getClass().getName() + "]", ioe);
+                    }
                 }
-                if (listenerInvoked) {
-                    request.getCoyoteRequest().action(
-                            ActionCode.ASYNC_IS_TIMINGOUT, result);
-                    return !result.get();
-                } else {
-                    // No listeners, trigger error handling
-                    return false;
-                }
-
+                request.getCoyoteRequest().action(
+                        ActionCode.ASYNC_IS_TIMINGOUT, result);
+                return !result.get();
             } finally {
                 Thread.currentThread().setContextClassLoader(oldCL);
             }
@@ -420,37 +417,50 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
 
-    public void setErrorState(Throwable t) {
+    public void setErrorState(Throwable t, boolean fireOnError) {
         if (t!=null) request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
         request.getCoyoteRequest().action(ActionCode.ASYNC_ERROR, null);
-        AsyncEvent errorEvent = new AsyncEvent(event.getAsyncContext(),
-                event.getSuppliedRequest(), event.getSuppliedResponse(), t);
-        List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
-        listenersCopy.addAll(listeners);
-        for (AsyncListenerWrapper listener : listenersCopy) {
-            try {
-                listener.fireOnError(errorEvent);
-            } catch (IOException ioe) {
-                log.warn("onError() failed for listener of type [" +
-                        listener.getClass().getName() + "]", ioe);
+
+        if (fireOnError) {
+            AsyncEvent errorEvent = new AsyncEvent(event.getAsyncContext(),
+                    event.getSuppliedRequest(), event.getSuppliedResponse(), t);
+            List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
+            listenersCopy.addAll(listeners);
+            for (AsyncListenerWrapper listener : listenersCopy) {
+                try {
+                    listener.fireOnError(errorEvent);
+                } catch (IOException ioe) {
+                    log.warn("onError() failed for listener of type [" +
+                            listener.getClass().getName() + "]", ioe);
+                }
             }
         }
 
-        // SRV.2.3.3.3 (search for "error dispatch")
-        if (servletResponse instanceof HttpServletResponse) {
-            ((HttpServletResponse) servletResponse).setStatus(
-                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
 
-        Host host = (Host) context.getParent();
-        Valve stdHostValve = host.getPipeline().getBasic();
-        if (stdHostValve instanceof StandardHostValve) {
-            ((StandardHostValve) stdHostValve).throwable(request,
-                    request.getResponse(), t);
-        }
+        AtomicBoolean result = new AtomicBoolean();
+        request.getCoyoteRequest().action(ActionCode.ASYNC_IS_ERROR, result);
+        if (result.get()) {
+            // No listener called dispatch() or complete(). This is an error.
+            // SRV.2.3.3.3 (search for "error dispatch")
+            if (servletResponse instanceof HttpServletResponse) {
+                ((HttpServletResponse) servletResponse).setStatus(
+                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
 
-        if (isStarted() && !request.isAsyncDispatching()) {
-            complete();
+            Host host = (Host) context.getParent();
+            Valve stdHostValve = host.getPipeline().getBasic();
+            if (stdHostValve instanceof StandardHostValve) {
+                ((StandardHostValve) stdHostValve).throwable(request,
+                        request.getResponse(), t);
+            }
+
+            request.getCoyoteRequest().action(
+                    ActionCode.ASYNC_IS_ERROR, result);
+            if (result.get()) {
+                // Still in the error state. The error page did not call
+                // complete() or dispatch(). Complete the async processing.
+                complete();
+            }
         }
     }
 

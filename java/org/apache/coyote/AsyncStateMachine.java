@@ -52,41 +52,45 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * |----------------->--------------|
  * |                               \|/
- * |   |----------<---------------ERROR-----------------------<----------------------------------|
- * |   |      complete()         /|\ |                                                           |
- * |   |                          |  |postProcess()                                              |
- * |   |                   error()|  |                                                           |
- * |   |                          |  |  |--|timeout()                                            |
- * |   |           postProcess()  | \|/ | \|/            auto                                    |
- * |   |         |--------------->DISPATCHED<-----------------------COMPLETING<-----|            |
- * |   |         |               /|\  |                               | /|\         |            |
- * |   |         |    |--->-------|   |                               |--|          |            |
- * |   |         ^    |               |startAsync()                 timeout()       |            |
- * |   |         |    |               |                                             |            |
- * |  \|/        |    |  complete()  \|/        postProcess()                       |            |
- * | MUST_COMPLETE-<- | ----<------STARTING-->--------------------|                 ^            |
- * |  /|\    /|\      |               |                           |      complete() |            |
- * |   |      |       |               |                           |     /-----------|            |
- * |   |      |       ^               |dispatch()                 |    /                         |
- * |   |      |       |               |                           |   /                          |
- * |   |      |       |              \|/                         \|/ /                           |
- * |   |      |       |         MUST_DISPATCH                  STARTED                           |
- * |   |      |       |           |                            /|  \ \                           |
- * |   |      |       |           |postProcess()              / |   \ \                          |
- * ^   |      ^       |           |              dispatch()  /  |    \ \                         |
- * |   |      |       |           |                         /   |     \ \    postProcess()       |
- * |   |      |       |           |    |-------------------/    |auto  \ \----<--------------|   |
- * |   |      |       | auto     \|/  \|/                      \|/      \                    |   |
- * |   |      |       |---<----DISPATCHING<-----------------TIMING_OUT   \                   |   |
- * |   |      |                               dispatch()      |   |      |asyncOperation()   ^   |
- * |   |      |                                               |   |     \|/                  |   ^
- * |   |      |-------<----------------------------------<----|   |      READ_WRITE_OP->-----|   |
- * |   |                          complete()                      |         |      |             |
- * |   |                                                          |         |      |  error()    |
- * |<- | ----<-------------------<-----------------------------<--|         |      |->-----------|
- *     |                           error()                                  |
- *     |                                                  complete()        |
- *     |--------------------------------------------------------------------|
+ * |   |----------<---------------ERROR---------------------------<-------------------------------|
+ * |   |      complete()         /|\ | \                                                          |
+ * |   |                          |  |  \---------------|                                         |
+ * |   |                          |  |                  |dispatch()                               |
+ * |   |                          |  |postProcess()    \|/                                        |
+ * |   |                   error()|  |                  |                                         |
+ * |   |                          |  |  |--|timeout()   |                                         |
+ * |   |           postProcess()  | \|/ | \|/           |         auto                            |
+ * |   |         |--------------->DISPATCHED<---------- | --------------COMPLETING<-----|         |
+ * |   |         |               /|\  |                 |                 | /|\         |         |
+ * |   |         |    |--->-------|   |                 |                 |--|          |         |
+ * |   |         ^    |               |startAsync()     |               timeout()       |         |
+ * |   |         |    |               |                 |                               |         |
+ * |  \|/        |    |  complete()  \|/  postProcess() |                               |         |
+ * | MUST_COMPLETE-<- | ----<------STARTING-->--------- | ------------|                 ^         |
+ * |  /|\    /|\      |               |                 |             |      complete() |         |
+ * |   |      |       |               |                 |             |     /-----------|         |
+ * |   |      |       ^               |dispatch()       |             |    /                      |
+ * |   |      |       |               |                 |             |   /                       |
+ * |   |      |       |              \|/                /            \|/ /                        |
+ * |   |      |       |         MUST_DISPATCH          /           STARTED                        |
+ * |   |      |       |           |                   /            /|  \ \                        |
+ * |   |      |       |           |postProcess()     /            / |   \ \                       |
+ * ^   |      ^       |           |                 /  dispatch()/  |    \ \                      |
+ * |   |      |       |           |                /            /   |     \ \   postProcess()     |
+ * |   |      |       |           |   |---------- / -----------/    |auto  \ \----<-----------|   |
+ * |   |      |       |           |   |          /                  |       \                 |   |
+ * |   |      |       |           |   |   |-----/                   |       |                 |   |
+ * |   |      |       | auto     \|/ \|/ \|/                       \|/      |                 |   |
+ * |   |      |       |---<------DISPATCHING<-----------------TIMING_OUT    |                 |   |
+ * |   |      |                               dispatch()        |   |       |asyncOperation() ^   |
+ * |   |      |                                                 |   |      \|/                |   ^
+ * |   |      |-------<----------------------------------<------|   |     READ_WRITE_OP->-----|   |
+ * |   |                          complete()                        |        |      |             |
+ * |   |                                                            |        |      |  error()    |
+ * |<- | ----<-------------------<-------------------------------<--|        |      |->-----------|
+ *     |                           error()                                   |
+ *     |                                                  complete()         |
+ *     |---------------------------------------------------------------------|
  * </pre>
  */
 public class AsyncStateMachine<S> {
@@ -165,6 +169,9 @@ public class AsyncStateMachine<S> {
         return state == AsyncState.TIMING_OUT;
     }
 
+    public boolean isAsyncError() {
+        return state == AsyncState.ERROR;
+    }
 
     public synchronized void asyncStart(AsyncContextCallback asyncCtxt) {
         if (state == AsyncState.DISPATCHED) {
@@ -211,13 +218,6 @@ public class AsyncStateMachine<S> {
         } else if (state == AsyncState.DISPATCHING) {
             state = AsyncState.DISPATCHED;
             return SocketState.ASYNC_END;
-        } else if (state == AsyncState.ERROR) {
-            asyncCtxt.fireOnComplete();
-            state = AsyncState.DISPATCHED;
-            return SocketState.ASYNC_END;
-        //} else if (state == AsyncState.DISPATCHED) {
-        //    // No state change
-        //    return SocketState.OPEN;
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",

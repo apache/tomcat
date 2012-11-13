@@ -300,7 +300,7 @@ public class CoyoteAdapter implements Adapter {
             if (status==SocketStatus.TIMEOUT) {
                 success = true;
                 if (!asyncConImpl.timeout()) {
-                    asyncConImpl.setErrorState(null);
+                    asyncConImpl.setErrorState(null, false);
                 }
             } else if (status==SocketStatus.ASYNC_READ_ERROR) {
                 success = true;
@@ -308,7 +308,7 @@ public class CoyoteAdapter implements Adapter {
                 req.getAttributes().remove(RequestDispatcher.ERROR_EXCEPTION);
                 asyncConImpl.notifyReadError(t);
                 if (t != null) {
-                    asyncConImpl.setErrorState(t);
+                    asyncConImpl.setErrorState(t, true);
                 }
             } else if (status==SocketStatus.ASYNC_WRITE_ERROR) {
                 success = true;
@@ -316,7 +316,7 @@ public class CoyoteAdapter implements Adapter {
                 req.getAttributes().remove(RequestDispatcher.ERROR_EXCEPTION);
                 asyncConImpl.notifyWriteError(t);
                 if (t != null) {
-                    asyncConImpl.setErrorState(t);
+                    asyncConImpl.setErrorState(t, true);
                 }
             }
 
@@ -338,7 +338,7 @@ public class CoyoteAdapter implements Adapter {
                 Throwable t = (Throwable) request.getAttribute(
                         RequestDispatcher.ERROR_EXCEPTION);
                 if (t != null) {
-                    asyncConImpl.setErrorState(t);
+                    asyncConImpl.setErrorState(t, true);
                 }
             }
 

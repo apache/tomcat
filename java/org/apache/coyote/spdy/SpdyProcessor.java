@@ -375,6 +375,8 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncOperation());
         } else if (actionCode == ActionCode.ASYNC_IS_TIMINGOUT) {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
+        } else if (actionCode == ActionCode.ASYNC_IS_ERROR) {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
         } else {
             // TODO:
             // actionInternal(actionCode, param);
