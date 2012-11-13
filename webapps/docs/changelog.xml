@@ -224,6 +224,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        <bug>54143</bug>: Add display of the memory pools usage (including
+        PermGen) to the Status page of the Manager web application. (kkolinko)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <fix>
