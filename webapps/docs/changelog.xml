@@ -148,6 +148,11 @@
         <code>CsrfPreventionFilter</code>, allowing to customize the HTTP
         status code used for denied requests. (kkolinko)
       </add>
+      <fix>
+        <bug>54141</bug>: Increase the permitted number of nested Realm levels
+        from 2 to 3 by default and make the limit configurable via a system
+        property. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
