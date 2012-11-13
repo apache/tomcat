@@ -31,6 +31,7 @@ import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Simple client for unit testing. It isn't robust, it isn't secure and
@@ -59,7 +60,7 @@ public abstract class SimpleHttpClient {
 
     protected static final String SESSION_COOKIE_NAME = "JSESSIONID";
     protected static final String SESSION_PARAMETER_NAME =
-            SESSION_COOKIE_NAME.toLowerCase();
+            SESSION_COOKIE_NAME.toLowerCase(Locale.US);
 
     private static final String COOKIE_HEADER_PREFIX = "Set-Cookie: ";
     private static final String SESSION_COOKIE_HEADER_PREFIX =

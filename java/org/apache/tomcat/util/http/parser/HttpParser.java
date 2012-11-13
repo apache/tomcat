@@ -372,7 +372,7 @@ public class HttpParser {
         if (result.length() == 0) {
             return null;
         } else {
-            return result.toString().toLowerCase();
+            return result.toString().toLowerCase(Locale.US);
         }
     }
 
