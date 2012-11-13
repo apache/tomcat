@@ -19,12 +19,17 @@
 package org.apache.catalina.manager;
 
 import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryPoolMXBean;
+import java.lang.management.MemoryUsage;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import javax.management.MBeanServer;
@@ -200,6 +205,12 @@ public class StatusTransformer {
     public static void writeVMState(PrintWriter writer, int mode)
         throws Exception {
 
+        SortedMap<String, MemoryPoolMXBean> memoryPoolMBeans = new TreeMap<>();
+        for (MemoryPoolMXBean mbean: ManagementFactory.getMemoryPoolMXBeans()) {
+            String sortKey = mbean.getType() + ":" + mbean.getName();
+            memoryPoolMBeans.put(sortKey, mbean);
+        }
+
         if (mode == 0){
             writer.print("<h1>JVM</h1>");
 
@@ -214,6 +225,29 @@ public class StatusTransformer {
             writer.print(formatSize(
                     Long.valueOf(Runtime.getRuntime().maxMemory()), true));
             writer.print("</p>");
+
+            writer.write("<table border=\"0\"><thead><tr><th>Memory Pool</th><th>Type</th><th>Initial</th><th>Total</th><th>Maximum</th><th>Used</th></tr></thead><tbody>");
+            for (MemoryPoolMXBean memoryPoolMBean : memoryPoolMBeans.values()) {
+                MemoryUsage usage = memoryPoolMBean.getUsage();
+                writer.write("<tr><td>");
+                writer.print(memoryPoolMBean.getName());
+                writer.write("</td><td>");
+                writer.print(memoryPoolMBean.getType());
+                writer.write("</td><td>");
+                writer.print(formatSize(Long.valueOf(usage.getInit()), true));
+                writer.write("</td><td>");
+                writer.print(formatSize(Long.valueOf(usage.getCommitted()), true));
+                writer.write("</td><td>");
+                writer.print(formatSize(Long.valueOf(usage.getMax()), true));
+                writer.write("</td><td>");
+                writer.print(formatSize(Long.valueOf(usage.getUsed()), true));
+                if (usage.getMax() > 0) {
+                    writer.write(" ("
+                            + (usage.getUsed() * 100 / usage.getMax()) + "%)");
+                }
+                writer.write("</td></tr>");
+            }
+            writer.write("</tbody></table>");
         } else if (mode == 1){
             writer.write("<jvm>");
 
@@ -221,6 +255,17 @@ public class StatusTransformer {
             writer.write(" free='" + Runtime.getRuntime().freeMemory() + "'");
             writer.write(" total='" + Runtime.getRuntime().totalMemory() + "'");
             writer.write(" max='" + Runtime.getRuntime().maxMemory() + "'/>");
+
+            for (MemoryPoolMXBean memoryPoolMBean : memoryPoolMBeans.values()) {
+                MemoryUsage usage = memoryPoolMBean.getUsage();
+                writer.write("<memorypool");
+                writer.write(" name='" + memoryPoolMBean.getName() + "'");
+                writer.write(" type='" + memoryPoolMBean.getType() + "'");
+                writer.write(" usageInit='" + usage.getInit() + "'");
+                writer.write(" usageCommitted='" + usage.getCommitted() + "'");
+                writer.write(" usageMax='" + usage.getMax() + "'");
+                writer.write(" usageUsed='" + usage.getInit() + "'/>");
+            }
 
             writer.write("</jvm>");
         }
