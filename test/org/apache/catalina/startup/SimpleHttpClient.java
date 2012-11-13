@@ -93,7 +93,7 @@ public abstract class SimpleHttpClient {
     private String redirectUri;
 
     private String responseBody;
-    private List<String> bodyUriElements = new ArrayList<>();
+    private List<String> bodyUriElements = null;
 
     protected void setPort(int thePort) {
         port = thePort;
@@ -138,6 +138,17 @@ public abstract class SimpleHttpClient {
         return responseBody;
     }
 
+    /**
+     * Return opening tags of HTML elements that were extracted by the
+     * {@link #extractUriElements()} method.
+     *
+     * <p>
+     * Note, that {@link #extractUriElements()} method has to be called
+     * explicitly.
+     *
+     * @return List of HTML tags, accumulated by {@link #extractUriElements()}
+     *         method, or {@code null} if the method has not been called yet.
+     */
     public List<String> getResponseBodyUriElements() {
         return bodyUriElements;
     }
@@ -292,20 +303,29 @@ public abstract class SimpleHttpClient {
             }
         }
         responseBody = builder.toString();
-        extractUriElements(responseBody);
     }
 
-    /*
-     * Scan an html body for useful html uri elements. If any are found,
-     * then accumulate them. Test classes might not use them, but they
-     * are collected anyway.
+    /**
+     * Scan the response body for opening tags of certain HTML elements
+     * (&lt;a&gt;, &lt;form&gt;). If any are found, then accumulate them.
+     *
+     * <p>
+     * Note: This method has the following limitations: a) It assumes that the
+     * response is HTML. b) It searches for lowercase tags only. 
+     *
+     * @see #getResponseBodyUriElements()
      */
-    private void extractUriElements(String body) {
-        if (body.length() > 0) {
+    public void extractUriElements() {
+        bodyUriElements = new ArrayList<>();
+        if (responseBody.length() > 0) {
             int ix = 0;
-            while ((ix = extractUriElement(body, ix, RESOURCE_TAG)) > 0){}
+            while ((ix = extractUriElement(responseBody, ix, RESOURCE_TAG)) > 0){
+                // loop
+            }
             ix = 0;
-            while ((ix = extractUriElement(body, ix, LOGIN_TAG)) > 0){}
+            while ((ix = extractUriElement(responseBody, ix, LOGIN_TAG)) > 0){
+                // loop
+            }
         }
     }
 
