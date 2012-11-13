@@ -222,7 +222,9 @@ public abstract class SimpleHttpClient {
         // clear any residual data before starting on this response
         responseHeaders.clear();
         responseBody = null;
-        bodyUriElements.clear();
+        if (bodyUriElements != null) {
+            bodyUriElements.clear();
+        }
 
         // Read the response status line
         responseLine = readLine();
