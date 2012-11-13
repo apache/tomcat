@@ -222,7 +222,9 @@ public abstract class SimpleHttpClient {
         // clear any residual data before starting on this response
         responseHeaders.clear();
         responseBody = null;
-        bodyUriElements.clear();
+        if (bodyUriElements != null) {
+            bodyUriElements.clear();
+        }
 
         // Read the response status line
         responseLine = readLine();
@@ -311,7 +313,7 @@ public abstract class SimpleHttpClient {
      *
      * <p>
      * Note: This method has the following limitations: a) It assumes that the
-     * response is HTML. b) It searches for lowercase tags only. 
+     * response is HTML. b) It searches for lowercase tags only.
      *
      * @see #getResponseBodyUriElements()
      */
