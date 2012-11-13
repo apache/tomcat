@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -805,7 +806,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 final String[] prefix = new String[] {"get","is"};
                 for (int j=0; j<prefix.length; j++) {
 
-                    String name = prefix[j] + fields[i].substring(0, 1).toUpperCase() +
+                    String name = prefix[j] + fields[i].substring(0, 1).toUpperCase(Locale.US) +
                                   fields[i].substring(1);
                     Method m = null;
                     try {
