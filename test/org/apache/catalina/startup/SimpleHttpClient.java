@@ -313,7 +313,7 @@ public abstract class SimpleHttpClient {
      *
      * <p>
      * Note: This method has the following limitations: a) It assumes that the
-     * response is HTML. b) It searches for lowercase tags only. 
+     * response is HTML. b) It searches for lowercase tags only.
      *
      * @see #getResponseBodyUriElements()
      */
