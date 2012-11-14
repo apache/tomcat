@@ -659,7 +659,7 @@ public abstract class BaseDirContext implements DirContext {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public final NamingEnumeration<NameClassPair> list(Name name)
+    public NamingEnumeration<NameClassPair> list(Name name)
         throws NamingException {
         return list(name.toString());
     }
@@ -675,7 +675,7 @@ public abstract class BaseDirContext implements DirContext {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public final NamingEnumeration<NameClassPair> list(String name)
+    public NamingEnumeration<NameClassPair> list(String name)
         throws NamingException {
 
         if (!aliases.isEmpty()) {
