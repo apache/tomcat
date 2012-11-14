@@ -435,7 +435,7 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setVerify)(TCN_STDARGS, jlong ctx,
             X509_STORE_set_flags(c->store, 0);
         }
         else {
-            /* XXX: See if this is fatal */ 
+            /* XXX: See if this is fatal */
         }
     }
 
@@ -508,7 +508,7 @@ static int ssl_load_pkcs12(tcn_ssl_ctxt_t *c, const char *file,
     PKCS12     *p12;
     BIO        *in;
     tcn_pass_cb_t *cb_data = c->cb_data;
-    
+
     if ((in = BIO_new(BIO_s_file())) == 0)
         return 0;
     if (BIO_read_filename(in, file) <= 0) {
@@ -526,7 +526,7 @@ static int ssl_load_pkcs12(tcn_ssl_ctxt_t *c, const char *file,
     }
     else {
         if (!cb_data)
-            cb_data = &tcn_password_callback;    
+            cb_data = &tcn_password_callback;
         len = SSL_password_callback(buff, PEM_BUFSIZE, 0, cb_data);
         if (len < 0) {
             /* Passpharse callback error */
@@ -544,7 +544,7 @@ cleanup:
         PKCS12_free(p12);
     BIO_free(in);
     return rc;
-} 
+}
 
 TCN_IMPLEMENT_CALL(void, SSLContext, setRandom)(TCN_STDARGS, jlong ctx,
                                                 jstring file)

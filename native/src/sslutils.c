@@ -792,7 +792,7 @@ static void *apr_xrealloc(void *buf, size_t oldlen, size_t len, apr_pool_t *p)
     return newp;
 }
 
-/* parses the ocsp url and updates the ocsp_urls and nocsp_urls variables 
+/* parses the ocsp url and updates the ocsp_urls and nocsp_urls variables
    returns 0 on success, 1 on failure */
 static int parse_ocsp_url(unsigned char *asn1, char ***ocsp_urls,
                           int *nocsp_urls, apr_pool_t *p)
@@ -804,7 +804,7 @@ static int parse_ocsp_url(unsigned char *asn1, char ***ocsp_urls,
         len = *++asn1;
         asn1++;
         new_nocsp_urls = *nocsp_urls+1;
-        if ((new_ocsp_urls = apr_xrealloc(*ocsp_urls,*nocsp_urls, new_nocsp_urls, p)) == NULL) 
+        if ((new_ocsp_urls = apr_xrealloc(*ocsp_urls,*nocsp_urls, new_nocsp_urls, p)) == NULL)
             err = 1;
         if (!err) {
             *ocsp_urls  = new_ocsp_urls;
@@ -841,7 +841,7 @@ static int parse_ASN1_OID(unsigned char *asn1, char ***ocsp_urls, int *nocsp_url
 
 
 /* Parses an ASN1 Sequence. It is a recursive function, since if it finds a  sequence
-   within the sequence it calls recursively itself. This function stops when it finds 
+   within the sequence it calls recursively itself. This function stops when it finds
    the end of the ASN1 sequence (marked by '\0'), so if there are other sequences within
    the same sequence the while loop parses the sequences */
 
@@ -916,7 +916,7 @@ static int add_ocsp_cert(OCSP_REQUEST **req, X509 *cert, X509 *issuer,
 }
 
 
-/* Creates the APR socket and connect to the hostname. Returns the 
+/* Creates the APR socket and connect to the hostname. Returns the
    socket or NULL if there is an error.
 */
 static apr_socket_t *make_socket(char *hostname, int port, apr_pool_t *mp)
@@ -1243,7 +1243,7 @@ static int ssl_ocsp_request(X509 *cert, X509 *issuer)
         ocsp_urls = decode_OCSP_url(os, p);
     }
 
-    /* if we find the extensions and we can parse it check 
+    /* if we find the extensions and we can parse it check
        the ocsp status. Otherwise, return OCSP_STATUS_UNKNOWN */
     if (ocsp_urls != NULL) {
         OCSP_RESPONSE *resp;

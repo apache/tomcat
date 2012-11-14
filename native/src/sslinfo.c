@@ -543,7 +543,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, getInfoI)(TCN_STDARGS, jlong sock,
                 break;
                 default:
                     rv = APR_EINVAL;
-                break;                    
+                break;
            }
            X509_free(xs);
         }

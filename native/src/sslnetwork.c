@@ -103,7 +103,7 @@ static apr_status_t ssl_cleanup(void *data)
         con->pollset = NULL;
         if (con->ssl) {
             SSL *ssl = con->ssl;
-            con->ssl = NULL;            
+            con->ssl = NULL;
             ssl_smart_shutdown(ssl, con->shutdown_type);
             SSL_free(ssl);
         }
@@ -178,19 +178,19 @@ static apr_status_t wait_for_io_or_timeout(tcn_ssl_conn_t *con,
     apr_os_sock_t sock;
 
     if (!con->pollset)
-        return APR_ENOPOLL;    
+        return APR_ENOPOLL;
     if (!con->sock)
-        return APR_ENOTSOCK;        
+        return APR_ENOTSOCK;
     if (con->reneg_state == RENEG_ABORT) {
         con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
         return APR_ECONNABORTED;
     }
-    
+
     /* Check if the socket was already closed
-     */    
-    apr_os_sock_get(&sock, con->sock);    
+     */
+    apr_os_sock_get(&sock, con->sock);
     if (sock == APR_INVALID_SOCKET)
-        return APR_ENOTSOCK;        
+        return APR_ENOTSOCK;
 
     /* Figure out the the poll direction */
     switch (for_what) {
@@ -352,7 +352,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
         }
         if (!con->ssl)
             return APR_ENOTSOCK;
-        
+
         /*
         * Check for failed client authentication
         */
@@ -398,7 +398,7 @@ ssl_socket_recv(apr_socket_t *sock, char *buf, apr_size_t *len)
             apr_status_t os = apr_get_netos_error();
             if (!con->ssl)
                 return os == APR_SUCCESS ? APR_ENOTSOCK : os;
-            
+
             i = SSL_get_error(con->ssl, s);
             /* Special case if the "close notify" alert send by peer */
             if (s == 0 && (con->ssl->shutdown & SSL_RECEIVED_SHUTDOWN)) {
@@ -461,7 +461,7 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
             apr_status_t os = apr_get_netos_error();
             if (!con->ssl)
                 return os == APR_SUCCESS ? APR_ENOTSOCK : os;
-            
+
             i = SSL_get_error(con->ssl, s);
             switch (i) {
                 case SSL_ERROR_ZERO_RETURN:
@@ -559,8 +559,8 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, attach)(TCN_STDARGS, jlong ctx,
     if ((rv = apr_os_sock_get(&oss, s->sock)) != APR_SUCCESS)
         return rv;
     if (oss == APR_INVALID_SOCKET)
-        return APR_ENOTSOCK;        
-        
+        return APR_ENOTSOCK;
+
     if ((con = ssl_create(e, c, s->pool)) == NULL)
         return APR_EGENERAL;
     con->sock = s->sock;
@@ -595,15 +595,15 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, renegotiate)(TCN_STDARGS,
      *  ssl->state = SSL_ST_ACCEPT
      *  SSL_do_handshake()
      */
-    
+
     /* Toggle the renegotiation state to allow the new
      * handshake to proceed.
      */
-    con->reneg_state = RENEG_ALLOW;      
+    con->reneg_state = RENEG_ALLOW;
     retVal = SSL_renegotiate(con->ssl);
     if (retVal <= 0)
         return APR_EGENERAL;
-    
+
     retVal = SSL_do_handshake(con->ssl);
     if (retVal <= 0)
         return APR_EGENERAL;
@@ -629,7 +629,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, renegotiate)(TCN_STDARGS,
             break;
     }
     con->reneg_state = RENEG_REJECT;
-   
+
     if (SSL_get_state(con->ssl) != SSL_ST_OK) {
         return APR_EGENERAL;
     }

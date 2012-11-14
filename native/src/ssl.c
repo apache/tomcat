@@ -370,10 +370,10 @@ static struct CRYPTO_dynlock_value *ssl_dyn_create_function(const char *file,
     apr_pool_t *p;
     apr_status_t rv;
 
-    /* 
+    /*
      * We need a pool to allocate our mutex.  Since we can't clear
      * allocated memory from a pool, create a subpool that we can blow
-     * away in the destruction callback. 
+     * away in the destruction callback.
      */
     rv = apr_pool_create(&p, dynlockpool);
     if (rv != APR_SUCCESS) {

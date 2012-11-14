@@ -179,7 +179,7 @@ static apr_status_t generic_pool_data_cleanup(void *data)
     if (data) {
         JNIEnv *env;
         tcn_get_java_env(&env);
-        
+
         if (!TCN_IS_NULL(env, cb->obj)) {
             TCN_UNLOAD_CLASS(env, cb->obj);
         }
@@ -204,7 +204,7 @@ TCN_IMPLEMENT_CALL(jint, Pool, dataSet)(TCN_STDARGS, jlong pool,
             apr_pool_cleanup_run(p, old, generic_pool_data_cleanup);
     }
     if (data) {
-        JNIEnv *e;        
+        JNIEnv *e;
         tcn_callback_t *cb = (tcn_callback_t *)malloc(sizeof(tcn_callback_t));
         tcn_get_java_env(&e);
         cb->obj = (*e)->NewGlobalRef(e, data);
