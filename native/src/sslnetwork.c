@@ -169,9 +169,9 @@ static tcn_ssl_conn_t *ssl_create(JNIEnv *env, tcn_ssl_ctxt_t *ctx, apr_pool_t *
 #endif
 
 static apr_status_t wait_for_io_or_timeout(tcn_ssl_conn_t *con,
-                                           int for_what)
+                                           int for_what,
+                                           apr_interval_time_t timeout)
 {
-    apr_interval_time_t timeout;
     apr_pollfd_t pfd;
     int type;
     apr_status_t status;
@@ -206,8 +206,11 @@ static apr_status_t wait_for_io_or_timeout(tcn_ssl_conn_t *con,
             return APR_EINVAL;
         break;
     }
-
-    apr_socket_timeout_get(con->sock, &timeout);
+    if (timeout <= 0) {
+        /* Waiting on zero or infinite timeouts is not allowed
+         */
+        return APR_EAGAIN;
+    }
     pfd.desc_type = APR_POLL_SOCKET;
     pfd.desc.s    = con->sock;
     pfd.reqevents = type;
@@ -305,6 +308,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
 {
     tcn_socket_t *ss = J2P(sock, tcn_socket_t *);
     tcn_ssl_conn_t *con;
+    apr_interval_time_t timeout;
     int s, i;
     long vr;
     apr_status_t rv;
@@ -315,12 +319,15 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
     if (ss->net->type != TCN_SOCKET_SSL)
         return APR_EINVAL;
     con = (tcn_ssl_conn_t *)ss->opaque;
+
+    apr_socket_timeout_get(con->sock, &timeout);
     while (!SSL_is_init_finished(con->ssl)) {
+        ERR_clear_error();
         if ((s = SSL_do_handshake(con->ssl)) <= 0) {
-            apr_status_t os = apr_get_netos_error();
             if (!con->ssl)
-                return os == APR_SUCCESS ? APR_ENOTSOCK : os;
-            i = SSL_get_error(con->ssl, s);
+                return APR_ENOTSOCK;
+            rv = apr_get_netos_error();
+            i  = SSL_get_error(con->ssl, s);
             switch (i) {
                 case SSL_ERROR_NONE:
                     con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
@@ -328,23 +335,23 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
                 break;
                 case SSL_ERROR_WANT_READ:
                 case SSL_ERROR_WANT_WRITE:
-                    if ((rv = wait_for_io_or_timeout(con, i)) != APR_SUCCESS) {
+                    if ((rv = wait_for_io_or_timeout(con, i, timeout)) != APR_SUCCESS) {
                         con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
                         return rv;
                     }
                 break;
                 case SSL_ERROR_SYSCALL:
-                case SSL_ERROR_SSL:
-                    if (!APR_STATUS_IS_EAGAIN(os) &&
-                        !APR_STATUS_IS_EINTR(os)) {
-                        con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
-                        return os == APR_SUCCESS ? APR_EGENERAL : os;
-                    }
-                break;
+#if !defined(_WIN32)
+                      if (APR_STATUS_IS_EINTR(rv)) {
+                          /* Interrupted by signal */
+                          continue;
+                      }
+#endif
+                    /* Fall trough */
                 default:
                     /*
-                    * Anything else is a fatal error
-                    */
+                     * Anything else is a fatal error
+                     */
                     con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
                     return SSL_TO_APR_ERROR(i);
                 break;
@@ -385,50 +392,58 @@ static apr_status_t APR_THREAD_FUNC
 ssl_socket_recv(apr_socket_t *sock, char *buf, apr_size_t *len)
 {
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
-    int s, i, wr = (int)(*len);
-    apr_status_t rv = APR_SUCCESS;
+    int s, i, rd = (int)(*len);
+    apr_status_t rv;
+    apr_interval_time_t timeout;
 
+    *len = 0;
     if (con->reneg_state == RENEG_ABORT) {
-        *len = 0;
         con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
         return APR_ECONNABORTED;
     }
+    apr_socket_timeout_get(con->sock, &timeout);
     for (;;) {
-        if ((s = SSL_read(con->ssl, buf, wr)) <= 0) {
-            apr_status_t os = apr_get_netos_error();
+        ERR_clear_error();
+        if ((s = SSL_read(con->ssl, buf, rd)) <= 0) {
             if (!con->ssl)
-                return os == APR_SUCCESS ? APR_ENOTSOCK : os;
-
-            i = SSL_get_error(con->ssl, s);
+                return APR_ENOTSOCK;
+            rv  = apr_get_netos_error();
+            i   = SSL_get_error(con->ssl, s);
             /* Special case if the "close notify" alert send by peer */
             if (s == 0 && (con->ssl->shutdown & SSL_RECEIVED_SHUTDOWN)) {
-                *len = 0;
+                con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
                 return APR_EOF;
             }
             switch (i) {
-                case SSL_ERROR_ZERO_RETURN:
-                    *len = 0;
-                    con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
-                    return APR_EOF;
-                break;
                 case SSL_ERROR_WANT_READ:
                 case SSL_ERROR_WANT_WRITE:
-                    if ((rv = wait_for_io_or_timeout(con, i)) != APR_SUCCESS) {
+                    if ((rv = wait_for_io_or_timeout(con, i, timeout)) != APR_SUCCESS) {
                         con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
                         return rv;
                     }
                 break;
                 case SSL_ERROR_SYSCALL:
-                case SSL_ERROR_SSL:
-                    if (!APR_STATUS_IS_EAGAIN(os) &&
-                        !APR_STATUS_IS_EINTR(os)) {
-                        con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
-                        return os == APR_SUCCESS ? APR_EGENERAL : os;
+                    if (APR_STATUS_IS_EPIPE(rv) || APR_STATUS_IS_ECONNRESET(rv)) {
+                        con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
+                        return APR_EOF;
                     }
-                break;
+#if !defined(_WIN32)
+                    else if (APR_STATUS_IS_EINTR(rv)) {
+                        /* Interrupted by signal
+                         */
+                        continue;
+                    }
+#endif
+                    /* Fall trough */
+                case SSL_ERROR_ZERO_RETURN:
+                    if (s == 0) {
+                        con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
+                        return APR_EOF;
+                    }
+                    /* Fall trough */
                 default:
                     con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
-                    return os;
+                    return APR_EGENERAL;
                 break;
             }
         }
@@ -438,7 +453,7 @@ ssl_socket_recv(apr_socket_t *sock, char *buf, apr_size_t *len)
             break;
         }
     }
-    return rv;
+    return APR_SUCCESS;
 }
 
 static apr_status_t APR_THREAD_FUNC
@@ -447,50 +462,66 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
 {
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
     int s, i, wr = (int)(*len);
-    apr_status_t rv = APR_SUCCESS;
-    apr_int32_t nb;
+    apr_status_t rv;
+    apr_interval_time_t timeout;
 
+    *len = 0;
     if (con->reneg_state == RENEG_ABORT) {
-        *len = 0;
         con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
         return APR_ECONNABORTED;
     }
-    apr_socket_opt_get(con->sock, APR_SO_NONBLOCK, &nb);
+    if (!SSL_is_init_finished(con->ssl)) {
+        /* XXX: Is this a correct retval ? */ 
+        return APR_EINPROGRESS;
+    }
+    if (wr == 0) {
+        /* According to docs calling SSL_write() with num=0 bytes
+         * to be sent the behaviour is undefined.
+         */
+        return APR_EINVAL;
+    }
+    apr_socket_timeout_get(con->sock, &timeout);
     for (;;) {
+        ERR_clear_error();
         if ((s = SSL_write(con->ssl, buf, wr)) <= 0) {
-            apr_status_t os = apr_get_netos_error();
             if (!con->ssl)
-                return os == APR_SUCCESS ? APR_ENOTSOCK : os;
-
-            i = SSL_get_error(con->ssl, s);
+                return APR_ENOTSOCK;
+            rv  = apr_get_netos_error();
+            i   = SSL_get_error(con->ssl, s);
             switch (i) {
-                case SSL_ERROR_ZERO_RETURN:
-                    *len = 0;
-                    con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
-                    return APR_EOF;
-                break;
                 case SSL_ERROR_WANT_READ:
                 case SSL_ERROR_WANT_WRITE:
-                    if (nb && i == SSL_ERROR_WANT_WRITE) {
-                        *len = 0;
-                        return APR_SUCCESS;
-                    }
-                    if ((rv = wait_for_io_or_timeout(con, i)) != APR_SUCCESS) {
+                    if ((rv = wait_for_io_or_timeout(con, i, timeout)) != APR_SUCCESS) {
                         con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
                         return rv;
                     }
                 break;
                 case SSL_ERROR_SYSCALL:
-                case SSL_ERROR_SSL:
-                    if (!APR_STATUS_IS_EAGAIN(os) &&
-                        !APR_STATUS_IS_EINTR(os)) {
-                        con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
-                        return os == APR_SUCCESS ? APR_EGENERAL : os;
+                    if (s == -1) {
+                        if (APR_STATUS_IS_EPIPE(rv) || APR_STATUS_IS_ECONNRESET(rv)) {
+                            con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
+                            return APR_EOF;
+                        }
+#if !defined(_WIN32)
+                        else if (APR_STATUS_IS_EINTR(rv)) {
+                            /* Interrupted by signal
+                             */
+                            continue;
+                        }
+#endif
                     }
+                    con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
+                    return rv;
                 break;
+                case SSL_ERROR_ZERO_RETURN:
+                    if (s == 0) {
+                        con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
+                        return APR_EOF;
+                    }
+                    /* Fall trough */
                 default:
                     con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
-                    return os;
+                    return rv;
                 break;
             }
         }
@@ -499,7 +530,7 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
             break;
         }
     }
-    return rv;
+    return APR_SUCCESS;
 }
 
 static apr_status_t APR_THREAD_FUNC
@@ -584,6 +615,8 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, renegotiate)(TCN_STDARGS,
     tcn_ssl_conn_t *con;
     int retVal;
     int ecode = SSL_ERROR_WANT_READ;
+    apr_status_t rv;
+    apr_interval_time_t timeout;
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
@@ -613,14 +646,15 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, renegotiate)(TCN_STDARGS,
     }
     con->ssl->state = SSL_ST_ACCEPT;
 
+    apr_socket_timeout_get(con->sock, &timeout);
     ecode = SSL_ERROR_WANT_READ;
     while (ecode == SSL_ERROR_WANT_READ) {
         retVal = SSL_do_handshake(con->ssl);
         if (retVal <= 0) {
             ecode = SSL_get_error(con->ssl, retVal);
             if (ecode == SSL_ERROR_WANT_READ) {
-                if (wait_for_io_or_timeout(con, ecode) != APR_SUCCESS)
-                    return APR_EGENERAL; /* Can't wait */
+                if ((rv = wait_for_io_or_timeout(con, ecode, timeout)) != APR_SUCCESS)
+                    return rv; /* Can't wait */
                 continue; /* It should be ok now */
             }
             else
