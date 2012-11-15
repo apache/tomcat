@@ -18,6 +18,7 @@ package org.apache.jasper.tagplugins.jstl.core;
 
 import java.io.File;
 
+import org.junit.Assert;
 import org.junit.Before;
 
 import org.apache.catalina.Context;
@@ -48,6 +49,7 @@ public abstract class AbstractTestTag extends TomcatBaseTest {
         // Configure the use of the plug-in rather than the standard impl
         File plugin = new File(
                 "java/org/apache/jasper/tagplugins/jstl/tagPlugins.xml");
+        Assert.assertTrue(plugin.isFile());
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, plugin.getAbsolutePath(),
                 "/WEB-INF/tagPlugins.xml", "");
