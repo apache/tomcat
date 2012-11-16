@@ -157,6 +157,11 @@
         Revert occasional API change in <code>BaseDirContext</code> class that
         was done in 7.0.32. Methods should not be <code>final</code>. (kkolinko)
       </fix>
+      <fix>
+        Prevent failures in the AccessLogValve when running under a
+        SecurityManager and the first request received is an asynchronous one.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
