@@ -38,4 +38,20 @@ public class TestOut extends AbstractTestTag {
         Assert.assertTrue(body.contains("OK - 1"));
         Assert.assertTrue(body.contains("OK - 2"));
     }
+
+    @Test
+    public void testBug54144() throws Exception {
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug54144.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String body = res.toString();
+        Assert.assertTrue(body.contains("OK - 1"));
+        Assert.assertTrue(body.contains("OK - 2"));
+        Assert.assertTrue(body.contains("OK - 3"));
+        Assert.assertFalse(body.contains("FAIL"));
+    }
 }
