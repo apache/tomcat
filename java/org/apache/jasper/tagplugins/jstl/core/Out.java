@@ -42,6 +42,7 @@ public final class Out implements TagPlugin {
         String strValName = ctxt.getTemporaryVariableName();
         String strDefName = ctxt.getTemporaryVariableName();
         String strEscapeXmlName = ctxt.getTemporaryVariableName();
+        String strSkipBodyName = ctxt.getTemporaryVariableName();
 
         //according to the tag file, the value attribute is mandatory.
         ctxt.generateJavaSource("String " + strValName + " = null;");
@@ -77,12 +78,16 @@ public final class Out implements TagPlugin {
 
         //main part.
         ctxt.generateJavaSource(
+                "boolean " + strSkipBodyName + " = " +
                 "org.apache.jasper.tagplugins.jstl.core.Out.output(out, " +
                 strValName + ", " + strDefName + ", " + strEscapeXmlName +
                 ");");
+        ctxt.generateJavaSource("if(!" + strSkipBodyName + ") {");
+        ctxt.generateBody();
+        ctxt.generateJavaSource("}");
     }
 
-    public static void output(JspWriter out, String value, String defaultValue,
+    public static boolean output(JspWriter out, String value, String defaultValue,
             boolean escapeXml) throws IOException {
         String v = value != null ? value : defaultValue;
         if (v != null) {
@@ -90,6 +95,9 @@ public final class Out implements TagPlugin {
                 v = org.apache.jasper.tagplugins.jstl.Util.escapeXml(v);
             }
             out.write(v);
+            return true;
+        } else {
+            return false;
         }
     }
 }
