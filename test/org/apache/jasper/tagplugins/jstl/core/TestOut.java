@@ -52,6 +52,7 @@ public class TestOut extends AbstractTestTag {
         Assert.assertTrue(body.contains("OK - 1"));
         Assert.assertTrue(body.contains("OK - 2"));
         Assert.assertTrue(body.contains("OK - 3"));
+        Assert.assertTrue(body.contains("OK - 4"));
         Assert.assertFalse(body.contains("FAIL"));
     }
 }

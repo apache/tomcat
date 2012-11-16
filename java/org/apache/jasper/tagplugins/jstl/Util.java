@@ -179,11 +179,18 @@ public class Util {
      *
      * taken from org.apache.taglibs.standard.tag.common.core.Util
      */
-    @SuppressWarnings("null") // escapedBuffer cannot be null
     public static String escapeXml(String buffer) {
+        String result = escapeXml(buffer.toCharArray(), buffer.length());
+        if (result == null) {
+            return buffer;
+        } else {
+            return result;
+        }
+    }
+
+    @SuppressWarnings("null") // escapedBuffer cannot be null
+    public static String escapeXml(char[] arrayBuffer, int length) {
         int start = 0;
-        int length = buffer.length();
-        char[] arrayBuffer = buffer.toCharArray();
         StringBuilder escapedBuffer = null;
 
         for (int i = 0; i < length; i++) {
@@ -207,7 +214,7 @@ public class Util {
         }
         // no xml escaping was necessary
         if (start == 0) {
-            return buffer;
+            return null;
         }
         // add rest of unescaped portion
         if (start < length) {
