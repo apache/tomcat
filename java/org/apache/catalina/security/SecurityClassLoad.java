@@ -43,6 +43,7 @@ public final class SecurityClassLoad {
         loadRealmPackage(loader);
         loadSessionPackage(loader);
         loadUtilPackage(loader);
+        loadValvesPackage(loader);
         loadJavaxPackage(loader);
         loadConnectorPackage(loader);
         loadTomcatPackage(loader);
@@ -52,6 +53,9 @@ public final class SecurityClassLoad {
     private static final void loadCorePackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.catalina.core.";
+        loader.loadClass
+            (basePackage +
+             "AccessLogAdapter");
         loader.loadClass
             (basePackage +
              "ApplicationContextFacade$1");
@@ -70,6 +74,12 @@ public final class SecurityClassLoad {
         loader.loadClass
             (basePackage +
             "AsyncContextImpl$1");
+        loader.loadClass
+            (basePackage +
+            "AsyncContextImpl$PrivilegedGetTccl");
+        loader.loadClass
+            (basePackage +
+            "AsyncContextImpl$PrivilegedSetTccl");
         loader.loadClass
             (basePackage +
             "AsyncListenerWrapper");
@@ -133,6 +143,13 @@ public final class SecurityClassLoad {
         final String basePackage = "org.apache.catalina.util.";
         loader.loadClass(basePackage + "ParameterMap");
     }
+
+
+    private static final void loadValvesPackage(ClassLoader loader)
+            throws Exception {
+            final String basePackage = "org.apache.catalina.valves.";
+            loader.loadClass(basePackage + "AccessLogValve$3");
+        }
 
 
     private static final void loadCoyotePackage(ClassLoader loader)
