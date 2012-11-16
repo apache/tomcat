@@ -97,11 +97,22 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
         listenersCopy.addAll(listeners);
 
-        ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
-        ClassLoader newCL = request.getContext().getLoader().getClassLoader();
+        ClassLoader oldCL;
+        if (Globals.IS_SECURITY_ENABLED) {
+            PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
+            oldCL = AccessController.doPrivileged(pa);
+        } else {
+            oldCL = Thread.currentThread().getContextClassLoader();
+        }
+        ClassLoader newCL = context.getLoader().getClassLoader();
 
         try {
-            Thread.currentThread().setContextClassLoader(newCL);
+            if (Globals.IS_SECURITY_ENABLED) {
+                PrivilegedAction<Void> pa = new PrivilegedSetTccl(newCL);
+                AccessController.doPrivileged(pa);
+            } else {
+                Thread.currentThread().setContextClassLoader(newCL);
+            }
             for (AsyncListenerWrapper listener : listenersCopy) {
                 try {
                     listener.fireOnComplete(event);
@@ -111,7 +122,12 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 }
             }
         } finally {
-            Thread.currentThread().setContextClassLoader(oldCL);
+            if (Globals.IS_SECURITY_ENABLED) {
+                PrivilegedAction<Void> pa = new PrivilegedSetTccl(oldCL);
+                AccessController.doPrivileged(pa);
+            } else {
+                Thread.currentThread().setContextClassLoader(oldCL);
+            }
         }
     }
 
