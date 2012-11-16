@@ -15,12 +15,21 @@
   limitations under the License.
 --%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-         pageEncoding="ISO-8859-1" session="false"%>
+         pageEncoding="ISO-8859-1" session="true"
+         import="java.io.Reader,java.io.StringReader"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
   <body>
-    <p><c:out value="${session.doesNotExist}">OK - 1</c:out></p>
-    <p><c:out value="${session.doesNotExist}">${'OK - '}${1+1}</c:out></p>
+    <!-- Use of body as default value -->
+    <p><c:out value="${sessionScope.doesNotExist}">OK - 1</c:out></p>
+    <p><c:out value="${sessionScope.doesNotExist}">${'OK - '}${1+1}</c:out></p>
     <p><c:out value="${'OK - '}${1+1+1}">FAIL</c:out></p>
+
+    <!-- Special handling for Reader objects -->
+    <%
+    Reader r = new StringReader("OK - 4");
+    session.setAttribute("reader", r);
+    %>
+    <p><c:out value="${sessionScope.reader}" /></p>
   </body>
 </html>
