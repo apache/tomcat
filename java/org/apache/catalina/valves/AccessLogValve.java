@@ -509,7 +509,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * The list of our format types.
      */
-    private static enum formatType {
+    private static enum FormatType {
         CLF, SEC, MSEC, MSEC_FRAC, SDF
     }
 
@@ -1433,7 +1433,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         /* Whether to use begin of request or end of response as the timestamp */
         private boolean usesBegin = false;
         /* The format type */
-        private formatType type = formatType.CLF;
+        private FormatType type = FormatType.CLF;
         /* Whether we need to postprocess by adding milliseconds */
         private boolean usesMsecs = false;
 
@@ -1485,15 +1485,15 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                     format = format.substring(4);
                 }
                 if (format.length() == 0) {
-                    type = formatType.CLF;
+                    type = FormatType.CLF;
                 } else if (format.equals(secFormat)) {
-                    type = formatType.SEC;
+                    type = FormatType.SEC;
                 } else if (format.equals(msecFormat)) {
-                    type = formatType.MSEC;
+                    type = FormatType.MSEC;
                 } else if (format.equals(msecFractionFormat)) {
-                    type = formatType.MSEC_FRAC;
+                    type = FormatType.MSEC_FRAC;
                 } else {
-                    type = formatType.SDF;
+                    type = FormatType.SDF;
                     format = tidyFormat(format);
                 }
             }
