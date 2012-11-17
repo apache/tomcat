@@ -165,8 +165,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 return result;
             }
 
-            @SuppressWarnings("unused") // New method added to interface in
-                                        // later JDT versions
+            @Override
             public boolean ignoreOptionalProblems() {
                 return false;
             }
