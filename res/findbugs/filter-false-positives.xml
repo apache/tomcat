@@ -278,6 +278,12 @@
     <Bug code="ES" />
   </Match>
   <Match>
+    <!-- Hiding of field in superclass is deliberate -->
+    <Class name="org.apache.tomcat.util.modeler.NotificationInfo"/>
+    <Field name="info" />
+    <Bug code="MF" />
+  </Match>
+  <Match>
     <!-- addCount is modified in other threads -->
     <Class name="org.apache.tomcat.util.net.AprEndpoint$Poller"/>
     <Method name="run"/>
