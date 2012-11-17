@@ -48,6 +48,7 @@ public final class Out implements TagPlugin {
         String strSkipBodyName = ctxt.getTemporaryVariableName();
 
         //according to the tag file, the value attribute is mandatory.
+        ctxt.generateImport("java.io.Reader");
         ctxt.generateJavaSource("Object " + strObjectName + "=");
         ctxt.generateAttribute("value");
         ctxt.generateJavaSource(";");
