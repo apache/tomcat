@@ -219,6 +219,12 @@
         <bug>54017</bug>: Simplify coercion of <code>String</code> instances to
         <code>Object</code>. (markt)
       </scode>
+      <fix>
+        <bug>54144</bug>: Fix a bug in the tag plug-in for
+        <code>&lt;c:out&gt;</code> that meant that if the value of the tag
+        evaluated to a <code>java.io.Reader</code> object then it was not
+        correctly handled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
