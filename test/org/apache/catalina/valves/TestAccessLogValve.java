@@ -34,7 +34,7 @@ public class TestAccessLogValve {
         final int cacheSize = 10;
 
         SimpleDateFormat sdf =
-                new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss", Locale.US);
+                new SimpleDateFormat("[dd/MMM/yyyy:HH:mm:ss Z]", Locale.US);
         sdf.setTimeZone(TimeZone.getDefault());
 
         AccessLogValve.DateFormatCache dfc =
@@ -89,6 +89,7 @@ public class TestAccessLogValve {
     }
 
     private String generateExpected(SimpleDateFormat sdf, long secs) {
-        return "[" + sdf.format(new Date(secs * 1000)) + " +0000]";
+        System.out.println("generateExpected: " + sdf.format(new Date(secs * 1000)));
+        return sdf.format(new Date(secs * 1000));
     }
 }
