@@ -89,7 +89,6 @@ public class TestAccessLogValve {
     }
 
     private String generateExpected(SimpleDateFormat sdf, long secs) {
-        System.out.println("generateExpected: " + sdf.format(new Date(secs * 1000)));
         return sdf.format(new Date(secs * 1000));
     }
 }
