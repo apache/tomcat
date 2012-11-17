@@ -106,8 +106,8 @@ public class TestMapper extends LoggingBaseTest {
         }
 
         // Check that host alias has the same data
-        Mapper.Host host = mapper.hosts[iowPos];
-        Mapper.Host alias = mapper.hosts[iowPos + 1];
+        Mapper.MappedHost host = mapper.hosts[iowPos];
+        Mapper.MappedHost alias = mapper.hosts[iowPos + 1];
         assertEquals("iowejoiejfoiew", host.name);
         assertEquals("iowejoiejfoiew_alias", alias.name);
         assertEquals(host.contextList, alias.contextList);
