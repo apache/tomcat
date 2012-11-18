@@ -19,8 +19,11 @@ package org.apache.catalina.mapper;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.Host;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
+import org.apache.catalina.Wrapper;
 import org.apache.tomcat.util.buf.Ascii;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -60,7 +63,7 @@ public final class Mapper {
      * Mapping from Context object to Context version to support
      * RequestDispatcher mappings.
      */
-    protected Map<Object, ContextVersion> contextObjectToContextVersionMap =
+    protected Map<Context, ContextVersion> contextObjectToContextVersionMap =
             new ConcurrentHashMap<>();
 
 
@@ -82,7 +85,7 @@ public final class Mapper {
      * @param host Host object
      */
     public synchronized void addHost(String name, String[] aliases,
-                                     Object host) {
+                                     Host host) {
         MappedHost[] newHosts = new MappedHost[hosts.length + 1];
         MappedHost newHost = new MappedHost();
         ContextList contextList = new ContextList();
@@ -116,7 +119,7 @@ public final class Mapper {
         if (pos < 0) {
             return;
         }
-        Object host = hosts[pos].object;
+        Host host = hosts[pos].object;
         MappedHost[] newHosts = new MappedHost[hosts.length - 1];
         if (removeMap(hosts, newHosts, name)) {
             hosts = newHosts;
@@ -185,8 +188,8 @@ public final class Mapper {
      * @param welcomeResources Welcome files defined for this context
      * @param resources Static resources of the context
      */
-    public void addContextVersion(String hostName, Object host, String path,
-            String version, Object context, String[] welcomeResources,
+    public void addContextVersion(String hostName, Host host, String path,
+            String version, Context context, String[] welcomeResources,
             WebResourceRoot resources) {
 
         MappedHost[] hosts = this.hosts;
@@ -244,15 +247,15 @@ public final class Mapper {
     /**
      * Remove a context from an existing host.
      *
-     * @param object    The actual context
+     * @param ctxt      The actual context
      * @param hostName  Virtual host name this context belongs to
      * @param path      Context path
      * @param version   Context version
      */
-    public void removeContextVersion(Object object, String hostName,
+    public void removeContextVersion(Context ctxt, String hostName,
             String path, String version) {
 
-        contextObjectToContextVersionMap.remove(object);
+        contextObjectToContextVersionMap.remove(ctxt);
 
         MappedHost[] hosts = this.hosts;
         int pos = find(hosts, hostName);
@@ -301,7 +304,7 @@ public final class Mapper {
 
 
     public void addWrapper(String hostName, String contextPath, String version,
-                           String path, Object wrapper, boolean jspWildCard,
+                           String path, Wrapper wrapper, boolean jspWildCard,
                            boolean resourceOnly) {
         MappedHost[] hosts = this.hosts;
         int pos = find(hosts, hostName);
@@ -347,7 +350,7 @@ public final class Mapper {
      * and the mapping path contains a wildcard; false otherwise
      */
     protected void addWrapper(ContextVersion context, String path,
-            Object wrapper, boolean jspWildCard, boolean resourceOnly) {
+            Wrapper wrapper, boolean jspWildCard, boolean resourceOnly) {
 
         synchronized (context) {
             MappedWrapper newWrapper = new MappedWrapper();
@@ -663,11 +666,12 @@ public final class Mapper {
      * Map the specified URI relative to the context,
      * mutating the given mapping data.
      *
+     * @param context The actual context
      * @param uri URI
      * @param mappingData This structure will contain the result of the mapping
      *                    operation
      */
-    public void map(Object context, MessageBytes uri,
+    public void map(Context context, MessageBytes uri,
             MappingData mappingData) throws Exception {
 
         ContextVersion contextVersion =
@@ -768,7 +772,7 @@ public final class Mapper {
             ContextVersion[] contextVersions = context.versions;
             int versionCount = contextVersions.length;
             if (versionCount > 1) {
-                Object[] contextObjects = new Object[contextVersions.length];
+                Context[] contextObjects = new Context[contextVersions.length];
                 for (int i = 0; i < contextObjects.length; i++) {
                     contextObjects[i] = contextVersions[i].object;
                 }
@@ -1122,7 +1126,7 @@ public final class Mapper {
      * This will return the index for the closest inferior or equal item in the
      * given array.
      */
-    private static final int find(MapElement[] map, CharChunk name) {
+    private static final <T> int find(MapElement<T>[] map, CharChunk name) {
         return find(map, name, name.getStart(), name.getEnd());
     }
 
@@ -1132,7 +1136,7 @@ public final class Mapper {
      * This will return the index for the closest inferior or equal item in the
      * given array.
      */
-    private static final int find(MapElement[] map, CharChunk name,
+    private static final <T> int find(MapElement<T>[] map, CharChunk name,
                                   int start, int end) {
 
         int a = 0;
@@ -1178,7 +1182,7 @@ public final class Mapper {
      * This will return the index for the closest inferior or equal item in the
      * given array.
      */
-    private static final int findIgnoreCase(MapElement[] map, CharChunk name) {
+    private static final <T> int findIgnoreCase(MapElement<T>[] map, CharChunk name) {
         return findIgnoreCase(map, name, name.getStart(), name.getEnd());
     }
 
@@ -1188,7 +1192,7 @@ public final class Mapper {
      * This will return the index for the closest inferior or equal item in the
      * given array.
      */
-    private static final int findIgnoreCase(MapElement[] map, CharChunk name,
+    private static final <T> int findIgnoreCase(MapElement<T>[] map, CharChunk name,
                                   int start, int end) {
 
         int a = 0;
@@ -1234,7 +1238,7 @@ public final class Mapper {
      * This will return the index for the closest inferior or equal item in the
      * given array.
      */
-    private static final int find(MapElement[] map, String name) {
+    private static final <T> int find(MapElement<T>[] map, String name) {
 
         int a = 0;
         int b = map.length - 1;
@@ -1396,8 +1400,8 @@ public final class Mapper {
      * Insert into the right place in a sorted MapElement array, and prevent
      * duplicates.
      */
-    private static final boolean insertMap
-        (MapElement[] oldMap, MapElement[] newMap, MapElement newElement) {
+    private static final <T> boolean insertMap
+        (MapElement<T>[] oldMap, MapElement<T>[] newMap, MapElement<T> newElement) {
         int pos = find(oldMap, newElement.name);
         if ((pos != -1) && (newElement.name.equals(oldMap[pos].name))) {
             return false;
@@ -1413,8 +1417,8 @@ public final class Mapper {
     /**
      * Insert into the right place in a sorted MapElement array.
      */
-    private static final boolean removeMap
-        (MapElement[] oldMap, MapElement[] newMap, String name) {
+    private static final <T> boolean removeMap
+        (MapElement<T>[] oldMap, MapElement<T>[] newMap, String name) {
         int pos = find(oldMap, name);
         if ((pos != -1) && (name.equals(oldMap[pos].name))) {
             System.arraycopy(oldMap, 0, newMap, 0, pos);
@@ -1429,10 +1433,10 @@ public final class Mapper {
     // ------------------------------------------------- MapElement Inner Class
 
 
-    protected abstract static class MapElement {
+    protected abstract static class MapElement<T> {
 
         public String name = null;
-        public Object object = null;
+        public T object = null;
 
     }
 
@@ -1441,7 +1445,7 @@ public final class Mapper {
 
 
     protected static final class MappedHost
-        extends MapElement {
+        extends MapElement<Host> {
 
         public ContextList contextList = null;
 
@@ -1462,12 +1466,12 @@ public final class Mapper {
     // ---------------------------------------------------- Context Inner Class
 
 
-    protected static final class MappedContext extends MapElement {
+    protected static final class MappedContext extends MapElement<Context> {
         public ContextVersion[] versions = new ContextVersion[0];
     }
 
 
-    protected static final class ContextVersion extends MapElement {
+    protected static final class ContextVersion extends MapElement<Context> {
         public String path = null;
         public String[] welcomeResources = new String[0];
         public WebResourceRoot resources = null;
@@ -1484,7 +1488,7 @@ public final class Mapper {
 
 
     protected static class MappedWrapper
-        extends MapElement {
+        extends MapElement<Wrapper> {
 
         public boolean jspWildCard = false;
         public boolean resourceOnly = false;

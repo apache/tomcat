@@ -16,12 +16,20 @@
  */
 package org.apache.catalina.mapper;
 
+import java.util.HashMap;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.Host;
+import org.apache.catalina.Wrapper;
+import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.core.StandardHost;
+import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.startup.LoggingBaseTest;
 import org.apache.tomcat.util.buf.MessageBytes;
 
@@ -29,28 +37,52 @@ public class TestMapper extends LoggingBaseTest {
 
     private Mapper mapper;
 
+    private HashMap<String, Host> hostMap = new HashMap<>();
+
+    private synchronized Host createHost(String name) {
+        Host host = hostMap.get(name);
+        if (host == null) {
+            host = new StandardHost();
+            host.setName(name);
+            hostMap.put(name, host);
+        }
+        return host;
+    }
+
+    private Context createContext(String name) {
+        Context context = new StandardContext();
+        context.setName(name);
+        return context;
+    }
+
+    private Wrapper createWrapper(String name) {
+        Wrapper wrapper = new StandardWrapper();
+        wrapper.setName(name);
+        return wrapper;
+    }
+
     @Before
     @Override
     public void setUp() throws Exception {
         super.setUp();
         mapper = new Mapper();
 
-        mapper.addHost("sjbjdvwsbvhrb", new String[0], "blah1");
-        mapper.addHost("sjbjdvwsbvhr/", new String[0], "blah1");
-        mapper.addHost("wekhfewuifweuibf", new String[0], "blah2");
-        mapper.addHost("ylwrehirkuewh", new String[0], "blah3");
-        mapper.addHost("iohgeoihro", new String[0], "blah4");
-        mapper.addHost("fwehoihoihwfeo", new String[0], "blah5");
-        mapper.addHost("owefojiwefoi", new String[0], "blah6");
-        mapper.addHost("iowejoiejfoiew", new String[0], "blah7");
-        mapper.addHost("iowejoiejfoiew", new String[0], "blah17");
-        mapper.addHost("ohewoihfewoih", new String[0], "blah8");
-        mapper.addHost("fewohfoweoih", new String[0], "blah9");
-        mapper.addHost("ttthtiuhwoih", new String[0], "blah10");
-        mapper.addHost("lkwefjwojweffewoih", new String[0], "blah11");
-        mapper.addHost("zzzuyopjvewpovewjhfewoih", new String[0], "blah12");
-        mapper.addHost("xxxxgqwiwoih", new String[0], "blah13");
-        mapper.addHost("qwigqwiwoih", new String[0], "blah14");
+        mapper.addHost("sjbjdvwsbvhrb", new String[0], createHost("blah1"));
+        mapper.addHost("sjbjdvwsbvhr/", new String[0], createHost("blah1"));
+        mapper.addHost("wekhfewuifweuibf", new String[0], createHost("blah2"));
+        mapper.addHost("ylwrehirkuewh", new String[0], createHost("blah3"));
+        mapper.addHost("iohgeoihro", new String[0], createHost("blah4"));
+        mapper.addHost("fwehoihoihwfeo", new String[0], createHost("blah5"));
+        mapper.addHost("owefojiwefoi", new String[0], createHost("blah6"));
+        mapper.addHost("iowejoiejfoiew", new String[0], createHost("blah7"));
+        mapper.addHost("iowejoiejfoiew", new String[0], createHost("blah17"));
+        mapper.addHost("ohewoihfewoih", new String[0], createHost("blah8"));
+        mapper.addHost("fewohfoweoih", new String[0], createHost("blah9"));
+        mapper.addHost("ttthtiuhwoih", new String[0], createHost("blah10"));
+        mapper.addHost("lkwefjwojweffewoih", new String[0], createHost("blah11"));
+        mapper.addHost("zzzuyopjvewpovewjhfewoih", new String[0], createHost("blah12"));
+        mapper.addHost("xxxxgqwiwoih", new String[0], createHost("blah13"));
+        mapper.addHost("qwigqwiwoih", new String[0], createHost("blah14"));
         mapper.addHostAlias("iowejoiejfoiew", "iowejoiejfoiew_alias");
 
         mapper.setDefaultHostName("ylwrehirkuewh");
@@ -59,31 +91,32 @@ public class TestMapper extends LoggingBaseTest {
         welcomes[0] = "boo/baba";
         welcomes[1] = "bobou";
 
-        mapper.addContextVersion("iowejoiejfoiew", "blah7", "",
-                "0", "context0", new String[0], null);
-        mapper.addContextVersion("iowejoiejfoiew", "blah7", "/foo",
-                "0", "context1", new String[0], null);
-        mapper.addContextVersion("iowejoiejfoiew", "blah7", "/foo/bar",
-                "0", "context2", welcomes, null);
-        mapper.addContextVersion("iowejoiejfoiew", "blah7", "/foo/bar/bla",
-                "0", "context3", new String[0], null);
+        Host host = createHost("blah7");
+        mapper.addContextVersion("iowejoiejfoiew", host, "",
+                "0", createContext("context0"), new String[0], null);
+        mapper.addContextVersion("iowejoiejfoiew", host, "/foo",
+                "0", createContext("context1"), new String[0], null);
+        mapper.addContextVersion("iowejoiejfoiew", host, "/foo/bar",
+                "0", createContext("context2"), welcomes, null);
+        mapper.addContextVersion("iowejoiejfoiew", host, "/foo/bar/bla",
+                "0", createContext("context3"), new String[0], null);
 
         mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "/fo/*",
-                "wrapper0", false, false);
+                createWrapper("wrapper0"), false, false);
         mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "/",
-                "wrapper1", false, false);
+                createWrapper("wrapper1"), false, false);
         mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "/blh",
-                "wrapper2", false, false);
+                createWrapper("wrapper2"), false, false);
         mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "*.jsp",
-                "wrapper3", false, false);
+                createWrapper("wrapper3"), false, false);
         mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "/blah/bou/*",
-                "wrapper4", false, false);
+                createWrapper("wrapper4"), false, false);
         mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "/blah/bobou/*",
-                "wrapper5", false, false);
+                createWrapper("wrapper5"), false, false);
         mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "*.htm",
-                "wrapper6", false, false);
+                createWrapper("wrapper6"), false, false);
         mapper.addWrapper("iowejoiejfoiew", "/foo/bar/bla", "0", "/bobou/*",
-                "wrapper7", false, false);
+                createWrapper("wrapper7"), false, false);
     }
 
     @Test
@@ -94,7 +127,7 @@ public class TestMapper extends LoggingBaseTest {
 
         // Make sure adding a duplicate *does not* overwrite
         final int iowPos = 3;
-        assertEquals("blah7", mapper.hosts[iowPos].object);
+        assertEquals("blah7", mapper.hosts[iowPos].object.getName());
 
         // Check for alphabetical order of host names
         String previous;
@@ -127,9 +160,9 @@ public class TestMapper extends LoggingBaseTest {
         uri.getCharChunk().setLimit(-1);
 
         mapper.map(host, uri, null, mappingData);
-        assertEquals("blah7", mappingData.host);
-        assertEquals("context2", mappingData.context);
-        assertEquals("wrapper5", mappingData.wrapper);
+        assertEquals("blah7", mappingData.host.getName());
+        assertEquals("context2", mappingData.context.getName());
+        assertEquals("wrapper5", mappingData.wrapper.getName());
         assertEquals("/foo/bar", mappingData.contextPath.toString());
         assertEquals("/blah/bobou", mappingData.wrapperPath.toString());
         assertEquals("/foo", mappingData.pathInfo.toString());
@@ -141,9 +174,9 @@ public class TestMapper extends LoggingBaseTest {
         uri.toChars();
         uri.getCharChunk().setLimit(-1);
         mapper.map(host, uri, null, mappingData);
-        assertEquals("blah7", mappingData.host);
-        assertEquals("context3", mappingData.context);
-        assertEquals("wrapper7", mappingData.wrapper);
+        assertEquals("blah7", mappingData.host.getName());
+        assertEquals("context3", mappingData.context.getName());
+        assertEquals("wrapper7", mappingData.wrapper.getName());
         assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
         assertEquals("/bobou", mappingData.wrapperPath.toString());
         assertEquals("/foo", mappingData.pathInfo.toString());
@@ -154,9 +187,9 @@ public class TestMapper extends LoggingBaseTest {
         uri.toChars();
         uri.getCharChunk().setLimit(-1);
         mapper.map(alias, uri, null, mappingData);
-        assertEquals("blah7", mappingData.host);
-        assertEquals("context3", mappingData.context);
-        assertEquals("wrapper7", mappingData.wrapper);
+        assertEquals("blah7", mappingData.host.getName());
+        assertEquals("context3", mappingData.context.getName());
+        assertEquals("wrapper7", mappingData.wrapper.getName());
         assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
         assertEquals("/bobou", mappingData.wrapperPath.toString());
         assertEquals("/foo", mappingData.pathInfo.toString());

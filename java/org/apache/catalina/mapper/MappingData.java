@@ -17,6 +17,9 @@
 
 package org.apache.catalina.mapper;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.Host;
+import org.apache.catalina.Wrapper;
 import org.apache.tomcat.util.buf.MessageBytes;
 
 /**
@@ -26,10 +29,10 @@ import org.apache.tomcat.util.buf.MessageBytes;
  */
 public class MappingData {
 
-    public Object host = null;
-    public Object context = null;
-    public Object[] contexts = null;
-    public Object wrapper = null;
+    public Host host = null;
+    public Context context = null;
+    public Context[] contexts = null;
+    public Wrapper wrapper = null;
     public boolean jspWildCard = false;
 
     public final MessageBytes contextPath = MessageBytes.newInstance();
