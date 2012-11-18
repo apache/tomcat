@@ -628,7 +628,7 @@ public class Request
      * Return the Host within which this Request is being processed.
      */
     public Host getHost() {
-        return ((Host) mappingData.host);
+        return mappingData.host;
     }
 
 
@@ -2233,7 +2233,7 @@ public class Request
                 return false;
             } else {
                 for (int i = (getMappingData().contexts.length); i > 0; i--) {
-                    Context ctxt = (Context) getMappingData().contexts[i - 1];
+                    Context ctxt = getMappingData().contexts[i - 1];
                     try {
                         if (ctxt.getManager().findSession(requestedSessionId) !=
                                 null) {

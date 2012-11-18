@@ -350,7 +350,7 @@ public class MapperListener extends LifecycleMBeanBase
         if ("/".equals(contextPath)) {
             contextPath = "";
         }
-        Container host = context.getParent();
+        Host host = (Host)context.getParent();
 
         WebResourceRoot resources = context.getResources();
         String[] welcomeFiles = context.findWelcomeFiles();

@@ -475,7 +475,7 @@ public class ApplicationContext
             return (null);
         }
 
-        Wrapper wrapper = (Wrapper) mappingData.wrapper;
+        Wrapper wrapper = mappingData.wrapper;
         String wrapperPath = mappingData.wrapperPath.toString();
         String pathInfo = mappingData.pathInfo.toString();
 

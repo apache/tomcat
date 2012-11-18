@@ -257,7 +257,7 @@ public class CoyoteAdapter implements Adapter {
             req.getRequestProcessor().setWorkerThreadName(null);
             // Recycle the wrapper request and response
             if (error || response.isClosed() || !request.isComet()) {
-                ((Context) request.getMappingData().context).logAccess(
+                request.getMappingData().context.logAccess(
                         request, response,
                         System.currentTimeMillis() - req.getStartTime(),
                         false);
@@ -288,7 +288,7 @@ public class CoyoteAdapter implements Adapter {
                 // Have to test this first since state may change while in this
                 // method and this is only required if entering this method in
                 // this state
-                Context ctxt = (Context) request.getMappingData().context;
+                Context ctxt = request.getMappingData().context;
                 if (ctxt != null) {
                     ctxt.fireRequestDestroyEvent(request);
                 }
@@ -364,7 +364,7 @@ public class CoyoteAdapter implements Adapter {
                 request.finishRequest();
                 response.finishResponse();
                 req.action(ActionCode.POST_REQUEST , null);
-                ((Context) request.getMappingData().context).logAccess(
+                request.getMappingData().context.logAccess(
                         request, response,
                         System.currentTimeMillis() - req.getStartTime(),
                         false);
@@ -477,7 +477,7 @@ public class CoyoteAdapter implements Adapter {
                     // If postParseRequest() failed, it has already logged it.
                     // If context is null this was the start of a comet request
                     // that failed and has already been logged.
-                    ((Context) request.getMappingData().context).logAccess(
+                    request.getMappingData().context.logAccess(
                             request, response,
                             System.currentTimeMillis() - req.getStartTime(),
                             false);
@@ -538,11 +538,11 @@ public class CoyoteAdapter implements Adapter {
             if (request.mappingData != null) {
                 if (request.mappingData.context != null) {
                     logged = true;
-                    ((Context) request.mappingData.context).logAccess(
+                    request.mappingData.context.logAccess(
                             request, response, time, true);
                 } else if (request.mappingData.host != null) {
                     logged = true;
-                    ((Host) request.mappingData.host).logAccess(
+                    request.mappingData.host.logAccess(
                             request, response, time, true);
                 }
             }
@@ -684,8 +684,8 @@ public class CoyoteAdapter implements Adapter {
             // This will map the the latest version by default
             connector.getService().getMapper().map(serverName, decodedURI,
                     version, request.getMappingData());
-            request.setContext((Context) request.getMappingData().context);
-            request.setWrapper((Wrapper) request.getMappingData().wrapper);
+            request.setContext(request.getMappingData().context);
+            request.setWrapper(request.getMappingData().wrapper);
 
             // Single contextVersion therefore no possibility of remap
             if (request.getMappingData().contexts == null) {
@@ -735,9 +735,9 @@ public class CoyoteAdapter implements Adapter {
                     mapRequired = false;
                 } else {
                     // Find the context associated with the session
-                    Object[] objs = request.getMappingData().contexts;
-                    for (int i = (objs.length); i > 0; i--) {
-                        Context ctxt = (Context) objs[i - 1];
+                    Context[] contexts = request.getMappingData().contexts;
+                    for (int i = (contexts.length); i > 0; i--) {
+                        Context ctxt = contexts[i - 1];
                         if (ctxt.getManager().findSession(sessionID) != null) {
                             // Was the correct context already mapped?
                             if (ctxt.equals(request.getMappingData().context)) {
@@ -958,7 +958,7 @@ public class CoyoteAdapter implements Adapter {
         // context, don't go looking for a session ID in a cookie as a cookie
         // from a parent context with a session ID may be present which would
         // overwrite the valid session ID encoded in the URL
-        Context context = (Context) request.getMappingData().context;
+        Context context = request.getMappingData().context;
         if (context != null && !context.getServletContext()
                 .getEffectiveSessionTrackingModes().contains(
                         SessionTrackingMode.COOKIE)) {
