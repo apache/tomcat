@@ -75,6 +75,12 @@
         property in <code>JDBCAccessLogValve</code>. (markt)
       </fix>
       <scode>
+        Make the Mapper type-safe. Hosts, Contexts and Wrappers are no
+        longer handled as plain objects, instead they keep their type.
+        Code using the Mapper doesn't need to cast objects returned by
+        the mapper. (rjung)
+      </scode>
+      <scode>
         Move Manager, Loader and Resources from Container to Context since
         Context is the only place they are used. The documentation already
         states (and has done for some time) that Context is the only valid
@@ -85,7 +91,7 @@
         identical for all Connectors of a given Service and it is common for
         there to be multiple Connectors for a Service (http, https and ajp).
         This means there is now only ever one Mapper per Service rather than
-        possibly multiple identically configured Mapper obejcts. (markt)
+        possibly multiple identically configured Mapper objects. (markt)
       </scode>
       <scode>
         Remove the per Context Mapper objects and use the Mapper from the
