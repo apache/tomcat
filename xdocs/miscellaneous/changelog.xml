@@ -38,6 +38,10 @@
 </section>
 <section name="Changes between 1.1.24 and 1.1.25">
   <changelog>
+    <fix>
+      <bug>52856</bug>: Fix high CPU usage when client changes IP address or
+      has high latency. (mturk)
+    </fix>
     <update>
       Add CPU information to OS info for Linux.
       This was already available under Windows and Solaris. (rjung)
