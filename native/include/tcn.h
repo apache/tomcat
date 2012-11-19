@@ -29,6 +29,7 @@
 #include "apr_pools.h"
 #include "apr_portable.h"
 #include "apr_network_io.h"
+#include "apr_poll.h"
 #include "apr_strings.h"
 
 #ifndef APR_HAS_THREADS
@@ -154,6 +155,7 @@ typedef struct {
     tcn_nlayer_t *net;
     apr_time_t          last_active;
     apr_interval_time_t timeout;
+    apr_pollfd_t        fd;
 } tcn_socket_t;
 
 /* Private helper functions */

@@ -206,8 +206,10 @@ TCN_IMPLEMENT_CALL(jlong, Socket, create)(TCN_STDARGS, jint family,
     a->sock = s;
     if (family >= 0)
         a->net = &apr_socket_layer;
-    a->opaque   = s;
-
+    a->opaque  = s;
+    a->fd.desc_type   = APR_POLL_SOCKET;
+    a->fd.desc.s      = a->sock;
+    a->fd.client_data = a;
     return P2J(a);
 cleanup:
     if (c)
@@ -367,6 +369,9 @@ TCN_IMPLEMENT_CALL(jlong, Socket, acceptx)(TCN_STDARGS, jlong sock,
         a->net    = &apr_socket_layer;
         a->sock   = n;
         a->opaque = n;
+        a->fd.desc_type   = APR_POLL_SOCKET;
+        a->fd.desc.s      = a->sock;
+        a->fd.client_data = a;
     }
 
 cleanup:
@@ -407,6 +412,9 @@ TCN_IMPLEMENT_CALL(jlong, Socket, accept)(TCN_STDARGS, jlong sock)
         a->net    = &apr_socket_layer;
         a->sock   = n;
         a->opaque = n;
+        a->fd.desc_type   = APR_POLL_SOCKET;
+        a->fd.desc.s      = a->sock;
+        a->fd.client_data = a;
     }
     return P2J(a);
 cleanup:
