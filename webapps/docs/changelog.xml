@@ -61,8 +61,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update to Eclipse JDT Compiler 4.2.1. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
-<section name="Tomcat 7.0.33 (markt)">
+<section name="Tomcat 7.0.33 (markt)" rtext="2012-11-TBD">
   <subsection name="Catalina">
     <changelog>
       <add>
