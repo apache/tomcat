@@ -303,6 +303,12 @@
   </Match>
   <Match>
     <!-- Object is only ever set to null, sync therefore is still valid -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint$SocketProcessor"/>
+    <Method name="run"/>
+    <Bug code="ML"/>
+  </Match>
+  <Match>
+    <!-- Object is only ever set to null, sync therefore is still valid -->
     <Class name="org.apache.tomcat.util.net.NioEndpoint$SocketProcessor"/>
     <Method name="run"/>
     <Bug code="ML"/>
