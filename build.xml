@@ -1654,7 +1654,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <path location="${ant.core.lib}"/>
       </classpath>
     </javadoc>
-    <javadoc packagenames="javax.net.websocket.*"
+    <javadoc packagenames="javax.websocket.*"
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/websocketapi"
       version="true"
