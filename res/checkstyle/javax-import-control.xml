@@ -33,9 +33,9 @@
   <subpackage name="mail">
     <allow pkg="javax.mail"/>
   </subpackage>
-  <subpackage name="net.websocket">
-    <allow pkg="javax.net.websocket"/>
-    <allow pkg="javax.net.websocket.extensions"/>
+  <subpackage name="websocket">
+    <allow pkg="javax.websocket"/>
+    <allow pkg="javax.websocket.extensions"/>
   </subpackage>
   <subpackage name="persistence">
     <allow pkg="javax.persistence"/>
