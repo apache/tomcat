@@ -282,7 +282,7 @@
   </patternset>
 
   <patternset id="files.websocket-api">
-    <include name="javax/net/websocket/**" />
+    <include name="javax/websocket/**" />
   </patternset>
 
   <patternset id="files.bootstrap">
