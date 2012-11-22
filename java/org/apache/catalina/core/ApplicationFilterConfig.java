@@ -43,6 +43,7 @@ import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.modeler.Util;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -416,16 +417,19 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
 
         String webMod = "//" + hostName + parentName;
         String onameStr = null;
+        String filterName = filterDef.getFilterName();
+        if (Util.objectNameValueNeedsQuote(filterName)) {
+            filterName = ObjectName.quote(filterName);
+        }
         if (context instanceof StandardContext) {
             StandardContext standardContext = (StandardContext) context;
-            onameStr = domain + ":j2eeType=Filter,name=" +
-                 filterDef.getFilterName() + ",WebModule=" + webMod +
-                 ",J2EEApplication=" +
+            onameStr = domain + ":j2eeType=Filter,name=" + filterName +
+                 ",WebModule=" + webMod + ",J2EEApplication=" +
                  standardContext.getJ2EEApplication() + ",J2EEServer=" +
                  standardContext.getJ2EEServer();
         } else {
-            onameStr = domain + ":j2eeType=Filter,name=" +
-                 filterDef.getFilterName() + ",WebModule=" + webMod;
+            onameStr = domain + ":j2eeType=Filter,name=" + filterName +
+                 ",WebModule=" + webMod;
         }
         try {
             oname = new ObjectName(onameStr);
