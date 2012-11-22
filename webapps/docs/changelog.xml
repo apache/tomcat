@@ -59,6 +59,11 @@
       <fix>
         Fix unit test for AccessLogValve when using non-GMT time zone. (rjung)
       </fix>
+      <fix>
+        <bug>54170</bug>: Ensure correct registration of Filters and Servlets in
+        the JMX registry if the Filter or Servlet name includes a character that
+        must be quoted if used in an ObjectName value. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

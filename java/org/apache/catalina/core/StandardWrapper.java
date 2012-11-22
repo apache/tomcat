@@ -69,6 +69,7 @@ import org.apache.tomcat.PeriodicEventListener;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.modeler.Util;
 
 /**
  * Standard implementation of the <b>Wrapper</b> interface that represents
@@ -1851,7 +1852,11 @@ public class StandardWrapper extends ContainerBase
         StringBuilder keyProperties =
             new StringBuilder("j2eeType=Servlet,name=");
         
-        keyProperties.append(getName());
+        String name = getName();
+        if (Util.objectNameValueNeedsQuote(name)) {
+            name = ObjectName.quote(name);
+        }
+        keyProperties.append(name);
         
         keyProperties.append(getWebModuleKeyProperties());
 
