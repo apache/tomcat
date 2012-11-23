@@ -30,6 +30,7 @@
 #include "apr_portable.h"
 #include "apr_network_io.h"
 #include "apr_poll.h"
+#include "apr_ring.h"
 #include "apr_strings.h"
 
 #ifndef APR_HAS_THREADS
@@ -145,7 +146,15 @@ typedef struct {
     apr_status_t (APR_THREAD_FUNC *recv) (apr_socket_t *, char *, apr_size_t *);
 } tcn_nlayer_t;
 
-typedef struct {
+typedef struct tcn_socket_t tcn_socket_t;
+typedef struct tcn_pfde_t   tcn_pfde_t;
+
+struct tcn_pfde_t {
+    APR_RING_ENTRY(tcn_pfde_t) link;
+    apr_pollfd_t fd;
+};
+
+struct tcn_socket_t {
     apr_pool_t   *pool;
     apr_pool_t   *child;
     apr_socket_t *sock;
@@ -155,8 +164,7 @@ typedef struct {
     tcn_nlayer_t *net;
     apr_time_t          last_active;
     apr_interval_time_t timeout;
-    apr_pollfd_t        fd;
-} tcn_socket_t;
+};
 
 /* Private helper functions */
 void            tcn_Throw(JNIEnv *, const char *, ...);
