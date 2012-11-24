@@ -28,12 +28,12 @@ public abstract class UpgradeServletOutputStream extends ServletOutputStream {
     private byte[] buffer;
 
     @Override
-    public boolean canWrite() {
+    public final boolean canWrite() {
         return buffer == null;
     }
 
     @Override
-    public void setWriteListener(WriteListener listener) {
+    public final void setWriteListener(WriteListener listener) {
         if (listener == null) {
             // TODO i18n
             throw new IllegalArgumentException();
@@ -84,7 +84,7 @@ public abstract class UpgradeServletOutputStream extends ServletOutputStream {
     }
 
 
-    protected void onWritePossible() {
+    protected final void onWritePossible() {
         try {
             writeInternal(buffer, 0, buffer.length);
         } catch (IOException ioe) {
