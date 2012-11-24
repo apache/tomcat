@@ -194,7 +194,7 @@ public class WsFrame {
      * Read the next WebSocket frame, reading data from the processor as
      * necessary.
      *
-     * @param processor Processor associated with the WebSocket connection on
+     * @param is    InputStream associated with the WebSocket connection on
      *                  which the frame has been sent
      *
      * @param block Should this method block until a frame is presented if no
