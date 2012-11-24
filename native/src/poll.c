@@ -261,17 +261,9 @@ static apr_status_t do_remove(tcn_pollset_t *p, const apr_pollfd_t *fd)
 
 static void update_last_active(tcn_pollset_t *p, const apr_pollfd_t *fd, apr_time_t t)
 {
-    tcn_pfde_t  *ep;
-
-    APR_RING_FOREACH(ep, &p->poll_ring, tcn_pfde_t, link)
-    {
-        if (fd->desc.s == ep->fd.desc.s) {
-            tcn_socket_t *s = (tcn_socket_t *)ep->fd.client_data;
-            /* Found an instance of the fd: update last active time */
-            s->last_active = t;
-            break;
-        }
-    }
+    tcn_socket_t *s = (tcn_socket_t *)fd->client_data;
+    TCN_ASSERT(s != 0);
+    s->last_active = t;
 }
 
 
