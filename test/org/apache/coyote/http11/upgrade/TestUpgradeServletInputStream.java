@@ -26,7 +26,11 @@ import java.io.Writer;
 import java.net.Socket;
 
 import javax.net.SocketFactory;
+import javax.servlet.ReadListener;
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,8 +49,34 @@ import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestUpgradeServletInputStream extends TomcatBaseTest {
 
+    private static final String MESSAGE = "This is a test.\n";
+
     @Test
     public void testSimpleUpgrade() throws Exception {
+        doUpgrade();
+    }
+
+    @Test
+    public void testSingleMessage() throws Exception {
+        UpgradeConnection conn = doUpgrade();
+        Writer writer = conn.getWriter();
+        BufferedReader reader = conn.getReader();
+
+        writer.write(MESSAGE);
+        writer.flush();
+
+        Thread.sleep(500);
+
+        writer.write(MESSAGE);
+        writer.flush();
+
+        String response = reader.readLine();
+
+        Assert.assertEquals(MESSAGE, response);
+    }
+
+
+    private UpgradeConnection doUpgrade() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
@@ -65,6 +95,8 @@ public class TestUpgradeServletInputStream extends TomcatBaseTest {
         Socket socket =
                 SocketFactory.getDefault().createSocket("localhost", getPort());
 
+        socket.setSoTimeout(300000);
+
         InputStream is = socket.getInputStream();
         OutputStream os = socket.getOutputStream();
 
@@ -80,6 +112,13 @@ public class TestUpgradeServletInputStream extends TomcatBaseTest {
 
         Assert.assertEquals("HTTP/1.1 101 Switching Protocols",
                 status.substring(0, 32));
+
+        // Skip the remaining response headers
+        while (reader.readLine().length() > 0) {
+            // Skip
+        }
+
+        return new UpgradeConnection(writer, reader);
     }
 
     private static class UpgradeServlet extends HttpServlet {
@@ -94,11 +133,94 @@ public class TestUpgradeServletInputStream extends TomcatBaseTest {
         }
     }
 
+    private static class UpgradeConnection {
+        private final Writer writer;
+        private final BufferedReader reader;
+
+        public UpgradeConnection(Writer writer, BufferedReader reader) {
+            this.writer = writer;
+            this.reader = reader;
+        }
+
+        public Writer getWriter() {
+            return writer;
+        }
+
+        public BufferedReader getReader() {
+            return reader;
+        }
+    }
+
     private static class Echo implements ProtocolHandler {
+
+        private ServletInputStream sis;
+        private ServletOutputStream sos;
 
         @Override
         public void init(WebConnection connection) {
-            // TODO
+
+            try {
+                sis = connection.getInputStream();
+                sos = connection.getOutputStream();
+            } catch (IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+
+            sis.setReadListener(new EchoReadListener());
+            sos.setWriteListener(new EchoWriteListener());
+        }
+
+        private class EchoReadListener implements ReadListener {
+
+            private byte[] buffer = new byte[8096];
+
+            @Override
+            public void onDataAvailable() {
+                try {
+                    while (sis.isReady()) {
+                        int read = sis.read(buffer);
+                        if (read > 0) {
+                            System.out.print(new String(buffer, 0, read));
+                            /*
+                            if (sos.canWrite()) {
+                                sos.write(buffer, 0, read);
+                            } else {
+                                throw new IOException("Unable to echo data. " +
+                                        "canWrite() returned false");
+                            }
+                            */
+                        }
+                    }
+                } catch (IOException ioe) {
+                    throw new RuntimeException(ioe);
+                }
+            }
+
+            @Override
+            public void onAllDataRead() {
+                System.out.println("All data read");
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                // TODO Auto-generated method stub
+
+            }
+        }
+
+        private class EchoWriteListener implements WriteListener {
+
+            @Override
+            public void onWritePossible() {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                // TODO Auto-generated method stub
+
+            }
         }
     }
 }
