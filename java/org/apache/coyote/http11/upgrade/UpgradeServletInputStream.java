@@ -101,7 +101,7 @@ public abstract class UpgradeServletInputStream extends ServletInputStream {
 
 
     private void preReadChecks() {
-        if (ready == null || !ready.booleanValue()) {
+        if (listener != null && (ready == null || !ready.booleanValue())) {
             // TODO i18n
             throw new IllegalStateException();
         }
