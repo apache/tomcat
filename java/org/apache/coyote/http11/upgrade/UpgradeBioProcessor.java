@@ -17,7 +17,6 @@
 package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.Socket;
 
 import javax.servlet.http.ProtocolHandler;
@@ -31,37 +30,8 @@ public class UpgradeBioProcessor extends UpgradeProcessor<Socket> {
     public UpgradeBioProcessor(SocketWrapper<Socket> wrapper,
             ProtocolHandler httpUpgradeProcessor) throws IOException {
         super(httpUpgradeProcessor, new UpgradeBioServletInputStream(wrapper),
-                new BioUpgradeServletOutputStream(wrapper));
+                new UpgradeBioServletOutputStream(wrapper));
 
         wrapper.getSocket().setSoTimeout(INFINITE_TIMEOUT);
-    }
-
-
-    // ----------------------------------------------------------- Inner classes
-
-    private static class BioUpgradeServletOutputStream
-            extends UpgradeServletOutputStream {
-
-        private final OutputStream os;
-
-        public BioUpgradeServletOutputStream(SocketWrapper<Socket> wrapper)
-                throws IOException {
-            os = wrapper.getSocket().getOutputStream();
-        }
-
-        @Override
-        protected void doWrite(int b) throws IOException {
-            os.write(b);
-        }
-
-        @Override
-        protected void doWrite(byte[] b, int off, int len) throws IOException {
-            os.write(b, off, len);
-        }
-
-        @Override
-        protected void doFlush() throws IOException {
-            os.flush();
-        }
     }
 }

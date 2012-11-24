@@ -24,6 +24,7 @@ public class UpgradeAprServletInputStream extends UpgradeServletInputStream {
 
     private final long socket;
 
+
     public UpgradeAprServletInputStream(SocketWrapper<Long> wrapper) {
         this.socket = wrapper.getSocket().longValue();
     }

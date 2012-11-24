@@ -21,7 +21,6 @@ import java.util.concurrent.Executor;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
 import javax.servlet.http.ProtocolHandler;
 import javax.servlet.http.WebConnection;
 
@@ -85,7 +84,7 @@ public abstract class UpgradeProcessor<S>
         if (status == SocketStatus.OPEN_READ) {
             upgradeServletInputStream.onDataAvailable();
         } else if (status == SocketStatus.OPEN_WRITE) {
-            upgradeServletOutputStream.writeListener.onWritePossible();
+            upgradeServletOutputStream.onWritePossible();
         } else {
             // Unexpected state
             return SocketState.CLOSED;
@@ -145,54 +144,5 @@ public abstract class UpgradeProcessor<S>
     @Override
     public final void setSslSupport(SSLSupport sslSupport) {
         // NOOP
-    }
-
-
-    // ----------------------------------------------------------- Inner classes
-
-    protected abstract static class UpgradeServletOutputStream extends
-            ServletOutputStream {
-
-        private volatile WriteListener writeListener = null;
-
-        @Override
-        public boolean canWrite() {
-            if (writeListener == null) {
-                throw new IllegalStateException(
-                        sm.getString("upgrade.sos.canWrite.ise"));
-            }
-
-            // TODO Support non-blocking IO
-            return false;
-        }
-
-        @Override
-        public void setWriteListener(WriteListener listener) {
-            if (listener == null) {
-                throw new NullPointerException(
-                        sm.getString("upgrade.sos.writeListener.null"));
-            }
-            this.writeListener = listener;
-        }
-
-        @Override
-        public void write(int b) throws IOException {
-            doWrite(b);
-        }
-
-        @Override
-        public void write(byte[] b, int off, int len) throws IOException {
-            doWrite(b, off, len);
-        }
-
-        @Override
-        public void flush() throws IOException {
-            doFlush();
-        }
-
-        protected abstract void doWrite(int b) throws IOException;
-        protected abstract void doWrite(byte[] b, int off, int len)
-                throws IOException;
-        protected abstract void doFlush() throws IOException;
     }
 }
