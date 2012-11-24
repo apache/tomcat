@@ -19,10 +19,11 @@ package org.apache.coyote.http11;
 import java.io.IOException;
 import java.net.Socket;
 
+import javax.servlet.http.ProtocolHandler;
+
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
 import org.apache.coyote.http11.upgrade.UpgradeBioProcessor;
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint;
@@ -208,9 +209,10 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
 
         @Override
         protected Processor<Socket> createUpgradeProcessor(
-                SocketWrapper<Socket> socket, UpgradeInbound inbound)
+                SocketWrapper<Socket> socket,
+                ProtocolHandler httpUpgradeProcessor)
                 throws IOException {
-            return new UpgradeBioProcessor(socket, inbound);
+            return new UpgradeBioProcessor(socket, httpUpgradeProcessor);
         }
 
         @Override

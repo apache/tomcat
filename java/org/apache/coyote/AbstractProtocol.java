@@ -30,7 +30,6 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
@@ -625,13 +624,14 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     }
 
                     if (state == SocketState.UPGRADING) {
-                        // Get the UpgradeInbound handler
-                        UpgradeInbound inbound = processor.getUpgradeInbound();
+                        // Get the HTTP upgrade handler
+                        javax.servlet.http.ProtocolHandler httpUpgradeHandler =
+                                processor.getHttpUpgradeHandler();
                         // Release the Http11 processor to be re-used
                         release(socket, processor, false, false);
                         // Create the light-weight upgrade processor
-                        processor = createUpgradeProcessor(socket, inbound);
-                        inbound.onUpgradeComplete();
+                        processor = createUpgradeProcessor(
+                                socket, httpUpgradeHandler);
                     }
                 } while (state == SocketState.ASYNC_END ||
                         state == SocketState.UPGRADING);
@@ -698,7 +698,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                 boolean addToPoller);
         protected abstract Processor<S> createUpgradeProcessor(
                 SocketWrapper<S> socket,
-                UpgradeInbound inbound) throws IOException;
+                javax.servlet.http.ProtocolHandler httpUpgradeProcessor)
+                        throws IOException;
 
         protected void register(AbstractProcessor<S> processor) {
             if (getProtocol().getDomain() != null) {
