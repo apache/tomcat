@@ -27,59 +27,63 @@ import org.apache.tomcat.util.net.SocketWrapper;
 
 public class UpgradeBioProcessor extends UpgradeProcessor<Socket> {
 
-    private final InputStream inputStream;
-    private final OutputStream outputStream;
+    private static final int INFINITE_TIMEOUT = 0;
 
     public UpgradeBioProcessor(SocketWrapper<Socket> wrapper,
             ProtocolHandler httpUpgradeProcessor) throws IOException {
-        super(upgradeInbound);
+        super(httpUpgradeProcessor, new BioUpgradeServletInputStream(wrapper),
+                new BioUpgradeServletOutputStream(wrapper));
 
-        int timeout = upgradeInbound.getReadTimeout();
-        if (timeout < 0) {
-            timeout = 0;
+        wrapper.getSocket().setSoTimeout(INFINITE_TIMEOUT);
+    }
+
+
+    // ----------------------------------------------------------- Inner classes
+
+    private static class BioUpgradeServletInputStream
+            extends UpgradeServletInputStream {
+
+        private final InputStream is;
+
+        public BioUpgradeServletInputStream(SocketWrapper<Socket> wrapper)
+                throws IOException {
+            is = wrapper.getSocket().getInputStream();
         }
-        wrapper.getSocket().setSoTimeout(timeout);
 
-        this.inputStream = wrapper.getSocket().getInputStream();
-        this.outputStream = wrapper.getSocket().getOutputStream();
+        @Override
+        protected int doRead() throws IOException {
+            return is.read();
+        }
+
+        @Override
+        protected int doRead(byte[] b, int off, int len) throws IOException {
+            return is.read(b, off, len);
+        }
     }
 
+    private static class BioUpgradeServletOutputStream
+            extends UpgradeServletOutputStream {
 
-    /*
-     * Output methods
-     */
-    @Override
-    public void flush() throws IOException {
-        outputStream.flush();
-    }
+        private final OutputStream os;
 
+        public BioUpgradeServletOutputStream(SocketWrapper<Socket> wrapper)
+                throws IOException {
+            os = wrapper.getSocket().getOutputStream();
+        }
 
-    @Override
-    public void write(int b) throws IOException {
-        outputStream.write(b);
-    }
+        @Override
+        protected void doWrite(int b) throws IOException {
+            os.write(b);
+        }
 
+        @Override
+        protected void doWrite(byte[] b, int off, int len) throws IOException {
+            os.write(b, off, len);
+        }
 
-    @Override
-    public void write(byte[]b, int off, int len) throws IOException {
-        outputStream.write(b, off, len);
-    }
-
-
-    /*
-     * Input methods
-     */
-    @Override
-    public int read() throws IOException {
-        return inputStream.read();
-    }
-
-
-    @Override
-    public int read(boolean block, byte[] bytes, int off, int len)
-            throws IOException {
-        // The BIO endpoint always uses blocking IO so the block parameter is
-        // ignored and a blocking read is performed.
-        return inputStream.read(bytes, off, len);
+        @Override
+        protected void doFlush() throws IOException {
+            os.flush();
+        }
     }
 }

@@ -19,6 +19,13 @@ package org.apache.coyote.http11.upgrade;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 
+import javax.servlet.ReadListener;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
+import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.WebConnection;
+
 import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -27,61 +34,40 @@ import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class UpgradeProcessor<S> implements Processor<S> {
+public abstract class UpgradeProcessor<S>
+        implements Processor<S>, WebConnection {
 
     protected static final StringManager sm =
             StringManager.getManager(Constants.Package);
 
-    private final UpgradeInbound upgradeInbound;
+    private final ProtocolHandler httpUpgradeHandler;
+    private final ServletInputStream upgradeServletInputStream;
+    private final ServletOutputStream upgradeServletOutputStream;
 
-    protected UpgradeProcessor (UpgradeInbound upgradeInbound) {
-        this.upgradeInbound = upgradeInbound;
-        upgradeInbound.setUpgradeProcessor(this);
-        upgradeInbound.setUpgradeOutbound(new UpgradeOutbound(this));
+    protected UpgradeProcessor (ProtocolHandler httpUpgradeHandler,
+            UpgradeServletInputStream upgradeServletInputStream,
+            UpgradeServletOutputStream upgradeServletOutputStream) {
+        this.httpUpgradeHandler = httpUpgradeHandler;
+        this.upgradeServletInputStream = upgradeServletInputStream;
+        this.upgradeServletOutputStream = upgradeServletOutputStream;
+        this.httpUpgradeHandler.init(this);
     }
 
-    // Output methods
-    public abstract void flush() throws IOException;
-    public abstract void write(int b) throws IOException;
-    public abstract void write(byte[] b, int off, int len) throws IOException;
 
-    // Input methods
-    /**
-     * This is always a blocking read of a single byte.
-     *
-     * @return  The next byte or -1 if the end of the input is reached.
-     *
-     * @throws IOException  If a problem occurs trying to read from the input
-     */
-    public abstract int read() throws IOException;
-
-    /**
-     * Read up to len bytes from the input in either blocking or non-blocking
-     * mode (where non-blocking is supported). If the input does not support
-     * non-blocking reads, a blcoking read will be performed.
-     *
-     * @param block
-     * @param bytes
-     * @param off
-     * @param len
-     * @return  The number of bytes read or -1 if the end of the input is
-     *          reached. Non-blocking reads may return zero if no data is
-     *          available. Blocking reads never return zero.
-     *
-     * @throws IOException  If a problem occurs trying to read from the input
-     */
-    public abstract int read(boolean block, byte[] bytes, int off, int len)
-            throws IOException;
+    // --------------------------------------------------- WebConnection methods
 
     @Override
-    public final UpgradeInbound getUpgradeInbound() {
-        return upgradeInbound;
+    public ServletInputStream getInputStream() throws IOException {
+        return upgradeServletInputStream;
     }
 
     @Override
-    public final SocketState upgradeDispatch() throws IOException {
-        return upgradeInbound.onData();
+    public ServletOutputStream getOutputStream() throws IOException {
+        return upgradeServletOutputStream;
     }
+
+
+    // ------------------------------------------- Implemented Processor methods
 
     @Override
     public final boolean isUpgrade() {
@@ -89,11 +75,25 @@ public abstract class UpgradeProcessor<S> implements Processor<S> {
     }
 
     @Override
+    public ProtocolHandler getHttpUpgradeHandler() {
+        return httpUpgradeHandler;
+    }
+
+    @Override
+    public final SocketState upgradeDispatch() throws IOException {
+
+        // TODO Handle read/write ready for non-blocking IO
+        return SocketState.UPGRADED;
+    }
+
+    @Override
     public final void recycle(boolean socketClosing) {
         // Currently a NO-OP as upgrade processors are not recycled.
     }
 
-    // NO-OP methods for upgrade
+
+    // ---------------------------- Processor methods that are NO-OP for upgrade
+
     @Override
     public final Executor getExecutor() {
         return null;
@@ -138,5 +138,105 @@ public abstract class UpgradeProcessor<S> implements Processor<S> {
     @Override
     public final void setSslSupport(SSLSupport sslSupport) {
         // NOOP
+    }
+
+
+    // ----------------------------------------------------------- Inner classes
+
+    protected abstract static class UpgradeServletInputStream extends
+            ServletInputStream {
+
+        private volatile ReadListener readListener = null;
+
+        @Override
+        public final boolean isFinished() {
+            if (readListener == null) {
+                throw new IllegalStateException(
+                        sm.getString("upgrade.sis.isFinished.ise"));
+            }
+
+            // TODO Support non-blocking IO
+            return false;
+        }
+
+        @Override
+        public final boolean isReady() {
+            if (readListener == null) {
+                throw new IllegalStateException(
+                        sm.getString("upgrade.sis.isReady.ise"));
+            }
+
+            // TODO Support non-blocking IO
+            return false;
+        }
+
+        @Override
+        public final void setReadListener(ReadListener listener) {
+            if (listener == null) {
+                throw new NullPointerException(
+                        sm.getString("upgrade.sis.readListener.null"));
+            }
+            this.readListener = listener;
+        }
+
+        @Override
+        public final int read() throws IOException {
+            return doRead();
+        }
+
+        @Override
+        public final int read(byte[] b, int off, int len) throws IOException {
+            return doRead(b, off, len);
+        }
+
+        protected abstract int doRead() throws IOException;
+        protected abstract int doRead(byte[] b, int off, int len)
+                throws IOException;
+    }
+
+    protected abstract static class UpgradeServletOutputStream extends
+            ServletOutputStream {
+
+        private volatile WriteListener writeListener = null;
+
+        @Override
+        public boolean canWrite() {
+            if (writeListener == null) {
+                throw new IllegalStateException(
+                        sm.getString("upgrade.sos.canWrite.ise"));
+            }
+
+            // TODO Support non-blocking IO
+            return false;
+        }
+
+        @Override
+        public void setWriteListener(WriteListener listener) {
+            if (listener == null) {
+                throw new NullPointerException(
+                        sm.getString("upgrade.sos.writeListener.null"));
+            }
+            this.writeListener = listener;
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            doWrite(b);
+        }
+
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            doWrite(b, off, len);
+        }
+
+        @Override
+        public void flush() throws IOException {
+            doFlush();
+        }
+
+        protected abstract void doWrite(int b) throws IOException;
+        protected abstract void doWrite(byte[] b, int off, int len)
+                throws IOException;
+        protected abstract void doFlush() throws IOException;
     }
 }
