@@ -80,7 +80,8 @@ public abstract class UpgradeProcessor<S>
     }
 
     @Override
-    public final SocketState upgradeDispatch() throws IOException {
+    public final SocketState upgradeDispatch(SocketStatus status)
+            throws IOException {
 
         // TODO Handle read/write ready for non-blocking IO
         return SocketState.UPGRADED;

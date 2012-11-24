@@ -493,7 +493,7 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
     }
 
     @Override
-    public SocketState upgradeDispatch() throws IOException {
+    public SocketState upgradeDispatch(SocketStatus status) throws IOException {
         return null;
     }
 

@@ -130,7 +130,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
      */
     @Override
     public abstract SocketState process(SocketWrapper<S> socket)
-        throws IOException;
+            throws IOException;
 
     /**
      * Process in-progress Comet requests. These will start as HTTP requests.
@@ -150,7 +150,8 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
      * upgrade.
      */
     @Override
-    public abstract SocketState upgradeDispatch() throws IOException;
+    public abstract SocketState upgradeDispatch(SocketStatus status)
+            throws IOException;
 
     @Override
     public abstract javax.servlet.http.ProtocolHandler getHttpUpgradeHandler();
