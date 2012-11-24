@@ -16,15 +16,31 @@
  */
 package javax.websocket;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 public class ContainerProvider {
 
+    private static final String CONTAINER_PROVIDER_IMPL =
+            "org.apache.websocket.ServerContainerImpl";
+
     public static ServerContainer getServerContainer() {
-        // TODO
-        return null;
+        // TODO SecurityManager
+        ServerContainer result = null;
+        try {
+            Class<?> clazz = Class.forName(CONTAINER_PROVIDER_IMPL);
+            Method m = clazz.getMethod("getServerContainer", (Class<?>[]) null);
+            result = (ServerContainer) m.invoke(null, (Object[]) null);
+        } catch (ClassNotFoundException | NoSuchMethodException |
+                SecurityException | IllegalAccessException |
+                IllegalArgumentException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     public static ClientContainer getClientContainer() {
-        // TODO
         return null;
     }
 }

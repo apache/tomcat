@@ -14,25 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.websocket;
+package org.apache.websocket;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+class Util {
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface WebSocketEndpoint {
+    private Util() {
+        // Hide default constructor
+    }
 
-    /**
-     * URI or URI-template that the annotated class should be mapped to.
-     */
-    public String value();
-
-    public String[] subprotocols() default {};
-
-    public Class<? extends Decoder>[] decoders() default {};
-
-    public Class<? extends Encoder>[] encoders() default {};
+    static String getServletMappingPath(String wsPath) {
+        int templateStart = wsPath.indexOf('{');
+        if (templateStart == -1) {
+            if (wsPath.charAt(wsPath.length() - 1) == '/') {
+                return wsPath + '*';
+            } else {
+                return wsPath + "/*";
+            }
+        } else {
+            String temp = wsPath.substring(0, templateStart);
+            if (temp.charAt(temp.length() - 1) == '/') {
+                return temp + '*';
+            } else {
+                return temp.substring(0, temp.lastIndexOf('/') + 1) + '*';
+            }
+        }
+    }
 }

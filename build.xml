@@ -89,6 +89,7 @@
   <property name="jsp-api.jar" value="${tomcat.build}/lib/jsp-api.jar"/>
   <property name="el-api.jar" value="${tomcat.build}/lib/el-api.jar"/>
   <property name="websocket-api.jar" value="${tomcat.build}/lib/websocket-api.jar"/>
+  <property name="websocket-impl.jar" value="${tomcat.build}/lib/websocket-impl.jar"/>
   <property name="catalina.jar" value="${tomcat.build}/lib/catalina.jar"/>
   <property name="catalina-tribes.jar" value="${tomcat.build}/lib/catalina-tribes.jar"/>
   <property name="catalina-ha.jar" value="${tomcat.build}/lib/catalina-ha.jar"/>
@@ -114,6 +115,7 @@
   <property name="jsp-api-src.jar" value="${tomcat.src.jars}/jsp-api-src.jar"/>
   <property name="el-api-src.jar" value="${tomcat.src.jars}/el-api-src.jar"/>
   <property name="websocket-api-src.jar" value="${tomcat.src.jars}/websocket-api-src.jar"/>
+  <property name="websocket-impl-src.jar" value="${tomcat.src.jars}/websocket-impl-src.jar"/>
   <property name="catalina-src.jar" value="${tomcat.src.jars}/catalina-src.jar"/>
   <property name="catalina-tribes-src.jar" value="${tomcat.src.jars}/catalina-tribes-src.jar"/>
   <property name="catalina-ha-src.jar" value="${tomcat.src.jars}/catalina-ha-src.jar"/>
@@ -285,6 +287,11 @@
     <include name="javax/websocket/**" />
   </patternset>
 
+  <patternset id="files.websocket-impl">
+    <include name="org/apache/websocket/**" />
+    <include name="org/apache/websocket/**" />
+  </patternset>
+
   <patternset id="files.bootstrap">
     <include name="org/apache/catalina/startup/Bootstrap.*" />
     <include name="org/apache/catalina/startup/catalina.properties" />
@@ -376,6 +383,7 @@
     <patternset refid="files.el-api" />
     <patternset refid="files.servlet-api" />
     <patternset refid="files.websocket-api" />
+    <patternset refid="files.websocket-impl" />
     <patternset refid="files.tomcat-api" />
     <!-- These pattern sets conflict so include files directly
       <patternset refid="files.tomcat-coyote" />
@@ -622,11 +630,7 @@
     <copy todir="${tomcat.manifests}" overwrite="yes" filtering="yes"
       encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
-      <fileset dir="${tomcat.home}/res/META-INF" >
-        <include name="*.manifest" />
-        <include name="*.license" />
-        <include name="*.notice" />
-      </fileset>
+      <fileset dir="${tomcat.home}/res/META-INF" />
     </copy>
 
   </target>
@@ -660,11 +664,17 @@
       filesId="files.el-api"
       manifest="${tomcat.manifests}/el-api.jar.manifest" />
 
-    <!-- WebSocket 1.0 Implementation JAR File -->
+    <!-- WebSocket 1.0 API JAR File -->
     <jarIt jarfile="${websocket-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.websocket-api"
       manifest="${tomcat.manifests}/websocket-api.jar.manifest" />
+
+    <!-- WebSocket 1.0 implementation JAR File -->
+    <jarIt jarfile="${websocket-impl.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.websocket-impl"
+      meta-inf="${tomcat.manifests}/websocket-impl.jar"/>
 
     <!-- Bootstrap JAR File -->
     <jarIt jarfile="${bootstrap.jar}"
@@ -1714,6 +1724,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <include name="jasper-el.jar"/>
         <include name="servlet-api.jar"/>
         <include name="websocket-api.jar"/>
+        <include name="websocket-impl.jar"/>
         <include name="tomcat-coyote.jar"/>
         <include name="tomcat-util.jar"/>
       </fileset>
@@ -2243,11 +2254,16 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       filesId="files.el-api"
       manifest="${tomcat.manifests}/el-api.jar.manifest" />
 
-    <!-- WebSocket 1.0 EL Implementation JAR File -->
+    <!-- WebSocket 1.0 API JAR File -->
     <jarIt jarfile="${websocket-api-src.jar}"
       filesDir="java"
       filesId="files.websocket-api"
       manifest="${tomcat.manifests}/websocket-api.jar.manifest" />
+
+    <!-- WebSocket 1.0 implementation JAR File -->
+    <jarIt jarfile="${websocket-impl-src.jar}"
+      filesDir="java"
+      filesId="files.websocket-impl" />
 
     <!-- Bootstrap JAR File -->
     <jarIt jarfile="${bootstrap-src.jar}"
@@ -2647,6 +2663,8 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
                default="${tomcat.manifests}/default.notice" />
     <attribute name="license" description="the NOTICE file to use"
                default="${tomcat.manifests}/default.license" />
+    <attribute name="meta-inf" description="additional contents for META-INF"
+               default="${tomcat.manifests}/default" />
     <sequential>
       <jar jarfile="@{jarfile}" manifest="@{manifest}">
         <fileset dir="@{filesDir}">
@@ -2655,6 +2673,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
           <exclude name="**/package.html" />
           <exclude name="**/LocalStrings_*" />
         </fileset>
+        <zipfileset dir="@{meta-inf}" prefix="META-INF/" />
         <zipfileset file="@{notice}" fullpath="META-INF/NOTICE" />
         <zipfileset file="@{license}" fullpath="META-INF/LICENSE" />
       </jar>
