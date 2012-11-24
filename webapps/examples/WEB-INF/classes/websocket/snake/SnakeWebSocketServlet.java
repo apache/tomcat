@@ -33,7 +33,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.catalina.websocket.MessageInbound;
-import org.apache.catalina.websocket.StreamInbound;
+import org.apache.catalina.websocket.StreamHandler;
 import org.apache.catalina.websocket.WebSocketServlet;
 import org.apache.catalina.websocket.WsOutbound;
 import org.apache.juli.logging.Log;
@@ -149,7 +149,7 @@ public class SnakeWebSocketServlet extends WebSocketServlet {
     }
 
     @Override
-    protected StreamInbound createWebSocketInbound(String subProtocol,
+    protected StreamHandler createWebSocketHandler(String subProtocol,
             HttpServletRequest request) {
         return new SnakeMessageInbound(connectionIds.incrementAndGet());
     }

@@ -18,12 +18,12 @@ package org.apache.catalina.websocket;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CoderResult;
 
 import org.apache.catalina.util.Conversions;
-import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -56,14 +56,14 @@ public class WsFrame {
      *                      connection.
      */
     private WsFrame(byte first,
-            UpgradeProcessor<?> processor) throws IOException {
+            InputStream is) throws IOException {
 
         int b = first & 0xFF;
         fin = (b & 0x80) > 0;
         rsv = (b & 0x70) >>> 4;
         opCode = (byte) (b & 0x0F);
 
-        b = blockingRead(processor);
+        b = blockingRead(is);
         // Client data must be masked
         if ((b & 0x80) == 0) {
             throw new IOException(sm.getString("frame.notMasked"));
@@ -72,11 +72,11 @@ public class WsFrame {
         payloadLength = b & 0x7F;
         if (payloadLength == 126) {
             byte[] extended = new byte[2];
-            blockingRead(processor, extended);
+            blockingRead(is, extended);
             payloadLength = Conversions.byteArrayToLong(extended);
         } else if (payloadLength == 127) {
             byte[] extended = new byte[8];
-            blockingRead(processor, extended);
+            blockingRead(is, extended);
             payloadLength = Conversions.byteArrayToLong(extended);
         }
 
@@ -89,12 +89,12 @@ public class WsFrame {
             }
         }
 
-        blockingRead(processor, mask);
+        blockingRead(is, mask);
 
         if (isControl()) {
             // Note: Payload limited to <= 125 bytes by test above
             payload = ByteBuffer.allocate((int) payloadLength);
-            blockingRead(processor, payload);
+            blockingRead(is, payload);
 
             if (opCode == Constants.OPCODE_CLOSE && payloadLength > 2) {
                 // Check close payload - if present - is valid UTF-8
@@ -144,9 +144,9 @@ public class WsFrame {
     /*
      * Blocks until a aingle byte has been read
      */
-    private int blockingRead(UpgradeProcessor<?> processor)
+    private int blockingRead(InputStream is)
             throws IOException {
-        int result = processor.read();
+        int result = is.read();
         if (result == -1) {
             throw new IOException(sm.getString("frame.eos"));
         }
@@ -157,12 +157,13 @@ public class WsFrame {
     /*
      * Blocks until the byte array has been filled.
      */
-    private void blockingRead(UpgradeProcessor<?> processor, byte[] bytes)
+    private void blockingRead(InputStream is, byte[] bytes)
             throws IOException {
         int read = 0;
         int last = 0;
         while (read < bytes.length) {
-            last = processor.read(true, bytes, read, bytes.length - read);
+            // TODO Must block ????
+            last = is.read(bytes, read, bytes.length - read);
             if (last == -1) {
                 throw new IOException(sm.getString("frame.eos"));
             }
@@ -175,11 +176,11 @@ public class WsFrame {
      * Intended to read whole payload and blocks until it has. Therefore able to
      * unmask the payload data.
      */
-    private void blockingRead(UpgradeProcessor<?> processor, ByteBuffer bb)
+    private void blockingRead(InputStream is, ByteBuffer bb)
             throws IOException {
         int last = 0;
         while (bb.hasRemaining()) {
-            last = processor.read();
+            last = is.read();
             if (last == -1) {
                 throw new IOException(sm.getString("frame.eos"));
             }
@@ -206,13 +207,14 @@ public class WsFrame {
      *                      exception will trigger the closing of the WebSocket
      *                      connection.
      */
-    public static WsFrame nextFrame(UpgradeProcessor<?> processor,
+    public static WsFrame nextFrame(InputStream is,
             boolean block) throws IOException {
 
         byte[] first = new byte[1];
-        int read = processor.read(block, first, 0, 1);
+        // TODO Must block ?????
+        int read = is.read(first, 0, 1);
         if (read == 1) {
-            return new WsFrame(first[0], processor);
+            return new WsFrame(first[0], is);
         } else if (read == 0) {
             return null;
         } else if (read == -1) {

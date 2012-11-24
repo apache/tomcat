@@ -17,12 +17,12 @@
 package org.apache.catalina.websocket;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 
-import org.apache.coyote.http11.upgrade.UpgradeOutbound;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -38,7 +38,7 @@ public class WsOutbound {
             StringManager.getManager(Constants.Package);
     public static final int DEFAULT_BUFFER_SIZE = 8192;
 
-    private UpgradeOutbound upgradeOutbound;
+    private OutputStream outputStream;
     private ByteBuffer bb;
     private CharBuffer cb;
     private boolean closed = false;
@@ -46,14 +46,14 @@ public class WsOutbound {
     private boolean firstFrame = true;
 
 
-    public WsOutbound(UpgradeOutbound upgradeOutbound) {
-        this(upgradeOutbound, DEFAULT_BUFFER_SIZE, DEFAULT_BUFFER_SIZE);
+    public WsOutbound(OutputStream outputStream) {
+        this(outputStream, DEFAULT_BUFFER_SIZE, DEFAULT_BUFFER_SIZE);
     }
 
 
-    public WsOutbound(UpgradeOutbound upgradeOutbound, int byteBufferSize,
+    public WsOutbound(OutputStream outputStream, int byteBufferSize,
             int charBufferSize) {
-        this.upgradeOutbound = upgradeOutbound;
+        this.outputStream = outputStream;
         this.bb = ByteBuffer.allocate(byteBufferSize);
         this.cb = CharBuffer.allocate(charBufferSize);
     }
@@ -271,25 +271,25 @@ public class WsOutbound {
         }
         closed = true;
 
-        upgradeOutbound.write(0x88);
+        outputStream.write(0x88);
         if (status == 0) {
-            upgradeOutbound.write(0);
+            outputStream.write(0);
         } else if (data == null || data.position() == data.limit()) {
-            upgradeOutbound.write(2);
-            upgradeOutbound.write(status >>> 8);
-            upgradeOutbound.write(status);
+            outputStream.write(2);
+            outputStream.write(status >>> 8);
+            outputStream.write(status);
         } else {
-            upgradeOutbound.write(2 + data.limit() - data.position());
-            upgradeOutbound.write(status >>> 8);
-            upgradeOutbound.write(status);
-            upgradeOutbound.write(data.array(), data.position(),
+            outputStream.write(2 + data.limit() - data.position());
+            outputStream.write(status >>> 8);
+            outputStream.write(status);
+            outputStream.write(data.array(), data.position(),
                     data.limit() - data.position());
         }
-        upgradeOutbound.flush();
+        outputStream.flush();
 
         bb = null;
         cb = null;
-        upgradeOutbound = null;
+        outputStream = null;
     }
 
 
@@ -331,16 +331,16 @@ public class WsOutbound {
 
         doFlush(true);
 
-        upgradeOutbound.write(0x80 | opcode);
+        outputStream.write(0x80 | opcode);
         if (data == null) {
-            upgradeOutbound.write(0);
+            outputStream.write(0);
         } else {
-            upgradeOutbound.write(data.limit() - data.position());
-            upgradeOutbound.write(data.array(), data.position(),
+            outputStream.write(data.limit() - data.position());
+            outputStream.write(data.array(), data.position(),
                     data.limit() - data.position());
         }
 
-        upgradeOutbound.flush();
+        outputStream.flush();
     }
 
 
@@ -368,31 +368,30 @@ public class WsOutbound {
             }
         }
         // Continuation frame is OpCode 0
-        upgradeOutbound.write(first);
+        outputStream.write(first);
 
         if (buffer.limit() < 126) {
-            upgradeOutbound.write(buffer.limit());
+            outputStream.write(buffer.limit());
         } else if (buffer.limit() < 65536) {
-            upgradeOutbound.write(126);
-            upgradeOutbound.write(buffer.limit() >>> 8);
-            upgradeOutbound.write(buffer.limit() & 0xFF);
+            outputStream.write(126);
+            outputStream.write(buffer.limit() >>> 8);
+            outputStream.write(buffer.limit() & 0xFF);
         } else {
             // Will never be more than 2^31-1
-            upgradeOutbound.write(127);
-            upgradeOutbound.write(0);
-            upgradeOutbound.write(0);
-            upgradeOutbound.write(0);
-            upgradeOutbound.write(0);
-            upgradeOutbound.write(buffer.limit() >>> 24);
-            upgradeOutbound.write(buffer.limit() >>> 16);
-            upgradeOutbound.write(buffer.limit() >>> 8);
-            upgradeOutbound.write(buffer.limit() & 0xFF);
-
+            outputStream.write(127);
+            outputStream.write(0);
+            outputStream.write(0);
+            outputStream.write(0);
+            outputStream.write(0);
+            outputStream.write(buffer.limit() >>> 24);
+            outputStream.write(buffer.limit() >>> 16);
+            outputStream.write(buffer.limit() >>> 8);
+            outputStream.write(buffer.limit() & 0xFF);
         }
 
         // Write the content
-        upgradeOutbound.write(buffer.array(), 0, buffer.limit());
-        upgradeOutbound.flush();
+        outputStream.write(buffer.array(), 0, buffer.limit());
+        outputStream.flush();
 
         // Reset
         if (finalFragment) {

@@ -300,7 +300,7 @@ public class TestWebSocket extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected StreamInbound createWebSocketInbound(String subProtocol,
+        protected StreamHandler createWebSocketInbound(String subProtocol,
                 HttpServletRequest request) {
             return new Bug53339WsInbound();
         }
