@@ -48,7 +48,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestUpgradeServletInputStream extends TomcatBaseTest {
+public class TestUpgrade extends TomcatBaseTest {
 
     private static final String MESSAGE = "This is a test.";
 
