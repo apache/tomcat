@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.Socket;
 
@@ -49,7 +50,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestUpgradeServletInputStream extends TomcatBaseTest {
 
-    private static final String MESSAGE = "This is a test.\n";
+    private static final String MESSAGE = "This is a test.";
 
     @Test
     public void testSimpleUpgrade() throws Exception {
@@ -59,20 +60,22 @@ public class TestUpgradeServletInputStream extends TomcatBaseTest {
     @Test
     public void testSingleMessage() throws Exception {
         UpgradeConnection conn = doUpgrade();
-        Writer writer = conn.getWriter();
+        PrintWriter pw = new PrintWriter(conn.getWriter());
         BufferedReader reader = conn.getReader();
 
-        writer.write(MESSAGE);
-        writer.flush();
+        pw.println(MESSAGE);
+        pw.flush();
 
         Thread.sleep(500);
 
-        writer.write(MESSAGE);
-        writer.flush();
+        pw.println(MESSAGE);
+        pw.flush();
 
         String response = reader.readLine();
 
-        Assert.assertEquals(MESSAGE, response);
+        // Note: BufferedReader.readLine() strips new lines
+        //       ServletInputStream.readLine() does not strip new lines
+        Assert.assertEquals(MESSAGE, response );
     }
 
 
@@ -180,7 +183,6 @@ public class TestUpgradeServletInputStream extends TomcatBaseTest {
                     while (sis.isReady()) {
                         int read = sis.read(buffer);
                         if (read > 0) {
-                            System.out.print(new String(buffer, 0, read));
                             if (sos.canWrite()) {
                                 sos.write(buffer, 0, read);
                             } else {
