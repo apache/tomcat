@@ -16,13 +16,9 @@
  */
 package org.apache.coyote.http11.upgrade;
 
-import java.io.IOException;
-import java.nio.channels.Selector;
-
 import javax.servlet.http.ProtocolHandler;
 
 import org.apache.tomcat.util.net.NioChannel;
-import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.net.SocketWrapper;
 
@@ -34,101 +30,8 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
             ProtocolHandler httpUpgradeProcessor, NioSelectorPool pool) {
         super(httpUpgradeProcessor,
                 new UpgradeNioServletInputStream(wrapper, pool),
-                new NioUpgradeServletOutputStream(wrapper, pool));
+                new UpgradeNioServletOutputStream(wrapper, pool));
 
         wrapper.setTimeout(INFINITE_TIMEOUT);
-    }
-
-
-    // ----------------------------------------------------------- Inner classes
-
-    private static class NioUpgradeServletOutputStream
-            extends UpgradeServletOutputStream {
-
-        private final NioChannel nioChannel;
-        private final NioSelectorPool pool;
-        private final int maxWrite;
-
-        public NioUpgradeServletOutputStream(
-                SocketWrapper<NioChannel> wrapper, NioSelectorPool pool) {
-            nioChannel = wrapper.getSocket();
-            this.pool = pool;
-            maxWrite = nioChannel.getBufHandler().getWriteBuffer().capacity();
-        }
-
-        @Override
-        protected void doWrite(int b) throws IOException {
-            writeToSocket(new byte[] {(byte) b}, 0, 1);
-        }
-
-        @Override
-        protected void doWrite(byte[] b, int off, int len) throws IOException {
-            int written = 0;
-            while (len - written > maxWrite) {
-                written += writeToSocket(b, off + written, maxWrite);
-            }
-            writeToSocket(b, off + written, len - written);
-        }
-
-        @Override
-        protected void doFlush() throws IOException {
-            NioEndpoint.KeyAttachment att =
-                    (NioEndpoint.KeyAttachment) nioChannel.getAttachment(false);
-            if (att == null) {
-                throw new IOException("Key must be cancelled");
-            }
-            long writeTimeout = att.getTimeout();
-            Selector selector = null;
-            try {
-                selector = pool.get();
-            } catch ( IOException x ) {
-                //ignore
-            }
-            try {
-                do {
-                    if (nioChannel.flush(true, selector, writeTimeout)) {
-                        break;
-                    }
-                } while (true);
-            } finally {
-                if (selector != null) {
-                    pool.put(selector);
-                }
-            }
-        }
-
-        /*
-         * Adapted from the NioOutputBuffer
-         */
-        private synchronized int writeToSocket(byte[] bytes, int off, int len)
-                throws IOException {
-
-            nioChannel.getBufHandler().getWriteBuffer().clear();
-            nioChannel.getBufHandler().getWriteBuffer().put(bytes, off, len);
-            nioChannel.getBufHandler().getWriteBuffer().flip();
-
-            int written = 0;
-            NioEndpoint.KeyAttachment att =
-                    (NioEndpoint.KeyAttachment) nioChannel.getAttachment(false);
-            if (att == null) {
-                throw new IOException("Key must be cancelled");
-            }
-            long writeTimeout = att.getTimeout();
-            Selector selector = null;
-            try {
-                selector = pool.get();
-            } catch ( IOException x ) {
-                //ignore
-            }
-            try {
-                written = pool.write(nioChannel.getBufHandler().getWriteBuffer(),
-                        nioChannel, selector, writeTimeout, true);
-            } finally {
-                if (selector != null) {
-                    pool.put(selector);
-                }
-            }
-            return written;
-        }
     }
 }

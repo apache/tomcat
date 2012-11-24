@@ -76,27 +76,19 @@ public abstract class UpgradeServletInputStream extends ServletInputStream {
     public int readLine(byte[] b, int off, int len) throws IOException {
         preReadChecks();
 
-        if (len == 0) {
+        if (len <= 0) {
             return 0;
         }
+        int count = 0, c;
 
-        int r;
-        int pos = off;
-        int count = 0;
-
-        while ((r = readInternal()) != -1) {
-            b[pos++] = (byte) r;
-            count ++;
-            if (r == -1 || count == len) {
+        while ((c = readInternal()) != -1) {
+            b[off++] = (byte) c;
+            count++;
+            if (c == '\n' || count == len) {
                 break;
             }
         }
-
-        if (r == -1) {
-            return -1;
-        } else {
-            return count;
-        }
+        return count > 0 ? count : -1;
     }
 
 
@@ -143,8 +135,8 @@ public abstract class UpgradeServletInputStream extends ServletInputStream {
     }
 
 
+    protected abstract boolean doIsReady() throws IOException;
+
     protected abstract int doRead(boolean block, byte[] b, int off, int len)
             throws IOException;
-
-    protected abstract boolean doIsReady() throws IOException;
 }

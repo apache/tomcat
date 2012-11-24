@@ -24,23 +24,12 @@ import javax.servlet.WriteListener;
 public abstract class UpgradeServletOutputStream extends ServletOutputStream {
 
     // Start in blocking-mode
-    private volatile Boolean writeable = null;
     private volatile WriteListener listener = null;
     private byte[] buffer;
 
     @Override
     public boolean canWrite() {
-     // If we already know the current state, return it.
-        if (writeable != null) {
-            return writeable.booleanValue();
-        }
-
-        try {
-            writeable = Boolean.valueOf(doCanWrite());
-        } catch (IOException e) {
-            listener.onError(e);
-        }
-        return writeable.booleanValue();
+        return buffer == null;
     }
 
     @Override
@@ -50,8 +39,6 @@ public abstract class UpgradeServletOutputStream extends ServletOutputStream {
             throw new IllegalArgumentException();
         }
         this.listener = listener;
-        // Switching to non-blocking. Don't know if data is available.
-        writeable = null;
     }
 
     @Override
@@ -71,12 +58,10 @@ public abstract class UpgradeServletOutputStream extends ServletOutputStream {
 
 
     private void preWriteChecks() {
-        if (writeable == null || !writeable.booleanValue()) {
+        if (buffer != null) {
             // TODO i18n
             throw new IllegalStateException();
         }
-        // No longer know if data is available
-        writeable = null;
     }
 
 
@@ -106,14 +91,12 @@ public abstract class UpgradeServletOutputStream extends ServletOutputStream {
             throw new RuntimeException(ioe);
         }
         if (buffer == null) {
-            writeable = Boolean.TRUE;
             listener.onWritePossible();
         }
     }
 
-
     protected abstract int doWrite(boolean block, byte[] b, int off, int len)
             throws IOException;
 
-    protected abstract boolean doCanWrite() throws IOException;
+    protected abstract void doFlush() throws IOException;
 }
