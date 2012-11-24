@@ -26,76 +26,86 @@ import org.apache.tomcat.util.net.SocketWrapper;
 
 public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
 
-    private final long socket;
-
+    private static final int INFINITE_TIMEOUT = -1;
 
     public UpgradeAprProcessor(SocketWrapper<Long> wrapper,
             ProtocolHandler httpUpgradeProcessor) {
-        super(upgradeInbound);
+        super(httpUpgradeProcessor,
+                new AprUpgradeServletInputStream(wrapper.getSocket().longValue()),
+                new AprUpgradeServletOutputStream(wrapper.getSocket().longValue()));
 
-        Socket.timeoutSet(wrapper.getSocket().longValue(),
-                upgradeInbound.getReadTimeout());
-
-        this.socket = wrapper.getSocket().longValue();
+        Socket.timeoutSet(wrapper.getSocket().longValue(), INFINITE_TIMEOUT);
     }
 
 
-    /*
-     * Output methods
-     */
-    @Override
-    public void flush() throws IOException {
-        // NOOP
-    }
+    // ----------------------------------------------------------- Inner classes
 
+    private static class AprUpgradeServletInputStream
+            extends UpgradeServletInputStream {
 
-    @Override
-    public void write(int b) throws IOException {
-        Socket.send(socket, new byte[] {(byte) b}, 0, 1);
-    }
+        private final long socket;
 
-
-    @Override
-    public void write(byte[]b, int off, int len) throws IOException {
-        Socket.send(socket, b, off, len);
-    }
-
-
-    /*
-     * Input methods
-     */
-    @Override
-    public int read() throws IOException {
-        byte[] bytes = new byte[1];
-        int result = Socket.recv(socket, bytes, 0, 1);
-        if (result == -1) {
-            return -1;
-        } else {
-            return bytes[0] & 0xFF;
+        public AprUpgradeServletInputStream(long socket) {
+            this.socket = socket;
         }
-    }
 
-
-    @Override
-    public int read(boolean block, byte[] bytes, int off, int len)
-            throws IOException {
-        if (!block) {
-            Socket.optSet(socket, Socket.APR_SO_NONBLOCK, -1);
-        }
-        try {
-            int result = Socket.recv(socket, bytes, off, len);
-            if (result > 0) {
-                return result;
-            } else if (-result == Status.EAGAIN) {
-                return 0;
+        @Override
+        protected int doRead() throws IOException {
+            byte[] bytes = new byte[1];
+            int result = Socket.recv(socket, bytes, 0, 1);
+            if (result == -1) {
+                return -1;
             } else {
-                throw new IOException(sm.getString("apr.error",
-                        Integer.valueOf(-result)));
+                return bytes[0] & 0xFF;
             }
-        } finally {
+        }
+
+        @Override
+        protected int doRead(byte[] b, int off, int len) throws IOException {
+            boolean block = true;
             if (!block) {
-                Socket.optSet(socket, Socket.APR_SO_NONBLOCK, 0);
+                Socket.optSet(socket, Socket.APR_SO_NONBLOCK, -1);
             }
+            try {
+                int result = Socket.recv(socket, b, off, len);
+                if (result > 0) {
+                    return result;
+                } else if (-result == Status.EAGAIN) {
+                    return 0;
+                } else {
+                    throw new IOException(sm.getString("apr.error",
+                            Integer.valueOf(-result)));
+                }
+            } finally {
+                if (!block) {
+                    Socket.optSet(socket, Socket.APR_SO_NONBLOCK, 0);
+                }
+            }
+        }
+    }
+
+    private static class AprUpgradeServletOutputStream
+            extends UpgradeServletOutputStream {
+
+        private final long socket;
+
+        public AprUpgradeServletOutputStream(long socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        protected void doWrite(int b) throws IOException {
+            Socket.send(socket, new byte[] {(byte) b}, 0, 1);
+        }
+
+        @Override
+        protected void doWrite(byte[] b, int off, int len) throws IOException {
+            Socket.send(socket, b, off, len);
+        }
+
+        @Override
+        protected void doFlush() throws IOException {
+            // NO-OP
         }
     }
 }
