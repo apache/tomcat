@@ -34,10 +34,10 @@ public class EchoStream extends WebSocketServlet {
     @Override
     protected StreamHandler createWebSocketHandler(String subProtocol,
             HttpServletRequest request) {
-        return new EchoStreamInbound();
+        return new EchoStreamHandler();
     }
 
-    private static final class EchoStreamInbound extends StreamHandler {
+    private static final class EchoStreamHandler extends StreamHandler {
 
         @Override
         protected void onBinaryData(InputStream is) throws IOException {

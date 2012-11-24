@@ -33,7 +33,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
  * Base implementation of the class used to process WebSocket connections based
  * on streams. Applications should extend this class to provide application
  * specific functionality. Applications that wish to operate on a message basis
- * rather than a stream basis should use {@link MessageInbound}.
+ * rather than a stream basis should use {@link MessageHandler}.
  */
 public abstract class StreamHandler implements ProtocolHandler {
 

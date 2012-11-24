@@ -30,7 +30,7 @@ import org.apache.tomcat.util.res.StringManager;
  * specific functionality. Applications that wish to operate on a stream basis
  * rather than a message basis should use {@link StreamHandler}.
  */
-public abstract class MessageInbound extends StreamHandler {
+public abstract class MessageHandler extends StreamHandler {
 
     private static final StringManager sm =
             StringManager.getManager(Constants.Package);

@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.catalina.websocket.MessageInbound;
+import org.apache.catalina.websocket.MessageHandler;
 import org.apache.catalina.websocket.StreamHandler;
 import org.apache.catalina.websocket.WebSocketServlet;
 import org.apache.catalina.websocket.WsOutbound;
@@ -63,7 +63,7 @@ public class SnakeWebSocketServlet extends WebSocketServlet {
     private final AtomicInteger connectionIds = new AtomicInteger(0);
     private final ConcurrentHashMap<Integer, Snake> snakes =
             new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer, SnakeMessageInbound> connections =
+    private final ConcurrentHashMap<Integer, SnakeMessageHandler> connections =
             new ConcurrentHashMap<>();
 
     @Override
@@ -97,7 +97,7 @@ public class SnakeWebSocketServlet extends WebSocketServlet {
     }
 
     private void broadcast(String message) {
-        for (SnakeMessageInbound connection : getConnections()) {
+        for (SnakeMessageHandler connection : getConnections()) {
             try {
                 CharBuffer buffer = CharBuffer.wrap(message);
                 connection.getWsOutbound().writeTextMessage(buffer);
@@ -107,7 +107,7 @@ public class SnakeWebSocketServlet extends WebSocketServlet {
         }
     }
 
-    private Collection<SnakeMessageInbound> getConnections() {
+    private Collection<SnakeMessageHandler> getConnections() {
         return Collections.unmodifiableCollection(connections.values());
     }
 
@@ -151,15 +151,15 @@ public class SnakeWebSocketServlet extends WebSocketServlet {
     @Override
     protected StreamHandler createWebSocketHandler(String subProtocol,
             HttpServletRequest request) {
-        return new SnakeMessageInbound(connectionIds.incrementAndGet());
+        return new SnakeMessageHandler(connectionIds.incrementAndGet());
     }
 
-    private final class SnakeMessageInbound extends MessageInbound {
+    private final class SnakeMessageHandler extends MessageHandler {
 
         private final int id;
         private Snake snake;
 
-        private SnakeMessageInbound(int id) {
+        private SnakeMessageHandler(int id) {
             this.id = id;
         }
 

@@ -23,7 +23,7 @@ import java.nio.CharBuffer;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.catalina.websocket.MessageInbound;
+import org.apache.catalina.websocket.MessageHandler;
 import org.apache.catalina.websocket.StreamHandler;
 import org.apache.catalina.websocket.WebSocketServlet;
 
@@ -65,7 +65,7 @@ public class EchoMessage extends WebSocketServlet {
         return new EchoMessageHandler(byteBufSize,charBufSize);
     }
 
-    private static final class EchoMessageHandler extends MessageInbound {
+    private static final class EchoMessageHandler extends MessageHandler {
 
         public EchoMessageHandler(int byteBufferMaxSize, int charBufferMaxSize) {
             super();

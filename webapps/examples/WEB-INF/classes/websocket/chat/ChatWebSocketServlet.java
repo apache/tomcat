@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.catalina.websocket.MessageInbound;
+import org.apache.catalina.websocket.MessageHandler;
 import org.apache.catalina.websocket.StreamHandler;
 import org.apache.catalina.websocket.WebSocketServlet;
 import org.apache.catalina.websocket.WsOutbound;
@@ -42,20 +42,20 @@ public class ChatWebSocketServlet extends WebSocketServlet {
     private static final String GUEST_PREFIX = "Guest";
 
     private final AtomicInteger connectionIds = new AtomicInteger(0);
-    private final Set<ChatMessageInbound> connections =
+    private final Set<ChatMessageHandler> connections =
             new CopyOnWriteArraySet<>();
 
     @Override
     protected StreamHandler createWebSocketHandler(String subProtocol,
             HttpServletRequest request) {
-        return new ChatMessageInbound(connectionIds.incrementAndGet());
+        return new ChatMessageHandler(connectionIds.incrementAndGet());
     }
 
-    private final class ChatMessageInbound extends MessageInbound {
+    private final class ChatMessageHandler extends MessageHandler {
 
         private final String nickname;
 
-        private ChatMessageInbound(int id) {
+        private ChatMessageHandler(int id) {
             this.nickname = GUEST_PREFIX + id;
         }
 
@@ -90,7 +90,7 @@ public class ChatWebSocketServlet extends WebSocketServlet {
         }
 
         private void broadcast(String message) {
-            for (ChatMessageInbound connection : connections) {
+            for (ChatMessageHandler connection : connections) {
                 try {
                     CharBuffer buffer = CharBuffer.wrap(message);
                     connection.getWsOutbound().writeTextMessage(buffer);
