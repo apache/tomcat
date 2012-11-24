@@ -26,12 +26,12 @@ import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.net.SocketWrapper;
 
-public class NioUpgradeServletInputStream extends UpgradeServletInputStream {
+public class UpgradeNioServletInputStream extends UpgradeServletInputStream {
 
     private final NioChannel channel;
     private final NioSelectorPool pool;
 
-    public NioUpgradeServletInputStream(SocketWrapper<NioChannel> wrapper,
+    public UpgradeNioServletInputStream(SocketWrapper<NioChannel> wrapper,
             NioSelectorPool pool) {
         this.channel = wrapper.getSocket();
         this.pool = pool;
