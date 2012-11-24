@@ -307,7 +307,7 @@ public class TestWebSocket extends TomcatBaseTest {
     }
 
 
-    private static class Bug53339WsInbound extends MessageInbound {
+    private static class Bug53339WsInbound extends MessageHandler {
 
         public static final String TEST_MESSAGE = "Test Message";
         public static final String JNDI_NAME = "Bug53339Message";
