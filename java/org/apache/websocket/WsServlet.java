@@ -14,25 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.websocket;
+package org.apache.websocket;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class WsServlet {
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface WebSocketEndpoint {
-
-    /**
-     * URI or URI-template that the annotated class should be mapped to.
-     */
-    public String value();
-
-    public String[] subprotocols() default {};
-
-    public Class<? extends Decoder>[] decoders() default {};
-
-    public Class<? extends Encoder>[] encoders() default {};
 }
