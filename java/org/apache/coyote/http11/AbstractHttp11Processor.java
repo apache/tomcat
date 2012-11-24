@@ -23,6 +23,8 @@ import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.ProtocolHandler;
+
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
@@ -36,7 +38,6 @@ import org.apache.coyote.http11.filters.IdentityOutputFilter;
 import org.apache.coyote.http11.filters.SavedRequestInputFilter;
 import org.apache.coyote.http11.filters.VoidInputFilter;
 import org.apache.coyote.http11.filters.VoidOutputFilter;
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.Ascii;
@@ -219,10 +220,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Listener to which data available events are passed once the associated
-     * connection has completed the HTTP upgrade process.
+     * Instance of the new protocol to use after the HTTP connection has been
+     * upgraded.
      */
-    protected UpgradeInbound upgradeInbound = null;
+    protected ProtocolHandler httpUpgradeHandler = null;
 
 
     public AbstractHttp11Processor(AbstractEndpoint endpoint) {
@@ -803,7 +804,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         } else if (actionCode == ActionCode.ASYNC_IS_ERROR) {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
         } else if (actionCode == ActionCode.UPGRADE) {
-            upgradeInbound = (UpgradeInbound) param;
+            httpUpgradeHandler = (ProtocolHandler) param;
             // Stop further HTTP output
             getOutputBuffer().finished = true;
         } else {
@@ -881,7 +882,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
         while (!error && keepAlive && !comet && !isAsync() &&
-                upgradeInbound == null && !endpoint.isPaused()) {
+                httpUpgradeHandler == null && !endpoint.isPaused()) {
 
             // Parsing the request header
             try {
@@ -1542,7 +1543,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     @Override
     public boolean isUpgrade() {
-        return upgradeInbound != null;
+        return httpUpgradeHandler != null;
     }
 
 
@@ -1557,8 +1558,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     @Override
-    public UpgradeInbound getUpgradeInbound() {
-        return upgradeInbound;
+    public ProtocolHandler getHttpUpgradeHandler() {
+        return httpUpgradeHandler;
     }
 
 
@@ -1627,7 +1628,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         if (asyncStateMachine != null) {
             asyncStateMachine.recycle();
         }
-        upgradeInbound = null;
+        httpUpgradeHandler = null;
         comet = false;
         recycleInternal();
     }
