@@ -22,6 +22,8 @@ import java.net.InetAddress;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.servlet.http.ProtocolHandler;
+
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
@@ -30,7 +32,6 @@ import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.tomcat.spdy.SpdyConnection;
 import org.apache.tomcat.spdy.SpdyContext;
 import org.apache.tomcat.spdy.SpdyFrame;
@@ -569,8 +570,7 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
     }
 
     @Override
-    public UpgradeInbound getUpgradeInbound() {
+    public ProtocolHandler getHttpUpgradeHandler() {
         return null;
     }
-
 }
