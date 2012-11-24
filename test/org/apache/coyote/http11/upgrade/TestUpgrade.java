@@ -47,19 +47,36 @@ import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.util.IOTools;
 
 public class TestUpgrade extends TomcatBaseTest {
 
     private static final String MESSAGE = "This is a test.";
 
     @Test
-    public void testSimpleUpgrade() throws Exception {
-        doUpgrade();
+    public void testSimpleUpgradeBlocking() throws Exception {
+        doUpgrade(EchoBlocking.class);
     }
 
     @Test
-    public void testSingleMessage() throws Exception {
-        UpgradeConnection conn = doUpgrade();
+    public void testSimpleUpgradeNonBlocking() throws Exception {
+        doUpgrade(EchoNonBlocking.class);
+    }
+
+    @Test
+    public void testMessagesBlocking() throws Exception {
+        doTestMessages(EchoBlocking.class);
+    }
+
+    @Test
+    public void testMessagesNonBlocking() throws Exception {
+        doTestMessages(EchoNonBlocking.class);
+    }
+
+    private void doTestMessages (
+            Class<? extends ProtocolHandler> upgradeHandlerClass)
+            throws Exception {
+        UpgradeConnection conn = doUpgrade(upgradeHandlerClass);
         PrintWriter pw = new PrintWriter(conn.getWriter());
         BufferedReader reader = conn.getReader();
 
@@ -79,7 +96,8 @@ public class TestUpgrade extends TomcatBaseTest {
     }
 
 
-    private UpgradeConnection doUpgrade() throws Exception {
+    private UpgradeConnection doUpgrade(
+            Class<? extends ProtocolHandler> upgradeHandlerClass) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
@@ -87,7 +105,7 @@ public class TestUpgrade extends TomcatBaseTest {
         Context ctx =
                 tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
-        UpgradeServlet servlet = new UpgradeServlet();
+        UpgradeServlet servlet = new UpgradeServlet(upgradeHandlerClass);
         Tomcat.addServlet(ctx, "servlet", servlet);
         ctx.addServletMapping("/", "servlet");
 
@@ -128,11 +146,24 @@ public class TestUpgrade extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
+        private final Class<? extends ProtocolHandler> upgradeHandlerClass;
+
+        public UpgradeServlet(Class<? extends ProtocolHandler> upgradeHandlerClass) {
+            this.upgradeHandlerClass = upgradeHandlerClass;
+        }
+
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
 
-            req.upgrade(new EchoNonBlocking());
+            ProtocolHandler upgradeHandler;
+            try {
+                upgradeHandler = upgradeHandlerClass.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new ServletException(e);
+            }
+
+            req.upgrade(upgradeHandler);
         }
     }
 
@@ -154,7 +185,23 @@ public class TestUpgrade extends TomcatBaseTest {
         }
     }
 
-    private static class EchoNonBlocking implements ProtocolHandler {
+
+    protected static class EchoBlocking implements ProtocolHandler {
+        @Override
+        public void init(WebConnection connection) {
+
+            try (ServletInputStream sis = connection.getInputStream();
+                 ServletOutputStream sos = connection.getOutputStream()){
+
+                IOTools.flow(sis, sos);
+            } catch (IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+        }
+    }
+
+
+    protected static class EchoNonBlocking implements ProtocolHandler {
 
         private ServletInputStream sis;
         private ServletOutputStream sos;
