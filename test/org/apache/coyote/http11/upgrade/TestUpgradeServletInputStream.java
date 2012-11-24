@@ -129,7 +129,7 @@ public class TestUpgradeServletInputStream extends TomcatBaseTest {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
 
-            req.upgrade(new Echo());
+            req.upgrade(new EchoNonBlocking());
         }
     }
 
@@ -151,7 +151,7 @@ public class TestUpgradeServletInputStream extends TomcatBaseTest {
         }
     }
 
-    private static class Echo implements ProtocolHandler {
+    private static class EchoNonBlocking implements ProtocolHandler {
 
         private ServletInputStream sis;
         private ServletOutputStream sos;
