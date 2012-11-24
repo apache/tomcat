@@ -289,7 +289,6 @@
 
   <patternset id="files.websocket-impl">
     <include name="org/apache/websocket/**" />
-    <include name="org/apache/websocket/**" />
   </patternset>
 
   <patternset id="files.bootstrap">
