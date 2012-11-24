@@ -76,7 +76,6 @@ import org.apache.catalina.mapper.MappingData;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.StringParser;
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -1862,12 +1861,18 @@ public class Request
     // --------------------------------------------- HttpServletRequest Methods
 
     /**
-     * TODO SERVLET 3.1
+     * {@inheritDoc}
+     *
+     * @since Servlet 3.1
      */
     @Override
     public void upgrade(ProtocolHandler handler) throws IOException {
-        // TODO Auto-generated method stub
+        coyoteRequest.action(ActionCode.UPGRADE, handler);
 
+        // Output required by RFC2616. Protocol specific headers should have
+        // already been set.
+        response.setStatus(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
+        response.flushBuffer();
     }
 
     /**
@@ -2639,22 +2644,7 @@ public class Request
     }
 
 
-    // --------------------------------------------------------- Upgrade Methods
-
-    public void doUpgrade(UpgradeInbound inbound)
-            throws IOException {
-
-        coyoteRequest.action(ActionCode.UPGRADE, inbound);
-
-        // Output required by RFC2616. Protocol specific headers should have
-        // already been set.
-        response.setStatus(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
-        response.flushBuffer();
-    }
-
-
     // ------------------------------------------------------ Protected Methods
-
 
     protected Session doGetSession(boolean create) {
 

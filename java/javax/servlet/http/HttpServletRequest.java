@@ -494,7 +494,10 @@ public interface HttpServletRequest extends ServletRequest {
     /**
      * Start the HTTP upgrade process and pass the connection to the provided
      * protocol handler once the current request/response pair has completed
-     * processing.
+     * processing. Calling this method sets the response status to {@link
+     * HttpServletResponse#SC_SWITCHING_PROTOCOLS} and flushes the response.
+     * Protocol specific headers must have already been set before this method
+     * is called.
      *
      * @since Servlet 3.1
      */
