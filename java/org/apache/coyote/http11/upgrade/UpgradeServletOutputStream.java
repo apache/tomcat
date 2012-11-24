@@ -21,7 +21,13 @@ import java.io.IOException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 
+import org.apache.tomcat.util.res.StringManager;
+
 public abstract class UpgradeServletOutputStream extends ServletOutputStream {
+
+    protected static final StringManager sm =
+            StringManager.getManager(Constants.Package);
+
 
     // Start in blocking-mode
     private volatile WriteListener listener = null;
@@ -29,14 +35,19 @@ public abstract class UpgradeServletOutputStream extends ServletOutputStream {
 
     @Override
     public final boolean canWrite() {
+        if (listener == null) {
+            throw new IllegalStateException(
+                    sm.getString("upgrade.sos.canWrite.is"));
+        }
+
         return buffer == null;
     }
 
     @Override
     public final void setWriteListener(WriteListener listener) {
         if (listener == null) {
-            // TODO i18n
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(
+                    sm.getString("upgrade.sos.writeListener.null"));
         }
         this.listener = listener;
     }
@@ -59,8 +70,8 @@ public abstract class UpgradeServletOutputStream extends ServletOutputStream {
 
     private void preWriteChecks() {
         if (buffer != null) {
-            // TODO i18n
-            throw new IllegalStateException();
+            throw new IllegalStateException(
+                    sm.getString("upgrade.sis.write.ise"));
         }
     }
 
