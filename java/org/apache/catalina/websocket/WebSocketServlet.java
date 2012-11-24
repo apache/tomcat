@@ -27,16 +27,13 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletRequestWrapper;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.ProtocolHandler;
 
-import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.Base64;
 import org.apache.tomcat.util.buf.B2CConverter;
-import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Provides the base implementation of a Servlet for processing WebSocket
@@ -49,8 +46,6 @@ public abstract class WebSocketServlet extends HttpServlet {
     private static final byte[] WS_ACCEPT =
             "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(
                     B2CConverter.ISO_8859_1);
-    private static final StringManager sm =
-            StringManager.getManager(Constants.Package);
 
     private final Queue<MessageDigest> sha1Helpers =
             new ConcurrentLinkedQueue<>();
@@ -118,21 +113,11 @@ public abstract class WebSocketServlet extends HttpServlet {
         }
 
         WsHttpServletRequestWrapper wrapper = new WsHttpServletRequestWrapper(req);
-        StreamInbound inbound = createWebSocketInbound(subProtocol, wrapper);
+        ProtocolHandler wsHandler =
+                createWebSocketHandler(subProtocol, wrapper);
         wrapper.invalidate();
 
-        // Small hack until the Servlet API provides a way to do this.
-        ServletRequest inner = req;
-        // Unwrap the request
-        while (inner instanceof ServletRequestWrapper) {
-            inner = ((ServletRequestWrapper) inner).getRequest();
-        }
-        if (inner instanceof RequestFacade) {
-            ((RequestFacade) inner).doUpgrade(inbound);
-        } else {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    sm.getString("servlet.reqUpgradeFail"));
-        }
+        req.upgrade(wsHandler);
     }
 
 
@@ -243,6 +228,6 @@ public abstract class WebSocketServlet extends HttpServlet {
      *                      method. If Tomcat detects such access, it will throw
      *                      an IllegalStateException
      */
-    protected abstract StreamInbound createWebSocketInbound(String subProtocol,
-            HttpServletRequest request);
+    protected abstract ProtocolHandler createWebSocketHandler(
+            String subProtocol, HttpServletRequest request);
 }

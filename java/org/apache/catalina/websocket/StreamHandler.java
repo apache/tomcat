@@ -24,9 +24,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.MalformedInputException;
 import java.nio.charset.UnmappableCharacterException;
 
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
-import org.apache.coyote.http11.upgrade.UpgradeOutbound;
-import org.apache.coyote.http11.upgrade.UpgradeProcessor;
+import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.WebConnection;
+
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 
 /**
@@ -35,16 +35,16 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
  * specific functionality. Applications that wish to operate on a message basis
  * rather than a stream basis should use {@link MessageInbound}.
  */
-public abstract class StreamInbound implements UpgradeInbound {
+public abstract class StreamHandler implements ProtocolHandler {
 
     private final ClassLoader applicationClassLoader;
-    private UpgradeProcessor<?> processor = null;
     private WsOutbound outbound;
+    private InputStream inputStream;
     private int outboundByteBufferSize = WsOutbound.DEFAULT_BUFFER_SIZE;
     private int outboundCharBufferSize = WsOutbound.DEFAULT_BUFFER_SIZE;
 
 
-    public StreamInbound() {
+    public StreamHandler() {
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
@@ -54,47 +54,8 @@ public abstract class StreamInbound implements UpgradeInbound {
     }
 
 
-    /**
-     * This only applies to the {@link WsOutbound} instance returned from
-     * {@link #getWsOutbound()} created by a subsequent call to
-     * {@link #setUpgradeOutbound(UpgradeOutbound)}. The current
-     * {@link WsOutbound} instance, if any, is not affected.
-     *
-     * @param outboundByteBufferSize
-     */
-    public void setOutboundByteBufferSize(int outboundByteBufferSize) {
-        this.outboundByteBufferSize = outboundByteBufferSize;
-    }
-
-
     public int getOutboundCharBufferSize() {
         return outboundCharBufferSize;
-    }
-
-
-    /**
-     * This only applies to the {@link WsOutbound} instance returned from
-     * {@link #getWsOutbound()} created by a subsequent call to
-     * {@link #setUpgradeOutbound(UpgradeOutbound)}. The current
-     * {@link WsOutbound} instance, if any, is not affected.
-     *
-     * @param outboundCharBufferSize
-     */
-    public void setOutboundCharBufferSize(int outboundCharBufferSize) {
-        this.outboundCharBufferSize = outboundCharBufferSize;
-    }
-
-
-    @Override
-    public final void setUpgradeOutbound(UpgradeOutbound upgradeOutbound) {
-        outbound = new WsOutbound(upgradeOutbound, outboundByteBufferSize,
-                outboundCharBufferSize);
-    }
-
-
-    @Override
-    public final void setUpgradeProcessor(UpgradeProcessor<?> processor) {
-        this.processor = processor;
     }
 
 
@@ -107,11 +68,10 @@ public abstract class StreamInbound implements UpgradeInbound {
     }
 
 
-    @Override
-    public final SocketState onData() throws IOException {
+    public final SocketState onData() {
         // Must be start the start of a message (which may consist of multiple
         // frames)
-        WsInputStream wsIs = new WsInputStream(processor, getWsOutbound());
+        WsInputStream wsIs = new WsInputStream(inputStream, getWsOutbound());
 
         try {
             WsFrame frame = wsIs.nextFrame(true);
@@ -149,16 +109,28 @@ public abstract class StreamInbound implements UpgradeInbound {
             }
         } catch (MalformedInputException mie) {
             // Invalid UTF-8
-            closeOutboundConnection(Constants.STATUS_BAD_DATA, null);
+            try {
+                closeOutboundConnection(Constants.STATUS_BAD_DATA, null);
+            } catch (IOException e) {
+                // TODO
+            }
             return SocketState.CLOSED;
         } catch (UnmappableCharacterException uce) {
             // Invalid UTF-8
-            closeOutboundConnection(Constants.STATUS_BAD_DATA, null);
+            try {
+                closeOutboundConnection(Constants.STATUS_BAD_DATA, null);
+            } catch (IOException e) {
+                // TODO
+            }
             return SocketState.CLOSED;
         } catch (IOException ioe) {
             // Given something must have gone to reach this point, this
             // might not work but try it anyway.
-            closeOutboundConnection(Constants.STATUS_PROTOCOL_ERROR, null);
+            try {
+                closeOutboundConnection(Constants.STATUS_PROTOCOL_ERROR, null);
+            } catch (IOException e) {
+                // TODO
+            }
             return SocketState.CLOSED;
         }
         return SocketState.UPGRADED;
@@ -219,7 +191,18 @@ public abstract class StreamInbound implements UpgradeInbound {
     }
 
     @Override
-    public final void onUpgradeComplete() {
+    public final void init(WebConnection webConnection) {
+
+        // TODO Make these buffer sizes configurable via the constructor
+        try {
+            inputStream = webConnection.getInputStream();
+            outbound = new WsOutbound(webConnection.getOutputStream(),
+                    outboundByteBufferSize, outboundCharBufferSize);
+        } catch (IOException ioe) {
+            // TODO i18n
+            throw new IllegalStateException(ioe);
+        }
+
         // Need to call onOpen using the web application's class loader
         Thread t = Thread.currentThread();
         ClassLoader cl = t.getContextClassLoader();
@@ -229,6 +212,8 @@ public abstract class StreamInbound implements UpgradeInbound {
         } finally {
             t.setContextClassLoader(cl);
         }
+
+        onData();
     }
 
     /**
@@ -282,17 +267,4 @@ public abstract class StreamInbound implements UpgradeInbound {
      *                      connection.
      */
     protected abstract void onTextData(Reader r) throws IOException;
-
-    /**
-     * This default implementation sets the read timeout to infinite and expects
-     * the WebSocket application to close the connection when it is no longer
-     * required. Applications wishing to set an explicit timeout may override
-     * this method and return a value of their choice.
-     *
-     * @return  The read timeout in milliseconds or -1 for infinite
-     */
-    @Override
-    public int getReadTimeout() {
-        return -1;
-    }
 }

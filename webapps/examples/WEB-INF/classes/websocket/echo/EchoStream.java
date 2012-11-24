@@ -22,7 +22,7 @@ import java.io.Reader;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.catalina.websocket.StreamInbound;
+import org.apache.catalina.websocket.StreamHandler;
 import org.apache.catalina.websocket.WebSocketServlet;
 import org.apache.catalina.websocket.WsOutbound;
 
@@ -32,12 +32,12 @@ public class EchoStream extends WebSocketServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected StreamInbound createWebSocketInbound(String subProtocol,
+    protected StreamHandler createWebSocketHandler(String subProtocol,
             HttpServletRequest request) {
         return new EchoStreamInbound();
     }
 
-    private static final class EchoStreamInbound extends StreamInbound {
+    private static final class EchoStreamInbound extends StreamHandler {
 
         @Override
         protected void onBinaryData(InputStream is) throws IOException {

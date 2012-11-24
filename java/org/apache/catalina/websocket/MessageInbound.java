@@ -28,9 +28,9 @@ import org.apache.tomcat.util.res.StringManager;
  * Base implementation of the class used to process WebSocket connections based
  * on messages. Applications should extend this class to provide application
  * specific functionality. Applications that wish to operate on a stream basis
- * rather than a message basis should use {@link StreamInbound}.
+ * rather than a message basis should use {@link StreamHandler}.
  */
-public abstract class MessageInbound extends StreamInbound {
+public abstract class MessageInbound extends StreamHandler {
 
     private static final StringManager sm =
             StringManager.getManager(Constants.Package);
