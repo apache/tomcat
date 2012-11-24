@@ -19,7 +19,6 @@ package org.apache.coyote.http11.upgrade;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 
-import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
@@ -41,8 +40,8 @@ public abstract class UpgradeProcessor<S>
             StringManager.getManager(Constants.Package);
 
     private final ProtocolHandler httpUpgradeHandler;
-    private final ServletInputStream upgradeServletInputStream;
-    private final ServletOutputStream upgradeServletOutputStream;
+    private final UpgradeServletInputStream upgradeServletInputStream;
+    private final UpgradeServletOutputStream upgradeServletOutputStream;
 
     protected UpgradeProcessor (ProtocolHandler httpUpgradeHandler,
             UpgradeServletInputStream upgradeServletInputStream,
@@ -83,7 +82,14 @@ public abstract class UpgradeProcessor<S>
     public final SocketState upgradeDispatch(SocketStatus status)
             throws IOException {
 
-        // TODO Handle read/write ready for non-blocking IO
+        if (status == SocketStatus.OPEN_READ) {
+            upgradeServletInputStream.onDataAvailable();
+        } else if (status == SocketStatus.OPEN_WRITE) {
+            upgradeServletOutputStream.writeListener.onWritePossible();
+        } else {
+            // Unexpected state
+            return SocketState.CLOSED;
+        }
         return SocketState.UPGRADED;
     }
 
@@ -143,57 +149,6 @@ public abstract class UpgradeProcessor<S>
 
 
     // ----------------------------------------------------------- Inner classes
-
-    protected abstract static class UpgradeServletInputStream extends
-            ServletInputStream {
-
-        private volatile ReadListener readListener = null;
-
-        @Override
-        public final boolean isFinished() {
-            if (readListener == null) {
-                throw new IllegalStateException(
-                        sm.getString("upgrade.sis.isFinished.ise"));
-            }
-
-            // TODO Support non-blocking IO
-            return false;
-        }
-
-        @Override
-        public final boolean isReady() {
-            if (readListener == null) {
-                throw new IllegalStateException(
-                        sm.getString("upgrade.sis.isReady.ise"));
-            }
-
-            // TODO Support non-blocking IO
-            return false;
-        }
-
-        @Override
-        public final void setReadListener(ReadListener listener) {
-            if (listener == null) {
-                throw new NullPointerException(
-                        sm.getString("upgrade.sis.readListener.null"));
-            }
-            this.readListener = listener;
-        }
-
-        @Override
-        public final int read() throws IOException {
-            return doRead();
-        }
-
-        @Override
-        public final int read(byte[] b, int off, int len) throws IOException {
-            return doRead(b, off, len);
-        }
-
-        protected abstract int doRead() throws IOException;
-        protected abstract int doRead(byte[] b, int off, int len)
-                throws IOException;
-    }
 
     protected abstract static class UpgradeServletOutputStream extends
             ServletOutputStream {

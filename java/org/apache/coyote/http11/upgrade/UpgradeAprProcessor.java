@@ -21,7 +21,6 @@ import java.io.IOException;
 import javax.servlet.http.ProtocolHandler;
 
 import org.apache.tomcat.jni.Socket;
-import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
@@ -31,7 +30,7 @@ public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
     public UpgradeAprProcessor(SocketWrapper<Long> wrapper,
             ProtocolHandler httpUpgradeProcessor) {
         super(httpUpgradeProcessor,
-                new AprUpgradeServletInputStream(wrapper.getSocket().longValue()),
+                new AprUpgradeServletInputStream(wrapper),
                 new AprUpgradeServletOutputStream(wrapper.getSocket().longValue()));
 
         Socket.timeoutSet(wrapper.getSocket().longValue(), INFINITE_TIMEOUT);
@@ -39,50 +38,6 @@ public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
 
 
     // ----------------------------------------------------------- Inner classes
-
-    private static class AprUpgradeServletInputStream
-            extends UpgradeServletInputStream {
-
-        private final long socket;
-
-        public AprUpgradeServletInputStream(long socket) {
-            this.socket = socket;
-        }
-
-        @Override
-        protected int doRead() throws IOException {
-            byte[] bytes = new byte[1];
-            int result = Socket.recv(socket, bytes, 0, 1);
-            if (result == -1) {
-                return -1;
-            } else {
-                return bytes[0] & 0xFF;
-            }
-        }
-
-        @Override
-        protected int doRead(byte[] b, int off, int len) throws IOException {
-            boolean block = true;
-            if (!block) {
-                Socket.optSet(socket, Socket.APR_SO_NONBLOCK, -1);
-            }
-            try {
-                int result = Socket.recv(socket, b, off, len);
-                if (result > 0) {
-                    return result;
-                } else if (-result == Status.EAGAIN) {
-                    return 0;
-                } else {
-                    throw new IOException(sm.getString("apr.error",
-                            Integer.valueOf(-result)));
-                }
-            } finally {
-                if (!block) {
-                    Socket.optSet(socket, Socket.APR_SO_NONBLOCK, 0);
-                }
-            }
-        }
-    }
 
     private static class AprUpgradeServletOutputStream
             extends UpgradeServletOutputStream {
