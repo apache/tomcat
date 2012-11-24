@@ -65,7 +65,8 @@ public class UpgradeAprServletInputStream extends UpgradeServletInputStream {
 */
 
     @Override
-    protected int doRead(boolean block) throws IOException {
+    protected int doRead(boolean block, byte[] b, int off, int len)
+            throws IOException {
         // TODO Auto-generated method stub
         return 0;
     }

@@ -32,8 +32,9 @@ public class UpgradeBioServletInputStream extends UpgradeServletInputStream {
     }
 
     @Override
-    protected int doRead(boolean block) throws IOException {
-        return inputStream.read();
+    protected int doRead(boolean block, byte[] b, int off, int len)
+            throws IOException {
+        return inputStream.read(b, off, len);
     }
 
     @Override

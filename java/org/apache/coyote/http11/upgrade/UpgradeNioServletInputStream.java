@@ -38,19 +38,6 @@ public class UpgradeNioServletInputStream extends UpgradeServletInputStream {
     }
 
     @Override
-    protected int doRead(boolean block) throws IOException {
-        byte[] bytes = new byte[1];
-        int result = readSocket(block, bytes, 0, 1);
-        if (result == 0) {
-            return NO_DATA;
-        } else if (result == -1) {
-            return EOF;
-        } else {
-            return bytes[0] & 0xFF;
-        }
-    }
-
-    @Override
     protected boolean doIsReady() throws IOException {
         ByteBuffer readBuffer = channel.getBufHandler().getReadBuffer();
 
@@ -66,7 +53,8 @@ public class UpgradeNioServletInputStream extends UpgradeServletInputStream {
         return isReady;
     }
 
-    private int readSocket(boolean block, byte[] b, int off, int len)
+    @Override
+    protected int doRead(boolean block, byte[] b, int off, int len)
             throws IOException {
 
         ByteBuffer readBuffer = channel.getBufHandler().getReadBuffer();
