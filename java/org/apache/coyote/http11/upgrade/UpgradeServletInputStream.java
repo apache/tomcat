@@ -23,27 +23,34 @@ import javax.servlet.ServletInputStream;
 
 public abstract class UpgradeServletInputStream extends ServletInputStream {
 
-    protected static final int EOF = -1;
-    protected static final int NO_DATA = -2;
-
     private volatile boolean finished = false;
-    private volatile boolean ready = true;
+
+    // Start in blocking-mode
+    private volatile Boolean ready = Boolean.TRUE;
     private volatile ReadListener listener = null;
+
 
     @Override
     public final boolean isFinished() {
         return finished;
     }
 
+
     @Override
     public boolean isReady() {
+        // If we already know the current state, return it.
+        if (ready != null) {
+            return ready.booleanValue();
+        }
+
         try {
-            ready = doIsReady();
+            ready = Boolean.valueOf(doIsReady());
         } catch (IOException e) {
             listener.onError(e);
         }
-        return ready;
+        return ready.booleanValue();
     }
+
 
     @Override
     public void setReadListener(ReadListener listener) {
@@ -52,36 +59,92 @@ public abstract class UpgradeServletInputStream extends ServletInputStream {
             throw new IllegalArgumentException();
         }
         this.listener = listener;
-
-        isReady();
+        // Switching to non-blocking. Don't know if data is available.
+        ready = null;
     }
+
 
     @Override
     public final int read() throws IOException {
-        if (!ready) {
+        preReadChecks();
+
+        return readInternal();
+    }
+
+
+    @Override
+    public int readLine(byte[] b, int off, int len) throws IOException {
+        preReadChecks();
+
+        if (len == 0) {
+            return 0;
+        }
+
+        int r;
+        int pos = off;
+        int count = 0;
+
+        while ((r = readInternal()) != -1) {
+            b[pos++] = (byte) r;
+            count ++;
+            if (r == -1 || count == len) {
+                break;
+            }
+        }
+
+        if (r == -1) {
+            return -1;
+        } else {
+            return count;
+        }
+    }
+
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        preReadChecks();
+
+        return doRead(listener == null, b, off, len);
+    }
+
+
+    private void preReadChecks() {
+        if (ready == null || !ready.booleanValue()) {
             // TODO i18n
             throw new IllegalStateException();
         }
+        // No longer know if data is available
+        ready = null;
+    }
+
+
+    private int readInternal() throws IOException {
+        // Handles difference between EOF and NO DATA when reading a single byte
         ReadListener readListener = this.listener;
-        int result = doRead(readListener == null);
-        if (result == EOF) {
+        byte[] b = new byte[1];
+        int result = doRead(readListener == null, b, 0, 1);
+        if (result == 0) {
+            return -1;
+        } else if (result == -1) {
             finished = true;
             if (readListener != null) {
                 readListener.onAllDataRead();
             }
-            return EOF;
-        } else if (result == NO_DATA) {
-            return EOF;
+            return -1;
+        } else {
+            return b[0] & 0xFF;
         }
-        return result;
     }
 
+
     protected void onDataAvailable() {
-        ready = true;
+        ready = Boolean.TRUE;
         listener.onDataAvailable();
     }
 
-    protected abstract int doRead(boolean block) throws IOException;
+
+    protected abstract int doRead(boolean block, byte[] b, int off, int len)
+            throws IOException;
 
     protected abstract boolean doIsReady() throws IOException;
 }
