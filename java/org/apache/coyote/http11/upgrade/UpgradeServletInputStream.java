@@ -21,7 +21,13 @@ import java.io.IOException;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 
+import org.apache.tomcat.util.res.StringManager;
+
 public abstract class UpgradeServletInputStream extends ServletInputStream {
+
+    protected static final StringManager sm =
+            StringManager.getManager(Constants.Package);
+
 
     // Start in blocking-mode
     private volatile Boolean ready = Boolean.TRUE;
@@ -30,6 +36,10 @@ public abstract class UpgradeServletInputStream extends ServletInputStream {
 
     @Override
     public final boolean isFinished() {
+        if (listener == null) {
+            throw new IllegalStateException(
+                    sm.getString("upgrade.sis.isFinished.ise"));
+        }
         // The only way to finish an HTTP Upgrade connection is to close the
         // socket.
         return false;
@@ -38,6 +48,11 @@ public abstract class UpgradeServletInputStream extends ServletInputStream {
 
     @Override
     public final boolean isReady() {
+        if (listener == null) {
+            throw new IllegalStateException(
+                    sm.getString("upgrade.sis.isReady.ise"));
+        }
+
         // If we already know the current state, return it.
         if (ready != null) {
             return ready.booleanValue();
@@ -55,8 +70,8 @@ public abstract class UpgradeServletInputStream extends ServletInputStream {
     @Override
     public final void setReadListener(ReadListener listener) {
         if (listener == null) {
-            // TODO i18n
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(
+                    sm.getString("upgrade.sis.readListener.null"));
         }
         this.listener = listener;
         // Switching to non-blocking. Don't know if data is available.
@@ -102,8 +117,8 @@ public abstract class UpgradeServletInputStream extends ServletInputStream {
 
     private void preReadChecks() {
         if (listener != null && (ready == null || !ready.booleanValue())) {
-            // TODO i18n
-            throw new IllegalStateException();
+            throw new IllegalStateException(
+                    sm.getString("upgrade.sis.read.ise"));
         }
         // No longer know if data is available
         ready = null;
