@@ -94,8 +94,6 @@ public class TestUpgrade extends TomcatBaseTest {
         //       ServletInputStream.readLine() does not strip new lines
         Assert.assertEquals(MESSAGE, response);
         Assert.assertEquals(MESSAGE, response);
-
-        pw.close();
     }
 
 
