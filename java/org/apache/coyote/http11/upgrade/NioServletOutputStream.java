@@ -24,14 +24,14 @@ import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.net.SocketWrapper;
 
-public class UpgradeNioServletOutputStream extends UpgradeServletOutputStream {
+public class NioServletOutputStream extends AbstractServletOutputStream {
 
     private final NioChannel nioChannel;
     private final NioSelectorPool pool;
     private final int maxWrite;
 
 
-    public UpgradeNioServletOutputStream(
+    public NioServletOutputStream(
             SocketWrapper<NioChannel> wrapper, NioSelectorPool pool) {
         nioChannel = wrapper.getSocket();
         this.pool = pool;

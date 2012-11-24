@@ -17,29 +17,29 @@
 package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.net.Socket;
 
 import org.apache.tomcat.util.net.SocketWrapper;
 
-public class UpgradeBioServletOutputStream extends UpgradeServletOutputStream {
+public class BioServletInputStream extends AbstractServletInputStream {
 
-    private final OutputStream os;
+    private final InputStream inputStream;
 
-    public UpgradeBioServletOutputStream(SocketWrapper<Socket> wrapper)
+    public BioServletInputStream(SocketWrapper<Socket> wrapper)
             throws IOException {
-        os = wrapper.getSocket().getOutputStream();
+        inputStream = wrapper.getSocket().getInputStream();
     }
 
     @Override
-    protected int doWrite(boolean block, byte[] b, int off, int len)
+    protected int doRead(boolean block, byte[] b, int off, int len)
             throws IOException {
-        os.write(b, off, len);
-        return len;
+        return inputStream.read(b, off, len);
     }
 
     @Override
-    protected void doFlush() throws IOException {
-        os.flush();
+    protected boolean doIsReady() {
+        // Always returns true for BIO
+        return true;
     }
 }

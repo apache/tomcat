@@ -23,14 +23,14 @@ import javax.servlet.http.ProtocolHandler;
 
 import org.apache.tomcat.util.net.SocketWrapper;
 
-public class UpgradeBioProcessor extends UpgradeProcessor<Socket> {
+public class BioProcessor extends AbstractProcessor<Socket> {
 
     private static final int INFINITE_TIMEOUT = 0;
 
-    public UpgradeBioProcessor(SocketWrapper<Socket> wrapper,
+    public BioProcessor(SocketWrapper<Socket> wrapper,
             ProtocolHandler httpUpgradeProcessor) throws IOException {
-        super(httpUpgradeProcessor, new UpgradeBioServletInputStream(wrapper),
-                new UpgradeBioServletOutputStream(wrapper));
+        super(httpUpgradeProcessor, new BioServletInputStream(wrapper),
+                new BioServletOutputStream(wrapper));
 
         wrapper.getSocket().setSoTimeout(INFINITE_TIMEOUT);
     }
