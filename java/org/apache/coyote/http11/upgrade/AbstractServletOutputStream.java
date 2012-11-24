@@ -23,7 +23,7 @@ import javax.servlet.WriteListener;
 
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class UpgradeServletOutputStream extends ServletOutputStream {
+public abstract class AbstractServletOutputStream extends ServletOutputStream {
 
     protected static final StringManager sm =
             StringManager.getManager(Constants.Package);

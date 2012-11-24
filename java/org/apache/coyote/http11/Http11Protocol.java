@@ -23,7 +23,7 @@ import javax.servlet.http.ProtocolHandler;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
-import org.apache.coyote.http11.upgrade.UpgradeBioProcessor;
+import org.apache.coyote.http11.upgrade.BioProcessor;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint;
@@ -212,7 +212,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
                 SocketWrapper<Socket> socket,
                 ProtocolHandler httpUpgradeProcessor)
                 throws IOException {
-            return new UpgradeBioProcessor(socket, httpUpgradeProcessor);
+            return new BioProcessor(socket, httpUpgradeProcessor);
         }
 
         @Override

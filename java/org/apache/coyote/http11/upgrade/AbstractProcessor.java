@@ -32,19 +32,19 @@ import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class UpgradeProcessor<S>
+public abstract class AbstractProcessor<S>
         implements Processor<S>, WebConnection {
 
     protected static final StringManager sm =
             StringManager.getManager(Constants.Package);
 
     private final ProtocolHandler httpUpgradeHandler;
-    private final UpgradeServletInputStream upgradeServletInputStream;
-    private final UpgradeServletOutputStream upgradeServletOutputStream;
+    private final AbstractServletInputStream upgradeServletInputStream;
+    private final AbstractServletOutputStream upgradeServletOutputStream;
 
-    protected UpgradeProcessor (ProtocolHandler httpUpgradeHandler,
-            UpgradeServletInputStream upgradeServletInputStream,
-            UpgradeServletOutputStream upgradeServletOutputStream) {
+    protected AbstractProcessor (ProtocolHandler httpUpgradeHandler,
+            AbstractServletInputStream upgradeServletInputStream,
+            AbstractServletOutputStream upgradeServletOutputStream) {
         this.httpUpgradeHandler = httpUpgradeHandler;
         this.upgradeServletInputStream = upgradeServletInputStream;
         this.upgradeServletOutputStream = upgradeServletOutputStream;

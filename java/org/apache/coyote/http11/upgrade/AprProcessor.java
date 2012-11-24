@@ -18,20 +18,19 @@ package org.apache.coyote.http11.upgrade;
 
 import javax.servlet.http.ProtocolHandler;
 
-import org.apache.tomcat.util.net.NioChannel;
-import org.apache.tomcat.util.net.NioSelectorPool;
+import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.util.net.SocketWrapper;
 
-public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
+public class AprProcessor extends AbstractProcessor<Long> {
 
     private static final int INFINITE_TIMEOUT = -1;
 
-    public UpgradeNioProcessor(SocketWrapper<NioChannel> wrapper,
-            ProtocolHandler httpUpgradeProcessor, NioSelectorPool pool) {
+    public AprProcessor(SocketWrapper<Long> wrapper,
+            ProtocolHandler httpUpgradeProcessor) {
         super(httpUpgradeProcessor,
-                new UpgradeNioServletInputStream(wrapper, pool),
-                new UpgradeNioServletOutputStream(wrapper, pool));
+                new AprServletInputStream(wrapper),
+                new AprServletOutputStream(wrapper));
 
-        wrapper.setTimeout(INFINITE_TIMEOUT);
+        Socket.timeoutSet(wrapper.getSocket().longValue(), INFINITE_TIMEOUT);
     }
 }
