@@ -18,6 +18,8 @@ package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
 
+import javax.servlet.http.ProtocolHandler;
+
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.net.SocketWrapper;
@@ -28,7 +30,7 @@ public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
 
 
     public UpgradeAprProcessor(SocketWrapper<Long> wrapper,
-            UpgradeInbound upgradeInbound) {
+            ProtocolHandler httpUpgradeProcessor) {
         super(upgradeInbound);
 
         Socket.timeoutSet(wrapper.getSocket().longValue(),

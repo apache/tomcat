@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Selector;
 
+import javax.servlet.http.ProtocolHandler;
+
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
@@ -34,7 +36,7 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
     private final int maxWrite;
 
     public UpgradeNioProcessor(SocketWrapper<NioChannel> wrapper,
-            UpgradeInbound upgradeInbound, NioSelectorPool pool) {
+            ProtocolHandler httpUpgradeProcessor, NioSelectorPool pool) {
         super(upgradeInbound);
 
         wrapper.setTimeout(upgradeInbound.getReadTimeout());

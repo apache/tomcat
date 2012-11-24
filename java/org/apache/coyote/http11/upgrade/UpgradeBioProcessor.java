@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import javax.servlet.http.ProtocolHandler;
+
 import org.apache.tomcat.util.net.SocketWrapper;
 
 public class UpgradeBioProcessor extends UpgradeProcessor<Socket> {
@@ -29,7 +31,7 @@ public class UpgradeBioProcessor extends UpgradeProcessor<Socket> {
     private final OutputStream outputStream;
 
     public UpgradeBioProcessor(SocketWrapper<Socket> wrapper,
-            UpgradeInbound upgradeInbound) throws IOException {
+            ProtocolHandler httpUpgradeProcessor) throws IOException {
         super(upgradeInbound);
 
         int timeout = upgradeInbound.getReadTimeout();

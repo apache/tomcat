@@ -16,9 +16,10 @@
  */
 package org.apache.coyote.ajp;
 
+import javax.servlet.http.ProtocolHandler;
+
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -92,7 +93,7 @@ public abstract class AbstractAjpProtocol extends AbstractProtocol {
 
         @Override
         protected P createUpgradeProcessor(SocketWrapper<S> socket,
-                UpgradeInbound inbound) {
+                ProtocolHandler httpUpgradeHandler) {
             // TODO should fail - throw IOE
             return null;
         }
