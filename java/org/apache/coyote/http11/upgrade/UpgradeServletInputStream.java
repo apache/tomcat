@@ -23,8 +23,6 @@ import javax.servlet.ServletInputStream;
 
 public abstract class UpgradeServletInputStream extends ServletInputStream {
 
-    private volatile boolean finished = false;
-
     // Start in blocking-mode
     private volatile Boolean ready = Boolean.TRUE;
     private volatile ReadListener listener = null;
@@ -32,12 +30,14 @@ public abstract class UpgradeServletInputStream extends ServletInputStream {
 
     @Override
     public final boolean isFinished() {
-        return finished;
+        // The only way to finish an HTTP Upgrade connection is to close the
+        // socket.
+        return false;
     }
 
 
     @Override
-    public boolean isReady() {
+    public final boolean isReady() {
         // If we already know the current state, return it.
         if (ready != null) {
             return ready.booleanValue();
@@ -53,7 +53,7 @@ public abstract class UpgradeServletInputStream extends ServletInputStream {
 
 
     @Override
-    public void setReadListener(ReadListener listener) {
+    public final void setReadListener(ReadListener listener) {
         if (listener == null) {
             // TODO i18n
             throw new IllegalArgumentException();
@@ -73,7 +73,7 @@ public abstract class UpgradeServletInputStream extends ServletInputStream {
 
 
     @Override
-    public int readLine(byte[] b, int off, int len) throws IOException {
+    public final int readLine(byte[] b, int off, int len) throws IOException {
         preReadChecks();
 
         if (len <= 0) {
@@ -93,7 +93,7 @@ public abstract class UpgradeServletInputStream extends ServletInputStream {
 
 
     @Override
-    public int read(byte[] b, int off, int len) throws IOException {
+    public final int read(byte[] b, int off, int len) throws IOException {
         preReadChecks();
 
         return doRead(listener == null, b, off, len);
@@ -111,17 +111,17 @@ public abstract class UpgradeServletInputStream extends ServletInputStream {
 
 
     private int readInternal() throws IOException {
-        // Handles difference between EOF and NO DATA when reading a single byte
+        // Single byte reads for non-blocking need special handling so all
+        // single byte reads run through this method.
         ReadListener readListener = this.listener;
         byte[] b = new byte[1];
         int result = doRead(readListener == null, b, 0, 1);
         if (result == 0) {
             return -1;
         } else if (result == -1) {
-            finished = true;
-            if (readListener != null) {
-                readListener.onAllDataRead();
-            }
+            // Will never happen with a network socket. An IOException will be
+            // thrown when the client closes the connection.
+            // Echo back the -1 to be safe.
             return -1;
         } else {
             return b[0] & 0xFF;
@@ -129,7 +129,7 @@ public abstract class UpgradeServletInputStream extends ServletInputStream {
     }
 
 
-    protected void onDataAvailable() {
+    protected final void onDataAvailable() {
         ready = Boolean.TRUE;
         listener.onDataAvailable();
     }

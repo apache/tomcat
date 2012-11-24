@@ -92,7 +92,10 @@ public class TestUpgrade extends TomcatBaseTest {
 
         // Note: BufferedReader.readLine() strips new lines
         //       ServletInputStream.readLine() does not strip new lines
-        Assert.assertEquals(MESSAGE, response );
+        Assert.assertEquals(MESSAGE, response);
+        Assert.assertEquals(MESSAGE, response);
+
+        pw.close();
     }
 
 
@@ -245,7 +248,7 @@ public class TestUpgrade extends TomcatBaseTest {
 
             @Override
             public void onAllDataRead() {
-                System.out.println("All data read");
+                // NO-OP for HTTP Upgrade
             }
 
             @Override
