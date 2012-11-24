@@ -39,7 +39,7 @@ public interface Processor<S> {
     SocketState asyncPostProcess();
 
     javax.servlet.http.ProtocolHandler getHttpUpgradeHandler();
-    SocketState upgradeDispatch() throws IOException;
+    SocketState upgradeDispatch(SocketStatus status) throws IOException;
 
     boolean isComet();
     boolean isAsync();
