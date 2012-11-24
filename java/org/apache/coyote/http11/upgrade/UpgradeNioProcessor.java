@@ -33,7 +33,7 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
     public UpgradeNioProcessor(SocketWrapper<NioChannel> wrapper,
             ProtocolHandler httpUpgradeProcessor, NioSelectorPool pool) {
         super(httpUpgradeProcessor,
-                new NioUpgradeServletInputStream(wrapper, pool),
+                new UpgradeNioServletInputStream(wrapper, pool),
                 new NioUpgradeServletOutputStream(wrapper, pool));
 
         wrapper.setTimeout(INFINITE_TIMEOUT);

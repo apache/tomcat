@@ -30,7 +30,7 @@ public class UpgradeBioProcessor extends UpgradeProcessor<Socket> {
 
     public UpgradeBioProcessor(SocketWrapper<Socket> wrapper,
             ProtocolHandler httpUpgradeProcessor) throws IOException {
-        super(httpUpgradeProcessor, new BioUpgradeServletInputStream(wrapper),
+        super(httpUpgradeProcessor, new UpgradeBioServletInputStream(wrapper),
                 new BioUpgradeServletOutputStream(wrapper));
 
         wrapper.getSocket().setSoTimeout(INFINITE_TIMEOUT);

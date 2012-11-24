@@ -22,11 +22,11 @@ import java.net.Socket;
 
 import org.apache.tomcat.util.net.SocketWrapper;
 
-public class BioUpgradeServletInputStream extends UpgradeServletInputStream {
+public class UpgradeBioServletInputStream extends UpgradeServletInputStream {
 
     private final InputStream inputStream;
 
-    public BioUpgradeServletInputStream(SocketWrapper<Socket> wrapper)
+    public UpgradeBioServletInputStream(SocketWrapper<Socket> wrapper)
             throws IOException {
         inputStream = wrapper.getSocket().getInputStream();
     }

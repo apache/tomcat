@@ -90,7 +90,7 @@ public class TestUpgradeServletInputStream extends TomcatBaseTest {
 
         tomcat.start();
 
-        // Use raw socket so the necessary control is available post the HTTP
+        // Use raw socket so the necessary control is available after the HTTP
         // upgrade
         Socket socket =
                 SocketFactory.getDefault().createSocket("localhost", getPort());
@@ -181,14 +181,12 @@ public class TestUpgradeServletInputStream extends TomcatBaseTest {
                         int read = sis.read(buffer);
                         if (read > 0) {
                             System.out.print(new String(buffer, 0, read));
-                            /*
                             if (sos.canWrite()) {
                                 sos.write(buffer, 0, read);
                             } else {
                                 throw new IOException("Unable to echo data. " +
                                         "canWrite() returned false");
                             }
-                            */
                         }
                     }
                 } catch (IOException ioe) {

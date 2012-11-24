@@ -20,11 +20,11 @@ import java.io.IOException;
 
 import org.apache.tomcat.util.net.SocketWrapper;
 
-public class AprUpgradeServletInputStream extends UpgradeServletInputStream {
+public class UpgradeAprServletInputStream extends UpgradeServletInputStream {
 
     private final long socket;
 
-    public AprUpgradeServletInputStream(SocketWrapper<Long> wrapper) {
+    public UpgradeAprServletInputStream(SocketWrapper<Long> wrapper) {
         this.socket = wrapper.getSocket().longValue();
     }
 /*

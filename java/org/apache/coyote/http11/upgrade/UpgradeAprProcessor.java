@@ -30,7 +30,7 @@ public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
     public UpgradeAprProcessor(SocketWrapper<Long> wrapper,
             ProtocolHandler httpUpgradeProcessor) {
         super(httpUpgradeProcessor,
-                new AprUpgradeServletInputStream(wrapper),
+                new UpgradeAprServletInputStream(wrapper),
                 new AprUpgradeServletOutputStream(wrapper.getSocket().longValue()));
 
         Socket.timeoutSet(wrapper.getSocket().longValue(), INFINITE_TIMEOUT);
