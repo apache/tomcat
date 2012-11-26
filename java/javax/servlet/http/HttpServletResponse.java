@@ -116,13 +116,13 @@ public interface HttpServletResponse extends ServletResponse {
     public String encodeRedirectUrl(String url);
 
     /**
-     * Sends an error response to the client using the specified status. The
-     * server defaults to creating the response to look like an HTML-formatted
-     * server error page containing the specified message, setting the content
-     * type to "text/html", leaving cookies and other headers unmodified. If an
-     * error-page declaration has been made for the web application
-     * corresponding to the status code passed in, it will be served back in
-     * preference to the suggested msg parameter.
+     * Sends an error response to the client using the specified status code and
+     * clears the output buffer. The server defaults to creating the response to
+     * look like an HTML-formatted server error page containing the specified
+     * message, setting the content type to "text/html", leaving cookies and
+     * other headers unmodified. If an error-page declaration has been made for
+     * the web application corresponding to the status code passed in, it will
+     * be served back in preference to the suggested msg parameter.
      * <p>
      * If the response has already been committed, this method throws an
      * IllegalStateException. After using this method, the response should be
@@ -141,11 +141,8 @@ public interface HttpServletResponse extends ServletResponse {
 
     /**
      * Sends an error response to the client using the specified status code and
-     * clearing the buffer.
-     * <p>
-     * If the response has already been committed, this method throws an
-     * IllegalStateException. After using this method, the response should be
-     * considered to be committed and should not be written to.
+     * clears the buffer. This is equivalent to calling {@link #sendError(int,
+     * String)} with the same status code and <code>null</code> for the message.
      *
      * @param sc
      *            the error status code
