@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.websocket;
+package org.apache.tomcat.websocket;
 
 import java.util.Map;
 import java.util.WeakHashMap;

@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 public class ContainerProvider {
 
     private static final String CONTAINER_PROVIDER_IMPL =
-            "org.apache.websocket.ServerContainerImpl";
+            "org.apache.tomcat.websocket.ServerContainerImpl";
 
     public static ServerContainer getServerContainer() {
         // TODO SecurityManager
