@@ -73,6 +73,10 @@
         <code>HttpServletResponse.sendError(int)</code> results in an HTML
         response by default. (markt)
       </fix>
+      <fix>
+        <bug>54207</bug>: Correct JNDI factory package name in Javadoc for
+        <code>org.apache.naming.java.javaURLContextFactory</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
