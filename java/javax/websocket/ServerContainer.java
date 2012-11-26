@@ -16,8 +16,18 @@
  */
 package javax.websocket;
 
+/**
+ * Defines the additional server specific methods.
+ */
 public interface ServerContainer extends ClientContainer {
 
+    /**
+     * Publish the Endpoint in this ServerContainer.
+     *
+     * @param clazz The implementation class for the Endpoint
+     *
+     * @throws DeploymentException  If the publish process fails for any reason
+     */
     void publishServer(Class<? extends Endpoint> clazz)
             throws DeploymentException;
 }
