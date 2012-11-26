@@ -40,7 +40,7 @@ import org.apache.naming.SelectorContext;
  * java.naming.factory.url.pkgs=org.apache.naming property
  * to the JNDI properties file</li>
  * <li>Setting an environment variable named Context.URL_PKG_PREFIXES with
- * its value including the org.apache.catalina.util.naming package name.
+ * its value including the org.apache.naming package name.
  * More detail about this can be found in the JNDI documentation :
  * {@link javax.naming.spi.NamingManager#getURLContext(java.lang.String, java.util.Hashtable)}.</li>
  * </ul>
