@@ -66,6 +66,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>54198</bug>: Clarify that
+        <code>HttpServletResponse.sendError(int)</code> results in an HTML
+        response by default. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
