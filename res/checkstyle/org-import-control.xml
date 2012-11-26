@@ -137,11 +137,11 @@
         <allow pkg="org.apache.tomcat" exact-match="true"/>
       </subpackage>
     </subpackage>
-  </subpackage>
-  <subpackage name="websocket">
-    <allow pkg="javax.servlet"/>
-    <allow pkg="javax.websocket"/>
-    <allow pkg="org.apache.juli"/>
-    <allow pkg="org.apache.tomcat.util"/>
+    <subpackage name="websocket">
+      <allow pkg="javax.servlet"/>
+      <allow pkg="javax.websocket"/>
+      <allow pkg="org.apache.juli"/>
+      <allow pkg="org.apache.tomcat.util"/>
+    </subpackage>
   </subpackage>
 </import-control>

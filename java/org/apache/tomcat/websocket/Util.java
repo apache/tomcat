@@ -14,8 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.websocket;
+package org.apache.tomcat.websocket;
 
-public class WsServlet {
+class Util {
 
+    private Util() {
+        // Hide default constructor
+    }
+
+    static String getServletMappingPath(String wsPath) {
+        int templateStart = wsPath.indexOf('{');
+        if (templateStart == -1) {
+            if (wsPath.charAt(wsPath.length() - 1) == '/') {
+                return wsPath + '*';
+            } else {
+                return wsPath + "/*";
+            }
+        } else {
+            String temp = wsPath.substring(0, templateStart);
+            if (temp.charAt(temp.length() - 1) == '/') {
+                return temp + '*';
+            } else {
+                return temp.substring(0, temp.lastIndexOf('/') + 1) + '*';
+            }
+        }
+    }
 }
