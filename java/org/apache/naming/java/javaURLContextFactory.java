@@ -37,7 +37,7 @@ import org.apache.naming.SelectorContext;
  * prefix, which can be done by either :
  * <ul>
  * <li>Adding a
- * java.naming.factory.url.pkgs=org.apache.catalina.util.naming property
+ * java.naming.factory.url.pkgs=org.apache.naming property
  * to the JNDI properties file</li>
  * <li>Setting an environment variable named Context.URL_PKG_PREFIXES with
  * its value including the org.apache.catalina.util.naming package name.
