@@ -35,16 +35,20 @@ public class WsSci implements ServletContainerInitializer {
     @Override
     public void onStartup(Set<Class<?>> clazzes, ServletContext ctx)
             throws ServletException {
+
+        // Need to configure the ServletContext in all cases
+        ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
+        sc.setServletContext(ctx);
+
         if (clazzes == null || clazzes.size() == 0) {
             return;
         }
-        ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
 
         for (Class<?> clazz : clazzes) {
             WebSocketEndpoint anotation =
                     clazz.getAnnotation(WebSocketEndpoint.class);
             String mappingPath = Util.getServletMappingPath(anotation.value());
-            sc.publishServer(clazz, mappingPath);
+            sc.publishServer(clazz, ctx, mappingPath);
         }
     }
 }
