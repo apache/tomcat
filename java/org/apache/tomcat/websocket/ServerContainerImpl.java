@@ -24,6 +24,8 @@ import javax.websocket.Endpoint;
 import javax.websocket.ServerContainer;
 import javax.websocket.ServerEndpointConfiguration;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Provides a per class loader (i.e. per web application) instance of a
  * {@link ServerContainer}.
@@ -36,6 +38,9 @@ public class ServerContainerImpl extends ClientContainerImpl implements
     private static Map<ClassLoader, ServerContainerImpl>
             classLoaderContainerMap = new WeakHashMap<>();
     private static Object classLoaderContainerMapLock = new  Object();
+
+    private static StringManager sm = StringManager.getManager(
+            Constants.PACKAGE_NAME);
 
 
     /**
@@ -78,9 +83,8 @@ public class ServerContainerImpl extends ClientContainerImpl implements
             System.out.println("Class [" + clazz.getName() +
                     "] deployed to path [" + path + "]");
         } catch (InstantiationException | IllegalAccessException e) {
-            // TODO i18n
             throw new DeploymentException(
-                    "Failed to instantiate specified Endpoint", e);
+                    sm.getString("sci.newInstance.fail", clazz.getName()), e);
         }
     }
 
