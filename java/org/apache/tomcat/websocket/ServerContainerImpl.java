@@ -18,9 +18,6 @@ package org.apache.tomcat.websocket;
 
 import java.util.Map;
 import java.util.WeakHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
@@ -38,40 +35,24 @@ public class ServerContainerImpl extends ClientContainerImpl implements
     // stopped
     private static Map<ClassLoader, ServerContainerImpl>
             classLoaderContainerMap = new WeakHashMap<>();
-    private static ReadWriteLock classLoaderContainerMapLock =
-            new  ReentrantReadWriteLock();
+    private static Object classLoaderContainerMapLock = new  Object();
 
 
     /**
-     * Intended to be used be implementations of {@link
+     * Intended to be used by implementations of {@link
      * javax.websocket.ContainerProvider#getServerContainer()} to obtain the
      * correct {@link ServerContainer} instance.
      */
     public static ServerContainerImpl getServerContainer() {
-        // TODO SecurityManager
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 
         ServerContainerImpl result = null;
 
-        Lock readlock = classLoaderContainerMapLock.readLock();
-        try {
-            readlock.lock();
+        synchronized (classLoaderContainerMapLock) {
             result = classLoaderContainerMap.get(tccl);
-        } finally {
-            readlock.unlock();
-        }
-
-        if (result == null) {
-            Lock writeLock = classLoaderContainerMapLock.writeLock();
-            try {
-                writeLock.lock();
-                result = classLoaderContainerMap.get(tccl);
-                if (result == null) {
-                    result = new ServerContainerImpl();
-                    classLoaderContainerMap.put(tccl, result);
-                }
-            } finally {
-                writeLock.unlock();
+            if (result == null) {
+                result = new ServerContainerImpl();
+                classLoaderContainerMap.put(tccl, result);
             }
         }
         return result;
