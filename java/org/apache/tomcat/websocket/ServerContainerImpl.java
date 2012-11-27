@@ -27,16 +27,26 @@ import javax.websocket.Endpoint;
 import javax.websocket.ServerContainer;
 import javax.websocket.ServerEndpointConfiguration;
 
+/**
+ * Provides a per class loader (i.e. per web application) instance of a
+ * {@link ServerContainer}.
+ */
 public class ServerContainerImpl extends ClientContainerImpl implements
         ServerContainer {
 
-    // Needs to be a WekaHashMap to prevent memory leaks when a context is
+    // Needs to be a WeakHashMap to prevent memory leaks when a context is
     // stopped
     private static Map<ClassLoader, ServerContainerImpl>
             classLoaderContainerMap = new WeakHashMap<>();
     private static ReadWriteLock classLoaderContainerMapLock =
             new  ReentrantReadWriteLock();
 
+
+    /**
+     * Intended to be used be implementations of {@link
+     * javax.websocket.ContainerProvider#getServerContainer()} to obtain the
+     * correct {@link ServerContainer} instance.
+     */
     public static ServerContainerImpl getServerContainer() {
         // TODO SecurityManager
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
@@ -67,9 +77,11 @@ public class ServerContainerImpl extends ClientContainerImpl implements
         return result;
     }
 
+
     private ServerContainerImpl() {
         // Hide default constructor
     }
+
 
     @Override
     public void publishServer(Class<? extends Endpoint> clazz)
@@ -91,6 +103,15 @@ public class ServerContainerImpl extends ClientContainerImpl implements
         }
     }
 
+
+    /**
+     * Provides the equivalent of {@link #publishServer(Class)} for publishing
+     * plain old java objects (POJOs) that have been annotated as WebSocket
+     * endpoints.
+     *
+     * @param pojo
+     * @param path
+     */
     public void publishServer(Class<?> pojo, String path) {
         // TODO Replace following debug code with something useful.
         System.out.println("Class [" + pojo.getName() +
