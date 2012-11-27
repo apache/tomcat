@@ -23,15 +23,15 @@ import java.util.Set;
  * file META-INF/services/javax.servlet.ServletContainerInitializer that must be
  * included in the JAR file that contains the SCI implementation.
  * <p>
- * SCIs processing is performed regardless of the setting of metadata-complete.
- * SCI processing can be controlled be JAR file via fragment ordering. If an
- * absolute ordering is defined, the only those fragments included in the
- * ordering will be scanned. To disable SCI processing completely, an empty
+ * SCI processing is performed regardless of the setting of metadata-complete.
+ * SCI processing can be controlled per JAR file via fragment ordering. If an
+ * absolute ordering is defined, the only those JARs included in the ordering
+ * will be processed for SCIs. To disable SCI processing completely, an empty
  * absolute ordering may be defined.
  * <p>
- * SCIs register an interest in annotations (class, method or field) or types
- * via the {@link javax.servlet.annotation.HandlesTypes} annotation which is
- * added to the {@link #onStartup(Set, ServletContext)} method.
+ * SCIs register an interest in annotations (class, method or field) and/or
+ * types via the {@link javax.servlet.annotation.HandlesTypes} annotation which
+ * is added to the class.
  *
  * @since Servlet 3.0
  */
