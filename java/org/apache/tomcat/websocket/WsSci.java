@@ -24,6 +24,11 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.HandlesTypes;
 import javax.websocket.WebSocketEndpoint;
 
+/**
+ * Registers an interest in any class that is annotated with
+ * {@link WebSocketEndpoint} so that Endpoint can be published via the
+ * WebSocket server.
+ */
 @HandlesTypes({WebSocketEndpoint.class})
 public class WsSci implements ServletContainerInitializer {
 
@@ -42,5 +47,4 @@ public class WsSci implements ServletContainerInitializer {
             sc.publishServer(clazz, mappingPath);
         }
     }
-
 }
