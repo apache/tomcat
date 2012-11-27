@@ -555,10 +555,17 @@ public interface ServletContext {
             throws ServletException;
 
     /**
-     * @param servletName
-     * @return TODO
-     * @throws UnsupportedOperationException
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * Obtain the details of the named servlet.
+     *
+     * @param servletName   The name of the Servlet of interest
+     *
+     * @return  The registration details for the named Servlet or
+     *          <code>null</code> if no Servlet has been registered with the
+     *          given name
+     *
+     * @throws UnsupportedOperationException TODO SERVLET3 - Add comments
+     *
+     * @since Servlet 3.0
      */
     public ServletRegistration getServletRegistration(String servletName);
 
