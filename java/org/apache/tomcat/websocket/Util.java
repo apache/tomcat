@@ -16,12 +16,24 @@
  */
 package org.apache.tomcat.websocket;
 
+/**
+ * Utility class for internal use only within the {@link
+ * org.apache.tomcat.websocket} package.
+ */
 class Util {
 
     private Util() {
         // Hide default constructor
     }
 
+    /**
+     * Converts a path defined for a WebSocket endpoint into a path that can be
+     * used as a servlet mapping.
+     *
+     * @param wsPath    The WebSocket endpoint path to convert
+     *
+     * @return  The servlet mapping
+     */
     static String getServletMappingPath(String wsPath) {
         int templateStart = wsPath.indexOf('{');
         if (templateStart == -1) {
