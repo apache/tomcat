@@ -160,4 +160,23 @@ public class ServerContainerImpl extends ClientContainerImpl implements
 
         sr.addMapping(mapping);
     }
+
+
+    public Endpoint getEndpoint(String servletPath)
+            throws InstantiationException, IllegalAccessException {
+        Class<? extends Endpoint> clazzEndpoint = endpointMap.get(servletPath);
+        if (clazzEndpoint != null) {
+            Endpoint ep = clazzEndpoint.newInstance();
+            return ep;
+        }
+
+        Class<?> clazzPojo = pojoMap.get(servletPath);
+        if (clazzPojo != null) {
+            Endpoint ep = new WsEndpointPojo(clazzPojo, servletPath);
+            return ep;
+        }
+
+        throw new IllegalStateException(
+                sm.getString("serverContainer.missingEndpoint", servletPath));
+    }
 }

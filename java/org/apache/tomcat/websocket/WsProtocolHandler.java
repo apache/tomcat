@@ -14,36 +14,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package websocket.echo;
+package org.apache.tomcat.websocket;
 
-import javax.websocket.DefaultServerConfiguration;
+import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.WebConnection;
 import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfiguration;
-import javax.websocket.ServerEndpointConfiguration;
-import javax.websocket.Session;
 
-public class EchoEndpoint extends Endpoint{
+public class WsProtocolHandler implements ProtocolHandler {
 
-    private static ServerEndpointConfiguration config =
-            new DefaultServerConfiguration("/websocket/echoProgrammatic") {
+    private final Endpoint ep;
 
-        @Override
-        public boolean checkOrigin(String originHeaderValue) {
-            // Accept any
-            return true;
-        }
-    };
-
-    @Override
-    public EndpointConfiguration getEndpointConfiguration() {
-        return config;
+    public WsProtocolHandler(Endpoint ep) {
+        this.ep = ep;
     }
 
     @Override
-    public void onOpen(Session session) {
-        // TODO - Review this debug hack
-        System.out.println("EchoEndpoint onOpen() called");
-        // TODO Auto-generated method stub
+    public void init(WebConnection connection) {
 
+        ep.onOpen(new WsSession());
+
+        // TODO Message handling
     }
 }
