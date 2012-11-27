@@ -34,8 +34,8 @@ public class ContainerProvider {
      */
     public static ServerContainer getServerContainer() {
         // Note: No special handling required when running under a
-        //       SecurityManager as the caller and this class will have the same
-        //       ClassLoader
+        //       SecurityManager as the container provider implementation and
+        //       this class have the same class loader.
         ServerContainer result = null;
         try {
             Class<?> clazz = Class.forName(CONTAINER_PROVIDER_IMPL);
