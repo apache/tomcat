@@ -18,12 +18,17 @@ package org.apache.tomcat.websocket;
 
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration;
 import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.ServerContainer;
 import javax.websocket.ServerEndpointConfiguration;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -41,6 +46,8 @@ public class ServerContainerImpl extends ClientContainerImpl implements
 
     private static StringManager sm = StringManager.getManager(
             Constants.PACKAGE_NAME);
+
+    protected Log log = LogFactory.getLog(ServerContainerImpl.class);
 
 
     /**
@@ -64,8 +71,21 @@ public class ServerContainerImpl extends ClientContainerImpl implements
     }
 
 
+    private volatile ServletContext servletContext = null;
+
+    private Map<String, Class<? extends Endpoint>> endpointMap =
+            new ConcurrentHashMap<>();
+
+    private Map<String, Class<?>> pojoMap = new ConcurrentHashMap<>();
+
+
     private ServerContainerImpl() {
         // Hide default constructor
+    }
+
+
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
     }
 
 
@@ -73,19 +93,25 @@ public class ServerContainerImpl extends ClientContainerImpl implements
     public void publishServer(Class<? extends Endpoint> clazz)
             throws DeploymentException {
 
+        Endpoint ep = null;
         try {
-            Endpoint ep = clazz.newInstance();
-            ServerEndpointConfiguration config =
-                    (ServerEndpointConfiguration) ep.getEndpointConfiguration();
-            String path = Util.getServletMappingPath(config.getPath());
-
-            // TODO Replace following debug code with something useful.
-            System.out.println("Class [" + clazz.getName() +
-                    "] deployed to path [" + path + "]");
+            ep = clazz.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             throw new DeploymentException(
                     sm.getString("sci.newInstance.fail", clazz.getName()), e);
         }
+
+        ServerEndpointConfiguration config =
+                (ServerEndpointConfiguration) ep.getEndpointConfiguration();
+        String path = Util.getServletMappingPath(config.getPath());
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("serverContainer.endpointDeploy",
+                    clazz.getName(), path, servletContext.getContextPath()));
+        }
+
+        endpointMap.put(path.substring(0, path.length() - 2), clazz);
+        addWsServletMapping(path);
     }
 
 
@@ -94,12 +120,44 @@ public class ServerContainerImpl extends ClientContainerImpl implements
      * plain old java objects (POJOs) that have been annotated as WebSocket
      * endpoints.
      *
-     * @param pojo
-     * @param path
+     * @param pojo  The annotated POJO
+     * @param ctxt  The ServletContext the endpoint is to be published in
+     * @param path  The path at which the endpoint is to be published
      */
-    public void publishServer(Class<?> pojo, String path) {
-        // TODO Replace following debug code with something useful.
-        System.out.println("Class [" + pojo.getName() +
-                "] deployed to path [" + path + "]");
+    public void publishServer(Class<?> pojo, ServletContext ctxt, String path) {
+        if (ctxt == null) {
+            throw new IllegalArgumentException(
+                    sm.getString("serverContainer.servletContextMissing"));
+        }
+
+        // Set the ServletContext if it hasn't already been set
+        if (servletContext == null) {
+            servletContext = ctxt;
+        } else if (ctxt != servletContext) {
+            // Should never happen
+            throw new IllegalStateException(sm.getString(
+                    "serverContainer.servletContextMismatch", path,
+                    servletContext.getContextPath(), ctxt.getContextPath()));
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("serverContainer.pojoDeploy", pojo.getName(),
+                    path, servletContext.getContextPath()));
+        }
+
+        pojoMap.put(path.substring(0, path.length() - 2), pojo);
+        addWsServletMapping(path);
+    }
+
+
+    private void addWsServletMapping(String mapping) {
+        ServletRegistration sr =
+                servletContext.getServletRegistration(Constants.SERVLET_NAME);
+        if (sr == null) {
+            sr = servletContext.addServlet(Constants.SERVLET_NAME,
+                    WsServlet.class);
+        }
+
+        sr.addMapping(mapping);
     }
 }

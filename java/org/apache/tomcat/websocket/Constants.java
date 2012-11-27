@@ -18,7 +18,9 @@ package org.apache.tomcat.websocket;
 
 public class Constants {
 
-    public static final String PACKAGE_NAME = "org.apache.tomcat.websocket";
+    protected static final String PACKAGE_NAME = "org.apache.tomcat.websocket";
+
+    protected static final String SERVLET_NAME = WsServlet.class.getName();
 
     private Constants() {
         // Hide default constructor
