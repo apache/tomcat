@@ -168,7 +168,6 @@ static apr_status_t do_add(tcn_pollset_t *p, tcn_socket_t *s,
                            apr_interval_time_t socket_timeout)
 {
 
-    apr_int32_t  i;
     apr_status_t rv;
     apr_interval_time_t timeout = socket_timeout;
     tcn_pfde_t *elem = NULL;
@@ -183,7 +182,7 @@ static apr_status_t do_add(tcn_pollset_t *p, tcn_socket_t *s,
         /* Socket is already added to the pollset.
          */
 #ifdef TCN_DO_STATISTICS
-        sp_equals++;
+        p->sp_equals++;
 #endif
         return APR_EEXIST;
     }
