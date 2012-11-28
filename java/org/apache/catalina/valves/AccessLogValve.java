@@ -208,6 +208,12 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected boolean rotatable = true;
 
+    /**
+     * Should we defer inclusion of the date stamp in the file
+     * name until rotate time? Default is false.
+     */
+    protected boolean renameOnRotate = false;
+
 
     /**
      * Buffered logging.
@@ -729,6 +735,26 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
 
     /**
+     * Should we defer inclusion of the date stamp in the file
+     * name until rotate time
+     */
+    public boolean isRenameOnRotate() {
+        return renameOnRotate;
+    }
+
+
+    /**
+     * Set the value if we should defer inclusion of the date
+     * stamp in the file name until rotate time
+     *
+     * @param renameOnRotate true if defer inclusion of date stamp
+     */
+    public void setRenameOnRotate(boolean renameOnRotate) {
+        this.renameOnRotate = renameOnRotate;
+    }
+
+
+    /**
      * Is the logging buffered
      */
     public boolean isBuffered() {
@@ -968,7 +994,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
         if (currentLogFile != null) {
             File holder = currentLogFile;
-            close();
+            close(false);
             try {
                 holder.renameTo(new File(newFileName));
             } catch (Throwable e) {
@@ -994,12 +1020,76 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * Close the currently open log file (if any)
      */
-    private synchronized void close() {
+    private File getLogFile(boolean useDateStamp) {
+
+        // Create the directory if necessary
+        File dir = new File(directory);
+        if (!dir.isAbsolute()) {
+            dir = new File(getContainer().getCatalinaBase(), directory);
+        }
+        if (!dir.mkdirs() && !dir.isDirectory()) {
+            log.error(sm.getString("accessLogValve.openDirFail", dir));
+        }
+
+        // Calculate the current log file name
+        File pathname;
+        if (useDateStamp) {
+            pathname = new File(dir.getAbsoluteFile(), prefix + dateStamp
+                    + suffix);
+        } else {
+            pathname = new File(dir.getAbsoluteFile(), prefix + suffix);
+        }
+        File parent = pathname.getParentFile();
+        if (!parent.mkdirs() && !parent.isDirectory()) {
+            log.error(sm.getString("accessLogValve.openDirFail", parent));
+        }
+        return pathname;
+    }
+
+    /**
+     * Move a current but rotated log file back to the unrotated
+     * one. Needed if date stamp inclusion is deferred to rotation
+     * time.
+     */
+    private void restore() {
+        File newLogFile = getLogFile(false);
+        File rotatedLogFile = getLogFile(true);
+        if (rotatedLogFile.exists() && !newLogFile.exists() &&
+            !rotatedLogFile.equals(newLogFile)) {
+            try {
+                if (!rotatedLogFile.renameTo(newLogFile)) {
+                    log.error(sm.getString("accessLogValve.renameFail", rotatedLogFile, newLogFile));
+                }
+            } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
+                log.error(sm.getString("accessLogValve.renameFail", rotatedLogFile, newLogFile), e);
+            }
+        }
+    }
+
+
+    /**
+     * Close the currently open log file (if any)
+     *
+     * @param rename Rename file to final name after closing
+     */
+    private synchronized void close(boolean rename) {
         if (writer == null) {
             return;
         }
         writer.flush();
         writer.close();
+        if (rename && renameOnRotate) {
+            File newLogFile = getLogFile(true);
+            try {
+                if (!currentLogFile.renameTo(newLogFile)) {
+                    log.error(sm.getString("accessLogValve.renameFail", currentLogFile, newLogFile));
+                }
+            } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
+                log.error(sm.getString("accessLogValve.renameFail", currentLogFile, newLogFile), e);
+            }
+        }
         writer = null;
         dateStamp = "";
         currentLogFile = null;
@@ -1027,7 +1117,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
                         // If the date has changed, switch log files
                         if (!dateStamp.equals(tsDate)) {
-                            close();
+                            close(true);
                             dateStamp = tsDate;
                             open();
                         }
@@ -1041,7 +1131,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             synchronized (this) {
                 if (currentLogFile != null && !currentLogFile.exists()) {
                     try {
-                        close();
+                        close(false);
                     } catch (Throwable e) {
                         ExceptionUtils.handleThrowable(e);
                         log.info(sm.getString("accessLogValve.closeFail"), e);
@@ -1078,28 +1168,9 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * Open the new log file for the date specified by <code>dateStamp</code>.
      */
     protected synchronized void open() {
-        // Create the directory if necessary
-        File dir = new File(directory);
-        if (!dir.isAbsolute()) {
-            dir = new File(getContainer().getCatalinaBase(), directory);
-        }
-        if (!dir.mkdirs() && !dir.isDirectory()) {
-            log.error(sm.getString("accessLogValve.openDirFail", dir));
-        }
-
         // Open the current log file
-        File pathname;
         // If no rotate - no need for dateStamp in fileName
-        if (rotatable) {
-            pathname = new File(dir.getAbsoluteFile(), prefix + dateStamp
-                    + suffix);
-        } else {
-            pathname = new File(dir.getAbsoluteFile(), prefix + suffix);
-        }
-        File parent = pathname.getParentFile();
-        if (!parent.mkdirs() && !parent.isDirectory()) {
-            log.error(sm.getString("accessLogValve.openDirFail", parent));
-        }
+        File pathname = getLogFile(rotatable && !renameOnRotate);
 
         Charset charset = null;
         if (encoding != null) {
@@ -1222,6 +1293,9 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         fileDateFormatter = new SimpleDateFormat(format, Locale.US);
         fileDateFormatter.setTimeZone(timezone);
         dateStamp = fileDateFormatter.format(new Date(System.currentTimeMillis()));
+        if (rotatable && renameOnRotate) {
+            restore();
+        }
         open();
 
         setState(LifecycleState.STARTING);
@@ -1239,7 +1313,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     protected synchronized void stopInternal() throws LifecycleException {
 
         setState(LifecycleState.STOPPING);
-        close();
+        close(false);
     }
 
     /**

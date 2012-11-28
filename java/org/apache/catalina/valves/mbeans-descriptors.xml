@@ -94,6 +94,11 @@
                is="true"
                type="boolean"/>
 
+    <attribute name="renameOnRotate"
+               description="Flag to defer inclusion of the date stamp in the log file name until rotation."
+               is="true"
+               type="boolean"/>
+
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
@@ -249,6 +254,11 @@
 
     <attribute name="rotatable"
                description="Flag to indicate automatic log rotation."
+               is="true"
+               type="boolean"/>
+
+    <attribute name="renameOnRotate"
+               description="Flag to defer inclusion of the date stamp in the log file name until rotation."
                is="true"
                type="boolean"/>
 
