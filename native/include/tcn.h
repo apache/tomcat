@@ -162,6 +162,7 @@ struct tcn_socket_t {
     char         *jsbbuff;
     char         *jrbbuff;
     tcn_nlayer_t *net;
+    tcn_pfde_t   *pe;
     apr_time_t          last_active;
     apr_interval_time_t timeout;
 };
