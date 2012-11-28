@@ -180,6 +180,20 @@
         </p>
       </attribute>
 
+      <attribute name="renameOnRotate" required="false">
+        <p>By default for a rotatable log the active access log file name
+           will contain the current timestamp in <code>fileDateFormat</code>.
+           During rotation the file is closed and a new file with the next
+           timestamp in the name is created and used. When setting
+           <code>renameOnRotate</code> to <code>true</code>, the timestamp
+           is no longer part of the active log file name. Only during rotation
+           the file is closed and then renamed to include the timestamp.
+           This is similar to the behavior of most log frameworks when
+           doing time based rotation.
+           Default value: <code>false</code>
+        </p>
+      </attribute>
+
       <attribute name="conditionIf" required="false">
         <p>Turns on conditional logging. If set, requests will be
            logged only if <code>ServletRequest.getAttribute()</code> is
