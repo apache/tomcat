@@ -50,8 +50,8 @@ import org.apache.tomcat.util.buf.ByteChunk;
  */
 public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
-    protected static final Boolean USE_COOKIES = true;
-    protected static final Boolean NO_COOKIES = !USE_COOKIES;
+    protected static final boolean USE_COOKIES = true;
+    protected static final boolean NO_COOKIES = !USE_COOKIES;
 
     private static final String USER = "user";
     private static final String PWD = "pwd";
