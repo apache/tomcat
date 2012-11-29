@@ -105,8 +105,8 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
      */
     @Test
     public void testAcceptPublicNonLogin() throws Exception {
-        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PUBLIC,
-                NO_COOKIES, HttpServletResponse.SC_OK);
+        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PUBLIC, NO_COOKIES,
+                HttpServletResponse.SC_OK);
     }
 
     /*
@@ -116,8 +116,8 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
      */
     @Test
     public void testRejectProtectedNonLogin() throws Exception {
-        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED,
-                NO_COOKIES, HttpServletResponse.SC_FORBIDDEN);
+        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED, NO_COOKIES,
+                HttpServletResponse.SC_FORBIDDEN);
     }
 
     /*
@@ -127,8 +127,8 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
      */
     @Test
     public void testAcceptPublicBasic() throws Exception {
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PUBLIC,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PUBLIC, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_OK);
     }
 
     /*
@@ -139,10 +139,10 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
      */
     @Test
     public void testAcceptProtectedBasic() throws Exception {
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                GOOD_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, GOOD_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_OK);
     }
 
     /*
@@ -151,10 +151,10 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
      */
     @Test
     public void testAuthMethodBadCredentials() throws Exception {
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                BAD_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, BAD_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     /*
@@ -164,10 +164,10 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
      */
     @Test
     public void testAuthMethodCaseBasic() throws Exception {
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                STRANGE_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, STRANGE_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_OK);
     }
 
     /*
@@ -184,10 +184,10 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
      */
     @Test
     public void testAuthMethodBadMethod() throws Exception {
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                BAD_METHOD, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, BAD_METHOD,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     /*
@@ -202,10 +202,10 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
      */
     @Test
     public void testAuthMethodExtraSpace() throws Exception {
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                SPACED_BASE64, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, SPACED_BASE64,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     /*
@@ -220,10 +220,10 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
      */
     @Test
     public void testUserExtraSpace() throws Exception {
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                SPACED_USERNAME, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, SPACED_USERNAME,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     /*
@@ -238,10 +238,10 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
      */
     @Test
     public void testPasswordExtraSpace() throws Exception {
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                SPACED_PASSWORD, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, SPACED_PASSWORD,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     /*
@@ -254,22 +254,22 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
     public void testBasicLoginWithoutSession() throws Exception {
 
         // this section is identical to testAuthMethodCaseBasic
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                GOOD_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, GOOD_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_OK);
 
         // next, try to access the protected resource while not providing
         // credentials. This confirms the server has not retained any state
         // data which might allow it to authenticate the client. Expect
         // to be challenged with 401 SC_UNAUTHORIZED.
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
 
         // finally, provide credentials to confirm the resource
         // can still be accessed with an authentication header.
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                GOOD_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, GOOD_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_OK);
     }
 
     /*
@@ -295,22 +295,22 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
         setAlwaysUseSession();
 
         // this section is identical to testAuthMethodCaseBasic
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                GOOD_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, GOOD_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_OK);
 
         // confirm the session is not recognised by the server alone
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
 
         // now provide the harvested session cookie for authentication
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, USE_COOKIES, HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                USE_COOKIES, HttpServletResponse.SC_OK);
 
         // finally, do it again with the cookie to be sure
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, USE_COOKIES, HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                USE_COOKIES, HttpServletResponse.SC_OK);
     }
 
     /*
@@ -323,29 +323,29 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
        setAlwaysUseSession();
 
        // this section is identical to testAuthMethodCaseBasic
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                GOOD_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, GOOD_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_OK);
 
         // now provide the harvested session cookie for authentication
         List<String> originalCookies = cookies;
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, USE_COOKIES, HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                USE_COOKIES, HttpServletResponse.SC_OK);
 
         // allow the session to time out and lose authentication
         Thread.sleep(TIMEOUT_DELAY_MSECS);
 
         // provide the harvested session cookie for authentication
         // to confirm it has expired
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, USE_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                USE_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
 
         // finally, do BASIC reauthentication and get another session
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                GOOD_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, GOOD_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_OK);
 
         // slightly paranoid verification
         boolean sameCookies = originalCookies.equals(cookies);
@@ -361,10 +361,10 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
      */
     @Test
     public void testBasicLoginRejectProtected() throws Exception {
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                GOOD_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, GOOD_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_OK);
 
         doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED,
                 NO_COOKIES, HttpServletResponse.SC_FORBIDDEN);
@@ -385,10 +385,10 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
         setAlwaysUseSession();
 
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                GOOD_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, GOOD_CREDENTIALS,
+                NO_COOKIES, HttpServletResponse.SC_OK);
 
         // use the session cookie harvested with the other webapp
         doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED,
@@ -419,9 +419,8 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
         }
     }
 
-    private void doTestBasic(String user, String pwd, String uri,
-            BasicCredentials credentials, boolean useCookie,
-            int expectedRC) throws Exception {
+    private void doTestBasic(String uri, BasicCredentials credentials,
+            boolean useCookie, int expectedRC) throws Exception {
 
         Map<String,List<String>> reqHeaders = new HashMap<>();
         Map<String,List<String>> respHeaders = new HashMap<>();
