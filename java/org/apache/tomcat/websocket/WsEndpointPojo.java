@@ -24,6 +24,9 @@ import javax.websocket.DefaultServerConfiguration;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfiguration;
 import javax.websocket.Session;
+import javax.websocket.WebSocketClose;
+import javax.websocket.WebSocketError;
+import javax.websocket.WebSocketOpen;
 
 public class WsEndpointPojo extends Endpoint {
 
@@ -36,12 +39,35 @@ public class WsEndpointPojo extends Endpoint {
     public WsEndpointPojo(Class<?> clazzPojo, String path)
             throws InstantiationException, IllegalAccessException {
         this.pojo = clazzPojo.newInstance();
-        this.config = new DefaultServerConfiguration(path);
+        this.config = new DefaultServerConfiguration(path) {
 
-        // TODO - Find these
-        this.onOpen = null;
-        this.onClose = null;
-        this.onError = null;
+            @Override
+            public boolean checkOrigin(String originHeaderValue) {
+                return true;
+            }
+
+        };
+
+        // TODO - Don't want to have to do this on every connection
+        Method open = null;
+        Method close = null;
+        Method error = null;
+        Method[] methods = clazzPojo.getMethods();
+        for (int i = 0; i < methods.length; i++) {
+            if (open == null &&
+                    methods[i].getAnnotation(WebSocketOpen.class) != null) {
+                open = methods[i];
+            } else if (close == null &&
+                    methods[i].getAnnotation(WebSocketClose.class) != null) {
+                close = methods[i];
+            } else if (error == null &&
+                    methods[i].getAnnotation(WebSocketError.class) != null) {
+                error = methods[i];
+            }
+        }
+        this.onOpen = open;
+        this.onClose = close;
+        this.onError = error;
     }
 
     @Override
@@ -52,6 +78,7 @@ public class WsEndpointPojo extends Endpoint {
     @Override
     public void onOpen(Session session) {
         if (onOpen != null) {
+
             try {
                 onOpen.invoke(pojo, session);
             } catch (IllegalAccessException | IllegalArgumentException
