@@ -17,8 +17,13 @@
 package websocket.echo;
 
 import javax.websocket.WebSocketEndpoint;
+import javax.websocket.WebSocketOpen;
 
 @WebSocketEndpoint("/websocket/echoAnnotation")
 public class EchoAnnotation {
 
+    @WebSocketOpen
+    public void printOpen() {
+        System.out.println("EchoAnnotation.printOpen()");
+    }
 }
