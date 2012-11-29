@@ -64,6 +64,10 @@
         the JMX registry if the Filter or Servlet name includes a character that
         must be quoted if used in an ObjectName value. (markt)
       </fix>
+      <add>
+        Add new attribute <code>renameOnRotate</code> to the AccessLogValve.
+        (rjung)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
