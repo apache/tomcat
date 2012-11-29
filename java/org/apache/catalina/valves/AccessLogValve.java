@@ -1018,7 +1018,12 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
 
     /**
-     * Close the currently open log file (if any)
+     * Create a File object based on the current log file name.
+     * Directories are created as needed but the underlying file
+     * is not created or opened.
+     *
+     * @param useDateStamp include the timestamp in the file name.
+     * @return the log file object
      */
     private File getLogFile(boolean useDateStamp) {
 
