@@ -24,19 +24,20 @@ import javax.websocket.DefaultServerConfiguration;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfiguration;
 import javax.websocket.Session;
-import javax.websocket.WebSocketClose;
-import javax.websocket.WebSocketError;
-import javax.websocket.WebSocketOpen;
 
 public class WsEndpointPojo extends Endpoint {
 
     private final Object pojo;
     private final EndpointConfiguration config;
     private final Method onOpen;
+    private final Object[] onOpenArgs;
     private final Method onClose;
+    private final Object[] onCloseArgs;
     private final Method onError;
+    private final Object[] onErrorArgs;
 
-    public WsEndpointPojo(Class<?> clazzPojo, String path)
+    public WsEndpointPojo(Class<?> clazzPojo, PojoMethodMapping methodMapping,
+            String path)
             throws InstantiationException, IllegalAccessException {
         this.pojo = clazzPojo.newInstance();
         this.config = new DefaultServerConfiguration(path) {
@@ -45,29 +46,28 @@ public class WsEndpointPojo extends Endpoint {
             public boolean checkOrigin(String originHeaderValue) {
                 return true;
             }
-
         };
 
-        // TODO - Don't want to have to do this on every connection
-        Method open = null;
-        Method close = null;
-        Method error = null;
-        Method[] methods = clazzPojo.getMethods();
-        for (int i = 0; i < methods.length; i++) {
-            if (open == null &&
-                    methods[i].getAnnotation(WebSocketOpen.class) != null) {
-                open = methods[i];
-            } else if (close == null &&
-                    methods[i].getAnnotation(WebSocketClose.class) != null) {
-                close = methods[i];
-            } else if (error == null &&
-                    methods[i].getAnnotation(WebSocketError.class) != null) {
-                error = methods[i];
-            }
+        onOpen = methodMapping.getOnOpen();
+        if (onOpen == null) {
+            onOpenArgs = null;
+        } else {
+            onOpenArgs = methodMapping.getOnOpenArgs(path);
         }
-        this.onOpen = open;
-        this.onClose = close;
-        this.onError = error;
+
+        onClose = methodMapping.getOnClose();
+        if (onClose == null) {
+            onCloseArgs = null;
+        } else {
+            onCloseArgs = methodMapping.getOnCloseArgs(path);
+        }
+
+        onError = methodMapping.getOnError();
+        if (onError == null) {
+            onErrorArgs = null;
+        } else {
+            onErrorArgs = methodMapping.getOnErrorArgs(path);
+        }
     }
 
     @Override
@@ -77,10 +77,10 @@ public class WsEndpointPojo extends Endpoint {
 
     @Override
     public void onOpen(Session session) {
+        // TODO Insert the session into the method args
         if (onOpen != null) {
-
             try {
-                onOpen.invoke(pojo, session);
+                onOpen.invoke(pojo, onOpenArgs);
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
                 // TODO Auto-generated catch block
@@ -93,7 +93,7 @@ public class WsEndpointPojo extends Endpoint {
     public void onClose(CloseReason closeReason) {
         if (onClose != null) {
             try {
-                onClose.invoke(pojo, (Object[]) null);
+                onClose.invoke(pojo, onCloseArgs);
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
                 // TODO Auto-generated catch block
@@ -106,7 +106,8 @@ public class WsEndpointPojo extends Endpoint {
     public void onError(Throwable throwable) {
         if (onError != null) {
             try {
-                onError.invoke(pojo, throwable);
+                // TODO Insert throwable
+                onError.invoke(pojo, onErrorArgs);
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
                 // TODO Auto-generated catch block

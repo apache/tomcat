@@ -78,6 +78,9 @@ public class ServerContainerImpl extends ClientContainerImpl implements
 
     private Map<String, Class<?>> pojoMap = new ConcurrentHashMap<>();
 
+    private Map<Class<?>, PojoMethodMapping> pojoMethodMap =
+            new ConcurrentHashMap<>();
+
 
     private ServerContainerImpl() {
         // Hide default constructor
@@ -146,6 +149,7 @@ public class ServerContainerImpl extends ClientContainerImpl implements
         }
 
         pojoMap.put(path.substring(0, path.length() - 2), pojo);
+        pojoMethodMap.put(pojo, new PojoMethodMapping(pojo, path));
         addWsServletMapping(path);
     }
 
@@ -170,10 +174,15 @@ public class ServerContainerImpl extends ClientContainerImpl implements
             return ep;
         }
 
+        // TODO Need to cache the pojoMethodMapping too
         Class<?> clazzPojo = pojoMap.get(servletPath);
         if (clazzPojo != null) {
-            Endpoint ep = new WsEndpointPojo(clazzPojo, servletPath);
-            return ep;
+            PojoMethodMapping mapping = pojoMethodMap.get(clazzPojo);
+            if (mapping != null) {
+                Endpoint ep = new WsEndpointPojo(clazzPojo,
+                        mapping, servletPath);
+                return ep;
+            }
         }
 
         throw new IllegalStateException(
