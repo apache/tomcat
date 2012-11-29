@@ -68,6 +68,11 @@
         Add new attribute <code>renameOnRotate</code> to the AccessLogValve.
         (rjung)
       </add>
+      <fix>
+        <bug>54190</bug>: Correct unit tests for BASIC authentication so that
+        session timeout is correctly tested. Also refactor unit test to make it
+        easier to add additional tests. Patch by Brian Burch. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
