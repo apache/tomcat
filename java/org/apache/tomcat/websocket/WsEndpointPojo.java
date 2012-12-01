@@ -37,10 +37,10 @@ public class WsEndpointPojo extends Endpoint {
     private final Object[] onErrorArgs;
 
     public WsEndpointPojo(Class<?> clazzPojo, PojoMethodMapping methodMapping,
-            String path)
+            String ServletPath, String pathInfo)
             throws InstantiationException, IllegalAccessException {
         this.pojo = clazzPojo.newInstance();
-        this.config = new DefaultServerConfiguration(path) {
+        this.config = new DefaultServerConfiguration(ServletPath) {
 
             @Override
             public boolean checkOrigin(String originHeaderValue) {
@@ -52,21 +52,21 @@ public class WsEndpointPojo extends Endpoint {
         if (onOpen == null) {
             onOpenArgs = null;
         } else {
-            onOpenArgs = methodMapping.getOnOpenArgs(path);
+            onOpenArgs = methodMapping.getOnOpenArgs(pathInfo);
         }
 
         onClose = methodMapping.getOnClose();
         if (onClose == null) {
             onCloseArgs = null;
         } else {
-            onCloseArgs = methodMapping.getOnCloseArgs(path);
+            onCloseArgs = methodMapping.getOnCloseArgs(pathInfo);
         }
 
         onError = methodMapping.getOnError();
         if (onError == null) {
             onErrorArgs = null;
         } else {
-            onErrorArgs = methodMapping.getOnErrorArgs(path);
+            onErrorArgs = methodMapping.getOnErrorArgs(pathInfo);
         }
     }
 

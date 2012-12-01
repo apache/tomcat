@@ -28,7 +28,10 @@ public class PojoMethodMapping {
     private final Method onClose;
     private final Method onError;
 
-    public PojoMethodMapping(Class<?> clazzPojo, String path) {
+    private final UriTemplate template;
+
+    public PojoMethodMapping(Class<?> clazzPojo, String path,
+            String mappingPath) {
         Method open = null;
         Method close = null;
         Method error = null;
@@ -48,13 +51,20 @@ public class PojoMethodMapping {
         this.onOpen = open;
         this.onClose = close;
         this.onError = error;
+
+        if (path.length() > mappingPath.length()) {
+            template =
+                    new UriTemplate(path.substring(mappingPath.length() - 1));
+        } else {
+            template = null;
+        }
     }
 
     public Method getOnOpen() {
         return onOpen;
     }
 
-    public Object[] getOnOpenArgs(String path) {
+    public Object[] getOnOpenArgs(String pathInfo) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -63,7 +73,7 @@ public class PojoMethodMapping {
         return onClose;
     }
 
-    public Object[] getOnCloseArgs(String path) {
+    public Object[] getOnCloseArgs(String pathInfo) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -72,7 +82,7 @@ public class PojoMethodMapping {
         return onError;
     }
 
-    public Object[] getOnErrorArgs(String path) {
+    public Object[] getOnErrorArgs(String pathInfo) {
         // TODO Auto-generated method stub
         return null;
     }
