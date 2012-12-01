@@ -153,7 +153,7 @@ public class ServerContainerImpl extends ClientContainerImpl implements
         String mappingPath = Util.getServletMappingPath(path);
 
         pojoMap.put(mappingPath.substring(0, mappingPath.length() - 2), pojo);
-        pojoMethodMap.put(pojo, new PojoMethodMapping(pojo, path));
+        pojoMethodMap.put(pojo, new PojoMethodMapping(pojo, path, mappingPath));
         addWsServletMapping(mappingPath);
     }
 
@@ -170,7 +170,7 @@ public class ServerContainerImpl extends ClientContainerImpl implements
     }
 
 
-    public Endpoint getEndpoint(String servletPath)
+    public Endpoint getEndpoint(String servletPath, String pathInfo)
             throws InstantiationException, IllegalAccessException {
         Class<? extends Endpoint> clazzEndpoint = endpointMap.get(servletPath);
         if (clazzEndpoint != null) {
@@ -184,7 +184,7 @@ public class ServerContainerImpl extends ClientContainerImpl implements
             PojoMethodMapping mapping = pojoMethodMap.get(clazzPojo);
             if (mapping != null) {
                 Endpoint ep = new WsEndpointPojo(clazzPojo,
-                        mapping, servletPath);
+                        mapping, servletPath, pathInfo);
                 return ep;
             }
         }

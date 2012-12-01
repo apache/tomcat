@@ -90,7 +90,7 @@ public class WsServlet extends HttpServlet {
         ServerContainerImpl cp = ServerContainerImpl.getServerContainer();
         Endpoint ep = null;
         try {
-             ep = cp.getEndpoint(req.getServletPath());
+             ep = cp.getEndpoint(req.getServletPath(), req.getPathInfo());
         } catch (InstantiationException | IllegalAccessException e) {
             // This will trigger an error response
             throw new ServletException(e);
