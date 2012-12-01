@@ -106,15 +106,17 @@ public class ServerContainerImpl extends ClientContainerImpl implements
 
         ServerEndpointConfiguration config =
                 (ServerEndpointConfiguration) ep.getEndpointConfiguration();
-        String path = Util.getServletMappingPath(config.getPath());
+        String path = config.getPath();
+        String mappingPath = Util.getServletMappingPath(path);
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("serverContainer.endpointDeploy",
                     clazz.getName(), path, servletContext.getContextPath()));
         }
 
-        endpointMap.put(path.substring(0, path.length() - 2), clazz);
-        addWsServletMapping(path);
+        endpointMap.put(
+                mappingPath.substring(0, mappingPath.length() - 2), clazz);
+        addWsServletMapping(mappingPath);
     }
 
 
@@ -148,9 +150,11 @@ public class ServerContainerImpl extends ClientContainerImpl implements
                     path, servletContext.getContextPath()));
         }
 
-        pojoMap.put(path.substring(0, path.length() - 2), pojo);
+        String mappingPath = Util.getServletMappingPath(path);
+
+        pojoMap.put(mappingPath.substring(0, mappingPath.length() - 2), pojo);
         pojoMethodMap.put(pojo, new PojoMethodMapping(pojo, path));
-        addWsServletMapping(path);
+        addWsServletMapping(mappingPath);
     }
 
 
