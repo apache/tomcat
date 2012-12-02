@@ -57,6 +57,11 @@ public class UriTemplate {
     }
 
 
+    public boolean contains(String name) {
+        return names.contains(name);
+    }
+
+
     /**
      * Extract the path parameters from the provided pathInfo based on the
      * template with which this UriTemplate was constructed.
