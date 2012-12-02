@@ -14,17 +14,22 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package websocket.echo;
+package org.apache.tomcat.websocket;
 
-import javax.websocket.WebSocketEndpoint;
-import javax.websocket.WebSocketOpen;
-import javax.websocket.WebSocketPathParam;
+public class PathParam {
+    private final Class<?> type;
+    private final String name;
 
-@WebSocketEndpoint("/websocket/echoAnnotation/{test}")
-public class EchoAnnotation {
+    public PathParam(Class<?> type, String name) {
+        this.type = type;
+        this.name = name;
+    }
 
-    @WebSocketOpen
-    public void printOpen(@WebSocketPathParam("test") String test) {
-        System.out.println("EchoAnnotation.printOpen() with [" + test + "]");
+    public Class<?> getType() {
+        return type;
+    }
+
+    public String getName() {
+        return name;
     }
 }

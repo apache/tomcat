@@ -16,17 +16,24 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Map;
 
+import javax.websocket.Session;
 import javax.websocket.WebSocketClose;
 import javax.websocket.WebSocketError;
 import javax.websocket.WebSocketOpen;
+import javax.websocket.WebSocketPathParam;
 
 public class PojoMethodMapping {
 
     private final Method onOpen;
     private final Method onClose;
     private final Method onError;
+    private final PathParam[] onOpenParams;
+    private final PathParam[] onCloseParams;
+    private final PathParam[] onErrorParams;
 
     private final UriTemplate template;
 
@@ -54,36 +61,139 @@ public class PojoMethodMapping {
 
         if (path.length() > mappingPath.length()) {
             template =
-                    new UriTemplate(path.substring(mappingPath.length() - 1));
+                    new UriTemplate(path.substring(mappingPath.length() - 2));
         } else {
             template = null;
         }
+
+        onOpenParams = getPathParams(onOpen, false);
+        onCloseParams = getPathParams(onClose, false);
+        onErrorParams = getPathParams(onError, true);
     }
+
 
     public Method getOnOpen() {
         return onOpen;
     }
 
-    public Object[] getOnOpenArgs(String pathInfo) {
-        // TODO Auto-generated method stub
-        return null;
+
+    public Object[] getOnOpenArgs(String pathInfo, Session session) {
+        return buildArgs(onOpenParams, template, pathInfo, session, null);
     }
+
 
     public Method getOnClose() {
         return onClose;
     }
 
-    public Object[] getOnCloseArgs(String pathInfo) {
-        // TODO Auto-generated method stub
-        return null;
+
+    public Object[] getOnCloseArgs(String pathInfo, Session session) {
+        return buildArgs(onCloseParams, template, pathInfo, session, null);
     }
 
     public Method getOnError() {
         return onError;
     }
 
-    public Object[] getOnErrorArgs(String pathInfo) {
-        // TODO Auto-generated method stub
-        return null;
+
+    public Object[] getOnErrorArgs(String pathInfo, Session session,
+            Throwable throwable) {
+        return buildArgs(onErrorParams, template, pathInfo, session, throwable);
+    }
+
+
+    private static PathParam[] getPathParams(Method m, boolean isError) {
+        if (m == null) {
+            return new PathParam[0];
+        }
+
+        boolean foundError = !isError;
+        Class<?>[] types = m.getParameterTypes();
+        Annotation[][] paramsAnnotations = m.getParameterAnnotations();
+        PathParam[] result = new PathParam[types.length];
+
+        for (int i = 0; i < types.length; i++) {
+            Class<?> type = types[i];
+            if (type.equals(Session.class)) {
+                result[i] = new PathParam(type, null);
+            } else if (type.equals(Throwable.class)) {
+                foundError = true;
+                result[i] = new PathParam(type, null);
+            } else {
+                Annotation[] paramAnnotations = paramsAnnotations[i];
+                for (Annotation paramAnnotation : paramAnnotations) {
+                    if (paramAnnotation.annotationType().equals(
+                            WebSocketPathParam.class)) {
+                        result[i] = new PathParam(type,
+                                ((WebSocketPathParam) paramAnnotation).value());
+                        break;
+                    }
+                }
+                // Parameters without annotations are not permitted
+                if (result[i] == null) {
+                    throw new IllegalArgumentException();
+                }
+            }
+        }
+
+        if (!foundError) {
+            throw new IllegalArgumentException();
+        }
+
+        return result;
+    }
+
+
+    private static Object[] buildArgs(PathParam[] pathParams,
+            UriTemplate template, String pathInfo, Session session,
+            Throwable throwable) {
+        Object[] result = new Object[pathParams.length];
+        Map<String, String> pathValues = template.match(pathInfo);
+
+        for (int i = 0; i < pathParams.length; i++) {
+            Class<?> type = pathParams[i].getType();
+            if (type.equals(Session.class)) {
+                result[i] = session;
+            } else if (type.equals(Throwable.class)) {
+                result[i] = throwable;
+            } else {
+                String name = pathParams[i].getName();
+                String value = pathValues.get(name);
+                if (value == null) {
+                    result[i] = null;
+                } else {
+                    result[i] = coerceToType(type, value);
+                }
+            }
+        }
+        return result;
+    }
+
+
+    private static Object coerceToType(Class<?> type, String value) {
+
+        if (type.equals(String.class)) {
+            return value;
+        } else if (type.equals(boolean.class) || type.equals(Boolean.class)) {
+            return Boolean.valueOf(value);
+        } else if (type.equals(byte.class) || type.equals(Byte.class)) {
+            return Byte.valueOf(value);
+        } else if (value.length() == 1 &&
+                type.equals(char.class) || type.equals(Character.class)) {
+            return Character.valueOf(value.charAt(0));
+        } else if (type.equals(double.class) || type.equals(Double.class)) {
+            return Double.valueOf(value);
+        } else if (type.equals(float.class) || type.equals(Float.class)) {
+            return Float.valueOf(value);
+        } else if (type.equals(int.class) || type.equals(Integer.class)) {
+            return Integer.valueOf(value);
+        } else if (type.equals(long.class) || type.equals(Long.class)) {
+            return Long.valueOf(value);
+        } else if (type.equals(short.class) || type.equals(Short.class)) {
+            return Short.valueOf(value);
+        } else {
+            // TODO
+            throw new IllegalArgumentException();
+        }
     }
 }

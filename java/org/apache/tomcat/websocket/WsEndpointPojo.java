@@ -17,7 +17,6 @@
 package org.apache.tomcat.websocket;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import javax.websocket.CloseReason;
 import javax.websocket.DefaultServerConfiguration;
@@ -29,12 +28,9 @@ public class WsEndpointPojo extends Endpoint {
 
     private final Object pojo;
     private final EndpointConfiguration config;
-    private final Method onOpen;
-    private final Object[] onOpenArgs;
-    private final Method onClose;
-    private final Object[] onCloseArgs;
-    private final Method onError;
-    private final Object[] onErrorArgs;
+    private final String pathInfo;
+    private final PojoMethodMapping methodMapping;
+    private Session session = null;
 
     public WsEndpointPojo(Class<?> clazzPojo, PojoMethodMapping methodMapping,
             String ServletPath, String pathInfo)
@@ -48,26 +44,8 @@ public class WsEndpointPojo extends Endpoint {
             }
         };
 
-        onOpen = methodMapping.getOnOpen();
-        if (onOpen == null) {
-            onOpenArgs = null;
-        } else {
-            onOpenArgs = methodMapping.getOnOpenArgs(pathInfo);
-        }
-
-        onClose = methodMapping.getOnClose();
-        if (onClose == null) {
-            onCloseArgs = null;
-        } else {
-            onCloseArgs = methodMapping.getOnCloseArgs(pathInfo);
-        }
-
-        onError = methodMapping.getOnError();
-        if (onError == null) {
-            onErrorArgs = null;
-        } else {
-            onErrorArgs = methodMapping.getOnErrorArgs(pathInfo);
-        }
+        this.methodMapping = methodMapping;
+        this.pathInfo = pathInfo;
     }
 
     @Override
@@ -77,10 +55,12 @@ public class WsEndpointPojo extends Endpoint {
 
     @Override
     public void onOpen(Session session) {
-        // TODO Insert the session into the method args
-        if (onOpen != null) {
+        this.session = session;
+
+        if (methodMapping.getOnOpen() != null) {
             try {
-                onOpen.invoke(pojo, onOpenArgs);
+                methodMapping.getOnOpen().invoke(
+                        pojo, methodMapping.getOnOpenArgs(pathInfo, session));
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
                 // TODO Auto-generated catch block
@@ -91,9 +71,10 @@ public class WsEndpointPojo extends Endpoint {
 
     @Override
     public void onClose(CloseReason closeReason) {
-        if (onClose != null) {
+        if (methodMapping.getOnClose() != null) {
             try {
-                onClose.invoke(pojo, onCloseArgs);
+                methodMapping.getOnClose().invoke(
+                        pojo, methodMapping.getOnCloseArgs(pathInfo, session));
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
                 // TODO Auto-generated catch block
@@ -104,10 +85,11 @@ public class WsEndpointPojo extends Endpoint {
 
     @Override
     public void onError(Throwable throwable) {
-        if (onError != null) {
+        if (methodMapping.getOnError() != null) {
             try {
-                // TODO Insert throwable
-                onError.invoke(pojo, onErrorArgs);
+                methodMapping.getOnError().invoke(pojo,
+                        methodMapping.getOnErrorArgs(
+                                pathInfo, session, throwable));
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
                 // TODO Auto-generated catch block

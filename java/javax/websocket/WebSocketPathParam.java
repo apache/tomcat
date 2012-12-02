@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target(ElementType.PARAMETER)
 public @interface WebSocketPathParam {
     public String value();
 }
