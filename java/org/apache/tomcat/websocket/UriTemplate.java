@@ -68,7 +68,7 @@ public class UriTemplate {
      *
      * @param pathInfo  The pathInfo from which the path parameters are to be
      *                  extracted
-     * @return  A map of paramater names to values
+     * @return  A map of parameter names to values
      */
     public Map<String,String> match(String pathInfo) {
         Map<String,String> result = new HashMap<>();
