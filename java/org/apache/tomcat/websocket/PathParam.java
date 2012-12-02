@@ -16,6 +16,13 @@
  */
 package org.apache.tomcat.websocket;
 
+/**
+ * Stores the parameter type and name for a parameter that needs to be passed to
+ * an onXxx method of {@link javax.websocket.Endpoint}. The name is only present
+ * for parameters annotated with {@link javax.websocket.WebSocketPathParam}. For
+ * the {@link javax.websocket.Session} and {@link java.lang.Throwable}
+ * parameters, {@link #getName()} will always return <code>null</code>.
+ */
 public class PathParam {
     private final Class<?> type;
     private final String name;

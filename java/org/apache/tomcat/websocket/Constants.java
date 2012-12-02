@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.websocket;
 
+/**
+ * Internal implementation constants.
+ */
 public class Constants {
 
     protected static final String PACKAGE_NAME = "org.apache.tomcat.websocket";

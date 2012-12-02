@@ -26,6 +26,11 @@ import javax.websocket.WebSocketError;
 import javax.websocket.WebSocketOpen;
 import javax.websocket.WebSocketPathParam;
 
+/**
+ * For a POJO class annotated with {@link javax.websocket.WebSocketEndpoint}, an
+ * instance of this class caches the method and parameter information for the
+ * onXXX calls.
+ */
 public class PojoMethodMapping {
 
     private final Method onOpen;

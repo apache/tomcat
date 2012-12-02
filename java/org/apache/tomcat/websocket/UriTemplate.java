@@ -23,6 +23,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Extracts path parameters from URIs used to create web socket connections
+ * using the URI template defined for the associated Endpoint.
+ */
 public class UriTemplate {
 
     private final Pattern pattern;

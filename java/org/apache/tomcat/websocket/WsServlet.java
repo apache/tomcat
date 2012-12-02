@@ -37,7 +37,9 @@ import javax.websocket.Endpoint;
 import javax.websocket.ServerEndpointConfiguration;
 import javax.xml.bind.DatatypeConverter;
 
-
+/**
+ * Handles the initial HTTP connection for WebSocket connections.
+ */
 public class WsServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
