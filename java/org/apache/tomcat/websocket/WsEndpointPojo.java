@@ -24,6 +24,11 @@ import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfiguration;
 import javax.websocket.Session;
 
+/**
+ * Wrapper class for instances of POJOs annotated with
+ * {@link javax.websocket.WebSocketEndpoint} so they appear as standard
+ * {@link Endpoint} instances.
+ */
 public class WsEndpointPojo extends Endpoint {
 
     private final Object pojo;

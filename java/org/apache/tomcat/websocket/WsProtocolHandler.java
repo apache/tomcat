@@ -20,6 +20,9 @@ import javax.servlet.http.ProtocolHandler;
 import javax.servlet.http.WebConnection;
 import javax.websocket.Endpoint;
 
+/**
+ * Servlet 3.1 HTTP upgrade handler for WebSocket connections.
+ */
 public class WsProtocolHandler implements ProtocolHandler {
 
     private final Endpoint ep;
