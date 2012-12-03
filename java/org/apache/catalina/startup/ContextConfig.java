@@ -2122,7 +2122,7 @@ public class ContextConfig implements LifecycleListener {
         result.addAll(getSCIsForClass(superClassName));
 
         // Interfaces
-for (String interfaceName : cacheEntry.getInterfaceNames()) {
+        for (String interfaceName : cacheEntry.getInterfaceNames()) {
             JavaClassCacheEntry interfaceEntry =
                     javaClassCache.get(interfaceName);
             // A null could mean that the class not present in application or
