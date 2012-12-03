@@ -66,4 +66,67 @@ public class TestErrorReportValve extends TomcatBaseTest {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
+
+
+    @Test
+    public void testBug54220DoNotSetNotFound() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+
+        Tomcat.addServlet(ctx, "bug54220", new Bug54220Servlet(false));
+        ctx.addServletMapping("/", "bug54220");
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertNull(res.toString());
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+    }
+
+
+    @Test
+    public void testBug54220SetNotFound() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+
+        Tomcat.addServlet(ctx, "bug54220", new Bug54220Servlet(true));
+        ctx.addServletMapping("/", "bug54220");
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertNull(res.toString());
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+    }
+
+
+    private static final class Bug54220Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private boolean setNotFound;
+
+        private Bug54220Servlet(boolean setNotFound) {
+            this.setNotFound = setNotFound;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            if (setNotFound) {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            }
+        }
+    }
 }
