@@ -57,6 +57,11 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>53871</bug>: Improve error message if annotation scanning fails
+        during web application start due to poor configuration or illegal
+        cyclic inheritance with the application&apos;s classes. (markt) 
+      </fix>
+      <fix>
         Fix unit test for AccessLogValve when using non-GMT time zone. (rjung)
       </fix>
       <fix>
