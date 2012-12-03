@@ -241,25 +241,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
 
     /**
-     * The system timezone.
-     */
-    private static final TimeZone timezone;
-
-
-    /**
-     * The time zone offset relative to GMT in text form when daylight saving
-     * is not in operation.
-     */
-    private static final String timeZoneNoDST;
-
-
-    /**
-     * The time zone offset relative to GMT in text form when daylight saving
-     * is in operation.
-     */
-    private static final String timeZoneDST;
-
-    /**
      * The size of our global date format cache
      */
     private static final int globalCacheSize = 300;
@@ -307,7 +288,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         protected class Cache {
 
             /* CLF log format */
-            private static final String cLFFormat = "dd/MMM/yyyy:HH:mm:ss";
+            private static final String cLFFormat = "dd/MMM/yyyy:HH:mm:ss Z";
 
             /* Second used to retrieve CLF format in most recent invocation */
             private long previousSeconds = Long.MIN_VALUE;
@@ -417,8 +398,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                         StringBuilder current = new StringBuilder(32);
                         current.append('[');
                         current.append(previousFormat);
-                        current.append(' ');
-                        current.append(getTimeZone(currentDate));
                         current.append(']');
                         previousFormat = current.toString();
                     }
@@ -1223,40 +1202,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     }
 
 
-    private static String getTimeZone(Date date) {
-        if (timezone.inDaylightTime(date)) {
-            return timeZoneDST;
-        } else {
-            return timeZoneNoDST;
-        }
-    }
-
-
-    private static String calculateTimeZoneOffset(long offset) {
-        StringBuilder tz = new StringBuilder();
-        if ((offset < 0)) {
-            tz.append("-");
-            offset = -offset;
-        } else {
-            tz.append("+");
-        }
-
-        long hourOffset = offset / (1000 * 60 * 60);
-        long minuteOffset = (offset / (1000 * 60)) % 60;
-
-        if (hourOffset < 10) {
-            tz.append("0");
-        }
-        tz.append(hourOffset);
-
-        if (minuteOffset < 10) {
-            tz.append("0");
-        }
-        tz.append(minuteOffset);
-
-        return tz.toString();
-    }
-
     /**
      * Find a locale by name
      */
@@ -1272,14 +1217,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         }
         log.error(sm.getString("accessLogValve.invalidLocale", name));
         return fallback;
-    }
-
-    static {
-        // Initialize the timeZone
-        timezone = TimeZone.getDefault();
-        timeZoneNoDST = calculateTimeZoneOffset(timezone.getRawOffset());
-        int offset = timezone.getDSTSavings();
-        timeZoneDST = calculateTimeZoneOffset(timezone.getRawOffset() + offset);
     }
 
 
@@ -1300,7 +1237,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             setFileDateFormat(format);
         }
         fileDateFormatter = new SimpleDateFormat(format, Locale.US);
-        fileDateFormatter.setTimeZone(timezone);
+        fileDateFormatter.setTimeZone(TimeZone.getDefault());
         dateStamp = fileDateFormatter.format(new Date(System.currentTimeMillis()));
         if (rotatable && renameOnRotate) {
             restore();
