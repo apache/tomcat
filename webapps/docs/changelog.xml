@@ -78,6 +78,10 @@
         session timeout is correctly tested. Also refactor unit test to make it
         easier to add additional tests. Patch by Brian Burch. (markt)
       </fix>
+      <fix>
+        <bug>54220</bug>: Ensure the ErrorReportValve only generates an error
+        report if the error flag on the response has been set. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
