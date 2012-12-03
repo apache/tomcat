@@ -37,14 +37,10 @@ public class TestUriTemplate {
     }
 
 
-    @Test
+    @Test(expected=java.lang.IllegalArgumentException.class)
     public void testOneOfTwo() throws Exception {
         UriTemplate t = new UriTemplate("/{a}/{b}");
-        Map<String,String> result = t.match("/foo");
-
-        Assert.assertEquals(1, result.size());
-        Assert.assertTrue(result.containsKey("a"));
-        Assert.assertEquals("foo", result.get("a"));
+        t.match("/foo");
     }
 
 
@@ -61,24 +57,34 @@ public class TestUriTemplate {
     }
 
 
-    @Test
+    @Test(expected=java.lang.IllegalArgumentException.class)
     public void testPrefixOneOfTwo() throws Exception {
         UriTemplate t = new UriTemplate("/x{a}/y{b}");
-        Map<String,String> result = t.match("/xfoo");
+        t.match("/xfoo");
+    }
 
-        Assert.assertEquals(1, result.size());
-        Assert.assertTrue(result.containsKey("a"));
-        Assert.assertEquals("foo", result.get("a"));
+
+    @Test(expected=java.lang.IllegalArgumentException.class)
+    public void testPrefixTwoOfTwo() throws Exception {
+        UriTemplate t = new UriTemplate("/x{a}/y{b}");
+        t.match("/ybar");
+    }
+
+
+    @Test(expected=java.lang.IllegalArgumentException.class)
+    public void testQuote1() throws Exception {
+        UriTemplate t = new UriTemplate("/.{a}");
+        t.match("/yfoo");
     }
 
 
     @Test
-    public void testPrefixTwoOfTwo() throws Exception {
-        UriTemplate t = new UriTemplate("/x{a}/y{b}");
-        Map<String,String> result = t.match("/ybar");
+    public void testQuote2() throws Exception {
+        UriTemplate t = new UriTemplate("/.{a}");
+        Map<String,String> result = t.match("/.foo");
 
         Assert.assertEquals(1, result.size());
-        Assert.assertTrue(result.containsKey("b"));
-        Assert.assertEquals("bar", result.get("b"));
+        Assert.assertTrue(result.containsKey("a"));
+        Assert.assertEquals("foo", result.get("a"));
     }
 }
