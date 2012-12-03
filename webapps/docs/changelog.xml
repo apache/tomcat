@@ -88,6 +88,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <scode>
+        Fix a handful of Eclipse warnings in the JDBC pool source code including
+        the warnings reported in <bug>53565</bug>. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
