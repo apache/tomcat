@@ -96,6 +96,11 @@ public class ServerContainerImpl extends ClientContainerImpl implements
     public void publishServer(Class<? extends Endpoint> clazz)
             throws DeploymentException {
 
+        if (servletContext == null) {
+            throw new IllegalArgumentException(
+                    sm.getString("serverContainer.servletContextMissing"));
+        }
+
         Endpoint ep = null;
         try {
             ep = clazz.newInstance();
