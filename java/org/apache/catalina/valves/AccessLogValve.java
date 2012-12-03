@@ -1086,13 +1086,17 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         writer.close();
         if (rename && renameOnRotate) {
             File newLogFile = getLogFile(true);
-            try {
-                if (!currentLogFile.renameTo(newLogFile)) {
-                    log.error(sm.getString("accessLogValve.renameFail", currentLogFile, newLogFile));
+            if (!newLogFile.exists()) {
+                try {
+                    if (!currentLogFile.renameTo(newLogFile)) {
+                        log.error(sm.getString("accessLogValve.renameFail", currentLogFile, newLogFile));
+                    }
+                } catch (Throwable e) {
+                    ExceptionUtils.handleThrowable(e);
+                    log.error(sm.getString("accessLogValve.renameFail", currentLogFile, newLogFile), e);
                 }
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                log.error(sm.getString("accessLogValve.renameFail", currentLogFile, newLogFile), e);
+            } else {
+                log.error(sm.getString("accessLogValve.alreadyExists", currentLogFile, newLogFile));
             }
         }
         writer = null;
