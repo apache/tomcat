@@ -21,14 +21,17 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
-import javax.websocket.ServerContainer;
+
+import org.apache.tomcat.websocket.ServerContainerImpl;
 
 @WebListener
 public class WsConfigListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        ServerContainer sc = ContainerProvider.getServerContainer();
+        ServerContainerImpl sc =
+                (ServerContainerImpl) ContainerProvider.getServerContainer();
+        sc.setServletContext(sce.getServletContext());
         try {
             sc.publishServer(EchoEndpoint.class);
         } catch (DeploymentException e) {
