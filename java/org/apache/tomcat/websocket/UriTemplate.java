@@ -23,19 +23,27 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Extracts path parameters from URIs used to create web socket connections
  * using the URI template defined for the associated Endpoint.
  */
 public class UriTemplate {
 
+    private static StringManager sm = StringManager.getManager(
+            Constants.PACKAGE_NAME);
+
+    private final String template;
     private final Pattern pattern;
     private final List<String> names = new ArrayList<>();
 
     public UriTemplate(String template) {
+
+        this.template = template;
+
         // +10 is just a guess at this point
         StringBuilder pattern = new StringBuilder(template.length() + 10);
-
 
         int pos = 0;
         int end = 0;
@@ -43,8 +51,8 @@ public class UriTemplate {
         while (start > -1) {
             end = template.indexOf('}', start);
             pattern.append('(');
-            pattern.append(template.substring(pos, start));
-            pattern.append(")?([^/]*)");
+            pattern.append(Pattern.quote(template.substring(pos, start)));
+            pattern.append(")([^/]*)");
             names.add(template.substring(start + 1, end));
             pos = end + 1;
             start = template.indexOf('{', pos);
@@ -77,7 +85,11 @@ public class UriTemplate {
     public Map<String,String> match(String pathInfo) {
         Map<String,String> result = new HashMap<>();
         Matcher m = pattern.matcher(pathInfo);
-        m.matches();
+
+        if (!m.matches()) {
+            throw new IllegalArgumentException(sm.getString(
+                    "uriTemplate.noMatch", template, pattern, pathInfo));
+        }
 
         int group = 2;
         for (String name : names) {
