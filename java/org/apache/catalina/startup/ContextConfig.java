@@ -1957,8 +1957,13 @@ public class ContextConfig implements LifecycleListener {
 
         ClassParser parser = new ClassParser(is, null);
         JavaClass clazz = parser.parse();
-
-        checkHandlesTypes(clazz);
+        try {
+            checkHandlesTypes(clazz);
+        } catch (StackOverflowError soe) {
+            throw new IllegalStateException(sm.getString(
+                    "contextConfig.annotationsStackOverflow",
+                    context.getName()), soe);
+        }
 
         if (handlesTypesOnly) {
             return;
