@@ -32,6 +32,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
+import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -64,13 +65,15 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
     private static final String URI_PROTECTED = "/protected";
     private static final String URI_PUBLIC = "/anyoneCanAccess";
 
-    private static final int SHORT_TIMEOUT_MINS = 1;
-    private static final int LONG_TIMEOUT_MINS = 2;
-    private static final int MANAGER_SCAN_DELAY_SECS = 60;
+    private static final int SHORT_SESSION_TIMEOUT_MINS = 1;
+    private static final int LONG_SESSION_TIMEOUT_MINS = 2;
+    private static final int MANAGER_SCAN_INTERVAL_SECS = 10;
+    private static final int MANAGER_EXPIRE_SESSIONS_FAST = 1;
     private static final int EXTRA_DELAY_SECS = 5;
     private static final long TIMEOUT_DELAY_MSECS =
-            (((SHORT_TIMEOUT_MINS * 60)
-                    + MANAGER_SCAN_DELAY_SECS + EXTRA_DELAY_SECS) * 1000);
+            (((SHORT_SESSION_TIMEOUT_MINS * 60)
+            + (MANAGER_SCAN_INTERVAL_SECS * MANAGER_EXPIRE_SESSIONS_FAST)
+            + EXTRA_DELAY_SECS) * 1000);
 
     private static final String CLIENT_AUTH_HEADER = "authorization";
     private static final String SERVER_AUTH_HEADER = "WWW-Authenticate";
@@ -94,8 +97,8 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
                 new BasicCredentials(NICE_METHOD, USER, " " + PWD + " ");
 
     private Tomcat tomcat;
-    private AuthenticatorBase basicAuthenticator;
-    private AuthenticatorBase nonloginAuthenticator;
+    private Context basicContext;
+    private Context nonloginContext;
     private List<String> cookies;
 
     /*
@@ -321,6 +324,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
     public void testBasicLoginSessionTimeout() throws Exception {
 
        setAlwaysUseSession();
+       setRapidSessionTimeout();
 
        // this section is identical to testAuthMethodCaseBasic
         doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
@@ -494,74 +498,74 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
     private void setUpNonLogin() throws Exception {
 
         // Must have a real docBase for webapps - just use temp
-        Context ctxt = tomcat.addContext(CONTEXT_PATH_NOLOGIN,
+        nonloginContext = tomcat.addContext(CONTEXT_PATH_NOLOGIN,
                 System.getProperty("java.io.tmpdir"));
-        ctxt.setSessionTimeout(LONG_TIMEOUT_MINS);
+        nonloginContext.setSessionTimeout(LONG_SESSION_TIMEOUT_MINS);
 
         // Add protected servlet to the context
-        Tomcat.addServlet(ctxt, "TesterServlet1", new TesterServlet());
-        ctxt.addServletMapping(URI_PROTECTED, "TesterServlet1");
+        Tomcat.addServlet(nonloginContext, "TesterServlet1", new TesterServlet());
+        nonloginContext.addServletMapping(URI_PROTECTED, "TesterServlet1");
 
         SecurityCollection collection1 = new SecurityCollection();
         collection1.addPattern(URI_PROTECTED);
         SecurityConstraint sc1 = new SecurityConstraint();
         sc1.addAuthRole(ROLE);
         sc1.addCollection(collection1);
-        ctxt.addConstraint(sc1);
+        nonloginContext.addConstraint(sc1);
 
         // Add unprotected servlet to the context
-        Tomcat.addServlet(ctxt, "TesterServlet2", new TesterServlet());
-        ctxt.addServletMapping(URI_PUBLIC, "TesterServlet2");
+        Tomcat.addServlet(nonloginContext, "TesterServlet2", new TesterServlet());
+        nonloginContext.addServletMapping(URI_PUBLIC, "TesterServlet2");
 
         SecurityCollection collection2 = new SecurityCollection();
         collection2.addPattern(URI_PUBLIC);
         SecurityConstraint sc2 = new SecurityConstraint();
         // do not add a role - which signals access permitted without one
         sc2.addCollection(collection2);
-        ctxt.addConstraint(sc2);
+        nonloginContext.addConstraint(sc2);
 
         // Configure the authenticator and inherit the Realm from Engine
         LoginConfig lc = new LoginConfig();
         lc.setAuthMethod("NONE");
-        ctxt.setLoginConfig(lc);
-        nonloginAuthenticator = new NonLoginAuthenticator();
-        ctxt.getPipeline().addValve(nonloginAuthenticator);
+        nonloginContext.setLoginConfig(lc);
+        AuthenticatorBase nonloginAuthenticator = new NonLoginAuthenticator();
+        nonloginContext.getPipeline().addValve(nonloginAuthenticator);
     }
 
     private void setUpLogin() throws Exception {
 
         // Must have a real docBase for webapps - just use temp
-        Context ctxt = tomcat.addContext(CONTEXT_PATH_LOGIN,
+        basicContext = tomcat.addContext(CONTEXT_PATH_LOGIN,
                 System.getProperty("java.io.tmpdir"));
-        ctxt.setSessionTimeout(SHORT_TIMEOUT_MINS);
+        basicContext.setSessionTimeout(SHORT_SESSION_TIMEOUT_MINS);
 
         // Add protected servlet to the context
-        Tomcat.addServlet(ctxt, "TesterServlet3", new TesterServlet());
-        ctxt.addServletMapping(URI_PROTECTED, "TesterServlet3");
+        Tomcat.addServlet(basicContext, "TesterServlet3", new TesterServlet());
+        basicContext.addServletMapping(URI_PROTECTED, "TesterServlet3");
         SecurityCollection collection = new SecurityCollection();
         collection.addPattern(URI_PROTECTED);
         SecurityConstraint sc = new SecurityConstraint();
         sc.addAuthRole(ROLE);
         sc.addCollection(collection);
-        ctxt.addConstraint(sc);
+        basicContext.addConstraint(sc);
 
         // Add unprotected servlet to the context
-        Tomcat.addServlet(ctxt, "TesterServlet4", new TesterServlet());
-        ctxt.addServletMapping(URI_PUBLIC, "TesterServlet4");
+        Tomcat.addServlet(basicContext, "TesterServlet4", new TesterServlet());
+        basicContext.addServletMapping(URI_PUBLIC, "TesterServlet4");
 
         SecurityCollection collection2 = new SecurityCollection();
         collection2.addPattern(URI_PUBLIC);
         SecurityConstraint sc2 = new SecurityConstraint();
         // do not add a role - which signals access permitted without one
         sc2.addCollection(collection2);
-        ctxt.addConstraint(sc2);
+        basicContext.addConstraint(sc2);
 
         // Configure the authenticator and inherit the Realm from Engine
         LoginConfig lc = new LoginConfig();
         lc.setAuthMethod("BASIC");
-        ctxt.setLoginConfig(lc);
-        basicAuthenticator = new BasicAuthenticator();
-        ctxt.getPipeline().addValve(basicAuthenticator);
+        basicContext.setLoginConfig(lc);
+        AuthenticatorBase basicAuthenticator = new BasicAuthenticator();
+        basicContext.getPipeline().addValve(basicAuthenticator);
     }
 
     /*
@@ -569,10 +573,22 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
      */
     private void setAlwaysUseSession() {
 
-        basicAuthenticator.setAlwaysUseSession(true);
-        nonloginAuthenticator.setAlwaysUseSession(true);
+        ((AuthenticatorBase)basicContext.getAuthenticator())
+                .setAlwaysUseSession(true);
+        ((AuthenticatorBase)nonloginContext.getAuthenticator())
+                .setAlwaysUseSession(true);
     }
 
+    /*
+     * Force rapid timeout scanning for the Basic Authentication webapp
+     * The StandardManager default service cycle time is 10 seconds,
+     * with a session expiry scan every 6 cycles.
+     */
+    private void setRapidSessionTimeout() {
+
+        ((ManagerBase) basicContext.getManager())
+                .setProcessExpiresFrequency(MANAGER_EXPIRE_SESSIONS_FAST);
+    }
     /*
      * Encapsulate the logic to generate an HTTP header
      * for BASIC Authentication.
