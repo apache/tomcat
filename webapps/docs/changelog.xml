@@ -82,6 +82,10 @@
         <bug>54220</bug>: Ensure the ErrorReportValve only generates an error
         report if the error flag on the response has been set. (markt)
       </fix>
+      <fix>
+        Simplify time zone handling in the access log valve and correctly handle
+        various edge cases for non-standard DST changes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
