@@ -184,7 +184,7 @@ public class PojoMethodMapping {
         } else if (type.equals(byte.class) || type.equals(Byte.class)) {
             return Byte.valueOf(value);
         } else if (value.length() == 1 &&
-                type.equals(char.class) || type.equals(Character.class)) {
+                (type.equals(char.class) || type.equals(Character.class))) {
             return Character.valueOf(value.charAt(0));
         } else if (type.equals(double.class) || type.equals(Double.class)) {
             return Double.valueOf(value);
