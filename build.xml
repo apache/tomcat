@@ -2672,7 +2672,8 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
           <exclude name="**/package.html" />
           <exclude name="**/LocalStrings_*" />
         </fileset>
-        <zipfileset dir="@{meta-inf}" prefix="META-INF/" />
+        <zipfileset dir="@{meta-inf}" prefix="META-INF/"
+                    excludes=".gitignore" />
         <zipfileset file="@{notice}" fullpath="META-INF/NOTICE" />
         <zipfileset file="@{license}" fullpath="META-INF/LICENSE" />
       </jar>
