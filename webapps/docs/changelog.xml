@@ -107,6 +107,10 @@
         Fix a handful of Eclipse warnings in the JDBC pool source code including
         the warnings reported in <bug>53565</bug>. (markt)
       </scode>
+      <fix>
+        <bug>54150</bug>: Make sure that SlowQueryReportJmx mbean deregistered
+        during webapp shutdown. Reported by Alex Franken. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
