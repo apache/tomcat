@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -1134,7 +1135,7 @@ public class AprEndpoint extends AbstractEndpoint {
         private int[] addSocketTimeout;
         private int[] addSocketFlags;
 
-        private volatile int addCount = 0;
+        private AtomicInteger addCount = new AtomicInteger(0);
 
         private boolean comet = true;
 
@@ -1167,7 +1168,7 @@ public class AprEndpoint extends AbstractEndpoint {
             addSocket = new long[size];
             addSocketTimeout = new int[size];
             addSocketFlags = new int[size];
-            addCount = 0;
+            addCount.set(0);
         }
 
         /**
@@ -1176,7 +1177,7 @@ public class AprEndpoint extends AbstractEndpoint {
         @Override
         public void destroy() {
             // Close all sockets in the add queue
-            for (int i = 0; i < addCount; i++) {
+            for (int i = 0; i < addCount.get(); i++) {
                 if (comet) {
                     processSocket(addSocket[i], SocketStatus.STOP);
                 } else {
@@ -1187,7 +1188,7 @@ public class AprEndpoint extends AbstractEndpoint {
             closePollset(connectionPollset);
             Pool.destroy(pool);
             keepAliveCount = 0;
-            addCount = 0;
+            addCount.set(0);
             try {
                 while (this.isAlive()) {
                     this.interrupt();
@@ -1231,7 +1232,7 @@ public class AprEndpoint extends AbstractEndpoint {
             synchronized (this) {
                 // Add socket to the list. Newly added sockets will wait
                 // at most for pollTime before being polled
-                if (addCount >= addSocket.length) {
+                if (addCount.get() >= addSocket.length) {
                     // Can't do anything: close the socket right away
                     if (comet) {
                         processSocket(socket, SocketStatus.ERROR);
@@ -1240,10 +1241,10 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                     return;
                 }
-                addSocket[addCount] = socket;
-                addSocketTimeout[addCount] = timeout;
-                addSocketFlags[addCount] = flags;
-                addCount++;
+                addSocket[addCount.get()] = socket;
+                addSocketTimeout[addCount.get()] = timeout;
+                addSocketFlags[addCount.get()] = flags;
+                addCount.incrementAndGet();
                 // TODO: interrupt poll ?
                 this.notify();
             }
@@ -1271,9 +1272,9 @@ public class AprEndpoint extends AbstractEndpoint {
                 if (!running) {
                     break;
                 }
-                if (keepAliveCount < 1 && addCount < 1) {
+                if (keepAliveCount < 1 && addCount.get() < 1) {
                     synchronized (this) {
-                        while (keepAliveCount < 1 && addCount < 1 && running) {
+                        while (keepAliveCount < 1 && addCount.get() < 1 && running) {
                             // Reset maintain time.
                             maintainTime = 0;
                             try {
@@ -1290,11 +1291,11 @@ public class AprEndpoint extends AbstractEndpoint {
                 }
                 try {
                     // Add sockets which are waiting to the poller
-                    if (addCount > 0) {
+                    if (addCount.get() > 0) {
                         synchronized (this) {
                             int successCount = 0;
                             try {
-                                for (int i = (addCount - 1); i >= 0; i--) {
+                                for (int i = (addCount.get() - 1); i >= 0; i--) {
                                     int timeout = addSocketTimeout[i];
                                     if (timeout > 0) {
                                         // Convert milliseconds to microseconds
@@ -1316,7 +1317,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                 }
                             } finally {
                                 keepAliveCount += successCount;
-                                addCount = 0;
+                                addCount.set(0);
                             }
                         }
                     }
@@ -1437,11 +1438,11 @@ public class AprEndpoint extends AbstractEndpoint {
         protected long[] desc;
         protected HashMap<Long, SendfileData> sendfileData;
 
-        protected volatile int sendfileCount;
-        public int getSendfileCount() { return sendfileCount; }
+        protected AtomicInteger sendfileCount = new AtomicInteger(0);
+        public int getSendfileCount() { return sendfileCount.get(); }
 
         protected ArrayList<SendfileData> addS;
-        protected volatile int addCount;
+        protected AtomicInteger addCount = new AtomicInteger(0);
 
         /**
          * Create the sendfile poller. With some versions of APR, the maximum poller size will
@@ -1462,7 +1463,7 @@ public class AprEndpoint extends AbstractEndpoint {
             desc = new long[size * 2];
             sendfileData = new HashMap<>(size);
             addS = new ArrayList<>();
-            addCount = 0;
+            addCount.set(0);
         }
 
         /**
@@ -1471,7 +1472,7 @@ public class AprEndpoint extends AbstractEndpoint {
         @Override
         public void destroy() {
             // Close any socket remaining in the add queue
-            addCount = 0;
+            addCount.set(0);
             for (int i = (addS.size() - 1); i >= 0; i--) {
                 SendfileData data = addS.get(i);
                 destroySocket(data.socket);
@@ -1559,7 +1560,7 @@ public class AprEndpoint extends AbstractEndpoint {
             // at most for pollTime before being polled
             synchronized (this) {
                 addS.add(data);
-                addCount++;
+                addCount.incrementAndGet();
                 this.notify();
             }
             return false;
@@ -1573,7 +1574,7 @@ public class AprEndpoint extends AbstractEndpoint {
         protected void remove(SendfileData data) {
             int rv = Poll.remove(sendfilePollset, data.socket);
             if (rv == Status.APR_SUCCESS) {
-                sendfileCount--;
+                sendfileCount.decrementAndGet();
             }
             sendfileData.remove(Long.valueOf(data.socket));
         }
@@ -1601,9 +1602,9 @@ public class AprEndpoint extends AbstractEndpoint {
                 if (!running) {
                     break;
                 }
-                if (sendfileCount < 1 && addCount < 1) {
+                if (sendfileCount.get() < 1 && addCount.get() < 1) {
                     synchronized (this) {
-                        while (sendfileCount < 1 && addS.size() < 1 && running) {
+                        while (sendfileCount.get() < 1 && addS.size() < 1 && running) {
                             // Reset maintain time.
                             maintainTime = 0;
                             try {
@@ -1620,7 +1621,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 }
                 try {
                     // Add socket to the poller
-                    if (addCount > 0) {
+                    if (addCount.get() > 0) {
                         synchronized (this) {
                             int successCount = 0;
                             try {
@@ -1637,9 +1638,9 @@ public class AprEndpoint extends AbstractEndpoint {
                                     }
                                 }
                             } finally {
-                                sendfileCount += successCount;
+                                sendfileCount.addAndGet(successCount);
                                 addS.clear();
-                                addCount = 0;
+                                addCount.set(0);
                             }
                         }
                     }
