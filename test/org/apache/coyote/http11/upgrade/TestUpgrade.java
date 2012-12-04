@@ -88,10 +88,11 @@ public class TestUpgrade extends TomcatBaseTest {
         pw.println(MESSAGE);
         pw.flush();
 
-        String response = reader.readLine();
-
         // Note: BufferedReader.readLine() strips new lines
         //       ServletInputStream.readLine() does not strip new lines
+        String response = reader.readLine();
+        Assert.assertEquals(MESSAGE, response);
+        response = reader.readLine();
         Assert.assertEquals(MESSAGE, response);
     }
 
