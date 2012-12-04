@@ -402,7 +402,9 @@ public class ConnectionPool {
         PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
         for (int i=0; i<proxies.length; i++) {
             try {
-                proxies[i].getInterceptorClass().newInstance().poolClosed(this);
+                JdbcInterceptor interceptor = proxies[i].getInterceptorClass().newInstance();
+                interceptor.setProperties(proxies[i].getProperties());
+                interceptor.poolClosed(this);
             }catch (Exception x) {
                 log.debug("Unable to inform interceptor of pool closure.",x);
             }
