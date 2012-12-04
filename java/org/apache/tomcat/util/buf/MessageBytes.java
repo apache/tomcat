@@ -50,7 +50,7 @@ public final class MessageBytes implements Cloneable, Serializable {
     public static final int T_CHARS = 3;
 
     private int hashCode=0;
-    // did we computed the hashcode ?
+    // did we compute the hashcode ?
     private boolean hasHashCode=false;
 
     // Internal objects to represent array + offset, and specific methods
