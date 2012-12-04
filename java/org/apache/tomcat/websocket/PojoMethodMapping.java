@@ -47,17 +47,16 @@ public class PojoMethodMapping {
         Method open = null;
         Method close = null;
         Method error = null;
-        Method[] methods = clazzPojo.getMethods();
-        for (int i = 0; i < methods.length; i++) {
+        for (Method method: clazzPojo.getMethods()) {
             if (open == null &&
-                    methods[i].getAnnotation(WebSocketOpen.class) != null) {
-                open = methods[i];
+                    method.getAnnotation(WebSocketOpen.class) != null) {
+                open = method;
             } else if (close == null &&
-                    methods[i].getAnnotation(WebSocketClose.class) != null) {
-                close = methods[i];
+                    method.getAnnotation(WebSocketClose.class) != null) {
+                close = method;
             } else if (error == null &&
-                    methods[i].getAnnotation(WebSocketError.class) != null) {
-                error = methods[i];
+                    method.getAnnotation(WebSocketError.class) != null) {
+                error = method;
             }
         }
         this.onOpen = open;
