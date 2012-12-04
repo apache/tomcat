@@ -111,6 +111,10 @@
         <bug>54150</bug>: Make sure that SlowQueryReportJmx mbean deregistered
         during webapp shutdown. Reported by Alex Franken. (kfujino)
       </fix>
+      <fix>
+        <bug>54194</bug>: Make sure that connection pool mbean is not registered
+        when jmxEnabled is false. Patch provided by tobias.gierke. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
