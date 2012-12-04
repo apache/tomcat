@@ -16,6 +16,12 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.IOException;
+
+import javax.servlet.ReadListener;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.ProtocolHandler;
 import javax.servlet.http.WebConnection;
 import javax.websocket.Endpoint;
@@ -26,16 +32,98 @@ import javax.websocket.Endpoint;
 public class WsProtocolHandler implements ProtocolHandler {
 
     private final Endpoint ep;
+    private final ClassLoader applicationClassLoader;
+    private final WsSession session;
 
     public WsProtocolHandler(Endpoint ep) {
         this.ep = ep;
+        applicationClassLoader = Thread.currentThread().getContextClassLoader();
+        session = new WsSession();
     }
 
     @Override
     public void init(WebConnection connection) {
 
-        ep.onOpen(new WsSession());
+        // Need to call onOpen using the web application's class loader
+        Thread t = Thread.currentThread();
+        ClassLoader cl = t.getContextClassLoader();
+        t.setContextClassLoader(applicationClassLoader);
+        try {
+            ep.onOpen(session);
+        } finally {
+            t.setContextClassLoader(cl);
+        }
 
-        // TODO Message handling
+        ServletInputStream sis;
+        ServletOutputStream sos;
+        try {
+            sis = connection.getInputStream();
+            sos = connection.getOutputStream();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+
+        sis.setReadListener(new WsReadListener(this));
+        sos.setWriteListener(new WsWriteListener(this));
+    }
+
+
+    private void onError(Throwable throwable) {
+        // Need to call onError using the web application's class loader
+        Thread t = Thread.currentThread();
+        ClassLoader cl = t.getContextClassLoader();
+        t.setContextClassLoader(applicationClassLoader);
+        try {
+            ep.onError(throwable);
+        } finally {
+            t.setContextClassLoader(cl);
+        }
+    }
+
+    private static class WsReadListener implements ReadListener {
+
+        private final WsProtocolHandler wsProtocolHandler;
+
+        private WsReadListener(WsProtocolHandler wsProtocolHandler) {
+            this.wsProtocolHandler = wsProtocolHandler;
+        }
+
+        @Override
+        public void onDataAvailable() {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onAllDataRead() {
+            // Will never happen with WebSocket
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            wsProtocolHandler.onError(throwable);
+        }
+    }
+
+
+    private static class WsWriteListener implements WriteListener {
+
+        private final WsProtocolHandler wsProtocolHandler;
+
+        private WsWriteListener(WsProtocolHandler wsProtocolHandler) {
+            this.wsProtocolHandler = wsProtocolHandler;
+        }
+
+        @Override
+        public void onWritePossible() {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            wsProtocolHandler.onError(throwable);
+        }
     }
 }
