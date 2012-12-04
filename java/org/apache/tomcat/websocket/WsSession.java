@@ -18,18 +18,22 @@ package org.apache.tomcat.websocket;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.websocket.ClientContainer;
 import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Encoder;
 import javax.websocket.MessageHandler;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 
 public class WsSession implements Session {
+
+    private final Set<MessageHandler> messageHandlers = new LinkedHashSet<>();
 
     @Override
     public ClientContainer getContainer() {
@@ -45,20 +49,17 @@ public class WsSession implements Session {
 
     @Override
     public void addMessageHandler(MessageHandler listener) {
-        // TODO Auto-generated method stub
-
+        messageHandlers.add(listener);
     }
 
     @Override
     public Set<MessageHandler> getMessageHandlers() {
-        // TODO Auto-generated method stub
-        return null;
+        return messageHandlers;
     }
 
     @Override
     public void removeMessageHandler(MessageHandler listener) {
-        // TODO Auto-generated method stub
-
+        messageHandlers.remove(listener);
     }
 
     @Override
@@ -129,8 +130,7 @@ public class WsSession implements Session {
 
     @Override
     public void close() throws IOException {
-        // TODO Auto-generated method stub
-
+        close(new CloseReason(CloseCodes.GOING_AWAY, ""));
     }
 
     @Override
