@@ -98,8 +98,10 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     @Override
     public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
         try {
-            this.oname = createObjectName(name);
-            if (oname!=null) registerJmx();
+            if ( isJmxEnabled() ) { 
+                this.oname = createObjectName(name);
+                if (oname!=null) registerJmx();
+            }
         }catch (MalformedObjectNameException x) {
             log.error("Unable to create object name for JDBC pool.",x);
         }
