@@ -23,9 +23,8 @@ public class Util {
     }
 
     public static boolean objectNameValueNeedsQuote(String input) {
-        char[] chars = input.toCharArray();
         for (int i = 0; i < input.length(); i++) {
-            char ch = chars[i];
+            char ch = input.charAt(i);
             if (ch == ',' || ch == '=' || ch == ':' || ch == '*' || ch == '?') {
                 return true;
             }
