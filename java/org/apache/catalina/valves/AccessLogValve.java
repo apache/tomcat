@@ -519,9 +519,9 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     protected String conditionIf = null;
 
     /**
-     * Date format to place in log file name. Use at your own risk!
+     * Date format to place in log file name.
      */
-    protected String fileDateFormat = null;
+    protected String fileDateFormat = ".yyyy-MM-dd";
 
 
     /**
@@ -1232,8 +1232,8 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
         // Initialize the Date formatters
         String format = getFileDateFormat();
-        if (format == null || format.length() == 0) {
-            format = ".yyyy-MM-dd";
+        if (format == null) {
+            format = "";
             setFileDateFormat(format);
         }
         fileDateFormatter = new SimpleDateFormat(format, Locale.US);
