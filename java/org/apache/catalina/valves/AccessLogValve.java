@@ -234,8 +234,8 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
 
     /**
-     * A date formatter to format a Date into a date in the format
-     * "yyyy-MM-dd".
+     * A date formatter to format a Date using the format
+     * given by <code>fileDateFormat</code>.
      */
     protected SimpleDateFormat fileDateFormatter = null;
 
