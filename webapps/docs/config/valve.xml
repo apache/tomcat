@@ -352,7 +352,7 @@
     <p>The <strong>Extended Access Log Valve</strong> supports all
     configuration attributes of the standard
     <a href="#Access_Log_Valve">Access Log Valve.</a> Only the
-    values used for <code>className</code> and <code>pattern</code> differ.
+    values used for <code>className</code> and <code>pattern</code> differ.</p>
 
     <attributes>
 
