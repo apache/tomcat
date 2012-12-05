@@ -1697,9 +1697,11 @@ public class NioEndpoint extends AbstractEndpoint {
                 } catch (OutOfMemoryError oom) {
                     try {
                         oomParachuteData = null;
-                        socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
-                        releaseCaches();
                         log.error("", oom);
+                        if (socket != null) {
+                            socket.getPoller().cancelledKey(key,SocketStatus.ERROR, false);
+                        }
+                        releaseCaches();
                     }catch ( Throwable oomt ) {
                         try {
                             System.err.println(oomParachuteMsg);
