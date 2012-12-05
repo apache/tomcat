@@ -35,8 +35,10 @@
   <xsl:param    name="home-logo"        select="'/images/tomcat.gif'"/>
   <xsl:param    name="printer-logo"     select="'/images/printer.gif'"/>
   <xsl:param    name="apache-logo"      select="'/images/asf-logo.gif'"/>
+  <xsl:param    name="subdir"           select="''"/>
   <xsl:param    name="relative-path"    select="'.'"/>
   <xsl:param    name="version"          select="'8.0.x'"/>
+  <xsl:param    name="majorversion"     select="'8.0'"/>
   <xsl:param    name="build-date"       select="'MMM d yyyy'"/>
   <xsl:param    name="year"             select="'yyyy'"/>
   <xsl:param    name="void-image"       select="'/images/void.gif'"/>
@@ -44,6 +46,8 @@
   <xsl:param    name="standalone"       select="''"/>
   <xsl:param    name="buglink"          select="'http://issues.apache.org/bugzilla/show_bug.cgi?id='"/>
   <xsl:param    name="revlink"          select="'http://svn.apache.org/viewvc?view=rev&amp;rev='"/>
+  <xsl:param    name="sitedir"          select="''"/>
+  <xsl:param    name="filename"         select="'-'"/>
 
   <!-- Defined variables (non-overrideable) -->
   <xsl:variable name="body-bg"          select="'#ffffff'"/>
