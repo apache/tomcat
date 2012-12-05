@@ -16,32 +16,41 @@
  */
 package websocket.echo;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
-import javax.websocket.ContainerProvider;
-import javax.websocket.DeploymentException;
+import javax.websocket.DefaultServerConfiguration;
+import javax.websocket.EndpointFactory;
 
-import org.apache.tomcat.websocket.ServerContainerImpl;
-
-@WebListener
-public class WsConfigListener implements ServletContextListener {
+public class EchoEndpointConfiguration
+        extends DefaultServerConfiguration<EchoEndpoint> {
 
     @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        ServerContainerImpl sc =
-                (ServerContainerImpl) ContainerProvider.getServerContainer();
-        sc.setServletContext(sce.getServletContext());
-        try {
-            sc.publishServer(EchoEndpointConfiguration.class);
-        } catch (DeploymentException e) {
-            throw new IllegalStateException(e);
-        }
+    public boolean checkOrigin(String originHeaderValue) {
+        // No origin checks
+        return true;
     }
 
 
     @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-        // NO-OP
+    public String getPath() {
+        return "/websocket/echoProgrammatic";
+    }
+
+
+    private static final EndpointFactory<EchoEndpoint> factory =
+            new EchoEndpointFactory();
+
+
+    @Override
+    public EndpointFactory<EchoEndpoint> getEndpointFactory() {
+        return factory;
+    }
+
+
+    private static class EchoEndpointFactory implements
+            EndpointFactory<EchoEndpoint> {
+
+        @Override
+        public EchoEndpoint createEndpoint() {
+            return new EchoEndpoint();
+        }
     }
 }
