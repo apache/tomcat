@@ -842,7 +842,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      *  Set the date format date based log rotation.
      */
     public void setFileDateFormat(String fileDateFormat) {
-        this.fileDateFormat =  fileDateFormat;
+        this.fileDateFormat = fileDateFormat;
     }
 
 
