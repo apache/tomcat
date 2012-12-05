@@ -30,6 +30,7 @@
     <menu name="Links">
         <item name="Docs Home"             href="../index.html"/>
         <item name="Config Ref. Home"      href="index.html"/>
+        <item name="FAQ"                   href="http://wiki.apache.org/tomcat/FAQ" />
     </menu>
 
     <menu name="Top Level Elements">
