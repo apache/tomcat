@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.websocket;
+package org.apache.tomcat.websocket;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
