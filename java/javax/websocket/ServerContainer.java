@@ -22,12 +22,14 @@ package javax.websocket;
 public interface ServerContainer extends ClientContainer {
 
     /**
-     * Publish the Endpoint in this ServerContainer.
+     * Publish the Endpoint asscoiated with the given configuration in this
+     * ServerContainer.
      *
-     * @param clazz The implementation class for the Endpoint
+     * @param clazz The configuration class for the Endpoint
      *
      * @throws DeploymentException  If the publish process fails for any reason
      */
-    void publishServer(Class<? extends Endpoint> clazz)
+    void publishServer(
+            Class<? extends ServerEndpointConfiguration<?>> clazz)
             throws DeploymentException;
 }

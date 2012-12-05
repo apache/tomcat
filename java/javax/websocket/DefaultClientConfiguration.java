@@ -66,4 +66,14 @@ public class DefaultClientConfiguration implements ClientEndpointConfiguration {
         this.decoders = decoders;
         return this;
     }
+
+    @Override
+    public void beforeRequest(HandshakeRequest handshakeRequest) {
+        // NO-OP
+    }
+
+    @Override
+    public void afterResponse(HandshakeResponse handshakeResponse) {
+        // NO-OP
+    }
 }

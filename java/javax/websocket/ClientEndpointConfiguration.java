@@ -23,4 +23,8 @@ public interface ClientEndpointConfiguration extends EndpointConfiguration {
     List<String> getPreferredSubprotocols();
 
     List<String> getExtensions();
+
+    void beforeRequest(HandshakeRequest handshakeRequest);
+
+    void afterResponse(HandshakeResponse handshakeResponse);
 }

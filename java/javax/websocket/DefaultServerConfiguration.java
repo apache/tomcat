@@ -20,7 +20,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefaultServerConfiguration implements ServerEndpointConfiguration {
+public class DefaultServerConfiguration<T>
+        implements ServerEndpointConfiguration<T> {
+
     private String path;
     @SuppressWarnings("unused") // TODO Remove this once implemented
     private List<String> subprotocols = new ArrayList<>();
@@ -32,27 +34,33 @@ public class DefaultServerConfiguration implements ServerEndpointConfiguration {
     protected DefaultServerConfiguration() {
     }
 
+    @Override
+    public EndpointFactory<T> getEndpointFactory() {
+        // TODO
+        return null;
+    }
+
     public DefaultServerConfiguration(String path) {
         this.path = path;
     }
 
-    public DefaultServerConfiguration setEncoders(List<Encoder> encoders) {
+    public DefaultServerConfiguration<T> setEncoders(List<Encoder> encoders) {
         this.encoders = encoders;
         return this;
     }
 
-    public DefaultServerConfiguration setDecoders(List<Decoder> decoders) {
+    public DefaultServerConfiguration<T> setDecoders(List<Decoder> decoders) {
         this.decoders = decoders;
         return this;
     }
 
-    public DefaultServerConfiguration setSubprotocols(
+    public DefaultServerConfiguration<T> setSubprotocols(
             List<String> subprotocols) {
         this.subprotocols = subprotocols;
         return this;
     }
 
-    public DefaultServerConfiguration setExtensions(
+    public DefaultServerConfiguration<T> setExtensions(
             List<String> extensions) {
         this.extensions = extensions;
         return this;
@@ -63,7 +71,6 @@ public class DefaultServerConfiguration implements ServerEndpointConfiguration {
     public List<Encoder> getEncoders() {
         return this.encoders;
     }
-
 
     @Override
     public List<Decoder> getDecoders() {
@@ -80,7 +87,6 @@ public class DefaultServerConfiguration implements ServerEndpointConfiguration {
         // TODO
         return null;
     }
-
 
     @Override
     public List<String> getNegotiatedExtensions(

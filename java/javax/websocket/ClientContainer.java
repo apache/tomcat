@@ -21,9 +21,14 @@ import java.util.Set;
 
 public interface ClientContainer {
 
-    void connectToServer(Object endpoint, URI path) throws DeploymentException;
+    Session connectToServer(Object endpoint, URI path)
+            throws DeploymentException;
 
-    Set<Session> getActiveSessions();
+    Session connectToServer(Endpoint endpoint,
+            ClientEndpointConfiguration clientEndpointConfiguration, URI path)
+            throws DeploymentException;
+
+    Set<Session> getOpenSessions();
 
     long getMaxSessionIdleTimeout();
 

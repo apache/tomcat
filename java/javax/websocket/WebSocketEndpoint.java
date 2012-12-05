@@ -28,11 +28,13 @@ public @interface WebSocketEndpoint {
     /**
      * URI or URI-template that the annotated class should be mapped to.
      */
-    public String value();
+    String value();
 
-    public String[] subprotocols() default {};
+    String[] subprotocols() default {};
 
-    public Class<? extends Decoder>[] decoders() default {};
+    Class<? extends Decoder>[] decoders() default {};
 
-    public Class<? extends Encoder>[] encoders() default {};
+    Class<? extends Encoder>[] encoders() default {};
+
+    //Class<? extends EndpointFactory<?>> factory();
 }

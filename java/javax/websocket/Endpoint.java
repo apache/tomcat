@@ -18,8 +18,6 @@ package javax.websocket;
 
 public abstract class Endpoint {
 
-    public abstract EndpointConfiguration getEndpointConfiguration();
-
     /**
      * Event that is triggered when a new session starts.
      *

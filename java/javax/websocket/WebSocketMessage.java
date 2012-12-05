@@ -24,5 +24,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface WebSocketMessage {
-    public long maxMessageSize() default -1;
+    long maxMessageSize() default -1;
 }
