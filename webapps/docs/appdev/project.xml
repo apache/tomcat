@@ -31,6 +31,7 @@
         <item name="Docs Home"             href="../index.html"/>
         <item name="App Dev Guide Home"    href="index.html"/>
         <item name="FAQ"                   href="http://wiki.apache.org/tomcat/FAQ" />
+        <item name="User Comments"         href="#comments_section"/>
     </menu>
 
     <menu name="Contents">
