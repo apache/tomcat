@@ -18,29 +18,11 @@ package websocket.echo;
 
 import java.io.IOException;
 
-import javax.websocket.DefaultServerConfiguration;
 import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfiguration;
 import javax.websocket.RemoteEndpoint;
-import javax.websocket.ServerEndpointConfiguration;
 import javax.websocket.Session;
 
 public class EchoEndpoint extends Endpoint{
-
-    private static ServerEndpointConfiguration config =
-            new DefaultServerConfiguration("/websocket/echoProgrammatic") {
-
-        @Override
-        public boolean checkOrigin(String originHeaderValue) {
-            // Accept any
-            return true;
-        }
-    };
-
-    @Override
-    public EndpointConfiguration getEndpointConfiguration() {
-        return config;
-    }
 
     @Override
     public void onOpen(Session session) {
