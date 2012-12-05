@@ -96,6 +96,15 @@
             .wrapped-source div { margin: 0 0 0 1.25em; }
             .wrapped-source p { margin: 0 0 0 1.25em; text-indent: -1.25em; }
         </style>
+        <style type="text/css">
+            p.notice {
+                border: 1px solid rgb(255, 0, 0);
+                background-color: rgb(238, 238, 238);
+                color: rgb(0, 51, 102);
+                padding: 0.5em;
+                margin: 1em 2em 1em 1em;
+            }
+        </style>
     </head>
 
     <body bgcolor="{$body-bg}" text="{$body-fg}" link="{$body-link}"
