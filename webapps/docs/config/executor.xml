@@ -83,7 +83,8 @@
   <attributes>
 
     <attribute name="threadPriority" required="false">
-      <p>(int) The thread priority for threads in the executor, the default is <code>Thread.NORM_PRIORITY</code></p>
+      <p>(int) The thread priority for threads in the executor, the default is
+      <code>5</code> (the value of the <code>Thread.NORM_PRIORITY</code> constant)</p>
     </attribute>
     <attribute name="daemon" required="false">
       <p>(boolean) Whether the threads should be daemon threads or not, the default is <code>true</code></p>
