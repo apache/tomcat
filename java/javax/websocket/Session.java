@@ -26,8 +26,6 @@ public interface Session {
 
     ClientContainer getContainer();
 
-    void setEncoders(List<Encoder> encoders);
-
     void addMessageHandler(MessageHandler listener);
 
     Set<MessageHandler> getMessageHandlers();
@@ -44,7 +42,7 @@ public interface Session {
 
     long getInactiveTime();
 
-    boolean isActive();
+    boolean isOpen();
 
     long getTimeout();
 
@@ -67,4 +65,6 @@ public interface Session {
     String getQueryString();
 
     Map<String,String> getPathParameters();
+
+    Map<String,Object> getUserProperties();
 }

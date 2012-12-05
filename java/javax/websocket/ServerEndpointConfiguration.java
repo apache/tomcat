@@ -19,7 +19,9 @@ package javax.websocket;
 import java.net.URI;
 import java.util.List;
 
-public interface ServerEndpointConfiguration extends EndpointConfiguration {
+public interface ServerEndpointConfiguration<T> extends EndpointConfiguration {
+
+    EndpointFactory<T> getEndpointFactory();
 
     String getNegotiatedSubprotocol(List<String> requestedSubprotocols);
 
