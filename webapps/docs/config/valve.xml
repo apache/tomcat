@@ -349,8 +349,10 @@
 
   <subsection name="Attributes">
 
-    <p>The <strong>Extended Access Log Valve</strong> supports the following
-    configuration attributes:</p>
+    <p>The <strong>Extended Access Log Valve</strong> supports all
+    configuration attributes of the standard
+    <a href="#Access_Log_Valve">Access Log Valve.</a> Only the
+    values used for <code>className</code> and <code>pattern</code> differ.
 
     <attributes>
 
@@ -360,124 +362,10 @@
         use the extended access log valve.</p>
       </attribute>
 
-      <attribute name="directory" required="false">
-        <p>Absolute or relative pathname of a directory in which log files
-        created by this valve will be placed.  If a relative path is
-        specified, it is interpreted as relative to $CATALINA_BASE.  If
-        no directory attribute is specified, the default value is "logs"
-        (relative to $CATALINA_BASE).</p>
-      </attribute>
-
-      <attribute name="encoding" required="false">
-        <p>Character set used to write the log file. An empty string means
-        to use the system default character set. Default value: use the
-        system default character set.
-        </p>
-      </attribute>
-
-      <attribute name="locale" required="false">
-        <p>The locale used to format timestamps in the access log
-           lines. Any timestamps configured using an
-           explicit SimpleDateFormat pattern (<code>%{xxx}t</code>)
-           are formatted in this locale. By default the
-           default locale of the Java process is used. Switching the
-           locale after the AccessLogValve is initialized is not supported.
-           Any timestamps using the common log format
-           (<code>CLF</code>) are always formatted in the locale
-           <code>en_US</code>.
-        </p>
-      </attribute>
-
-      <attribute name="maxLogMessageBufferSize" required="false">
-        <p>Log message buffers are usually recycled and re-used. To prevent
-           excessive memory usage, if a buffer grows beyond this size it will be
-           discarded. The default is <code>256</code> characters. This should be
-           set to larger than the typical access log message size.</p>
-      </attribute>
-
       <attribute name="pattern" required="false">
         <p>A formatting layout identifying the various information fields
         from the request and response to be logged.
         See below for more information on configuring this attribute.</p>
-      </attribute>
-
-      <attribute name="prefix" required="false">
-        <p>The prefix added to the start of each log file's name.  If not
-        specified, the default value is "access_log.".</p>
-      </attribute>
-
-      <attribute name="requestAttributesEnabled" required="false">
-        <p>Set to <code>true</code> to check for the existence of request
-        attributes (typically set by the RemoteIpValve and similar) that should
-        be used to override the values returned by the request for remote
-        address, remote host, server port and protocol. If the attributes are
-        not set, or this attribute is set to <code>false</code> then the values
-        from the request will be used. If not set, the default value of
-        <code>false</code> will be used.</p>
-      </attribute>
-
-      <attribute name="resolveHosts" required="false">
-        <p>This attribute is no longer supported. Use the connector
-        attribute <code>enableLookups</code> instead.</p>
-      </attribute>
-
-      <attribute name="suffix" required="false">
-        <p>The suffix added to the end of each log file's name.  If not
-        specified, the default value is "" (a zero-length string),
-        meaning that no suffix will be added.</p>
-      </attribute>
-
-      <attribute name="rotatable" required="false">
-        <p>Flag to determine if log rotation should occur.
-           If set to <code>false</code>, then this file is never rotated and
-           <code>fileDateFormat</code> is ignored. Use with caution!
-           Default value: <code>true</code>
-        </p>
-      </attribute>
-
-      <attribute name="conditionIf" required="false">
-        <p>Turns on conditional logging. If set, requests will be
-           logged only if <code>ServletRequest.getAttribute()</code> is
-           not null. For example, if this value is set to
-           <code>important</code>, then a particular request will only be logged
-           if <code>ServletRequest.getAttribute("important") != null</code>.
-           The use of Filters is an easy way to set/unset the attribute
-           in the ServletRequest on many different requests.
-        </p>
-      </attribute>
-
-      <attribute name="conditionUnless" required="false">
-        <p>Turns on conditional logging. If set, requests will be
-           logged only if <code>ServletRequest.getAttribute()</code> is
-           null. For example, if this value is set to
-           <code>junk</code>, then a particular request will only be logged
-           if <code>ServletRequest.getAttribute("junk") == null</code>.
-           The use of Filters is an easy way to set/unset the attribute
-           in the ServletRequest on many different requests.
-        </p>
-      </attribute>
-
-      <attribute name="condition" required="false">
-        <p>The same as <code>conditionUnless</code>. This attribute is
-           provided for backwards compatibility.
-        </p>
-      </attribute>
-
-      <attribute name="fileDateFormat" required="false">
-        <p>Allows a customized date format in the access log file name.
-           The date format also decides how often the file is rotated.
-           If you wish to rotate every hour, then set this value
-           to: <code>yyyy-MM-dd.HH</code>. The default value is
-           <code>yyyy-MM-dd</code>. The date format will always be localized
-           using the locale <code>en_US</code>.
-        </p>
-      </attribute>
-
-      <attribute name="buffered" required="false">
-        <p>Flag to determine if logging will be buffered.
-           If set to <code>false</code>, then access logging will be written after each
-           request. Default value: <code>true</code>
-        </p>
       </attribute>
 
     </attributes>
