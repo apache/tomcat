@@ -16,8 +16,9 @@
 ================================================================================
 
 # Java -> Compiler -> Errors/Warnings
+=======================================
 
-The following settings are for Indigo Release (Eclipse 3.7)
+The following settings are for Juno Service Release 1 (Eclipse 4.2.1)
 W = Warning
 I = Ignore
 E = Error
@@ -26,15 +27,22 @@ Code style
  - Non-static access to static member   - W
  - Indirect access to static member     - I
  - Unqualified access to instance field - I
- - Undocumented empty block             - I
  - Access to a non-accessible member... - I
- - Method with a constructor name       - W
  - Parameter assignment                 - I
  - Non-externalized strings             - I
- - Method can be static                 - I (Eclipse 3.7+)
- - Method can potentially be static     - I (Eclipse 3.7+)
+ - Undocumented empty block             - I
+ - Resource not managed via try-with-resource (1.7 or higher)  - I
+ - Method with a constructor name       - W
+ - Method can be static                 - I
+ - Method can potentially be static     - I
 Potential programming errors
  - All                                  - W
+   except the following:
+
+ - Incomplete 'switch' cases on enum    - W
+   [ ] Signal even if 'default' case exists
+ - 'switch' is missing 'default' case   - I
+
 Name shadowing and conflicts
  - Field declaration hides another...   - I
  - Local variable declaration hides..   - I
@@ -43,32 +51,43 @@ Name shadowing and conflicts
  - Interface method conflicts...        - W
 Deprecated and restricted API
  - Deprecated API                       - W
-   (no additional check boxes)
+   ([ ] on all additional check boxes)
  - Forbidden references                 - E
  - Discouraged reference                - W
 Unnecessary code
+ - All                                  - W
+   ([x] on all additional check boxes)
+   except the following:
+
  - Unnecessary else                     - I
- - The rest                             - W
-   (all additional check boxes)
+
 Generic types
  - All                                  - W
-   (ignore unavoidable generics warnings)   (Eclipse 3.7+)
+   [x] Ignore unavoidable generic type problems
 Annotations
  - All                                  - W
-   (all additional check boxes)
+   ([x] on all additional check boxes)
+Null analysis
+ - Null pointer access                  - W
+ - Potential null pointer access        - W
+ - Redundant null check                 - W
+   [ ] Include 'assert' in null analysis
+   [ ] Enable annotation-based null analysis
 
 Note: The list of codes supported in @SuppressWarnings annotation in
 Eclipse IDE is documented here:
 
  3.6: http://help.eclipse.org/helios/topic/org.eclipse.jdt.doc.isv/guide/jdt_api_compile.htm
  3.7: http://help.eclipse.org/indigo/topic/org.eclipse.jdt.doc.user/tasks/task-suppress_warnings.htm
+ 4.2: http://help.eclipse.org/juno/topic/org.eclipse.jdt.doc.user/tasks/task-suppress_warnings.htm
 
 
 # Java -> Code Style -> Organize Imports
+==========================================
 
-The following configuration of Organize Imports can be recommended for a
-quick setup. The order is enforced by checkstyle, so for the authorative
-definition look at <module name="ImportOrder"> in
+The following configuration of "Organize Imports" setting can be
+recommended for a quick setup. The order is enforced by checkstyle, so for
+the authorative definition look at <module name="ImportOrder"> in
 res/checkstyle/checkstyle.xml
 
  - java
