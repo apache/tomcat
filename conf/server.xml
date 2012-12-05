@@ -133,7 +133,7 @@
              Documentation at: /docs/config/valve.html
              Note: The pattern used is equivalent to using pattern="common" -->
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
-               prefix="localhost_access_log." suffix=".txt"
+               prefix="localhost_access_log" suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
 
       </Host>

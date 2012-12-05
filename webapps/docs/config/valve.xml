@@ -226,8 +226,8 @@
         <p>Allows a customized date format in the access log file name.
            The date format also decides how often the file is rotated.
            If you wish to rotate every hour, then set this value
-           to: <code>yyyy-MM-dd.HH</code>. The default value is
-           <code>yyyy-MM-dd</code>. The date format will always be localized
+           to: <code>.yyyy-MM-dd.HH</code>. The default value is
+           <code>.yyyy-MM-dd</code>. The date format will always be localized
            using the locale <code>en_US</code>.
         </p>
       </attribute>
