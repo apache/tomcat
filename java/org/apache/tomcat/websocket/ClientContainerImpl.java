@@ -20,20 +20,30 @@ import java.net.URI;
 import java.util.Set;
 
 import javax.websocket.ClientContainer;
+import javax.websocket.ClientEndpointConfiguration;
 import javax.websocket.DeploymentException;
+import javax.websocket.Endpoint;
 import javax.websocket.Session;
 
 public class ClientContainerImpl implements ClientContainer {
 
     @Override
-    public void connectToServer(Object endpoint, URI path)
+    public Session connectToServer(Object endpoint, URI path)
             throws DeploymentException {
         // TODO Auto-generated method stub
-
+        return null;
     }
 
     @Override
-    public Set<Session> getActiveSessions() {
+    public Session connectToServer(Endpoint endpoint,
+            ClientEndpointConfiguration clientEndpointConfiguration, URI path)
+            throws DeploymentException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Set<Session> getOpenSessions() {
         // TODO Auto-generated method stub
         return null;
     }

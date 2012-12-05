@@ -26,7 +26,6 @@ import java.util.Set;
 import javax.websocket.ClientContainer;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.Encoder;
 import javax.websocket.MessageHandler;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
@@ -39,12 +38,6 @@ public class WsSession implements Session {
     public ClientContainer getContainer() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    public void setEncoders(List<Encoder> encoders) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -93,7 +86,7 @@ public class WsSession implements Session {
     }
 
     @Override
-    public boolean isActive() {
+    public boolean isOpen() {
         // TODO Auto-generated method stub
         return false;
     }
@@ -163,4 +156,9 @@ public class WsSession implements Session {
         return null;
     }
 
+    @Override
+    public Map<String, Object> getUserProperties() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

@@ -23,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import javax.websocket.DeploymentException;
-import javax.websocket.Endpoint;
 import javax.websocket.ServerContainer;
 import javax.websocket.ServerEndpointConfiguration;
 
@@ -73,7 +72,7 @@ public class ServerContainerImpl extends ClientContainerImpl implements
 
     private volatile ServletContext servletContext = null;
 
-    private Map<String, Class<? extends Endpoint>> endpointMap =
+    private Map<String, ServerEndpointConfiguration<?>> configMap =
             new ConcurrentHashMap<>();
 
     private Map<String, Class<?>> pojoMap = new ConcurrentHashMap<>();
@@ -93,7 +92,7 @@ public class ServerContainerImpl extends ClientContainerImpl implements
 
 
     @Override
-    public void publishServer(Class<? extends Endpoint> clazz)
+    public void publishServer(Class<? extends ServerEndpointConfiguration<?>> clazz)
             throws DeploymentException {
 
         if (servletContext == null) {
@@ -101,17 +100,15 @@ public class ServerContainerImpl extends ClientContainerImpl implements
                     sm.getString("serverContainer.servletContextMissing"));
         }
 
-        Endpoint ep = null;
+        ServerEndpointConfiguration<?> sec = null;
         try {
-            ep = clazz.newInstance();
+            sec = clazz.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             throw new DeploymentException(
                     sm.getString("sci.newInstance.fail", clazz.getName()), e);
         }
 
-        ServerEndpointConfiguration config =
-                (ServerEndpointConfiguration) ep.getEndpointConfiguration();
-        String path = config.getPath();
+        String path = sec.getPath();
         String mappingPath = Util.getServletMappingPath(path);
 
         if (log.isDebugEnabled()) {
@@ -119,8 +116,7 @@ public class ServerContainerImpl extends ClientContainerImpl implements
                     clazz.getName(), path, servletContext.getContextPath()));
         }
 
-        endpointMap.put(
-                mappingPath.substring(0, mappingPath.length() - 2), clazz);
+        configMap.put(mappingPath.substring(0, mappingPath.length() - 2), sec);
         addWsServletMapping(mappingPath);
     }
 
@@ -175,22 +171,22 @@ public class ServerContainerImpl extends ClientContainerImpl implements
     }
 
 
-    public Endpoint getEndpoint(String servletPath, String pathInfo)
-            throws InstantiationException, IllegalAccessException {
-        Class<? extends Endpoint> clazzEndpoint = endpointMap.get(servletPath);
-        if (clazzEndpoint != null) {
-            Endpoint ep = clazzEndpoint.newInstance();
-            return ep;
+    public ServerEndpointConfiguration<?> getServerEndpointConfiguration(
+            String servletPath, String pathInfo) {
+
+        ServerEndpointConfiguration<?> sec = configMap.get(servletPath);
+        if (sec != null) {
+            return sec;
         }
 
-        // TODO Need to cache the pojoMethodMapping too
-        Class<?> clazzPojo = pojoMap.get(servletPath);
-        if (clazzPojo != null) {
-            PojoMethodMapping mapping = pojoMethodMap.get(clazzPojo);
+        Class<?> pojo = pojoMap.get(servletPath);
+        if (pojo != null) {
+            PojoMethodMapping mapping = pojoMethodMap.get(pojo);
             if (mapping != null) {
-                Endpoint ep = new WsEndpointPojo(clazzPojo,
-                        mapping, servletPath, pathInfo);
-                return ep;
+                PojoServerEndpointConfiguration pojoSec =
+                        new PojoServerEndpointConfiguration(pojo, mapping,
+                                servletPath, pathInfo);
+                return pojoSec;
             }
         }
 
