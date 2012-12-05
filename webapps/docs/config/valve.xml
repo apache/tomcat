@@ -80,6 +80,17 @@
     <code>AccessLog</code> implementation found to log those requests that are
     rejected before they are passed to a container.</p>
 
+    <p>The output file will be placed in the directory given by the
+    <code>directory</code> attribute. The name of the file is composed
+    by concatenation of the configured <code>prefix</code>, timestamp and
+    <code>suffix</code>. The format of the timestamp in the file name can be
+    set using the <code>fileDateFormat</code> attribute. This timestamp will
+    be omitted if the file rotation is switched off by setting
+    <code>rotatable</code> to <code>false</code>.</p>
+
+    <p><strong>Warning:</strong> If multiple AccessLogValve instances
+    are used, they should be configured to use different output files.</p>
+
     <p>If sendfile is used, the response bytes will be written asynchronously
     in a separate thread and the access log valve will not know how many bytes
     were actually written. In this case, the number of bytes that was passed to
@@ -175,7 +186,7 @@
       <attribute name="rotatable" required="false">
         <p>Flag to determine if log rotation should occur.
            If set to <code>false</code>, then this file is never rotated and
-           <code>fileDateFormat</code> is ignored. Use with caution!
+           <code>fileDateFormat</code> is ignored.
            Default value: <code>true</code>
         </p>
       </attribute>
@@ -223,11 +234,12 @@
       </attribute>
 
       <attribute name="fileDateFormat" required="false">
-        <p>Allows a customized date format in the access log file name.
-           The date format also decides how often the file is rotated.
+        <p>Allows a customized timestamp in the access log file name.
+           The file is rotated whenever the formatted timestamp changes.
+           The default value is <code>.yyyy-MM-dd</code>.
            If you wish to rotate every hour, then set this value
-           to: <code>.yyyy-MM-dd.HH</code>. The default value is
-           <code>.yyyy-MM-dd</code>. The date format will always be localized
+           to <code>.yyyy-MM-dd.HH</code>.
+           The date format will always be localized
            using the locale <code>en_US</code>.
         </p>
       </attribute>
