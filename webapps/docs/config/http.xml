@@ -279,9 +279,10 @@
 
     <attribute name="acceptorThreadPriority" required="false">
       <p>The priority of the acceptor threads. The threads used to accept
-      new connections. The default value is
-      <code>java.lang.Thread#NORM_PRIORITY</code>. See the JavaDoc for the
-      java.lang.Thread class for more details on what this priority means.</p>
+      new connections. The default value is <code>5</code> (the value of the
+      <code>java.lang.Thread.NORM_PRIORITY</code> constant). See the JavaDoc
+      for the <code>java.lang.Thread</code> class for more details on what
+      this priority means.</p>
     </attribute>
 
     <attribute name="address" required="false">
@@ -497,9 +498,10 @@
 
     <attribute name="threadPriority" required="false">
       <p>The priority of the request processing threads within the JVM.
-      The default value is <code>java.lang.Thread#NORM_PRIORITY</code>.
-      See the JavaDoc for the java.lang.Thread class for more details on
-      what this priority means.
+      The default value is <code>5</code> (the value of the
+      <code>java.lang.Thread.NORM_PRIORITY</code> constant). See the JavaDoc
+      for the <code>java.lang.Thread</code> class for more details on what
+      this priority means.
       </p>
     </attribute>
 
@@ -621,9 +623,11 @@
       </attribute>
 
       <attribute name="pollerThreadPriority" required="false">
-        <p>(int)The priority of the poller threads. The default value is
-        <code>java.lang.Thread#NORM_PRIORITY</code>. See the JavaDoc for the
-        java.lang.Thread class for more details on what this priority means.</p>
+        <p>(int)The priority of the poller threads.
+        The default value is <code>5</code> (the value of the
+        <code>java.lang.Thread.NORM_PRIORITY</code> constant). See the JavaDoc
+        for the <code>java.lang.Thread</code> class for more details on what
+        this priority means.</p>
       </attribute>
 
       <attribute name="selectorTimeout" required="false">
@@ -807,10 +811,11 @@
       </attribute>
 
       <attribute name="threadPriority" required="false">
-        <p>(int)The priority of the acceptor and poller threads. The default
-        value is <code>java.lang.Thread#NORM_PRIORITY</code>. See the JavaDoc
-        for the java.lang.Thread class for more details on what this priority
-        means.</p>
+        <p>(int)The priority of the acceptor and poller threads.
+        The default value is <code>5</code> (the value of the
+        <code>java.lang.Thread.NORM_PRIORITY</code> constant). See the JavaDoc
+        for the <code>java.lang.Thread</code> class for more details on what
+        this priority means.</p>
       </attribute>
 
       <attribute name="useComet" required="false">
