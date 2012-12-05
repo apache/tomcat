@@ -33,12 +33,12 @@ public class WsProtocolHandler implements ProtocolHandler {
 
     private final Endpoint ep;
     private final ClassLoader applicationClassLoader;
-    private final WsSession session;
+    private final WsSession wsSession;
 
     public WsProtocolHandler(Endpoint ep) {
         this.ep = ep;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
-        session = new WsSession();
+        wsSession = new WsSession();
     }
 
     @Override
@@ -49,7 +49,7 @@ public class WsProtocolHandler implements ProtocolHandler {
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
         try {
-            ep.onOpen(session);
+            ep.onOpen(wsSession);
         } finally {
             t.setContextClassLoader(cl);
         }
@@ -63,7 +63,9 @@ public class WsProtocolHandler implements ProtocolHandler {
             throw new IllegalStateException(e);
         }
 
-        sis.setReadListener(new WsReadListener(this));
+        WsFrame wsFrame = new WsFrame(sis, wsSession);
+
+        sis.setReadListener(new WsReadListener(this, wsFrame));
         sos.setWriteListener(new WsWriteListener(this));
     }
 
@@ -83,15 +85,21 @@ public class WsProtocolHandler implements ProtocolHandler {
     private static class WsReadListener implements ReadListener {
 
         private final WsProtocolHandler wsProtocolHandler;
+        private final WsFrame wsFrame;
 
-        private WsReadListener(WsProtocolHandler wsProtocolHandler) {
+        private WsReadListener(WsProtocolHandler wsProtocolHandler,
+                WsFrame wsFrame) {
             this.wsProtocolHandler = wsProtocolHandler;
+            this.wsFrame = wsFrame;
         }
 
         @Override
         public void onDataAvailable() {
-            // TODO Auto-generated method stub
-
+            try {
+                wsFrame.onDataAvailable();
+            } catch (IOException e) {
+                onError(e);
+            }
         }
 
         @Override
