@@ -105,7 +105,7 @@ public class WsFrame {
         b = inputBuffer[1];
         // Client data must be masked
         if ((b & 0x80) == 0) {
-            throw new IOException(sm.getString("wsFrame.notMasked.notMasked"));
+            throw new IOException(sm.getString("wsFrame.notMasked"));
         }
 
         payloadLength = b & 0x7F;

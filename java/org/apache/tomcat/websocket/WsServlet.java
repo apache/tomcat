@@ -90,20 +90,12 @@ public class WsServlet extends HttpServlet {
 
         // Need an Endpoint instance to progress this further
         ServerContainerImpl cp = ServerContainerImpl.getServerContainer();
-        Endpoint ep = null;
-        try {
-             ep = cp.getEndpoint(req.getServletPath(), req.getPathInfo());
-        } catch (InstantiationException | IllegalAccessException e) {
-            // This will trigger an error response
-            throw new ServletException(e);
-        }
-
-        ServerEndpointConfiguration epConfig =
-                (ServerEndpointConfiguration) ep.getEndpointConfiguration();
+        ServerEndpointConfiguration<?> sec = cp.getServerEndpointConfiguration(
+                req.getServletPath(), req.getPathInfo());
 
         // Origin check
         String origin = req.getHeader("Origin");
-        if (!epConfig.checkOrigin(origin)) {
+        if (!sec.checkOrigin(origin)) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -112,14 +104,14 @@ public class WsServlet extends HttpServlet {
         List<String> subProtocols =
                 getTokensFromHeader(req, "Sec-WebSocket-Protocol");
         if (!subProtocols.isEmpty()) {
-            subProtocol = epConfig.getNegotiatedSubprotocol(subProtocols);
+            subProtocol = sec.getNegotiatedSubprotocol(subProtocols);
         }
 
         // Extensions
         List<String> requestedExtensions =
                 getTokensFromHeader(req, "Sec-WebSocket-Extensions");
         if (!extensions.isEmpty()) {
-            extensions = epConfig.getNegotiatedExtensions(requestedExtensions);
+            extensions = sec.getNegotiatedExtensions(requestedExtensions);
         }
 
         // If we got this far, all is good. Accept the connection.
@@ -141,6 +133,7 @@ public class WsServlet extends HttpServlet {
             resp.setHeader("Sec-WebSocket-Extensions", sb.toString());
         }
 
+        Endpoint ep = (Endpoint) sec.getEndpointFactory().createEndpoint();
         ProtocolHandler wsHandler = new WsProtocolHandler(ep);
 
         req.upgrade(wsHandler);

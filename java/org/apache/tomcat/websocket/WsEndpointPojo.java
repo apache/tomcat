@@ -19,9 +19,7 @@ package org.apache.tomcat.websocket;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.websocket.CloseReason;
-import javax.websocket.DefaultServerConfiguration;
 import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfiguration;
 import javax.websocket.Session;
 
 /**
@@ -32,30 +30,17 @@ import javax.websocket.Session;
 public class WsEndpointPojo extends Endpoint {
 
     private final Object pojo;
-    private final EndpointConfiguration config;
     private final String pathInfo;
     private final PojoMethodMapping methodMapping;
     private Session session = null;
 
     public WsEndpointPojo(Class<?> clazzPojo, PojoMethodMapping methodMapping,
-            String ServletPath, String pathInfo)
+            String pathInfo)
             throws InstantiationException, IllegalAccessException {
+        // TODO Use factory from annotation if present
         this.pojo = clazzPojo.newInstance();
-        this.config = new DefaultServerConfiguration(ServletPath) {
-
-            @Override
-            public boolean checkOrigin(String originHeaderValue) {
-                return true;
-            }
-        };
-
         this.methodMapping = methodMapping;
         this.pathInfo = pathInfo;
-    }
-
-    @Override
-    public EndpointConfiguration getEndpointConfiguration() {
-        return config;
     }
 
     @Override
