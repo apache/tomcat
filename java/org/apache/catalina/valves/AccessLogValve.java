@@ -200,7 +200,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * The prefix that is added to log file filenames.
      */
-    protected String prefix = "access_log.";
+    protected String prefix = "access_log";
 
 
     /**
@@ -1233,7 +1233,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         // Initialize the Date formatters
         String format = getFileDateFormat();
         if (format == null || format.length() == 0) {
-            format = "yyyy-MM-dd";
+            format = ".yyyy-MM-dd";
             setFileDateFormat(format);
         }
         fileDateFormatter = new SimpleDateFormat(format, Locale.US);
