@@ -22,7 +22,7 @@ package javax.websocket;
 public interface ServerContainer extends ClientContainer {
 
     /**
-     * Publish the Endpoint asscoiated with the given configuration in this
+     * Publish the Endpoint associated with the given configuration in this
      * ServerContainer.
      *
      * @param clazz The configuration class for the Endpoint
