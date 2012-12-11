@@ -30,7 +30,7 @@ import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
 import javax.websocket.MessageHandler;
-import javax.websocket.PingMessage;
+import javax.websocket.PongMessage;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 
@@ -38,7 +38,7 @@ public class WsSession implements Session {
 
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
-    private MessageHandler.Basic<PingMessage> pingMessageHandler =
+    private MessageHandler.Basic<PongMessage> pongMessageHandler =
             new DefaultPingMessageHandler(this);
 
     private final Endpoint localEndpoint;
@@ -62,12 +62,24 @@ public class WsSession implements Session {
             throw new IllegalArgumentException();
         }
         if (types[0].getClass().equals(String.class)) {
+            if (textMessageHandler != null) {
+                // TODO i18n
+                throw new IllegalStateException();
+            }
             textMessageHandler = listener;
         } else if (types[0].getClass().equals(ByteBuffer.class)){
+            if (binaryMessageHandler != null) {
+                // TODO i18n
+                throw new IllegalStateException();
+            }
             binaryMessageHandler = listener;
-        } else if (types[0].getClass().equals(PingMessage.class)){
+        } else if (types[0].getClass().equals(PongMessage.class)){
+            if (pongMessageHandler != null) {
+                // TODO i18n
+                throw new IllegalStateException();
+            }
             if (listener instanceof MessageHandler.Basic<?>) {
-                pingMessageHandler = (MessageHandler.Basic<PingMessage>) listener;
+                pongMessageHandler = (MessageHandler.Basic<PongMessage>) listener;
             } else {
                 // TODO i18n
                 throw new IllegalArgumentException();
@@ -87,8 +99,8 @@ public class WsSession implements Session {
         if (textMessageHandler != null) {
             result.add(textMessageHandler);
         }
-        if (pingMessageHandler != null) {
-            result.add(pingMessageHandler);
+        if (pongMessageHandler != null) {
+            result.add(pongMessageHandler);
         }
         return result;
     }
@@ -102,8 +114,8 @@ public class WsSession implements Session {
             textMessageHandler = null;
         } else if (listener.equals(binaryMessageHandler)) {
             binaryMessageHandler = null;
-        } else if (listener.equals(pingMessageHandler)) {
-            pingMessageHandler = null;
+        } else if (listener.equals(pongMessageHandler)) {
+            pongMessageHandler = null;
         }
         // TODO Ignore? ISE?
     }
@@ -224,13 +236,13 @@ public class WsSession implements Session {
         return binaryMessageHandler;
     }
 
-    public MessageHandler.Basic<PingMessage> getPingMessageHandler() {
-        return pingMessageHandler;
+    public MessageHandler.Basic<PongMessage> getPongMessageHandler() {
+        return pongMessageHandler;
     }
 
 
     private static class DefaultPingMessageHandler
-            implements MessageHandler.Basic<PingMessage>{
+            implements MessageHandler.Basic<PongMessage>{
 
         private final WsSession wsSession;
 
@@ -239,7 +251,7 @@ public class WsSession implements Session {
         }
 
         @Override
-        public void onMessage(PingMessage message) {
+        public void onMessage(PongMessage message) {
             RemoteEndpoint remoteEndpoint = wsSession.getRemote();
             if (remoteEndpoint != null) {
                 remoteEndpoint.sendPong(message.getApplicationData());

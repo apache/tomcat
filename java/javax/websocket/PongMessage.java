@@ -14,22 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.websocket;
+package javax.websocket;
 
 import java.nio.ByteBuffer;
 
-import javax.websocket.PingMessage;
-
-public class WsPingMessage implements PingMessage {
-
-    private final ByteBuffer applicationData;
-
-    public WsPingMessage(ByteBuffer applicationData) {
-        this.applicationData = applicationData;
-    }
-
-    @Override
-    public ByteBuffer getApplicationData() {
-        return applicationData;
-    }
+public interface PongMessage {
+    ByteBuffer getApplicationData();
 }

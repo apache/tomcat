@@ -42,7 +42,10 @@ public class EchoEndpoint extends Endpoint{
         @Override
         public void onMessage(String message) {
             try {
-                remoteEndpoint.sendString(message);
+                System.out.println(message);
+                if (remoteEndpoint != null) {
+                    remoteEndpoint.sendString(message);
+                }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

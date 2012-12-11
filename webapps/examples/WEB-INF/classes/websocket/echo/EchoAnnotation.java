@@ -17,6 +17,7 @@
 package websocket.echo;
 
 import javax.websocket.WebSocketEndpoint;
+import javax.websocket.WebSocketMessage;
 import javax.websocket.WebSocketOpen;
 import javax.websocket.WebSocketPathParam;
 
@@ -26,5 +27,11 @@ public class EchoAnnotation {
     @WebSocketOpen
     public void printOpen(@WebSocketPathParam("test") String test) {
         System.out.println("EchoAnnotation.printOpen() with [" + test + "]");
+    }
+
+    @WebSocketMessage
+    public String printMessage(String msg) {
+        System.out.println("EchoAnnotation.printMessage() with [" + msg + "]");
+        return msg;
     }
 }

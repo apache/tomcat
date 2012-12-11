@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.websocket.Session;
 import javax.websocket.WebSocketClose;
 import javax.websocket.WebSocketError;
+import javax.websocket.WebSocketMessage;
 import javax.websocket.WebSocketOpen;
 import javax.websocket.WebSocketPathParam;
 
@@ -57,6 +58,8 @@ public class PojoMethodMapping {
             } else if (error == null &&
                     method.getAnnotation(WebSocketError.class) != null) {
                 error = method;
+            } else if (method.getAnnotation(WebSocketMessage.class) != null) {
+                // TODO
             }
         }
         this.onOpen = open;
