@@ -38,7 +38,7 @@ public class WsProtocolHandler implements ProtocolHandler {
     public WsProtocolHandler(Endpoint ep) {
         this.ep = ep;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
-        wsSession = new WsSession();
+        wsSession = new WsSession(ep);
     }
 
     @Override

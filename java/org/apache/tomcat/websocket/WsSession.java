@@ -17,8 +17,10 @@
 package org.apache.tomcat.websocket;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URI;
-import java.util.LinkedHashSet;
+import java.nio.ByteBuffer;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,13 +28,24 @@ import java.util.Set;
 import javax.websocket.ClientContainer;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.Endpoint;
 import javax.websocket.MessageHandler;
+import javax.websocket.PingMessage;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 
 public class WsSession implements Session {
 
-    private final Set<MessageHandler> messageHandlers = new LinkedHashSet<>();
+    private MessageHandler textMessageHandler = null;
+    private MessageHandler binaryMessageHandler = null;
+    private MessageHandler.Basic<PingMessage> pingMessageHandler =
+            new DefaultPingMessageHandler(this);
+
+    private final Endpoint localEndpoint;
+
+    public WsSession(Endpoint localEndpoint) {
+        this.localEndpoint = localEndpoint;
+    }
 
     @Override
     public ClientContainer getContainer() {
@@ -40,19 +53,59 @@ public class WsSession implements Session {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void addMessageHandler(MessageHandler listener) {
-        messageHandlers.add(listener);
+        Type[] types = listener.getClass().getGenericInterfaces();
+        if (types.length != 1) {
+            // TODO i18n
+            throw new IllegalArgumentException();
+        }
+        if (types[0].getClass().equals(String.class)) {
+            textMessageHandler = listener;
+        } else if (types[0].getClass().equals(ByteBuffer.class)){
+            binaryMessageHandler = listener;
+        } else if (types[0].getClass().equals(PingMessage.class)){
+            if (listener instanceof MessageHandler.Basic<?>) {
+                pingMessageHandler = (MessageHandler.Basic<PingMessage>) listener;
+            } else {
+                // TODO i18n
+                throw new IllegalArgumentException();
+            }
+        } else {
+            // TODO i18n
+            throw new IllegalArgumentException();
+        }
     }
 
     @Override
     public Set<MessageHandler> getMessageHandlers() {
-        return messageHandlers;
+        Set<MessageHandler> result = new HashSet<>();
+        if (binaryMessageHandler != null) {
+            result.add(binaryMessageHandler);
+        }
+        if (textMessageHandler != null) {
+            result.add(textMessageHandler);
+        }
+        if (pingMessageHandler != null) {
+            result.add(pingMessageHandler);
+        }
+        return result;
     }
 
     @Override
     public void removeMessageHandler(MessageHandler listener) {
-        messageHandlers.remove(listener);
+        if (listener == null) {
+            return;
+        }
+        if (listener.equals(textMessageHandler)) {
+            textMessageHandler = null;
+        } else if (listener.equals(binaryMessageHandler)) {
+            binaryMessageHandler = null;
+        } else if (listener.equals(pingMessageHandler)) {
+            pingMessageHandler = null;
+        }
+        // TODO Ignore? ISE?
     }
 
     @Override
@@ -128,8 +181,8 @@ public class WsSession implements Session {
 
     @Override
     public void close(CloseReason closeStatus) throws IOException {
-        // TODO Auto-generated method stub
-
+        // TODO Send the close message to the remote endpoint
+        localEndpoint.onClose(closeStatus);
     }
 
     @Override
@@ -160,5 +213,37 @@ public class WsSession implements Session {
     public Map<String, Object> getUserProperties() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+
+    public MessageHandler getTextMessageHandler() {
+        return textMessageHandler;
+    }
+
+    public MessageHandler getBinaryMessageHandler() {
+        return binaryMessageHandler;
+    }
+
+    public MessageHandler.Basic<PingMessage> getPingMessageHandler() {
+        return pingMessageHandler;
+    }
+
+
+    private static class DefaultPingMessageHandler
+            implements MessageHandler.Basic<PingMessage>{
+
+        private final WsSession wsSession;
+
+        private DefaultPingMessageHandler(WsSession wsSession) {
+            this.wsSession = wsSession;
+        }
+
+        @Override
+        public void onMessage(PingMessage message) {
+            RemoteEndpoint remoteEndpoint = wsSession.getRemote();
+            if (remoteEndpoint != null) {
+                remoteEndpoint.sendPong(message.getApplicationData());
+            }
+        }
     }
 }
