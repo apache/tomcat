@@ -22,6 +22,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 import javax.servlet.ServletInputStream;
+import javax.websocket.MessageHandler;
+import javax.websocket.PongMessage;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -40,12 +42,17 @@ public class WsFrame {
     private int pos = 0;
 
     private State state = State.NEW_FRAME;
+    private int headerLength = 0;
+    private boolean continutationExpected = false;
+    private boolean textMessage = false;
+    private long payloadSent = 0;
+
+    private long payloadLength = 0;
     private boolean fin;
     private int rsv;
     private byte opCode;
     private byte[] mask = new byte[4];
-    private long payloadLength = -1;
-    private int headerLength = -1;
+    int maskIndex = 0;
 
 
     public WsFrame(ServletInputStream sis, WsSession wsSession) {
@@ -106,6 +113,27 @@ public class WsFrame {
         fin = (b & 0x80) > 0;
         rsv = (b & 0x70) >>> 4;
         opCode = (byte) (b & 0x0F);
+
+        if (!isControl()) {
+            if (continutationExpected) {
+                if (opCode != Constants.OPCODE_CONTINUATION) {
+                    // TODO i18n
+                    throw new IllegalStateException();
+                }
+            } else {
+                if (opCode == Constants.OPCODE_BINARY) {
+                    textMessage = false;
+                } else if (opCode == Constants.OPCODE_TEXT) {
+                    textMessage = true;
+                } else {
+                    // TODO i18n
+                    throw new UnsupportedOperationException();
+                }
+            }
+
+            continutationExpected = !fin;
+        }
+
 
         b = inputBuffer[1];
         // Client data must be masked
@@ -172,39 +200,67 @@ public class WsFrame {
             if (opCode == Constants.OPCODE_CLOSE) {
                 wsSession.close();
             } else if (opCode == Constants.OPCODE_PING) {
-                wsSession.getPingMessageHandler().onMessage(
-                        new WsPingMessage(getPayload()));
+                wsSession.getRemote().sendPong(getPayloadBinary());
             } else if (opCode == Constants.OPCODE_PONG) {
-                // TODO
-                // Validate the PONG?
+                MessageHandler.Basic<PongMessage> mhPong =
+                        wsSession.getPongMessageHandler();
+                if (mhPong != null) {
+                    mhPong.onMessage(new WsPongMessage(getPayloadBinary()));
+                }
             } else {
                 // TODO i18n
                 throw new UnsupportedOperationException();
             }
             return true;
         }
-        if (isPayloadComplete()) {
-            // TODO Check if partial messages supported
-            if (inputBuffer.length - pos > 0) {
+        if (!isPayloadComplete()) {
+            if (usePartial()) {
+                sendPayload(false);
                 return false;
+            } else {
+                if (inputBuffer.length - pos > 0) {
+                    return false;
+                }
+                throw new UnsupportedOperationException();
             }
-            throw new UnsupportedOperationException();
         } else {
-            // Unmask the data
-            for (int i = 0; i < payloadLength; i++) {
-                inputBuffer[headerLength + i] = (byte)
-                        ((inputBuffer[headerLength + i] ^ mask[i % 4]) & 0xFF);
-            }
-            // TODO Handle incoming data properly
-            System.out.println(new String(inputBuffer, headerLength,
-                    (int) payloadLength, Charset.forName("UTF-8")));
+            sendPayload(true);
         }
 
         state = State.NEW_FRAME;
-        pos = 0;
+        payloadLength = 0;
+        payloadSent = 0;
+        maskIndex = 0;
         return true;
     }
 
+
+    @SuppressWarnings("unchecked")
+    private void sendPayload(boolean last) {
+        if (textMessage) {
+            String payload = getPayloadText();
+            MessageHandler mh = wsSession.getTextMessageHandler();
+            if (mh != null) {
+                if (mh instanceof MessageHandler.Async<?>) {
+                    ((MessageHandler.Async<String>) mh).onMessage(payload,
+                            last);
+                } else {
+                    ((MessageHandler.Basic<String>) mh).onMessage(payload);
+                }
+            }
+        } else {
+            ByteBuffer payload = getPayloadBinary();
+            MessageHandler mh = wsSession.getBinaryMessageHandler();
+            if (mh != null) {
+                if (mh instanceof MessageHandler.Async<?>) {
+                    ((MessageHandler.Async<ByteBuffer>) mh).onMessage(payload,
+                            last);
+                } else {
+                    ((MessageHandler.Basic<ByteBuffer>) mh).onMessage(payload);
+                }
+            }
+        }
+    }
 
     private boolean isControl() {
         return (opCode & 0x08) > 0;
@@ -212,21 +268,59 @@ public class WsFrame {
 
 
     private boolean isPayloadComplete() {
-        return pos < (headerLength + payloadLength);
+        return (payloadSent + pos - headerLength) >= payloadLength;
     }
 
-    private ByteBuffer getPayload() {
-        ByteBuffer result;
-        if (isPayloadComplete()) {
-            result = ByteBuffer.allocate((int) payloadLength);
-            System.arraycopy(inputBuffer, headerLength, result.array(), 0,
-                    (int) payloadLength);
+    private boolean usePartial() {
+        if (opCode == Constants.OPCODE_BINARY) {
+            MessageHandler mh = wsSession.getBinaryMessageHandler();
+            if (mh != null) {
+                return mh instanceof MessageHandler.Async<?>;
+            }
+            return false;
+        } else if (opCode == Constants.OPCODE_TEXT) {
+            MessageHandler mh = wsSession.getTextMessageHandler();
+            if (mh != null) {
+                return mh instanceof MessageHandler.Async<?>;
+            }
+            return false;
         } else {
-            // TODO Handle partial payloads
-            result = null;
+            // All other OpCodes require the full payload to be present
+            return false;
+        }
+    }
+
+    private ByteBuffer getPayloadBinary() {
+        int end;
+        if (isPayloadComplete()) {
+            end = (int) (payloadLength - payloadSent) + headerLength;
+        } else {
+            end = pos;
         }
 
+        ByteBuffer result = ByteBuffer.allocate(end - headerLength);
+
+        for (int i = headerLength; i < end; i++) {
+            result.put(i - headerLength,
+                    (byte) ((inputBuffer[i] ^ mask[maskIndex]) & 0xFF));
+            maskIndex++;
+            if (maskIndex == 4) {
+                maskIndex = 0;
+            }
+        }
+
+        // May have read past end of current frame into next
+
+        pos = 0;
+        headerLength = 0;
+
         return result;
+    }
+
+    private String getPayloadText() {
+        ByteBuffer bb = getPayloadBinary();
+
+        return new String(bb.array(), Charset.forName("UTF-8"));
     }
 
     protected static long byteArrayToLong(byte[] b, int start, int len)
