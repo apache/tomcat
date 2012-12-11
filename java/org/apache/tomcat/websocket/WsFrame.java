@@ -18,6 +18,7 @@ package org.apache.tomcat.websocket;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 import javax.servlet.ServletInputStream;
@@ -91,6 +92,10 @@ public class WsFrame {
     }
 
 
+    /**
+     * @return <code>true</code> if sufficient data was present to process all
+     *         of the initial header
+     */
     private boolean processInitialHeader() throws IOException {
         // Need at least two bytes of data to do this
         if (pos < 2) {
@@ -115,6 +120,10 @@ public class WsFrame {
     }
 
 
+    /**
+     * @return <code>true</code> if sufficient data was present to complete the
+     *         processing of the header
+     */
     private boolean processRemainingHeader() throws IOException {
         // Initial 2 bytes already read + 4 for the mask
         headerLength = 6;
@@ -155,8 +164,26 @@ public class WsFrame {
     }
 
 
-    private boolean processData() {
-        if (pos < (headerLength + payloadLength)) {
+    private boolean processData() throws IOException {
+        if (isControl()) {
+            if (!isPayloadComplete()) {
+                return false;
+            }
+            if (opCode == Constants.OPCODE_CLOSE) {
+                wsSession.close();
+            } else if (opCode == Constants.OPCODE_PING) {
+                wsSession.getPingMessageHandler().onMessage(
+                        new WsPingMessage(getPayload()));
+            } else if (opCode == Constants.OPCODE_PONG) {
+                // TODO
+                // Validate the PONG?
+            } else {
+                // TODO i18n
+                throw new UnsupportedOperationException();
+            }
+            return true;
+        }
+        if (isPayloadComplete()) {
             // TODO Check if partial messages supported
             if (inputBuffer.length - pos > 0) {
                 return false;
@@ -183,6 +210,24 @@ public class WsFrame {
         return (opCode & 0x08) > 0;
     }
 
+
+    private boolean isPayloadComplete() {
+        return pos < (headerLength + payloadLength);
+    }
+
+    private ByteBuffer getPayload() {
+        ByteBuffer result;
+        if (isPayloadComplete()) {
+            result = ByteBuffer.allocate((int) payloadLength);
+            System.arraycopy(inputBuffer, headerLength, result.array(), 0,
+                    (int) payloadLength);
+        } else {
+            // TODO Handle partial payloads
+            result = null;
+        }
+
+        return result;
+    }
 
     protected static long byteArrayToLong(byte[] b, int start, int len)
             throws IOException {
