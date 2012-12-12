@@ -18,8 +18,11 @@ package org.apache.tomcat.websocket;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 import javax.websocket.WebSocketClose;
 import javax.websocket.WebSocketError;
@@ -41,6 +44,8 @@ public class PojoMethodMapping {
     private final PathParam[] onCloseParams;
     private final PathParam[] onErrorParams;
 
+    private final Set<MessageMethod> onMessage = new HashSet<>();
+
     private final UriTemplate template;
 
     public PojoMethodMapping(Class<?> clazzPojo, String path,
@@ -59,7 +64,7 @@ public class PojoMethodMapping {
                     method.getAnnotation(WebSocketError.class) != null) {
                 error = method;
             } else if (method.getAnnotation(WebSocketMessage.class) != null) {
-                // TODO
+                onMessage.add(new MessageMethod(method));
             }
         }
         this.onOpen = open;
@@ -108,6 +113,27 @@ public class PojoMethodMapping {
         return buildArgs(onErrorParams, template, pathInfo, session, throwable);
     }
 
+
+    public Set<MessageHandler> getMessageHandlers(Object pojo, String pathInfo,
+            Session session) {
+
+        Set<MessageHandler> result = new HashSet<>();
+
+        for (MessageMethod messageMethod : onMessage) {
+            result.add(buildMessageHandler(
+                    messageMethod, pojo, pathInfo, session));
+        }
+
+        return result;
+    }
+
+
+    private static MessageHandler buildMessageHandler(
+            MessageMethod messageMethod, Object pojo, String pathInfo,
+            Session session) {
+
+        return null;
+    }
 
     private static PathParam[] getPathParams(Method m, boolean isError) {
         if (m == null) {
@@ -201,6 +227,24 @@ public class PojoMethodMapping {
         } else {
             // TODO
             throw new IllegalArgumentException();
+        }
+    }
+
+
+    private static class MessageMethod {
+
+        private final Method m;
+
+        public MessageMethod(Method m) {
+            this.m = m;
+        }
+
+        public Method getMethod() {
+            return m;
+        }
+
+        public Object[] getParameters() {
+            return null;
         }
     }
 }
