@@ -21,25 +21,24 @@ import java.lang.reflect.Method;
 
 import javax.websocket.MessageHandler;
 
-public class PojoMessageHandlerBasic<T>  extends PojoMessageHandlerBase<T>
-        implements MessageHandler.Basic<T>{
+public class PojoMessageHandlerBasic<T> extends PojoMessageHandlerBase<T>
+        implements MessageHandler.Basic<T> {
 
     public PojoMessageHandlerBasic(Object pojo, Method method,
             WsSession wsSession) {
         super(pojo, method, wsSession);
     }
 
+
     @Override
     public void onMessage(T message) {
-
         Object[] params = null; // TODO insert message and session into params
         Object result;
         try {
-             result = method.invoke(pojo, params);
+            result = method.invoke(pojo, params);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new IllegalArgumentException();
         }
-
         processResult(result);
     }
 }

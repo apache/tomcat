@@ -40,12 +40,12 @@ public abstract class PojoMessageHandlerBase<T> {
     protected void processResult(Object result) {
         try {
             if (result instanceof String) {
-                wsSession.getRemote().sendString((String)result);
-            } else if (result instanceof ByteBuffer){
-                wsSession.getRemote().sendBytes((ByteBuffer)result);
+                wsSession.getRemote().sendString((String) result);
+            } else if (result instanceof ByteBuffer) {
+                wsSession.getRemote().sendBytes((ByteBuffer) result);
             } else if (result instanceof byte[]) {
                 wsSession.getRemote().sendBytes(
-                        ByteBuffer.wrap((byte[])result));
+                        ByteBuffer.wrap((byte[]) result));
             } else if (result != null) {
                 wsSession.getRemote().sendObject(result);
             }

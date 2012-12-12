@@ -24,9 +24,11 @@ public class WsPongMessage implements PongMessage {
 
     private final ByteBuffer applicationData;
 
+
     public WsPongMessage(ByteBuffer applicationData) {
         this.applicationData = applicationData;
     }
+
 
     @Override
     public ByteBuffer getApplicationData() {

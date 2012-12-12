@@ -24,17 +24,21 @@ package org.apache.tomcat.websocket;
  * parameters, {@link #getName()} will always return <code>null</code>.
  */
 public class PathParam {
+
     private final Class<?> type;
     private final String name;
+
 
     public PathParam(Class<?> type, String name) {
         this.type = type;
         this.name = name;
     }
 
+
     public Class<?> getType() {
         return type;
     }
+
 
     public String getName() {
         return name;

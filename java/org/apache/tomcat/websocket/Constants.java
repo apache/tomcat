@@ -22,9 +22,7 @@ package org.apache.tomcat.websocket;
 public class Constants {
 
     protected static final String PACKAGE_NAME = "org.apache.tomcat.websocket";
-
     protected static final String SERVLET_NAME = WsServlet.class.getName();
-
     // OP Codes
     public static final byte OPCODE_CONTINUATION = 0x00;
     public static final byte OPCODE_TEXT = 0x01;
@@ -32,6 +30,7 @@ public class Constants {
     public static final byte OPCODE_CLOSE = 0x08;
     public static final byte OPCODE_PING = 0x09;
     public static final byte OPCODE_PONG = 0x0A;
+
 
     private Constants() {
         // Hide default constructor

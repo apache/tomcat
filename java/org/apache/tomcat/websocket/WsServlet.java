@@ -43,77 +43,61 @@ import javax.xml.bind.DatatypeConverter;
 public class WsServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-
     private static final Charset ISO_8859_1;
     static {
         ISO_8859_1 = Charset.forName("ISO-8859-1");
     }
-
-    private static final byte[] WS_ACCEPT =
-            "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(ISO_8859_1);
-
-    private final Queue<MessageDigest> sha1Helpers =
-            new ConcurrentLinkedQueue<>();
-
+    private static final byte[] WS_ACCEPT = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(ISO_8859_1);
+    private final Queue<MessageDigest> sha1Helpers = new ConcurrentLinkedQueue<>();
 
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
         // Information required to send the server handshake message
         String key;
         String subProtocol = null;
         List<String> extensions = Collections.emptyList();
-
         if (!headerContainsToken(req, "upgrade", "websocket")) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-
         if (!headerContainsToken(req, "connection", "upgrade")) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-
         if (!headerContainsToken(req, "sec-websocket-version", "13")) {
             resp.setStatus(426);
             resp.setHeader("Sec-WebSocket-Version", "13");
             return;
         }
-
         key = req.getHeader("Sec-WebSocket-Key");
         if (key == null) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-
         // Need an Endpoint instance to progress this further
         ServerContainerImpl cp = ServerContainerImpl.getServerContainer();
         ServerEndpointConfiguration<?> sec = cp.getServerEndpointConfiguration(
                 req.getServletPath(), req.getPathInfo());
-
         // Origin check
         String origin = req.getHeader("Origin");
         if (!sec.checkOrigin(origin)) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-
         // Sub-protocols
-        List<String> subProtocols =
-                getTokensFromHeader(req, "Sec-WebSocket-Protocol");
+        List<String> subProtocols = getTokensFromHeader(req,
+                "Sec-WebSocket-Protocol");
         if (!subProtocols.isEmpty()) {
             subProtocol = sec.getNegotiatedSubprotocol(subProtocols);
         }
-
         // Extensions
-        List<String> requestedExtensions =
-                getTokensFromHeader(req, "Sec-WebSocket-Extensions");
+        List<String> requestedExtensions = getTokensFromHeader(req,
+                "Sec-WebSocket-Extensions");
         if (!extensions.isEmpty()) {
             extensions = sec.getNegotiatedExtensions(requestedExtensions);
         }
-
         // If we got this far, all is good. Accept the connection.
         resp.setHeader("Upgrade", "websocket");
         resp.setHeader("Connection", "upgrade");
@@ -132,10 +116,8 @@ public class WsServlet extends HttpServlet {
             }
             resp.setHeader("Sec-WebSocket-Extensions", sb.toString());
         }
-
         Endpoint ep = (Endpoint) sec.getEndpointFactory().createEndpoint();
         ProtocolHandler wsHandler = new WsProtocolHandler(ep);
-
         req.upgrade(wsHandler);
     }
 
@@ -167,7 +149,6 @@ public class WsServlet extends HttpServlet {
     private List<String> getTokensFromHeader(HttpServletRequest req,
             String headerName) {
         List<String> result = new ArrayList<>();
-
         Enumeration<String> headers = req.getHeaders(headerName);
         while (headers.hasMoreElements()) {
             String header = headers.nextElement();
@@ -181,7 +162,6 @@ public class WsServlet extends HttpServlet {
 
 
     private String getWebSocketAccept(String key) throws ServletException {
-
         MessageDigest sha1Helper = sha1Helpers.poll();
         if (sha1Helper == null) {
             try {
@@ -190,14 +170,10 @@ public class WsServlet extends HttpServlet {
                 throw new ServletException(e);
             }
         }
-
         sha1Helper.reset();
         sha1Helper.update(key.getBytes(ISO_8859_1));
-        String result = DatatypeConverter.printBase64Binary(
-                sha1Helper.digest(WS_ACCEPT));
-
+        String result = DatatypeConverter.printBase64Binary(sha1Helper.digest(WS_ACCEPT));
         sha1Helpers.add(sha1Helper);
-
         return result;
     }
 }

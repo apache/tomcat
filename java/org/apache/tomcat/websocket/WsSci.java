@@ -26,8 +26,8 @@ import javax.websocket.WebSocketEndpoint;
 
 /**
  * Registers an interest in any class that is annotated with
- * {@link WebSocketEndpoint} so that Endpoint can be published via the
- * WebSocket server.
+ * {@link WebSocketEndpoint} so that Endpoint can be published via the WebSocket
+ * server.
  */
 @HandlesTypes({WebSocketEndpoint.class})
 public class WsSci implements ServletContainerInitializer {
@@ -35,18 +35,14 @@ public class WsSci implements ServletContainerInitializer {
     @Override
     public void onStartup(Set<Class<?>> clazzes, ServletContext ctx)
             throws ServletException {
-
         // Need to configure the ServletContext in all cases
         ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
         sc.setServletContext(ctx);
-
         if (clazzes == null || clazzes.size() == 0) {
             return;
         }
-
         for (Class<?> clazz : clazzes) {
-            WebSocketEndpoint annotation =
-                    clazz.getAnnotation(WebSocketEndpoint.class);
+            WebSocketEndpoint annotation = clazz.getAnnotation(WebSocketEndpoint.class);
             sc.publishServer(clazz, ctx, annotation.value());
         }
     }

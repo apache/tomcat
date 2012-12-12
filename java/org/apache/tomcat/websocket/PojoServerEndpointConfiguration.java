@@ -28,14 +28,14 @@ public class PojoServerEndpointConfiguration extends
         // Allow all
         return true;
     }
-
     private final EndpointFactory<Endpoint> endpointFactory;
     private final String servletPath;
 
+
     PojoServerEndpointConfiguration(Class<?> pojo,
             PojoMethodMapping methodMapping, String servletPath, String pathInfo) {
-        this.endpointFactory =
-                new PojoEndpointFactory(pojo, methodMapping, pathInfo);
+        this.endpointFactory = new PojoEndpointFactory(pojo, methodMapping,
+                pathInfo);
         this.servletPath = servletPath;
     }
 
@@ -45,17 +45,19 @@ public class PojoServerEndpointConfiguration extends
         return endpointFactory;
     }
 
+
     @Override
     public String getPath() {
         return servletPath;
     }
 
-    private static class PojoEndpointFactory
-            implements EndpointFactory<Endpoint> {
+    private static class PojoEndpointFactory implements
+            EndpointFactory<Endpoint> {
 
         private final Class<?> pojo;
         private final PojoMethodMapping methodMapping;
         private final String pathInfo;
+
 
         public PojoEndpointFactory(Class<?> pojo,
                 PojoMethodMapping methodMapping, String pathInfo) {
@@ -63,6 +65,7 @@ public class PojoServerEndpointConfiguration extends
             this.methodMapping = methodMapping;
             this.pathInfo = pathInfo;
         }
+
 
         @Override
         public Endpoint createEndpoint() {
