@@ -43,17 +43,15 @@ public class PojoMethodMapping {
     private final PathParam[] onOpenParams;
     private final PathParam[] onCloseParams;
     private final PathParam[] onErrorParams;
-
     private final Set<MessageMethod> onMessage = new HashSet<>();
-
     private final UriTemplate template;
 
-    public PojoMethodMapping(Class<?> clazzPojo, String path,
-            String mappingPath) {
+
+    public PojoMethodMapping(Class<?> clazzPojo, String path, String mappingPath) {
         Method open = null;
         Method close = null;
         Method error = null;
-        for (Method method: clazzPojo.getMethods()) {
+        for (Method method : clazzPojo.getMethods()) {
             if (open == null &&
                     method.getAnnotation(WebSocketOpen.class) != null) {
                 open = method;
@@ -70,14 +68,11 @@ public class PojoMethodMapping {
         this.onOpen = open;
         this.onClose = close;
         this.onError = error;
-
         if (path.length() > mappingPath.length()) {
-            template =
-                    new UriTemplate(path.substring(mappingPath.length() - 2));
+            template = new UriTemplate(path.substring(mappingPath.length() - 2));
         } else {
             template = null;
         }
-
         onOpenParams = getPathParams(onOpen, false);
         onCloseParams = getPathParams(onClose, false);
         onErrorParams = getPathParams(onError, true);
@@ -103,6 +98,7 @@ public class PojoMethodMapping {
         return buildArgs(onCloseParams, template, pathInfo, session, null);
     }
 
+
     public Method getOnError() {
         return onError;
     }
@@ -116,14 +112,11 @@ public class PojoMethodMapping {
 
     public Set<MessageHandler> getMessageHandlers(Object pojo, String pathInfo,
             Session session) {
-
         Set<MessageHandler> result = new HashSet<>();
-
         for (MessageMethod messageMethod : onMessage) {
-            result.add(buildMessageHandler(
-                    messageMethod, pojo, pathInfo, session));
+            result.add(buildMessageHandler(messageMethod, pojo, pathInfo,
+                    session));
         }
-
         return result;
     }
 
@@ -131,20 +124,18 @@ public class PojoMethodMapping {
     private static MessageHandler buildMessageHandler(
             MessageMethod messageMethod, Object pojo, String pathInfo,
             Session session) {
-
         return null;
     }
+
 
     private static PathParam[] getPathParams(Method m, boolean isError) {
         if (m == null) {
             return new PathParam[0];
         }
-
         boolean foundError = !isError;
         Class<?>[] types = m.getParameterTypes();
         Annotation[][] paramsAnnotations = m.getParameterAnnotations();
         PathParam[] result = new PathParam[types.length];
-
         for (int i = 0; i < types.length; i++) {
             Class<?> type = types[i];
             if (type.equals(Session.class)) {
@@ -168,11 +159,9 @@ public class PojoMethodMapping {
                 }
             }
         }
-
         if (!foundError) {
             throw new IllegalArgumentException();
         }
-
         return result;
     }
 
@@ -181,8 +170,7 @@ public class PojoMethodMapping {
             UriTemplate template, String pathInfo, Session session,
             Throwable throwable) {
         Object[] result = new Object[pathParams.length];
-        Map<String, String> pathValues = template.match(pathInfo);
-
+        Map<String,String> pathValues = template.match(pathInfo);
         for (int i = 0; i < pathParams.length; i++) {
             Class<?> type = pathParams[i].getType();
             if (type.equals(Session.class)) {
@@ -204,7 +192,6 @@ public class PojoMethodMapping {
 
 
     private static Object coerceToType(Class<?> type, String value) {
-
         if (type.equals(String.class)) {
             return value;
         } else if (type.equals(boolean.class) || type.equals(Boolean.class)) {
@@ -230,18 +217,20 @@ public class PojoMethodMapping {
         }
     }
 
-
     private static class MessageMethod {
 
         private final Method m;
+
 
         public MessageMethod(Method m) {
             this.m = m;
         }
 
+
         public Method getMethod() {
             return m;
         }
+
 
         public Object[] getParameters() {
             return null;

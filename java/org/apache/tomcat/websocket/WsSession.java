@@ -38,20 +38,22 @@ public class WsSession implements Session {
 
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
-    private MessageHandler.Basic<PongMessage> pongMessageHandler =
-            new DefaultPingMessageHandler(this);
-
+    private MessageHandler.Basic<PongMessage> pongMessageHandler = new DefaultPingMessageHandler(
+            this);
     private final Endpoint localEndpoint;
+
 
     public WsSession(Endpoint localEndpoint) {
         this.localEndpoint = localEndpoint;
     }
+
 
     @Override
     public ClientContainer getContainer() {
         // TODO Auto-generated method stub
         return null;
     }
+
 
     @SuppressWarnings("unchecked")
     @Override
@@ -67,13 +69,13 @@ public class WsSession implements Session {
                 throw new IllegalStateException();
             }
             textMessageHandler = listener;
-        } else if (types[0].getClass().equals(ByteBuffer.class)){
+        } else if (types[0].getClass().equals(ByteBuffer.class)) {
             if (binaryMessageHandler != null) {
                 // TODO i18n
                 throw new IllegalStateException();
             }
             binaryMessageHandler = listener;
-        } else if (types[0].getClass().equals(PongMessage.class)){
+        } else if (types[0].getClass().equals(PongMessage.class)) {
             if (pongMessageHandler != null) {
                 // TODO i18n
                 throw new IllegalStateException();
@@ -90,6 +92,7 @@ public class WsSession implements Session {
         }
     }
 
+
     @Override
     public Set<MessageHandler> getMessageHandlers() {
         Set<MessageHandler> result = new HashSet<>();
@@ -104,6 +107,7 @@ public class WsSession implements Session {
         }
         return result;
     }
+
 
     @Override
     public void removeMessageHandler(MessageHandler listener) {
@@ -120,11 +124,13 @@ public class WsSession implements Session {
         // TODO Ignore? ISE?
     }
 
+
     @Override
     public String getProtocolVersion() {
         // TODO Auto-generated method stub
         return null;
     }
+
 
     @Override
     public String getNegotiatedSubprotocol() {
@@ -132,11 +138,13 @@ public class WsSession implements Session {
         return null;
     }
 
+
     @Override
     public List<String> getNegotiatedExtensions() {
         // TODO Auto-generated method stub
         return null;
     }
+
 
     @Override
     public boolean isSecure() {
@@ -144,11 +152,13 @@ public class WsSession implements Session {
         return false;
     }
 
+
     @Override
     public long getInactiveTime() {
         // TODO Auto-generated method stub
         return 0;
     }
+
 
     @Override
     public boolean isOpen() {
@@ -156,23 +166,25 @@ public class WsSession implements Session {
         return false;
     }
 
+
     @Override
     public long getTimeout() {
         // TODO Auto-generated method stub
         return 0;
     }
 
+
     @Override
     public void setTimeout(long seconds) {
         // TODO Auto-generated method stub
-
     }
+
 
     @Override
     public void setMaximumMessageSize(long length) {
         // TODO Auto-generated method stub
-
     }
+
 
     @Override
     public long getMaximumMessageSize() {
@@ -180,16 +192,19 @@ public class WsSession implements Session {
         return 0;
     }
 
+
     @Override
     public RemoteEndpoint getRemote() {
         // TODO Auto-generated method stub
         return null;
     }
 
+
     @Override
     public void close() throws IOException {
         close(new CloseReason(CloseCodes.GOING_AWAY, ""));
     }
+
 
     @Override
     public void close(CloseReason closeStatus) throws IOException {
@@ -197,17 +212,20 @@ public class WsSession implements Session {
         localEndpoint.onClose(closeStatus);
     }
 
+
     @Override
     public URI getRequestURI() {
         // TODO Auto-generated method stub
         return null;
     }
 
+
     @Override
-    public Map<String, String[]> getRequestParameterMap() {
+    public Map<String,String[]> getRequestParameterMap() {
         // TODO Auto-generated method stub
         return null;
     }
+
 
     @Override
     public String getQueryString() {
@@ -215,14 +233,16 @@ public class WsSession implements Session {
         return null;
     }
 
+
     @Override
-    public Map<String, String> getPathParameters() {
+    public Map<String,String> getPathParameters() {
         // TODO Auto-generated method stub
         return null;
     }
 
+
     @Override
-    public Map<String, Object> getUserProperties() {
+    public Map<String,Object> getUserProperties() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -232,23 +252,26 @@ public class WsSession implements Session {
         return textMessageHandler;
     }
 
+
     public MessageHandler getBinaryMessageHandler() {
         return binaryMessageHandler;
     }
+
 
     public MessageHandler.Basic<PongMessage> getPongMessageHandler() {
         return pongMessageHandler;
     }
 
-
-    private static class DefaultPingMessageHandler
-            implements MessageHandler.Basic<PongMessage>{
+    private static class DefaultPingMessageHandler implements
+            MessageHandler.Basic<PongMessage> {
 
         private final WsSession wsSession;
+
 
         private DefaultPingMessageHandler(WsSession wsSession) {
             this.wsSession = wsSession;
         }
+
 
         @Override
         public void onMessage(PongMessage message) {

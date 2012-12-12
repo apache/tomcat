@@ -33,20 +33,16 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class WsFrame {
 
-    private static StringManager sm = StringManager.getManager(
-            Constants.PACKAGE_NAME);
-
+    private static StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
     private final ServletInputStream sis;
     private final WsSession wsSession;
     private final byte[] inputBuffer;
     private int pos = 0;
-
     private State state = State.NEW_FRAME;
     private int headerLength = 0;
     private boolean continutationExpected = false;
     private boolean textMessage = false;
     private long payloadSent = 0;
-
     private long payloadLength = 0;
     private boolean fin;
     private int rsv;
@@ -58,7 +54,6 @@ public class WsFrame {
     public WsFrame(ServletInputStream sis, WsSession wsSession) {
         this.sis = sis;
         this.wsSession = wsSession;
-
         inputBuffer = new byte[8192];
     }
 
@@ -77,7 +72,6 @@ public class WsFrame {
                 throw new EOFException();
             }
             pos += read;
-
             while (true) {
                 if (state == State.NEW_FRAME) {
                     if (!processInitialHeader()) {
@@ -108,12 +102,10 @@ public class WsFrame {
         if (pos < 2) {
             return false;
         }
-
         int b = inputBuffer[0];
         fin = (b & 0x80) > 0;
         rsv = (b & 0x70) >>> 4;
         opCode = (byte) (b & 0x0F);
-
         if (!isControl()) {
             if (continutationExpected) {
                 if (opCode != Constants.OPCODE_CONTINUATION) {
@@ -130,19 +122,14 @@ public class WsFrame {
                     throw new UnsupportedOperationException();
                 }
             }
-
             continutationExpected = !fin;
         }
-
-
         b = inputBuffer[1];
         // Client data must be masked
         if ((b & 0x80) == 0) {
             throw new IOException(sm.getString("wsFrame.notMasked"));
         }
-
         payloadLength = b & 0x7F;
-
         state = State.PARTIAL_HEADER;
         return true;
     }
@@ -155,25 +142,21 @@ public class WsFrame {
     private boolean processRemainingHeader() throws IOException {
         // Initial 2 bytes already read + 4 for the mask
         headerLength = 6;
-
         // Add additional bytes depending on length
         if (payloadLength == 126) {
-            headerLength +=2;
+            headerLength += 2;
         } else if (payloadLength == 127) {
-            headerLength +=8;
+            headerLength += 8;
         }
-
         if (pos < headerLength) {
             return false;
         }
-
         // Calculate new payload length if necessary
         if (payloadLength == 126) {
             payloadLength = byteArrayToLong(inputBuffer, 2, 2);
         } else if (payloadLength == 127) {
             payloadLength = byteArrayToLong(inputBuffer, 2, 8);
         }
-
         if (isControl()) {
             if (payloadLength > 125) {
                 throw new IOException(sm.getString(
@@ -184,9 +167,7 @@ public class WsFrame {
                 throw new IOException("wsFrame.controlNoFin");
             }
         }
-
         System.arraycopy(inputBuffer, headerLength - 4, mask, 0, 4);
-
         state = State.DATA;
         return true;
     }
@@ -202,8 +183,7 @@ public class WsFrame {
             } else if (opCode == Constants.OPCODE_PING) {
                 wsSession.getRemote().sendPong(getPayloadBinary());
             } else if (opCode == Constants.OPCODE_PONG) {
-                MessageHandler.Basic<PongMessage> mhPong =
-                        wsSession.getPongMessageHandler();
+                MessageHandler.Basic<PongMessage> mhPong = wsSession.getPongMessageHandler();
                 if (mhPong != null) {
                     mhPong.onMessage(new WsPongMessage(getPayloadBinary()));
                 }
@@ -226,7 +206,6 @@ public class WsFrame {
         } else {
             sendPayload(true);
         }
-
         state = State.NEW_FRAME;
         payloadLength = 0;
         payloadSent = 0;
@@ -242,8 +221,7 @@ public class WsFrame {
             MessageHandler mh = wsSession.getTextMessageHandler();
             if (mh != null) {
                 if (mh instanceof MessageHandler.Async<?>) {
-                    ((MessageHandler.Async<String>) mh).onMessage(payload,
-                            last);
+                    ((MessageHandler.Async<String>) mh).onMessage(payload, last);
                 } else {
                     ((MessageHandler.Basic<String>) mh).onMessage(payload);
                 }
@@ -262,6 +240,7 @@ public class WsFrame {
         }
     }
 
+
     private boolean isControl() {
         return (opCode & 0x08) > 0;
     }
@@ -270,6 +249,7 @@ public class WsFrame {
     private boolean isPayloadComplete() {
         return (payloadSent + pos - headerLength) >= payloadLength;
     }
+
 
     private boolean usePartial() {
         if (opCode == Constants.OPCODE_BINARY) {
@@ -290,6 +270,7 @@ public class WsFrame {
         }
     }
 
+
     private ByteBuffer getPayloadBinary() {
         int end;
         if (isPayloadComplete()) {
@@ -297,9 +278,7 @@ public class WsFrame {
         } else {
             end = pos;
         }
-
         ByteBuffer result = ByteBuffer.allocate(end - headerLength);
-
         for (int i = headerLength; i < end; i++) {
             result.put(i - headerLength,
                     (byte) ((inputBuffer[i] ^ mask[maskIndex]) & 0xFF));
@@ -308,42 +287,35 @@ public class WsFrame {
                 maskIndex = 0;
             }
         }
-
         // May have read past end of current frame into next
-
         pos = 0;
         headerLength = 0;
-
         return result;
     }
 
+
     private String getPayloadText() {
         ByteBuffer bb = getPayloadBinary();
-
         return new String(bb.array(), Charset.forName("UTF-8"));
     }
 
+
     protected static long byteArrayToLong(byte[] b, int start, int len)
             throws IOException {
-
         if (len > 8) {
-            throw new IOException(
-                    sm.getString("wsFrame.byteToLongFail", Long.valueOf(len)));
+            throw new IOException(sm.getString("wsFrame.byteToLongFail",
+                    Long.valueOf(len)));
         }
-
         int shift = 0;
         long result = 0;
         for (int i = start + len - 1; i >= start; i--) {
             result = result + ((b[i] & 0xFF) << shift);
             shift += 8;
         }
-
         return result;
     }
 
     private static enum State {
-        NEW_FRAME,
-        PARTIAL_HEADER,
-        DATA
+        NEW_FRAME, PARTIAL_HEADER, DATA
     }
 }

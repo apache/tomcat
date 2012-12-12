@@ -35,42 +35,43 @@ public class WsEndpointPojo extends Endpoint {
     private final PojoMethodMapping methodMapping;
     private Session session = null;
 
+
     public WsEndpointPojo(Class<?> clazzPojo, PojoMethodMapping methodMapping,
-            String pathInfo)
-            throws InstantiationException, IllegalAccessException {
+            String pathInfo) throws InstantiationException,
+            IllegalAccessException {
         // TODO Use factory from annotation if present
         this.pojo = clazzPojo.newInstance();
         this.methodMapping = methodMapping;
         this.pathInfo = pathInfo;
     }
 
+
     @Override
     public void onOpen(Session session) {
         this.session = session;
-
         if (methodMapping.getOnOpen() != null) {
             try {
-                methodMapping.getOnOpen().invoke(
-                        pojo, methodMapping.getOnOpenArgs(pathInfo, session));
+                methodMapping.getOnOpen().invoke(pojo,
+                        methodMapping.getOnOpenArgs(pathInfo, session));
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
-
-        for (MessageHandler mh :
-                methodMapping.getMessageHandlers(pojo, pathInfo, session)) {
+        for (MessageHandler mh : methodMapping.getMessageHandlers(pojo,
+                pathInfo, session)) {
             session.addMessageHandler(mh);
         }
     }
+
 
     @Override
     public void onClose(CloseReason closeReason) {
         if (methodMapping.getOnClose() != null) {
             try {
-                methodMapping.getOnClose().invoke(
-                        pojo, methodMapping.getOnCloseArgs(pathInfo, session));
+                methodMapping.getOnClose().invoke(pojo,
+                        methodMapping.getOnCloseArgs(pathInfo, session));
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
                 // TODO Auto-generated catch block
@@ -79,13 +80,15 @@ public class WsEndpointPojo extends Endpoint {
         }
     }
 
+
     @Override
     public void onError(Throwable throwable) {
         if (methodMapping.getOnError() != null) {
             try {
-                methodMapping.getOnError().invoke(pojo,
-                        methodMapping.getOnErrorArgs(
-                                pathInfo, session, throwable));
+                methodMapping.getOnError().invoke(
+                        pojo,
+                        methodMapping.getOnErrorArgs(pathInfo, session,
+                                throwable));
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
                 // TODO Auto-generated catch block

@@ -34,6 +34,7 @@ public class ClientContainerImpl implements ClientContainer {
         return null;
     }
 
+
     @Override
     public Session connectToServer(Endpoint endpoint,
             ClientEndpointConfiguration clientEndpointConfiguration, URI path)
@@ -42,11 +43,13 @@ public class ClientContainerImpl implements ClientContainer {
         return null;
     }
 
+
     @Override
     public Set<Session> getOpenSessions() {
         // TODO Auto-generated method stub
         return null;
     }
+
 
     @Override
     public long getMaxSessionIdleTimeout() {
@@ -54,11 +57,12 @@ public class ClientContainerImpl implements ClientContainer {
         return 0;
     }
 
+
     @Override
     public void setMaxSessionIdleTimeout(long timeout) {
         // TODO Auto-generated method stub
-
     }
+
 
     @Override
     public long getMaxBinaryMessageBufferSize() {
@@ -66,11 +70,12 @@ public class ClientContainerImpl implements ClientContainer {
         return 0;
     }
 
+
     @Override
     public void setMaxBinaryMessageBufferSize(long max) {
         // TODO Auto-generated method stub
-
     }
+
 
     @Override
     public long getMaxTextMessageBufferSize() {
@@ -78,16 +83,16 @@ public class ClientContainerImpl implements ClientContainer {
         return 0;
     }
 
+
     @Override
     public void setMaxTextMessageBufferSize(long max) {
         // TODO Auto-generated method stub
-
     }
+
 
     @Override
     public Set<String> getInstalledExtensions() {
         // TODO Auto-generated method stub
         return null;
     }
-
 }

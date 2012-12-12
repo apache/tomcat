@@ -36,13 +36,12 @@ public class Utf8Decoder extends CharsetDecoder {
     //
     // Please note, o means 0, actually.
     // -------------------------------------------------------------------
-    // 0         1         2         3          Value
+    // 0 1 2 3 Value
     // -------------------------------------------------------------------
-    // oxxxxxxx                                 00000000 00000000 0xxxxxxx
-    // 11oyyyyy  1oxxxxxx                       00000000 00000yyy yyxxxxxx
-    // 111ozzzz  1oyyyyyy  1oxxxxxx             00000000 zzzzyyyy yyxxxxxx
-    // 1111ouuu  1ouuzzzz  1oyyyyyy  1oxxxxxx   000uuuuu zzzzyyyy yyxxxxxx
-
+    // oxxxxxxx 00000000 00000000 0xxxxxxx
+    // 11oyyyyy 1oxxxxxx 00000000 00000yyy yyxxxxxx
+    // 111ozzzz 1oyyyyyy 1oxxxxxx 00000000 zzzzyyyy yyxxxxxx
+    // 1111ouuu 1ouuzzzz 1oyyyyyy 1oxxxxxx 000uuuuu zzzzyyyy yyxxxxxx
     private static final int remainingBytes[] = {
             // 1owwwwww
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -57,20 +56,20 @@ public class Utf8Decoder extends CharsetDecoder {
             // 1111ouuu
             3, 3, 3, 3, 3, 3, 3, 3,
             // > 11110111
-            -1, -1, -1, -1, -1, -1, -1, -1 };
-
-    private static final int remainingNumbers[] = {
-                   0, //                0                 1                2           3
-                4224, // (01o00000b <<  6)+(1o000000b)
-              401536, // (011o0000b << 12)+(1o000000b <<  6)+(1o000000b)
-            29892736  // (0111o000b << 18)+(1o000000b << 12)+(1o000000b << 6)+(1o000000b)
+            -1, -1, -1, -1, -1, -1, -1, -1};
+    private static final int remainingNumbers[] = {0, // 0 1 2 3
+            4224, // (01o00000b << 6)+(1o000000b)
+            401536, // (011o0000b << 12)+(1o000000b << 6)+(1o000000b)
+            29892736 // (0111o000b << 18)+(1o000000b << 12)+(1o000000b <<
+                     // 6)+(1o000000b)
     };
+    private static final int lowerEncodingLimit[] = {-1, 0x80, 0x800, 0x10000};
 
-    private static final int lowerEncodingLimit[] = { -1, 0x80, 0x800, 0x10000 };
 
     public Utf8Decoder() {
         super(B2CConverter.UTF_8, 1.0f, 1.0f);
     }
+
 
     @Override
     protected CoderResult decodeLoop(ByteBuffer in, CharBuffer out) {
@@ -79,6 +78,7 @@ public class Utf8Decoder extends CharsetDecoder {
         }
         return decodeNotHasArray(in, out);
     }
+
 
     private CoderResult decodeNotHasArray(ByteBuffer in, CharBuffer out) {
         int outRemaining = out.remaining();
@@ -89,7 +89,6 @@ public class Utf8Decoder extends CharsetDecoder {
                 if (outRemaining == 0) {
                     return CoderResult.OVERFLOW;
                 }
-
                 int jchar = in.get();
                 if (jchar < 0) {
                     jchar = jchar & 0x7F;
@@ -100,13 +99,11 @@ public class Utf8Decoder extends CharsetDecoder {
                     if (limit - pos < 1 + tail) {
                         return CoderResult.UNDERFLOW;
                     }
-
                     int nextByte;
                     for (int i = 0; i < tail; i++) {
                         nextByte = in.get() & 0xFF;
                         if ((nextByte & 0xC0) != 0x80) {
-                            return CoderResult
-                                    .malformedForLength(1 + i);
+                            return CoderResult.malformedForLength(1 + i);
                         }
                         jchar = (jchar << 6) + nextByte;
                     }
@@ -118,15 +115,15 @@ public class Utf8Decoder extends CharsetDecoder {
                     pos += tail;
                 }
                 if (jchar <= 0xffff) {
-                  out.put((char) jchar);
-                  outRemaining--;
+                    out.put((char) jchar);
+                    outRemaining--;
                 } else {
-                  if (outRemaining < 2) {
-                      return CoderResult.OVERFLOW;
-                  }
-                  out.put((char) ((jchar >> 0xA) + 0xD7C0));
-                  out.put((char) ((jchar & 0x3FF) + 0xDC00));
-                  outRemaining -= 2;
+                    if (outRemaining < 2) {
+                        return CoderResult.OVERFLOW;
+                    }
+                    out.put((char) ((jchar >> 0xA) + 0xD7C0));
+                    out.put((char) ((jchar & 0x3FF) + 0xDC00));
+                    outRemaining -= 2;
                 }
                 pos++;
             }
@@ -136,6 +133,7 @@ public class Utf8Decoder extends CharsetDecoder {
         }
     }
 
+
     private CoderResult decodeHasArray(ByteBuffer in, CharBuffer out) {
         int outRemaining = out.remaining();
         int pos = in.position();
@@ -143,10 +141,8 @@ public class Utf8Decoder extends CharsetDecoder {
         final byte[] bArr = in.array();
         final char[] cArr = out.array();
         final int inIndexLimit = limit + in.arrayOffset();
-
         int inIndex = pos + in.arrayOffset();
         int outIndex = out.position() + out.arrayOffset();
-
         // if someone would change the limit in process,
         // he would face consequences
         for (; inIndex < inIndexLimit && outRemaining > 0; inIndex++) {
@@ -154,7 +150,6 @@ public class Utf8Decoder extends CharsetDecoder {
             if (jchar < 0) {
                 jchar = jchar & 0x7F;
                 int tail = remainingBytes[jchar];
-
                 if (tail == -1) {
                     in.position(inIndex - in.arrayOffset());
                     out.position(outIndex - out.arrayOffset());
@@ -163,7 +158,6 @@ public class Utf8Decoder extends CharsetDecoder {
                 if (inIndexLimit - inIndex < 1 + tail) {
                     break;
                 }
-
                 for (int i = 0; i < tail; i++) {
                     int nextByte = bArr[inIndex + i + 1] & 0xFF;
                     if ((nextByte & 0xC0) != 0x80) {
@@ -183,25 +177,24 @@ public class Utf8Decoder extends CharsetDecoder {
                 inIndex += tail;
             }
             // Note: This is the additional test added
-            if (jchar >= 0xD800 && jchar <=0xDFFF) {
+            if (jchar >= 0xD800 && jchar <= 0xDFFF) {
                 return CoderResult.unmappableForLength(3);
             }
             if (jchar <= 0xffff) {
-              cArr[outIndex++] = (char) jchar;
-              outRemaining--;
+                cArr[outIndex++] = (char) jchar;
+                outRemaining--;
             } else {
-              if (outRemaining < 2) {
-                  return CoderResult.OVERFLOW;
-              }
-              cArr[outIndex++] = (char) ((jchar >> 0xA) + 0xD7C0);
-              cArr[outIndex++] = (char) ((jchar & 0x3FF) + 0xDC00);
-              outRemaining -= 2;
+                if (outRemaining < 2) {
+                    return CoderResult.OVERFLOW;
+                }
+                cArr[outIndex++] = (char) ((jchar >> 0xA) + 0xD7C0);
+                cArr[outIndex++] = (char) ((jchar & 0x3FF) + 0xDC00);
+                outRemaining -= 2;
             }
         }
         in.position(inIndex - in.arrayOffset());
         out.position(outIndex - out.arrayOffset());
-        return (outRemaining == 0 && inIndex < inIndexLimit) ?
-                CoderResult.OVERFLOW :
-                CoderResult.UNDERFLOW;
+        return (outRemaining == 0 && inIndex < inIndexLimit) ? CoderResult.OVERFLOW
+                : CoderResult.UNDERFLOW;
     }
 }

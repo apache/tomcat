@@ -35,15 +35,16 @@ public class WsProtocolHandler implements ProtocolHandler {
     private final ClassLoader applicationClassLoader;
     private final WsSession wsSession;
 
+
     public WsProtocolHandler(Endpoint ep) {
         this.ep = ep;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
         wsSession = new WsSession(ep);
     }
 
+
     @Override
     public void init(WebConnection connection) {
-
         // Need to call onOpen using the web application's class loader
         Thread t = Thread.currentThread();
         ClassLoader cl = t.getContextClassLoader();
@@ -53,7 +54,6 @@ public class WsProtocolHandler implements ProtocolHandler {
         } finally {
             t.setContextClassLoader(cl);
         }
-
         ServletInputStream sis;
         ServletOutputStream sos;
         try {
@@ -62,9 +62,7 @@ public class WsProtocolHandler implements ProtocolHandler {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
-
         WsFrame wsFrame = new WsFrame(sis, wsSession);
-
         sis.setReadListener(new WsReadListener(this, wsFrame));
         sos.setWriteListener(new WsWriteListener(this));
     }
@@ -87,11 +85,13 @@ public class WsProtocolHandler implements ProtocolHandler {
         private final WsProtocolHandler wsProtocolHandler;
         private final WsFrame wsFrame;
 
+
         private WsReadListener(WsProtocolHandler wsProtocolHandler,
                 WsFrame wsFrame) {
             this.wsProtocolHandler = wsProtocolHandler;
             this.wsFrame = wsFrame;
         }
+
 
         @Override
         public void onDataAvailable() {
@@ -102,11 +102,13 @@ public class WsProtocolHandler implements ProtocolHandler {
             }
         }
 
+
         @Override
         public void onAllDataRead() {
             // Will never happen with WebSocket
             throw new IllegalStateException();
         }
+
 
         @Override
         public void onError(Throwable throwable) {
@@ -114,20 +116,21 @@ public class WsProtocolHandler implements ProtocolHandler {
         }
     }
 
-
     private static class WsWriteListener implements WriteListener {
 
         private final WsProtocolHandler wsProtocolHandler;
+
 
         private WsWriteListener(WsProtocolHandler wsProtocolHandler) {
             this.wsProtocolHandler = wsProtocolHandler;
         }
 
+
         @Override
         public void onWritePossible() {
             // TODO Auto-generated method stub
-
         }
+
 
         @Override
         public void onError(Throwable throwable) {
