@@ -18,24 +18,42 @@ package org.apache.tomcat.websocket;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
 
 import javax.websocket.MessageHandler;
+import javax.websocket.Session;
 
-public class PojoMessageHandlerBasic<T> extends PojoMessageHandlerBase<T>
-        implements MessageHandler.Basic<T> {
+public abstract class PojoMessageHandlerAsyncBase<T>
+        extends PojoMessageHandlerBase<T> implements MessageHandler.Async<T> {
 
-    public PojoMessageHandlerBasic(Object pojo, Method method,
-            WsSession wsSession) {
-        super(pojo, method, wsSession);
+    private final int indexBoolean;
+
+    public PojoMessageHandlerAsyncBase(Object pojo, Method method,
+            Session session, Object[] params, int indexPayload,
+            boolean wrap, int indexBoolean, int indexSession) {
+        super(pojo, method, session, params, indexPayload, wrap,
+                indexSession);
+        this.indexBoolean = indexBoolean;
     }
 
 
     @Override
-    public void onMessage(T message) {
-        Object[] params = null; // TODO insert message and session into params
+    public void onMessage(T message, boolean last) {
+        Object[] parameters = params.clone();
+        if (indexBoolean != -1) {
+            parameters[indexBoolean] = Boolean.valueOf(last);
+        }
+        if (indexSession != -1) {
+            parameters[indexSession] = session;
+        }
+        if (unwrap) {
+            parameters[indexPayload] = ((ByteBuffer) message).array();
+        } else {
+            parameters[indexPayload] = message;
+        }
         Object result;
         try {
-            result = method.invoke(pojo, params);
+            result = method.invoke(pojo, parameters);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new IllegalArgumentException();
         }
