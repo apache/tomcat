@@ -37,12 +37,12 @@ import javax.websocket.Session;
 
 public class WsSession implements Session {
 
+    private final Endpoint localEndpoint;
+    private RemoteEndpoint remoteEndpoint;
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
-    private MessageHandler.Basic<PongMessage> pongMessageHandler = new DefaultPingMessageHandler(
-            this);
-    private final Endpoint localEndpoint;
-
+    private MessageHandler.Basic<PongMessage> pongMessageHandler =
+            new DefaultPingMessageHandler(this);
 
     public WsSession(Endpoint localEndpoint) {
         this.localEndpoint = localEndpoint;
@@ -196,8 +196,7 @@ public class WsSession implements Session {
 
     @Override
     public RemoteEndpoint getRemote() {
-        // TODO Auto-generated method stub
-        return null;
+        return remoteEndpoint;
     }
 
 
@@ -246,6 +245,11 @@ public class WsSession implements Session {
     public Map<String,Object> getUserProperties() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+
+    public void setRemote(WsRemoteEndpoint remoteEndpoint) {
+        this.remoteEndpoint = remoteEndpoint;
     }
 
 

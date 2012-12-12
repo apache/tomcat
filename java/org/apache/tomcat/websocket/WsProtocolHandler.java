@@ -64,7 +64,9 @@ public class WsProtocolHandler implements ProtocolHandler {
         }
         WsFrame wsFrame = new WsFrame(sis, wsSession);
         sis.setReadListener(new WsReadListener(this, wsFrame));
-        sos.setWriteListener(new WsWriteListener(this));
+        WsRemoteEndpoint wsRemoteEndpoint = new WsRemoteEndpoint(sos);
+        wsSession.setRemote(wsRemoteEndpoint);
+        sos.setWriteListener(new WsWriteListener(this, wsRemoteEndpoint));
     }
 
 
@@ -119,16 +121,18 @@ public class WsProtocolHandler implements ProtocolHandler {
     private static class WsWriteListener implements WriteListener {
 
         private final WsProtocolHandler wsProtocolHandler;
+        private final WsRemoteEndpoint wsRemoteEndpoint;
 
-
-        private WsWriteListener(WsProtocolHandler wsProtocolHandler) {
+        private WsWriteListener(WsProtocolHandler wsProtocolHandler,
+                WsRemoteEndpoint wsRemoteEndpoint) {
             this.wsProtocolHandler = wsProtocolHandler;
+            this.wsRemoteEndpoint = wsRemoteEndpoint;
         }
 
 
         @Override
         public void onWritePossible() {
-            // TODO Auto-generated method stub
+            wsRemoteEndpoint.onWritePossible();
         }
 
 
