@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
+import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
 /**
@@ -56,6 +57,11 @@ public class WsEndpointPojo extends Endpoint {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+        }
+
+        for (MessageHandler mh :
+                methodMapping.getMessageHandlers(pojo, pathInfo, session)) {
+            session.addMessageHandler(mh);
         }
     }
 
