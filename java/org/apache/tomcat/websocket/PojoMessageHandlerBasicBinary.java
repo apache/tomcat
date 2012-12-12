@@ -16,30 +16,17 @@
  */
 package org.apache.tomcat.websocket;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
 
-import javax.websocket.MessageHandler;
+import javax.websocket.Session;
 
-public class PojoMessageHandlerAsync<T> extends PojoMessageHandlerBase<T>
-        implements MessageHandler.Async<T> {
+public class PojoMessageHandlerBasicBinary
+        extends PojoMessageHandlerBasicBase<ByteBuffer> {
 
-    public PojoMessageHandlerAsync(Object pojo, Method method,
-            WsSession wsSession) {
-        super(pojo, method, wsSession);
-    }
-
-
-    @Override
-    public void onMessage(T message, boolean last) {
-        Object[] params = null; // TODO insert message, last and session into
-                                // params
-        Object result;
-        try {
-            result = method.invoke(pojo, params);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalArgumentException();
-        }
-        processResult(result);
+    public PojoMessageHandlerBasicBinary(Object pojo, Method method,
+            Session session, Object[] params, int indexPayload, boolean wrap,
+            int indexSession) {
+        super(pojo, method, session, params, indexPayload, wrap, indexSession);
     }
 }

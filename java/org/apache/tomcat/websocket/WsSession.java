@@ -17,6 +17,7 @@
 package org.apache.tomcat.websocket;
 
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -58,24 +59,24 @@ public class WsSession implements Session {
     @SuppressWarnings("unchecked")
     @Override
     public void addMessageHandler(MessageHandler listener) {
-        Type[] types = listener.getClass().getGenericInterfaces();
+        Type[] types = ((ParameterizedType) listener.getClass().getGenericSuperclass()).getActualTypeArguments();
         if (types.length != 1) {
             // TODO i18n
             throw new IllegalArgumentException();
         }
-        if (types[0].getClass().equals(String.class)) {
+        if (types[0].equals(String.class)) {
             if (textMessageHandler != null) {
                 // TODO i18n
                 throw new IllegalStateException();
             }
             textMessageHandler = listener;
-        } else if (types[0].getClass().equals(ByteBuffer.class)) {
+        } else if (types[0].equals(ByteBuffer.class)) {
             if (binaryMessageHandler != null) {
                 // TODO i18n
                 throw new IllegalStateException();
             }
             binaryMessageHandler = listener;
-        } else if (types[0].getClass().equals(PongMessage.class)) {
+        } else if (types[0].equals(PongMessage.class)) {
             if (pongMessageHandler != null) {
                 // TODO i18n
                 throw new IllegalStateException();

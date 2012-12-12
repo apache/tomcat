@@ -21,33 +21,53 @@ import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
 import javax.websocket.EncodeException;
+import javax.websocket.RemoteEndpoint;
+import javax.websocket.Session;
 
 public abstract class PojoMessageHandlerBase<T> {
 
     protected final Object pojo;
     protected final Method method;
-    protected final WsSession wsSession;
+    protected final Session session;
+    protected final Object[] params;
+    protected final int indexPayload;
+    protected final boolean unwrap;
+    protected final int indexSession;
 
 
     public PojoMessageHandlerBase(Object pojo, Method method,
-            WsSession wsSession) {
+            Session session, Object[] params, int indexPayload, boolean unwrap,
+            int indexSession) {
         this.pojo = pojo;
         this.method = method;
-        this.wsSession = wsSession;
+        this.session = session;
+        this.params = params;
+        this.indexPayload = indexPayload;
+        this.unwrap = unwrap;
+        this.indexSession = indexSession;
     }
 
 
     protected void processResult(Object result) {
+        if (result == null) {
+            return;
+        }
+
+        RemoteEndpoint remoteEndpoint = session.getRemote();
+        // TODO: Remove this once sendXxx is implemented?
+        if (remoteEndpoint == null) {
+            return;
+        }
+
         try {
             if (result instanceof String) {
-                wsSession.getRemote().sendString((String) result);
+                remoteEndpoint.sendString((String) result);
             } else if (result instanceof ByteBuffer) {
-                wsSession.getRemote().sendBytes((ByteBuffer) result);
+                remoteEndpoint.sendBytes((ByteBuffer) result);
             } else if (result instanceof byte[]) {
-                wsSession.getRemote().sendBytes(
-                        ByteBuffer.wrap((byte[]) result));
-            } else if (result != null) {
-                wsSession.getRemote().sendObject(result);
+                remoteEndpoint.sendBytes(ByteBuffer.wrap((byte[]) result));
+            } else {
+                remoteEndpoint.sendObject(result);
             }
         } catch (IOException | EncodeException ioe) {
             throw new IllegalStateException(ioe);

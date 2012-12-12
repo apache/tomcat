@@ -18,11 +18,14 @@ package org.apache.tomcat.websocket;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import javax.websocket.MessageHandler;
+import javax.websocket.PongMessage;
 import javax.websocket.Session;
 import javax.websocket.WebSocketClose;
 import javax.websocket.WebSocketError;
@@ -51,6 +54,11 @@ public class PojoMethodMapping {
         Method open = null;
         Method close = null;
         Method error = null;
+        if (path.length() > mappingPath.length()) {
+            template = new UriTemplate(path.substring(mappingPath.length() - 2));
+        } else {
+            template = null;
+        }
         for (Method method : clazzPojo.getMethods()) {
             if (open == null &&
                     method.getAnnotation(WebSocketOpen.class) != null) {
@@ -62,17 +70,12 @@ public class PojoMethodMapping {
                     method.getAnnotation(WebSocketError.class) != null) {
                 error = method;
             } else if (method.getAnnotation(WebSocketMessage.class) != null) {
-                onMessage.add(new MessageMethod(method));
+                onMessage.add(new MessageMethod(method, template));
             }
         }
         this.onOpen = open;
         this.onClose = close;
         this.onError = error;
-        if (path.length() > mappingPath.length()) {
-            template = new UriTemplate(path.substring(mappingPath.length() - 2));
-        } else {
-            template = null;
-        }
         onOpenParams = getPathParams(onOpen, false);
         onCloseParams = getPathParams(onClose, false);
         onErrorParams = getPathParams(onError, true);
@@ -114,17 +117,9 @@ public class PojoMethodMapping {
             Session session) {
         Set<MessageHandler> result = new HashSet<>();
         for (MessageMethod messageMethod : onMessage) {
-            result.add(buildMessageHandler(messageMethod, pojo, pathInfo,
-                    session));
+            result.add(messageMethod.getMessageHandler(pojo, pathInfo,session));
         }
         return result;
-    }
-
-
-    private static MessageHandler buildMessageHandler(
-            MessageMethod messageMethod, Object pojo, String pathInfo,
-            Session session) {
-        return null;
     }
 
 
@@ -220,20 +215,168 @@ public class PojoMethodMapping {
     private static class MessageMethod {
 
         private final Method m;
+        private final UriTemplate template;
+        private int indexString = -1;
+        private int indexByteArray = -1;
+        private int indexByteBuffer = -1;
+        private int indexPong = -1;
+        private int indexBoolean = -1;
+        private int indexSession = -1;
+        private Map<Integer,PathParam> indexPathParams = new HashMap<>();
+        private int indexPayload = -1;
 
 
-        public MessageMethod(Method m) {
+        public MessageMethod(Method m, UriTemplate template) {
             this.m = m;
+            this.template = template;
+
+            Class<?>[] types = m.getParameterTypes();
+            Annotation[][] paramsAnnotations = m.getParameterAnnotations();
+
+            for (int i = 0; i < types.length; i++) {
+                if (types[i] == String.class) {
+                    Annotation[] paramAnnotations = paramsAnnotations[i];
+                    for (Annotation paramAnnotation : paramAnnotations) {
+                        if (paramAnnotation.annotationType().equals(
+                                WebSocketPathParam.class)) {
+                            indexPathParams.put(
+                                    Integer.valueOf(i), new PathParam(types[i],
+                                            ((WebSocketPathParam) paramAnnotation).value()));
+                            break;
+                        }
+                    }
+                    if (indexString == -1) {
+                        indexString = i;
+                    } else {
+                        // TODO i18n
+                        throw new IllegalArgumentException();
+                    }
+                } else if (types[i] == boolean.class) {
+                    if (indexBoolean == -1) {
+                        indexBoolean = i;
+                    } else {
+                        // TODO i18n
+                        throw new IllegalArgumentException();
+                    }
+                } else if (types[i] == ByteBuffer.class) {
+                    if (indexByteBuffer == -1) {
+                        indexByteBuffer = i;
+                    } else {
+                        // TODO i18n
+                        throw new IllegalArgumentException();
+                    }
+                } else if (types[i] == byte[].class) {
+                    if (indexByteArray == -1) {
+                        indexByteArray = i;
+                    } else {
+                        // TODO i18n
+                        throw new IllegalArgumentException();
+                    }
+                } else if (types[i] == Session.class) {
+                    if (indexSession == -1) {
+                        indexSession = i;
+                    } else {
+                        // TODO i18n
+                        throw new IllegalArgumentException();
+                    }
+                } else if (types[i] == PongMessage.class) {
+                    if (indexPong == -1) {
+                        indexPong = i;
+                    } else {
+                        // TODO i18n
+                        throw new IllegalArgumentException();
+                    }
+                }
+            }
+            // Additional checks required
+            if (indexString != -1) {
+                indexPayload = indexString;
+            }
+            if (indexByteArray != -1) {
+                if (indexPayload != -1) {
+                    // TODO i18n
+                    throw new IllegalArgumentException();
+                } else {
+                    indexPayload = indexByteArray;
+                }
+            }
+            if (indexByteBuffer != -1) {
+                if (indexPayload != -1) {
+                    // TODO i18n
+                    throw new IllegalArgumentException();
+                } else {
+                    indexPayload = indexByteBuffer;
+                }
+            }
+            if (indexPong != -1) {
+                if (indexPayload != -1) {
+                    // TODO i18n
+                    throw new IllegalArgumentException();
+                } else {
+                    indexPayload = indexPong;
+                }
+            }
+            if (indexPayload == -1) {
+                // TODO i18n
+                throw new IllegalArgumentException();
+            }
+            if (indexPong != -1 && indexBoolean != -1) {
+                // TODO i18n
+                throw new IllegalArgumentException();
+            }
         }
 
 
-        public Method getMethod() {
-            return m;
-        }
+        public MessageHandler getMessageHandler(Object pojo, String pathInfo,
+                Session session) {
+            Object[] params = new Object[m.getParameterTypes().length];
 
+            Map<String,String> pathParams = template.match(pathInfo);
 
-        public Object[] getParameters() {
-            return null;
+            for (Map.Entry<Integer,PathParam> entry :
+                    indexPathParams.entrySet()) {
+                PathParam pathParam = entry.getValue();
+                String valueString = pathParams.get(pathParam.getName());
+                Object value = null;
+                if (valueString != null) {
+                    value = coerceToType(pathParam.getType(), valueString);
+                }
+                params[entry.getKey().intValue()] = value;
+            }
+
+            MessageHandler mh = null;
+            if (indexBoolean == -1) {
+                // Basic
+                if (indexString != -1) {
+                    mh = new PojoMessageHandlerBasicString(pojo, m,  session,
+                            params, indexString, false, indexSession);
+                } else if (indexByteArray != -1) {
+                    mh = new PojoMessageHandlerBasicBinary(pojo, m, session,
+                            params, indexByteArray, true, indexSession);
+                } else if (indexByteBuffer != -1) {
+                    mh = new PojoMessageHandlerBasicBinary(pojo, m, session,
+                            params, indexByteBuffer, false, indexSession);
+                } else {
+                    mh = new PojoMessageHandlerBasicPong(pojo, m, session,
+                            params, indexPong, false, indexSession);
+                }
+            } else {
+                // ASync
+                if (indexString != -1) {
+                    mh = new PojoMessageHandlerAsyncString(pojo, m, session,
+                            params, indexString, false, indexSession,
+                            indexBoolean);
+                } else if (indexByteArray != -1) {
+                    mh = new PojoMessageHandlerAsyncBinary(pojo, m, session,
+                            params, indexByteArray, true, indexSession,
+                            indexBoolean);
+                } else {
+                    mh = new PojoMessageHandlerAsyncBinary(pojo, m, session,
+                            params, indexByteBuffer, false, indexSession,
+                            indexBoolean);
+                }
+            }
+            return mh;
         }
     }
 }
