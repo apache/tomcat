@@ -25,8 +25,18 @@ import java.util.concurrent.Future;
 
 public interface RemoteEndpoint {
 
+    /**
+     * Send the message, blocking until the message is sent.
+     * @param text  The text message to send.
+     * @throws IOException
+     */
     void sendString(String text) throws IOException;
 
+    /**
+     * Send the message, blocking until the message is sent.
+     * @param data  The binary message to send
+     * @throws IOException
+     */
     void sendBytes(ByteBuffer data) throws IOException;
 
     void sendPartialString(String fragment, boolean isLast) throws IOException;
