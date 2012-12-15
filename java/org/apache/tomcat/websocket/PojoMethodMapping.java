@@ -117,7 +117,7 @@ public class PojoMethodMapping {
             Session session) {
         Set<MessageHandler> result = new HashSet<>();
         for (MessageMethod messageMethod : onMessage) {
-            result.add(messageMethod.getMessageHandler(pojo, pathInfo,session));
+            result.add(messageMethod.getMessageHandler(pojo, pathInfo, session));
         }
         return result;
     }
@@ -331,7 +331,12 @@ public class PojoMethodMapping {
                 Session session) {
             Object[] params = new Object[m.getParameterTypes().length];
 
-            Map<String,String> pathParams = template.match(pathInfo);
+            Map<String,String> pathParams;
+            if (template == null) {
+                pathParams = new HashMap<>();
+            } else {
+                pathParams = template.match(pathInfo);
+            }
 
             for (Map.Entry<Integer,PathParam> entry :
                     indexPathParams.entrySet()) {
