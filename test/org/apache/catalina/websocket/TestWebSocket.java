@@ -70,7 +70,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
 
         // Send the WebSocket handshake
-        client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
+        client.writer.write("GET /examples/websocket/echoProgrammatic HTTP/1.1" + CRLF);
         client.writer.write("Host: foo" + CRLF);
         client.writer.write("Upgrade: websocket" + CRLF);
         client.writer.write("Connection: keep-alive, upgrade" + CRLF);
@@ -110,7 +110,7 @@ public class TestWebSocket extends TomcatBaseTest {
         WebSocketClient client= new WebSocketClient(getPort());
 
         // Send the WebSocket handshake
-        client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
+        client.writer.write("GET /examples/websocket/echoProgrammatic HTTP/1.1" + CRLF);
         client.writer.write("Host: foo" + CRLF);
         client.writer.write("Upgrade: websocket" + CRLF);
         client.writer.write("Connection: upgrade" + CRLF);
@@ -148,7 +148,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
 
         // Send the WebSocket handshake
-        client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
+        client.writer.write("GET /examples/websocket/echoProgrammatic HTTP/1.1" + CRLF);
         client.writer.write("Host: foo" + CRLF);
         client.writer.write("Upgrade: websocket" + CRLF);
         client.writer.write("Sec-WebSocket-Version: 13" + CRLF);
@@ -176,7 +176,7 @@ public class TestWebSocket extends TomcatBaseTest {
         WebSocketClient client= new WebSocketClient(getPort());
 
         // Send the WebSocket handshake
-        client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
+        client.writer.write("GET /examples/websocket/echoProgrammatic HTTP/1.1" + CRLF);
         client.writer.write("Host: foo" + CRLF);
         client.writer.write("Connection: upgrade" + CRLF);
         client.writer.write("Sec-WebSocket-Version: 13" + CRLF);
@@ -203,7 +203,7 @@ public class TestWebSocket extends TomcatBaseTest {
         WebSocketClient client= new WebSocketClient(getPort());
 
         // Send the WebSocket handshake
-        client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
+        client.writer.write("GET /examples/websocket/echoProgrammatic HTTP/1.1" + CRLF);
         client.writer.write("Host: foo" + CRLF);
         client.writer.write("Upgrade: websocket" + CRLF);
         client.writer.write("Connection: upgrade" + CRLF);
@@ -356,7 +356,7 @@ public class TestWebSocket extends TomcatBaseTest {
             SocketAddress addr = new InetSocketAddress("localhost", port);
             socket = new Socket();
             try {
-                socket.setSoTimeout(10000);
+                socket.setSoTimeout(100000);
                 socket.connect(addr, 10000);
                 os = socket.getOutputStream();
                 writer = new OutputStreamWriter(os, encoding);
