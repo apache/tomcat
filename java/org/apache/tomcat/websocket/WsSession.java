@@ -19,6 +19,7 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.HashSet;
@@ -59,24 +60,21 @@ public class WsSession implements Session {
     @SuppressWarnings("unchecked")
     @Override
     public void addMessageHandler(MessageHandler listener) {
-        Type[] types = ((ParameterizedType) listener.getClass().getGenericSuperclass()).getActualTypeArguments();
-        if (types.length != 1) {
-            // TODO i18n
-            throw new IllegalArgumentException();
-        }
-        if (types[0].equals(String.class)) {
+        Type t = getMessageType(listener);
+
+        if (t.equals(String.class)) {
             if (textMessageHandler != null) {
                 // TODO i18n
                 throw new IllegalStateException();
             }
             textMessageHandler = listener;
-        } else if (types[0].equals(ByteBuffer.class)) {
+        } else if (t.equals(ByteBuffer.class)) {
             if (binaryMessageHandler != null) {
                 // TODO i18n
                 throw new IllegalStateException();
             }
             binaryMessageHandler = listener;
-        } else if (types[0].equals(PongMessage.class)) {
+        } else if (t.equals(PongMessage.class)) {
             if (pongMessageHandler != null) {
                 // TODO i18n
                 throw new IllegalStateException();
@@ -266,6 +264,79 @@ public class WsSession implements Session {
     public MessageHandler.Basic<PongMessage> getPongMessageHandler() {
         return pongMessageHandler;
     }
+
+
+    // Protected so unit tests can use it
+    protected static Class<?> getMessageType(MessageHandler listener) {
+        return (Class<?>) getMessageType(listener.getClass());
+    }
+
+
+    private static Object getMessageType(Class<? extends MessageHandler> clazz) {
+
+        // Look to see if this class implements the generic MessageHandler<>
+        // interface
+
+        // Get all the interfaces
+        Type[] interfaces = clazz.getGenericInterfaces();
+        for (Type iface : interfaces) {
+            // Only need to check interfaces that use generics
+            if (iface instanceof ParameterizedType) {
+                ParameterizedType pi = (ParameterizedType) iface;
+                // Look for the MessageHandler<> interface
+                if (pi.getRawType().equals(MessageHandler.Basic.class)
+                        || pi.getRawType().equals(MessageHandler.Async.class)) {
+                    // Whichever interface it is, there is only one generic
+                    // type.
+                    return getTypeParameter(
+                            clazz, pi.getActualTypeArguments()[0]);
+                }
+            }
+        }
+
+        // Interface not found on this class. Look at the superclass.
+        Class<? extends MessageHandler> superClazz =
+                (Class<? extends MessageHandler>) clazz.getSuperclass();
+
+        Object result = getMessageType(superClazz);
+        if (result instanceof Class<?>) {
+            // Superclass implements interface and defines explicit type for
+            // MessageHandler<>
+            return result;
+        } else if (result instanceof Integer) {
+            // Superclass implements interface and defines unknown type for
+            // MessageHandler<>
+            // Map that unknown type to the generic types defined in this class
+            ParameterizedType superClassType =
+                    (ParameterizedType) clazz.getGenericSuperclass();
+            return getTypeParameter(clazz,
+                    superClassType.getActualTypeArguments()[
+                            ((Integer) result).intValue()]);
+        } else {
+            // TODO: Something went wrong. Log an error.
+            return null;
+        }
+    }
+
+
+    /*
+     * For a generic parameter, return either the Class used or if the type
+     * is unknown, the index for the type in definition of the class
+     */
+    private static Object getTypeParameter(Class<?> clazz, Type argType) {
+        if (argType instanceof Class<?>) {
+            return argType;
+        } else {
+            TypeVariable<?>[] tvs = clazz.getTypeParameters();
+            for (int i = 0; i < tvs.length; i++) {
+                if (tvs[i].equals(argType)) {
+                    return Integer.valueOf(i);
+                }
+            }
+            return null;
+        }
+    }
+
 
     private static class DefaultPingMessageHandler implements
             MessageHandler.Basic<PongMessage> {
