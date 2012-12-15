@@ -45,15 +45,6 @@ public class WsProtocolHandler implements ProtocolHandler {
 
     @Override
     public void init(WebConnection connection) {
-        // Need to call onOpen using the web application's class loader
-        Thread t = Thread.currentThread();
-        ClassLoader cl = t.getContextClassLoader();
-        t.setContextClassLoader(applicationClassLoader);
-        try {
-            ep.onOpen(wsSession);
-        } finally {
-            t.setContextClassLoader(cl);
-        }
         ServletInputStream sis;
         ServletOutputStream sos;
         try {
@@ -67,6 +58,16 @@ public class WsProtocolHandler implements ProtocolHandler {
         WsRemoteEndpoint wsRemoteEndpoint = new WsRemoteEndpoint(sos);
         wsSession.setRemote(wsRemoteEndpoint);
         sos.setWriteListener(new WsWriteListener(this, wsRemoteEndpoint));
+
+        // Need to call onOpen using the web application's class loader
+        Thread t = Thread.currentThread();
+        ClassLoader cl = t.getContextClassLoader();
+        t.setContextClassLoader(applicationClassLoader);
+        try {
+            ep.onOpen(wsSession);
+        } finally {
+            t.setContextClassLoader(cl);
+        }
     }
 
 
