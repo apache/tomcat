@@ -770,7 +770,7 @@
  filenameparameter="filename"
           excludes="build.xml project.xml"
           includes="*.xml">
-      <param name="sitedir" expression="tomcat-${version.major.minor}-docs/"/>
+      <param name="sitedir" expression="tomcat-${version.major.minor}-doc/"/>
       <param name="subdir" expression=""/>
       <param name="relative-path" expression="."/>
       <param name="version" expression="${version}"/>
@@ -784,7 +784,7 @@
  filenameparameter="filename"
           excludes="project.xml"
           includes="*.xml">
-      <param name="sitedir" expression="tomcat-${version.major.minor}-docs/"/>
+      <param name="sitedir" expression="tomcat-${version.major.minor}-doc/"/>
       <param name="subdir" expression="appdev/"/>
       <param name="relative-path" expression=".."/>
       <param name="version" expression="${version}"/>
@@ -798,7 +798,7 @@
  filenameparameter="filename"
           excludes="project.xml"
           includes="*.xml">
-      <param name="sitedir" expression="tomcat-${version.major.minor}-docs/"/>
+      <param name="sitedir" expression="tomcat-${version.major.minor}-doc/"/>
       <param name="subdir" expression="funcspecs/"/>
       <param name="relative-path" expression=".."/>
       <param name="version" expression="${version}"/>
@@ -812,7 +812,7 @@
  filenameparameter="filename"
           excludes="project.xml"
           includes="*.xml">
-      <param name="sitedir" expression="tomcat-${version.major.minor}-docs/"/>
+      <param name="sitedir" expression="tomcat-${version.major.minor}-doc/"/>
       <param name="subdir" expression="config/"/>
       <param name="relative-path" expression=".."/>
       <param name="version" expression="${version}"/>
@@ -826,7 +826,7 @@
  filenameparameter="filename"
           excludes="project.xml"
           includes="*.xml">
-      <param name="sitedir" expression="tomcat-${version.major.minor}-docs/"/>
+      <param name="sitedir" expression="tomcat-${version.major.minor}-doc/"/>
       <param name="subdir" expression="architecture/"/>
       <param name="relative-path" expression=".."/>
       <param name="version" expression="${version}"/>
@@ -841,7 +841,7 @@
      filenameparameter="filename"
               excludes="project.xml"
               includes="*.xml">
-      <param name="sitedir" expression="tomcat-${version.major.minor}-docs/"/>
+      <param name="sitedir" expression="tomcat-${version.major.minor}-doc/"/>
       <param name="subdir" expression="tribes/"/>
       <param name="relative-path" expression=".."/>
       <param name="version" expression="${version}"/>
