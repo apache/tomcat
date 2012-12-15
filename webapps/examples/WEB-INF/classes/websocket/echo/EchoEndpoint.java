@@ -19,6 +19,7 @@ package websocket.echo;
 import java.io.IOException;
 
 import javax.websocket.Endpoint;
+import javax.websocket.MessageHandler;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 
@@ -27,11 +28,11 @@ public class EchoEndpoint extends Endpoint{
     @Override
     public void onOpen(Session session) {
         RemoteEndpoint remoteEndpoint = session.getRemote();
-        session.addMessageHandler(new EchoMessageHandler<>(remoteEndpoint));
+        session.addMessageHandler(new EchoMessageHandler(remoteEndpoint));
     }
 
-    private static class EchoMessageHandler<T>
-            implements javax.websocket.MessageHandler.Basic<String> {
+    private static class EchoMessageHandler
+            implements MessageHandler.Basic<String> {
 
         private final RemoteEndpoint remoteEndpoint;
 
@@ -42,7 +43,6 @@ public class EchoEndpoint extends Endpoint{
         @Override
         public void onMessage(String message) {
             try {
-                System.out.println(message);
                 if (remoteEndpoint != null) {
                     remoteEndpoint.sendString(message);
                 }
