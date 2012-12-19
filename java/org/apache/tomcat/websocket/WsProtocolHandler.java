@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 import javax.servlet.ReadListener;
@@ -24,6 +25,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 import javax.servlet.http.ProtocolHandler;
 import javax.servlet.http.WebConnection;
+import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
 
 /**
@@ -54,7 +57,7 @@ public class WsProtocolHandler implements ProtocolHandler {
             throw new IllegalStateException(e);
         }
         WsFrame wsFrame = new WsFrame(sis, wsSession);
-        sis.setReadListener(new WsReadListener(this, wsFrame));
+        sis.setReadListener(new WsReadListener(this, wsFrame, wsSession));
         WsRemoteEndpoint wsRemoteEndpoint = new WsRemoteEndpoint(sos);
         wsSession.setRemote(wsRemoteEndpoint);
         sos.setWriteListener(new WsWriteListener(this, wsRemoteEndpoint));
@@ -87,12 +90,14 @@ public class WsProtocolHandler implements ProtocolHandler {
 
         private final WsProtocolHandler wsProtocolHandler;
         private final WsFrame wsFrame;
+        private final WsSession wsSession;
 
 
         private WsReadListener(WsProtocolHandler wsProtocolHandler,
-                WsFrame wsFrame) {
+                WsFrame wsFrame, WsSession wsSession) {
             this.wsProtocolHandler = wsProtocolHandler;
             this.wsFrame = wsFrame;
+            this.wsSession = wsSession;
         }
 
 
@@ -101,7 +106,16 @@ public class WsProtocolHandler implements ProtocolHandler {
             try {
                 wsFrame.onDataAvailable();
             } catch (IOException e) {
-                onError(e);
+                if (e instanceof EOFException){
+                    try {
+                        wsSession.close(new CloseReason(
+                                CloseCodes.CLOSED_ABNORMALLY, e.getMessage()));
+                    } catch (IOException e1) {
+                        // TODO
+                    }
+                } else {
+                    onError(e);
+                }
             }
         }
 
