@@ -19,6 +19,7 @@ package org.apache.tomcat.websocket;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -155,6 +156,7 @@ public class PojoMethodMapping {
             }
         }
         if (!foundError) {
+            // TODO i18n
             throw new IllegalArgumentException();
         }
         return result;
@@ -165,7 +167,12 @@ public class PojoMethodMapping {
             UriTemplate template, String pathInfo, Session session,
             Throwable throwable) {
         Object[] result = new Object[pathParams.length];
-        Map<String,String> pathValues = template.match(pathInfo);
+        Map<String,String> pathValues;
+        if (template != null && pathInfo != null) {
+            pathValues = template.match(pathInfo);
+        } else {
+            pathValues = Collections.EMPTY_MAP;
+        }
         for (int i = 0; i < pathParams.length; i++) {
             Class<?> type = pathParams[i].getType();
             if (type.equals(Session.class)) {
