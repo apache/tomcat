@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.websocket;
+package org.apache.tomcat.websocket;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -46,6 +46,11 @@ import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.Base64;
+import org.apache.catalina.websocket.Constants;
+import org.apache.catalina.websocket.MessageHandler;
+import org.apache.catalina.websocket.StreamHandler;
+import org.apache.catalina.websocket.WebSocketServlet;
+import org.apache.catalina.websocket.WsOutbound;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
