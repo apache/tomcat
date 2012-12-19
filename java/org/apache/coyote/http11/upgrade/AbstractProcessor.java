@@ -89,6 +89,9 @@ public abstract class AbstractProcessor<S>
             // Unexpected state
             return SocketState.CLOSED;
         }
+        if (upgradeServletInputStream.isCloseRequired()) {
+            return SocketState.CLOSED;
+        }
         return SocketState.UPGRADED;
     }
 
