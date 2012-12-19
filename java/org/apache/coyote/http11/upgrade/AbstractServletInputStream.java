@@ -28,7 +28,7 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
     protected static final StringManager sm =
             StringManager.getManager(Constants.Package);
 
-
+    private boolean closeRequired = false;
     // Start in blocking-mode
     private volatile Boolean ready = Boolean.TRUE;
     private volatile ReadListener listener = null;
@@ -111,7 +111,12 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
     public final int read(byte[] b, int off, int len) throws IOException {
         preReadChecks();
 
-        return doRead(listener == null, b, off, len);
+        try {
+            return doRead(listener == null, b, off, len);
+        } catch (IOException ioe) {
+            closeRequired = true;
+            throw ioe;
+        }
     }
 
 
@@ -130,7 +135,13 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
         // single byte reads run through this method.
         ReadListener readListener = this.listener;
         byte[] b = new byte[1];
-        int result = doRead(readListener == null, b, 0, 1);
+        int result;
+        try {
+            result = doRead(readListener == null, b, 0, 1);
+        } catch (IOException ioe) {
+            closeRequired = true;
+            throw ioe;
+        }
         if (result == 0) {
             return -1;
         } else if (result == -1) {
@@ -147,6 +158,11 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
     protected final void onDataAvailable() {
         ready = Boolean.TRUE;
         listener.onDataAvailable();
+    }
+
+
+    protected final boolean isCloseRequired() {
+        return closeRequired;
     }
 
 
