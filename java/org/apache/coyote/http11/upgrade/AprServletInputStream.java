@@ -78,4 +78,8 @@ public class AprServletInputStream extends AbstractServletInputStream {
         return false;
     }
 
+    @Override
+    protected void doClose() throws IOException {
+        // TODO Auto-generated method stub
+    }
 }

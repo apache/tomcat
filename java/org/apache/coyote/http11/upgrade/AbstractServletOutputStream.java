@@ -68,6 +68,11 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
     }
 
 
+    @Override
+    public void close() throws IOException {
+        doClose();
+    }
+
     private void preWriteChecks() {
         if (buffer != null) {
             throw new IllegalStateException(
@@ -110,4 +115,6 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
             throws IOException;
 
     protected abstract void doFlush() throws IOException;
+
+    protected abstract void doClose() throws IOException;
 }

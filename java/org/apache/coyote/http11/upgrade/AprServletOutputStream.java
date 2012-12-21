@@ -41,4 +41,10 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
     protected void doFlush() throws IOException {
         // TODO Auto-generated method stub
     }
+
+
+    @Override
+    protected void doClose() throws IOException {
+        // TODO Auto-generated method stub
+    }
 }

@@ -42,4 +42,9 @@ public class BioServletOutputStream extends AbstractServletOutputStream {
     protected void doFlush() throws IOException {
         os.flush();
     }
+
+    @Override
+    protected void doClose() throws IOException {
+        os.close();
+    }
 }

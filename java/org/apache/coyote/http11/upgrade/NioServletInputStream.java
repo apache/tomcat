@@ -101,6 +101,14 @@ public class NioServletInputStream extends AbstractServletInputStream {
         return len - leftToWrite;
     }
 
+
+
+    @Override
+    protected void doClose() throws IOException {
+        channel.close();
+    }
+
+
     private int fillReadBuffer(boolean block) throws IOException {
         int nRead;
         if (block) {
