@@ -90,11 +90,12 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
         textToByte.clear();
         CharBuffer cb = CharBuffer.wrap(fragment);
         CoderResult cr = encoder.encode(cb, textToByte, true);
+        textToByte.flip();
         while (cr.isOverflow()) {
-            textToByte.flip();
             sendMessage(Constants.OPCODE_TEXT, textToByte, first, false);
             textToByte.clear();
             cr = encoder.encode(cb, textToByte, true);
+            textToByte.flip();
             first = false;
         }
         sendMessage(Constants.OPCODE_TEXT, textToByte, first, isLast);
