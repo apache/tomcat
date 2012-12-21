@@ -91,7 +91,10 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
         CharBuffer cb = CharBuffer.wrap(fragment);
         CoderResult cr = encoder.encode(cb, textToByte, true);
         while (cr.isOverflow()) {
+            textToByte.flip();
             sendMessage(Constants.OPCODE_TEXT, textToByte, first, false);
+            textToByte.clear();
+            cr = encoder.encode(cb, textToByte, true);
             first = false;
         }
         sendMessage(Constants.OPCODE_TEXT, textToByte, first, isLast);
@@ -217,7 +220,6 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
         }
         // If not the first fragment, it is a continuation with opCode of zero
 
-        message.flip();
         header.put(first);
 
         // Next write the length
