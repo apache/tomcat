@@ -309,11 +309,11 @@
     <attribute name="accessToUnderlyingConnectionAllowed" required="false">
       <p>(boolean) Property not used. Access can be achieved by calling <code>unwrap</code> on the pooled connection.
          see <code>javax.sql.DataSource</code> interface, or call <code>getConnection</code> through reflection or
-          or cast the object as <code>javax.sql.PooledConnection</code></p>
+         cast the object as <code>javax.sql.PooledConnection</code></p>
     </attribute>
 
     <attribute name="removeAbandoned" required="false">
-      <p>(boolean) Flag to remove abandoned connections if they exceed the <code>removeAbandonedTimout</code>.
+      <p>(boolean) Flag to remove abandoned connections if they exceed the <code>removeAbandonedTimeout</code>.
          If set to true a connection is considered abandoned and eligible for removal if it has been in use
          longer than the <code>removeAbandonedTimeout</code> Setting this to <code>true</code> can recover db connections from
          applications that fail to close a connection. See also <code>logAbandoned</code>
