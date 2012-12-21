@@ -58,7 +58,8 @@ public class WsProtocolHandler implements ProtocolHandler {
         }
         WsFrame wsFrame = new WsFrame(sis, wsSession);
         sis.setReadListener(new WsReadListener(this, wsFrame, wsSession));
-        WsRemoteEndpoint wsRemoteEndpoint = new WsRemoteEndpoint(sos);
+        WsRemoteEndpoint wsRemoteEndpoint =
+                new WsRemoteEndpoint(wsSession, sos);
         wsSession.setRemote(wsRemoteEndpoint);
         sos.setWriteListener(new WsWriteListener(this, wsRemoteEndpoint));
 
@@ -108,8 +109,10 @@ public class WsProtocolHandler implements ProtocolHandler {
             } catch (IOException e) {
                 if (e instanceof EOFException){
                     try {
-                        wsSession.close(new CloseReason(
-                                CloseCodes.CLOSED_ABNORMALLY, e.getMessage()));
+                        CloseReason cr = new CloseReason(
+                                CloseCodes.CLOSED_ABNORMALLY, e.getMessage());
+                        wsSession.onClose(cr);
+                        wsSession.close(cr);
                     } catch (IOException e1) {
                         // TODO
                     }

@@ -37,6 +37,7 @@ import javax.websocket.SendResult;
 public class WsRemoteEndpoint implements RemoteEndpoint {
 
     private final ServletOutputStream sos;
+    private final WsSession wsSession;
     // Max length for outgoing WebSocket frame header is 10 bytes
     private final ByteBuffer header = ByteBuffer.allocate(10);
 
@@ -46,7 +47,8 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
     private volatile CyclicBarrier writeBarrier = new CyclicBarrier(2);
 
 
-    public WsRemoteEndpoint(ServletOutputStream sos) {
+    public WsRemoteEndpoint(WsSession wsSession, ServletOutputStream sos) {
+        this.wsSession = wsSession;
         this.sos = sos;
     }
 
@@ -198,7 +200,7 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
     }
 
 
-    private void sendMessage(byte opCode, ByteBuffer message,
+    protected void sendMessage(byte opCode, ByteBuffer message,
             boolean isFirstFragment, boolean isLastFragment) {
         // Clear header, ready for new message
         header.clear();
@@ -247,6 +249,15 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
+        if (Constants.OPCODE_CLOSE == opCode) {
+            try {
+                sos.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 
 
@@ -255,15 +266,13 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
             try {
                 writeBarrier.await();
             } catch (InterruptedException | BrokenBarrierException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                wsSession.getLocalEndpoint().onError(e);
             }
         }
         try {
             sos.write(data.array(), data.arrayOffset(), data.limit());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            wsSession.getLocalEndpoint().onError(e);
         }
     }
 }

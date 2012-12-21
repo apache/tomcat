@@ -22,6 +22,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,14 +39,16 @@ import javax.websocket.Session;
 
 public class WsSession implements Session {
 
+    private static final Charset UTF8 = Charset.forName("UTF8");
+
     private final Endpoint localEndpoint;
-    private RemoteEndpoint remoteEndpoint;
+    private WsRemoteEndpoint wsRemoteEndpoint;
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
     private MessageHandler.Basic<PongMessage> pongMessageHandler =
             new DefaultPingMessageHandler(this);
 
-    public WsSession(Endpoint localEndpoint) {
+    protected WsSession(Endpoint localEndpoint) {
         this.localEndpoint = localEndpoint;
     }
 
@@ -194,20 +197,28 @@ public class WsSession implements Session {
 
     @Override
     public RemoteEndpoint getRemote() {
-        return remoteEndpoint;
+        return wsRemoteEndpoint;
     }
 
 
     @Override
     public void close() throws IOException {
-        close(new CloseReason(CloseCodes.GOING_AWAY, ""));
+        close(new CloseReason(CloseCodes.NORMAL_CLOSURE, ""));
     }
 
 
     @Override
     public void close(CloseReason closeStatus) throws IOException {
         // TODO Send the close message to the remote endpoint
-        localEndpoint.onClose(closeStatus);
+        // 125 is maximum size for the payload of a control message
+        ByteBuffer msg = ByteBuffer.allocate(125);
+        msg.putShort((short) closeStatus.getCloseCode().getCode());
+        String reason = closeStatus.getReasonPhrase();
+        if (reason != null && reason.length() > 0) {
+            msg.put(reason.getBytes(UTF8));
+        }
+        msg.flip();
+        wsRemoteEndpoint.sendMessage(Constants.OPCODE_CLOSE, msg, true, true);
     }
 
 
@@ -246,23 +257,32 @@ public class WsSession implements Session {
     }
 
 
-    public void setRemote(WsRemoteEndpoint remoteEndpoint) {
-        this.remoteEndpoint = remoteEndpoint;
+    protected void setRemote(WsRemoteEndpoint wsRemoteEndpoint) {
+        this.wsRemoteEndpoint = wsRemoteEndpoint;
     }
 
 
-    public MessageHandler getTextMessageHandler() {
+    protected MessageHandler getTextMessageHandler() {
         return textMessageHandler;
     }
 
 
-    public MessageHandler getBinaryMessageHandler() {
+    protected MessageHandler getBinaryMessageHandler() {
         return binaryMessageHandler;
     }
 
 
-    public MessageHandler.Basic<PongMessage> getPongMessageHandler() {
+    protected MessageHandler.Basic<PongMessage> getPongMessageHandler() {
         return pongMessageHandler;
+    }
+
+    protected void onClose(CloseReason closeReason) {
+        localEndpoint.onClose(closeReason);
+    }
+
+
+    protected Endpoint getLocalEndpoint() {
+        return localEndpoint;
     }
 
 
