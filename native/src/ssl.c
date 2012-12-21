@@ -110,6 +110,10 @@ static const jint supported_ssl_opts = 0
      | SSL_OP_CIPHER_SERVER_PREFERENCE
 #endif
 
+#ifdef SSL_OP_CRYPTOPRO_TLSEXT_BUG
+     | SSL_OP_CRYPTOPRO_TLSEXT_BUG
+#endif
+
 #ifdef SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS
      | SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS
 #endif
@@ -150,6 +154,14 @@ static const jint supported_ssl_opts = 0
      | SSL_OP_NETSCAPE_REUSE_CIPHER_CHANGE_BUG
 #endif
 
+#ifdef SSL_OP_NO_COMPRESSION
+     | SSL_OP_NO_COMPRESSION
+#endif
+
+#ifdef SSL_OP_NO_QUERY_MTU
+     | SSL_OP_NO_QUERY_MTU
+#endif
+
 #ifdef SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION
      | SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION
 #endif
@@ -180,6 +192,10 @@ static const jint supported_ssl_opts = 0
 
 #ifdef SSL_OP_SINGLE_DH_USE
      | SSL_OP_SINGLE_DH_USE
+#endif
+
+#ifdef SSL_OP_SINGLE_ECDH_USE
+     | SSL_OP_SINGLE_ECDH_USE
 #endif
 
 #ifdef SSL_OP_SSLEAY_080_CLIENT_DH_BUG
