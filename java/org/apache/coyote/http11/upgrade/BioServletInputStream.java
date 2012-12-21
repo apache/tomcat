@@ -42,4 +42,9 @@ public class BioServletInputStream extends AbstractServletInputStream {
         // Always returns true for BIO
         return true;
     }
+
+    @Override
+    protected void doClose() throws IOException {
+        inputStream.close();
+    }
 }

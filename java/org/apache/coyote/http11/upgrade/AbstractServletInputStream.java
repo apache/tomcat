@@ -120,6 +120,13 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
     }
 
 
+
+    @Override
+    public void close() throws IOException {
+        doClose();
+    }
+
+
     private void preReadChecks() {
         if (listener != null && (ready == null || !ready.booleanValue())) {
             throw new IllegalStateException(
@@ -170,4 +177,6 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
 
     protected abstract int doRead(boolean block, byte[] b, int off, int len)
             throws IOException;
+
+    protected abstract void doClose() throws IOException;
 }
