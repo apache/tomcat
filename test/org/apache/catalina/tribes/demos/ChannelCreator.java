@@ -133,7 +133,7 @@ public class ChannelCreator {
                 String d = args[++i];
                 String h = d.substring(0,d.indexOf(":"));
                 String p = d.substring(h.length()+1);
-                MemberImpl m = new MemberImpl(h,Integer.parseInt(p),2000);
+                Member m = new MemberImpl(h,Integer.parseInt(p),2000);
                 staticMembers.add(m);
             } else if ("-throughput".equals(args[i])) {
                 throughput = true;
