@@ -62,6 +62,7 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
             ready = Boolean.valueOf(doIsReady());
         } catch (IOException e) {
             listener.onError(e);
+            ready = Boolean.FALSE;
         }
         return ready.booleanValue();
     }
