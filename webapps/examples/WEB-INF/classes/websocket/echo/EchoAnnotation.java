@@ -16,6 +16,8 @@
  */
 package websocket.echo;
 
+import java.nio.ByteBuffer;
+
 import javax.websocket.WebSocketEndpoint;
 import javax.websocket.WebSocketMessage;
 
@@ -23,7 +25,12 @@ import javax.websocket.WebSocketMessage;
 public class EchoAnnotation {
 
     @WebSocketMessage
-    public String printMessage(String msg) {
+    public String echoTextMessage(String msg) {
         return msg;
+    }
+
+    @WebSocketMessage
+    public ByteBuffer echoBinaryMessage(ByteBuffer bb) {
+        return bb;
     }
 }
