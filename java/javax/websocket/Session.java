@@ -54,8 +54,22 @@ public interface Session {
 
     RemoteEndpoint getRemote();
 
+    /**
+     * Close the connection to the remote end point using the code
+     * {@link javax.websocket.CloseReason.CloseCodes#NORMAL_CLOSURE} and an
+     * empty reason phrase.
+     *
+     * @throws IOException
+     */
     void close() throws IOException;
 
+
+    /**
+     * Close the connection to the remote end point using the specified code
+     * and reason phrase.
+     *
+     * @throws IOException
+     */
     void close(CloseReason closeStatus) throws IOException;
 
     URI getRequestURI();

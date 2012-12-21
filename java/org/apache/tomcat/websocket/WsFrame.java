@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import javax.servlet.ServletInputStream;
+import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.MessageHandler;
 import javax.websocket.PongMessage;
 
@@ -194,7 +196,19 @@ public class WsFrame {
                 return false;
             }
             if (opCode == Constants.OPCODE_CLOSE) {
-                wsSession.close();
+                messageBuffer.flip();
+                String reason = null;
+                int code = CloseCodes.NO_STATUS_CODE.getCode();
+                if (messageBuffer.remaining() > 1) {
+                    code = messageBuffer.getShort();
+                    if (messageBuffer.remaining() > 0) {
+                         reason = new String(messageBuffer.array(),
+                                messageBuffer.arrayOffset() + messageBuffer.position(),
+                                messageBuffer.remaining(), "UTF8");
+                    }
+                }
+                wsSession.onClose(
+                        new CloseReason(Util.getCloseCode(code), reason));
             } else if (opCode == Constants.OPCODE_PING) {
                 messageBuffer.flip();
                 wsSession.getRemote().sendPong(messageBuffer);
