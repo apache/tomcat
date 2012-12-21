@@ -327,9 +327,13 @@ public class WsFrame {
                 return;
             }
             if (inputBuffer.length < frameSize) {
-                // Never going to work
                 // TODO i18n - buffer too small
-                throw new IOException();
+                CloseReason cr = new CloseReason(CloseCodes.TOO_BIG,
+                        "Buffer size: [" + inputBuffer.length +
+                        "], frame size: [" + frameSize + "]");
+                wsSession.close(cr);
+                wsSession.onClose(cr);
+                throw new IOException(cr.getReasonPhrase());
             }
             makeRoom();
         }
