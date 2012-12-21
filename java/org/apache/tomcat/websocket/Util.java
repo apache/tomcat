@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.websocket;
 
+import javax.websocket.CloseReason.CloseCode;
+import javax.websocket.CloseReason.CloseCodes;
+
 /**
  * Utility class for internal use only within the
  * {@link org.apache.tomcat.websocket} package.
@@ -49,6 +52,44 @@ class Util {
             } else {
                 return temp.substring(0, temp.lastIndexOf('/') + 1) + '*';
             }
+        }
+    }
+
+
+    static CloseCode getCloseCode(int code) {
+        switch (code) {
+            case 1000:
+                return CloseCodes.NORMAL_CLOSURE;
+            case 1001:
+                return CloseCodes.GOING_AWAY;
+            case 1002:
+                return CloseCodes.PROTOCOL_ERROR;
+            case 1003:
+                return CloseCodes.CANNOT_ACCEPT;
+            case 1004:
+                return CloseCodes.RESERVED;
+            case 1005:
+                return CloseCodes.NO_STATUS_CODE;
+            case 1006:
+                return CloseCodes.CLOSED_ABNORMALLY;
+            case 1007:
+                return CloseCodes.NOT_CONSISTENT;
+            case 1008:
+                return CloseCodes.VIOLATED_POLICY;
+            case 1009:
+                return CloseCodes.TOO_BIG;
+            case 1010:
+                return CloseCodes.NO_EXTENSION;
+            case 1011:
+                return CloseCodes.UNEXPECTED_CONDITION;
+            case 1012:
+                return CloseCodes.SERVICE_RESTART;
+            case 1013:
+                return CloseCodes.TRY_AGAIN_LATER;
+            case 1015:
+                return CloseCodes.TLS_HANDSHAKE_FAILURE;
+            default:
+                return CloseCodes.PROTOCOL_ERROR;
         }
     }
 }
