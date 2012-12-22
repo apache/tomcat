@@ -19,8 +19,8 @@ package websocket.echo;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
+import javax.websocket.server.DefaultServerConfiguration;
 
 import org.apache.tomcat.websocket.ServerContainerImpl;
 
@@ -29,11 +29,11 @@ public class WsConfigListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        ServerContainerImpl sc =
-                (ServerContainerImpl) ContainerProvider.getServerContainer();
+        ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
         sc.setServletContext(sce.getServletContext());
         try {
-            sc.publishServer(EchoEndpointConfiguration.class);
+            sc.publishServer(EchoEndpoint.class, "/websocket/echoProgrammatic",
+                    DefaultServerConfiguration.class);
         } catch (DeploymentException e) {
             throw new IllegalStateException(e);
         }

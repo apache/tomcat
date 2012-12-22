@@ -21,23 +21,21 @@ import java.io.IOException;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
+import javax.websocket.EndpointConfiguration;
 import javax.websocket.MessageHandler;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 
 public class EchoEndpoint extends Endpoint{
 
-    private Session session;
-
     @Override
-    public void onOpen(Session session) {
-        this.session = session;
+    public void onOpen(Session session, EndpointConfiguration endpointConfig) {
         RemoteEndpoint remoteEndpoint = session.getRemote();
         session.addMessageHandler(new EchoMessageHandler(remoteEndpoint));
     }
 
     @Override
-    public void onClose(CloseReason closeReason) {
+    public void onClose(Session session, CloseReason closeReason) {
         try {
             session.close(new CloseReason(CloseCodes.NORMAL_CLOSURE, null));
         } catch (IOException e) {

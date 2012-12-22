@@ -23,9 +23,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.websocket.Session;
 import javax.websocket.WebSocketClose;
-import javax.websocket.WebSocketEndpoint;
 import javax.websocket.WebSocketMessage;
 import javax.websocket.WebSocketOpen;
+import javax.websocket.server.WebSocketEndpoint;
 
 @WebSocketEndpoint(value = "/websocket/snake")
 public class SnakeAnnotation {
