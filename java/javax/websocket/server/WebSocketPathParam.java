@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.websocket;
+package javax.websocket.server;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,19 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface WebSocketEndpoint {
-
-    /**
-     * URI or URI-template that the annotated class should be mapped to.
-     */
+@Target(ElementType.PARAMETER)
+public @interface WebSocketPathParam {
     String value();
-
-    String[] subprotocols() default {};
-
-    Class<? extends Decoder>[] decoders() default {};
-
-    Class<? extends Encoder>[] encoders() default {};
-
-    //Class<? extends EndpointFactory<?>> factory();
 }

@@ -16,45 +16,17 @@
  */
 package javax.websocket;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 /**
  * Provides access to the implementation. This version of the API is hard-coded
  * to use the Apache Tomcat WebSocket implementation.
  */
 public class ContainerProvider {
 
-    private static final String CONTAINER_PROVIDER_IMPL =
-            "org.apache.tomcat.websocket.ServerContainerImpl";
-
-    /**
-     * Obtain a reference to the Server container used for processing incoming
-     * WebSocket connections.
-     */
-    public static ServerContainer getServerContainer() {
-        // Note: No special handling required when running under a
-        //       SecurityManager as the container provider implementation and
-        //       this class have the same class loader.
-        ServerContainer result = null;
-        try {
-            Class<?> clazz = Class.forName(CONTAINER_PROVIDER_IMPL);
-            Method m = clazz.getMethod("getServerContainer", (Class<?>[]) null);
-            result = (ServerContainer) m.invoke(null, (Object[]) null);
-        } catch (ClassNotFoundException | NoSuchMethodException |
-                SecurityException | IllegalAccessException |
-                IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return result;
-    }
-
     /**
      * Obtain a reference to the ClientContainer used to create outgoing
      * WebSocket connections.
      */
-    public static ClientContainer getClientContainer() {
+    public static WebSocketContainer getClientContainer() {
         return null;
     }
 }

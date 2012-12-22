@@ -19,12 +19,16 @@ package javax.websocket;
 import java.net.URI;
 import java.util.Set;
 
-public interface ClientContainer {
+public interface WebSocketContainer {
 
-    Session connectToServer(Object endpoint, URI path)
+    long getDefaultAsyncSendTimeout();
+
+    void setAsyncSendTimeout(long timeout);
+
+    Session connectToServer(Class<?> annotatedEndpointClass, URI path)
             throws DeploymentException;
 
-    Session connectToServer(Endpoint endpoint,
+    Session connectToServer(Class<? extends Endpoint> endpoint,
             ClientEndpointConfiguration clientEndpointConfiguration, URI path)
             throws DeploymentException;
 
@@ -42,5 +46,5 @@ public interface ClientContainer {
 
     void setMaxTextMessageBufferSize(long max);
 
-    Set<String> getInstalledExtensions();
+    Set<Extension> getInstalledExtensions();
 }

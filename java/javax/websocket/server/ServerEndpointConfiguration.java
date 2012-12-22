@@ -14,18 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.websocket;
+package javax.websocket.server;
 
 import java.net.URI;
 import java.util.List;
 
-public interface ServerEndpointConfiguration<T> extends EndpointConfiguration {
+import javax.websocket.Endpoint;
+import javax.websocket.EndpointConfiguration;
+import javax.websocket.Extension;
+import javax.websocket.HandshakeResponse;
 
-    EndpointFactory<T> getEndpointFactory();
+public interface ServerEndpointConfiguration extends EndpointConfiguration {
+
+    Class<? extends Endpoint> getEndpointClass();
 
     String getNegotiatedSubprotocol(List<String> requestedSubprotocols);
 
-    List<String> getNegotiatedExtensions(List<String> requestedExtensions);
+    List<Extension> getNegotiatedExtensions(List<Extension> requestedExtensions);
 
     boolean checkOrigin(String originHeaderValue);
 

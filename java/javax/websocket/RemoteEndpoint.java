@@ -25,6 +25,12 @@ import java.util.concurrent.Future;
 
 public interface RemoteEndpoint {
 
+    void setBatchingAllowed(boolean batchingAllowed);
+    boolean getBatchingAllowed();
+    void flushBatch();
+    long getAsyncSendTimeout();
+    void setAsyncSendTimeout(long timeout);
+
     /**
      * Send the message, blocking until the message is sent.
      * @param text  The text message to send.

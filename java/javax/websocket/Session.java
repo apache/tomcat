@@ -18,15 +18,17 @@ package javax.websocket;
 
 import java.io.IOException;
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public interface Session {
 
-    ClientContainer getContainer();
+    WebSocketContainer getContainer();
 
-    void addMessageHandler(MessageHandler listener);
+    void addMessageHandler(MessageHandler listener)
+            throws IllegalStateException;
 
     Set<MessageHandler> getMessageHandlers();
 
@@ -40,8 +42,6 @@ public interface Session {
 
     boolean isSecure();
 
-    long getInactiveTime();
-
     boolean isOpen();
 
     long getTimeout();
@@ -53,6 +53,8 @@ public interface Session {
     long getMaximumMessageSize();
 
     RemoteEndpoint getRemote();
+
+    String getId();
 
     /**
      * Close the connection to the remote end point using the code
@@ -74,11 +76,13 @@ public interface Session {
 
     URI getRequestURI();
 
-    Map<String, String[]> getRequestParameterMap();
+    Map<String, List<String>> getRequestParameterMap();
 
     String getQueryString();
 
     Map<String,String> getPathParameters();
 
     Map<String,Object> getUserProperties();
+
+    Principal getUserPrincipal();
 }
