@@ -18,6 +18,7 @@ package javax.websocket;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class DefaultClientConfiguration implements ClientEndpointConfiguration {
     private List<String> preferredSubprotocols = new ArrayList<>();
@@ -68,7 +69,7 @@ public class DefaultClientConfiguration implements ClientEndpointConfiguration {
     }
 
     @Override
-    public void beforeRequest(HandshakeRequest handshakeRequest) {
+    public void beforeRequest(Map<String, List<String>> headers) {
         // NO-OP
     }
 

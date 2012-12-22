@@ -23,23 +23,25 @@ public abstract class Endpoint {
      *
      * @param session   The new session.
      */
-    public abstract void onOpen(Session session);
+    public abstract void onOpen(Session session, EndpointConfiguration config);
 
     /**
      * Event that is triggered when a session has closed.
      *
+     * @param session       The session
      * @param closeReason   Why the session was closed
      */
-    public void onClose(CloseReason closeReason) {
+    public void onClose(Session session, CloseReason closeReason) {
         // NO-OP by default
     }
 
     /**
      * Event that is triggered when a protocol error occurs.
      *
+     * @param session   The session
      * @param throwable The exception
      */
-    public void onError(Throwable throwable) {
+    public void onError(Session session, Throwable throwable) {
         // NO-OP by default
     }
 }

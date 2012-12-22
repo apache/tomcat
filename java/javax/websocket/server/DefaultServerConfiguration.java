@@ -14,58 +14,64 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.websocket;
+package javax.websocket.server;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefaultServerConfiguration<T>
-        implements ServerEndpointConfiguration<T> {
+import javax.websocket.Decoder;
+import javax.websocket.Encoder;
+import javax.websocket.Endpoint;
+import javax.websocket.Extension;
+import javax.websocket.HandshakeResponse;
 
+public class DefaultServerConfiguration implements ServerEndpointConfiguration {
+
+    private Class<? extends Endpoint> endpointClass;
     private String path;
-    @SuppressWarnings("unused") // TODO Remove this once implemented
     private List<String> subprotocols = new ArrayList<>();
-    @SuppressWarnings("unused") // TODO Remove this once implemented
-    private List<String> extensions = new ArrayList<>();
+    private List<Extension> extensions = new ArrayList<>();
     private List<Encoder> encoders = new ArrayList<>();
     private List<Decoder> decoders = new ArrayList<>();
 
-    protected DefaultServerConfiguration() {
-    }
-
-    @Override
-    public EndpointFactory<T> getEndpointFactory() {
-        // TODO
-        return null;
-    }
-
-    public DefaultServerConfiguration(String path) {
+    public DefaultServerConfiguration(Class<? extends Endpoint> endpointClass,
+            String path) {
+        this.endpointClass = endpointClass;
         this.path = path;
     }
 
-    public DefaultServerConfiguration<T> setEncoders(List<Encoder> encoders) {
-        this.encoders = encoders;
+    public DefaultServerConfiguration setEncoders(List<Encoder> encoders) {
+        this.encoders.clear();
+        this.encoders.addAll(encoders);
         return this;
     }
 
-    public DefaultServerConfiguration<T> setDecoders(List<Decoder> decoders) {
-        this.decoders = decoders;
+    public DefaultServerConfiguration setDecoders(List<Decoder> decoders) {
+        this.decoders.clear();
+        this.decoders.addAll(decoders);
         return this;
     }
 
-    public DefaultServerConfiguration<T> setSubprotocols(
+    public DefaultServerConfiguration setSubprotocols(
             List<String> subprotocols) {
-        this.subprotocols = subprotocols;
+        this.subprotocols.clear();
+        this.subprotocols.addAll(subprotocols);
         return this;
     }
 
-    public DefaultServerConfiguration<T> setExtensions(
-            List<String> extensions) {
-        this.extensions = extensions;
+    public DefaultServerConfiguration setExtensions(
+            List<Extension> extensions) {
+        this.extensions.clear();
+        this.extensions.addAll(extensions);
         return this;
     }
 
+
+    @Override
+    public Class<? extends Endpoint> getEndpointClass() {
+        return endpointClass;
+    }
 
     @Override
     public List<Encoder> getEncoders() {
@@ -89,16 +95,15 @@ public class DefaultServerConfiguration<T>
     }
 
     @Override
-    public List<String> getNegotiatedExtensions(
-            List<String> requestedExtensions) {
+    public List<Extension> getNegotiatedExtensions(
+            List<Extension> requestedExtensions) {
         // TODO
         return null;
     }
 
     @Override
     public boolean checkOrigin(String originHeaderValue) {
-        // TODO
-        return false;
+        return true;
     }
 
     @Override

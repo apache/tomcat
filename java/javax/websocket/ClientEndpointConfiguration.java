@@ -17,6 +17,7 @@
 package javax.websocket;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ClientEndpointConfiguration extends EndpointConfiguration {
 
@@ -24,7 +25,7 @@ public interface ClientEndpointConfiguration extends EndpointConfiguration {
 
     List<String> getExtensions();
 
-    void beforeRequest(HandshakeRequest handshakeRequest);
+    void beforeRequest(Map<String, List<String>> headers);
 
     void afterResponse(HandshakeResponse handshakeResponse);
 }
