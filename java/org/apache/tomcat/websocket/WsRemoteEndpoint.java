@@ -269,13 +269,48 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
             try {
                 writeBarrier.await();
             } catch (InterruptedException | BrokenBarrierException e) {
-                wsSession.getLocalEndpoint().onError(e);
+                wsSession.getLocalEndpoint().onError(wsSession, e);
             }
         }
         try {
             sos.write(data.array(), data.arrayOffset(), data.limit());
         } catch (IOException e) {
-            wsSession.getLocalEndpoint().onError(e);
+            wsSession.getLocalEndpoint().onError(wsSession, e);
         }
+    }
+
+
+    @Override
+    public void setBatchingAllowed(boolean batchingAllowed) {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    @Override
+    public boolean getBatchingAllowed() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    @Override
+    public void flushBatch() {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    @Override
+    public long getAsyncSendTimeout() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+
+    @Override
+    public void setAsyncSendTimeout(long timeout) {
+        // TODO Auto-generated method stub
+
     }
 }

@@ -28,6 +28,7 @@ import javax.servlet.http.WebConnection;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
+import javax.websocket.EndpointConfiguration;
 
 /**
  * Servlet 3.1 HTTP upgrade handler for WebSocket connections.
@@ -35,12 +36,14 @@ import javax.websocket.Endpoint;
 public class WsProtocolHandler implements ProtocolHandler {
 
     private final Endpoint ep;
+    private final EndpointConfiguration endpointConfig;
     private final ClassLoader applicationClassLoader;
     private final WsSession wsSession;
 
 
-    public WsProtocolHandler(Endpoint ep) {
+    public WsProtocolHandler(Endpoint ep, EndpointConfiguration endpointConfig) {
         this.ep = ep;
+        this.endpointConfig = endpointConfig;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
         wsSession = new WsSession(ep);
     }
@@ -68,7 +71,7 @@ public class WsProtocolHandler implements ProtocolHandler {
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
         try {
-            ep.onOpen(wsSession);
+            ep.onOpen(wsSession, endpointConfig);
         } finally {
             t.setContextClassLoader(cl);
         }
@@ -81,7 +84,7 @@ public class WsProtocolHandler implements ProtocolHandler {
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
         try {
-            ep.onError(throwable);
+            ep.onError(wsSession, throwable);
         } finally {
             t.setContextClassLoader(cl);
         }

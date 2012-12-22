@@ -23,12 +23,12 @@ import java.lang.reflect.TypeVariable;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.websocket.ClientContainer;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
@@ -36,6 +36,7 @@ import javax.websocket.MessageHandler;
 import javax.websocket.PongMessage;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
 
 public class WsSession implements Session {
 
@@ -54,7 +55,7 @@ public class WsSession implements Session {
 
 
     @Override
-    public ClientContainer getContainer() {
+    public WebSocketContainer getContainer() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -156,13 +157,6 @@ public class WsSession implements Session {
 
 
     @Override
-    public long getInactiveTime() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-
-    @Override
     public boolean isOpen() {
         // TODO Auto-generated method stub
         return false;
@@ -230,7 +224,7 @@ public class WsSession implements Session {
 
 
     @Override
-    public Map<String,String[]> getRequestParameterMap() {
+    public Map<String,List<String>> getRequestParameterMap() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -277,7 +271,7 @@ public class WsSession implements Session {
     }
 
     protected void onClose(CloseReason closeReason) {
-        localEndpoint.onClose(closeReason);
+        localEndpoint.onClose(this, closeReason);
     }
 
 
@@ -376,5 +370,19 @@ public class WsSession implements Session {
                 remoteEndpoint.sendPong(message.getApplicationData());
             }
         }
+    }
+
+
+    @Override
+    public String getId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public Principal getUserPrincipal() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

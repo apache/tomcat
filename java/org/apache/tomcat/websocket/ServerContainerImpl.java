@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,8 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import javax.websocket.DeploymentException;
-import javax.websocket.ServerContainer;
-import javax.websocket.ServerEndpointConfiguration;
+import javax.websocket.Endpoint;
+import javax.websocket.server.ServerEndpointConfiguration;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -32,10 +34,9 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Provides a per class loader (i.e. per web application) instance of a
- * {@link ServerContainer}.
+ * ServerContainer.
  */
-public class ServerContainerImpl extends ClientContainerImpl implements
-        ServerContainer {
+public class ServerContainerImpl extends WebSocketContainerImpl {
 
     // Needs to be a WeakHashMap to prevent memory leaks when a context is
     // stopped
@@ -45,11 +46,6 @@ public class ServerContainerImpl extends ClientContainerImpl implements
     protected Log log = LogFactory.getLog(ServerContainerImpl.class);
 
 
-    /**
-     * Intended to be used by implementations of
-     * {@link javax.websocket.ContainerProvider#getServerContainer()} to obtain
-     * the correct {@link ServerContainer} instance.
-     */
     public static ServerContainerImpl getServerContainer() {
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         ServerContainerImpl result = null;
@@ -63,7 +59,7 @@ public class ServerContainerImpl extends ClientContainerImpl implements
         return result;
     }
     private volatile ServletContext servletContext = null;
-    private Map<String,ServerEndpointConfiguration<?>> configMap = new ConcurrentHashMap<>();
+    private Map<String,ServerEndpointConfiguration> configMap = new ConcurrentHashMap<>();
     private Map<String,Class<?>> pojoMap = new ConcurrentHashMap<>();
     private Map<Class<?>,PojoMethodMapping> pojoMethodMap = new ConcurrentHashMap<>();
 
@@ -78,26 +74,29 @@ public class ServerContainerImpl extends ClientContainerImpl implements
     }
 
 
-    @Override
-    public void publishServer(
-            Class<? extends ServerEndpointConfiguration<?>> clazz)
+    public void publishServer(Class<? extends Endpoint> endpointClass,
+            String path,
+            Class<? extends ServerEndpointConfiguration> configClass)
             throws DeploymentException {
         if (servletContext == null) {
             throw new IllegalArgumentException(
                     sm.getString("serverContainer.servletContextMissing"));
         }
-        ServerEndpointConfiguration<?> sec = null;
+        ServerEndpointConfiguration sec = null;
         try {
-            sec = clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            Constructor<? extends ServerEndpointConfiguration> c =
+                    configClass.getConstructor(Class.class, String.class);
+            sec = c.newInstance(endpointClass, path);
+        } catch (InstantiationException | IllegalAccessException |
+                NoSuchMethodException | SecurityException |
+                IllegalArgumentException | InvocationTargetException e) {
             throw new DeploymentException(sm.getString("sci.newInstance.fail",
-                    clazz.getName()), e);
+                    endpointClass.getName()), e);
         }
-        String path = sec.getPath();
         String mappingPath = Util.getServletMappingPath(path);
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("serverContainer.endpointDeploy",
-                    clazz.getName(), path, servletContext.getContextPath()));
+                    endpointClass.getName(), path, servletContext.getContextPath()));
         }
         configMap.put(mappingPath.substring(0, mappingPath.length() - 2), sec);
         addWsServletMapping(mappingPath);
@@ -105,9 +104,9 @@ public class ServerContainerImpl extends ClientContainerImpl implements
 
 
     /**
-     * Provides the equivalent of {@link #publishServer(Class)} for publishing
-     * plain old java objects (POJOs) that have been annotated as WebSocket
-     * endpoints.
+     * Provides the equivalent of {@link #publishServer(Class,String,Class)} for
+     * publishing plain old java objects (POJOs) that have been annotated as
+     * WebSocket endpoints.
      *
      * @param pojo The annotated POJO
      * @param ctxt The ServletContext the endpoint is to be published in
@@ -148,9 +147,9 @@ public class ServerContainerImpl extends ClientContainerImpl implements
     }
 
 
-    public ServerEndpointConfiguration<?> getServerEndpointConfiguration(
+    public ServerEndpointConfiguration getServerEndpointConfiguration(
             String servletPath, String pathInfo) {
-        ServerEndpointConfiguration<?> sec = configMap.get(servletPath);
+        ServerEndpointConfiguration sec = configMap.get(servletPath);
         if (sec != null) {
             return sec;
         }
@@ -158,7 +157,7 @@ public class ServerContainerImpl extends ClientContainerImpl implements
         if (pojo != null) {
             PojoMethodMapping mapping = pojoMethodMap.get(pojo);
             if (mapping != null) {
-                PojoServerEndpointConfiguration pojoSec = new PojoServerEndpointConfiguration(
+                PojoEndpointConfiguration pojoSec = new PojoEndpointConfiguration(
                         pojo, mapping, servletPath, pathInfo);
                 return pojoSec;
             }
