@@ -18,8 +18,8 @@ package websocket.echo;
 
 import java.nio.ByteBuffer;
 
-import javax.websocket.WebSocketEndpoint;
 import javax.websocket.WebSocketMessage;
+import javax.websocket.server.WebSocketEndpoint;
 
 @WebSocketEndpoint("/websocket/echoAnnotation")
 public class EchoAnnotation {
