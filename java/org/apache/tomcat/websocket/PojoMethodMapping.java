@@ -32,12 +32,12 @@ import javax.websocket.WebSocketClose;
 import javax.websocket.WebSocketError;
 import javax.websocket.WebSocketMessage;
 import javax.websocket.WebSocketOpen;
-import javax.websocket.WebSocketPathParam;
+import javax.websocket.server.WebSocketPathParam;
 
 /**
- * For a POJO class annotated with {@link javax.websocket.WebSocketEndpoint}, an
- * instance of this class caches the method and parameter information for the
- * onXXX calls.
+ * For a POJO class annotated with
+ * {@link javax.websocket.server.WebSocketEndpoint}, an instance of this class
+ * caches the method and parameter information for the onXXX calls.
  */
 public class PojoMethodMapping {
 
@@ -48,10 +48,12 @@ public class PojoMethodMapping {
     private final PathParam[] onCloseParams;
     private final PathParam[] onErrorParams;
     private final Set<MessageMethod> onMessage = new HashSet<>();
+    private final String mappingPath;
     private final UriTemplate template;
 
 
     public PojoMethodMapping(Class<?> clazzPojo, String path, String mappingPath) {
+        this.mappingPath = mappingPath;
         Method open = null;
         Method close = null;
         Method error = null;
@@ -80,6 +82,11 @@ public class PojoMethodMapping {
         onOpenParams = getPathParams(onOpen, false);
         onCloseParams = getPathParams(onClose, false);
         onErrorParams = getPathParams(onError, true);
+    }
+
+
+    public String getMappingPath() {
+        return mappingPath;
     }
 
 

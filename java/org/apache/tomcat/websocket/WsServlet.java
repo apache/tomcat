@@ -34,7 +34,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.ProtocolHandler;
 import javax.websocket.Endpoint;
-import javax.websocket.ServerEndpointConfiguration;
+import javax.websocket.Extension;
+import javax.websocket.server.ServerEndpointConfiguration;
 import javax.xml.bind.DatatypeConverter;
 
 /**
@@ -57,7 +58,7 @@ public class WsServlet extends HttpServlet {
         // Information required to send the server handshake message
         String key;
         String subProtocol = null;
-        List<String> extensions = Collections.emptyList();
+        List<Extension> extensions = Collections.emptyList();
         if (!headerContainsToken(req, "upgrade", "websocket")) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
@@ -78,7 +79,7 @@ public class WsServlet extends HttpServlet {
         }
         // Need an Endpoint instance to progress this further
         ServerContainerImpl cp = ServerContainerImpl.getServerContainer();
-        ServerEndpointConfiguration<?> sec = cp.getServerEndpointConfiguration(
+        ServerEndpointConfiguration sec = cp.getServerEndpointConfiguration(
                 req.getServletPath(), req.getPathInfo());
         // Origin check
         String origin = req.getHeader("Origin");
@@ -95,8 +96,9 @@ public class WsServlet extends HttpServlet {
         // Extensions
         List<String> requestedExtensions = getTokensFromHeader(req,
                 "Sec-WebSocket-Extensions");
-        if (!extensions.isEmpty()) {
-            extensions = sec.getNegotiatedExtensions(requestedExtensions);
+        if (!requestedExtensions.isEmpty()) {
+            // TODO
+            // extensions = sec.getNegotiatedExtensions(requestedExtensions);
         }
         // If we got this far, all is good. Accept the connection.
         resp.setHeader("Upgrade", "websocket");
@@ -107,17 +109,22 @@ public class WsServlet extends HttpServlet {
         }
         if (!extensions.isEmpty()) {
             StringBuilder sb = new StringBuilder();
-            Iterator<String> iter = extensions.iterator();
+            Iterator<Extension> iter = extensions.iterator();
             // There must be at least one
             sb.append(iter.next());
             while (iter.hasNext()) {
                 sb.append(',');
-                sb.append(iter.next());
+                sb.append(iter.next().getName());
             }
             resp.setHeader("Sec-WebSocket-Extensions", sb.toString());
         }
-        Endpoint ep = (Endpoint) sec.getEndpointFactory().createEndpoint();
-        ProtocolHandler wsHandler = new WsProtocolHandler(ep);
+        Endpoint ep;
+        try {
+            ep = sec.getEndpointClass().newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new ServletException(e);
+        }
+        ProtocolHandler wsHandler = new WsProtocolHandler(ep, sec);
         req.upgrade(wsHandler);
     }
 

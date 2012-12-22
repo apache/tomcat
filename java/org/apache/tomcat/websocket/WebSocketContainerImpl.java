@@ -19,16 +19,17 @@ package org.apache.tomcat.websocket;
 import java.net.URI;
 import java.util.Set;
 
-import javax.websocket.ClientContainer;
 import javax.websocket.ClientEndpointConfiguration;
 import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
+import javax.websocket.Extension;
 import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
 
-public class ClientContainerImpl implements ClientContainer {
+public class WebSocketContainerImpl implements WebSocketContainer {
 
     @Override
-    public Session connectToServer(Object endpoint, URI path)
+    public Session connectToServer(Class<?> annotatedEndpointClass, URI path)
             throws DeploymentException {
         // TODO Auto-generated method stub
         return null;
@@ -36,7 +37,7 @@ public class ClientContainerImpl implements ClientContainer {
 
 
     @Override
-    public Session connectToServer(Endpoint endpoint,
+    public Session connectToServer(Class<? extends Endpoint> endpoint,
             ClientEndpointConfiguration clientEndpointConfiguration, URI path)
             throws DeploymentException {
         // TODO Auto-generated method stub
@@ -91,8 +92,22 @@ public class ClientContainerImpl implements ClientContainer {
 
 
     @Override
-    public Set<String> getInstalledExtensions() {
+    public Set<Extension> getInstalledExtensions() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+
+    @Override
+    public long getDefaultAsyncSendTimeout() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+
+    @Override
+    public void setAsyncSendTimeout(long timeout) {
+        // TODO Auto-generated method stub
+
     }
 }

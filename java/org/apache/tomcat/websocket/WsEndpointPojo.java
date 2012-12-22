@@ -21,35 +21,32 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
+import javax.websocket.EndpointConfiguration;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
 /**
  * Wrapper class for instances of POJOs annotated with
- * {@link javax.websocket.WebSocketEndpoint} so they appear as standard
+ * {@link javax.websocket.server.WebSocketEndpoint} so they appear as standard
  * {@link Endpoint} instances.
  */
 public class WsEndpointPojo extends Endpoint {
 
-    private final Object pojo;
-    private final String pathInfo;
-    private final PojoMethodMapping methodMapping;
-    private Session session = null;
-
-
-    public WsEndpointPojo(Class<?> clazzPojo, PojoMethodMapping methodMapping,
-            String pathInfo) throws InstantiationException,
-            IllegalAccessException {
-        // TODO Use factory from annotation if present
-        this.pojo = clazzPojo.newInstance();
-        this.methodMapping = methodMapping;
-        this.pathInfo = pathInfo;
-    }
+    private Object pojo;
+    private String pathInfo;
+    private PojoMethodMapping methodMapping;
 
 
     @Override
-    public void onOpen(Session session) {
-        this.session = session;
+    public void onOpen(Session session,
+            EndpointConfiguration endpointConfiguration) {
+        PojoEndpointConfiguration pec =
+                (PojoEndpointConfiguration) endpointConfiguration;
+
+        pojo = pec.getPojo();
+        pathInfo = pec.getPathInfo();
+        methodMapping = pec.getMethodMapping();
+
         if (methodMapping.getOnOpen() != null) {
             try {
                 methodMapping.getOnOpen().invoke(pojo,
@@ -68,7 +65,7 @@ public class WsEndpointPojo extends Endpoint {
 
 
     @Override
-    public void onClose(CloseReason closeReason) {
+    public void onClose(Session session, CloseReason closeReason) {
         if (methodMapping.getOnClose() == null) {
             // If the POJO doesn't handle the close, close the connection
             try {
@@ -91,7 +88,7 @@ public class WsEndpointPojo extends Endpoint {
 
 
     @Override
-    public void onError(Throwable throwable) {
+    public void onError(Session session, Throwable throwable) {
         if (methodMapping.getOnError() != null) {
             try {
                 methodMapping.getOnError().invoke(

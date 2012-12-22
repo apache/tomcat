@@ -22,7 +22,7 @@ import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HandlesTypes;
-import javax.websocket.WebSocketEndpoint;
+import javax.websocket.server.WebSocketEndpoint;
 
 /**
  * Registers an interest in any class that is annotated with
