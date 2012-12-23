@@ -838,7 +838,7 @@ public class NioEndpoint extends AbstractEndpoint {
     public class Poller implements Runnable {
 
         private Selector selector;
-        private final SynchronizedQueue<Runnable> events =
+        private final SynchronizedQueue<PollerEvent> events =
                 new SynchronizedQueue<>();
 
         private volatile boolean close = false;
@@ -872,7 +872,7 @@ public class NioEndpoint extends AbstractEndpoint {
             selector.wakeup();
         }
 
-        private void addEvent(Runnable event) {
+        private void addEvent(PollerEvent event) {
             events.offer(event);
             if ( wakeupCounter.incrementAndGet() == 0 ) selector.wakeup();
         }
@@ -911,16 +911,14 @@ public class NioEndpoint extends AbstractEndpoint {
         public boolean events() {
             boolean result = false;
 
-            Runnable r = null;
-            while ( (r = events.poll()) != null ) {
+            PollerEvent pe = null;
+            while ( (pe = events.poll()) != null ) {
                 result = true;
                 try {
-                    r.run();
-                    if ( r instanceof PollerEvent ) {
-                        ((PollerEvent)r).reset();
-                        if (running && !paused) {
-                            eventCache.push((PollerEvent)r);
-                        }
+                    pe.run();
+                    pe.reset();
+                    if (running && !paused) {
+                        eventCache.push(pe);
                     }
                 } catch ( Throwable x ) {
                     log.error("",x);
@@ -930,8 +928,12 @@ public class NioEndpoint extends AbstractEndpoint {
             return result;
         }
 
-        public void register(final NioChannel socket)
-        {
+        /**
+         * Registers a newly created socket with the poller.
+         *
+         * @param socket    The newly created socket
+         */
+        public void register(final NioChannel socket) {
             socket.setPoller(this);
             KeyAttachment key = keyCache.pop();
             final KeyAttachment ka = key!=null?key:new KeyAttachment(socket);
@@ -943,6 +945,7 @@ public class NioEndpoint extends AbstractEndpoint {
             else r.reset(socket,ka,OP_REGISTER);
             addEvent(r);
         }
+
         public void cancelledKey(SelectionKey key, SocketStatus status) {
             try {
                 if ( key == null ) return;//nothing to do
