@@ -85,70 +85,70 @@ public class NioEndpoint extends AbstractEndpoint {
 
     // ----------------------------------------------------------------- Fields
 
-    protected NioSelectorPool selectorPool = new NioSelectorPool();
+    private NioSelectorPool selectorPool = new NioSelectorPool();
 
     /**
      * Server socket "pointer".
      */
-    protected ServerSocketChannel serverSock = null;
+    private ServerSocketChannel serverSock = null;
 
     /**
      * use send file
      */
-    protected boolean useSendfile = true;
+    private boolean useSendfile = true;
 
     /**
      * The size of the OOM parachute.
      */
-    protected int oomParachute = 1024*1024;
+    private int oomParachute = 1024*1024;
     /**
      * The oom parachute, when an OOM error happens,
      * will release the data, giving the JVM instantly
      * a chunk of data to be able to recover with.
      */
-    protected byte[] oomParachuteData = null;
+    private byte[] oomParachuteData = null;
 
     /**
      * Make sure this string has already been allocated
      */
-    protected static final String oomParachuteMsg =
+    private static final String oomParachuteMsg =
         "SEVERE:Memory usage is low, parachute is non existent, your system may start failing.";
 
     /**
      * Keep track of OOM warning messages.
      */
-    long lastParachuteCheck = System.currentTimeMillis();
+    private long lastParachuteCheck = System.currentTimeMillis();
 
     /**
      *
      */
-    protected volatile CountDownLatch stopLatch = null;
+    private volatile CountDownLatch stopLatch = null;
 
     /**
      * Cache for SocketProcessor objects
      */
-    protected final SynchronizedStack<SocketProcessor> processorCache =
+    private final SynchronizedStack<SocketProcessor> processorCache =
             new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
                     socketProperties.getProcessorCache());
 
     /**
      * Cache for key attachment objects
      */
-    protected final SynchronizedStack<KeyAttachment> keyCache =
+    private final SynchronizedStack<KeyAttachment> keyCache =
             new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
                     socketProperties.getKeyCache());
 
     /**
      * Cache for poller events
      */
-    protected final SynchronizedStack<PollerEvent> eventCache =
+    private final SynchronizedStack<PollerEvent> eventCache =
             new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
                     socketProperties.getEventCache());
 
     /**
      * Bytebuffer cache, each channel holds a set of buffers (two, except for SSL holds four)
      */
-    protected final SynchronizedStack<NioChannel> nioChannels =
+    private final SynchronizedStack<NioChannel> nioChannels =
             new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
                     socketProperties.getBufferPoolSize());
 
@@ -178,7 +178,7 @@ public class NioEndpoint extends AbstractEndpoint {
     /**
      * Priority of the poller threads.
      */
-    protected int pollerThreadPriority = Thread.NORM_PRIORITY;
+    private int pollerThreadPriority = Thread.NORM_PRIORITY;
     public void setPollerThreadPriority(int pollerThreadPriority) { this.pollerThreadPriority = pollerThreadPriority; }
     public int getPollerThreadPriority() { return pollerThreadPriority; }
 
@@ -186,7 +186,7 @@ public class NioEndpoint extends AbstractEndpoint {
     /**
      * Handling of accepted sockets.
      */
-    protected Handler handler = null;
+    private Handler handler = null;
     public void setHandler(Handler handler ) { this.handler = handler; }
     public Handler getHandler() { return handler; }
 
@@ -194,7 +194,7 @@ public class NioEndpoint extends AbstractEndpoint {
     /**
      * Allow comet request handling.
      */
-    protected boolean useComet = true;
+    private boolean useComet = true;
     public void setUseComet(boolean useComet) { this.useComet = useComet; }
     @Override
     public boolean getUseComet() { return useComet; }
@@ -207,18 +207,18 @@ public class NioEndpoint extends AbstractEndpoint {
     /**
      * Poller thread count.
      */
-    protected int pollerThreadCount = Math.min(2,Runtime.getRuntime().availableProcessors());
+    private int pollerThreadCount = Math.min(2,Runtime.getRuntime().availableProcessors());
     public void setPollerThreadCount(int pollerThreadCount) { this.pollerThreadCount = pollerThreadCount; }
     public int getPollerThreadCount() { return pollerThreadCount; }
 
-    protected long selectorTimeout = 1000;
+    private long selectorTimeout = 1000;
     public void setSelectorTimeout(long timeout){ this.selectorTimeout = timeout;}
     public long getSelectorTimeout(){ return this.selectorTimeout; }
     /**
      * The socket poller.
      */
-    protected Poller[] pollers = null;
-    protected AtomicInteger pollerRotater = new AtomicInteger(0);
+    private Poller[] pollers = null;
+    private AtomicInteger pollerRotater = new AtomicInteger(0);
     /**
      * Return an available poller in true round robin fashion
      */
@@ -258,7 +258,7 @@ public class NioEndpoint extends AbstractEndpoint {
     }
 
 
-    protected SSLContext sslContext = null;
+    private SSLContext sslContext = null;
     public SSLContext getSSLContext() { return sslContext;}
     public void setSSLContext(SSLContext c) { sslContext = c;}
 
@@ -765,9 +765,10 @@ public class NioEndpoint extends AbstractEndpoint {
      */
     public static class PollerEvent implements Runnable {
 
-        protected NioChannel socket;
-        protected int interestOps;
-        protected KeyAttachment key;
+        private NioChannel socket;
+        private int interestOps;
+        private KeyAttachment key;
+
         public PollerEvent(NioChannel ch, KeyAttachment k, int intOps) {
             reset(ch, k, intOps);
         }
@@ -836,16 +837,16 @@ public class NioEndpoint extends AbstractEndpoint {
      */
     public class Poller implements Runnable {
 
-        protected Selector selector;
-        protected final SynchronizedQueue<Runnable> events =
+        private Selector selector;
+        private final SynchronizedQueue<Runnable> events =
                 new SynchronizedQueue<>();
 
-        protected volatile boolean close = false;
-        protected long nextExpiration = 0;//optimize expiration handling
+        private volatile boolean close = false;
+        private long nextExpiration = 0;//optimize expiration handling
 
-        protected AtomicLong wakeupCounter = new AtomicLong(0l);
+        private AtomicLong wakeupCounter = new AtomicLong(0l);
 
-        protected volatile int keyCount = 0;
+        private volatile int keyCount = 0;
 
         public Poller() throws IOException {
             synchronized (Selector.class) {
@@ -1429,8 +1430,6 @@ public class NioEndpoint extends AbstractEndpoint {
         public int getCometOps() { return cometOps; }
         public NioChannel getChannel() { return getSocket();}
         public void setChannel(NioChannel channel) { this.socket = channel;}
-        protected Poller poller = null;
-        protected int interestOps = 0;
         public int interestOps() { return interestOps;}
         public int interestOps(int ops) { this.interestOps  = ops; return ops; }
         public CountDownLatch getReadLatch() { return readLatch; }
@@ -1464,19 +1463,21 @@ public class NioEndpoint extends AbstractEndpoint {
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf;}
         public SendfileData getSendfileData() { return this.sendfileData;}
 
-        protected boolean comet = false;
-        protected int cometOps = SelectionKey.OP_READ;
-        protected boolean cometNotify = false;
-        protected CountDownLatch readLatch = null;
-        protected CountDownLatch writeLatch = null;
-        protected SendfileData sendfileData = null;
+        private Poller poller = null;
+        private int interestOps = 0;
+        private boolean comet = false;
+        private int cometOps = SelectionKey.OP_READ;
+        private boolean cometNotify = false;
+        private CountDownLatch readLatch = null;
+        private CountDownLatch writeLatch = null;
+        private SendfileData sendfileData = null;
 
     }
 
     // ------------------------------------------------ Application Buffer Handler
     public static class NioBufferHandler implements ApplicationBufferHandler {
-        protected ByteBuffer readbuf = null;
-        protected ByteBuffer writebuf = null;
+        private ByteBuffer readbuf = null;
+        private ByteBuffer writebuf = null;
 
         public NioBufferHandler(int readsize, int writesize, boolean direct) {
             if ( direct ) {
@@ -1522,8 +1523,8 @@ public class NioEndpoint extends AbstractEndpoint {
      */
     protected class SocketProcessor implements Runnable {
 
-        protected NioChannel socket = null;
-        protected SocketStatus status = null;
+        private NioChannel socket = null;
+        private SocketStatus status = null;
 
         public SocketProcessor(NioChannel socket, SocketStatus status) {
             reset(socket,status);
