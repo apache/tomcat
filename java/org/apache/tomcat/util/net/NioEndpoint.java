@@ -1558,16 +1558,12 @@ public class NioEndpoint extends AbstractEndpoint {
                         // Process the request from this socket
                         // Suppress null warnings for key in this block since
                         // key can't be null in this block
-                        if (status == null) {
-                            state = handler.process(
-                                    (KeyAttachment) key.attachment(),
-                                    SocketStatus.OPEN_READ);
-                        } else {
-                            state = handler.process(
-                                    (KeyAttachment) key.attachment(),
-                                    status);
-                        }
                         KeyAttachment ka = (KeyAttachment)key.attachment();
+                        if (status == null) {
+                            state = handler.process(ka, SocketStatus.OPEN_READ);
+                        } else {
+                            state = handler.process(ka, status);
+                        }
                         if (state == SocketState.CLOSED) {
                             // Close socket and pool
                             try {
