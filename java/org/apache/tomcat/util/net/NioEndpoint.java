@@ -871,24 +871,9 @@ public class NioEndpoint extends AbstractEndpoint {
             selector.wakeup();
         }
 
-        /**
-         * Only used in this class. Will be made private in Tomcat 8.0.x
-         * @deprecated
-         */
-        @Deprecated
-        public void addEvent(Runnable event) {
+        private void addEvent(Runnable event) {
             events.offer(event);
             if ( wakeupCounter.incrementAndGet() == 0 ) selector.wakeup();
-        }
-
-        /**
-         * Unused. Will be removed in Tomcat 8.0.x
-         * @deprecated
-         */
-        @Deprecated
-        public void cometInterest(NioChannel socket) {
-            KeyAttachment att = (KeyAttachment)socket.getAttachment(false);
-            add(socket,att.getCometOps());
         }
 
         /**
