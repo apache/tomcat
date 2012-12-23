@@ -31,7 +31,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
 
     // Start in blocking-mode
     private volatile WriteListener listener = null;
-    private byte[] buffer;
+    private volatile byte[] buffer;
 
     @Override
     public final boolean canWrite() {
