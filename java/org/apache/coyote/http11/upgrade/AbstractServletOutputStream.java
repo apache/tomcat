@@ -31,6 +31,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
 
     // Start in blocking-mode
     private volatile WriteListener listener = null;
+    private volatile boolean fireListener = false;
     private volatile byte[] buffer;
 
     @Override
@@ -40,7 +41,9 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
                     sm.getString("upgrade.sos.canWrite.is"));
         }
 
-        return buffer == null;
+        boolean result = (buffer == null);
+        fireListener = !result;
+        return result;
     }
 
     @Override
@@ -106,7 +109,8 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
-        if (buffer == null) {
+        if (buffer == null && fireListener) {
+            fireListener = false;
             listener.onWritePossible();
         }
     }
