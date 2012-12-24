@@ -264,7 +264,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         @Override
         protected void longPoll(SocketWrapper<NioChannel> socket,
                 Processor<NioChannel> processor) {
-            connections.put(socket.getSocket(), processor);
 
             if (processor.isAsync()) {
                 socket.setAsync(true);

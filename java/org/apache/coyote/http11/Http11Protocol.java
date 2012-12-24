@@ -179,7 +179,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
         @Override
         protected void longPoll(SocketWrapper<Socket> socket,
                 Processor<Socket> processor) {
-            connections.put(socket.getSocket(), processor);
+            // NO-OP
         }
 
         @Override
