@@ -46,8 +46,7 @@ public class WsSession implements Session {
     private WsRemoteEndpoint wsRemoteEndpoint;
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
-    private MessageHandler.Basic<PongMessage> pongMessageHandler =
-            new DefaultPingMessageHandler(this);
+    private MessageHandler.Basic<PongMessage> pongMessageHandler = null;
 
     protected WsSession(Endpoint localEndpoint) {
         this.localEndpoint = localEndpoint;
@@ -348,27 +347,6 @@ public class WsSession implements Session {
                 }
             }
             return null;
-        }
-    }
-
-
-    private static class DefaultPingMessageHandler implements
-            MessageHandler.Basic<PongMessage> {
-
-        private final WsSession wsSession;
-
-
-        private DefaultPingMessageHandler(WsSession wsSession) {
-            this.wsSession = wsSession;
-        }
-
-
-        @Override
-        public void onMessage(PongMessage message) {
-            RemoteEndpoint remoteEndpoint = wsSession.getRemote();
-            if (remoteEndpoint != null) {
-                remoteEndpoint.sendPong(message.getApplicationData());
-            }
         }
     }
 

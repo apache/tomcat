@@ -34,7 +34,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class WsFrame {
 
-    private static StringManager sm =
+    private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
 
     // Connection level attributes
@@ -177,9 +177,11 @@ public class WsFrame {
         }
         if (isControl()) {
             if (payloadLength > 125) {
-                throw new IOException(sm.getString(
-                        "wsFrame.controlPayloadTooBig",
-                        Long.valueOf(payloadLength)));
+                CloseReason cr = new CloseReason(
+                        CloseCodes.PROTOCOL_ERROR,
+                        sm.getString("wsFrame.controlPayloadTooBig",
+                                Long.valueOf(payloadLength)));
+                throw new WsIOException(cr);
             }
             if (!fin) {
                 throw new IOException("wsFrame.controlNoFin");
@@ -202,7 +204,7 @@ public class WsFrame {
             if (opCode == Constants.OPCODE_CLOSE) {
                 messageBuffer.flip();
                 String reason = null;
-                int code = CloseCodes.NO_STATUS_CODE.getCode();
+                int code = CloseCodes.NORMAL_CLOSURE.getCode();
                 if (messageBuffer.remaining() > 1) {
                     code = messageBuffer.getShort();
                     if (messageBuffer.remaining() > 0) {

@@ -111,19 +111,25 @@ public class WsProtocolHandler implements ProtocolHandler {
         public void onDataAvailable() {
             try {
                 wsFrame.onDataAvailable();
-            } catch (IOException e) {
-                if (e instanceof EOFException){
-                    try {
-                        CloseReason cr = new CloseReason(
-                                CloseCodes.CLOSED_ABNORMALLY, e.getMessage());
-                        wsSession.onClose(cr);
-                        wsSession.close(cr);
-                    } catch (IOException e1) {
-                        // TODO
-                    }
-                } else {
-                    onError(e);
+            } catch (WsIOException ws) {
+                CloseReason cr = ws.getCloseReason();
+                wsSession.onClose(cr);
+                try {
+                    wsSession.close(cr);
+                } catch (IOException e) {
+                    // TODO Log?
                 }
+            } catch (EOFException eof) {
+                try {
+                    CloseReason cr = new CloseReason(
+                            CloseCodes.CLOSED_ABNORMALLY, eof.getMessage());
+                    wsSession.onClose(cr);
+                    wsSession.close(cr);
+                } catch (IOException e1) {
+                    // TODO Log?
+                }
+            } catch (IOException ioe) {
+                onError(ioe);
             }
         }
 
