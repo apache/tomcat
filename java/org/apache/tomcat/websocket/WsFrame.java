@@ -123,6 +123,12 @@ public class WsFrame {
         int b = inputBuffer[frameStart];
         fin = (b & 0x80) > 0;
         rsv = (b & 0x70) >>> 4;
+        if (rsv != 0) {
+            // TODO Extensions may use rsv bits
+            throw new WsIOException(new CloseReason(
+                    CloseCodes.PROTOCOL_ERROR,
+                    sm.getString("wsFrame.wrongRsv", Integer.valueOf(rsv))));
+        }
         opCode = (byte) (b & 0x0F);
         if (!isControl()) {
             if (continuationExpected) {
