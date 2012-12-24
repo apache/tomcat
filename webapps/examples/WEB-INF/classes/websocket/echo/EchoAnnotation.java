@@ -18,6 +18,7 @@ package websocket.echo;
 
 import java.nio.ByteBuffer;
 
+import javax.websocket.PongMessage;
 import javax.websocket.WebSocketMessage;
 import javax.websocket.server.WebSocketEndpoint;
 
@@ -32,5 +33,15 @@ public class EchoAnnotation {
     @WebSocketMessage
     public ByteBuffer echoBinaryMessage(ByteBuffer bb) {
         return bb;
+    }
+
+    /**
+     * Process a received pong. This is a NO-OP.
+     *
+     * @param pm    Ignored.
+     */
+    @WebSocketMessage
+    public void echoPongMessage(PongMessage pm) {
+        // NO-OP
     }
 }
