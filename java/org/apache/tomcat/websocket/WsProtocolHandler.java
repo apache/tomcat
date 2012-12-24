@@ -59,18 +59,20 @@ public class WsProtocolHandler implements ProtocolHandler {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
-        WsFrame wsFrame = new WsFrame(sis, wsSession);
-        sis.setReadListener(new WsReadListener(this, wsFrame, wsSession));
-        WsRemoteEndpoint wsRemoteEndpoint =
-                new WsRemoteEndpoint(wsSession, sos);
-        wsSession.setRemote(wsRemoteEndpoint);
-        sos.setWriteListener(new WsWriteListener(this, wsRemoteEndpoint));
 
         // Need to call onOpen using the web application's class loader
+        // Create the frame using the application's class loader so it can pick
+        // up application specific config from the ServerContainerImpl
         Thread t = Thread.currentThread();
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
         try {
+            WsFrame wsFrame = new WsFrame(sis, wsSession);
+            sis.setReadListener(new WsReadListener(this, wsFrame, wsSession));
+            WsRemoteEndpoint wsRemoteEndpoint =
+                    new WsRemoteEndpoint(wsSession, sos);
+            wsSession.setRemote(wsRemoteEndpoint);
+            sos.setWriteListener(new WsWriteListener(this, wsRemoteEndpoint));
             ep.onOpen(wsSession, endpointConfig);
         } finally {
             t.setContextClassLoader(cl);
