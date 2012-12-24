@@ -18,6 +18,7 @@ package org.apache.tomcat.websocket;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 
 import javax.servlet.ServletInputStream;
@@ -282,8 +283,13 @@ public class WsFrame {
     @SuppressWarnings("unchecked")
     private void sendMessage(boolean last) {
         if (textMessage) {
-            String payload =
-                    new String(messageBuffer.array(), 0, messageBuffer.limit());
+            String payload = null;
+            try {
+                payload = new String(messageBuffer.array(), 0,
+                        messageBuffer.limit(), "UTF8");
+            } catch (UnsupportedEncodingException e) {
+                // All JVMs must support UTF8
+            }
             MessageHandler mh = wsSession.getTextMessageHandler();
             if (mh != null) {
                 if (mh instanceof MessageHandler.Async<?>) {
