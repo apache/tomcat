@@ -42,6 +42,11 @@ public class WsFrame {
     private final WsSession wsSession;
     private final byte[] inputBuffer;
 
+    // Attributes for control messages
+    // Control messages can appear in the middle of other messages so need
+    // separate attributes
+    private final ByteBuffer controlBuffer = ByteBuffer.allocate(125);
+
     // Attributes of the current message
     private final ByteBuffer messageBuffer;
     private boolean continuationExpected = false;
@@ -130,11 +135,18 @@ public class WsFrame {
                     sm.getString("wsFrame.wrongRsv", Integer.valueOf(rsv))));
         }
         opCode = (byte) (b & 0x0F);
-        if (!isControl()) {
+        if (isControl()) {
+            if (!fin) {
+                throw new WsIOException(new CloseReason(
+                        CloseCodes.PROTOCOL_ERROR,
+                        sm.getString("wsFrame.controlFragmented")));
+            }
+        } else {
             if (continuationExpected) {
                 if (opCode != Constants.OPCODE_CONTINUATION) {
-                    // TODO i18n
-                    throw new IllegalStateException();
+                    throw new WsIOException(new CloseReason(
+                            CloseCodes.PROTOCOL_ERROR,
+                            sm.getString("wsFrame.noContinuation")));
                 }
             } else {
                 if (opCode == Constants.OPCODE_BINARY) {
@@ -204,33 +216,31 @@ public class WsFrame {
 
     private boolean processData() throws IOException {
         checkRoomPayload();
-        appendPayloadToMessage();
         if (isControl()) {
+            appendPayloadToMessage(controlBuffer);
             if (writePos < frameStart + headerLength + payloadLength) {
                 return false;
             }
+            controlBuffer.flip();
             if (opCode == Constants.OPCODE_CLOSE) {
-                messageBuffer.flip();
                 String reason = null;
                 int code = CloseCodes.NORMAL_CLOSURE.getCode();
-                if (messageBuffer.remaining() > 1) {
-                    code = messageBuffer.getShort();
-                    if (messageBuffer.remaining() > 0) {
-                         reason = new String(messageBuffer.array(),
-                                messageBuffer.arrayOffset() + messageBuffer.position(),
-                                messageBuffer.remaining(), "UTF8");
+                if (controlBuffer.remaining() > 1) {
+                    code = controlBuffer.getShort();
+                    if (controlBuffer.remaining() > 0) {
+                        reason = new String(controlBuffer.array(),
+                                controlBuffer.arrayOffset() + controlBuffer.position(),
+                                controlBuffer.remaining(), "UTF8");
                     }
                 }
                 wsSession.onClose(
                         new CloseReason(Util.getCloseCode(code), reason));
             } else if (opCode == Constants.OPCODE_PING) {
-                messageBuffer.flip();
-                wsSession.getRemote().sendPong(messageBuffer);
+                wsSession.getRemote().sendPong(controlBuffer);
             } else if (opCode == Constants.OPCODE_PONG) {
                 MessageHandler.Basic<PongMessage> mhPong = wsSession.getPongMessageHandler();
                 if (mhPong != null) {
-                    messageBuffer.flip();
-                    mhPong.onMessage(new WsPongMessage(messageBuffer));
+                    mhPong.onMessage(new WsPongMessage(controlBuffer));
                 }
             } else {
                 throw new WsIOException(new CloseReason(
@@ -238,9 +248,11 @@ public class WsFrame {
                         sm.getString("wsFrame.invalidOpCode",
                                 Integer.valueOf(opCode))));
             }
-            newMessage();
+            controlBuffer.clear();
+            newFrame();
             return true;
         }
+        appendPayloadToMessage(messageBuffer);
         if (payloadWritten == payloadLength) {
             if (continuationExpected) {
                 if (usePartial()) {
@@ -385,7 +397,7 @@ public class WsFrame {
     }
 
 
-    private void appendPayloadToMessage() {
+    private void appendPayloadToMessage(ByteBuffer dest) {
         while (payloadWritten < payloadLength && payloadRead < writePos) {
             byte b = (byte) ((inputBuffer[payloadRead] ^ mask[maskIndex]) & 0xFF);
             maskIndex++;
@@ -394,7 +406,7 @@ public class WsFrame {
             }
             payloadRead++;
             payloadWritten++;
-            messageBuffer.put(b);
+            dest.put(b);
         }
     }
 
