@@ -142,8 +142,10 @@ public class WsFrame {
                 } else if (opCode == Constants.OPCODE_TEXT) {
                     textMessage = true;
                 } else {
-                    // TODO i18n
-                    throw new UnsupportedOperationException();
+                    throw new WsIOException(new CloseReason(
+                            CloseCodes.PROTOCOL_ERROR,
+                            sm.getString("wsFrame.invalidOpCode",
+                                    Integer.valueOf(opCode))));
                 }
             }
             continuationExpected = !fin;
@@ -231,8 +233,10 @@ public class WsFrame {
                     mhPong.onMessage(new WsPongMessage(messageBuffer));
                 }
             } else {
-                // TODO i18n
-                throw new UnsupportedOperationException();
+                throw new WsIOException(new CloseReason(
+                        CloseCodes.PROTOCOL_ERROR,
+                        sm.getString("wsFrame.invalidOpCode",
+                                Integer.valueOf(opCode))));
             }
             newMessage();
             return true;
