@@ -66,8 +66,12 @@ public class WsFrame {
     public WsFrame(ServletInputStream sis, WsSession wsSession) {
         this.sis = sis;
         this.wsSession = wsSession;
-        inputBuffer = new byte[8192];
-        messageBuffer = ByteBuffer.allocate(8192);
+
+        int readBufferSize =
+                ServerContainerImpl.getServerContainer().getReadBufferSize();
+
+        inputBuffer = new byte[readBufferSize];
+        messageBuffer = ByteBuffer.allocate(readBufferSize);
     }
 
 

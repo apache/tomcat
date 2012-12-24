@@ -16,6 +16,7 @@
  */
 package websocket.echo;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
@@ -30,12 +31,19 @@ public class WsConfigListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
-        sc.setServletContext(sce.getServletContext());
+        ServletContext servletContext = sce.getServletContext();
+        sc.setServletContext(servletContext);
         try {
             sc.publishServer(EchoEndpoint.class, "/websocket/echoProgrammatic",
                     DefaultServerConfiguration.class);
         } catch (DeploymentException e) {
             throw new IllegalStateException(e);
+        }
+
+        String strReadBufferSize =
+                servletContext.getInitParameter("wsReadBufferSize");
+        if (strReadBufferSize != null) {
+            sc.setReadBufferSize(Integer.valueOf(strReadBufferSize).intValue());
         }
     }
 

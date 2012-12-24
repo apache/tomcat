@@ -62,6 +62,7 @@ public class ServerContainerImpl extends WebSocketContainerImpl {
     private Map<String,ServerEndpointConfiguration> configMap = new ConcurrentHashMap<>();
     private Map<String,Class<?>> pojoMap = new ConcurrentHashMap<>();
     private Map<Class<?>,PojoMethodMapping> pojoMethodMap = new ConcurrentHashMap<>();
+    private volatile int readBufferSize = 8192;
 
 
     private ServerContainerImpl() {
@@ -164,5 +165,17 @@ public class ServerContainerImpl extends WebSocketContainerImpl {
         }
         throw new IllegalStateException(sm.getString(
                 "serverContainer.missingEndpoint", servletPath));
+    }
+
+
+
+    public int getReadBufferSize() {
+        return readBufferSize;
+    }
+
+
+
+    public void setReadBufferSize(int readBufferSize) {
+        this.readBufferSize = readBufferSize;
     }
 }
