@@ -18,8 +18,9 @@ package org.apache.tomcat.websocket;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CoderResult;
 
 import javax.servlet.ServletInputStream;
 import javax.websocket.CloseReason;
@@ -49,7 +50,9 @@ public class WsFrame {
     private final ByteBuffer controlBuffer = ByteBuffer.allocate(125);
 
     // Attributes of the current message
-    private final ByteBuffer messageBuffer;
+    private final ByteBuffer messageBufferBinary;
+    private final CharBuffer messageBufferText;
+    private final Utf8Decoder utf8Decoder = new Utf8Decoder();
     private boolean continuationExpected = false;
     private boolean textMessage = false;
 
@@ -77,7 +80,8 @@ public class WsFrame {
                 ServerContainerImpl.getServerContainer().getReadBufferSize();
 
         inputBuffer = new byte[readBufferSize];
-        messageBuffer = ByteBuffer.allocate(readBufferSize);
+        messageBufferBinary = ByteBuffer.allocate(readBufferSize);
+        messageBufferText = CharBuffer.allocate(readBufferSize);
     }
 
 
@@ -253,27 +257,28 @@ public class WsFrame {
             newFrame();
             return true;
         }
-        appendPayloadToMessage(messageBuffer);
+        appendPayloadToMessage(messageBufferBinary);
+
         if (payloadWritten == payloadLength) {
             if (continuationExpected) {
                 if (usePartial()) {
-                    messageBuffer.flip();
+                    messageBufferBinary.flip();
                     sendMessage(false);
-                    messageBuffer.clear();
+                    messageBufferBinary.clear();
                 }
                 newFrame();
                 return true;
             } else {
-                messageBuffer.flip();
+                messageBufferBinary.flip();
                 sendMessage(true);
                 newMessage();
                 return true;
             }
         } else {
             if (usePartial()) {
-                messageBuffer.flip();
+                messageBufferBinary.flip();
                 sendMessage(false);
-                messageBuffer.clear();
+                messageBufferBinary.clear();
             }
             return false;
         }
@@ -281,32 +286,36 @@ public class WsFrame {
 
 
     @SuppressWarnings("unchecked")
-    private void sendMessage(boolean last) {
+    private void sendMessage(boolean last) throws IOException {
         if (textMessage) {
-            String payload = null;
-            try {
-                payload = new String(messageBuffer.array(), 0,
-                        messageBuffer.limit(), "UTF8");
-            } catch (UnsupportedEncodingException e) {
-                // All JVMs must support UTF8
-            }
             MessageHandler mh = wsSession.getTextMessageHandler();
             if (mh != null) {
-                if (mh instanceof MessageHandler.Async<?>) {
-                    ((MessageHandler.Async<String>) mh).onMessage(payload, last);
-                } else {
-                    ((MessageHandler.Basic<String>) mh).onMessage(payload);
+                CoderResult cr = utf8Decoder.decode(
+                        messageBufferBinary, messageBufferText, last);
+                if (cr.isError()) {
+                    throw new WsIOException(new CloseReason(
+                            CloseCodes.NOT_CONSISTENT,
+                            sm.getString("wsFrame.invalidUtf8")));
                 }
+                messageBufferText.flip();
+                if (mh instanceof MessageHandler.Async<?>) {
+                    ((MessageHandler.Async<String>) mh).onMessage(
+                            messageBufferText.toString(), last);
+                } else {
+                    ((MessageHandler.Basic<String>) mh).onMessage(
+                            messageBufferText.toString());
+                }
+                messageBufferText.clear();
             }
         } else {
             MessageHandler mh = wsSession.getBinaryMessageHandler();
             if (mh != null) {
                 if (mh instanceof MessageHandler.Async<?>) {
                     ((MessageHandler.Async<ByteBuffer>) mh).onMessage(
-                            messageBuffer, last);
+                            messageBufferBinary, last);
                 } else {
                     ((MessageHandler.Basic<ByteBuffer>) mh).onMessage(
-                            messageBuffer);
+                            messageBufferBinary);
                 }
             }
         }
@@ -314,7 +323,9 @@ public class WsFrame {
 
 
     private void newMessage() {
-        messageBuffer.clear();
+        messageBufferBinary.clear();
+        messageBufferText.clear();
+        utf8Decoder.reset();
         continuationExpected = false;
         newFrame();
     }
