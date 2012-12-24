@@ -581,7 +581,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
         public SocketState process(SocketWrapper<S> socket,
                 SocketStatus status) {
-            Processor<S> processor = connections.remove(socket.getSocket());
+            Processor<S> processor = connections.get(socket.getSocket());
 
             if (status == SocketStatus.DISCONNECT && processor == null) {
                 //nothing more to be done endpoint requested a close
@@ -645,22 +645,27 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     // In the middle of processing a request/response. Keep the
                     // socket associated with the processor. Exact requirements
                     // depend on type of long poll
+                    connections.put(socket.getSocket(), processor);
                     longPoll(socket, processor);
                 } else if (state == SocketState.OPEN) {
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
+                    connections.remove(processor);
                     release(socket, processor, false, true);
                 } else if (state == SocketState.SENDFILE) {
                     // Sendfile in progress. If it fails, the socket will be
                     // closed. If it works, the socket will be re-added to the
                     // poller
+                    connections.remove(processor);
                     release(socket, processor, false, false);
                 } else if (state == SocketState.UPGRADED) {
                     // Need to keep the connection associated with the processor
+                    connections.put(socket.getSocket(), processor);
                     longPoll(socket, processor);
                 } else {
                     // Connection closed. OK to recycle the processor. Upgrade
                     // processors are not recycled.
+                    connections.remove(processor);
                     if (!processor.isUpgrade()) {
                         release(socket, processor, true, false);
                     }

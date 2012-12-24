@@ -288,7 +288,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         @Override
         protected void longPoll(SocketWrapper<Long> socket,
                 Processor<Long> processor) {
-            connections.put(socket.getSocket(), processor);
 
             if (processor.isAsync()) {
                 // Async
