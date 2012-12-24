@@ -632,6 +632,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                         // Create the light-weight upgrade processor
                         processor = createUpgradeProcessor(
                                 socket, httpUpgradeHandler);
+                        socket.setUpgraded(true);
                     }
                     if (getLog().isDebugEnabled()) {
                         getLog().debug("Socket: [" + socket +

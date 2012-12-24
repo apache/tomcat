@@ -27,6 +27,7 @@ public class SocketWrapper<E> {
     protected volatile int keepAliveLeft = 100;
     protected boolean async = false;
     protected boolean keptAlive = false;
+    private boolean upgraded = false;
     /*
      * Following cached for speed / reduced GC
      */
@@ -48,6 +49,8 @@ public class SocketWrapper<E> {
 
     public boolean isAsync() { return async; }
     public void setAsync(boolean async) { this.async = async; }
+    public boolean isUpgraded() { return upgraded; }
+    public void setUpgraded(boolean upgraded) { this.upgraded = upgraded; }
     public long getLastAccess() { return lastAccess; }
     public void access() { access(System.currentTimeMillis()); }
     public void access(long access) { lastAccess = access; }
