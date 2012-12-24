@@ -17,6 +17,7 @@
 package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 
 import org.apache.tomcat.util.net.NioChannel;
@@ -94,6 +95,9 @@ public class NioServletOutputStream extends AbstractServletOutputStream {
             if (selector != null) {
                 pool.put(selector);
             }
+        }
+        if (written < len) {
+            channel.getPoller().add(channel, SelectionKey.OP_WRITE);
         }
         return written;
     }
