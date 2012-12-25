@@ -30,19 +30,19 @@ import org.apache.tomcat.util.buf.B2CConverter;
 public class TestUtf8 {
 
     // Invalid UTF-8
-    private static final byte[] SRC_BYTES =
+    private static final byte[] SRC_BYTES_1 =
             new byte[] {-50, -70, -31,  -67, -71, -49, -125, -50, -68, -50,
                         -75, -19, -96, -128, 101, 100,  105, 116, 101, 100};
 
 
     @Test
-    public void testDecoder() throws Exception {
+    public void testJvmDecoder1() throws Exception {
         CharsetDecoder decoder = B2CConverter.UTF_8.newDecoder()
                 .onMalformedInput(CodingErrorAction.REPORT)
                 .onUnmappableCharacter(CodingErrorAction.REPORT);
 
 
-        ByteBuffer bb = ByteBuffer.wrap(SRC_BYTES);
+        ByteBuffer bb = ByteBuffer.wrap(SRC_BYTES_1);
         CharBuffer cb = CharBuffer.allocate(bb.limit());
 
         CoderResult cr = decoder.decode(bb, cb, true);
@@ -56,11 +56,11 @@ public class TestUtf8 {
     }
 
     @Test
-    public void testDecoder2() throws Exception {
+    public void testHarmonyDecoder1() throws Exception {
 
         CharsetDecoder decoder = new Utf8Decoder();
 
-        ByteBuffer bb = ByteBuffer.wrap(SRC_BYTES);
+        ByteBuffer bb = ByteBuffer.wrap(SRC_BYTES_1);
         CharBuffer cb = CharBuffer.allocate(bb.limit());
 
         CoderResult cr = decoder.decode(bb, cb, true);
