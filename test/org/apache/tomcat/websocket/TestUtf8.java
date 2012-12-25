@@ -36,36 +36,44 @@ public class TestUtf8 {
 
 
     @Test
-    public void testJvmDecoder1() throws Exception {
+    public void testJvmDecoder1() {
+        // This should trigger an error but currently passes. Once the JVM is#
+        // fixed, s/false/true/
+        doJvmDecoder(SRC_BYTES_1, false);
+    }
+
+
+    private void doJvmDecoder(byte[] src, boolean errorExpected) {
         CharsetDecoder decoder = B2CConverter.UTF_8.newDecoder()
                 .onMalformedInput(CodingErrorAction.REPORT)
                 .onUnmappableCharacter(CodingErrorAction.REPORT);
 
 
-        ByteBuffer bb = ByteBuffer.wrap(SRC_BYTES_1);
+        ByteBuffer bb = ByteBuffer.wrap(src);
         CharBuffer cb = CharBuffer.allocate(bb.limit());
 
         CoderResult cr = decoder.decode(bb, cb, true);
-        // if (!cr.isError()) {
-        if (cr.isError()) {
-            // This should fail but currently passes. Once this test fails, the
-            // JVM has been fixed and the commented out if statement above can
-            // be used.
+        if (cr.isError() != errorExpected) {
             fail();
         }
     }
 
-    @Test
-    public void testHarmonyDecoder1() throws Exception {
 
+    @Test
+    public void testHarmonyDecoder1() {
+        doHarmonyDecoder(SRC_BYTES_1, true);
+    }
+
+
+    public void doHarmonyDecoder(byte[] src, boolean errorExpected) {
         CharsetDecoder decoder = new Utf8Decoder();
 
-        ByteBuffer bb = ByteBuffer.wrap(SRC_BYTES_1);
+        ByteBuffer bb = ByteBuffer.wrap(src);
         CharBuffer cb = CharBuffer.allocate(bb.limit());
 
         CoderResult cr = decoder.decode(bb, cb, true);
         // Confirm the custom decoder correctly reports an error
-        if (!cr.isError()) {
+        if (cr.isError() != errorExpected) {
             fail();
         }
     }
