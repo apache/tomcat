@@ -25,7 +25,6 @@ import java.nio.charset.CodingErrorAction;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
-import org.apache.catalina.websocket.Utf8Decoder;
 import org.apache.tomcat.util.buf.B2CConverter;
 
 public class TestUtf8 {
