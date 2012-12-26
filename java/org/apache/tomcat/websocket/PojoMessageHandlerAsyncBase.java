@@ -55,7 +55,7 @@ public abstract class PojoMessageHandlerAsyncBase<T>
         try {
             result = method.invoke(pojo, parameters);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(e);
         }
         processResult(result);
     }
