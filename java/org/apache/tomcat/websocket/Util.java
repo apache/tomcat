@@ -57,6 +57,9 @@ class Util {
 
 
     static CloseCode getCloseCode(int code) {
+        if (code > 2999 && code < 5000) {
+            return CloseCodes.NORMAL_CLOSURE;
+        }
         switch (code) {
             case 1000:
                 return CloseCodes.NORMAL_CLOSURE;
@@ -67,11 +70,17 @@ class Util {
             case 1003:
                 return CloseCodes.CANNOT_ACCEPT;
             case 1004:
-                return CloseCodes.RESERVED;
+                // Should not be used in a close frame
+                // return CloseCodes.RESERVED;
+                return CloseCodes.PROTOCOL_ERROR;
             case 1005:
-                return CloseCodes.NO_STATUS_CODE;
+                // Should not be used in a close frame
+                // return CloseCodes.NO_STATUS_CODE;
+                return CloseCodes.PROTOCOL_ERROR;
             case 1006:
-                return CloseCodes.CLOSED_ABNORMALLY;
+                // Should not be used in a close frame
+                // return CloseCodes.CLOSED_ABNORMALLY;
+                return CloseCodes.PROTOCOL_ERROR;
             case 1007:
                 return CloseCodes.NOT_CONSISTENT;
             case 1008:
@@ -83,11 +92,17 @@ class Util {
             case 1011:
                 return CloseCodes.UNEXPECTED_CONDITION;
             case 1012:
-                return CloseCodes.SERVICE_RESTART;
+                // Not in RFC6455
+                // return CloseCodes.SERVICE_RESTART;
+                return CloseCodes.PROTOCOL_ERROR;
             case 1013:
-                return CloseCodes.TRY_AGAIN_LATER;
+                // Not in RFC6455
+                // return CloseCodes.TRY_AGAIN_LATER;
+                return CloseCodes.PROTOCOL_ERROR;
             case 1015:
-                return CloseCodes.TLS_HANDSHAKE_FAILURE;
+                // Should not be used in a close frame
+                // return CloseCodes.TLS_HANDSHAKE_FAILURE;
+                return CloseCodes.PROTOCOL_ERROR;
             default:
                 return CloseCodes.PROTOCOL_ERROR;
         }

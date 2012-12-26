@@ -49,12 +49,16 @@ public class WsFrame {
     // Attributes for control messages
     // Control messages can appear in the middle of other messages so need
     // separate attributes
-    private final ByteBuffer controlBuffer = ByteBuffer.allocate(125);
+    private final ByteBuffer controlBufferBinary = ByteBuffer.allocate(125);
+    private final CharBuffer controlBufferText = CharBuffer.allocate(125);
 
     // Attributes of the current message
     private final ByteBuffer messageBufferBinary;
     private final CharBuffer messageBufferText;
-    private final CharsetDecoder utf8Decoder = new Utf8Decoder().
+    private final CharsetDecoder utf8DecoderControl = new Utf8Decoder().
+            onMalformedInput(CodingErrorAction.REPORT).
+            onUnmappableCharacter(CodingErrorAction.REPORT);
+    private final CharsetDecoder utf8DecoderMessage = new Utf8Decoder().
             onMalformedInput(CodingErrorAction.REPORT).
             onUnmappableCharacter(CodingErrorAction.REPORT);
     private boolean continuationExpected = false;
@@ -246,7 +250,7 @@ public class WsFrame {
             messageBufferBinary.flip();
             boolean last = false;
             while (true) {
-                CoderResult cr = utf8Decoder.decode(
+                CoderResult cr = utf8DecoderMessage.decode(
                         messageBufferBinary, messageBufferText, last);
                 if (cr.isError()) {
                     throw new WsIOException(new CloseReason(
@@ -314,40 +318,58 @@ public class WsFrame {
 
 
     private boolean processDataControl() throws IOException {
-        appendPayloadToMessage(controlBuffer);
+        appendPayloadToMessage(controlBufferBinary);
         if (writePos < frameStart + headerLength + payloadLength) {
             return false;
         }
-        controlBuffer.flip();
+        controlBufferBinary.flip();
         if (opCode == Constants.OPCODE_CLOSE) {
             String reason = null;
             int code = CloseCodes.NORMAL_CLOSURE.getCode();
-            if (controlBuffer.remaining() > 1) {
-                code = controlBuffer.getShort();
-                if (controlBuffer.remaining() > 0) {
-                    reason = new String(controlBuffer.array(),
-                            controlBuffer.arrayOffset() + controlBuffer.position(),
-                            controlBuffer.remaining(), "UTF8");
+            if (controlBufferBinary.remaining() == 1) {
+                controlBufferBinary.clear();
+                // Payload must be zero or greater than 2
+                throw new WsIOException(new CloseReason(
+                        CloseCodes.PROTOCOL_ERROR,
+                        sm.getString("wsFrame.oneByteCloseCode")));
+            }
+            if (controlBufferBinary.remaining() > 1) {
+                code = controlBufferBinary.getShort();
+                if (controlBufferBinary.remaining() > 0) {
+                    CoderResult cr = utf8DecoderControl.decode(
+                            controlBufferBinary, controlBufferText, true);
+                    if (cr.isError()) {
+                        controlBufferBinary.clear();
+                        controlBufferText.clear();
+                        throw new WsIOException(new CloseReason(
+                                CloseCodes.PROTOCOL_ERROR,
+                                sm.getString("wsFrame.invalidUtf8Close")));
+                    }
+                    reason = new String(controlBufferBinary.array(),
+                            controlBufferBinary.arrayOffset() +
+                                    controlBufferBinary.position(),
+                            controlBufferBinary.remaining(), "UTF8");
                 }
             }
             wsSession.onClose(
                     new CloseReason(Util.getCloseCode(code), reason));
         } else if (opCode == Constants.OPCODE_PING) {
-            wsSession.getRemote().sendPong(controlBuffer);
+            wsSession.getRemote().sendPong(controlBufferBinary);
         } else if (opCode == Constants.OPCODE_PONG) {
             MessageHandler.Basic<PongMessage> mhPong =
                     wsSession.getPongMessageHandler();
             if (mhPong != null) {
-                mhPong.onMessage(new WsPongMessage(controlBuffer));
+                mhPong.onMessage(new WsPongMessage(controlBufferBinary));
             }
         } else {
             // Should have caught this earlier but just in case...
+            controlBufferBinary.clear();
             throw new WsIOException(new CloseReason(
                     CloseCodes.PROTOCOL_ERROR,
                     sm.getString("wsFrame.invalidOpCode",
                             Integer.valueOf(opCode))));
         }
-        controlBuffer.clear();
+        controlBufferBinary.clear();
         newFrame();
         return true;
     }
@@ -386,7 +408,7 @@ public class WsFrame {
     private void newMessage() {
         messageBufferBinary.clear();
         messageBufferText.clear();
-        utf8Decoder.reset();
+        utf8DecoderMessage.reset();
         continuationExpected = false;
         newFrame();
     }
