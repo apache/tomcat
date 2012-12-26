@@ -478,20 +478,20 @@ public class WsFrame {
 
 
     private boolean usePartial() {
-        if (opCode == Constants.OPCODE_BINARY) {
-            MessageHandler mh = wsSession.getBinaryMessageHandler();
-            if (mh != null) {
-                return mh instanceof MessageHandler.Async<?>;
-            }
+        if (isControl()) {
             return false;
-        } else if (opCode == Constants.OPCODE_TEXT) {
+        } else if (textMessage) {
             MessageHandler mh = wsSession.getTextMessageHandler();
             if (mh != null) {
                 return mh instanceof MessageHandler.Async<?>;
             }
             return false;
         } else {
-            // All other OpCodes require the full payload to be present
+            // Must be binary
+            MessageHandler mh = wsSession.getBinaryMessageHandler();
+            if (mh != null) {
+                return mh instanceof MessageHandler.Async<?>;
+            }
             return false;
         }
     }
