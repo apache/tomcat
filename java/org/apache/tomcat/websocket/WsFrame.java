@@ -20,7 +20,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
+import java.nio.charset.CodingErrorAction;
 
 import javax.servlet.ServletInputStream;
 import javax.websocket.CloseReason;
@@ -52,7 +54,9 @@ public class WsFrame {
     // Attributes of the current message
     private final ByteBuffer messageBufferBinary;
     private final CharBuffer messageBufferText;
-    private final Utf8Decoder utf8Decoder = new Utf8Decoder();
+    private final CharsetDecoder utf8Decoder = new Utf8Decoder().
+            onMalformedInput(CodingErrorAction.REPORT).
+            onUnmappableCharacter(CodingErrorAction.REPORT);
     private boolean continuationExpected = false;
     private boolean textMessage = false;
 
@@ -146,6 +150,14 @@ public class WsFrame {
                         CloseCodes.PROTOCOL_ERROR,
                         sm.getString("wsFrame.controlFragmented")));
             }
+            if (opCode != Constants.OPCODE_PING &&
+                    opCode != Constants.OPCODE_PONG &&
+                    opCode != Constants.OPCODE_CLOSE) {
+                throw new WsIOException(new CloseReason(
+                        CloseCodes.PROTOCOL_ERROR,
+                        sm.getString("wsFrame.invalidOpCode",
+                                Integer.valueOf(opCode))));
+            }
         } else {
             if (continuationExpected) {
                 if (opCode != Constants.OPCODE_CONTINUATION) {
@@ -222,105 +234,154 @@ public class WsFrame {
     private boolean processData() throws IOException {
         checkRoomPayload();
         if (isControl()) {
-            appendPayloadToMessage(controlBuffer);
-            if (writePos < frameStart + headerLength + payloadLength) {
-                return false;
-            }
-            controlBuffer.flip();
-            if (opCode == Constants.OPCODE_CLOSE) {
-                String reason = null;
-                int code = CloseCodes.NORMAL_CLOSURE.getCode();
-                if (controlBuffer.remaining() > 1) {
-                    code = controlBuffer.getShort();
-                    if (controlBuffer.remaining() > 0) {
-                        reason = new String(controlBuffer.array(),
-                                controlBuffer.arrayOffset() + controlBuffer.position(),
-                                controlBuffer.remaining(), "UTF8");
-                    }
-                }
-                wsSession.onClose(
-                        new CloseReason(Util.getCloseCode(code), reason));
-            } else if (opCode == Constants.OPCODE_PING) {
-                wsSession.getRemote().sendPong(controlBuffer);
-            } else if (opCode == Constants.OPCODE_PONG) {
-                MessageHandler.Basic<PongMessage> mhPong = wsSession.getPongMessageHandler();
-                if (mhPong != null) {
-                    mhPong.onMessage(new WsPongMessage(controlBuffer));
-                }
-            } else {
-                throw new WsIOException(new CloseReason(
-                        CloseCodes.PROTOCOL_ERROR,
-                        sm.getString("wsFrame.invalidOpCode",
-                                Integer.valueOf(opCode))));
-            }
-            controlBuffer.clear();
-            newFrame();
-            return true;
+            return processDataControl();
         }
+
+        // Unmask data
         appendPayloadToMessage(messageBufferBinary);
 
-        if (payloadWritten == payloadLength) {
-            if (continuationExpected) {
-                if (usePartial()) {
-                    messageBufferBinary.flip();
-                    sendMessage(false);
-                    messageBufferBinary.clear();
-                }
-                newFrame();
-                return true;
-            } else {
-                messageBufferBinary.flip();
-                sendMessage(true);
-                newMessage();
-                return true;
-            }
-        } else {
-            if (usePartial()) {
-                messageBufferBinary.flip();
-                sendMessage(false);
-                messageBufferBinary.clear();
-            }
-            return false;
-        }
-    }
-
-
-    @SuppressWarnings("unchecked")
-    private void sendMessage(boolean last) throws IOException {
         if (textMessage) {
-            MessageHandler mh = wsSession.getTextMessageHandler();
-            if (mh != null) {
+            // Convert the bytes to text as early as possible to catch any
+            // conversion issues
+            messageBufferBinary.flip();
+            boolean last = false;
+            while (true) {
                 CoderResult cr = utf8Decoder.decode(
                         messageBufferBinary, messageBufferText, last);
                 if (cr.isError()) {
                     throw new WsIOException(new CloseReason(
                             CloseCodes.NOT_CONSISTENT,
                             sm.getString("wsFrame.invalidUtf8")));
-                }
-                messageBufferText.flip();
-                if (mh instanceof MessageHandler.Async<?>) {
-                    ((MessageHandler.Async<String>) mh).onMessage(
-                            messageBufferText.toString(), last);
+                } else if (cr.isOverflow()) {
+                    if (usePartial()) {
+                        messageBufferText.flip();
+                        sendMessageText(false);
+                        messageBufferText.clear();
+                    } else {
+                        throw new WsIOException(new CloseReason(
+                                CloseCodes.TOO_BIG,
+                                sm.getString("wsFrame.textMessageTooBig")));
+                    }
+                } else if (cr.isUnderflow() && !last) {
+                    // Need more data
+                    messageBufferBinary.compact();
+                    if (payloadWritten == payloadLength) {
+                        if (continuationExpected) {
+                            newFrame();
+                            return true;
+                        } else {
+                            messageBufferBinary.flip();
+                            last = true;
+                        }
+                    } else {
+                        return false;
+                    }
                 } else {
-                    ((MessageHandler.Basic<String>) mh).onMessage(
-                            messageBufferText.toString());
+                    // End of input
+                    messageBufferText.flip();
+                    sendMessageText(true);
+                    messageBufferText.clear();
+                    newMessage();
+                    return true;
                 }
-                messageBufferText.clear();
             }
         } else {
-            MessageHandler mh = wsSession.getBinaryMessageHandler();
-            if (mh != null) {
-                if (mh instanceof MessageHandler.Async<?>) {
-                    ((MessageHandler.Async<ByteBuffer>) mh).onMessage(
-                            messageBufferBinary, last);
+            if (payloadWritten == payloadLength) {
+                if (continuationExpected) {
+                    if (usePartial()) {
+                        messageBufferBinary.flip();
+                        sendMessageBinary(false);
+                        messageBufferBinary.clear();
+                    }
+                    newFrame();
+                    return true;
                 } else {
-                    ((MessageHandler.Basic<ByteBuffer>) mh).onMessage(
-                            messageBufferBinary);
+                    messageBufferBinary.flip();
+                    sendMessageBinary(true);
+                    newMessage();
+                    return true;
                 }
+            } else {
+                if (usePartial()) {
+                    messageBufferBinary.flip();
+                    sendMessageBinary(false);
+                    messageBufferBinary.clear();
+                }
+                return false;
             }
         }
     }
 
+
+    private boolean processDataControl() throws IOException {
+        appendPayloadToMessage(controlBuffer);
+        if (writePos < frameStart + headerLength + payloadLength) {
+            return false;
+        }
+        controlBuffer.flip();
+        if (opCode == Constants.OPCODE_CLOSE) {
+            String reason = null;
+            int code = CloseCodes.NORMAL_CLOSURE.getCode();
+            if (controlBuffer.remaining() > 1) {
+                code = controlBuffer.getShort();
+                if (controlBuffer.remaining() > 0) {
+                    reason = new String(controlBuffer.array(),
+                            controlBuffer.arrayOffset() + controlBuffer.position(),
+                            controlBuffer.remaining(), "UTF8");
+                }
+            }
+            wsSession.onClose(
+                    new CloseReason(Util.getCloseCode(code), reason));
+        } else if (opCode == Constants.OPCODE_PING) {
+            wsSession.getRemote().sendPong(controlBuffer);
+        } else if (opCode == Constants.OPCODE_PONG) {
+            MessageHandler.Basic<PongMessage> mhPong =
+                    wsSession.getPongMessageHandler();
+            if (mhPong != null) {
+                mhPong.onMessage(new WsPongMessage(controlBuffer));
+            }
+        } else {
+            // Should have caught this earlier but just in case...
+            throw new WsIOException(new CloseReason(
+                    CloseCodes.PROTOCOL_ERROR,
+                    sm.getString("wsFrame.invalidOpCode",
+                            Integer.valueOf(opCode))));
+        }
+        controlBuffer.clear();
+        newFrame();
+        return true;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private void sendMessageText(boolean last) {
+        MessageHandler mh = wsSession.getTextMessageHandler();
+        if (mh != null) {
+            if (mh instanceof MessageHandler.Async<?>) {
+                ((MessageHandler.Async<String>) mh).onMessage(
+                        messageBufferText.toString(), last);
+            } else {
+                ((MessageHandler.Basic<String>) mh).onMessage(
+                        messageBufferText.toString());
+            }
+            messageBufferText.clear();
+        }
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private void sendMessageBinary(boolean last) {
+        MessageHandler mh = wsSession.getBinaryMessageHandler();
+        if (mh != null) {
+            if (mh instanceof MessageHandler.Async<?>) {
+                ((MessageHandler.Async<ByteBuffer>) mh).onMessage(
+                        messageBufferBinary, last);
+            } else {
+                ((MessageHandler.Basic<ByteBuffer>) mh).onMessage(
+                        messageBufferBinary);
+            }
+        }
+    }
 
     private void newMessage() {
         messageBufferBinary.clear();
