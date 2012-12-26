@@ -383,16 +383,16 @@ public class PojoMethodMapping {
                 // ASync
                 if (indexString != -1) {
                     mh = new PojoMessageHandlerAsyncString(pojo, m, session,
-                            params, indexString, false, indexSession,
-                            indexBoolean);
+                            params, indexString, false, indexBoolean,
+                            indexSession);
                 } else if (indexByteArray != -1) {
                     mh = new PojoMessageHandlerAsyncBinary(pojo, m, session,
-                            params, indexByteArray, true, indexSession,
-                            indexBoolean);
+                            params, indexByteArray, true, indexBoolean,
+                            indexSession);
                 } else {
                     mh = new PojoMessageHandlerAsyncBinary(pojo, m, session,
-                            params, indexByteBuffer, false, indexSession,
-                            indexBoolean);
+                            params, indexByteBuffer, false, indexBoolean,
+                            indexSession);
                 }
             }
             return mh;
