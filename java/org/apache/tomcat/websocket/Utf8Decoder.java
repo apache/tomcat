@@ -114,6 +114,10 @@ public class Utf8Decoder extends CharsetDecoder {
                     }
                     pos += tail;
                 }
+                // Note: This is the additional test added
+                if ((jchar >= 0xD800 && jchar <= 0xDFFF) || jchar > 0x10FFFF) {
+                    return CoderResult.unmappableForLength(3);
+                }
                 if (jchar <= 0xffff) {
                     out.put((char) jchar);
                     outRemaining--;
@@ -177,7 +181,7 @@ public class Utf8Decoder extends CharsetDecoder {
                 inIndex += tail;
             }
             // Note: This is the additional test added
-            if (jchar >= 0xD800 && jchar <= 0xDFFF) {
+            if ((jchar >= 0xD800 && jchar <= 0xDFFF) || jchar > 0x10FFFF) {
                 return CoderResult.unmappableForLength(3);
             }
             if (jchar <= 0xffff) {

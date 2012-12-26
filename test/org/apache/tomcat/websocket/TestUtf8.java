@@ -22,7 +22,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import org.apache.tomcat.util.buf.B2CConverter;
@@ -34,47 +34,88 @@ public class TestUtf8 {
             new byte[] {-50, -70, -31,  -67, -71, -49, -125, -50, -68, -50,
                         -75, -19, -96, -128, 101, 100,  105, 116, 101, 100};
 
+    // Invalid code point (out of range)
+    private static final byte[] SRC_BYTES_2 =
+            new byte[] {-12, -112, -128, -128};
 
     @Test
     public void testJvmDecoder1() {
-        // This should trigger an error but currently passes. Once the JVM is#
-        // fixed, s/false/true/
-        doJvmDecoder(SRC_BYTES_1, false);
+        // This should trigger an error but currently passes. Once the JVM is
+        // fixed, s/false/true/ and s/20/13/
+        doJvmDecoder(SRC_BYTES_1, false, 20);
     }
 
 
-    private void doJvmDecoder(byte[] src, boolean errorExpected) {
+    @Test
+    public void testJvmDecoder2() {
+        // Ideally should fail after 2 bytes (i==1)
+        doJvmDecoder(SRC_BYTES_2, true, 3);
+    }
+
+
+    private void doJvmDecoder(byte[] src, boolean errorExpected,
+            int failPosExpected) {
         CharsetDecoder decoder = B2CConverter.UTF_8.newDecoder()
                 .onMalformedInput(CodingErrorAction.REPORT)
                 .onUnmappableCharacter(CodingErrorAction.REPORT);
 
 
-        ByteBuffer bb = ByteBuffer.wrap(src);
+        ByteBuffer bb = ByteBuffer.allocate(src.length);
         CharBuffer cb = CharBuffer.allocate(bb.limit());
 
-        CoderResult cr = decoder.decode(bb, cb, true);
-        if (cr.isError() != errorExpected) {
-            fail();
+        boolean error = false;
+        int i = 0;
+        for (; i < src.length; i++) {
+            bb.put(src[i]);
+            bb.flip();
+            CoderResult cr = decoder.decode(bb, cb, false);
+            if (cr.isError()) {
+                error = true;
+                break;
+            }
+            bb.compact();
         }
+
+        assertEquals(Boolean.valueOf(errorExpected), Boolean.valueOf(error));
+        assertEquals(failPosExpected, i);
     }
 
 
     @Test
     public void testHarmonyDecoder1() {
-        doHarmonyDecoder(SRC_BYTES_1, true);
+        doHarmonyDecoder(SRC_BYTES_1, true, 13);
     }
 
 
-    public void doHarmonyDecoder(byte[] src, boolean errorExpected) {
+    @Test
+    public void testHarmonyDecoder2() {
+        // Ideally should fail after 2 bytes (i==1) but that makes the decoder
+        // a lot more complex to write
+        doHarmonyDecoder(SRC_BYTES_2, true, 3);
+    }
+
+
+    public void doHarmonyDecoder(byte[] src, boolean errorExpected,
+            int failPosExpected) {
         CharsetDecoder decoder = new Utf8Decoder();
 
-        ByteBuffer bb = ByteBuffer.wrap(src);
+        ByteBuffer bb = ByteBuffer.allocate(src.length);
         CharBuffer cb = CharBuffer.allocate(bb.limit());
 
-        CoderResult cr = decoder.decode(bb, cb, true);
-        // Confirm the custom decoder correctly reports an error
-        if (cr.isError() != errorExpected) {
-            fail();
+        boolean error = false;
+        int i = 0;
+        for (; i < src.length; i++) {
+            bb.put(src[i]);
+            bb.flip();
+            CoderResult cr = decoder.decode(bb, cb, false);
+            if (cr.isError()) {
+                error = true;
+                break;
+            }
+            bb.compact();
         }
+
+        assertEquals(Boolean.valueOf(errorExpected), Boolean.valueOf(error));
+        assertEquals(failPosExpected, i);
     }
 }
