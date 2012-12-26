@@ -100,7 +100,7 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
         }
         sendMessage(Constants.OPCODE_TEXT, textToByte, first, isLast);
         if (!isLast) {
-            isText = Boolean.FALSE;
+            isText = Boolean.TRUE;
         }
     }
 
