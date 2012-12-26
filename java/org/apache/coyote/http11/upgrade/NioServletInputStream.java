@@ -83,7 +83,6 @@ public class NioServletInputStream extends AbstractServletInputStream {
         // that was just read
         if (nRead > 0) {
             readBuffer.flip();
-            readBuffer.limit(nRead);
             if (nRead > leftToWrite) {
                 readBuffer.get(b, newOffset, leftToWrite);
                 leftToWrite = 0;
