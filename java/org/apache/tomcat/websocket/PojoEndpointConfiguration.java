@@ -18,19 +18,18 @@ package org.apache.tomcat.websocket;
 
 import javax.websocket.server.DefaultServerConfiguration;
 
-public class PojoEndpointConfiguration extends
-        DefaultServerConfiguration {
+/**
+ * Provides the configuration for POJOs annotated at WebSocket endpoints. It
+ * provides the means, via casting, of new {@link WsEndpointPojo} instances
+ * obtaining POJO endpoint specific configuration settings such as the mapping
+ * of onXxx calls to POJO methods.
+ */
+public class PojoEndpointConfiguration extends DefaultServerConfiguration {
 
     private final Class<?> pojoClass;
     private final PojoMethodMapping methodMapping;
     private final String servletPath;
     private final String pathInfo;
-
-    @Override
-    public boolean checkOrigin(String originHeaderValue) {
-        // Allow all
-        return true;
-    }
 
 
     PojoEndpointConfiguration(Class<?> pojoClass,
@@ -45,16 +44,22 @@ public class PojoEndpointConfiguration extends
 
 
     @Override
+    public boolean checkOrigin(String originHeaderValue) {
+        // Allow all
+        return true;
+    }
+
+
+    @Override
     public String getPath() {
         return servletPath;
     }
+
 
     public Object getPojo() {
         try {
             return pojoClass.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
             throw new IllegalArgumentException(e);
         }
     }
