@@ -37,7 +37,8 @@ import javax.websocket.server.WebSocketPathParam;
 /**
  * For a POJO class annotated with
  * {@link javax.websocket.server.WebSocketEndpoint}, an instance of this class
- * caches the method and parameter information for the onXXX calls.
+ * caches the method handlers and the method and parameter information for the
+ * onXXX calls.
  */
 public class PojoMethodMapping {
 
