@@ -32,11 +32,24 @@ public interface ServerEndpointConfiguration extends EndpointConfiguration {
 
     List<Extension> getNegotiatedExtensions(List<Extension> requestedExtensions);
 
+    /**
+     * Enables the WebSocket endpoint to acceot or reject connections based on
+     * the HTTP origin header.
+     *
+     * @param originHeaderValue The HTTP origin header provided by the client.
+     *
+     * @return  <code>true</code> if the request should be accepted otherwise
+     *          <code>false</false>
+     */
     boolean checkOrigin(String originHeaderValue);
 
     boolean matchesURI(URI uri);
 
     void modifyHandshake(HandshakeRequest request, HandshakeResponse response);
 
+    /**
+     * Returns the path at which this WebSocket server endpoint has been
+     * registered. It may be a path or a level 0 URI template.
+     */
     String getPath();
 }

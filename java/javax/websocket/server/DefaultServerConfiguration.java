@@ -26,6 +26,9 @@ import javax.websocket.Endpoint;
 import javax.websocket.Extension;
 import javax.websocket.HandshakeResponse;
 
+/**
+ * Provides the default implementation for WebSocket server endpoints.
+ */
 public class DefaultServerConfiguration implements ServerEndpointConfiguration {
 
     private Class<? extends Endpoint> endpointClass;
@@ -101,6 +104,11 @@ public class DefaultServerConfiguration implements ServerEndpointConfiguration {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * The default implementation accepts all connection requests.
+     */
     @Override
     public boolean checkOrigin(String originHeaderValue) {
         return true;
