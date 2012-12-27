@@ -89,9 +89,7 @@ public class TestUtf8 {
 
     @Test
     public void testHarmonyDecoder2() {
-        // Ideally should fail after 2 bytes (i==1) but that makes the decoder
-        // a lot more complex to write
-        doHarmonyDecoder(SRC_BYTES_2, true, 3);
+        doHarmonyDecoder(SRC_BYTES_2, true, 1);
     }
 
 
