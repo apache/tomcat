@@ -33,7 +33,7 @@ public interface ServerEndpointConfiguration extends EndpointConfiguration {
     List<Extension> getNegotiatedExtensions(List<Extension> requestedExtensions);
 
     /**
-     * Enables the WebSocket endpoint to acceot or reject connections based on
+     * Enables the WebSocket endpoint to accept or reject connections based on
      * the HTTP origin header.
      *
      * @param originHeaderValue The HTTP origin header provided by the client.
