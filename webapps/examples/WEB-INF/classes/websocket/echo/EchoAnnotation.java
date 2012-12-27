@@ -16,9 +16,11 @@
  */
 package websocket.echo;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import javax.websocket.PongMessage;
+import javax.websocket.Session;
 import javax.websocket.WebSocketMessage;
 import javax.websocket.server.WebSocketEndpoint;
 
@@ -26,13 +28,30 @@ import javax.websocket.server.WebSocketEndpoint;
 public class EchoAnnotation {
 
     @WebSocketMessage
-    public String echoTextMessage(String msg) {
-        return msg;
+    public void echoTextMessage(Session session, String msg, boolean last) {
+        try {
+            session.getRemote().sendPartialString(msg, last);
+        } catch (IOException e) {
+            try {
+                session.close();
+            } catch (IOException e1) {
+                // Ignore
+            }
+        }
     }
 
     @WebSocketMessage
-    public ByteBuffer echoBinaryMessage(ByteBuffer bb) {
-        return bb;
+    public void echoBinaryMessage(Session session, ByteBuffer bb,
+            boolean last) {
+        try {
+            session.getRemote().sendPartialBytes(bb, last);
+        } catch (IOException e) {
+            try {
+                session.close();
+            } catch (IOException e1) {
+                // Ignore
+            }
+        }
     }
 
     /**
