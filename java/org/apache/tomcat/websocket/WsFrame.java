@@ -212,10 +212,10 @@ public class WsFrame {
         }
         // Calculate new payload length if necessary
         if (payloadLength == 126) {
-            payloadLength = byteArrayToLong(inputBuffer, 2, 2);
+            payloadLength = byteArrayToLong(inputBuffer, readPos, 2);
             readPos += 2;
         } else if (payloadLength == 127) {
-            payloadLength = byteArrayToLong(inputBuffer, 2, 8);
+            payloadLength = byteArrayToLong(inputBuffer, readPos, 8);
             readPos += 8;
         }
         if (isControl()) {
