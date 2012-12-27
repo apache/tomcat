@@ -99,6 +99,9 @@ public class Utf8Decoder extends CharsetDecoder {
                         return CoderResult.malformedForLength(1);
                     }
                     if (limit - pos < 1 + tail) {
+                        // No early test for invalid sequences here as peeking
+                        // at the next byte is harder (and Tomcat's WebSocket
+                        // implementation always uses array backed buffers)
                         return CoderResult.UNDERFLOW;
                     }
                     int nextByte;
@@ -116,9 +119,13 @@ public class Utf8Decoder extends CharsetDecoder {
                     }
                     pos += tail;
                 }
-                // Note: This is the additional test added
-                if ((jchar >= 0xD800 && jchar <= 0xDFFF) || jchar > 0x10FFFF) {
+                // Apache Tomcat added test
+                if (jchar >= 0xD800 && jchar <= 0xDFFF) {
                     return CoderResult.unmappableForLength(3);
+                }
+                // Apache Tomcat added test
+                if (jchar > 0x10FFFF) {
+                    return CoderResult.unmappableForLength(4);
                 }
                 if (jchar <= 0xffff) {
                     out.put((char) jchar);
@@ -162,6 +169,13 @@ public class Utf8Decoder extends CharsetDecoder {
                     return CoderResult.malformedForLength(1);
                 }
                 if (inIndexLimit - inIndex < 1 + tail) {
+                    // Apache Tomcat added test - detects invalid sequence as
+                    // early as possible
+                    if (jchar == 0x74 && inIndexLimit > inIndex + 1) {
+                        if ((bArr[inIndex + 1] & 0xFF) > 0x8F) {
+                            return CoderResult.unmappableForLength(4);
+                        }
+                    }
                     break;
                 }
                 for (int i = 0; i < tail; i++) {
@@ -182,9 +196,13 @@ public class Utf8Decoder extends CharsetDecoder {
                 }
                 inIndex += tail;
             }
-            // Note: This is the additional test added
-            if ((jchar >= 0xD800 && jchar <= 0xDFFF) || jchar > 0x10FFFF) {
+            // Apache Tomcat added test
+            if (jchar >= 0xD800 && jchar <= 0xDFFF) {
                 return CoderResult.unmappableForLength(3);
+            }
+            // Apache Tomcat added test
+            if (jchar > 0x10FFFF) {
+                return CoderResult.unmappableForLength(4);
             }
             if (jchar <= 0xffff) {
                 cArr[outIndex++] = (char) jchar;
