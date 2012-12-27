@@ -18,6 +18,13 @@ package javax.websocket;
 
 import java.nio.ByteBuffer;
 
+/**
+ * Represents a WebSocket Pong message and used by message handlers to enable
+ * applications to process the response to any Pings they send.
+ */
 public interface PongMessage {
+    /**
+     * Obtain the payload of the Pong message as a ByteBuffer.
+     */
     ByteBuffer getApplicationData();
 }
