@@ -263,6 +263,11 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
                 }
             }
         }
+        if (opCode == Constants.OPCODE_CLOSE) {
+            // Connection is closing - ensure no threads are stuck waiting on
+            // the write barrier
+            writeBarrier.reset();
+        }
     }
 
 
