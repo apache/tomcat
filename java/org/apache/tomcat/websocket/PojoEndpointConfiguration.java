@@ -44,13 +44,6 @@ public class PojoEndpointConfiguration extends DefaultServerConfiguration {
 
 
     @Override
-    public boolean checkOrigin(String originHeaderValue) {
-        // Allow all
-        return true;
-    }
-
-
-    @Override
     public String getPath() {
         return servletPath;
     }
