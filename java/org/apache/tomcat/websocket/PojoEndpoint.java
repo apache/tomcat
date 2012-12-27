@@ -30,7 +30,7 @@ import javax.websocket.Session;
  * {@link javax.websocket.server.WebSocketEndpoint} so they appear as standard
  * {@link Endpoint} instances.
  */
-public class WsEndpointPojo extends Endpoint {
+public class PojoEndpoint extends Endpoint {
 
     private Object pojo;
     private String pathInfo;
@@ -43,7 +43,7 @@ public class WsEndpointPojo extends Endpoint {
         PojoEndpointConfiguration pec =
                 (PojoEndpointConfiguration) endpointConfiguration;
 
-        pojo = pec.getPojo();
+        pojo = pec.createPojo();
         pathInfo = pec.getPathInfo();
         methodMapping = pec.getMethodMapping();
 

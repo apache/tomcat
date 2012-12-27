@@ -20,7 +20,7 @@ import javax.websocket.server.DefaultServerConfiguration;
 
 /**
  * Provides the configuration for POJOs annotated at WebSocket endpoints. It
- * provides the means, via casting, of new {@link WsEndpointPojo} instances
+ * provides the means, via casting, of new {@link PojoEndpoint} instances
  * obtaining POJO endpoint specific configuration settings such as the mapping
  * of onXxx calls to POJO methods.
  */
@@ -28,28 +28,19 @@ public class PojoEndpointConfiguration extends DefaultServerConfiguration {
 
     private final Class<?> pojoClass;
     private final PojoMethodMapping methodMapping;
-    private final String servletPath;
     private final String pathInfo;
 
 
     PojoEndpointConfiguration(Class<?> pojoClass,
-            PojoMethodMapping methodMapping, String servletPath,
-            String pathInfo) {
-        super(WsEndpointPojo.class, methodMapping.getMappingPath());
+            PojoMethodMapping methodMapping, String pathInfo) {
+        super(PojoEndpoint.class, methodMapping.getWsPath());
         this.pojoClass = pojoClass;
         this.methodMapping = methodMapping;
-        this.servletPath = servletPath;
         this.pathInfo = pathInfo;
     }
 
 
-    @Override
-    public String getPath() {
-        return servletPath;
-    }
-
-
-    public Object getPojo() {
+    public Object createPojo() {
         try {
             return pojoClass.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {

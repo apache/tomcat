@@ -23,6 +23,12 @@ import java.nio.ByteBuffer;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
+/**
+ * Common implementation code for the POJO basic message handlers. All the real
+ * work is done in this class and in the superclass.
+ *
+ * @param <T>   The type of message to handle
+ */
 public abstract class PojoMessageHandlerBasicBase<T>
         extends PojoMessageHandlerBase<T> implements MessageHandler.Basic<T> {
 
@@ -35,7 +41,7 @@ public abstract class PojoMessageHandlerBasicBase<T>
 
 
     @Override
-    public void onMessage(T message) {
+    public final void onMessage(T message) {
         Object[] parameters = params.clone();
         if (indexSession != -1) {
             parameters[indexSession] = session;

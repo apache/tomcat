@@ -37,7 +37,7 @@ class Util {
      * @param wsPath The WebSocket endpoint path to convert
      * @return The servlet mapping
      */
-    static String getServletMappingPath(String wsPath) {
+    static String getServletPath(String wsPath) {
         int templateStart = wsPath.indexOf('{');
         if (templateStart == -1) {
             if (wsPath.charAt(wsPath.length() - 1) == '/') {

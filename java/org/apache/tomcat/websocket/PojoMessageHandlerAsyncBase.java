@@ -23,6 +23,12 @@ import java.nio.ByteBuffer;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
+/**
+ * Common implementation code for the POJO asynchronous message handlers. All
+ * the real work is done in this class and in the superclass.
+ *
+ * @param <T>   The type of message to handle
+ */
 public abstract class PojoMessageHandlerAsyncBase<T>
         extends PojoMessageHandlerBase<T> implements MessageHandler.Async<T> {
 
@@ -38,7 +44,7 @@ public abstract class PojoMessageHandlerAsyncBase<T>
 
 
     @Override
-    public void onMessage(T message, boolean last) {
+    public final void onMessage(T message, boolean last) {
         Object[] parameters = params.clone();
         if (indexBoolean != -1) {
             parameters[indexBoolean] = Boolean.valueOf(last);

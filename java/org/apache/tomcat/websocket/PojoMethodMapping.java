@@ -48,17 +48,18 @@ public class PojoMethodMapping {
     private final PathParam[] onCloseParams;
     private final PathParam[] onErrorParams;
     private final Set<MessageMethod> onMessage = new HashSet<>();
-    private final String mappingPath;
+    private final String wsPath;
     private final UriTemplate template;
 
 
-    public PojoMethodMapping(Class<?> clazzPojo, String path, String mappingPath) {
-        this.mappingPath = mappingPath;
+    public PojoMethodMapping(Class<?> clazzPojo, String wsPath,
+            String servletPath) {
+        this.wsPath = wsPath;
         Method open = null;
         Method close = null;
         Method error = null;
-        if (path.length() > mappingPath.length()) {
-            template = new UriTemplate(path.substring(mappingPath.length() - 2));
+        if (wsPath.length() > servletPath.length()) {
+            template = new UriTemplate(wsPath.substring(servletPath.length() - 2));
         } else {
             template = null;
         }
@@ -85,8 +86,8 @@ public class PojoMethodMapping {
     }
 
 
-    public String getMappingPath() {
-        return mappingPath;
+    public String getWsPath() {
+        return wsPath;
     }
 
 

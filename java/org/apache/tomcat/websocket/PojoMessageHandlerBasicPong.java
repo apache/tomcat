@@ -21,6 +21,9 @@ import java.lang.reflect.Method;
 import javax.websocket.PongMessage;
 import javax.websocket.Session;
 
+/**
+ * PongMessage specific concrete basic implementation.
+ */
 public class PojoMessageHandlerBasicPong
         extends PojoMessageHandlerBasicBase<PongMessage> {
 
