@@ -244,21 +244,23 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
         }
         header.flip();
 
-        doBlockingWrite(header);
-        doBlockingWrite(message);
-        try {
-            sos.flush();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        if (Constants.OPCODE_CLOSE == opCode) {
+        synchronized (sos) {
+            doBlockingWrite(header);
+            doBlockingWrite(message);
             try {
-                sos.close();
+                sos.flush();
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
+            }
+
+            if (Constants.OPCODE_CLOSE == opCode) {
+                try {
+                    sos.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         }
     }

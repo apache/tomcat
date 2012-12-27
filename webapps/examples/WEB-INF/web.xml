@@ -354,11 +354,12 @@
       <url-pattern>/async/stockticker</url-pattern>
     </servlet-mapping>
 
-    <!-- Uncomment the section below to increase the WebSocket read buffer -->
-    <!-- size for the Autobahn testsuite.                                  -->
+    <!-- Uncomment the section below to increase the WebSocket read buffer  -->
+    <!-- size from the default of 8k to 512k                                -->
+    <!--
     <context-param>
       <param-name>wsReadBufferSize</param-name>
-      <!-- 512k -->
       <param-value>524288</param-value>
     </context-param>
+    -->
 </web-app>
