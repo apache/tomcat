@@ -20,7 +20,9 @@ import java.lang.reflect.Method;
 
 import javax.websocket.Session;
 
-
+/**
+ * String specific concrete asynchronous implementation.
+ */
 public class PojoMessageHandlerAsyncString
         extends PojoMessageHandlerAsyncBase<String>{
 

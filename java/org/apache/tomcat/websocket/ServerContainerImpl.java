@@ -40,9 +40,11 @@ public class ServerContainerImpl extends WebSocketContainerImpl {
 
     // Needs to be a WeakHashMap to prevent memory leaks when a context is
     // stopped
-    private static Map<ClassLoader,ServerContainerImpl> classLoaderContainerMap = new WeakHashMap<>();
+    private static Map<ClassLoader,ServerContainerImpl> classLoaderContainerMap =
+            new WeakHashMap<>();
     private static Object classLoaderContainerMapLock = new Object();
-    private static StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
+    private static StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
     protected Log log = LogFactory.getLog(ServerContainerImpl.class);
 
 
@@ -59,9 +61,11 @@ public class ServerContainerImpl extends WebSocketContainerImpl {
         return result;
     }
     private volatile ServletContext servletContext = null;
-    private Map<String,ServerEndpointConfiguration> configMap = new ConcurrentHashMap<>();
+    private Map<String,ServerEndpointConfiguration> configMap =
+            new ConcurrentHashMap<>();
     private Map<String,Class<?>> pojoMap = new ConcurrentHashMap<>();
-    private Map<Class<?>,PojoMethodMapping> pojoMethodMap = new ConcurrentHashMap<>();
+    private Map<Class<?>,PojoMethodMapping> pojoMethodMap =
+            new ConcurrentHashMap<>();
     private volatile int readBufferSize = 8192;
 
 
@@ -75,6 +79,17 @@ public class ServerContainerImpl extends WebSocketContainerImpl {
     }
 
 
+    /**
+     * Published the provided endpoint implementation at the specified path with
+     * the specified configuration. {@link #setServletContext(ServletContext)}
+     * must be called before calling this method.
+     *
+     * @param endpointClass The WebSocket server implementation to publish
+     * @param path          The path to publish the implementation at
+     * @param configClass   The configuration to use when creating endpoint
+     *                          instances
+     * @throws DeploymentException
+     */
     public void publishServer(Class<? extends Endpoint> endpointClass,
             String path,
             Class<? extends ServerEndpointConfiguration> configClass)
@@ -94,13 +109,14 @@ public class ServerContainerImpl extends WebSocketContainerImpl {
             throw new DeploymentException(sm.getString("sci.newInstance.fail",
                     endpointClass.getName()), e);
         }
-        String mappingPath = Util.getServletMappingPath(path);
+        String servletPath = Util.getServletPath(path);
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("serverContainer.endpointDeploy",
-                    endpointClass.getName(), path, servletContext.getContextPath()));
+                    endpointClass.getName(), path,
+                    servletContext.getContextPath()));
         }
-        configMap.put(mappingPath.substring(0, mappingPath.length() - 2), sec);
-        addWsServletMapping(mappingPath);
+        configMap.put(servletPath.substring(0, servletPath.length() - 2), sec);
+        addWsServletMapping(servletPath);
     }
 
 
@@ -109,11 +125,12 @@ public class ServerContainerImpl extends WebSocketContainerImpl {
      * publishing plain old java objects (POJOs) that have been annotated as
      * WebSocket endpoints.
      *
-     * @param pojo The annotated POJO
-     * @param ctxt The ServletContext the endpoint is to be published in
-     * @param path The path at which the endpoint is to be published
+     * @param pojo   The annotated POJO
+     * @param ctxt   The ServletContext the endpoint is to be published in
+     * @param wsPath The path at which the endpoint is to be published
      */
-    public void publishServer(Class<?> pojo, ServletContext ctxt, String path) {
+    public void publishServer(Class<?> pojo, ServletContext ctxt,
+            String wsPath) {
         if (ctxt == null) {
             throw new IllegalArgumentException(
                     sm.getString("serverContainer.servletContextMissing"));
@@ -124,27 +141,30 @@ public class ServerContainerImpl extends WebSocketContainerImpl {
         } else if (ctxt != servletContext) {
             // Should never happen
             throw new IllegalStateException(sm.getString(
-                    "serverContainer.servletContextMismatch", path,
+                    "serverContainer.servletContextMismatch", wsPath,
                     servletContext.getContextPath(), ctxt.getContextPath()));
         }
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("serverContainer.pojoDeploy",
-                    pojo.getName(), path, servletContext.getContextPath()));
+                    pojo.getName(), wsPath, servletContext.getContextPath()));
         }
-        String mappingPath = Util.getServletMappingPath(path);
-        pojoMap.put(mappingPath.substring(0, mappingPath.length() - 2), pojo);
-        pojoMethodMap.put(pojo, new PojoMethodMapping(pojo, path, mappingPath));
-        addWsServletMapping(mappingPath);
+        String servletPath = Util.getServletPath(wsPath);
+        // Remove the trailing /* before adding it to the map
+        pojoMap.put(servletPath.substring(0, servletPath.length() - 2), pojo);
+        pojoMethodMap.put(pojo,
+                new PojoMethodMapping(pojo, wsPath, servletPath));
+        addWsServletMapping(servletPath);
     }
 
 
-    private void addWsServletMapping(String mapping) {
-        ServletRegistration sr = servletContext.getServletRegistration(Constants.SERVLET_NAME);
+    private void addWsServletMapping(String servletPath) {
+        ServletRegistration sr =
+                servletContext.getServletRegistration(Constants.SERVLET_NAME);
         if (sr == null) {
             sr = servletContext.addServlet(Constants.SERVLET_NAME,
                     WsServlet.class);
         }
-        sr.addMapping(mapping);
+        sr.addMapping(servletPath);
     }
 
 
@@ -156,10 +176,11 @@ public class ServerContainerImpl extends WebSocketContainerImpl {
         }
         Class<?> pojo = pojoMap.get(servletPath);
         if (pojo != null) {
-            PojoMethodMapping mapping = pojoMethodMap.get(pojo);
-            if (mapping != null) {
-                PojoEndpointConfiguration pojoSec = new PojoEndpointConfiguration(
-                        pojo, mapping, servletPath, pathInfo);
+            PojoMethodMapping methodMapping = pojoMethodMap.get(pojo);
+            if (methodMapping != null) {
+                PojoEndpointConfiguration pojoSec =
+                        new PojoEndpointConfiguration(pojo, methodMapping,
+                                pathInfo);
                 return pojoSec;
             }
         }

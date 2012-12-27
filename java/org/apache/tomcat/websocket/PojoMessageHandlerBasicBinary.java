@@ -21,6 +21,9 @@ import java.nio.ByteBuffer;
 
 import javax.websocket.Session;
 
+/**
+ * ByteBuffer specific concrete basic implementation.
+ */
 public class PojoMessageHandlerBasicBinary
         extends PojoMessageHandlerBasicBase<ByteBuffer> {
 

@@ -24,6 +24,11 @@ import javax.websocket.EncodeException;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 
+/**
+ * Common implementation code for the POJO message handlers.
+ *
+ * @param <T>   The type of message to handle
+ */
 public abstract class PojoMessageHandlerBase<T> {
 
     protected final Object pojo;
@@ -48,7 +53,7 @@ public abstract class PojoMessageHandlerBase<T> {
     }
 
 
-    protected void processResult(Object result) {
+    protected final void processResult(Object result) {
         if (result == null) {
             return;
         }

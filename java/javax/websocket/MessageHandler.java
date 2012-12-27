@@ -20,11 +20,23 @@ public interface MessageHandler {
 
     interface Async<T> extends MessageHandler {
 
+        /**
+         * Called when part of a message is available to be processed.
+         *
+         * @param messagePart   The message part
+         * @param last          <code>true</code> if this is the last part of
+         *                      this message, else <code>false</code>
+         */
         void onMessage(T messagePart, boolean last);
     }
 
     interface Basic<T> extends MessageHandler {
 
+        /**
+         * Called when a whole message is available to be processed.
+         *
+         * @param messagePart   The message
+         */
         void onMessage(T message);
     }
 }

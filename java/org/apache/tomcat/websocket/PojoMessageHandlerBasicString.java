@@ -20,6 +20,9 @@ import java.lang.reflect.Method;
 
 import javax.websocket.Session;
 
+/**
+ * String specific concrete basic implementation.
+ */
 public class PojoMessageHandlerBasicString
         extends PojoMessageHandlerBasicBase<String> {
 

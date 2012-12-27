@@ -24,20 +24,20 @@ public class TestUtil {
     @Test
     public void testGetServletMappingPath() throws Exception {
         Assert.assertEquals("/foo/*",
-                Util.getServletMappingPath("/foo"));
+                Util.getServletPath("/foo"));
         Assert.assertEquals("/foo/*",
-                Util.getServletMappingPath("/foo/"));
+                Util.getServletPath("/foo/"));
         Assert.assertEquals("/foo/bar/*",
-                Util.getServletMappingPath("/foo/bar"));
+                Util.getServletPath("/foo/bar"));
         Assert.assertEquals("/foo/bar/*",
-                Util.getServletMappingPath("/foo/bar/"));
+                Util.getServletPath("/foo/bar/"));
         Assert.assertEquals("/foo/*",
-                Util.getServletMappingPath("/foo/{bar}"));
+                Util.getServletPath("/foo/{bar}"));
         Assert.assertEquals("/foo/*",
-                Util.getServletMappingPath("/foo/{bar}/"));
+                Util.getServletPath("/foo/{bar}/"));
         Assert.assertEquals("/foo/*",
-                Util.getServletMappingPath("/foo/x{bar}"));
+                Util.getServletPath("/foo/x{bar}"));
         Assert.assertEquals("/foo/*",
-                Util.getServletMappingPath("/foo/x{bar}/"));
+                Util.getServletPath("/foo/x{bar}/"));
     }
 }
