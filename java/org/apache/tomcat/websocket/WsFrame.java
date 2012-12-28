@@ -187,7 +187,9 @@ public class WsFrame {
         b = inputBuffer[readPos++];
         // Client data must be masked
         if ((b & 0x80) == 0) {
-            throw new IOException(sm.getString("wsFrame.notMasked"));
+            throw new WsIOException(new CloseReason(
+                    CloseCodes.PROTOCOL_ERROR,
+                    sm.getString("wsFrame.notMasked")));
         }
         payloadLength = b & 0x7F;
         state = State.PARTIAL_HEADER;
@@ -221,14 +223,15 @@ public class WsFrame {
         }
         if (isControl()) {
             if (payloadLength > 125) {
-                CloseReason cr = new CloseReason(
+                throw new WsIOException(new CloseReason(
                         CloseCodes.PROTOCOL_ERROR,
                         sm.getString("wsFrame.controlPayloadTooBig",
-                                Long.valueOf(payloadLength)));
-                throw new WsIOException(cr);
+                                Long.valueOf(payloadLength))));
             }
             if (!fin) {
-                throw new IOException("wsFrame.controlNoFin");
+                throw new WsIOException(new CloseReason(
+                        CloseCodes.PROTOCOL_ERROR,
+                        sm.getString("wsFrame.controlNoFin")));
             }
         }
         System.arraycopy(inputBuffer, readPos, mask, 0, 4);
