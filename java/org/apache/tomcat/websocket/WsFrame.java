@@ -280,10 +280,10 @@ public class WsFrame {
                                 CloseCodes.PROTOCOL_ERROR,
                                 sm.getString("wsFrame.invalidUtf8Close")));
                     }
-                    reason = new String(controlBufferBinary.array(),
-                            controlBufferBinary.arrayOffset() +
-                                    controlBufferBinary.position(),
-                            controlBufferBinary.remaining(), "UTF8");
+                    // There will be no overflow as the output buffer is big
+                    // enough. There will be no underflow as all the data is
+                    // passed to the decoder in a single call.
+                    reason = controlBufferText.toString();
                 }
             }
             wsSession.onClose(
