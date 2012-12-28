@@ -33,7 +33,7 @@ import javax.websocket.PongMessage;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Takes the ServletInputStream process the WebSocket frames it contains and
+ * Takes the ServletInputStream, processes the WebSocket frames it contains and
  * extracts the messages. WebSocket Pings received will be responded to
  * automatically without any action required by the application.
  */
