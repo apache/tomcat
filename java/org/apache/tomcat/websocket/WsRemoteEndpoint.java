@@ -99,7 +99,9 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
             first = false;
         }
         sendMessage(Constants.OPCODE_TEXT, textToByte, first, isLast);
-        if (!isLast) {
+        if (isLast) {
+            isText = null;
+        } else {
             isText = Boolean.TRUE;
         }
     }
@@ -117,7 +119,9 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
 
         boolean first = (isText == null);
         sendMessage(Constants.OPCODE_BINARY, partialByte, first, isLast);
-        if (!isLast) {
+        if (isLast) {
+            isText = null;
+        } else {
             isText = Boolean.FALSE;
         }
     }
