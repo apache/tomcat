@@ -1292,7 +1292,6 @@ public class NioEndpoint extends AbstractEndpoint {
         protected void reg(SelectionKey sk, KeyAttachment attachment, int intops) {
             sk.interestOps(intops);
             attachment.interestOps(intops);
-            attachment.setCometOps(intops);
         }
 
         protected void timeout(int keyCount, boolean hasEvents) {
@@ -1425,17 +1424,6 @@ public class NioEndpoint extends AbstractEndpoint {
         public boolean getComet() { return comet; }
         public void setCometNotify(boolean notify) { this.cometNotify = notify; }
         public boolean getCometNotify() { return cometNotify; }
-        /**
-         * @deprecated Unused (value is set but never read) - will be removed in
-         * Tomcat 8
-         */
-        @Deprecated
-        public void setCometOps(int ops) { this.cometOps = ops; }
-        /**
-         * @deprecated Unused - will be removed in Tomcat 8
-         */
-        @Deprecated
-        public int getCometOps() { return cometOps; }
         public NioChannel getChannel() { return getSocket();}
         public void setChannel(NioChannel channel) { this.socket = channel;}
         public int interestOps() { return interestOps;}
@@ -1464,17 +1452,6 @@ public class NioEndpoint extends AbstractEndpoint {
         }
         public void awaitReadLatch(long timeout, TimeUnit unit) throws InterruptedException { awaitLatch(readLatch,timeout,unit);}
         public void awaitWriteLatch(long timeout, TimeUnit unit) throws InterruptedException { awaitLatch(writeLatch,timeout,unit);}
-
-        /**
-         * @deprecated Unused - will be removed in Tomcat 8
-         */
-        @Deprecated
-        public long getLastRegistered() { return lastRegistered; }
-        /**
-         * @deprecated Unused - will be removed in Tomcat 8
-         */
-        @Deprecated
-        public void setLastRegistered(long reg) { lastRegistered = reg; }
 
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf;}
         public SendfileData getSendfileData() { return this.sendfileData;}
