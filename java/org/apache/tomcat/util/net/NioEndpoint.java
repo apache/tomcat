@@ -1408,7 +1408,6 @@ public class NioEndpoint extends AbstractEndpoint {
             }
             writeLatch = null;
             cometNotify = false;
-            cometOps = SelectionKey.OP_READ;
             sendfileData = null;
             keepAliveLeft = 100;
             async = false;
@@ -1459,7 +1458,6 @@ public class NioEndpoint extends AbstractEndpoint {
         private Poller poller = null;
         private int interestOps = 0;
         private boolean comet = false;
-        private int cometOps = SelectionKey.OP_READ;
         private boolean cometNotify = false;
         private CountDownLatch readLatch = null;
         private CountDownLatch writeLatch = null;
