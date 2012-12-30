@@ -556,7 +556,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             comet = true;
         } else if (actionCode == ActionCode.COMET_END) {
             comet = false;
-        }  else if (actionCode == ActionCode.COMET_CLOSE) {
+        } else if (actionCode == ActionCode.COMET_CLOSE) {
             if (socket==null || socket.getSocket().getAttachment(false)==null) {
                 return;
             }
