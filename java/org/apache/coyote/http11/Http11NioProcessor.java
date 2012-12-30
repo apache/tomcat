@@ -623,7 +623,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         } else if (actionCode == ActionCode.NB_WRITE_INTEREST) {
             if (socket==null || socket.getSocket().getAttachment(false)==null) {
                 return;
-        }
+            }
             AtomicBoolean canWrite = (AtomicBoolean)param;
             RequestInfo rp = request.getRequestProcessor();
             if (rp.getStage() == org.apache.coyote.Constants.STAGE_SERVICE) {
@@ -631,7 +631,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     canWrite.set(true);
                 } else {
                     canWrite.set(false);
-    }
+                }
             } else {
                 throw new IllegalStateException("Calling canWrite asynchronously is illegal.");
             }
