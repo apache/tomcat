@@ -561,7 +561,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 return;
             }
             NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
-            attach.setCometOps(NioEndpoint.OP_CALLBACK);
             RequestInfo rp = request.getRequestProcessor();
             if (rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE) {
                 // Close event for this processor triggered by request
