@@ -54,6 +54,19 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.35 (markt)">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>54241</bug>: Revert the fix for <bug>35410</bug> as it was not
+        compliant with the JSP specification, specifically that
+        <code>&lt;%= obj %&gt;</code> must be translated to
+        <code>out.write(String.valueOf(obj))</code> which will trigger a
+        <code>NullPointerException</code> if <code>obj.toString()</code> returns
+        <code>null</code>. The fix for <bug>35410</bug> incorrectly suppressed
+        the <code>NullPointerException</code> in this case.
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.34 (markt)" rtext="2012-12-12">
   <subsection name="Catalina">
