@@ -141,7 +141,7 @@ public class DirContextURLConnection extends URLConnection {
             
             try {
                 date = System.currentTimeMillis();
-                String path = getURL().getFile();
+                String path = URL_DECODER.convert(getURL().getFile(), false);
                 if (context instanceof ProxyDirContext) {
                     ProxyDirContext proxyDirContext = 
                         (ProxyDirContext) context;
@@ -159,7 +159,6 @@ public class DirContextURLConnection extends URLConnection {
                         path = path.substring(contextPath.length());
                     }
                 }
-                path = URL_DECODER.convert(path, false);
                 object = context.lookup(path);
                 attributes = context.getAttributes(path);
                 if (object instanceof Resource)

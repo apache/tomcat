@@ -60,6 +60,11 @@
         <bug>54247</bug>: Prevent <code>ClassNotFoundException</code>s on stop
         when running as a service. (markt)
       </fix>
+      <fix>
+        <bug>54249</bug>: Ensure resource properties are available when the
+        context path contains encoded characters such as a space. This triggered
+        compilation issues in Jasper. Patch provided by Polina Genova. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
