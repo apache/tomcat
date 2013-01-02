@@ -89,7 +89,7 @@ public class TestContextConfig extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug51396.jsp", bc, null);
+                "/test/bug51396.jsp", bc, null);
 
         assertEquals(HttpServletResponse.SC_OK, rc);
         assertTrue(bc.toString().contains("<p>OK</p>"));
