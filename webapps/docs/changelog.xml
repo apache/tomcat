@@ -54,6 +54,14 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.35 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>54247</bug>: Prevent <code>ClassNotFoundException</code>s on stop
+        when running as a service. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
