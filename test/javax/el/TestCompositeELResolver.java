@@ -47,7 +47,7 @@ public class TestCompositeELResolver extends TomcatBaseTest {
         tomcat.start();
 
         int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug50408.jsp", new ByteChunk(), null);
+                "/test/bug5nnnn/bug50408.jsp", new ByteChunk(), null);
 
         assertEquals(HttpServletResponse.SC_OK, rc);
     }

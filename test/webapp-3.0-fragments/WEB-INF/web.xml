@@ -46,7 +46,7 @@
   <!-- Bug 51396 -->
   <servlet>
     <servlet-name>bug51396</servlet-name>
-    <jsp-file>/bug51396.jsp</jsp-file>
+    <jsp-file>/bug5nnnn/bug51396.jsp</jsp-file>
   </servlet>
 
 </web-app>

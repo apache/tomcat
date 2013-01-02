@@ -302,7 +302,7 @@ public class TestParser extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug52335.jsp");
+                "/test/bug5nnnn/bug52335.jsp");
 
         String result = res.toString();
         // Beware of the differences between escaping in JSP attributes and

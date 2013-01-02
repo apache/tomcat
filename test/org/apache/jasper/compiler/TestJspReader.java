@@ -38,7 +38,7 @@ public class TestJspReader extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/bug53986.jsp");
+                "/bug5nnnn/bug53986.jsp");
         Assert.assertTrue(res.toString().contains("OK"));
     }
 }
