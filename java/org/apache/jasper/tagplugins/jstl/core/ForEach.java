@@ -155,6 +155,9 @@ public final class ForEach implements TagPlugin {
         ctxt.generateJavaSource("else if (" + itemsV + " instanceof Map)");
         ctxt.generateJavaSource(iterV + "=((Map)" + itemsV + ").entrySet().iterator();");
 
+        // Not null
+        ctxt.generateJavaSource("if (" + iterV + " != null) {");
+
         if (hasBegin) {
             String tV = ctxt.getTemporaryVariableName();
             ctxt.generateJavaSource("for (int " + tV + "=" + beginV + ";" +
@@ -196,6 +199,7 @@ public final class ForEach implements TagPlugin {
             ctxt.generateJavaSource("break;");
         }
         ctxt.generateJavaSource("}"); // while
+        ctxt.generateJavaSource("}"); // Not Null
     }
 
     /**
