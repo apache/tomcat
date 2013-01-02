@@ -65,6 +65,11 @@
         context path contains encoded characters such as a space. This triggered
         compilation issues in Jasper. Patch provided by Polina Genova. (markt)
       </fix>
+      <fix>
+        <bug>54256</bug>: Improve error reporting when a JAR file fails
+        extension validation by including the name of the JAR file in the
+        exception. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
