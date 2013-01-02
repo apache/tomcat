@@ -42,7 +42,7 @@ public class TestPageContextImpl extends TomcatBaseTest {
         ByteChunk res = new ByteChunk();
 
         int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug53545.jsp", res, null);
+                "/test/bug5nnnn/bug53545.jsp", res, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
