@@ -63,7 +63,12 @@
         <code>out.write(String.valueOf(obj))</code> which will trigger a
         <code>NullPointerException</code> if <code>obj.toString()</code> returns
         <code>null</code>. The fix for <bug>35410</bug> incorrectly suppressed
-        the <code>NullPointerException</code> in this case.
+        the <code>NullPointerException</code> in this case. (markt)
+      </fix>
+      <fix>
+        <bug>54242</bug>: Correct handle null iterations with in the JSTL
+        ForEach tag plug-in implementation. Patch provided by Sheldon Shao.
+        (markt)
       </fix>
     </changelog>
   </subsection>
