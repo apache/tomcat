@@ -465,6 +465,11 @@ public final class Bootstrap {
                 return;
             }
             daemon = bootstrap;
+        } else {
+            // When running as a service the call to stop will be on a new
+            // thread so make sure the correct class loader is used to prevent
+            // a range of class not found exceptions.
+            Thread.currentThread().setContextClassLoader(daemon.catalinaLoader);
         }
 
         try {
