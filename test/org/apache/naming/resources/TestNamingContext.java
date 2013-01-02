@@ -361,7 +361,7 @@ public class TestNamingContext extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug53465.jsp", bc, null);
+                "/test/bug5nnnn/bug53465.jsp", bc, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertTrue(bc.toString().contains("<p>10</p>"));

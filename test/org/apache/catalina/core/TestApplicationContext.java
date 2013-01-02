@@ -64,7 +64,7 @@ public class TestApplicationContext extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug53467].jsp", res, null);
+                "/test/bug5nnnn/bug53467].jsp", res, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertTrue(res.toString().contains("<p>OK</p>"));

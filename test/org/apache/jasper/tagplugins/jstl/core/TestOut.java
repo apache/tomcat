@@ -30,7 +30,7 @@ public class TestOut extends AbstractTestTag {
         ByteChunk res = new ByteChunk();
 
         int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug54011.jsp", res, null);
+                "/test/bug5nnnn/bug54011.jsp", res, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
@@ -44,7 +44,7 @@ public class TestOut extends AbstractTestTag {
         ByteChunk res = new ByteChunk();
 
         int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug54144.jsp", res, null);
+                "/test/bug5nnnn/bug54144.jsp", res, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 

@@ -44,7 +44,7 @@ public class TestDefaultInstanceManager extends TomcatBaseTest {
         int count = instanceManager.getAnnotationCacheSize();
 
         // Request a third JSP (again, no tag libraries etc.)
-        getUrl("http://localhost:" + getPort() + "/test/bug51544.jsp");
+        getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug51544.jsp");
 
         // Force a GC to clear out unloaded class (first JSP)
         System.gc();
