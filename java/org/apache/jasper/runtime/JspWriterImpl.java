@@ -339,21 +339,6 @@ public class JspWriterImpl extends JspWriter {
         }
     }
 
-    /**
-     * Write a string.  This method cannot be inherited from the Writer class
-     * because it must suppress I/O exceptions.
-     */
-    @Override
-    public void write(String s) throws IOException {
-        // Simple fix for Bugzilla 35410
-        // Calling the other write function so as to init the buffer anyways
-        if(s == null) {
-            write(s, 0, 0);
-        } else {
-            write(s, 0, s.length());
-        }
-    }
-
 
     static final String lineSeparator = System.getProperty("line.separator");
 
