@@ -70,6 +70,10 @@
         extension validation by including the name of the JAR file in the
         exception. (markt)
       </fix>
+      <fix>
+        Allow web applications to be stopped cleanly even if filters shown
+        exceptions when their destroy() method is called. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
