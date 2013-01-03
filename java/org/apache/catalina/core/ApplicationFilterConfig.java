@@ -309,7 +309,15 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
                 }
                 SecurityUtil.remove(filter);
             } else {
-                filter.destroy();
+                try {
+                    filter.destroy();
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    context.getLogger().error(sm.getString(
+                            "applicationFilterConfig.release",
+                            filterDef.getFilterName(),
+                            filterDef.getFilterClass()), t);
+                }
             }
             if (!context.getIgnoreAnnotations()) {
                 try {
