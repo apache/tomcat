@@ -88,6 +88,10 @@
         ForEach tag plug-in implementation. Patch provided by Sheldon Shao.
         (markt)
       </fix>
+      <fix>
+        <bug>54260</bug>: Avoid <code>NullPointerException</code> when using
+        JSP unloading and tag files. (markt)  
+      </fix>
     </changelog>
   </subsection>
 </section>

@@ -174,7 +174,7 @@ public class FastRemovalDequeue<T> {
      * Removes any element of the list and returns its content.
      **/
     public synchronized void remove(final Entry element) {
-        if (!element.getValid()) {
+        if (element == null || !element.getValid()) {
             return;
         }
         Entry next = element.getNext();
