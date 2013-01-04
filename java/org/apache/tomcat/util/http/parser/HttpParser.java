@@ -48,6 +48,7 @@ public class HttpParser {
     private static final Integer FIELD_TYPE_TOKEN_OR_QUOTED_STRING = Integer.valueOf(2);
     private static final Integer FIELD_TYPE_LHEX = Integer.valueOf(3);
     private static final Integer FIELD_TYPE_QUOTED_LHEX = Integer.valueOf(4);
+    private static final Integer FIELD_TYPE_QUOTED_TOKEN = Integer.valueOf(5);
 
     private static final Map<String,Integer> fieldTypes = new HashMap<>();
 
@@ -64,7 +65,7 @@ public class HttpParser {
         fieldTypes.put("algorithm", FIELD_TYPE_TOKEN);
         fieldTypes.put("cnonce", FIELD_TYPE_QUOTED_STRING);
         fieldTypes.put("opaque", FIELD_TYPE_QUOTED_STRING);
-        fieldTypes.put("qop", FIELD_TYPE_TOKEN);
+        fieldTypes.put("qop", FIELD_TYPE_QUOTED_TOKEN);
         fieldTypes.put("nc", FIELD_TYPE_LHEX);
 
         // Setup the flag arrays
@@ -147,6 +148,10 @@ public class HttpParser {
                 case 4:
                     // FIELD_TYPE_QUOTED_LHEX
                     value = readQuotedLhex(input);
+                    break;
+                case 5:
+                    // FIELD_TYPE_QUOTED_TOKEN
+                    value = readQuotedToken(input);
                     break;
                 default:
                     // Error
@@ -342,6 +347,58 @@ public class HttpParser {
             return readQuotedString(input, returnQuoted);
         } else {
             return readToken(input);
+        }
+    }
+
+    /**
+     * This is not defined in any RFC. It is a special case to handle data from
+     * buggy clients (known buggy clients include Microsoft IE 8 & 9, Apple
+     * Safari for OSX and iOS) that add quotes to values that should be tokens.
+     *
+     * @return the token if one was found, null if data other than a token or
+     *         quoted token was found or null if the end of data was reached
+     *         before a quoted token was terminated
+     */
+    private static String readQuotedToken(StringReader input)
+            throws IOException {
+
+        StringBuilder result = new StringBuilder();
+        boolean quoted = false;
+
+        int c = input.read();
+
+        // Skip lws
+        while (c == 32 || c == 9) {
+            c = input.read();
+        }
+
+        if (c == '"') {
+            quoted = true;
+        } else if (c == -1) {
+            return null;
+        } else {
+            result.append((char) c);
+        }
+        c = input.read();
+
+        while (c != -1 && isToken[c]) {
+            result.append((char) c);
+            c = input.read();
+        }
+
+        if (quoted) {
+            if (c != '"') {
+                return null;
+            }
+        } else {
+            // Skip back so non-token character is available for next read
+            input.skip(-1);
+        }
+
+        if (c != -1 && result.length() == 0) {
+            return null;
+        } else {
+            return result.toString();
         }
     }
 
