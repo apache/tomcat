@@ -104,6 +104,11 @@
         <bug>54370</bug>: Improve handling of nulls when trying to match sets of
         parameters to a method in EL. (markt)
       </fix>
+      <fix>
+        <bug>54338</bug>: Correctly coerce the value to the expected type when
+        using the tag plug-in for the JSTL set tag. Patch provided by Sheldon
+        Shao. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
