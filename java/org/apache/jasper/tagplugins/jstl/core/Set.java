@@ -144,7 +144,7 @@ public class Set implements TagPlugin {
 
             //invoke the method through the reflection
             ctxt.generateJavaSource("                    if(" + resultName + " != null){");
-            ctxt.generateJavaSource("                        " + methodName + ".invoke(" + targetName + ", new Object[]{(" + methodName + ".getParameterTypes()[0]).cast(" + resultName + ")});");
+            ctxt.generateJavaSource("                        " + methodName + ".invoke(" + targetName + ", new Object[]{org.apache.el.lang.ELSupport.coerceToType(" + resultName + ", " + methodName + ".getParameterTypes()[0])});");
             ctxt.generateJavaSource("                    }else{");
             ctxt.generateJavaSource("                        " + methodName + ".invoke(" + targetName + ", new Object[]{null});");
             ctxt.generateJavaSource("                    }");
