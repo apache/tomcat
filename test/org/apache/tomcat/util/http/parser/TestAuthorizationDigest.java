@@ -155,4 +155,53 @@ public class TestAuthorizationDigest {
         Assert.assertNull(result);
     }
 
+    @Test
+    public void testTokenQop() throws Exception {
+        String header = "Digest qop=auth";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = HttpParser.parseAuthorizationDigest(input);
+        Assert.assertEquals("auth", result.get("qop"));
+    }
+
+    @Test
+    public void testQuotedTokenQop() throws Exception {
+        String header = "Digest qop=\"auth\"";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = HttpParser.parseAuthorizationDigest(input);
+        Assert.assertEquals("auth", result.get("qop"));
+    }
+
+    @Test
+    public void testNonTokenQop() throws Exception {
+        String header = "Digest qop=au{th";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = HttpParser.parseAuthorizationDigest(input);
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void testQuotedNonTokenQop() throws Exception {
+        String header = "Digest qop=\"au{th\"";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = HttpParser.parseAuthorizationDigest(input);
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void testUnclosedQuotedTokenQop() throws Exception {
+        String header = "Digest qop=\"auth";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = HttpParser.parseAuthorizationDigest(input);
+        Assert.assertNull(result);
+    }
 }

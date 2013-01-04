@@ -74,6 +74,10 @@
         Allow web applications to be stopped cleanly even if filters shown
         exceptions when their destroy() method is called. (markt)
       </fix>
+      <add>
+        Make HTTP Digest authentication header parsing tolerant of invalid
+        headers sent by known buggy clients. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
