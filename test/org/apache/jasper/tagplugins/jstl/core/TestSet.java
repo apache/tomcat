@@ -37,4 +37,18 @@ public class TestSet extends AbstractTestTag {
         String body = res.toString();
         Assert.assertTrue(body.contains("OK"));
     }
+
+
+    @Test
+    public void testBug54338() throws Exception {
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug5nnnn/bug54338.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String body = res.toString();
+        Assert.assertTrue(body.contains("OK - 42"));
+    }
 }
