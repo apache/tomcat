@@ -301,23 +301,22 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
 
         if (this.filter != null)
         {
-            if (Globals.IS_SECURITY_ENABLED) {
-                try {
-                    SecurityUtil.doAsPrivilege("destroy", filter);
-                } catch(java.lang.Exception ex){
-                    context.getLogger().error("ApplicationFilterConfig.doAsPrivilege", ex);
-                }
-                SecurityUtil.remove(filter);
-            } else {
-                try {
+            try {
+                if (Globals.IS_SECURITY_ENABLED) {
+                    try {
+                        SecurityUtil.doAsPrivilege("destroy", filter);
+                    } finally {
+                        SecurityUtil.remove(filter);
+                    }
+                } else {
                     filter.destroy();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    context.getLogger().error(sm.getString(
-                            "applicationFilterConfig.release",
-                            filterDef.getFilterName(),
-                            filterDef.getFilterClass()), t);
                 }
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                context.getLogger().error(sm.getString(
+                        "applicationFilterConfig.release",
+                        filterDef.getFilterName(),
+                        filterDef.getFilterClass()), t);
             }
             if (!context.getIgnoreAnnotations()) {
                 try {
@@ -357,20 +356,28 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
                IllegalAccessException, InstantiationException,
                ServletException, InvocationTargetException, NamingException {
 
+        FilterDef oldFilterDef = this.filterDef;
         this.filterDef = filterDef;
         if (filterDef == null) {
 
             // Release any previously allocated filter instance
             if (this.filter != null){
-                if (Globals.IS_SECURITY_ENABLED) {
-                    try{
-                        SecurityUtil.doAsPrivilege("destroy", filter);
-                    } catch(java.lang.Exception ex){
-                        context.getLogger().error("ApplicationFilterConfig.doAsPrivilege", ex);
+                try {
+                    if (Globals.IS_SECURITY_ENABLED) {
+                        try{
+                            SecurityUtil.doAsPrivilege("destroy", filter);
+                        } finally {
+                            SecurityUtil.remove(filter);
+                        }
+                    } else {
+                        filter.destroy();
                     }
-                    SecurityUtil.remove(filter);
-                } else {
-                    filter.destroy();
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    context.getLogger().error(sm.getString(
+                            "applicationFilterConfig.release",
+                            oldFilterDef.getFilterName(),
+                            oldFilterDef.getFilterClass()), t);
                 }
                 if (!context.getIgnoreAnnotations()) {
                     try {
