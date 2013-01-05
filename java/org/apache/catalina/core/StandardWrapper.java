@@ -1480,7 +1480,7 @@ public class StandardWrapper extends ContainerBase
                         try {
                             SecurityUtil.doAsPrivilege("destroy", s);
                         } finally {
-                            SecurityUtil.remove(instance);
+                            SecurityUtil.remove(s);
                         }
                     } else {
                         s.destroy();
