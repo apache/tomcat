@@ -40,17 +40,20 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * This utility class associates a <code>Subject</code> to the current
  * <code>AccessControlContext</code>. When a <code>SecurityManager</code> is
- * used, * the container will always associate the called thread with an
- * AccessControlContext * containing only the principal of the requested
+ * used, the container will always associate the called thread with an
+ * AccessControlContext containing only the principal of the requested
  * Servlet/Filter.
  *
- * This class uses reflection to invoke the invoke methods.
+ * This class uses reflection to invoke the methods.
  *
  * @author Jean-Francois Arcand
  */
 
 public final class SecurityUtil{
 
+    // Note that indexes overlap.
+    // A Servlet uses "init", "service", "event", "destroy".
+    // A Filter uses "doFilter", "doFilterEvent", "destroy".
     private static final int INIT= 0;
     private static final int SERVICE = 1;
     private static final int DOFILTER = 1;
