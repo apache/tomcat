@@ -83,6 +83,10 @@
         SecurityManager and either init() or destroy() methods fail
         or the servlet is a SingleThreadModel one. (kkolinko)
       </fix>
+      <scode>
+        Cleanup method cache lookup code in <code>SecurityUtil</code> class.
+        (kkolinko)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">

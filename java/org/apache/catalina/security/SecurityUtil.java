@@ -40,17 +40,20 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * This utility class associates a <code>Subject</code> to the current
  * <code>AccessControlContext</code>. When a <code>SecurityManager</code> is
- * used, * the container will always associate the called thread with an
- * AccessControlContext * containing only the principal of the requested
+ * used, the container will always associate the called thread with an
+ * AccessControlContext containing only the principal of the requested
  * Servlet/Filter.
  *
- * This class uses reflection to invoke the invoke methods.
+ * This class uses reflection to invoke the methods.
  *
  * @author Jean-Francois Arcand
  */
 
 public final class SecurityUtil{
 
+    // Note that indexes overlap.
+    // A Servlet uses "init", "service", "event", "destroy".
+    // A Filter uses "doFilter", "doFilterEvent", "destroy".
     private static final int INIT= 0;
     private static final int SERVICE = 1;
     private static final int DOFILTER = 1;
@@ -339,23 +342,17 @@ public final class SecurityUtil{
      */
     private static Method findMethod(Method[] methodsCache,
                                      String methodName){
-        if (methodName.equalsIgnoreCase(INIT_METHOD)
-                && methodsCache[INIT] != null){
+        if (methodName.equals(INIT_METHOD)){
             return methodsCache[INIT];
-        } else if (methodName.equalsIgnoreCase(DESTROY_METHOD)
-                && methodsCache[DESTROY] != null){
+        } else if (methodName.equals(DESTROY_METHOD)){
             return methodsCache[DESTROY];
-        } else if (methodName.equalsIgnoreCase(SERVICE_METHOD)
-                && methodsCache[SERVICE] != null){
+        } else if (methodName.equals(SERVICE_METHOD)){
             return methodsCache[SERVICE];
-        } else if (methodName.equalsIgnoreCase(DOFILTER_METHOD)
-                && methodsCache[DOFILTER] != null){
+        } else if (methodName.equals(DOFILTER_METHOD)){
             return methodsCache[DOFILTER];
-        } else if (methodName.equalsIgnoreCase(EVENT_METHOD)
-                && methodsCache[EVENT] != null){
+        } else if (methodName.equals(EVENT_METHOD)){
             return methodsCache[EVENT];
-        } else if (methodName.equalsIgnoreCase(DOFILTEREVENT_METHOD)
-                && methodsCache[DOFILTEREVENT] != null){
+        } else if (methodName.equals(DOFILTEREVENT_METHOD)){
             return methodsCache[DOFILTEREVENT];
         }
         return null;
@@ -385,17 +382,17 @@ public final class SecurityUtil{
         Method method =
             targetObject.getClass().getMethod(methodName, targetType);
 
-        if (methodName.equalsIgnoreCase(INIT_METHOD)){
+        if (methodName.equals(INIT_METHOD)){
             methodsCache[INIT] = method;
-        } else if (methodName.equalsIgnoreCase(DESTROY_METHOD)){
+        } else if (methodName.equals(DESTROY_METHOD)){
             methodsCache[DESTROY] = method;
-        } else if (methodName.equalsIgnoreCase(SERVICE_METHOD)){
+        } else if (methodName.equals(SERVICE_METHOD)){
             methodsCache[SERVICE] = method;
-        } else if (methodName.equalsIgnoreCase(DOFILTER_METHOD)){
+        } else if (methodName.equals(DOFILTER_METHOD)){
             methodsCache[DOFILTER] = method;
-        } else if (methodName.equalsIgnoreCase(EVENT_METHOD)){
+        } else if (methodName.equals(EVENT_METHOD)){
             methodsCache[EVENT] = method;
-        } else if (methodName.equalsIgnoreCase(DOFILTEREVENT_METHOD)){
+        } else if (methodName.equals(DOFILTEREVENT_METHOD)){
             methodsCache[DOFILTEREVENT] = method;
         }
 
