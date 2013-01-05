@@ -339,22 +339,22 @@ public final class SecurityUtil{
      */
     private static Method findMethod(Method[] methodsCache,
                                      String methodName){
-        if (methodName.equalsIgnoreCase(INIT_METHOD)
+        if (methodName.equals(INIT_METHOD)
                 && methodsCache[INIT] != null){
             return methodsCache[INIT];
-        } else if (methodName.equalsIgnoreCase(DESTROY_METHOD)
+        } else if (methodName.equals(DESTROY_METHOD)
                 && methodsCache[DESTROY] != null){
             return methodsCache[DESTROY];
-        } else if (methodName.equalsIgnoreCase(SERVICE_METHOD)
+        } else if (methodName.equals(SERVICE_METHOD)
                 && methodsCache[SERVICE] != null){
             return methodsCache[SERVICE];
-        } else if (methodName.equalsIgnoreCase(DOFILTER_METHOD)
+        } else if (methodName.equals(DOFILTER_METHOD)
                 && methodsCache[DOFILTER] != null){
             return methodsCache[DOFILTER];
-        } else if (methodName.equalsIgnoreCase(EVENT_METHOD)
+        } else if (methodName.equals(EVENT_METHOD)
                 && methodsCache[EVENT] != null){
             return methodsCache[EVENT];
-        } else if (methodName.equalsIgnoreCase(DOFILTEREVENT_METHOD)
+        } else if (methodName.equals(DOFILTEREVENT_METHOD)
                 && methodsCache[DOFILTEREVENT] != null){
             return methodsCache[DOFILTEREVENT];
         }
@@ -385,17 +385,17 @@ public final class SecurityUtil{
         Method method =
             targetObject.getClass().getMethod(methodName, targetType);
 
-        if (methodName.equalsIgnoreCase(INIT_METHOD)){
+        if (methodName.equals(INIT_METHOD)){
             methodsCache[INIT] = method;
-        } else if (methodName.equalsIgnoreCase(DESTROY_METHOD)){
+        } else if (methodName.equals(DESTROY_METHOD)){
             methodsCache[DESTROY] = method;
-        } else if (methodName.equalsIgnoreCase(SERVICE_METHOD)){
+        } else if (methodName.equals(SERVICE_METHOD)){
             methodsCache[SERVICE] = method;
-        } else if (methodName.equalsIgnoreCase(DOFILTER_METHOD)){
+        } else if (methodName.equals(DOFILTER_METHOD)){
             methodsCache[DOFILTER] = method;
-        } else if (methodName.equalsIgnoreCase(EVENT_METHOD)){
+        } else if (methodName.equals(EVENT_METHOD)){
             methodsCache[EVENT] = method;
-        } else if (methodName.equalsIgnoreCase(DOFILTEREVENT_METHOD)){
+        } else if (methodName.equals(DOFILTEREVENT_METHOD)){
             methodsCache[DOFILTEREVENT] = method;
         }
 
