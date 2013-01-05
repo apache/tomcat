@@ -1210,13 +1210,20 @@ public class StandardWrapper extends ContainerBase
                                               servlet);
 
             if( Globals.IS_SECURITY_ENABLED) {
-
-                Object[] args = new Object[]{(facade)};
-                SecurityUtil.doAsPrivilege("init",
-                                           servlet,
-                                           classType,
-                                           args);
-                args = null;
+                boolean success = false;
+                try {
+                    Object[] args = new Object[] { facade };
+                    SecurityUtil.doAsPrivilege("init",
+                                               servlet,
+                                               classType,
+                                               args);
+                    success = true;
+                } finally {
+                    if (!success) {
+                        // destroy() will not be called, thus clear the reference now
+                        SecurityUtil.remove(servlet);
+                    }
+                }
             } else {
                 servlet.init(facade);
             }
@@ -1412,9 +1419,12 @@ public class StandardWrapper extends ContainerBase
                   (InstanceEvent.BEFORE_DESTROY_EVENT, instance);
 
                 if( Globals.IS_SECURITY_ENABLED) {
-                    SecurityUtil.doAsPrivilege("destroy",
-                                               instance);
-                    SecurityUtil.remove(instance);
+                    try {
+                        SecurityUtil.doAsPrivilege("destroy",
+                                                   instance);
+                    } finally {
+                        SecurityUtil.remove(instance);
+                    }
                 } else {
                     instance.destroy();
                 }
@@ -1467,8 +1477,11 @@ public class StandardWrapper extends ContainerBase
                 while (!instancePool.isEmpty()) {
                     Servlet s = instancePool.pop();
                     if (Globals.IS_SECURITY_ENABLED) {
-                        SecurityUtil.doAsPrivilege("destroy", s);
-                        SecurityUtil.remove(instance);
+                        try {
+                            SecurityUtil.doAsPrivilege("destroy", s);
+                        } finally {
+                            SecurityUtil.remove(instance);
+                        }
                     } else {
                         s.destroy();
                     }
