@@ -339,23 +339,17 @@ public final class SecurityUtil{
      */
     private static Method findMethod(Method[] methodsCache,
                                      String methodName){
-        if (methodName.equals(INIT_METHOD)
-                && methodsCache[INIT] != null){
+        if (methodName.equals(INIT_METHOD)){
             return methodsCache[INIT];
-        } else if (methodName.equals(DESTROY_METHOD)
-                && methodsCache[DESTROY] != null){
+        } else if (methodName.equals(DESTROY_METHOD)){
             return methodsCache[DESTROY];
-        } else if (methodName.equals(SERVICE_METHOD)
-                && methodsCache[SERVICE] != null){
+        } else if (methodName.equals(SERVICE_METHOD)){
             return methodsCache[SERVICE];
-        } else if (methodName.equals(DOFILTER_METHOD)
-                && methodsCache[DOFILTER] != null){
+        } else if (methodName.equals(DOFILTER_METHOD)){
             return methodsCache[DOFILTER];
-        } else if (methodName.equals(EVENT_METHOD)
-                && methodsCache[EVENT] != null){
+        } else if (methodName.equals(EVENT_METHOD)){
             return methodsCache[EVENT];
-        } else if (methodName.equals(DOFILTEREVENT_METHOD)
-                && methodsCache[DOFILTEREVENT] != null){
+        } else if (methodName.equals(DOFILTEREVENT_METHOD)){
             return methodsCache[DOFILTEREVENT];
         }
         return null;
