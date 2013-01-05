@@ -72,7 +72,7 @@
       </fix>
       <fix>
         Allow web applications to be stopped cleanly even if filters shown
-        exceptions when their destroy() method is called. (markt)
+        exceptions when their destroy() method is called. (markt/kkolinko)
       </fix>
       <add>
         Make HTTP Digest authentication header parsing tolerant of invalid
