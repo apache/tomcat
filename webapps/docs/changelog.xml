@@ -78,6 +78,11 @@
         Make HTTP Digest authentication header parsing tolerant of invalid
         headers sent by known buggy clients. (markt)
       </add>
+      <fix>
+        Fix memory leak of servlet instances when running with a
+        SecurityManager and either init() or destroy() methods fail
+        or the servlet is a SingleThreadModel one. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
