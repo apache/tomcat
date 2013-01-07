@@ -92,6 +92,12 @@
         (where supported by the connector) between the HTTP upgrade and the
         first WebSocket message from the client to the server. (markt)
       </add>
+      <fix>
+        <bug>54371</bug>: Prevent exceptions when processing web fragments for
+        unexpanded WAR files when the context path contains characters that
+        need to be encoded in URLs such as spaces. Patch provided by Polina
+        Genova. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
