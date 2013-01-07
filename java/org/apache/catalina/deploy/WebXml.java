@@ -76,16 +76,17 @@ public class WebXml {
     // web.xml only elements
     // Absolute Ordering
     private Set<String> absoluteOrdering = null;
-    public void addAbsoluteOrdering(String fragmentName) {
+    public void createAbsoluteOrdering() {
         if (absoluteOrdering == null) {
             absoluteOrdering = new LinkedHashSet<>();
         }
+    }
+    public void addAbsoluteOrdering(String fragmentName) {
+        createAbsoluteOrdering();
         absoluteOrdering.add(fragmentName);
     }
     public void addAbsoluteOrderingOthers() {
-        if (absoluteOrdering == null) {
-            absoluteOrdering = new LinkedHashSet<>();
-        }
+        createAbsoluteOrdering();
         absoluteOrdering.add(ORDER_OTHERS);
     }
     public Set<String> getAbsoluteOrdering() {
