@@ -444,6 +444,7 @@ public class DirContextURLConnection extends URLConnection {
                 int start;
                 if (context instanceof ProxyDirContext) {
                     String cp = ((ProxyDirContext)context).getContextPath();
+                    cp = URL_ENCODER.encodeURL(cp);
                     String h = ((ProxyDirContext)context).getHostName();
                     if ("".equals(cp)) {
                         start = h.length() + 2;
