@@ -34,21 +34,6 @@
     </typedef>
   </target>
 
-  <target name="maven-deploy-nexus" depends="init-maven">
-    <!--deploy it in nexus -->
-    <artifact:deploy file="${file}">
-        <pom file="${pom}.tmp"/>
-        <remoteRepository url="${maven.repo.url}" layout="default">
-          <authentication username="${asf.ldap.username}"
-                          password="${asf.ldap.password}"/>
-        </remoteRepository>
-        <attach file="${file}.asc" type="jar.asc"/>
-        <attach file="${src}" classifier="sources" type="jar"/>
-        <attach file="${src}.asc" classifier="sources" type="jar.asc"/>
-        <attach file="${pom}.asc" type="pom.asc"/>
-    </artifact:deploy>
-  </target>
-
   <target name="maven-deploy" depends="init-maven">
     <!--cleanup-->
     <delete file="${pom}.tmp"/>
@@ -91,12 +76,17 @@
       <arg value="${pom}.tmp"/>
     </exec>
 
-    <!--deploy it-->
-    <antcall target="maven-deploy-nexus">
-        <param name="file" value="${file}"/>
-        <param name="pom" value="${pom}"/>
-        <param name="src" value="${src}"/>
-    </antcall>
+    <artifact:deploy file="${file}">
+        <pom file="${pom}.tmp"/>
+        <remoteRepository url="${maven.repo.url}" layout="default">
+          <authentication username="${asf.ldap.username}"
+                          password="${asf.ldap.password}"/>
+        </remoteRepository>
+        <attach file="${file}.asc" type="jar.asc"/>
+        <attach file="${src}" classifier="sources" type="jar"/>
+        <attach file="${src}.asc" classifier="sources" type="jar.asc"/>
+        <attach file="${pom}.asc" type="pom.asc"/>
+    </artifact:deploy>
 
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
@@ -137,7 +127,7 @@
       </filterset>
     </copy>
 
-    <!--sign the jar and pom -->
+    <!--sign the file and pom -->
     <exec executable="${gpg.exec}" failonerror="true"
           inputstring="${gpg.passphrase}">
       <arg value="--passphrase-fd"/>
@@ -157,7 +147,6 @@
       <arg value="${pom}.tmp"/>
     </exec>
 
-    <!--deploy it-->
     <artifact:deploy file="${file}">
       <pom file="${pom}.tmp"/>
       <remoteRepository url="${maven.repo.url}" layout="default" >
@@ -181,6 +170,82 @@
     <attribute name="pom" default="@{artifactId}.pom" />
     <sequential>
       <antcall target="maven-deploy-nosrc">
+        <param name="file" value="@{file}"/>
+        <param name="groupId" value="@{groupId}"/>
+        <param name="artifactId" value="@{artifactId}"/>
+        <param name="pom" value="${tomcat.pom.path}/@{pom}"/>
+      </antcall>
+    </sequential>
+  </macrodef>
+
+  <target name="maven-deploy-binaries" depends="init-maven">
+    <!--cleanup-->
+    <delete file="${pom}.tmp"/>
+    <delete file="${pom}.asc"/>
+    <delete file="${file}.zip.asc"/>
+    <delete file="${file}.tar.gz.asc"/>
+
+    <!--replace the version in the pom-->
+    <copy file="${pom}" tofile="${pom}.tmp">
+      <filterset>
+        <filter token="MAVEN.DEPLOY.VERSION" value="${maven.deploy.version}"/>
+      </filterset>
+    </copy>
+
+    <!--sign the zip, the tar.gz and the pom -->
+    <exec executable="${gpg.exec}" failonerror="true"
+          inputstring="${gpg.passphrase}">
+      <arg value="--passphrase-fd"/>
+      <arg value="0"/>
+      <arg value="-a"/>
+      <arg value="-b"/>
+      <arg value="${file}.zip"/>
+    </exec>
+    <exec executable="${gpg.exec}" failonerror="true"
+          inputstring="${gpg.passphrase}">
+      <arg value="--passphrase-fd"/>
+      <arg value="0"/>
+      <arg value="-a"/>
+      <arg value="-b"/>
+      <arg value="${file}.tar.gz"/>
+    </exec>
+    <exec executable="${gpg.exec}" failonerror="true"
+          inputstring="${gpg.passphrase}">
+      <arg value="--passphrase-fd"/>
+      <arg value="0"/>
+      <arg value="-a"/>
+      <arg value="-b"/>
+      <arg value="-o"/>
+      <arg value="${pom}.asc"/>
+      <arg value="${pom}.tmp"/>
+    </exec>
+
+    <artifact:deploy file="${pom}">
+        <pom file="${pom}.tmp"/>
+        <remoteRepository url="${maven.repo.url}" layout="default">
+          <authentication username="${asf.ldap.username}"
+                          password="${asf.ldap.password}"/>
+        </remoteRepository>
+        <attach file="${file}.zip" type="zip"/>
+        <attach file="${file}.zip.asc" type="zip.asc"/>
+        <attach file="${file}.tar.gz" type="tar.gz"/>
+        <attach file="${file}.tar.gz.asc" type="tar.gz.asc"/>
+        <attach file="${pom}.asc" type="pom.asc"/>
+    </artifact:deploy>
+
+    <delete file="${pom}.tmp"/>
+    <delete file="${pom}.asc"/>
+    <delete file="${file}.zip.asc"/>
+    <delete file="${file}.tar.gz.asc"/>
+  </target>
+
+  <macrodef name="doMavenDeployBinaries">
+    <attribute name="artifactId"/>
+    <attribute name="groupId" default="org.apache.tomcat" />
+    <attribute name="file" />
+    <attribute name="pom" default="@{artifactId}.pom" />
+    <sequential>
+      <antcall target="maven-deploy-binaries">
         <param name="file" value="@{file}"/>
         <param name="groupId" value="@{groupId}"/>
         <param name="artifactId" value="@{artifactId}"/>
@@ -292,6 +357,11 @@
         pom="tomcat-embed-logging-log4j.pom"
         src="${tomcat.embed.src.path}/tomcat-embed-logging-log4j-src.jar"/>
 
+    <!-- Binaries -->
+    <doMavenDeployBinaries
+      artifactId="tomcat"
+      file="${tomcat.release.path}/v${maven.deploy.binary.version}/bin/apache-tomcat-${maven.deploy.binary.version}"/>
+
   </target>
 
   <target name="deploy-snapshot">
@@ -300,6 +370,8 @@
              value="${maven.snapshot.repo.repositoryId}"/>
       <param name="maven.repo.url" value="${maven.snapshot.repo.url}"/>
       <param name="maven.deploy.version" value="8.0-SNAPSHOT"/>
+      <param name="maven.deploy.binary.version"
+             value="${maven.asf.release.deploy.version}-dev"/>
     </antcall>
   </target>
 
@@ -309,6 +381,8 @@
              value="${maven.asf.release.repo.repositoryId}"/>
       <param name="maven.repo.url" value="${maven.asf.release.repo.url}"/>
       <param name="maven.deploy.version"
+             value="${maven.asf.release.deploy.version}"/>
+      <param name="maven.deploy.binary.version"
              value="${maven.asf.release.deploy.version}"/>
     </antcall>
   </target>
