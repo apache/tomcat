@@ -22,6 +22,7 @@
   <version>@MAVEN.DEPLOY.VERSION@</version>
   <description>Binary distribution of Apache Tomcat</description>
   <url>http://tomcat.apache.org/</url>
+  <packaging>pom</packaging>
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
