@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -102,6 +103,7 @@ public class B2CConverter {
 
     private IntermediateInputStream iis;
     private ReadConvertor conv;
+    private CharsetDecoder decoder;
     private final String encoding;
 
     /** Create a converter, with bytes going to a byte buffer
@@ -119,6 +121,7 @@ public class B2CConverter {
      */
     public  void recycle() {
         conv.recycle();
+        decoder.reset();
     }
 
     static final int BUFFER_SIZE=8192;
@@ -167,12 +170,11 @@ public class B2CConverter {
     }
 
 
-    public void reset()
-        throws IOException
-    {
-        // destroy the reader/iis
-        iis=new IntermediateInputStream();
-        conv = new ReadConvertor(iis, getCharset(encoding));
+    public void reset() throws IOException {
+        // Re-create the reader and iis
+        iis = new IntermediateInputStream();
+        decoder = getCharset(encoding).newDecoder();
+        conv = new ReadConvertor(iis, decoder);
     }
 
 }
@@ -184,12 +186,12 @@ public class B2CConverter {
 /**
  *
  */
-final class  ReadConvertor extends InputStreamReader {
+final class ReadConvertor extends InputStreamReader {
 
     /** Create a converter.
      */
-    public ReadConvertor(IntermediateInputStream in, Charset charset) {
-        super(in, charset);
+    public ReadConvertor(IntermediateInputStream in, CharsetDecoder decoder) {
+        super(in, decoder);
     }
 
     /** Overridden - will do nothing but reset internal state.
