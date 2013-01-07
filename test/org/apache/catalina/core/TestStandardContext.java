@@ -49,6 +49,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.deploy.FilterDef;
@@ -70,6 +71,8 @@ public class TestStandardContext extends TomcatBaseTest {
 
     @Test
     public void testBug46243() throws Exception {
+        // This tests that if a Filter init() fails then the web application
+        // is not put into service.
 
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
@@ -107,6 +110,10 @@ public class TestStandardContext extends TomcatBaseTest {
         client.connect();
         client.processRequest();
         assertTrue(client.isResponse404());
+
+        // Context failed to start. This checks that automatic transition
+        // from FAILED to STOPPED state was successful.
+        assertEquals(LifecycleState.STOPPED, root.getState());
     }
 
     private static final class Bug46243Client extends SimpleHttpClient {
@@ -145,6 +152,9 @@ public class TestStandardContext extends TomcatBaseTest {
 
     @Test
     public void testBug49922() throws Exception {
+        // Test that filter mapping works. Test that the same filter is
+        // called only once, even if is selected by several mapping
+        // url-patterns or by both a url-pattern and a servlet-name.
 
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
@@ -269,6 +279,9 @@ public class TestStandardContext extends TomcatBaseTest {
 
     @Test
     public void testBug50015() throws Exception {
+        // Test that configuring servlet security constraints programmatically
+        // does work.
+
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
 
@@ -348,6 +361,9 @@ public class TestStandardContext extends TomcatBaseTest {
     }
 
     private void doTestBug51376(boolean loadOnStartUp) throws Exception {
+        // Test that for a servlet that was added programmatically its
+        // loadOnStartup property is honored and its init() and destroy()
+        // methods are called.
 
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
@@ -368,6 +384,7 @@ public class TestStandardContext extends TomcatBaseTest {
 
         // Make sure that init() and destroy() were called correctly
         assertTrue(sci.getServlet().isOk());
+        assertTrue(loadOnStartUp == sci.getServlet().isInitCalled());
     }
 
     public static final class Bug51376SCI
@@ -402,11 +419,11 @@ public class TestStandardContext extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         private Boolean initOk = null;
-        private Boolean destoryOk = null;
+        private Boolean destroyOk = null;
 
         @Override
         public void init() {
-            if (initOk == null && destoryOk == null) {
+            if (initOk == null && destroyOk == null) {
                 initOk = Boolean.TRUE;
             } else {
                 initOk = Boolean.FALSE;
@@ -415,10 +432,10 @@ public class TestStandardContext extends TomcatBaseTest {
 
         @Override
         public void destroy() {
-            if (initOk.booleanValue() && destoryOk == null) {
-                destoryOk = Boolean.TRUE;
+            if (initOk.booleanValue() && destroyOk == null) {
+                destroyOk = Boolean.TRUE;
             } else {
-                destoryOk = Boolean.FALSE;
+                destroyOk = Boolean.FALSE;
             }
         }
 
@@ -430,14 +447,18 @@ public class TestStandardContext extends TomcatBaseTest {
         }
 
         protected boolean isOk() {
-            if (initOk != null && initOk.booleanValue() && destoryOk != null &&
-                    destoryOk.booleanValue()) {
+            if (initOk != null && initOk.booleanValue() && destroyOk != null &&
+                    destroyOk.booleanValue()) {
                 return true;
-            } else if (initOk == null && destoryOk == null) {
+            } else if (initOk == null && destroyOk == null) {
                 return true;
             } else {
                 return false;
             }
+        }
+
+        protected boolean isInitCalled() {
+            return initOk != null && initOk.booleanValue();
         }
     }
 
@@ -499,6 +520,7 @@ public class TestStandardContext extends TomcatBaseTest {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
 
+            @SuppressWarnings("resource") // No need to close this writer
             PrintWriter out = resp.getWriter();
 
             out.println("parts=" + (null == req.getParts()
