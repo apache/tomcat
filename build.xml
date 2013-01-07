@@ -120,6 +120,8 @@
   <property name="catalina-tribes-src.jar" value="${tomcat.src.jars}/catalina-tribes-src.jar"/>
   <property name="catalina-ha-src.jar" value="${tomcat.src.jars}/catalina-ha-src.jar"/>
   <property name="catalina-ant-src.jar" value="${tomcat.src.jars}/catalina-ant-src.jar"/>
+  <property name="tomcat-jni-src.jar" value="${tomcat.src.jars}/tomcat-jni-src.jar"/>
+  <property name="tomcat-spdy-src.jar" value="${tomcat.src.jars}/tomcat-spdy-src.jar"/>
   <property name="tomcat-coyote-src.jar" value="${tomcat.src.jars}/tomcat-coyote-src.jar"/>
   <property name="tomcat-api-src.jar" value="${tomcat.src.jars}/tomcat-api-src.jar"/>
   <property name="tomcat-util-src.jar" value="${tomcat.src.jars}/tomcat-util-src.jar"/>
@@ -897,7 +899,7 @@
     </xslt>
   </target>
 
-  <target name="deploy" depends="package,build-docs"
+  <target name="deploy" depends="package,build-docs,build-tomcat-jdbc"
           description="Default. Builds a working Tomcat instance">
 
     <copy tofile="${tomcat.build}/bin/tomcat-native.tar.gz"
@@ -987,7 +989,9 @@
     <copy file="${tomcat-dbcp.jar}" todir="${tomcat.build}/lib"
       failonerror="false"/>
     <copy file="${jdt.jar}" todir="${tomcat.build}/lib" />
+  </target>
 
+  <target name="build-tomcat-jdbc" depends="package">
     <!-- build the jdbc-pool jar and source jar-->
     <echo message="Building Tomcat JDBC pool libraries"/>
     <ant antfile="${tomcat.jdbc.dir}/build.xml" dir="${tomcat.jdbc.dir}" inheritall="false" target="build">
@@ -2239,7 +2243,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   </target>
 
   <!-- Packages the source code in JARs to match the binary JARs -->
-  <target name="package-src-jar" depends="build-manifests">
+  <target name="package-src-jar" depends="build-manifests,build-tomcat-jdbc">
 
     <mkdir dir="${tomcat.src.jars}" />
 
@@ -2329,6 +2333,16 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       filesId="files.tomcat-coyote"
       notice="${tomcat.manifests}/tomcat-coyote.jar.notice"
       license="${tomcat.manifests}/tomcat-coyote.license" />
+
+    <!-- SPDY -->
+    <jarIt jarfile="${tomcat-spdy-src.jar}"
+      filesDir="java"
+      filesId="files.tomcat-spdy" />
+
+    <!-- JNI -->
+    <jarIt jarfile="${tomcat-jni-src.jar}"
+      filesDir="java"
+      filesId="files.tomcat-jni" />
 
     <!-- Jasper Implementation JAR File -->
     <jarIt jarfile="${jasper-src.jar}"
