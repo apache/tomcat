@@ -99,6 +99,11 @@
         Georgieva. (markt) 
       </fix>
       <fix>
+        <bug>54284</bug>: As per clarification from the Servlet EG, anonymous
+        Filters and Servlets are not permitted. Patch by Violeta Georgieva.
+        (markt)
+      </fix>
+      <fix>
         <bug>54371</bug>: Prevent exceptions when processing web fragments for
         unexpanded WAR files when the context path contains characters that
         need to be encoded in URLs such as spaces. Patch provided by Polina
