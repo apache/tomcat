@@ -1131,6 +1131,12 @@ final class AbsoluteOrderingRule extends Rule {
                     "webRuleSet.absoluteOrderingCount"));
         } else {
             isAbsoluteOrderingSet = true;
+            WebXml webXml = (WebXml) digester.peek();
+            webXml.createAbsoluteOrdering();
+            if (digester.getLogger().isDebugEnabled()) {
+                digester.getLogger().debug(
+                        webXml.getClass().getName() + ".setAbsoluteOrdering()");
+            }
         }
     }
 }
