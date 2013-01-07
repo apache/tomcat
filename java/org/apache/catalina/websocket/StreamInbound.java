@@ -114,7 +114,7 @@ public abstract class StreamInbound implements UpgradeInbound {
         WsInputStream wsIs = new WsInputStream(processor, getWsOutbound());
 
         try {
-            WsFrame frame = wsIs.nextFrame(true);
+            WsFrame frame = wsIs.nextFrame(false);
 
             while (frame != null) {
                 // TODO User defined extensions may define values for rsv
