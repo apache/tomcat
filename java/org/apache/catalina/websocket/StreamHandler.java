@@ -74,7 +74,7 @@ public abstract class StreamHandler implements ProtocolHandler {
         WsInputStream wsIs = new WsInputStream(inputStream, getWsOutbound());
 
         try {
-            WsFrame frame = wsIs.nextFrame(true);
+            WsFrame frame = wsIs.nextFrame(false);
 
             while (frame != null) {
                 // TODO User defined extensions may define values for rsv
