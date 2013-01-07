@@ -25,6 +25,8 @@ import java.util.Map;
 
 import javax.servlet.Filter;
 
+import org.apache.tomcat.util.res.StringManager;
+
 
 /**
  * Representation of a filter definition for a web application, as represented
@@ -37,6 +39,9 @@ import javax.servlet.Filter;
 public class FilterDef implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private static final StringManager sm =
+        StringManager.getManager(Constants.Package);
 
     // ------------------------------------------------------------- Properties
 
@@ -108,6 +113,10 @@ public class FilterDef implements Serializable {
     }
 
     public void setFilterName(String filterName) {
+        if (filterName == null || filterName.equals("")) {
+            throw new IllegalArgumentException(
+                    sm.getString("filterDef.invalidFilterName", filterName));
+        }
         this.filterName = filterName;
     }
 

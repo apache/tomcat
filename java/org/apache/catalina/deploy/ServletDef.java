@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.tomcat.util.res.StringManager;
+
 
 /**
  * Representation of a servlet definition for a web application, as represented
@@ -34,6 +36,9 @@ import java.util.Set;
 public class ServletDef implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private static final StringManager sm =
+        StringManager.getManager(Constants.Package);
 
     // ------------------------------------------------------------- Properties
 
@@ -104,6 +109,10 @@ public class ServletDef implements Serializable {
     }
 
     public void setServletName(String servletName) {
+        if (servletName == null || servletName.equals("")) {
+            throw new IllegalArgumentException(
+                    sm.getString("servletDef.invalidServletName", servletName));
+        }
         this.servletName = servletName;
     }
 

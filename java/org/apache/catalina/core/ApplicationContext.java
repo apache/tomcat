@@ -884,6 +884,11 @@ public class ApplicationContext
     private FilterRegistration.Dynamic addFilter(String filterName,
             String filterClass, Filter filter) throws IllegalStateException {
 
+        if (filterName == null || filterName.equals("")) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.invalidFilterName", filterName));
+        }
+
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             //TODO Spec breaking enhancement to ignore this restriction
             throw new IllegalStateException(
@@ -1022,6 +1027,11 @@ public class ApplicationContext
 
     private ServletRegistration.Dynamic addServlet(String servletName,
             String servletClass, Servlet servlet) throws IllegalStateException {
+
+        if (servletName == null || servletName.equals("")) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.invalidServletName", servletName));
+        }
 
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             //TODO Spec breaking enhancement to ignore this restriction
