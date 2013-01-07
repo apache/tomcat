@@ -29,9 +29,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -66,15 +63,7 @@ public class TestContextConfig extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk res = new ByteChunk();
-
-        int rc =getUrl("http://localhost:" + getPort() + "/test", res, null);
-
-        // Check return code
-        assertEquals(HttpServletResponse.SC_OK, rc);
-
-        // Check context
-        assertEquals("OK - Custom default Servlet", res.toString());
+        assertPageContains("/test", "OK - Custom default Servlet");
     }
 
     @Test
@@ -87,12 +76,7 @@ public class TestContextConfig extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk bc = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug51396.jsp", bc, null);
-
-        assertEquals(HttpServletResponse.SC_OK, rc);
-        assertTrue(bc.toString().contains("<p>OK</p>"));
+        assertPageContains("/test/bug51396.jsp", "<p>OK</p>");
     }
 
     @Test
@@ -104,15 +88,22 @@ public class TestContextConfig extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk res = new ByteChunk();
+        assertPageContains("/test/bug53574", "OK");
+    }
 
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug53574", res, null);
+    @Test
+    public void testBug54262() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
 
-        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        File appDir = new File("test/webapp-3.0-fragments-empty-absolute-ordering");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
-        String body = res.toString();
-        Assert.assertTrue(body.contains("OK"));
+        tomcat.start();
+
+        assertPageContains("/test/resourceA.jsp",
+                "resourceA.jsp in resources.jar");
+        assertPageContains("/test/resources/HelloWorldExample",
+                null, HttpServletResponse.SC_NOT_FOUND);
     }
 
     private static class CustomDefaultServletSCI
@@ -143,6 +134,24 @@ public class TestContextConfig extends TomcatBaseTest {
                 throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.getWriter().print("OK - Custom default Servlet");
+        }
+    }
+
+    private void assertPageContains(String pageUrl, String expectedBody)
+            throws IOException {
+        assertPageContains(pageUrl, expectedBody, HttpServletResponse.SC_OK);
+    }
+
+    private void assertPageContains(String pageUrl, String expectedBody,
+            int expectedStatus) throws IOException {
+        ByteChunk res = new ByteChunk();
+        int sc = getUrl("http://localhost:" + getPort() + pageUrl, res, null);
+
+        Assert.assertEquals(expectedStatus, sc);
+
+        if (expectedStatus == HttpServletResponse.SC_OK) {
+            String result = res.toString();
+            Assert.assertTrue(result, result.indexOf(expectedBody) > -1);
         }
     }
 }
