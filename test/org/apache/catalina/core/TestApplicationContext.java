@@ -18,6 +18,9 @@ package org.apache.catalina.core;
 
 import java.io.File;
 
+import javax.servlet.Filter;
+import javax.servlet.Servlet;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
@@ -68,5 +71,41 @@ public class TestApplicationContext extends TomcatBaseTest {
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertTrue(res.toString().contains("<p>OK</p>"));
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddFilterWithFilterNameNull() {
+        getServletContext().addFilter(null, (Filter) null);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddFilterWithFilterNameEmptyString() {
+        getServletContext().addFilter("", (Filter) null);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddServletWithServletNameNull() {
+        getServletContext().addServlet(null, (Servlet) null);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddServletWithServletNameEmptyString() {
+        getServletContext().addServlet("", (Servlet) null);
+    }
+
+
+    private ServletContext getServletContext() {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0");
+        // app dir is relative to server home
+        StandardContext standardContext = (StandardContext) tomcat.addWebapp(
+                null, "/test", appDir.getAbsolutePath());
+
+        return standardContext.getServletContext();
     }
 }
