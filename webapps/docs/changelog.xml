@@ -106,7 +106,7 @@
       <fix>
         <bug>54371</bug>: Prevent exceptions when processing web fragments for
         unexpanded WAR files when the context path contains characters that
-        need to be encoded in URLs such as spaces. Patch provided by Polina
+        need to be encoded in URLs such as spaces. Based on a patch by Polina
         Genova. (markt)
       </fix>
     </changelog>

@@ -435,28 +435,8 @@ public class DirContextURLConnection extends URLConnection {
         
         if (collection != null) {
             try {
-                String file = getURL().getFile();
-                // This will be of the form /<hostname>/<contextpath>/file name
-                // if <contextpath> is not empty otherwise this will be of the
-                // form /<hostname>/file name
-                // Strip off the hostname and the contextpath (note that context
-                // path may contain '/'
-                int start;
-                if (context instanceof ProxyDirContext) {
-                    String cp = ((ProxyDirContext)context).getContextPath();
-                    cp = URL_ENCODER.encodeURL(cp);
-                    String h = ((ProxyDirContext)context).getHostName();
-                    if ("".equals(cp)) {
-                        start = h.length() + 2;
-                    } else {
-                        start = h.length() + cp.length() + 2;
-                    }
-                } else {
-                    start = file.indexOf('/', file.indexOf('/', 1) + 1);
-                }
-                
                 NamingEnumeration<NameClassPair> enumeration =
-                    context.list(file.substring(start));
+                    collection.list("/");
                 while (enumeration.hasMoreElements()) {
                     NameClassPair ncp = enumeration.nextElement();
                     result.addElement(URL_ENCODER.encodeURL(ncp.getName()));
