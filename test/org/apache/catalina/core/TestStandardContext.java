@@ -72,7 +72,9 @@ public class TestStandardContext extends TomcatBaseTest {
     @Test
     public void testBug46243() throws Exception {
         // This tests that if a Filter init() fails then the web application
-        // is not put into service.
+        // is not put into service. (BZ 46243)
+        // This also tests that if the cause of the failure is gone,
+        // the context can be started without a need to redeploy it.
 
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
@@ -83,23 +85,7 @@ public class TestStandardContext extends TomcatBaseTest {
         }
 
         Context root = tomcat.addContext("", "ROOT");
-
-        // Add test a filter that fails
-        FilterDef filterDef = new FilterDef();
-        filterDef.setFilterClass(Bug46243Filter.class.getName());
-        filterDef.setFilterName("Bug46243");
-        root.addFilterDef(filterDef);
-        FilterMap filterMap = new FilterMap();
-        filterMap.setFilterName("Bug46243");
-        filterMap.addURLPattern("*");
-        root.addFilterMap(filterMap);
-
-        // Add a test servlet so there is something to generate a response if
-        // it works (although it shouldn't)
-        Tomcat.addServlet(root, "Bug46243", new HelloWorldServlet());
-        root.addServletMapping("/", "Bug46243");
-
-
+        configureTest46243Context(root, true);
         tomcat.start();
 
         // Configure the client
@@ -114,6 +100,37 @@ public class TestStandardContext extends TomcatBaseTest {
         // Context failed to start. This checks that automatic transition
         // from FAILED to STOPPED state was successful.
         assertEquals(LifecycleState.STOPPED, root.getState());
+
+        // Prepare context for the second attempt
+        // Configuration was cleared on stop() thanks to
+        // StandardContext.resetContext(), so we need to configure it again
+        // from scratch.
+        configureTest46243Context(root, false);
+        root.start();
+        // The same request is processed successfully
+        client.connect();
+        client.processRequest();
+        assertTrue(client.isResponse200());
+        assertEquals(Bug46243Filter.class.getName()
+                + HelloWorldServlet.RESPONSE_TEXT, client.getResponseBody());
+    }
+
+    private static void configureTest46243Context(Context context, boolean fail) {
+        // Add a test filter that fails
+        FilterDef filterDef = new FilterDef();
+        filterDef.setFilterClass(Bug46243Filter.class.getName());
+        filterDef.setFilterName("Bug46243");
+        filterDef.addInitParameter("fail", Boolean.toString(fail));
+        context.addFilterDef(filterDef);
+        FilterMap filterMap = new FilterMap();
+        filterMap.setFilterName("Bug46243");
+        filterMap.addURLPattern("*");
+        context.addFilterMap(filterMap);
+
+        // Add a test servlet so there is something to generate a response if
+        // it works (although it shouldn't)
+        Tomcat.addServlet(context, "Bug46243", new HelloWorldServlet());
+        context.addServletMapping("/", "Bug46243");
     }
 
     private static final class Bug46243Client extends SimpleHttpClient {
@@ -139,13 +156,19 @@ public class TestStandardContext extends TomcatBaseTest {
         @Override
         public void doFilter(ServletRequest request, ServletResponse response,
                 FilterChain chain) throws IOException, ServletException {
-            // If it works, do nothing
+            @SuppressWarnings("resource") // No need to close this writer
+            PrintWriter out = response.getWriter();
+            out.print(getClass().getName());
             chain.doFilter(request, response);
         }
 
         @Override
         public void init(FilterConfig filterConfig) throws ServletException {
-            throw new ServletException("Init fail", new ClassNotFoundException());
+            boolean fail = filterConfig.getInitParameter("fail").equals("true");
+            if (fail) {
+                throw new ServletException("Init fail",
+                        new ClassNotFoundException());
+            }
         }
 
     }
