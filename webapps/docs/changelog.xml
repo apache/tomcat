@@ -113,6 +113,10 @@
         <bug>54380</bug>: Do not try to register servlets or contexts into the
         mapper too early (which just caused a warning to be logged). (kkolinko)
       </fix>
+      <fix>
+        Fix NPE in <code>WebappLoader.stopInternal</code> when stop is called
+        after a failed start. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

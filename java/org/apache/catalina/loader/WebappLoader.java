@@ -658,7 +658,9 @@ public class WebappLoader extends LifecycleMBeanBase
         }
 
         // Throw away our current class loader
-        ((Lifecycle) classLoader).stop();
+        if (classLoader != null) {
+            ((Lifecycle) classLoader).stop();
+        }
         DirContextURLStreamHandler.unbind(classLoader);
 
         try {
