@@ -78,22 +78,22 @@ public class TestVirtualContext extends TomcatBaseTest {
         File f6 = new File("test/webapp-3.0-virtual-webapp/src/main/webapp2");
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, f1.getAbsolutePath(),
-                "/WEB-INF/classes", "");
+                "/WEB-INF/classes", "/");
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, f2.getAbsolutePath(),
-                "/WEB-INF/classes", "");
+                "/WEB-INF/classes", "/");
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, f3.getAbsolutePath(),
-                "/WEB-INF/classes", "");
+                "/WEB-INF/classes", "/");
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, f4.getAbsolutePath(),
-                "/WEB-INF/classes", "");
+                "/WEB-INF/classes", "/");
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, f5.getAbsolutePath(),
-                "/other", "");
+                "/other", "/");
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, f6.getAbsolutePath(),
-                "", "");
+                "/", "/");
 
         StandardJarScanner jarScanner = new StandardJarScanner();
         jarScanner.setScanAllDirectories(true);
@@ -281,10 +281,10 @@ public class TestVirtualContext extends TomcatBaseTest {
         File f2 = new File("test/webapp-3.0-virtual-library/target/classes");
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, f1.getAbsolutePath(),
-                "/WEB-INF/classes", "");
+                "/WEB-INF/classes", "/");
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, f2.getAbsolutePath(),
-                "/WEB-INF/classes", "");
+                "/WEB-INF/classes", "/");
 
         tomcat.start();
         // first test that without the setting on StandardContext the annotated
@@ -298,14 +298,14 @@ public class TestVirtualContext extends TomcatBaseTest {
         ctx.setResources(new StandardRoot(ctx));
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, f1.getAbsolutePath(),
-                "/WEB-INF/classes", "");
+                "/WEB-INF/classes", "/");
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, f2.getAbsolutePath(),
-                "/WEB-INF/classes", "");
+                "/WEB-INF/classes", "/");
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST,
                 additionWebInfClasses.getAbsolutePath(),
-                "/WEB-INF/classes", "");
+                "/WEB-INF/classes", "/");
 
         tomcat.start();
         assertPageContains("/test/annotatedServlet", MyAnnotatedServlet.MESSAGE);

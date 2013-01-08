@@ -41,7 +41,11 @@ public abstract class AbstractResourceSet extends LifecycleBase
     }
 
     protected final String checkInternalPath(String internalPath) {
-        //checkPath(internalPath);
+        checkPath(internalPath);
+        // Optimise internal processing
+        if (internalPath.equals("/")) {
+            return "";
+        }
         return internalPath;
     }
 

@@ -59,7 +59,7 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
         File f1 = new File("test/webapp-3.0-fragments/WEB-INF/lib");
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, f1.getAbsolutePath(),
-                "/WEB-INF/lib", "");
+                "/WEB-INF/lib", "/");
 
         loader.start();
         String[] repos = loader.getLoaderRepositories();

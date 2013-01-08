@@ -185,7 +185,7 @@ public interface WebResourceRoot extends Lifecycle {
      *                          resources should be published at. It must start
      *                          with '/'.
      * @param internalPath  The path within the resource where the content is to
-     *                          be found.
+     *                          be found. It must start with '/'.
      */
     void createWebResourceSet(ResourceSetType type, URL url, String webAppMount,
             String internalPath);
@@ -200,7 +200,7 @@ public interface WebResourceRoot extends Lifecycle {
      *                          resources should be published at. It must start
      *                          with '/'.
      * @param internalPath  The path within the resource where the content is to
-     *                          be found.
+     *                          be found. It must start with '/'.
      */
     void createWebResourceSet(ResourceSetType type, String base,
             String webAppMount, String internalPath);

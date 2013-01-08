@@ -72,7 +72,7 @@ public class DirResourceSet extends AbstractFileResourceSet {
 
             if (f.isDirectory()) {
                 root.createWebResourceSet(ResourceSetType.RESOURCE_JAR,
-                         f.getAbsolutePath(), "/", "");
+                         f.getAbsolutePath(), "/", "/");
             }
         }
 

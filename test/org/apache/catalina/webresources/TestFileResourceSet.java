@@ -29,23 +29,23 @@ public class TestFileResourceSet extends AbstractTestResourceSet {
         TesterWebResourceRoot root = new TesterWebResourceRoot();
         WebResourceSet webResourceSet =
                 new DirResourceSet(new TesterWebResourceRoot(),
-                        f.getAbsolutePath(), "/", "");
+                        f.getAbsolutePath(), "/", "/");
         root.setWebResourceSet(webResourceSet);
 
         WebResourceSet f1 = new FileResourceSet(root,
-                "test/webresources/dir1/f1.txt", "/f1.txt", "");
+                "test/webresources/dir1/f1.txt", "/f1.txt", "/");
         root.addPreResources(f1);
 
         WebResourceSet f2 = new FileResourceSet(root,
-                "test/webresources/dir1/f2.txt", "/f2.txt", "");
+                "test/webresources/dir1/f2.txt", "/f2.txt", "/");
         root.addPreResources(f2);
 
         WebResourceSet d1f1 = new FileResourceSet(root,
-                "test/webresources/dir1/d1/d1-f1.txt", "/d1/d1-f1.txt", "");
+                "test/webresources/dir1/d1/d1-f1.txt", "/d1/d1-f1.txt", "/");
         root.addPreResources(d1f1);
 
         WebResourceSet d2f1 = new FileResourceSet(root,
-                "test/webresources/dir1/d2/d2-f1.txt", "/d2/d2-f1.txt", "");
+                "test/webresources/dir1/d2/d2-f1.txt", "/d2/d2-f1.txt", "/");
         root.addPreResources(d2f1);
 
         return root;

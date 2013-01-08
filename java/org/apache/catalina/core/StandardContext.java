@@ -4786,7 +4786,7 @@ public class StandardContext extends ContainerBase
             if (webinfClassesResource.isDirectory()) {
                 getResources().createWebResourceSet(
                         WebResourceRoot.ResourceSetType.RESOURCE_JAR,
-                        webinfClassesResource.getURL(), "/", "");
+                        webinfClassesResource.getURL(), "/", "/");
             }
         }
 
