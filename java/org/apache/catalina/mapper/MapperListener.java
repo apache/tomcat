@@ -430,9 +430,19 @@ public class MapperListener extends LifecycleMBeanBase
         if (event.getType().equals(Lifecycle.AFTER_START_EVENT)) {
             Object obj = event.getSource();
             if (obj instanceof Wrapper) {
-                registerWrapper((Wrapper) obj);
+                Wrapper w = (Wrapper) obj;
+                // Only if the Context has started. If it has not, then it will
+                // have its own "after_start" event later.
+                if (w.getParent().getState().isAvailable()) {
+                    registerWrapper(w);
+                }
             } else if (obj instanceof Context) {
-                registerContext((Context) obj);
+                Context c = (Context) obj;
+                // Only if the Host has started. If it has not, then it will
+                // have its own "after_start" event later.
+                if (c.getParent().getState().isAvailable()) {
+                    registerContext(c);
+                }
             } else if (obj instanceof Host) {
                 registerHost((Host) obj);
             }
