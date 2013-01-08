@@ -25,9 +25,12 @@
 
 # Make sure prerequisite environment variables are set
 if [ -z "$JAVA_HOME" -a -z "$JRE_HOME" ]; then
-  # Bugzilla 37284 (reviewed).
   if $darwin; then
-    if [ -d "/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home" ]; then
+    # Bugzilla 54390
+    if [ -x '/usr/libexec/java_home' ] ; then
+      export JAVA_HOME=`/usr/libexec/java_home`
+    # Bugzilla 37284 (reviewed).
+    elif [ -d "/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home" ]; then
       export JAVA_HOME="/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home"
     fi
   else
