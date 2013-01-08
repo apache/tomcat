@@ -67,7 +67,13 @@ public abstract class AbstractTestResourceSet {
     public final void testGetResourceRoot() {
         WebResource webResource = resourceRoot.getResource(getMount() + "/");
         Assert.assertTrue(webResource.isDirectory());
-        Assert.assertEquals("", webResource.getName());
+        String expected;
+        if (getMount().length() > 0) {
+            expected = getMount().substring(1);
+        } else {
+            expected = "";
+        }
+        Assert.assertEquals(expected, webResource.getName());
         Assert.assertEquals(getMount() + "/", webResource.getWebappPath());
     }
 
