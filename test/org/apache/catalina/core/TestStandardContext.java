@@ -49,12 +49,17 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
+import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
@@ -166,11 +171,111 @@ public class TestStandardContext extends TomcatBaseTest {
         public void init(FilterConfig filterConfig) throws ServletException {
             boolean fail = filterConfig.getInitParameter("fail").equals("true");
             if (fail) {
-                throw new ServletException("Init fail",
+                throw new ServletException("Init fail (test)",
                         new ClassNotFoundException());
             }
         }
 
+    }
+
+    @Test
+    public void testWebappLoaderStartFail() throws Exception {
+        // Test that if WebappLoader start() fails and if the cause of
+        // the failure is gone, the context can be started without
+        // a need to redeploy it.
+
+        // Set up a container
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.start();
+        // To not start Context automatically, as we have to configure it first
+        ((ContainerBase) tomcat.getHost()).setStartChildren(false);
+
+        FailingWebappLoader loader = new FailingWebappLoader();
+        File root = new File("test/webapp-3.0");
+        Context context = tomcat.addWebapp("", root.getAbsolutePath());
+        context.setLoader(loader);
+
+        try {
+            context.start();
+            fail();
+        } catch (LifecycleException ex) {
+            // As expected
+        }
+        assertEquals(LifecycleState.FAILED, context.getState());
+
+        // The second attempt
+        loader.setFail(false);
+        context.start();
+        assertEquals(LifecycleState.STARTED, context.getState());
+
+        // Using a test from testBug49922() to check that the webapp is running
+        ByteChunk result = getUrl("http://localhost:" + getPort() +
+                "/bug49922/target");
+        assertEquals("Target", result.toString());
+    }
+
+    @Test
+    public void testWebappListenerConfigureFail() throws Exception {
+        // Test that if LifecycleListener on webapp fails during
+        // configure_start event and if the cause of the failure is gone,
+        // the context can be started without a need to redeploy it.
+
+        // Set up a container
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.start();
+        // To not start Context automatically, as we have to configure it first
+        ((ContainerBase) tomcat.getHost()).setStartChildren(false);
+
+        FailingLifecycleListener listener = new FailingLifecycleListener();
+        File root = new File("test/webapp-3.0");
+        Context context = tomcat.addWebapp("", root.getAbsolutePath());
+        context.addLifecycleListener(listener);
+
+        try {
+            context.start();
+            fail();
+        } catch (LifecycleException ex) {
+            // As expected
+        }
+        assertEquals(LifecycleState.FAILED, context.getState());
+
+        // The second attempt
+        listener.setFail(false);
+        context.start();
+        assertEquals(LifecycleState.STARTED, context.getState());
+
+        // Using a test from testBug49922() to check that the webapp is running
+        ByteChunk result = getUrl("http://localhost:" + getPort() +
+                "/bug49922/target");
+        assertEquals("Target", result.toString());
+    }
+
+    private static class FailingWebappLoader extends WebappLoader {
+        private boolean fail = true;
+        protected void setFail(boolean fail) {
+            this.fail = fail;
+        }
+        @Override
+        protected void startInternal() throws LifecycleException {
+            if (fail) {
+                throw new RuntimeException("Start fail (test)");
+            }
+            super.startInternal();
+        }
+    }
+
+    private static class FailingLifecycleListener implements LifecycleListener {
+        private final String failEvent = Lifecycle.CONFIGURE_START_EVENT;
+        private boolean fail = true;
+        protected void setFail(boolean fail) {
+            this.fail = fail;
+        }
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+            if (fail && event.getType().equals(failEvent)) {
+                throw new RuntimeException(failEvent + " fail (test)");
+            }
+        }
     }
 
     @Test
