@@ -2253,7 +2253,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       filesId="files.annotations-api"
       manifest="${tomcat.manifests}/annotations-api.jar.manifest" />
 
-    <!-- Servlet 3.0 Implementation JAR File -->
+    <!-- Servlet 3.1 Implementation JAR File -->
     <jarIt jarfile="${servlet-api-src.jar}"
       filesDir="java"
       filesId="files.servlet-api"
@@ -2261,7 +2261,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       notice="${tomcat.manifests}/servlet-api.jar.notice"
       license="${tomcat.manifests}/servlet-api.jar.license" />
 
-    <!-- JSP 2.1 Implementation JAR File -->
+    <!-- JSP 2.2 Implementation JAR File -->
     <jarIt jarfile="${jsp-api-src.jar}"
       filesDir="java"
       filesId="files.jsp-api"
@@ -2269,7 +2269,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       notice="${tomcat.manifests}/jsp-api.jar.notice"
       license="${tomcat.manifests}/jsp-api.jar.license" />
 
-    <!-- JSP 2.1 EL Implementation JAR File -->
+    <!-- JSP 2.2 EL Implementation JAR File -->
     <jarIt jarfile="${el-api-src.jar}"
       filesDir="java"
       filesId="files.el-api"
