@@ -21,7 +21,6 @@ import java.util.Arrays;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
-import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.membership.Membership;
 
 /**
@@ -52,7 +51,7 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
         boolean notify = false;
         synchronized (membership) {
             notify = Arrays.equals(domain,member.getDomain());
-            if ( notify ) notify = membership.memberAlive((MemberImpl)member);
+            if ( notify ) notify = membership.memberAlive(member);
         }
         if ( notify ) super.memberAdded(member);
     }
@@ -63,7 +62,7 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
         boolean notify = false;
         synchronized (membership) {
             notify = Arrays.equals(domain,member.getDomain());
-            membership.removeMember((MemberImpl)member);
+            membership.removeMember(member);
         }
         if ( notify ) super.memberDisappeared(member);
     }
@@ -94,7 +93,7 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
 
     protected synchronized void setupMembership() {
         if ( membership == null ) {
-            membership = new Membership((MemberImpl)super.getLocalMember(true));
+            membership = new Membership(super.getLocalMember(true));
         }
 
     }

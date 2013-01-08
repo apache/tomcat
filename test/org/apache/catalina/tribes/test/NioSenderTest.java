@@ -40,7 +40,7 @@ import org.apache.catalina.tribes.transport.nio.NioSender;
 public class NioSenderTest {
     private Selector selector = null;
     private int counter = 0;
-    MemberImpl mbr;
+    Member mbr;
     private static int testOptions = Channel.SEND_OPTIONS_DEFAULT;
     public NioSenderTest()  {
         // Default constructor

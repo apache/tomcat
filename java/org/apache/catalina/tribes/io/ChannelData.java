@@ -186,7 +186,7 @@ public class ChannelData implements ChannelMessage {
             4 + //unique id length off=12
             uniqueId.length+ //id data off=12+uniqueId.length
             4 + //addr length off=12+uniqueId.length+4
-            ((MemberImpl)address).getDataLength()+ //member data off=12+uniqueId.length+4+add.length
+            address.getDataLength()+ //member data off=12+uniqueId.length+4+add.length
             4 + //message length off=12+uniqueId.length+4+add.length+4
             message.getLength();
         return length;
@@ -205,7 +205,7 @@ public class ChannelData implements ChannelMessage {
     }
 
     public byte[] getDataPackage(byte[] data, int offset)  {
-        byte[] addr = ((MemberImpl)address).getData(false);
+        byte[] addr = address.getData(false);
         XByteBuffer.toBytes(options,data,offset);
         offset += 4; //options
         XByteBuffer.toBytes(timestamp,data,offset);

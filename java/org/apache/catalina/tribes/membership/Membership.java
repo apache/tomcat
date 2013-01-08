@@ -40,7 +40,7 @@ import org.apache.catalina.tribes.Member;
  */
 public class Membership implements Cloneable {
 
-    protected static final MemberImpl[] EMPTY_MEMBERS = new MemberImpl[0];
+    protected static final Member[] EMPTY_MEMBERS = new Member[0];
 
     private final Object membersLock = new Object();
 
@@ -48,17 +48,17 @@ public class Membership implements Cloneable {
      * The name of this membership, has to be the same as the name for the local
      * member
      */
-    protected final MemberImpl local;
+    protected final Member local;
 
     /**
      * A map of all the members in the cluster.
      */
-    protected HashMap<MemberImpl, MbrEntry> map = new HashMap<>();
+    protected HashMap<Member, MbrEntry> map = new HashMap<>();
 
     /**
      * A list of all the members in the cluster.
      */
-    protected MemberImpl[] members = EMPTY_MEMBERS;
+    protected Member[] members = EMPTY_MEMBERS;
 
     /**
       * sort members by alive time
@@ -69,9 +69,9 @@ public class Membership implements Cloneable {
     public Object clone() {
         synchronized (membersLock) {
             Membership clone = new Membership(local, memberComparator);
-            final HashMap<MemberImpl, MbrEntry> tmpclone = (HashMap<MemberImpl, MbrEntry>) map.clone();
+            final HashMap<Member, MbrEntry> tmpclone = (HashMap<Member, MbrEntry>) map.clone();
             clone.map = tmpclone;
-            clone.members = new MemberImpl[members.length];
+            clone.members = new Member[members.length];
             System.arraycopy(members,0,clone.members,0,members.length);
             return clone;
         }
@@ -82,19 +82,19 @@ public class Membership implements Cloneable {
      * @param local - has to be the name of the local member. Used to filter the local member from the cluster membership
      * @param includeLocal - TBA
      */
-    public Membership(MemberImpl local, boolean includeLocal) {
+    public Membership(Member local, boolean includeLocal) {
         this(local, new MemberComparator(), includeLocal);
     }
 
-    public Membership(MemberImpl local) {
+    public Membership(Member local) {
         this(local, false);
     }
 
-    public Membership(MemberImpl local, Comparator<Member> comp) {
+    public Membership(Member local, Comparator<Member> comp) {
         this(local, comp, false);
     }
 
-    public Membership(MemberImpl local, Comparator<Member> comp, boolean includeLocal) {
+    public Membership(Member local, Comparator<Member> comp, boolean includeLocal) {
         this.local = local;
         if ( includeLocal ) addMember(local);
         this.memberComparator = comp;
@@ -115,7 +115,7 @@ public class Membership implements Cloneable {
      * @return - true if this member is new to the cluster, false otherwise.<br/>
      * - false if this member is the local member or updated.
      */
-    public synchronized boolean memberAlive(MemberImpl member) {
+    public synchronized boolean memberAlive(Member member) {
         boolean result = false;
         //ignore ourselves
         if (  member.equals(local) ) return result;
@@ -127,7 +127,7 @@ public class Membership implements Cloneable {
             result = true;
        } else {
             //update the member alive time
-            MemberImpl updateMember = entry.getMember() ;
+            Member updateMember = entry.getMember() ;
             if(updateMember.getMemberAliveTime() != member.getMemberAliveTime()) {
                 //update fields that can change
                 updateMember.setMemberAliveTime(member.getMemberAliveTime());
@@ -144,12 +144,12 @@ public class Membership implements Cloneable {
      * Add a member to this component and sort array with memberComparator
      * @param member The member to add
      */
-    public synchronized MbrEntry addMember(MemberImpl member) {
+    public synchronized MbrEntry addMember(Member member) {
       synchronized (membersLock) {
           MbrEntry entry = new MbrEntry(member);
           if (!map.containsKey(member) ) {
               map.put(member, entry);
-              MemberImpl results[] = new MemberImpl[members.length + 1];
+              Member results[] = new Member[members.length + 1];
               for (int i = 0; i < members.length; i++) results[i] = members[i];
               results[members.length] = member;
               members = results;
@@ -164,7 +164,7 @@ public class Membership implements Cloneable {
      *
      * @param member The member to remove
      */
-    public void removeMember(MemberImpl member) {
+    public void removeMember(Member member) {
         map.remove(member);
         synchronized (membersLock) {
             int n = -1;
@@ -175,7 +175,7 @@ public class Membership implements Cloneable {
                 }
             }
             if (n < 0) return;
-            MemberImpl results[] = new MemberImpl[members.length - 1];
+            Member results[] = new Member[members.length - 1];
             int j = 0;
             for (int i = 0; i < members.length; i++) {
                 if (i != n)
@@ -192,11 +192,11 @@ public class Membership implements Cloneable {
      * @param maxtime - the max time a member can remain unannounced before it is considered dead.
      * @return the list of expired members
      */
-    public synchronized MemberImpl[] expire(long maxtime) {
+    public synchronized Member[] expire(long maxtime) {
         if(!hasMembers() )
            return EMPTY_MEMBERS;
 
-        ArrayList<MemberImpl> list = null;
+        ArrayList<Member> list = null;
         Iterator<MbrEntry> i = map.values().iterator();
         while(i.hasNext()) {
             MbrEntry entry = i.next();
@@ -208,7 +208,7 @@ public class Membership implements Cloneable {
         }
 
         if(list != null) {
-            MemberImpl[] result = new MemberImpl[list.size()];
+            Member[] result = new Member[list.size()];
             list.toArray(result);
             for( int j=0; j<result.length; j++) {
                 removeMember(result[j]);
@@ -227,9 +227,9 @@ public class Membership implements Cloneable {
     }
 
 
-    public MemberImpl getMember(Member mbr) {
+    public Member getMember(Member mbr) {
         if(hasMembers()) {
-            MemberImpl result = null;
+            Member result = null;
             for ( int i=0; i<this.members.length && result==null; i++ ) {
                 if ( members[i].equals(mbr) ) result = members[i];
             }//for
@@ -247,7 +247,7 @@ public class Membership implements Cloneable {
      * Returning a list of all the members in the membership
      * We not need a copy: add and remove generate new arrays.
      */
-    public MemberImpl[] getMembers() {
+    public Member[] getMembers() {
         if(hasMembers()) {
             return members;
         } else {
@@ -261,7 +261,7 @@ public class Membership implements Cloneable {
     protected synchronized MbrEntry[] getMemberEntries()
     {
         MbrEntry[] result = new MbrEntry[map.size()];
-        Iterator<Map.Entry<MemberImpl,MbrEntry>> i = map.entrySet().iterator();
+        Iterator<Map.Entry<Member,MbrEntry>> i = map.entrySet().iterator();
         int pos = 0;
         while ( i.hasNext() )
             result[pos++] = i.next().getValue();
@@ -293,10 +293,10 @@ public class Membership implements Cloneable {
      */
     protected static class MbrEntry {
 
-        protected final MemberImpl mbr;
+        protected final Member mbr;
         protected long lastHeardFrom;
 
-        public MbrEntry(MemberImpl mbr) {
+        public MbrEntry(Member mbr) {
            this.mbr = mbr;
         }
 
@@ -310,7 +310,7 @@ public class Membership implements Cloneable {
         /**
          * Return the actual Member object
          */
-        public MemberImpl getMember() {
+        public Member getMember() {
             return mbr;
         }
 

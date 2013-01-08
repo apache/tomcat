@@ -360,7 +360,7 @@ public class McastServiceImpl
     }
 
     private void memberDataReceived(byte[] data) {
-        final MemberImpl m = MemberImpl.getMember(data);
+        final Member m = MemberImpl.getMember(data);
         if (log.isTraceEnabled()) log.trace("Mcast receive ping from member " + m);
         Runnable t = null;
         if (Arrays.equals(m.getCommand(), Member.SHUTDOWN_PAYLOAD)) {
@@ -444,9 +444,9 @@ public class McastServiceImpl
     protected final Object expiredMutex = new Object();
     protected void checkExpired() {
         synchronized (expiredMutex) {
-            MemberImpl[] expired = membership.expire(timeToExpiration);
+            Member[] expired = membership.expire(timeToExpiration);
             for (int i = 0; i < expired.length; i++) {
-                final MemberImpl member = expired[i];
+                final Member member = expired[i];
                 if (log.isDebugEnabled())
                     log.debug("Mcast expire  member " + expired[i]);
                 try {

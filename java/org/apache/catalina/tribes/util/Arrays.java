@@ -25,7 +25,6 @@ import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.AbsoluteOrder;
-import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.membership.Membership;
 
 /**
@@ -152,17 +151,17 @@ public class Arrays {
     }
 
     public static void fill(Membership mbrship, Member[] m) {
-        for (int i=0; i<m.length; i++ ) mbrship.addMember((MemberImpl)m[i]);
+        for (int i=0; i<m.length; i++ ) mbrship.addMember(m[i]);
     }
 
-    public static Member[] diff(Membership complete, Membership local, MemberImpl ignore) {
+    public static Member[] diff(Membership complete, Membership local, Member ignore) {
         ArrayList<Member> result = new ArrayList<>();
-        MemberImpl[] comp = complete.getMembers();
+        Member[] comp = complete.getMembers();
         for ( int i=0; i<comp.length; i++ ) {
             if ( ignore!=null && ignore.equals(comp[i]) ) continue;
             if ( local.getMember(comp[i]) == null ) result.add(comp[i]);
         }
-        return result.toArray(new MemberImpl[result.size()]);
+        return result.toArray(new Member[result.size()]);
     }
 
     public static Member[] remove(Member[] all, Member remove) {
