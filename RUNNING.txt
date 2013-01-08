@@ -75,33 +75,40 @@ to prepare the command that starts Tomcat.
 
 (3.1) Set CATALINA_HOME (required) and CATALINA_BASE (optional)
 
-The CATALINA_HOME and CATALINA_BASE environment variables are used to
-specify the location of Apache Tomcat and the location of its active
-configuration, respectively.
+The CATALINA_HOME environment variable should be set to the location of the
+root directory of the "binary" distribution of Tomcat.
 
-The CATALINA_HOME environment variable should be set as defined in (2.2)
-above. The Tomcat startup scripts have some logic to set this variable
-automatically if it is absent (based on the location of the script in
-Unixes and on the current directory in Windows), but this logic might not work
-in all circumstances.
+An example was given in (2.2) above.
 
-The CATALINA_BASE environment variable is optional and is further described
-in the "Multiple Tomcat Instances" section below. If it is absent, it defaults
-to be equal to CATALINA_HOME.
+The Tomcat startup scripts have some logic to set this variable
+automatically if it is absent, based on the location of the startup script
+in *nix and on the current directory in Windows. That logic might not work
+in all circumstances, so setting the variable explicitly is recommended.
+
+The CATALINA_BASE environment variable specifies location of the root
+directory of the "active configuration" of Tomcat. It is optional. It
+defaults to be equal to CATALINA_HOME.
+
+Using distinct values for the CATALINA_HOME and CATALINA_BASE variables is
+recommended to simplify further upgrades and maintenance. It is documented
+in the "Multiple Tomcat Instances" section below.
 
 
 (3.2) Set JRE_HOME or JAVA_HOME (required)
 
-The JRE_HOME variable is used to specify location of a JRE that is used to
-start Tomcat.
+These variables are used to specify location of a Java Runtime
+Environment or of a Java Development Kit that is used to start Tomcat.
 
-The JAVA_HOME variable is used to specify location of a JDK. It is used instead
-of JRE_HOME.
+The JRE_HOME variable is used to specify location of a JRE. The JAVA_HOME
+variable is used to specify location of a JDK.
 
 Using JAVA_HOME provides access to certain additional startup options that
 are not allowed when JRE_HOME is used.
 
 If both JRE_HOME and JAVA_HOME are specified, JRE_HOME is used.
+
+The recommended place to specify these variables is a "setenv" script. See
+below.
 
 
 (3.3) Other variables (optional)
@@ -123,63 +130,74 @@ A similar variable is JAVA_OPTS. It is used less frequently. It allows
 specification of options that are used both to start and to stop Tomcat as well
 as for other commands.
 
-Do not use JAVA_OPTS to specify memory limits. You do not need much memory
-for a small process that is used to stop Tomcat. Those settings belong to
-CATALINA_OPTS.
+Note: Do not use JAVA_OPTS to specify memory limits. You do not need much
+memory for a small process that is used to stop Tomcat. Those settings
+belong to CATALINA_OPTS.
 
-Another frequently used variable is CATALINA_PID (on *nix platforms only). It
-specifies the location of the file where process id of the forked Tomcat java
-process will be written. This setting is optional. It will enable the
+Another frequently used variable is CATALINA_PID (on *nix only). It
+specifies the location of the file where process id of the forked Tomcat
+java process will be written. This setting is optional. It will enable the
 following features:
 
- - better protection against duplicate start attempts and
- - allows forceful termination of Tomcat process when it does not react to
-   the standard shutdown command.
+ *  better protection against duplicate start attempts and
+ *  allows forceful termination of Tomcat process when it does not react to
+    the standard shutdown command.
 
 
-(3.4) setenv script (optional)
+(3.4) Using the "setenv" script (optional, recommended)
 
 Apart from CATALINA_HOME and CATALINA_BASE, all environment variables can
-be specified in the "setenv" script.
+be specified in the "setenv" script. The script is placed either into
+CATALINA_BASE/bin or into CATALINA_HOME/bin directory and is named
+setenv.bat (on Windows) or setenv.sh (on *nix). The file has to be
+readable.
 
-The script is named setenv.bat (Windows) or setenv.sh (*nix). It can be
-placed either into CATALINA_BASE/bin or into CATALINA_HOME/bin. The file
-has to be readable.
-
-By default the setenv script file is absent. If the setenv script is
-present both in CATALINA_BASE and in CATALINA_HOME, the one in
-CATALINA_BASE is used.
+By default the setenv script file is absent. If the script file is present
+both in CATALINA_BASE and in CATALINA_HOME, the one in CATALINA_BASE is
+preferred.
 
 For example, to configure the JRE_HOME and CATALINA_PID variables you can
 create the following script file:
 
 On Windows, %CATALINA_BASE%\bin\setenv.bat:
 
-  set "JRE_HOME=%ProgramFiles%\Java\jre6"
+  set "JRE_HOME=%ProgramFiles%\Java\jre7"
   exit /b 0
 
-On Unix, $CATALINA_BASE/bin/setenv.sh:
+On *nix, $CATALINA_BASE/bin/setenv.sh:
 
   JRE_HOME=/usr/java/latest
   CATALINA_PID="$CATALINA_BASE/tomcat.pid"
 
-You cannot configure CATALINA_HOME and CATALINA_BASE variables in the
-setenv script, because they are used to find that file.
+
+The CATALINA_HOME and CATALINA_BASE variables cannot be configured in the
+setenv script, because they are used to locate that file.
+
+All the environment variables described here and the "setenv" script are
+used only if you use the standard scripts to launch Tomcat. For example, if
+you have installed Tomcat as a service on Windows, the service wrapper
+launches Java directly and does not use the script files.
 
 
 (4) Start Up Tomcat
 
 (4.1) Tomcat can be started by executing one of the following commands:
 
-      %CATALINA_HOME%\bin\startup.bat         (Windows)
+  On Windows:
 
-      $CATALINA_HOME/bin/startup.sh           (Unix)
+      %CATALINA_HOME%\bin\startup.bat
 
-   or
+    or
 
-      %CATALINA_HOME%\bin\catalina.bat start  (Windows)
+      %CATALINA_HOME%\bin\catalina.bat start
 
-      $CATALINA_HOME/bin/catalina.sh start    (Unix)
+  On *nix:
+
+      $CATALINA_HOME/bin/startup.sh
+
+    or
+
+      $CATALINA_HOME/bin/catalina.sh start
 
 (4.2) After startup, the default web applications included with Tomcat will be
       available by visiting:
@@ -196,15 +214,21 @@ setenv script, because they are used to find that file.
 
 (5.1) Tomcat can be shut down by executing one of the following commands:
 
-      %CATALINA_HOME%\bin\shutdown.bat       (Windows)
+  On Windows:
 
-      $CATALINA_HOME/bin/shutdown.sh         (Unix)
+      %CATALINA_HOME%\bin\shutdown.bat
 
-   or
+    or
 
-      %CATALINA_HOME%\bin\catalina.bat stop  (Windows)
+      %CATALINA_HOME%\bin\catalina.bat stop
 
-      $CATALINA_HOME/bin/catalina.sh stop    (Unix)
+  On *nix:
+
+      $CATALINA_HOME/bin/shutdown.sh
+
+    or
+
+      $CATALINA_HOME/bin/catalina.sh stop
 
 ==================================================
 Advanced Configuration - Multiple Tomcat Instances
