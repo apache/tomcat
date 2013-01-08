@@ -138,7 +138,7 @@ public abstract class StreamInbound implements UpgradeInbound {
                 } else if (opCode == Constants.OPCODE_PING) {
                     getWsOutbound().pong(frame.getPayLoad());
                 } else if (opCode == Constants.OPCODE_PONG) {
-                    // NO-OP
+                    doOnPong(frame.getPayLoad());
                 } else {
                     // Unknown OpCode
                     closeOutboundConnection(
@@ -218,6 +218,18 @@ public abstract class StreamInbound implements UpgradeInbound {
         }
     }
 
+    private void doOnPong(ByteBuffer payload) {
+        // Need to call onPong using the web application's class loader
+        Thread t = Thread.currentThread();
+        ClassLoader cl = t.getContextClassLoader();
+        t.setContextClassLoader(applicationClassLoader);
+        try {
+            onPong(payload);
+        } finally {
+            t.setContextClassLoader(cl);
+        }
+    }
+    
     @Override
     public final void onUpgradeComplete() {
         // Need to call onOpen using the web application's class loader
@@ -253,6 +265,15 @@ public abstract class StreamInbound implements UpgradeInbound {
         // NO-OP
     }
 
+    /**
+     * Intended to be overridden by sub-classes that wish to be notified
+     * when a pong is received. The default implementation is a NO-OP.
+     *
+     * @param payload   The payload included in the pong.
+     */
+    protected void onPong(ByteBuffer payload) {
+        // NO-OP
+    }
 
     /**
      * This method is called when there is a binary WebSocket message available

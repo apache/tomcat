@@ -121,6 +121,10 @@
         Fix NPE in <code>WebappLoader.stopInternal</code> when stop is called
         after a failed start. (kkolinko)
       </fix>
+      <add>
+        <bug>54381</bug>: Add support for receiving WebSocket pong messages.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
