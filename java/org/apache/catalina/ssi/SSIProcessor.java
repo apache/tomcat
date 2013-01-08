@@ -307,11 +307,11 @@ public class SSIProcessor {
                 break;
             }
         }
-        String command = null;
-        if (firstLetter != -1) {
-            command = cmd.substring(firstLetter, lastLetter + 1);
+        if (firstLetter == -1) {
+            return "";
+        } else {
+            return cmd.substring(firstLetter, lastLetter + 1);
         }
-        return command;
     }
 
 
