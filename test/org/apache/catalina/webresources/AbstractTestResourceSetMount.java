@@ -44,14 +44,17 @@ public abstract class AbstractTestResourceSetMount
         String[] results = resourceRoot.list("/");
 
         Assert.assertNotNull(results);
-        Assert.assertEquals(0, results.length);
+        Assert.assertEquals(1, results.length);
+        Assert.assertEquals(getMount().substring(1), results[0]);
     }
 
     @Test
     public final void testListWebAppPathsAbove() {
         Set<String> results = resourceRoot.listWebAppPaths("/");
 
-        Assert.assertNull(results);
+        Assert.assertNotNull(results);
+        Assert.assertEquals(1, results.size());
+        Assert.assertTrue(results.contains(getMount() + "/"));
     }
 
     @Test

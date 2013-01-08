@@ -167,6 +167,19 @@ public class JarResourceSet extends AbstractResourceSet {
                     }
                 }
             }
+        } else {
+            if (!path.endsWith("/")) {
+                path = path + "/";
+            }
+            if (webAppMount.startsWith(path)) {
+                int i = webAppMount.indexOf('/', path.length());
+                if (i == -1) {
+                    return new String[] {webAppMount.substring(path.length())};
+                } else {
+                    return new String[] {
+                            webAppMount.substring(path.length(), i)};
+                }
+            }
         }
         return result.toArray(new String[result.size()]);
     }
@@ -202,6 +215,18 @@ public class JarResourceSet extends AbstractResourceSet {
                                     name.substring(internalPath.length()));
                         }
                     }
+                }
+            }
+        } else {
+            if (!path.endsWith("/")) {
+                path = path + "/";
+            }
+            if (webAppMount.startsWith(path)) {
+                int i = webAppMount.indexOf('/', path.length());
+                if (i == -1) {
+                    result.add(webAppMount + "/");
+                } else {
+                    result.add(webAppMount.substring(0, i + 1));
                 }
             }
         }

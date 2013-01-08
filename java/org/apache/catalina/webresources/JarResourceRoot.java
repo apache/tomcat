@@ -31,12 +31,26 @@ public class JarResourceRoot extends AbstractResource {
 
     private final File base;
     private final String baseUrl;
+    private final String name;
 
     public JarResourceRoot(WebResourceRoot root, File base, String baseUrl,
             String webAppPath) {
         super(root, webAppPath);
         this.base = base;
         this.baseUrl = "jar:" + baseUrl;
+        // Extract the name from the webAppPath
+        // Strip any trailing '/' character
+        String resourceName;
+        if (webAppPath.endsWith("/")) {
+            resourceName = webAppPath.substring(0, webAppPath.length() - 1);
+        } else {
+            resourceName = webAppPath;
+        }
+        int i = resourceName.lastIndexOf('/');
+        if (i > -1) {
+            resourceName = resourceName.substring(i + 1);
+        }
+        name = resourceName;
     }
 
     @Override
@@ -71,7 +85,7 @@ public class JarResourceRoot extends AbstractResource {
 
     @Override
     public String getName() {
-        return "";
+        return name;
     }
 
     @Override

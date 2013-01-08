@@ -121,6 +121,18 @@ public class DirResourceSet extends AbstractFileResourceSet {
                 return result;
             }
         } else {
+            if (!path.endsWith("/")) {
+                path = path + "/";
+            }
+            if (webAppMount.startsWith(path)) {
+                int i = webAppMount.indexOf('/', path.length());
+                if (i == -1) {
+                    return new String[] {webAppMount.substring(path.length())};
+                } else {
+                    return new String[] {
+                            webAppMount.substring(path.length(), i)};
+                }
+            }
             return EMPTY_STRING_ARRAY;
         }
     }
@@ -146,6 +158,18 @@ public class DirResourceSet extends AbstractFileResourceSet {
                         }
                         result.add(sb.toString());
                     }
+                }
+            }
+        } else {
+            if (!path.endsWith("/")) {
+                path = path + "/";
+            }
+            if (webAppMount.startsWith(path)) {
+                int i = webAppMount.indexOf('/', path.length());
+                if (i == -1) {
+                    result.add(webAppMount + "/");
+                } else {
+                    result.add(webAppMount.substring(0, i + 1));
                 }
             }
         }
