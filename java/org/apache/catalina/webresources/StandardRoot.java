@@ -223,13 +223,13 @@ public class StandardRoot extends LifecycleMBeanBase
 
     @Override
     public void createWebResourceSet(ResourceSetType type, URL url,
-            String webAppPath, String internalPath) {
-        createWebResourceSet(type, toBase(url), webAppPath, internalPath);
+            String webAppMount, String internalPath) {
+        createWebResourceSet(type, toBase(url), webAppMount, internalPath);
     }
 
     @Override
     public void createWebResourceSet(ResourceSetType type, String base,
-            String webAppPath, String internalPath) {
+            String webAppMount, String internalPath) {
 
         ArrayList<WebResourceSet> resourceList;
         WebResourceSet resourceSet;
@@ -255,15 +255,15 @@ public class StandardRoot extends LifecycleMBeanBase
 
         if (file.isFile()) {
             if (file.getName().toLowerCase(Locale.ENGLISH).endsWith(".jar")) {
-                resourceSet = new JarResourceSet(this, base, webAppPath,
+                resourceSet = new JarResourceSet(this, base, webAppMount,
                         internalPath);
             } else {
-                resourceSet = new FileResourceSet(this, base, webAppPath,
+                resourceSet = new FileResourceSet(this, base, webAppMount,
                         internalPath);
             }
         } else if (file.isDirectory()) {
             resourceSet =
-                    new DirResourceSet(this, base, webAppPath, internalPath);
+                    new DirResourceSet(this, base, webAppMount, internalPath);
         } else {
             throw new IllegalArgumentException(
                     sm.getString("standardRoot.createInvalidFile", file));

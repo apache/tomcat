@@ -32,7 +32,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
     protected String canonicalBase;
 
     protected AbstractFileResourceSet(String internalPath) {
-        this.internalPath = internalPath;
+        this.internalPath = checkInternalPath(internalPath);
     }
 
     protected File file(String name, boolean mustExist) {

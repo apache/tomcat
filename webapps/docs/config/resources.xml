@@ -138,10 +138,11 @@
 
     <attribute name="webAppMount" required="false">
       <p>Identifies the path within the web application that these resources
-      will be made available. This attribute is required by the
+      will be made available. For the
       <code>org.apache.catalina.WebResourceSet</code> implementations provided
-      by Tomcat. Custom implementations may not require it. If not specified,
-      the default value of the empty string will be used.</p>
+      by Tomcat, this attribute is required and must start with '/'. Custom
+      implementations may not require it. If not specified, the default value of
+      "/" will be used.</p>
     </attribute>
 
   </attributes>

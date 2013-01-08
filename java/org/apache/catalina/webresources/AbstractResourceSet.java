@@ -40,6 +40,11 @@ public abstract class AbstractResourceSet extends LifecycleBase
         }
     }
 
+    protected final String checkInternalPath(String internalPath) {
+        //checkPath(internalPath);
+        return internalPath;
+    }
+
     @Override
     public final void setRoot(WebResourceRoot root) {
         this.root = root;
@@ -50,7 +55,13 @@ public abstract class AbstractResourceSet extends LifecycleBase
     }
 
     public final void setWebAppMount(String webAppMount) {
-        this.webAppMount = webAppMount;
+        checkPath(webAppMount);
+        // Optimise internal processing
+        if (webAppMount.equals("/")) {
+            this.webAppMount = "";
+        } else {
+            this.webAppMount = webAppMount;
+        }
     }
 
     public final String getWebAppMount() {

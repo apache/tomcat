@@ -181,12 +181,13 @@ public interface WebResourceRoot extends Lifecycle {
      * @param type          The type of {@link WebResourceSet} to create
      * @param url           The URL of the resource (must locate a JAR, file or
      *                          directory)
-     * @param webAppPath    The path within the web application that the
-     *                          resources should be published at
+     * @param webAppMount   The path within the web application that the
+     *                          resources should be published at. It must start
+     *                          with '/'.
      * @param internalPath  The path within the resource where the content is to
      *                          be found.
      */
-    void createWebResourceSet(ResourceSetType type, URL url, String webAppPath,
+    void createWebResourceSet(ResourceSetType type, URL url, String webAppMount,
             String internalPath);
 
     /**
@@ -196,7 +197,8 @@ public interface WebResourceRoot extends Lifecycle {
      * @param type          The type of {@link WebResourceSet} to create
      * @param base          The location of the resources
      * @param webAppMount   The path within the web application that the
-     *                          resources should be published at
+     *                          resources should be published at. It must start
+     *                          with '/'.
      * @param internalPath  The path within the resource where the content is to
      *                          be found.
      */
