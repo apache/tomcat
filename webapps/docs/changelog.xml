@@ -109,6 +109,10 @@
         need to be encoded in URLs such as spaces. Based on a patch by Polina
         Genova. (markt)
       </fix>
+      <fix>
+        <bug>54380</bug>: Do not try to register servlets or contexts into the
+        mapper too early (which just caused a warning to be logged). (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
