@@ -62,7 +62,7 @@ public class JarResourceSet extends AbstractResourceSet {
         setRoot(root);
         setBase(base);
         setWebAppMount(webAppMount);
-        this.internalPath = internalPath;
+        this.internalPath = checkInternalPath(internalPath);
 
         if (getRoot().getState().isAvailable()) {
             try {
