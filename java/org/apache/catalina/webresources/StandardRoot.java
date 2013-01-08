@@ -442,9 +442,9 @@ public class StandardRoot extends LifecycleMBeanBase
             f = new File(((Host)context.getParent()).getAppBaseFile(), f.getName());
         }
         if (f.isDirectory()) {
-            main = new DirResourceSet(this, f.getAbsolutePath(), "", "");
+            main = new DirResourceSet(this, f.getAbsolutePath(), "/", "/");
         } else if(f.isFile() && docBase.endsWith(".war")) {
-            main = new JarResourceSet(this, f.getAbsolutePath(), "", "");
+            main = new JarResourceSet(this, f.getAbsolutePath(), "/", "/");
         } else {
             throw new IllegalArgumentException(
                     sm.getString("standardRoot.startInvalidMain"));
