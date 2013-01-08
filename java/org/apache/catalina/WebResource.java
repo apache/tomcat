@@ -41,6 +41,15 @@ public interface WebResource {
     boolean exists();
 
     /**
+     * Indicates if this resource is required for applications to correctly scan
+     * the file structure but that does not exist in either the main or any
+     * additional {@link WebResourceSet}. For example, if an external
+     * directory is mapped to /WEB-INF/lib in an otherwise empty web
+     * application, /WEB-INF will be represented as a virtual resource.
+     */
+    boolean isVirtual();
+
+    /**
      * See {@link java.io.File#isDirectory()}.
      */
     boolean isDirectory();

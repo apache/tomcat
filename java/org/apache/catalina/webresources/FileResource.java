@@ -75,6 +75,11 @@ public class FileResource extends AbstractResource {
     }
 
     @Override
+    public boolean isVirtual() {
+        return false;
+    }
+
+    @Override
     public boolean isDirectory() {
         return resource.isDirectory();
     }

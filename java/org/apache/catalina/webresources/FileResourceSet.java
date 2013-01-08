@@ -85,9 +85,20 @@ public class FileResourceSet extends AbstractFileResourceSet {
                 return new EmptyResource(root, path);
             }
             return new FileResource(root, f, path);
-        } else {
-            return new EmptyResource(root, path);
         }
+
+        if (path.charAt(path.length() - 1) != '/') {
+            path = path + '/';
+        }
+
+        if (webAppMount.startsWith(path)) {
+            String name = path.substring(0, path.length() - 1);
+            name = name.substring(name.lastIndexOf('/') + 1);
+            if (name.length() > 0) {
+                return new VirtualResource(root, path, name);
+            }
+        }
+        return new EmptyResource(root, path);
     }
 
     @Override
@@ -97,14 +108,21 @@ public class FileResourceSet extends AbstractFileResourceSet {
         if (path.charAt(path.length() - 1) != '/') {
             path = path + '/';
         }
-        String webappMount = getWebAppMount();
+        String webAppMount = getWebAppMount();
 
-        if (webappMount.startsWith(path)) {
-            webappMount = webappMount.substring(path.length());
-            if (webappMount.equals(fileBase.getName())) {
+        if (webAppMount.startsWith(path)) {
+            webAppMount = webAppMount.substring(path.length());
+            if (webAppMount.equals(fileBase.getName())) {
                 return new String[] {fileBase.getName()};
+            } else {
+                // Virtual directory
+                int i = webAppMount.indexOf('/');
+                if (i > 0) {
+                    return new String[] {webAppMount.substring(0, i)};
+                }
             }
         }
+
         return EMPTY_STRING_ARRAY;
     }
 
@@ -117,12 +135,18 @@ public class FileResourceSet extends AbstractFileResourceSet {
         if (path.charAt(path.length() - 1) != '/') {
             path = path + '/';
         }
-        String webappMount = getWebAppMount();
+        String webAppMount = getWebAppMount();
 
-        if (webappMount.startsWith(path)) {
-            webappMount = webappMount.substring(path.length());
-            if (webappMount.equals(fileBase.getName())) {
+        if (webAppMount.startsWith(path)) {
+            webAppMount = webAppMount.substring(path.length());
+            if (webAppMount.equals(fileBase.getName())) {
                 result.add(path + fileBase.getName());
+            } else {
+                // Virtual directory
+                int i = webAppMount.indexOf('/');
+                if (i > 0) {
+                    result.add(path + webAppMount.substring(0, i + 1));
+                }
             }
         }
 

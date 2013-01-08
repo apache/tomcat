@@ -30,7 +30,7 @@ public class TestDirResourceSetMount extends AbstractTestResourceSetMount {
         WebResourceSet webResourceSet =
                 new DirResourceSet(new TesterWebResourceRoot(),
                         f.getAbsolutePath(), "/mount", "/");
-        root.setWebResourceSet(webResourceSet);
+        root.setMainResources(webResourceSet);
         return root;
     }
 

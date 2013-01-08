@@ -29,7 +29,7 @@ public class TestJarResourceSetMount extends AbstractTestResourceSetMount {
         TesterWebResourceRoot root = new TesterWebResourceRoot();
         WebResourceSet webResourceSet =
                 new JarResourceSet(root, f.getAbsolutePath(), "/mount", "/");
-        root.setWebResourceSet(webResourceSet);
+        root.setMainResources(webResourceSet);
         return root;
     }
 
