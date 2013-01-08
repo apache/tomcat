@@ -129,6 +129,10 @@
         <bug>54382</bug>: Fix NPE when SSI processing is enabled and an empty
         SSI directive is present. (markt)
       </fix>
+      <fix>
+        <bug>54390</bug> Use 'java_home' on Mac OS X to auto-detect JAVA_HOME.
+        (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
