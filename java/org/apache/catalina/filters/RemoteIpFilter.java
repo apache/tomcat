@@ -820,13 +820,13 @@ public class RemoteIpFilter implements Filter {
             }
             if (requestAttributesEnabled) {
                 request.setAttribute(AccessLog.REMOTE_ADDR_ATTRIBUTE,
-                        request.getRemoteAddr());
+                        xRequest.getRemoteAddr());
                 request.setAttribute(AccessLog.REMOTE_HOST_ATTRIBUTE,
-                        request.getRemoteHost());
+                        xRequest.getRemoteHost());
                 request.setAttribute(AccessLog.PROTOCOL_ATTRIBUTE,
-                        request.getProtocol());
+                        xRequest.getProtocol());
                 request.setAttribute(AccessLog.SERVER_PORT_ATTRIBUTE,
-                        Integer.valueOf(request.getServerPort()));
+                        Integer.valueOf(xRequest.getServerPort()));
             }
             chain.doFilter(xRequest, response);
         } else {
