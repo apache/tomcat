@@ -16,34 +16,23 @@
  */
 package org.apache.catalina.webresources;
 
-import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
-import org.apache.catalina.WebResource;
-import org.apache.catalina.WebResourceRoot;
-import org.apache.catalina.WebResourceSet;
 import org.apache.catalina.core.TesterContext;
 
 /**
  * Minimal implementation for use in unit tests that supports main and pre
  * resources.
  */
-public class TesterWebResourceRoot implements WebResourceRoot {
+public class TesterWebResourceRoot extends StandardRoot {
 
-    private WebResourceSet main;
-
-    private List<WebResourceSet> resources = new ArrayList<>();
-
-    public void setWebResourceSet(WebResourceSet main) {
-        this.main = main;
+    public TesterWebResourceRoot() {
+        super();
+        setCachingAllowed(false);
     }
 
     @Override
@@ -62,22 +51,22 @@ public class TesterWebResourceRoot implements WebResourceRoot {
     }
 
     @Override
-    public void init() throws LifecycleException {
+    public void initInternal() throws LifecycleException {
         // NO-OP
     }
 
     @Override
-    public void start() throws LifecycleException {
-        resources.add(main);
+    public void startInternal() throws LifecycleException {
+        setState(LifecycleState.STARTING);
     }
 
     @Override
-    public void stop() throws LifecycleException {
-        // NO-OP
+    public void stopInternal() throws LifecycleException {
+        setState(LifecycleState.STOPPING);
     }
 
     @Override
-    public void destroy() throws LifecycleException {
+    public void destroyInternal() throws LifecycleException {
         // NO-OP
     }
 
@@ -89,74 +78,6 @@ public class TesterWebResourceRoot implements WebResourceRoot {
     @Override
     public String getStateName() {
         return null;
-    }
-
-    @Override
-    public WebResource getResource(String path) {
-        WebResource result = null;
-        for (WebResourceSet webResourceSet : resources) {
-            result = webResourceSet.getResource(path);
-            if (result.exists()) {
-                return result;
-            }
-        }
-
-        // Default is empty resource in main resources
-        return new EmptyResource(this, path);
-    }
-
-    @Override
-    public WebResource[] getResources(String path) {
-        return null;
-    }
-
-    @Override
-    public String[] list(String path) {
-        // Set because we don't want duplicates
-        HashSet<String> result = new HashSet<>();
-        for (WebResourceSet webResourceSet : resources) {
-            String[] entries = webResourceSet.list(path);
-            for (String entry : entries) {
-                result.add(entry);
-            }
-        }
-        return result.toArray(new String[result.size()]);
-    }
-
-    @Override
-    public Set<String> listWebAppPaths(String path) {
-        // Set because we don't want duplicates
-        HashSet<String> result = new HashSet<>();
-        for (WebResourceSet webResourceSet : resources) {
-            result.addAll(webResourceSet.listWebAppPaths(path));
-        }
-        if (result.size() == 0 && !getResource(path).isDirectory()) {
-            return null;
-        }
-        return result;
-    }
-
-    @Override
-    public WebResource[] listResources(String path) {
-        return null;
-    }
-
-    @Override
-    public boolean mkdir(String path) {
-        if (getResource(path).exists()) {
-            return false;
-        }
-
-        return main.mkdir(path);
-    }
-
-    @Override
-    public boolean write(String path, InputStream is, boolean overwrite) {
-        if (getResource(path).exists()) {
-            return false;
-        }
-
-        return main.write(path, is, false);
     }
 
     @Override
@@ -229,21 +150,6 @@ public class TesterWebResourceRoot implements WebResourceRoot {
     @Override
     public long getCacheMaxObjectSize() {
         return 0;
-    }
-
-    @Override
-    public void addPreResources(WebResourceSet webResourceSet) {
-        resources.add(webResourceSet);
-    }
-
-    @Override
-    public void addJarResources(WebResourceSet webResourceSet) {
-        // NO-OP
-    }
-
-    @Override
-    public void addPostResources(WebResourceSet webResourceSet) {
-        // NO-OP
     }
 
     @Override

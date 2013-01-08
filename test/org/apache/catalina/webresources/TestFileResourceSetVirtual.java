@@ -16,21 +16,15 @@
  */
 package org.apache.catalina.webresources;
 
-import java.io.File;
-
-import org.apache.catalina.WebResourceRoot;
-import org.apache.catalina.WebResourceSet;
-
-public class TestDirResourceSetInternal extends TestDirResourceSet {
+/**
+ * Mounts file resources in sub directories that do not exist in the main
+ * resoucres.
+ */
+public class TestFileResourceSetVirtual extends TestFileResourceSet {
 
     @Override
-    public WebResourceRoot getWebResourceRoot() {
-        File f = new File("test/");
-        TesterWebResourceRoot root = new TesterWebResourceRoot();
-        WebResourceSet webResourceSet =
-                new DirResourceSet(new TesterWebResourceRoot(),
-                        f.getAbsolutePath(), "/", "/webresources/dir1");
-        root.setMainResources(webResourceSet);
-        return root;
+    public String getBaseDir() {
+        return "test/webresources/dir3";
     }
+
 }

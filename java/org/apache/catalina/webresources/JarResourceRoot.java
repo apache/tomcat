@@ -50,6 +50,11 @@ public class JarResourceRoot extends AbstractResource {
     }
 
     @Override
+    public boolean isVirtual() {
+        return false;
+    }
+
+    @Override
     public boolean isDirectory() {
         return true;
     }

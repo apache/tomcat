@@ -43,6 +43,7 @@ public class CachedResource implements WebResource {
     private volatile Boolean cachedIsFile = null;
     private volatile Boolean cachedIsDirectory = null;
     private volatile Boolean cachedExists = null;
+    private volatile Boolean cachedIsVirtual = null;
     private volatile Long cachedContentLength = null;
 
 
@@ -115,6 +116,16 @@ public class CachedResource implements WebResource {
             this.cachedExists = cachedExists;
         }
         return cachedExists.booleanValue();
+    }
+
+    @Override
+    public boolean isVirtual() {
+        Boolean cachedIsVirtual = this.cachedIsVirtual;
+        if (cachedIsVirtual == null) {
+            cachedIsVirtual = Boolean.valueOf(webResource.isVirtual());
+            this.cachedIsVirtual = cachedIsVirtual;
+        }
+        return cachedIsVirtual.booleanValue();
     }
 
     @Override

@@ -225,12 +225,32 @@ public abstract class AbstractTestResourceSet {
 
     @Test
     public final void testMkdirDirA() {
-        Assert.assertFalse(resourceRoot.mkdir(getMount() + "/d1"));
+        WebResource d1 = resourceRoot.getResource(getMount() + "/d1");
+        if (d1.exists()) {
+            Assert.assertFalse(resourceRoot.mkdir(getMount() + "/d1"));
+        } else if (d1.isVirtual()) {
+            Assert.assertTrue(resourceRoot.mkdir(getMount() + "/d1"));
+            File file = new File(getBaseDir(), "d1");
+            Assert.assertTrue(file.isDirectory());
+            Assert.assertTrue(file.delete());
+        } else {
+            Assert.fail("Unhandled condition in unit test");
+        }
     }
 
     @Test
     public final void testMkdirDirB() {
-        Assert.assertFalse(resourceRoot.mkdir(getMount() + "/d1/"));
+        WebResource d1 = resourceRoot.getResource(getMount() + "/d1/");
+        if (d1.exists()) {
+            Assert.assertFalse(resourceRoot.mkdir(getMount() + "/d1/"));
+        } else if (d1.isVirtual()) {
+            Assert.assertTrue(resourceRoot.mkdir(getMount() + "/d1/"));
+            File file = new File(getBaseDir(), "d1");
+            Assert.assertTrue(file.isDirectory());
+            Assert.assertTrue(file.delete());
+        } else {
+            Assert.fail("Unhandled condition in unit test");
+        }
     }
 
     @Test
@@ -267,14 +287,36 @@ public abstract class AbstractTestResourceSet {
 
     @Test
     public final void testWriteDirA() {
+        WebResource d1 = resourceRoot.getResource(getMount() + "/d1");
         InputStream is = new ByteArrayInputStream("test".getBytes());
-        Assert.assertFalse(resourceRoot.write(getMount() + "/d1", is, false));
+        if (d1.exists()) {
+            Assert.assertFalse(resourceRoot.write(getMount() + "/d1", is, false));
+        } else if (d1.isVirtual()) {
+            Assert.assertTrue(resourceRoot.write(
+                    getMount() + "/d1", is, false));
+            File file = new File(getBaseDir(), "d1");
+            Assert.assertTrue(file.exists());
+            Assert.assertTrue(file.delete());
+        } else {
+            Assert.fail("Unhandled condition in unit test");
+        }
     }
 
     @Test
     public final void testWriteDirB() {
+        WebResource d1 = resourceRoot.getResource(getMount() + "/d1/");
         InputStream is = new ByteArrayInputStream("test".getBytes());
-        Assert.assertFalse(resourceRoot.write(getMount() + "/d1/", is, false));
+        if (d1.exists()) {
+            Assert.assertFalse(resourceRoot.write(getMount() + "/d1/", is, false));
+        } else if (d1.isVirtual()) {
+            Assert.assertTrue(resourceRoot.write(
+                    getMount() + "/d1/", is, false));
+            File file = new File(getBaseDir(), "d1");
+            Assert.assertTrue(file.exists());
+            Assert.assertTrue(file.delete());
+        } else {
+            Assert.fail("Unhandled condition in unit test");
+        }
     }
 
     @Test

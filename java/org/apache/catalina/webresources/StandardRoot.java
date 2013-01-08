@@ -170,13 +170,22 @@ public class StandardRoot extends LifecycleMBeanBase
         checkState();
 
         WebResource result = null;
+        WebResource virtual = null;
         for (ArrayList<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
                 result = webResourceSet.getResource(path);
                 if (result.exists()) {
                     return result;
                 }
+                if (virtual == null && result.isVirtual()) {
+                    virtual = result;
+                }
             }
+        }
+
+        // Use the first virtual result if no real result was found
+        if (virtual != null) {
+            return virtual;
         }
 
         // Default is empty resource in main resources
@@ -376,6 +385,15 @@ public class StandardRoot extends LifecycleMBeanBase
             }
         }
         return f.getAbsolutePath();
+    }
+
+    /**
+     * For unit testing
+     */
+    protected void setMainResources(WebResourceSet main) {
+        this.main = main;
+        mainResources.clear();
+        mainResources.add(main);
     }
 
     @Override
