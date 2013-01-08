@@ -44,7 +44,7 @@ public abstract class AbstractTestTag extends TomcatBaseTest {
         File lib = new File("webapps/examples/WEB-INF/lib");
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, lib.getAbsolutePath(),
-                "/WEB-INF/lib", "");
+                "/WEB-INF/lib", "/");
 
         // Configure the use of the plug-in rather than the standard impl
         File plugin = new File(
@@ -52,7 +52,7 @@ public abstract class AbstractTestTag extends TomcatBaseTest {
         Assert.assertTrue(plugin.isFile());
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, plugin.getAbsolutePath(),
-                "/WEB-INF/tagPlugins.xml", "");
+                "/WEB-INF/tagPlugins.xml", "/");
 
         tomcat.start();
     }
