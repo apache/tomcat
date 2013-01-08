@@ -38,3 +38,13 @@ PATCHES PROPOSED TO BACKPORT:
   http://svn.apache.org/viewvc?view=revision&revision=1346365
   +1: kkolinko
   -1:
+
+* https://issues.apache.org/bugzilla/show_bug.cgi?id=54330
+  Refactor Member interface to reduce dependency on concrete implementation.
+  Based on a patch by Greg Turnquist.
+  I have added this to the status file because it changes an interface. I don't
+  believe there is any harm in this - the interface isn't really usable prior to
+  this patch - but I'd prefer this change to be RTC.
+  http://svn.apache.org/viewvc?rev=1430602&view=rev
+  +1: markt
+  -1:
