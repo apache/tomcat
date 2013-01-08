@@ -125,6 +125,10 @@
         <bug>54381</bug>: Add support for receiving WebSocket pong messages.
         (markt)
       </add>
+      <fix>
+        <bug>54382</bug>: Fix NPE when SSI processing is enabled and an empty
+        SSI directive is present. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
