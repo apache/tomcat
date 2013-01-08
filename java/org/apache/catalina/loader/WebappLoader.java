@@ -487,7 +487,9 @@ public class WebappLoader extends LifecycleMBeanBase
         servletContext.removeAttribute(Globals.CLASS_PATH_ATTR);
 
         // Throw away our current class loader
-        ((Lifecycle) classLoader).stop();
+        if (classLoader != null) {
+            ((Lifecycle) classLoader).stop();
+        }
 
         try {
             String contextName = context.getName();
