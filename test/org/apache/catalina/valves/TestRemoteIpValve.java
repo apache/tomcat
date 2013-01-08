@@ -30,8 +30,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.AccessLog;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 
@@ -80,7 +82,12 @@ public class TestRemoteIpValve {
     public static class MockRequest extends Request {
         @Override
         public void setAttribute(String name, Object value) {
-            // NOOP. Prevents NPE during testing.
+            getCoyoteRequest().getAttributes().put(name, value);
+        }
+
+        @Override
+        public Object getAttribute(String name) {
+            return getCoyoteRequest().getAttribute(name);
         }
     }
 
@@ -668,6 +675,43 @@ public class TestRemoteIpValve {
             "element1", "element2", "element3"
         };
         assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testRequestAttributesForAccessLog() throws Exception {
+
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+        remoteIpValve.setProtocolHeader("x-forwarded-proto");
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+
+        Request request = new MockRequest();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("140.211.11.130");
+        // protocol
+        request.setServerPort(8080);
+        request.getCoyoteRequest().scheme().setString("http");
+
+        // TEST
+        remoteIpValve.invoke(request, null);
+
+        // VERIFY
+        Assert.assertEquals("org.apache.catalina.AccessLog.ServerPort",
+                Integer.valueOf(8080),
+                request.getAttribute(AccessLog.SERVER_PORT_ATTRIBUTE));
+
+        Assert.assertEquals("org.apache.catalina.AccessLog.RemoteAddr",
+                "140.211.11.130",
+                request.getAttribute(AccessLog.REMOTE_ADDR_ATTRIBUTE));
+
+        Assert.assertEquals("org.apache.catalina.AccessLog.RemoteHost",
+                "140.211.11.130",
+                request.getAttribute(AccessLog.REMOTE_HOST_ATTRIBUTE));
     }
 
     private void assertArrayEquals(String[] expected, String[] actual) {

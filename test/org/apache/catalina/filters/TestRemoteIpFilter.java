@@ -45,6 +45,7 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
+import org.apache.catalina.AccessLog;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
@@ -127,7 +128,12 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         @Override
         public void setAttribute(String name, Object value) {
-            // NOOP. Prevents NPE during testing.
+            getCoyoteRequest().getAttributes().put(name, value);
+        }
+
+        @Override
+        public Object getAttribute(String name) {
+            return getCoyoteRequest().getAttributes().get(name);
         }
     }
 
@@ -501,6 +507,37 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         // TEST
         remoteIpFilter.doFilter(request, new Response(), filterChain);
         return filterChain.getRequest();
+    }
+
+    @Test
+    public void testRequestAttributesForAccessLog() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("protocolHeader", "x-forwarded-proto");
+        filterDef.addInitParameter("remoteIpHeader", "x-my-forwarded-for");
+        filterDef.addInitParameter("httpServerPort", "8080");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("192.168.0.10");
+        request.setHeader("x-my-forwarded-for", "140.211.11.130");
+        request.setHeader("x-forwarded-proto", "http");
+
+        // TEST
+        HttpServletRequest actualRequest =
+                testRemoteIpFilter(filterDef, request);
+
+        // VERIFY
+        Assert.assertEquals("org.apache.catalina.AccessLog.ServerPort",
+                Integer.valueOf(8080),
+                actualRequest.getAttribute(AccessLog.SERVER_PORT_ATTRIBUTE));
+
+        Assert.assertEquals("org.apache.catalina.AccessLog.RemoteAddr",
+                "140.211.11.130",
+                actualRequest.getAttribute(AccessLog.REMOTE_ADDR_ATTRIBUTE));
+
+        Assert.assertEquals("org.apache.catalina.AccessLog.RemoteHost",
+                "140.211.11.130",
+                actualRequest.getAttribute(AccessLog.REMOTE_HOST_ATTRIBUTE));
     }
 
     /**

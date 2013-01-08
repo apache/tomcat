@@ -110,6 +110,10 @@
         Genova. (markt)
       </fix>
       <fix>
+        <bug>54377</bug>: Correctly set request attributes for AccessLog in
+        RemoteIpFilter. Patch by Violeta Georgieva. (markt)
+      </fix>
+      <fix>
         <bug>54380</bug>: Do not try to register servlets or contexts into the
         mapper too early (which just caused a warning to be logged). (kkolinko)
       </fix>
