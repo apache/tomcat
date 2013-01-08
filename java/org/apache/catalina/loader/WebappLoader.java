@@ -660,8 +660,8 @@ public class WebappLoader extends LifecycleMBeanBase
         // Throw away our current class loader
         if (classLoader != null) {
             ((Lifecycle) classLoader).stop();
+            DirContextURLStreamHandler.unbind(classLoader);
         }
-        DirContextURLStreamHandler.unbind(classLoader);
 
         try {
             StandardContext ctx=(StandardContext)container;
