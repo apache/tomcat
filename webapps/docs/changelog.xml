@@ -180,6 +180,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>54244</bug>: Clarify the documentation for the BIO and NIO SSL
+        configuration attributes <code>sslEnabledProtocols</code> and
+        <code>sslProtocol</code> within the documentation web application.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
