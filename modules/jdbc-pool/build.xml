@@ -136,7 +136,7 @@
     <delete file="${basedir}/src/main/java/org/apache/tomcat/jdbc/pool/package.html"/>
   </target>
 
-  <target name="build" depends="prepare,download">
+  <target name="build" depends="prepare,download,build-src">
     <!-- compile org.apache.tomcat.jdbc-->
     <javac srcdir="${basedir}/src/main/java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
@@ -160,7 +160,9 @@
       </fileset>
       <fileset refid="license.notice"/>
     </jar>
+  </target>
 
+  <target name="build-src">
     <!-- connection pool source file-->
     <jar jarfile="${tomcat-jdbc-src.jar}" update="true">
       <fileset dir="${basedir}/src/main/java">
