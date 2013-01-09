@@ -84,7 +84,7 @@ public class TestWebXmlOrdering {
         app.addAbsoluteOrdering("e");
         app.addAbsoluteOrdering("d");
 
-        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
+        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments, null);
 
         Iterator<WebXml> iter = ordered.iterator();
         assertEquals(c,iter.next());
@@ -100,7 +100,7 @@ public class TestWebXmlOrdering {
         app.addAbsoluteOrdering("c");
         app.addAbsoluteOrdering("a");
 
-        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
+        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments, null);
 
         Iterator<WebXml> iter = ordered.iterator();
         assertEquals(c,iter.next());
@@ -120,7 +120,7 @@ public class TestWebXmlOrdering {
         others.add(e);
         others.add(f);
 
-        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
+        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments, null);
 
         Iterator<WebXml> iter = ordered.iterator();
         while (others.size() > 0) {
@@ -145,7 +145,7 @@ public class TestWebXmlOrdering {
         others.add(e);
         others.add(f);
 
-        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
+        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments, null);
 
         Iterator<WebXml> iter = ordered.iterator();
         assertEquals(b,iter.next());
@@ -163,7 +163,7 @@ public class TestWebXmlOrdering {
     public void testWebFragmentsAbsoluteWrongFragmentName() {
         app.addAbsoluteOrdering("a");
         app.addAbsoluteOrdering("z");
-        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
+        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments, null);
         assertEquals(1,ordered.size());
         assertEquals(fragments.get("a"),ordered.toArray()[0]);
     }
@@ -180,7 +180,7 @@ public class TestWebXmlOrdering {
         others.add(e);
         others.add(f);
 
-        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments);
+        Set<WebXml> ordered = WebXml.orderWebFragments(app, fragments, null);
 
         Iterator<WebXml> iter = ordered.iterator();
         assertEquals(b,iter.next());
@@ -238,7 +238,7 @@ public class TestWebXmlOrdering {
                             */
 
                             Set<WebXml> ordered =
-                                    WebXml.orderWebFragments(app, input);
+                                    WebXml.orderWebFragments(app, input, null);
                             populatePositions(ordered);
 
                             runner.validate(getOrder(ordered));
@@ -341,7 +341,7 @@ public class TestWebXmlOrdering {
         a.addBeforeOrdering("b");
         b.addBeforeOrdering("a");
 
-        WebXml.orderWebFragments(app, fragments);
+        WebXml.orderWebFragments(app, fragments, null);
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -351,7 +351,7 @@ public class TestWebXmlOrdering {
         c.addBeforeOrdering("a");
         c.addAfterOrdering("b");
 
-        WebXml.orderWebFragments(app, fragments);
+        WebXml.orderWebFragments(app, fragments, null);
     }
 
     private interface RelativeOrderingTestRunner {

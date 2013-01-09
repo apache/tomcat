@@ -133,6 +133,10 @@
         <bug>54390</bug> Use 'java_home' on Mac OS X to auto-detect JAVA_HOME.
         (schultz)
       </fix>
+      <fix>
+        <bug>54391</bug>: Provide a value for the
+        <code>javax.servlet.context.orderedLibs</code> attribute. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
