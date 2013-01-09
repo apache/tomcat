@@ -719,7 +719,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
      * @param protocols the protocols to use.
      */
     protected void setEnabledProtocols(SSLServerSocket socket,
-            String []protocols){
+            String[] protocols){
         if (protocols != null) {
             socket.setEnabledProtocols(protocols);
         }
