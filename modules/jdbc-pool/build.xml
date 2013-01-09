@@ -137,7 +137,6 @@
   </target>
 
   <target name="build" depends="prepare,download">
-    <mkdir dir="${tomcat.pool}"/>
     <!-- compile org.apache.tomcat.jdbc-->
     <javac srcdir="${basedir}/src/main/java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
