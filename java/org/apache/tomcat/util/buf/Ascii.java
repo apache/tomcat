@@ -64,8 +64,7 @@ public final class Ascii {
     /**
      * Returns true if the specified ASCII character is a digit.
      */
-
-    public static boolean isDigit(int c) {
+    private static boolean isDigit(int c) {
         return isDigit[c & 0xff];
     }
 
