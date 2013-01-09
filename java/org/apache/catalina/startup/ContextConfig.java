@@ -1166,7 +1166,8 @@ public class ContextConfig implements LifecycleListener {
 
         // Step 2. Order the fragments.
         Set<WebXml> orderedFragments = null;
-        orderedFragments = WebXml.orderWebFragments(webXml, fragments);
+        orderedFragments =
+                WebXml.orderWebFragments(webXml, fragments, sContext);
 
         // Step 3. Look for ServletContainerInitializer implementations
         if (ok) {
@@ -2505,8 +2506,20 @@ public class ContextConfig implements LifecycleListener {
                 if (fragment.getName() == null) {
                     fragment.setName(fragment.getURL().toString());
                 }
+                fragment.setJarName(extractJarFileName(url));
                 fragments.put(fragment.getName(), fragment);
             }
+        }
+
+        private String extractJarFileName(URL input) {
+            String url = input.toString();
+            if (url.endsWith("!/")) {
+                // Remove it
+                url = url.substring(0, url.length() - 2);
+            }
+
+            // File name will now be whatever is after the final /
+            return url.substring(url.lastIndexOf('/') + 1);
         }
 
         @Override
@@ -2536,6 +2549,7 @@ public class ContextConfig implements LifecycleListener {
                 if (fragment.getName() == null) {
                     fragment.setName(fragment.getURL().toString());
                 }
+                fragment.setJarName(file.getName());
                 fragments.put(fragment.getName(), fragment);
             }
         }

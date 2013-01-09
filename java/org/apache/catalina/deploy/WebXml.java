@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletContext;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspPropertyGroupDescriptor;
@@ -566,6 +567,10 @@ public class WebXml {
     public void setURL(URL url) { this.uRL = url; }
     public URL getURL() { return uRL; }
 
+    // Name of jar file
+    private String jarName = null;
+    public void setJarName(String jarName) { this.jarName = jarName; }
+    public String getJarName() { return jarName; }
 
     @Override
     public String toString() {
@@ -2084,19 +2089,23 @@ public class WebXml {
      * the order that the fragments must be processed as per the rules in the
      * Servlet spec.
      *
-     * @param application   The application web.xml file
-     * @param fragments     The map of fragment names to web fragments
+     * @param application    The application web.xml file
+     * @param fragments      The map of fragment names to web fragments
+     * @param servletContext The servlet context the fragments are associated
+     *                       with
      * @return Ordered list of web-fragment.xml files to process
      */
     public static Set<WebXml> orderWebFragments(WebXml application,
-            Map<String,WebXml> fragments) {
+            Map<String,WebXml> fragments, ServletContext servletContext) {
 
         Set<WebXml> orderedFragments = new LinkedHashSet<>();
 
         boolean absoluteOrdering =
             (application.getAbsoluteOrdering() != null);
+        boolean orderingPresent = false;
 
         if (absoluteOrdering) {
+            orderingPresent = true;
             // Only those fragments listed should be processed
             Set<String> requestedOrder = application.getAbsoluteOrdering();
 
@@ -2127,6 +2136,7 @@ public class WebXml {
                 Iterator<String> before =
                         fragment.getBeforeOrdering().iterator();
                 while (before.hasNext()) {
+                    orderingPresent = true;
                     String beforeEntry = before.next();
                     if (!beforeEntry.equals(ORDER_OTHERS)) {
                         WebXml beforeFragment = fragments.get(beforeEntry);
@@ -2139,6 +2149,7 @@ public class WebXml {
                 }
                 Iterator<String> after = fragment.getAfterOrdering().iterator();
                 while (after.hasNext()) {
+                    orderingPresent = true;
                     String afterEntry = after.next();
                     if (!afterEntry.equals(ORDER_OTHERS)) {
                         WebXml afterFragment = fragments.get(afterEntry);
@@ -2196,6 +2207,20 @@ public class WebXml {
             orderFragments(orderedFragments, beforeSet);
             orderFragments(orderedFragments, othersSet);
             orderFragments(orderedFragments, afterSet);
+        }
+
+        // Avoid NPE when unit testing
+        if (servletContext != null) {
+            // Publish the ordered fragments
+            List<String> orderedJarFileNames = null;
+            if (orderingPresent) {
+                orderedJarFileNames = new ArrayList<>();
+                for (WebXml fragment: orderedFragments) {
+                    orderedJarFileNames.add(fragment.getJarName());
+                }
+            }
+            servletContext.setAttribute(ServletContext.ORDERED_LIBS,
+                    orderedJarFileNames);
         }
 
         return orderedFragments;
