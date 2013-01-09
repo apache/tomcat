@@ -196,8 +196,48 @@ public class TestAuthorizationDigest {
     }
 
     @Test
+    public void testQuotedNonTokenQop2() throws Exception {
+        String header = "Digest qop=\"{auth\"";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = HttpParser.parseAuthorizationDigest(input);
+        Assert.assertNull(result);
+    }
+
+    @Test
     public void testUnclosedQuotedTokenQop() throws Exception {
         String header = "Digest qop=\"auth";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = HttpParser.parseAuthorizationDigest(input);
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void testWrongCharacterInToken() throws Exception {
+        String header = "Digest \u044f";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = HttpParser.parseAuthorizationDigest(input);
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void testWrongCharacterInQuotedToken() throws Exception {
+        String header = "Digest qop=\"\u044f\"";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = HttpParser.parseAuthorizationDigest(input);
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void testWrongCharacterInHex() throws Exception {
+        String header = "Digest nc=\u044f";
 
         StringReader input = new StringReader(header);
 

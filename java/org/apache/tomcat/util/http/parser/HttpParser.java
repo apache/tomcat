@@ -53,6 +53,7 @@ public class HttpParser {
     private static final Map<String,Integer> fieldTypes =
             new HashMap<String,Integer>();
 
+    // Arrays used by isToken(), isHex()
     private static final boolean isToken[] = new boolean[128];
     private static final boolean isHex[] = new boolean[128];
 
@@ -240,6 +241,24 @@ public class HttpParser {
         return result.toString();
     }
 
+    private static boolean isToken(int c) {
+        // Fast for correct values, slower for incorrect ones
+        try {
+            return isToken[c];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return false;
+        }
+    }
+
+    private static boolean isHex(int c) {
+        // Fast for correct values, slower for incorrect ones
+        try {
+            return isHex[c];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return false;
+        }
+    }
+
     private static SkipConstantResult skipConstant(StringReader input,
             String constant) throws IOException {
         int len = constant.length();
@@ -279,7 +298,7 @@ public class HttpParser {
             c = input.read();
         }
 
-        while (c != -1 && isToken[c]) {
+        while (c != -1 && isToken(c)) {
             result.append((char) c);
             c = input.read();
         }
@@ -383,7 +402,7 @@ public class HttpParser {
         }
         c = input.read();
 
-        while (c != -1 && isToken[c]) {
+        while (c != -1 && isToken(c)) {
             result.append((char) c);
             c = input.read();
         }
@@ -421,7 +440,7 @@ public class HttpParser {
             c = input.read();
         }
 
-        while (c != -1 && isHex[c]) {
+        while (c != -1 && isHex(c)) {
             result.append((char) c);
             c = input.read();
         }

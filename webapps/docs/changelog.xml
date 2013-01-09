@@ -130,8 +130,8 @@
         SSI directive is present. (markt)
       </fix>
       <fix>
-        <bug>54390</bug> Use 'java_home' on Mac OS X to auto-detect JAVA_HOME.
-        (schultz)
+        Fix <code>ArrayIndexOutOfBoundsException</code> in
+        <code>HttpParser</code> when parsing incorrect HTTP headers. (kkolinko)
       </fix>
       <fix>
         <bug>54391</bug>: Provide a value for the
@@ -176,6 +176,14 @@
         <bug>54338</bug>: Correctly coerce the value to the expected type when
         using the tag plug-in for the JSTL set tag. Patch provided by Sheldon
         Shao. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>54390</bug>: Use 'java_home' on Mac OS X to auto-detect JAVA_HOME.
+        (schultz)
       </fix>
     </changelog>
   </subsection>
