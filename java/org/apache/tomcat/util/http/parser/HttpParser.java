@@ -52,7 +52,7 @@ public class HttpParser {
 
     private static final Map<String,Integer> fieldTypes = new HashMap<>();
 
-    // Arrays used by isToken(), isHex() 
+    // Arrays used by isToken(), isHex()
     private static final boolean isToken[] = new boolean[128];
     private static final boolean isHex[] = new boolean[128];
 
