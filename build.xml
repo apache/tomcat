@@ -2255,7 +2255,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- Packages the source code in JARs to match the binary JARs -->
   <target name="package-src-jar"
-  	      depends="build-manifests,build-tomcat-jdbc-src">
+          depends="build-manifests,build-tomcat-jdbc-src">
 
     <mkdir dir="${tomcat.src.jars}" />
 
