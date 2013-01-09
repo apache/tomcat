@@ -2224,7 +2224,7 @@ public class WebXml {
             // Publish the ordered fragments
             List<String> orderedJarFileNames = null;
             if (orderingPresent) {
-                orderedJarFileNames = new ArrayList<>();
+                orderedJarFileNames = new ArrayList<String>();
                 for (WebXml fragment: orderedFragments) {
                     orderedJarFileNames.add(fragment.getJarName());
                 }
