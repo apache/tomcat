@@ -74,10 +74,6 @@
         Allow web applications to be stopped cleanly even if filters shown
         exceptions when their destroy() method is called. (markt/kkolinko)
       </fix>
-      <add>
-        Make HTTP Digest authentication header parsing tolerant of invalid
-        headers sent by known buggy clients. (markt)
-      </add>
       <fix>
         Fix memory leak of servlet instances when running with a
         SecurityManager and either init() or destroy() methods fail
@@ -109,6 +105,10 @@
         need to be encoded in URLs such as spaces. Based on a patch by Polina
         Genova. (markt)
       </fix>
+      <add>
+        <bug>54372</bug>: Make HTTP Digest authentication header parsing
+        tolerant of invalid headers sent by known buggy clients. (markt)
+      </add>
       <fix>
         <bug>54377</bug>: Correctly set request attributes for AccessLog in
         RemoteIpFilter. Patch by Violeta Georgieva. (markt)
