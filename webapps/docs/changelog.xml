@@ -154,6 +154,11 @@
   </subsection>
   <subsection name="Jasper">
     <changelog>
+      <add>
+        <bug>54240</bug>: Add support for auto-detection and configuration of
+        JARs on the classpath that provide tag plug-in implementations. Based on
+        a patch by Sheldon Shao. (markt)
+      </add>
       <fix>
         <bug>54241</bug>: Revert the fix for <bug>35410</bug> as it was not
         compliant with the JSP specification, specifically that
