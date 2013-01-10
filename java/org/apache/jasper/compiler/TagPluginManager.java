@@ -14,10 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -33,9 +35,10 @@ import org.apache.jasper.xmlparser.TreeNode;
  * Manages tag plugin optimizations.
  * @author Kin-man Chung
  */
-
 public class TagPluginManager {
 
+    private static final String META_INF_JASPER_TAG_PLUGINS_XML =
+            "META-INF/org.apache.jasper/tagPlugins.xml";
     private static final String TAG_PLUGINS_XML = "/WEB-INF/tagPlugins.xml";
     private static final String TAG_PLUGINS_ROOT_ELEM = "tag-plugins";
 
@@ -73,12 +76,44 @@ public class TagPluginManager {
         if (initialized)
             return;
 
-        InputStream is = ctxt.getResourceAsStream(TAG_PLUGINS_XML);
-        if (is == null)
-            return;
+        tagPlugins = new HashMap<>();
 
-        TreeNode root = (new ParserUtils()).parseXMLDocument(TAG_PLUGINS_XML,
-                                                             is);
+        Enumeration<URL> urls = null;
+        try {
+            urls = ctxt.getClassLoader().getResources(
+                    META_INF_JASPER_TAG_PLUGINS_XML);
+        } catch (IOException ioe) {
+            throw new JasperException(ioe);
+        }
+
+        if (urls != null) {
+            while(urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                try (InputStream is = url.openStream()){
+                    loadTagPlugins(err, is);
+                } catch(IOException ioe) {
+                    throw new JasperException(ioe);
+                }
+            }
+        }
+
+        try (InputStream is = ctxt.getResourceAsStream(TAG_PLUGINS_XML)) {
+            if (is != null) {
+                loadTagPlugins(err, is);
+            }
+        } catch (IOException ioe) {
+            throw new JasperException(ioe);
+        }
+
+        initialized = true;
+    }
+
+
+    private void loadTagPlugins(ErrorDispatcher err, InputStream is)
+            throws JasperException {
+
+        TreeNode root =
+                (new ParserUtils()).parseXMLDocument(TAG_PLUGINS_XML, is);
         if (root == null) {
             return;
         }
