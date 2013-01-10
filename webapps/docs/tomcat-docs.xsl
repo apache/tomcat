@@ -194,9 +194,10 @@
               <a href="{$commentslink}">here</a>.
               Comments should be pointed towards suggestions on improving the documentation
               or server, and may be removed again by our moderators if they are either
-              implemented or considered invalid/off-topic.
-              Questions on how to manage Apache Tomcat should be directed
-              to our <a href="http://tomcat.apache.org/lists.html">mailing lists</a>.</p>
+              implemented or considered invalid/off-topic.<br/><br/>
+              Questions on how to configure or use Apache Tomcat should be directed
+              to our <a href="http://tomcat.apache.org/lists.html">mailing lists</a>.
+              If you need help, ask on the users mailing list.</p>
               <script type="text/javascript">
               <xsl:text disable-output-escaping="yes"><![CDATA[<!--//--><![CDATA[//><!--
               var comments_shortname = 'tomcat';
