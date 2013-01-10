@@ -35,13 +35,15 @@ Code style
  - Method with a constructor name       - W
  - Method can be static                 - I
  - Method can potentially be static     - I
-Potential programming errors
+
+Potential programming problems
  - All                                  - W
    except the following:
 
- - Incomplete 'switch' cases on enum    - W
-   [ ] Signal even if 'default' case exists
- - 'switch' is missing 'default' case   - I
+   - Incomplete 'switch' cases on enum    - W
+     [ ] Signal even if 'default' case exists
+   - 'switch' is missing 'default' case   - I
+   - Potential resource leak              - I
 
 Name shadowing and conflicts
  - Field declaration hides another...   - I
@@ -49,24 +51,28 @@ Name shadowing and conflicts
  - Type parameter hides another type    - W
  - Method does not override...          - W
  - Interface method conflicts...        - W
+
 Deprecated and restricted API
  - Deprecated API                       - W
    ([ ] on all additional check boxes)
  - Forbidden references                 - E
  - Discouraged reference                - W
+
 Unnecessary code
  - All                                  - W
    ([x] on all additional check boxes)
    except the following:
 
- - Unnecessary else                     - I
+   - Unnecessary else                     - I
 
 Generic types
  - All                                  - W
    [x] Ignore unavoidable generic type problems
+
 Annotations
  - All                                  - W
    ([x] on all additional check boxes)
+
 Null analysis
  - Null pointer access                  - W
  - Potential null pointer access        - W
