@@ -71,7 +71,7 @@
         exception. (markt)
       </fix>
       <fix>
-        Allow web applications to be stopped cleanly even if filters shown
+        Allow web applications to be stopped cleanly even if filters throw
         exceptions when their destroy() method is called. (markt/kkolinko)
       </fix>
       <fix>
