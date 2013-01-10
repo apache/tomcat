@@ -27,7 +27,6 @@ import java.util.Vector;
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
 import javax.servlet.jsp.tagext.TagAttributeInfo;
-import javax.servlet.jsp.tagext.TagExtraInfo;
 import javax.servlet.jsp.tagext.TagFileInfo;
 import javax.servlet.jsp.tagext.TagInfo;
 import javax.servlet.jsp.tagext.TagLibraryInfo;
@@ -98,8 +97,6 @@ class TagFileProcessor {
         private String name = null;
 
         private String path = null;
-
-        private TagExtraInfo tei = null;
 
         private String bodycontent = null;
 
@@ -371,7 +368,7 @@ class TagFileProcessor {
             attributeVector.copyInto(tagAttributeInfo);
 
             return new JasperTagInfo(name, tagClassName, bodycontent,
-                    description, tagLibInfo, tei, tagAttributeInfo,
+                    description, tagLibInfo, null, tagAttributeInfo,
                     displayName, smallIcon, largeIcon, tagVariableInfos,
                     dynamicAttrsMapName);
         }
