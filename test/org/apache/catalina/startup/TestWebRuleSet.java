@@ -115,6 +115,13 @@ public class TestWebRuleSet {
         parse(new WebXml(), "web-1ordering.xml", false, true);
 }
 
+    @Test
+    public void testLifecycleMethodsDefinitions() throws Exception {
+        // post-construct and pre-destroy
+        parse(new WebXml(), "web-1lifecyclecallback.xml", false, true);
+        // conflicting post-construct definitions
+        parse(new WebXml(), "web-2lifecyclecallback.xml", false, false);
+    }
 
     private synchronized void parse(WebXml webXml, String target,
             boolean fragment, boolean expected) throws FileNotFoundException {

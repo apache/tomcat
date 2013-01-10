@@ -559,6 +559,27 @@ public class WebXml {
         return localeEncodingMappings;
     }
 
+    // post-construct elements
+    private Map<String, String> postConstructMethods = new HashMap<>();
+    public void addPostConstructMethods(String clazz, String method) {
+        if (!postConstructMethods.containsKey(clazz)) {
+            postConstructMethods.put(clazz, method);
+        }
+    }
+    public Map<String, String> getPostConstructMethods() {
+        return postConstructMethods;
+    }
+
+    // pre-destroy elements
+    private Map<String, String> preDestroyMethods = new HashMap<>();
+    public void addPreDestroyMethods(String clazz, String method) {
+        if (!preDestroyMethods.containsKey(clazz)) {
+            preDestroyMethods.put(clazz, method);
+        }
+    }
+    public Map<String, String> getPreDestroyMethods() {
+        return preDestroyMethods;
+    }
 
     // Attributes not defined in web.xml or web-fragment.xml
 
@@ -1066,6 +1087,32 @@ public class WebXml {
         }
         sb.append('\n');
 
+        if (!postConstructMethods.isEmpty()) {
+            for (Entry<String, String> entry : postConstructMethods
+                    .entrySet()) {
+                sb.append("  <post-construct>\n");
+                appendElement(sb, INDENT4, "lifecycle-callback-class",
+                        entry.getKey());
+                appendElement(sb, INDENT4, "lifecycle-callback-method",
+                        entry.getValue());
+                sb.append("  </post-construct>\n");
+            }
+            sb.append('\n');
+        }
+
+        if (!preDestroyMethods.isEmpty()) {
+            for (Entry<String, String> entry : preDestroyMethods
+                    .entrySet()) {
+                sb.append("  <pre-destroy>\n");
+                appendElement(sb, INDENT4, "lifecycle-callback-class",
+                        entry.getKey());
+                appendElement(sb, INDENT4, "lifecycle-callback-method",
+                        entry.getValue());
+                sb.append("  </pre-destroy>\n");
+            }
+            sb.append('\n');
+        }
+
         for (MessageDestinationRef mdr : messageDestinationRefs.values()) {
             sb.append("  <message-destination-ref>\n");
             appendElement(sb, INDENT4, "description", mdr.getDescription());
@@ -1364,6 +1411,14 @@ public class WebXml {
                     }
                 }
             }
+        }
+
+        for (Entry<String, String> entry : postConstructMethods.entrySet()) {
+            context.addPostConstructMethod(entry.getKey(), entry.getValue());
+        }
+
+        for (Entry<String, String> entry : preDestroyMethods.entrySet()) {
+            context.addPreDestroyMethod(entry.getKey(), entry.getValue());
         }
     }
 
@@ -1860,6 +1915,28 @@ public class WebXml {
             }
         }
 
+        if (postConstructMethods.isEmpty()) {
+            for (WebXml fragment : fragments) {
+                if (!mergeLifecycleCallback(fragment.getPostConstructMethods(),
+                        temp.getPostConstructMethods(), fragment,
+                        "Post Construct Methods")) {
+                    return false;
+                }
+            }
+            postConstructMethods.putAll(temp.getPostConstructMethods());
+        }
+
+        if (preDestroyMethods.isEmpty()) {
+            for (WebXml fragment : fragments) {
+                if (!mergeLifecycleCallback(fragment.getPreDestroyMethods(),
+                        temp.getPreDestroyMethods(), fragment,
+                        "Pre Destroy Methods")) {
+                    return false;
+                }
+            }
+            preDestroyMethods.putAll(temp.getPreDestroyMethods());
+        }
+
         return true;
     }
 
@@ -2080,6 +2157,26 @@ public class WebXml {
             }
         }
 
+        return true;
+    }
+
+
+    private static <T> boolean mergeLifecycleCallback(
+            Map<String, String> fragmentMap, Map<String, String> tempMap,
+            WebXml fragment, String mapName) {
+        for (Entry<String, String> entry : fragmentMap.entrySet()) {
+            final String key = entry.getKey();
+            final String value = entry.getValue();
+            if (tempMap.containsKey(key)) {
+                if (value != null && !value.equals(tempMap.get(key))) {
+                    log.error(sm.getString("webXml.mergeConflictString",
+                            mapName, key, fragment.getName(), fragment.getURL()));
+                    return false;
+                }
+            } else {
+                tempMap.put(key, value);
+            }
+        }
         return true;
     }
 
