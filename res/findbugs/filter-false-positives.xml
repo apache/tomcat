@@ -193,6 +193,12 @@
     <Bug code="DLS"/>
   </Match>
   <Match>
+    <!-- NPE is not possible -->
+    <Class name="org.apache.jasper.compiler.JspConfig"/>
+    <Method name="selectProperty"/>
+    <Bug code="NP"/>
+  </Match>
+  <Match>
     <!-- Returning null is intentional -->
     <Class name="org.apache.jasper.compiler.JspReader"/>
     <Method name="indexOf"/>
