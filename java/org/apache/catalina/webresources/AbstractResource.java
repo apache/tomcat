@@ -104,14 +104,14 @@ public abstract class AbstractResource implements WebResource {
         int size = (int) len;
         byte[] result = new byte[size];
 
-        InputStream is = getInputStream();
 
-        if (is == null) {
-            return null;
-        }
 
         int pos = 0;
-        try {
+        try (InputStream is = getInputStream()) {
+            if (is == null) {
+                return null;
+            }
+
             while (pos < size) {
                 int n = is.read(result, pos, size - pos);
                 if (n < 0) {
