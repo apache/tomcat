@@ -649,7 +649,8 @@ public class CoyoteAdapter implements Adapter {
             // protocol handler, we have to assume the URL has been properly
             // decoded already
             decodedURI.toChars();
-            // Remove any path parameters
+            // Remove all path parameters; any needed path parameter should be set 
+            // using the request object rather than passing it in the URL
             CharChunk uriCC = decodedURI.getCharChunk();
             int semicolon = uriCC.indexOf(';');
             if (semicolon > 0) {
