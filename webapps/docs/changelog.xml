@@ -192,6 +192,12 @@
         <code>sslProtocol</code> within the documentation web application.
         (markt)
       </fix>
+      <add>
+        Integrate documentation of Tomcat 7 with Apache Comments System.
+        People can leave their comments when reading documentation online
+        at the <a href="http://tomcat.apache.org/">tomcat.apache.org</a>
+        site. (rjung)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
