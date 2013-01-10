@@ -235,7 +235,7 @@ public class TestWebXml {
         WebXml f1 = new WebXml();
         WebXml f2 = new WebXml();
 
-        HashSet<WebXml> fragments = new HashSet<>();
+        HashSet<WebXml> fragments = new HashSet<WebXml>();
         fragments.add(f1);
         fragments.add(f2);
 
@@ -253,7 +253,7 @@ public class TestWebXml {
         WebXml f1 = new WebXml();
         WebXml f2 = new WebXml();
 
-        HashSet<WebXml> fragments = new HashSet<>();
+        HashSet<WebXml> fragments = new HashSet<WebXml>();
         fragments.add(f1);
         fragments.add(f2);
 
