@@ -328,7 +328,14 @@ public class WebXml {
     private Map<String,String> servletMappings = new HashMap<String,String>();
     private Set<String> servletMappingNames = new HashSet<String>();
     public void addServletMapping(String urlPattern, String servletName) {
-        servletMappings.put(urlPattern, servletName);
+        String oldServletName = servletMappings.put(urlPattern, servletName);
+        if (oldServletName != null) {
+            // Duplicate mapping. As per clarification from the Servlet EG,
+            // deployment should fail.
+            throw new IllegalArgumentException(sm.getString(
+                    "webXml.duplicateServletMapping", oldServletName,
+                    servletName, urlPattern));
+        }
         servletMappingNames.add(servletName);
     }
     public Map<String,String> getServletMappings() { return servletMappings; }
