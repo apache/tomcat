@@ -609,39 +609,53 @@ public class CoyoteAdapter implements Adapter {
         MessageBytes decodedURI = req.decodedURI();
         decodedURI.duplicate(req.requestURI());
 
-        // Parse the path parameters. This will:
-        //   - strip out the path parameters
-        //   - convert the decodedURI to bytes
-        parsePathParameters(req, request);
+        if (decodedURI.getType() == MessageBytes.T_BYTES) {
+            // Parse the path parameters. This will:
+            //   - strip out the path parameters
+            //   - convert the decodedURI to bytes
+            parsePathParameters(req, request);
 
-        // URI decoding
-        // %xx decoding of the URL
-        try {
-            req.getURLDecoder().convert(decodedURI, false);
-        } catch (IOException ioe) {
-            res.setStatus(400);
-            res.setMessage("Invalid URI: " + ioe.getMessage());
-            connector.getService().getContainer().logAccess(
-                    request, response, 0, true);
-            return false;
-        }
-        // Normalization
-        if (!normalize(req.decodedURI())) {
-            res.setStatus(400);
-            res.setMessage("Invalid URI");
-            connector.getService().getContainer().logAccess(
-                    request, response, 0, true);
-            return false;
-        }
-        // Character decoding
-        convertURI(decodedURI, request);
-        // Check that the URI is still normalized
-        if (!checkNormalize(req.decodedURI())) {
-            res.setStatus(400);
-            res.setMessage("Invalid URI character encoding");
-            connector.getService().getContainer().logAccess(
-                    request, response, 0, true);
-            return false;
+            // URI decoding
+            // %xx decoding of the URL
+            try {
+                req.getURLDecoder().convert(decodedURI, false);
+            } catch (IOException ioe) {
+                res.setStatus(400);
+                res.setMessage("Invalid URI: " + ioe.getMessage());
+                connector.getService().getContainer().logAccess(
+                        request, response, 0, true);
+                return false;
+            }
+            // Normalization
+            if (!normalize(req.decodedURI())) {
+                res.setStatus(400);
+                res.setMessage("Invalid URI");
+                connector.getService().getContainer().logAccess(
+                        request, response, 0, true);
+                return false;
+            }
+            // Character decoding
+            convertURI(decodedURI, request);
+            // Check that the URI is still normalized
+            if (!checkNormalize(req.decodedURI())) {
+                res.setStatus(400);
+                res.setMessage("Invalid URI character encoding");
+                connector.getService().getContainer().logAccess(
+                        request, response, 0, true);
+                return false;
+            }
+        } else {
+            // The URL is chars or String, and has been sent using an in-memory
+            // protocol handler, we have to assume the URL has been properly
+            // decoded already
+            decodedURI.toChars();
+            // Remove any path parameters
+            CharChunk uriCC = decodedURI.getCharChunk();
+            int semicolon = uriCC.indexOf(';');
+            if (semicolon > 0) {
+                decodedURI.setChars
+                    (uriCC.getBuffer(), uriCC.getStart(), semicolon);
+            }
         }
 
         // Set the remote principal
