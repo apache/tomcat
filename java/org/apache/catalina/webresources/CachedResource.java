@@ -72,6 +72,11 @@ public class CachedResource implements WebResource {
             return true;
         }
 
+        if (!webResource.exists() &&
+                root.getResourceInternal(webAppPath).exists()) {
+            return false;
+        }
+
         // If modified date or length change - resource has changed / been
         // removed etc.
         if (webResource.getLastModified() != getLastModified() ||
