@@ -63,16 +63,16 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
 
         loader.start();
         String[] repos = loader.getLoaderRepositories();
-        assertEquals(2,repos.length);
+        assertEquals(3,repos.length);
         loader.stop();
         // ToDo: Why doesn't remove repositories?
         repos = loader.getLoaderRepositories();
-        assertEquals(2, repos.length);
+        assertEquals(3, repos.length);
 
         // no leak
         loader.start();
         repos = loader.getLoaderRepositories();
-        assertEquals(2,repos.length);
+        assertEquals(3,repos.length);
 
         // clear loader
         ctx.setLoader(null);
