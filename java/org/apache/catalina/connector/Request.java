@@ -1002,6 +1002,14 @@ public class Request
 
 
     /**
+     * Set the content type for this Request.
+     */
+    public void setContentType(String contentType) {
+        coyoteRequest.setContentType(contentType);
+    }
+
+
+    /**
      * Return the servlet input stream for this Request.  The default
      * implementation returns a servlet input stream created by
      * <code>createInputStream()</code>.
@@ -1827,6 +1835,16 @@ public class Request
      */
     public String getDecodedRequestURI() {
         return coyoteRequest.decodedURI().toString();
+    }
+
+
+    /**
+     * Get the decoded request URI.
+     *
+     * @return the URL decoded request URI
+     */
+    public MessageBytes getDecodedRequestURIMB() {
+        return coyoteRequest.decodedURI();
     }
 
 
