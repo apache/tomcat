@@ -146,7 +146,8 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
          */
         @Override
         public void release(SocketWrapper<NioChannel> socket) {
-            Processor<NioChannel> processor = connections.remove(socket);
+            Processor<NioChannel> processor =
+                    connections.remove(socket.getSocket());
             if (processor != null) {
                 processor.recycle(true);
                 recycledProcessors.push(processor);
