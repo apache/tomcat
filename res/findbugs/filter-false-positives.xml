@@ -193,6 +193,12 @@
     <Bug code="DLS"/>
   </Match>
   <Match>
+    <!-- Returning null is intentional -->
+    <Class name="org.apache.jasper.compiler.JspReader"/>
+    <Method name="indexOf"/>
+    <Bug code="NP"/>
+  </Match>
+  <Match>
     <!-- Node constructors add node to parent. Local variable is used to
          silence an Eclipse warning -->
     <Class name="org.apache.jasper.compiler.Parser"/>
