@@ -120,7 +120,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             jspFile = config.getInitParameter("jspFile");
             try {
                 if (null == context.getResource(jspFile)) {
-                    throw new ServletException("missing jspFile");
+                    throw new ServletException("missing jspFile: [" + jspFile + "]");
                 }
             } catch (MalformedURLException e) {
                 throw new ServletException("Can not locate jsp file", e);
