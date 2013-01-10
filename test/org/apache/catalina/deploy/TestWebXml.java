@@ -219,4 +219,48 @@ public class TestWebXml {
 
         Assert.assertEquals(0, webxml.getPreDestroyMethods().size());
     }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testBug54387a() {
+        // Multiple servlets may not be mapped to the same url-pattern
+        WebXml webxml = new WebXml();
+        webxml.addServletMapping("/foo", "a");
+        webxml.addServletMapping("/foo", "b");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testBug54387b() {
+        // Multiple servlets may not be mapped to the same url-pattern
+        WebXml webxml = new WebXml();
+        WebXml f1 = new WebXml();
+        WebXml f2 = new WebXml();
+
+        HashSet<WebXml> fragments = new HashSet<>();
+        fragments.add(f1);
+        fragments.add(f2);
+
+        f1.addServletMapping("/foo", "a");
+        f2.addServletMapping("/foo", "b");
+
+        webxml.merge(fragments);
+    }
+
+    @Test
+    public void testBug54387c() {
+        // Multiple servlets may not be mapped to the same url-pattern but main
+        // web.xml takes priority
+        WebXml webxml = new WebXml();
+        WebXml f1 = new WebXml();
+        WebXml f2 = new WebXml();
+
+        HashSet<WebXml> fragments = new HashSet<>();
+        fragments.add(f1);
+        fragments.add(f2);
+
+        f1.addServletMapping("/foo", "a");
+        f2.addServletMapping("/foo", "b");
+        webxml.addServletMapping("/foo", "main");
+
+        webxml.merge(fragments);
+    }
 }
