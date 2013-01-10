@@ -5622,6 +5622,9 @@ public class StandardContext extends ContainerBase
         
         createdServlets.clear();
 
+        postConstructMethods.clear();
+        preDestroyMethods.clear();
+
         if(log.isDebugEnabled())
             log.debug("resetContext " + getObjectName());
     }
