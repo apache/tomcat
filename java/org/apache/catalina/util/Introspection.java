@@ -19,6 +19,7 @@ package org.apache.catalina.util;
 import java.beans.Introspector;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -68,6 +69,24 @@ public class Introspection {
         return false;
     }
 
+    /**
+     * Determines if a method is a valid lifecycle callback method.
+     *
+     * @param method
+     *            The method to test
+     *
+     * @return <code>true</code> if the method is a valid lifecycle callback
+     *         method, else <code>false</code>
+     */
+    public static boolean isValidLifecycleCallback(Method method) {
+        if (method.getParameterTypes().length != 0
+                || Modifier.isStatic(method.getModifiers())
+                || method.getExceptionTypes().length > 0
+                || !method.getReturnType().getName().equals("void")) {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * Obtain the declared fields for a class taking account of any security

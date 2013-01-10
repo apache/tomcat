@@ -49,4 +49,12 @@
     <jsp-file>/bug5nnnn/bug51396.jsp</jsp-file>
   </servlet>
 
+  <post-construct>
+    <lifecycle-callback-class>org.apache.catalina.startup.TesterServletWithLifeCycleMethods</lifecycle-callback-class>
+    <lifecycle-callback-method>postConstruct1</lifecycle-callback-method>
+  </post-construct>
+  <pre-destroy>
+    <lifecycle-callback-class>org.apache.catalina.startup.TesterServletWithLifeCycleMethods</lifecycle-callback-class>
+    <lifecycle-callback-method>preDestroy1</lifecycle-callback-method>
+  </pre-destroy>
 </web-app>

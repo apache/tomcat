@@ -19,10 +19,10 @@ package org.apache.catalina.core;
 import java.beans.Introspector;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
@@ -80,6 +80,8 @@ public class DefaultInstanceManager implements InstanceManager {
     private final Properties restrictedServlets = new Properties();
     private final Map<Class<?>, AnnotationCacheEntry[]> annotationCache =
         new WeakHashMap<Class<?>, AnnotationCacheEntry[]>();
+    private final Map<String, String> postConstructMethods;
+    private final Map<String, String> preDestroyMethods;
 
     public DefaultInstanceManager(Context context, Map<String, Map<String, String>> injectionMap, org.apache.catalina.Context catalinaContext, ClassLoader containerClassLoader) {
         classLoader = catalinaContext.getLoader().getClassLoader();
@@ -126,6 +128,8 @@ public class DefaultInstanceManager implements InstanceManager {
         }
         this.context = context;
         this.injectionMap = injectionMap;
+        this.postConstructMethods = catalinaContext.findPostConstructMethods();
+        this.preDestroyMethods = catalinaContext.findPreDestroyMethods();
     }
 
     @Override
@@ -332,7 +336,9 @@ public class DefaultInstanceManager implements InstanceManager {
                 // Initialize methods annotations
                 Method[] methods = Introspection.getDeclaredMethods(clazz);
                 Method postConstruct = null;
+                String postConstructFromXml = postConstructMethods.get(clazz.getName());
                 Method preDestroy = null;
+                String preDestroyFromXml = preDestroyMethods.get(clazz.getName());
                 for (Method method : methods) {
                     if (context != null) {
                         // Resource injection only if JNDI is enabled
@@ -389,41 +395,30 @@ public class DefaultInstanceManager implements InstanceManager {
                         }
                     }
 
-                    if (method.isAnnotationPresent(PostConstruct.class)) {
-                        if ((postConstruct != null) ||
-                                (method.getParameterTypes().length != 0) ||
-                                (Modifier.isStatic(method.getModifiers())) ||
-                                (method.getExceptionTypes().length > 0) ||
-                                (!method.getReturnType().getName().equals("void"))) {
-                            throw new IllegalArgumentException(
-                                    "Invalid PostConstruct annotation");
-                        }
-                        postConstruct = method;
-                    }
+                    postConstruct = findPostConstruct(postConstruct, postConstructFromXml, method);
 
-                    if (method.isAnnotationPresent(PreDestroy.class)) {
-                        if ((preDestroy != null ||
-                                method.getParameterTypes().length != 0) ||
-                                (Modifier.isStatic(method.getModifiers())) ||
-                                (method.getExceptionTypes().length > 0) ||
-                                (!method.getReturnType().getName().equals("void"))) {
-                            throw new IllegalArgumentException(
-                                    "Invalid PreDestroy annotation");
-                        }
-                        preDestroy = method;
-                    }
+                    preDestroy = findPreDestroy(preDestroy, preDestroyFromXml, method);
                 }
+
                 if (postConstruct != null) {
                     annotations.add(new AnnotationCacheEntry(
                             postConstruct.getName(),
                             postConstruct.getParameterTypes(), null,
                             AnnotationCacheEntryType.POST_CONSTRUCT));
+                } else if (postConstructFromXml != null) {
+                    throw new IllegalArgumentException("Post construct method "
+                        + postConstructFromXml + " for class " + clazz.getName()
+                        + " is declared in deployment descriptor but cannot be found.");
                 }
                 if (preDestroy != null) {
                     annotations.add(new AnnotationCacheEntry(
                             preDestroy.getName(),
                             preDestroy.getParameterTypes(), null,
                             AnnotationCacheEntryType.PRE_DESTROY));
+                } else if (preDestroyFromXml != null) {
+                    throw new IllegalArgumentException("Pre destroy method "
+                        + preDestroyFromXml + " for class " + clazz.getName()
+                        + " is declared in deployment descriptor but cannot be found.");
                 }
                 if (annotations.isEmpty()) {
                     // Use common object to save memory
@@ -706,6 +701,44 @@ public class DefaultInstanceManager implements InstanceManager {
                         entry.getAccessibleObjectName());
             } catch (NoSuchFieldException e) {
                 // Should never happen. On that basis don't log it.
+            }
+        }
+        return result;
+    }
+
+
+    private static Method findPostConstruct(Method currentPostConstruct,
+            String postConstructFromXml, Method method) {
+        return findLifecycleCallback(currentPostConstruct,
+            postConstructFromXml, method, PostConstruct.class);
+    }
+
+    private static Method findPreDestroy(Method currentPreDestroy,
+        String preDestroyFromXml, Method method) {
+        return findLifecycleCallback(currentPreDestroy,
+            preDestroyFromXml, method, PreDestroy.class);
+    }
+
+    private static Method findLifecycleCallback(Method currentMethod,
+            String methodNameFromXml, Method method,
+            Class<? extends Annotation> annotation) {
+        Method result = currentMethod;
+        if (methodNameFromXml != null) {
+            if (method.getName().equals(methodNameFromXml)) {
+                if (!Introspection.isValidLifecycleCallback(method)) {
+                    throw new IllegalArgumentException(
+                        "Invalid " + annotation.getName() + " annotation");
+                }
+                result = method;
+            }
+        } else {
+            if (method.isAnnotationPresent(annotation)) {
+                if (currentMethod != null ||
+                    !Introspection.isValidLifecycleCallback(method)) {
+                    throw new IllegalArgumentException(
+                        "Invalid " + annotation.getName() + " annotation");
+                }
+                result = method;
             }
         }
         return result;

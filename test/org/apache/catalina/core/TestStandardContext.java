@@ -754,4 +754,38 @@ public class TestStandardContext extends TomcatBaseTest {
             return false; // Don't care
         }
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddPostConstructMethodNullClassName() {
+        new StandardContext().addPostConstructMethod(null, "");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddPostConstructMethodNullMethodName() {
+        new StandardContext().addPostConstructMethod("", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddPostConstructMethodConflicts() {
+        StandardContext standardContext = new StandardContext();
+        standardContext.addPostConstructMethod("a", "a");
+        standardContext.addPostConstructMethod("a", "b");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddPreDestroyMethodNullClassName() {
+        new StandardContext().addPreDestroyMethod(null, "");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddPreDestroyMethodNullMethodName() {
+        new StandardContext().addPreDestroyMethod("", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddPreDestroyMethodConflicts() {
+        StandardContext standardContext = new StandardContext();
+        standardContext.addPreDestroyMethod("a", "a");
+        standardContext.addPreDestroyMethod("a", "b");
+    }
 }
