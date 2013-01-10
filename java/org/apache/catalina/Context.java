@@ -18,6 +18,7 @@ package org.apache.catalina;
 
 import java.net.URL;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContainerInitializer;
@@ -1420,5 +1421,101 @@ public interface Context extends Container {
      * JAR.
      */
     public boolean getAddWebinfClassesResources();
-}
 
+    /**
+     * Add a post construct method definition for the given class, if there is
+     * an existing definition for the specified class - IllegalArgumentException
+     * will be thrown.
+     *
+     * @param clazz Fully qualified class name
+     * @param method
+     *            Post construct method name
+     * @throws IllegalArgumentException
+     *             if the fully qualified class name or method name are
+     *             <code>NULL</code>; if there is already post construct method
+     *             definition for the given class
+     */
+    public void addPostConstructMethod(String clazz, String method);
+
+    /**
+     * Add a pre destroy method definition for the given class, if there is an
+     * existing definition for the specified class - IllegalArgumentException
+     * will be thrown.
+     *
+     * @param clazz Fully qualified class name
+     * @param method
+     *            Post construct method name
+     * @throws IllegalArgumentException
+     *             if the fully qualified class name or method name are
+     *             <code>NULL</code>; if there is already pre destroy method
+     *             definition for the given class
+     */
+    public void addPreDestroyMethod(String clazz, String method);
+
+    /**
+     * Removes the post construct method definition for the given class, if it
+     * exists; otherwise, no action is taken.
+     *
+     * @param clazz
+     *            Fully qualified class name
+     */
+    public void removePostConstructMethod(String clazz);
+
+    /**
+     * Removes the pre destroy method definition for the given class, if it
+     * exists; otherwise, no action is taken.
+     *
+     * @param clazz
+     *            Fully qualified class name
+     */
+    public void removePreDestroyMethod(String clazz);
+
+    /**
+     * Returns the method name that is specified as post construct method for
+     * the given class, if it exists; otherwise <code>NULL</code> will be
+     * returned.
+     *
+     * @param clazz
+     *            Fully qualified class name
+     *
+     * @return the method name that is specified as post construct method for
+     *         the given class, if it exists; otherwise <code>NULL</code> will
+     *         be returned.
+     */
+    public String findPostConstructMethod(String clazz);
+
+    /**
+     * Returns the method name that is specified as pre destroy method for the
+     * given class, if it exists; otherwise <code>NULL</code> will be returned.
+     *
+     * @param clazz
+     *            Fully qualified class name
+     *
+     * @return the method name that is specified as pre destroy method for the
+     *         given class, if it exists; otherwise <code>NULL</code> will be
+     *         returned.
+     */
+    public String findPreDestroyMethod(String clazz);
+
+    /**
+     * Returns a map with keys - fully qualified class names of the classes that
+     * have post construct methods and the values are the corresponding method
+     * names. If there are no such classes an empty map will be returned.
+     *
+     * @return a map with keys - fully qualified class names of the classes that
+     *         have post construct methods and the values are the corresponding
+     *         method names.
+     */
+    public Map<String, String> findPostConstructMethods();
+
+    /**
+     * Returns a map with keys - fully qualified class names of the classes that
+     * have pre destroy methods and the values are the corresponding method
+     * names. If there are no such classes an empty map will be returned.
+     *
+     * @return a map with keys - fully qualified class names of the classes that
+     *         have pre destroy methods and the values are the corresponding
+     *         method names.
+     */
+    public Map<String, String> findPreDestroyMethods();
+}

@@ -823,6 +823,10 @@ public class StandardContext extends ContainerBase
 
     private boolean jndiExceptionOnFailedWrite = true;
 
+    private Map<String, String> postConstructMethods = new HashMap<>();
+    private Map<String, String> preDestroyMethods = new HashMap<>();
+
+
     // ----------------------------------------------------- Context Properties
 
     @Override
@@ -5841,6 +5845,72 @@ public class StandardContext extends ContainerBase
             }
         }
         return true;
+    }
+
+
+    @Override
+    public void addPostConstructMethod(String clazz, String method) {
+        if (clazz == null || method == null)
+            throw new IllegalArgumentException(
+                    sm.getString("standardContext.postconstruct.required"));
+        if (postConstructMethods.get(clazz) != null)
+            throw new IllegalArgumentException(sm.getString(
+                    "standardContext.postconstruct.duplicate", clazz));
+
+        postConstructMethods.put(clazz, method);
+        fireContainerEvent("addPostConstructMethod", clazz);
+    }
+
+
+    @Override
+    public void removePostConstructMethod(String clazz) {
+        postConstructMethods.remove(clazz);
+        fireContainerEvent("removePostConstructMethod", clazz);
+    }
+
+
+    @Override
+    public void addPreDestroyMethod(String clazz, String method) {
+        if (clazz == null || method == null)
+            throw new IllegalArgumentException(
+                    sm.getString("standardContext.predestroy.required"));
+        if (preDestroyMethods.get(clazz) != null)
+            throw new IllegalArgumentException(sm.getString(
+                    "standardContext.predestroy.duplicate", clazz));
+
+        preDestroyMethods.put(clazz, method);
+        fireContainerEvent("addPreDestroyMethod", clazz);
+    }
+
+
+    @Override
+    public void removePreDestroyMethod(String clazz) {
+        preDestroyMethods.remove(clazz);
+        fireContainerEvent("removePreDestroyMethod", clazz);
+    }
+
+
+    @Override
+    public String findPostConstructMethod(String clazz) {
+        return postConstructMethods.get(clazz);
+    }
+
+
+    @Override
+    public String findPreDestroyMethod(String clazz) {
+        return preDestroyMethods.get(clazz);
+    }
+
+
+    @Override
+    public Map<String, String> findPostConstructMethods() {
+        return postConstructMethods;
+    }
+
+
+    @Override
+    public Map<String, String> findPreDestroyMethods() {
+        return preDestroyMethods;
     }
 
 

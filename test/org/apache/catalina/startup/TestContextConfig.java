@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardContext;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -104,6 +105,25 @@ public class TestContextConfig extends TomcatBaseTest {
                 "resourceA.jsp in resources.jar");
         assertPageContains("/test/resources/HelloWorldExample",
                 null, HttpServletResponse.SC_NOT_FOUND);
+    }
+
+    @Test
+    public void testBug54379() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0-fragments");
+        Context context =
+                tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        Tomcat.addServlet(context, "TestServlet",
+                "org.apache.catalina.startup.TesterServletWithLifeCycleMethods");
+        context.addServletMapping("/testServlet", "TestServlet");
+
+        tomcat.enableNaming();
+
+        tomcat.start();
+
+        assertPageContains("/test/testServlet", "postConstruct1()");
     }
 
     private static class CustomDefaultServletSCI

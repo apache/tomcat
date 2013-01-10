@@ -20,6 +20,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.URL;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.management.ObjectName;
@@ -1111,5 +1112,45 @@ public class TesterContext implements Context {
     @Override
     public boolean getAddWebinfClassesResources() {
         return false;
+    }
+
+    @Override
+    public void addPostConstructMethod(String clazz, String method) {
+        // NO-OP
+    }
+
+    @Override
+    public void addPreDestroyMethod(String clazz, String method) {
+        // NO-OP
+    }
+
+    @Override
+    public void removePostConstructMethod(String clazz) {
+        // NO-OP
+    }
+
+    @Override
+    public void removePreDestroyMethod(String clazz) {
+        // NO-OP
+    }
+
+    @Override
+    public String findPostConstructMethod(String clazz) {
+        return null;
+    }
+
+    @Override
+    public String findPreDestroyMethod(String clazz) {
+        return null;
+    }
+
+    @Override
+    public Map<String,String> findPostConstructMethods() {
+        return null;
+    }
+
+    @Override
+    public Map<String,String> findPreDestroyMethods() {
+        return null;
     }
 }
