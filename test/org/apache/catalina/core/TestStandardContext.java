@@ -161,7 +161,6 @@ public class TestStandardContext extends TomcatBaseTest {
         @Override
         public void doFilter(ServletRequest request, ServletResponse response,
                 FilterChain chain) throws IOException, ServletException {
-            @SuppressWarnings("resource") // No need to close this writer
             PrintWriter out = response.getWriter();
             out.print(getClass().getName());
             chain.doFilter(request, response);
@@ -648,7 +647,6 @@ public class TestStandardContext extends TomcatBaseTest {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
 
-            @SuppressWarnings("resource") // No need to close this writer
             PrintWriter out = resp.getWriter();
 
             out.println("parts=" + (null == req.getParts()

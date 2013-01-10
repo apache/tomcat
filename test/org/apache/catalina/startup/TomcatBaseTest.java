@@ -182,7 +182,6 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            @SuppressWarnings("resource") // No need to close this writer
             PrintWriter out = resp.getWriter();
             out.print(RESPONSE_TEXT);
         }
