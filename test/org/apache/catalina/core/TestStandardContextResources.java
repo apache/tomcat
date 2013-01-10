@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -86,8 +87,16 @@ public class TestStandardContextResources extends TomcatBaseTest {
                 "<p>resourceG.jsp in WEB-INF/classes</p>", 404);
 
         // For BZ 54391. Relative ordering is specified in resources2.jar.
-        assertEquals(Arrays.asList("resources.jar", "resources2.jar"), ctx
-                .getServletContext().getAttribute(ServletContext.ORDERED_LIBS));
+        // It is not absolute-ordering, so there may be other jars in the list
+        List<String> orderedLibs = (List<String>) ctx.getServletContext()
+                .getAttribute(ServletContext.ORDERED_LIBS);
+        if (orderedLibs.size() > 2) {
+            log.warn("testResources(): orderedLibs: " + orderedLibs);
+        }
+        int index = orderedLibs.indexOf("resources.jar");
+        int index2 = orderedLibs.indexOf("resources2.jar");
+        assertTrue(orderedLibs.toString(), index >= 0 && index2 >= 0
+                && index < index2);
     }
 
     @Test
