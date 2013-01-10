@@ -146,6 +146,10 @@
         a Reader to read a request body with a BOM for those encodings that
         require byte order marks. (markt)
       </fix>
+      <fix>
+        Fix release of processors in <code>AjpNioProtocol</code>. Wrong object
+        was used as a key in the connections map. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
