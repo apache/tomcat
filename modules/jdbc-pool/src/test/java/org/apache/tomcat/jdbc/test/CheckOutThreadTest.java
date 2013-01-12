@@ -17,8 +17,6 @@
 package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.concurrent.CountDownLatch;
 
 import javax.sql.DataSource;
@@ -373,7 +371,6 @@ public class CheckOutThreadTest extends DefaultTestCase {
 
     public class TestThread extends Thread {
         protected DataSource d;
-        protected String query = null;
         @Override
         public void run() {
             long max = -1, totalmax=0, totalcmax=0, cmax = -1, nroffetch = 0, totalruntime = 0;
@@ -387,14 +384,6 @@ public class CheckOutThreadTest extends DefaultTestCase {
                         totalmax += delta;
                         max = Math.max(delta, max);
                         nroffetch++;
-                        if (query!=null) {
-                            Statement st = con.createStatement();
-                            ResultSet rs = st.executeQuery(query);
-                            while (rs.next()) {
-                            }
-                            rs.close();
-                            st.close();
-                        }
                     } finally {
                         long cstart = System.nanoTime();
                         if (con!=null) try {con.close();}catch(Exception x) {x.printStackTrace();}

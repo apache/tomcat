@@ -17,8 +17,6 @@
 package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -216,7 +214,6 @@ public class FairnessTest extends DefaultTestCase {
 
     public class TestThread extends Thread {
         protected DataSource d;
-        protected String query = null;
         protected long sleep = 10;
         protected boolean async = false;
         long minwait = Long.MAX_VALUE, maxwait = -1, totalwait=0, totalcmax=0, cmax = -1, nroffetch = 0, totalruntime = 0;
@@ -240,14 +237,6 @@ public class FairnessTest extends DefaultTestCase {
                         maxwait = Math.max(delta, maxwait);
                         minwait = Math.min(delta, minwait);
                         nroffetch++;
-                        if (query!=null) {
-                            Statement st = con.createStatement();
-                            ResultSet rs = st.executeQuery(query);
-                            while (rs.next()) {
-                            }
-                            rs.close();
-                            st.close();
-                        }
                         try {
                             if (FairnessTest.this.sleep>0) sleep(FairnessTest.this.sleep);
                         } catch (InterruptedException x) {
