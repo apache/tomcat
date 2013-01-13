@@ -53,6 +53,21 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.36 (markt)">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>54406</bug>: Fix NIO HTTPS connector to prune specified <code>
+        ciphers</code> and <code>sslEnableProtocols</code> options to those
+        supported by the SSL implementation, sharing logic with the BIO
+        connector. Modified ciphers and sslEnabledProtocols option pruning to
+        not silently revert to JVM defaults when none of the options specified
+        are supported - new behaviour is to warn and explicitly enable no
+        options. (timw)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.35 (markt)">
   <subsection name="Catalina">
     <changelog>
