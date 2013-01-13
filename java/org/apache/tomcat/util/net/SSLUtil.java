@@ -30,4 +30,33 @@ public interface SSLUtil {
     public TrustManager[] getTrustManagers() throws Exception;
 
     public void configureSessionContext(SSLSessionContext sslSessionContext);
+
+    /**
+     * Determines the SSL cipher suites that can be enabled, based on the
+     * configuration of the endpoint and the ciphers supported by the SSL
+     * implementation.
+     *
+     * @param context An initialized context to obtain the supported ciphers from.
+     *
+     * @return Array of SSL cipher suites that may be enabled (which may be
+     *         empty if none of the specified ciphers are supported), or
+     *         the defaults for the underlying SSL implementation if 
+     *         the endpoint configuration does not specify any ciphers.
+     */
+    public String[] getEnableableCiphers(SSLContext context);
+	
+    /**
+     * Determines the SSL protocol variants that can be enabled, based on the
+     * configuration of the endpoint and the ciphers supported by the SSL
+     * implementation.
+     *
+     * @param context An initialized context to obtain the supported protocols from.
+     *
+     * @return Array of SSL protocol variants that may be enabled (which may be
+     *         empty if none of the specified protocols are supported), or
+     *         the defaults for the underlying SSL implementation if 
+     *         the endpoint configuration does not specify any protocols.
+     */
+    public String[] getEnableableProtocols(SSLContext context);
+
 }

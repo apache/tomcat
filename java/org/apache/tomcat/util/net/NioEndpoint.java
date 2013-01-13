@@ -261,7 +261,8 @@ public class NioEndpoint extends AbstractEndpoint {
     private SSLContext sslContext = null;
     public SSLContext getSSLContext() { return sslContext;}
     public void setSSLContext(SSLContext c) { sslContext = c;}
-
+    private String[] enabledCiphers;
+    private String[] enabledProtocols;
 
     /**
      * Port in use.
@@ -284,16 +285,7 @@ public class NioEndpoint extends AbstractEndpoint {
 
     @Override
     public String[] getCiphersUsed() {
-        SSLContext sslContext = getSSLContext();
-        if (sslContext != null) {
-            SSLEngine engine = getSSLContext().createSSLEngine();
-            if (getCiphersArray().length > 0) {
-                engine.setEnabledCipherSuites(getCiphersArray());
-            }
-            return engine.getEnabledCipherSuites();
-        } else {
-            return new String[0];
-        }
+        return enabledCiphers;
     }
 
 
@@ -384,6 +376,9 @@ public class NioEndpoint extends AbstractEndpoint {
             if (sessionContext != null) {
                 sslUtil.configureSessionContext(sessionContext);
             }
+            // Determine which cipher suites and protocols to enable
+            enabledCiphers = sslUtil.getEnableableCiphers(sslContext);
+            enabledProtocols = sslUtil.getEnableableProtocols(sslContext);
         }
 
         if (oomParachute>0) reclaimParachute(true);
@@ -589,8 +584,8 @@ public class NioEndpoint extends AbstractEndpoint {
             engine.setWantClientAuth(true);
         }
         engine.setUseClientMode(false);
-        if ( getCiphersArray().length > 0 ) engine.setEnabledCipherSuites(getCiphersArray());
-        if ( getSslEnabledProtocolsArray().length > 0 ) engine.setEnabledProtocols(getSslEnabledProtocolsArray());
+        engine.setEnabledCipherSuites(enabledCiphers);
+        engine.setEnabledProtocols(enabledProtocols);
 
         handler.onCreateSSLEngine(engine);
         return engine;

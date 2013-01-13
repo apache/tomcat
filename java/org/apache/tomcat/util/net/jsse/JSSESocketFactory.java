@@ -40,9 +40,11 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.X509CertSelector;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
-import java.util.Vector;
 
 import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.KeyManager;
@@ -124,6 +126,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
 
     protected SSLServerSocketFactory sslProxy = null;
     protected String[] enabledCiphers;
+    protected String[] enabledProtocols;
     protected boolean allowUnsafeLegacyRenegotiation = false;
 
     /**
@@ -199,84 +202,46 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         }
     }
 
-    /*
-     * Determines the SSL cipher suites to be enabled.
-     *
-     * @param requestedCiphers Comma-separated list of requested ciphers
-     * @param supportedCiphers Array of supported ciphers
-     *
-     * @return Array of SSL cipher suites to be enabled, or null if none of the
-     * requested ciphers are supported
-     */
-    protected String[] getEnabledCiphers(String requestedCiphers,
-                                         String[] supportedCiphers) {
+    @Override
+    public String[] getEnableableCiphers(SSLContext context) {
+        String requestedCiphersStr = endpoint.getCiphers();
 
-        String[] result = null;
-
-        if (ALLOW_ALL_SUPPORTED_CIPHERS.equals(requestedCiphers)) {
-            return supportedCiphers;
+        if (ALLOW_ALL_SUPPORTED_CIPHERS.equals(requestedCiphersStr)) {
+            return context.getSupportedSSLParameters().getCipherSuites();
+        }
+        if ((requestedCiphersStr == null)
+                || (requestedCiphersStr.trim().length() == 0)) {
+            return context.getDefaultSSLParameters().getCipherSuites();
         }
 
-        if (requestedCiphers != null) {
-            Vector<String> vec = null;
-            String cipher = requestedCiphers;
-            int index = requestedCiphers.indexOf(',');
-            if (index != -1) {
-                int fromIndex = 0;
-                while (index != -1) {
-                    cipher =
-                        requestedCiphers.substring(fromIndex, index).trim();
-                    if (cipher.length() > 0) {
-                        /*
-                         * Check to see if the requested cipher is among the
-                         * supported ciphers, i.e., may be enabled
-                         */
-                        for (int i=0; supportedCiphers != null
-                                     && i<supportedCiphers.length; i++) {
-                            if (supportedCiphers[i].equals(cipher)) {
-                                if (vec == null) {
-                                    vec = new Vector<>();
-                                }
-                                vec.addElement(cipher);
-                                break;
-                            }
-                        }
-                    }
-                    fromIndex = index+1;
-                    index = requestedCiphers.indexOf(',', fromIndex);
-                } // while
-                cipher = requestedCiphers.substring(fromIndex);
+        List<String> requestedCiphers = new ArrayList<String>();
+        for (String rc : requestedCiphersStr.split(",")) {
+            final String cipher = rc.trim();
+            if (cipher.length() > 0) {
+                requestedCiphers.add(cipher);
             }
+        }
+        if (requestedCiphers.isEmpty()) {
+            return context.getDefaultSSLParameters().getCipherSuites();
+        }
+        List<String> ciphers = new ArrayList<String>(requestedCiphers);
+        ciphers.retainAll(Arrays.asList(context.getSupportedSSLParameters()
+                .getCipherSuites()));
 
-            if (cipher != null) {
-                cipher = cipher.trim();
-                if (cipher.length() > 0) {
-                    /*
-                     * Check to see if the requested cipher is among the
-                     * supported ciphers, i.e., may be enabled
-                     */
-                    for (int i=0; supportedCiphers != null
-                                 && i<supportedCiphers.length; i++) {
-                        if (supportedCiphers[i].equals(cipher)) {
-                            if (vec == null) {
-                                vec = new Vector<>();
-                            }
-                            vec.addElement(cipher);
-                            break;
-                        }
-                    }
-                }
+        if (ciphers.isEmpty()) {
+            log.warn(sm.getString("jsse.requested_ciphers_not_supported",
+                    requestedCiphersStr));
+        }
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("jsse.enableable_ciphers", ciphers));
+            if (ciphers.size() != requestedCiphers.size()) {
+                List<String> skipped = new ArrayList<String>(requestedCiphers);
+                skipped.removeAll(ciphers);
+                log.debug(sm.getString("jsse.unsupported_ciphers", skipped));
             }
-
-            if (vec != null) {
-                result = new String[vec.size()];
-                vec.copyInto(result);
-            }
-        } else {
-            result = sslProxy.getDefaultCipherSuites();
         }
 
-        return result;
+        return ciphers.toArray(new String[ciphers.size()]);
     }
 
     public String[] getEnabledCiphers() {
@@ -463,9 +428,8 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
             sslProxy = context.getServerSocketFactory();
 
             // Determine which cipher suites to enable
-            String requestedCiphers = endpoint.getCiphers();
-            enabledCiphers = getEnabledCiphers(requestedCiphers,
-                    sslProxy.getSupportedCipherSuites());
+            enabledCiphers = getEnableableCiphers(context);
+            enabledProtocols = getEnableableProtocols(context);
 
             allowUnsafeLegacyRenegotiation = "true".equals(
                     endpoint.getAllowUnsafeLegacyRenegotiation());
@@ -713,60 +677,32 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         return crls;
     }
 
-    /**
-     * Set the SSL protocol variants to be enabled.
-     * @param socket the SSLServerSocket.
-     * @param protocols the protocols to use.
-     */
-    protected void setEnabledProtocols(SSLServerSocket socket,
-            String[] protocols){
-        if (protocols != null) {
-            socket.setEnabledProtocols(protocols);
-        }
-    }
-
-    /**
-     * Determines the SSL protocol variants to be enabled.
-     *
-     * @param socket The socket to get supported list from.
-     * @param requestedProtocols Array of requested protocol names all of which
-     *                           must be non-null and non-zero length
-     *
-     * @return Array of SSL protocol variants to be enabled, or null if none of
-     * the requested protocol variants are supported
-     */
-    protected String[] getEnabledProtocols(SSLServerSocket socket,
-                                           String[] requestedProtocols){
-        String[] supportedProtocols = socket.getSupportedProtocols();
-
-        String[] enabledProtocols = null;
-
-        if (requestedProtocols != null && requestedProtocols.length > 0) {
-            Vector<String> vec = null;
-            for (String protocol : requestedProtocols) {
-                /*
-                 * Check to see if the requested protocol is among the supported
-                 * protocols, i.e., may be enabled
-                 */
-                for (int i=0; supportedProtocols != null &&
-                        i < supportedProtocols.length; i++) {
-                    if (supportedProtocols[i].equals(protocol)) {
-                        if (vec == null) {
-                            vec = new Vector<>();
-                        }
-                        vec.addElement(protocol);
-                        break;
-                    }
-                }
-            }
-
-            if (vec != null) {
-                enabledProtocols = new String[vec.size()];
-                vec.copyInto(enabledProtocols);
-            }
+    @Override
+    public String[] getEnableableProtocols(SSLContext context) {
+        String[] requestedProtocols = endpoint.getSslEnabledProtocolsArray();
+        if ((requestedProtocols == null) || (requestedProtocols.length == 0)) {
+            return context.getDefaultSSLParameters().getProtocols();
         }
 
-        return enabledProtocols;
+        List<String> protocols = new ArrayList<String>(
+                Arrays.asList(requestedProtocols));
+        protocols.retainAll(Arrays.asList(context.getSupportedSSLParameters()
+                .getProtocols()));
+
+        if (protocols.isEmpty()) {
+            log.warn(sm.getString("jsse.requested_protocols_not_supported",
+                    Arrays.asList(requestedProtocols)));
+        }
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("jsse.enableable_protocols", protocols));
+            if (protocols.size() != requestedProtocols.length) {
+                List<String> skipped = new ArrayList<String>(
+                        Arrays.asList(requestedProtocols));
+                skipped.removeAll(protocols);
+                log.debug(sm.getString("jsse.unsupported_protocols", skipped));
+            }
+        }
+        return protocols.toArray(new String[protocols.size()]);
     }
 
     /**
@@ -791,14 +727,9 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
 
         SSLServerSocket socket = (SSLServerSocket) ssocket;
 
-        if (enabledCiphers != null) {
-            socket.setEnabledCipherSuites(enabledCiphers);
-        }
-
-        String[] requestedProtocols = endpoint.getSslEnabledProtocolsArray();
-        setEnabledProtocols(socket, getEnabledProtocols(socket,
-                                                         requestedProtocols));
-
+        socket.setEnabledCipherSuites(enabledCiphers);
+        socket.setEnabledProtocols(enabledProtocols);
+        
         // we don't know if client auth is needed -
         // after parsing the request we may re-handshake
         configureClientAuth(socket);
