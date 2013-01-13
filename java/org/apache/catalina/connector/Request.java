@@ -1939,7 +1939,6 @@ public class Request
      *
      * @return the URL decoded request URI
      */
-    @Deprecated
     public MessageBytes getDecodedRequestURIMB() {
         return coyoteRequest.decodedURI();
     }
