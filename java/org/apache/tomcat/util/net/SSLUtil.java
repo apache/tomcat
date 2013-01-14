@@ -44,7 +44,7 @@ public interface SSLUtil {
      *         the endpoint configuration does not specify any ciphers.
      */
     public String[] getEnableableCiphers(SSLContext context);
-	
+
     /**
      * Determines the SSL protocol variants that can be enabled, based on the
      * configuration of the endpoint and the ciphers supported by the SSL
