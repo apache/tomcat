@@ -207,7 +207,7 @@ public class Connector extends LifecycleMBeanBase  {
      * Defaults to the Coyote HTTP/1.1 protocolHandler.
      */
     protected String protocolHandlerClassName =
-        "org.apache.coyote.http11.Http11Protocol";
+        "org.apache.coyote.http11.Http11NioProtocol";
 
 
     /**
@@ -540,7 +540,7 @@ public class Connector extends LifecycleMBeanBase  {
             || "org.apache.coyote.http11.Http11AprProtocol".equals
             (getProtocolHandlerClassName())) {
             return "HTTP/1.1";
-        } else if ("org.apache.coyote.ajp.AjpProtocol".equals
+        } else if ("org.apache.coyote.ajp.AjpNioProtocol".equals
                    (getProtocolHandlerClassName())
                    || "org.apache.coyote.ajp.AjpAprProtocol".equals
                    (getProtocolHandlerClassName())) {
@@ -577,7 +577,7 @@ public class Connector extends LifecycleMBeanBase  {
                     ("org.apache.coyote.http11.Http11NioProtocol");
             } else if ("AJP/1.3".equals(protocol)) {
                 setProtocolHandlerClassName
-                    ("org.apache.coyote.ajp.AjpProtocol");
+                    ("org.apache.coyote.ajp.AjpNioProtocol");
             } else if (protocol != null) {
                 setProtocolHandlerClassName(protocol);
             }
