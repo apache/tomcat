@@ -36,6 +36,8 @@ import javax.websocket.SendResult;
 
 public class WsRemoteEndpoint implements RemoteEndpoint {
 
+    private final Object messageWriteLock = new Object();
+
     private final ServletOutputStream sos;
     private final WsSession wsSession;
     // Max length for outgoing WebSocket frame header is 10 bytes
@@ -248,7 +250,9 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
         }
         header.flip();
 
-        synchronized (sos) {
+        // Could sync on sos but don't as other (user or container) code may
+        // sync on this creating the potential for deadlocks.
+        synchronized (messageWriteLock) {
             doBlockingWrite(header);
             doBlockingWrite(message);
             try {

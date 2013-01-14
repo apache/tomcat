@@ -28,6 +28,8 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
     protected static final StringManager sm =
             StringManager.getManager(Constants.Package);
 
+    private final Object fireListenerLock = new Object();
+    private final Object nioWriteLock = new Object();
 
     // Start in blocking-mode
     private volatile WriteListener listener = null;
@@ -41,9 +43,13 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
                     sm.getString("upgrade.sos.canWrite.is"));
         }
 
-        boolean result = (buffer == null);
-        fireListener = !result;
-        return result;
+        // Make sure canWrite() and onWritePossible() have a consistent view of
+        // buffer and fireListener when determining if the listener should fire
+        synchronized (fireListenerLock) {
+            boolean result = (buffer == null);
+            fireListener = !result;
+            return result;
+        }
     }
 
     @Override
@@ -90,14 +96,21 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
             doWrite(true, b, off, len);
         } else {
             // Non-blocking IO
-            int written = doWrite(false, b, off, len);
-            if (written < len) {
-                // TODO: - Reuse the buffer
-                //       - Only reallocate if it gets too big (>8k?)
-                buffer = new byte[len - written];
-                System.arraycopy(b, off + written, buffer, 0, len - written);
-            } else {
-                buffer = null;
+            // If the non-blocking read does not complete, doWrite() will add
+            // the socket back into the poller. The poller way trigger a new
+            // write event before this method has finished updating buffer. This
+            // sync makes sure that buffer is updated before the next write
+            // executes.
+            synchronized (nioWriteLock) {
+                int written = doWrite(false, b, off, len);
+                if (written < len) {
+                    // TODO: - Reuse the buffer
+                    //       - Only reallocate if it gets too big (>8k?)
+                    buffer = new byte[len - written];
+                    System.arraycopy(b, off + written, buffer, 0, len - written);
+                } else {
+                    buffer = null;
+                }
             }
         }
     }
@@ -109,9 +122,13 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
-        if (buffer == null && fireListener) {
-            fireListener = false;
-            listener.onWritePossible();
+        // Make sure canWrite() and onWritePossible() have a consistent view of
+        // buffer and fireListener when determining if the listener should fire
+        synchronized (fireListenerLock) {
+            if (buffer == null && fireListener) {
+                fireListener = false;
+                listener.onWritePossible();
+            }
         }
     }
 
