@@ -29,7 +29,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
             StringManager.getManager(Constants.Package);
 
     private final Object fireListenerLock = new Object();
-    private final Object nioWriteLock = new Object();
+    private final Object writeLock = new Object();
 
     // Start in blocking-mode
     private volatile WriteListener listener = null;
@@ -91,17 +91,17 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
 
 
     private void writeInternal(byte[] b, int off, int len) throws IOException {
-        if (listener == null) {
-            // Simple case - blocking IO
-            doWrite(true, b, off, len);
-        } else {
-            // Non-blocking IO
-            // If the non-blocking read does not complete, doWrite() will add
-            // the socket back into the poller. The poller way trigger a new
-            // write event before this method has finished updating buffer. This
-            // sync makes sure that buffer is updated before the next write
-            // executes.
-            synchronized (nioWriteLock) {
+        synchronized (writeLock) {
+            if (listener == null) {
+                // Simple case - blocking IO
+                doWrite(true, b, off, len);
+            } else {
+                // Non-blocking IO
+                // If the non-blocking read does not complete, doWrite() will add
+                // the socket back into the poller. The poller way trigger a new
+                // write event before this method has finished updating buffer. This
+                // sync makes sure that buffer is updated before the next write
+                // executes.
                 int written = doWrite(false, b, off, len);
                 if (written < len) {
                     // TODO: - Reuse the buffer
