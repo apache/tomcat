@@ -230,6 +230,12 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <!-- Lock is released -->
+    <Class name="org.apache.tomcat.jdbc.pool.FairBlockingQueue" />
+    <Method name="poll" />
+    <Bug code="UL" />
+  </Match>
+  <Match>
     <!-- Use of == is deliberate -->
     <Class name="org.apache.tomcat.jdbc.pool.JdbcInterceptor" />
     <Method name="compare" />
