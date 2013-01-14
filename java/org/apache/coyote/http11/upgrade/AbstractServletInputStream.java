@@ -28,7 +28,7 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
     protected static final StringManager sm =
             StringManager.getManager(Constants.Package);
 
-    private boolean closeRequired = false;
+    private volatile boolean closeRequired = false;
     // Start in blocking-mode
     private volatile Boolean ready = Boolean.TRUE;
     private volatile ReadListener listener = null;
@@ -124,6 +124,7 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
 
     @Override
     public void close() throws IOException {
+        closeRequired = true;
         doClose();
     }
 
@@ -176,6 +177,11 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
 
     protected abstract boolean doIsReady() throws IOException;
 
+    /**
+     * Abstract method to be overridden by concrete implementations. The base
+     * class will ensure that there are no concurrent calls to this method for
+     * the same socket.
+     */
     protected abstract int doRead(boolean block, byte[] b, int off, int len)
             throws IOException;
 

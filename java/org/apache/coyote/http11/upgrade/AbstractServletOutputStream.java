@@ -31,6 +31,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
     private final Object fireListenerLock = new Object();
     private final Object writeLock = new Object();
 
+    private volatile boolean closeRequired = false;
     // Start in blocking-mode
     private volatile WriteListener listener = null;
     private volatile boolean fireListener = false;
@@ -61,6 +62,10 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
         this.listener = listener;
     }
 
+    protected final boolean isCloseRequired() {
+        return closeRequired;
+    }
+
     @Override
     public void write(int b) throws IOException {
         preWriteChecks();
@@ -79,6 +84,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
 
     @Override
     public void close() throws IOException {
+        closeRequired = true;
         doClose();
     }
 
@@ -132,6 +138,11 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
         }
     }
 
+    /**
+     * Abstract method to be overridden by concrete implementations. The base
+     * class will ensure that there are no concurrent calls to this method for
+     * the same socket.
+     */
     protected abstract int doWrite(boolean block, byte[] b, int off, int len)
             throws IOException;
 
