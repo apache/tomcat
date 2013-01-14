@@ -37,7 +37,11 @@ public class SocketWrapper<E> {
     private int remotePort = -1;
     private String remoteHost = null;
     private String remoteAddr = null;
-
+    /*
+     * Used if block/non-blocking is set at the socket level. The client is
+     * responsible for the thread-safe use of this field.
+     */
+    private volatile boolean blockingStatus = true;
 
     public SocketWrapper(E socket) {
         this.socket = socket;
@@ -74,4 +78,8 @@ public class SocketWrapper<E> {
     public void setRemoteHost(String remoteHost) {this.remoteHost = remoteHost; }
     public String getRemoteAddr() { return remoteAddr; }
     public void setRemoteAddr(String remoteAddr) {this.remoteAddr = remoteAddr; }
+    public boolean getBlockingStatus() { return blockingStatus; }
+    public void setBlockingStatus(boolean blockingStatus) {
+        this.blockingStatus = blockingStatus;
+    }
 }

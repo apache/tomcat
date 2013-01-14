@@ -17,69 +17,93 @@
 package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import org.apache.tomcat.jni.Socket;
+import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 public class AprServletInputStream extends AbstractServletInputStream {
 
+    private final SocketWrapper<Long> wrapper;
     private final long socket;
+    private final Lock blockingStatusReadLock;
+    private final WriteLock blockingStatusWriteLock;
+    private volatile boolean eagain = false;
 
 
     public AprServletInputStream(SocketWrapper<Long> wrapper) {
+        this.wrapper = wrapper;
         this.socket = wrapper.getSocket().longValue();
-    }
-/*
-    @Override
-    protected int doRead() throws IOException {
-        byte[] bytes = new byte[1];
-        int result = Socket.recv(socket, bytes, 0, 1);
-        if (result == -1) {
-            return -1;
-        } else {
-            return bytes[0] & 0xFF;
-        }
+        ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+        this.blockingStatusReadLock = lock.readLock();
+        this.blockingStatusWriteLock =lock.writeLock();
     }
 
-    @Override
-    protected int doRead(byte[] b, int off, int len) throws IOException {
-        boolean block = true;
-        if (!block) {
-            Socket.optSet(socket, Socket.APR_SO_NONBLOCK, -1);
-        }
-        try {
-            int result = Socket.recv(socket, b, off, len);
-            if (result > 0) {
-                return result;
-            } else if (-result == Status.EAGAIN) {
-                return 0;
-            } else {
-                throw new IOException(sm.getString("apr.error",
-                        Integer.valueOf(-result)));
-            }
-        } finally {
-            if (!block) {
-                Socket.optSet(socket, Socket.APR_SO_NONBLOCK, 0);
-            }
-        }
-    }
-}
-*/
 
     @Override
     protected int doRead(boolean block, byte[] b, int off, int len)
             throws IOException {
-        // TODO Auto-generated method stub
-        return 0;
+
+        boolean readDone = false;
+        int result = 0;
+        try {
+            blockingStatusReadLock.lock();
+            if (wrapper.getBlockingStatus() == block) {
+                result = Socket.recv(socket, b, off, len);
+                readDone = true;
+            }
+        } finally {
+            blockingStatusReadLock.unlock();
+        }
+
+        if (!readDone) {
+            try {
+                blockingStatusWriteLock.lock();
+                wrapper.setBlockingStatus(block);
+                // Set the current settings for this socket
+                Socket.optSet(socket, Socket.APR_SO_NONBLOCK, (block ? 0 : 1));
+                // Downgrade the lock
+                try {
+                    blockingStatusReadLock.lock();
+                    blockingStatusWriteLock.unlock();
+                    result = Socket.recv(socket, b, off, len);
+                } finally {
+                    blockingStatusReadLock.unlock();
+                }
+            } finally {
+                // Should have been released above but may not have been on some
+                // exception paths
+                if (blockingStatusWriteLock.isHeldByCurrentThread()) {
+                    blockingStatusWriteLock.unlock();
+                }
+            }
+        }
+
+        if (result > 0) {
+            eagain = false;
+            return result;
+        } else if (-result == Status.EAGAIN) {
+            eagain = true;
+            return 0;
+        } else {
+            throw new IOException(sm.getString("apr.read.error",
+                    Integer.valueOf(-result)));
+        }
     }
+
 
     @Override
     protected boolean doIsReady() {
-        // TODO Auto-generated method stub
-        return false;
+        return !eagain;
     }
+
 
     @Override
     protected void doClose() throws IOException {
-        // TODO Auto-generated method stub
+        // NO-OP
+        // Let AbstractProcessor trigger the close
     }
 }
