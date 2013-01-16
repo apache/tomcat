@@ -1391,7 +1391,7 @@ public class AprEndpoint extends AbstractEndpoint {
             while (info != null) {
                 if (!event || (event && !processSocket(
                         info.socket, SocketStatus.STOP))) {
-                    Socket.destroy(info.socket);
+                    destroySocket(info.socket);
                 }
                 info = addList.get();
             }
@@ -1403,7 +1403,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     for (int n = 0; n < rv; n++) {
                         if (!event || (event && !processSocket(
                                 desc[n*2+1], SocketStatus.STOP))) {
-                            Socket.destroy(desc[n*2+1]);
+                            destroySocket(desc[n*2+1]);
                         }
                     }
                 }
@@ -1442,7 +1442,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 // Can't do anything: close the socket right away
                 if (!event || (event && !processSocket(
                         socket, SocketStatus.ERROR))) {
-                    Socket.destroy(socket);
+                    destroySocket(socket);
                 }
             }
         }
@@ -1484,7 +1484,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 // Can't do anything: close the socket right away
                 if (!event || (event && !processSocket(
                         socket, SocketStatus.ERROR))) {
-                    Socket.destroy(socket);
+                    destroySocket(socket);
                 }
             }
         }
@@ -1543,7 +1543,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 removeFromPoller(socket);
                 if (!event || (event && !processSocket(
                         socket, SocketStatus.TIMEOUT))) {
-                    Socket.destroy(socket);
+                    destroySocket(socket);
                 }
                 socket = timeouts.check(date);
             }
@@ -1631,7 +1631,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                     // away
                                     if (!event || (event && !processSocket(
                                             info.socket, SocketStatus.ERROR))) {
-                                        Socket.destroy(info.socket);
+                                        destroySocket(info.socket);
                                     }
                                 } else {
                                     timeouts.add(info.socket,
@@ -1641,7 +1641,7 @@ public class AprEndpoint extends AbstractEndpoint {
                             } else {
                                 // Should never happen.
                                 timeouts.remove(info.socket);
-                                Socket.destroy(info.socket);
+                                destroySocket(info.socket);
                                 getLog().warn(sm.getString(
                                         "endpoint.apr.pollAddInvalid", info));
                             }
@@ -1674,17 +1674,17 @@ public class AprEndpoint extends AbstractEndpoint {
                                             || ((desc[n*2] & Poll.APR_POLLNVAL) == Poll.APR_POLLNVAL)) {
                                         if (!processSocket(desc[n*2+1], SocketStatus.ERROR)) {
                                             // Close socket and clear pool
-                                            Socket.destroy(desc[n*2+1]);
+                                            destroySocket(desc[n*2+1]);
                                         }
                                     } else if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
                                         if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
                                             // Close socket and clear pool
-                                            Socket.destroy(desc[n*2+1]);
+                                            destroySocket(desc[n*2+1]);
                                         }
                                     } else if ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
                                         if (!processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
                                             // Close socket and clear pool
-                                            Socket.destroy(desc[n*2+1]);
+                                            destroySocket(desc[n*2+1]);
                                         }
                                     } else {
                                         // Unknown event
@@ -1693,18 +1693,18 @@ public class AprEndpoint extends AbstractEndpoint {
                                                 Long.valueOf(desc[n*2])));
                                         if (!processSocket(desc[n*2+1], SocketStatus.ERROR)) {
                                             // Close socket and clear pool
-                                            Socket.destroy(desc[n*2+1]);
+                                            destroySocket(desc[n*2+1]);
                                         }
                                     }
                                 } else if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                                         || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
                                         || ((desc[n*2] & Poll.APR_POLLNVAL) == Poll.APR_POLLNVAL)) {
                                     // Close socket and clear pool
-                                    Socket.destroy(desc[n*2+1]);
+                                    destroySocket(desc[n*2+1]);
                                 } else if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
                                     if (!processSocket(desc[n*2+1])) {
                                         // Close socket and clear pool
-                                        Socket.destroy(desc[n*2+1]);
+                                        destroySocket(desc[n*2+1]);
                                     }
                                 } else {
                                     // Unknown event
@@ -1712,7 +1712,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                             "endpoint.apr.pollUnknownEvent",
                                             Long.valueOf(desc[n*2])));
                                     // Close socket and clear pool
-                                    Socket.destroy(desc[n*2+1]);
+                                    destroySocket(desc[n*2+1]);
                                 }
                             }
                         } else if (rv < 0) {
@@ -1850,13 +1850,13 @@ public class AprEndpoint extends AbstractEndpoint {
             // Close any socket remaining in the add queue
             for (int i = (addS.size() - 1); i >= 0; i--) {
                 SendfileData data = addS.get(i);
-                Socket.destroy(data.socket);
+                destroySocket(data.socket);
             }
             // Close all sockets still in the poller
             int rv = Poll.pollset(sendfilePollset, desc);
             if (rv > 0) {
                 for (int n = 0; n < rv; n++) {
-                    Socket.destroy(desc[n*2+1]);
+                    destroySocket(desc[n*2+1]);
                 }
             }
             Pool.destroy(pool);
@@ -1982,7 +1982,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                             Integer.valueOf(rv),
                                             Error.strerror(rv)));
                                     // Can't do anything: close the socket right away
-                                    Socket.destroy(data.socket);
+                                    destroySocket(data.socket);
                                 }
                             }
                             addS.clear();
@@ -2004,7 +2004,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                 remove(state);
                                 // Destroy file descriptor pool, which should close the file
                                 // Close the socket, as the response would be incomplete
-                                Socket.destroy(state.socket);
+                                destroySocket(state.socket);
                                 continue;
                             }
                             // Write some data using sendfile
@@ -2016,7 +2016,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                 remove(state);
                                 // Close the socket, as the response would be incomplete
                                 // This will close the file too.
-                                Socket.destroy(state.socket);
+                                destroySocket(state.socket);
                                 continue;
                             }
 
@@ -2034,7 +2034,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                 } else {
                                     // Close the socket since this is
                                     // the end of not keep-alive request.
-                                    Socket.destroy(state.socket);
+                                    destroySocket(state.socket);
                                 }
                             }
                         }
@@ -2070,7 +2070,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                 remove(state);
                                 // Destroy file descriptor pool, which should close the file
                                 // Close the socket, as the response would be incomplete
-                                Socket.destroy(state.socket);
+                                destroySocket(state.socket);
                             }
                         }
                     }
