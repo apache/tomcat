@@ -825,7 +825,7 @@ public class AprEndpoint extends AbstractEndpoint {
      * Process given socket. Called in non-comet mode, typically keep alive
      * or upgraded protocol.
      */
-    protected boolean processSocket(long socket) {
+    public boolean processSocket(long socket, SocketStatus status) {
         try {
             Executor executor = getExecutor();
             if (executor == null) {
@@ -834,7 +834,7 @@ public class AprEndpoint extends AbstractEndpoint {
             } else {
                 SocketWrapper<Long> wrapper =
                     new SocketWrapper<>(Long.valueOf(socket));
-                executor.execute(new SocketProcessor(wrapper, null));
+                executor.execute(new SocketProcessor(wrapper, status));
             }
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
@@ -849,33 +849,6 @@ public class AprEndpoint extends AbstractEndpoint {
         return true;
     }
 
-
-    /**
-     * Process given socket for an event.
-     */
-    public boolean processSocket(long socket, SocketStatus status) {
-        try {
-            Executor executor = getExecutor();
-            if (executor == null) {
-                log.warn(sm.getString("endpoint.warn.noExector",
-                        Long.valueOf(socket), status));
-            } else {
-                SocketWrapper<Long> wrapper =
-                        new SocketWrapper<>(Long.valueOf(socket));
-                executor.execute(new SocketEventProcessor(wrapper, status));
-            }
-        } catch (RejectedExecutionException x) {
-            log.warn("Socket processing request was rejected for:"+socket,x);
-            return false;
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            // This means we got an OOM or similar creating a thread, or that
-            // the pool and its queue are full
-            log.error(sm.getString("endpoint.process.fail"), t);
-            return false;
-        }
-        return true;
-    }
 
     public boolean processSocketAsync(SocketWrapper<Long> socket,
             SocketStatus status) {
@@ -1702,7 +1675,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                     // Close socket and clear pool
                                     destroySocket(desc[n*2+1]);
                                 } else if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
-                                    if (!processSocket(desc[n*2+1])) {
+                                    if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
                                         // Close socket and clear pool
                                         destroySocket(desc[n*2+1]);
                                     }
@@ -2175,6 +2148,10 @@ public class AprEndpoint extends AbstractEndpoint {
         public SocketProcessor(SocketWrapper<Long> socket,
                 SocketStatus status) {
             this.socket = socket;
+            if (status == null) {
+                // Should never happen
+                throw new NullPointerException();
+            }
             this.status = status;
         }
 
@@ -2182,12 +2159,7 @@ public class AprEndpoint extends AbstractEndpoint {
         public void run() {
             synchronized (socket) {
                 // Process the request from this socket
-                SocketState state = SocketState.OPEN;
-                if (status == null) {
-                    state = handler.process(socket,SocketStatus.OPEN_READ);
-                } else {
-                    state = handler.process(socket, status);
-                }
+                SocketState state = handler.process(socket, status);
                 if (state == Handler.SocketState.CLOSED) {
                     // Close socket and pool
                     destroySocket(socket.getSocket().longValue());
@@ -2199,45 +2171,14 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                 } else if (state == Handler.SocketState.ASYNC_END) {
                     socket.access();
-                    SocketProcessor proc = new SocketProcessor(socket, SocketStatus.OPEN_READ);
+                    SocketProcessor proc = new SocketProcessor(socket,
+                            SocketStatus.OPEN_READ);
                     getExecutor().execute(proc);
                 }
             }
         }
     }
 
-
-    // --------------------------------------- SocketEventProcessor Inner Class
-
-
-    /**
-     * This class is the equivalent of the Worker, but will simply use in an
-     * external Executor thread pool.
-     */
-    protected class SocketEventProcessor implements Runnable {
-
-        protected SocketWrapper<Long> socket = null;
-        protected SocketStatus status = null;
-
-        public SocketEventProcessor(SocketWrapper<Long> socket,
-                SocketStatus status) {
-            this.socket = socket;
-            this.status = status;
-        }
-
-        @Override
-        public void run() {
-            synchronized (socket) {
-                // Process the request from this socket
-                Handler.SocketState state = handler.process(socket, status);
-                if (state == Handler.SocketState.CLOSED) {
-                    // Close socket and pool
-                    destroySocket(socket.getSocket().longValue());
-                    socket = null;
-                }
-            }
-        }
-    }
 
     private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
 
