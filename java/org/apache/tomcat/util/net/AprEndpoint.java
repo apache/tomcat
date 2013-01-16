@@ -1385,6 +1385,7 @@ public class AprEndpoint extends AbstractEndpoint {
             connectionCount = 0;
         }
 
+
         /**
          * Add specified socket and associated pool to the poller. The socket
          * will be added to a temporary array, and polled first after a maximum
@@ -2142,8 +2143,8 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     protected class SocketProcessor implements Runnable {
 
-        protected SocketWrapper<Long> socket = null;
-        protected SocketStatus status = null;
+        private final SocketWrapper<Long> socket;
+        private final SocketStatus status;
 
         public SocketProcessor(SocketWrapper<Long> socket,
                 SocketStatus status) {
@@ -2163,7 +2164,6 @@ public class AprEndpoint extends AbstractEndpoint {
                 if (state == Handler.SocketState.CLOSED) {
                     // Close socket and pool
                     destroySocket(socket.getSocket().longValue());
-                    socket = null;
                 } else if (state == Handler.SocketState.LONG) {
                     socket.access();
                     if (socket.async) {
