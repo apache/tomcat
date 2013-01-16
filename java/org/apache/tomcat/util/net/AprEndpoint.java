@@ -22,6 +22,8 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
@@ -96,6 +98,9 @@ public class AprEndpoint extends AbstractEndpoint {
 
     protected ConcurrentLinkedQueue<SocketWrapper<Long>> waitingRequests =
             new ConcurrentLinkedQueue<>();
+
+    private Map<Long,SocketWrapper<Long>> connections =
+            new ConcurrentHashMap<>();
 
     // ------------------------------------------------------------ Constructor
 
@@ -675,6 +680,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 // Ignore
             }
             poller = null;
+            connections.clear();
             try {
                 cometPoller.destroy();
             } catch (Exception e) {
@@ -805,6 +811,8 @@ public class AprEndpoint extends AbstractEndpoint {
             if (running) {
                 SocketWrapper<Long> wrapper =
                     new SocketWrapper<>(Long.valueOf(socket));
+                wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
+                connections.put(Long.valueOf(socket), wrapper);
                 getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
             }
         } catch (RejectedExecutionException x) {
@@ -833,7 +841,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         Long.valueOf(socket), null));
             } else {
                 SocketWrapper<Long> wrapper =
-                    new SocketWrapper<>(Long.valueOf(socket));
+                        connections.get(Long.valueOf(socket));
                 executor.execute(new SocketProcessor(wrapper, status));
             }
         } catch (RejectedExecutionException x) {
@@ -907,6 +915,7 @@ public class AprEndpoint extends AbstractEndpoint {
         // countDownConnection(). Once the connector is stopped, the latch is
         // removed so it does not matter that destroySocket() does not call
         // countDownConnection() in that case
+        connections.remove(Long.valueOf(socket));
         destroySocket(socket, running);
     }
 
