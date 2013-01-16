@@ -1125,8 +1125,6 @@ public class AprEndpoint extends AbstractEndpoint {
         public static final int FLAGS_READ = Poll.APR_POLLIN;
         public static final int FLAGS_WRITE  = Poll.APR_POLLOUT;
 
-        // Need two pollsets since the socketTimeout and the keep-alive timeout
-        // can have different values.
         private long connectionPollset = 0;
         private long pool = 0;
         private long[] desc;
@@ -1328,7 +1326,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         continue;
                     }
 
-                    // Check timeouts (much less frequently that polling)
+                    // Check timeouts (much less frequently than polling)
                     if (maintainTime > 1000000L && running) {
                         maintainTime = 0;
                         if (socketProperties.getSoTimeout() > 0) {
