@@ -19,6 +19,7 @@ package org.apache.coyote.http11.upgrade;
 import javax.servlet.http.ProtocolHandler;
 
 import org.apache.tomcat.jni.Socket;
+import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 public class AprProcessor extends AbstractProcessor<Long> {
@@ -26,10 +27,10 @@ public class AprProcessor extends AbstractProcessor<Long> {
     private static final int INFINITE_TIMEOUT = -1;
 
     public AprProcessor(SocketWrapper<Long> wrapper,
-            ProtocolHandler httpUpgradeProcessor) {
+            ProtocolHandler httpUpgradeProcessor, AprEndpoint endpoint) {
         super(httpUpgradeProcessor,
                 new AprServletInputStream(wrapper),
-                new AprServletOutputStream(wrapper));
+                new AprServletOutputStream(wrapper, endpoint));
 
         Socket.timeoutSet(wrapper.getSocket().longValue(), INFINITE_TIMEOUT);
     }
