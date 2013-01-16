@@ -945,7 +945,7 @@ public class NioEndpoint extends AbstractEndpoint {
             try {
                 if ( key == null ) return;//nothing to do
                 KeyAttachment ka = (KeyAttachment) key.attachment();
-                if (ka != null && ka.getComet() && status != null) {
+                if (ka != null && ka.isComet() && status != null) {
                     ka.setComet(false);//to avoid a loop
                     if (status == SocketStatus.TIMEOUT ) {
                         if (processSocket(ka.getChannel(), status, true)) {
@@ -1122,7 +1122,7 @@ public class NioEndpoint extends AbstractEndpoint {
                     if (sk.isReadable() || sk.isWritable() ) {
                         if ( attachment.getSendfileData() != null ) {
                             processSendfile(sk,attachment, false);
-                        } else if ( attachment.getComet() ) {
+                        } else if ( attachment.isComet() ) {
                             //check if thread is available
                             if ( isWorkerAvailable() ) {
                                 //set interest ops to 0 so we don't get multiple
@@ -1334,7 +1334,7 @@ public class NioEndpoint extends AbstractEndpoint {
                             ka.interestOps(0); //avoid duplicate timeout calls
                             cancelledKey(key, SocketStatus.TIMEOUT);
                         }
-                    } else if (ka.isAsync() || ka.getComet()) {
+                    } else if (ka.isAsync() || ka.isComet()) {
                         if (close) {
                             key.interestOps(0);
                             ka.interestOps(0); //avoid duplicate stop calls
@@ -1379,7 +1379,7 @@ public class NioEndpoint extends AbstractEndpoint {
             this.socket = channel;
             this.poller = poller;
             lastAccess = System.currentTimeMillis();
-            comet = false;
+            setComet(false);
             timeout = soTimeout;
             error = false;
             lastRegistered = 0;
@@ -1414,8 +1414,6 @@ public class NioEndpoint extends AbstractEndpoint {
 
         public Poller getPoller() { return poller;}
         public void setPoller(Poller poller){this.poller = poller;}
-        public void setComet(boolean comet) { this.comet = comet; }
-        public boolean getComet() { return comet; }
         public void setCometNotify(boolean notify) { this.cometNotify = notify; }
         public boolean getCometNotify() { return cometNotify; }
         public NioChannel getChannel() { return getSocket();}
@@ -1452,7 +1450,6 @@ public class NioEndpoint extends AbstractEndpoint {
 
         private Poller poller = null;
         private int interestOps = 0;
-        private boolean comet = false;
         private boolean cometNotify = false;
         private CountDownLatch readLatch = null;
         private CountDownLatch writeLatch = null;

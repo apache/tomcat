@@ -195,15 +195,6 @@ public class AprEndpoint extends AbstractEndpoint {
 
 
     /**
-     * The socket poller used for Comet support.
-     */
-    protected Poller cometPoller = null;
-    public Poller getCometPoller() {
-        return cometPoller;
-    }
-
-
-    /**
      * The static file sender.
      */
     protected Sendfile sendfile = null;
@@ -600,21 +591,12 @@ public class AprEndpoint extends AbstractEndpoint {
             initializeConnectionLatch();
 
             // Start poller thread
-            poller = new Poller(false);
+            poller = new Poller();
             poller.init();
             Thread pollerThread = new Thread(poller, getName() + "-Poller");
             pollerThread.setPriority(threadPriority);
             pollerThread.setDaemon(true);
             pollerThread.start();
-
-            // Start comet poller thread
-            cometPoller = new Poller(true);
-            cometPoller.init();
-            Thread cometPollerThread =
-                    new Thread(cometPoller, getName() + "-CometPoller");
-            cometPollerThread.setPriority(threadPriority);
-            cometPollerThread.setDaemon(true);
-            cometPollerThread.start();
 
             // Start sendfile thread
             if (useSendfile) {
@@ -681,12 +663,6 @@ public class AprEndpoint extends AbstractEndpoint {
             }
             poller = null;
             connections.clear();
-            try {
-                cometPoller.destroy();
-            } catch (Exception e) {
-                // Ignore
-            }
-            cometPoller = null;
             if (useSendfile) {
                 try {
                     sendfile.destroy();
@@ -934,7 +910,6 @@ public class AprEndpoint extends AbstractEndpoint {
     protected Log getLog() {
         return log;
     }
-
 
     // --------------------------------------------------- Acceptor Inner Class
     /**
@@ -1272,11 +1247,6 @@ public class AprEndpoint extends AbstractEndpoint {
         protected SocketList localAddList = null;
 
         /**
-         * Event mode flag.
-         */
-        protected boolean event = true;
-
-        /**
          * Structure used for storing timeouts.
          */
         protected SocketTimeouts timeouts = null;
@@ -1294,9 +1264,6 @@ public class AprEndpoint extends AbstractEndpoint {
         protected int connectionCount = 0;
         public int getConnectionCount() { return connectionCount; }
 
-        public Poller(boolean event) {
-            this.event = event;
-        }
 
         /**
          * Create the poller. With some versions of APR, the maximum poller size
@@ -1371,7 +1338,9 @@ public class AprEndpoint extends AbstractEndpoint {
             // Close all sockets in the add queue
             SocketInfo info = addList.get();
             while (info != null) {
-                if (!event || (event && !processSocket(
+                boolean comet =
+                        connections.get(Long.valueOf(info.socket)).isComet();
+                if (!comet || (comet && !processSocket(
                         info.socket, SocketStatus.STOP))) {
                     destroySocket(info.socket);
                 }
@@ -1383,7 +1352,9 @@ public class AprEndpoint extends AbstractEndpoint {
                 int rv = Poll.pollset(pollers[i], desc);
                 if (rv > 0) {
                     for (int n = 0; n < rv; n++) {
-                        if (!event || (event && !processSocket(
+                        boolean comet = connections.get(
+                                Long.valueOf(desc[n*2+1])).isComet();
+                        if (!comet || (comet && !processSocket(
                                 desc[n*2+1], SocketStatus.STOP))) {
                             destroySocket(desc[n*2+1]);
                         }
@@ -1423,7 +1394,9 @@ public class AprEndpoint extends AbstractEndpoint {
             }
             if (!ok) {
                 // Can't do anything: close the socket right away
-                if (!event || (event && !processSocket(
+                boolean comet = connections.get(
+                        Long.valueOf(socket)).isComet();
+                if (!comet || (comet && !processSocket(
                         socket, SocketStatus.ERROR))) {
                     destroySocket(socket);
                 }
@@ -1465,7 +1438,9 @@ public class AprEndpoint extends AbstractEndpoint {
             }
             if (!ok) {
                 // Can't do anything: close the socket right away
-                if (!event || (event && !processSocket(
+                boolean comet = connections.get(
+                        Long.valueOf(socket)).isComet();
+                if (!comet || (comet && !processSocket(
                         socket, SocketStatus.ERROR))) {
                     destroySocket(socket);
                 }
@@ -1524,7 +1499,9 @@ public class AprEndpoint extends AbstractEndpoint {
             long socket = timeouts.check(date);
             while (socket != 0) {
                 removeFromPoller(socket);
-                if (!event || (event && !processSocket(
+                boolean comet = connections.get(
+                        Long.valueOf(socket)).isComet();
+                if (!comet || (comet && !processSocket(
                         socket, SocketStatus.TIMEOUT))) {
                     destroySocket(socket);
                 }
@@ -1539,7 +1516,7 @@ public class AprEndpoint extends AbstractEndpoint {
         @Override
         public String toString() {
             StringBuffer buf = new StringBuffer();
-            buf.append("Poller event=[").append(event).append("]");
+            buf.append("Poller");
             long[] res = new long[actualPollerSize * 2];
             for (int i = 0; i < pollers.length; i++) {
                 int count = Poll.pollset(pollers[i], res);
@@ -1602,8 +1579,10 @@ public class AprEndpoint extends AbstractEndpoint {
                         SocketInfo info = localAddList.get();
                         while (info != null) {
                             if (info.read() || info.write()) {
+                                boolean comet = connections.get(
+                                        Long.valueOf(info.socket)).isComet();
                                 // Store timeout
-                                if (event) {
+                                if (comet) {
                                     removeFromPoller(info.socket);
                                 }
                                 int events =
@@ -1612,7 +1591,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                 if (!addToPoller(info.socket, events)) {
                                     // Can't do anything: close the socket right
                                     // away
-                                    if (!event || (event && !processSocket(
+                                    if (!comet || (comet && !processSocket(
                                             info.socket, SocketStatus.ERROR))) {
                                         destroySocket(info.socket);
                                     }
@@ -1650,7 +1629,7 @@ public class AprEndpoint extends AbstractEndpoint {
                             for (int n = 0; n < rv; n++) {
                                 timeouts.remove(desc[n*2+1]);
                                 // Check for failed sockets and hand this socket off to a worker
-                                if (event) {
+                                if (connections.get(Long.valueOf(desc[n*2+1])).isComet()) {
                                     // Event processes either a read or a write depending on what the poller returns
                                     if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                                             || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
