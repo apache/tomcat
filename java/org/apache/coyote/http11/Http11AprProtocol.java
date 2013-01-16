@@ -252,8 +252,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
             if (addToPoller && proto.endpoint.isRunning()) {
                 ((AprEndpoint)proto.endpoint).getPoller().add(
                         socket.getSocket().longValue(),
-                        proto.endpoint.getKeepAliveTimeout(),
-                        AprEndpoint.Poller.FLAGS_READ);
+                        proto.endpoint.getKeepAliveTimeout(), true, false);
             }
         }
 
@@ -297,8 +296,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                 if (proto.endpoint.isRunning()) {
                     ((AprEndpoint) proto.endpoint).getCometPoller().add(
                             socket.getSocket().longValue(),
-                            proto.endpoint.getSoTimeout(),
-                            AprEndpoint.Poller.FLAGS_READ);
+                            proto.endpoint.getSoTimeout(), true, false);
                 } else {
                     // Process a STOP directly
                     ((AprEndpoint) proto.endpoint).processSocket(
@@ -308,8 +306,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
             } else {
                 // Upgraded
                 ((AprEndpoint) proto.endpoint).getPoller().add(
-                        socket.getSocket().longValue(), -1,
-                        AprEndpoint.Poller.FLAGS_READ);
+                        socket.getSocket().longValue(), -1, true, false);
             }
         }
 
