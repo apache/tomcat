@@ -22,16 +22,21 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.tomcat.jni.Socket;
+import org.apache.tomcat.jni.Status;
+import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 public class AprServletOutputStream extends AbstractServletOutputStream {
 
+    private final AprEndpoint endpoint;
     private final SocketWrapper<Long> wrapper;
     private final long socket;
     private final Lock blockingStatusReadLock;
     private final WriteLock blockingStatusWriteLock;
 
-    public AprServletOutputStream(SocketWrapper<Long> wrapper) {
+    public AprServletOutputStream(SocketWrapper<Long> wrapper,
+            AprEndpoint endpoint) {
+        this.endpoint = endpoint;
         this.wrapper = wrapper;
         this.socket = wrapper.getSocket().longValue();
         ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
@@ -79,12 +84,20 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
             }
         }
 
-        if (result < 0) {
-            throw new IOException(sm.getString("apr.write.error",
-                    Integer.valueOf(-result)));
+        if (result >= 0) {
+            if (result < len) {
+                endpoint.getPoller().add(socket, -1, false, true);
+            }
+            return result;
+        }
+        else if (-result == Status.EAGAIN) {
+            endpoint.getPoller().add(socket, -1, false, true);
+            return 0;
         }
 
-        return result;
+        throw new IOException(sm.getString("apr.write.error",
+                Integer.valueOf(-result)));
+
     }
 
     @Override

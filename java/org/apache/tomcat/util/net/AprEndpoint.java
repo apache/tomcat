@@ -1047,20 +1047,18 @@ public class AprEndpoint extends AbstractEndpoint {
     // -------------------------------------------------- SocketInfo Inner Class
 
     public static class SocketInfo {
-        public static final int READ = 1;
-        public static final int WRITE = 2;
         public long socket;
         public int timeout;
         public int flags;
         public boolean read() {
-            return (flags & READ) == READ;
+            return (flags & Poll.APR_POLLIN) == Poll.APR_POLLIN;
         }
         public boolean write() {
-            return (flags & WRITE) == WRITE;
+            return (flags & Poll.APR_POLLOUT) == Poll.APR_POLLOUT;
         }
         public static int merge(int flag1, int flag2) {
-            return ((flag1 & READ) | (flag2 & READ))
-                | ((flag1 & WRITE) | (flag2 & WRITE));
+            return ((flag1 & Poll.APR_POLLIN) | (flag2 & Poll.APR_POLLIN))
+                | ((flag1 & Poll.APR_POLLOUT) | (flag2 & Poll.APR_POLLOUT));
         }
         @Override
         public String toString() {
@@ -1386,7 +1384,7 @@ public class AprEndpoint extends AbstractEndpoint {
             synchronized (this) {
                 // Add socket to the list. Newly added sockets will wait
                 // at most for pollTime before being polled
-                if (addList.add(socket, timeout, SocketInfo.READ)) {
+                if (addList.add(socket, timeout, Poll.APR_POLLIN)) {
                     ok = true;
                     this.notify();
                 }
@@ -1417,6 +1415,12 @@ public class AprEndpoint extends AbstractEndpoint {
          * @param write to do write polling
          */
         public void add(long socket, int timeout, boolean read, boolean write) {
+            add(socket, timeout,
+                    (read ? Poll.APR_POLLIN : 0) |
+                    (write ? Poll.APR_POLLOUT : 0));
+        }
+
+        private void add(long socket, int timeout, int flags) {
             if (timeout < 0) {
                 timeout = getSoTimeout();
             }
@@ -1428,9 +1432,7 @@ public class AprEndpoint extends AbstractEndpoint {
             synchronized (this) {
                 // Add socket to the list. Newly added sockets will wait
                 // at most for pollTime before being polled
-                if (addList.add(socket, timeout,
-                        (read ? SocketInfo.READ : 0) |
-                                (write ? SocketInfo.WRITE : 0))) {
+                if (addList.add(socket, timeout, flags)) {
                     ok = true;
                     this.notify();
                 }
@@ -1630,6 +1632,9 @@ public class AprEndpoint extends AbstractEndpoint {
                                 AprSocketWrapper wrapper = connections.get(
                                         Long.valueOf(desc[n*2+1]));
                                 wrapper.pollerFlags = wrapper.pollerFlags & ~((int) desc[n*2]);
+                                if (wrapper.pollerFlags != 0) {
+                                    add(desc[n*2+1], 1, wrapper.pollerFlags);
+                                }
                                 // Check for failed sockets and hand this socket off to a worker
                                 if (wrapper.isComet()) {
                                     // Event processes either a read or a write depending on what the poller returns
@@ -1665,8 +1670,18 @@ public class AprEndpoint extends AbstractEndpoint {
                                         || ((desc[n*2] & Poll.APR_POLLNVAL) == Poll.APR_POLLNVAL)) {
                                     // Close socket and clear pool
                                     destroySocket(desc[n*2+1]);
-                                } else if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
-                                    if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
+                                } else if (((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN)
+                                        || ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT)) {
+                                    boolean error = false;
+                                    if (((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN) &&
+                                            !processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
+                                        error = true;
+                                        // Close socket and clear pool
+                                        destroySocket(desc[n*2+1]);
+                                    }
+                                    if (!error &&
+                                            ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) &&
+                                            !processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
                                         // Close socket and clear pool
                                         destroySocket(desc[n*2+1]);
                                     }
@@ -2148,23 +2163,35 @@ public class AprEndpoint extends AbstractEndpoint {
 
         @Override
         public void run() {
-            synchronized (socket) {
-                // Process the request from this socket
-                SocketState state = handler.process(socket, status);
-                if (state == Handler.SocketState.CLOSED) {
-                    // Close socket and pool
-                    destroySocket(socket.getSocket().longValue());
-                } else if (state == Handler.SocketState.LONG) {
-                    socket.access();
-                    if (socket.async) {
-                        waitingRequests.add(socket);
-                    }
-                } else if (state == Handler.SocketState.ASYNC_END) {
-                    socket.access();
-                    SocketProcessor proc = new SocketProcessor(socket,
-                            SocketStatus.OPEN_READ);
-                    getExecutor().execute(proc);
+
+            // Upgraded connections need to allow multiple threads to access the
+            // connection at the same time to enable blocking IO to be used when
+            // Servlet 3.1 NIO has been configured
+            if (socket != null && socket.isUpgraded()) {
+                doRun();
+            } else {
+                synchronized (socket) {
+                    doRun();
                 }
+            }
+        }
+
+        private void doRun() {
+            // Process the request from this socket
+            SocketState state = handler.process(socket, status);
+            if (state == Handler.SocketState.CLOSED) {
+                // Close socket and pool
+                destroySocket(socket.getSocket().longValue());
+            } else if (state == Handler.SocketState.LONG) {
+                socket.access();
+                if (socket.async) {
+                    waitingRequests.add(socket);
+                }
+            } else if (state == Handler.SocketState.ASYNC_END) {
+                socket.access();
+                SocketProcessor proc = new SocketProcessor(socket,
+                        SocketStatus.OPEN_READ);
+                getExecutor().execute(proc);
             }
         }
     }

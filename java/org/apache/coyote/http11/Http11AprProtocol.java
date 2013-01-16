@@ -340,7 +340,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                 SocketWrapper<Long> socket,
                 ProtocolHandler httpUpgradeProcessor)
                 throws IOException {
-            return new AprProcessor(socket, httpUpgradeProcessor);
+            return new AprProcessor(socket, httpUpgradeProcessor,
+                    (AprEndpoint) proto.endpoint);
         }
     }
 }
