@@ -99,8 +99,7 @@ public class AprEndpoint extends AbstractEndpoint {
     protected ConcurrentLinkedQueue<SocketWrapper<Long>> waitingRequests =
             new ConcurrentLinkedQueue<>();
 
-    private Map<Long,SocketWrapper<Long>> connections =
-            new ConcurrentHashMap<>();
+    private Map<Long,AprSocketWrapper> connections = new ConcurrentHashMap<>();
 
     // ------------------------------------------------------------ Constructor
 
@@ -785,8 +784,8 @@ public class AprEndpoint extends AbstractEndpoint {
         try {
             // During shutdown, executor may be null - avoid NPE
             if (running) {
-                SocketWrapper<Long> wrapper =
-                    new SocketWrapper<>(Long.valueOf(socket));
+                AprSocketWrapper wrapper =
+                        new AprSocketWrapper(Long.valueOf(socket));
                 wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
                 connections.put(Long.valueOf(socket), wrapper);
                 getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
@@ -1548,8 +1547,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         // Ignore
                     }
                 }
-                // Check timeouts for suspended connections if the poller is
-                // empty
+                // Check timeouts if the poller is empty
                 while (connectionCount < 1 && addList.size() < 1) {
                     // Reset maintain time.
                     try {
@@ -1579,16 +1577,17 @@ public class AprEndpoint extends AbstractEndpoint {
                         SocketInfo info = localAddList.get();
                         while (info != null) {
                             if (info.read() || info.write()) {
-                                boolean comet = connections.get(
-                                        Long.valueOf(info.socket)).isComet();
+                                AprSocketWrapper wrapper = connections.get(
+                                        Long.valueOf(info.socket));
+                                boolean comet = wrapper.isComet();
                                 // Store timeout
                                 if (comet) {
                                     removeFromPoller(info.socket);
                                 }
-                                int events =
+                                wrapper.pollerFlags = wrapper.pollerFlags |
                                         (info.read() ? Poll.APR_POLLIN : 0) |
                                         (info.write() ? Poll.APR_POLLOUT : 0);
-                                if (!addToPoller(info.socket, events)) {
+                                if (!addToPoller(info.socket, wrapper.pollerFlags)) {
                                     // Can't do anything: close the socket right
                                     // away
                                     if (!comet || (comet && !processSocket(
@@ -1628,8 +1627,11 @@ public class AprEndpoint extends AbstractEndpoint {
                             connectionCount -= rv;
                             for (int n = 0; n < rv; n++) {
                                 timeouts.remove(desc[n*2+1]);
+                                AprSocketWrapper wrapper = connections.get(
+                                        Long.valueOf(desc[n*2+1]));
+                                wrapper.pollerFlags = wrapper.pollerFlags & ~((int) desc[n*2]);
                                 // Check for failed sockets and hand this socket off to a worker
-                                if (connections.get(Long.valueOf(desc[n*2+1])).isComet()) {
+                                if (wrapper.isComet()) {
                                     // Event processes either a read or a write depending on what the poller returns
                                     if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                                             || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
@@ -2164,6 +2166,17 @@ public class AprEndpoint extends AbstractEndpoint {
                     getExecutor().execute(proc);
                 }
             }
+        }
+    }
+
+
+    private static class AprSocketWrapper extends SocketWrapper<Long> {
+
+        // This field should only be used by Poller#run()
+        private int pollerFlags = 0;
+
+        public AprSocketWrapper(Long socket) {
+            super(socket);
         }
     }
 
