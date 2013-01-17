@@ -38,7 +38,7 @@ import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
  * Provides a per class loader (i.e. per web application) instance of a
  * ServerContainer.
  */
-public class ServerContainerImpl extends WebSocketContainerImpl {
+public class ServerContainerImpl extends WsWebSocketContainer {
 
     // Needs to be a WeakHashMap to prevent memory leaks when a context is
     // stopped
