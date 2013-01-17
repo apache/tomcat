@@ -113,6 +113,8 @@ public final class SSL {
     public static final int SSL_OP_ALL                              = 0x00000FFF;
     /* As server, disallow session resumption on renegotiation */
     public static final int SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION = 0x00010000;
+    /* Don't use compression even if supported */
+    public static final int SSL_OP_NO_COMPRESSION                         = 0x00020000;
     /* Permit unsafe legacy renegotiation */
     public static final int SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION      = 0x00040000;
     /* If set, always create a new key when using tmp_eddh parameters */
@@ -338,15 +340,16 @@ public final class SSL {
     public static native String getLastError();
 
     /**
-     * Return true if SSL_OP_ if defined.
-     * <p>
-     * Currently used for testing weather the
-     * SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION is supported by OpenSSL.
-     * <p>
-     * @param op SSL_OP to test.
-     * @return true if SSL_OP is supported by OpenSSL library.
+     * Return true if all the requested SSL_OP_* are supported by OpenSSL.
+     * 
+     * <i>Note that for versions of tcnative &lt; 1.1.25, this method will
+     * return <code>true</code> if and only if <code>op</code>=
+     * {@link #SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION} and tcnative
+     * supports that flag.</i>
+     *
+     * @param Bitwise-OR of all SSL_OP_* to test.
+     * 
+     * @return true if all SSL_OP_* are supported by OpenSSL library.
      */
     public static native boolean hasOp(int op);
-
 }
-
