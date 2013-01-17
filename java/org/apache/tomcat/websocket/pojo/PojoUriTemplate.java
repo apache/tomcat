@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.websocket;
+package org.apache.tomcat.websocket.pojo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,7 +81,7 @@ public class PojoUriTemplate {
         Matcher m = pattern.matcher(pathInfo);
         if (!m.matches()) {
             throw new IllegalArgumentException(sm.getString(
-                    "uriTemplate.noMatch", template, pattern, pathInfo));
+                    "pojoUriTemplate.noMatch", template, pattern, pathInfo));
         }
         int group = 2;
         for (String name : names) {

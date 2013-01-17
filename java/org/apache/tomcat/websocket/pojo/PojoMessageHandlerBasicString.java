@@ -14,20 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.websocket;
+package org.apache.tomcat.websocket.pojo;
 
 import java.lang.reflect.Method;
 
-import javax.websocket.PongMessage;
 import javax.websocket.Session;
 
 /**
- * PongMessage specific concrete basic implementation.
+ * String specific concrete basic implementation.
  */
-public class PojoMessageHandlerBasicPong
-        extends PojoMessageHandlerBasicBase<PongMessage> {
+public class PojoMessageHandlerBasicString
+        extends PojoMessageHandlerBasicBase<String> {
 
-    public PojoMessageHandlerBasicPong(Object pojo, Method method,
+    public PojoMessageHandlerBasicString(Object pojo, Method method,
             Session session, Object[] params, int indexPayload, boolean wrap,
             int indexSession) {
         super(pojo, method, session, params, indexPayload, wrap, indexSession);

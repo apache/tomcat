@@ -142,6 +142,8 @@
       <allow pkg="javax.websocket"/>
       <allow pkg="org.apache.juli"/>
       <allow pkg="org.apache.tomcat.util"/>
+      <!-- Ideally want to remove this -->
+      <allow pkg="org.apache.tomcat.websocket.pojo"/>
     </subpackage>
   </subpackage>
 </import-control>

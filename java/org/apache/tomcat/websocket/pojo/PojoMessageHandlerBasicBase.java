@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.websocket;
+package org.apache.tomcat.websocket.pojo;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,31 +24,25 @@ import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
 /**
- * Common implementation code for the POJO asynchronous message handlers. All
- * the real work is done in this class and in the superclass.
+ * Common implementation code for the POJO basic message handlers. All the real
+ * work is done in this class and in the superclass.
  *
  * @param <T>   The type of message to handle
  */
-public abstract class PojoMessageHandlerAsyncBase<T>
-        extends PojoMessageHandlerBase<T> implements MessageHandler.Async<T> {
+public abstract class PojoMessageHandlerBasicBase<T>
+        extends PojoMessageHandlerBase<T> implements MessageHandler.Basic<T> {
 
-    private final int indexBoolean;
-
-    public PojoMessageHandlerAsyncBase(Object pojo, Method method,
+    public PojoMessageHandlerBasicBase(Object pojo, Method method,
             Session session, Object[] params, int indexPayload,
-            boolean wrap, int indexBoolean, int indexSession) {
+            boolean wrap, int indexSession) {
         super(pojo, method, session, params, indexPayload, wrap,
                 indexSession);
-        this.indexBoolean = indexBoolean;
     }
 
 
     @Override
-    public final void onMessage(T message, boolean last) {
+    public final void onMessage(T message) {
         Object[] parameters = params.clone();
-        if (indexBoolean != -1) {
-            parameters[indexBoolean] = Boolean.valueOf(last);
-        }
         if (indexSession != -1) {
             parameters[indexSession] = session;
         }
@@ -61,7 +55,7 @@ public abstract class PojoMessageHandlerAsyncBase<T>
         try {
             result = method.invoke(pojo, parameters);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException();
         }
         processResult(result);
     }
