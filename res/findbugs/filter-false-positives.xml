@@ -174,6 +174,20 @@
     <Bug code="UG" />
   </Match>
   <Match>
+    <!-- Locks are always released. Non-standard pattern is required because -->
+    <!-- of lock upgrade that is used. -->
+    <Class name="org.apache.coyote.http11.upgrade.AprServletInputStream" />
+    <Method name="doRead"/>
+    <Bug code="UL" />
+  </Match>
+  <Match>
+    <!-- Locks are always released. Non-standard pattern is required because -->
+    <!-- of lock upgrade that is used. -->
+    <Class name="org.apache.coyote.http11.upgrade.AprServletOutputStream" />
+    <Method name="doWrite"/>
+    <Bug code="UL" />
+  </Match>
+  <Match>
     <!-- JspC will not be used under a security manager -->
     <Class name="org.apache.jasper.JspC"/>
     <Method name="initClassLoader"/>
