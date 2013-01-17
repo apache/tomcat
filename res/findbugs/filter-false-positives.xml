@@ -262,6 +262,16 @@
     <Bug code="UL" />
   </Match>
   <Match>
+    <!-- Lack of thread-safety is accepted in return for better performance. -->
+    <Class name="org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport$QueryStats" />
+    <Or>
+      <Method name="add" />
+      <Method name="failure" />
+      <Method name="prepare" />
+    </Or>
+    <Bug code="VO" />
+  </Match>
+  <Match>
     <!-- Wait is in AprSocket -->
     <Class name="org.apache.tomcat.jni.socket.AprSocketContext$AprPoller" />
     <Method name="run"/>
