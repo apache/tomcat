@@ -188,6 +188,12 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     public int getSSLVerifyDepth() { return ((AprEndpoint)endpoint).getSSLVerifyDepth(); }
     public void setSSLVerifyDepth(int SSLVerifyDepth) { ((AprEndpoint)endpoint).setSSLVerifyDepth(SSLVerifyDepth); }
 
+    /**
+     * Disable SSL compression.
+     */
+    public boolean getSSLDisableCompression() { return ((AprEndpoint)endpoint).getSSLDisableCompression(); }
+    public void setSSLDisableCompression(boolean disable) { ((AprEndpoint)endpoint).setSSLDisableCompression(disable); }
+
     // ----------------------------------------------------- JMX related methods
 
     @Override
