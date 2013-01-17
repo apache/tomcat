@@ -57,6 +57,10 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        <bug>54324</bug>: Allow APR connector to disable TLS compression
+        if OpenSSL supports it. (schultz)
+      </fix>
+      <fix>
         <bug>54406</bug>: Fix NIO HTTPS connector to prune specified <code>
         ciphers</code> and <code>sslEnableProtocols</code> options to those
         supported by the SSL implementation, sharing logic with the BIO
