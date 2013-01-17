@@ -177,14 +177,6 @@ public class AprEndpoint extends AbstractEndpoint {
 
 
     /**
-     * Poller thread count.
-     */
-    protected int pollerThreadCount = 0;
-    public void setPollerThreadCount(int pollerThreadCount) { this.pollerThreadCount = pollerThreadCount; }
-    public int getPollerThreadCount() { return pollerThreadCount; }
-
-
-    /**
      * The socket poller.
      */
     protected Poller poller = null;
@@ -436,34 +428,10 @@ public class AprEndpoint extends AbstractEndpoint {
             useSendfile = false;
         }
 
-        // Initialize thread count defaults for acceptor, poller and sendfile
+        // Initialize thread count default for acceptor
         if (acceptorThreadCount == 0) {
             // FIXME: Doesn't seem to work that well with multiple accept threads
             acceptorThreadCount = 1;
-        }
-        if (pollerThreadCount == 0) {
-            if ((OS.IS_WIN32 || OS.IS_WIN64) && (getMaxConnections() > 1024)) {
-                // The maximum per poller to get reasonable performance is 1024
-                pollerThreadCount = getMaxConnections() / 1024;
-                // Adjust poller size so that it won't reach the limit
-                setMaxConnections(
-                        getMaxConnections() - (getMaxConnections() % 1024));
-            } else {
-                // No explicit poller size limitation
-                pollerThreadCount = 1;
-            }
-        }
-        if (sendfileThreadCount == 0) {
-            if ((OS.IS_WIN32 || OS.IS_WIN64) && (sendfileSize > 1024)) {
-                // The maximum per poller to get reasonable performance is 1024
-                sendfileThreadCount = sendfileSize / 1024;
-                // Adjust poller size so that it won't reach the limit
-                sendfileSize = sendfileSize - (sendfileSize % 1024);
-            } else {
-                // No explicit poller size limitation
-                // FIXME: Default to one per CPU ?
-                sendfileThreadCount = 1;
-            }
         }
 
         // Delay accepting of new connections until data is available
