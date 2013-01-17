@@ -1513,7 +1513,7 @@ public class JspC extends Task implements Options {
         URL urlsA[]=new URL[urls.size()];
         urls.toArray(urlsA);
         loader = new URLClassLoader(urlsA, this.getClass().getClassLoader());
-
+        context.setClassLoader(loader);
     }
 
     /**
