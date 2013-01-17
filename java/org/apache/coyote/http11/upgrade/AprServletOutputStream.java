@@ -33,6 +33,7 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
     private final long socket;
     private final Lock blockingStatusReadLock;
     private final WriteLock blockingStatusWriteLock;
+    private volatile boolean closed = false;
 
     public AprServletOutputStream(SocketWrapper<Long> wrapper,
             AprEndpoint endpoint) {
@@ -54,6 +55,9 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
         try {
             blockingStatusReadLock.lock();
             if (wrapper.getBlockingStatus() == block) {
+                if (closed) {
+                    throw new IOException(sm.getString("apr.closed"));
+                }
                 result = Socket.send(socket, b, off, len);
                 writeDone = true;
             }
@@ -71,6 +75,9 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
                 try {
                     blockingStatusReadLock.lock();
                     blockingStatusWriteLock.unlock();
+                    if (closed) {
+                        throw new IOException(sm.getString("apr.closed"));
+                    }
                     result = Socket.send(socket, b, off, len);
                 } finally {
                     blockingStatusReadLock.unlock();
@@ -108,7 +115,8 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
 
     @Override
     protected void doClose() throws IOException {
-        // NO-OP
-        // Let AbstractProcessor trigger the close
+        closed = true;
+        // AbstractProcessor needs to trigger the close as multiple closes for
+        // APR/native sockets will cause problems.
     }
 }
