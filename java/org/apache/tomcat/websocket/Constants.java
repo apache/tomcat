@@ -21,7 +21,8 @@ package org.apache.tomcat.websocket;
  */
 public class Constants {
 
-    protected static final String PACKAGE_NAME = "org.apache.tomcat.websocket";
+    protected static final String PACKAGE_NAME =
+            Constants.class.getPackage().getName();
     protected static final String SERVLET_NAME = WsServlet.class.getName();
     // OP Codes
     public static final byte OPCODE_CONTINUATION = 0x00;
