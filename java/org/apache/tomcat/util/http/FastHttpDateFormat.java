@@ -167,10 +167,8 @@ public final class FastHttpDateFormat {
             date = internalParseDate(value, threadLocalformats);
             updateParseCache(value, date);
         } else {
-            synchronized (parseCache) {
-                date = internalParseDate(value, formats);
-                updateParseCache(value, date);
-            }
+            date = internalParseDate(value, formats);
+            updateParseCache(value, date);
         }
         if (date == null) {
             return (-1L);
