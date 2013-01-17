@@ -31,6 +31,8 @@ import javax.websocket.server.ServerEndpointConfiguration;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.pojo.PojoEndpointConfiguration;
+import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
 
 /**
  * Provides a per class loader (i.e. per web application) instance of a

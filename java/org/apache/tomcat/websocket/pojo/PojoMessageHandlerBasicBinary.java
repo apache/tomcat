@@ -14,19 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.websocket;
+package org.apache.tomcat.websocket.pojo;
 
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
 
 import javax.websocket.Session;
 
 /**
- * String specific concrete basic implementation.
+ * ByteBuffer specific concrete basic implementation.
  */
-public class PojoMessageHandlerBasicString
-        extends PojoMessageHandlerBasicBase<String> {
+public class PojoMessageHandlerBasicBinary
+        extends PojoMessageHandlerBasicBase<ByteBuffer> {
 
-    public PojoMessageHandlerBasicString(Object pojo, Method method,
+    public PojoMessageHandlerBasicBinary(Object pojo, Method method,
             Session session, Object[] params, int indexPayload, boolean wrap,
             int indexSession) {
         super(pojo, method, session, params, indexPayload, wrap, indexSession);

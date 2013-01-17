@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.websocket;
+package org.apache.tomcat.websocket.pojo;
 
 import javax.websocket.server.DefaultServerConfiguration;
 
@@ -31,7 +31,7 @@ public class PojoEndpointConfiguration extends DefaultServerConfiguration {
     private final String pathInfo;
 
 
-    PojoEndpointConfiguration(Class<?> pojoClass,
+    public PojoEndpointConfiguration(Class<?> pojoClass,
             PojoMethodMapping methodMapping, String pathInfo) {
         super(PojoEndpoint.class, methodMapping.getWsPath());
         this.pojoClass = pojoClass;

@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,22 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.websocket;
-
-import java.lang.reflect.Method;
-
-import javax.websocket.Session;
+package org.apache.tomcat.websocket.pojo;
 
 /**
- * String specific concrete asynchronous implementation.
+ * Internal implementation constants.
  */
-public class PojoMessageHandlerAsyncString
-        extends PojoMessageHandlerAsyncBase<String>{
+public class Constants {
 
-    public PojoMessageHandlerAsyncString(Object pojo, Method method,
-            Session session, Object[] params, int indexPayload, boolean wrap,
-            int indexBoolean, int indexSession) {
-        super(pojo, method, session, params, indexPayload, wrap, indexBoolean,
-                indexSession);
+    protected static final String PACKAGE_NAME =
+            Constants.class.getPackage().getName();
+
+
+    private Constants() {
+        // Hide default constructor
     }
 }
