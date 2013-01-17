@@ -142,15 +142,12 @@ public final class FastHttpDateFormat {
             newDate = threadLocalformat.format(dateValue);
             updateFormatCache(longValue, newDate);
         } else {
-            synchronized (formatCache) {
-                synchronized (format) {
-                    newDate = format.format(dateValue);
-                }
-                updateFormatCache(longValue, newDate);
+            synchronized (format) {
+                newDate = format.format(dateValue);
             }
+            updateFormatCache(longValue, newDate);
         }
         return newDate;
-
     }
 
 
