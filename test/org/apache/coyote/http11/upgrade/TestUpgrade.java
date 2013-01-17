@@ -132,12 +132,15 @@ public class TestUpgrade extends TomcatBaseTest {
 
         String status = reader.readLine();
 
+        Assert.assertNotNull(status);
         Assert.assertEquals("HTTP/1.1 101 Switching Protocols",
                 status.substring(0, 32));
 
         // Skip the remaining response headers
-        while (reader.readLine().length() > 0) {
+        String line = reader.readLine();
+        while (line != null && line.length() > 0) {
             // Skip
+            line = reader.readLine();
         }
 
         return new UpgradeConnection(writer, reader);
