@@ -209,8 +209,6 @@ but possibly 7.1.x).
       - Not started
 
 13. Fix all FindBugs warnings
-    - Complete for javax.*
-    - Complete for o.a.[catalina|coyote|el|juli|naming].*
-    - Remaining code in progress
+    - Complete
 
 14. Review date formatting with a view to reducing duplication.
