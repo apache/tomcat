@@ -376,9 +376,10 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                                   String md5a2) {
 
         // In digest auth, digests are always lower case
-        String md5a1 = getDigest(username, realm).toLowerCase(Locale.ENGLISH);
+        String md5a1 = getDigest(username, realm);
         if (md5a1 == null)
             return null;
+        md5a1 = md5a1.toLowerCase(Locale.ENGLISH);
         String serverDigestValue;
         if (qop == null) {
             serverDigestValue = md5a1 + ":" + nonce + ":" + md5a2;
