@@ -45,12 +45,12 @@ public class PojoMethodMapping {
     private final Method onOpen;
     private final Method onClose;
     private final Method onError;
-    private final PathParam[] onOpenParams;
-    private final PathParam[] onCloseParams;
-    private final PathParam[] onErrorParams;
+    private final PojoPathParam[] onOpenParams;
+    private final PojoPathParam[] onCloseParams;
+    private final PojoPathParam[] onErrorParams;
     private final Set<MessageMethod> onMessage = new HashSet<>();
     private final String wsPath;
-    private final UriTemplate template;
+    private final PojoUriTemplate template;
 
 
     public PojoMethodMapping(Class<?> clazzPojo, String wsPath,
@@ -60,7 +60,7 @@ public class PojoMethodMapping {
         Method close = null;
         Method error = null;
         if (wsPath.length() > servletPath.length()) {
-            template = new UriTemplate(wsPath.substring(servletPath.length() - 2));
+            template = new PojoUriTemplate(wsPath.substring(servletPath.length() - 2));
         } else {
             template = null;
         }
@@ -133,27 +133,27 @@ public class PojoMethodMapping {
     }
 
 
-    private static PathParam[] getPathParams(Method m, boolean isError) {
+    private static PojoPathParam[] getPathParams(Method m, boolean isError) {
         if (m == null) {
-            return new PathParam[0];
+            return new PojoPathParam[0];
         }
         boolean foundError = !isError;
         Class<?>[] types = m.getParameterTypes();
         Annotation[][] paramsAnnotations = m.getParameterAnnotations();
-        PathParam[] result = new PathParam[types.length];
+        PojoPathParam[] result = new PojoPathParam[types.length];
         for (int i = 0; i < types.length; i++) {
             Class<?> type = types[i];
             if (type.equals(Session.class)) {
-                result[i] = new PathParam(type, null);
+                result[i] = new PojoPathParam(type, null);
             } else if (type.equals(Throwable.class)) {
                 foundError = true;
-                result[i] = new PathParam(type, null);
+                result[i] = new PojoPathParam(type, null);
             } else {
                 Annotation[] paramAnnotations = paramsAnnotations[i];
                 for (Annotation paramAnnotation : paramAnnotations) {
                     if (paramAnnotation.annotationType().equals(
                             WebSocketPathParam.class)) {
-                        result[i] = new PathParam(type,
+                        result[i] = new PojoPathParam(type,
                                 ((WebSocketPathParam) paramAnnotation).value());
                         break;
                     }
@@ -172,8 +172,8 @@ public class PojoMethodMapping {
     }
 
 
-    private static Object[] buildArgs(PathParam[] pathParams,
-            UriTemplate template, String pathInfo, Session session,
+    private static Object[] buildArgs(PojoPathParam[] pathParams,
+            PojoUriTemplate template, String pathInfo, Session session,
             Throwable throwable) {
         Object[] result = new Object[pathParams.length];
         Map<String,String> pathValues;
@@ -231,18 +231,18 @@ public class PojoMethodMapping {
     private static class MessageMethod {
 
         private final Method m;
-        private final UriTemplate template;
+        private final PojoUriTemplate template;
         private int indexString = -1;
         private int indexByteArray = -1;
         private int indexByteBuffer = -1;
         private int indexPong = -1;
         private int indexBoolean = -1;
         private int indexSession = -1;
-        private Map<Integer,PathParam> indexPathParams = new HashMap<>();
+        private Map<Integer,PojoPathParam> indexPathParams = new HashMap<>();
         private int indexPayload = -1;
 
 
-        public MessageMethod(Method m, UriTemplate template) {
+        public MessageMethod(Method m, PojoUriTemplate template) {
             this.m = m;
             this.template = template;
 
@@ -256,7 +256,7 @@ public class PojoMethodMapping {
                         if (paramAnnotation.annotationType().equals(
                                 WebSocketPathParam.class)) {
                             indexPathParams.put(
-                                    Integer.valueOf(i), new PathParam(types[i],
+                                    Integer.valueOf(i), new PojoPathParam(types[i],
                                             ((WebSocketPathParam) paramAnnotation).value()));
                             break;
                         }
@@ -354,9 +354,9 @@ public class PojoMethodMapping {
                 pathParams = template.match(pathInfo);
             }
 
-            for (Map.Entry<Integer,PathParam> entry :
+            for (Map.Entry<Integer,PojoPathParam> entry :
                     indexPathParams.entrySet()) {
-                PathParam pathParam = entry.getValue();
+                PojoPathParam pathParam = entry.getValue();
                 String valueString = pathParams.get(pathParam.getName());
                 Object value = null;
                 if (valueString != null) {
