@@ -244,6 +244,12 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <!-- Return value is ignored but a null result will trigger an exception -->
+    <Class name="org.apache.tomcat.jdbc.pool.ConnectionPool$ConnectionFuture" />
+    <Method name="get" />
+    <Bug code="RV" />
+  </Match>
+  <Match>
     <!-- Lock is released -->
     <Class name="org.apache.tomcat.jdbc.pool.FairBlockingQueue" />
     <Method name="poll" />
