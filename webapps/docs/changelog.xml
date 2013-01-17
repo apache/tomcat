@@ -67,6 +67,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>54440</bug>: Correct a regression caused by the changes for
+        <bug>54240</bug> that broke compilation of JSPs with JspC. Patch
+        provided by Sheldon Shao. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.35 (markt)">
   <subsection name="Catalina">
