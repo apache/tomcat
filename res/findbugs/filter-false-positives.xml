@@ -361,6 +361,13 @@
     <Bug code="ML"/>
   </Match>
   <Match>
+    <!-- Return value is ignored at this point but logic further up call     -->
+    <!-- stack will ensure that a SocketTimeoutException is thrown           -->
+    <Class name="org.apache.tomcat.util.net.NioEndpoint$KeyAttachment"/>
+    <Method name="awaitLatch"/>
+    <Bug code="RV"/>
+  </Match>
+  <Match>
     <!-- Object is only ever set to null, sync therefore is still valid -->
     <Class name="org.apache.tomcat.util.net.NioEndpoint$SocketProcessor"/>
     <Method name="run"/>

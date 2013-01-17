@@ -1440,6 +1440,9 @@ public class NioEndpoint extends AbstractEndpoint {
 
         protected void awaitLatch(CountDownLatch latch, long timeout, TimeUnit unit) throws InterruptedException {
             if ( latch == null ) throw new IllegalStateException("Latch cannot be null");
+            // Note: While the return value is ignored if the latch does time
+            //       out, logic further up the call stack will trigger a
+            //       SocketTimeoutException
             latch.await(timeout,unit);
         }
         public void awaitReadLatch(long timeout, TimeUnit unit) throws InterruptedException { awaitLatch(readLatch,timeout,unit);}
