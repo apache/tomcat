@@ -26,7 +26,7 @@ import javax.websocket.Extension;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
-public class WebSocketContainerImpl implements WebSocketContainer {
+public class WsWebSocketContainer implements WebSocketContainer {
 
     @Override
     public Session connectToServer(Class<?> annotatedEndpointClass, URI path)
