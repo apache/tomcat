@@ -78,8 +78,13 @@ public class JspCServletContext implements ServletContext {
     protected final URL myResourceBaseURL;
 
 
-    // ----------------------------------------------------------- Constructors
+    /**
+     * Web application class loader.
+     */
+    private ClassLoader loader;
 
+
+    // ----------------------------------------------------------- Constructors
 
     /**
      * Create a new instance of this ServletContext implementation.
@@ -612,7 +617,12 @@ public class JspCServletContext implements ServletContext {
 
     @Override
     public ClassLoader getClassLoader() {
-        return null;
+        return loader;
+    }
+
+
+    public void setClassLoader(ClassLoader loader) {
+        this.loader = loader;
     }
 
 
