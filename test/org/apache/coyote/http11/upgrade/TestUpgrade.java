@@ -38,8 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.ProtocolHandler;
 import javax.servlet.http.WebConnection;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
