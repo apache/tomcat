@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jdbc.test;
 
 import java.sql.SQLException;
@@ -27,16 +26,17 @@ import java.util.concurrent.Future;
 
 import javax.sql.PooledConnection;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import org.apache.tomcat.jdbc.test.driver.Connection;
 import org.apache.tomcat.jdbc.test.driver.Driver;
-
 
 public class AlternateUsernameTest extends DefaultTestCase {
 
     private static final int iterations = 500000; //(new Random(System.currentTimeMillis())).nextInt(1000000)+100000;
-    public AlternateUsernameTest(String name) {
-        super(name);
-    }
+
+    @Test
     public void testUsernameCompare() throws Exception {
         testUsername(true);
     }
@@ -45,7 +45,6 @@ public class AlternateUsernameTest extends DefaultTestCase {
         long start = System.currentTimeMillis();
         int withoutuser =10;
         int withuser = withoutuser;
-        this.init();
         this.datasource.setMaxActive(withuser+withoutuser);
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
@@ -70,7 +69,7 @@ public class AlternateUsernameTest extends DefaultTestCase {
             total+=results.get(i+withuser).get().iterations;
         }
         long stop = System.currentTimeMillis();
-        assertEquals("Nr of failures was:"+failures,0, failures);
+        Assert.assertEquals("Nr of failures was:"+failures,0, failures);
         svc.shutdownNow();
         this.datasource.close();
         System.out.println("Nr of connect() calls:"+Driver.connectCount.get());
@@ -79,10 +78,12 @@ public class AlternateUsernameTest extends DefaultTestCase {
 
     }
 
+    @Test
     public void testUsernameCompareAgain() throws Exception {
         testUsernameCompare();
     }
 
+    @Test
     public void testUsernameCompareNotAllowed() throws Exception {
         testUsername(false);
     }
@@ -120,8 +121,8 @@ public class AlternateUsernameTest extends DefaultTestCase {
 
                     Connection con = (Connection)pcon.getConnection();
 
-                    assertTrue("Username mismatch: Requested User:"+username+" Actual user:"+con.getUsername(), con.getUsername().equals(username));
-                    assertTrue("Password mismatch: Requested Password:"+password+" Actual password:"+con.getPassword(), con.getPassword().equals(password));
+                    Assert.assertTrue("Username mismatch: Requested User:"+username+" Actual user:"+con.getUsername(), con.getUsername().equals(username));
+                    Assert.assertTrue("Password mismatch: Requested Password:"+password+" Actual password:"+con.getPassword(), con.getPassword().equals(password));
                 }catch (SQLException x) {
                     test.failures++;
                     test.lastMessage = x.getMessage();

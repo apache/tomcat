@@ -18,20 +18,16 @@ package org.apache.tomcat.jdbc.test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * @author Filip Hanik
- * @version 1.0
- */
+import org.junit.Assert;
+import org.junit.Test;
+
 public class TestTimeout extends DefaultTestCase {
-    public TestTimeout(String name) {
-        super(name);
-    }
 
     AtomicInteger counter = new AtomicInteger(0);
 
+    @Test
     public void testCheckoutTimeout() throws Exception {
         try {
-            init();
             this.datasource.getPoolProperties().setTestWhileIdle(true);
             this.datasource.getPoolProperties().setTestOnBorrow(false);
             this.datasource.getPoolProperties().setTestOnReturn(false);
@@ -50,18 +46,17 @@ public class TestTimeout extends DefaultTestCase {
                 long delta = System.currentTimeMillis()-now;
                 System.out.println("Got connection #"+i+" in "+delta+" ms.");
             }
-            assertTrue(false);
+            Assert.assertTrue(false);
         } catch ( Exception x ) {
-            assertTrue(true);
+            Assert.assertTrue(true);
         }finally {
             Thread.sleep(2000);
-            tearDown();
         }
     }
 
+    @Test
     public void testCheckoutTimeoutFair() throws Exception {
         try {
-            init();
             this.datasource.getPoolProperties().setFairQueue(true);
             this.datasource.getPoolProperties().setTestWhileIdle(true);
             this.datasource.getPoolProperties().setTestOnBorrow(false);
@@ -81,13 +76,11 @@ public class TestTimeout extends DefaultTestCase {
                 long delta = System.currentTimeMillis()-now;
                 System.out.println("Got connection #"+i+" in "+delta+" ms.");
             }
-            assertTrue(false);
+            Assert.assertTrue(false);
         } catch ( Exception x ) {
-            assertTrue(true);
+            Assert.assertTrue(true);
         }finally {
             Thread.sleep(2000);
-            tearDown();
         }
     }
-
 }

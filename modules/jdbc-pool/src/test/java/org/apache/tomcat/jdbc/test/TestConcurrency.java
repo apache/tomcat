@@ -14,11 +14,15 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.test.driver.Driver;
@@ -29,13 +33,8 @@ public class TestConcurrency extends DefaultTestCase {
 
     protected volatile DataSource ds = null;
 
-    public TestConcurrency(String name) {
-        super(name);
-    }
-
-    @Override
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
         ds = createDefaultDataSource();
         ds.getPoolProperties().setDriverClassName(Driver.class.getName());
         ds.getPoolProperties().setUrl(Driver.url);
@@ -52,12 +51,14 @@ public class TestConcurrency extends DefaultTestCase {
     }
 
     @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         ds.close(true);
         Driver.reset();
         super.tearDown();
     }
 
+    @Test
     public void testSimple() throws Exception {
         ds.getConnection().close();
         final int iter = 1000 * 10;
@@ -86,7 +87,7 @@ public class TestConcurrency extends DefaultTestCase {
         }
         try {
             while (loopcount.get()<iter) {
-                assertTrue("Size comparison(less than 11):",ds.getPool().getSize()<=10);
+                Assert.assertTrue("Size comparison(less than 11):",ds.getPool().getSize()<=10);
                 if (debug) {
                     System.out.println("Size: "+ds.getPool().getSize());
                     System.out.println("Used: "+ds.getPool().getActive());
@@ -102,13 +103,14 @@ public class TestConcurrency extends DefaultTestCase {
         for (int i=0; i<threads.length; i++) {
             threads[i].join();
         }
-        assertEquals("Size comparison:",10, ds.getPool().getSize());
-        assertEquals("Idle comparison:",10, ds.getPool().getIdle());
-        assertEquals("Used comparison:",0, ds.getPool().getActive());
-        assertEquals("Connect count",10,Driver.connectCount.get());
+        Assert.assertEquals("Size comparison:",10, ds.getPool().getSize());
+        Assert.assertEquals("Idle comparison:",10, ds.getPool().getIdle());
+        Assert.assertEquals("Used comparison:",0, ds.getPool().getActive());
+        Assert.assertEquals("Connect count",10,Driver.connectCount.get());
 
     }
 
+    @Test
     public void testBrutal() throws Exception {
         ds.getPoolProperties().setRemoveAbandoned(false);
         ds.getPoolProperties().setRemoveAbandonedTimeout(1);
@@ -140,7 +142,7 @@ public class TestConcurrency extends DefaultTestCase {
         }
         try {
             while (loopcount.get()<iter) {
-                assertTrue("Size comparison(less than 11):",ds.getPool().getSize()<=10);
+                Assert.assertTrue("Size comparison(less than 11):",ds.getPool().getSize()<=10);
                 ds.getPool().testAllIdle();
                 ds.getPool().checkAbandoned();
                 ds.getPool().checkIdle();
@@ -154,12 +156,13 @@ public class TestConcurrency extends DefaultTestCase {
         }
         System.out.println("Connect count:"+Driver.connectCount.get());
         System.out.println("DisConnect count:"+Driver.disconnectCount.get());
-        assertEquals("Size comparison:",10, ds.getPool().getSize());
-        assertEquals("Idle comparison:",10, ds.getPool().getIdle());
-        assertEquals("Used comparison:",0, ds.getPool().getActive());
-        assertEquals("Connect count",10,Driver.connectCount.get());
+        Assert.assertEquals("Size comparison:",10, ds.getPool().getSize());
+        Assert.assertEquals("Idle comparison:",10, ds.getPool().getIdle());
+        Assert.assertEquals("Used comparison:",0, ds.getPool().getActive());
+        Assert.assertEquals("Connect count",10,Driver.connectCount.get());
     }
 
+    @Test
     public void testBrutalNonFair() throws Exception {
         ds.getPoolProperties().setRemoveAbandoned(false);
         ds.getPoolProperties().setRemoveAbandonedTimeout(1);
@@ -191,7 +194,7 @@ public class TestConcurrency extends DefaultTestCase {
         }
         try {
             while (loopcount.get()<iter) {
-                assertTrue("Size comparison(less than 11):",ds.getPool().getSize()<=10);
+                Assert.assertTrue("Size comparison(less than 11):",ds.getPool().getSize()<=10);
                 ds.getPool().testAllIdle();
                 ds.getPool().checkAbandoned();
                 ds.getPool().checkIdle();
@@ -205,10 +208,9 @@ public class TestConcurrency extends DefaultTestCase {
         }
         System.out.println("Connect count:"+Driver.connectCount.get());
         System.out.println("DisConnect count:"+Driver.disconnectCount.get());
-        assertEquals("Size comparison:",10, ds.getPool().getSize());
-        assertEquals("Idle comparison:",10, ds.getPool().getIdle());
-        assertEquals("Used comparison:",0, ds.getPool().getActive());
-        assertEquals("Connect count",10,Driver.connectCount.get());
+        Assert.assertEquals("Size comparison:",10, ds.getPool().getSize());
+        Assert.assertEquals("Idle comparison:",10, ds.getPool().getIdle());
+        Assert.assertEquals("Used comparison:",0, ds.getPool().getActive());
+        Assert.assertEquals("Connect count",10,Driver.connectCount.get());
     }
-
 }

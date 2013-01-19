@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
@@ -23,18 +22,16 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Random;
 
+import org.junit.Test;
+
 import org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer;
 
 public class CreateTestTable extends DefaultTestCase {
 
     public static volatile boolean recreate = Boolean.getBoolean("recreate");
 
-    public CreateTestTable(String name) {
-        super(name);
-    }
-
+    @Test
     public void testCreateTestTable() throws Exception {
-        this.init();
         Connection con = datasource.getConnection();
         Statement st = con.createStatement();
         try {
@@ -49,7 +46,6 @@ public class CreateTestTable extends DefaultTestCase {
     public int testCheckData() throws Exception {
         int count = 0;
         String check = "select count (*) from test";
-        this.init();
         Connection con = datasource.getConnection();
         Statement st = con.createStatement();
         try {
@@ -65,6 +61,7 @@ public class CreateTestTable extends DefaultTestCase {
         return count;
     }
 
+    @Test
     public void testPopulateData() throws Exception {
         int count = 100000;
         int actual = testCheckData();
@@ -75,7 +72,6 @@ public class CreateTestTable extends DefaultTestCase {
 
         datasource.setJdbcInterceptors(ResetAbandonedTimer.class.getName());
         String insert = "insert into test values (?,?,?,?,?)";
-        this.init();
         this.datasource.setRemoveAbandoned(false);
         Connection con = datasource.getConnection();
 
@@ -135,8 +131,7 @@ public class CreateTestTable extends DefaultTestCase {
 
     public static void main(String[] args) throws Exception {
         recreate = true;
-        CreateTestTable test = new CreateTestTable("CreateTestTable");
+        CreateTestTable test = new CreateTestTable();
         test.testPopulateData();
     }
-
 }

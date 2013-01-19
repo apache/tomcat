@@ -19,7 +19,8 @@ package org.apache.tomcat.jdbc.test;
 import java.lang.reflect.Method;
 import java.util.Properties;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
 
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory;
@@ -34,20 +35,13 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
  * @author Filip Hanik
  * @version 1.0
  */
-public class DefaultTestCase extends TestCase {
+public abstract class DefaultTestCase {
+
     protected org.apache.tomcat.jdbc.pool.DataSource datasource;
     protected BasicDataSource tDatasource;
 //    protected ComboPooledDataSource c3p0Datasource;
     protected int threadcount = 10;
     protected int iterations = 100000;
-    public DefaultTestCase(String name) {
-        super(name);
-    }
-
-    @Override
-    public void setUp() throws Exception {
-        init();
-    }
 
     public org.apache.tomcat.jdbc.pool.DataSource createDefaultDataSource() {
         org.apache.tomcat.jdbc.pool.DataSource datasource = null;
@@ -72,7 +66,8 @@ public class DefaultTestCase extends TestCase {
         return datasource;
     }
 
-    protected void init() throws Exception {
+    @Before
+    public void init() throws Exception {
         this.datasource = createDefaultDataSource();
     }
 
@@ -178,8 +173,8 @@ public class DefaultTestCase extends TestCase {
     }
 
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         try {
             datasource.close();
         } catch (Exception ignore){

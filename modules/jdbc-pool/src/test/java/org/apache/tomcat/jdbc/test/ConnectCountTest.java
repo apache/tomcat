@@ -23,17 +23,13 @@ import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
+import org.junit.After;
+import org.junit.Test;
+
 import org.apache.tomcat.jdbc.pool.DataSourceProxy;
 import org.apache.tomcat.jdbc.test.driver.Driver;
 
-/**
- * @author Filip Hanik
- * @version 1.0
- */
 public class ConnectCountTest extends DefaultTestCase {
-    public ConnectCountTest(String name) {
-        super(name);
-    }
 
     protected boolean run = true;
     protected long sleep = Long.getLong("sleep", 10).longValue();
@@ -57,7 +53,8 @@ public class ConnectCountTest extends DefaultTestCase {
 
 
     @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         Driver.reset();
         super.tearDown();
     }
@@ -81,14 +78,12 @@ public class ConnectCountTest extends DefaultTestCase {
                            (((float)totalfetch))/(float)threads.length);
         System.out.println("["+name+"] Max wait:"+maxwait/1000000f+"ms. Min wait:"+minwait/1000000f+"ms. Average wait:"+(((((float)totalwait))/(float)totalfetch)/1000000f)+" ms.");
         System.out.println("["+name+"] Max active:"+active+" Expected Active:"+expected);
-
-
     }
 
+    @Test
     public void testDBCPThreads20Connections10() throws Exception {
         System.out.println("[testDBCPThreads20Connections10] Starting fairness - DBCP");
         this.threadcount = 20;
-        init();
         this.transferProperties();
         this.tDatasource.getConnection().close();
         latch = new CountDownLatch(threadcount);
@@ -110,12 +105,11 @@ public class ConnectCountTest extends DefaultTestCase {
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testDBCPThreads20Connections10",Driver.connectCount.get(),10);
         System.out.println("Test completed in: " + delta + "ms.");
-        tearDown();
     }
 
+    @Test
     public void testPoolThreads20Connections10() throws Exception {
         System.out.println("[testPoolThreads20Connections10] Starting fairness - Tomcat JDBC - Non Fair");
-        init();
         this.threadcount = 20;
         this.transferProperties();
         this.datasource.getConnection().close();
@@ -138,13 +132,11 @@ public class ConnectCountTest extends DefaultTestCase {
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10",Driver.connectCount.get(),10);
         System.out.println("Test completed in: " + delta + "ms.");
-        tearDown();
-
     }
 
+    @Test
     public void testPoolThreads20Connections10Fair() throws Exception {
         System.out.println("[testPoolThreads20Connections10Fair] Starting fairness - Tomcat JDBC - Fair");
-        init();
         this.threadcount = 20;
         this.datasource.getPoolProperties().setFairQueue(true);
         this.transferProperties();
@@ -168,12 +160,11 @@ public class ConnectCountTest extends DefaultTestCase {
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10Fair",Driver.connectCount.get(),10);
         System.out.println("Test completed in: " + delta + "ms.");
-        tearDown();
     }
 
+    @Test
     public void testPoolThreads20Connections10FairAsync() throws Exception {
         System.out.println("[testPoolThreads20Connections10FairAsync] Starting fairness - Tomcat JDBC - Fair - Async");
-        init();
         this.threadcount = 20;
         this.datasource.getPoolProperties().setFairQueue(true);
         this.datasource.getPoolProperties().setInitialSize(this.datasource.getPoolProperties().getMaxActive());
@@ -199,12 +190,11 @@ public class ConnectCountTest extends DefaultTestCase {
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10FairAsync",Driver.connectCount.get(),10);
         System.out.println("Test completed in: " + delta + "ms.");
-        tearDown();
     }
 
+//    @Test
 //    public void testC3P0Threads20Connections10() throws Exception {
 //        System.out.println("[testC3P0Threads20Connections10] Starting fairness - C3P0");
-//        init();
 //        this.threadcount = 20;
 //        this.transferPropertiesToC3P0();
 //        this.datasource.getConnection().close();
@@ -226,8 +216,6 @@ public class ConnectCountTest extends DefaultTestCase {
 //        this.run = false;
 //        long delta = System.currentTimeMillis() - start;
 //        printThreadResults(threads,"testC3P0Threads20Connections10",Driver.connectCount.get(),10);
-//        tearDown();
-//
 //    }
 
 
@@ -290,4 +278,3 @@ public class ConnectCountTest extends DefaultTestCase {
         }
     }
 }
-
