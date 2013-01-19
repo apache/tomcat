@@ -21,20 +21,14 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.sql.DataSource;
 
+import org.junit.Test;
 
-/**
- * @author Filip Hanik
- * @version 1.0
- */
 public class CheckOutThreadTest extends DefaultTestCase {
-    public CheckOutThreadTest(String name) {
-        super(name);
-    }
 
     CountDownLatch latch = null;
 
+    @Test
     public void testDBCPThreads10Connections10() throws Exception {
-        init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.threadcount = 10;
         this.transferProperties();
@@ -53,8 +47,8 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
 
+    @Test
     public void testPoolThreads10Connections10() throws Exception {
-        init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.datasource.getPoolProperties().setFairQueue(false);
         this.threadcount = 10;
@@ -74,8 +68,8 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
 
+    @Test
     public void testPoolThreads10Connections10Fair() throws Exception {
-        init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.datasource.getPoolProperties().setFairQueue(true);
         this.threadcount = 10;
@@ -95,8 +89,8 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
 
+//    @Test
 //    public void testC3P0Threads10Connections10() throws Exception {
-//        init();
 //        this.datasource.getPoolProperties().setMaxActive(10);
 //        this.threadcount = 10;
 //        this.transferPropertiesToC3P0();
@@ -115,8 +109,8 @@ public class CheckOutThreadTest extends DefaultTestCase {
 //        tearDown();
 //    }
 
+    @Test
     public void testDBCPThreads20Connections10() throws Exception {
-        init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.threadcount = 20;
         this.transferProperties();
@@ -135,8 +129,8 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
 
+    @Test
     public void testPoolThreads20Connections10() throws Exception {
-        init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.datasource.getPoolProperties().setFairQueue(false);
         this.threadcount = 20;
@@ -156,8 +150,8 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
 
+    @Test
     public void testPoolThreads20Connections10Fair() throws Exception {
-        init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.datasource.getPoolProperties().setFairQueue(true);
         this.threadcount = 20;
@@ -177,8 +171,8 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
 
+//    @Test
 //    public void testC3P0Threads20Connections10() throws Exception {
-//        init();
 //        this.datasource.getPoolProperties().setMaxActive(10);
 //        this.threadcount = 20;
 //        this.transferPropertiesToC3P0();
@@ -197,8 +191,8 @@ public class CheckOutThreadTest extends DefaultTestCase {
 //        tearDown();
 //    }
 
+    @Test
     public void testDBCPThreads10Connections10Validate() throws Exception {
-        init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.datasource.getPoolProperties().setTestOnBorrow(true);
         this.threadcount = 10;
@@ -218,8 +212,8 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
 
+    @Test
     public void testPoolThreads10Connections10Validate() throws Exception {
-        init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.datasource.getPoolProperties().setTestOnBorrow(true);
         this.datasource.getPoolProperties().setFairQueue(false);
@@ -240,8 +234,8 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
 
+    @Test
     public void testPoolThreads10Connections10ValidateFair() throws Exception {
-        init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.datasource.getPoolProperties().setTestOnBorrow(true);
         this.datasource.getPoolProperties().setFairQueue(true);
@@ -262,8 +256,8 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
 
+//    @Test
 //    public void testC3P0Threads10Connections10Validate() throws Exception {
-//        init();
 //        this.datasource.getPoolProperties().setMaxActive(10);
 //        this.datasource.getPoolProperties().setTestOnBorrow(true);
 //        this.threadcount = 10;
@@ -283,8 +277,8 @@ public class CheckOutThreadTest extends DefaultTestCase {
 //        tearDown();
 //    }
 
+    @Test
     public void testDBCPThreads20Connections10Validate() throws Exception {
-        init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.datasource.getPoolProperties().setTestOnBorrow(true);
         this.threadcount = 20;
@@ -304,8 +298,8 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
 
+    @Test
     public void testPoolThreads10Connections20Validate() throws Exception {
-        init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.datasource.getPoolProperties().setTestOnBorrow(true);
         this.datasource.getPoolProperties().setFairQueue(false);
@@ -326,8 +320,8 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
 
+    @Test
     public void testPoolThreads10Connections20ValidateFair() throws Exception {
-        init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.datasource.getPoolProperties().setTestOnBorrow(true);
         this.datasource.getPoolProperties().setFairQueue(true);
@@ -348,8 +342,8 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
 
+//    @Test
 //    public void testC3P0Threads10Connections20Validate() throws Exception {
-//        init();
 //        this.datasource.getPoolProperties().setMaxActive(10);
 //        this.datasource.getPoolProperties().setTestOnBorrow(true);
 //        this.threadcount = 20;

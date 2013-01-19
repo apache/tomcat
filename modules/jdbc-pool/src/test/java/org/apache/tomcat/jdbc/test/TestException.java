@@ -14,10 +14,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
+
+import org.junit.Test;
 
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
@@ -25,18 +26,14 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 public class TestException extends DefaultTestCase {
 
-    public TestException(String name) {
-        super(name);
-    }
-
+    @Test
     public void testException() throws Exception {
-        init();
         datasource.getPoolProperties().setJdbcInterceptors(TestInterceptor.class.getName());
         Connection con = datasource.getConnection();
         try {
             con.createStatement();
         }catch (Exception x) {
-
+            // Ignore
         }
     }
 
@@ -46,10 +43,6 @@ public class TestException extends DefaultTestCase {
         @Override
         public void reset(ConnectionPool parent, PooledConnection con) {
             // TODO Auto-generated method stub
-
         }
-
-
     }
-
 }

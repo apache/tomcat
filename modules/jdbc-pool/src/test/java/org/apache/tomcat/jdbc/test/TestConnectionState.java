@@ -18,15 +18,15 @@ package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import org.apache.tomcat.jdbc.pool.DataSourceProxy;
 import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
 
 public class TestConnectionState extends DefaultTestCase {
 
-    public TestConnectionState(String name) {
-        super(name);
-    }
-
+    @Test
     public void testAutoCommitFalse() throws Exception {
         DataSourceProxy d1 = this.createDefaultDataSource();
         d1.setMaxActive(1);
@@ -35,16 +35,17 @@ public class TestConnectionState extends DefaultTestCase {
         d1.setJdbcInterceptors(ConnectionState.class.getName());
         d1.setDefaultAutoCommit(Boolean.FALSE);
         Connection c1 = d1.getConnection();
-        assertFalse("Auto commit should be false",c1.getAutoCommit());
+        Assert.assertFalse("Auto commit should be false",c1.getAutoCommit());
         c1.setAutoCommit(true);
-        assertTrue("Auto commit should be true",c1.getAutoCommit());
+        Assert.assertTrue("Auto commit should be true",c1.getAutoCommit());
         c1.close();
         c1 = d1.getConnection();
-        assertFalse("Auto commit should be false for a reused connection",c1.getAutoCommit());
+        Assert.assertFalse("Auto commit should be false for a reused connection",c1.getAutoCommit());
         d1.close(true);
-        assertTrue("Connection should be closed",c1.isClosed());
+        Assert.assertTrue("Connection should be closed",c1.isClosed());
     }
 
+    @Test
     public void testAutoCommitTrue() throws Exception {
         DataSourceProxy d1 = this.createDefaultDataSource();
         d1.setMaxActive(1);
@@ -52,14 +53,15 @@ public class TestConnectionState extends DefaultTestCase {
         d1.setDefaultAutoCommit(Boolean.TRUE);
         d1.setMinIdle(1);
         Connection c1 = d1.getConnection();
-        assertTrue("Auto commit should be true",c1.getAutoCommit());
+        Assert.assertTrue("Auto commit should be true",c1.getAutoCommit());
         c1.setAutoCommit(false);
-        assertFalse("Auto commit should be false",c1.getAutoCommit());
+        Assert.assertFalse("Auto commit should be false",c1.getAutoCommit());
         c1.close();
         c1 = d1.getConnection();
-        assertTrue("Auto commit should be true for a reused connection",c1.getAutoCommit());
+        Assert.assertTrue("Auto commit should be true for a reused connection",c1.getAutoCommit());
     }
 
+    @Test
     public void testDefaultCatalog() throws Exception {
         DataSourceProxy d1 = this.createDefaultDataSource();
         d1.setMaxActive(1);
@@ -67,16 +69,14 @@ public class TestConnectionState extends DefaultTestCase {
         d1.setDefaultCatalog("information_schema");
         d1.setMinIdle(1);
         Connection c1 = d1.getConnection();
-        assertEquals("Catalog should be information_schema",c1.getCatalog(),"information_schema");
+        Assert.assertEquals("Catalog should be information_schema",c1.getCatalog(),"information_schema");
         c1.close();
         c1 = d1.getConnection();
-        assertEquals("Catalog should be information_schema",c1.getCatalog(),"information_schema");
+        Assert.assertEquals("Catalog should be information_schema",c1.getCatalog(),"information_schema");
         c1.setCatalog("mysql");
-        assertEquals("Catalog should be information_schema",c1.getCatalog(),"mysql");
+        Assert.assertEquals("Catalog should be information_schema",c1.getCatalog(),"mysql");
         c1.close();
         c1 = d1.getConnection();
-        assertEquals("Catalog should be information_schema",c1.getCatalog(),"information_schema");
+        Assert.assertEquals("Catalog should be information_schema",c1.getCatalog(),"information_schema");
     }
-
-
 }

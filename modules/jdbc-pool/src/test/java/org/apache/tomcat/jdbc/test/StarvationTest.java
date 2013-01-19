@@ -19,19 +19,16 @@ package org.apache.tomcat.jdbc.test;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 /**
  * If a connection is abandoned and closed,
  * then that should free up a spot in the pool, and other threads
  * that are waiting should not time out and throw an error but be
  * able to acquire a connection, since one was just released.
- * @author fhanik
- *
  */
 public class StarvationTest extends DefaultTestCase {
-
-    public StarvationTest(String name) {
-        super(name);
-    }
 
     private void config() {
         datasource.getPoolProperties().setMaxActive(1);
@@ -44,8 +41,8 @@ public class StarvationTest extends DefaultTestCase {
         datasource.getPoolProperties().setLogAbandoned(true);
     }
 
+//    @Test
 //    public void testDBCPConnectionStarvation() throws Exception {
-//        init();
 //        config();
 //        this.transferProperties();
 //        this.tDatasource.getConnection().close();
@@ -65,11 +62,10 @@ public class StarvationTest extends DefaultTestCase {
 //        }finally {
 //            if (con2!=null) con2.close();
 //        }
-//
 //    }
 
+    @Test
     public void testConnectionStarvation() throws Exception {
-        init();
         config();
         Connection con1 = datasource.getConnection();
         Connection con2 = null;
@@ -78,16 +74,17 @@ public class StarvationTest extends DefaultTestCase {
             try {
                 con2.setCatalog("mysql");//make sure connection is valid
             }catch (SQLException x) {
-                assertFalse("2nd Connection is not valid:"+x.getMessage(),true);
+                Assert.assertFalse("2nd Connection is not valid:"+x.getMessage(),true);
             }
-            assertTrue("Connection 1 should be closed.",con1.isClosed()); //first connection should be closed
+            Assert.assertTrue("Connection 1 should be closed.",con1.isClosed()); //first connection should be closed
         }catch (Exception x) {
-            assertFalse("Connection got starved:"+x.getMessage(),true);
+            Assert.assertFalse("Connection got starved:"+x.getMessage(),true);
         }finally {
             if (con2!=null) con2.close();
         }
     }
 
+    @Test
     public void testFairConnectionStarvation() throws Exception {
         init();
         config();
@@ -99,11 +96,11 @@ public class StarvationTest extends DefaultTestCase {
             try {
                 con2.setCatalog("mysql");//make sure connection is valid
             }catch (SQLException x) {
-                assertFalse("2nd Connection is not valid:"+x.getMessage(),true);
+                Assert.assertFalse("2nd Connection is not valid:"+x.getMessage(),true);
             }
-            assertTrue("Connection 1 should be closed.",con1.isClosed()); //first connection should be closed
+            Assert.assertTrue("Connection 1 should be closed.",con1.isClosed()); //first connection should be closed
         }catch (Exception x) {
-            assertFalse("Connection got starved:"+x.getMessage(),true);
+            Assert.assertFalse("Connection got starved:"+x.getMessage(),true);
         }finally {
             if (con2!=null) con2.close();
         }

@@ -16,25 +16,20 @@
  */
 package org.apache.tomcat.jdbc.test;
 
-/**
- * @author Filip Hanik
- * @version 1.0
- */
-public class TestGCClose extends DefaultTestCase {
-    public TestGCClose(String name) {
-        super(name);
-    }
+import org.junit.Test;
 
+public class TestGCClose extends DefaultTestCase {
+
+    @Test
     public void testGCStop() throws Exception {
-        init();
         datasource.getConnection();
         System.out.println("Got a connection, but didn't return it");
         tearDown();
         Thread.sleep(20000);
     }
 
+    @Test
     public void testClose() throws Exception {
-        init();
         datasource.getConnection();
         System.out.println("Got a connection, but didn't return it");
         datasource.close(true);
