@@ -19,18 +19,18 @@ package org.apache.tomcat.jdbc.test;
 import java.sql.Connection;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.test.driver.Driver;
+
 /**
- *
  * @author Jeremy Norris
  * https://issues.apache.org/bugzilla/show_bug.cgi?id=50613
- *
  */
-public class TestSizePreservation extends TestCase {
+public class TestSizePreservation {
 
     protected volatile DataSource ds = null;
 
@@ -71,6 +71,7 @@ public class TestSizePreservation extends TestCase {
         ds.getPoolProperties().setRemoveAbandonedTimeout(1);
     }
 
+    @Test
     public void testSimple() throws Exception {
         initSimplePoolProperties();
         common();
@@ -78,6 +79,7 @@ public class TestSizePreservation extends TestCase {
         Driver.reset();
     }
 
+    @Test
     public void testEvicting() throws Exception {
         initEvictingPool();
         common();
@@ -122,7 +124,7 @@ public class TestSizePreservation extends TestCase {
             threads[i].join();
         }
         System.out.println("Pool size:"+ds.getPool().getSize());
-        assertTrue("Size validity check: ", ds.getPool().getSize() >= 0);
+        Assert.assertTrue("Size validity check: ", ds.getPool().getSize() >= 0);
     }
 
 }
