@@ -138,9 +138,6 @@ of pre-installed shared library files, including:</p>
 <ul>
 <li>The <em>Servlet 3.1</em> and <em>JSP 2.2</em> APIs that are fundamental
     to writing servlets and JavaServer Pages.<br/><br/></li>
-<li>An <em>XML Parser</em> compliant with the JAXP (version 1.2) APIs, so
-    your application can perform DOM-based or SAX-based processing of
-    XML documents.<br/><br/></li>
 </ul>
 
 </section>
@@ -177,10 +174,11 @@ the order defined by the DTD (see Section 13.3).</p>
 <section name="Tomcat Context Descriptor">
 
 <p>A /META-INF/context.xml file can be used to define Tomcat specific
-configuration options, such as loggers, data sources, session manager
+configuration options, such as an access log, data sources, session manager
 configuration and more. This XML file must contain one Context element, which
 will be considered as if it was the child of the Host element corresponding
-to the Host to which the  The Tomcat configuration documentation contains
+to the Host to which the web application is being deployed. The
+<a href="../config/index.html">Tomcat configuration documentation</a> contains
 information on the Context element.</p>
 
 </section>
