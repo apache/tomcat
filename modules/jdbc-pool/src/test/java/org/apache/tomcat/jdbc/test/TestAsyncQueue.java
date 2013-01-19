@@ -21,32 +21,38 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.apache.tomcat.jdbc.pool.FairBlockingQueue;
 
-public class TestAsyncQueue extends TestCase {
+public class TestAsyncQueue {
+
     protected FairBlockingQueue<Object> queue = null;
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+
+    @Before
+    public void setUp() throws Exception {
         this.queue = new FairBlockingQueue<>();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         this.queue = null;
-        super.tearDown();
     }
 
 
+    @Test
     public void testAsyncPoll1() throws Exception {
         Object item = new Object();
         queue.offer(item);
         Future<Object> future = queue.pollAsync();
-        assertEquals(future.get(),item);
+        Assert.assertEquals(future.get(),item);
     }
 
+
+    @Test
     public void testAsyncPoll2() throws Exception {
         Object item = new Object();
         OfferThread thread = new OfferThread(item,5000);
@@ -54,14 +60,14 @@ public class TestAsyncQueue extends TestCase {
         Future<Object> future = queue.pollAsync();
         try {
             future.get(2000, TimeUnit.MILLISECONDS);
-            assertFalse("Request should have timed out",true);
+            Assert.assertFalse("Request should have timed out",true);
         }catch (TimeoutException x) {
-            assertTrue("Request timed out properly",true);
+            Assert.assertTrue("Request timed out properly",true);
         }catch (Exception x) {
-            assertTrue("Request threw an error",false);
+            Assert.assertTrue("Request threw an error",false);
             x.printStackTrace();
         }
-        assertEquals(future.get(),item);
+        Assert.assertEquals(future.get(),item);
     }
 
     protected class OfferThread extends Thread {
