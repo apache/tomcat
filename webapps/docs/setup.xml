@@ -35,12 +35,10 @@
 
   <section name="Introduction">
     <p>
-      This document introduces several ways to set up Tomcat for running
-      on different platforms.  Please note that some advanced setup issues
-      are not covered here: the full distribution (ZIP file or tarball)
-      includes a file called
-      RUNNING.txt which discusses these issues.  We encourage you to refer
-      to it if the information below does not answer some of your questions.
+      There are several ways to set up Tomcat for running on different
+      platforms. The main documentation for this is a file called
+      <a href="RUNNING.txt">RUNNING.txt</a>. We encourage you to refer to that
+      file if the information below does not answer some of your questions.
     </p>
   </section>
 
