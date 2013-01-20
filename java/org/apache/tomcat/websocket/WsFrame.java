@@ -83,8 +83,13 @@ public class WsFrame {
         this.sis = sis;
         this.wsSession = wsSession;
 
+        // TODO This needs to work for client and server side code
+        /*
         int readBufferSize =
                 ServerContainerImpl.getServerContainer().getReadBufferSize();
+        */
+        // Temp hack until the above is resolved
+        int readBufferSize = 8192;
 
         inputBuffer = new byte[readBufferSize];
         messageBufferBinary = ByteBuffer.allocate(readBufferSize);

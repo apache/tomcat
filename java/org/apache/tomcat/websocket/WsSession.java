@@ -43,12 +43,12 @@ public class WsSession implements Session {
     private static final Charset UTF8 = Charset.forName("UTF8");
 
     private final Endpoint localEndpoint;
-    private WsRemoteEndpoint wsRemoteEndpoint;
+    private WsRemoteEndpointBase wsRemoteEndpoint;
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
     private MessageHandler.Basic<PongMessage> pongMessageHandler = null;
 
-    protected WsSession(Endpoint localEndpoint) {
+    public WsSession(Endpoint localEndpoint) {
         this.localEndpoint = localEndpoint;
     }
 
@@ -250,7 +250,7 @@ public class WsSession implements Session {
     }
 
 
-    protected void setRemote(WsRemoteEndpoint wsRemoteEndpoint) {
+    public void setRemote(WsRemoteEndpointBase wsRemoteEndpoint) {
         this.wsRemoteEndpoint = wsRemoteEndpoint;
     }
 
@@ -269,12 +269,12 @@ public class WsSession implements Session {
         return pongMessageHandler;
     }
 
-    protected void onClose(CloseReason closeReason) {
+    public void onClose(CloseReason closeReason) {
         localEndpoint.onClose(this, closeReason);
     }
 
 
-    protected Endpoint getLocalEndpoint() {
+    public Endpoint getLocalEndpoint() {
         return localEndpoint;
     }
 

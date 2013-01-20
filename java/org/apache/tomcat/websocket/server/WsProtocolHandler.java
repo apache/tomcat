@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.websocket;
+package org.apache.tomcat.websocket.server;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -29,6 +29,10 @@ import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfiguration;
+
+import org.apache.tomcat.websocket.WsFrame;
+import org.apache.tomcat.websocket.WsIOException;
+import org.apache.tomcat.websocket.WsSession;
 
 /**
  * Servlet 3.1 HTTP upgrade handler for WebSocket connections.
@@ -69,10 +73,11 @@ public class WsProtocolHandler implements ProtocolHandler {
         try {
             WsFrame wsFrame = new WsFrame(sis, wsSession);
             sis.setReadListener(new WsReadListener(this, wsFrame, wsSession));
-            WsRemoteEndpoint wsRemoteEndpoint =
-                    new WsRemoteEndpoint(wsSession, sos);
-            wsSession.setRemote(wsRemoteEndpoint);
-            sos.setWriteListener(new WsWriteListener(this, wsRemoteEndpoint));
+            WsRemoteEndpointServer wsRemoteEndpointServer =
+                    new WsRemoteEndpointServer(wsSession, sos);
+            wsSession.setRemote(wsRemoteEndpointServer);
+            sos.setWriteListener(
+                    new WsWriteListener(this, wsRemoteEndpointServer));
             ep.onOpen(wsSession, endpointConfig);
         } finally {
             t.setContextClassLoader(cl);
@@ -150,18 +155,18 @@ public class WsProtocolHandler implements ProtocolHandler {
     private static class WsWriteListener implements WriteListener {
 
         private final WsProtocolHandler wsProtocolHandler;
-        private final WsRemoteEndpoint wsRemoteEndpoint;
+        private final WsRemoteEndpointServer wsRemoteEndpointServer;
 
         private WsWriteListener(WsProtocolHandler wsProtocolHandler,
-                WsRemoteEndpoint wsRemoteEndpoint) {
+                WsRemoteEndpointServer wsRemoteEndpointServer) {
             this.wsProtocolHandler = wsProtocolHandler;
-            this.wsRemoteEndpoint = wsRemoteEndpoint;
+            this.wsRemoteEndpointServer = wsRemoteEndpointServer;
         }
 
 
         @Override
         public void onWritePossible() {
-            wsRemoteEndpoint.onWritePossible();
+            wsRemoteEndpointServer.onWritePossible();
         }
 
 

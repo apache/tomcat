@@ -23,7 +23,7 @@ import javax.servlet.annotation.WebListener;
 import javax.websocket.DeploymentException;
 import javax.websocket.server.DefaultServerConfiguration;
 
-import org.apache.tomcat.websocket.ServerContainerImpl;
+import org.apache.tomcat.websocket.server.ServerContainerImpl;
 
 @WebListener
 public class WsConfigListener implements ServletContextListener {

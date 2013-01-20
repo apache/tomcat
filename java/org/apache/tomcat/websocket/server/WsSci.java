@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.websocket;
+package org.apache.tomcat.websocket.server;
 
 import java.util.Set;
 
@@ -23,6 +23,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HandlesTypes;
 import javax.websocket.server.WebSocketEndpoint;
+
 
 /**
  * Registers an interest in any class that is annotated with

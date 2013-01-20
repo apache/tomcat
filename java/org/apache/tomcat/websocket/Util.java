@@ -30,32 +30,6 @@ class Util {
     }
 
 
-    /**
-     * Converts a path defined for a WebSocket endpoint into a path that can be
-     * used as a servlet mapping.
-     *
-     * @param wsPath The WebSocket endpoint path to convert
-     * @return The servlet mapping
-     */
-    static String getServletPath(String wsPath) {
-        int templateStart = wsPath.indexOf('{');
-        if (templateStart == -1) {
-            if (wsPath.charAt(wsPath.length() - 1) == '/') {
-                return wsPath + '*';
-            } else {
-                return wsPath + "/*";
-            }
-        } else {
-            String temp = wsPath.substring(0, templateStart);
-            if (temp.charAt(temp.length() - 1) == '/') {
-                return temp + '*';
-            } else {
-                return temp.substring(0, temp.lastIndexOf('/') + 1) + '*';
-            }
-        }
-    }
-
-
     static CloseCode getCloseCode(int code) {
         if (code > 2999 && code < 5000) {
             return CloseCodes.NORMAL_CLOSURE;

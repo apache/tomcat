@@ -14,25 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.websocket;
-
 /**
- * Internal implementation constants.
+ * Server-side specific implementation classes. These are in a separate package
+ * to make packaging a pure client JAR simpler.
  */
-public class Constants {
-
-    protected static final String PACKAGE_NAME =
-            Constants.class.getPackage().getName();
-    // OP Codes
-    public static final byte OPCODE_CONTINUATION = 0x00;
-    public static final byte OPCODE_TEXT = 0x01;
-    public static final byte OPCODE_BINARY = 0x02;
-    public static final byte OPCODE_CLOSE = 0x08;
-    public static final byte OPCODE_PING = 0x09;
-    public static final byte OPCODE_PONG = 0x0A;
-
-
-    private Constants() {
-        // Hide default constructor
-    }
-}
+package org.apache.tomcat.websocket.server;
