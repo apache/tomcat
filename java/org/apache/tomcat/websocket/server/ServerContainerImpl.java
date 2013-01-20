@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.websocket;
+package org.apache.tomcat.websocket.server;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -31,6 +31,7 @@ import javax.websocket.server.ServerEndpointConfiguration;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.WsWebSocketContainer;
 import org.apache.tomcat.websocket.pojo.PojoEndpointConfiguration;
 import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
 
@@ -111,7 +112,7 @@ public class ServerContainerImpl extends WsWebSocketContainer {
             throw new DeploymentException(sm.getString("sci.newInstance.fail",
                     endpointClass.getName()), e);
         }
-        String servletPath = Util.getServletPath(path);
+        String servletPath = getServletPath(path);
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("serverContainer.endpointDeploy",
                     endpointClass.getName(), path,
@@ -150,7 +151,7 @@ public class ServerContainerImpl extends WsWebSocketContainer {
             log.debug(sm.getString("serverContainer.pojoDeploy",
                     pojo.getName(), wsPath, servletContext.getContextPath()));
         }
-        String servletPath = Util.getServletPath(wsPath);
+        String servletPath = getServletPath(wsPath);
         // Remove the trailing /* before adding it to the map
         pojoMap.put(servletPath.substring(0, servletPath.length() - 2), pojo);
         pojoMethodMap.put(pojo,
@@ -200,5 +201,31 @@ public class ServerContainerImpl extends WsWebSocketContainer {
 
     public void setReadBufferSize(int readBufferSize) {
         this.readBufferSize = readBufferSize;
+    }
+
+
+    /**
+     * Converts a path defined for a WebSocket endpoint into a path that can be
+     * used as a servlet mapping.
+     *
+     * @param wsPath The WebSocket endpoint path to convert
+     * @return The servlet mapping
+     */
+    static String getServletPath(String wsPath) {
+        int templateStart = wsPath.indexOf('{');
+        if (templateStart == -1) {
+            if (wsPath.charAt(wsPath.length() - 1) == '/') {
+                return wsPath + '*';
+            } else {
+                return wsPath + "/*";
+            }
+        } else {
+            String temp = wsPath.substring(0, templateStart);
+            if (temp.charAt(temp.length() - 1) == '/') {
+                return temp + '*';
+            } else {
+                return temp.substring(0, temp.lastIndexOf('/') + 1) + '*';
+            }
+        }
     }
 }

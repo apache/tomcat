@@ -24,35 +24,21 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Future;
 
-import javax.servlet.ServletOutputStream;
 import javax.websocket.EncodeException;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
 
-public class WsRemoteEndpoint implements RemoteEndpoint {
+public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
-    private final Object messageWriteLock = new Object();
-
-    private final ServletOutputStream sos;
-    private final WsSession wsSession;
     // Max length for outgoing WebSocket frame header is 10 bytes
     private final ByteBuffer header = ByteBuffer.allocate(10);
 
     private final ByteBuffer textToByte = ByteBuffer.allocate(8192);
     private final CharsetEncoder encoder = Charset.forName("UTF8").newEncoder();
     private volatile Boolean isText = null;
-    private volatile CyclicBarrier writeBarrier = new CyclicBarrier(2);
-
-
-    public WsRemoteEndpoint(WsSession wsSession, ServletOutputStream sos) {
-        this.wsSession = wsSession;
-        this.sos = sos;
-    }
 
 
     @Override
@@ -200,14 +186,7 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
     }
 
 
-    public void onWritePossible() {
-        try {
-            writeBarrier.await();
-        } catch (InterruptedException | BrokenBarrierException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+    public abstract void onWritePossible();
 
 
     protected void sendMessage(byte opCode, ByteBuffer message,
@@ -250,49 +229,12 @@ public class WsRemoteEndpoint implements RemoteEndpoint {
         }
         header.flip();
 
-        // Could sync on sos but don't as other (user or container) code may
-        // sync on this creating the potential for deadlocks.
-        synchronized (messageWriteLock) {
-            doBlockingWrite(header);
-            doBlockingWrite(message);
-            try {
-                sos.flush();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
 
-            if (Constants.OPCODE_CLOSE == opCode) {
-                try {
-                    sos.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }
-        if (opCode == Constants.OPCODE_CLOSE) {
-            // Connection is closing - ensure no threads are stuck waiting on
-            // the write barrier
-            writeBarrier.reset();
-        }
+        writeMessage(opCode, header, message);
     }
 
-
-    private void doBlockingWrite(ByteBuffer data) {
-        if (!sos.canWrite()) {
-            try {
-                writeBarrier.await();
-            } catch (InterruptedException | BrokenBarrierException e) {
-                wsSession.getLocalEndpoint().onError(wsSession, e);
-            }
-        }
-        try {
-            sos.write(data.array(), data.arrayOffset(), data.limit());
-        } catch (IOException e) {
-            wsSession.getLocalEndpoint().onError(wsSession, e);
-        }
-    }
+    protected abstract void writeMessage(int opCode, ByteBuffer header,
+            ByteBuffer message);
 
 
     @Override

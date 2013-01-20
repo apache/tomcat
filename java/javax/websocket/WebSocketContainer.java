@@ -28,6 +28,21 @@ public interface WebSocketContainer {
     Session connectToServer(Class<?> annotatedEndpointClass, URI path)
             throws DeploymentException;
 
+    /**
+     * Creates a new connection to the WebSocket.
+     *
+     * @param endpoint
+     *            An instance of this class will be created to handle responses
+     *            from the server
+     * @param clientEndpointConfiguration
+     *            Used to configure the new connection
+     * @param path
+     *            The full URL of the WebSocket endpoint to connect to
+     *
+     * @return The WebSocket session for the connection
+     *
+     * @throws DeploymentException  If the connection can not be established
+     */
     Session connectToServer(Class<? extends Endpoint> endpoint,
             ClientEndpointConfiguration clientEndpointConfiguration, URI path)
             throws DeploymentException;

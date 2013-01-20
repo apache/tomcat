@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.websocket;
+package org.apache.tomcat.websocket.server;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -37,6 +37,7 @@ import javax.websocket.Endpoint;
 import javax.websocket.Extension;
 import javax.websocket.server.ServerEndpointConfiguration;
 import javax.xml.bind.DatatypeConverter;
+
 
 /**
  * Handles the initial HTTP connection for WebSocket connections.

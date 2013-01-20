@@ -14,30 +14,30 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.websocket;
+package org.apache.tomcat.websocket.server;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestUtil {
+public class TestServerContainerImpl {
 
     @Test
     public void testGetServletMappingPath() throws Exception {
         Assert.assertEquals("/foo/*",
-                Util.getServletPath("/foo"));
+                ServerContainerImpl.getServletPath("/foo"));
         Assert.assertEquals("/foo/*",
-                Util.getServletPath("/foo/"));
+                ServerContainerImpl.getServletPath("/foo/"));
         Assert.assertEquals("/foo/bar/*",
-                Util.getServletPath("/foo/bar"));
+                ServerContainerImpl.getServletPath("/foo/bar"));
         Assert.assertEquals("/foo/bar/*",
-                Util.getServletPath("/foo/bar/"));
+                ServerContainerImpl.getServletPath("/foo/bar/"));
         Assert.assertEquals("/foo/*",
-                Util.getServletPath("/foo/{bar}"));
+                ServerContainerImpl.getServletPath("/foo/{bar}"));
         Assert.assertEquals("/foo/*",
-                Util.getServletPath("/foo/{bar}/"));
+                ServerContainerImpl.getServletPath("/foo/{bar}/"));
         Assert.assertEquals("/foo/*",
-                Util.getServletPath("/foo/x{bar}"));
+                ServerContainerImpl.getServletPath("/foo/x{bar}"));
         Assert.assertEquals("/foo/*",
-                Util.getServletPath("/foo/x{bar}/"));
+                ServerContainerImpl.getServletPath("/foo/x{bar}/"));
     }
 }
