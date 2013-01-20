@@ -347,7 +347,7 @@ public final class SSL {
      * {@link #SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION} and tcnative
      * supports that flag.</i>
      *
-     * @param Bitwise-OR of all SSL_OP_* to test.
+     * @param op Bitwise-OR of all SSL_OP_* to test.
      *
      * @return true if all SSL_OP_* are supported by OpenSSL library.
      */
