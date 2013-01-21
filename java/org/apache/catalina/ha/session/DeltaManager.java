@@ -527,7 +527,7 @@ public class DeltaManager extends ClusterManagerBase{
         // original sessionID
         String orgSessionID = session.getId();
         super.changeSessionId(session);
-        if (notify) {
+        if (notify && cluster.getMembers().length > 0) {
             // changed sessionID
             String newSessionID = session.getId();
             try {
@@ -1163,11 +1163,14 @@ public class DeltaManager extends ClusterManagerBase{
      *            session id
      */
     protected void sessionExpired(String id) {
-        counterSend_EVT_SESSION_EXPIRED++ ;
-        SessionMessage msg = new SessionMessageImpl(getName(),SessionMessage.EVT_SESSION_EXPIRED, null, id, id+ "-EXPIRED-MSG");
-        msg.setTimestamp(System.currentTimeMillis());
-        if (log.isDebugEnabled()) log.debug(sm.getString("deltaManager.createMessage.expire",getName(), id));
-        send(msg);
+        if(cluster.getMembers().length > 0 ) {
+            counterSend_EVT_SESSION_EXPIRED++ ;
+            SessionMessage msg = new SessionMessageImpl(getName(),
+                    SessionMessage.EVT_SESSION_EXPIRED, null, id, id+ "-EXPIRED-MSG");
+            msg.setTimestamp(System.currentTimeMillis());
+            if (log.isDebugEnabled()) log.debug(sm.getString("deltaManager.createMessage.expire",getName(), id));
+            send(msg);
+        }
     }
 
     /**
