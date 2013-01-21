@@ -28,9 +28,9 @@ import org.apache.tomcat.websocket.WsRemoteEndpointBase;
 import org.apache.tomcat.websocket.WsSession;
 
 /**
- * This is the server side {@link RemoteEndpoint} implementation - i.e. what the
- * server uses to send data to the client. Communication is over a
- * {@link ServletOutputStream}.
+ * This is the server side {@link javax.websocket.RemoteEndpoint} implementation
+ * - i.e. what the server uses to send data to the client. Communication is over
+ * a {@link ServletOutputStream}.
  */
 public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
 
