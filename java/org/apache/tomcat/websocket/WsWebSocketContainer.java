@@ -40,8 +40,27 @@ public class WsWebSocketContainer implements WebSocketContainer {
     public Session connectToServer(Class<? extends Endpoint> endpoint,
             ClientEndpointConfiguration clientEndpointConfiguration, URI path)
             throws DeploymentException {
-        // TODO Auto-generated method stub
-        return null;
+
+        // Create HTTP connection
+        // TODO
+
+        // Handshake
+        // TODO
+
+        // Switch to WebSocket
+        WsRemoteEndpointClient wsRemoteEndpointClient =
+                new WsRemoteEndpointClient();
+
+        WsSession wsSession;
+        try {
+            wsSession = new WsSession(endpoint.newInstance());
+        } catch (InstantiationException | IllegalAccessException e) {
+            // TODO
+            throw new DeploymentException("TBD", e);
+        }
+
+        wsSession.setRemote(wsRemoteEndpointClient);
+        return wsSession;
     }
 
 
