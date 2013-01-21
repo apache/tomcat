@@ -30,7 +30,7 @@ import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfiguration;
 
-import org.apache.tomcat.websocket.WsFrame;
+import org.apache.tomcat.websocket.WsFrameBase;
 import org.apache.tomcat.websocket.WsIOException;
 import org.apache.tomcat.websocket.WsSession;
 
@@ -71,7 +71,7 @@ public class WsProtocolHandler implements ProtocolHandler {
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
         try {
-            WsFrame wsFrame = new WsFrame(sis, wsSession);
+            WsFrameBase wsFrame = new WsFrameServer(sis, wsSession);
             sis.setReadListener(new WsReadListener(this, wsFrame, wsSession));
             WsRemoteEndpointServer wsRemoteEndpointServer =
                     new WsRemoteEndpointServer(wsSession, sos);
@@ -100,12 +100,12 @@ public class WsProtocolHandler implements ProtocolHandler {
     private static class WsReadListener implements ReadListener {
 
         private final WsProtocolHandler wsProtocolHandler;
-        private final WsFrame wsFrame;
+        private final WsFrameBase wsFrame;
         private final WsSession wsSession;
 
 
         private WsReadListener(WsProtocolHandler wsProtocolHandler,
-                WsFrame wsFrame, WsSession wsSession) {
+                WsFrameBase wsFrame, WsSession wsSession) {
             this.wsProtocolHandler = wsProtocolHandler;
             this.wsFrame = wsFrame;
             this.wsSession = wsSession;
