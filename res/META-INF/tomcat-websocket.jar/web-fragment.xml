@@ -22,4 +22,5 @@
   version="3.0"
   metadata-complete="true">
   <name>org.apache.tomcat.websocket</name>
+  <distributable/>
 </web-fragment>
