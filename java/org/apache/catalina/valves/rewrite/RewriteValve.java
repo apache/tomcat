@@ -180,9 +180,7 @@ public class RewriteValve extends ValveBase {
                 container.getLogger().error("Error closing configuration", e);
             }
             try {
-                if (is != null) {
-                    is.close();
-                }
+                is.close();
             } catch (IOException e) {
                 container.getLogger().error("Error closing configuration", e);
             }
