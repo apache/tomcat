@@ -24,7 +24,6 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 
-import javax.servlet.ServletInputStream;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.MessageHandler;
@@ -37,13 +36,13 @@ import org.apache.tomcat.util.res.StringManager;
  * extracts the messages. WebSocket Pings received will be responded to
  * automatically without any action required by the application.
  */
-public class WsFrame {
+public abstract class WsFrameBase {
 
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
 
     // Connection level attributes
-    private final ServletInputStream sis;
+    private final Object connectionReadLock = new Object();
     private final WsSession wsSession;
     private final byte[] inputBuffer;
 
@@ -79,8 +78,7 @@ public class WsFrame {
     private int readPos = 0;
     private int writePos = 0;
 
-    public WsFrame(ServletInputStream sis, WsSession wsSession) {
-        this.sis = sis;
+    public WsFrameBase(WsSession wsSession) {
         this.wsSession = wsSession;
 
         // TODO This needs to work for client and server side code
@@ -101,11 +99,10 @@ public class WsFrame {
      * Called when there is data in the ServletInputStream to process.
      */
     public void onDataAvailable() throws IOException {
-        synchronized (sis) {
-            while (sis.isReady()) {
+        synchronized (connectionReadLock) {
+            while (isDataAvailable()) {
                 // Fill up the input buffer with as much data as we can
-                int read = sis.read(inputBuffer, writePos,
-                        inputBuffer.length - writePos);
+                int read = fillInputBuffer(inputBuffer, writePos);
                 if (read == 0) {
                     return;
                 }
@@ -133,6 +130,27 @@ public class WsFrame {
             }
         }
     }
+
+
+    /**
+     * Allows sub-classes to control whether the read loop in
+     * {@link #onDataAvailable()} should continue or terminate.
+     *
+     * @return  <code>true</code> if the data source is ready to be read
+     */
+    protected abstract boolean isDataAvailable();
+
+
+    /**
+     * Fill as much of the input buffer as possible (i.e. to the end of the
+     * supplied buffer).
+     *
+     * @param inputBuffer   The input buffer
+     * @param start         The start point
+     * @return  The number of bytes (possibly zero) added to the buffer
+     */
+    protected abstract int fillInputBuffer(byte[] inputBuffer, int start)
+            throws IOException;
 
 
     /**
