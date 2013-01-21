@@ -85,6 +85,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Fix incorrect increment of <code>counterSend_EVT_SESSION_EXPIRED</code>
+        and <code>counterSend_EVT_CHANGE_SESSION_ID</code>. These values are not
+        incremented if no members active in cluster group. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.35 (markt)" rtext="2013-01-16">
   <subsection name="Catalina">
