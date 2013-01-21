@@ -104,6 +104,9 @@
         repositories into a single framework rather than a separate one for each
         feature. (markt)
       </add>
+      <add>
+        URL rewrite valve, similar in functionality to mod_rewrite. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

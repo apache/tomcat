@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<mbeans-descriptors>
+
+  <mbean name="RewriteValve"
+         description="A URL rewrite valve"
+         domain="Catalina"
+         group="Valve"
+         type="org.apache.catalina.valves.rewrite.RewriteValve">
+    
+    <attribute   name="className"
+               description="Fully qualified class name of the managed object"
+               type="java.lang.String"
+               writeable="false"/>
+      
+    <attribute   name="configuration"
+               description="Rewrite configuration"
+               type="java.lang.String" />
+      
+  </mbean>
+  
+</mbeans-descriptors>

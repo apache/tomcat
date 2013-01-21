@@ -74,6 +74,7 @@
         <item name="31) Tomcat's JDBC Pool"
               href="jdbc-pool.html"/>
         <item name="32) WebSocket"          href="web-socket-howto.html"/>
+        <item name="33) Rewrite"            href="rewrite.html"/>
     </menu>
 
     <menu name="Reference">
