@@ -5,16 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.valves.rewrite;
 
 import java.util.ArrayList;
@@ -26,63 +25,71 @@ public class Substitution {
     public abstract class SubstitutionElement {
         public abstract String evaluate(Matcher rule, Matcher cond, Resolver resolver);
     }
-    
+
     public class StaticElement extends SubstitutionElement {
         public String value;
 
+        @Override
         public String evaluate
             (Matcher rule, Matcher cond, Resolver resolver) {
             return value;
         }
-    
+
     }
-    
+
     public class RewriteRuleBackReferenceElement extends SubstitutionElement {
         public int n;
+        @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
             return rule.group(n);
         }
     }
-    
+
     public class RewriteCondBackReferenceElement extends SubstitutionElement {
         public int n;
+        @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
             return cond.group(n);
         }
     }
-    
+
     public class ServerVariableElement extends SubstitutionElement {
         public String key;
+        @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
             return resolver.resolve(key);
         }
     }
-    
+
     public class ServerVariableEnvElement extends SubstitutionElement {
         public String key;
+        @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
             return resolver.resolveEnv(key);
         }
     }
-    
+
     public class ServerVariableSslElement extends SubstitutionElement {
         public String key;
+        @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
             return resolver.resolveSsl(key);
         }
     }
-    
+
     public class ServerVariableHttpElement extends SubstitutionElement {
         public String key;
+        @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
             return resolver.resolveHttp(key);
         }
     }
-    
+
     public class MapElement extends SubstitutionElement {
         public RewriteMap map = null;
         public String key;
         public String defaultValue = null;
+        @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
             String result = map.lookup(key);
             if (result == null) {
@@ -91,7 +98,7 @@ public class Substitution {
             return result;
         }
     }
-    
+
     protected SubstitutionElement[] elements = null;
 
     protected String sub = null;
@@ -100,11 +107,11 @@ public class Substitution {
 
     public void parse(Map<String, RewriteMap> maps) {
 
-        ArrayList<SubstitutionElement> elements = new ArrayList<SubstitutionElement>();
+        ArrayList<SubstitutionElement> elements = new ArrayList<>();
         int pos = 0;
         int percentPos = 0;
         int dollarPos = 0;
-        
+
         while (pos < sub.length()) {
             percentPos = sub.indexOf('%', pos);
             dollarPos = sub.indexOf('$', pos);
@@ -211,17 +218,16 @@ public class Substitution {
                 }
             }
         }
-        
-        this.elements = (SubstitutionElement[]) elements.toArray(new SubstitutionElement[0]);
-        
+
+        this.elements = elements.toArray(new SubstitutionElement[0]);
+
     }
-    
+
     /**
      * Evaluate the substitution based on the context
-     * 
+     *
      * @param rule corresponding matched rule
      * @param cond last matched condition
-     * @return
      */
     public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
         StringBuffer buf = new StringBuffer();
@@ -230,5 +236,4 @@ public class Substitution {
         }
         return buf.toString();
     }
-
 }

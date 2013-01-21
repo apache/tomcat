@@ -5,16 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.valves.rewrite;
 
 import java.util.Locale;
@@ -27,10 +26,12 @@ public class RewriteCond {
     public abstract class Condition {
         public abstract boolean evaluate(String value, Resolver resolver);
     }
-    
+
     public class PatternCondition extends Condition {
         public Pattern pattern;
         public Matcher matcher = null;
+
+        @Override
         public boolean evaluate(String value, Resolver resolver) {
             Matcher m = pattern.matcher(value);
             if (m.matches()) {
@@ -41,7 +42,7 @@ public class RewriteCond {
             }
         }
     }
-    
+
     public class LexicalCondition extends Condition {
         /**
          * -1: <
@@ -50,6 +51,8 @@ public class RewriteCond {
          */
         public int type = 0;
         public String condition;
+
+        @Override
         public boolean evaluate(String value, Resolver resolver) {
             int result = value.compareTo(condition);
             switch (type) {
@@ -62,10 +65,10 @@ public class RewriteCond {
             default:
                 return false;
             }
-                
+
         }
     }
-    
+
     public class ResourceCondition extends Condition {
         /**
          * 0: -d (is directory ?)
@@ -73,14 +76,16 @@ public class RewriteCond {
          * 2: -s (is regular file with size ?)
          */
         public int type = 0;
+
+        @Override
         public boolean evaluate(String value, Resolver resolver) {
             return resolver.resolveResource(type, value);
         }
     }
-    
+
     protected String testString = null;
     protected String condPattern = null;
-    
+
     public String getCondPattern() {
         return condPattern;
     }
@@ -135,38 +140,39 @@ public class RewriteCond {
             condition.pattern = Pattern.compile(condPattern, flags);
         }
     }
-    
+
     public Matcher getMatcher() {
         Object condition = this.condition.get();
         if (condition instanceof PatternCondition) {
-            return ((PatternCondition) condition).matcher; 
+            return ((PatternCondition) condition).matcher;
         }
         return null;
     }
-    
+
     /**
      * String representation.
      */
+    @Override
     public String toString() {
         // FIXME: Add flags if possible
         return "RewriteCond " + testString + " " + condPattern;
     }
-    
-    
+
+
     protected boolean positive = true;
-    
+
     protected Substitution test = null;
 
-    protected ThreadLocal<Condition> condition = new ThreadLocal<Condition>();
-    
+    protected ThreadLocal<Condition> condition = new ThreadLocal<>();
+
     /**
-     * This makes the test case-insensitive, i.e., there is no difference between 
-     * 'A-Z' and 'a-z' both in the expanded TestString and the CondPattern. This 
-     * flag is effective only for comparisons between TestString and CondPattern. 
+     * This makes the test case-insensitive, i.e., there is no difference between
+     * 'A-Z' and 'a-z' both in the expanded TestString and the CondPattern. This
+     * flag is effective only for comparisons between TestString and CondPattern.
      * It has no effect on filesystem and subrequest checks.
      */
     public boolean nocase = false;
-    
+
     /**
      * Use this to combine rule conditions with a local OR instead of the implicit AND.
      */
@@ -174,10 +180,9 @@ public class RewriteCond {
 
     /**
      * Evaluate the condition based on the context
-     * 
+     *
      * @param rule corresponding matched rule
      * @param cond last matched condition
-     * @return
      */
     public boolean evaluate(Matcher rule, Matcher cond, Resolver resolver) {
         String value = test.evaluate(rule, cond, resolver);
@@ -230,7 +235,7 @@ public class RewriteCond {
             return !condition.evaluate(value, resolver);
         }
     }
-        
+
     public boolean isNocase() {
         return nocase;
     }
@@ -254,5 +259,4 @@ public class RewriteCond {
     public void setPositive(boolean positive) {
         this.positive = positive;
     }
-
 }

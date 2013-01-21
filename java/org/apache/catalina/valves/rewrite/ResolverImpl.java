@@ -5,16 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.valves.rewrite;
 
 import java.util.Calendar;
@@ -25,21 +24,21 @@ import org.apache.catalina.connector.Request;
 
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 
-@SuppressWarnings("deprecation")
 public class ResolverImpl extends Resolver {
 
     protected Request request = null;
-    
+
     public ResolverImpl(Request request) {
         this.request = request;
     }
-    
+
     /**
      * The following are not implemented:
      * - SERVER_ADMIN
      * - API_VERSION
      * - IS_SUBREQ
      */
+    @Override
     public String resolve(String key) {
         if (key.equals("HTTP_USER_AGENT")) {
             return request.getHeader("user-agent");
@@ -98,7 +97,7 @@ public class ResolverImpl extends Resolver {
         } else if (key.equals("SERVER_SOFTWARE")) {
             return "tomcat";
         } else if (key.equals("THE_REQUEST")) {
-            return request.getMethod() + " " + request.getRequestURI() 
+            return request.getMethod() + " " + request.getRequestURI()
             + " " + request.getProtocol();
         } else if (key.equals("REQUEST_URI")) {
             return request.getRequestURI();
@@ -126,20 +125,24 @@ public class ResolverImpl extends Resolver {
         return null;
     }
 
+    @Override
     public String resolveEnv(String key) {
         Object result = request.getAttribute(key);
         return (result != null) ? result.toString() : System.getProperty(key);
     }
-    
+
+    @Override
     public String resolveSsl(String key) {
         // FIXME: Implement SSL environment variables
         return null;
     }
 
+    @Override
     public String resolveHttp(String key) {
         return request.getHeader(key);
     }
-    
+
+    @Override
     public boolean resolveResource(int type, String name) {
         WebResourceRoot resources = request.getContext().getResources();
         WebResource resource = resources.getResource(name);
@@ -166,5 +169,4 @@ public class ResolverImpl extends Resolver {
             return value;
         }
     }
-
 }
