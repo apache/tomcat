@@ -101,6 +101,16 @@
     <Bug code="IS" />
   </Match>
   <Match>
+    <!-- Non-constant strings are configuration settings rather than client
+         supplied -->
+    <Class name="org.apache.catalina.session.JDBCStore" />
+    <Or>
+      <Method name="load" />
+      <Method name="save" />
+    </Or>
+    <Bug code="SQL" />
+  </Match>
+  <Match>
     <!-- We can live with the threading issue. See code comment for details. -->
     <Class name="org.apache.catalina.session.ManagerBase" />
     <Method name="generateSessionId" />
@@ -172,6 +182,13 @@
     <Class name="org.apache.catalina.util.LifecycleBase" />
     <Method name="getState"/>
     <Bug code="UG" />
+  </Match>
+  <Match>
+    <!-- Non-constant strings are configuration settings rather than client
+         supplied -->
+    <Class name="org.apache.catalina.valves.JDBCAccessLogValve" />
+    <Method name="open" />
+    <Bug code="SQL" />
   </Match>
   <Match>
     <!-- Locks are always released. Non-standard pattern is required because -->
@@ -349,6 +366,15 @@
     <Bug code="MF" />
   </Match>
   <Match>
+    <!-- JSSE vs APR attribute names. More confusing to change one of them -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint"/>
+    <Or>
+      <Method name="getSSLProtocol"/>
+      <Method name="setSSLProtocol"/>
+    </Or>
+    <Bug code="Nm"/>
+  </Match>
+  <Match>
     <!-- See wait() call in destroy() -->
     <Class name="org.apache.tomcat.util.net.AprEndpoint$Poller"/>
     <Method name="run"/>
@@ -406,7 +432,16 @@
     <Bug code="Nm" />
   </Match>
 
-  <!--  Generated code -->
+  <!-- Example code -->
+  <Match>
+    <!-- FindBugs assumes the container uses the values as is. Tomcat validates
+         them and escapes them as necessary to ensure they are safe. -->
+    <Class name="CookieExample" />
+    <Method name="doGet" />
+    <Bug code="HRS" />
+  </Match>
+  
+  <!-- Generated code -->
   <Match>
     <Class name="org.apache.el.parser.ELParserTokenManager" />
   </Match>
@@ -524,6 +559,12 @@
     <Class name="org.apache.catalina.tribes.test.transport.SocketValidateReceive$1" />
     <Method name="run" />
     <Bug code="DE" />
+  </Match>
+  <Match>
+    <!-- Use of static is unavoidable -->
+    <Class name="org.apache.tomcat.jdbc.test.TestStatementCache" />
+    <Method name="tearDown" />
+    <Bug code="ST" />
   </Match>
   <Match>
     <!-- Use of statics is unavoidable in all cases -->
