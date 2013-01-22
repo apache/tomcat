@@ -90,6 +90,13 @@ public final class SSLContext {
     public static native void setOptions(long ctx, int options);
 
     /**
+     * Clears OpenSSL Options.
+     * @param ctx Server or Client context to use.
+     * @param options  See SSL.SSL_OP_* for option flags.
+     */
+    public static native void clearOptions(long ctx, int options);
+
+    /**
      * Sets the "quiet shutdown" flag for <b>ctx</b> to be
      * <b>mode</b>. SSL objects created from <b>ctx</b> inherit the
      * <b>mode</b> valid at the time and may be 0 or 1.
