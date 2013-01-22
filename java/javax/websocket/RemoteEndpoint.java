@@ -47,7 +47,7 @@ public interface RemoteEndpoint {
 
     void sendPartialString(String fragment, boolean isLast) throws IOException;
 
-    void sendPartialBytes(ByteBuffer partialByte, boolean isLast) throws IOException; // or Iterable<byte[]>
+    void sendPartialBytes(ByteBuffer partialByte, boolean isLast) throws IOException;
 
     OutputStream getSendStream() throws IOException;
 
@@ -67,8 +67,8 @@ public interface RemoteEndpoint {
 
     void sendObjectByCompletion(Object obj, SendHandler completion);
 
-    void sendPing(ByteBuffer applicationData);
+    void sendPing(ByteBuffer applicationData) throws IOException;
 
-    void sendPong(ByteBuffer applicationData);
+    void sendPong(ByteBuffer applicationData) throws IOException;
 }
 
