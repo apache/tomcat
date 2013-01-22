@@ -31,6 +31,16 @@ public class Constants {
     public static final byte OPCODE_PING = 0x09;
     public static final byte OPCODE_PONG = 0x0A;
 
+    // Client connection
+    public static final String HOST_HEADER_NAME = "Host";
+    public static final String UPGRADE_HEADER_NAME = "Upgrade";
+    public static final String UPGRADE_HEADER_VALUE = "websocket";
+    public static final String CONNECTION_HEADER_NAME = "Connection";
+    public static final String CONNECTION_HEADER_VALUE = "upgrade";
+    public static final String WS_VERSION_HEADER_NAME = "Sec-WebSocket-Version";
+    public static final String WS_VERSION_HEADER_VALUE = "13";
+    public static final String WS_KEY_HEADER_NAME = "Sec-WebSocket-Key";
+
 
     private Constants() {
         // Hide default constructor
