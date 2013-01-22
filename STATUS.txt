@@ -48,3 +48,10 @@ PATCHES PROPOSED TO BACKPORT:
   http://svn.apache.org/viewvc?rev=1430602&view=rev
   +1: markt
   -1:
+
+* Back-port r1437083 from trunk.
+  http://svn.apache.org/viewvc?view=revision&revision=1437083
+  Adds SSLContext.clearOptions method to allow clearing of SSL_OP_* options
+  in OpenSSL.
+  This will require tcnative 1.1.25 or errors may be thrown when attempting
+  to call this method.
