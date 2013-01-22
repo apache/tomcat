@@ -186,9 +186,6 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     }
 
 
-    public abstract void onWritePossible();
-
-
     protected void sendMessage(byte opCode, ByteBuffer message,
             boolean isFirstFragment, boolean isLastFragment) {
         // Clear header, ready for new message

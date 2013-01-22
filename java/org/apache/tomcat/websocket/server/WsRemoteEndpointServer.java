@@ -48,8 +48,7 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
     }
 
 
-    @Override
-    public void onWritePossible() {
+    protected void onWritePossible() {
         try {
             writeBarrier.await();
         } catch (InterruptedException | BrokenBarrierException e) {
