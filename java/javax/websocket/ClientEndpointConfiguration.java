@@ -25,7 +25,19 @@ public interface ClientEndpointConfiguration extends EndpointConfiguration {
 
     List<String> getExtensions();
 
+    /**
+     * Provides the client with a mechanism to inspect and/or modify the headers
+     * that are sent to the server to start the WebSocket handshake.
+     *
+     * @param headers   The HTTP headers
+     */
     void beforeRequest(Map<String, List<String>> headers);
 
+    /**
+     * Provides the client with a mechanism to inspect the handshake response
+     * that is returned from the server.
+     *
+     * @param handshakeResponse The response
+     */
     void afterResponse(HandshakeResponse handshakeResponse);
 }
