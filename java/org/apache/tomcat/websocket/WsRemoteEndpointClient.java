@@ -17,26 +17,20 @@
 package org.apache.tomcat.websocket;
 
 import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousSocketChannel;
 
 public class WsRemoteEndpointClient extends WsRemoteEndpointBase {
 
-    @Override
-    public void onWritePossible() {
-        // TODO Auto-generated method stub
+    private final AsynchronousSocketChannel channel;
 
+    public WsRemoteEndpointClient(AsynchronousSocketChannel channel) {
+        this.channel = channel;
     }
+
 
     @Override
     protected void writeMessage(int opCode, ByteBuffer header,
             ByteBuffer message) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
         // TODO Auto-generated method stub
 
     }
