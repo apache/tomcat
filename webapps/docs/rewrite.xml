@@ -1,4 +1,20 @@
 <?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
 ]>
@@ -26,7 +42,7 @@
   class name.</p>
 
   <p>The rewrite valve can be configured as a valve added in a Host.
-     See <a href="config/host.html">virtual-server</a> documentation for 
+     See <a href="config/host.html">virtual-server</a> documentation for
      informations how to configure it. It will use a <code>rewrite.config</code> file
      containing the rewrite directives, it must be placed in the Host configuration
      folder.
@@ -44,19 +60,19 @@
   <p>The rewrite.config file contains a list of directives which closely resemble
   the directives used by mod_rewrite, in particular the central RewriteRule and
   RewriteCond directives.</p>
-  
+
   <p>Note: This section is a modified version of the mod_rewrite documentation,
   which is Copyright 1995-2006 The Apache Software Foundation, and licensed under the
   under the Apache License, Version 2.0.</p>
-  
+
   <subsection name="RewriteCond">
-  
+
     <p>Syntax: <code>RewriteCond TestString CondPattern</code></p>
-    
-    <p>The RewriteCond directive defines a rule condition. One or more RewriteCond 
-    can precede a RewriteRule directive. The following rule is then only used if both 
+
+    <p>The RewriteCond directive defines a rule condition. One or more RewriteCond
+    can precede a RewriteRule directive. The following rule is then only used if both
     the current state of the URI matches its pattern, and if these conditions are met.</p>
-  
+
       <p><em>TestString</em> is a string which can contain the
       following expanded constructs in addition to plain text:</p>
 
@@ -66,8 +82,8 @@
           backreferences of the form <strong><code>$N</code></strong>
           (0 &lt;= N &lt;= 9), which provide access to the grouped
           parts (in parentheses) of the pattern, from the
-          <code>RewriteRule</code> which is subject to the current 
-	  set of <code>RewriteCond</code> conditions..
+          <code>RewriteRule</code> which is subject to the current
+          set of <code>RewriteCond</code> conditions..
         </li>
         <li>
           <strong>RewriteCond backreferences</strong>: These are
@@ -80,27 +96,27 @@
         <li>
           <strong>RewriteMap expansions</strong>: These are
           expansions of the form <strong><code
-	  >${mapname:key|default}</code></strong>.
+          >${mapname:key|default}</code></strong>.
           See <a href="#mapfunc">the documentation for
           RewriteMap</a> for more details.
         </li>
         <li>
           <strong>Server-Variables</strong>: These are variables of
-          the form 
+          the form
             <strong><code>%{</code> <em>NAME_OF_VARIABLE</em>
             <code>}</code></strong>
           where <em>NAME_OF_VARIABLE</em> can be a string taken
-          from the following list: 
+          from the following list:
 
           <table border="1">
 
             <tr>
               <th>HTTP headers:</th> <th>connection &amp; request:</th> <th></th>
-	        </tr>
+            </tr>
 
             <tr>
-	      <td>
-		 HTTP_USER_AGENT<br />
+              <td>
+                 HTTP_USER_AGENT<br />
                  HTTP_REFERER<br />
                  HTTP_COOKIE<br />
                  HTTP_FORWARDED<br />
@@ -124,17 +140,17 @@
                  QUERY_STRING<br />
                  AUTH_TYPE<br />
               </td>
-	      
-	      <td></td>
+
+              <td></td>
             </tr>
 
             <tr>
               <th>server internals:</th> <th>date and time:</th> <th>specials:</th>
-	    </tr>
+            </tr>
 
             <tr>
-	      <td>
-	         DOCUMENT_ROOT<br />
+              <td>
+                 DOCUMENT_ROOT<br />
                  SERVER_NAME<br />
                  SERVER_ADDR<br />
                  SERVER_PORT<br />
@@ -226,7 +242,7 @@
 
         <li>
         <code>%{ENV:variable}</code>, where <em>variable</em> can be
-	any Java system property, is also available.</li>
+        any Java system property, is also available.</li>
 
         <li>
         <code>%{SSL:variable}</code>, where <em>variable</em> is the
@@ -237,8 +253,8 @@
 
         <li>
         <code>%{HTTP:header}</code>, where <em>header</em> can be
-	any HTTP MIME-header name, can always be used to obtain the
-	value of a header sent in the HTTP request.
+        any HTTP MIME-header name, can always be used to obtain the
+        value of a header sent in the HTTP request.
         Example: <code>%{HTTP:Proxy-Connection}</code> is
         the value of the HTTP header
         ``<code>Proxy-Connection:</code>''.</li>
@@ -263,11 +279,11 @@
         <li>
           There are some special variants of <em>CondPatterns</em>.
           Instead of real regular expression strings you can also
-          use one of the following: 
+          use one of the following:
 
           <ul>
-            <li>'<strong>&lt;CondPattern</strong>' (lexicographically 
-	    precedes)<br />
+            <li>'<strong>&lt;CondPattern</strong>' (lexicographically
+            precedes)<br />
             Treats the <em>CondPattern</em> as a plain string and
             compares it lexicographically to <em>TestString</em>. True if
             <em>TestString</em> lexicographically precedes
@@ -315,7 +331,7 @@
 </note>
         </li>
 
-	<li>You can also set special flags for
+        <li>You can also set special flags for
       <em>CondPattern</em> by appending
         <strong><code>[</code><em>flags</em><code>]</code></strong>
       as the third argument to the <code>RewriteCond</code>
@@ -325,8 +341,8 @@
       <ul>
         <li>'<strong><code>nocase|NC</code></strong>'
         (<strong>n</strong>o <strong>c</strong>ase)<br />
-        This makes the test case-insensitive - differences 
-	between 'A-Z' and 'a-z' are ignored, both in the
+        This makes the test case-insensitive - differences
+        between 'A-Z' and 'a-z' are ignored, both in the
         expanded <em>TestString</em> and the <em>CondPattern</em>.
         This flag is effective only for comparisons between
         <em>TestString</em> and <em>CondPattern</em>. It has no
@@ -336,7 +352,7 @@
           '<strong><code>ornext|OR</code></strong>'
           (<strong>or</strong> next condition)<br />
           Use this to combine rule conditions with a local OR
-          instead of the implicit AND. Typical example: 
+          instead of the implicit AND. Typical example:
 
 <source>
 RewriteCond %{REMOTE_HOST}  ^host1.*  [OR]
@@ -368,26 +384,26 @@ RewriteRule  ^/$                 /homepage.min.html  [L]
 RewriteRule  ^/$                 /homepage.std.html  [L]
 </source>
 
-        <p>Explanation: If you use a browser which identifies itself 
-	as 'Mozilla' (including Netscape Navigator, Mozilla etc), then you
+        <p>Explanation: If you use a browser which identifies itself
+        as 'Mozilla' (including Netscape Navigator, Mozilla etc), then you
         get the max homepage (which could include frames, or other special
-	features).
+        features).
         If you use the Lynx browser (which is terminal-based), then
-	you get the min homepage (which could be a version designed for 
-	easy, text-only browsing).
-	If neither of these conditions apply (you use any other browser,
-	or your browser identifies itself as something non-standard), you get
+        you get the min homepage (which could be a version designed for
+        easy, text-only browsing).
+        If neither of these conditions apply (you use any other browser,
+        or your browser identifies itself as something non-standard), you get
         the std (standard) homepage.</p>
-  
+
   </subsection>
 
   <subsection name="RewriteMap">
-  
+
     <p>Syntax: <code>RewriteMap name rewriteMapClassName optionalParameters</code></p>
-    
+
     <p>The maps are implemented using an interface that users must implement. Its class
     name is <code>org.apache.catalina.valves.rewrite.RewriteMap</code>, and its code is:</p>
-    
+
 <source>
 package org.apache.catalina.valves.rewrite;
 
@@ -396,15 +412,15 @@ public interface RewriteMap {
     public String lookup(String key);
 }
 </source>
-  
+
   </subsection>
 
   <subsection name="RewriteRule">
-  
+
     <p>Syntax: <code>RewriteRule Pattern Substitution</code></p>
 
       <p>The RewriteRule directive is the real
-      rewriting workhorse. The directive can occur more than once, 
+      rewriting workhorse. The directive can occur more than once,
       with each instance defining a single rewrite rule. The
       order in which these rules are defined is important - this is the order
       in which they will be applied at run-time.</p>
@@ -416,7 +432,7 @@ public interface RewriteMap {
       which may already have matched a previous rule, and have been
       altered.</p>
 
-      <p>Some hints on the syntax of regular 
+      <p>Some hints on the syntax of regular
       expressions:</p>
 
 <pre>
@@ -434,7 +450,7 @@ public interface RewriteMap {
 <strong>Grouping:</strong>
   <strong><code>(</code></strong>text<strong><code>)</code></strong>      Grouping of text
               (used either to set the borders of an alternative as above, or
-              to make backreferences, where the <strong>N</strong>th group can 
+              to make backreferences, where the <strong>N</strong>th group can
               be referred to on the RHS of a RewriteRule as <code>$</code><strong>N</strong>)
 
 <strong>Anchors:</strong>
@@ -460,8 +476,8 @@ public interface RewriteMap {
          ISBN 0-596-00289-0<br />
       </p>
 
-      <p>In the rules, the NOT character	
-       ('<code>!</code>') is also available as a possible pattern 
+      <p>In the rules, the NOT character
+       ('<code>!</code>') is also available as a possible pattern
       prefix. This enables you to negate a pattern; to say, for instance:
       ``<em>if the current URL does <strong>NOT</strong> match this
       pattern</em>''. This can be used for exceptional cases, where
@@ -469,9 +485,9 @@ public interface RewriteMap {
       default rule.</p>
 
 <p>
-Note: When using the NOT character to negate a pattern, you cannot include 
-grouped wildcard parts in that pattern. This is because, when the 
-pattern does NOT match (ie, the negation matches), there are no 
+Note: When using the NOT character to negate a pattern, you cannot include
+grouped wildcard parts in that pattern. This is because, when the
+pattern does NOT match (ie, the negation matches), there are no
 contents for the groups. Thus, if negated patterns are used, you
 cannot use <code>$N</code> in the substitution string!
 </p>
@@ -494,8 +510,8 @@ cannot use <code>$N</code> in the substitution string!
         <li><a href="#mapfunc">mapping-function</a> calls
         (<code>${mapname:key|default}</code>)</li>
       </ol>
-      <p>Back-references are identifiers of the form 
-	      <code>$</code><strong>N</strong>
+      <p>Back-references are identifiers of the form
+      <code>$</code><strong>N</strong>
       (<strong>N</strong>=0..9), which will be replaced
       by the contents of the <strong>N</strong>th group of the
       matched <em>Pattern</em>. The server-variables are the same
@@ -505,7 +521,7 @@ cannot use <code>$N</code> in the substitution string!
       These three types of variables are expanded in the order above.</p>
 
       <p>As already mentioned, all rewrite rules are
-      applied to the <em>Substitution</em> (in the order in which 
+      applied to the <em>Substitution</em> (in the order in which
       they are defined
       in the config file). The URL is <strong>completely
       replaced</strong> by the <em>Substitution</em> and the
@@ -517,13 +533,13 @@ cannot use <code>$N</code> in the substitution string!
       '<code>-</code>' which means: <strong>NO
       substitution</strong>! This is useful in providing
       rewriting rules which <strong>only</strong> match
-      URLs but do not substitute anything for them. It is commonly used 
-      in conjunction with the <strong>C</strong> (chain) flag, in order 
+      URLs but do not substitute anything for them. It is commonly used
+      in conjunction with the <strong>C</strong> (chain) flag, in order
       to apply more than one pattern before substitution occurs.</p>
 
 
       <p>Additionally you can set special <a name="rewriteflags"
-      id="rewriteflags">flags</a> for <em>Substitution</em> by 
+      id="rewriteflags">flags</a> for <em>Substitution</em> by
       appending <strong><code>[</code><em>flags</em><code>]</code></strong>
       as the third argument to the <code>RewriteRule</code>
       directive. <em>Flags</em> is a comma-separated list of any of the
@@ -535,7 +551,7 @@ cannot use <code>$N</code> in the substitution string!
          This flag chains the current rule with the next rule
         (which itself can be chained with the following rule,
         and so on). This has the following effect: if a rule
-        matches, then processing continues as usual - 
+        matches, then processing continues as usual -
         the flag has no effect. If the rule does
         <strong>not</strong> match, then all following chained
         rules are skipped. For instance, it can be used to remove the
@@ -544,14 +560,14 @@ cannot use <code>$N</code> in the substitution string!
         ``<code>.www</code>'' part should not occur!).</li>
 
         <li>
-		'<strong><code>cookie|CO=</code></strong><em>NAME</em>:<em>VAL</em>:<em>domain</em>[:<em>lifetime</em>[:<em>path</em>]]'
+        '<strong><code>cookie|CO=</code></strong><em>NAME</em>:<em>VAL</em>:<em>domain</em>[:<em>lifetime</em>[:<em>path</em>]]'
         (set <strong>co</strong>okie)<br />
         This sets a cookie in the client's browser.  The cookie's name
         is specified by <em>NAME</em> and the value is
         <em>VAL</em>. The <em>domain</em> field is the domain of the
         cookie, such as '.apache.org', the optional <em>lifetime</em>
-	is the lifetime of the cookie in minutes, and the optional 
-	<em>path</em> is the path of the cookie</li>
+        is the lifetime of the cookie in minutes, and the optional
+        <em>path</em> is the path of the cookie</li>
 
         <li>
         '<strong><code>env|E=</code></strong><em>VAR</em>:<em>VAL</em>'
@@ -564,9 +580,9 @@ cannot use <code>$N</code> in the substitution string!
 
         <li>'<strong><code>forbidden|F</code></strong>' (force URL
         to be <strong>f</strong>orbidden)<br />
-        This forces the current URL to be forbidden - it immediately 
-	sends back a HTTP response of 403 (FORBIDDEN). 
-	Use this flag in conjunction with
+        This forces the current URL to be forbidden - it immediately
+        sends back a HTTP response of 403 (FORBIDDEN).
+        Use this flag in conjunction with
         appropriate RewriteConds to conditionally block some
         URLs.</li>
 
@@ -622,12 +638,12 @@ cannot use <code>$N</code> in the substitution string!
           will be escaped into their hexcode equivalents ('%25',
           '%24', and '%3B', respectively); this flag prevents this
           from happening. This allows percent symbols to appear in
-          the output, as in 
+          the output, as in
 <example>
     RewriteRule /foo/(.*) /bar?arg=P1\%3d$1 [R,NE]
 </example>
           which would turn '<code>/foo/zed</code>' into a safe
-          request for '<code>/bar?arg=P1=zed</code>'. 
+          request for '<code>/bar?arg=P1=zed</code>'.
         </li>
 
 <!-- Not supported yet
@@ -635,8 +651,8 @@ cannot use <code>$N</code> in the substitution string!
           '<strong><code>proxy|P</code></strong>' (force
           <strong>p</strong>roxy)<br />
           This flag forces the substitution part to be internally
-	  sent as a proxy request and immediately (rewrite 
-	  processing stops here) put through the <a
+          sent as a proxy request and immediately (rewrite
+          processing stops here) put through the <a
           href="mod_proxy.html">proxy module</a>. You must make
           sure that the substitution string is a valid URI
           (typically starting with
@@ -646,7 +662,7 @@ cannot use <code>$N</code> in the substitution string!
           more powerful implementation of the <a
           href="mod_proxy.html#proxypass">ProxyPass</a> directive,
           to map remote content into the namespace of the local
-          server. 
+          server.
 
           <p>Note: <module>mod_proxy</module> must be enabled in order
           to use this flag.</p>
@@ -673,8 +689,8 @@ cannot use <code>$N</code> in the substitution string!
           or use one of the following symbolic names:
           <code>temp</code> (default), <code>permanent</code>,
           <code>seeother</code>. Use this for rules to
-          canonicalize the URL and return it to the client - to 
-	  translate ``<code>/~</code>'' into
+          canonicalize the URL and return it to the client - to
+          translate ``<code>/~</code>'' into
           ``<code>/u/</code>'', or to always append a slash to
           <code>/u/</code><em>user</em>, etc.<br />
           <strong>Note:</strong> When you use this flag, make
@@ -682,9 +698,9 @@ cannot use <code>$N</code> in the substitution string!
           you will be redirecting to an invalid location. Remember
           that this flag on its own will only prepend
           <code>http://thishost[:thisport]/</code> to the URL, and rewriting
-	  will continue. Usually, you will want to stop rewriting at this point,
-	  and redirect immediately. To stop rewriting, you should add 
-	  the 'L' flag.
+          will continue. Usually, you will want to stop rewriting at this point,
+          and redirect immediately. To stop rewriting, you should add
+          the 'L' flag.
         </li>
 
         <li>'<strong><code>skip|S</code></strong>=<em>num</em>'
