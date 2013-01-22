@@ -17,15 +17,10 @@
 package org.apache.tomcat.websocket.server;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 
 import javax.servlet.ServletOutputStream;
 
-import org.apache.tomcat.websocket.Constants;
 import org.apache.tomcat.websocket.WsRemoteEndpointBase;
-import org.apache.tomcat.websocket.WsSession;
 
 /**
  * This is the server side {@link javax.websocket.RemoteEndpoint} implementation
@@ -34,74 +29,71 @@ import org.apache.tomcat.websocket.WsSession;
  */
 public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
 
-    private final WsSession wsSession;
     private final ServletOutputStream sos;
-    private final Object messageWriteLock = new Object();
+    private volatile WsCompletionHandler handler = null;
+    private volatile boolean close;
+    private volatile Long size = null;
+    private volatile boolean headerWritten = false;
+    private volatile boolean payloadWritten = false;
 
-    private volatile CyclicBarrier writeBarrier = new CyclicBarrier(2);
-
-
-    public WsRemoteEndpointServer(WsSession wsSession,
-            ServletOutputStream sos) {
-        this.wsSession = wsSession;
+    public WsRemoteEndpointServer(ServletOutputStream sos) {
         this.sos = sos;
     }
 
 
-    protected void onWritePossible() {
+    @Override
+    protected byte getMasked() {
+        // Messages from the server are not masked
+        return 0;
+    }
+
+
+    @Override
+    protected void sendMessage(WsCompletionHandler handler) {
+        this.handler = handler;
+        onWritePossible();
+    }
+
+
+    public void onWritePossible() {
         try {
-            writeBarrier.await();
-        } catch (InterruptedException | BrokenBarrierException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            // If this is false there will be a call back when it is true
+            while (sos.canWrite()) {
+                if (!headerWritten) {
+                    headerWritten = true;
+                    size = Long.valueOf(
+                            header.remaining() + payload.remaining());
+                    sos.write(header.array(), header.arrayOffset(),
+                            header.limit());
+                } else if (!payloadWritten) {
+                    payloadWritten = true;
+                    sos.write(payload.array(), payload.arrayOffset(),
+                            payload.limit());
+                } else {
+                    if (close) {
+                        sos.close();
+                    }
+                    handler.completed(size, null);
+                    size = null;
+                    handler = null;
+                    headerWritten = false;
+                    payloadWritten = false;
+                    break;
+                }
+            }
+        } catch (IOException ioe) {
+            handler.failed(ioe, null);
         }
     }
 
 
     @Override
-    protected void writeMessage(int opCode, ByteBuffer header,
-            ByteBuffer message) {
-        // Could sync on sos but don't as other (user or container) code may
-        // sync on this creating the potential for deadlocks.
-        synchronized (messageWriteLock) {
-            doBlockingWrite(header);
-            doBlockingWrite(message);
-            try {
-                sos.flush();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-            if (Constants.OPCODE_CLOSE == opCode) {
-                try {
-                    sos.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }
-        if (opCode == Constants.OPCODE_CLOSE) {
-            // Connection is closing - ensure no threads are stuck waiting on
-            // the write barrier
-            writeBarrier.reset();
-        }
-    }
-
-
-    private void doBlockingWrite(ByteBuffer data) {
-        if (!sos.canWrite()) {
-            try {
-                writeBarrier.await();
-            } catch (InterruptedException | BrokenBarrierException e) {
-                wsSession.getLocalEndpoint().onError(wsSession, e);
-            }
-        }
+    protected void close() {
         try {
-            sos.write(data.array(), data.arrayOffset(), data.limit());
+            sos.close();
         } catch (IOException e) {
-            wsSession.getLocalEndpoint().onError(wsSession, e);
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 }
