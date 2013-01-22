@@ -30,7 +30,9 @@ public class EchoAnnotation {
     @WebSocketMessage
     public void echoTextMessage(Session session, String msg, boolean last) {
         try {
-            session.getRemote().sendPartialString(msg, last);
+            if (session.isOpen()) {
+                session.getRemote().sendPartialString(msg, last);
+            }
         } catch (IOException e) {
             try {
                 session.close();
@@ -44,7 +46,9 @@ public class EchoAnnotation {
     public void echoBinaryMessage(Session session, ByteBuffer bb,
             boolean last) {
         try {
-            session.getRemote().sendPartialBytes(bb, last);
+            if (session.isOpen()) {
+                session.getRemote().sendPartialBytes(bb, last);
+            }
         } catch (IOException e) {
             try {
                 session.close();

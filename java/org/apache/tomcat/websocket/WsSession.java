@@ -47,6 +47,7 @@ public class WsSession implements Session {
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
     private MessageHandler.Basic<PongMessage> pongMessageHandler = null;
+    private volatile boolean open = true;
 
     public WsSession(Endpoint localEndpoint) {
         this.localEndpoint = localEndpoint;
@@ -157,8 +158,7 @@ public class WsSession implements Session {
 
     @Override
     public boolean isOpen() {
-        // TODO Auto-generated method stub
-        return false;
+        return open;
     }
 
 
@@ -202,7 +202,7 @@ public class WsSession implements Session {
 
     @Override
     public void close(CloseReason closeStatus) throws IOException {
-        // TODO Send the close message to the remote endpoint
+        open = false;
         // 125 is maximum size for the payload of a control message
         ByteBuffer msg = ByteBuffer.allocate(125);
         msg.putShort((short) closeStatus.getCloseCode().getCode());
@@ -211,7 +211,7 @@ public class WsSession implements Session {
             msg.put(reason.getBytes(UTF8));
         }
         msg.flip();
-        wsRemoteEndpoint.sendMessage(Constants.OPCODE_CLOSE, msg, true, true);
+        wsRemoteEndpoint.sendMessageBlocking(Constants.OPCODE_CLOSE, msg, true);
     }
 
 

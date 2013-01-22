@@ -16,8 +16,10 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.util.concurrent.TimeUnit;
 
 public class WsRemoteEndpointClient extends WsRemoteEndpointBase {
 
@@ -29,9 +31,24 @@ public class WsRemoteEndpointClient extends WsRemoteEndpointBase {
 
 
     @Override
-    protected void writeMessage(int opCode, ByteBuffer header,
-            ByteBuffer message) {
-        // TODO Auto-generated method stub
+    protected byte getMasked() {
+        return (byte) 0x80;
+    }
 
+
+    @Override
+    protected void sendMessage(WsCompletionHandler handler) {
+        channel.write(new ByteBuffer[] {header, payload}, 0, 2, Long.MAX_VALUE,
+                TimeUnit.DAYS, null, handler);
+    }
+
+    @Override
+    protected void close() {
+        try {
+            channel.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }

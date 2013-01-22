@@ -30,7 +30,6 @@ import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfiguration;
 
-import org.apache.tomcat.websocket.WsFrameBase;
 import org.apache.tomcat.websocket.WsIOException;
 import org.apache.tomcat.websocket.WsSession;
 
@@ -71,10 +70,10 @@ public class WsProtocolHandler implements ProtocolHandler {
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
         try {
-            WsFrameBase wsFrame = new WsFrameServer(sis, wsSession);
+            WsFrameServer wsFrame = new WsFrameServer(sis, wsSession);
             sis.setReadListener(new WsReadListener(this, wsFrame, wsSession));
             WsRemoteEndpointServer wsRemoteEndpointServer =
-                    new WsRemoteEndpointServer(wsSession, sos);
+                    new WsRemoteEndpointServer(sos);
             wsSession.setRemote(wsRemoteEndpointServer);
             sos.setWriteListener(
                     new WsWriteListener(this, wsRemoteEndpointServer));
@@ -100,12 +99,12 @@ public class WsProtocolHandler implements ProtocolHandler {
     private static class WsReadListener implements ReadListener {
 
         private final WsProtocolHandler wsProtocolHandler;
-        private final WsFrameBase wsFrame;
+        private final WsFrameServer wsFrame;
         private final WsSession wsSession;
 
 
         private WsReadListener(WsProtocolHandler wsProtocolHandler,
-                WsFrameBase wsFrame, WsSession wsSession) {
+                WsFrameServer wsFrame, WsSession wsSession) {
             this.wsProtocolHandler = wsProtocolHandler;
             this.wsFrame = wsFrame;
             this.wsSession = wsSession;
@@ -119,10 +118,14 @@ public class WsProtocolHandler implements ProtocolHandler {
             } catch (WsIOException ws) {
                 CloseReason cr = ws.getCloseReason();
                 wsSession.onClose(cr);
-                try {
-                    wsSession.close(cr);
-                } catch (IOException e) {
-                    // TODO Log?
+                // Explicitly close the session if it wasn't closed during the
+                // onClose() event
+                if (wsSession.isOpen()) {
+                    try {
+                        wsSession.close(cr);
+                    } catch (IOException e) {
+                        // TODO Log
+                    }
                 }
             } catch (EOFException eof) {
                 try {

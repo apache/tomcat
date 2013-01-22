@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket.server;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 import javax.servlet.ServletInputStream;
@@ -26,21 +27,50 @@ import org.apache.tomcat.websocket.WsSession;
 public class WsFrameServer extends WsFrameBase {
 
     private final ServletInputStream sis;
+    private final Object connectionReadLock = new Object();
 
     public WsFrameServer(ServletInputStream sis, WsSession wsSession) {
         super(wsSession);
         this.sis = sis;
     }
 
-    @Override
-    protected boolean isDataAvailable() {
+
+    /**
+     * Allows sub-classes to control whether the read loop in
+     * {@link #onDataAvailable()} should continue or terminate.
+     *
+     * @return  <code>true</code> if the data source is ready to be read
+     */
+    private boolean isDataAvailable() {
         return sis.isReady();
     }
 
+
+    /**
+     * Called when there is data in the ServletInputStream to process.
+     */
+    public void onDataAvailable() throws IOException {
+        synchronized (connectionReadLock) {
+            while (isDataAvailable()) {
+                // Fill up the input buffer with as much data as we can
+                int read = sis.read(
+                        inputBuffer, writePos, inputBuffer.length - writePos);
+                if (read == 0) {
+                    return;
+                }
+                if (read == -1) {
+                    throw new EOFException();
+                }
+                writePos += read;
+                processInputBuffer();
+            }
+        }
+    }
+
+
     @Override
-    protected int fillInputBuffer(byte[] inputBuffer, int start)
-            throws IOException {
-        return sis.read(inputBuffer, start,
-                inputBuffer.length - start);
+    protected boolean isMasked() {
+        // Data is from the client so it should be masked
+        return true;
     }
 }

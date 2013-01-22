@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.websocket;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -42,9 +41,8 @@ public abstract class WsFrameBase {
             StringManager.getManager(Constants.PACKAGE_NAME);
 
     // Connection level attributes
-    private final Object connectionReadLock = new Object();
     private final WsSession wsSession;
-    private final byte[] inputBuffer;
+    protected final byte[] inputBuffer;
 
     // Attributes for control messages
     // Control messages can appear in the middle of other messages so need
@@ -76,7 +74,7 @@ public abstract class WsFrameBase {
     // Attributes tracking state
     private State state = State.NEW_FRAME;
     private int readPos = 0;
-    private int writePos = 0;
+    protected int writePos = 0;
 
     public WsFrameBase(WsSession wsSession) {
         this.wsSession = wsSession;
@@ -95,62 +93,25 @@ public abstract class WsFrameBase {
     }
 
 
-    /**
-     * Called when there is data in the ServletInputStream to process.
-     */
-    public void onDataAvailable() throws IOException {
-        synchronized (connectionReadLock) {
-            while (isDataAvailable()) {
-                // Fill up the input buffer with as much data as we can
-                int read = fillInputBuffer(inputBuffer, writePos);
-                if (read == 0) {
-                    return;
+    protected void processInputBuffer() throws IOException {
+        while (true) {
+            if (state == State.NEW_FRAME) {
+                if (!processInitialHeader()) {
+                    break;
                 }
-                if (read == -1) {
-                    throw new EOFException();
+            }
+            if (state == State.PARTIAL_HEADER) {
+                if (!processRemainingHeader()) {
+                    break;
                 }
-                writePos += read;
-                while (true) {
-                    if (state == State.NEW_FRAME) {
-                        if (!processInitialHeader()) {
-                            break;
-                        }
-                    }
-                    if (state == State.PARTIAL_HEADER) {
-                        if (!processRemainingHeader()) {
-                            break;
-                        }
-                    }
-                    if (state == State.DATA) {
-                        if (!processData()) {
-                            break;
-                        }
-                    }
+            }
+            if (state == State.DATA) {
+                if (!processData()) {
+                    break;
                 }
             }
         }
     }
-
-
-    /**
-     * Allows sub-classes to control whether the read loop in
-     * {@link #onDataAvailable()} should continue or terminate.
-     *
-     * @return  <code>true</code> if the data source is ready to be read
-     */
-    protected abstract boolean isDataAvailable();
-
-
-    /**
-     * Fill as much of the input buffer as possible (i.e. to the end of the
-     * supplied buffer).
-     *
-     * @param inputBuffer   The input buffer
-     * @param start         The start point
-     * @return  The number of bytes (possibly zero) added to the buffer
-     */
-    protected abstract int fillInputBuffer(byte[] inputBuffer, int start)
-            throws IOException;
 
 
     /**
@@ -172,7 +133,7 @@ public abstract class WsFrameBase {
                     sm.getString("wsFrame.wrongRsv", Integer.valueOf(rsv))));
         }
         opCode = (byte) (b & 0x0F);
-        if (isControl()) {
+        if (Util.isControl(opCode)) {
             if (!fin) {
                 throw new WsIOException(new CloseReason(
                         CloseCodes.PROTOCOL_ERROR,
@@ -209,7 +170,7 @@ public abstract class WsFrameBase {
         }
         b = inputBuffer[readPos++];
         // Client data must be masked
-        if ((b & 0x80) == 0) {
+        if ((b & 0x80) == 0 && isMasked()) {
             throw new WsIOException(new CloseReason(
                     CloseCodes.PROTOCOL_ERROR,
                     sm.getString("wsFrame.notMasked")));
@@ -218,6 +179,9 @@ public abstract class WsFrameBase {
         state = State.PARTIAL_HEADER;
         return true;
     }
+
+
+    protected abstract boolean isMasked();
 
 
     /**
@@ -244,7 +208,7 @@ public abstract class WsFrameBase {
             payloadLength = byteArrayToLong(inputBuffer, readPos, 8);
             readPos += 8;
         }
-        if (isControl()) {
+        if (Util.isControl(opCode)) {
             if (payloadLength > 125) {
                 throw new WsIOException(new CloseReason(
                         CloseCodes.PROTOCOL_ERROR,
@@ -257,8 +221,10 @@ public abstract class WsFrameBase {
                         sm.getString("wsFrame.controlNoFin")));
             }
         }
-        System.arraycopy(inputBuffer, readPos, mask, 0, 4);
-        readPos += 4;
+        if (isMasked()) {
+            System.arraycopy(inputBuffer, readPos, mask, 0, 4);
+            readPos += 4;
+        }
         state = State.DATA;
         return true;
     }
@@ -266,7 +232,7 @@ public abstract class WsFrameBase {
 
     private boolean processData() throws IOException {
         checkRoomPayload();
-        if (isControl()) {
+        if (Util.isControl(opCode)) {
             return processDataControl();
         } else if (textMessage) {
             return processDataText();
@@ -312,7 +278,9 @@ public abstract class WsFrameBase {
             wsSession.onClose(
                     new CloseReason(Util.getCloseCode(code), reason));
         } else if (opCode == Constants.OPCODE_PING) {
-            wsSession.getRemote().sendPong(controlBufferBinary);
+            if (wsSession.isOpen()) {
+                wsSession.getRemote().sendPong(controlBufferBinary);
+            }
         } else if (opCode == Constants.OPCODE_PONG) {
             MessageHandler.Basic<PongMessage> mhPong =
                     wsSession.getPongMessageHandler();
@@ -520,7 +488,7 @@ public abstract class WsFrameBase {
 
     private void checkRoomPayload() throws IOException {
         if (inputBuffer.length - readPos - payloadLength + payloadWritten < 0) {
-            if (isControl()) {
+            if (Util.isControl(opCode)) {
                 makeRoom();
                 return;
             }
@@ -547,7 +515,7 @@ public abstract class WsFrameBase {
 
 
     private boolean usePartial() {
-        if (isControl()) {
+        if (Util.isControl(opCode)) {
             return false;
         } else if (textMessage) {
             MessageHandler mh = wsSession.getTextMessageHandler();
@@ -567,18 +535,30 @@ public abstract class WsFrameBase {
 
 
     private boolean appendPayloadToMessage(ByteBuffer dest) {
-        while (payloadWritten < payloadLength && readPos < writePos &&
-                dest.hasRemaining()) {
-            byte b = (byte) ((inputBuffer[readPos] ^ mask[maskIndex]) & 0xFF);
-            maskIndex++;
-            if (maskIndex == 4) {
-                maskIndex = 0;
+        if (isMasked()) {
+            while (payloadWritten < payloadLength && readPos < writePos &&
+                    dest.hasRemaining()) {
+                byte b = (byte) ((inputBuffer[readPos] ^ mask[maskIndex]) & 0xFF);
+                maskIndex++;
+                if (maskIndex == 4) {
+                    maskIndex = 0;
+                }
+                readPos++;
+                payloadWritten++;
+                dest.put(b);
             }
-            readPos++;
-            payloadWritten++;
-            dest.put(b);
+            return (payloadWritten == payloadLength);
+        } else {
+            long toWrite = Math.min(
+                    payloadLength - payloadWritten, writePos - readPos);
+            toWrite = Math.min(toWrite, dest.remaining());
+
+            dest.put(inputBuffer, readPos, (int) toWrite);
+            readPos += toWrite;
+            payloadWritten += toWrite;
+            return (payloadWritten == payloadLength);
+
         }
-        return (payloadWritten == payloadLength);
     }
 
 
@@ -595,11 +575,6 @@ public abstract class WsFrameBase {
             shift += 8;
         }
         return result;
-    }
-
-
-    private boolean isControl() {
-        return (opCode & 0x08) > 0;
     }
 
 

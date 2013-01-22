@@ -16,13 +16,15 @@
  */
 package org.apache.tomcat.websocket;
 
-import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.websocket.ContainerProvider;
 import javax.websocket.DefaultClientConfiguration;
 import javax.websocket.Endpoint;
@@ -30,41 +32,77 @@ import javax.websocket.EndpointConfiguration;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
+import javax.websocket.WebSocketMessage;
 
 import org.junit.Assert;
-//import org.junit.Test;
+import org.junit.Test;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.websocket.server.ServerContainerImpl;
 
 public class TestWsWebSocketContainer extends TomcatBaseTest {
 
     private static final String MESSAGE_STRING_1 = "qwerty";
 
-    //@Test Disable until client implementation progresses
+    @Test
     public void testConnectToServerEndpoint() throws Exception {
-        // Examples app includes WebSocket Echo endpoint
         Tomcat tomcat = getTomcatInstance();
-        File appDir = new File(getBuildDirectory(), "webapps/examples");
-        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(EchoConfig.class.getName());
 
         tomcat.start();
 
         WebSocketContainer wsContainer = ContainerProvider.getClientContainer();
         Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
                 new DefaultClientConfiguration(), new URI("http://localhost:" +
-                        getPort() + "/examples/echoAnnotation"));
+                        getPort() + EchoConfig.PATH));
         TesterMessageHandlerString handler = new TesterMessageHandlerString(1);
         wsSession.addMessageHandler(handler);
         wsSession.getRemote().sendString(MESSAGE_STRING_1);
 
-        boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
+        boolean latchResult = handler.getLatch().await(100, TimeUnit.SECONDS);
 
         Assert.assertTrue(latchResult);
 
         List<String> messages = handler.getMessages();
         Assert.assertEquals(1, messages.size());
         Assert.assertEquals(MESSAGE_STRING_1, messages.get(0));
+    }
+
+    @Test(expected=javax.websocket.DeploymentException.class)
+    public void testConnectToServerEndpointInvalidScheme() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(EchoConfig.class.getName());
+
+        tomcat.start();
+
+        WebSocketContainer wsContainer = ContainerProvider.getClientContainer();
+        wsContainer.connectToServer(TesterEndpoint.class,
+                new DefaultClientConfiguration(), new URI("ftp://localhost:" +
+                        getPort() + EchoConfig.PATH));
+    }
+
+    @Test(expected=javax.websocket.DeploymentException.class)
+    public void testConnectToServerEndpointNoHost() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(EchoConfig.class.getName());
+
+        tomcat.start();
+
+        WebSocketContainer wsContainer = ContainerProvider.getClientContainer();
+        wsContainer.connectToServer(TesterEndpoint.class,
+                new DefaultClientConfiguration(),
+                new URI("http://" + EchoConfig.PATH));
     }
 
     private static class TesterMessageHandlerString
@@ -99,11 +137,42 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         }
     }
 
-    private static class TesterEndpoint extends Endpoint {
+    public static class TesterEndpoint extends Endpoint {
+
+       @Override
+        public void onOpen(Session session, EndpointConfiguration config) {
+            // NO-OP
+        }
+    }
+
+    public static class EchoConfig implements ServletContextListener {
+
+        public static final String PATH = "/echo";
 
         @Override
-        public void onOpen(Session session, EndpointConfiguration config) {
-            // TODO Auto-generated method stub
+        public void contextInitialized(ServletContextEvent sce) {
+            ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
+            sc.publishServer(Echo.class, sce.getServletContext(), PATH);
+        }
+
+        @Override
+        public void contextDestroyed(ServletContextEvent sce) {
+            // NO-OP
+        }
+    }
+
+    public static class Echo {
+        @WebSocketMessage
+        public void echoTextMessage(Session session, String msg, boolean last) {
+            try {
+                session.getRemote().sendPartialString(msg, last);
+            } catch (IOException e) {
+                try {
+                    session.close();
+                } catch (IOException e1) {
+                    // Ignore
+                }
+            }
         }
     }
 }

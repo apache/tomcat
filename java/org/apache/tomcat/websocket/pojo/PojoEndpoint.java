@@ -69,7 +69,9 @@ public class PojoEndpoint extends Endpoint {
         if (methodMapping.getOnClose() == null) {
             // If the POJO doesn't handle the close, close the connection
             try {
-                session.close(closeReason);
+                if (session.isOpen()) {
+                    session.close(closeReason);
+                }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
