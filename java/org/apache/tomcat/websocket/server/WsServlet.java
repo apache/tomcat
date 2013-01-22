@@ -38,6 +38,7 @@ import javax.websocket.Extension;
 import javax.websocket.server.ServerEndpointConfiguration;
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.tomcat.websocket.Constants;
 
 /**
  * Handles the initial HTTP connection for WebSocket connections.
@@ -60,20 +61,24 @@ public class WsServlet extends HttpServlet {
         String key;
         String subProtocol = null;
         List<Extension> extensions = Collections.emptyList();
-        if (!headerContainsToken(req, "upgrade", "websocket")) {
+        if (!headerContainsToken(req, Constants.UPGRADE_HEADER_NAME,
+                Constants.UPGRADE_HEADER_VALUE)) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        if (!headerContainsToken(req, "connection", "upgrade")) {
+        if (!headerContainsToken(req, Constants.CONNECTION_HEADER_NAME,
+                Constants.CONNECTION_HEADER_VALUE)) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        if (!headerContainsToken(req, "sec-websocket-version", "13")) {
+        if (!headerContainsToken(req, Constants.WS_VERSION_HEADER_NAME,
+                Constants.WS_VERSION_HEADER_VALUE)) {
             resp.setStatus(426);
-            resp.setHeader("Sec-WebSocket-Version", "13");
+            resp.setHeader(Constants.WS_VERSION_HEADER_NAME,
+                    Constants.WS_VERSION_HEADER_VALUE);
             return;
         }
-        key = req.getHeader("Sec-WebSocket-Key");
+        key = req.getHeader(Constants.WS_KEY_HEADER_NAME);
         if (key == null) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
@@ -102,8 +107,10 @@ public class WsServlet extends HttpServlet {
             // extensions = sec.getNegotiatedExtensions(requestedExtensions);
         }
         // If we got this far, all is good. Accept the connection.
-        resp.setHeader("Upgrade", "websocket");
-        resp.setHeader("Connection", "upgrade");
+        resp.setHeader(Constants.UPGRADE_HEADER_NAME,
+                Constants.UPGRADE_HEADER_VALUE);
+        resp.setHeader(Constants.CONNECTION_HEADER_NAME,
+                Constants.CONNECTION_HEADER_VALUE);
         resp.setHeader("Sec-WebSocket-Accept", getWebSocketAccept(key));
         if (subProtocol != null) {
             resp.setHeader("Sec-WebSocket-Protocol", subProtocol);
