@@ -30,6 +30,16 @@ class Util {
     }
 
 
+    static boolean isControl(byte opCode) {
+        return (opCode & 0x08) > 0;
+    }
+
+
+    static boolean isText(byte opCode) {
+        return opCode == Constants.OPCODE_TEXT;
+    }
+
+
     static CloseCode getCloseCode(int code) {
         if (code > 2999 && code < 5000) {
             return CloseCodes.NORMAL_CLOSURE;
