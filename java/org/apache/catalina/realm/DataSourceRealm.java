@@ -431,7 +431,7 @@ public class DataSourceRealm extends RealmBase {
         } catch(SQLException e) {
             containerLog.error(
                     sm.getString("dataSourceRealm.getPassword.exception",
-                                 username));
+                                 username), e);
         } finally {
             try {
                 if (rs != null) {
@@ -443,7 +443,7 @@ public class DataSourceRealm extends RealmBase {
             } catch (SQLException e) {
                     containerLog.error(
                         sm.getString("dataSourceRealm.getPassword.exception",
-                             username));
+                             username), e);
 
             }
         }
@@ -524,7 +524,7 @@ public class DataSourceRealm extends RealmBase {
             return list;
         } catch(SQLException e) {
             containerLog.error(
-                sm.getString("dataSourceRealm.getRoles.exception", username));
+                sm.getString("dataSourceRealm.getRoles.exception", username), e);
         }
         finally {
             try {
@@ -537,7 +537,7 @@ public class DataSourceRealm extends RealmBase {
             } catch (SQLException e) {
                     containerLog.error(
                         sm.getString("dataSourceRealm.getRoles.exception",
-                                     username));
+                                     username), e);
             }
         }
 
