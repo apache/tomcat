@@ -87,7 +87,8 @@ class DefaultErrorHandler implements ErrorHandler {
                 buf.append(details[i].getJspExtract());
             } else {
                 args = new Object[] {
-                        Integer.valueOf(details[i].getJavaLineNumber()) };
+                        Integer.valueOf(details[i].getJavaLineNumber()),
+                        details[i].getJavaFileName() };
                 buf.append(Constants.NEWLINE);
                 buf.append(Constants.NEWLINE);
                 buf.append(Localizer.getMessage("jsp.error.java.line.number",
