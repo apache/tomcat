@@ -20,6 +20,9 @@ import java.io.IOException;
 
 import javax.servlet.ServletOutputStream;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsRemoteEndpointBase;
 
 /**
@@ -29,12 +32,18 @@ import org.apache.tomcat.websocket.WsRemoteEndpointBase;
  */
 public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
 
+    private static StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final Log log =
+            LogFactory.getLog(WsProtocolHandler.class);
+
     private final ServletOutputStream sos;
     private volatile WsCompletionHandler handler = null;
     private volatile boolean close;
     private volatile Long size = null;
     private volatile boolean headerWritten = false;
     private volatile boolean payloadWritten = false;
+
 
     public WsRemoteEndpointServer(ServletOutputStream sos) {
         this.sos = sos;
@@ -92,8 +101,9 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
         try {
             sos.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            if (log.isInfoEnabled()) {
+                log.info(sm.getString("wsRemoteEndpointServer.closeFailed"), e);
+            }
         }
     }
 }
