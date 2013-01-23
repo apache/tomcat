@@ -112,6 +112,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>54461</bug>: Improve the documentation for the compiler attribute
+        in the Jasper how-to. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.35 (markt)" rtext="2013-01-16">
   <subsection name="Catalina">
