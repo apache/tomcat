@@ -101,6 +101,11 @@
         <bug>54240</bug> that broke compilation of JSPs with JspC. Patch
         provided by Sheldon Shao. (markt)
       </fix>
+      <fix>
+        <bug>54466</bug>: Improve error message by including the name of the
+        file when the java file generated from a tag file cannot be compiled.
+        Based on a patch by Sheldon Shao. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
