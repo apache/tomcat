@@ -153,4 +153,34 @@ public class Introspection {
         }
         return clazz;
     }
+
+    /**
+     * Converts the primitive type to its corresponding wrapper.
+     *
+     * @param clazz
+     *            Class that will be evaluated
+     * @return if the parameter is a primitive type returns its wrapper;
+     *         otherwise returns the same class
+     */
+    public static Class<?> convertPrimitiveType(Class<?> clazz) {
+        if (clazz.equals(char.class)) {
+            return Character.class;
+        } else if (clazz.equals(int.class)) {
+            return Integer.class;
+        } else if (clazz.equals(boolean.class)) {
+            return Boolean.class;
+        } else if (clazz.equals(double.class)) {
+            return Double.class;
+        } else if (clazz.equals(byte.class)) {
+            return Byte.class;
+        } else if (clazz.equals(short.class)) {
+            return Short.class;
+        } else if (clazz.equals(long.class)) {
+            return Long.class;
+        } else if (clazz.equals(float.class)) {
+            return Float.class;
+        } else {
+            return clazz;
+        }
+    }
 }

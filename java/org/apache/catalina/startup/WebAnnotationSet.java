@@ -265,7 +265,7 @@ public class WebAnnotationSet {
                     Resource annotation = field.getAnnotation(Resource.class);
                     String defaultName =
                             classClass.getName() + SEPARATOR + field.getName();
-                    String defaultType = field.getType().getCanonicalName();
+                    Class<?> defaultType = field.getType();
                     addResource(context, annotation, defaultName, defaultType);
                 }
             }
@@ -290,8 +290,8 @@ public class WebAnnotationSet {
                     String defaultName = classClass.getName() + SEPARATOR +
                             Introspection.getPropertyName(method);
 
-                    String defaultType =
-                            (method.getParameterTypes()[0]).getCanonicalName();
+                    Class<?> defaultType =
+                            (method.getParameterTypes()[0]);
                     addResource(context, annotation, defaultName, defaultType);
                 }
             }
@@ -309,7 +309,7 @@ public class WebAnnotationSet {
     }
 
     protected static void addResource(Context context, Resource annotation,
-            String defaultName, String defaultType) {
+            String defaultName, Class<?> defaultType) {
         String name = getName(annotation, defaultName);
         String type = getType(annotation, defaultType);
 
@@ -412,14 +412,14 @@ public class WebAnnotationSet {
     }
 
 
-    private static String getType(Resource annotation, String defaultType) {
-        String type = annotation.type().getCanonicalName();
-        if (type == null || type.equals("java.lang.Object")) {
+    private static String getType(Resource annotation, Class<?> defaultType) {
+        Class<?> type = annotation.type();
+        if (type == null || type.equals(Object.class)) {
             if (defaultType != null) {
                 type = defaultType;
             }
         }
-        return type;
+        return Introspection.convertPrimitiveType(type).getCanonicalName();
     }
 
 
