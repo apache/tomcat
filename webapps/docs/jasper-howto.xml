@@ -96,9 +96,14 @@ attribute is always set when Jasper is used within Tomcat. By default the
 classpath is created dynamically based on the current web application.</li>
 
 <li><strong>compiler</strong> - Which compiler Ant should use to compile JSP
-pages.  See the Ant documentation for more information. If the value is not set,
-then the default Eclipse JDT Java compiler will be used instead of using Ant.
-No default value.</li>
+pages. The valid values for this are the same as for the compiler attribute of
+Ant&apos;s
+<a href="http://ant.apache.org/manual/Tasks/javac.html#compilervalues">javac</a>
+task. If the value is not set, then the default Eclipse JDT Java compiler will
+be used instead of using Ant. There is no default value. If this attribute is
+set then <code>setenv.[sh|bat]</code> should be used to add
+<code>ant.jar</code>, <code>ant-launcher.jar</code> and <code>tools.jar</code>
+to the <code>CLASSPATH</code> environment variable.</li>
 
 <li><strong>compilerSourceVM</strong> - What JDK version are the source files
 compatible with? (Default value: <code>1.6</code>)</li>
@@ -202,9 +207,8 @@ tens of JARs. On fast servers, this will allow sub-second recompilation cycles
 for even large JSP  pages.</p>
 
 <p>Apache Ant, which was used in previous Tomcat releases, can be used instead
-of the new compiler by simply removing the <code>lib/ecj-*.jar</code> file,
-and placing the <code>ant.jar</code> and <code>ant-launcher.jar</code> files
-from the latest Ant distribution in the <code>lib</code> folder.</p>
+of the new compiler by configuring the compiler attribute as explained above.
+</p>
 
 </section>
 
