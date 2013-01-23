@@ -510,7 +510,6 @@ public class RewriteValve extends ValveBase {
      * will be stored.
      *
      * @param resourceName
-     * @return
      */
     protected String getHostConfigPath(String resourceName) {
         StringBuffer result = new StringBuffer();

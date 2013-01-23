@@ -43,7 +43,7 @@ public class TestB2CConverter {
         B2CConverter conv = new B2CConverter("UTF-16");
 
         ByteChunk bc = new ByteChunk();
-        CharChunk cc = new CharChunk();
+        CharChunk cc = new CharChunk(32);
 
 
         for (int i = 0; i < msgCount; i++) {
