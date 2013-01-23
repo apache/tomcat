@@ -16,9 +16,7 @@
  */
 package org.apache.tomcat.util.buf;
 
-import java.io.CharArrayWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.BitSet;
 
 /**
@@ -42,6 +40,8 @@ public final class UEncoder {
     private BitSet safeChars=null;
     private C2BConverter c2b=null;
     private ByteChunk bb=null;
+    private CharChunk cb=null;
+    private CharChunk output=null;
 
     private final String ENCODING = "UTF8";
 
@@ -55,92 +55,65 @@ public final class UEncoder {
 
 
     /** URL Encode string, using a specified encoding.
-     *
-     * @param buf The writer
-     * @param s string to be encoded
-     * @throws IOException If an I/O error occurs
-     */
-    public void urlEncode( Writer buf, String s )
-            throws IOException {
-        if( c2b==null ) {
-            bb=new ByteChunk(16); // small enough.
-            c2b=new C2BConverter( bb, ENCODING );
-        }
+    *
+    * @param buf The writer
+    * @param s string to be encoded
+    * @throws IOException If an I/O error occurs
+    */
+   public CharChunk encodeURL(String s, int start, int end)
+       throws IOException {
+       if (c2b == null) {
+           bb = new ByteChunk(8); // small enough.
+           cb = new CharChunk(2); // small enough.
+           output = new CharChunk(64); // small enough.
+           c2b = new C2BConverter(ENCODING);
+       } else {
+           bb.recycle();
+           cb.recycle();
+       }
 
-        for (int i = 0; i < s.length(); i++) {
-            int c = s.charAt(i);
-            if( safeChars.get( c ) ) {
-                if(log.isDebugEnabled()) {
-                    log.debug("Encoder: Safe: " + (char)c);
-                }
-                buf.write((char)c);
-            } else {
-                if(log.isDebugEnabled()) {
-                    log.debug("Encoder: Unsafe:  " + (char)c);
-                }
-                c2b.convert( (char)c );
+       for (int i = start; i < end; i++) {
+           char c = s.charAt(i);
+           if (safeChars.get(c)) {
+               output.append(c);
+           } else {
+               cb.append(c);
+               c2b.convert(cb, bb);
 
-                // "surrogate" - UTF is _not_ 16 bit, but 21 !!!!
-                // ( while UCS is 31 ). Amazing...
-                if (c >= 0xD800 && c <= 0xDBFF) {
-                    if ( (i+1) < s.length()) {
-                        int d = s.charAt(i+1);
-                        if (d >= 0xDC00 && d <= 0xDFFF) {
-                            if(log.isDebugEnabled()) {
-                                log.debug("Encoder: Unsafe:  " + c);
-                            }
-                            c2b.convert( (char)d);
-                            i++;
-                        }
-                    }
-                }
+               // "surrogate" - UTF is _not_ 16 bit, but 21 !!!!
+               // ( while UCS is 31 ). Amazing...
+               if (c >= 0xD800 && c <= 0xDBFF) {
+                   if ((i+1) < end) {
+                       char d = s.charAt(i+1);
+                       if (d >= 0xDC00 && d <= 0xDFFF) {
+                           cb.append(d);
+                           c2b.convert(cb, bb);
+                           i++;
+                       }
+                   }
+               }
 
-                c2b.flushBuffer();
+               urlEncode(output, bb);
+               cb.recycle();
+               bb.recycle();
+           }
+       }
+       
+       return output;
+   }
 
-                urlEncode( buf, bb.getBuffer(), bb.getOffset(),
-                           bb.getLength() );
-                bb.recycle();
-            }
-        }
-    }
-
-    /**
-     */
-    public void urlEncode( Writer buf, byte bytes[], int off, int len)
-            throws IOException {
-        for( int j=off; j< len; j++ ) {
-            buf.write( '%' );
-            char ch = Character.forDigit((bytes[j] >> 4) & 0xF, 16);
-            if(log.isDebugEnabled()) {
-                log.debug("Encoder: Encode:  " + ch);
-            }
-            buf.write(ch);
-            ch = Character.forDigit(bytes[j] & 0xF, 16);
-            if(log.isDebugEnabled()) {
-                log.debug("Encoder: Encode:  " + ch);
-            }
-            buf.write(ch);
-        }
-    }
-
-    /**
-     * Utility function to re-encode the URL.
-     * Still has problems with charset, since UEncoder mostly
-     * ignores it.
-     */
-    public String encodeURL(String uri) {
-        String outUri=null;
-        try {
-            // XXX optimize - recycle, etc
-            CharArrayWriter out = new CharArrayWriter();
-            urlEncode(out, uri);
-            outUri=out.toString();
-        } catch (IOException iex) {
-        }
-        return outUri;
-    }
-
-
+   protected void urlEncode(CharChunk out, ByteChunk bb)
+       throws IOException {
+       byte[] bytes = bb.getBuffer();
+       for (int j = bb.getStart(); j < bb.getEnd(); j++) {
+           out.append('%');
+           char ch = Character.forDigit((bytes[j] >> 4) & 0xF, 16);
+           out.append(ch);
+           ch = Character.forDigit(bytes[j] & 0xF, 16);
+           out.append(ch);
+       }
+   }
+   
     // -------------------- Internal implementation --------------------
 
     private void initSafeChars() {

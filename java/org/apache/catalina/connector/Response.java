@@ -1578,17 +1578,16 @@ public class Response
                 if (!leadingSlash) {
                     String relativePath = request.getDecodedRequestURI();
                     int pos = relativePath.lastIndexOf('/');
-                    relativePath = relativePath.substring(0, pos);
-
-                    String encodedURI = null;
+                    CharChunk encodedURI = null;
                     final String frelativePath = relativePath;
+                    final int fend = pos;
                     if (SecurityUtil.isPackageProtectionEnabled() ){
                         try{
                             encodedURI = AccessController.doPrivileged(
-                                new PrivilegedExceptionAction<String>(){
+                                new PrivilegedExceptionAction<CharChunk>(){
                                     @Override
-                                    public String run() throws IOException{
-                                        return urlEncoder.encodeURL(frelativePath);
+                                    public CharChunk run() throws IOException{
+                                        return urlEncoder.encodeURL(frelativePath, 0, fend);
                                     }
                            });
                         } catch (PrivilegedActionException pae){
@@ -1598,9 +1597,10 @@ public class Response
                             throw iae;
                         }
                     } else {
-                        encodedURI = urlEncoder.encodeURL(relativePath);
+                        encodedURI = urlEncoder.encodeURL(relativePath, 0, pos);
                     }
-                    redirectURLCC.append(encodedURI, 0, encodedURI.length());
+                    redirectURLCC.append(encodedURI);
+                    encodedURI.recycle();
                     redirectURLCC.append('/');
                 }
                 redirectURLCC.append(location, 0, location.length());

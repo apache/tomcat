@@ -397,7 +397,7 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
     /** Make space for len chars. If len is small, allocate
      *        a reserve space too. Never grow bigger than limit.
      */
-    private void makeSpace(int count)
+    public void makeSpace(int count)
     {
         char[] tmp = null;
 

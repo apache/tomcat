@@ -380,9 +380,10 @@ public class TestWebSocket extends TomcatBaseTest {
         private void sendMessage(String message, boolean finalFragment)
                 throws IOException {
             ByteChunk bc = new ByteChunk(8192);
-            C2BConverter c2b = new C2BConverter(bc, "UTF-8");
-            c2b.convert(message);
-            c2b.flushBuffer();
+            CharChunk cc = new CharChunk(8192);
+            C2BConverter c2b = new C2BConverter("UTF-8");
+            cc.append(message);
+            c2b.convert(cc, bc);
 
             int len = bc.getLength();
             Assert.assertTrue(len < 126);
@@ -435,7 +436,7 @@ public class TestWebSocket extends TomcatBaseTest {
             bc.setEnd(len);
 
             B2CConverter b2c = new B2CConverter("UTF-8");
-            b2c.convert(bc, cc, len);
+            b2c.convert(bc, cc);
 
             return cc.toString();
         }

@@ -48,8 +48,7 @@ public class TestB2CConverter {
 
         for (int i = 0; i < msgCount; i++) {
             bc.append(UTF16_MESSAGE, 0, UTF16_MESSAGE.length);
-            // Note: The limit is the number of characters to read
-            conv.convert(bc, cc, 3);
+            conv.convert(bc, cc);
             Assert.assertEquals("ABC", cc.toString());
             bc.recycle();
             cc.recycle();

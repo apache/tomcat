@@ -373,14 +373,19 @@ public class InputBuffer extends Reader
         if (markPos == -1) {
             cb.setOffset(0);
             cb.setEnd(0);
+        } else {
+            // Make sure there's enough space in the worst case
+            cb.makeSpace(bb.getLength());
+            if ((cb.getBuffer().length - cb.getEnd()) == 0) {
+                // We went over the limit
+                cb.setOffset(0);
+                cb.setEnd(0);
+                markPos = -1;
+            }
         }
-        int limit = bb.getLength()+cb.getStart();
-        if ( cb.getLimit() < limit ) {
-            cb.setLimit(limit);
-        }
+
         state = CHAR_STATE;
-        conv.convert(bb, cb, bb.getLength());
-        bb.setOffset(bb.getEnd());
+        conv.convert(bb, cb);
 
         return cb.getLength();
 
