@@ -61,6 +61,10 @@
         triggered a NPE when digested passwords were used and an authentication
         attempt was made for a user that did not exist in the realm. (markt)
       </fix>
+      <fix>
+        <bug>54448</bug>: Correctly handle @Resource annotations on primitives.
+        Patch provided by Violeta Georgieva. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
