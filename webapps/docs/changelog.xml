@@ -62,8 +62,14 @@
         attempt was made for a user that did not exist in the realm. (markt)
       </fix>
       <fix>
-        <bug>54448</bug>: Correctly handle @Resource annotations on primitives.
-        Patch provided by Violeta Georgieva. (markt)
+        <bug>54448</bug>: Correctly handle <code>@Resource</code> annotations on
+        primitives. Patch provided by Violeta Georgieva. (markt)
+      </fix>
+      <fix>
+        <bug>54450</bug>: Correctly handle resource injection when part of the
+        servlet properties uses <code>@Resource</code> and the other uses
+        <code>injection-target</code>. Patch provided by  Violeta Georgieva.
+        (markt)
       </fix>
     </changelog>
   </subsection>
