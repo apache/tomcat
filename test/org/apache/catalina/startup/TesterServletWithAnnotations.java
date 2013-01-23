@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.catalina.startup;
 
 import java.io.IOException;
@@ -29,12 +30,35 @@ public class TesterServletWithAnnotations extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     @Resource(mappedName = "1")
-    private int envEntry;
+    private int envEntry1;
+
+    private int envEntry2;
+
+    private int envEntry3;
+
+    private int envEntry4;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         resp.setContentType("text/plain");
-        resp.getWriter().print("envEntry: " + envEntry);
+        resp.getWriter().print("envEntry1: " + envEntry1);
+        resp.getWriter().print(" envEntry2: " + envEntry2);
+        resp.getWriter().print(" envEntry3: " + envEntry3);
+        resp.getWriter().print(" envEntry4: " + envEntry4);
+    }
+
+    public void setEnvEntry2(int envEntry2) {
+        this.envEntry2 = envEntry2;
+    }
+
+    @Resource(mappedName = "3")
+    public void setEnvEntry3(int envEntry3) {
+        this.envEntry3 = envEntry3;
+    }
+
+    @Resource(mappedName = "4")
+    public void setEnvEntry4(int envEntry4) {
+        this.envEntry4 = envEntry4;
     }
 }
