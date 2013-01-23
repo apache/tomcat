@@ -54,6 +54,15 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.36 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>54438</bug>: Fix a regression in the fix for <bug>52953</bug> that
+        triggered a NPE when digested passwords were used and an authentication
+        attempt was made for a user that did not exist in the realm. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
@@ -68,11 +77,6 @@
         not silently revert to JVM defaults when none of the options specified
         are supported - new behaviour is to warn and explicitly enable no
         options. (timw)
-      </fix>
-      <fix>
-        <bug>54438</bug>: Fix a regression in the fix for <bug>52953</bug> that
-        triggered a NPE when digested passwords were used and an authentication
-        attempt was made for a user that did not exist in the realm. (markt)
       </fix>
     </changelog>
   </subsection>
