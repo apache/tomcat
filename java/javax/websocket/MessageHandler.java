@@ -35,7 +35,7 @@ public interface MessageHandler {
         /**
          * Called when a whole message is available to be processed.
          *
-         * @param messagePart   The message
+         * @param message   The message
          */
         void onMessage(T message);
     }

@@ -56,7 +56,6 @@ public final class UEncoder {
 
     /** URL Encode string, using a specified encoding.
     *
-    * @param buf The writer
     * @param s string to be encoded
     * @throws IOException If an I/O error occurs
     */
