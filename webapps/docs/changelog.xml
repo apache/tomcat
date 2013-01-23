@@ -71,6 +71,10 @@
         <code>injection-target</code>. Patch provided by  Violeta Georgieva.
         (markt)
       </fix>
+      <fix>
+        <bug>54458</bug>: Include exception when logging errors in the
+        DataSourceRealm. Patch provided by  Violeta Georgieva. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
