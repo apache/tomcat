@@ -348,9 +348,9 @@ public class DefaultInstanceManager implements InstanceManager {
                                 annotations.add(new AnnotationCacheEntry(
                                         method.getName(),
                                         method.getParameterTypes(),
-                                        injections.get(method.getName()),
+                                        injections.get(fieldName),
                                         AnnotationCacheEntryType.SETTER));
-                                break;
+                                continue;
                             }
                         }
                         if (method.isAnnotationPresent(Resource.class)) {
