@@ -1177,7 +1177,7 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
                 // No match - ignore this injection target
                 continue;
             }
-            targetType = convertPrimitiveType(targetType);
+            targetType = Introspection.convertPrimitiveType(targetType);
 
             if (typeClass == null) {
                 // Need to find a common type amongst the injection targets
@@ -1229,27 +1229,5 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
             }
         }
         return null;
-    }
-
-    private Class<?> convertPrimitiveType(Class<?> clazz) {
-        if (clazz.equals(char.class)) {
-            return Character.class;
-        } else if (clazz.equals(int.class)) {
-            return Integer.class;
-        } else if (clazz.equals(boolean.class)) {
-            return Boolean.class;
-        } else if (clazz.equals(double.class)) {
-            return Double.class;
-        } else if (clazz.equals(byte.class)) {
-            return Byte.class;
-        } else if (clazz.equals(short.class)) {
-            return Short.class;
-        } else if (clazz.equals(long.class)) {
-            return Long.class;
-        } else if (clazz.equals(float.class)) {
-            return Float.class;
-        } else {
-            return clazz;
-        }
     }
 }
