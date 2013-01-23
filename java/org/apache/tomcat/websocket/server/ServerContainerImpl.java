@@ -48,7 +48,7 @@ public class ServerContainerImpl extends WsWebSocketContainer {
     private static Object classLoaderContainerMapLock = new Object();
     private static StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
-    protected Log log = LogFactory.getLog(ServerContainerImpl.class);
+    protected final Log log = LogFactory.getLog(ServerContainerImpl.class);
 
 
     public static ServerContainerImpl getServerContainer() {
@@ -63,6 +63,8 @@ public class ServerContainerImpl extends WsWebSocketContainer {
         }
         return result;
     }
+
+
     private volatile ServletContext servletContext = null;
     private Map<String,ServerEndpointConfiguration> configMap =
             new ConcurrentHashMap<>();

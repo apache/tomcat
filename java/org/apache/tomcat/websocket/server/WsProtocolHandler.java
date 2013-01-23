@@ -30,6 +30,9 @@ import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfiguration;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsIOException;
 import org.apache.tomcat.websocket.WsSession;
 
@@ -37,6 +40,11 @@ import org.apache.tomcat.websocket.WsSession;
  * Servlet 3.1 HTTP upgrade handler for WebSocket connections.
  */
 public class WsProtocolHandler implements ProtocolHandler {
+
+    private static StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final Log log =
+            LogFactory.getLog(WsProtocolHandler.class);
 
     private final Endpoint ep;
     private final EndpointConfiguration endpointConfig;
@@ -71,7 +79,7 @@ public class WsProtocolHandler implements ProtocolHandler {
         t.setContextClassLoader(applicationClassLoader);
         try {
             WsFrameServer wsFrame = new WsFrameServer(sis, wsSession);
-            sis.setReadListener(new WsReadListener(this, wsFrame, wsSession));
+            sis.setReadListener(new WsReadListener(this, wsFrame));
             WsRemoteEndpointServer wsRemoteEndpointServer =
                     new WsRemoteEndpointServer(sos);
             wsSession.setRemote(wsRemoteEndpointServer);
@@ -96,18 +104,41 @@ public class WsProtocolHandler implements ProtocolHandler {
         }
     }
 
+
+    private void close(CloseReason cr) {
+        // Need to call onClose using the web application's class loader
+        Thread t = Thread.currentThread();
+        ClassLoader cl = t.getContextClassLoader();
+        t.setContextClassLoader(applicationClassLoader);
+        try {
+            ep.onClose(wsSession, cr);
+        } finally {
+            t.setContextClassLoader(cl);
+        }
+        // Explicitly close the session if it wasn't closed during the
+        // onClose() event
+        if (wsSession.isOpen()) {
+            try {
+                wsSession.close(cr);
+            } catch (IOException e) {
+                if (log.isInfoEnabled()) {
+                    log.info(sm.getString("wsProtocolHandler.closeFailed"), e);
+                }
+            }
+        }
+    }
+
+
     private static class WsReadListener implements ReadListener {
 
         private final WsProtocolHandler wsProtocolHandler;
         private final WsFrameServer wsFrame;
-        private final WsSession wsSession;
 
 
         private WsReadListener(WsProtocolHandler wsProtocolHandler,
-                WsFrameServer wsFrame, WsSession wsSession) {
+                WsFrameServer wsFrame) {
             this.wsProtocolHandler = wsProtocolHandler;
             this.wsFrame = wsFrame;
-            this.wsSession = wsSession;
         }
 
 
@@ -116,26 +147,11 @@ public class WsProtocolHandler implements ProtocolHandler {
             try {
                 wsFrame.onDataAvailable();
             } catch (WsIOException ws) {
-                CloseReason cr = ws.getCloseReason();
-                wsSession.onClose(cr);
-                // Explicitly close the session if it wasn't closed during the
-                // onClose() event
-                if (wsSession.isOpen()) {
-                    try {
-                        wsSession.close(cr);
-                    } catch (IOException e) {
-                        // TODO Log
-                    }
-                }
+                wsProtocolHandler.close(ws.getCloseReason());
             } catch (EOFException eof) {
-                try {
-                    CloseReason cr = new CloseReason(
-                            CloseCodes.CLOSED_ABNORMALLY, eof.getMessage());
-                    wsSession.onClose(cr);
-                    wsSession.close(cr);
-                } catch (IOException e1) {
-                    // TODO Log?
-                }
+                CloseReason cr = new CloseReason(
+                        CloseCodes.CLOSED_ABNORMALLY, eof.getMessage());
+                wsProtocolHandler.close(cr);
             } catch (IOException ioe) {
                 onError(ioe);
             }
@@ -154,6 +170,7 @@ public class WsProtocolHandler implements ProtocolHandler {
             wsProtocolHandler.onError(throwable);
         }
     }
+
 
     private static class WsWriteListener implements WriteListener {
 

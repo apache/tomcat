@@ -24,7 +24,6 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.HandlesTypes;
 import javax.websocket.server.WebSocketEndpoint;
 
-
 /**
  * Registers an interest in any class that is annotated with
  * {@link WebSocketEndpoint} so that Endpoint can be published via the WebSocket
