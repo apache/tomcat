@@ -41,7 +41,7 @@ public abstract class WsFrameBase {
             StringManager.getManager(Constants.PACKAGE_NAME);
 
     // Connection level attributes
-    private final WsSession wsSession;
+    protected final WsSession wsSession;
     protected final byte[] inputBuffer;
 
     // Attributes for control messages
@@ -493,10 +493,10 @@ public abstract class WsFrameBase {
                 return;
             }
             if (!usePartial() && (inputBuffer.length < payloadLength)) {
-                // TODO i18n - buffer too small
                 CloseReason cr = new CloseReason(CloseCodes.TOO_BIG,
-                        "Buffer size: [" + inputBuffer.length +
-                        "], payload size: [" + payloadLength + "]");
+                        sm.getString("wsFrame.bufferToSmall",
+                                Integer.valueOf(inputBuffer.length),
+                                Long.valueOf(payloadLength)));
                 wsSession.close(cr);
                 wsSession.onClose(cr);
                 throw new IOException(cr.getReasonPhrase());

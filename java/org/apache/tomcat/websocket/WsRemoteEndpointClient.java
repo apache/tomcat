@@ -46,9 +46,8 @@ public class WsRemoteEndpointClient extends WsRemoteEndpointBase {
     protected void close() {
         try {
             channel.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (IOException ignore) {
+            // Ignore
         }
     }
 }
