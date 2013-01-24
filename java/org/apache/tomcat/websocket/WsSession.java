@@ -43,14 +43,29 @@ public class WsSession implements Session {
     private static final Charset UTF8 = Charset.forName("UTF8");
 
     private final Endpoint localEndpoint;
-    private WsRemoteEndpointBase wsRemoteEndpoint;
+    private final WsRemoteEndpointBase wsRemoteEndpoint;
+    private final ClassLoader applicationClassLoader;
+
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
     private MessageHandler.Basic<PongMessage> pongMessageHandler = null;
     private volatile boolean open = true;
 
-    public WsSession(Endpoint localEndpoint) {
+
+    /**
+     * Creates a new WebSocket session for communication between the two
+     * provided end points. The result of {@link Thread#getContextClassLoader()}
+     * at the time this constructor is called will be used when calling
+     * {@link Endpoint#onClose(Session, CloseReason)}.
+     *
+     * @param localEndpoint
+     * @param wsRemoteEndpoint
+     */
+    public WsSession(Endpoint localEndpoint,
+            WsRemoteEndpointBase wsRemoteEndpoint) {
         this.localEndpoint = localEndpoint;
+        this.wsRemoteEndpoint = wsRemoteEndpoint;
+        applicationClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
 
@@ -201,17 +216,29 @@ public class WsSession implements Session {
 
 
     @Override
-    public void close(CloseReason closeStatus) throws IOException {
+    public void close(CloseReason closeReason) throws IOException {
         open = false;
+
+        // Send the close message
         // 125 is maximum size for the payload of a control message
         ByteBuffer msg = ByteBuffer.allocate(125);
-        msg.putShort((short) closeStatus.getCloseCode().getCode());
-        String reason = closeStatus.getReasonPhrase();
+        msg.putShort((short) closeReason.getCloseCode().getCode());
+        String reason = closeReason.getReasonPhrase();
         if (reason != null && reason.length() > 0) {
             msg.put(reason.getBytes(UTF8));
         }
         msg.flip();
         wsRemoteEndpoint.sendMessageBlocking(Constants.OPCODE_CLOSE, msg, true);
+
+        // Fire the onClose event
+        Thread t = Thread.currentThread();
+        ClassLoader cl = t.getContextClassLoader();
+        t.setContextClassLoader(applicationClassLoader);
+        try {
+            localEndpoint.onClose(this, closeReason);
+        } finally {
+            t.setContextClassLoader(cl);
+        }
     }
 
 
@@ -250,11 +277,6 @@ public class WsSession implements Session {
     }
 
 
-    public void setRemote(WsRemoteEndpointBase wsRemoteEndpoint) {
-        this.wsRemoteEndpoint = wsRemoteEndpoint;
-    }
-
-
     protected MessageHandler getTextMessageHandler() {
         return textMessageHandler;
     }
@@ -267,15 +289,6 @@ public class WsSession implements Session {
 
     protected MessageHandler.Basic<PongMessage> getPongMessageHandler() {
         return pongMessageHandler;
-    }
-
-    public void onClose(CloseReason closeReason) {
-        localEndpoint.onClose(this, closeReason);
-    }
-
-
-    public Endpoint getLocalEndpoint() {
-        return localEndpoint;
     }
 
 

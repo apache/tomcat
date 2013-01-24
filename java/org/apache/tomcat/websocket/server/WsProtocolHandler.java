@@ -49,14 +49,15 @@ public class WsProtocolHandler implements ProtocolHandler {
     private final Endpoint ep;
     private final EndpointConfiguration endpointConfig;
     private final ClassLoader applicationClassLoader;
-    private final WsSession wsSession;
+
+    private WsSession wsSession;
 
 
-    public WsProtocolHandler(Endpoint ep, EndpointConfiguration endpointConfig) {
+    public WsProtocolHandler(Endpoint ep,
+            EndpointConfiguration endpointConfig) {
         this.ep = ep;
         this.endpointConfig = endpointConfig;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
-        wsSession = new WsSession(ep);
     }
 
 
@@ -82,7 +83,7 @@ public class WsProtocolHandler implements ProtocolHandler {
             sis.setReadListener(new WsReadListener(this, wsFrame));
             WsRemoteEndpointServer wsRemoteEndpointServer =
                     new WsRemoteEndpointServer(sos);
-            wsSession.setRemote(wsRemoteEndpointServer);
+            wsSession = new WsSession(ep, wsRemoteEndpointServer);
             sos.setWriteListener(
                     new WsWriteListener(this, wsRemoteEndpointServer));
             ep.onOpen(wsSession, endpointConfig);
@@ -106,17 +107,6 @@ public class WsProtocolHandler implements ProtocolHandler {
 
 
     private void close(CloseReason cr) {
-        // Need to call onClose using the web application's class loader
-        Thread t = Thread.currentThread();
-        ClassLoader cl = t.getContextClassLoader();
-        t.setContextClassLoader(applicationClassLoader);
-        try {
-            ep.onClose(wsSession, cr);
-        } finally {
-            t.setContextClassLoader(cl);
-        }
-        // Explicitly close the session if it wasn't closed during the
-        // onClose() event
         if (wsSession.isOpen()) {
             try {
                 wsSession.close(cr);

@@ -63,7 +63,7 @@ public class WsWebSocketContainer implements WebSocketContainer {
 
 
     @Override
-    public Session connectToServer(Class<? extends Endpoint> endpoint,
+    public Session connectToServer(Class<? extends Endpoint> clazz,
             ClientEndpointConfiguration clientEndpointConfiguration, URI path)
             throws DeploymentException {
 
@@ -134,14 +134,16 @@ public class WsWebSocketContainer implements WebSocketContainer {
         WsRemoteEndpointClient wsRemoteEndpointClient =
                 new WsRemoteEndpointClient(channel);
 
-        WsSession wsSession;
+        Endpoint endpoint;
         try {
-            wsSession = new WsSession(endpoint.newInstance());
+            endpoint = clazz.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            // TODO
-            throw new DeploymentException("TBD", e);
+            // TODO i18n
+            throw new DeploymentException("TDB", e);
         }
-        wsSession.setRemote(wsRemoteEndpointClient);
+        WsSession wsSession = new WsSession(endpoint, wsRemoteEndpointClient);
+
+        endpoint.onOpen(wsSession, clientEndpointConfiguration);
 
         try {
             // Object creation will trigger input processing
