@@ -169,7 +169,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
 
     /**
      * Send a message to the destinations specified
-     * @param destination Member[] - destination.length > 1
+     * @param destination Member[] - destination.length > 0
      * @param msg Serializable - the message to send
      * @param options int - sender options, options can trigger guarantee levels and different interceptors to
      * react to the message see class documentation for the <code>Channel</code> object.<br>
@@ -184,7 +184,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
 
     /**
      *
-     * @param destination Member[] - destination.length > 1
+     * @param destination Member[] - destination.length > 0
      * @param msg Serializable - the message to send
      * @param options int - sender options, options can trigger guarantee levels and different interceptors to
      * react to the message see class documentation for the <code>Channel</code> object.<br>

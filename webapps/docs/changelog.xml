@@ -115,6 +115,11 @@
         and <code>counterSend_EVT_CHANGE_SESSION_ID</code>. These values are not
         incremented if no members active in cluster group. (kfujino)
       </fix>
+      <fix>
+        <bug>54476</bug>: Correct error in Javadoc of GroupChannel send methods
+        to maker clear that the minimum length of the destination member array
+        is one, not two. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
