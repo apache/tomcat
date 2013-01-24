@@ -32,9 +32,6 @@ import java.util.BitSet;
  */
 public final class UEncoder {
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog(UEncoder.class );
-
     // Not static - the set may differ ( it's better than adding
     // an extra check for "/", "+", etc
     private BitSet safeChars=null;

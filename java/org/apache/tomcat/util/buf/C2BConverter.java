@@ -23,20 +23,11 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.res.StringManager;
-
 /**
  * NIO based character encoder.
  */
 public final class C2BConverter {
 
-    private static final Log log = LogFactory.getLog(C2BConverter.class);
-    private static final StringManager sm =
-            StringManager.getManager(Constants.Package);
-
-    private final String encoding;
     protected CharsetEncoder encoder = null;
     protected ByteBuffer bb = null;
     protected CharBuffer cb = null;
@@ -47,9 +38,9 @@ public final class C2BConverter {
     protected CharBuffer leftovers = null;
 
     public C2BConverter(String encoding) throws IOException {
-        this.encoding = encoding;
         encoder = B2CConverter.getCharset(encoding).newEncoder();
-        // FIXME: See if unmappable/malformed behavior configuration is needed in practice
+        // FIXME: See if unmappable/malformed behavior configuration is needed
+        //        in practice
         encoder.onUnmappableCharacter(CodingErrorAction.REPLACE)
             .onMalformedInput(CodingErrorAction.REPLACE);
         char[] left = new char[4];
@@ -75,7 +66,7 @@ public final class C2BConverter {
      * @param bc byte output
      */
     public void convert(CharChunk cc, ByteChunk bc)
-    throws IOException {
+            throws IOException {
         if ((bb == null) || (bb.array() != bc.getBuffer())) {
             // Create a new byte buffer if anything changed
             bb = ByteBuffer.wrap(bc.getBuffer(), bc.getEnd(),
@@ -112,7 +103,8 @@ public final class C2BConverter {
             cb.position(cc.getStart());
             leftovers.position(0);
         }
-        // Do the decoding and get the results into the byte chunk and the char chunk
+        // Do the decoding and get the results into the byte chunk and the char
+        // chunk
         result = encoder.encode(cb, bb, false);
         if (result.isError() || result.isMalformed()) {
             result.throwException();
