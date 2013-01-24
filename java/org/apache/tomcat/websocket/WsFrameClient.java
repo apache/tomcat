@@ -21,6 +21,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 
+import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
+
 public class WsFrameClient extends WsFrameBase {
 
     private ByteBuffer response;
@@ -34,11 +37,11 @@ public class WsFrameClient extends WsFrameBase {
         this.channel = channel;
         this.handler = new WsFrameClientCompletionHandler();
 
-        tbd();
+        processSocketRead();
     }
 
 
-    private void tbd() throws IOException {
+    private void processSocketRead() throws IOException {
 
         while (response.hasRemaining()) {
             int remaining = response.remaining();
@@ -74,16 +77,25 @@ public class WsFrameClient extends WsFrameBase {
         public void completed(Integer result, Void attachment) {
             response.flip();
             try {
-                tbd();
+                processSocketRead();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                close(e);
             }
         }
 
         @Override
         public void failed(Throwable exc, Void attachment) {
-            // TODO Auto-generated method stub
+            close(exc);
+        }
+
+        private final void close(Throwable t) {
+            CloseReason cr = new CloseReason(
+                    CloseCodes.CLOSED_ABNORMALLY, t.getMessage());
+            try {
+                wsSession.close(cr);
+            } catch (IOException ignore) {
+                // Ignore
+            }
         }
     }
 }
