@@ -97,7 +97,7 @@ public final class UEncoder {
                bb.recycle();
            }
        }
-       
+
        return output;
    }
 
@@ -112,7 +112,7 @@ public final class UEncoder {
            out.append(ch);
        }
    }
-   
+
     // -------------------- Internal implementation --------------------
 
     private void initSafeChars() {

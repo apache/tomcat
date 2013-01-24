@@ -233,18 +233,18 @@ public class OutputBuffer extends Writer
         initial = true;
         bytesWritten = 0;
         charsWritten = 0;
-        
+
         bb.recycle();
         cb.recycle();
         outputCharChunk.setChars(null, 0, 0);
         closed = false;
         suspended = false;
         doFlush = false;
-        
+
         if (conv!= null) {
             conv.recycle();
         }
-        
+
         gotEnc = false;
         enc = null;
 
@@ -447,13 +447,13 @@ public class OutputBuffer extends Writer
     // ------------------------------------------------- Chars Handling Methods
 
 
-    /** 
+    /**
      * Convert the chars to bytes, then send the data to the client.
-     * 
+     *
      * @param buf Char buffer to be written to the response
      * @param off Offset
      * @param len Length
-     * 
+     *
      * @throws IOException An underlying IOException occurred
      */
     @Override
@@ -461,7 +461,7 @@ public class OutputBuffer extends Writer
         throws IOException {
 
         outputCharChunk.setChars(buf, off, len);
-        while (outputCharChunk.getLength() > 0) { 
+        while (outputCharChunk.getLength() > 0) {
             conv.convert(outputCharChunk, bb);
             if (bb.getLength() == 0) {
                 // Break out of the loop if more chars are needed to produce any output
