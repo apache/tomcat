@@ -145,6 +145,22 @@ do
     fi
 done
 
+# check the release if release.
+if [ "x$JKJNIEXT" = "xtrunk" ]; then
+   echo "Not a release"
+else
+   grep TCN_IS_DEV_VERSION ${JKJNIDIST}/jni/native/include/tcn_version.h | grep 0
+   if [ $? -ne 0 ]; then
+     echo "Check: ${JKJNIDIST}/jni/native/include/tcn_version.h it says -dev"
+     exit 1
+   fi
+   WIN_VERSION=`grep TCN_VERSION ${JKJNIDIST}/jni/native/os/win32/libtcnative.rc | grep define | awk ' { print $3 } '`
+   if [ "x\"$JKJNIVER\"" != "x$WIN_VERSION" ]; then
+     echo "Check: ${JKJNIDIST}/jni/native/os/win32/libtcnative.rc says $WIN_VERSION (FILEVERSION, PRODUCTVERSION, TCN_VERSION"
+     exit 1
+   fi
+fi
+
 top="`pwd`"
 cd ${JKJNIDIST}/jni/xdocs
 ant
