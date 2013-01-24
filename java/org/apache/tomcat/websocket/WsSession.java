@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -50,6 +51,8 @@ public class WsSession implements Session {
     private MessageHandler binaryMessageHandler = null;
     private MessageHandler.Basic<PongMessage> pongMessageHandler = null;
     private volatile boolean open = true;
+    private final Object closeLock = new Object();
+    private Map<String,Object> userProperties = new ConcurrentHashMap<>();
 
 
     /**
@@ -217,27 +220,36 @@ public class WsSession implements Session {
 
     @Override
     public void close(CloseReason closeReason) throws IOException {
-        open = false;
-
-        // Send the close message
-        // 125 is maximum size for the payload of a control message
-        ByteBuffer msg = ByteBuffer.allocate(125);
-        msg.putShort((short) closeReason.getCloseCode().getCode());
-        String reason = closeReason.getReasonPhrase();
-        if (reason != null && reason.length() > 0) {
-            msg.put(reason.getBytes(UTF8));
+        // Double-checked locking. OK because open is volatile
+        if (!open) {
+            return;
         }
-        msg.flip();
-        wsRemoteEndpoint.sendMessageBlocking(Constants.OPCODE_CLOSE, msg, true);
+        synchronized (closeLock) {
+            if (!open) {
+                return;
+            }
+            open = false;
 
-        // Fire the onClose event
-        Thread t = Thread.currentThread();
-        ClassLoader cl = t.getContextClassLoader();
-        t.setContextClassLoader(applicationClassLoader);
-        try {
-            localEndpoint.onClose(this, closeReason);
-        } finally {
-            t.setContextClassLoader(cl);
+            // Send the close message
+            // 125 is maximum size for the payload of a control message
+            ByteBuffer msg = ByteBuffer.allocate(125);
+            msg.putShort((short) closeReason.getCloseCode().getCode());
+            String reason = closeReason.getReasonPhrase();
+            if (reason != null && reason.length() > 0) {
+                msg.put(reason.getBytes(UTF8));
+            }
+            msg.flip();
+            wsRemoteEndpoint.sendMessageBlocking(Constants.OPCODE_CLOSE, msg, true);
+
+            // Fire the onClose event
+            Thread t = Thread.currentThread();
+            ClassLoader cl = t.getContextClassLoader();
+            t.setContextClassLoader(applicationClassLoader);
+            try {
+                localEndpoint.onClose(this, closeReason);
+            } finally {
+                t.setContextClassLoader(cl);
+            }
         }
     }
 
@@ -272,8 +284,7 @@ public class WsSession implements Session {
 
     @Override
     public Map<String,Object> getUserProperties() {
-        // TODO Auto-generated method stub
-        return null;
+        return userProperties;
     }
 
 

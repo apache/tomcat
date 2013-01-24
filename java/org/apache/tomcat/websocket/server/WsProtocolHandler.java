@@ -29,6 +29,7 @@ import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfiguration;
+import javax.websocket.WebSocketContainer;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -49,15 +50,20 @@ public class WsProtocolHandler implements ProtocolHandler {
     private final Endpoint ep;
     private final EndpointConfiguration endpointConfig;
     private final ClassLoader applicationClassLoader;
+    private final int binaryBufferSize;
+    private final int textBufferSize;
 
     private WsSession wsSession;
 
 
     public WsProtocolHandler(Endpoint ep,
-            EndpointConfiguration endpointConfig) {
+            EndpointConfiguration endpointConfig,
+            WebSocketContainer wsc) {
         this.ep = ep;
         this.endpointConfig = endpointConfig;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
+        binaryBufferSize = (int) wsc.getMaxBinaryMessageBufferSize();
+        textBufferSize = (int) wsc.getMaxTextMessageBufferSize();
     }
 
 
@@ -79,11 +85,12 @@ public class WsProtocolHandler implements ProtocolHandler {
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
         try {
-            WsFrameServer wsFrame = new WsFrameServer(sis, wsSession);
-            sis.setReadListener(new WsReadListener(this, wsFrame));
             WsRemoteEndpointServer wsRemoteEndpointServer =
                     new WsRemoteEndpointServer(sos);
             wsSession = new WsSession(ep, wsRemoteEndpointServer);
+            WsFrameServer wsFrame = new WsFrameServer(
+                    sis, binaryBufferSize, textBufferSize, wsSession);
+            sis.setReadListener(new WsReadListener(this, wsFrame));
             sos.setWriteListener(
                     new WsWriteListener(this, wsRemoteEndpointServer));
             ep.onOpen(wsSession, endpointConfig);
@@ -107,13 +114,11 @@ public class WsProtocolHandler implements ProtocolHandler {
 
 
     private void close(CloseReason cr) {
-        if (wsSession.isOpen()) {
-            try {
-                wsSession.close(cr);
-            } catch (IOException e) {
-                if (log.isInfoEnabled()) {
-                    log.info(sm.getString("wsProtocolHandler.closeFailed"), e);
-                }
+        try {
+            wsSession.close(cr);
+        } catch (IOException e) {
+            if (log.isInfoEnabled()) {
+                log.info(sm.getString("wsProtocolHandler.closeFailed"), e);
             }
         }
     }

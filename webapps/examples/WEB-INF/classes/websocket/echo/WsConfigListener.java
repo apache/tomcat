@@ -39,12 +39,6 @@ public class WsConfigListener implements ServletContextListener {
         } catch (DeploymentException e) {
             throw new IllegalStateException(e);
         }
-
-        String strReadBufferSize =
-                servletContext.getInitParameter("wsReadBufferSize");
-        if (strReadBufferSize != null) {
-            sc.setReadBufferSize(Integer.valueOf(strReadBufferSize).intValue());
-        }
     }
 
 

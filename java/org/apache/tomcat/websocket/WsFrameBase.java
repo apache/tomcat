@@ -51,6 +51,7 @@ public abstract class WsFrameBase {
     private final CharBuffer controlBufferText = CharBuffer.allocate(125);
 
     // Attributes of the current message
+    // TODO: May need a new ByteBuffer per message
     private final ByteBuffer messageBufferBinary;
     private final CharBuffer messageBufferText;
     private final CharsetDecoder utf8DecoderControl = new Utf8Decoder().
@@ -76,20 +77,13 @@ public abstract class WsFrameBase {
     private int readPos = 0;
     protected int writePos = 0;
 
-    public WsFrameBase(WsSession wsSession) {
+    public WsFrameBase(int binaryBufferSize, int textBufferSize,
+            WsSession wsSession) {
+
+        inputBuffer = new byte[binaryBufferSize];
+        messageBufferBinary = ByteBuffer.allocate(binaryBufferSize);
+        messageBufferText = CharBuffer.allocate(textBufferSize);
         this.wsSession = wsSession;
-
-        // TODO This needs to work for client and server side code
-        /*
-        int readBufferSize =
-                ServerContainerImpl.getServerContainer().getReadBufferSize();
-        */
-        // Temp hack until the above is resolved
-        int readBufferSize = 8192;
-
-        inputBuffer = new byte[readBufferSize];
-        messageBufferBinary = ByteBuffer.allocate(readBufferSize);
-        messageBufferText = CharBuffer.allocate(readBufferSize);
     }
 
 
@@ -414,7 +408,11 @@ public abstract class WsFrameBase {
             } else {
                 // Ran out of message buffer - flush it
                 messageBufferBinary.flip();
-                sendMessageBinary(false);
+                ByteBuffer copy =
+                        ByteBuffer.allocate(messageBufferBinary.limit());
+                copy.put(messageBufferBinary);
+                copy.flip();
+                sendMessageBinary(copy, false);
                 messageBufferBinary.clear();
             }
         }
@@ -426,7 +424,11 @@ public abstract class WsFrameBase {
         } else {
             // Message is complete - send it
             messageBufferBinary.flip();
-            sendMessageBinary(true);
+            ByteBuffer copy =
+                    ByteBuffer.allocate(messageBufferBinary.limit());
+            copy.put(messageBufferBinary);
+            copy.flip();
+            sendMessageBinary(copy, true);
             messageBufferBinary.clear();
             newMessage();
         }
@@ -436,18 +438,17 @@ public abstract class WsFrameBase {
 
 
     @SuppressWarnings("unchecked")
-    private void sendMessageBinary(boolean last) {
+    private void sendMessageBinary(ByteBuffer msg, boolean last) {
         MessageHandler mh = wsSession.getBinaryMessageHandler();
         if (mh != null) {
             if (mh instanceof MessageHandler.Async<?>) {
-                ((MessageHandler.Async<ByteBuffer>) mh).onMessage(
-                        messageBufferBinary, last);
+                ((MessageHandler.Async<ByteBuffer>) mh).onMessage(msg, last);
             } else {
-                ((MessageHandler.Basic<ByteBuffer>) mh).onMessage(
-                        messageBufferBinary);
+                ((MessageHandler.Basic<ByteBuffer>) mh).onMessage(msg);
             }
         }
     }
+
 
     private void newMessage() {
         messageBufferBinary.clear();
