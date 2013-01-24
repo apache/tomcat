@@ -84,8 +84,8 @@ public class WsServlet extends HttpServlet {
             return;
         }
         // Need an Endpoint instance to progress this further
-        ServerContainerImpl cp = ServerContainerImpl.getServerContainer();
-        ServerEndpointConfiguration sec = cp.getServerEndpointConfiguration(
+        ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
+        ServerEndpointConfiguration sec = sc.getServerEndpointConfiguration(
                 req.getServletPath(), req.getPathInfo());
         // Origin check
         String origin = req.getHeader("Origin");
@@ -132,7 +132,7 @@ public class WsServlet extends HttpServlet {
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ServletException(e);
         }
-        ProtocolHandler wsHandler = new WsProtocolHandler(ep, sec);
+        ProtocolHandler wsHandler = new WsProtocolHandler(ep, sec, sc);
         req.upgrade(wsHandler);
     }
 

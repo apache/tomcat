@@ -53,12 +53,24 @@ public interface WebSocketContainer {
 
     void setMaxSessionIdleTimeout(long timeout);
 
+    /**
+     * Get the current maximum buffer size (in bytes) for binary messages.
+     */
     long getMaxBinaryMessageBufferSize();
 
+    /**
+     * Set the current maximum buffer size (in bytes) for binary messages.
+     */
     void setMaxBinaryMessageBufferSize(long max);
 
+    /**
+     * Get the current maximum buffer size (in characters) for text messages.
+     */
     long getMaxTextMessageBufferSize();
 
+    /**
+     * Set the current maximum buffer size (in characters) for text messages.
+     */
     void setMaxTextMessageBufferSize(long max);
 
     Set<Extension> getInstalledExtensions();

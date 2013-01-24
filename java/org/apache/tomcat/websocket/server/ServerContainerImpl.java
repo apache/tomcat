@@ -37,7 +37,13 @@ import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
 
 /**
  * Provides a per class loader (i.e. per web application) instance of a
- * ServerContainer.
+ * ServerContainer. Web application wide defaults may be configured by setting
+ * the following sevrlet context initialisation parameters to the desired
+ * values.
+ * <ul>
+ * <li>{@link Constants#BINARY_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM}</li>
+ * <li>{@link Constants#TEXT_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM}</li>
+ * </ul>
  */
 public class ServerContainerImpl extends WsWebSocketContainer {
 
@@ -71,7 +77,6 @@ public class ServerContainerImpl extends WsWebSocketContainer {
     private Map<String,Class<?>> pojoMap = new ConcurrentHashMap<>();
     private Map<Class<?>,PojoMethodMapping> pojoMethodMap =
             new ConcurrentHashMap<>();
-    private volatile int readBufferSize = 8192;
 
 
     private ServerContainerImpl() {
@@ -81,6 +86,19 @@ public class ServerContainerImpl extends WsWebSocketContainer {
 
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
+
+        // Configure servlet context wide defaults
+        String value = servletContext.getInitParameter(
+                Constants.BINARY_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM);
+        if (value != null) {
+            setMaxBinaryMessageBufferSize(Long.parseLong(value));
+        }
+
+        value = servletContext.getInitParameter(
+                Constants.TEXT_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM);
+        if (value != null) {
+            setMaxTextMessageBufferSize(Long.parseLong(value));
+        }
     }
 
 
@@ -191,18 +209,6 @@ public class ServerContainerImpl extends WsWebSocketContainer {
         }
         throw new IllegalStateException(sm.getString(
                 "serverContainer.missingEndpoint", servletPath));
-    }
-
-
-
-    public int getReadBufferSize() {
-        return readBufferSize;
-    }
-
-
-
-    public void setReadBufferSize(int readBufferSize) {
-        this.readBufferSize = readBufferSize;
     }
 
 

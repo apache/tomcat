@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.websocket.pojo;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.websocket.CloseReason;
@@ -66,17 +65,7 @@ public class PojoEndpoint extends Endpoint {
 
     @Override
     public void onClose(Session session, CloseReason closeReason) {
-        if (methodMapping.getOnClose() == null) {
-            // If the POJO doesn't handle the close, close the connection
-            try {
-                if (session.isOpen()) {
-                    session.close(closeReason);
-                }
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        } else {
+        if (methodMapping.getOnClose() != null) {
             try {
                 methodMapping.getOnClose().invoke(pojo,
                         methodMapping.getOnCloseArgs(pathInfo, session));

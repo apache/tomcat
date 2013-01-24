@@ -52,7 +52,10 @@ public class WsWebSocketContainer implements WebSocketContainer {
     private static final Random random = new Random();
     private static final Charset iso88591 = Charset.forName("ISO-8859-1");
     private static final byte[] crlf = new byte[] {13, 10};
+    private static final int defaultBufferSize = 8 * 1024;
 
+    private int binaryBufferSize = defaultBufferSize;
+    private int textBufferSize = defaultBufferSize;
 
     @Override
     public Session connectToServer(Class<?> annotatedEndpointClass, URI path)
@@ -120,8 +123,8 @@ public class WsWebSocketContainer implements WebSocketContainer {
                 thisWrite = fWrite.get();
                 toWrite -= thisWrite.intValue();
             }
-            // TODO Needs to be same size or smaller than WsFrame input buffer
-            response = ByteBuffer.allocate(4 * 1024);
+            // Same size as the WsFrame input buffer
+            response = ByteBuffer.allocate(binaryBufferSize);
 
             HandshakeResponse handshakeResponse =
                     processResponse(response, channel);
@@ -148,8 +151,8 @@ public class WsWebSocketContainer implements WebSocketContainer {
 
         // Object creation will trigger input processing
         @SuppressWarnings("unused")
-        WsFrameClient wsFrameClient =
-                new WsFrameClient(response, channel, wsSession);
+        WsFrameClient wsFrameClient = new WsFrameClient(response, channel,
+                binaryBufferSize, textBufferSize, wsSession);
 
         return wsSession;
     }
@@ -358,27 +361,33 @@ public class WsWebSocketContainer implements WebSocketContainer {
 
     @Override
     public long getMaxBinaryMessageBufferSize() {
-        // TODO Auto-generated method stub
-        return 0;
+        return binaryBufferSize;
     }
 
 
     @Override
     public void setMaxBinaryMessageBufferSize(long max) {
-        // TODO Auto-generated method stub
+        if (max > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(
+                    sm.getString("wsWebSocketContainer.maxBuffer"));
+        }
+        binaryBufferSize = (int) max;
     }
 
 
     @Override
     public long getMaxTextMessageBufferSize() {
-        // TODO Auto-generated method stub
-        return 0;
+        return textBufferSize;
     }
 
 
     @Override
     public void setMaxTextMessageBufferSize(long max) {
-        // TODO Auto-generated method stub
+        if (max > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(
+                    sm.getString("wsWebSocketContainer.maxBuffer"));
+        }
+        textBufferSize = (int) max;
     }
 
 
