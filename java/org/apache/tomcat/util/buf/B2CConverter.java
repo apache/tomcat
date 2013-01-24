@@ -34,10 +34,6 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class B2CConverter {
 
-
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( B2CConverter.class );
-
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
@@ -70,7 +66,7 @@ public class B2CConverter {
     }
 
     public static Charset getCharset(String enc)
-            throws UnsupportedEncodingException{
+            throws UnsupportedEncodingException {
 
         // Encoding names should all be ASCII
         String lowerCaseEnc = enc.toLowerCase(Locale.US);
@@ -82,7 +78,7 @@ public class B2CConverter {
      * Only to be used when it is known that the encoding name is in lower case.
      */
     public static Charset getCharsetLower(String lowerCaseEnc)
-            throws UnsupportedEncodingException{
+            throws UnsupportedEncodingException {
 
         Charset charset = encodingToCharsetCache.get(lowerCaseEnc);
 
@@ -103,12 +99,7 @@ public class B2CConverter {
      */
     protected ByteBuffer leftovers = null;
 
-    private final String encoding;
-
-    public B2CConverter(String encoding)
-        throws IOException
-    {
-        this.encoding=encoding;
+    public B2CConverter(String encoding) throws IOException {
         byte[] left = new byte[4];
         leftovers = ByteBuffer.wrap(left);
         decoder = getCharset(encoding).newDecoder();
@@ -133,7 +124,7 @@ public class B2CConverter {
      * @param cc char output
      */
     public void convert(ByteChunk bc, CharChunk cc)
-        throws IOException {
+            throws IOException {
         if ((bb == null) || (bb.array() != bc.getBuffer())) {
             // Create a new byte buffer if anything changed
             bb = ByteBuffer.wrap(bc.getBuffer(), bc.getStart(), bc.getLength());
@@ -169,13 +160,14 @@ public class B2CConverter {
             bb.position(bc.getStart());
             leftovers.position(0);
         }
-        // Do the decoding and get the results into the byte chunk and the char chunk
+        // Do the decoding and get the results into the byte chunk and the char
+        // chunk
         result = decoder.decode(bb, cb, false);
         if (result.isError() || result.isMalformed()) {
             result.throwException();
         } else if (result.isOverflow()) {
-            // Propagate current positions to the byte chunk and char chunk, if this
-            // continues the char buffer will get resized
+            // Propagate current positions to the byte chunk and char chunk, if
+            // this continues the char buffer will get resized
             bc.setOffset(bb.position());
             cc.setEnd(cb.position());
         } else if (result.isUnderflow()) {
@@ -190,5 +182,4 @@ public class B2CConverter {
             }
         }
     }
-
 }
