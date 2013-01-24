@@ -56,7 +56,7 @@ public final class C2BConverter {
         leftovers = CharBuffer.wrap(left);
     }
 
-    /** 
+    /**
      * Reset the encoder state.
      */
     public void recycle() {
@@ -70,15 +70,15 @@ public final class C2BConverter {
 
     /**
      * Convert the given characters to bytes.
-     * 
+     *
      * @param cc char input
      * @param bc byte output
      */
-    public void convert(CharChunk cc, ByteChunk bc) 
+    public void convert(CharChunk cc, ByteChunk bc)
     throws IOException {
         if ((bb == null) || (bb.array() != bc.getBuffer())) {
             // Create a new byte buffer if anything changed
-            bb = ByteBuffer.wrap(bc.getBuffer(), bc.getEnd(), 
+            bb = ByteBuffer.wrap(bc.getBuffer(), bc.getEnd(),
                     bc.getBuffer().length - bc.getEnd());
         } else {
             // Initialize the byte buffer
@@ -87,7 +87,7 @@ public final class C2BConverter {
         }
         if ((cb == null) || (cb.array() != cc.getBuffer())) {
             // Create a new char buffer if anything changed
-            cb = CharBuffer.wrap(cc.getBuffer(), cc.getStart(), 
+            cb = CharBuffer.wrap(cc.getBuffer(), cc.getStart(),
                     cc.getLength());
         } else {
             // Initialize the char buffer
@@ -132,5 +132,5 @@ public final class C2BConverter {
             }
         }
     }
-    
+
 }

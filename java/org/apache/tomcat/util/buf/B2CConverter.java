@@ -114,7 +114,7 @@ public class B2CConverter {
         decoder = getCharset(encoding).newDecoder();
     }
 
-    /** 
+    /**
      * Reset the decoder state.
      */
     public void recycle() {
@@ -128,11 +128,11 @@ public class B2CConverter {
 
     /**
      * Convert the given bytes to characters.
-     * 
+     *
      * @param bc byte input
      * @param cc char output
      */
-    public void convert(ByteChunk bc, CharChunk cc) 
+    public void convert(ByteChunk bc, CharChunk cc)
         throws IOException {
         if ((bb == null) || (bb.array() != bc.getBuffer())) {
             // Create a new byte buffer if anything changed
@@ -144,7 +144,7 @@ public class B2CConverter {
         }
         if ((cb == null) || (cb.array() != cc.getBuffer())) {
             // Create a new char buffer if anything changed
-            cb = CharBuffer.wrap(cc.getBuffer(), cc.getEnd(), 
+            cb = CharBuffer.wrap(cc.getBuffer(), cc.getEnd(),
                     cc.getBuffer().length - cc.getEnd());
         } else {
             // Initialize the char buffer
