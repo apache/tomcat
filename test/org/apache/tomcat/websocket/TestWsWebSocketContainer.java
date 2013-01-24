@@ -110,7 +110,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         private final CountDownLatch latch;
 
-        private List<String> messages = new ArrayList<>();
+        private volatile List<String> messages = new ArrayList<>();
 
         public TesterMessageHandlerString(int latchCount) {
             if (latchCount > 0) {
