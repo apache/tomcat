@@ -125,6 +125,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection>
+    <changelog>
+      <update>
+        Update to Commons Daemon 1.0.12. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.35 (markt)" rtext="2013-01-16">
   <subsection name="Catalina">
