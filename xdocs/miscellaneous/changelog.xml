@@ -36,6 +36,13 @@
   new documentation project for Tomcat Native was started.
   </p>
 </section>
+<section name="Changes between 1.1.25 and 1.1.26">
+  <changelog>
+    <update>
+      add clearOptions function to allow access to OpenSSL's SSL_CTX_clear_options function. (schultz)
+    </update>
+  </changelog>
+</section>
 <section name="Changes between 1.1.24 and 1.1.25">
   <changelog>
     <fix>
