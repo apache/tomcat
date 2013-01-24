@@ -275,8 +275,7 @@ public abstract class WsFrameBase {
                     reason = controlBufferText.toString();
                 }
             }
-            wsSession.onClose(
-                    new CloseReason(Util.getCloseCode(code), reason));
+            wsSession.close(new CloseReason(Util.getCloseCode(code), reason));
         } else if (opCode == Constants.OPCODE_PING) {
             if (wsSession.isOpen()) {
                 wsSession.getRemote().sendPong(controlBufferBinary);
@@ -498,7 +497,6 @@ public abstract class WsFrameBase {
                                 Integer.valueOf(inputBuffer.length),
                                 Long.valueOf(payloadLength)));
                 wsSession.close(cr);
-                wsSession.onClose(cr);
                 throw new IOException(cr.getReasonPhrase());
             }
             makeRoom();
