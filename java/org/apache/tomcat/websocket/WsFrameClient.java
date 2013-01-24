@@ -31,13 +31,17 @@ public class WsFrameClient extends WsFrameBase {
     private final CompletionHandler<Integer,Void> handler;
 
     public WsFrameClient(ByteBuffer response, AsynchronousSocketChannel channel,
-            WsSession wsSession) throws IOException {
+            WsSession wsSession) {
         super(wsSession);
         this.response = response;
         this.channel = channel;
         this.handler = new WsFrameClientCompletionHandler();
 
-        processSocketRead();
+        try {
+            processSocketRead();
+        } catch (IOException e) {
+            close(e);
+        }
     }
 
 
@@ -60,6 +64,17 @@ public class WsFrameClient extends WsFrameBase {
 
         // Get some more data
         channel.read(response, null, handler);
+    }
+
+
+    private final void close(Throwable t) {
+        CloseReason cr = new CloseReason(
+                CloseCodes.CLOSED_ABNORMALLY, t.getMessage());
+        try {
+            wsSession.close(cr);
+        } catch (IOException ignore) {
+            // Ignore
+        }
     }
 
 
@@ -86,16 +101,6 @@ public class WsFrameClient extends WsFrameBase {
         @Override
         public void failed(Throwable exc, Void attachment) {
             close(exc);
-        }
-
-        private final void close(Throwable t) {
-            CloseReason cr = new CloseReason(
-                    CloseCodes.CLOSED_ABNORMALLY, t.getMessage());
-            try {
-                wsSession.close(cr);
-            } catch (IOException ignore) {
-                // Ignore
-            }
         }
     }
 }
