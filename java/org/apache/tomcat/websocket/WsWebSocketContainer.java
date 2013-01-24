@@ -138,21 +138,18 @@ public class WsWebSocketContainer implements WebSocketContainer {
         try {
             endpoint = clazz.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            // TODO i18n
-            throw new DeploymentException("TDB", e);
+            throw new DeploymentException(sm.getString(
+                    "wsWebSocketContainer.endpointCreateFail", clazz.getName()),
+                    e);
         }
         WsSession wsSession = new WsSession(endpoint, wsRemoteEndpointClient);
 
         endpoint.onOpen(wsSession, clientEndpointConfiguration);
 
-        try {
-            // Object creation will trigger input processing
-            @SuppressWarnings("unused")
-            WsFrameClient wsFrameClient =
-                    new WsFrameClient(response, channel, wsSession);
-        } catch (IOException e) {
-            throw new DeploymentException("", e);
-        }
+        // Object creation will trigger input processing
+        @SuppressWarnings("unused")
+        WsFrameClient wsFrameClient =
+                new WsFrameClient(response, channel, wsSession);
 
         return wsSession;
     }
