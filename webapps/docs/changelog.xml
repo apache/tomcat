@@ -75,6 +75,10 @@
         <bug>54458</bug>: Include exception when logging errors in the
         DataSourceRealm. Patch provided by  Violeta Georgieva. (markt)
       </fix>
+      <fix>
+        <bug>54483</bug>: Correct one of the Spanish translations. Based on a
+        suggestion from adinamita. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
