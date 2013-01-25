@@ -457,8 +457,8 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
             if (fragmented) {
                 // Currently fragmented
                 if (text != isText) {
-                    // TODO i18n
-                    throw new IllegalStateException();
+                    throw new IllegalStateException(
+                            sm.getString("messageSendStateMachine.changeType"));
                 }
                 nextText = text;
                 nextFragmented = !isLast;
