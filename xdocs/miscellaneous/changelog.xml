@@ -38,6 +38,11 @@
 </section>
 <section name="Changes between 1.1.25 and 1.1.26">
   <changelog>
+    <fix>
+      <bug>54468</bug>: Fix FIPS mode for listeners when using OpenSSL 1.0.1c
+      and later; resolves 'Low level API call to digest MD5 forbidden in FIPS
+      mode!' errors. (wrowe)
+    </fix>
     <update>
       add clearOptions function to allow access to OpenSSL's SSL_CTX_clear_options function. (schultz)
     </update>

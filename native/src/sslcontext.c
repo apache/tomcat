@@ -148,7 +148,7 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
     /* Default session context id and cache size */
     SSL_CTX_sess_set_cache_size(c->ctx, SSL_DEFAULT_CACHE_SIZE);
     EVP_Digest((const unsigned char *)SSL_DEFAULT_VHOST_NAME,
-               (unsigned long)(sizeof(SSL_DEFAULT_VHOST_NAME) - 1),
+               (unsigned long)((sizeof SSL_DEFAULT_VHOST_NAME) - 1),
                &(c->context_id[0]), NULL, EVP_sha1(), NULL);
     if (mode) {
         SSL_CTX_set_tmp_rsa_callback(c->ctx, SSL_callback_tmp_RSA);
