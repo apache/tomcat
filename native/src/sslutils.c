@@ -404,25 +404,6 @@ DH *SSL_callback_tmp_DH(SSL *ssl, int export, int keylen)
     return (DH *)SSL_temp_keys[idx];
 }
 
-void SSL_vhost_algo_id(const unsigned char *vhost_id, unsigned char *md, int algo)
-{
-    MD5_CTX c;
-    MD5_Init(&c);
-    MD5_Update(&c, vhost_id, MD5_DIGEST_LENGTH);
-    switch (algo) {
-        case SSL_ALGO_UNKNOWN:
-            MD5_Update(&c, "UNKNOWN", 7);
-        break;
-        case SSL_ALGO_RSA:
-            MD5_Update(&c, "RSA", 3);
-        break;
-        case SSL_ALGO_DSA:
-            MD5_Update(&c, "DSA", 3);
-        break;
-    }
-    MD5_Final(md, &c);
-}
-
 /*
  * Read a file that optionally contains the server certificate in PEM
  * format, possibly followed by a sequence of CA certificates that

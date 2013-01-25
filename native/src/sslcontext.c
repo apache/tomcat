@@ -147,9 +147,9 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
 #endif
     /* Default session context id and cache size */
     SSL_CTX_sess_set_cache_size(c->ctx, SSL_DEFAULT_CACHE_SIZE);
-    MD5((const unsigned char *)SSL_DEFAULT_VHOST_NAME,
-        (unsigned long)(sizeof(SSL_DEFAULT_VHOST_NAME) - 1),
-        &(c->context_id[0]));
+    EVP_Digest((const unsigned char *)SSL_DEFAULT_VHOST_NAME,
+               (unsigned long)(sizeof(SSL_DEFAULT_VHOST_NAME) - 1),
+               &(c->context_id[0]), NULL, EVP_sha1(), NULL);
     if (mode) {
         SSL_CTX_set_tmp_rsa_callback(c->ctx, SSL_callback_tmp_RSA);
         SSL_CTX_set_tmp_dh_callback(c->ctx,  SSL_callback_tmp_DH);
@@ -195,9 +195,9 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setContextId)(TCN_STDARGS, jlong ctx,
     TCN_ASSERT(ctx != 0);
     UNREFERENCED(o);
     if (J2S(id)) {
-        MD5((const unsigned char *)J2S(id),
-            (unsigned long)strlen(J2S(id)),
-            &(c->context_id[0]));
+        EVP_Digest((const unsigned char *)J2S(id),
+                   (unsigned long)strlen(J2S(id)),
+                   &(c->context_id[0]), NULL, EVP_sha1(), NULL);
     }
     TCN_FREE_CSTRING(id);
 }

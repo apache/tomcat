@@ -49,7 +49,6 @@
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 #include <openssl/x509v3.h>
-#include <openssl/md5.h>
 /* Avoid tripping over an engine build installed globally and detected
  * when the user points at an explicit non-engine flavor of OpenSSL
  */
@@ -234,7 +233,7 @@ struct tcn_ssl_ctxt_t {
     BIO             *bio_os;
     BIO             *bio_is;
 
-    unsigned char   context_id[MD5_DIGEST_LENGTH];
+    unsigned char   context_id[SHA_DIGEST_LENGTH];
 
     int             protocol;
     /* we are one or the other */
@@ -309,7 +308,6 @@ DH         *SSL_dh_get_param_from_file(const char *);
 RSA        *SSL_callback_tmp_RSA(SSL *, int, int);
 DH         *SSL_callback_tmp_DH(SSL *, int, int);
 void        SSL_callback_handshake(const SSL *, int, int);
-void        SSL_vhost_algo_id(const unsigned char *, unsigned char *, int);
 int         SSL_CTX_use_certificate_chain(SSL_CTX *, const char *, int);
 int         SSL_callback_SSL_verify(int, X509_STORE_CTX *);
 int         SSL_rand_seed(const char *file);
