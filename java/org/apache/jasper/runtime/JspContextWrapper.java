@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.runtime;
 
 import java.io.IOException;
@@ -78,10 +77,22 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 
     private final HashMap<String, Object> originalNestedVars;
 
+    private ServletContext servletContext = null;
+
+    private ELContext elContext = null;
+
+    private PageContext rootJspCtxt;
+
     public JspContextWrapper(JspContext jspContext,
             ArrayList<String> nestedVars, ArrayList<String> atBeginVars,
             ArrayList<String> atEndVars, Map<String,String> aliases) {
         this.invokingJspCtxt = (PageContext) jspContext;
+        if (jspContext instanceof JspContextWrapper) {
+            rootJspCtxt = ((JspContextWrapper)jspContext).rootJspCtxt;
+        }
+        else {
+            rootJspCtxt = invokingJspCtxt;
+        }
         this.nestedVars = nestedVars;
         this.atBeginVars = atBeginVars;
         this.atEndVars = atEndVars;
@@ -126,7 +137,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
             return pageAttributes.get(name);
         }
 
-        return invokingJspCtxt.getAttribute(name, scope);
+        return rootJspCtxt.getAttribute(name, scope);
     }
 
     @Override
@@ -159,7 +170,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
                 removeAttribute(name, PAGE_SCOPE);
             }
         } else {
-            invokingJspCtxt.setAttribute(name, value, scope);
+            rootJspCtxt.setAttribute(name, value, scope);
         }
     }
 
@@ -173,13 +184,13 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 
         Object o = pageAttributes.get(name);
         if (o == null) {
-            o = invokingJspCtxt.getAttribute(name, REQUEST_SCOPE);
+            o = rootJspCtxt.getAttribute(name, REQUEST_SCOPE);
             if (o == null) {
                 if (getSession() != null) {
-                    o = invokingJspCtxt.getAttribute(name, SESSION_SCOPE);
+                    o = rootJspCtxt.getAttribute(name, SESSION_SCOPE);
                 }
                 if (o == null) {
-                    o = invokingJspCtxt.getAttribute(name, APPLICATION_SCOPE);
+                    o = rootJspCtxt.getAttribute(name, APPLICATION_SCOPE);
                 }
             }
         }
@@ -196,11 +207,11 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
         }
 
         pageAttributes.remove(name);
-        invokingJspCtxt.removeAttribute(name, REQUEST_SCOPE);
+        rootJspCtxt.removeAttribute(name, REQUEST_SCOPE);
         if (getSession() != null) {
-            invokingJspCtxt.removeAttribute(name, SESSION_SCOPE);
+            rootJspCtxt.removeAttribute(name, SESSION_SCOPE);
         }
-        invokingJspCtxt.removeAttribute(name, APPLICATION_SCOPE);
+        rootJspCtxt.removeAttribute(name, APPLICATION_SCOPE);
     }
 
     @Override
@@ -214,7 +225,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
         if (scope == PAGE_SCOPE) {
             pageAttributes.remove(name);
         } else {
-            invokingJspCtxt.removeAttribute(name, scope);
+            rootJspCtxt.removeAttribute(name, scope);
         }
     }
 
@@ -229,7 +240,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
         if (pageAttributes.get(name) != null) {
             return PAGE_SCOPE;
         } else {
-            return invokingJspCtxt.getAttributesScope(name);
+            return rootJspCtxt.getAttributesScope(name);
         }
     }
 
@@ -239,7 +250,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
             return Collections.enumeration(pageAttributes.keySet());
         }
 
-        return invokingJspCtxt.getAttributeNamesInScope(scope);
+        return rootJspCtxt.getAttributeNamesInScope(scope);
     }
 
     @Override
@@ -249,12 +260,12 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 
     @Override
     public JspWriter getOut() {
-        return invokingJspCtxt.getOut();
+        return rootJspCtxt.getOut();
     }
 
     @Override
     public HttpSession getSession() {
-        return invokingJspCtxt.getSession();
+        return rootJspCtxt.getSession();
     }
 
     @Override
@@ -269,7 +280,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 
     @Override
     public ServletResponse getResponse() {
-        return invokingJspCtxt.getResponse();
+        return rootJspCtxt.getResponse();
     }
 
     @Override
@@ -284,7 +295,10 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 
     @Override
     public ServletContext getServletContext() {
-        return invokingJspCtxt.getServletContext();
+        if (servletContext == null) {
+            servletContext = rootJspCtxt.getServletContext();
+        }
+        return servletContext;
     }
 
     @Override
@@ -484,7 +498,10 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
     public ELContext getELContext() {
         // instead decorate!!!
 
-        return this.invokingJspCtxt.getELContext();
+        if (elContext == null) {
+            elContext = rootJspCtxt.getELContext();
+        }
+        return elContext;
 
         /*
         if (this.elContext != null) {
