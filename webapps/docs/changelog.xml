@@ -140,7 +140,7 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection>
+  <subsection name="Other">
     <changelog>
       <update>
         Update to Commons Daemon 1.0.12. (markt)
