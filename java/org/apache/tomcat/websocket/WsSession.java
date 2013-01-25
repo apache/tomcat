@@ -46,6 +46,7 @@ public class WsSession implements Session {
     private final Endpoint localEndpoint;
     private final WsRemoteEndpointBase wsRemoteEndpoint;
     private final ClassLoader applicationClassLoader;
+    private final WebSocketContainer webSocketContainer;
 
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
@@ -65,17 +66,18 @@ public class WsSession implements Session {
      * @param wsRemoteEndpoint
      */
     public WsSession(Endpoint localEndpoint,
-            WsRemoteEndpointBase wsRemoteEndpoint) {
+            WsRemoteEndpointBase wsRemoteEndpoint,
+            WebSocketContainer webSocketContainer) {
         this.localEndpoint = localEndpoint;
         this.wsRemoteEndpoint = wsRemoteEndpoint;
+        this.webSocketContainer = webSocketContainer;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
 
     @Override
     public WebSocketContainer getContainer() {
-        // TODO Auto-generated method stub
-        return null;
+        return webSocketContainer;
     }
 
 

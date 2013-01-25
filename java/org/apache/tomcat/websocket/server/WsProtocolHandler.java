@@ -50,8 +50,7 @@ public class WsProtocolHandler implements ProtocolHandler {
     private final Endpoint ep;
     private final EndpointConfiguration endpointConfig;
     private final ClassLoader applicationClassLoader;
-    private final int binaryBufferSize;
-    private final int textBufferSize;
+    private final WebSocketContainer webSocketContainer;
 
     private WsSession wsSession;
 
@@ -61,9 +60,8 @@ public class WsProtocolHandler implements ProtocolHandler {
             WebSocketContainer wsc) {
         this.ep = ep;
         this.endpointConfig = endpointConfig;
+        this.webSocketContainer = wsc;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
-        binaryBufferSize = (int) wsc.getMaxBinaryMessageBufferSize();
-        textBufferSize = (int) wsc.getMaxTextMessageBufferSize();
     }
 
 
@@ -87,9 +85,13 @@ public class WsProtocolHandler implements ProtocolHandler {
         try {
             WsRemoteEndpointServer wsRemoteEndpointServer =
                     new WsRemoteEndpointServer(sos);
-            wsSession = new WsSession(ep, wsRemoteEndpointServer);
+            wsSession = new WsSession(
+                    ep, wsRemoteEndpointServer, webSocketContainer);
             WsFrameServer wsFrame = new WsFrameServer(
-                    sis, binaryBufferSize, textBufferSize, wsSession);
+                    sis,
+                    (int) webSocketContainer.getMaxBinaryMessageBufferSize(),
+                    (int) webSocketContainer.getMaxTextMessageBufferSize(),
+                    wsSession);
             sis.setReadListener(new WsReadListener(this, wsFrame));
             sos.setWriteListener(
                     new WsWriteListener(this, wsRemoteEndpointServer));
