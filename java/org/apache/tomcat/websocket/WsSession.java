@@ -39,9 +39,13 @@ import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
+import org.apache.tomcat.util.res.StringManager;
+
 public class WsSession implements Session {
 
     private static final Charset UTF8 = Charset.forName("UTF8");
+    private static final StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final Endpoint localEndpoint;
     private final WsRemoteEndpointBase wsRemoteEndpoint;
@@ -88,30 +92,31 @@ public class WsSession implements Session {
 
         if (t.equals(String.class)) {
             if (textMessageHandler != null) {
-                // TODO i18n
-                throw new IllegalStateException();
+                throw new IllegalStateException(
+                        sm.getString("wsSession.duplicateHandlerText"));
             }
             textMessageHandler = listener;
         } else if (t.equals(ByteBuffer.class)) {
             if (binaryMessageHandler != null) {
-                // TODO i18n
-                throw new IllegalStateException();
+                throw new IllegalStateException(
+                        sm.getString("wsSession.duplicateHandlerBinary"));
             }
             binaryMessageHandler = listener;
         } else if (t.equals(PongMessage.class)) {
             if (pongMessageHandler != null) {
-                // TODO i18n
-                throw new IllegalStateException();
+                throw new IllegalStateException(
+                        sm.getString("wsSession.duplicateHandlerPong"));
             }
             if (listener instanceof MessageHandler.Basic<?>) {
-                pongMessageHandler = (MessageHandler.Basic<PongMessage>) listener;
+                pongMessageHandler =
+                        (MessageHandler.Basic<PongMessage>) listener;
             } else {
-                // TODO i18n
-                throw new IllegalArgumentException();
+                throw new IllegalStateException(
+                        sm.getString("wsSession.invalidHandlerTypePong"));
             }
         } else {
-            // TODO i18n
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(
+                    sm.getString("wsSession.unknownHandler", listener, t));
         }
     }
 
@@ -144,7 +149,11 @@ public class WsSession implements Session {
         } else if (listener.equals(pongMessageHandler)) {
             pongMessageHandler = null;
         }
-        // TODO Ignore? ISE?
+
+        // ISE for now. Could swallow this silently / log this if the ISE
+        // becomes a problem
+        throw new IllegalStateException(
+                sm.getString("wsSession.removeHandlerFailed", listener));
     }
 
 
