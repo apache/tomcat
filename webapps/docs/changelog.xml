@@ -101,6 +101,12 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
+        <bug>53869</bug>: Performance improvement for pages with lots of heavily
+        nested tags. Retain a reference to the root JSP context rather than
+        traversing the hierarchy on every call. Based on a patch suggested by
+        Sheldon Shao. (markt)
+      </fix>
+      <fix>
         <bug>54440</bug>: Correct a regression caused by the changes for
         <bug>54240</bug> that broke compilation of JSPs with JspC. Patch
         provided by Sheldon Shao. (markt)
