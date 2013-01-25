@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -245,7 +246,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         private final CountDownLatch latch;
 
-        private volatile List<T> messages = new ArrayList<>();
+        private final List<T> messages = Collections
+                .synchronizedList(new ArrayList<T>());
 
         public TesterMessageHandler(CountDownLatch latch) {
             this.latch = latch;
