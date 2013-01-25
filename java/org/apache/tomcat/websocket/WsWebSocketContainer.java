@@ -145,7 +145,8 @@ public class WsWebSocketContainer implements WebSocketContainer {
                     "wsWebSocketContainer.endpointCreateFail", clazz.getName()),
                     e);
         }
-        WsSession wsSession = new WsSession(endpoint, wsRemoteEndpointClient);
+        WsSession wsSession =
+                new WsSession(endpoint, wsRemoteEndpointClient, this);
 
         endpoint.onOpen(wsSession, clientEndpointConfiguration);
 

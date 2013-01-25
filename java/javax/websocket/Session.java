@@ -25,6 +25,9 @@ import java.util.Set;
 
 public interface Session {
 
+    /**
+     * Returns the container that created this session.
+     */
     WebSocketContainer getContainer();
 
     void addMessageHandler(MessageHandler listener)
