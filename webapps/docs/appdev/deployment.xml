@@ -124,7 +124,7 @@ API Specification, version 2.3, which you should consult for more details.</p>
 <p>Like most servlet containers, Tomcat also supports mechanisms to install
 library JAR files (or unpacked classes) once, and make them visible to all
 installed web applications (without having to be included inside the web
-application itself.  The details of how Tomcat locates and shares such
+application itself).  The details of how Tomcat locates and shares such
 classes are described in the
 <a href="../class-loader-howto.html">Class Loader HOW-TO</a> documentation.
 The location commonly used within a Tomcat installation for shared code is
