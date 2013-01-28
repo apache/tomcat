@@ -210,8 +210,8 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
         int res = 0;                           /* general result state */
         /* non-static variables - sysinfo/swapctl use */
         long ret_sysconf;                      /* value returned from sysconf call */
-        long tck_dividend;                     /* factor used by transforming tick numbers to milliseconds */
-        long tck_divisor;                      /* divisor used by transforming tick numbers to milliseconds */
+        long tck_dividend;                     /* factor used by transforming tick numbers to microseconds */
+        long tck_divisor;                      /* divisor used by transforming tick numbers to microseconds */
         long sys_pagesize = sysconf(_SC_PAGESIZE); /* size of a system memory page in bytes */
         long sys_clk_tck = sysconf(_SC_CLK_TCK); /* number of system ticks per second */
         struct anoninfo info;                  /* structure for information about sizes in anonymous memory system */
@@ -283,11 +283,11 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
                 creation = (long)(now - (prusg.pr_tstamp.tv_sec -
                                          prusg.pr_create.tv_sec));
             }
-            pvals[10] = (jlong)(creation);
-            pvals[11] = (jlong)((jlong)prusg.pr_stime.tv_sec * 1000 +
-                                (prusg.pr_stime.tv_nsec / 1000000));
-            pvals[12] = (jlong)((jlong)prusg.pr_utime.tv_sec * 1000 +
-                                (prusg.pr_utime.tv_nsec / 1000000));
+            pvals[10] = (jlong)(creation * 1000000L);
+            pvals[11] = (jlong)((jlong)prusg.pr_stime.tv_sec * 1000000L +
+                                (prusg.pr_stime.tv_nsec / 1000L));
+            pvals[12] = (jlong)((jlong)prusg.pr_utime.tv_sec * 1000000L +
+                                (prusg.pr_utime.tv_nsec / 1000L));
             pvals[15] = (jlong)(prusg.pr_majf);
         }
         else {
@@ -299,7 +299,7 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
             rv = apr_get_os_error();
         }
         else {
-            tck_dividend = 1000;
+            tck_dividend = 1000000L;
             tck_divisor = sys_clk_tck;
             for (i = 0; i < 3; i++) {
                 if (tck_divisor % 2 == 0) {
