@@ -149,6 +149,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        <bug>54496</bug>: Don't use a hard-coded class name in
+        <code>MemberImpl.toString()</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
