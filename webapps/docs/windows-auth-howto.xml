@@ -220,8 +220,8 @@ com.sun.security.jgss.krb5.accept {
 
   <subsection name="Waffle">
   <p>Full details of this solution can be found through the
-  <a href="http://waffle.codeplex.com/">Waffle web site</a>. The key features
-  are:</p>
+  <a href="http://waffle.codeplex.com/"  rel="nofollow">Waffle web site</a>. The
+  key features are:</p>
   <ul>
   <li>Drop-in solution</li>
   <li>Simple configuration (no JAAS or Kerberos keytab configuration required)
@@ -232,8 +232,8 @@ com.sun.security.jgss.krb5.accept {
 
   <subsection name="Spring Security - Kerberos Extension">
   <p>Full details of this solution can be found through the
-  <a href="http://static.springsource.org/spring-security/site/extensions/krb/index.html">
-  Kerberos extension web site</a>. The key features are:</p>
+  <a href="http://static.springsource.org/spring-security/site/extensions/krb/index.html"
+  rel="nofollow"> Kerberos extension web site</a>. The key features are:</p>
   <ul>
   <li>Extension to Spring Security</li>
   <li>Requires a Kerberos keytab file to be generated</li>
@@ -243,8 +243,8 @@ com.sun.security.jgss.krb5.accept {
 
   <subsection name="SPNEGO project at SourceForge">
   <p>Full details of this solution can be found through the
-  <a href="http://spnego.sourceforge.net/index.html/">project site</a>. The key
-  features are:</p>
+  <a href="http://spnego.sourceforge.net/index.html/"  rel="nofollow">project
+  site</a>. The key features are:</p>
   <ul>
   <li>Uses Kerberos</li>
   <li>Pure Java solution</li>
@@ -253,7 +253,7 @@ com.sun.security.jgss.krb5.accept {
 
   <subsection name="Jespa">
   <p>Full details of this solution can be found through the
-  <a href="http://www.ioplex.com/">project web site</a>The key
+  <a href="http://www.ioplex.com/" rel="nofollow">project web site</a>The key
   features are:</p>
   <ul>
   <li>Pure Java solution</li>
@@ -282,12 +282,12 @@ com.sun.security.jgss.krb5.accept {
   <p>Apache httpd does not support Windows authentication out of the box but
   there are a number of third-party modules that can be used. These include:</p>
   <ol>
-  <li><a href="http://sourceforge.net/projects/mod-auth-sspi/">mod_auth_sspi</a>
-  for use on Windows platforms.</li>
-  <li><a href="http://adldap.sourceforge.net/wiki/doku.php?id=mod_auth_ntlm_winbind">
-  mod_auth_ntlm_winbind</a> for non-Windows platforms. Known to work with httpd
-  2.0.x on 32-bit platforms. Some users have reported stability issues with both
-  httpd 2.2.x builds and 64-bit Linux builds.</li>
+  <li><a href="http://sourceforge.net/projects/mod-auth-sspi/"
+  rel="nofollow">mod_auth_sspi</a> for use on Windows platforms.</li>
+  <li><a href="http://adldap.sourceforge.net/wiki/doku.php?id=mod_auth_ntlm_winbind"
+  rel="nofollow">mod_auth_ntlm_winbind</a> for non-Windows platforms. Known to
+  work with httpd 2.0.x on 32-bit platforms. Some users have reported stability
+  issues with both httpd 2.2.x builds and 64-bit Linux builds.</li>
   </ol>
   <p>There are three steps to configuring httpd to provide Windows
   authentication. They are:</p>
