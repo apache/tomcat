@@ -513,7 +513,8 @@ public class MemberImpl implements Member, java.io.Externalizable {
      */
     @Override
     public String toString()  {
-        StringBuilder buf = new StringBuilder("org.apache.catalina.tribes.membership.MemberImpl[");
+        StringBuilder buf = new StringBuilder(getClass().getName());
+        buf.append(getName()).append("[");
         buf.append(getName()).append(",");
         buf.append(getHostname()).append(",");
         buf.append(port).append(", alive=");
