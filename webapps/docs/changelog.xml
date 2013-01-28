@@ -138,6 +138,11 @@
         <bug>54461</bug>: Improve the documentation for the compiler attribute
         in the Jasper how-to. (markt)
       </fix>
+      <add>
+        Add Jespa to the list of third-party Windows authentication providers
+        and make external links in the documentation for those providers
+        <code>no-follow</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
