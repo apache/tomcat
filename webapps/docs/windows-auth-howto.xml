@@ -51,8 +51,9 @@ sections.</p>
 </section>
 
 <section name="Built-in Tomcat support">
-<p><strong>This is a work in progress. There are a number of outstanding
-questions that require further testing.</strong> These include:
+<p><strong>This documentation is a work in progress. There are a number of
+outstanding questions around the edge cases that require further
+testing.</strong> These include:
 </p>
 <ul>
 <li>Does the domain name have to be in upper case?</li>
@@ -219,7 +220,8 @@ com.sun.security.jgss.krb5.accept {
 
   <subsection name="Waffle">
   <p>Full details of this solution can be found through the
-  <a href="http://waffle.codeplex.com/">Waffle site</a>. The key features are:</p>
+  <a href="http://waffle.codeplex.com/">Waffle web site</a>. The key features
+  are:</p>
   <ul>
   <li>Drop-in solution</li>
   <li>Simple configuration (no JAAS or Kerberos keytab configuration required)
@@ -231,7 +233,7 @@ com.sun.security.jgss.krb5.accept {
   <subsection name="Spring Security - Kerberos Extension">
   <p>Full details of this solution can be found through the
   <a href="http://static.springsource.org/spring-security/site/extensions/krb/index.html">
-  Kerberos extension site</a>. The key features are:</p>
+  Kerberos extension web site</a>. The key features are:</p>
   <ul>
   <li>Extension to Spring Security</li>
   <li>Requires a Kerberos keytab file to be generated</li>
@@ -246,6 +248,16 @@ com.sun.security.jgss.krb5.accept {
   <ul>
   <li>Uses Kerberos</li>
   <li>Pure Java solution</li>
+  </ul>
+  </subsection>
+
+  <subsection name="Jespa">
+  <p>Full details of this solution can be found through the
+  <a href="http://www.ioplex.com/">project web site</a>The key
+  features are:</p>
+  <ul>
+  <li>Pure Java solution</li>
+  <li>Advanced Active Directory integration</li>
   </ul>
   </subsection>
 </section>
