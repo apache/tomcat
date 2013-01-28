@@ -68,8 +68,14 @@ public class WsFrameClient extends WsFrameBase {
 
 
     private final void close(Throwable t) {
-        CloseReason cr = new CloseReason(
+        CloseReason cr;
+        if (t instanceof WsIOException) {
+            cr = ((WsIOException) t).getCloseReason();
+        } else {
+            cr = new CloseReason(
                 CloseCodes.CLOSED_ABNORMALLY, t.getMessage());
+        }
+
         try {
             wsSession.close(cr);
         } catch (IOException ignore) {
