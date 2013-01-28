@@ -497,8 +497,7 @@ public abstract class WsFrameBase {
                         sm.getString("wsFrame.bufferToSmall",
                                 Integer.valueOf(inputBuffer.length),
                                 Long.valueOf(payloadLength)));
-                wsSession.close(cr);
-                throw new IOException(cr.getReasonPhrase());
+                throw new WsIOException(cr);
             }
             makeRoom();
         }
