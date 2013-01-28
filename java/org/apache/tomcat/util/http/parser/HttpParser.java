@@ -43,6 +43,7 @@ import java.util.Map;
  */
 public class HttpParser {
 
+    @SuppressWarnings("unused")  // Unused due to buggy client implementations
     private static final Integer FIELD_TYPE_TOKEN = Integer.valueOf(0);
     private static final Integer FIELD_TYPE_QUOTED_STRING = Integer.valueOf(1);
     private static final Integer FIELD_TYPE_TOKEN_OR_QUOTED_STRING = Integer.valueOf(2);
@@ -63,7 +64,7 @@ public class HttpParser {
         fieldTypes.put("nonce", FIELD_TYPE_QUOTED_STRING);
         fieldTypes.put("digest-uri", FIELD_TYPE_QUOTED_STRING);
         fieldTypes.put("response", FIELD_TYPE_QUOTED_LHEX);
-        fieldTypes.put("algorithm", FIELD_TYPE_TOKEN);
+        fieldTypes.put("algorithm", FIELD_TYPE_QUOTED_TOKEN);
         fieldTypes.put("cnonce", FIELD_TYPE_QUOTED_STRING);
         fieldTypes.put("opaque", FIELD_TYPE_QUOTED_STRING);
         fieldTypes.put("qop", FIELD_TYPE_QUOTED_TOKEN);
