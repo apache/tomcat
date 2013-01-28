@@ -19,9 +19,8 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -246,8 +245,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         private final CountDownLatch latch;
 
-        private final List<T> messages = Collections
-                .synchronizedList(new ArrayList<T>());
+        private final List<T> messages = new CopyOnWriteArrayList<>();
 
         public TesterMessageHandler(CountDownLatch latch) {
             this.latch = latch;
