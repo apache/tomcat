@@ -902,7 +902,6 @@ static int add_ocsp_cert(OCSP_REQUEST **req, X509 *cert, X509 *issuer,
 */
 static apr_socket_t *make_socket(char *hostname, int port, apr_pool_t *mp)
 {
-    int r = 0;
     apr_sockaddr_t *sa_in;
     apr_status_t status;
     apr_socket_t *sock = NULL;
