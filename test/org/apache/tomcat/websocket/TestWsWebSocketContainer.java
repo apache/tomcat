@@ -79,7 +79,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         wsSession.addMessageHandler(handler);
         wsSession.getRemote().sendString(MESSAGE_STRING_1);
 
-        boolean latchResult = handler.getLatch().await(100, TimeUnit.SECONDS);
+        boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
 
         Assert.assertTrue(latchResult);
 
@@ -223,7 +223,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             wsSession.getRemote().sendBytes(ByteBuffer.wrap(MESSAGE_BINARY_4K));
         }
 
-        boolean latchResult = handler.getLatch().await(100, TimeUnit.SECONDS);
+        boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
 
         Assert.assertTrue(latchResult);
 
