@@ -57,6 +57,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        Make additional allowances for buggy client implementations of HTTP
+        DIGEST authentication. This is a follow-on to <bug>54060</bug>. (markt)
+      </fix>
+      <fix>
         <bug>54438</bug>: Fix a regression in the fix for <bug>52953</bug> that
         triggered a NPE when digested passwords were used and an authentication
         attempt was made for a user that did not exist in the realm. (markt)
