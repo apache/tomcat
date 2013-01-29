@@ -38,7 +38,7 @@ import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
 /**
  * Provides a per class loader (i.e. per web application) instance of a
  * ServerContainer. Web application wide defaults may be configured by setting
- * the following sevrlet context initialisation parameters to the desired
+ * the following servlet context initialisation parameters to the desired
  * values.
  * <ul>
  * <li>{@link Constants#BINARY_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM}</li>
@@ -160,7 +160,7 @@ public class ServerContainerImpl extends WsWebSocketContainer {
         }
         // Set the ServletContext if it hasn't already been set
         if (servletContext == null) {
-            servletContext = ctxt;
+            setServletContext(ctxt);
         } else if (ctxt != servletContext) {
             // Should never happen
             throw new IllegalStateException(sm.getString(
