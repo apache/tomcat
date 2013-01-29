@@ -141,6 +141,10 @@
         to maker clear that the minimum length of the destination member array
         is one, not two. (markt)
       </fix>
+      <fix>
+        Prevent SSO deregister when node shutdown normally in cluster
+        environment. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
