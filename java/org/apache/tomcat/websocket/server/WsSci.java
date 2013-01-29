@@ -42,7 +42,8 @@ public class WsSci implements ServletContainerInitializer {
             return;
         }
         for (Class<?> clazz : clazzes) {
-            WebSocketEndpoint annotation = clazz.getAnnotation(WebSocketEndpoint.class);
+            WebSocketEndpoint annotation =
+                    clazz.getAnnotation(WebSocketEndpoint.class);
             sc.publishServer(clazz, ctx, annotation.value());
         }
     }
