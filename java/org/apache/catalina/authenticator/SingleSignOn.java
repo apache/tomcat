@@ -197,6 +197,10 @@ public class SingleSignOn extends ValveBase implements SessionListener {
     @Override
     public void sessionEvent(SessionEvent event) {
 
+        if (!getState().isAvailable()) {
+            return;
+        }
+
         // We only care about session destroyed events
         if (!Session.SESSION_DESTROYED_EVENT.equals(event.getType())
                 && (!Session.SESSION_PASSIVATED_EVENT.equals(event.getType()))) {
