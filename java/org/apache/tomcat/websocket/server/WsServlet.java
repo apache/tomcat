@@ -100,12 +100,8 @@ public class WsServlet extends HttpServlet {
             subProtocol = sec.getNegotiatedSubprotocol(subProtocols);
         }
         // Extensions
-        List<String> requestedExtensions = getTokensFromHeader(req,
-                "Sec-WebSocket-Extensions");
-        if (!requestedExtensions.isEmpty()) {
-            // TODO
-            // extensions = sec.getNegotiatedExtensions(requestedExtensions);
-        }
+        // Currently no extensions are supported by this implementation
+
         // If we got this far, all is good. Accept the connection.
         resp.setHeader(Constants.UPGRADE_HEADER_NAME,
                 Constants.UPGRADE_HEADER_VALUE);
