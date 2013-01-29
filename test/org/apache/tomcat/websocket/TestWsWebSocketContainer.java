@@ -181,6 +181,12 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         WebSocketContainer wsContainer = ContainerProvider.getClientContainer();
 
+        // Reset client buffer size as client container is retained between
+        // tests
+
+        wsContainer.setMaxBinaryMessageBufferSize(8192);
+        wsContainer.setMaxTextMessageBufferSize(8192);
+
         if (isServerBuffer) {
             if (isTextBuffer) {
                 ctx.addParameter(
