@@ -612,7 +612,7 @@ public class HostConfig
                 } catch (Exception e) {
                     log.error(sm.getString(
                             "hostConfig.deployDescriptor.error",
-                            contextXml.getAbsolutePath()));
+                            contextXml.getAbsolutePath()), e);
                     context = new FailedContext();
                 } finally {
                     digester.reset();

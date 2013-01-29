@@ -90,6 +90,10 @@
         In this case, because most sessions is not time-out, SSO deregister was
         triggered. (kfujino)
       </fix>
+      <fix>
+        Include the exception in the log message if the parsing of the
+        context.xml file fails. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
