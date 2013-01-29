@@ -121,7 +121,8 @@ public abstract class WsFrameBase {
         fin = (b & 0x80) > 0;
         rsv = (b & 0x70) >>> 4;
         if (rsv != 0) {
-            // TODO Extensions may use rsv bits
+            // Note extensions may use rsv bits but currently no extensions are
+            // supported
             throw new WsIOException(new CloseReason(
                     CloseCodes.PROTOCOL_ERROR,
                     sm.getString("wsFrame.wrongRsv", Integer.valueOf(rsv))));
