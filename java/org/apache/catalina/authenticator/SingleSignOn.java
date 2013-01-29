@@ -224,7 +224,8 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         if (((session.getMaxInactiveInterval() > 0)
             && (System.currentTimeMillis() - session.getThisAccessedTimeInternal() >=
                 session.getMaxInactiveInterval() * 1000))
-            || (Session.SESSION_PASSIVATED_EVENT.equals(event.getType()))) {
+            || (Session.SESSION_PASSIVATED_EVENT.equals(event.getType()))
+            || (!session.getManager().getContext().getState().isAvailable())) {
             removeSession(ssoId, session);
         } else {
             // The session was logged out.
