@@ -250,7 +250,13 @@ public class WsSession implements Session {
                 msg.put(reason.getBytes(UTF8));
             }
             msg.flip();
-            wsRemoteEndpoint.sendMessageBlocking(Constants.OPCODE_CLOSE, msg, true);
+            try {
+                wsRemoteEndpoint.sendMessageBlocking(
+                        Constants.OPCODE_CLOSE, msg, true);
+            } catch (IOException ioe) {
+                // Unable to send close message.
+                // TODO - Ignore?
+            }
 
             // Fire the onClose event
             Thread t = Thread.currentThread();
