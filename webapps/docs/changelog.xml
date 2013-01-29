@@ -83,6 +83,13 @@
         <bug>54483</bug>: Correct one of the Spanish translations. Based on a
         suggestion from adinamita. (markt)
       </fix>
+      <fix>
+        Prevent the SSO deregister when web application is stopped or reloaded.
+        When StandardManager(pathname="") or DeltaManager stops normally, all
+        sessions in the context are expired.
+        In this case, because most sessions is not time-out, SSO deregister was
+        triggered. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
