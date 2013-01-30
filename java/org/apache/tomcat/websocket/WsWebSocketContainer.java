@@ -54,6 +54,7 @@ public class WsWebSocketContainer implements WebSocketContainer {
     private static final byte[] crlf = new byte[] {13, 10};
     private static final int defaultBufferSize = 8 * 1024;
 
+    private long defaultAsyncTimeout = -1;
     private int binaryBufferSize = defaultBufferSize;
     private int textBufferSize = defaultBufferSize;
 
@@ -399,16 +400,25 @@ public class WsWebSocketContainer implements WebSocketContainer {
     }
 
 
+    /**
+     * {@inheritDoc}
+     *
+     * The default value for this implementation is -1.
+     */
     @Override
     public long getDefaultAsyncSendTimeout() {
-        // TODO Auto-generated method stub
-        return 0;
+        return defaultAsyncTimeout;
     }
 
 
+    /**
+     * {@inheritDoc}
+     *
+     * The default value for this implementation is -1.
+     */
     @Override
     public void setAsyncSendTimeout(long timeout) {
-        // TODO Auto-generated method stub
+        this.defaultAsyncTimeout = timeout;
     }
 
     private static class WsHandshakeResponse implements HandshakeResponse {

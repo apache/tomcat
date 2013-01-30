@@ -16,37 +16,26 @@
  */
 package org.apache.tomcat.websocket.server;
 
-import java.util.Set;
-
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.HandlesTypes;
-import javax.websocket.server.WebSocketEndpoint;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 /**
- * Registers an interest in any class that is annotated with
- * {@link WebSocketEndpoint} so that Endpoint can be published via the WebSocket
- * server.
+ * This will be added automatically to a {@link javax.servlet.ServletContext} by
+ * the {@link WsSci}. If the {@link WsSci} is disabled, this listener must be
+ * added manually to every {@link javax.servlet.ServletContext} that uses
+ * WebSocket.
  */
-@HandlesTypes({WebSocketEndpoint.class})
-public class WsSci implements ServletContainerInitializer {
+public class WsListener implements ServletContextListener {
 
     @Override
-    public void onStartup(Set<Class<?>> clazzes, ServletContext ctx)
-            throws ServletException {
-
-        ctx.addListener(WsListener.class);
-
-        if (clazzes == null || clazzes.size() == 0) {
-            return;
-        }
-
+    public void contextInitialized(ServletContextEvent sce) {
         ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
-        for (Class<?> clazz : clazzes) {
-            WebSocketEndpoint annotation =
-                    clazz.getAnnotation(WebSocketEndpoint.class);
-            sc.publishServer(clazz, ctx, annotation.value());
-        }
+        sc.setServletContext(sce.getServletContext());
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
+        sc.stop();
     }
 }

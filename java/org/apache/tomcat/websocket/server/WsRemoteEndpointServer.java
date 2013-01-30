@@ -17,6 +17,7 @@
 package org.apache.tomcat.websocket.server;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 
 import javax.servlet.ServletOutputStream;
 
@@ -38,15 +39,19 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
             LogFactory.getLog(WsProtocolHandler.class);
 
     private final ServletOutputStream sos;
+    private final WsTimeout wsTimeout;
     private volatile WsCompletionHandler handler = null;
+    private volatile long timeoutExpiry = -1;
     private volatile boolean close;
     private volatile Long size = null;
     private volatile boolean headerWritten = false;
     private volatile boolean payloadWritten = false;
 
 
-    public WsRemoteEndpointServer(ServletOutputStream sos) {
+    public WsRemoteEndpointServer(ServletOutputStream sos,
+            ServerContainerImpl serverContainer) {
         this.sos = sos;
+        this.wsTimeout = serverContainer.getTimeout();
     }
 
 
@@ -79,19 +84,29 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
                     sos.write(payload.array(), payload.arrayOffset(),
                             payload.limit());
                 } else {
+                    wsTimeout.unregister(this);
                     if (close) {
-                        sos.close();
+                        close();
                     }
                     handler.completed(size, null);
-                    size = null;
-                    handler = null;
-                    headerWritten = false;
-                    payloadWritten = false;
+                    nextWrite();
                     break;
                 }
             }
         } catch (IOException ioe) {
+            wsTimeout.unregister(this);
+            close();
             handler.failed(ioe, null);
+            nextWrite();
+        }
+        if (handler != null) {
+            // Async write is in progress
+
+            timeoutExpiry = getAsyncSendTimeout() + System.currentTimeMillis();
+            if (timeoutExpiry > 0) {
+                // Register with timeout thread
+                wsTimeout.register(this);
+            }
         }
     }
 
@@ -105,5 +120,26 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
                 log.info(sm.getString("wsRemoteEndpointServer.closeFailed"), e);
             }
         }
+        wsTimeout.unregister(this);
+    }
+
+
+    protected long getTimeoutExpiry() {
+        return timeoutExpiry;
+    }
+
+
+    protected void onTimeout() {
+        close();
+        handler.failed(new SocketTimeoutException(), null);
+        nextWrite();
+    }
+
+
+    private void nextWrite() {
+        handler = null;
+        size = null;
+        headerWritten = false;
+        payloadWritten = false;
     }
 }

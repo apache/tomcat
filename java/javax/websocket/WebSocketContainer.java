@@ -21,8 +21,16 @@ import java.util.Set;
 
 public interface WebSocketContainer {
 
+    /**
+     * Obtain the default timeout (in milliseconds) for sending a message
+     * asynchronously. A non-positive value means an infinite timeout.
+     */
     long getDefaultAsyncSendTimeout();
 
+    /**
+     * Set the default timeout (in milliseconds) for sending a message
+     * asynchronously. A non-positive value means an infinite timeout.
+     */
     void setAsyncSendTimeout(long timeout);
 
     Session connectToServer(Class<?> annotatedEndpointClass, URI path)

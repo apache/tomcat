@@ -76,6 +76,8 @@ public class WsSession implements Session {
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.webSocketContainer = webSocketContainer;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
+        wsRemoteEndpoint.setAsyncSendTimeout(
+                webSocketContainer.getDefaultAsyncSendTimeout());
     }
 
 

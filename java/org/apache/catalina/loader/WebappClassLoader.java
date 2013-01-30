@@ -2233,18 +2233,19 @@ public class WebappClassLoader
             Object[] table = (Object[]) internalTableField.get(map);
             if (table != null) {
                 for (int j =0; j < table.length; j++) {
-                    if (table[j] != null) {
+                    Object obj = table[j];
+                    if (obj != null) {
                         boolean potentialLeak = false;
                         // Check the key
-                        Object key = ((Reference<?>) table[j]).get();
+                        Object key = ((Reference<?>) obj).get();
                         if (this.equals(key) || loadedByThisOrChild(key)) {
                             potentialLeak = true;
                         }
                         // Check the value
                         Field valueField =
-                            table[j].getClass().getDeclaredField("value");
+                                obj.getClass().getDeclaredField("value");
                         valueField.setAccessible(true);
-                        Object value = valueField.get(table[j]);
+                        Object value = valueField.get(obj);
                         if (this.equals(value) || loadedByThisOrChild(value)) {
                             potentialLeak = true;
                         }
