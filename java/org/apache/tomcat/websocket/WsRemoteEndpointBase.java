@@ -49,9 +49,24 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     private final AtomicBoolean toBytesInProgress = new AtomicBoolean(false);
     private final CharsetEncoder encoder = Charset.forName("UTF8").newEncoder();
     private final MessageSendStateMachine state = new MessageSendStateMachine();
+
+    private volatile long asyncSendTimeout = -1;
+
     // Max length for WebSocket frame header is 14 bytes
     protected final ByteBuffer header = ByteBuffer.allocate(14);
     protected ByteBuffer payload = null;
+
+
+    @Override
+    public long getAsyncSendTimeout() {
+        return asyncSendTimeout;
+    }
+
+
+    @Override
+    public void setAsyncSendTimeout(long timeout) {
+        this.asyncSendTimeout = timeout;
+    }
 
 
     @Override
@@ -70,20 +85,6 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
     @Override
     public void flushBatch() {
-        // TODO Auto-generated method stub
-
-    }
-
-
-    @Override
-    public long getAsyncSendTimeout() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-
-    @Override
-    public void setAsyncSendTimeout(long timeout) {
         // TODO Auto-generated method stub
 
     }

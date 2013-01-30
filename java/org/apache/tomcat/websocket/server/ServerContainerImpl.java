@@ -70,6 +70,8 @@ public class ServerContainerImpl extends WsWebSocketContainer {
         return result;
     }
 
+    private final WsTimeout wsTimeout;
+    private final Thread timeoutThread;
 
     private volatile ServletContext servletContext = null;
     private Map<String,ServerEndpointConfiguration> configMap =
@@ -80,11 +82,18 @@ public class ServerContainerImpl extends WsWebSocketContainer {
 
 
     private ServerContainerImpl() {
-        // Hide default constructor
+        wsTimeout = new WsTimeout();
+        timeoutThread = new Thread(wsTimeout);
+        timeoutThread.setName(WsTimeout.THREAD_NAME_PREFIX + this);
+        timeoutThread.start();
     }
 
 
     public void setServletContext(ServletContext servletContext) {
+        if (this.servletContext == servletContext) {
+            return;
+        }
+
         this.servletContext = servletContext;
 
         // Configure servlet context wide defaults
@@ -99,6 +108,10 @@ public class ServerContainerImpl extends WsWebSocketContainer {
         if (value != null) {
             setMaxTextMessageBufferSize(Long.parseLong(value));
         }
+
+        // Update the timeout thread name
+        timeoutThread.setName(
+                WsTimeout.THREAD_NAME_PREFIX + servletContext.getContextPath());
     }
 
 
@@ -209,6 +222,25 @@ public class ServerContainerImpl extends WsWebSocketContainer {
         }
         throw new IllegalStateException(sm.getString(
                 "serverContainer.missingEndpoint", servletPath));
+    }
+
+
+    protected WsTimeout getTimeout() {
+        return wsTimeout;
+    }
+
+
+    protected void stop() {
+        wsTimeout.stop();
+        int count = 0;
+        while (count < 50 && timeoutThread.isAlive()) {
+            count ++;
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        }
     }
 
 

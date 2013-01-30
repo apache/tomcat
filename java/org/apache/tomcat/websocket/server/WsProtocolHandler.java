@@ -29,7 +29,6 @@ import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfiguration;
-import javax.websocket.WebSocketContainer;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -50,14 +49,14 @@ public class WsProtocolHandler implements ProtocolHandler {
     private final Endpoint ep;
     private final EndpointConfiguration endpointConfig;
     private final ClassLoader applicationClassLoader;
-    private final WebSocketContainer webSocketContainer;
+    private final ServerContainerImpl webSocketContainer;
 
     private WsSession wsSession;
 
 
     public WsProtocolHandler(Endpoint ep,
             EndpointConfiguration endpointConfig,
-            WebSocketContainer wsc) {
+            ServerContainerImpl wsc) {
         this.ep = ep;
         this.endpointConfig = endpointConfig;
         this.webSocketContainer = wsc;
@@ -84,7 +83,7 @@ public class WsProtocolHandler implements ProtocolHandler {
         t.setContextClassLoader(applicationClassLoader);
         try {
             WsRemoteEndpointServer wsRemoteEndpointServer =
-                    new WsRemoteEndpointServer(sos);
+                    new WsRemoteEndpointServer(sos, webSocketContainer);
             wsSession = new WsSession(
                     ep, wsRemoteEndpointServer, webSocketContainer);
             WsFrameServer wsFrame = new WsFrameServer(

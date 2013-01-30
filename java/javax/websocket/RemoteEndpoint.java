@@ -28,7 +28,20 @@ public interface RemoteEndpoint {
     void setBatchingAllowed(boolean batchingAllowed);
     boolean getBatchingAllowed();
     void flushBatch();
+
+    /**
+     * Obtain the timeout (in milliseconds) for sending a message
+     * asynchronously. A non-positive value means an infinite timeout. The
+     * default value is determined by
+     * {@link WebSocketContainer#getDefaultAsyncSendTimeout()}.
+     */
     long getAsyncSendTimeout();
+
+    /**
+     * Set the timeout (in milliseconds) for sending a message asynchronously. A
+     * non-positive value means an infinite timeout. The default value is
+     * determined by {@link WebSocketContainer#getDefaultAsyncSendTimeout()}.
+     */
     void setAsyncSendTimeout(long timeout);
 
     /**

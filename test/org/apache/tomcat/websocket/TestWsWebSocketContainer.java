@@ -22,6 +22,8 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContextEvent;
@@ -29,12 +31,15 @@ import javax.servlet.ServletContextListener;
 import javax.websocket.CloseReason;
 import javax.websocket.ContainerProvider;
 import javax.websocket.DefaultClientConfiguration;
+import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfiguration;
 import javax.websocket.MessageHandler;
+import javax.websocket.SendResult;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import javax.websocket.WebSocketMessage;
+import javax.websocket.server.DefaultServerConfiguration;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,13 +47,17 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.coyote.http11.Http11Protocol;
 import org.apache.tomcat.websocket.server.ServerContainerImpl;
+import org.apache.tomcat.websocket.server.WsListener;
 
 public class TestWsWebSocketContainer extends TomcatBaseTest {
 
     private static final String MESSAGE_STRING_1 = "qwerty";
     private static final String MESSAGE_TEXT_4K;
     private static final byte[] MESSAGE_BINARY_4K = new byte[4096];
+
+    private static final long TIMEOUT_MS = 5 * 1000;
 
     static {
         StringBuilder sb = new StringBuilder(4096);
@@ -246,6 +255,161 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         }
     }
 
+
+    @Test
+    public void testTimeoutClientContainer() throws Exception {
+        doTestTimeoutClient(true);
+    }
+
+
+    @Test
+    public void testTimeoutClientEndpoint() throws Exception {
+        doTestTimeoutClient(false);
+    }
+
+
+    private void doTestTimeoutClient(boolean setTimeoutOnContainer)
+            throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(BlockingConfig.class.getName());
+
+        WebSocketContainer wsContainer = ContainerProvider.getClientContainer();
+
+        // Reset client buffer size as client container is retained between
+        // tests
+        wsContainer.setMaxBinaryMessageBufferSize(8192);
+        wsContainer.setMaxTextMessageBufferSize(8192);
+
+
+        // Set the async timeout
+        if (setTimeoutOnContainer) {
+            wsContainer.setAsyncSendTimeout(TIMEOUT_MS);
+        }
+
+        tomcat.start();
+
+        Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
+                new DefaultClientConfiguration(), new URI("http://localhost:" +
+                        getPort() + BlockingConfig.PATH));
+
+        if (!setTimeoutOnContainer) {
+            wsSession.getRemote().setAsyncSendTimeout(TIMEOUT_MS);
+        }
+
+        long lastSend = 0;
+        boolean isOK = true;
+        SendResult sr = null;
+
+        // Should send quickly until the network buffers fill up and then block
+        // until the timeout kicks in
+        while (isOK) {
+            Future<SendResult> f = wsSession.getRemote().sendBytesByFuture(
+                    ByteBuffer.wrap(MESSAGE_BINARY_4K));
+            lastSend = System.currentTimeMillis();
+            sr = f.get();
+            isOK = sr.isOK();
+        }
+
+        long timeout = System.currentTimeMillis() - lastSend;
+
+        // Check correct time passed
+        Assert.assertTrue(timeout >= TIMEOUT_MS);
+
+        // Check the timeout wasn't too long
+        Assert.assertTrue(timeout < TIMEOUT_MS*2);
+
+        if (sr == null) {
+            Assert.fail();
+        } else {
+            Assert.assertNotNull(sr.getException());
+        }
+    }
+
+
+    @Test
+    public void testTimeoutServerContainer() throws Exception {
+        doTestTimeoutServer(true);
+    }
+
+
+    @Test
+    public void testTimeoutServerEndpoint() throws Exception {
+        doTestTimeoutServer(false);
+    }
+
+
+    private static volatile boolean timoutOnContainer = false;
+
+    private void doTestTimeoutServer(boolean setTimeoutOnContainer)
+            throws Exception {
+
+        /*
+         * Note: There are all sorts of horrible uses of statics in this test
+         *       because the API uses classes and the tests really need access
+         *       to the instances which simply isn't possible.
+         */
+        timoutOnContainer = setTimeoutOnContainer;
+
+        Tomcat tomcat = getTomcatInstance();
+
+        if (getProtocol().equals(Http11Protocol.class.getName())) {
+            // This will never work for BIO
+            return;
+        }
+
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(WsListener.class.getName());
+        ctx.addApplicationListener(ConstantTxConfig.class.getName());
+
+        WebSocketContainer wsContainer = ContainerProvider.getClientContainer();
+
+        // Reset client buffer size as client container is retained between
+        // tests
+        wsContainer.setMaxBinaryMessageBufferSize(8192);
+        wsContainer.setMaxTextMessageBufferSize(8192);
+
+        tomcat.start();
+
+        Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
+                new DefaultClientConfiguration(), new URI("http://localhost:" +
+                        getPort() + ConstantTxConfig.PATH));
+
+        wsSession.addMessageHandler(new BlockingBinaryHandler());
+
+        int loops = 0;
+        while (loops < 60) {
+            Thread.sleep(1000);
+            if (!ConstantTxEndpoint.getRunning()) {
+                break;
+            }
+        }
+
+        // Check nothing really bad happened
+        Assert.assertNull(ConstantTxEndpoint.getException());
+
+        System.out.println(ConstantTxEndpoint.getTimeout());
+        // Check correct time passed
+        Assert.assertTrue(ConstantTxEndpoint.getTimeout() >= TIMEOUT_MS);
+
+        // Check the timeout wasn't too long
+        Assert.assertTrue(ConstantTxEndpoint.getTimeout() < TIMEOUT_MS*2);
+
+        if (ConstantTxEndpoint.getSendResult() == null) {
+            Assert.fail();
+        } else {
+            Assert.assertNotNull(
+                    ConstantTxEndpoint.getSendResult().getException());
+        }
+
+    }
+
+
     private abstract static class TesterMessageHandler<T>
             implements MessageHandler.Basic<T> {
 
@@ -409,6 +573,153 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                     // Ignore
                 }
             }
+        }
+    }
+
+
+    public static class BlockingConfig implements ServletContextListener {
+
+        public static final String PATH = "/block";
+
+        @Override
+        public void contextInitialized(ServletContextEvent sce) {
+            ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
+            sc.publishServer(BlockingPojo.class, sce.getServletContext(), PATH);
+        }
+
+        @Override
+        public void contextDestroyed(ServletContextEvent sce) {
+            // NO-OP
+        }
+    }
+
+
+    public static class BlockingPojo {
+        @SuppressWarnings("unused")
+        @WebSocketMessage
+        public void echoTextMessage(Session session, String msg, boolean last) {
+            try {
+                Thread.sleep(60000);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        }
+
+
+        @SuppressWarnings("unused")
+        @WebSocketMessage
+        public void echoBinaryMessage(Session session, ByteBuffer msg,
+                boolean last) {
+            try {
+                Thread.sleep(TIMEOUT_MS * 10);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        }
+    }
+
+
+    public static class BlockingBinaryHandler
+            implements MessageHandler.Async<ByteBuffer> {
+
+        @Override
+        public void onMessage(ByteBuffer messagePart, boolean last) {
+            try {
+                Thread.sleep(TIMEOUT_MS * 10);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        }
+    }
+
+
+    public static class ConstantTxEndpoint extends Endpoint {
+
+        // Have to be static to be able to retrieve results from test case
+        private static volatile long timeout = -1;
+        private static volatile boolean ok = true;
+        private static volatile SendResult sr = null;
+        private static volatile Exception exception = null;
+        private static volatile boolean running = true;
+
+
+        @Override
+        public void onOpen(Session session, EndpointConfiguration config) {
+
+            // Reset everything
+            timeout = -1;
+            ok = true;
+            sr = null;
+            exception = null;
+            running = true;
+
+            if (!TestWsWebSocketContainer.timoutOnContainer) {
+                session.getRemote().setAsyncSendTimeout(TIMEOUT_MS);
+            }
+
+            long lastSend = 0;
+
+            // Should send quickly until the network buffers fill up and then
+            // block until the timeout kicks in
+            try {
+                while (ok) {
+                    lastSend = System.currentTimeMillis();
+                    Future<SendResult> f = session.getRemote().sendBytesByFuture(
+                            ByteBuffer.wrap(MESSAGE_BINARY_4K));
+                    sr = f.get();
+                    ok = sr.isOK();
+                }
+            } catch (ExecutionException | InterruptedException e) {
+                exception = e;
+            }
+            timeout = System.currentTimeMillis() - lastSend;
+            running = false;
+        }
+
+        public static long getTimeout() {
+            return timeout;
+        }
+
+        public static boolean isOK() {
+            return ok;
+        }
+
+        public static SendResult getSendResult() {
+            return sr;
+        }
+
+        public static Exception getException() {
+            return exception;
+        }
+
+        public static boolean getRunning() {
+            return running;
+        }
+    }
+
+
+    public static class ConstantTxConfig implements ServletContextListener {
+
+        private static final String PATH = "/test";
+
+        @Override
+        public void contextInitialized(ServletContextEvent sce) {
+            ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
+            sc.setServletContext(sce.getServletContext());
+            try {
+                sc.publishServer(ConstantTxEndpoint.class, PATH,
+                        DefaultServerConfiguration.class);
+                if (TestWsWebSocketContainer.timoutOnContainer) {
+                    sc.setAsyncSendTimeout(TIMEOUT_MS);
+                }
+            } catch (DeploymentException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+
+        @Override
+        public void contextDestroyed(ServletContextEvent sce) {
+            // NO-OP
         }
     }
 }

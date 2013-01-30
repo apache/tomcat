@@ -38,8 +38,13 @@ public class WsRemoteEndpointClient extends WsRemoteEndpointBase {
 
     @Override
     protected void sendMessage(WsCompletionHandler handler) {
-        channel.write(new ByteBuffer[] {header, payload}, 0, 2, Long.MAX_VALUE,
-                TimeUnit.DAYS, null, handler);
+        long timeout = getAsyncSendTimeout();
+        if (timeout < 1) {
+            timeout = Long.MAX_VALUE;
+
+        }
+        channel.write(new ByteBuffer[] {header, payload}, 0, 2,
+                getAsyncSendTimeout(), TimeUnit.MILLISECONDS, null, handler);
     }
 
     @Override
