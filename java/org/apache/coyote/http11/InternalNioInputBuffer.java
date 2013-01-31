@@ -145,7 +145,8 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
 
     /**
-     * Maximum allowed size of the HTTP request line plus headers.
+     * Maximum allowed size of the HTTP request line plus headers plus any
+     * leading blank lines.
      */
     private final int headerBufferSize;
 
@@ -154,21 +155,8 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
      */
     private int socketReadBufferSize;
 
-    /**
-     * Additional size we allocate to the buffer to be more effective when
-     * skipping empty lines that may precede the request.
-     */
-    private static final int skipBlankLinesSize = 1024;
-
-    /**
-     * How many bytes in the buffer are occupied by skipped blank lines that
-     * precede the request.
-     */
-    private int skipBlankLinesBytes;
-
 
     // --------------------------------------------------------- Public Methods
-
 
     @Override
     public boolean supportsNonBlocking() {
@@ -277,22 +265,15 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
                     if (useAvailableDataOnly) {
                         return false;
                     }
-                    // Ignore bytes that were read
-                    pos = lastValid = 0;
                     // Do a simple read with a short timeout
-                    if ( readSocket(true, false)==0 ) return false;
+                    if (!fill(true, false)) {
+                        return false;
+                    }
                 }
                 chr = buf[pos++];
             } while ((chr == Constants.CR) || (chr == Constants.LF));
             pos--;
-            if (pos >= skipBlankLinesSize) {
-                // Move data, to have enough space for further reading
-                // of headers and body
-                System.arraycopy(buf, pos, buf, 0, lastValid - pos);
-                lastValid -= pos;
-                pos = 0;
-            }
-            skipBlankLinesBytes = pos;
+
             parsingRequestLineStart = pos;
             parsingRequestLinePhase = 2;
             if (log.isDebugEnabled()) {
@@ -524,7 +505,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             // limitation to enforce the meaning of headerBufferSize
             // From the way how buf is allocated and how blank lines are being
             // read, it should be enough to check (1) only.
-            if (pos - skipBlankLinesBytes > headerBufferSize
+            if (pos > headerBufferSize
                     || buf.length - pos < socketReadBufferSize) {
                 throw new IllegalArgumentException(
                         sm.getString("iib.requestheadertoolarge.error"));
@@ -811,8 +792,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
         socketReadBufferSize =
             socket.getBufHandler().getReadBuffer().capacity();
 
-        int bufLength = skipBlankLinesSize + headerBufferSize
-                + socketReadBufferSize;
+        int bufLength = headerBufferSize + socketReadBufferSize;
         if (buf == null || buf.length < bufLength) {
             buf = new byte[bufLength];
         }
@@ -838,7 +818,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
         if (parsingHeader) {
 
-            if (lastValid == buf.length) {
+            if (lastValid > headerBufferSize) {
                 throw new IllegalArgumentException
                     (sm.getString("iib.requestheadertoolarge.error"));
             }
