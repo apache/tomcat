@@ -27,12 +27,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
+import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
@@ -316,4 +318,97 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
             }
         }
     }
+
+
+    /**
+     * Test case for new lines at the start of a request. RFC2616
+     * does not permit any, but Tomcat is tolerant of them if they are present.
+     */
+    @Test
+    public void testNewLines() {
+
+        NewLinesClient client = new NewLinesClient(10);
+
+        client.doRequest();
+        assertTrue(client.isResponse200());
+        assertTrue(client.isResponseBodyOK());
+    }
+
+
+    /**
+     * Test case for new lines at the start of a request. RFC2616
+     * does not permit any, but Tomcat is tolerant of them if they are present.
+     */
+    @Test
+    public void testNewLinesExcessive() {
+
+        NewLinesClient client = new NewLinesClient(10000);
+
+        client.doRequest();
+        assertTrue(client.isResponse400());
+        assertFalse(client.isResponseBodyOK());
+    }
+
+
+    private class NewLinesClient extends SimpleHttpClient {
+
+        private final String newLines;
+
+        private NewLinesClient(int count) {
+            StringBuilder sb = new StringBuilder(count * 2);
+            for (int i = 0; i < count; i++) {
+                sb.append(CRLF);
+            }
+            newLines = sb.toString();
+        }
+
+        private Exception doRequest() {
+
+            Tomcat tomcat = getTomcatInstance();
+
+            Context root = tomcat.addContext("", TEMP_DIR);
+            Tomcat.addServlet(root, "test", new TesterServlet());
+            root.addServletMapping("/test", "test");
+
+            try {
+                tomcat.start();
+                setPort(tomcat.getConnector().getLocalPort());
+
+                // Open connection
+                connect();
+
+                String[] request = new String[1];
+                request[0] =
+                    newLines +
+                    "GET http://localhost:8080/test HTTP/1.1" + CRLF +
+                    "X-Bug48839: abcd" + CRLF +
+                    "\tefgh" + CRLF +
+                    "Connection: close" + CRLF +
+                    CRLF;
+
+                setRequest(request);
+                processRequest(); // blocks until response has been read
+
+                // Close the connection
+                disconnect();
+            } catch (Exception e) {
+                return e;
+            }
+            return null;
+        }
+
+        @Override
+        public boolean isResponseBodyOK() {
+            if (getResponseBody() == null) {
+                return false;
+            }
+            if (!getResponseBody().contains("OK")) {
+                return false;
+            }
+            return true;
+        }
+
+    }
+
+
 }
