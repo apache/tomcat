@@ -16,6 +16,7 @@
  */
 package javax.websocket;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.security.Principal;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface Session {
+public interface Session extends Closeable {
 
     /**
      * Returns the container that created this session.
@@ -41,7 +42,7 @@ public interface Session {
 
     String getNegotiatedSubprotocol();
 
-    List<String> getNegotiatedExtensions();
+    List<Extension> getNegotiatedExtensions();
 
     boolean isSecure();
 
@@ -66,6 +67,7 @@ public interface Session {
      *
      * @throws IOException
      */
+    @Override
     void close() throws IOException;
 
 

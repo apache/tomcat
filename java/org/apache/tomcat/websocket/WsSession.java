@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
+import javax.websocket.Extension;
 import javax.websocket.MessageHandler;
 import javax.websocket.PongMessage;
 import javax.websocket.RemoteEndpoint;
@@ -174,7 +175,7 @@ public class WsSession implements Session {
 
 
     @Override
-    public List<String> getNegotiatedExtensions() {
+    public List<Extension> getNegotiatedExtensions() {
         // TODO Auto-generated method stub
         return null;
     }

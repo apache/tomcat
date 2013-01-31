@@ -16,9 +16,14 @@
  */
 package javax.websocket;
 
-import java.util.Map;
+import java.util.List;
 
 public interface Extension {
     String getName();
-    Map<String,String> getParameters();
+    List<Parameter> getParameters();
+
+    interface Parameter {
+        String getName();
+        String getValue();
+    }
 }

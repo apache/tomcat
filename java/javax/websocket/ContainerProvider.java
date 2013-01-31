@@ -16,20 +16,11 @@
  */
 package javax.websocket;
 
-import java.util.Map;
-import java.util.WeakHashMap;
-
 /**
  * Provides access to the implementation. This version of the API is hard-coded
  * to use the Apache Tomcat WebSocket implementation.
  */
 public class ContainerProvider {
-
-    // Needs to be a WeakHashMap to prevent memory leaks when a context is
-    // stopped
-    private static Map<ClassLoader,WebSocketContainer> classLoaderContainerMap =
-            new WeakHashMap<>();
-    private static Object classLoaderContainerMapLock = new Object();
 
     private static final String DEFAULT_PROVIDER_CLASS_NAME =
             "org.apache.tomcat.websocket.WsWebSocketContainer";
@@ -46,22 +37,15 @@ public class ContainerProvider {
     }
 
     /**
-     * Obtain a reference to the per class loader ClientContainer used to create
-     * outgoing WebSocket connections.
+     * Create a new ClientContainer used to create outgoing WebSocket
+     * connections.
      */
-    public static WebSocketContainer getClientContainer() {
-        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+    public static WebSocketContainer createClientContainer() {
         WebSocketContainer result = null;
-        synchronized (classLoaderContainerMapLock) {
-            result = classLoaderContainerMap.get(tccl);
-            if (result == null) {
-                try {
-                    result = clazz.newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
-                    throw new IllegalArgumentException(e);
-                }
-                classLoaderContainerMap.put(tccl, result);
-            }
+        try {
+            result = clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new IllegalArgumentException(e);
         }
         return result;
     }

@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class DefaultClientConfiguration implements ClientEndpointConfiguration {
     private List<String> preferredSubprotocols = new ArrayList<>();
-    private List<String> extensions = new ArrayList<>();
+    private List<Extension> extensions = new ArrayList<>();
     private List<Encoder> encoders = new ArrayList<>();
     private List<Decoder> decoders = new ArrayList<>();
 
@@ -38,12 +38,12 @@ public class DefaultClientConfiguration implements ClientEndpointConfiguration {
     }
 
     @Override
-    public List<String> getExtensions() {
+    public List<Extension> getExtensions() {
         return extensions;
     }
 
     public ClientEndpointConfiguration setExtensions(
-            List<String> extensions) {
+            List<Extension> extensions) {
         this.extensions = extensions;
         return this;
     }

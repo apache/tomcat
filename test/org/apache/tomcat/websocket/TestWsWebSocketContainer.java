@@ -78,7 +78,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         tomcat.start();
 
-        WebSocketContainer wsContainer = ContainerProvider.getClientContainer();
+        WebSocketContainer wsContainer =
+                ContainerProvider.createClientContainer();
         Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
                 new DefaultClientConfiguration(), new URI("http://localhost:" +
                         getPort() + EchoConfig.PATH_ASYNC));
@@ -107,7 +108,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         tomcat.start();
 
-        WebSocketContainer wsContainer = ContainerProvider.getClientContainer();
+        WebSocketContainer wsContainer =
+                ContainerProvider.createClientContainer();
         wsContainer.connectToServer(TesterEndpoint.class,
                 new DefaultClientConfiguration(), new URI("ftp://localhost:" +
                         getPort() + EchoConfig.PATH_ASYNC));
@@ -124,7 +126,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         tomcat.start();
 
-        WebSocketContainer wsContainer = ContainerProvider.getClientContainer();
+        WebSocketContainer wsContainer =
+                ContainerProvider.createClientContainer();
         wsContainer.connectToServer(TesterEndpoint.class,
                 new DefaultClientConfiguration(),
                 new URI("http://" + EchoConfig.PATH_ASYNC));
@@ -188,13 +191,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.addApplicationListener(EchoConfig.class.getName());
 
-        WebSocketContainer wsContainer = ContainerProvider.getClientContainer();
-
-        // Reset client buffer size as client container is retained between
-        // tests
-
-        wsContainer.setMaxBinaryMessageBufferSize(8192);
-        wsContainer.setMaxTextMessageBufferSize(8192);
+        WebSocketContainer wsContainer =
+                ContainerProvider.createClientContainer();
 
         if (isServerBuffer) {
             if (isTextBuffer) {
@@ -277,13 +275,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.addApplicationListener(BlockingConfig.class.getName());
 
-        WebSocketContainer wsContainer = ContainerProvider.getClientContainer();
-
-        // Reset client buffer size as client container is retained between
-        // tests
-        wsContainer.setMaxBinaryMessageBufferSize(8192);
-        wsContainer.setMaxTextMessageBufferSize(8192);
-
+        WebSocketContainer wsContainer =
+                ContainerProvider.createClientContainer();
 
         // Set the async timeout
         if (setTimeoutOnContainer) {
@@ -367,12 +360,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         ctx.addApplicationListener(WsListener.class.getName());
         ctx.addApplicationListener(ConstantTxConfig.class.getName());
 
-        WebSocketContainer wsContainer = ContainerProvider.getClientContainer();
-
-        // Reset client buffer size as client container is retained between
-        // tests
-        wsContainer.setMaxBinaryMessageBufferSize(8192);
-        wsContainer.setMaxTextMessageBufferSize(8192);
+        WebSocketContainer wsContainer =
+                ContainerProvider.createClientContainer();
 
         tomcat.start();
 
