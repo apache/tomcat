@@ -162,7 +162,7 @@ public class ClusterSingleSignOn extends SingleSignOn {
     @Override
     protected void associate(String ssoId, Session session) {
 
-        if (cluster != null) {
+        if (cluster != null && cluster.getMembers().length > 0) {
             messageNumber++;
             SingleSignOnMessage msg =
                 new SingleSignOnMessage(cluster.getLocalMember(),
@@ -204,7 +204,7 @@ public class ClusterSingleSignOn extends SingleSignOn {
     @Override
     protected void deregister(String ssoId, Session session) {
 
-        if (cluster != null) {
+        if (cluster != null && cluster.getMembers().length > 0) {
             messageNumber++;
             SingleSignOnMessage msg =
                 new SingleSignOnMessage(cluster.getLocalMember(),
@@ -244,7 +244,7 @@ public class ClusterSingleSignOn extends SingleSignOn {
     @Override
     protected void deregister(String ssoId) {
 
-        if (cluster != null) {
+        if (cluster != null && cluster.getMembers().length > 0) {
             messageNumber++;
             SingleSignOnMessage msg =
                 new SingleSignOnMessage(cluster.getLocalMember(),
@@ -284,7 +284,7 @@ public class ClusterSingleSignOn extends SingleSignOn {
     protected void register(String ssoId, Principal principal, String authType,
                   String username, String password) {
 
-        if (cluster != null) {
+        if (cluster != null && cluster.getMembers().length > 0) {
             messageNumber++;
             SingleSignOnMessage msg =
                 new SingleSignOnMessage(cluster.getLocalMember(),
@@ -349,7 +349,7 @@ public class ClusterSingleSignOn extends SingleSignOn {
     protected void update(String ssoId, Principal principal, String authType,
                           String username, String password) {
 
-        if (cluster != null) {
+        if (cluster != null && cluster.getMembers().length > 0) {
             messageNumber++;
             SingleSignOnMessage msg =
                 new SingleSignOnMessage(cluster.getLocalMember(),
@@ -394,7 +394,7 @@ public class ClusterSingleSignOn extends SingleSignOn {
     @Override
     protected void removeSession(String ssoId, Session session) {
 
-        if (cluster != null) {
+        if (cluster != null && cluster.getMembers().length > 0) {
             messageNumber++;
             SingleSignOnMessage msg =
                 new SingleSignOnMessage(cluster.getLocalMember(),
