@@ -61,11 +61,11 @@ public class WsTimeout implements Runnable {
             while (iter.hasNext()) {
                 WsRemoteEndpointServer endpoint = iter.next();
                 if (endpoint.getTimeoutExpiry() < now) {
-                    System.out.println(now);
                     endpoint.onTimeout();
                 } else {
-                    // Endpoints are ordered by timeout expiry so we reach this
-                    // point there is no need to check the remaining endpoints
+                    // Endpoints are ordered by timeout expiry so if this point
+                    // is reached there is no need to check the remaining
+                    // endpoints
                     break;
                 }
             }
