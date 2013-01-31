@@ -44,16 +44,15 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
 
-    // TODO Make the size of this conversion buffer configurable
-    private final ByteBuffer toBytes = ByteBuffer.allocate(8192);
-    private final AtomicBoolean toBytesInProgress = new AtomicBoolean(false);
+    // TODO Make the size of these buffers configurable
+    private final ByteBuffer intermediateBuffer = ByteBuffer.allocate(8192);
+    protected final ByteBuffer outputBuffer = ByteBuffer.allocate(8192);
+    private final AtomicBoolean charToByteInProgress = new AtomicBoolean(false);
     private final CharsetEncoder encoder = Charset.forName("UTF8").newEncoder();
     private final MessageSendStateMachine state = new MessageSendStateMachine();
 
     private volatile long asyncSendTimeout = -1;
 
-    // Max length for WebSocket frame header is 14 bytes
-    protected final ByteBuffer header = ByteBuffer.allocate(14);
     protected ByteBuffer payload = null;
 
 
@@ -108,27 +107,29 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
         // The toBytes buffer needs to be protected from multiple threads and
         // the state check happens to late.
-        if (!toBytesInProgress.compareAndSet(false, true)) {
+        if (!charToByteInProgress.compareAndSet(false, true)) {
             throw new IllegalStateException(sm.getString(
                     "wsRemoteEndpoint.concurrentMessageSend"));
         }
 
         try {
             encoder.reset();
-            toBytes.clear();
+            intermediateBuffer.clear();
             CharBuffer cb = CharBuffer.wrap(fragment);
-            CoderResult cr = encoder.encode(cb, toBytes, true);
-            toBytes.flip();
+            CoderResult cr = encoder.encode(cb, intermediateBuffer, true);
+            intermediateBuffer.flip();
             while (cr.isOverflow()) {
-                sendMessageBlocking(Constants.OPCODE_TEXT, toBytes, false);
-                toBytes.clear();
-                cr = encoder.encode(cb, toBytes, true);
-                toBytes.flip();
+                sendMessageBlocking(
+                        Constants.OPCODE_TEXT, intermediateBuffer, false);
+                intermediateBuffer.clear();
+                cr = encoder.encode(cb, intermediateBuffer, true);
+                intermediateBuffer.flip();
             }
-            sendMessageBlocking(Constants.OPCODE_TEXT, toBytes, isLast);
+            sendMessageBlocking(
+                    Constants.OPCODE_TEXT, intermediateBuffer, isLast);
         } finally {
             // Make sure flag is reset before method exists
-            toBytesInProgress.set(false);
+            charToByteInProgress.set(false);
         }
     }
 
@@ -206,7 +207,7 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
         boolean isFirst = state.startMessage(opCode, isLast);
 
-        header.clear();
+        outputBuffer.clear();
         byte first = 0;
 
         if (isLast) {
@@ -220,37 +221,37 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
         }
         // If not the first fragment, it is a continuation with opCode of zero
 
-        header.put(first);
+        outputBuffer.put(first);
 
         byte masked = getMasked();
 
         // Next write the mask && length length
         if (payload.limit() < 126) {
-            header.put((byte) (payload.limit() | masked));
+            outputBuffer.put((byte) (payload.limit() | masked));
         } else if (payload.limit() < 65536) {
-            header.put((byte) (126 | masked));
-            header.put((byte) (payload.limit() >>> 8));
-            header.put((byte) (payload.limit() & 0xFF));
+            outputBuffer.put((byte) (126 | masked));
+            outputBuffer.put((byte) (payload.limit() >>> 8));
+            outputBuffer.put((byte) (payload.limit() & 0xFF));
         } else {
             // Will never be more than 2^31-1
-            header.put((byte) (127 | masked));
-            header.put((byte) 0);
-            header.put((byte) 0);
-            header.put((byte) 0);
-            header.put((byte) 0);
-            header.put((byte) (payload.limit() >>> 24));
-            header.put((byte) (payload.limit() >>> 16));
-            header.put((byte) (payload.limit() >>> 8));
-            header.put((byte) (payload.limit() & 0xFF));
+            outputBuffer.put((byte) (127 | masked));
+            outputBuffer.put((byte) 0);
+            outputBuffer.put((byte) 0);
+            outputBuffer.put((byte) 0);
+            outputBuffer.put((byte) 0);
+            outputBuffer.put((byte) (payload.limit() >>> 24));
+            outputBuffer.put((byte) (payload.limit() >>> 16));
+            outputBuffer.put((byte) (payload.limit() >>> 8));
+            outputBuffer.put((byte) (payload.limit() & 0xFF));
         }
         if (masked != 0) {
             // TODO Mask the data properly
-            header.put((byte) 0);
-            header.put((byte) 0);
-            header.put((byte) 0);
-            header.put((byte) 0);
+            outputBuffer.put((byte) 0);
+            outputBuffer.put((byte) 0);
+            outputBuffer.put((byte) 0);
+            outputBuffer.put((byte) 0);
         }
-        header.flip();
+        outputBuffer.flip();
 
         sendMessage(handler);
     }

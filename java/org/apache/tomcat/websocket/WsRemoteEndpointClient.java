@@ -43,7 +43,7 @@ public class WsRemoteEndpointClient extends WsRemoteEndpointBase {
             timeout = Long.MAX_VALUE;
 
         }
-        channel.write(new ByteBuffer[] {header, payload}, 0, 2,
+        channel.write(new ByteBuffer[] {outputBuffer, payload}, 0, 2,
                 getAsyncSendTimeout(), TimeUnit.MILLISECONDS, null, handler);
     }
 
