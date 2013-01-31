@@ -111,6 +111,10 @@
         are supported - new behaviour is to warn and explicitly enable no
         options. (timw)
       </fix>
+      <fix>
+        Align NIO HTTP connector with other HTTP connectors and include leading
+        blank lines when determining the size of the HTTP headers. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
