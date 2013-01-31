@@ -80,8 +80,8 @@ public interface RemoteEndpoint {
 
     void sendObjectByCompletion(Object obj, SendHandler completion);
 
-    void sendPing(ByteBuffer applicationData) throws IOException;
+    void sendPing(ByteBuffer applicationData) throws IOException, IllegalArgumentException;
 
-    void sendPong(ByteBuffer applicationData) throws IOException;
+    void sendPong(ByteBuffer applicationData) throws IOException, IllegalArgumentException;
 }
 

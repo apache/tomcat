@@ -23,7 +23,7 @@ public interface ClientEndpointConfiguration extends EndpointConfiguration {
 
     List<String> getPreferredSubprotocols();
 
-    List<String> getExtensions();
+    List<Extension> getExtensions();
 
     /**
      * Provides the client with a mechanism to inspect and/or modify the headers
