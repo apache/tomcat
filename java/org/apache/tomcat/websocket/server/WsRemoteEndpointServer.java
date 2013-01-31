@@ -76,9 +76,9 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
                 if (!headerWritten) {
                     headerWritten = true;
                     size = Long.valueOf(
-                            header.remaining() + payload.remaining());
-                    sos.write(header.array(), header.arrayOffset(),
-                            header.limit());
+                            outputBuffer.remaining() + payload.remaining());
+                    sos.write(outputBuffer.array(), outputBuffer.arrayOffset(),
+                            outputBuffer.limit());
                 } else if (!payloadWritten) {
                     payloadWritten = true;
                     sos.write(payload.array(), payload.arrayOffset(),
