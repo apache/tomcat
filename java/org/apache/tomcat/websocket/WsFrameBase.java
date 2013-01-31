@@ -77,11 +77,11 @@ public abstract class WsFrameBase {
     private int readPos = 0;
     protected int writePos = 0;
 
-    public WsFrameBase(int binaryMerssageBufferSize, int textMessageBufferSize,
+    public WsFrameBase(int binaryMessageBufferSize, int textMessageBufferSize,
             WsSession wsSession) {
 
-        inputBuffer = new byte[binaryMerssageBufferSize];
-        messageBufferBinary = ByteBuffer.allocate(binaryMerssageBufferSize);
+        inputBuffer = new byte[binaryMessageBufferSize];
+        messageBufferBinary = ByteBuffer.allocate(binaryMessageBufferSize);
         messageBufferText = CharBuffer.allocate(textMessageBufferSize);
         this.wsSession = wsSession;
     }
@@ -410,7 +410,7 @@ public abstract class WsFrameBase {
                 // Ran out of message buffer - flush it
                 if (!usePartial()) {
                     CloseReason cr = new CloseReason(CloseCodes.TOO_BIG,
-                            sm.getString("wsFrame.bufferToSmall",
+                            sm.getString("wsFrame.bufferTooSmall",
                                     Integer.valueOf(
                                             messageBufferBinary.capacity()),
                                     Long.valueOf(payloadLength)));
