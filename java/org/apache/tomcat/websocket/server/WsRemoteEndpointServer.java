@@ -102,9 +102,10 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
         if (handler != null) {
             // Async write is in progress
 
-            timeoutExpiry = getAsyncSendTimeout() + System.currentTimeMillis();
-            if (timeoutExpiry > 0) {
+            long timeout = getAsyncSendTimeout();
+            if (timeout > 0) {
                 // Register with timeout thread
+                timeoutExpiry = timeout + System.currentTimeMillis();
                 wsTimeout.register(this);
             }
         }
