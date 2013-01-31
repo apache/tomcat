@@ -30,9 +30,9 @@ public class WsFrameServer extends WsFrameBase {
     private final Object connectionReadLock = new Object();
 
 
-    public WsFrameServer(ServletInputStream sis, int binaryBufferSize,
-            int textBufferSize, WsSession wsSession) {
-        super(binaryBufferSize, textBufferSize, wsSession);
+    public WsFrameServer(ServletInputStream sis, int binaryMessageBufferSize,
+            int textMessageBufferSize, WsSession wsSession) {
+        super(binaryMessageBufferSize, textMessageBufferSize, wsSession);
         this.sis = sis;
     }
 

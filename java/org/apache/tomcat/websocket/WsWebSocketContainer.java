@@ -52,11 +52,11 @@ public class WsWebSocketContainer implements WebSocketContainer {
     private static final Random random = new Random();
     private static final Charset iso88591 = Charset.forName("ISO-8859-1");
     private static final byte[] crlf = new byte[] {13, 10};
-    private static final int defaultBufferSize = 8 * 1024;
+    private static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
 
     private long defaultAsyncTimeout = -1;
-    private int binaryBufferSize = defaultBufferSize;
-    private int textBufferSize = defaultBufferSize;
+    private int maxBinaryMessageBufferSize = DEFAULT_BUFFER_SIZE;
+    private int maxTextMessageBufferSize = DEFAULT_BUFFER_SIZE;
 
     @Override
     public Session connectToServer(Class<?> annotatedEndpointClass, URI path)
@@ -125,7 +125,7 @@ public class WsWebSocketContainer implements WebSocketContainer {
                 toWrite -= thisWrite.intValue();
             }
             // Same size as the WsFrame input buffer
-            response = ByteBuffer.allocate(binaryBufferSize);
+            response = ByteBuffer.allocate(maxBinaryMessageBufferSize);
 
             HandshakeResponse handshakeResponse =
                     processResponse(response, channel);
@@ -154,7 +154,8 @@ public class WsWebSocketContainer implements WebSocketContainer {
         // Object creation will trigger input processing
         @SuppressWarnings("unused")
         WsFrameClient wsFrameClient = new WsFrameClient(response, channel,
-                binaryBufferSize, textBufferSize, wsSession);
+                maxBinaryMessageBufferSize, maxTextMessageBufferSize,
+                wsSession);
 
         return wsSession;
     }
@@ -363,7 +364,7 @@ public class WsWebSocketContainer implements WebSocketContainer {
 
     @Override
     public long getMaxBinaryMessageBufferSize() {
-        return binaryBufferSize;
+        return maxBinaryMessageBufferSize;
     }
 
 
@@ -373,13 +374,13 @@ public class WsWebSocketContainer implements WebSocketContainer {
             throw new IllegalArgumentException(
                     sm.getString("wsWebSocketContainer.maxBuffer"));
         }
-        binaryBufferSize = (int) max;
+        maxBinaryMessageBufferSize = (int) max;
     }
 
 
     @Override
     public long getMaxTextMessageBufferSize() {
-        return textBufferSize;
+        return maxTextMessageBufferSize;
     }
 
 
@@ -389,7 +390,7 @@ public class WsWebSocketContainer implements WebSocketContainer {
             throw new IllegalArgumentException(
                     sm.getString("wsWebSocketContainer.maxBuffer"));
         }
-        textBufferSize = (int) max;
+        maxTextMessageBufferSize = (int) max;
     }
 
 

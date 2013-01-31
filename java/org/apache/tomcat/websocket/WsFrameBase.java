@@ -77,12 +77,12 @@ public abstract class WsFrameBase {
     private int readPos = 0;
     protected int writePos = 0;
 
-    public WsFrameBase(int binaryBufferSize, int textBufferSize,
+    public WsFrameBase(int binaryMerssageBufferSize, int textMessageBufferSize,
             WsSession wsSession) {
 
-        inputBuffer = new byte[binaryBufferSize];
-        messageBufferBinary = ByteBuffer.allocate(binaryBufferSize);
-        messageBufferText = CharBuffer.allocate(textBufferSize);
+        inputBuffer = new byte[binaryMerssageBufferSize];
+        messageBufferBinary = ByteBuffer.allocate(binaryMerssageBufferSize);
+        messageBufferText = CharBuffer.allocate(textMessageBufferSize);
         this.wsSession = wsSession;
     }
 
