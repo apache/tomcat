@@ -399,7 +399,7 @@ public abstract class WsFrameBase {
     }
 
 
-    private boolean processDataBinary() {
+    private boolean processDataBinary() throws IOException {
         // Copy the available data to the buffer
         while (!appendPayloadToMessage(messageBufferBinary)) {
             // Frame not complete - what did we run out of?
@@ -408,6 +408,14 @@ public abstract class WsFrameBase {
                 return false;
             } else {
                 // Ran out of message buffer - flush it
+                if (!usePartial()) {
+                    CloseReason cr = new CloseReason(CloseCodes.TOO_BIG,
+                            sm.getString("wsFrame.bufferToSmall",
+                                    Integer.valueOf(
+                                            messageBufferBinary.capacity()),
+                                    Long.valueOf(payloadLength)));
+                    throw new WsIOException(cr);
+                }
                 messageBufferBinary.flip();
                 ByteBuffer copy =
                         ByteBuffer.allocate(messageBufferBinary.limit());
@@ -487,19 +495,8 @@ public abstract class WsFrameBase {
     }
 
 
-    private void checkRoomPayload() throws IOException {
+    private void checkRoomPayload() {
         if (inputBuffer.length - readPos - payloadLength + payloadWritten < 0) {
-            if (Util.isControl(opCode)) {
-                makeRoom();
-                return;
-            }
-            if (!usePartial() && (inputBuffer.length < payloadLength)) {
-                CloseReason cr = new CloseReason(CloseCodes.TOO_BIG,
-                        sm.getString("wsFrame.bufferToSmall",
-                                Integer.valueOf(inputBuffer.length),
-                                Long.valueOf(payloadLength)));
-                throw new WsIOException(cr);
-            }
             makeRoom();
         }
     }
