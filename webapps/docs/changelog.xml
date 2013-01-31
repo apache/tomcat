@@ -149,6 +149,10 @@
         Prevent SSO deregister when node shutdown normally in cluster
         environment. (kfujino)
       </fix>
+      <fix>
+        Check cluster member before sending replicate message in
+        ClusterSingleSignOn. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
