@@ -5127,9 +5127,6 @@ public class StandardContext extends ContainerBase
                 if ((manager != null) && (manager instanceof Lifecycle)) {
                     ((Lifecycle) getManager()).start();
                 }
-
-                // Start ContainerBackgroundProcessor thread
-                super.threadStart();
             } catch(Exception e) {
                 log.error("Error manager.start()", e);
                 ok = false;
@@ -5148,6 +5145,8 @@ public class StandardContext extends ContainerBase
                 loadOnStartup(findChildren());
             }
 
+            // Start ContainerBackgroundProcessor thread
+            super.threadStart();
         } finally {
             // Unbinding thread
             unbindThread(oldCCL);
@@ -5303,15 +5302,15 @@ public class StandardContext extends ContainerBase
 
             ClassLoader old = bindThread();
             try {
+                // Stop ContainerBackgroundProcessor thread
+                threadStop();
+
                 for (int i = 0; i < children.length; i++) {
                     children[i].stop();
                 }
 
                 // Stop our filters
                 filterStop();
-
-                // Stop ContainerBackgroundProcessor thread
-                threadStop();
 
                 Manager manager = getManager();
                 if (manager != null && manager instanceof Lifecycle &&
