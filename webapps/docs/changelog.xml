@@ -92,7 +92,7 @@
       </fix>
       <fix>
         Include the exception in the log message if the parsing of the
-        context.xml file fails. (markt)
+        context.xml file fails. (markt/kkolinko)
       </fix>
     </changelog>
   </subsection>
