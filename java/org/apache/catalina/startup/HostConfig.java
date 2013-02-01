@@ -906,7 +906,7 @@ public class HostConfig
                     } catch (Exception e) {
                         log.error(sm.getString(
                                 "hostConfig.deployDescriptor.error",
-                                war.getAbsolutePath()));
+                                war.getAbsolutePath()), e);
                         context = new FailedContext();
                     } finally {
                         digester.reset();
@@ -924,7 +924,7 @@ public class HostConfig
                     } catch (Exception e) {
                         log.error(sm.getString(
                                 "hostConfig.deployDescriptor.error",
-                                war.getAbsolutePath()));
+                                war.getAbsolutePath()), e);
                     } finally {
                         if (context == null) {
                             context = new FailedContext();
@@ -1067,7 +1067,7 @@ public class HostConfig
                     } catch (Exception e) {
                         log.error(sm.getString(
                                 "hostConfig.deployDescriptor.error",
-                                xml));
+                                xml), e);
                         context = new FailedContext();
                     } finally {
                         digester.reset();
