@@ -95,6 +95,11 @@
         context.xml file fails. (markt/kkolinko)
       </fix>
       <fix>
+        <bug>54497</bug>: Make memory leak detection code more robust so a
+        failure in the leak detection code does not prevent the Context from
+        stopping unless the error is fatal to the JVM. (markt)
+      </fix>
+      <fix>
         <bug>54507</bug>: Do not start the background thread that is used to
         expiring sessions (amongst other things) until the web application is
         fully started. Stop the background thread as soon as the web application

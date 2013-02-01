@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
@@ -2463,27 +2462,11 @@ public class WebappClassLoader
                     }
                 }
             }
-        } catch (SecurityException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    contextName), e);
-        } catch (NoSuchFieldException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    contextName), e);
-        } catch (ClassNotFoundException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    contextName), e);
-        } catch (IllegalArgumentException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    contextName), e);
-        } catch (IllegalAccessException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    contextName), e);
-        } catch (InvocationTargetException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    contextName), e);
-        } catch (NoSuchMethodException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    contextName), e);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.warn(sm.getString(
+                    "webappClassLoader.checkThreadLocalsForLeaksFail",
+                    getContextName()), t);
         }
     }
 
@@ -2500,18 +2483,19 @@ public class WebappClassLoader
             Object[] table = (Object[]) internalTableField.get(map);
             if (table != null) {
                 for (int j =0; j < table.length; j++) {
-                    if (table[j] != null) {
+                    Object obj = table[j];
+                    if (obj != null) {
                         boolean potentialLeak = false;
                         // Check the key
-                        Object key = ((Reference<?>) table[j]).get();
+                        Object key = ((Reference<?>) obj).get();
                         if (this.equals(key) || loadedByThisOrChild(key)) {
                             potentialLeak = true;
                         }
                         // Check the value
                         Field valueField =
-                            table[j].getClass().getDeclaredField("value");
+                                obj.getClass().getDeclaredField("value");
                         valueField.setAccessible(true);
-                        Object value = valueField.get(table[j]);
+                        Object value = valueField.get(obj);
                         if (this.equals(value) || loadedByThisOrChild(value)) {
                             potentialLeak = true;
                         }
