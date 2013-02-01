@@ -63,7 +63,7 @@ implementation is simple and sufficient:
 An
 <a href="../config/engine.html">Engine</a> represents request processing
 pipeline for a specific Service.  As a Service may have multiple Connectors,
-the Engine received and processes all requests from these connectors, handing
+the Engine receives and processes all requests from these connectors, handing
 the response back to the appropriate connector for transmission to the client.
 The <a href="../api/org/apache/catalina/Engine.html">Engine interface</a>
 may be implemented to supply custom Engines, though this is uncommon.
