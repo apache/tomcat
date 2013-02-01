@@ -5453,6 +5453,10 @@ public class StandardContext extends ContainerBase
 
     @Override
     public void backgroundProcess() {
+
+        if (!getState().isAvailable())
+            return;
+
         Loader loader = getLoader();
         if (loader != null) {
             try {
