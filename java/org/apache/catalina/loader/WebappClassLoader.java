@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
@@ -2196,27 +2195,11 @@ public class WebappClassLoader
                     }
                 }
             }
-        } catch (SecurityException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    getContextName()), e);
-        } catch (NoSuchFieldException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    getContextName()), e);
-        } catch (ClassNotFoundException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    getContextName()), e);
-        } catch (IllegalArgumentException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    getContextName()), e);
-        } catch (IllegalAccessException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    getContextName()), e);
-        } catch (InvocationTargetException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    getContextName()), e);
-        } catch (NoSuchMethodException e) {
-            log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
-                    getContextName()), e);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.warn(sm.getString(
+                    "webappClassLoader.checkThreadLocalsForLeaksFail",
+                    getContextName()), t);
         }
     }
 
