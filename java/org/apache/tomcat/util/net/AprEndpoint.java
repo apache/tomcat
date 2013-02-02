@@ -186,6 +186,15 @@ public class AprEndpoint extends AbstractEndpoint {
 
 
     /**
+     * The socket poller.
+     */
+    protected AsyncTimeout asyncTimeout = null;
+    public AsyncTimeout getAsyncTimeout() {
+        return asyncTimeout;
+    }
+
+
+    /**
      * The static file sender.
      */
     protected Sendfile sendfile = null;
@@ -609,7 +618,8 @@ public class AprEndpoint extends AbstractEndpoint {
             startAcceptorThreads();
 
             // Start async timeout thread
-            Thread timeoutThread = new Thread(new AsyncTimeout(),
+            asyncTimeout = new AsyncTimeout();
+            Thread timeoutThread = new Thread(asyncTimeout,
                     getName() + "-AsyncTimeout");
             timeoutThread.setPriority(threadPriority);
             timeoutThread.setDaemon(true);
@@ -629,6 +639,8 @@ public class AprEndpoint extends AbstractEndpoint {
         }
         if (running) {
             running = false;
+            poller.stop();
+            asyncTimeout.stop();
             unlockAccept();
             for (AbstractEndpoint.Acceptor acceptor : acceptors) {
                 long waitLeft = 10000;
@@ -1000,6 +1012,9 @@ public class AprEndpoint extends AbstractEndpoint {
      * Async timeout thread
      */
     protected class AsyncTimeout implements Runnable {
+
+        private volatile boolean asyncTimeoutRunning = true;
+
         /**
          * The background thread that checks async requests and fires the
          * timeout if there has been no activity.
@@ -1008,7 +1023,7 @@ public class AprEndpoint extends AbstractEndpoint {
         public void run() {
 
             // Loop until we receive a shutdown command
-            while (running) {
+            while (asyncTimeoutRunning) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -1029,7 +1044,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 }
 
                 // Loop if endpoint is paused
-                while (paused && running) {
+                while (paused && asyncTimeoutRunning) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -1038,6 +1053,11 @@ public class AprEndpoint extends AbstractEndpoint {
                 }
 
             }
+        }
+
+
+        protected void stop() {
+            asyncTimeoutRunning = false;
         }
     }
 
@@ -1260,6 +1280,8 @@ public class AprEndpoint extends AbstractEndpoint {
         public int getConnectionCount() { return connectionCount; }
 
 
+        private volatile boolean pollerRunning = true;
+
         /**
          * Create the poller. With some versions of APR, the maximum poller size
          * will be 62 (recompiling APR is necessary to remove this limitation).
@@ -1316,6 +1338,12 @@ public class AprEndpoint extends AbstractEndpoint {
 
         }
 
+
+        protected void stop() {
+            pollerRunning = false;
+        }
+
+
         /**
          * Destroy the poller.
          */
@@ -1325,6 +1353,7 @@ public class AprEndpoint extends AbstractEndpoint {
             // still in the poller can cause problems
             try {
                 synchronized (this) {
+                    this.notify();
                     this.wait(pollTime / 1000);
                 }
             } catch (InterruptedException e) {
@@ -1351,7 +1380,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                 Long.valueOf(desc[n*2+1])).isComet();
                         if (!comet || (comet && !processSocket(
                                 desc[n*2+1], SocketStatus.STOP))) {
-                            destroySocket(desc[n*2+1]);
+                            destroySocket(desc[n*2+1], true);
                         }
                     }
                 }
@@ -1537,7 +1566,7 @@ public class AprEndpoint extends AbstractEndpoint {
 
             int maintain = 0;
             // Loop until we receive a shutdown command
-            while (running) {
+            while (pollerRunning) {
 
                 // Loop if endpoint is paused
                 while (paused) {
@@ -1548,10 +1577,11 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                 }
                 // Check timeouts if the poller is empty
-                while (connectionCount < 1 && addList.size() < 1) {
+                while (pollerRunning && connectionCount < 1 &&
+                        addList.size() < 1) {
                     // Reset maintain time.
                     try {
-                        if (getSoTimeout() > 0 && running) {
+                        if (getSoTimeout() > 0 && pollerRunning) {
                             maintain();
                         }
                         synchronized (this) {
@@ -1722,7 +1752,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
 
                     // Process socket timeouts
-                    if (getSoTimeout() > 0 && maintain++ > 1000 && running) {
+                    if (getSoTimeout() > 0 && maintain++ > 1000 && pollerRunning) {
                         // This works and uses only one timeout mechanism for everything, but the
                         // non event poller might be a bit faster by using the old maintain.
                         maintain = 0;
@@ -1785,6 +1815,8 @@ public class AprEndpoint extends AbstractEndpoint {
 
         protected ArrayList<SendfileData> addS;
 
+        private volatile boolean sendfileRunning = true;
+
         /**
          * Create the sendfile poller. With some versions of APR, the maximum
          * poller size will be 62 (recompiling APR is necessary to remove this
@@ -1814,6 +1846,7 @@ public class AprEndpoint extends AbstractEndpoint {
          * Destroy the poller.
          */
         protected void destroy() {
+            sendfileRunning = false;
             // Wait for polltime before doing anything, so that the poller threads
             // exit, otherwise parallel destruction of sockets which are still
             // in the poller can cause problems
@@ -1920,7 +1953,7 @@ public class AprEndpoint extends AbstractEndpoint {
 
             long maintainTime = 0;
             // Loop until we receive a shutdown command
-            while (running) {
+            while (sendfileRunning) {
 
                 // Loop if endpoint is paused
                 while (paused) {
@@ -2036,7 +2069,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                     // Call maintain for the sendfile poller
                     if (getSoTimeout() > 0 &&
-                            maintainTime > 1000000L && running) {
+                            maintainTime > 1000000L && sendfileRunning) {
                         rv = Poll.maintain(sendfilePollset, desc, false);
                         maintainTime = 0;
                         if (rv > 0) {
