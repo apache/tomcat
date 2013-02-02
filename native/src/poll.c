@@ -477,5 +477,5 @@ TCN_IMPLEMENT_CALL(jint, Poll, pollset)(TCN_STDARGS, jlong pollset,
     }
     if (n > 0)
         (*e)->SetLongArrayRegion(e, set, 0, n, p->set);
-    return n;
+    return n / 2;
 }
