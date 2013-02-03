@@ -1339,7 +1339,11 @@ public class AprEndpoint extends AbstractEndpoint {
         }
 
 
-        protected void stop() {
+        /*
+         * This method is synchronized so that it is not possible for a socket
+         * to be added to the Poller's addList once this method has completed.
+         */
+        protected synchronized void stop() {
             pollerRunning = false;
         }
 
@@ -1421,8 +1425,10 @@ public class AprEndpoint extends AbstractEndpoint {
             boolean ok = false;
             synchronized (this) {
                 // Add socket to the list. Newly added sockets will wait
-                // at most for pollTime before being polled
-                if (addList.add(socket, timeout, flags)) {
+                // at most for pollTime before being polled. Don't add the
+                // socket once the poller has stopped but destroy it straight
+                // away
+                if (pollerRunning && addList.add(socket, timeout, flags)) {
                     ok = true;
                     this.notify();
                 }
