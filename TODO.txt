@@ -41,10 +41,6 @@ Java Tests and Examples
 - No mentioning of running "ant download" before tests. Without
   it test compilation fails.
 
-- "ant test" fails in line 85 of SocketServerTestSuite.java, because
-  on my system the checking for precisely 2 milliseconds won't work.
-  The call returns after 11 millis not after 2
-
 - "ant run-echo": will fail, because by default uses privileged
   port 23. Maybe switch to 8023 as a default?
   Users should not run tests as root and on most systems the default

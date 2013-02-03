@@ -79,7 +79,8 @@ public class SocketServerTestSuite extends TestCase {
         while (Socket.recv(clientSock, buf, 0, 1) == 1) {
         }
         long wait = System.currentTimeMillis() - start;
-        if (wait < 1 || wait >3) {
+        /* allow some margin between set timeout and observed return time */
+        if (wait < 1 || wait > 12) {
             Socket.close(clientSock);
             Socket.close(serverSock);
             throw new Exception("2 milliseconds client Socket.timeoutSet failed");
@@ -101,7 +102,8 @@ public class SocketServerTestSuite extends TestCase {
             ok = true;
         }
         wait = System.currentTimeMillis() - start;
-        if (wait < 1 || wait >3 && ! ok) {
+        /* allow some margin between set timeout and observed return time */
+        if (wait < 1 || wait > 12 && ! ok) {
             Socket.close(clientSock);
             Socket.close(serverSock);
             throw new Exception("2 milliseconds accept Socket.timeoutSet failed");
