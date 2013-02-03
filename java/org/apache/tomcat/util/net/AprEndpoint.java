@@ -1394,43 +1394,6 @@ public class AprEndpoint extends AbstractEndpoint {
          * Add specified socket and associated pool to the poller. The socket
          * will be added to a temporary array, and polled first after a maximum
          * amount of time equal to pollTime (in most cases, latency will be much
-         * lower, however).
-         *
-         * @param socket to add to the poller
-         */
-        public void add(long socket) {
-            int timeout = getKeepAliveTimeout();
-            if (timeout <= 0) {
-                timeout = getSoTimeout();
-            }
-            if (timeout <= 0) {
-                // Always put a timeout in
-                timeout = Integer.MAX_VALUE;
-            }
-            boolean ok = false;
-            synchronized (this) {
-                // Add socket to the list. Newly added sockets will wait
-                // at most for pollTime before being polled
-                if (addList.add(socket, timeout, Poll.APR_POLLIN)) {
-                    ok = true;
-                    this.notify();
-                }
-            }
-            if (!ok) {
-                // Can't do anything: close the socket right away
-                boolean comet = connections.get(
-                        Long.valueOf(socket)).isComet();
-                if (!comet || (comet && !processSocket(
-                        socket, SocketStatus.ERROR))) {
-                    destroySocket(socket);
-                }
-            }
-        }
-
-        /**
-         * Add specified socket and associated pool to the poller. The socket
-         * will be added to a temporary array, and polled first after a maximum
-         * amount of time equal to pollTime (in most cases, latency will be much
          * lower, however). Note: If both read and write are false, the socket
          * will only be checked for timeout; if the socket was already present
          * in the poller, a callback event will be generated and the socket will
@@ -2038,9 +2001,11 @@ public class AprEndpoint extends AbstractEndpoint {
                                     Pool.destroy(state.fdpool);
                                     Socket.timeoutSet(state.socket,
                                             getSoTimeout() * 1000);
-                                    // If all done put the socket back in the poller for
-                                    // processing of further requests
-                                    getPoller().add(state.socket);
+                                    // If all done put the socket back in the
+                                    // poller for processing of further requests
+                                    getPoller().add(
+                                            state.socket, getKeepAliveTimeout(),
+                                            true, false);
                                 } else {
                                     // Close the socket since this is
                                     // the end of not keep-alive request.
