@@ -45,6 +45,17 @@ To build the Java API
 To build the native part see jni/native/BUILDING
 
 
+Running the tests
+-----------------
+
+First run "ant download" to retrieve junit. It will be placed
+in the directory given by "base.path". The path can be changed
+by adjusting "base.path" in the file build.properties.default
+or overwrite it in a new file build.properties.
+
+Now run "ant test.
+
+
 Running the examples
 --------------------
 
