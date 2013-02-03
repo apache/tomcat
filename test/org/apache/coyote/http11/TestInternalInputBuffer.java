@@ -344,8 +344,12 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
         NewLinesClient client = new NewLinesClient(10000);
 
-        client.doRequest();
-        assertTrue(client.isResponse400());
+        // If the connection is closed fast enough, writing the request will
+        // fail and the response won't be read.
+        Exception e = client.doRequest();
+        if (e == null) {
+            assertTrue(client.isResponse400());
+        }
         assertFalse(client.isResponseBodyOK());
     }
 
