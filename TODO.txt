@@ -41,11 +41,6 @@ Java Tests and Examples
 - No mentioning of running "ant download" before tests. Without
   it test compilation fails.
 
-- "ant run-echo": will fail, because by default uses privileged
-  port 23. Maybe switch to 8023 as a default?
-  Users should not run tests as root and on most systems the default
-  port should just work.
-
 - "ant run-echo": what is the expected behaviour of this example.
   I couldn't get it to do something understandable.
   Document the example in the README.txt.

@@ -49,7 +49,7 @@ public class Echo {
             props.load(is);
             is.close();
             echoAddr = props.getProperty("echo.ip", "127.0.0.1");
-            echoPort = Integer.decode(props.getProperty("echo.port", "23")).intValue();
+            echoPort = Integer.decode(props.getProperty("echo.port", "8023")).intValue();
             echoNmax = Integer.decode(props.getProperty("echo.max", "1")).intValue();
         }
         catch (Throwable t) {
