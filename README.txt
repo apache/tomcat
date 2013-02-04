@@ -53,7 +53,7 @@ in the directory given by "base.path". The path can be changed
 by adjusting "base.path" in the file build.properties.default
 or overwrite it in a new file build.properties.
 
-Now run "ant test.
+Now run "ant test".
 
 
 Running the examples
