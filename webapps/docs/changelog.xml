@@ -107,6 +107,10 @@
       <add>
         URL rewrite valve, similar in functionality to mod_rewrite. (remm)
       </add>
+      <add>
+        Port storeconfig functionality, which can persist to server.xml and
+        context.xml runtime container configuration changes. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
