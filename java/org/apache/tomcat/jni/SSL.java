@@ -73,7 +73,7 @@ public final class SSL {
     public static final int SSL_PROTOCOL_SSLV2 = (1<<0);
     public static final int SSL_PROTOCOL_SSLV3 = (1<<1);
     public static final int SSL_PROTOCOL_TLSV1 = (1<<2);
-    public static final int SSL_PROTOCOL_ALL   = (SSL_PROTOCOL_SSLV2|SSL_PROTOCOL_SSLV3|SSL_PROTOCOL_TLSV1);
+    public static final int SSL_PROTOCOL_ALL   = (SSL_PROTOCOL_SSLV3|SSL_PROTOCOL_TLSV1);
 
     /*
      * Define the SSL verify levels
@@ -115,6 +115,8 @@ public final class SSL {
     public static final int SSL_OP_ALL                              = 0x00000FFF;
     /* As server, disallow session resumption on renegotiation */
     public static final int SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION = 0x00010000;
+    /* Don't use compression even if supported */
+    public static final int SSL_OP_NO_COMPRESSION                         = 0x00020000;
     /* Permit unsafe legacy renegotiation */
     public static final int SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION      = 0x00040000;
     /* If set, always create a new key when using tmp_eddh parameters */
@@ -230,6 +232,15 @@ public final class SSL {
     public static native int initialize(String engine);
 
     /**
+     * Enable/Disable FIPS Mode.
+     *
+     * @param mode 1 - enable, 0 - disable
+     *
+     * @return FIPS_mode_set return code
+     */
+    public static native int fipsModeSet(int mode);
+
+    /**
      * Add content of the file to the PRNG
      * @param filename Filename containing random data.
      *        If null the default file will be tested.
@@ -330,21 +341,16 @@ public final class SSL {
     public static native String getLastError();
 
     /**
-     * Return true if SSL_OP_ was defined at compile time.
-     * <p>
-     * In Tomcat Native 1.1.21 - 1.1.24 this method can be used to test whether
-     * the SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION is supported by OpenSSL.
-     * Calling it with any other SSL_OP flag returns false.
-     * <p>
-     * Since Tomcat Native 1.1.25 this method can be used with any SSL_OP flag
-     * and with any or'ed combination of SSL_OP flags to test that all of the
-     * flags were defined at compile time. It returns true if all of the flags
-     * specified by <code>op</code> were defined, and false otherwise.
-     * @param op SSL_OP to test.
-     * @return true if SSL_OP is supported by OpenSSL library.
-     * @since Tomcat Native 1.1.21
+     * Return true if all the requested SSL_OP_* are supported by OpenSSL.
+     * 
+     * <i>Note that for versions of tcnative &lt; 1.1.25, this method will
+     * return <code>true</code> if and only if <code>op</code>=
+     * {@link #SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION} and tcnative
+     * supports that flag.</i>
+     *
+     * @param op Bitwise-OR of all SSL_OP_* to test.
+     * 
+     * @return true if all SSL_OP_* are supported by OpenSSL library.
      */
     public static native boolean hasOp(int op);
-
 }
-

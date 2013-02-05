@@ -57,6 +57,29 @@ public class SSLSocket {
     public static native int renegotiate(long thesocket);
 
     /**
+     * Set Type of Client Certificate verification and Maximum depth of CA
+     * Certificates in Client Certificate verification.
+     * <br />
+     * This is used to change the verification level for a connection prior to
+     * starting a re-negotiation.
+     * <br />
+     * The following levels are available for level:
+     * <PRE>
+     * SSL_CVERIFY_NONE           - No client Certificate is required at all
+     * SSL_CVERIFY_OPTIONAL       - The client may present a valid Certificate
+     * SSL_CVERIFY_REQUIRE        - The client has to present a valid
+     *                              Certificate
+     * SSL_CVERIFY_OPTIONAL_NO_CA - The client may present a valid Certificate
+     *                              but it need not to be (successfully)
+     *                              verifiable
+     * </PRE>
+     * <br />
+     * @param sock  The socket to change.
+     * @param level Type of Client Certificate verification.
+     */
+    public static native void setVerify(long sock, int level, int depth);
+
+    /**
      * Return SSL Info parameter as byte array.
      *
      * @param sock The socket to read the data from.

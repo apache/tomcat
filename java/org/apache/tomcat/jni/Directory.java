@@ -53,7 +53,7 @@ public class Directory {
      * Find an existing directory suitable as a temporary storage location.
      * @param pool The pool to use for any necessary allocations.
      * @return The temp directory.
-     * 
+     *
      * This function uses an algorithm to search for a directory that an
      * an application can use for temporary storage.  Once such a
      * directory is found, that location is cached by the library.  Thus,

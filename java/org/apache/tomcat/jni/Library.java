@@ -30,19 +30,25 @@ public final class Library {
     /*
      * A handle to the unique Library singleton instance.
      */
-    static private Library _instance = null;
+    private static Library _instance = null;
 
     private Library()
         throws Exception
     {
         boolean loaded = false;
-        String err = "";
+        StringBuilder err = new StringBuilder();
         for (int i = 0; i < NAMES.length; i++) {
             try {
                 System.loadLibrary(NAMES[i]);
                 loaded = true;
             }
-            catch (Throwable e) {
+            catch (Throwable t) {
+                if (t instanceof ThreadDeath) {
+                    throw (ThreadDeath) t;
+                }
+                if (t instanceof VirtualMachineError) {
+                    throw (VirtualMachineError) t;
+                }
                 String name = System.mapLibraryName(NAMES[i]);
                 String path = System.getProperty("java.library.path");
                 String sep = System.getProperty("path.separator");
@@ -50,21 +56,21 @@ public final class Library {
                 for (int j=0; j<paths.length; j++) {
                     java.io.File fd = new java.io.File(paths[j] , name);
                     if (fd.exists()) {
-                        e.printStackTrace();
+                        t.printStackTrace();
                     }
                 }
                 if ( i > 0)
-                    err += ", ";
-                err +=  e.getMessage();
+                    err.append(", ");
+                err.append(t.getMessage());
             }
             if (loaded)
                 break;
         }
         if (!loaded) {
-            err += "(";
-            err += System.getProperty("java.library.path");
-            err += ")";
-            throw new UnsatisfiedLinkError(err);
+            err.append('(');
+            err.append(System.getProperty("java.library.path"));
+            err.append(')');
+            throw new UnsatisfiedLinkError(err.toString());
         }
     }
 
@@ -160,7 +166,7 @@ public final class Library {
      * called for any APR library.
      * @param libraryName the name of the library to load
      */
-    static public boolean initialize(String libraryName)
+    public static boolean initialize(String libraryName)
         throws Exception
     {
         if (_instance == null) {
