@@ -20,7 +20,7 @@ package org.apache.tomcat.jni;
 /** PasswordCallback Interface
  *
  * @author Mladen Turk
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 public interface PasswordCallback {

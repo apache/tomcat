@@ -22,7 +22,7 @@ import java.util.Properties;
 /** SSL Server server example
  *
  * @author Mladen Turk
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 public class SSLServer {

@@ -22,7 +22,7 @@ import java.util.Properties;
 /** Local Socket server example
  *
  * @author Mladen Turk
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 public class LocalServer {

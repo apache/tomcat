@@ -17,7 +17,7 @@
 /*
  *
  * @author Mladen Turk
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 #ifndef TCN_H

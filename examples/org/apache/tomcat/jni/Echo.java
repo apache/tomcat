@@ -23,7 +23,7 @@ import java.util.Properties;
 /** Echo server example
  *
  * @author Mladen Turk
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 public class Echo {

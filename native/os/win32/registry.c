@@ -17,7 +17,7 @@
 /*
  *
  * @author Mladen Turk
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 #ifndef _WIN32_WINNT

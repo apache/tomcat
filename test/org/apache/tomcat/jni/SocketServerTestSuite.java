@@ -28,7 +28,7 @@ import java.io.OutputStream;
  * A basic test suite that tests Socket Server feature.
  * 
  * @author Jean-Frederic Clere
- * @version $Revision: 466585 $, $Date: 2006-10-22 00:16:34 +0200 (Sun, 22 Oct 2006) $ 
+ * @version $Id$
  * @see org.apache.tomcat.jni
  */
 public class SocketServerTestSuite extends TestCase {

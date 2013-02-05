@@ -17,7 +17,7 @@
 /*
  *
  * @author Mladen Turk
- * @version $Revision$, $Date$
+ * @version $Id$
  */
  
 #include "tcn.h"
