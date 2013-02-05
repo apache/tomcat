@@ -54,8 +54,8 @@
     <property name="dist.root" value="./dist"/>
     <property name="ant.home" value="."/>
 
-    <property name="compile.source" value="1.4"/>
-    <property name="compile.target" value="1.4"/>
+    <property name="compile.source" value="1.7"/>
+    <property name="compile.target" value="1.7"/>
     <property name="compile.debug" value="off"/>
     <property name="compile.optimize" value="on"/>
     <property name="compile.deprecation" value="on"/>

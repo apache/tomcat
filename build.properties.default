@@ -30,8 +30,8 @@ base.path=/usr/share/java
 #base.path=C:/path/to/the/repository
 #base.path=/usr/local
 
-compile.source=1.4
-compile.target=1.4
+compile.source=1.7
+compile.target=1.7
 compile.debug=off
 compile.deprecation=on
 compile.optimize=on
