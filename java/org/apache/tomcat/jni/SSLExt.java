@@ -92,9 +92,9 @@ public final class SSLExt {
      * Return the last openssl error
      */
     public static native String sslErrReasonErrorString();
-    
+
     public static native long sslCtxSetMode(long ctx, long mode);
-    
+
     /* Allow SSL_write(..., n) to return r with 0 < r < n (i.e. report success
      * when just a single record has been written): */
     public static final int SSL_MODE_ENABLE_PARTIAL_WRITE = 0x1;
