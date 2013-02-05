@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jni;
 
 /** SSL
@@ -22,7 +21,6 @@ package org.apache.tomcat.jni;
  * @author Mladen Turk
  * @version $Id$
  */
-
 public final class SSL {
 
     /*
@@ -138,6 +136,7 @@ public final class SSL {
     public static final int SSL_OP_NO_SSLv2                         = 0x01000000;
     public static final int SSL_OP_NO_SSLv3                         = 0x02000000;
     public static final int SSL_OP_NO_TLSv1                         = 0x04000000;
+    public static final int SSL_OP_NO_TICKET                        = 0x00004000;
 
     /* The next flag deliberately changes the ciphertest, this is a check
      * for the PKCS#1 attack */
@@ -342,14 +341,14 @@ public final class SSL {
 
     /**
      * Return true if all the requested SSL_OP_* are supported by OpenSSL.
-     * 
+     *
      * <i>Note that for versions of tcnative &lt; 1.1.25, this method will
      * return <code>true</code> if and only if <code>op</code>=
      * {@link #SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION} and tcnative
      * supports that flag.</i>
      *
      * @param op Bitwise-OR of all SSL_OP_* to test.
-     * 
+     *
      * @return true if all SSL_OP_* are supported by OpenSSL library.
      */
     public static native boolean hasOp(int op);
