@@ -130,12 +130,18 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
         }
         // Make sure canWrite() and onWritePossible() have a consistent view of
         // buffer and fireListener when determining if the listener should fire
+        boolean fire = false;
+
         synchronized (fireListenerLock) {
             if (buffer == null && fireListener) {
                 fireListener = false;
-                listener.onWritePossible();
+                fire = true;
             }
         }
+        if (fire) {
+            listener.onWritePossible();
+        }
+
     }
 
     /**
