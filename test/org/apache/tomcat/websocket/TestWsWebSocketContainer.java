@@ -160,7 +160,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
     @Test
     public void testSmallBinaryBufferClientTextMessage() throws Exception {
-        doBufferTest(false, false, true, false);
+        doBufferTest(false, false, true, true);
     }
 
 
@@ -172,7 +172,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
     @Test
     public void testSmallBinaryBufferServerTextMessage() throws Exception {
-        doBufferTest(false, true, true, false);
+        doBufferTest(false, true, true, true);
     }
 
 
@@ -382,7 +382,6 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Check nothing really bad happened
         Assert.assertNull(ConstantTxEndpoint.getException());
 
-        System.out.println(ConstantTxEndpoint.getTimeout());
         // Check correct time passed
         Assert.assertTrue(ConstantTxEndpoint.getTimeout() >= TIMEOUT_MS);
 
