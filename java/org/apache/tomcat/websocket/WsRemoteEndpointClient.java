@@ -19,7 +19,11 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.CompletionHandler;
 import java.util.concurrent.TimeUnit;
+
+import javax.websocket.SendHandler;
+import javax.websocket.SendResult;
 
 public class WsRemoteEndpointClient extends WsRemoteEndpointBase {
 
@@ -31,20 +35,22 @@ public class WsRemoteEndpointClient extends WsRemoteEndpointBase {
 
 
     @Override
-    protected byte getMasked() {
-        return (byte) 0x80;
+    protected boolean isMasked() {
+        return true;
     }
 
 
     @Override
-    protected void sendMessage(WsCompletionHandler handler) {
+    protected void doWrite(SendHandler handler, ByteBuffer... data) {
         long timeout = getAsyncSendTimeout();
         if (timeout < 1) {
             timeout = Long.MAX_VALUE;
 
         }
-        channel.write(new ByteBuffer[] {outputBuffer, payload}, 0, 2,
-                getAsyncSendTimeout(), TimeUnit.MILLISECONDS, null, handler);
+        SendHandlerToCompletionHandler sh2ch =
+                new SendHandlerToCompletionHandler(handler);
+        channel.write(data, 0, data.length, getAsyncSendTimeout(),
+                TimeUnit.MILLISECONDS, null, sh2ch);
     }
 
     @Override
@@ -53,6 +59,27 @@ public class WsRemoteEndpointClient extends WsRemoteEndpointBase {
             channel.close();
         } catch (IOException ignore) {
             // Ignore
+        }
+    }
+
+
+    private static class SendHandlerToCompletionHandler
+            implements CompletionHandler<Long,Void> {
+
+        private SendHandler handler;
+
+        public SendHandlerToCompletionHandler(SendHandler handler) {
+            this.handler = handler;
+        }
+
+        @Override
+        public void completed(Long result, Void attachment) {
+            handler.setResult(new SendResult());
+        }
+
+        @Override
+        public void failed(Throwable exc, Void attachment) {
+            handler.setResult(new SendResult(exc));
         }
     }
 }

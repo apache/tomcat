@@ -18,8 +18,11 @@ package org.apache.tomcat.websocket.server;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.nio.ByteBuffer;
 
 import javax.servlet.ServletOutputStream;
+import javax.websocket.SendHandler;
+import javax.websocket.SendResult;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -40,12 +43,11 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
 
     private final ServletOutputStream sos;
     private final WsTimeout wsTimeout;
-    private volatile WsCompletionHandler handler = null;
+    private volatile SendHandler handler = null;
+    private volatile ByteBuffer[] buffers = null;
+
     private volatile long timeoutExpiry = -1;
     private volatile boolean close;
-    private volatile Long size = null;
-    private volatile boolean headerWritten = false;
-    private volatile boolean payloadWritten = false;
 
 
     public WsRemoteEndpointServer(ServletOutputStream sos,
@@ -56,50 +58,59 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
 
 
     @Override
-    protected byte getMasked() {
-        // Messages from the server are not masked
-        return 0;
+    protected final boolean isMasked() {
+        return false;
     }
 
 
     @Override
-    protected void sendMessage(WsCompletionHandler handler) {
+    protected void doWrite(SendHandler handler, ByteBuffer... buffers) {
         this.handler = handler;
+        this.buffers = buffers;
         onWritePossible();
     }
 
 
     public void onWritePossible() {
+        boolean complete = true;
         try {
             // If this is false there will be a call back when it is true
             while (sos.canWrite()) {
-                if (!headerWritten) {
-                    headerWritten = true;
-                    size = Long.valueOf(
-                            outputBuffer.remaining() + payload.remaining());
-                    sos.write(outputBuffer.array(), outputBuffer.arrayOffset(),
-                            outputBuffer.limit());
-                } else if (!payloadWritten) {
-                    payloadWritten = true;
-                    sos.write(payload.array(), payload.arrayOffset(),
-                            payload.limit());
-                } else {
+                complete = true;
+                for (ByteBuffer buffer : buffers) {
+                    if (buffer.hasRemaining()) {
+                        complete = false;
+                        sos.write(buffer.array(), buffer.arrayOffset(),
+                                buffer.limit());
+                        buffer.position(buffer.limit());
+                        break;
+                    }
+                }
+                if (complete) {
                     wsTimeout.unregister(this);
                     if (close) {
                         close();
                     }
-                    handler.completed(size, null);
-                    nextWrite();
+                    // Setting the result marks this (partial) message as
+                    // complete which means the next one may be sent which
+                    // could update the value of the handler. Therefore, keep a
+                    // local copy before signalling the end of the (partial)
+                    // message.
+                    SendHandler sh = handler;
+                    handler = null;
+                    sh.setResult(new SendResult());
                     break;
                 }
             }
+
         } catch (IOException ioe) {
             wsTimeout.unregister(this);
             close();
-            handler.failed(ioe, null);
-            nextWrite();
+            SendHandler sh = handler;
+            handler = null;
+            sh.setResult(new SendResult(ioe));
         }
-        if (handler != null) {
+        if (!complete) {
             // Async write is in progress
 
             long timeout = getAsyncSendTimeout();
@@ -132,15 +143,7 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
 
     protected void onTimeout() {
         close();
-        handler.failed(new SocketTimeoutException(), null);
-        nextWrite();
-    }
-
-
-    private void nextWrite() {
+        handler.setResult(new SendResult(new SocketTimeoutException()));
         handler = null;
-        size = null;
-        headerWritten = false;
-        payloadWritten = false;
     }
 }

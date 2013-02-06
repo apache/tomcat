@@ -254,8 +254,8 @@ public class WsSession implements Session {
             }
             msg.flip();
             try {
-                wsRemoteEndpoint.sendMessageBlocking(
-                        Constants.OPCODE_CLOSE, msg, true);
+                wsRemoteEndpoint.sendControlMessage(
+                        Constants.OPCODE_CLOSE, msg);
             } catch (IOException ioe) {
                 // Unable to send close message.
                 // TODO - Ignore?
