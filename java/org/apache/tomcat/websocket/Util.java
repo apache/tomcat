@@ -16,6 +16,11 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.CloseReason.CloseCodes;
 
@@ -24,6 +29,9 @@ import javax.websocket.CloseReason.CloseCodes;
  * {@link org.apache.tomcat.websocket} package.
  */
 class Util {
+
+    private static final Queue<SecureRandom> randoms =
+            new ConcurrentLinkedQueue<>();
 
     private Util() {
         // Hide default constructor
@@ -90,5 +98,35 @@ class Util {
             default:
                 return CloseCodes.PROTOCOL_ERROR;
         }
+    }
+
+
+    static byte[] generateMask() {
+        // SecureRandom is not thread-safe so need to make sure only one thread
+        // uses it at a time. In theory, the pool could grow to the same size
+        // as the number of request processing threads. In reality it will be
+        // a lot smaller.
+
+        // Get a SecureRandom from the pool
+        SecureRandom sr = randoms.poll();
+
+        // If one isn't available, generate a new one
+        if (sr == null) {
+            try {
+                sr = SecureRandom.getInstance("SHA1PRNG");
+            } catch (NoSuchAlgorithmException e) {
+                // Fall back to platform default
+                sr = new SecureRandom();
+            }
+        }
+
+        // Generate the mask
+        byte[] result = new byte[4];
+        sr.nextBytes(result);
+
+        // Put the SecureRandom back in the poll
+        randoms.add(sr);
+
+        return result;
     }
 }
