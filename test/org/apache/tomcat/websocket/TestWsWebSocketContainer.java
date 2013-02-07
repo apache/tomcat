@@ -309,11 +309,14 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         long timeout = System.currentTimeMillis() - lastSend;
 
+
+        String msg = "Time out was [" + timeout + "] ms";
+
         // Check correct time passed
-        Assert.assertTrue(timeout >= TIMEOUT_MS);
+        Assert.assertTrue(msg, timeout >= TIMEOUT_MS);
 
         // Check the timeout wasn't too long
-        Assert.assertTrue(timeout < TIMEOUT_MS*2);
+        Assert.assertTrue(msg, timeout < TIMEOUT_MS*2);
 
         if (sr == null) {
             Assert.fail();
