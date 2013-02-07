@@ -288,15 +288,30 @@ public class StandardRoot extends LifecycleMBeanBase
     }
 
     @Override
+    public WebResourceSet[] getPreResources() {
+        return preResources.toArray(new WebResourceSet[0]);
+    }
+
+    @Override
     public void addJarResources(WebResourceSet webResourceSet) {
         webResourceSet.setRoot(this);
         jarResources.add(webResourceSet);
     }
 
     @Override
+    public WebResourceSet[] getJarResources() {
+        return jarResources.toArray(new WebResourceSet[0]);
+    }
+
+    @Override
     public void addPostResources(WebResourceSet webResourceSet) {
         webResourceSet.setRoot(this);
         postResources.add(webResourceSet);
+    }
+
+    @Override
+    public WebResourceSet[] getPostResources() {
+        return postResources.toArray(new WebResourceSet[0]);
     }
 
     @Override
