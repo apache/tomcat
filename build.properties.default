@@ -18,9 +18,10 @@
 # ----- Version Control Flags -----
 version.major=1
 version.minor=1
-version.build=25
+version.build=27
 version.patch=0
-version.suffix=-devs
+#version.suffix=-dev
+version.suffix=
 
 # ----- Default Base Path for Dependent Packages -----
 # Please note this path must be absolute, not relative,
