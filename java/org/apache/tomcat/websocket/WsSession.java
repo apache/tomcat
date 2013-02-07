@@ -162,8 +162,7 @@ public class WsSession implements Session {
 
     @Override
     public String getProtocolVersion() {
-        // TODO Auto-generated method stub
-        return null;
+        return Constants.WS_VERSION_HEADER_VALUE;
     }
 
 
