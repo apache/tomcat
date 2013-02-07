@@ -68,7 +68,7 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
         Request request = new TesterRequest();
         final int count = 1000;
 
-        Set<String> nonces = new HashSet<>();
+        Set<String> nonces = new HashSet<String>();
 
         for (int i = 0; i < count; i++) {
             nonces.add(digestAuthenticator.generateNonce(request));
