@@ -114,6 +114,14 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     /**
+     * The last timestamp used to generate a nonce. Each nonce should get a
+     * unique timestamp.
+     */
+    protected long lastTimestamp = 0;
+    protected final Object lastTimestampLock = new Object();
+
+
+    /**
      * Maximum number of server nonces to keep in the cache. If not specified,
      * the default value of 1000 is used.
      */
@@ -399,6 +407,13 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
         long currentTime = System.currentTimeMillis();
 
+        synchronized (lastTimestampLock) {
+            if (currentTime > lastTimestamp) {
+                lastTimestamp = currentTime;
+            } else {
+                currentTime = ++lastTimestamp;
+            }
+        }
 
         String ipTimeKey =
             request.getRemoteAddr() + ":" + currentTime + ":" + getKey();
