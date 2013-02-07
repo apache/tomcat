@@ -553,13 +553,20 @@ public class StandardWrapper extends ContainerBase
 
         // The logic to determine this safely is more complex than one might
         // expect. allocate() already has the necessary logic so re-use it.
+        // Make sure the Servlet is loaded with the right class loader
+        ClassLoader old = Thread.currentThread().getContextClassLoader();
+        ClassLoader webappClassLoader =
+                ((Context) getParent()).getLoader().getClassLoader();
         try {
+            Thread.currentThread().setContextClassLoader(webappClassLoader);
             Servlet s = allocate();
             deallocate(s);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
+        } finally {
+            Thread.currentThread().setContextClassLoader(old);
         }
-        return (singleThreadModel);
+        return singleThreadModel;
 
     }
 
