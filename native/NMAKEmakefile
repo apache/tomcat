@@ -17,8 +17,9 @@
 #
 # NMAKEmakefile   Master Tomcat Native makefile.
 # Usage:
-#                 STATIC=1  Use static version of the APR
-#                 DEBUG=1   Build DEBUG version of TCN
+#                 APR_DECLARE_STATIC=1  Use static version of the APR
+#                 ENABLE_OCSP=1  	Enable OpenSSL OCSP code
+#                 DEBUG=1   		Build DEBUG version of TCN
 #
 # Originally contributed by Mladen Turk <mturk redhat.com>
 #
@@ -39,6 +40,9 @@ APR_LIB = libapr-1.lib
 !ELSE
 CFLAGS = $(CFLAGS) -DAPR_DECLARE_STATIC
 APR_LIB = apr-1.lib
+!ENDIF
+!IF DEFINED(ENABLE_OCSP)
+CFLAGS = $(CFLAGS) -DHAVE_OPENSSL_OCSP
 !ENDIF
 
 !IF !DEFINED(SRCDIR) || "$(SRCDIR)" == ""
@@ -68,9 +72,6 @@ LFLAGS = $(LFLAGS) /version:1.1
 LFLAGS = $(LFLAGS) user32.lib psapi.lib gdi32.lib shlwapi.lib wldap32.lib ole32.lib
 LFLAGS = $(LFLAGS) $(APR_LIB)
 LFLAGS = $(LFLAGS) libeay32.lib ssleay32.lib
-!IF DEFINED(WITH_OPENSSL)
-!ELSE
-!ENDIF
 
 CFLAGS = $(CFLAGS) -DZLIB_WINAPI -DNO_IDEA -DNO_RC5 -DNO_MDC2 -DOPENSSL_NO_IDEA \
 	-DOPENSSL_NO_RC5 -DOPENSSL_NO_MDC2 -DHAVE_OPENSSL -DHAVE_SSL_SET_STATE=1
@@ -107,6 +108,12 @@ OBJECTS = \
 	$(WORKDIR)\registry.obj \
 	$(WORKDIR)\system.obj
 
+HEADERS = \
+	$(SRCDIR)\include\tcn.h \
+	$(SRCDIR)\include\tcn_api.h \
+	$(SRCDIR)\include\tcn_version.h \
+	$(SRCDIR)\include\ssl_private.h
+
 BUILDLIB = $(PREFIX)\lib
 BUILDBIN = $(WORKDIR)\$(PROJECT).dll
 BUILDPDB = $(WORKDIR)\$(PROJECT).pdb
@@ -127,9 +134,9 @@ $(WORKDIR) :
 {$(SRCDIR)\os\win32}.c{$(WORKDIR)}.obj:
 	$(CC) $(CFLAGS) $(INCLUDES) $(PDBFLAGS) $<
 
-$(OBJECTS): $(SRCDIR)\include\*.h
+$(OBJECTS): $(HEADERS)
 
-$(BUILDRES): $(SRCDIR)\os\win32\libtcnative.rc $(SRCDIR)\include\*.h
+$(BUILDRES): $(SRCDIR)\os\win32\libtcnative.rc $(HEADERS)
 	$(RC) $(RCFLAGS) /i "$(SRCDIR)\include" /fo $(BUILDRES) $(SRCDIR)\os\win32\libtcnative.rc
 
 $(BUILDBIN): $(WORKDIR) $(OBJECTS) $(BUILDRES)
