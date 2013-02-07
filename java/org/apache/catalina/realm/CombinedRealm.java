@@ -84,6 +84,12 @@ public class CombinedRealm extends RealmBase {
         return result;
     }
 
+    /**
+     * Return the list of Realms contained by this Realm.
+     */
+    public Realm[] getNestedRealms() {
+        return realms.toArray(new Realm[0]);
+    }
 
     /**
      * Return the Principal associated with the specified username, which
