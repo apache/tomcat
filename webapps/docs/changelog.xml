@@ -56,9 +56,15 @@
 <section name="Tomcat 7.0.37 (markt)">
   <subsection name="Catalina">
     <changelog>
-      <bug>54534</bug>: Ensure that, if a call to
-      <code>StandardWrapper#isSingleThreadModel()</code> triggers the loading of
-      a Servlet, the correct class loader is used. (markt)
+      <fix>
+        <bug>54521</bug>: Ensure that concurrent requests that require a DIGEST
+        authentication challenge receive different nonce values. (markt)
+      </fix>
+      <fix>
+        <bug>54534</bug>: Ensure that, if a call to
+        <code>StandardWrapper#isSingleThreadModel()</code> triggers the loading
+        of a Servlet, the correct class loader is used. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
