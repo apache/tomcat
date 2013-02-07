@@ -39,12 +39,15 @@
 <section name="Changes between 1.1.26 and 1.1.27">
   <changelog>
     <fix>
+      <bug>54513</bug>: Fix regression in pollset return value. (mturk)
+    </fix>
+    <fix>
       Switch CPU information on Solaris from milliseconds to
       microseconds. Make consistent with OS.java and Linux impl. (rjung)
     </fix>
   </changelog>
 </section>
-<section name="Changes between 1.1.25 and 1.1.26">
+<section name="Changes between 1.1.25 and 1.1.26 (not released)">
   <changelog>
     <fix>
       <bug>54468</bug>: Fix FIPS mode for listeners when using OpenSSL 1.0.1c
