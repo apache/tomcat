@@ -25,8 +25,24 @@ import java.util.concurrent.Future;
 
 public interface RemoteEndpoint {
 
+    /**
+     * Enable or disable the batching of outgoing messages for this endpoint. If
+     * batching is disabled when it was previously enabled then this method will
+     * block until any currently batched messages have been written.
+     *
+     * @param batchingAllowed   New setting
+     */
     void setBatchingAllowed(boolean batchingAllowed);
+
+    /**
+     * Obtains the current batching status of the endpoint.
+     */
     boolean getBatchingAllowed();
+
+    /**
+     * Flush any currently batched messages to the remote endpoint. This method
+     * will block until the flush completes.
+     */
     void flushBatch();
 
     /**
@@ -58,8 +74,28 @@ public interface RemoteEndpoint {
      */
     void sendBytes(ByteBuffer data) throws IOException;
 
+    /**
+     * Sends part of a text message to the remote endpoint. Once the first part
+     * of a message has been sent, no other text or binary messages may be sent
+     * until all remaining parts of this message have been sent.
+     *
+     * @param fragment  The partial message to send
+     * @param isLast    <code>true</code> if this is the last part of the
+     *                  message, otherwise <code>false</code>
+     * @throws IOException
+     */
     void sendPartialString(String fragment, boolean isLast) throws IOException;
 
+    /**
+     * Sends part of a binary message to the remote endpoint. Once the first
+     * part of a message has been sent, no other text or binary messages may be
+     * sent until all remaining parts of this message have been sent.
+     *
+     * @param partialByte   The partial message to send
+     * @param isLast        <code>true</code> if this is the last part of the
+     *                      message, otherwise <code>false</code>
+     * @throws IOException
+     */
     void sendPartialBytes(ByteBuffer partialByte, boolean isLast) throws IOException;
 
     OutputStream getSendStream() throws IOException;
@@ -68,20 +104,60 @@ public interface RemoteEndpoint {
 
     void sendObject(Object o) throws IOException, EncodeException;
 
+    /**
+     * Send the message asynchronously, using the SendHandler to signal to the
+     * client when the message has been sent.
+     * @param text          The text message to send
+     * @param completion    Used to signal to the client when the message has
+     *                      been sent
+     */
     void sendStringByCompletion(String text, SendHandler completion);
 
+    /**
+     * Send the message asynchronously, using the Future to signal to the client
+     * when the message has been sent.
+     * @param text          The text message to send
+     */
     Future<SendResult> sendStringByFuture(String text);
 
+    /**
+     * Send the message asynchronously, using the Future to signal to the client
+     * when the message has been sent.
+     * @param data          The text message to send
+     */
     Future<SendResult> sendBytesByFuture(ByteBuffer data);
 
+    /**
+     * Send the message asynchronously, using the SendHandler to signal to the
+     * client when the message has been sent.
+     * @param data          The text message to send
+     * @param completion    Used to signal to the client when the message has
+     *                      been sent
+     */
     void sendBytesByCompletion(ByteBuffer data, SendHandler completion);
 
     Future<SendResult> sendObjectByFuture(Object obj);
 
     void sendObjectByCompletion(Object obj, SendHandler completion);
 
-    void sendPing(ByteBuffer applicationData) throws IOException, IllegalArgumentException;
+    /**
+     * Send a ping message blocking until the message has been sent. Note that
+     * if a message is in the process of being sent asynchronously, this method
+     * will block until that message and this ping has been sent.
+     *
+     * @param applicationData   The payload for the ping message
+     */
+    void sendPing(ByteBuffer applicationData)
+            throws IOException, IllegalArgumentException;
 
-    void sendPong(ByteBuffer applicationData) throws IOException, IllegalArgumentException;
+    /**
+     * Send a pong message blocking until the message has been sent. Note that
+     * if a message is in the process of being sent asynchronously, this method
+     * will block until that message and this pong has been sent.
+     *
+     * @param applicationData   The payload for the pong message
+     */
+    void sendPong(ByteBuffer applicationData)
+            throws IOException, IllegalArgumentException;
 }
 
