@@ -18,15 +18,21 @@ package org.apache.catalina.authenticator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.core.TesterContext;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
@@ -52,6 +58,25 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
     private static String NC1 = "00000001";
     private static String NC2 = "00000002";
     private static String QOP = "auth";
+
+
+    @Test
+    public void bug54521() throws LifecycleException {
+        DigestAuthenticator digestAuthenticator = new DigestAuthenticator();
+        digestAuthenticator.setContainer(new TesterContext());
+        digestAuthenticator.start();
+        Request request = new TesterRequest();
+        final int count = 1000;
+
+        Set<String> nonces = new HashSet<>();
+
+        for (int i = 0; i < count; i++) {
+            nonces.add(digestAuthenticator.generateNonce(request));
+        }
+
+        Assert.assertEquals(count,  nonces.size());
+    }
+
 
     @Test
     public void testAllValid() throws Exception {
@@ -361,5 +386,14 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
     private static String digest(String input) {
         return MD5Encoder.encode(
                 ConcurrentMessageDigest.digestMD5(input.getBytes()));
+    }
+
+
+    private static class TesterRequest extends Request {
+
+        @Override
+        public String getRemoteAddr() {
+            return "127.0.0.1";
+        }
     }
 }
