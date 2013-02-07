@@ -53,7 +53,16 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
-<section name="Tomcat 7.0.36 (markt)">
+<section name="Tomcat 7.0.37 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <bug>54534</bug>: Ensure that, if a call to
+      <code>StandardWrapper#isSingleThreadModel()</code> triggers the loading of
+      a Servlet, the correct class loader is used. (markt)
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 7.0.36 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
