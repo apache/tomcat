@@ -213,16 +213,34 @@ public interface WebResourceRoot extends Lifecycle {
     void addPreResources(WebResourceSet webResourceSet);
 
     /**
+     * Get the list of WebResourceSet configured to this web application 
+     * as a 'Pre' resource.
+     */
+    WebResourceSet[] getPreResources();
+
+    /**
      * Adds the provided WebResourceSet to this web application as a 'Jar'
      * resource.
      */
     void addJarResources(WebResourceSet webResourceSet);
 
     /**
+     * Get the list of WebResourceSet configured to this web application 
+     * as a 'Jar' resource.
+     */
+    WebResourceSet[] getJarResources();
+
+    /**
      * Adds the provided WebResourceSet to this web application as a 'Post'
      * resource.
      */
     void addPostResources(WebResourceSet webResourceSet);
+
+    /**
+     * Get the list of WebResourceSet configured to this web application 
+     * as a 'Post' resource.
+     */
+    WebResourceSet[] getPostResources();
 
     /**
      * Obtain the web application this WebResourceRoot is associated with.

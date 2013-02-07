@@ -20,6 +20,7 @@ package org.apache.catalina.storeconfig;
 import java.io.PrintWriter;
 
 import org.apache.catalina.WebResourceRoot;
+import org.apache.catalina.WebResourceSet;
 
 /**
  * Generate Resources element
@@ -42,7 +43,44 @@ public class WebResourceRootSF extends StoreFactoryBase {
     public void storeChilds(PrintWriter aWriter, int indent, Object aResourceRoot,
             StoreDescription parentDesc) throws Exception {
         if (aResourceRoot instanceof WebResourceRoot) {
-            // FIXME: No getter to access PreResource, JarResources and PostResources
+            WebResourceRoot resourceRoot = (WebResourceRoot) aResourceRoot;
+
+            // Store nested <PreResources> elements
+            WebResourceSet[] preResourcesArray = resourceRoot.getPreResources();
+            StoreDescription preResourcesElementDesc = getRegistry().findDescription(
+                    WebResourceSet.class.getName()
+                            + ".[PreResources]");
+            if (preResourcesElementDesc != null) {
+                for (WebResourceSet preResources : preResourcesArray) {
+                    preResourcesElementDesc.getStoreFactory().store(aWriter, indent,
+                            preResources);
+                }
+            }
+
+            // Store nested <JarResources> elements
+            WebResourceSet[] jarResourcesArray = resourceRoot.getJarResources();
+            StoreDescription jarResourcesElementDesc = getRegistry().findDescription(
+                    WebResourceSet.class.getName()
+                            + ".[JarResources]");
+            if (jarResourcesElementDesc != null) {
+                for (WebResourceSet jarResources : jarResourcesArray) {
+                    preResourcesElementDesc.getStoreFactory().store(aWriter, indent,
+                            jarResources);
+                }
+            }
+
+            // Store nested <PostResources> elements
+            WebResourceSet[] postResourcesArray = resourceRoot.getPostResources();
+            StoreDescription postResourcesElementDesc = getRegistry().findDescription(
+                    WebResourceSet.class.getName()
+                            + ".[PostResources]");
+            if (postResourcesElementDesc != null) {
+                for (WebResourceSet postResources : postResourcesArray) {
+                    preResourcesElementDesc.getStoreFactory().store(aWriter, indent,
+                            postResources);
+                }
+            }
+
         }
     }
 }
