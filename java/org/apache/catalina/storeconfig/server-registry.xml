@@ -69,15 +69,15 @@
 	    <TransientAttribute>displayName</TransientAttribute>
 	    <TransientAttribute>distributable</TransientAttribute>
 	    <TransientAttribute>domain</TransientAttribute>
-	    <TransientAttribute>engineName</TransientAttribute>
 	    <TransientAttribute>name</TransientAttribute>
 	    <TransientAttribute>publicId</TransientAttribute>
 	    <TransientAttribute>originalDocBase</TransientAttribute>	    
 	    <TransientAttribute>replaceWelcomeFiles</TransientAttribute>
-	    <TransientAttribute>saveConfig</TransientAttribute>
 	    <TransientAttribute>sessionTimeout</TransientAttribute>
 	    <TransientAttribute>startupTime</TransientAttribute>
 	    <TransientAttribute>tldScanTime</TransientAttribute>
+        <TransientAttribute>effectiveMajorVersion</TransientAttribute>
+        <TransientAttribute>effectiveMinorVersion</TransientAttribute>    
      </Description>
      <Description
         id="org.apache.catalina.deploy.NamingResources.[GlobalNamingResources]"
