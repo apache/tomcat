@@ -90,7 +90,7 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
         MBeanServer mserver = MBeanUtils.createServer();
         InputStream descriptor = null;
         try {
-            ObjectName objectName = new ObjectName(server.getDomain() + ":type=StoreConfig" );
+            ObjectName objectName = new ObjectName("Catalina:type=StoreConfig" );
             if (!mserver.isRegistered(objectName)) {
                 registry.registerComponent(storeConfig, objectName, "StoreConfig");
             }
