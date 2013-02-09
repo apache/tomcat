@@ -213,7 +213,7 @@ public interface WebResourceRoot extends Lifecycle {
     void addPreResources(WebResourceSet webResourceSet);
 
     /**
-     * Get the list of WebResourceSet configured to this web application 
+     * Get the list of WebResourceSet configured to this web application
      * as a 'Pre' resource.
      */
     WebResourceSet[] getPreResources();
@@ -225,7 +225,7 @@ public interface WebResourceRoot extends Lifecycle {
     void addJarResources(WebResourceSet webResourceSet);
 
     /**
-     * Get the list of WebResourceSet configured to this web application 
+     * Get the list of WebResourceSet configured to this web application
      * as a 'Jar' resource.
      */
     WebResourceSet[] getJarResources();
@@ -237,7 +237,7 @@ public interface WebResourceRoot extends Lifecycle {
     void addPostResources(WebResourceSet webResourceSet);
 
     /**
-     * Get the list of WebResourceSet configured to this web application 
+     * Get the list of WebResourceSet configured to this web application
      * as a 'Post' resource.
      */
     WebResourceSet[] getPostResources();

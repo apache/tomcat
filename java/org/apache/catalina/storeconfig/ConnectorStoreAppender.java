@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,7 +60,7 @@ public class ConnectorStoreAppender extends StoreAppender {
 
     /**
      * Store the relevant attributes of the specified JavaBean.
-     * 
+     *
      * @param writer
      *            PrintWriter to which we are storing
      * @param include
@@ -69,7 +69,7 @@ public class ConnectorStoreAppender extends StoreAppender {
      *            Bean whose properties are to be rendered as attributes,
      * @param desc
      *            RegistryDescrpitor from this bean
-     * 
+     *
      * @exception Exception
      *                if an exception occurs while storing
      */
@@ -123,7 +123,7 @@ public class ConnectorStoreAppender extends StoreAppender {
 
     /**
      * Get all properties from Connector and current ProtocolHandler
-     * 
+     *
      * @param bean
      * @return List of Connector Properties
      * @throws IntrospectionException
@@ -182,7 +182,7 @@ public class ConnectorStoreAppender extends StoreAppender {
 
     /**
      * print Attributes
-     * 
+     *
      * @param aWriter
      * @param indent
      * @param bean
@@ -198,7 +198,7 @@ public class ConnectorStoreAppender extends StoreAppender {
 
     /*
      * Print the open tag for connector attributes (override)
-     * 
+     *
      * @see org.apache.catalina.storeconfig.StoreAppender#printOpenTag(java.io.PrintWriter,
      *      int, java.lang.Object,
      *      org.apache.catalina.storeconfig.StoreDescription)
@@ -213,7 +213,7 @@ public class ConnectorStoreAppender extends StoreAppender {
 
     /**
      * print a tag for connector attributes (override)
-     * 
+     *
      * @see org.apache.catalina.storeconfig.StoreAppender#printTag(java.io.PrintWriter,
      *      int, java.lang.Object,
      *      org.apache.catalina.storeconfig.StoreDescription)
@@ -228,7 +228,7 @@ public class ConnectorStoreAppender extends StoreAppender {
 
     /**
      * print a value but replace attribute name
-     * 
+     *
      * @param writer
      * @param name
      * @param value
@@ -243,11 +243,11 @@ public class ConnectorStoreAppender extends StoreAppender {
         }
         super.printValue(writer, indent, repl, value);
     }
-    
+
     /*
      * Print Connector Values. <ul><li> Spezial handling to default jkHome.
      * </li><li> Don't save catalina.base path at server.xml</li><li></ul>
-     * 
+     *
      * @see org.apache.catalina.config.StoreAppender#isPrintValue(java.lang.Object,
      *      java.lang.Object, java.lang.String,
      *      org.apache.catalina.config.StoreDescription)

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,17 +21,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Bean of a StoreDescription 
- * 
+ * Bean of a StoreDescription
+ *
  * <pre>
- * 
+ *
  *  &lt;Description
  *  tag=&quot;Context&quot;
  *  standard=&quot;true&quot;
- *  default=&quot;true&quot; 
- *  externalAllowed=&quot;true&quot; 
+ *  default=&quot;true&quot;
+ *  externalAllowed=&quot;true&quot;
  *  storeSeparate=&quot;true&quot;
- *  backup=&quot;true&quot; 
+ *  backup=&quot;true&quot;
  *  childs=&quot;true&quot;
  *  tagClass=&quot;org.apache.catalina.core.StandardContext&quot;
  *  storeFactoryClass=&quot;org.apache.catalina.storeconfig.StandardContextSF&quot;
@@ -51,8 +51,8 @@ import java.util.List;
  *     &lt;TransientAttribute&gt;startupTime&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;tldScanTime&lt;/TransientAttribute&gt;
  *  &lt;/Description&gt;
- * 
- *  
+ *
+ *
  * </pre>
  */
 public class StoreDescription {
@@ -286,7 +286,7 @@ public class StoreDescription {
 
     /**
      * is child transient, please don't save this.
-     * 
+     *
      * @param classname
      * @return is classname attribute?
      */
@@ -298,7 +298,7 @@ public class StoreDescription {
 
     /**
      * is attribute transient, please don't save this.
-     * 
+     *
      * @param attribute
      * @return is transient attribute?
      */
@@ -310,7 +310,7 @@ public class StoreDescription {
 
     /**
      * Return the real id or TagClass
-     * 
+     *
      * @return Returns the id.
      */
     public String getId() {

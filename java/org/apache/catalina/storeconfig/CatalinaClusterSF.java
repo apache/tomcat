@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,14 +36,14 @@ public class CatalinaClusterSF extends StoreFactoryBase {
 
     /**
      * Store the specified Cluster childs.
-     * 
+     *
      * @param aWriter
      *            PrintWriter to which we are storing
      * @param indent
      *            Number of spaces to indent this element
      * @param aCluster
      *            Cluster whose properties are being stored
-     * 
+     *
      * @exception Exception
      *                if an exception occurs while storing
      */
@@ -73,7 +73,7 @@ public class CatalinaClusterSF extends StoreFactoryBase {
             // ClusterValve are not store at Hosts element, see
             Valve valves[] = cluster.getValves();
             storeElementArray(aWriter, indent, valves);
- 
+
             if (aCluster instanceof SimpleTcpCluster) {
                 // Store nested <Listener> elements
                 LifecycleListener listeners[] = ((SimpleTcpCluster)cluster).findLifecycleListeners();

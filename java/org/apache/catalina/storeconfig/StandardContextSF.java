@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -58,7 +58,7 @@ public class StandardContextSF extends StoreFactoryBase {
     /*
      * Store a Context as Separate file as configFile value from context exists.
      * filename can be relative to catalina.base.
-     * 
+     *
      * @see org.apache.catalina.config.IStoreFactory#store(java.io.PrintWriter,
      *      int, java.lang.Object)
      */
@@ -92,7 +92,7 @@ public class StandardContextSF extends StoreFactoryBase {
     /**
      * Store a Context without backup add separate file or when configFile =
      * null a aWriter.
-     * 
+     *
      * @param aWriter
      * @param indent
      * @param aContext
@@ -107,7 +107,7 @@ public class StandardContextSF extends StoreFactoryBase {
             if (!config.isAbsolute()) {
                 config = new File(System.getProperty("catalina.base"),
                         config.getPath());
-            }            
+            }
             if( (!config.isFile()) || (!config.canWrite())) {
                 log.error("Cannot write context output file at "
                             + configFile + ", not saving.");
@@ -145,7 +145,7 @@ public class StandardContextSF extends StoreFactoryBase {
 
     /**
      * Store the Context with a Backup
-     * 
+     *
      * @param aContext
      * @throws Exception
      */
@@ -201,7 +201,7 @@ public class StandardContextSF extends StoreFactoryBase {
 
     /**
      * Get explicit writer for context (context.getConfigFile()).
-     * 
+     *
      * @param context
      * @return The file mover
      * @throws IOException
@@ -225,14 +225,14 @@ public class StandardContextSF extends StoreFactoryBase {
 
     /**
      * Store the specified Host properties.
-     * 
+     *
      * @param aWriter
      *            PrintWriter to which we are storing
      * @param indent
      *            Number of spaces to indent this element
      * @param aContext
      *            Context whose properties are being stored
-     * 
+     *
      * @exception Exception
      *                if an exception occurs while storing
      */
@@ -334,7 +334,7 @@ public class StandardContextSF extends StoreFactoryBase {
 
     /**
      * filter out the default watched resources
-     * 
+     *
      * @param context
      * @param wresources
      * @return The watched resources
@@ -355,7 +355,7 @@ public class StandardContextSF extends StoreFactoryBase {
                 .getCanonicalPath();
         String configFile = new File(context.getConfigFile().toURI()).getCanonicalPath();
         String webxml = "WEB-INF/web.xml" ;
-        
+
         List<String> resource = new ArrayList<>();
         for (int i = 0; i < wresources.length; i++) {
 
