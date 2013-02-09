@@ -137,14 +137,15 @@ public class StoreConfig implements IStoreConfig {
                         desc.setStoreSeparate(true);
                         desc.setBackup(backup);
                         desc.setExternalAllowed(externalAllowed);
-                        store((Server) aServer);
+                        store(aServer);
                     } finally {
                         desc.setStoreSeparate(oldSeparate);
                         desc.setBackup(oldBackup);
                         desc.setExternalAllowed(oldExternalAllowed);
                     }
-                } else
-                    store((Server) aServer);
+                } else {
+                    store(aServer);
+                }
             } catch (Exception e) {
                 if (log.isInfoEnabled())
                     log.info("Object " + aServerName

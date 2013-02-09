@@ -19,7 +19,6 @@ package org.apache.catalina.storeconfig;
 
 import java.io.PrintWriter;
 
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.connector.Connector;
 
@@ -43,11 +42,8 @@ public class ConnectorSF extends StoreFactoryBase {
         if (aConnector instanceof Connector) {
             Connector connector = (Connector) aConnector;
             // Store nested <Listener> elements
-            if (connector instanceof Lifecycle) {
-                LifecycleListener listeners[] = ((Lifecycle) connector)
-                        .findLifecycleListeners();
-                storeElementArray(aWriter, indent, listeners);
-            }
+            LifecycleListener listeners[] = connector.findLifecycleListeners();
+            storeElementArray(aWriter, indent, listeners);
         }
     }
 

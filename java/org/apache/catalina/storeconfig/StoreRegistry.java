@@ -105,7 +105,7 @@ public class StoreRegistry {
     public StoreDescription findDescription(String id) {
         if (log.isDebugEnabled())
             log.debug("search descriptor " + id);
-        StoreDescription desc = (StoreDescription) descriptors.get(id);
+        StoreDescription desc = descriptors.get(id);
         if (desc == null) {
             Class<?> aClass = null;
             try {
@@ -115,11 +115,10 @@ public class StoreRegistry {
                 log.error("ClassName:" + id, e);
             }
             if (aClass != null) {
-                desc = (StoreDescription) descriptors.get(aClass.getName());
+                desc = descriptors.get(aClass.getName());
                 for (int i = 0; desc == null && i < interfaces.length; i++) {
                     if (interfaces[i].isAssignableFrom(aClass)) {
-                        desc = (StoreDescription) descriptors.get(interfaces[i]
-                                .getName());
+                        desc = descriptors.get(interfaces[i].getName());
                     }
                 }
             }
@@ -187,7 +186,7 @@ public class StoreRegistry {
         String key = desc.getId();
         if (key == null || "".equals(key))
             key = desc.getTagClass();
-        return (StoreDescription) descriptors.remove(key);
+        return descriptors.remove(key);
     }
 
     // Attributes

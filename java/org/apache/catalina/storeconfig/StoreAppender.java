@@ -252,7 +252,7 @@ public class StoreAppender {
         if (bean instanceof ResourceBase) {
             ResourceBase resource = (ResourceBase) bean;
             for (Iterator<String> iter = resource.listProperties(); iter.hasNext();) {
-                String name = (String) iter.next();
+                String name = iter.next();
                 Object value = resource.getProperty(name);
                 if (!isPersistable(value.getClass())) {
                     continue;
