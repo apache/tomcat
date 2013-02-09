@@ -19,7 +19,6 @@ package org.apache.tomcat.websocket;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -27,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.websocket.CloseReason;
 import javax.websocket.ContainerProvider;
 import javax.websocket.DefaultClientConfiguration;
 import javax.websocket.DeploymentException;
@@ -47,6 +45,10 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.coyote.http11.Http11Protocol;
+import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicBinary;
+import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicHandler;
+import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicText;
+import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterEndpoint;
 import org.apache.tomcat.websocket.server.ServerContainerImpl;
 import org.apache.tomcat.websocket.server.WsListener;
 
@@ -73,7 +75,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(TesterEcho.Config.class.getName());
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
 
         tomcat.start();
 
@@ -81,9 +83,9 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                 ContainerProvider.createClientContainer();
         Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
                 new DefaultClientConfiguration(), new URI("http://localhost:" +
-                        getPort() + TesterEcho.Config.PATH_ASYNC));
+                        getPort() + TesterEchoServer.Config.PATH_ASYNC));
         CountDownLatch latch = new CountDownLatch(1);
-        TesterMessageHandlerText handler = new TesterMessageHandlerText(latch);
+        BasicText handler = new BasicText(latch);
         wsSession.addMessageHandler(handler);
         wsSession.getRemote().sendString(MESSAGE_STRING_1);
 
@@ -103,7 +105,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(TesterEcho.Config.class.getName());
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
 
         tomcat.start();
 
@@ -111,7 +113,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                 ContainerProvider.createClientContainer();
         wsContainer.connectToServer(TesterEndpoint.class,
                 new DefaultClientConfiguration(), new URI("ftp://localhost:" +
-                        getPort() + TesterEcho.Config.PATH_ASYNC));
+                        getPort() + TesterEchoServer.Config.PATH_ASYNC));
     }
 
 
@@ -121,7 +123,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(TesterEcho.Config.class.getName());
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
 
         tomcat.start();
 
@@ -129,7 +131,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                 ContainerProvider.createClientContainer();
         wsContainer.connectToServer(TesterEndpoint.class,
                 new DefaultClientConfiguration(),
-                new URI("http://" + TesterEcho.Config.PATH_ASYNC));
+                new URI("http://" + TesterEchoServer.Config.PATH_ASYNC));
     }
 
 
@@ -188,7 +190,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(TesterEcho.Config.class.getName());
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
 
         WebSocketContainer wsContainer =
                 ContainerProvider.createClientContainer();
@@ -217,14 +219,14 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
                 new DefaultClientConfiguration(), new URI("http://localhost:" +
-                        getPort() + TesterEcho.Config.PATH_BASIC));
-        TesterMessageHandler<?> handler;
+                        getPort() + TesterEchoServer.Config.PATH_BASIC));
+        BasicHandler<?> handler;
         CountDownLatch latch = new CountDownLatch(1);
         wsSession.getUserProperties().put("latch", latch);
         if (isTextMessage) {
-            handler = new TesterMessageHandlerText(latch);
+            handler = new BasicText(latch);
         } else {
-            handler = new TesterMessageHandlerBinary(latch);
+            handler = new BasicBinary(latch);
         }
 
         wsSession.addMessageHandler(handler);
@@ -397,90 +399,6 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                     ConstantTxEndpoint.getSendResult().getException());
         }
 
-    }
-
-
-    private abstract static class TesterMessageHandler<T>
-            implements MessageHandler.Basic<T> {
-
-        private final CountDownLatch latch;
-
-        private final List<T> messages = new CopyOnWriteArrayList<>();
-
-        public TesterMessageHandler(CountDownLatch latch) {
-            this.latch = latch;
-        }
-
-        public CountDownLatch getLatch() {
-            return latch;
-        }
-
-        public List<T> getMessages() {
-            return messages;
-        }
-    }
-
-    private static class TesterMessageHandlerText
-            extends TesterMessageHandler<String> {
-
-
-        public TesterMessageHandlerText(CountDownLatch latch) {
-            super(latch);
-        }
-
-        @Override
-        public void onMessage(String message) {
-            getMessages().add(message);
-            if (getLatch() != null) {
-                getLatch().countDown();
-            }
-        }
-    }
-
-
-    private static class TesterMessageHandlerBinary
-            extends TesterMessageHandler<ByteBuffer> {
-
-        public TesterMessageHandlerBinary(CountDownLatch latch) {
-            super(latch);
-        }
-
-        @Override
-        public void onMessage(ByteBuffer message) {
-            getMessages().add(message);
-            if (getLatch() != null) {
-                getLatch().countDown();
-            }
-        }
-    }
-
-
-    public static class TesterEndpoint extends Endpoint {
-
-        @Override
-        public void onClose(Session session, CloseReason closeReason) {
-            clearLatch(session);
-        }
-
-        @Override
-        public void onError(Session session, Throwable throwable) {
-            clearLatch(session);
-        }
-
-        private void clearLatch(Session session) {
-            CountDownLatch latch =
-                    (CountDownLatch) session.getUserProperties().get("latch");
-            if (latch != null) {
-                while (latch.getCount() > 0) {
-                    latch.countDown();
-                }
-            }
-        }
-
-        @Override
-        public void onOpen(Session session, EndpointConfiguration config) {
-            // NO-OP
-        }
     }
 
 
