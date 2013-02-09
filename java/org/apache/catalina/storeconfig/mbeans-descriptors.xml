@@ -23,11 +23,11 @@
                domain="Catalina"
                 group="StoreConfig"
                  type="org.apache.catalina.storeconfig.StoreConfig">
-    <operation name="storeConfig" 
-               description="Store Server" 
+    <operation name="storeConfig"
+               description="Store Server"
                impact="ACTION" returnType="void" />
-    <operation name="storeServer" 
-               description="Store Server from ObjectName" 
+    <operation name="storeServer"
+               description="Store Server from ObjectName"
                impact="ACTION" returnType="void" >
          <parameter name="objectname"
                  description="Objectname from Server"
@@ -44,8 +44,8 @@
 <!--
    Catalina:j2eeType=WebModule,name=//localhost/manager,J2EEApplication=none,J2EEServer=none
 -->
-   <operation name="storeContext" 
-               description="Store Context from ObjectName" 
+   <operation name="storeContext"
+               description="Store Context from ObjectName"
                impact="ACTION" returnType="void" >
          <parameter name="objectname"
                  description="ObjectName from Context"
@@ -56,37 +56,37 @@
          <parameter name="externalAllowed"
                  description="store all or store only internal server.xml context (configFile == null)"
                  type="boolean"/>
-    </operation>           
-    <operation name="store" 
-               description="Store Server" 
+    </operation>
+    <operation name="store"
+               description="Store Server"
                impact="ACTION" returnType="void" >
           <parameter name="server"
                  description="Server"
                  type="org.apache.catalina.Server"
                  />
-    </operation>           
-    <operation name="store" 
-               description="Store Context" 
+    </operation>
+    <operation name="store"
+               description="Store Context"
                impact="ACTION" returnType="void" >
           <parameter name="context"
                  description="Context"
                  type="org.apache.catalina.context"/>
-    </operation>           
-    <operation name="store" 
-               description="Store Host" 
+    </operation>
+    <operation name="store"
+               description="Store Host"
                impact="ACTION" returnType="void" >
           <parameter name="host"
                  description="Host"
                  type="org.apache.catalina.Host"/>
-    </operation>           
-    <operation name="store" 
-               description="Store Service" 
+    </operation>
+    <operation name="store"
+               description="Store Service"
                impact="ACTION" returnType="void" >
           <parameter name="service"
                  description="service"
                  type="org.apache.catalina.Service"/>
-    </operation>           
- 
+    </operation>
+
   </mbean>
 
 </mbeans-descriptors>

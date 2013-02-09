@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,7 +47,7 @@ public class StoreConfig implements IStoreConfig {
 
     /**
      * get server.xml location
-     * 
+     *
      * @return The server file name
      */
     public String getServerFilename() {
@@ -56,7 +56,7 @@ public class StoreConfig implements IStoreConfig {
 
     /**
      * set new server.xml location
-     * 
+     *
      * @param string
      */
     public void setServerFilename(String string) {
@@ -66,7 +66,7 @@ public class StoreConfig implements IStoreConfig {
     /*
      * Get the StoreRegistry with all factory to generate the
      * server.xml/context.xml files
-     * 
+     *
      * @see org.apache.catalina.config.IStoreConfig#getRegistry()
      */
     public StoreRegistry getRegistry() {
@@ -75,7 +75,7 @@ public class StoreConfig implements IStoreConfig {
 
     /*
      * set StoreRegistry
-     * 
+     *
      * @see org.apache.catalina.config.IStoreConfig#setRegistry(org.apache.catalina.config.ConfigurationRegistry)
      */
     public void setServer(Server aServer) {
@@ -92,7 +92,7 @@ public class StoreConfig implements IStoreConfig {
 
     /**
      * Store current Server
-     * 
+     *
      * @see org.apache.catalina.ServerFactory#getServer()
      */
     public synchronized void storeConfig() {
@@ -101,7 +101,7 @@ public class StoreConfig implements IStoreConfig {
 
     /**
      * Store Server from Object Name (Catalina:type=Server)
-     * 
+     *
      * @param aServerName
      *            Server ObjectName
      * @param backup
@@ -151,7 +151,7 @@ public class StoreConfig implements IStoreConfig {
 
     /**
      * Store a Context from ObjectName
-     * 
+     *
      * @param aContextName
      *            MBean ObjectName
      * @param backup
@@ -216,7 +216,7 @@ public class StoreConfig implements IStoreConfig {
     /**
      * Write the configuration information for this entire <code>Server</code>
      * out to the server.xml configuration file.
-     *  
+     *
      */
     public synchronized void store(Server aServer) {
 
@@ -252,7 +252,7 @@ public class StoreConfig implements IStoreConfig {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.catalina.config.IStoreConfig#store(org.apache.catalina.Context)
      */
     public synchronized void store(Context aContext) {
@@ -280,7 +280,7 @@ public class StoreConfig implements IStoreConfig {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.catalina.config.IStoreConfig#store(java.io.PrintWriter,
      *      int, org.apache.catalina.Context)
      */
@@ -303,7 +303,7 @@ public class StoreConfig implements IStoreConfig {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.catalina.config.IStoreConfig#store(java.io.PrintWriter,
      *      int, org.apache.catalina.Host)
      */
@@ -319,7 +319,7 @@ public class StoreConfig implements IStoreConfig {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.catalina.config.IStoreConfig#store(java.io.PrintWriter,
      *      int, org.apache.catalina.Service)
      */
@@ -337,7 +337,7 @@ public class StoreConfig implements IStoreConfig {
     /**
      * Store the state of this Server MBean (which will recursively store
      * everything)
-     * 
+     *
      * @param writer
      * @param indent
      * @param aServer

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,11 +29,11 @@ import org.xml.sax.SAXException;
 
 /**
  * <b>XML Format </b>
- * 
+ *
  * <pre>
- *    
+ *
  *       &lt;Registry name=&quot;&quot; encoding=&quot;UTF8&quot; &gt;
- *       &lt;Description tag=&quot;Server&quot; standard=&quot;true&quot; default=&quot;true&quot;/&gt; 
+ *       &lt;Description tag=&quot;Server&quot; standard=&quot;true&quot; default=&quot;true&quot;/&gt;
  *          tagClass=&quot;org.apache.catalina.core.StandardServer&quot;
  *          storeFactory=&quot;org.apache.catalina.storeconfig.StandardServerSF&quot;&gt;
  *        &lt;TransientAttributes&gt;
@@ -45,10 +45,10 @@ import org.xml.sax.SAXException;
  *       &lt;/Description&gt;
  *   ...
  *       &lt;/Tegistry&gt;
- *     
+ *
  * </pre>
- * 
- * 
+ *
+ *
  * Convention:
  * <ul>
  * <li>Factories at subpackage <i>org.apache.catalina.core.storeconfig.xxxSF
@@ -78,7 +78,7 @@ public class StoreLoader {
     protected static Digester digester = createDigester();
 
     private StoreRegistry registry;
-    
+
     private URL registryResource ;
 
     /**
@@ -136,7 +136,7 @@ public class StoreLoader {
     }
 
     /**
-     * 
+     *
      * @param aFile
      * @return The server file
      */
@@ -158,7 +158,7 @@ public class StoreLoader {
 
     /**
      * Load Description from external source
-     * 
+     *
      * @param aURL
      */
     public void load(String aURL) {
@@ -228,7 +228,7 @@ public class StoreLoader {
                             .info("Find registry server-registry.xml at classpath resource");
                 registryResource = StoreLoader.class
                     .getResource("/org/apache/catalina/storeconfig/server-registry.xml");
-                
+
             } catch (Throwable t) {
                 // Ignore
             }
@@ -273,8 +273,6 @@ public class StoreLoader {
     private static String getConfigUrl() {
         return System.getProperty("catalina.storeconfig");
     }
-    
-    
 
     /**
      * @return Returns the registryResource.

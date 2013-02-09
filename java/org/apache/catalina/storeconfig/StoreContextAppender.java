@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 
 /**
- * store StandardContext Attributes ... 
+ * store StandardContext Attributes ...
  */
 public class StoreContextAppender extends StoreAppender {
 
@@ -55,7 +55,7 @@ public class StoreContextAppender extends StoreAppender {
      * Print Context Values. <ul><li> Spezial handling to default workDir.
      * </li><li> Don't save path at external context.xml </li><li> Don't
      * generate docBase for host.appBase webapps <LI></ul>
-     * 
+     *
      * @see org.apache.catalina.config.StoreAppender#isPrintValue(java.lang.Object,
      *      java.lang.Object, java.lang.String,
      *      org.apache.catalina.config.StoreDescription)
@@ -69,7 +69,7 @@ public class StoreContextAppender extends StoreAppender {
                 String defaultWorkDir = getDefaultWorkDir(context);
                 isPrint = !defaultWorkDir.equals(context.getWorkDir());
             } else if ("path".equals(attrName)) {
-                isPrint = desc.isStoreSeparate() 
+                isPrint = desc.isStoreSeparate()
                             && desc.isExternalAllowed()
                             && context.getConfigFile() == null;
             } else if ("docBase".equals(attrName)) {
@@ -120,7 +120,7 @@ public class StoreContextAppender extends StoreAppender {
 
     /**
      * Make default Work Dir.
-     * 
+     *
      * @param context
      * @return The default working directory for the context.
      */
@@ -149,7 +149,7 @@ public class StoreContextAppender extends StoreAppender {
      * default context.xml and context.xml.default TODO Cache a Default
      * StandardContext ( with reloading strategy) TODO remove really all
      * elements, but detection is hard... To Listener or Valve from same class?>
-     * 
+     *
      * @see org.apache.catalina.storeconfig.StoreAppender#defaultInstance(java.lang.Object)
      */
     public Object defaultInstance(Object bean) throws InstantiationException,

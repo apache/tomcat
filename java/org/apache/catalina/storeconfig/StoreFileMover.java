@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ import java.sql.Timestamp;
 
 /**
  * Move server.xml or context.xml as backup
- * 
+ *
  * TODO Get Encoding from Registry
  */
 public class StoreFileMover {
@@ -148,7 +148,7 @@ public class StoreFileMover {
 
     /**
      * Shuffle old->save and new->old
-     * 
+     *
      * @throws IOException
      */
     public void move() throws IOException {
@@ -176,7 +176,7 @@ public class StoreFileMover {
 
     /**
      * Open an output writer for the new configuration file
-     * 
+     *
      * @return The writer
      * @throws IOException
      */
@@ -187,7 +187,7 @@ public class StoreFileMover {
 
     /**
      * Time value for backup yyyy-mm-dd.hh-mm-ss
-     * 
+     *
      * @return The time
      */
     protected String getTimeTag() {

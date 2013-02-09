@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,14 +28,14 @@ public interface IStoreConfig {
 
     /**
      * Get Configuration Registry
-     * 
+     *
      * @return aRegistry that handle the store operations
      */
     StoreRegistry getRegistry();
 
     /**
      * Set Configuration Registry
-     * 
+     *
      * @param aRegistry
      *            aregistry that handle the store operations
      */
@@ -43,21 +43,21 @@ public interface IStoreConfig {
 
     /**
      * Get associated server
-     * 
+     *
      * @return aServer the associated server
      */
     Server getServer();
 
     /**
      * Set associated server
-     * 
+     *
      * @param aServer the associated server
      */
     void setServer(Server aServer);
 
     /**
      * Store the current StoreFactory Server.
-     * 
+     *
      * @exception Exception
      *                if an exception occurs while storing
      */
@@ -65,10 +65,10 @@ public interface IStoreConfig {
 
     /**
      * Store the specified Server properties.
-     * 
+     *
      * @param aServer
      *            Object to be stored
-     * 
+     *
      * @exception Exception
      *                if an exception occurs while storing
      */
@@ -76,14 +76,14 @@ public interface IStoreConfig {
 
     /**
      * Store the specified Server properties.
-     * 
+     *
      * @param aWriter
      *            PrintWriter to which we are storing
      * @param indent
      *            Number of spaces to indent this element
      * @param aServer
      *            Object to be stored
-     * 
+     *
      * @exception Exception
      *                if an exception occurs while storing
      */
@@ -91,14 +91,14 @@ public interface IStoreConfig {
 
     /**
      * Store the specified Service properties.
-     * 
+     *
      * @param aWriter
      *            PrintWriter to which we are storing
      * @param indent
      *            Number of spaces to indent this element
      * @param aService
      *            Object to be stored
-     * 
+     *
      * @exception Exception
      *                if an exception occurs while storing
      */
@@ -106,14 +106,14 @@ public interface IStoreConfig {
 
     /**
      * Store the specified Host properties.
-     * 
+     *
      * @param aWriter
      *            PrintWriter to which we are storing
      * @param indent
      *            Number of spaces to indent this element
      * @param aHost
      *            Object to be stored
-     * 
+     *
      * @exception Exception
      *                if an exception occurs while storing
      */
@@ -121,10 +121,10 @@ public interface IStoreConfig {
 
     /**
      * Store the specified Context properties.
-     * 
+     *
      * @param aContext
      *            Object to be stored
-     * 
+     *
      * @exception Exception
      *                if an exception occurs while storing
      */
@@ -132,14 +132,14 @@ public interface IStoreConfig {
 
     /**
      * Store the specified Context properties.
-     * 
+     *
      * @param aWriter
      *            PrintWriter to which we are storing
      * @param indent
      *            Number of spaces to indent this element
      * @param aContext
      *            Object to be stored
-     * 
+     *
      * @exception Exception
      *                if an exception occurs while storing
      */

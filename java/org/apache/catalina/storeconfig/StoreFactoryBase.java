@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -74,7 +74,7 @@ public class StoreFactoryBase implements IStoreFactory {
 
     /*
      * set Registry
-     * 
+     *
      * @see org.apache.catalina.config.IStoreFactory#setRegistry(org.apache.catalina.config.ConfigurationRegistry)
      */
     public void setRegistry(StoreRegistry aRegistry) {
@@ -84,7 +84,7 @@ public class StoreFactoryBase implements IStoreFactory {
 
     /*
      * get Registry
-     * 
+     *
      * @see org.apache.catalina.config.IStoreFactory#getRegistry()
      */
     public StoreRegistry getRegistry() {
@@ -101,7 +101,7 @@ public class StoreFactoryBase implements IStoreFactory {
 
     /*
      * Store a server.xml element with attributes and childs
-     * 
+     *
      * @see org.apache.catalina.storeconfig.IStoreFactory#store(java.io.PrintWriter,
      *      int, java.lang.Object)
      */
@@ -133,7 +133,7 @@ public class StoreFactoryBase implements IStoreFactory {
 
     /**
      * Must Implement at subclass for sepzial store childs handling
-     * 
+     *
      * @param aWriter
      * @param indent
      * @param aElement
@@ -146,7 +146,7 @@ public class StoreFactoryBase implements IStoreFactory {
     /**
      * Store only elements from storeChilds methods that are not a transient
      * child.
-     * 
+     *
      * @param aWriter current output writer
      * @param indent indentation level
      * @param aTagElement current tomcat element

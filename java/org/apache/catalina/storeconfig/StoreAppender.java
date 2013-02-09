@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,7 @@ public class StoreAppender {
 
     /**
      * print the closing tag
-     * 
+     *
      * @param aWriter
      * @param aDesc
      * @throws Exception
@@ -56,7 +56,7 @@ public class StoreAppender {
 
     /**
      * print only the open tag with all attributes
-     * 
+     *
      * @param aWriter
      * @param indent
      * @param bean
@@ -74,7 +74,7 @@ public class StoreAppender {
 
     /**
      * Print tag with all attributes
-     * 
+     *
      * @param aWriter
      * @param indent
      * @param bean
@@ -92,7 +92,7 @@ public class StoreAppender {
 
     /**
      * print the value from tag as content
-     * 
+     *
      * @param aWriter
      * @param tag
      * @param content
@@ -111,7 +111,7 @@ public class StoreAppender {
 
     /**
      * print an array of values
-     * 
+     *
      * @param aWriter
      * @param tag
      * @param indent
@@ -139,7 +139,7 @@ public class StoreAppender {
 
     /**
      * print a array of elements
-     * 
+     *
      * @param aWriter
      * @param tag
      * @param indent
@@ -157,7 +157,7 @@ public class StoreAppender {
 
     /**
      * Print some spaces
-     * 
+     *
      * @param aWriter
      * @param indent
      *            number of spaces
@@ -172,12 +172,12 @@ public class StoreAppender {
      * Store the relevant attributes of the specified JavaBean, plus a
      * <code>className</code> attribute defining the fully qualified Java
      * class name of the bean.
-     * 
+     *
      * @param writer
      *            PrintWriter to which we are storing
      * @param bean
      *            Bean whose properties are to be rendered as attributes,
-     * 
+     *
      * @exception Exception
      *                if an exception occurs while storing
      */
@@ -190,7 +190,7 @@ public class StoreAppender {
 
     /**
      * Store the relevant attributes of the specified JavaBean.
-     * 
+     *
      * @param writer
      *            PrintWriter to which we are storing
      * @param include
@@ -199,7 +199,7 @@ public class StoreAppender {
      *            Bean whose properties are to be rendered as attributes,
      * @param desc
      *            RegistryDescrpitor from this bean
-     * 
+     *
      * @exception Exception
      *                if an exception occurs while storing
      */
@@ -282,7 +282,7 @@ public class StoreAppender {
 
     /**
      * print this Attribute value or not
-     * 
+     *
      * @param bean
      *            orginal bean
      * @param bean2
@@ -308,7 +308,7 @@ public class StoreAppender {
 
     /**
      * generate default Instance
-     * 
+     *
      * @param bean
      * @return an object from same class as bean parameter
      * @throws InstantiationException
@@ -321,7 +321,7 @@ public class StoreAppender {
 
     /**
      * print an attribute value
-     * 
+     *
      * @param writer
      * @param name
      * @param value
@@ -370,7 +370,7 @@ public class StoreAppender {
     /**
      * Is the specified property type one for which we should generate a
      * persistence attribute?
-     * 
+     *
      * @param clazz
      *            Java class to be tested
      */
