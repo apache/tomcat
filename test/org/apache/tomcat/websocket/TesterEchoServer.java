@@ -26,7 +26,7 @@ import javax.websocket.WebSocketMessage;
 
 import org.apache.tomcat.websocket.server.ServerContainerImpl;
 
-public class TesterEcho {
+public class TesterEchoServer {
 
     public static class Config implements ServletContextListener {
 
