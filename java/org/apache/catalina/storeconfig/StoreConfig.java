@@ -69,6 +69,7 @@ public class StoreConfig implements IStoreConfig {
      *
      * @see org.apache.catalina.config.IStoreConfig#getRegistry()
      */
+    @Override
     public StoreRegistry getRegistry() {
         return registry;
     }
@@ -78,14 +79,17 @@ public class StoreConfig implements IStoreConfig {
      *
      * @see org.apache.catalina.config.IStoreConfig#setRegistry(org.apache.catalina.config.ConfigurationRegistry)
      */
+    @Override
     public void setServer(Server aServer) {
         server = aServer;
     }
 
+    @Override
     public Server getServer() {
         return server;
     }
 
+    @Override
     public void setRegistry(StoreRegistry aRegistry) {
         registry = aRegistry;
     }
@@ -95,6 +99,7 @@ public class StoreConfig implements IStoreConfig {
      *
      * @see org.apache.catalina.ServerFactory#getServer()
      */
+    @Override
     public synchronized void storeConfig() {
         store(server);
     }
@@ -218,6 +223,7 @@ public class StoreConfig implements IStoreConfig {
      * out to the server.xml configuration file.
      *
      */
+    @Override
     public synchronized void store(Server aServer) {
 
         StoreFileMover mover = new StoreFileMover(System
@@ -255,6 +261,7 @@ public class StoreConfig implements IStoreConfig {
      *
      * @see org.apache.catalina.config.IStoreConfig#store(org.apache.catalina.Context)
      */
+    @Override
     public synchronized void store(Context aContext) {
         URL configFile = aContext.getConfigFile();
         if (configFile != null) {
@@ -284,6 +291,7 @@ public class StoreConfig implements IStoreConfig {
      * @see org.apache.catalina.config.IStoreConfig#store(java.io.PrintWriter,
      *      int, org.apache.catalina.Context)
      */
+    @Override
     public synchronized void store(PrintWriter aWriter, int indent,
             Context aContext) {
         boolean oldSeparate = true;
@@ -307,6 +315,7 @@ public class StoreConfig implements IStoreConfig {
      * @see org.apache.catalina.config.IStoreConfig#store(java.io.PrintWriter,
      *      int, org.apache.catalina.Host)
      */
+    @Override
     public synchronized void store(PrintWriter aWriter, int indent, Host aHost) {
         try {
             StoreDescription desc = getRegistry().findDescription(
@@ -323,6 +332,7 @@ public class StoreConfig implements IStoreConfig {
      * @see org.apache.catalina.config.IStoreConfig#store(java.io.PrintWriter,
      *      int, org.apache.catalina.Service)
      */
+    @Override
     public synchronized void store(PrintWriter aWriter, int indent,
             Service aService) {
         try {
@@ -342,6 +352,7 @@ public class StoreConfig implements IStoreConfig {
      * @param indent
      * @param aServer
      */
+    @Override
     public synchronized void store(PrintWriter writer, int indent,
             Server aServer) {
         try {

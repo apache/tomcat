@@ -56,6 +56,7 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
      *
      * @see org.apache.catalina.LifecycleListener#lifecycleEvent(org.apache.catalina.LifecycleEvent)
      */
+    @Override
     public void lifecycleEvent(LifecycleEvent event) {
         if (Lifecycle.AFTER_START_EVENT.equals(event.getType())) {
             if (event.getSource() instanceof StandardServer) {

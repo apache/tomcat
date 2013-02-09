@@ -38,6 +38,7 @@ public class StoreContextAppender extends StoreAppender {
      * @param bean2
      * @param value
      */
+    @Override
     protected void printAttribute(PrintWriter writer, int indent, Object bean, StoreDescription desc, String attributeName, Object bean2, Object value) {
         if (isPrintValue(bean, bean2, attributeName, desc)) {
             if(attributeName.equals("docBase")) {
@@ -60,6 +61,7 @@ public class StoreContextAppender extends StoreAppender {
      *      java.lang.Object, java.lang.String,
      *      org.apache.catalina.config.StoreDescription)
      */
+    @Override
     public boolean isPrintValue(Object bean, Object bean2, String attrName,
             StoreDescription desc) {
         boolean isPrint = super.isPrintValue(bean, bean2, attrName, desc);
@@ -152,6 +154,7 @@ public class StoreContextAppender extends StoreAppender {
      *
      * @see org.apache.catalina.storeconfig.StoreAppender#defaultInstance(java.lang.Object)
      */
+    @Override
     public Object defaultInstance(Object bean) throws InstantiationException,
             IllegalAccessException {
         if (bean instanceof StandardContext) {

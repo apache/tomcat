@@ -34,6 +34,7 @@ public class GlobalNamingResourcesSF extends StoreFactoryBase {
      * @see org.apache.catalina.storeconfig.IStoreFactory#store(java.io.PrintWriter,
      *      int, java.lang.Object)
      */
+    @Override
     public void store(PrintWriter aWriter, int indent, Object aElement)
             throws Exception {
 

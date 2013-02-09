@@ -47,6 +47,7 @@ public class CatalinaClusterSF extends StoreFactoryBase {
      * @exception Exception
      *                if an exception occurs while storing
      */
+    @Override
     public void storeChilds(PrintWriter aWriter, int indent, Object aCluster,
             StoreDescription parentDesc) throws Exception {
         if (aCluster instanceof CatalinaCluster) {

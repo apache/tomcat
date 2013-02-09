@@ -40,6 +40,7 @@ public class SenderSF extends StoreFactoryBase {
      * @exception Exception
      *                if an exception occurs while storing
      */
+    @Override
     public void storeChilds(PrintWriter aWriter, int indent, Object aSender,
             StoreDescription parentDesc) throws Exception {
         if (aSender instanceof ReplicationTransmitter) {
