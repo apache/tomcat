@@ -51,11 +51,9 @@ public class StandardEngineSF extends StoreFactoryBase {
         if (aEngine instanceof StandardEngine) {
             StandardEngine engine = (StandardEngine) aEngine;
             // Store nested <Listener> elements
-            if (engine instanceof Lifecycle) {
-                LifecycleListener listeners[] = ((Lifecycle) engine)
-                        .findLifecycleListeners();
-                storeElementArray(aWriter, indent, listeners);
-            }
+            LifecycleListener listeners[] = ((Lifecycle) engine)
+                    .findLifecycleListeners();
+            storeElementArray(aWriter, indent, listeners);
 
             // Store nested <Realm> element
             Realm realm = engine.getRealm();

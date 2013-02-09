@@ -45,11 +45,10 @@ public class StandardServiceSF extends StoreFactoryBase {
         if (aService instanceof StandardService) {
             StandardService service = (StandardService) aService;
             // Store nested <Listener> elements
-            if (service instanceof Lifecycle) {
-                LifecycleListener listeners[] = ((Lifecycle) service)
-                        .findLifecycleListeners();
-                storeElementArray(aWriter, indent, listeners);
-            }
+            LifecycleListener listeners[] = ((Lifecycle) service)
+                    .findLifecycleListeners();
+            storeElementArray(aWriter, indent, listeners);
+
             // Store nested <Executor> elements
             Executor[] executors = service.findExecutors();
             storeElementArray(aWriter, indent, executors);

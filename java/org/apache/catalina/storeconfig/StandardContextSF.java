@@ -30,7 +30,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Manager;
@@ -151,7 +150,7 @@ public class StandardContextSF extends StoreFactoryBase {
      * @throws Exception
      */
     protected void storeWithBackup(StandardContext aContext) throws Exception {
-        StoreFileMover mover = getConfigFileWriter((Context) aContext);
+        StoreFileMover mover = getConfigFileWriter(aContext);
         if (mover != null) {
             // Bugzilla 37781 Check to make sure we can write this output file
             if ((mover.getConfigOld() == null)
@@ -243,11 +242,9 @@ public class StandardContextSF extends StoreFactoryBase {
         if (aContext instanceof StandardContext) {
             StandardContext context = (StandardContext) aContext;
             // Store nested <Listener> elements
-            if (context instanceof Lifecycle) {
-                LifecycleListener listeners[] = context
-                        .findLifecycleListeners();
-                storeElementArray(aWriter, indent, listeners);
-            }
+            LifecycleListener listeners[] = context.findLifecycleListeners();
+            storeElementArray(aWriter, indent, listeners);
+
             // Store nested <Valve> elements
             Valve valves[] = context.getPipeline().getValves();
             storeElementArray(aWriter, indent, valves);
@@ -373,7 +370,7 @@ public class StandardContextSF extends StoreFactoryBase {
                 continue;
             resource.add(wresources[i]);
         }
-        return (String[]) resource.toArray(new String[resource.size()]);
+        return resource.toArray(new String[resource.size()]);
     }
 
 }

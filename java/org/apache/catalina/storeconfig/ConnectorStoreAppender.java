@@ -93,7 +93,7 @@ public class ConnectorStoreAppender extends StoreAppender {
         Iterator<String> propertyIterator = propertyKeys.iterator();
         while (propertyIterator.hasNext()) {
             String key = propertyIterator.next();
-            Object value = (Object) IntrospectionUtils.getProperty(bean, key);
+            Object value = IntrospectionUtils.getProperty(bean, key);
 
             if (desc.isTransientAttribute(key)) {
                 continue; // Skip the specified exceptions
@@ -172,7 +172,7 @@ public class ConnectorStoreAppender extends StoreAppender {
             }
             String key = descriptors[i].getName();
             if (replacements.get(key) != null) {
-                key = (String) replacements.get(key);
+                key = replacements.get(key);
             }
             if (!propertyKeys.contains(key)) {
                 propertyKeys.add(key);
@@ -243,7 +243,7 @@ public class ConnectorStoreAppender extends StoreAppender {
             Object value) {
         String repl = name;
         if (replacements.get(name) != null) {
-            repl = (String) replacements.get(name);
+            repl = replacements.get(name);
         }
         super.printValue(writer, indent, repl, value);
     }

@@ -55,11 +55,9 @@ public class StandardHostSF extends StoreFactoryBase {
         if (aHost instanceof StandardHost) {
             StandardHost host = (StandardHost) aHost;
             // Store nested <Listener> elements
-            if (host instanceof Lifecycle) {
-                LifecycleListener listeners[] = ((Lifecycle) host)
-                        .findLifecycleListeners();
-                storeElementArray(aWriter, indent, listeners);
-            }
+            LifecycleListener listeners[] = ((Lifecycle) host)
+                    .findLifecycleListeners();
+            storeElementArray(aWriter, indent, listeners);
 
             // Store nested <Alias> elements
             String aliases[] = host.findAliases();
