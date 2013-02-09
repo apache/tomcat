@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.websocket;
 
-import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -74,7 +73,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(EchoConfig.class.getName());
+        ctx.addApplicationListener(TesterEcho.Config.class.getName());
 
         tomcat.start();
 
@@ -82,7 +81,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                 ContainerProvider.createClientContainer();
         Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
                 new DefaultClientConfiguration(), new URI("http://localhost:" +
-                        getPort() + EchoConfig.PATH_ASYNC));
+                        getPort() + TesterEcho.Config.PATH_ASYNC));
         CountDownLatch latch = new CountDownLatch(1);
         TesterMessageHandlerText handler = new TesterMessageHandlerText(latch);
         wsSession.addMessageHandler(handler);
@@ -104,7 +103,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(EchoConfig.class.getName());
+        ctx.addApplicationListener(TesterEcho.Config.class.getName());
 
         tomcat.start();
 
@@ -112,7 +111,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                 ContainerProvider.createClientContainer();
         wsContainer.connectToServer(TesterEndpoint.class,
                 new DefaultClientConfiguration(), new URI("ftp://localhost:" +
-                        getPort() + EchoConfig.PATH_ASYNC));
+                        getPort() + TesterEcho.Config.PATH_ASYNC));
     }
 
 
@@ -122,7 +121,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(EchoConfig.class.getName());
+        ctx.addApplicationListener(TesterEcho.Config.class.getName());
 
         tomcat.start();
 
@@ -130,7 +129,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                 ContainerProvider.createClientContainer();
         wsContainer.connectToServer(TesterEndpoint.class,
                 new DefaultClientConfiguration(),
-                new URI("http://" + EchoConfig.PATH_ASYNC));
+                new URI("http://" + TesterEcho.Config.PATH_ASYNC));
     }
 
 
@@ -189,7 +188,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(EchoConfig.class.getName());
+        ctx.addApplicationListener(TesterEcho.Config.class.getName());
 
         WebSocketContainer wsContainer =
                 ContainerProvider.createClientContainer();
@@ -218,7 +217,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
                 new DefaultClientConfiguration(), new URI("http://localhost:" +
-                        getPort() + EchoConfig.PATH_BASIC));
+                        getPort() + TesterEcho.Config.PATH_BASIC));
         TesterMessageHandler<?> handler;
         CountDownLatch latch = new CountDownLatch(1);
         wsSession.getUserProperties().put("latch", latch);
@@ -481,89 +480,6 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         @Override
         public void onOpen(Session session, EndpointConfiguration config) {
             // NO-OP
-        }
-    }
-
-
-    public static class EchoConfig implements ServletContextListener {
-
-        public static final String PATH_ASYNC = "/echoAsync";
-        public static final String PATH_BASIC = "/echoBasic";
-
-        @Override
-        public void contextInitialized(ServletContextEvent sce) {
-            ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
-            sc.publishServer(
-                    EchoAsync.class, sce.getServletContext(), PATH_ASYNC);
-            sc.publishServer(
-                    EchoBasic.class, sce.getServletContext(), PATH_BASIC);
-        }
-
-        @Override
-        public void contextDestroyed(ServletContextEvent sce) {
-            // NO-OP
-        }
-    }
-
-
-    public static class EchoBasic {
-        @WebSocketMessage
-        public void echoTextMessage(Session session, String msg) {
-            try {
-                session.getRemote().sendString(msg);
-            } catch (IOException e) {
-                try {
-                    session.close();
-                } catch (IOException e1) {
-                    // Ignore
-                }
-            }
-        }
-
-
-        @WebSocketMessage
-        public void echoBinaryMessage(Session session, ByteBuffer msg) {
-            try {
-                session.getRemote().sendBytes(msg);
-            } catch (IOException e) {
-                try {
-                    session.close();
-                } catch (IOException e1) {
-                    // Ignore
-                }
-            }
-        }
-    }
-
-
-    public static class EchoAsync {
-
-        @WebSocketMessage
-        public void echoTextMessage(Session session, String msg, boolean last) {
-            try {
-                session.getRemote().sendPartialString(msg, last);
-            } catch (IOException e) {
-                try {
-                    session.close();
-                } catch (IOException e1) {
-                    // Ignore
-                }
-            }
-        }
-
-
-        @WebSocketMessage
-        public void echoBinaryMessage(Session session, ByteBuffer msg,
-                boolean last) {
-            try {
-                session.getRemote().sendPartialBytes(msg, last);
-            } catch (IOException e) {
-                try {
-                    session.close();
-                } catch (IOException e1) {
-                    // Ignore
-                }
-            }
         }
     }
 
