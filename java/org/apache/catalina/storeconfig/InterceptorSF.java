@@ -39,6 +39,7 @@ public class InterceptorSF extends StoreFactoryBase {
      * @exception Exception
      *                if an exception occurs while storing
      */
+    @Override
     public void storeChilds(PrintWriter aWriter, int indent, Object aInterceptor,
             StoreDescription parentDesc) throws Exception {
         if (aInterceptor instanceof ChannelInterceptor) {

@@ -39,6 +39,7 @@ public class NamingResourcesSF extends StoreFactoryBase {
      *
      * @see NamingResourcesSF#storeChilds(PrintWriter, int, Object, StoreDescription)
      */
+    @Override
     public void store(PrintWriter aWriter, int indent, Object aElement)
             throws Exception {
         StoreDescription elementDesc = getRegistry().findDescription(
@@ -73,6 +74,7 @@ public class NamingResourcesSF extends StoreFactoryBase {
      * @see org.apache.catalina.storeconfig.StoreFactoryBase#storeChilds(java.io.PrintWriter,
      *      int, java.lang.Object, StoreDescription)
      */
+    @Override
     public void storeChilds(PrintWriter aWriter, int indent, Object aElement,
             StoreDescription elementDesc) throws Exception {
 

@@ -35,6 +35,7 @@ public class ManagerSF extends StoreFactoryBase {
      *
      * @see NamingResourcesSF#storeChilds(PrintWriter, int, Object, StoreDescription)
      */
+    @Override
     public void store(PrintWriter aWriter, int indent, Object aElement)
             throws Exception {
         StoreDescription elementDesc = getRegistry().findDescription(

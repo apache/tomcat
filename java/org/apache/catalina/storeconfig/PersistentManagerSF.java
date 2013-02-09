@@ -40,6 +40,7 @@ public class PersistentManagerSF extends StoreFactoryBase {
      * @exception Exception
      *                if an exception occurs while storing
      */
+    @Override
     public void storeChilds(PrintWriter aWriter, int indent, Object aManager,
             StoreDescription parentDesc) throws Exception {
         if (aManager instanceof PersistentManager) {

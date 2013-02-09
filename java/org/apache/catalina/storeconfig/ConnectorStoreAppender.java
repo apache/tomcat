@@ -73,6 +73,7 @@ public class ConnectorStoreAppender extends StoreAppender {
      * @exception Exception
      *                if an exception occurs while storing
      */
+    @Override
     public void printAttributes(PrintWriter writer, int indent,
             boolean include, Object bean, StoreDescription desc)
             throws Exception {
@@ -203,6 +204,7 @@ public class ConnectorStoreAppender extends StoreAppender {
      *      int, java.lang.Object,
      *      org.apache.catalina.storeconfig.StoreDescription)
      */
+    @Override
     public void printOpenTag(PrintWriter aWriter, int indent, Object bean,
             StoreDescription aDesc) throws Exception {
         aWriter.print("<");
@@ -218,6 +220,7 @@ public class ConnectorStoreAppender extends StoreAppender {
      *      int, java.lang.Object,
      *      org.apache.catalina.storeconfig.StoreDescription)
      */
+    @Override
     public void printTag(PrintWriter aWriter, int indent, Object bean,
             StoreDescription aDesc) throws Exception {
         aWriter.print("<");
@@ -235,6 +238,7 @@ public class ConnectorStoreAppender extends StoreAppender {
      * @see org.apache.catalina.storeconfig.StoreAppender#printValue(java.io.PrintWriter,
      *      int, java.lang.String, java.lang.Object)
      */
+    @Override
     public void printValue(PrintWriter writer, int indent, String name,
             Object value) {
         String repl = name;
@@ -252,6 +256,7 @@ public class ConnectorStoreAppender extends StoreAppender {
      *      java.lang.Object, java.lang.String,
      *      org.apache.catalina.config.StoreDescription)
      */
+    @Override
     public boolean isPrintValue(Object bean, Object bean2, String attrName,
             StoreDescription desc) {
         boolean isPrint = super.isPrintValue(bean, bean2, attrName, desc);

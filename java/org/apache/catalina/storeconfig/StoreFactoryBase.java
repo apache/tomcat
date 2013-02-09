@@ -60,6 +60,7 @@ public class StoreFactoryBase implements IStoreFactory {
     /**
      * @return Returns the storeAppender.
      */
+    @Override
     public StoreAppender getStoreAppender() {
         return storeAppender;
     }
@@ -68,6 +69,7 @@ public class StoreFactoryBase implements IStoreFactory {
      * @param storeAppender
      *            The storeAppender to set.
      */
+    @Override
     public void setStoreAppender(StoreAppender storeAppender) {
         this.storeAppender = storeAppender;
     }
@@ -77,6 +79,7 @@ public class StoreFactoryBase implements IStoreFactory {
      *
      * @see org.apache.catalina.config.IStoreFactory#setRegistry(org.apache.catalina.config.ConfigurationRegistry)
      */
+    @Override
     public void setRegistry(StoreRegistry aRegistry) {
         registry = aRegistry;
 
@@ -87,11 +90,13 @@ public class StoreFactoryBase implements IStoreFactory {
      *
      * @see org.apache.catalina.config.IStoreFactory#getRegistry()
      */
+    @Override
     public StoreRegistry getRegistry() {
 
         return registry;
     }
 
+    @Override
     public void storeXMLHead(PrintWriter aWriter) {
         // Store the beginning of this element
         aWriter.print("<?xml version=\"1.0\" encoding=\"");
@@ -105,6 +110,7 @@ public class StoreFactoryBase implements IStoreFactory {
      * @see org.apache.catalina.storeconfig.IStoreFactory#store(java.io.PrintWriter,
      *      int, java.lang.Object)
      */
+    @Override
     public void store(PrintWriter aWriter, int indent, Object aElement)
             throws Exception {
 

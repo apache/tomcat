@@ -62,6 +62,7 @@ public class StandardContextSF extends StoreFactoryBase {
      * @see org.apache.catalina.config.IStoreFactory#store(java.io.PrintWriter,
      *      int, java.lang.Object)
      */
+    @Override
     public void store(PrintWriter aWriter, int indent, Object aContext)
             throws Exception {
 
@@ -236,6 +237,7 @@ public class StandardContextSF extends StoreFactoryBase {
      * @exception Exception
      *                if an exception occurs while storing
      */
+    @Override
     public void storeChilds(PrintWriter aWriter, int indent, Object aContext,
             StoreDescription parentDesc) throws Exception {
         if (aContext instanceof StandardContext) {

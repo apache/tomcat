@@ -40,6 +40,7 @@ public class WebResourceRootSF extends StoreFactoryBase {
      * @exception Exception
      *                if an exception occurs while storing
      */
+    @Override
     public void storeChilds(PrintWriter aWriter, int indent, Object aResourceRoot,
             StoreDescription parentDesc) throws Exception {
         if (aResourceRoot instanceof WebResourceRoot) {

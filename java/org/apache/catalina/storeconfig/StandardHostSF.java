@@ -49,6 +49,7 @@ public class StandardHostSF extends StoreFactoryBase {
      * @exception Exception
      *                if an exception occurs while storing
      */
+    @Override
     public void storeChilds(PrintWriter aWriter, int indent, Object aHost,
             StoreDescription parentDesc) throws Exception {
         if (aHost instanceof StandardHost) {

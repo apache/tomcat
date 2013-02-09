@@ -46,6 +46,7 @@ public class StandardServerSF extends StoreFactoryBase {
      * @see org.apache.catalina.storeconfig.IStoreFactory#store(java.io.PrintWriter,
      *      int, java.lang.Object)
      */
+    @Override
     public void store(PrintWriter aWriter, int indent, Object aServer)
             throws Exception {
         storeXMLHead(aWriter);
@@ -61,6 +62,7 @@ public class StandardServerSF extends StoreFactoryBase {
      * @param parentDesc
      * @throws Exception
      */
+    @Override
     public void storeChilds(PrintWriter aWriter, int indent, Object aObject,
             StoreDescription parentDesc) throws Exception {
         if (aObject instanceof StandardServer) {
