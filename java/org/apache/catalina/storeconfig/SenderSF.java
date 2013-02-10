@@ -41,7 +41,7 @@ public class SenderSF extends StoreFactoryBase {
      *                if an exception occurs while storing
      */
     @Override
-    public void storeChilds(PrintWriter aWriter, int indent, Object aSender,
+    public void storeChildren(PrintWriter aWriter, int indent, Object aSender,
             StoreDescription parentDesc) throws Exception {
         if (aSender instanceof ReplicationTransmitter) {
             ReplicationTransmitter transmitter = (ReplicationTransmitter) aSender;

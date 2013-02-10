@@ -28,7 +28,7 @@ import org.apache.catalina.WebResourceSet;
 public class WebResourceRootSF extends StoreFactoryBase {
 
     /**
-     * Store the specified Resources childs.
+     * Store the specified Resources children.
      *
      * @param aWriter
      *            PrintWriter to which we are storing
@@ -41,7 +41,7 @@ public class WebResourceRootSF extends StoreFactoryBase {
      *                if an exception occurs while storing
      */
     @Override
-    public void storeChilds(PrintWriter aWriter, int indent, Object aResourceRoot,
+    public void storeChildren(PrintWriter aWriter, int indent, Object aResourceRoot,
             StoreDescription parentDesc) throws Exception {
         if (aResourceRoot instanceof WebResourceRoot) {
             WebResourceRoot resourceRoot = (WebResourceRoot) aResourceRoot;

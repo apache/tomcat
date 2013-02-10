@@ -39,9 +39,9 @@ import org.xml.sax.SAXException;
  *        &lt;TransientAttributes&gt;
  *          &lt;Attribute&gt;&lt;/Attribute&gt;
  *        &lt;/TransientAttributes&gt;
- *        &lt;TransientChilds&gt;
+ *        &lt;TransientChildren&gt;
  *          &lt;Child&gt;&lt;/Child&gt;
- *        &lt;/TransientChilds&gt;
+ *        &lt;/TransientChildren&gt;
  *       &lt;/Description&gt;
  *   ...
  *       &lt;/Tegistry&gt;

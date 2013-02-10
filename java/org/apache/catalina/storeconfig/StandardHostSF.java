@@ -36,7 +36,7 @@ import org.apache.catalina.ha.ClusterValve;
 public class StandardHostSF extends StoreFactoryBase {
 
     /**
-     * Store the specified Host properties and childs
+     * Store the specified Host properties and children
      * (Listener,Alias,Realm,Valve,Cluster, Context)
      *
      * @param aWriter
@@ -50,7 +50,7 @@ public class StandardHostSF extends StoreFactoryBase {
      *                if an exception occurs while storing
      */
     @Override
-    public void storeChilds(PrintWriter aWriter, int indent, Object aHost,
+    public void storeChildren(PrintWriter aWriter, int indent, Object aHost,
             StoreDescription parentDesc) throws Exception {
         if (aHost instanceof StandardHost) {
             StandardHost host = (StandardHost) aHost;

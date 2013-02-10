@@ -33,7 +33,7 @@ import org.apache.catalina.tribes.MembershipService;
 public class ChannelSF extends StoreFactoryBase {
 
     /**
-     * Store the specified Channel childs.
+     * Store the specified Channel children.
      *
      * @param aWriter
      *            PrintWriter to which we are storing
@@ -46,7 +46,7 @@ public class ChannelSF extends StoreFactoryBase {
      *                if an exception occurs while storing
      */
     @Override
-    public void storeChilds(PrintWriter aWriter, int indent, Object aChannel,
+    public void storeChildren(PrintWriter aWriter, int indent, Object aChannel,
             StoreDescription parentDesc) throws Exception {
         if (aChannel instanceof Channel) {
             Channel channel = (Channel) aChannel;

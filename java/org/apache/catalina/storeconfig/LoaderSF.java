@@ -34,7 +34,7 @@ public class LoaderSF extends StoreFactoryBase {
     /**
      * Store the only the Loader elements, when not default
      *
-     * @see NamingResourcesSF#storeChilds(PrintWriter, int, Object, StoreDescription)
+     * @see NamingResourcesSF#storeChildren(PrintWriter, int, Object, StoreDescription)
      */
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement)

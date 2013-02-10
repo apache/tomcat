@@ -40,7 +40,7 @@ public class InterceptorSF extends StoreFactoryBase {
      *                if an exception occurs while storing
      */
     @Override
-    public void storeChilds(PrintWriter aWriter, int indent, Object aInterceptor,
+    public void storeChildren(PrintWriter aWriter, int indent, Object aInterceptor,
             StoreDescription parentDesc) throws Exception {
         if (aInterceptor instanceof ChannelInterceptor) {
             ChannelInterceptor interceptor = (ChannelInterceptor) aInterceptor;
