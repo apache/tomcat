@@ -129,12 +129,12 @@ public class StandardContextSF extends StoreFactoryBase {
                     try {
                         writer.flush();
                     } catch (Exception e) {
-                        ;
+                        // Ignore
                     }
                     try {
                         writer.close();
                     } catch (Throwable t) {
-                        ;
+                        // Ignore
                     }
                 }
             }

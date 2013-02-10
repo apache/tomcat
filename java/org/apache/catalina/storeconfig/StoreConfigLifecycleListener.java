@@ -16,8 +16,6 @@
  */
 package org.apache.catalina.storeconfig;
 
-import java.io.InputStream;
-
 import javax.management.DynamicMBean;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -89,7 +87,6 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
             return;
         }
         MBeanServer mserver = MBeanUtils.createServer();
-        InputStream descriptor = null;
         try {
             ObjectName objectName = new ObjectName("Catalina:type=StoreConfig" );
             if (!mserver.isRegistered(objectName)) {
@@ -97,16 +94,6 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
             }
         } catch (Exception ex) {
             log.error("createMBean register MBean", ex);
-
-        } finally {
-            if (descriptor != null) {
-                try {
-                    descriptor.close();
-                    descriptor = null;
-                } catch (Exception ex) {
-                    log.error("createMBean register MBean", ex);
-                }
-            }
         }
     }
 

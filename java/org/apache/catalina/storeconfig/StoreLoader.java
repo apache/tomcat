@@ -142,7 +142,7 @@ public class StoreLoader {
      */
     protected File serverFile(String aFile) {
 
-        if (aFile == null || (aFile != null && aFile.length() < 1))
+        if (aFile == null || aFile.length() < 1)
             aFile = "server-registry.xml";
         File file = new File(aFile);
         if (!file.isAbsolute())
@@ -195,10 +195,8 @@ public class StoreLoader {
             if (configUrl != null) {
                 is = (new URL(configUrl)).openStream();
                 if (log.isInfoEnabled())
-                    log
-                            .info("Find registry server-registry.xml from system property at url "
-                                    + configUrl);
-                ;
+                    log.info("Find registry server-registry.xml from system property at url "
+                            + configUrl);
                 registryResource = new URL(configUrl);
             }
         } catch (Throwable t) {
@@ -213,7 +211,6 @@ public class StoreLoader {
                 if (log.isInfoEnabled())
                     log.info("Find registry server-registry.xml at file "
                             + reg.getCanonicalPath());
-                ;
                 registryResource = reg.toURI().toURL();
             } catch (Throwable t) {
                 // Ignore
