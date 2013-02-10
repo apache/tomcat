@@ -21,7 +21,7 @@
         standard="true"
         default="true"
         externalAllowed="true"
-        childs="true"
+        children="true"
         tagClass="org.apache.catalina.core.StandardServer"
         storeFactoryClass="org.apache.catalina.storeconfig.StandardServerSF">
      </Description>
@@ -29,7 +29,7 @@
         tag="Service"
         standard="true"
         default="true"
-        childs="true"
+        children="true"
         tagClass="org.apache.catalina.core.StandardService"
         storeFactoryClass="org.apache.catalina.storeconfig.StandardServiceSF">
      </Description>
@@ -37,7 +37,7 @@
         tag="Engine"
         standard="true"
         default="true"
-        childs="true"
+        children="true"
         tagClass="org.apache.catalina.core.StandardEngine"
         storeFactoryClass="org.apache.catalina.storeconfig.StandardEngineSF">
         <TransientAttribute>domain</TransientAttribute>
@@ -46,7 +46,7 @@
         tag="Host"
         standard="true"
         default="true"
-        childs="true"
+        children="true"
         tagClass="org.apache.catalina.core.StandardHost"
         storeFactoryClass="org.apache.catalina.storeconfig.StandardHostSF">
         <TransientAttribute>domain</TransientAttribute>
@@ -59,7 +59,7 @@
         externalOnly="true"
          storeSeparate="true"
         backup="true"
-        childs="true"
+        children="true"
         tagClass="org.apache.catalina.core.StandardContext"
         storeFactoryClass="org.apache.catalina.storeconfig.StandardContextSF"
         storeAppenderClass="org.apache.catalina.storeconfig.StoreContextAppender">
@@ -85,7 +85,7 @@
         standard="true"
         default="false"
         attributes="false"
-        childs="true"
+        children="true"
         tagClass="org.apache.catalina.deploy.NamingResources"
         storeFactoryClass="org.apache.catalina.storeconfig.GlobalNamingResourcesSF">
      </Description>
@@ -94,7 +94,7 @@
         standard="true"
         default="true"
         tagClass="org.apache.catalina.connector.Connector"
-        childs="true"
+        children="true"
         storeFactoryClass="org.apache.catalina.storeconfig.ConnectorSF"
         storeAppenderClass="org.apache.catalina.storeconfig.ConnectorStoreAppender">
         <TransientAttribute>URIEncoding</TransientAttribute>
@@ -106,7 +106,7 @@
         standard="true"
         default="false"
         attributes="false"
-        childs="true"
+        children="true"
         tagClass="org.apache.catalina.deploy.NamingResources"
         storeFactoryClass="org.apache.catalina.storeconfig.NamingResourcesSF">
      </Description>
@@ -123,7 +123,7 @@
         tag="Manager"
         standard="false"
         default="false"
-        childs="true"
+        children="true"
         tagClass="org.apache.catalina.session.PersistentManager"
         storeFactoryClass="org.apache.catalina.storeconfig.PersistentManagerSF">
         <TransientAttribute>entropy</TransientAttribute>
@@ -147,7 +147,7 @@
         tag="Cluster"
         standard="false"
         default="false"
-        childs="true"
+        children="true"
         tagClass="org.apache.catalina.ha.CatalinaCluster"
         storeFactoryClass="org.apache.catalina.storeconfig.CatalinaClusterSF">
      </Description>
@@ -155,7 +155,7 @@
         tag="Realm"
         standard="false"
         default="false"
-        childs="false"
+        children="false"
         tagClass="org.apache.catalina.Realm"
         storeFactoryClass="org.apache.catalina.storeconfig.RealmSF">
         <TransientAttribute>domain</TransientAttribute>
@@ -251,7 +251,7 @@
         tag="Resources"
         standard="false"
         default="false"
-        childs="true"
+        children="true"
         tagClass="org.apache.catalina.WebResourceRoot"
         storeFactoryClass="org.apache.catalina.storeconfig.WebResourceRootSF">
         <TransientAttribute>allowLinking</TransientAttribute>
@@ -351,7 +351,7 @@
         tag="Sender"
         standard="false"
         default="false"
-        childs="true"
+        children="true"
         tagClass="org.apache.catalina.tribes.ChannelSender"
         storeFactoryClass="org.apache.catalina.storeconfig.SenderSF">
      </Description>
@@ -394,7 +394,7 @@
         tag="Channel"
         standard="false"
         default="false"
-        childs="true"
+        children="true"
         tagClass="org.apache.catalina.tribes.Channel"
         storeFactoryClass="org.apache.catalina.storeconfig.ChannelSF">
      </Description>
@@ -402,7 +402,7 @@
         tag="Interceptor"
         standard="false"
         default="false"
-        childs="true"
+        children="true"
         tagClass="org.apache.catalina.tribes.ChannelInterceptor"
         storeFactoryClass="org.apache.catalina.storeconfig.InterceptorSF">
      </Description>

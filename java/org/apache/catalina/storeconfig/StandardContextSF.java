@@ -43,7 +43,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Store server.xml Context element with all childs
+ * Store server.xml Context element with all children
  * <ul>
  * <li>Store all context at server.xml</li>
  * <li>Store existing app.xml context a conf/enginename/hostname/app.xml</li>
@@ -237,7 +237,7 @@ public class StandardContextSF extends StoreFactoryBase {
      *                if an exception occurs while storing
      */
     @Override
-    public void storeChilds(PrintWriter aWriter, int indent, Object aContext,
+    public void storeChildren(PrintWriter aWriter, int indent, Object aContext,
             StoreDescription parentDesc) throws Exception {
         if (aContext instanceof StandardContext) {
             StandardContext context = (StandardContext) aContext;

@@ -26,7 +26,7 @@ import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.deploy.NamingResources;
 
 /**
- * Store server.xml Server element and childs (
+ * Store server.xml Server element and children (
  * Listener,GlobalNamingResource,Service)
  */
 public class StandardServerSF extends StoreFactoryBase {
@@ -54,7 +54,7 @@ public class StandardServerSF extends StoreFactoryBase {
     }
 
     /**
-     * Store Childs from this StandardServer descrition
+     * Store Children from this StandardServer descrition
      *
      * @param aWriter
      * @param indent
@@ -63,7 +63,7 @@ public class StandardServerSF extends StoreFactoryBase {
      * @throws Exception
      */
     @Override
-    public void storeChilds(PrintWriter aWriter, int indent, Object aObject,
+    public void storeChildren(PrintWriter aWriter, int indent, Object aObject,
             StoreDescription parentDesc) throws Exception {
         if (aObject instanceof StandardServer) {
             StandardServer server = (StandardServer) aObject;

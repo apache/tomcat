@@ -41,7 +41,7 @@ public class PersistentManagerSF extends StoreFactoryBase {
      *                if an exception occurs while storing
      */
     @Override
-    public void storeChilds(PrintWriter aWriter, int indent, Object aManager,
+    public void storeChildren(PrintWriter aWriter, int indent, Object aManager,
             StoreDescription parentDesc) throws Exception {
         if (aManager instanceof PersistentManager) {
             PersistentManager manager = (PersistentManager) aManager;

@@ -37,7 +37,7 @@ public class NamingResourcesSF extends StoreFactoryBase {
     /**
      * Store the only the NamingResources elements
      *
-     * @see NamingResourcesSF#storeChilds(PrintWriter, int, Object, StoreDescription)
+     * @see NamingResourcesSF#storeChildren(PrintWriter, int, Object, StoreDescription)
      */
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement)
@@ -48,7 +48,7 @@ public class NamingResourcesSF extends StoreFactoryBase {
             if (log.isDebugEnabled())
                 log.debug("store " + elementDesc.getTag() + "( " + aElement
                         + " )");
-            storeChilds(aWriter, indent, aElement, elementDesc);
+            storeChildren(aWriter, indent, aElement, elementDesc);
         } else {
             if (log.isWarnEnabled())
                 log.warn("Descriptor for element" + aElement.getClass()
@@ -71,11 +71,11 @@ public class NamingResourcesSF extends StoreFactoryBase {
      * @exception Exception
      *                if an exception occurs while storing
      *
-     * @see org.apache.catalina.storeconfig.StoreFactoryBase#storeChilds(java.io.PrintWriter,
+     * @see org.apache.catalina.storeconfig.StoreFactoryBase#storeChildren(java.io.PrintWriter,
      *      int, java.lang.Object, StoreDescription)
      */
     @Override
-    public void storeChilds(PrintWriter aWriter, int indent, Object aElement,
+    public void storeChildren(PrintWriter aWriter, int indent, Object aElement,
             StoreDescription elementDesc) throws Exception {
 
         if (aElement instanceof NamingResources) {

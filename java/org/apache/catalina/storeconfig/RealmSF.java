@@ -45,7 +45,7 @@ public class RealmSF extends StoreFactoryBase {
                 getStoreAppender().printIndent(aWriter, indent + 2);
                 getStoreAppender().printOpenTag(aWriter, indent + 2, aElement,
                             elementDesc);
-                storeChilds(aWriter, indent + 2, aElement, elementDesc);
+                storeChildren(aWriter, indent + 2, aElement, elementDesc);
                 getStoreAppender().printIndent(aWriter, indent + 2);
                 getStoreAppender().printCloseTag(aWriter, elementDesc);
             } else {
@@ -72,7 +72,7 @@ public class RealmSF extends StoreFactoryBase {
      *                if an exception occurs while storing
      */
     @Override
-    public void storeChilds(PrintWriter aWriter, int indent, Object aRealm,
+    public void storeChildren(PrintWriter aWriter, int indent, Object aRealm,
             StoreDescription parentDesc) throws Exception {
         if (aRealm instanceof CombinedRealm) {
             CombinedRealm combinedRealm = (CombinedRealm) aRealm;

@@ -27,12 +27,12 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardService;
 
 /**
- * Store server.xml Element Service and all childs
+ * Store server.xml Element Service and all children
  */
 public class StandardServiceSF extends StoreFactoryBase {
 
     /**
-     * Store Childs from this StandardService description
+     * Store Children from this StandardService description
      *
      * @param aWriter
      * @param indent
@@ -40,7 +40,7 @@ public class StandardServiceSF extends StoreFactoryBase {
      * @throws Exception
      */
     @Override
-    public void storeChilds(PrintWriter aWriter, int indent, Object aService,
+    public void storeChildren(PrintWriter aWriter, int indent, Object aService,
             StoreDescription parentDesc) throws Exception {
         if (aService instanceof StandardService) {
             StandardService service = (StandardService) aService;

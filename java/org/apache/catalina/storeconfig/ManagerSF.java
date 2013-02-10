@@ -33,7 +33,7 @@ public class ManagerSF extends StoreFactoryBase {
     /**
      * Store the only the Manager elements
      *
-     * @see NamingResourcesSF#storeChilds(PrintWriter, int, Object, StoreDescription)
+     * @see NamingResourcesSF#storeChildren(PrintWriter, int, Object, StoreDescription)
      */
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement)

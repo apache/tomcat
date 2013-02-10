@@ -105,7 +105,7 @@ public class StoreFactoryBase implements IStoreFactory {
     }
 
     /*
-     * Store a server.xml element with attributes and childs
+     * Store a server.xml element with attributes and children
      *
      * @see org.apache.catalina.storeconfig.IStoreFactory#store(java.io.PrintWriter,
      *      int, java.lang.Object)
@@ -122,13 +122,13 @@ public class StoreFactoryBase implements IStoreFactory {
                 log.debug(sm.getString("factory.storeTag",
                         elementDesc.getTag(), aElement));
             getStoreAppender().printIndent(aWriter, indent + 2);
-            if (!elementDesc.isChilds()) {
+            if (!elementDesc.isChildren()) {
                 getStoreAppender().printTag(aWriter, indent, aElement,
                         elementDesc);
             } else {
                 getStoreAppender().printOpenTag(aWriter, indent + 2, aElement,
                         elementDesc);
-                storeChilds(aWriter, indent + 2, aElement, elementDesc);
+                storeChildren(aWriter, indent + 2, aElement, elementDesc);
                 getStoreAppender().printIndent(aWriter, indent + 2);
                 getStoreAppender().printCloseTag(aWriter, elementDesc);
             }
@@ -138,19 +138,19 @@ public class StoreFactoryBase implements IStoreFactory {
     }
 
     /**
-     * Must Implement at subclass for sepzial store childs handling
+     * Must Implement at subclass for sepzial store children handling
      *
      * @param aWriter
      * @param indent
      * @param aElement
      * @param elementDesc
      */
-    public void storeChilds(PrintWriter aWriter, int indent, Object aElement,
+    public void storeChildren(PrintWriter aWriter, int indent, Object aElement,
             StoreDescription elementDesc) throws Exception {
     }
 
     /**
-     * Store only elements from storeChilds methods that are not a transient
+     * Store only elements from storeChildren methods that are not a transient
      * child.
      *
      * @param aWriter current output writer
@@ -189,7 +189,7 @@ public class StoreFactoryBase implements IStoreFactory {
                 try {
                     storeElement(aWriter, indent, elements[i]);
                 } catch (IOException ioe) {
-                    // ingore childs report error them self!
+                    // ingore children report error them self!
                     // see StandartContext.storeWithBackup()
                 }
             }

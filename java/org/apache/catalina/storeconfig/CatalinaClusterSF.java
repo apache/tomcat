@@ -35,7 +35,7 @@ import org.apache.catalina.tribes.Channel;
 public class CatalinaClusterSF extends StoreFactoryBase {
 
     /**
-     * Store the specified Cluster childs.
+     * Store the specified Cluster children.
      *
      * @param aWriter
      *            PrintWriter to which we are storing
@@ -48,7 +48,7 @@ public class CatalinaClusterSF extends StoreFactoryBase {
      *                if an exception occurs while storing
      */
     @Override
-    public void storeChilds(PrintWriter aWriter, int indent, Object aCluster,
+    public void storeChildren(PrintWriter aWriter, int indent, Object aCluster,
             StoreDescription parentDesc) throws Exception {
         if (aCluster instanceof CatalinaCluster) {
             CatalinaCluster cluster = (CatalinaCluster) aCluster;

@@ -32,7 +32,7 @@ import java.util.List;
  *  externalAllowed=&quot;true&quot;
  *  storeSeparate=&quot;true&quot;
  *  backup=&quot;true&quot;
- *  childs=&quot;true&quot;
+ *  children=&quot;true&quot;
  *  tagClass=&quot;org.apache.catalina.core.StandardContext&quot;
  *  storeFactoryClass=&quot;org.apache.catalina.storeconfig.StandardContextSF&quot;
  *  storeAppenderClass=&quot;org.apache.catalina.storeconfig.StoreContextAppender&quot;&gt;
@@ -81,11 +81,11 @@ public class StoreDescription {
 
     private String storeWriterClass;
 
-    private boolean childs = false;
+    private boolean children = false;
 
     private List<String> transientAttributes;
 
-    private List<String> transientChilds;
+    private List<String> transientChildren;
 
     private boolean storeSeparate = false;
 
@@ -259,29 +259,29 @@ public class StoreDescription {
     }
 
     /**
-     * @return Returns the transientChilds.
+     * @return Returns the transientChildren.
      */
-    public List<String> getTransientChilds() {
-        return transientChilds;
+    public List<String> getTransientChildren() {
+        return transientChildren;
     }
 
     /**
-     * @param transientChilds
-     *            The transientChilds to set.
+     * @param transientChildren
+     *            The transientChildren to set.
      */
-    public void setTransientChilds(List<String> transientChilds) {
-        this.transientChilds = transientChilds;
+    public void setTransientChildren(List<String> transientChildren) {
+        this.transientChildren = transientChildren;
     }
 
     public void addTransientChild(String classname) {
-        if (transientChilds == null)
-            transientChilds = new ArrayList<>();
-        transientChilds.add(classname);
+        if (transientChildren == null)
+            transientChildren = new ArrayList<>();
+        transientChildren.add(classname);
     }
 
     public void removeTransientChild(String classname) {
-        if (transientChilds != null)
-            transientChilds.remove(classname);
+        if (transientChildren != null)
+            transientChildren.remove(classname);
     }
 
     /**
@@ -291,8 +291,8 @@ public class StoreDescription {
      * @return is classname attribute?
      */
     public boolean isTransientChild(String classname) {
-        if (transientChilds != null)
-            return transientChilds.contains(classname);
+        if (transientChildren != null)
+            return transientChildren.contains(classname);
         return false;
     }
 
@@ -355,17 +355,17 @@ public class StoreDescription {
     }
 
     /**
-     * @return Returns the childs.
+     * @return Returns the children.
      */
-    public boolean isChilds() {
-        return childs;
+    public boolean isChildren() {
+        return children;
     }
 
     /**
-     * @param childs
-     *            The childs to set.
+     * @param children
+     *            The children to set.
      */
-    public void setChilds(boolean childs) {
-        this.childs = childs;
+    public void setChildren(boolean children) {
+        this.children = children;
     }
 }

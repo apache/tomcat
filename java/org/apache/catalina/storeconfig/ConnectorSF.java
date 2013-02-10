@@ -36,7 +36,7 @@ public class ConnectorSF extends StoreFactoryBase {
      * @throws Exception
      */
     @Override
-    public void storeChilds(PrintWriter aWriter, int indent, Object aConnector,
+    public void storeChildren(PrintWriter aWriter, int indent, Object aConnector,
             StoreDescription parentDesc) throws Exception {
 
         if (aConnector instanceof Connector) {
