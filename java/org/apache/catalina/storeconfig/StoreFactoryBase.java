@@ -189,7 +189,7 @@ public class StoreFactoryBase implements IStoreFactory {
                 try {
                     storeElement(aWriter, indent, elements[i]);
                 } catch (IOException ioe) {
-                    // ingore children report error them self!
+                    // ignore children report error them self!
                     // see StandartContext.storeWithBackup()
                 }
             }
