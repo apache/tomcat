@@ -65,7 +65,7 @@ public class WebResourceRootSF extends StoreFactoryBase {
                             + ".[JarResources]");
             if (jarResourcesElementDesc != null) {
                 for (WebResourceSet jarResources : jarResourcesArray) {
-                    preResourcesElementDesc.getStoreFactory().store(aWriter, indent,
+                    jarResourcesElementDesc.getStoreFactory().store(aWriter, indent,
                             jarResources);
                 }
             }
@@ -77,7 +77,7 @@ public class WebResourceRootSF extends StoreFactoryBase {
                             + ".[PostResources]");
             if (postResourcesElementDesc != null) {
                 for (WebResourceSet postResources : postResourcesArray) {
-                    preResourcesElementDesc.getStoreFactory().store(aWriter, indent,
+                    postResourcesElementDesc.getStoreFactory().store(aWriter, indent,
                             postResources);
                 }
             }
