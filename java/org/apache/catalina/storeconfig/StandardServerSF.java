@@ -68,25 +68,23 @@ public class StandardServerSF extends StoreFactoryBase {
         if (aObject instanceof StandardServer) {
             StandardServer server = (StandardServer) aObject;
             // Store nested <Listener> elements
-            if (server instanceof Lifecycle) {
-                LifecycleListener listeners[] = ((Lifecycle) server)
-                        .findLifecycleListeners();
-                storeElementArray(aWriter, indent, listeners);
-                /*LifecycleListener listener = null;
-                for (int i = 0; listener == null && i < listeners.length; i++)
-                    if (listeners[i] instanceof ServerLifecycleListener)
-                        listener = listeners[i];
-                if (listener != null) {
-                    StoreDescription elementDesc = getRegistry()
-                            .findDescription(
-                                    StandardServer.class.getName()
-                                            + ".[ServerLifecycleListener]");
-                    if (elementDesc != null) {
-                        elementDesc.getStoreFactory().store(aWriter, indent,
-                                listener);
-                    }
-                }*/
-            }
+            LifecycleListener listeners[] = ((Lifecycle) server)
+                    .findLifecycleListeners();
+            storeElementArray(aWriter, indent, listeners);
+            /*LifecycleListener listener = null;
+            for (int i = 0; listener == null && i < listeners.length; i++)
+                if (listeners[i] instanceof ServerLifecycleListener)
+                    listener = listeners[i];
+            if (listener != null) {
+                StoreDescription elementDesc = getRegistry()
+                        .findDescription(
+                                StandardServer.class.getName()
+                                        + ".[ServerLifecycleListener]");
+                if (elementDesc != null) {
+                    elementDesc.getStoreFactory().store(aWriter, indent,
+                            listener);
+                }
+            }*/
             // Store nested <GlobalNamingResources> element
             NamingResources globalNamingResources = server
                     .getGlobalNamingResources();
