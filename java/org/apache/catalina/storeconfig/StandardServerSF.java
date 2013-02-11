@@ -54,7 +54,7 @@ public class StandardServerSF extends StoreFactoryBase {
     }
 
     /**
-     * Store Children from this StandardServer descrition
+     * Store Children from this StandardServer description
      *
      * @param aWriter
      * @param indent
