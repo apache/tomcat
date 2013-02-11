@@ -38,7 +38,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
     private volatile byte[] buffer;
 
     @Override
-    public final boolean canWrite() {
+    public final boolean isReady() {
         if (listener == null) {
             throw new IllegalStateException(
                     sm.getString("upgrade.sos.canWrite.is"));
