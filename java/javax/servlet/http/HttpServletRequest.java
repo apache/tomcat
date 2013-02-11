@@ -501,5 +501,5 @@ public interface HttpServletRequest extends ServletRequest {
      *
      * @since Servlet 3.1
      */
-    public void upgrade(ProtocolHandler handler) throws java.io.IOException;
+    public void upgrade(HttpUpgradeHandler handler) throws java.io.IOException;
 }

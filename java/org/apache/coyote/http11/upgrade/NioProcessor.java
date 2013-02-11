@@ -16,7 +16,7 @@
  */
 package org.apache.coyote.http11.upgrade;
 
-import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioSelectorPool;
@@ -27,7 +27,7 @@ public class NioProcessor extends AbstractProcessor<NioChannel> {
     private static final int INFINITE_TIMEOUT = -1;
 
     public NioProcessor(SocketWrapper<NioChannel> wrapper,
-            ProtocolHandler httpUpgradeProcessor, NioSelectorPool pool) {
+            HttpUpgradeHandler httpUpgradeProcessor, NioSelectorPool pool) {
         super(httpUpgradeProcessor,
                 new NioServletInputStream(wrapper, pool),
                 new NioServletOutputStream(wrapper, pool));

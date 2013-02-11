@@ -21,7 +21,7 @@ import java.util.concurrent.Executor;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
 import org.apache.coyote.Processor;
@@ -38,11 +38,11 @@ public abstract class AbstractProcessor<S>
     protected static final StringManager sm =
             StringManager.getManager(Constants.Package);
 
-    private final ProtocolHandler httpUpgradeHandler;
+    private final HttpUpgradeHandler httpUpgradeHandler;
     private final AbstractServletInputStream upgradeServletInputStream;
     private final AbstractServletOutputStream upgradeServletOutputStream;
 
-    protected AbstractProcessor (ProtocolHandler httpUpgradeHandler,
+    protected AbstractProcessor (HttpUpgradeHandler httpUpgradeHandler,
             AbstractServletInputStream upgradeServletInputStream,
             AbstractServletOutputStream upgradeServletOutputStream) {
         this.httpUpgradeHandler = httpUpgradeHandler;
@@ -73,7 +73,7 @@ public abstract class AbstractProcessor<S>
     }
 
     @Override
-    public ProtocolHandler getHttpUpgradeHandler() {
+    public HttpUpgradeHandler getHttpUpgradeHandler() {
         return httpUpgradeHandler;
     }
 

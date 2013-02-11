@@ -30,7 +30,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.catalina.util.Base64;
 import org.apache.tomcat.util.buf.B2CConverter;
@@ -113,7 +113,7 @@ public abstract class WebSocketServlet extends HttpServlet {
         }
 
         WsHttpServletRequestWrapper wrapper = new WsHttpServletRequestWrapper(req);
-        ProtocolHandler wsHandler =
+        HttpUpgradeHandler wsHandler =
                 createWebSocketHandler(subProtocol, wrapper);
         wrapper.invalidate();
 
@@ -228,6 +228,6 @@ public abstract class WebSocketServlet extends HttpServlet {
      *                      method. If Tomcat detects such access, it will throw
      *                      an IllegalStateException
      */
-    protected abstract ProtocolHandler createWebSocketHandler(
+    protected abstract HttpUpgradeHandler createWebSocketHandler(
             String subProtocol, HttpServletRequest request);
 }

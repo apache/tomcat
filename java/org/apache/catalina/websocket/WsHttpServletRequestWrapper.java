@@ -37,8 +37,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
-import javax.servlet.http.ProtocolHandler;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -409,7 +409,7 @@ public class WsHttpServletRequestWrapper implements HttpServletRequest {
     }
 
     @Override
-    public void upgrade(ProtocolHandler handler) throws IOException {
+    public void upgrade(HttpUpgradeHandler handler) throws IOException {
         getRequest().upgrade(handler);
     }
 }

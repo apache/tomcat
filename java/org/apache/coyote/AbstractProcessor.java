@@ -154,5 +154,5 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
             throws IOException;
 
     @Override
-    public abstract javax.servlet.http.ProtocolHandler getHttpUpgradeHandler();
+    public abstract javax.servlet.http.HttpUpgradeHandler getHttpUpgradeHandler();
 }

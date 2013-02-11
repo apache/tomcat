@@ -19,7 +19,7 @@ package org.apache.coyote.http11.upgrade;
 import java.io.IOException;
 import java.net.Socket;
 
-import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.tomcat.util.net.SocketWrapper;
 
@@ -28,7 +28,7 @@ public class BioProcessor extends AbstractProcessor<Socket> {
     private static final int INFINITE_TIMEOUT = 0;
 
     public BioProcessor(SocketWrapper<Socket> wrapper,
-            ProtocolHandler httpUpgradeProcessor) throws IOException {
+            HttpUpgradeHandler httpUpgradeProcessor) throws IOException {
         super(httpUpgradeProcessor, new BioServletInputStream(wrapper),
                 new BioServletOutputStream(wrapper));
 

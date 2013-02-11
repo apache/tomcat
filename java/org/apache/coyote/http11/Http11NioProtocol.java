@@ -21,7 +21,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
 import javax.net.ssl.SSLEngine;
-import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
@@ -303,7 +303,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         @Override
         protected Processor<NioChannel> createUpgradeProcessor(
                 SocketWrapper<NioChannel> socket,
-                ProtocolHandler httpUpgradeProcessor)
+                HttpUpgradeHandler httpUpgradeProcessor)
                 throws IOException {
             return new NioProcessor(socket, httpUpgradeProcessor,
                     ((Http11NioProtocol) getProtocol()).getEndpoint().getSelectorPool());

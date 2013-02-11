@@ -21,13 +21,13 @@ package javax.servlet.http;
  *
  * @since Servlet 3.1
  */
-public interface ProtocolHandler {
+public interface HttpUpgradeHandler {
 
     /**
      * This method is called once the request/response pair where
-     * {@link HttpServletRequest#upgrade(ProtocolHandler)} is called has
+     * {@link HttpServletRequest#upgrade(HttpUpgradeHandler)} is called has
      * completed processing and is the point where control of the connection
-     * passes from the container to the {@link ProtocolHandler}.
+     * passes from the container to the {@link HttpUpgradeHandler}.
      *
      * @param connection    The connection that has been upgraded
      *

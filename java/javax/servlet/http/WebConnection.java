@@ -22,7 +22,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 
 /**
- * The interface used by a {@link ProtocolHandler} to interact with an upgraded
+ * The interface used by a {@link HttpUpgradeHandler} to interact with an upgraded
  * HTTP connection.
  *
  * @since Servlet 3.1

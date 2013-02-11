@@ -23,7 +23,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
@@ -223,7 +223,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * Instance of the new protocol to use after the HTTP connection has been
      * upgraded.
      */
-    protected ProtocolHandler httpUpgradeHandler = null;
+    protected HttpUpgradeHandler httpUpgradeHandler = null;
 
 
     public AbstractHttp11Processor(AbstractEndpoint endpoint) {
@@ -804,7 +804,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         } else if (actionCode == ActionCode.ASYNC_IS_ERROR) {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
         } else if (actionCode == ActionCode.UPGRADE) {
-            httpUpgradeHandler = (ProtocolHandler) param;
+            httpUpgradeHandler = (HttpUpgradeHandler) param;
             // Stop further HTTP output
             getOutputBuffer().finished = true;
         } else {
@@ -1558,7 +1558,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     @Override
-    public ProtocolHandler getHttpUpgradeHandler() {
+    public HttpUpgradeHandler getHttpUpgradeHandler() {
         return httpUpgradeHandler;
     }
 

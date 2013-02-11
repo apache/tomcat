@@ -22,7 +22,7 @@ import java.net.InetAddress;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
@@ -570,7 +570,7 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
     }
 
     @Override
-    public ProtocolHandler getHttpUpgradeHandler() {
+    public HttpUpgradeHandler getHttpUpgradeHandler() {
         return null;
     }
 }

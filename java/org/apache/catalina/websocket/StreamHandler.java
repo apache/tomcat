@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.MalformedInputException;
 import java.nio.charset.UnmappableCharacterException;
 
-import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -35,7 +35,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
  * specific functionality. Applications that wish to operate on a message basis
  * rather than a stream basis should use {@link MessageHandler}.
  */
-public abstract class StreamHandler implements ProtocolHandler {
+public abstract class StreamHandler implements HttpUpgradeHandler {
 
     private final ClassLoader applicationClassLoader;
     private WsOutbound outbound;
