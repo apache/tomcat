@@ -31,6 +31,11 @@ public class Constants {
     public static final byte OPCODE_PING = 0x09;
     public static final byte OPCODE_PONG = 0x0A;
 
+    // Internal OP Codes
+    // RFC 6455 limits OP Codes to 4 bits so these should never clash
+    // Always set bit 4 so these will be treated as control codes
+    static final byte INTERNAL_OPCODE_FLUSH = 0x18;
+
     // Client connection
     public static final String HOST_HEADER_NAME = "Host";
     public static final String UPGRADE_HEADER_NAME = "Upgrade";
