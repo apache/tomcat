@@ -108,4 +108,55 @@ public class TesterSingleMessageClient {
             }
         }
     }
+
+    public abstract static class AsyncHandler<T>
+            implements MessageHandler.Async<T> {
+
+        private final CountDownLatch latch;
+
+        private final List<T> messages = new CopyOnWriteArrayList<>();
+
+        public AsyncHandler(CountDownLatch latch) {
+            this.latch = latch;
+        }
+
+        public CountDownLatch getLatch() {
+            return latch;
+        }
+
+        public List<T> getMessages() {
+            return messages;
+        }
+    }
+
+    public static class AsyncBinary extends AsyncHandler<ByteBuffer> {
+
+        public AsyncBinary(CountDownLatch latch) {
+            super(latch);
+        }
+
+        @Override
+        public void onMessage(ByteBuffer message, boolean last) {
+            getMessages().add(message);
+            if (last && getLatch() != null) {
+                getLatch().countDown();
+            }
+        }
+    }
+
+    public static class AsyncText extends AsyncHandler<String> {
+
+
+        public AsyncText(CountDownLatch latch) {
+            super(latch);
+        }
+
+        @Override
+        public void onMessage(String message, boolean last) {
+            getMessages().add(message);
+            if (last && getLatch() != null) {
+                getLatch().countDown();
+            }
+        }
+    }
 }
