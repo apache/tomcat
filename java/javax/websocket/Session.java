@@ -52,9 +52,25 @@ public interface Session extends Closeable {
 
     void setTimeout(long seconds);
 
-    void setMaximumMessageSize(long length);
+    /**
+     * Set the current maximum buffer size (in bytes) for binary messages.
+     */
+    void setMaxBinaryMessageBufferSize(int max);
 
-    long getMaximumMessageSize();
+    /**
+     * Get the current maximum buffer size (in bytes) for binary messages.
+     */
+    int getMaxBinaryMessageBufferSize();
+
+    /**
+     * Set the current maximum buffer size (in characters) for text messages.
+     */
+    void setMaxTextMessageBufferSize(int max);
+
+    /**
+     * Get the current maximum buffer size (in characters) for text messages.
+     */
+    int getMaxTextMessageBufferSize();
 
     RemoteEndpoint getRemote();
 
@@ -90,4 +106,6 @@ public interface Session extends Closeable {
     Map<String,Object> getUserProperties();
 
     Principal getUserPrincipal();
+
+    Set<Session> getOpenSessions();
 }

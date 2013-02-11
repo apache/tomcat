@@ -100,13 +100,13 @@ public class ServerContainerImpl extends WsWebSocketContainer {
         String value = servletContext.getInitParameter(
                 Constants.BINARY_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM);
         if (value != null) {
-            setMaxBinaryMessageBufferSize(Long.parseLong(value));
+            setDefaultMaxBinaryMessageBufferSize(Integer.parseInt(value));
         }
 
         value = servletContext.getInitParameter(
                 Constants.TEXT_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM);
         if (value != null) {
-            setMaxTextMessageBufferSize(Long.parseLong(value));
+            setDefaultMaxTextMessageBufferSize(Integer.parseInt(value));
         }
 
         // Update the timeout thread name

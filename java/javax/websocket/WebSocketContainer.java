@@ -55,31 +55,29 @@ public interface WebSocketContainer {
             ClientEndpointConfiguration clientEndpointConfiguration, URI path)
             throws DeploymentException;
 
-    Set<Session> getOpenSessions();
-
     long getMaxSessionIdleTimeout();
 
     void setMaxSessionIdleTimeout(long timeout);
 
     /**
-     * Get the current maximum buffer size (in bytes) for binary messages.
+     * Get the default maximum buffer size (in bytes) for binary messages.
      */
-    long getMaxBinaryMessageBufferSize();
+    int getDefaultMaxBinaryMessageBufferSize();
 
     /**
-     * Set the current maximum buffer size (in bytes) for binary messages.
+     * Set the default maximum buffer size (in bytes) for binary messages.
      */
-    void setMaxBinaryMessageBufferSize(long max);
+    void setDefaultMaxBinaryMessageBufferSize(int max);
 
     /**
-     * Get the current maximum buffer size (in characters) for text messages.
+     * Get the default maximum buffer size (in characters) for text messages.
      */
-    long getMaxTextMessageBufferSize();
+    int getDefaultMaxTextMessageBufferSize();
 
     /**
-     * Set the current maximum buffer size (in characters) for text messages.
+     * Set the default maximum buffer size (in characters) for text messages.
      */
-    void setMaxTextMessageBufferSize(long max);
+    void setDefaultMaxTextMessageBufferSize(int max);
 
     Set<Extension> getInstalledExtensions();
 }

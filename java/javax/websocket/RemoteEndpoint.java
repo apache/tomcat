@@ -43,7 +43,7 @@ public interface RemoteEndpoint {
      * Flush any currently batched messages to the remote endpoint. This method
      * will block until the flush completes.
      */
-    void flushBatch();
+    void flushBatch() throws IOException;
 
     /**
      * Obtain the timeout (in milliseconds) for sending a message

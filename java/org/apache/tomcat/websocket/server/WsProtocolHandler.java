@@ -88,8 +88,8 @@ public class WsProtocolHandler implements ProtocolHandler {
                     ep, wsRemoteEndpointServer, webSocketContainer);
             WsFrameServer wsFrame = new WsFrameServer(
                     sis,
-                    (int) webSocketContainer.getMaxBinaryMessageBufferSize(),
-                    (int) webSocketContainer.getMaxTextMessageBufferSize(),
+                    webSocketContainer.getDefaultMaxBinaryMessageBufferSize(),
+                    webSocketContainer.getDefaultMaxTextMessageBufferSize(),
                     wsSession);
             sis.setReadListener(new WsReadListener(this, wsFrame));
             sos.setWriteListener(

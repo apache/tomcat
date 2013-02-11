@@ -206,16 +206,40 @@ public class WsSession implements Session {
     }
 
 
+
+
     @Override
-    public void setMaximumMessageSize(long length) {
+    public void setMaxBinaryMessageBufferSize(int max) {
         // TODO Auto-generated method stub
+
     }
 
 
     @Override
-    public long getMaximumMessageSize() {
+    public int getMaxBinaryMessageBufferSize() {
         // TODO Auto-generated method stub
         return 0;
+    }
+
+
+    @Override
+    public void setMaxTextMessageBufferSize(int max) {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    @Override
+    public int getMaxTextMessageBufferSize() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+
+    @Override
+    public Set<Session> getOpenSessions() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 
