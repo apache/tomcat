@@ -75,7 +75,7 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
         boolean complete = true;
         try {
             // If this is false there will be a call back when it is true
-            while (sos.canWrite()) {
+            while (sos.isReady()) {
                 complete = true;
                 for (ByteBuffer buffer : buffers) {
                     if (buffer.hasRemaining()) {

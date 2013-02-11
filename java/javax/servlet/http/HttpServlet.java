@@ -868,7 +868,7 @@ class NoBodyOutputStream extends ServletOutputStream {
     }
 
     @Override
-    public boolean canWrite() {
+    public boolean isReady() {
         // TODO SERVLET 3.1
         return false;
     }

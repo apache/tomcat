@@ -274,7 +274,7 @@ public class Util {
              * TODO SERVLET 3.1
              */
             @Override
-            public boolean canWrite() {
+            public boolean isReady() {
                 // TODO Auto-generated method stub
                 return false;
             }

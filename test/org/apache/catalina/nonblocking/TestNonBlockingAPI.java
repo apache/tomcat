@@ -409,7 +409,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 long start = System.currentTimeMillis();
                 long end = System.currentTimeMillis();
                 long before = left;
-                while (left > 0 && ctx.getResponse().getOutputStream().canWrite()) {
+                while (left > 0 && ctx.getResponse().getOutputStream().isReady()) {
                     byte[] b = new byte[(int) Math.min(chunk, bytesToDownload)];
                     Arrays.fill(b, (byte) 'X');
                     ctx.getResponse().getOutputStream().write(b);
@@ -418,7 +418,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 }
                 System.out.println("Write took:" + (end - start) + " ms. Bytes before=" + before + " after=" + left);
                 // only call complete if we have emptied the buffer
-                if (left == 0 && ctx.getResponse().getOutputStream().canWrite()) {
+                if (left == 0 && ctx.getResponse().getOutputStream().isReady()) {
                     // it is illegal to call complete
                     // if there is a write in progress
                     ctx.complete();

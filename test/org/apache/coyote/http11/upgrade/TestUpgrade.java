@@ -233,7 +233,7 @@ public class TestUpgrade extends TomcatBaseTest {
                     while (sis.isReady()) {
                         int read = sis.read(buffer);
                         if (read > 0) {
-                            if (sos.canWrite()) {
+                            if (sos.isReady()) {
                                 sos.write(buffer, 0, read);
                             } else {
                                 throw new IOException("Unable to echo data. " +
