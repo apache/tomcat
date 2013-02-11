@@ -343,13 +343,6 @@ public class WsWebSocketContainer implements WebSocketContainer {
 
 
     @Override
-    public Set<Session> getOpenSessions() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
     public long getMaxSessionIdleTimeout() {
         // TODO Auto-generated method stub
         return 0;
@@ -363,34 +356,26 @@ public class WsWebSocketContainer implements WebSocketContainer {
 
 
     @Override
-    public long getMaxBinaryMessageBufferSize() {
+    public int getDefaultMaxBinaryMessageBufferSize() {
         return maxBinaryMessageBufferSize;
     }
 
 
     @Override
-    public void setMaxBinaryMessageBufferSize(long max) {
-        if (max > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException(
-                    sm.getString("wsWebSocketContainer.maxBuffer"));
-        }
-        maxBinaryMessageBufferSize = (int) max;
+    public void setDefaultMaxBinaryMessageBufferSize(int max) {
+        maxBinaryMessageBufferSize = max;
     }
 
 
     @Override
-    public long getMaxTextMessageBufferSize() {
+    public int getDefaultMaxTextMessageBufferSize() {
         return maxTextMessageBufferSize;
     }
 
 
     @Override
-    public void setMaxTextMessageBufferSize(long max) {
-        if (max > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException(
-                    sm.getString("wsWebSocketContainer.maxBuffer"));
-        }
-        maxTextMessageBufferSize = (int) max;
+    public void setDefaultMaxTextMessageBufferSize(int max) {
+        maxTextMessageBufferSize = max;
     }
 
 

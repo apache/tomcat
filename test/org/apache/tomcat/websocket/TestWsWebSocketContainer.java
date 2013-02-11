@@ -80,7 +80,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         tomcat.start();
 
         WebSocketContainer wsContainer =
-                ContainerProvider.createClientContainer();
+                ContainerProvider.getWebSocketContainer();
         Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
                 new DefaultClientConfiguration(), new URI("http://localhost:" +
                         getPort() + TesterEchoServer.Config.PATH_ASYNC));
@@ -110,7 +110,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         tomcat.start();
 
         WebSocketContainer wsContainer =
-                ContainerProvider.createClientContainer();
+                ContainerProvider.getWebSocketContainer();
         wsContainer.connectToServer(TesterEndpoint.class,
                 new DefaultClientConfiguration(), new URI("ftp://localhost:" +
                         getPort() + TesterEchoServer.Config.PATH_ASYNC));
@@ -128,7 +128,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         tomcat.start();
 
         WebSocketContainer wsContainer =
-                ContainerProvider.createClientContainer();
+                ContainerProvider.getWebSocketContainer();
         wsContainer.connectToServer(TesterEndpoint.class,
                 new DefaultClientConfiguration(),
                 new URI("http://" + TesterEchoServer.Config.PATH_ASYNC));
@@ -193,7 +193,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
 
         WebSocketContainer wsContainer =
-                ContainerProvider.createClientContainer();
+                ContainerProvider.getWebSocketContainer();
 
         if (isServerBuffer) {
             if (isTextBuffer) {
@@ -209,9 +209,9 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             }
         } else {
             if (isTextBuffer) {
-                wsContainer.setMaxTextMessageBufferSize(1024);
+                wsContainer.setDefaultMaxTextMessageBufferSize(1024);
             } else {
-                wsContainer.setMaxBinaryMessageBufferSize(1024);
+                wsContainer.setDefaultMaxBinaryMessageBufferSize(1024);
             }
         }
 
@@ -277,7 +277,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         ctx.addApplicationListener(BlockingConfig.class.getName());
 
         WebSocketContainer wsContainer =
-                ContainerProvider.createClientContainer();
+                ContainerProvider.getWebSocketContainer();
 
         // Set the async timeout
         if (setTimeoutOnContainer) {
@@ -365,7 +365,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         ctx.addApplicationListener(ConstantTxConfig.class.getName());
 
         WebSocketContainer wsContainer =
-                ContainerProvider.createClientContainer();
+                ContainerProvider.getWebSocketContainer();
 
         tomcat.start();
 

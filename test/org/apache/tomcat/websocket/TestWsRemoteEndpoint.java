@@ -60,7 +60,7 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
 
         WebSocketContainer wsContainer =
-                ContainerProvider.createClientContainer();
+                ContainerProvider.getWebSocketContainer();
 
         tomcat.start();
 

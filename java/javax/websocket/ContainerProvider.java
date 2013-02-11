@@ -20,7 +20,7 @@ package javax.websocket;
  * Provides access to the implementation. This version of the API is hard-coded
  * to use the Apache Tomcat WebSocket implementation.
  */
-public class ContainerProvider {
+public abstract class ContainerProvider {
 
     private static final String DEFAULT_PROVIDER_CLASS_NAME =
             "org.apache.tomcat.websocket.WsWebSocketContainer";
@@ -40,7 +40,7 @@ public class ContainerProvider {
      * Create a new ClientContainer used to create outgoing WebSocket
      * connections.
      */
-    public static WebSocketContainer createClientContainer() {
+    public static WebSocketContainer getWebSocketContainer() {
         WebSocketContainer result = null;
         try {
             result = clazz.newInstance();

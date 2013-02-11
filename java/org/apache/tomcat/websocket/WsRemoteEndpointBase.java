@@ -84,7 +84,11 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
         if (oldValue && !batchingAllowed) {
             // Just disabled batched. Must flush.
-            flushBatch();
+            try {
+                flushBatch();
+            } catch (IOException e) {
+                // TODO Log this? Runtime exception? Something else?
+            }
         }
     }
 
@@ -96,12 +100,8 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
 
     @Override
-    public void flushBatch() {
-        try {
-            startMessageBlock(Constants.INTERNAL_OPCODE_FLUSH, null, true);
-        } catch (IOException e) {
-            // TODO Log this? Runtime exception? Something else?
-        }
+    public void flushBatch() throws IOException {
+        startMessageBlock(Constants.INTERNAL_OPCODE_FLUSH, null, true);
     }
 
 

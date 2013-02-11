@@ -42,7 +42,7 @@ public class DefaultClientConfiguration implements ClientEndpointConfiguration {
         return extensions;
     }
 
-    public ClientEndpointConfiguration setExtensions(
+    public DefaultClientConfiguration setExtensions(
             List<Extension> extensions) {
         this.extensions = extensions;
         return this;
@@ -53,7 +53,7 @@ public class DefaultClientConfiguration implements ClientEndpointConfiguration {
         return encoders;
     }
 
-    public ClientEndpointConfiguration setEncoders(List<Encoder> encoders) {
+    public DefaultClientConfiguration setEncoders(List<Encoder> encoders) {
         this.encoders = encoders;
         return this;
     }
@@ -63,7 +63,7 @@ public class DefaultClientConfiguration implements ClientEndpointConfiguration {
         return decoders;
     }
 
-    public ClientEndpointConfiguration setDecoders(List<Decoder> decoders) {
+    public DefaultClientConfiguration setDecoders(List<Decoder> decoders) {
         this.decoders = decoders;
         return this;
     }
