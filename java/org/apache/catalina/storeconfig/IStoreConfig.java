@@ -83,9 +83,6 @@ public interface IStoreConfig {
      *            Number of spaces to indent this element
      * @param aServer
      *            Object to be stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
      */
     void store(PrintWriter aWriter, int indent, Server aServer);
 
@@ -98,9 +95,6 @@ public interface IStoreConfig {
      *            Number of spaces to indent this element
      * @param aService
      *            Object to be stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
      */
     void store(PrintWriter aWriter, int indent, Service aService);
 
@@ -113,9 +107,6 @@ public interface IStoreConfig {
      *            Number of spaces to indent this element
      * @param aHost
      *            Object to be stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
      */
     void store(PrintWriter aWriter, int indent, Host aHost);
 
@@ -124,9 +115,6 @@ public interface IStoreConfig {
      *
      * @param aContext
      *            Object to be stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
      */
     void store(Context aContext);
 
@@ -139,9 +127,6 @@ public interface IStoreConfig {
      *            Number of spaces to indent this element
      * @param aContext
      *            Object to be stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
      */
     void store(PrintWriter aWriter, int indent, Context aContext);
 }
