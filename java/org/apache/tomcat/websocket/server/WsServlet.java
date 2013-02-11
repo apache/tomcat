@@ -32,7 +32,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.HttpUpgradeHandler;
 import javax.websocket.Endpoint;
 import javax.websocket.Extension;
 import javax.websocket.server.ServerEndpointConfiguration;
@@ -128,7 +128,7 @@ public class WsServlet extends HttpServlet {
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ServletException(e);
         }
-        ProtocolHandler wsHandler = new WsProtocolHandler(ep, sec, sc);
+        HttpUpgradeHandler wsHandler = new WsProtocolHandler(ep, sec, sc);
         req.upgrade(wsHandler);
     }
 

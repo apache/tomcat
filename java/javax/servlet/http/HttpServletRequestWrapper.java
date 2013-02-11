@@ -355,13 +355,13 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
      * {@inheritDoc}
      * <p>
      * The default behavior of this method is to return
-     * {@link HttpServletRequest#upgrade(ProtocolHandler)}
+     * {@link HttpServletRequest#upgrade(HttpUpgradeHandler)}
      * on the wrapped request object.
      *
      * @since Servlet 3.1
      */
     @Override
-    public void upgrade(ProtocolHandler handler) throws java.io.IOException {
+    public void upgrade(HttpUpgradeHandler handler) throws java.io.IOException {
         this._getHttpServletRequest().upgrade(handler);
     }
 }

@@ -626,7 +626,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
                     if (state == SocketState.UPGRADING) {
                         // Get the HTTP upgrade handler
-                        javax.servlet.http.ProtocolHandler httpUpgradeHandler =
+                        javax.servlet.http.HttpUpgradeHandler httpUpgradeHandler =
                                 processor.getHttpUpgradeHandler();
                         // Release the Http11 processor to be re-used
                         release(wrapper, processor, false, false);
@@ -720,7 +720,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                 boolean addToPoller);
         protected abstract Processor<S> createUpgradeProcessor(
                 SocketWrapper<S> socket,
-                javax.servlet.http.ProtocolHandler httpUpgradeProcessor)
+                javax.servlet.http.HttpUpgradeHandler httpUpgradeProcessor)
                         throws IOException;
 
         protected void register(AbstractProcessor<S> processor) {

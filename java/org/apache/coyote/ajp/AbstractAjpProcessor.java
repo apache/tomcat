@@ -25,7 +25,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
@@ -537,7 +537,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     @Override
-    public ProtocolHandler getHttpUpgradeHandler() {
+    public HttpUpgradeHandler getHttpUpgradeHandler() {
         // Should never reach this code but in case we do...
         throw new IllegalStateException(
                 sm.getString("ajpprocessor.httpupgrade.notsupported"));

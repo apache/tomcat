@@ -58,8 +58,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
-import javax.servlet.http.ProtocolHandler;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
@@ -1884,7 +1884,7 @@ public class Request
      * @since Servlet 3.1
      */
     @Override
-    public void upgrade(ProtocolHandler handler) throws IOException {
+    public void upgrade(HttpUpgradeHandler handler) throws IOException {
         coyoteRequest.action(ActionCode.UPGRADE, handler);
 
         // Output required by RFC2616. Protocol specific headers should have

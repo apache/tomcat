@@ -18,7 +18,7 @@ package org.apache.coyote.http11;
 
 import java.io.IOException;
 
-import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
@@ -341,7 +341,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         @Override
         protected Processor<Long> createUpgradeProcessor(
                 SocketWrapper<Long> socket,
-                ProtocolHandler httpUpgradeProcessor)
+                HttpUpgradeHandler httpUpgradeProcessor)
                 throws IOException {
             return new AprProcessor(socket, httpUpgradeProcessor,
                     (AprEndpoint) proto.endpoint);

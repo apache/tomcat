@@ -37,8 +37,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
-import javax.servlet.http.ProtocolHandler;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
@@ -1102,7 +1102,7 @@ public class RequestFacade implements HttpServletRequest {
      * @since Servlet 3.1
      */
     @Override
-    public void upgrade(ProtocolHandler handler) throws IOException {
+    public void upgrade(HttpUpgradeHandler handler) throws IOException {
         request.upgrade(handler);
     }
 }

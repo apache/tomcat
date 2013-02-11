@@ -23,7 +23,7 @@ import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
-import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -39,7 +39,7 @@ import org.apache.tomcat.websocket.WsSession;
 /**
  * Servlet 3.1 HTTP upgrade handler for WebSocket connections.
  */
-public class WsProtocolHandler implements ProtocolHandler {
+public class WsProtocolHandler implements HttpUpgradeHandler {
 
     private static StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);

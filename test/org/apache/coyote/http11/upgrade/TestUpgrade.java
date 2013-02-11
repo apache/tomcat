@@ -35,7 +35,7 @@ import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.ProtocolHandler;
+import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
 import org.junit.Assert;
@@ -73,7 +73,7 @@ public class TestUpgrade extends TomcatBaseTest {
     }
 
     private void doTestMessages (
-            Class<? extends ProtocolHandler> upgradeHandlerClass)
+            Class<? extends HttpUpgradeHandler> upgradeHandlerClass)
             throws Exception {
         UpgradeConnection conn = doUpgrade(upgradeHandlerClass);
         PrintWriter pw = new PrintWriter(conn.getWriter());
@@ -97,7 +97,7 @@ public class TestUpgrade extends TomcatBaseTest {
 
 
     private UpgradeConnection doUpgrade(
-            Class<? extends ProtocolHandler> upgradeHandlerClass) throws Exception {
+            Class<? extends HttpUpgradeHandler> upgradeHandlerClass) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
@@ -149,9 +149,9 @@ public class TestUpgrade extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        private final Class<? extends ProtocolHandler> upgradeHandlerClass;
+        private final Class<? extends HttpUpgradeHandler> upgradeHandlerClass;
 
-        public UpgradeServlet(Class<? extends ProtocolHandler> upgradeHandlerClass) {
+        public UpgradeServlet(Class<? extends HttpUpgradeHandler> upgradeHandlerClass) {
             this.upgradeHandlerClass = upgradeHandlerClass;
         }
 
@@ -159,7 +159,7 @@ public class TestUpgrade extends TomcatBaseTest {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
 
-            ProtocolHandler upgradeHandler;
+            HttpUpgradeHandler upgradeHandler;
             try {
                 upgradeHandler = upgradeHandlerClass.newInstance();
             } catch (InstantiationException | IllegalAccessException e) {
@@ -189,7 +189,7 @@ public class TestUpgrade extends TomcatBaseTest {
     }
 
 
-    protected static class EchoBlocking implements ProtocolHandler {
+    protected static class EchoBlocking implements HttpUpgradeHandler {
         @Override
         public void init(WebConnection connection) {
 
@@ -204,7 +204,7 @@ public class TestUpgrade extends TomcatBaseTest {
     }
 
 
-    protected static class EchoNonBlocking implements ProtocolHandler {
+    protected static class EchoNonBlocking implements HttpUpgradeHandler {
 
         private ServletInputStream sis;
         private ServletOutputStream sos;
