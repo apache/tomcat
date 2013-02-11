@@ -95,9 +95,7 @@ public class StoreConfig implements IStoreConfig {
     }
 
     /**
-     * Store current Server
-     *
-     * @see org.apache.catalina.ServerFactory#getServer()
+     * Store current Server.
      */
     @Override
     public synchronized void storeConfig() {
