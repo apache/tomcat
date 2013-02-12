@@ -129,4 +129,44 @@ public class TestErrorReportValve extends TomcatBaseTest {
             }
         }
     }
+
+
+    /**
+     * Custom error/status codes should not result in a blank response.
+     */
+    @Test
+    public void testBug54536() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+
+        Tomcat.addServlet(ctx, "bug54536", new Bug54536Servlet());
+        ctx.addServletMapping("/", "bug54536");
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertEquals(Bug54536Servlet.ERROR_STATUS, rc);
+        String body = res.toString();
+        Assert.assertNotNull(body);
+        Assert.assertTrue(body, body.contains(Bug54536Servlet.ERROR_MESSAGE));
+    }
+
+
+    private static final class Bug54536Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+        private static final int ERROR_STATUS = 999;
+        private static final String ERROR_MESSAGE = "The sky is falling";
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.sendError(ERROR_STATUS, ERROR_MESSAGE);
+        }
+    }
 }
