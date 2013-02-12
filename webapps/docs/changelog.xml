@@ -76,6 +76,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        <bug>54239</bug>: Enable web applications to provide their own
+        Expression Language interpreter to enable them to optimise processing of
+        expressions. Based on a patch by Sheldon Shao. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
