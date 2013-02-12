@@ -25,7 +25,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 import javax.websocket.ContainerProvider;
 import javax.websocket.DefaultClientConfiguration;
 import javax.websocket.DeploymentException;

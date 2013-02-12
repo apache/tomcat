@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 import javax.websocket.Session;
 import javax.websocket.WebSocketMessage;
 
