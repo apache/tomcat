@@ -125,6 +125,8 @@ class Generator {
     
     private final DateFormat timestampFormat;
 
+    private final ELInterpreter elInterpreter;
+
     /**
      * @param s
      *            the input string
@@ -831,8 +833,8 @@ class Generator {
                 }
                 return v;
             } else if (attr.isELInterpreterInput()) {
-                v = JspUtil.interpreterCall(this.isTagFile, v, expectedType,
-                        attr.getEL().getMapName(), false);
+                v = elInterpreter.interpreterCall(ctxt, this.isTagFile, v,
+                        expectedType, attr.getEL().getMapName(), false);
                 if (encode) {
                     return "org.apache.jasper.runtime.JspRuntimeLibrary.URLEncode("
                             + v + ", request.getCharacterEncoding())";
@@ -917,9 +919,10 @@ class Generator {
             n.setBeginJavaLine(out.getJavaLine());
             if (!pageInfo.isELIgnored() && (n.getEL() != null)) {
                 out.printil("out.write("
-                        + JspUtil.interpreterCall(this.isTagFile, n.getType() +
-                                "{" + n.getText() + "}", String.class,
-                                n.getEL().getMapName(), false) + ");");
+                        + elInterpreter.interpreterCall(ctxt, this.isTagFile,
+                                n.getType() + "{" + n.getText() + "}",
+                                String.class, n.getEL().getMapName(), false) +
+                        ");");
             } else {
                 out.printil("out.write("
                         + quote(n.getType() + "{" + n.getText() + "}") + ");");
@@ -2977,8 +2980,8 @@ class Generator {
                     // run attrValue through the expression interpreter
                     String mapName = (attr.getEL() != null) ? attr.getEL()
                             .getMapName() : null;
-                    attrValue = JspUtil.interpreterCall(this.isTagFile, attrValue,
-                            c[0], mapName, false);
+                    attrValue = elInterpreter.interpreterCall(ctxt,
+                            this.isTagFile, attrValue, c[0], mapName, false);
                 }
             } else {
                 attrValue = convertString(c[0], attrValue, localName,
@@ -3416,7 +3419,7 @@ class Generator {
     /**
      * Constructor.
      */
-    Generator(ServletWriter out, Compiler compiler) {
+    Generator(ServletWriter out, Compiler compiler) throws JasperException {
         this.out = out;
         methodsBuffered = new ArrayList<GenBuffer>();
         charArrayBuffer = null;
@@ -3424,6 +3427,16 @@ class Generator {
         ctxt = compiler.getCompilationContext();
         fragmentHelperClass = new FragmentHelperClass("Helper");
         pageInfo = compiler.getPageInfo();
+
+        ELInterpreter elInterpreter = null;
+        try {
+            elInterpreter = ELInterpreterFactory.getELInterpreter(
+                    compiler.getCompilationContext().getServletContext());
+        } catch (Exception e) {
+            err.jspError("jsp.error.el_interpreter_class.instantiation",
+                    e.getMessage());
+        }
+        this.elInterpreter = elInterpreter;
 
         /*
          * Temporary hack. If a JSP page uses the "extends" attribute of the
