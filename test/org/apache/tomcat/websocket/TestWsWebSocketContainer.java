@@ -408,6 +408,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         @Override
         public void contextInitialized(ServletContextEvent sce) {
+            super.contextInitialized(sce);
             ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
             sc.publishServer(BlockingPojo.class, sce.getServletContext(), PATH);
         }
