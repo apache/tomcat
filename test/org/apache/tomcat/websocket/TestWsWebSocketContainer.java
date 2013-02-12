@@ -59,6 +59,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
     private static final byte[] MESSAGE_BINARY_4K = new byte[4096];
 
     private static final long TIMEOUT_MS = 5 * 1000;
+    private static final long MARGIN = 500;
 
     static {
         StringBuilder sb = new StringBuilder(4096);
@@ -314,10 +315,10 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         String msg = "Time out was [" + timeout + "] ms";
 
         // Check correct time passed
-        Assert.assertTrue(msg, timeout >= TIMEOUT_MS);
+        Assert.assertTrue(msg, timeout >= TIMEOUT_MS - MARGIN );
 
         // Check the timeout wasn't too long
-        Assert.assertTrue(msg, timeout < TIMEOUT_MS*2);
+        Assert.assertTrue(msg, timeout < TIMEOUT_MS * 2);
 
         if (sr == null) {
             Assert.fail();
