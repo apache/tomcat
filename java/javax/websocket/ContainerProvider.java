@@ -16,37 +16,45 @@
  */
 package javax.websocket;
 
+import java.util.Iterator;
+import java.util.ServiceLoader;
+
 /**
- * Provides access to the implementation. This version of the API is hard-coded
- * to use the Apache Tomcat WebSocket implementation.
+ * Use the {@link ServiceLoader} mechanism to provide instances of the WebSocket
+ * client container.
  */
 public abstract class ContainerProvider {
 
     private static final String DEFAULT_PROVIDER_CLASS_NAME =
             "org.apache.tomcat.websocket.WsWebSocketContainer";
 
-    private static final Class<WebSocketContainer> clazz;
-
-    static {
-        try {
-            clazz = (Class<WebSocketContainer>) Class.forName(
-                    DEFAULT_PROVIDER_CLASS_NAME);
-        } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
     /**
-     * Create a new ClientContainer used to create outgoing WebSocket
-     * connections.
+     * Create a new container used to create outgoing WebSocket connections.
      */
     public static WebSocketContainer getWebSocketContainer() {
         WebSocketContainer result = null;
-        try {
-            result = clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new IllegalArgumentException(e);
+
+        ServiceLoader<ContainerProvider> serviceLoader =
+                ServiceLoader.load(ContainerProvider.class);
+        Iterator<ContainerProvider> iter = serviceLoader.iterator();
+        while (result == null && iter.hasNext()) {
+            result = iter.next().getContainer(WebSocketContainer.class);
+        }
+
+        // Fall-back. Also used by unit tests
+        if (result == null) {
+            try {
+                Class<WebSocketContainer> clazz =
+                        (Class<WebSocketContainer>) Class.forName(
+                                DEFAULT_PROVIDER_CLASS_NAME);
+                result = clazz.newInstance();
+            } catch (ClassNotFoundException | InstantiationException |
+                    IllegalAccessException e) {
+                // No options left. Just return null.
+            }
         }
         return result;
     }
+
+    protected abstract <T> T getContainer(Class<T> containerClass);
 }
