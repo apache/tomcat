@@ -128,19 +128,23 @@ public class StoreContextAppender extends StoreAppender {
      */
     protected String getDefaultWorkDir(StandardContext context) {
         String defaultWorkDir = null;
-        String contextPath = context.getPath().length() == 0 ? "_" : context
-                .getPath().substring(1);
+        String contextWorkDir = context.getName();
+        if (contextWorkDir.length() == 0)
+            contextWorkDir = "_";
+        if (contextWorkDir.startsWith("/"))
+            contextWorkDir = contextWorkDir.substring(1);
+
         Container host = context.getParent();
         if (host instanceof StandardHost) {
             String hostWorkDir = ((StandardHost) host).getWorkDir();
             if (hostWorkDir != null) {
-                defaultWorkDir = hostWorkDir + File.separator + contextPath;
+                defaultWorkDir = hostWorkDir + File.separator + contextWorkDir;
             } else {
                 String engineName = context.getParent().getParent().getName();
                 String hostName = context.getParent().getName();
                 defaultWorkDir = "work" + File.separator + engineName
                         + File.separator + hostName + File.separator
-                        + contextPath;
+                        + contextWorkDir;
             }
         }
         return defaultWorkDir;
