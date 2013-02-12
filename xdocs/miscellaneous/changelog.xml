@@ -55,11 +55,12 @@
       mode!' errors. (wrowe)
     </fix>
     <update>
-      add clearOptions function to allow access to OpenSSL's SSL_CTX_clear_options function. (schultz)
+      Add clearOptions function to allow access to OpenSSL's
+      SSL_CTX_clear_options function. (schultz)
     </update>
   </changelog>
 </section>
-<section name="Changes between 1.1.24 and 1.1.25">
+<section name="Changes between 1.1.24 and 1.1.25 (not released)">
   <changelog>
     <fix>
       <bug>52856</bug>: Fix high CPU usage when client changes IP address or
@@ -97,7 +98,9 @@
       <bug>52717</bug>: Set scope_id for IPv6 addresses if provided. (mturk)
     </fix>
     <update>
-      <bug>50570</bug>: Allow explicit use of FIPS mode in APR lifecycle listener (native support only in this update; Java support to follow). Based upon a patch from Chris Beckey. (schultz)
+      <bug>50570</bug>: Allow explicit use of FIPS mode in APR lifecycle
+      listener (native support only in this update; Java support to follow).
+      Based upon a patch from Chris Beckey. (schultz)
     </update>
   </changelog>
 </section>
