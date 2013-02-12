@@ -16,23 +16,21 @@
  */
 package websocket.echo;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import javax.websocket.DeploymentException;
 import javax.websocket.server.DefaultServerConfiguration;
 
 import org.apache.tomcat.websocket.server.ServerContainerImpl;
+import org.apache.tomcat.websocket.server.WsListener;
 
 @WebListener
-public class WsConfigListener implements ServletContextListener {
+public class WsConfigListener extends WsListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        super.contextInitialized(sce);
         ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
-        ServletContext servletContext = sce.getServletContext();
-        sc.setServletContext(servletContext);
         try {
             sc.publishServer(EchoEndpoint.class, "/websocket/echoProgrammatic",
                     DefaultServerConfiguration.class);
@@ -44,6 +42,7 @@ public class WsConfigListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        super.contextDestroyed(sce);
         // NO-OP
     }
 }
