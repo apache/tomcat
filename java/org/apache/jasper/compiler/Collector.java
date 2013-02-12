@@ -33,7 +33,7 @@ class Collector {
      * A visitor for collecting information on the page and the body of
      * the custom tags.
      */
-    static class CollectVisitor extends Node.Visitor {
+    private static class CollectVisitor extends Node.Visitor {
 
         private boolean scriptingElementSeen = false;
         private boolean usebeanSeen = false;
@@ -199,7 +199,7 @@ class Collector {
             scriptingElementSeen = true;
         }
 
-        public void updatePageInfo(PageInfo pageInfo) {
+        private void updatePageInfo(PageInfo pageInfo) {
             pageInfo.setScriptless(! scriptingElementSeen);
         }
     }
