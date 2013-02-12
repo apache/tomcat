@@ -25,10 +25,11 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketMessage;
 
 import org.apache.tomcat.websocket.server.ServerContainerImpl;
+import org.apache.tomcat.websocket.server.WsListener;
 
 public class TesterEchoServer {
 
-    public static class Config implements ServletContextListener {
+    public static class Config extends WsListener {
 
         public static final String PATH_ASYNC = "/echoAsync";
         public static final String PATH_BASIC = "/echoBasic";
@@ -43,7 +44,7 @@ public class TesterEchoServer {
 
         @Override
         public void contextDestroyed(ServletContextEvent sce) {
-            // NO-OP
+            super.contextDestroyed(sce);
         }
     }
 
