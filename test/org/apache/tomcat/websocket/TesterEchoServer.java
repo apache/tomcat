@@ -35,6 +35,7 @@ public class TesterEchoServer {
 
         @Override
         public void contextInitialized(ServletContextEvent sce) {
+            super.contextInitialized(sce);
             ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
             sc.publishServer(Async.class, sce.getServletContext(), PATH_ASYNC);
             sc.publishServer(
