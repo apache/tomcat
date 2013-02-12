@@ -29,9 +29,9 @@ import org.apache.jasper.JasperException;
  */
 public class BeanRepository {
 
-    protected final HashMap<String, String> beanTypes;
-    protected final ClassLoader loader;
-    protected final ErrorDispatcher errDispatcher;
+    private final HashMap<String, String> beanTypes;
+    private final ClassLoader loader;
+    private final ErrorDispatcher errDispatcher;
 
     /**
      * Constructor.
