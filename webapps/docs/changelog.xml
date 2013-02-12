@@ -74,6 +74,10 @@
         a chunked request body that this is communicated correctly to the client
         reading the request body. (markt)
       </fix>
+      <update>
+        Update the native component of the APR/native connector to 1.1.27 and
+        make that version the recommended minimum version. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
