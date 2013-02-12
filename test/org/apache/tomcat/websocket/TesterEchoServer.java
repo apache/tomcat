@@ -41,11 +41,6 @@ public class TesterEchoServer {
             sc.publishServer(
                     Basic.class, sce.getServletContext(), PATH_BASIC);
         }
-
-        @Override
-        public void contextDestroyed(ServletContextEvent sce) {
-            super.contextDestroyed(sce);
-        }
     }
 
     public static class Async {
