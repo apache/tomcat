@@ -38,11 +38,4 @@ public class WsConfigListener extends WsListener {
             throw new IllegalStateException(e);
         }
     }
-
-
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-        super.contextDestroyed(sce);
-        // NO-OP
-    }
 }

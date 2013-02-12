@@ -412,11 +412,6 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
             sc.publishServer(BlockingPojo.class, sce.getServletContext(), PATH);
         }
-
-        @Override
-        public void contextDestroyed(ServletContextEvent sce) {
-            super.contextDestroyed(sce);
-        }
     }
 
 
@@ -541,11 +536,6 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             } catch (DeploymentException e) {
                 throw new IllegalStateException(e);
             }
-        }
-
-        @Override
-        public void contextDestroyed(ServletContextEvent sce) {
-            super.contextDestroyed(sce);
         }
     }
 }
