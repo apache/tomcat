@@ -403,7 +403,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
     }
 
 
-    public static class BlockingConfig implements ServletContextListener {
+    public static class BlockingConfig extends WsListener {
 
         public static final String PATH = "/block";
 
@@ -415,7 +415,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         @Override
         public void contextDestroyed(ServletContextEvent sce) {
-            // NO-OP
+            super.contextDestroyed(sce);
         }
     }
 
@@ -524,14 +524,14 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
     }
 
 
-    public static class ConstantTxConfig implements ServletContextListener {
+    public static class ConstantTxConfig extends WsListener {
 
         private static final String PATH = "/test";
 
         @Override
         public void contextInitialized(ServletContextEvent sce) {
+            super.contextInitialized(sce);
             ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
-            sc.setServletContext(sce.getServletContext());
             try {
                 sc.publishServer(ConstantTxEndpoint.class, PATH,
                         DefaultServerConfiguration.class);
@@ -545,7 +545,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         @Override
         public void contextDestroyed(ServletContextEvent sce) {
-            // NO-OP
+            super.contextDestroyed(sce);
         }
     }
 }
