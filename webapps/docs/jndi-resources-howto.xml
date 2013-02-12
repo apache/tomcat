@@ -78,6 +78,18 @@ resources:</p>
 use to create the resource and that no further configuration information is
 required, Tomcat will use the information in <code>/WEB-INF/web.xml</code> to
 create the resource.</p>
+
+<p>Tomcat provides a number of Tomcat specific options for JNDI resources that
+cannot be specified in web.xml. These include <code>closeMethod</code> that
+enables faster cleaning-up of JNDI resources when a web application stops and
+<code>singleton</code> that controls whether or not a new instance of the
+resource is created for every JNDI lookup. To use these configuration options
+the resource must be specified in a web application&apos;s
+<a href="config/context.html"><code>&lt;Context&gt;</code></a> element or in the
+<a href="config/globalresources.html">
+<code><strong>&lt;GlobalNamingResources&gt;</strong></code></a> element of
+<code>$CATALINA_BASE/conf/server.xml</code>.</p>
+
 </section>
 
 <section name="context.xml configuration">
