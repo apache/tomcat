@@ -155,7 +155,8 @@ public class ErrorReportValve extends ValveBase {
             }
         }
 
-        // Do nothing if there is no report for the specified status code
+        // Do nothing if there is no report for the specified status code and
+        // no error message provided
         String report = null;
         try {
             report = sm.getString("http." + statusCode);
@@ -163,7 +164,11 @@ public class ErrorReportValve extends ValveBase {
             ExceptionUtils.handleThrowable(t);
         }
         if (report == null) {
-            return;
+            if (message.length() == 0) {
+                return;
+            } else {
+                report = sm.getString("errorReportValve.noDescription");
+            }
         }
 
         StringBuilder sb = new StringBuilder();
