@@ -76,6 +76,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        <bug>54505</bug>: Create clearer links from the JNDI How-To to the
+        Tomcat specific options for configuring JNDI resources. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.36 (markt)" rtext="not released">
   <subsection name="Catalina">
