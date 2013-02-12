@@ -78,6 +78,7 @@
         <TransientAttribute>tldScanTime</TransientAttribute>
         <TransientAttribute>effectiveMajorVersion</TransientAttribute>
         <TransientAttribute>effectiveMinorVersion</TransientAttribute>
+        <TransientAttribute>webappVersion</TransientAttribute>
      </Description>
      <Description
         id="org.apache.catalina.deploy.NamingResources.[GlobalNamingResources]"
