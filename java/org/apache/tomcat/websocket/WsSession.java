@@ -51,7 +51,7 @@ public class WsSession implements Session {
     private final Endpoint localEndpoint;
     private final WsRemoteEndpointBase wsRemoteEndpoint;
     private final ClassLoader applicationClassLoader;
-    private final WebSocketContainer webSocketContainer;
+    private final WsWebSocketContainer webSocketContainer;
 
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
@@ -76,13 +76,13 @@ public class WsSession implements Session {
      */
     public WsSession(Endpoint localEndpoint,
             WsRemoteEndpointBase wsRemoteEndpoint,
-            WebSocketContainer webSocketContainer) {
+            WsWebSocketContainer wsWebSocketContainer) {
         this.localEndpoint = localEndpoint;
         this.wsRemoteEndpoint = wsRemoteEndpoint;
-        this.webSocketContainer = webSocketContainer;
+        this.webSocketContainer = wsWebSocketContainer;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
         wsRemoteEndpoint.setAsyncSendTimeout(
-                webSocketContainer.getDefaultAsyncSendTimeout());
+                wsWebSocketContainer.getDefaultAsyncSendTimeout());
         this.maxBinaryMessageBufferSize =
                 webSocketContainer.getDefaultMaxBinaryMessageBufferSize();
         this.maxTextMessageBufferSize =
@@ -240,8 +240,7 @@ public class WsSession implements Session {
 
     @Override
     public Set<Session> getOpenSessions() {
-        // TODO Auto-generated method stub
-        return null;
+        return webSocketContainer.getOpenSession(localEndpoint.getClass());
     }
 
 
@@ -285,6 +284,9 @@ public class WsSession implements Session {
                 // Unable to send close message.
                 // TODO - Ignore?
             }
+
+            webSocketContainer.unregisterSession(
+                    localEndpoint.getClass(), this);
 
             // Fire the onClose event
             Thread t = Thread.currentThread();

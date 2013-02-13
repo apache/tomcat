@@ -31,6 +31,7 @@ import javax.websocket.server.ServerEndpointConfiguration;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.WsSession;
 import org.apache.tomcat.websocket.WsWebSocketContainer;
 import org.apache.tomcat.websocket.pojo.PojoEndpointConfiguration;
 import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
@@ -241,6 +242,28 @@ public class ServerContainerImpl extends WsWebSocketContainer {
                 // Ignore
             }
         }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * Overridden to make them visible to other classes in this package.
+     */
+    @Override
+    protected void registerSession(Class<?> endpoint, WsSession wsSession) {
+        super.registerSession(endpoint, wsSession);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * Overridden to make them visible to other classes in this package.
+     */
+    @Override
+    protected void unregisterSession(Class<?> endpoint, WsSession wsSession) {
+        super.unregisterSession(endpoint, wsSession);
     }
 
 

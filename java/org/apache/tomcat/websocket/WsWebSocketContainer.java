@@ -25,6 +25,7 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,10 @@ public class WsWebSocketContainer implements WebSocketContainer {
     private static final Random random = new Random();
     private static final Charset iso88591 = Charset.forName("ISO-8859-1");
     private static final byte[] crlf = new byte[] {13, 10};
+
+    private final Map<Class<?>, Set<WsSession>> endpointSessionMap =
+            new HashMap<>();
+    private final Object endPointSessionMapLock = new Object();
 
     private long defaultAsyncTimeout = -1;
     private int maxBinaryMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
@@ -147,8 +152,8 @@ public class WsWebSocketContainer implements WebSocketContainer {
         }
         WsSession wsSession =
                 new WsSession(endpoint, wsRemoteEndpointClient, this);
-
         endpoint.onOpen(wsSession, clientEndpointConfiguration);
+        registerSession(clazz, wsSession);
 
         // Object creation will trigger input processing
         @SuppressWarnings("unused")
@@ -158,6 +163,37 @@ public class WsWebSocketContainer implements WebSocketContainer {
         return wsSession;
     }
 
+
+    protected void registerSession(Class<?> endpoint, WsSession wsSession) {
+        synchronized (endPointSessionMapLock) {
+            Set<WsSession> wsSessions = endpointSessionMap.get(endpoint);
+            if (wsSessions == null) {
+                wsSessions = new HashSet<>();
+                endpointSessionMap.put(endpoint, wsSessions);
+            }
+            wsSessions.add(wsSession);
+        }
+    }
+
+
+    protected void unregisterSession(Class<?> endpoint, WsSession wsSession) {
+        synchronized (endPointSessionMapLock) {
+            Set<WsSession> wsSessions = endpointSessionMap.get(endpoint);
+            if (wsSessions != null) {
+                wsSessions.remove(wsSession);
+                if (wsSessions.size() == 0) {
+                    endpointSessionMap.remove(endpoint);
+                }
+            }
+        }
+    }
+
+
+    Set<Session> getOpenSession(Class<?> endpoint) {
+        HashSet<Session> result = new HashSet<>();
+        result.addAll(endpointSessionMap.get(endpoint));
+        return result;
+    }
 
     private Map<String,List<String>> createRequestHeaders(String host,
             int port) {

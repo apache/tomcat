@@ -19,6 +19,7 @@ package org.apache.tomcat.websocket;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -538,4 +539,72 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             }
         }
     }
+
+
+    @Test
+    public void testGetOpenSessions() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+
+        tomcat.start();
+
+        WebSocketContainer wsContainer =
+                ContainerProvider.getWebSocketContainer();
+
+        Session s1a = connectToEchoServerBasic(wsContainer, EndpointA.class);
+        Session s2a = connectToEchoServerBasic(wsContainer, EndpointA.class);
+        Session s3a = connectToEchoServerBasic(wsContainer, EndpointA.class);
+
+        Session s1b = connectToEchoServerBasic(wsContainer, EndpointB.class);
+        Session s2b = connectToEchoServerBasic(wsContainer, EndpointB.class);
+
+        Set<Session> setA = s3a.getOpenSessions();
+        Assert.assertEquals(3, setA.size());
+        Assert.assertTrue(setA.remove(s1a));
+        Assert.assertTrue(setA.remove(s2a));
+        Assert.assertTrue(setA.remove(s3a));
+
+        s1a.close();
+
+        setA = s3a.getOpenSessions();
+        Assert.assertEquals(2, setA.size());
+        Assert.assertFalse(setA.remove(s1a));
+        Assert.assertTrue(setA.remove(s2a));
+        Assert.assertTrue(setA.remove(s3a));
+
+        Set<Session> setB = s1b.getOpenSessions();
+        Assert.assertEquals(2, setB.size());
+        Assert.assertTrue(setB.remove(s1b));
+        Assert.assertTrue(setB.remove(s2b));
+    }
+
+
+    private Session connectToEchoServerBasic(WebSocketContainer wsContainer,
+            Class<? extends Endpoint> clazz) throws Exception {
+        return wsContainer.connectToServer(clazz,
+                new DefaultClientConfiguration(),
+                new URI("http://localhost:" + getPort() +
+                        TesterEchoServer.Config.PATH_BASIC));
+    }
+
+    public static final class EndpointA extends Endpoint {
+
+        @Override
+        public void onOpen(Session session, EndpointConfiguration config) {
+            // NO-OP
+        }
+    }
+
+
+    public static final class EndpointB extends Endpoint {
+
+        @Override
+        public void onOpen(Session session, EndpointConfiguration config) {
+            // NO-OP
+        }
+    }
+
 }
