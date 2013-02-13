@@ -53,11 +53,11 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
     private static final String IMPLICIT_TLD = "implicit.tld";
 
     // Maps tag names to tag file paths
-    private Hashtable<String,String> tagFileMap;
+    private final Hashtable<String,String> tagFileMap;
 
-    private ParserController pc;
-    private PageInfo pi;
-    private Vector<TagFileInfo> vec;
+    private final ParserController pc;
+    private final PageInfo pi;
+    private final Vector<TagFileInfo> vec;
 
     /**
      * Constructor.

@@ -748,7 +748,7 @@ class Generator {
     /**
      * A visitor that generates codes for the elements in the page.
      */
-    class GenerateVisitor extends Node.Visitor {
+    private class GenerateVisitor extends Node.Visitor {
 
         /*
          * Hashtable containing introspection information on tag handlers:
@@ -862,7 +862,7 @@ class Generator {
                 throws JasperException {
 
             class ParamVisitor extends Node.Visitor {
-                String separator;
+                private String separator;
 
                 ParamVisitor(String separator) {
                     this.separator = separator;
