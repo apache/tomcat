@@ -267,7 +267,7 @@ if test -d $srcdir/test; then
 fi
 
 dnl
-dnl everthing is done.
+dnl everything is done.
 MAKEFILES="Makefile"
 AC_OUTPUT([
     tcnative.pc

@@ -826,7 +826,7 @@ static int parse_ASN1_OID(unsigned char *asn1, char ***ocsp_urls, int *nocsp_url
    the end of the ASN1 sequence (marked by '\0'), so if there are other sequences within
    the same sequence the while loop parses the sequences */
 
-/* This algo was developped with AIA in mind so it was tested only with this extension */
+/* This algo was developed with AIA in mind so it was tested only with this extension */
 static int parse_ASN1_Sequence(unsigned char *asn1, char ***ocsp_urls,
                                int *nocsp_urls, apr_pool_t *p)
 {

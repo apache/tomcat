@@ -147,7 +147,7 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
             if (sys_clk_tck >= 0) {
                 /* Get total CPU times from /proc/stat */
                 /* Example for the first line: cpu  2095497 8176 3280198 908667841 1543576 28867 375399 0 0 */
-                /* Accoring to the man pages, the numbers are given in units of USER_HZ:
+                /* According to the man pages, the numbers are given in units of USER_HZ:
                  * user mode, user mode with low priority (nice), system mode, and the idle task.
                  * Additional values can be ignored. */
                 fd = open("/proc/stat", O_RDONLY);

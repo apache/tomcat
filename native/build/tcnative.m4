@@ -96,7 +96,7 @@ AC_DEFUN(
     ],
     [
       # This works if the parameter was NOT specified, so it's a good time
-      # to see what the enviroment says.
+      # to see what the environment says.
       # Since Sun uses JAVA_HOME a lot, we check it first and ignore the
       # JAVA_HOME, otherwise just use whatever JAVA_HOME was specified.
 

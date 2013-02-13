@@ -31,7 +31,7 @@
 use IO::File;
 use File::Find;
 
-# The ignore list is '-' seperated, with this leading hyphen and
+# The ignore list is '-' separated, with this leading hyphen and
 # trailing hyphens in ever concatinated list below.
 $ignore = "-";
 
