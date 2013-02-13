@@ -198,22 +198,12 @@ final class Mark {
     }
 
 
-    // -------------------- Locator interface --------------------
-
     public int getLineNumber() {
         return line;
     }
 
     public int getColumnNumber() {
         return col;
-    }
-
-    public String getSystemId() {
-        return getFile();
-    }
-
-    public String getPublicId() {
-        return null;
     }
 
     @Override
@@ -267,12 +257,12 @@ final class Mark {
      * included file. In other words, it's the parser's continuation to be
      * reinstalled after the included file parsing is done.
      */
-    class IncludeState {
-        int cursor, line, col;
-        int fileId;
-        String fileName;
-        String baseDir;
-        char[] stream = null;
+    private class IncludeState {
+        private final int cursor, line, col;
+        private final int fileId;
+        private final String fileName;
+        private final String baseDir;
+        private final char[] stream;
 
         IncludeState(int inCursor, int inLine, int inCol, int inFileId,
                      String name, String inBaseDir, String inEncoding,

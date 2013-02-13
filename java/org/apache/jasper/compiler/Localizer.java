@@ -31,12 +31,12 @@ import org.apache.jasper.util.ExceptionUtils;
  */
 public class Localizer {
 
-    private static ResourceBundle bundle = null;
+    private static ResourceBundle bundle;
 
     static {
         try {
-        bundle = ResourceBundle.getBundle(
-            "org.apache.jasper.resources.LocalStrings");
+            bundle = ResourceBundle.getBundle(
+                    "org.apache.jasper.resources.LocalStrings");
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             t.printStackTrace();

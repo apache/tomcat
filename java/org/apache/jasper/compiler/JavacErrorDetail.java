@@ -36,11 +36,11 @@ import org.apache.jasper.JspCompilationContext;
  */
 public class JavacErrorDetail {
 
-    private String javaFileName;
-    private int javaLineNum;
-    private String jspFileName;
+    private final String javaFileName;
+    private final int javaLineNum;
+    private final String jspFileName;
     private int jspBeginLineNum;
-    private StringBuilder errMsg;
+    private final StringBuilder errMsg;
     private String jspExtract = null;
 
     /**
@@ -55,10 +55,7 @@ public class JavacErrorDetail {
                             int javaLineNum,
                             StringBuilder errMsg) {
 
-        this.javaFileName = javaFileName;
-        this.javaLineNum = javaLineNum;
-        this.errMsg = errMsg;
-        this.jspBeginLineNum = -1;
+        this(javaFileName, javaLineNum, null, -1, errMsg, null);
     }
 
     /**
@@ -81,9 +78,10 @@ public class JavacErrorDetail {
             StringBuilder errMsg,
             JspCompilationContext ctxt) {
 
-        this(javaFileName, javaLineNum, errMsg);
+        this.javaFileName = javaFileName;
+        this.javaLineNum = javaLineNum;
+        this.errMsg = errMsg;
         this.jspFileName = jspFileName;
-        this.jspBeginLineNum = jspBeginLineNum;
 
         if (jspBeginLineNum > 0 && ctxt != null) {
             InputStream is = null;
@@ -114,7 +112,7 @@ public class JavacErrorDetail {
                     for (int i=jspBeginLineNum-1; i<jspLines.length; i++) {
                         if (jspLines[i].indexOf(javaLine) != -1) {
                             // Update jsp line number
-                            this.jspBeginLineNum = i+1;
+                            jspBeginLineNum = i+1;
                             break;
                         }
                     }
@@ -153,6 +151,7 @@ public class JavacErrorDetail {
                 }
             }
         }
+        this.jspBeginLineNum = jspBeginLineNum;
     }
 
     /**

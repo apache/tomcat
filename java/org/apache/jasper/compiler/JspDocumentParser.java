@@ -58,10 +58,10 @@ class JspDocumentParser
         "http://xml.org/sax/properties/lexical-handler";
     private static final String JSP_URI = "http://java.sun.com/JSP/Page";
 
-    private ParserController parserController;
-    private JspCompilationContext ctxt;
-    private PageInfo pageInfo;
-    private String path;
+    private final ParserController parserController;
+    private final JspCompilationContext ctxt;
+    private final PageInfo pageInfo;
+    private final String path;
     private StringBuilder charBuffer;
 
     // Node representing the XML element currently being parsed
@@ -93,9 +93,9 @@ class JspDocumentParser
 
     private boolean isValidating;
 
-    private ErrorDispatcher err;
-    private boolean isTagFile;
-    private boolean directivesOnly;
+    private final ErrorDispatcher err;
+    private final boolean isTagFile;
+    private final boolean directivesOnly;
     private boolean isTop;
 
     // Nesting level of Tag dependent bodies
