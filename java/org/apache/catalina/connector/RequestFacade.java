@@ -910,6 +910,16 @@ public class RequestFacade implements HttpServletRequest {
         return getSession(true);
     }
 
+    @Override
+    public String changeSessionId() {
+
+        if (request == null) {
+            throw new IllegalStateException(
+                            sm.getString("requestFacade.nullRequest"));
+        }
+
+        return request.changeSessionId();
+    }
 
     @Override
     public boolean isRequestedSessionIdValid() {

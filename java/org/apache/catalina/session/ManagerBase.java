@@ -33,6 +33,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionIdListener;
+
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
@@ -762,6 +765,25 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         String newId = session.getIdInternal();
         context.fireContainerEvent(Context.CHANGE_SESSION_ID_EVENT,
                 new String[] {oldId, newId});
+
+        Object listeners[] = context.getApplicationEventListeners();
+        if (listeners != null && listeners.length > 0) {
+            HttpSessionEvent event =
+                new HttpSessionEvent(session.getSession());
+
+            for(Object listener : listeners) {
+                if (!(listener instanceof HttpSessionIdListener))
+                    continue;
+
+                HttpSessionIdListener idListener =
+                    (HttpSessionIdListener)listener;
+                try {
+                    idListener.sessionIdChanged(event, oldId);
+                } catch (Throwable t) {
+                    log.error(sm.getString("standardSession.sessionEvent"), t);
+                }
+            }
+        }
     }
 
 
