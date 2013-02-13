@@ -55,8 +55,16 @@ public interface WebSocketContainer {
             ClientEndpointConfiguration clientEndpointConfiguration, URI path)
             throws DeploymentException;
 
+    /**
+     * Get the current default session idle timeout in milliseconds. Zero or
+     * negative values indicate an infinite timeout.
+     */
     long getMaxSessionIdleTimeout();
 
+    /**
+     * Set the current default session idle timeout in milliseconds. Zero or
+     * negative values indicate an infinite timeout.
+     */
     void setMaxSessionIdleTimeout(long timeout);
 
     /**

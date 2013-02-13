@@ -48,8 +48,16 @@ public interface Session extends Closeable {
 
     boolean isOpen();
 
+    /**
+     * Get the idle timeout for this session in milliseconds. Zero or negative
+     * values indicate an infinite timeout.
+     */
     long getTimeout();
 
+    /**
+     * Set the idle timeout for this session in milliseconds. Zero or negative
+     * values indicate an infinite timeout.
+     */
     void setTimeout(long seconds);
 
     /**
