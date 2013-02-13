@@ -61,6 +61,7 @@ public class WsWebSocketContainer implements WebSocketContainer {
     private long defaultAsyncTimeout = -1;
     private int maxBinaryMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
+    private volatile long maxSessionIdleTimeout = 0;
 
     @Override
     public Session connectToServer(Class<?> annotatedEndpointClass, URI path)
@@ -378,14 +379,13 @@ public class WsWebSocketContainer implements WebSocketContainer {
 
     @Override
     public long getMaxSessionIdleTimeout() {
-        // TODO Auto-generated method stub
-        return 0;
+        return maxSessionIdleTimeout;
     }
 
 
     @Override
     public void setMaxSessionIdleTimeout(long timeout) {
-        // TODO Auto-generated method stub
+        this.maxSessionIdleTimeout = timeout;
     }
 
 

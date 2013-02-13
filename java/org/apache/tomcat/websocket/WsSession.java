@@ -63,6 +63,7 @@ public class WsSession implements Session {
             Constants.DEFAULT_BUFFER_SIZE;
     private volatile int maxTextMessageBufferSize =
             Constants.DEFAULT_BUFFER_SIZE;
+    private volatile long sessionIdleTimeout = 0;
 
 
     /**
@@ -87,6 +88,8 @@ public class WsSession implements Session {
                 webSocketContainer.getDefaultMaxBinaryMessageBufferSize();
         this.maxTextMessageBufferSize =
                 webSocketContainer.getDefaultMaxTextMessageBufferSize();
+        this.sessionIdleTimeout =
+                webSocketContainer.getMaxSessionIdleTimeout();
     }
 
 
@@ -203,14 +206,13 @@ public class WsSession implements Session {
 
     @Override
     public long getTimeout() {
-        // TODO Auto-generated method stub
-        return 0;
+        return sessionIdleTimeout;
     }
 
 
     @Override
-    public void setTimeout(long seconds) {
-        // TODO Auto-generated method stub
+    public void setTimeout(long timeout) {
+        this.sessionIdleTimeout = timeout;
     }
 
 
