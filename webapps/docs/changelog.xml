@@ -53,6 +53,16 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.38 (markt)">
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>54203</bug>: Complete the Javadoc for
+        <code>javax.servlet.http.Part</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.37 (markt)">
   <subsection name="Catalina">
     <changelog>
