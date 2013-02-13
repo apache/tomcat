@@ -186,7 +186,7 @@ abstract class ELNode {
         /* Name used for creating a map for the functions in this
            EL expression, for communication to Generator.
          */
-        String mapName = null;        // The function map associated this EL
+        private String mapName = null;    // The function map associated this EL
         private final List<ELNode> list;
 
         public Nodes() {

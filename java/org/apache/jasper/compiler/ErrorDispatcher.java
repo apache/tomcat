@@ -44,10 +44,10 @@ import org.xml.sax.SAXException;
 public class ErrorDispatcher {
 
     // Custom error handler
-    private ErrorHandler errHandler;
+    private final ErrorHandler errHandler;
 
     // Indicates whether the compilation was initiated by JspServlet or JspC
-    private boolean jspcMode = false;
+    private final boolean jspcMode;
 
 
     /*
@@ -575,16 +575,16 @@ public class ErrorDispatcher {
      * Visitor responsible for mapping a line number in the generated servlet
      * source code to the corresponding JSP node.
      */
-    static class ErrorVisitor extends Node.Visitor {
+    private static class ErrorVisitor extends Node.Visitor {
 
         // Java source line number to be mapped
-        private int lineNum;
+        private final int lineNum;
 
         /*
          * JSP node whose Java source code range in the generated servlet
          * contains the Java source line number to be mapped
          */
-        Node found;
+        private Node found;
 
         /*
          * Constructor.

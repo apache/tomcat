@@ -38,8 +38,8 @@ import org.apache.jasper.JasperException;
 
 public class ELFunctionMapper {
     private int currFunc = 0;
-    StringBuilder ds;  // Contains codes to initialize the functions mappers.
-    StringBuilder ss;  // Contains declarations of the functions mappers.
+    private StringBuilder ds;  // Contains codes to initialize the functions mappers.
+    private StringBuilder ss;  // Contains declarations of the functions mappers.
 
     /**
      * Creates the functions mappers for all EL expressions in the JSP page.
@@ -70,7 +70,7 @@ public class ELFunctionMapper {
      * A visitor for the page.  The places where EL is allowed are scanned
      * for functions, and if found functions mappers are created.
      */
-    class ELFunctionVisitor extends Node.Visitor {
+    private class ELFunctionVisitor extends Node.Visitor {
 
         /**
          * Use a global name map to facilitate reuse of function maps.
@@ -165,8 +165,9 @@ public class ELFunctionMapper {
 
             // Only care about functions in ELNode's
             class Fvisitor extends ELNode.Visitor {
-                final ArrayList<ELNode.Function> funcs = new ArrayList<>();
-                final HashMap<String, String> keyMap = new HashMap<>();
+                private final ArrayList<ELNode.Function> funcs =
+                        new ArrayList<>();
+                private final HashMap<String, String> keyMap = new HashMap<>();
                 @Override
                 public void visit(ELNode.Function n) throws JasperException {
                     String key = n.getPrefix() + ":" + n.getName();

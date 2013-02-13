@@ -31,7 +31,7 @@ import javax.servlet.jsp.tagext.TagVariableInfo;
  */
 class JasperTagInfo extends TagInfo {
 
-    private String dynamicAttrsMapName;
+    private final String dynamicAttrsMapName;
 
     public JasperTagInfo(String tagName,
             String tagClassName,

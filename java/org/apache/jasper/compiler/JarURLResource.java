@@ -25,11 +25,7 @@ import java.util.jar.JarFile;
 
 public class JarURLResource implements JarResource {
 
-    private String jarUrl;
-
-    public JarURLResource(URL jarURL) {
-        this(jarURL.toExternalForm());
-    }
+    private final String jarUrl;
 
     public JarURLResource(String jarUrl) {
         this.jarUrl = jarUrl;
