@@ -88,8 +88,6 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
                     ep, wsRemoteEndpointServer, webSocketContainer);
             WsFrameServer wsFrame = new WsFrameServer(
                     sis,
-                    webSocketContainer.getDefaultMaxBinaryMessageBufferSize(),
-                    webSocketContainer.getDefaultMaxTextMessageBufferSize(),
                     wsSession);
             sis.setReadListener(new WsReadListener(this, wsFrame));
             sos.setWriteListener(

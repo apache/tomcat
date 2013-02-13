@@ -36,6 +36,9 @@ public class Constants {
     // Always set bit 4 so these will be treated as control codes
     static final byte INTERNAL_OPCODE_FLUSH = 0x18;
 
+    // Buffers
+    static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
+
     // Client connection
     public static final String HOST_HEADER_NAME = "Host";
     public static final String UPGRADE_HEADER_NAME = "Upgrade";

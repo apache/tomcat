@@ -31,9 +31,8 @@ public class WsFrameClient extends WsFrameBase {
     private final CompletionHandler<Integer,Void> handler;
 
     public WsFrameClient(ByteBuffer response, AsynchronousSocketChannel channel,
-            int binaryMessageBufferSize, int textMessageBufferSize,
             WsSession wsSession) {
-        super(binaryMessageBufferSize, textMessageBufferSize, wsSession);
+        super(wsSession);
         this.response = response;
         this.channel = channel;
         this.handler = new WsFrameClientCompletionHandler();

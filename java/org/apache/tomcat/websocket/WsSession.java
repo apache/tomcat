@@ -59,6 +59,10 @@ public class WsSession implements Session {
     private volatile boolean open = true;
     private final Object closeLock = new Object();
     private Map<String,Object> userProperties = new ConcurrentHashMap<>();
+    private volatile int maxBinaryMessageBufferSize =
+            Constants.DEFAULT_BUFFER_SIZE;
+    private volatile int maxTextMessageBufferSize =
+            Constants.DEFAULT_BUFFER_SIZE;
 
 
     /**
@@ -79,6 +83,10 @@ public class WsSession implements Session {
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
         wsRemoteEndpoint.setAsyncSendTimeout(
                 webSocketContainer.getDefaultAsyncSendTimeout());
+        this.maxBinaryMessageBufferSize =
+                webSocketContainer.getDefaultMaxBinaryMessageBufferSize();
+        this.maxTextMessageBufferSize =
+                webSocketContainer.getDefaultMaxTextMessageBufferSize();
     }
 
 
@@ -206,33 +214,27 @@ public class WsSession implements Session {
     }
 
 
-
-
     @Override
     public void setMaxBinaryMessageBufferSize(int max) {
-        // TODO Auto-generated method stub
-
+        this.maxBinaryMessageBufferSize = max;
     }
 
 
     @Override
     public int getMaxBinaryMessageBufferSize() {
-        // TODO Auto-generated method stub
-        return 0;
+        return maxBinaryMessageBufferSize;
     }
 
 
     @Override
     public void setMaxTextMessageBufferSize(int max) {
-        // TODO Auto-generated method stub
-
+        this.maxTextMessageBufferSize = max;
     }
 
 
     @Override
     public int getMaxTextMessageBufferSize() {
-        // TODO Auto-generated method stub
-        return 0;
+        return maxTextMessageBufferSize;
     }
 
 
@@ -320,6 +322,20 @@ public class WsSession implements Session {
 
     @Override
     public Map<String,String> getPathParameters() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public String getId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public Principal getUserPrincipal() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -415,19 +431,5 @@ public class WsSession implements Session {
             }
             return null;
         }
-    }
-
-
-    @Override
-    public String getId() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
-    public Principal getUserPrincipal() {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

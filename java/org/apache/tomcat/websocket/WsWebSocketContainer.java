@@ -52,11 +52,10 @@ public class WsWebSocketContainer implements WebSocketContainer {
     private static final Random random = new Random();
     private static final Charset iso88591 = Charset.forName("ISO-8859-1");
     private static final byte[] crlf = new byte[] {13, 10};
-    private static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
 
     private long defaultAsyncTimeout = -1;
-    private int maxBinaryMessageBufferSize = DEFAULT_BUFFER_SIZE;
-    private int maxTextMessageBufferSize = DEFAULT_BUFFER_SIZE;
+    private int maxBinaryMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
+    private int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
 
     @Override
     public Session connectToServer(Class<?> annotatedEndpointClass, URI path)
@@ -154,7 +153,6 @@ public class WsWebSocketContainer implements WebSocketContainer {
         // Object creation will trigger input processing
         @SuppressWarnings("unused")
         WsFrameClient wsFrameClient = new WsFrameClient(response, channel,
-                maxBinaryMessageBufferSize, maxTextMessageBufferSize,
                 wsSession);
 
         return wsSession;
