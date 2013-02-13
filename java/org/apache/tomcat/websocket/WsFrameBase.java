@@ -51,9 +51,6 @@ public abstract class WsFrameBase {
     private final CharBuffer controlBufferText = CharBuffer.allocate(125);
 
     // Attributes of the current message
-    // TODO: May need a new ByteBuffer per message
-    private final ByteBuffer messageBufferBinary;
-    private final CharBuffer messageBufferText;
     private final CharsetDecoder utf8DecoderControl = new Utf8Decoder().
             onMalformedInput(CodingErrorAction.REPORT).
             onUnmappableCharacter(CodingErrorAction.REPORT);
@@ -62,6 +59,9 @@ public abstract class WsFrameBase {
             onUnmappableCharacter(CodingErrorAction.REPORT);
     private boolean continuationExpected = false;
     private boolean textMessage = false;
+    // TODO: May need a new ByteBuffer per message
+    private ByteBuffer messageBufferBinary;
+    private CharBuffer messageBufferText;
 
     // Attributes of the current frame
     private boolean fin = false;
@@ -77,12 +77,13 @@ public abstract class WsFrameBase {
     private int readPos = 0;
     protected int writePos = 0;
 
-    public WsFrameBase(int binaryMessageBufferSize, int textMessageBufferSize,
-            WsSession wsSession) {
+    public WsFrameBase(WsSession wsSession) {
 
-        inputBuffer = new byte[binaryMessageBufferSize];
-        messageBufferBinary = ByteBuffer.allocate(binaryMessageBufferSize);
-        messageBufferText = CharBuffer.allocate(textMessageBufferSize);
+        inputBuffer = new byte[Constants.DEFAULT_BUFFER_SIZE];
+        messageBufferBinary =
+                ByteBuffer.allocate(wsSession.getMaxBinaryMessageBufferSize());
+        messageBufferText =
+                CharBuffer.allocate(wsSession.getMaxTextMessageBufferSize());
         this.wsSession = wsSession;
     }
 
@@ -151,9 +152,19 @@ public abstract class WsFrameBase {
                 }
             } else {
                 if (opCode == Constants.OPCODE_BINARY) {
+                    // New binary message
                     textMessage = false;
+                    int size = wsSession.getMaxBinaryMessageBufferSize();
+                    if (size != messageBufferBinary.capacity()) {
+                        messageBufferBinary = ByteBuffer.allocate(size);
+                    }
                 } else if (opCode == Constants.OPCODE_TEXT) {
+                    // New text message
                     textMessage = true;
+                    int size = wsSession.getMaxTextMessageBufferSize();
+                    if (size != messageBufferText.capacity()) {
+                        messageBufferText = CharBuffer.allocate(size);
+                    }
                 } else {
                     throw new WsIOException(new CloseReason(
                             CloseCodes.PROTOCOL_ERROR,
