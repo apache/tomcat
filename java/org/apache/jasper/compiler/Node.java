@@ -93,13 +93,11 @@ abstract class Node implements TagConstants {
      */
     protected String innerClassName;
 
-    private boolean isDummy;
 
     /**
      * Zero-arg Constructor.
      */
     public Node() {
-        this.isDummy = true;
     }
 
     /**
@@ -112,7 +110,6 @@ abstract class Node implements TagConstants {
      */
     public Node(Mark start, Node parent) {
         this.startMark = start;
-        this.isDummy = (start == null);
         addToParent(parent);
     }
 
@@ -136,7 +133,6 @@ abstract class Node implements TagConstants {
         this.localName = localName;
         this.attrs = attrs;
         this.startMark = start;
-        this.isDummy = (start == null);
         addToParent(parent);
     }
 
@@ -168,7 +164,6 @@ abstract class Node implements TagConstants {
         this.nonTaglibXmlnsAttrs = nonTaglibXmlnsAttrs;
         this.taglibAttrs = taglibAttrs;
         this.startMark = start;
-        this.isDummy = (start == null);
         addToParent(parent);
     }
 
@@ -185,7 +180,6 @@ abstract class Node implements TagConstants {
         this.localName = localName;
         this.text = text;
         this.startMark = start;
-        this.isDummy = (start == null);
         addToParent(parent);
     }
 
@@ -357,10 +351,6 @@ abstract class Node implements TagConstants {
         endJavaLine = end;
     }
 
-    public boolean isDummy() {
-        return isDummy;
-    }
-
     public Node.Root getRoot() {
         Node n = this;
         while (!(n instanceof Node.Root)) {
@@ -413,9 +403,9 @@ abstract class Node implements TagConstants {
      */
     public static class Root extends Node {
 
-        private Root parentRoot;
+        private final Root parentRoot;
 
-        private boolean isXmlSyntax;
+        private final boolean isXmlSyntax;
 
         // Source encoding of the page containing this Root
         private String pageEnc;
@@ -528,14 +518,6 @@ abstract class Node implements TagConstants {
         }
 
         /**
-         * @return The enclosing root to this Root. Usually represents the page
-         *         that includes this one.
-         */
-        public Root getParentRoot() {
-            return parentRoot;
-        }
-
-        /**
          * Generates a new temporary variable name.
          */
         public String nextTemporaryVariableName() {
@@ -571,7 +553,7 @@ abstract class Node implements TagConstants {
      */
     public static class PageDirective extends Node {
 
-        private Vector<String> imports;
+        private final Vector<String> imports;
 
         public PageDirective(Attributes attrs, Mark start, Node parent) {
             this(JSP_PAGE_DIRECTIVE_ACTION, attrs, null, null, start, parent);
@@ -660,7 +642,7 @@ abstract class Node implements TagConstants {
      * Represents a tag directive
      */
     public static class TagDirective extends Node {
-        private Vector<String> imports;
+        private final Vector<String> imports;
 
         public TagDirective(Attributes attrs, Mark start, Node parent) {
             this(JSP_TAG_DIRECTIVE_ACTION, attrs, null, null, start, parent);
@@ -972,7 +954,7 @@ abstract class Node implements TagConstants {
      */
     public static class ParamAction extends Node {
 
-        JspAttribute value;
+        private JspAttribute value;
 
         public ParamAction(Attributes attrs, Mark start, Node parent) {
             this(JSP_PARAM_ACTION, attrs, null, null, start, parent);
@@ -1164,7 +1146,7 @@ abstract class Node implements TagConstants {
      */
     public static class UseBean extends Node {
 
-        JspAttribute beanName;
+        private JspAttribute beanName;
 
         public UseBean(Attributes attrs, Mark start, Node parent) {
             this(JSP_USE_BEAN_ACTION, attrs, null, null, start, parent);
@@ -1399,9 +1381,9 @@ abstract class Node implements TagConstants {
      */
     public static class CustomTag extends Node {
 
-        private String uri;
+        private final String uri;
 
-        private String prefix;
+        private final String prefix;
 
         private JspAttribute[] jspAttrs;
 
@@ -1409,29 +1391,29 @@ abstract class Node implements TagConstants {
 
         private String tagHandlerPoolName;
 
-        private TagInfo tagInfo;
+        private final TagInfo tagInfo;
 
-        private TagFileInfo tagFileInfo;
+        private final TagFileInfo tagFileInfo;
 
         private Class<?> tagHandlerClass;
 
         private VariableInfo[] varInfos;
 
-        private int customNestingLevel;
+        private final int customNestingLevel;
 
-        private ChildInfo childInfo;
+        private final ChildInfo childInfo;
 
-        private boolean implementsIterationTag;
+        private final boolean implementsIterationTag;
 
-        private boolean implementsBodyTag;
+        private final boolean implementsBodyTag;
 
-        private boolean implementsTryCatchFinally;
+        private final boolean implementsTryCatchFinally;
 
-        private boolean implementsJspIdConsumer;
+        private final boolean implementsJspIdConsumer;
 
-        private boolean implementsSimpleTag;
+        private final boolean implementsSimpleTag;
 
-        private boolean implementsDynamicAttributes;
+        private final boolean implementsDynamicAttributes;
 
         private List<Object> atBeginScriptingVars;
 
@@ -1480,6 +1462,7 @@ abstract class Node implements TagConstants {
             this.uri = uri;
             this.prefix = prefix;
             this.tagInfo = tagInfo;
+            this.tagFileInfo = null;
             this.tagHandlerClass = tagHandlerClass;
             this.customNestingLevel = makeCustomNestingLevel();
             this.childInfo = new ChildInfo();
@@ -1812,9 +1795,9 @@ abstract class Node implements TagConstants {
      * attribute (used by the tag plugin machinery only).
      */
     public static class AttributeGenerator extends Node {
-        String name; // name of the attribute
+        private String name; // name of the attribute
 
-        CustomTag tag; // The tag this attribute belongs to
+        private CustomTag tag; // The tag this attribute belongs to
 
         public AttributeGenerator(Mark start, String name, CustomTag tag) {
             super(start, null);
@@ -1868,9 +1851,9 @@ abstract class Node implements TagConstants {
         // used with a <jsp:element>, otherwise false
         private JspAttribute omit;
 
-        private ChildInfo childInfo;
+        private final ChildInfo childInfo;
 
-        private String name;
+        private final String name;
 
         private String localName;
 
@@ -1957,7 +1940,7 @@ abstract class Node implements TagConstants {
         public String getText() {
 
             class AttributeVisitor extends Visitor {
-                String attrValue = null;
+                private String attrValue = null;
 
                 @Override
                 public void visit(TemplateText txt) {
@@ -1991,7 +1974,7 @@ abstract class Node implements TagConstants {
      */
     public static class JspBody extends Node {
 
-        private ChildInfo childInfo;
+        private final ChildInfo childInfo;
 
         public JspBody(Mark start, Node parent) {
             this(JSP_BODY_ACTION, null, null, start, parent);
@@ -2104,27 +2087,27 @@ abstract class Node implements TagConstants {
 
     public static class JspAttribute {
 
-        private String qName;
+        private final String qName;
 
-        private String uri;
+        private final String uri;
 
-        private String localName;
+        private final String localName;
 
-        private String value;
+        private final String value;
 
-        private boolean expression;
+        private final boolean expression;
 
-        private boolean dynamic;
+        private final boolean dynamic;
 
         private final ELNode.Nodes el;
 
         private final TagAttributeInfo tai;
 
         // If true, this JspAttribute represents a <jsp:attribute>
-        private boolean namedAttribute;
+        private final boolean namedAttribute;
 
         // The node in the parse tree for the NamedAttribute
-        private NamedAttribute namedAttributeNode;
+        private final NamedAttribute namedAttributeNode;
 
         JspAttribute(TagAttributeInfo tai, String qName, String uri,
                 String localName, String value, boolean expr, ELNode.Nodes el,
@@ -2171,6 +2154,7 @@ abstract class Node implements TagConstants {
             this.dynamic = dyn;
             this.namedAttribute = true;
             this.tai = tai;
+            this.uri = null;
         }
 
         /**
@@ -2326,7 +2310,7 @@ abstract class Node implements TagConstants {
      */
     public static class Nodes {
 
-        private List<Node> list;
+        private final List<Node> list;
 
         private Node.Root root; // null if this is not a page
 

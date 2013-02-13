@@ -67,12 +67,12 @@ public final class JspRuntimeContext {
     /*
      * Counts how many times the webapp's JSPs have been reloaded.
      */
-    private AtomicInteger jspReloadCount = new AtomicInteger(0);
+    private final AtomicInteger jspReloadCount = new AtomicInteger(0);
 
     /*
      * Counts how many times JSPs have been unloaded in this webapp.
      */
-    private AtomicInteger jspUnloadCount = new AtomicInteger(0);
+    private final AtomicInteger jspUnloadCount = new AtomicInteger(0);
 
     /**
      * Preload classes required at runtime by a JSP servlet so that
@@ -192,7 +192,8 @@ public final class JspRuntimeContext {
     /**
      * Maps JSP pages to their JspServletWrapper's
      */
-    private Map<String, JspServletWrapper> jsps = new ConcurrentHashMap<>();
+    private final Map<String, JspServletWrapper> jsps =
+            new ConcurrentHashMap<>();
 
     /**
      * Keeps JSP pages ordered by last access.
@@ -354,13 +355,6 @@ public final class JspRuntimeContext {
             return jspQueue.getSize();
         }
         return -1;
-    }
-
-    /**
-     * Increments the JSP unload counter.
-     */
-    public void incrementJspUnloadCount() {
-        jspUnloadCount.incrementAndGet();
     }
 
     /**

@@ -67,7 +67,7 @@ class JspReader {
     /**
      * The list of source files.
      */
-    private List<String> sourceFiles;
+    private final List<String> sourceFiles;
 
     /**
      * The current file ID (-1 indicates an error or no file).
@@ -77,12 +77,12 @@ class JspReader {
     /**
      * The compilation context.
      */
-    private JspCompilationContext context;
+    private final JspCompilationContext context;
 
     /**
      * The Jasper error dispatcher.
      */
-    private ErrorDispatcher err;
+    private final ErrorDispatcher err;
 
     /**
      * Set to true when using the JspReader on a single file where we read up

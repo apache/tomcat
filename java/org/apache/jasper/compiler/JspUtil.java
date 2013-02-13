@@ -232,36 +232,10 @@ public class JspUtil {
         return sb.toString();
     }
 
-    /**
-     * Replaces any occurrences of the character <tt>replace</tt> with the
-     * string <tt>with</tt>.
-     */
-    public static String replace(String name, char replace, String with) {
-        StringBuilder buf = new StringBuilder();
-        int begin = 0;
-        int end;
-        int last = name.length();
-
-        while (true) {
-            end = name.indexOf(replace, begin);
-            if (end < 0) {
-                end = last;
-            }
-            buf.append(name.substring(begin, end));
-            if (end == last) {
-                break;
-            }
-            buf.append(with);
-            begin = end + 1;
-        }
-
-        return buf.toString();
-    }
-
     public static class ValidAttribute {
-        String name;
 
-        boolean mandatory;
+        private final String name;
+        private final boolean mandatory;
 
         public ValidAttribute(String name, boolean mandatory) {
             this.name = name;
@@ -905,31 +879,6 @@ public class JspUtil {
             }
         }
         return false;
-    }
-
-    public static boolean isJavaIdentifier(String key) {
-        // Should not be the case but check to be sure
-        if (key == null || key.length() == 0) {
-            return false;
-        }
-
-        if (isJavaKeyword(key)) {
-            return false;
-        }
-
-        // Check the start character that has more restrictions
-        if (!Character.isJavaIdentifierStart(key.charAt(0))) {
-            return false;
-        }
-
-        // Check each remaining character used is permitted
-        for (int idx = 1; idx < key.length(); idx++) {
-            if (!Character.isJavaIdentifierPart(key.charAt(idx))) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     static InputStreamReader getReader(String fname, String encoding,
