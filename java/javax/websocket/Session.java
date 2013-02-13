@@ -107,5 +107,9 @@ public interface Session extends Closeable {
 
     Principal getUserPrincipal();
 
+    /**
+     * Obtain the set of currently open sessions for the local endpoint that
+     * this session is associated with.
+     */
     Set<Session> getOpenSessions();
 }

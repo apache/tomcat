@@ -93,6 +93,7 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
             sos.setWriteListener(
                     new WsWriteListener(this, wsRemoteEndpointServer));
             ep.onOpen(wsSession, endpointConfig);
+            webSocketContainer.registerSession(ep.getClass(), wsSession);
         } finally {
             t.setContextClassLoader(cl);
         }
