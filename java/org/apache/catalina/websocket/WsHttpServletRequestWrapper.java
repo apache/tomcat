@@ -362,6 +362,11 @@ public class WsHttpServletRequestWrapper implements HttpServletRequest {
     }
 
     @Override
+    public String changeSessionId() {
+        return getRequest().changeSessionId();
+    }
+
+    @Override
     public boolean isRequestedSessionIdValid() {
         return getRequest().isRequestedSessionIdValid();
     }

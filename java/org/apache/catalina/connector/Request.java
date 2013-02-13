@@ -2362,6 +2362,30 @@ public class Request
         }
     }
 
+    /**
+     * Changes the session ID of the session associated with this request.
+     *
+     * @return the old session ID before it was changed
+     * @see javax.servlet.http.HttpSessionIdListener
+     * @since Servlet 3.1
+     */
+    @Override
+    public String changeSessionId() {
+
+        Session session = this.getSessionInternal(false);
+        if (session == null) {
+            throw new IllegalStateException(
+                sm.getString("coyoteRequest.changeSessionId"));
+        }
+
+        Manager manager = this.getContext().getManager();
+        manager.changeSessionId(session);
+
+        String newSessionId = session.getId();
+        this.changeSessionId(newSessionId);
+
+        return newSessionId;
+    }
 
     /**
      * Return the session associated with this Request, creating one

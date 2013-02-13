@@ -383,6 +383,17 @@ public interface HttpServletRequest extends ServletRequest {
     public HttpSession getSession();
 
     /**
+     * Changes the session ID of the session associated with this request. This
+     * method does not create a new session object it only changes the ID of the
+     * current session.
+     *
+     * @return the new session ID allocated to the session
+     * @see HttpSessionIdListener
+     * @since Servlet 3.1
+     */
+    public String changeSessionId();
+
+    /**
      * Checks whether the requested session ID is still valid.
      *
      * @return <code>true</code> if this request has an id for a valid session

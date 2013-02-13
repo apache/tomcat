@@ -65,6 +65,7 @@ import javax.servlet.ServletRequestListener;
 import javax.servlet.ServletSecurityElement;
 import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.http.HttpSessionAttributeListener;
+import javax.servlet.http.HttpSessionIdListener;
 import javax.servlet.http.HttpSessionListener;
 
 import org.apache.catalina.Authenticator;
@@ -4632,6 +4633,7 @@ public class StandardContext extends ContainerBase
             if ((results[i] instanceof ServletContextAttributeListener)
                 || (results[i] instanceof ServletRequestAttributeListener)
                 || (results[i] instanceof ServletRequestListener)
+                || (results[i] instanceof HttpSessionIdListener)
                 || (results[i] instanceof HttpSessionAttributeListener)) {
                 eventListeners.add(results[i]);
             }

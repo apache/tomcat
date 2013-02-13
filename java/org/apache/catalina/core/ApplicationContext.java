@@ -50,6 +50,7 @@ import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.http.HttpSessionAttributeListener;
+import javax.servlet.http.HttpSessionIdListener;
 import javax.servlet.http.HttpSessionListener;
 
 import org.apache.catalina.Container;
@@ -1282,6 +1283,7 @@ public class ApplicationContext
         if (t instanceof ServletContextAttributeListener ||
                 t instanceof ServletRequestListener ||
                 t instanceof ServletRequestAttributeListener ||
+                t instanceof HttpSessionIdListener ||
                 t instanceof HttpSessionAttributeListener) {
             context.addApplicationEventListener(t);
             match = true;
@@ -1319,6 +1321,7 @@ public class ApplicationContext
                     listener instanceof ServletRequestListener ||
                     listener instanceof ServletRequestAttributeListener ||
                     listener instanceof HttpSessionListener ||
+                    listener instanceof HttpSessionIdListener ||
                     listener instanceof HttpSessionAttributeListener) {
                 return listener;
             }

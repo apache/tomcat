@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionIdListener;
+
 import org.apache.catalina.Cluster;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -1470,6 +1473,30 @@ public class DeltaManager extends ClusterManagerBase{
             if (notifyContainerListenersOnReplication) {
                 getContext().fireContainerEvent(Context.CHANGE_SESSION_ID_EVENT,
                         new String[] {msg.getSessionID(), newSessionID});
+            }
+
+            if (notifySessionListenersOnReplication) {
+                Object listeners[] = getContext().
+                    getApplicationEventListeners();
+                if (listeners != null && listeners.length > 0) {
+                    HttpSessionEvent event =
+                        new HttpSessionEvent(session.getSession());
+
+                    for(Object listener : listeners) {
+                        if (!(listener instanceof HttpSessionIdListener))
+                            continue;
+
+                        HttpSessionIdListener idListener =
+                            (HttpSessionIdListener)listener;
+                        try {
+                            idListener.
+                                sessionIdChanged(event, msg.getSessionID());
+                        } catch (Throwable t) {
+                            log.error(sm.getString(
+                                "standardSession.sessionEvent"), t);
+                        }
+                    }
+                }
             }
         }
     }
