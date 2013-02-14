@@ -87,5 +87,9 @@ public interface WebSocketContainer {
      */
     void setDefaultMaxTextMessageBufferSize(int max);
 
+    /**
+     * Get the set of extensions that are supported by this WebSocket
+     * implementation.
+     */
     Set<Extension> getInstalledExtensions();
 }
