@@ -506,6 +506,8 @@ public final class Request {
         remoteUser.recycle();
         authType.recycle();
         attributes.clear();
+
+        startTime = -1;
     }
 
     // -------------------- Info  --------------------
