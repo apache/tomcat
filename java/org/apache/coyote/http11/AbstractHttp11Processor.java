@@ -899,7 +899,12 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     response.setStatus(503);
                     error = true;
                 } else {
-                    request.setStartTime(System.currentTimeMillis());
+                    // Make sure that connectors that are non-blocking during
+                    // header processing (NIO) only set the start time the first
+                    // time a request is processed.
+                    if (request.getStartTime() < 0) {
+                        request.setStartTime(System.currentTimeMillis());
+                    }
                     keptAlive = true;
                     // Set this every time in case limit has been changed via JMX
                     request.getMimeHeaders().setLimit(endpoint.getMaxHeaderCount());
