@@ -760,30 +760,27 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     @Override
     public void changeSessionId(Session session) {
+        String newId = generateSessionId();
+        changeSessionId(session, newId, true, true);
+    }
+
+    /**
+     * Change the session ID of the current session to a specified session ID.
+     *
+     * @param session   The session to change the session ID for
+     * @param newId   new session ID
+     */
+    @Override
+    public void changeSessionId(Session session, String newId) {
+        changeSessionId(session, newId, true, true);
+    }
+
+    protected void changeSessionId(Session session, String newId,
+            boolean notifySessionListeners, boolean notifyContainerListeners) {
         String oldId = session.getIdInternal();
-        session.setId(generateSessionId(), false);
-        String newId = session.getIdInternal();
-        context.fireContainerEvent(Context.CHANGE_SESSION_ID_EVENT,
-                new String[] {oldId, newId});
-
-        Object listeners[] = context.getApplicationEventListeners();
-        if (listeners != null && listeners.length > 0) {
-            HttpSessionEvent event =
-                new HttpSessionEvent(session.getSession());
-
-            for(Object listener : listeners) {
-                if (!(listener instanceof HttpSessionIdListener))
-                    continue;
-
-                HttpSessionIdListener idListener =
-                    (HttpSessionIdListener)listener;
-                try {
-                    idListener.sessionIdChanged(event, oldId);
-                } catch (Throwable t) {
-                    log.error(sm.getString("standardSession.sessionEvent"), t);
-                }
-            }
-        }
+        session.setId(newId, false);
+        session.tellChangedSessionId(newId, oldId,
+                notifySessionListeners, notifyContainerListeners);
     }
 
 

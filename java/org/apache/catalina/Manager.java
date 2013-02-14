@@ -280,6 +280,15 @@ public interface Manager {
 
 
     /**
+     * Change the session ID of the current session to a specified session ID.
+     *
+     * @param session   The session to change the session ID for
+     * @param newId   new session ID
+     */
+    public void changeSessionId(Session session, String newId);
+
+
+    /**
      * Get a session from the recycled ones or create a new empty one.
      * The PersistentManager manager does not need to create session data
      * because it reads it from the Store.
