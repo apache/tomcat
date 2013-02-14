@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -47,7 +48,8 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.apache.tomcat.util.res.StringManager;
 
-public class WsWebSocketContainer implements WebSocketContainer {
+public class WsWebSocketContainer
+        implements WebSocketContainer, BackgroundProcess {
 
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
@@ -57,12 +59,15 @@ public class WsWebSocketContainer implements WebSocketContainer {
 
     private final Map<Class<?>, Set<WsSession>> endpointSessionMap =
             new HashMap<>();
+    private final Map<WsSession,WsSession> sessions = new ConcurrentHashMap<>();
     private final Object endPointSessionMapLock = new Object();
 
     private long defaultAsyncTimeout = -1;
     private int maxBinaryMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile long maxSessionIdleTimeout = 0;
+    private int backgroundProcessCount = 0;
+    private int processPeriod = 10;
 
     @Override
     public Session connectToServer(Class<?> annotatedEndpointClass, URI path)
@@ -168,6 +173,9 @@ public class WsWebSocketContainer implements WebSocketContainer {
 
     protected void registerSession(Class<?> endpoint, WsSession wsSession) {
         synchronized (endPointSessionMapLock) {
+            if (endpointSessionMap.size() == 0) {
+                BackgroundProcessManager.getInstance().register(this);
+            }
             Set<WsSession> wsSessions = endpointSessionMap.get(endpoint);
             if (wsSessions == null) {
                 wsSessions = new HashSet<>();
@@ -175,6 +183,7 @@ public class WsWebSocketContainer implements WebSocketContainer {
             }
             wsSessions.add(wsSession);
         }
+        sessions.put(wsSession, wsSession);
     }
 
 
@@ -187,13 +196,20 @@ public class WsWebSocketContainer implements WebSocketContainer {
                     endpointSessionMap.remove(endpoint);
                 }
             }
+            if (endpointSessionMap.size() == 0) {
+                BackgroundProcessManager.getInstance().unregister(this);
+            }
         }
+        sessions.remove(wsSession);
     }
 
 
     Set<Session> getOpenSession(Class<?> endpoint) {
         HashSet<Session> result = new HashSet<>();
-        result.addAll(endpointSessionMap.get(endpoint));
+        Set<WsSession> sessions = endpointSessionMap.get(endpoint);
+        if (sessions != null) {
+            result.addAll(sessions);
+        }
         return result;
     }
 
@@ -458,5 +474,41 @@ public class WsWebSocketContainer implements WebSocketContainer {
         public Map<String,List<String>> getHeaders() {
             return headers;
         }
+    }
+
+
+    // ----------------------------------------------- BackgroundProcess methods
+
+    @Override
+    public void backgroundProcess() {
+        // This method gets called once a second.
+        backgroundProcessCount ++;
+
+        if (backgroundProcessCount >= processPeriod) {
+            backgroundProcessCount = 0;
+
+            for (WsSession wsSession : sessions.keySet()) {
+                wsSession.expire();
+            }
+        }
+
+    }
+
+
+    @Override
+    public void setProcessPeriod(int period) {
+        this.processPeriod = period;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * The default value is 10 which means session expirations are processed
+     * every 10 seconds.
+     */
+    @Override
+    public int getProcessPeriod() {
+        return processPeriod;
     }
 }
