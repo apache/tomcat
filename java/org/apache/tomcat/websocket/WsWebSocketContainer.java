@@ -24,6 +24,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -413,10 +414,14 @@ public class WsWebSocketContainer implements WebSocketContainer {
     }
 
 
+    /**
+     * {@inheritDoc}
+     *
+     * Currently, this implementation does not support any extensions.
+     */
     @Override
     public Set<Extension> getInstalledExtensions() {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.EMPTY_SET;
     }
 
 
