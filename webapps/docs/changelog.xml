@@ -62,6 +62,10 @@
         NIO connector. In some cases the request processing time may have been
         longer than that recorded. (markt)
       </fix>
+      <update>
+        Add one more library from JDK 7 to the value of <code>jarsToSkip</code>
+        property in the <code>catalina.properties</code> file. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Web applications">
