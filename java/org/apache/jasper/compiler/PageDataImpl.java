@@ -56,7 +56,7 @@ class PageDataImpl extends PageData implements TagConstants {
     private static final Charset CHARSET_UTF8 = Charset.forName("UTF-8");
 
     // string buffer used to build XML view
-    private StringBuilder buf;
+    private final StringBuilder buf;
 
     /**
      * Constructor.
@@ -99,12 +99,12 @@ class PageDataImpl extends PageData implements TagConstants {
      * In addition, this Visitor converts any taglib directives into xmlns:
      * attributes and adds them to the jsp:root element of the XML view.
      */
-    static class FirstPassVisitor
+    private static class FirstPassVisitor
                 extends Node.Visitor implements TagConstants {
 
-        private Node.Root root;
-        private AttributesImpl rootAttrs;
-        private PageInfo pageInfo;
+        private final Node.Root root;
+        private final AttributesImpl rootAttrs;
+        private final PageInfo pageInfo;
 
         // Prefix for the 'id' attribute
         private String jspIdPrefix;
@@ -231,13 +231,13 @@ class PageDataImpl extends PageData implements TagConstants {
      * Second-pass Visitor responsible for producing XML view and assigning
      * each element a unique jsp:id attribute.
      */
-    static class SecondPassVisitor extends Node.Visitor
+    private static class SecondPassVisitor extends Node.Visitor
                 implements TagConstants {
 
-        private Node.Root root;
-        private StringBuilder buf;
-        private Compiler compiler;
-        private String jspIdPrefix;
+        private final Node.Root root;
+        private final StringBuilder buf;
+        private final Compiler compiler;
+        private final String jspIdPrefix;
         private boolean resetDefaultNS = false;
 
         // Current value of jsp:id attribute
