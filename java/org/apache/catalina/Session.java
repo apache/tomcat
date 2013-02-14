@@ -333,7 +333,7 @@ public interface Session {
      * @param newId  new session ID
      * @param oldId  old session ID
      * @param notifySessionListeners  Should any associated sessionListeners be
-     *        notified that session ID has been changed?     
+     *        notified that session ID has been changed?
      * @param notifyContainerListeners  Should any associated ContainerListeners
      *        be notified that session ID has been changed?
      */
