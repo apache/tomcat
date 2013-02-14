@@ -349,17 +349,8 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     protected void changeSessionID(Request request, String sessionId,
             String newSessionID, Session catalinaSession) {
         fireLifecycleEvent("Before session migration", catalinaSession);
-        catalinaSession.setId(newSessionID, false);
-        // FIXME: Why we remove change data from other running request?
-        // setId also trigger resetDeltaRequest!!
-        if (catalinaSession instanceof DeltaSession) {
-            ((DeltaSession) catalinaSession).resetDeltaRequest();
-        }
+        catalinaSession.getManager().changeSessionId(catalinaSession, newSessionID);
         changeRequestSessionID(request, sessionId, newSessionID);
-
-        // now sending the change to all other clusternodes!
-        sendSessionIDClusterBackup(request,sessionId, newSessionID);
-
         fireLifecycleEvent("After session migration", catalinaSession);
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("jvmRoute.changeSession", sessionId,
