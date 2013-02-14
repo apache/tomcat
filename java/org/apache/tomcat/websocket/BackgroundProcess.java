@@ -14,27 +14,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.websocket.server;
+package org.apache.tomcat.websocket;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+public interface BackgroundProcess {
 
-/**
- * This will be added automatically to a {@link javax.servlet.ServletContext} by
- * the {@link WsSci}. If the {@link WsSci} is disabled, this listener must be
- * added manually to every {@link javax.servlet.ServletContext} that uses
- * WebSocket.
- */
-public class WsListener implements ServletContextListener {
+    void backgroundProcess();
 
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
-        sc.setServletContext(sce.getServletContext());
-    }
+    void setProcessPeriod(int period);
 
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-        // NOOP
-    }
+    int getProcessPeriod();
 }

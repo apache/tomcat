@@ -64,6 +64,7 @@ public class WsSession implements Session {
     private volatile int maxTextMessageBufferSize =
             Constants.DEFAULT_BUFFER_SIZE;
     private volatile long sessionIdleTimeout = 0;
+    private volatile long lastActive = System.currentTimeMillis();
 
 
     /**
@@ -80,6 +81,7 @@ public class WsSession implements Session {
             WsWebSocketContainer wsWebSocketContainer) {
         this.localEndpoint = localEndpoint;
         this.wsRemoteEndpoint = wsRemoteEndpoint;
+        this.wsRemoteEndpoint.setSession(this);
         this.webSocketContainer = wsWebSocketContainer;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
         wsRemoteEndpoint.setAsyncSendTimeout(
@@ -365,6 +367,26 @@ public class WsSession implements Session {
         return pongMessageHandler;
     }
 
+
+    protected void updateLastActive() {
+        lastActive = System.currentTimeMillis();
+    }
+
+    protected void expire() {
+        long timeout = sessionIdleTimeout;
+        if (timeout < 1) {
+            return;
+        }
+
+        if (System.currentTimeMillis() - lastActive > timeout) {
+            try {
+                close(new CloseReason(CloseCodes.GOING_AWAY,
+                        sm.getString("wsSession.timeout")));
+            } catch (IOException e) {
+                // TODO Log this?
+            }
+        }
+    }
 
     // Protected so unit tests can use it
     protected static Class<?> getMessageType(MessageHandler listener) {

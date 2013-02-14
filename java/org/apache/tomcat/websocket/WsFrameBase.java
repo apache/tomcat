@@ -90,6 +90,8 @@ public abstract class WsFrameBase {
 
     protected void processInputBuffer() throws IOException {
         while (true) {
+            wsSession.updateLastActive();
+
             if (state == State.NEW_FRAME) {
                 if (!processInitialHeader()) {
                     break;

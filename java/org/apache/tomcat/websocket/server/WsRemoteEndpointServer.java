@@ -42,7 +42,7 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
             LogFactory.getLog(WsProtocolHandler.class);
 
     private final ServletOutputStream sos;
-    private final WsTimeout wsTimeout;
+    private final WsWriteTimeout wsWriteTimeout;
     private volatile SendHandler handler = null;
     private volatile ByteBuffer[] buffers = null;
 
@@ -53,7 +53,7 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
     public WsRemoteEndpointServer(ServletOutputStream sos,
             ServerContainerImpl serverContainer) {
         this.sos = sos;
-        this.wsTimeout = serverContainer.getTimeout();
+        this.wsWriteTimeout = serverContainer.getTimeout();
     }
 
 
@@ -87,7 +87,7 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
                     }
                 }
                 if (complete) {
-                    wsTimeout.unregister(this);
+                    wsWriteTimeout.unregister(this);
                     if (close) {
                         close();
                     }
@@ -104,7 +104,7 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
             }
 
         } catch (IOException ioe) {
-            wsTimeout.unregister(this);
+            wsWriteTimeout.unregister(this);
             close();
             SendHandler sh = handler;
             handler = null;
@@ -117,7 +117,7 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
             if (timeout > 0) {
                 // Register with timeout thread
                 timeoutExpiry = timeout + System.currentTimeMillis();
-                wsTimeout.register(this);
+                wsWriteTimeout.register(this);
             }
         }
     }
@@ -132,7 +132,7 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
                 log.info(sm.getString("wsRemoteEndpointServer.closeFailed"), e);
             }
         }
-        wsTimeout.unregister(this);
+        wsWriteTimeout.unregister(this);
     }
 
 

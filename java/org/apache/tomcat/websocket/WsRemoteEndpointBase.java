@@ -64,6 +64,7 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     private final ByteBuffer encoderBuffer = ByteBuffer.allocate(8192);
     private AtomicBoolean batchingAllowed = new AtomicBoolean(false);
     private volatile long asyncSendTimeout = -1;
+    private WsSession wsSession;
 
 
     @Override
@@ -226,6 +227,9 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
     void startMessage(byte opCode, ByteBuffer payload, boolean last,
             SendHandler handler) {
+
+        wsSession.updateLastActive();
+
         MessagePart mp = new MessagePart(opCode, payload, last, handler, this);
 
         synchronized (messagePartLock) {
@@ -271,6 +275,8 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
                 writeMessagePart(mpNext);
             }
         }
+
+        wsSession.updateLastActive();
 
         handler.setResult(result);
     }
@@ -459,7 +465,9 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     }
 
 
-
+    protected void setSession(WsSession wsSession) {
+        this.wsSession = wsSession;
+    }
 
 
     protected abstract void doWrite(SendHandler handler, ByteBuffer... data);

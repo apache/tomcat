@@ -20,41 +20,32 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.tomcat.websocket.BackgroundProcess;
+import org.apache.tomcat.websocket.BackgroundProcessManager;
 
 /**
  * Provides timeouts for asynchronous web socket writes. On the server side we
  * only have access to {@link javax.servlet.ServletOutputStream} and
  * {@link javax.servlet.ServletInputStream} so there is no way to set a timeout
- * for writes to the client. Hence the separate thread.
+ * for writes to the client.
  */
-public class WsTimeout implements Runnable {
-
-    public static final String THREAD_NAME_PREFIX = "Websocket Timeout - ";
+public class WsWriteTimeout implements BackgroundProcess {
 
     private final Set<WsRemoteEndpointServer> endpoints =
             new ConcurrentSkipListSet<>(new EndpointComparator());
-    private volatile boolean running = true;
-
-    public void stop() {
-        running = false;
-        synchronized (this) {
-            this.notify();
-        }
-    }
-
+    private final AtomicInteger count = new AtomicInteger(0);
+    private int backgroundProcessCount = 0;
+    private volatile int processPeriod = 1;
 
     @Override
-    public void run() {
-        while (running) {
-            // Wait for one second - no need for timeouts more frequently than
-            // that
-            synchronized (this) {
-                try {
-                    wait(1000);
-                } catch (InterruptedException e) {
-                    // Ignore
-                }
-            }
+    public void backgroundProcess() {
+        // This method gets called once a second.
+        backgroundProcessCount ++;
+
+        if (backgroundProcessCount >= processPeriod) {
+            backgroundProcessCount = 0;
 
             long now = System.currentTimeMillis();
             Iterator<WsRemoteEndpointServer> iter = endpoints.iterator();
@@ -73,13 +64,43 @@ public class WsTimeout implements Runnable {
     }
 
 
+    @Override
+    public void setProcessPeriod(int period) {
+        this.processPeriod = period;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * The default value is 1 which means asynchronous write timeouts are
+     * processed every 1 second.
+     */
+    @Override
+    public int getProcessPeriod() {
+        return processPeriod;
+    }
+
+
     public void register(WsRemoteEndpointServer endpoint) {
-        endpoints.add(endpoint);
+        boolean result = endpoints.add(endpoint);
+        if (result) {
+            int newCount = count.incrementAndGet();
+            if (newCount == 1) {
+                BackgroundProcessManager.getInstance().register(this);
+            }
+        }
     }
 
 
     public void unregister(WsRemoteEndpointServer endpoint) {
-        endpoints.remove(endpoint);
+        boolean result = endpoints.remove(endpoint);
+        if (result) {
+            int newCount = count.decrementAndGet();
+            if (newCount == 0) {
+                BackgroundProcessManager.getInstance().unregister(this);
+            }
+        }
     }
 
 

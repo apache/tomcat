@@ -583,6 +583,94 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testSessionExpiryContainer() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+
+        tomcat.start();
+
+        // Need access to implementation methods for configuring unit tests
+        WsWebSocketContainer wsContainer = (WsWebSocketContainer)
+                ContainerProvider.getWebSocketContainer();
+
+        // 5 second timeout
+        wsContainer.setMaxSessionIdleTimeout(5000);
+        wsContainer.setProcessPeriod(1);
+
+        connectToEchoServerBasic(wsContainer, EndpointA.class);
+        connectToEchoServerBasic(wsContainer, EndpointA.class);
+        Session s3a = connectToEchoServerBasic(wsContainer, EndpointA.class);
+
+        // Check all three sessions are open
+        Set<Session> setA = s3a.getOpenSessions();
+        Assert.assertEquals(3, setA.size());
+
+        int count = 0;
+        setA = s3a.getOpenSessions();
+        while (setA.size() > 0 && count < 8) {
+            count ++;
+            Thread.sleep(1000);
+            setA = s3a.getOpenSessions();
+        }
+
+        if (setA.size() > 0) {
+            Assert.fail("There were [" + setA.size() + "] open sessions");
+        }
+    }
+
+
+    @Test
+    public void testSessionExpirySession() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+
+        tomcat.start();
+
+        // Need access to implementation methods for configuring unit tests
+        WsWebSocketContainer wsContainer = (WsWebSocketContainer)
+                ContainerProvider.getWebSocketContainer();
+
+        // 5 second timeout
+        wsContainer.setMaxSessionIdleTimeout(5000);
+        wsContainer.setProcessPeriod(1);
+
+        Session s1a = connectToEchoServerBasic(wsContainer, EndpointA.class);
+        s1a.setTimeout(3000);
+        Session s2a = connectToEchoServerBasic(wsContainer, EndpointA.class);
+        s2a.setTimeout(6000);
+        Session s3a = connectToEchoServerBasic(wsContainer, EndpointA.class);
+        s3a.setTimeout(9000);
+
+        // Check all three sessions are open
+        Set<Session> setA = s3a.getOpenSessions();
+
+        int expected = 3;
+        while (expected > 0) {
+            Assert.assertEquals(expected, setA.size());
+
+            int count = 0;
+            while (setA.size() == expected && count < 5) {
+                count ++;
+                Thread.sleep(1000);
+                setA = s3a.getOpenSessions();
+            }
+
+            expected--;
+        }
+
+        Assert.assertEquals(0, setA.size());
+    }
+
+
     private Session connectToEchoServerBasic(WebSocketContainer wsContainer,
             Class<? extends Endpoint> clazz) throws Exception {
         return wsContainer.connectToServer(clazz,
