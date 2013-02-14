@@ -652,7 +652,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     protected void checkDefaults() {
         if ( clusterListeners.size() == 0 ) {
-            addClusterListener(new JvmRouteSessionIDBinderListener());
             addClusterListener(new ClusterSessionListener());
         }
         if ( valves.size() == 0 ) {
