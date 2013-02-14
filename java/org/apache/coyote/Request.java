@@ -539,6 +539,8 @@ public final class Request {
 
         blocking = true;
         listener = null;
+
+        startTime = -1;
     }
 
     // -------------------- Info  --------------------
