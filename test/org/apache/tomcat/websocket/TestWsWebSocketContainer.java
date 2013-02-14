@@ -257,18 +257,18 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
 
     @Test
-    public void testTimeoutClientContainer() throws Exception {
-        doTestTimeoutClient(true);
+    public void testWriteTimeoutClientContainer() throws Exception {
+        doTestWriteTimeoutClient(true);
     }
 
 
     @Test
-    public void testTimeoutClientEndpoint() throws Exception {
-        doTestTimeoutClient(false);
+    public void testWriteTimeoutClientEndpoint() throws Exception {
+        doTestWriteTimeoutClient(false);
     }
 
 
-    private void doTestTimeoutClient(boolean setTimeoutOnContainer)
+    private void doTestWriteTimeoutClient(boolean setTimeoutOnContainer)
             throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
@@ -329,20 +329,20 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
 
     @Test
-    public void testTimeoutServerContainer() throws Exception {
-        doTestTimeoutServer(true);
+    public void testWriteTimeoutServerContainer() throws Exception {
+        doTestWriteTimeoutServer(true);
     }
 
 
     @Test
-    public void testTimeoutServerEndpoint() throws Exception {
-        doTestTimeoutServer(false);
+    public void testWriteTimeoutServerEndpoint() throws Exception {
+        doTestWriteTimeoutServer(false);
     }
 
 
     private static volatile boolean timoutOnContainer = false;
 
-    private void doTestTimeoutServer(boolean setTimeoutOnContainer)
+    private void doTestWriteTimeoutServer(boolean setTimeoutOnContainer)
             throws Exception {
 
         /*
