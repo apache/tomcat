@@ -377,11 +377,12 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         wsSession.addMessageHandler(new BlockingBinaryHandler());
 
         int loops = 0;
-        while (loops < 60) {
+        while (loops < 15) {
             Thread.sleep(1000);
             if (!ConstantTxEndpoint.getRunning()) {
                 break;
             }
+            loops++;
         }
 
         // Check nothing really bad happened
