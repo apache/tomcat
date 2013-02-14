@@ -44,25 +44,25 @@ import org.xml.sax.helpers.AttributesImpl;
 
 class Parser implements TagConstants {
 
-    private ParserController parserController;
+    private final ParserController parserController;
 
-    private JspCompilationContext ctxt;
+    private final JspCompilationContext ctxt;
 
-    private JspReader reader;
+    private final JspReader reader;
 
     private Mark start;
 
-    private ErrorDispatcher err;
+    private final ErrorDispatcher err;
 
     private int scriptlessCount;
 
-    private boolean isTagFile;
+    private final boolean isTagFile;
 
-    private boolean directivesOnly;
+    private final boolean directivesOnly;
 
-    private JarResource jarResource;
+    private final JarResource jarResource;
 
-    private PageInfo pageInfo;
+    private final PageInfo pageInfo;
 
     // Virtual body content types, to make parsing a little easier.
     // These are not accessible from outside the parser.

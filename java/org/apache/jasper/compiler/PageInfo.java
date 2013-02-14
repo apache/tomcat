@@ -39,19 +39,19 @@ import org.apache.jasper.JasperException;
 
 class PageInfo {
 
-    private Vector<String> imports;
-    private Map<String,Long> dependants;
+    private final Vector<String> imports;
+    private final Map<String,Long> dependants;
 
-    private BeanRepository beanRepository;
-    private Set<String> varInfoNames;
-    private HashMap<String,TagLibraryInfo> taglibsMap;
-    private HashMap<String, String> jspPrefixMapper;
-    private HashMap<String, LinkedList<String>> xmlPrefixMapper;
-    private HashMap<String, Mark> nonCustomTagPrefixMap;
-    private String jspFile;
-    private String defaultLanguage = "java";
+    private final BeanRepository beanRepository;
+    private final Set<String> varInfoNames;
+    private final HashMap<String,TagLibraryInfo> taglibsMap;
+    private final HashMap<String, String> jspPrefixMapper;
+    private final HashMap<String, LinkedList<String>> xmlPrefixMapper;
+    private final HashMap<String, Mark> nonCustomTagPrefixMap;
+    private final String jspFile;
+    private final String defaultLanguage = "java";
     private String language;
-    private String defaultExtends = Constants.JSP_SERVLET_BASE;
+    private final String defaultExtends = Constants.JSP_SERVLET_BASE;
     private String xtends;
     private String contentType = null;
     private String session;
@@ -76,7 +76,7 @@ class PageInfo {
     // JSP 2.1
     private String deferredSyntaxAllowedAsLiteralValue;
     private boolean deferredSyntaxAllowedAsLiteral = false;
-    private ExpressionFactory expressionFactory =
+    private final ExpressionFactory expressionFactory =
         ExpressionFactory.newInstance();
     private String trimDirectiveWhitespacesValue;
     private boolean trimDirectiveWhitespaces = false;
@@ -89,17 +89,17 @@ class PageInfo {
     private boolean isJspPrefixHijacked;
 
     // Set of all element and attribute prefixes used in this translation unit
-    private HashSet<String> prefixes;
+    private final HashSet<String> prefixes;
 
     private boolean hasJspRoot = false;
     private Vector<String> includePrelude;
     private Vector<String> includeCoda;
-    private Vector<String> pluginDcls;      // Id's for tagplugin declarations
+    private final Vector<String> pluginDcls;  // Id's for tagplugin declarations
 
     // JSP 2.2
     private boolean errorOnUndeclaredNamepsace = false;
 
-    private boolean isTagFile = false;
+    private final boolean isTagFile;
 
     PageInfo(BeanRepository beanRepository, String jspFile, boolean isTagFile) {
         this.isTagFile = isTagFile;
@@ -390,11 +390,6 @@ class PageInfo {
     public String getLanguage(boolean useDefault) {
         return (language == null && useDefault ? defaultLanguage : language);
     }
-
-    public String getLanguage() {
-        return getLanguage(true);
-    }
-
 
     /*
      * extends
