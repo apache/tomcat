@@ -158,7 +158,7 @@ public class WsWebSocketContainer
                     e);
         }
         WsSession wsSession =
-                new WsSession(endpoint, wsRemoteEndpointClient, this);
+                new WsSession(endpoint, wsRemoteEndpointClient, this, null);
         endpoint.onOpen(wsSession, clientEndpointConfiguration);
         registerSession(clazz, wsSession);
 

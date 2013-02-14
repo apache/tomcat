@@ -24,6 +24,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ public class WsSession implements Session {
     private final WsRemoteEndpointBase wsRemoteEndpoint;
     private final ClassLoader applicationClassLoader;
     private final WsWebSocketContainer webSocketContainer;
+    private final WsRequest request;
 
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
@@ -78,7 +80,8 @@ public class WsSession implements Session {
      */
     public WsSession(Endpoint localEndpoint,
             WsRemoteEndpointBase wsRemoteEndpoint,
-            WsWebSocketContainer wsWebSocketContainer) {
+            WsWebSocketContainer wsWebSocketContainer,
+            WsRequest request) {
         this.localEndpoint = localEndpoint;
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);
@@ -92,6 +95,7 @@ public class WsSession implements Session {
                 webSocketContainer.getDefaultMaxTextMessageBufferSize();
         this.sessionIdleTimeout =
                 webSocketContainer.getMaxSessionIdleTimeout();
+        this.request = request;
     }
 
 
@@ -188,8 +192,7 @@ public class WsSession implements Session {
 
     @Override
     public List<Extension> getNegotiatedExtensions() {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.EMPTY_LIST;
     }
 
 
@@ -307,22 +310,37 @@ public class WsSession implements Session {
 
     @Override
     public URI getRequestURI() {
-        // TODO Auto-generated method stub
-        return null;
+        if (request == null) {
+            return null;
+        }
+        return request.getRequestURI();
     }
 
 
     @Override
     public Map<String,List<String>> getRequestParameterMap() {
-        // TODO Auto-generated method stub
-        return null;
+        if (request == null) {
+            return Collections.EMPTY_MAP;
+        }
+        return request.getRequestParameterMap();
     }
 
 
     @Override
     public String getQueryString() {
-        // TODO Auto-generated method stub
-        return null;
+        if (request == null) {
+            return null;
+        }
+        return request.getQueryString();
+    }
+
+
+    @Override
+    public Principal getUserPrincipal() {
+        if (request == null) {
+            return null;
+        }
+        return request.getUserPrincipal();
     }
 
 
@@ -335,13 +353,6 @@ public class WsSession implements Session {
 
     @Override
     public String getId() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
-    public Principal getUserPrincipal() {
         // TODO Auto-generated method stub
         return null;
     }

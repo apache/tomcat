@@ -34,6 +34,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsIOException;
+import org.apache.tomcat.websocket.WsRequest;
 import org.apache.tomcat.websocket.WsSession;
 
 /**
@@ -50,16 +51,17 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
     private final EndpointConfiguration endpointConfig;
     private final ClassLoader applicationClassLoader;
     private final ServerContainerImpl webSocketContainer;
+    private final WsRequest request;
 
     private WsSession wsSession;
 
 
-    public WsProtocolHandler(Endpoint ep,
-            EndpointConfiguration endpointConfig,
-            ServerContainerImpl wsc) {
+    public WsProtocolHandler(Endpoint ep, EndpointConfiguration endpointConfig,
+            ServerContainerImpl wsc, WsRequest request) {
         this.ep = ep;
         this.endpointConfig = endpointConfig;
         this.webSocketContainer = wsc;
+        this.request = request;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
@@ -84,8 +86,8 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
         try {
             WsRemoteEndpointServer wsRemoteEndpointServer =
                     new WsRemoteEndpointServer(sos, webSocketContainer);
-            wsSession = new WsSession(
-                    ep, wsRemoteEndpointServer, webSocketContainer);
+            wsSession = new WsSession(ep, wsRemoteEndpointServer,
+                    webSocketContainer, request);
             WsFrameServer wsFrame = new WsFrameServer(
                     sis,
                     wsSession);

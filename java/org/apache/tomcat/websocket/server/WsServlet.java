@@ -17,14 +17,20 @@
 package org.apache.tomcat.websocket.server;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -39,6 +45,7 @@ import javax.websocket.server.ServerEndpointConfiguration;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.tomcat.websocket.Constants;
+import org.apache.tomcat.websocket.WsRequest;
 
 /**
  * Handles the initial HTTP connection for WebSocket connections.
@@ -128,8 +135,42 @@ public class WsServlet extends HttpServlet {
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ServletException(e);
         }
-        HttpUpgradeHandler wsHandler = new WsProtocolHandler(ep, sec, sc);
+        WsRequest wsRequest = createWsRequest(req);
+        HttpUpgradeHandler wsHandler =
+                new WsProtocolHandler(ep, sec, sc, wsRequest);
         req.upgrade(wsHandler);
+    }
+
+
+    private WsRequest createWsRequest(HttpServletRequest req)
+            throws ServletException {
+
+        String queryString = req.getQueryString();
+
+        StringBuffer sb = req.getRequestURL();
+        if (queryString != null) {
+            sb.append("?");
+            sb.append(queryString);
+        }
+        URI requestURI;
+        try {
+            requestURI = new URI(sb.toString());
+        } catch (URISyntaxException e) {
+            throw new ServletException(e);
+        }
+
+        Map<String,String[]> originalParameters = req.getParameterMap();
+        Map<String,List<String>> newParameters = new HashMap<>();
+        for (Entry<String,String[]> entry : originalParameters.entrySet()) {
+            newParameters.put(entry.getKey(),
+                    Collections.unmodifiableList(
+                            Arrays.asList(entry.getValue())));
+        }
+        Map<String,List<String>> parameterMap =
+                Collections.unmodifiableMap(newParameters);
+
+        return new WsRequest(requestURI, parameterMap, queryString,
+                req.getUserPrincipal());
     }
 
 
