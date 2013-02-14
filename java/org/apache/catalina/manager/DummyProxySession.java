@@ -198,4 +198,10 @@ public class DummyProxySession implements Session {
     public void setValid(boolean isValid) {
         // NOOP
     }
+
+    @Override
+    public void tellChangedSessionId(String newId, String oldId,
+            boolean notifySessionListeners, boolean notifyContainerListeners) {
+        // NOOP
+    }
 }
