@@ -526,13 +526,31 @@ public class DeltaManager extends ClusterManagerBase{
         changeSessionId(session, true);
     }
 
-    public void changeSessionId(Session session, boolean notify) {
-        // original sessionID
+    /**
+     * Change the session ID of the current session to a specified session ID.
+     *
+     * @param session   The session to change the session ID for
+     * @param newId   new session ID
+     */
+    @Override
+    public void changeSessionId(Session session, String newId) {
+        changeSessionId(session, newId, true);
+    }
+
+    protected void changeSessionId(Session session, boolean notify) {
         String orgSessionID = session.getId();
         super.changeSessionId(session);
-        if (notify && cluster.getMembers().length > 0) {
-            // changed sessionID
-            String newSessionID = session.getId();
+        if (notify) sendChangeSessionId(session.getId(), orgSessionID);
+    }
+
+    protected void changeSessionId(Session session, String newId, boolean notify) {
+        String orgSessionID = session.getId();
+        super.changeSessionId(session, newId);
+        if (notify) sendChangeSessionId(session.getId(), orgSessionID);
+    }
+
+    protected void sendChangeSessionId(String newSessionID, String orgSessionID) {
+        if (cluster.getMembers().length > 0) {
             try {
                 // serialize sessionID
                 byte[] data = serializeSessionId(newSessionID);
@@ -1469,35 +1487,8 @@ public class DeltaManager extends ClusterManagerBase{
         if (session != null) {
             String newSessionID = deserializeSessionId(msg.getSession());
             session.setPrimarySession(false);
-            session.setId(newSessionID, false);
-            if (notifyContainerListenersOnReplication) {
-                getContext().fireContainerEvent(Context.CHANGE_SESSION_ID_EVENT,
-                        new String[] {msg.getSessionID(), newSessionID});
-            }
-
-            if (notifySessionListenersOnReplication) {
-                Object listeners[] = getContext().
-                    getApplicationEventListeners();
-                if (listeners != null && listeners.length > 0) {
-                    HttpSessionEvent event =
-                        new HttpSessionEvent(session.getSession());
-
-                    for(Object listener : listeners) {
-                        if (!(listener instanceof HttpSessionIdListener))
-                            continue;
-
-                        HttpSessionIdListener idListener =
-                            (HttpSessionIdListener)listener;
-                        try {
-                            idListener.
-                                sessionIdChanged(event, msg.getSessionID());
-                        } catch (Throwable t) {
-                            log.error(sm.getString(
-                                "standardSession.sessionEvent"), t);
-                        }
-                    }
-                }
-            }
+            // change session id
+            changeSessionId(session, newSessionID, notifySessionListenersOnReplication, notifyContainerListenersOnReplication);
         }
     }
 

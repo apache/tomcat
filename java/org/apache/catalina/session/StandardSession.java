@@ -44,6 +44,7 @@ import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionIdListener;
 import javax.servlet.http.HttpSessionListener;
 
 import org.apache.catalina.Context;
@@ -428,6 +429,50 @@ public class StandardSession implements HttpSession, Session, Serializable {
             }
         }
 
+    }
+
+    /**
+     * Inform the listeners about the change session ID.
+     *
+     * @param newId  new session ID
+     * @param oldId  old session ID
+     * @param notifySessionListeners  Should any associated sessionListeners be
+     *        notified that session ID has been changed?     
+     * @param notifyContainerListeners  Should any associated ContainerListeners
+     *        be notified that session ID has been changed?
+     */
+    @Override
+    public void tellChangedSessionId(String newId, String oldId,
+            boolean notifySessionListeners, boolean notifyContainerListeners) {
+        Context context = manager.getContext();
+         // notify ContainerListeners
+        if (notifyContainerListeners) {
+            context.fireContainerEvent(Context.CHANGE_SESSION_ID_EVENT,
+                    new String[] {oldId, newId});
+        }
+
+        // notify HttpSessionIdListener
+        if (notifySessionListeners) {
+            Object listeners[] = context.getApplicationEventListeners();
+            if (listeners != null && listeners.length > 0) {
+                HttpSessionEvent event =
+                    new HttpSessionEvent(getSession());
+
+                for(Object listener : listeners) {
+                    if (!(listener instanceof HttpSessionIdListener))
+                        continue;
+
+                    HttpSessionIdListener idListener =
+                        (HttpSessionIdListener)listener;
+                    try {
+                        idListener.sessionIdChanged(event, oldId);
+                    } catch (Throwable t) {
+                        manager.getContext().getLogger().error
+                            (sm.getString("standardSession.sessionEvent"), t);
+                    }
+                }
+            }   
+        }
     }
 
 

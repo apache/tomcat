@@ -327,4 +327,18 @@ public interface Session {
     public void setNote(String name, Object value);
 
 
+    /**
+     * Inform the listeners about the change session ID.
+     *
+     * @param newId  new session ID
+     * @param oldId  old session ID
+     * @param notifySessionListeners  Should any associated sessionListeners be
+     *        notified that session ID has been changed?     
+     * @param notifyContainerListeners  Should any associated ContainerListeners
+     *        be notified that session ID has been changed?
+     */
+    public void tellChangedSessionId(String newId, String oldId,
+            boolean notifySessionListeners, boolean notifyContainerListeners);
+
+
 }
