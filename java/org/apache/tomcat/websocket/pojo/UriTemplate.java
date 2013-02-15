@@ -29,7 +29,7 @@ import org.apache.tomcat.util.res.StringManager;
  * Extracts path parameters from URIs used to create web socket connections
  * using the URI template defined for the associated Endpoint.
  */
-public class PojoUriTemplate {
+public class UriTemplate {
 
     private static StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
     private final String template;
@@ -37,7 +37,7 @@ public class PojoUriTemplate {
     private final List<String> names = new ArrayList<>();
 
 
-    public PojoUriTemplate(String template) {
+    public UriTemplate(String template) {
         this.template = template;
         // +10 is just a guess at this point
         StringBuilder pattern = new StringBuilder(template.length() + 10);
