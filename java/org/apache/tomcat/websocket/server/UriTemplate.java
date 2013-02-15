@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.websocket.pojo;
+package org.apache.tomcat.websocket.server;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +32,9 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class UriTemplate {
 
-    private static StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
+    private static StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
+
     private final String template;
     private final Pattern pattern;
     private final List<String> names = new ArrayList<>();

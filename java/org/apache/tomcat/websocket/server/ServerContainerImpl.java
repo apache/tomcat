@@ -36,7 +36,6 @@ import org.apache.tomcat.websocket.WsSession;
 import org.apache.tomcat.websocket.WsWebSocketContainer;
 import org.apache.tomcat.websocket.pojo.PojoEndpointConfiguration;
 import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
-import org.apache.tomcat.websocket.pojo.UriTemplate;
 
 /**
  * Provides a per class loader (i.e. per web application) instance of a
