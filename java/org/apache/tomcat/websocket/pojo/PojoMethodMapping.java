@@ -19,7 +19,6 @@ package org.apache.tomcat.websocket.pojo;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -50,20 +49,13 @@ public class PojoMethodMapping {
     private final PojoPathParam[] onErrorParams;
     private final Set<MessageMethod> onMessage = new HashSet<>();
     private final String wsPath;
-    private final UriTemplate template;
 
 
-    public PojoMethodMapping(Class<?> clazzPojo, String wsPath,
-            String servletPath) {
+    public PojoMethodMapping(Class<?> clazzPojo, String wsPath) {
         this.wsPath = wsPath;
         Method open = null;
         Method close = null;
         Method error = null;
-        if (wsPath.length() > servletPath.length()) {
-            template = new UriTemplate(wsPath.substring(servletPath.length() - 2));
-        } else {
-            template = null;
-        }
         for (Method method : clazzPojo.getMethods()) {
             if (open == null &&
                     method.getAnnotation(WebSocketOpen.class) != null) {
@@ -75,7 +67,7 @@ public class PojoMethodMapping {
                     method.getAnnotation(WebSocketError.class) != null) {
                 error = method;
             } else if (method.getAnnotation(WebSocketMessage.class) != null) {
-                onMessage.add(new MessageMethod(method, template));
+                onMessage.add(new MessageMethod(method));
             }
         }
         this.onOpen = open;
@@ -97,8 +89,9 @@ public class PojoMethodMapping {
     }
 
 
-    public Object[] getOnOpenArgs(String pathInfo, Session session) {
-        return buildArgs(onOpenParams, template, pathInfo, session, null);
+    public Object[] getOnOpenArgs(Map<String,String> pathParameters,
+            Session session) {
+        return buildArgs(onOpenParams, pathParameters, session, null);
     }
 
 
@@ -107,8 +100,9 @@ public class PojoMethodMapping {
     }
 
 
-    public Object[] getOnCloseArgs(String pathInfo, Session session) {
-        return buildArgs(onCloseParams, template, pathInfo, session, null);
+    public Object[] getOnCloseArgs(Map<String,String> pathParameters,
+            Session session) {
+        return buildArgs(onCloseParams, pathParameters, session, null);
     }
 
 
@@ -117,17 +111,17 @@ public class PojoMethodMapping {
     }
 
 
-    public Object[] getOnErrorArgs(String pathInfo, Session session,
-            Throwable throwable) {
-        return buildArgs(onErrorParams, template, pathInfo, session, throwable);
+    public Object[] getOnErrorArgs(Map<String,String> pathParameters,
+            Session session, Throwable throwable) {
+        return buildArgs(onErrorParams, pathParameters, session, throwable);
     }
 
 
-    public Set<MessageHandler> getMessageHandlers(Object pojo, String pathInfo,
-            Session session) {
+    public Set<MessageHandler> getMessageHandlers(Object pojo,
+            Map<String,String> pathParameters, Session session) {
         Set<MessageHandler> result = new HashSet<>();
         for (MessageMethod messageMethod : onMessage) {
-            result.add(messageMethod.getMessageHandler(pojo, pathInfo, session));
+            result.add(messageMethod.getMessageHandler(pojo, pathParameters, session));
         }
         return result;
     }
@@ -173,15 +167,9 @@ public class PojoMethodMapping {
 
 
     private static Object[] buildArgs(PojoPathParam[] pathParams,
-            UriTemplate template, String pathInfo, Session session,
+            Map<String,String> pathParameters, Session session,
             Throwable throwable) {
         Object[] result = new Object[pathParams.length];
-        Map<String,String> pathValues;
-        if (template != null && pathInfo != null) {
-            pathValues = template.match(pathInfo);
-        } else {
-            pathValues = Collections.EMPTY_MAP;
-        }
         for (int i = 0; i < pathParams.length; i++) {
             Class<?> type = pathParams[i].getType();
             if (type.equals(Session.class)) {
@@ -190,7 +178,7 @@ public class PojoMethodMapping {
                 result[i] = throwable;
             } else {
                 String name = pathParams[i].getName();
-                String value = pathValues.get(name);
+                String value = pathParameters.get(name);
                 if (value == null) {
                     result[i] = null;
                 } else {
@@ -231,7 +219,6 @@ public class PojoMethodMapping {
     private static class MessageMethod {
 
         private final Method m;
-        private final UriTemplate template;
         private int indexString = -1;
         private int indexByteArray = -1;
         private int indexByteBuffer = -1;
@@ -242,9 +229,8 @@ public class PojoMethodMapping {
         private int indexPayload = -1;
 
 
-        public MessageMethod(Method m, UriTemplate template) {
+        public MessageMethod(Method m) {
             this.m = m;
-            this.template = template;
 
             Class<?>[] types = m.getParameterTypes();
             Annotation[][] paramsAnnotations = m.getParameterAnnotations();
@@ -343,21 +329,14 @@ public class PojoMethodMapping {
         }
 
 
-        public MessageHandler getMessageHandler(Object pojo, String pathInfo,
-                Session session) {
+        public MessageHandler getMessageHandler(Object pojo,
+                Map<String,String> pathParameters, Session session) {
             Object[] params = new Object[m.getParameterTypes().length];
-
-            Map<String,String> pathParams;
-            if (template == null) {
-                pathParams = new HashMap<>();
-            } else {
-                pathParams = template.match(pathInfo);
-            }
 
             for (Map.Entry<Integer,PojoPathParam> entry :
                     indexPathParams.entrySet()) {
                 PojoPathParam pathParam = entry.getValue();
-                String valueString = pathParams.get(pathParam.getName());
+                String valueString = pathParameters.get(pathParam.getName());
                 Object value = null;
                 if (valueString != null) {
                     value = coerceToType(pathParam.getType(), valueString);

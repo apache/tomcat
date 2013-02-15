@@ -92,8 +92,10 @@ public class WsServlet extends HttpServlet {
         }
         // Need an Endpoint instance to progress this further
         ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
+        Map<String,String> pathParameters = sc.getPathParameters(
+                req.getServletPath(),  req.getPathInfo());
         ServerEndpointConfiguration sec = sc.getServerEndpointConfiguration(
-                req.getServletPath(), req.getPathInfo());
+                req.getServletPath(), pathParameters);
         // Origin check
         String origin = req.getHeader("Origin");
         if (!sec.checkOrigin(origin)) {
@@ -136,8 +138,8 @@ public class WsServlet extends HttpServlet {
             throw new ServletException(e);
         }
         WsRequest wsRequest = createWsRequest(req);
-        HttpUpgradeHandler wsHandler =
-                new WsProtocolHandler(ep, sec, sc, wsRequest, subProtocol);
+        HttpUpgradeHandler wsHandler = new WsProtocolHandler(ep, sec, sc,
+                wsRequest, subProtocol, pathParameters);
         req.upgrade(wsHandler);
     }
 
