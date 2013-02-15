@@ -48,7 +48,7 @@ public class SmapUtil {
     //*********************************************************************
     // Constants
 
-    public static final String SMAP_ENCODING = "UTF-8";
+    private static final String SMAP_ENCODING = "UTF-8";
 
     //*********************************************************************
     // Public entry points
@@ -458,11 +458,11 @@ public class SmapUtil {
         }
     }
 
-    static class SmapGenVisitor extends Node.Visitor {
+    private static class SmapGenVisitor extends Node.Visitor {
 
         private SmapStratum smap;
-        private boolean breakAtLF;
-        private HashMap<String, SmapStratum> innerClassMap;
+        private final boolean breakAtLF;
+        private final HashMap<String, SmapStratum> innerClassMap;
 
         SmapGenVisitor(SmapStratum s, boolean breakAtLF, HashMap<String, SmapStratum> map) {
             this.smap = s;

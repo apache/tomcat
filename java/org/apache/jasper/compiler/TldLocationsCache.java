@@ -151,10 +151,10 @@ public class TldLocationsCache {
      *    [0] The location
      *    [1] If the location is a jar file, this is the location of the tld.
      */
-    private Hashtable<String, TldLocation> mappings;
+    private final Hashtable<String, TldLocation> mappings;
 
     private volatile boolean initialized;
-    private ServletContext ctxt;
+    private final ServletContext ctxt;
 
     /** Constructor.
      *

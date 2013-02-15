@@ -19,8 +19,8 @@ package org.apache.jasper.compiler;
 
 public class TldLocation {
 
-    private String entryName;
-    private JarResource jar;
+    private final String entryName;
+    private final JarResource jar;
 
     public TldLocation(String entryName) {
         this(entryName, (JarResource)null);
