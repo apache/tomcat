@@ -21,11 +21,11 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestPojoUriTemplate {
+public class TestUriTemplate {
 
     @Test
     public void testBasic() throws Exception {
-        PojoUriTemplate t = new PojoUriTemplate("/{a}/{b}");
+        UriTemplate t = new UriTemplate("/{a}/{b}");
         Map<String,String> result = t.match("/foo/bar");
 
         Assert.assertEquals(2, result.size());
@@ -38,14 +38,14 @@ public class TestPojoUriTemplate {
 
     @Test(expected=java.lang.IllegalArgumentException.class)
     public void testOneOfTwo() throws Exception {
-        PojoUriTemplate t = new PojoUriTemplate("/{a}/{b}");
+        UriTemplate t = new UriTemplate("/{a}/{b}");
         t.match("/foo");
     }
 
 
     @Test
     public void testBasicPrefix() throws Exception {
-        PojoUriTemplate t = new PojoUriTemplate("/x{a}/y{b}");
+        UriTemplate t = new UriTemplate("/x{a}/y{b}");
         Map<String,String> result = t.match("/xfoo/ybar");
 
         Assert.assertEquals(2, result.size());
@@ -58,28 +58,28 @@ public class TestPojoUriTemplate {
 
     @Test(expected=java.lang.IllegalArgumentException.class)
     public void testPrefixOneOfTwo() throws Exception {
-        PojoUriTemplate t = new PojoUriTemplate("/x{a}/y{b}");
+        UriTemplate t = new UriTemplate("/x{a}/y{b}");
         t.match("/xfoo");
     }
 
 
     @Test(expected=java.lang.IllegalArgumentException.class)
     public void testPrefixTwoOfTwo() throws Exception {
-        PojoUriTemplate t = new PojoUriTemplate("/x{a}/y{b}");
+        UriTemplate t = new UriTemplate("/x{a}/y{b}");
         t.match("/ybar");
     }
 
 
     @Test(expected=java.lang.IllegalArgumentException.class)
     public void testQuote1() throws Exception {
-        PojoUriTemplate t = new PojoUriTemplate("/.{a}");
+        UriTemplate t = new UriTemplate("/.{a}");
         t.match("/yfoo");
     }
 
 
     @Test
     public void testQuote2() throws Exception {
-        PojoUriTemplate t = new PojoUriTemplate("/.{a}");
+        UriTemplate t = new UriTemplate("/.{a}");
         Map<String,String> result = t.match("/.foo");
 
         Assert.assertEquals(1, result.size());

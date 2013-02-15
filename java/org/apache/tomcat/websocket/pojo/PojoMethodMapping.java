@@ -50,7 +50,7 @@ public class PojoMethodMapping {
     private final PojoPathParam[] onErrorParams;
     private final Set<MessageMethod> onMessage = new HashSet<>();
     private final String wsPath;
-    private final PojoUriTemplate template;
+    private final UriTemplate template;
 
 
     public PojoMethodMapping(Class<?> clazzPojo, String wsPath,
@@ -60,7 +60,7 @@ public class PojoMethodMapping {
         Method close = null;
         Method error = null;
         if (wsPath.length() > servletPath.length()) {
-            template = new PojoUriTemplate(wsPath.substring(servletPath.length() - 2));
+            template = new UriTemplate(wsPath.substring(servletPath.length() - 2));
         } else {
             template = null;
         }
@@ -173,7 +173,7 @@ public class PojoMethodMapping {
 
 
     private static Object[] buildArgs(PojoPathParam[] pathParams,
-            PojoUriTemplate template, String pathInfo, Session session,
+            UriTemplate template, String pathInfo, Session session,
             Throwable throwable) {
         Object[] result = new Object[pathParams.length];
         Map<String,String> pathValues;
@@ -231,7 +231,7 @@ public class PojoMethodMapping {
     private static class MessageMethod {
 
         private final Method m;
-        private final PojoUriTemplate template;
+        private final UriTemplate template;
         private int indexString = -1;
         private int indexByteArray = -1;
         private int indexByteBuffer = -1;
@@ -242,7 +242,7 @@ public class PojoMethodMapping {
         private int indexPayload = -1;
 
 
-        public MessageMethod(Method m, PojoUriTemplate template) {
+        public MessageMethod(Method m, UriTemplate template) {
             this.m = m;
             this.template = template;
 
