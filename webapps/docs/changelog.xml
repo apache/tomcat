@@ -74,6 +74,10 @@
         <bug>54203</bug>: Complete the Javadoc for
         <code>javax.servlet.http.Part</code>. (markt)
       </fix>
+      <fix>
+        Correct typos in configuration samples on SSL Configuration page
+        of Tomcat documentation. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
