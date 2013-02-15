@@ -25,15 +25,15 @@ import java.io.PrintWriter;
  * @author Kin-man Chung
  */
 public class ServletWriter {
-    public static final int TAB_WIDTH = 2;
-    public static final String SPACES = "                              ";
+    private static final int TAB_WIDTH = 2;
+    private static final String SPACES = "                              ";
 
     // Current indent level:
     private int indent = 0;
     private int virtual_indent = 0;
 
     // The sink writer:
-    PrintWriter writer;
+    private final PrintWriter writer;
 
     // servlet line numbers start from 1
     private int javaLine = 1;

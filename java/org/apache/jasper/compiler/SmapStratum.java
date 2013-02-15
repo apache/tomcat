@@ -36,7 +36,7 @@ public class SmapStratum {
      * Represents a single LineSection in an SMAP, associated with
      * a particular stratum.
      */
-    public static class LineInfo {
+    private static class LineInfo {
         private int inputStartLine = -1;
         private int outputStartLine = -1;
         private int lineFileID = 0;
@@ -115,10 +115,10 @@ public class SmapStratum {
     //*********************************************************************
     // Private state
 
-    private String stratumName;
-    private List<String> fileNameList;
-    private List<String> filePathList;
-    private List<LineInfo> lineData;
+    private final String stratumName;
+    private final List<String> fileNameList;
+    private final List<String> filePathList;
+    private final List<LineInfo> lineData;
     private int lastFileID;
 
     //*********************************************************************

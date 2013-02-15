@@ -42,7 +42,7 @@ class ScriptingVariabler {
      * to help identify, for every custom tag, the scripting variables that it
      * needs to declare.
      */
-    static class CustomTagCounter extends Node.Visitor {
+    private static class CustomTagCounter extends Node.Visitor {
 
         private int count;
         private Node.CustomTag parent;
@@ -62,10 +62,10 @@ class ScriptingVariabler {
      * For every custom tag, determines the scripting variables it needs to
      * declare.
      */
-    static class ScriptingVariableVisitor extends Node.Visitor {
+    private static class ScriptingVariableVisitor extends Node.Visitor {
 
-        private ErrorDispatcher err;
-        private Map<String, Integer> scriptVars;
+        private final ErrorDispatcher err;
+        private final Map<String, Integer> scriptVars;
 
         public ScriptingVariableVisitor(ErrorDispatcher err) {
             this.err = err;
