@@ -54,6 +54,8 @@ public class WsSession implements Session {
     private final ClassLoader applicationClassLoader;
     private final WsWebSocketContainer webSocketContainer;
     private final WsRequest request;
+    private final String subProtocol;
+    private final Map<String,String> pathParameters;
 
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
@@ -81,7 +83,8 @@ public class WsSession implements Session {
     public WsSession(Endpoint localEndpoint,
             WsRemoteEndpointBase wsRemoteEndpoint,
             WsWebSocketContainer wsWebSocketContainer,
-            WsRequest request) {
+            WsRequest request, String subProtocol,
+            Map<String,String> pathParameters) {
         this.localEndpoint = localEndpoint;
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);
@@ -96,6 +99,8 @@ public class WsSession implements Session {
         this.sessionIdleTimeout =
                 webSocketContainer.getMaxSessionIdleTimeout();
         this.request = request;
+        this.subProtocol = subProtocol;
+        this.pathParameters = pathParameters;
     }
 
 
@@ -185,8 +190,7 @@ public class WsSession implements Session {
 
     @Override
     public String getNegotiatedSubprotocol() {
-        // TODO Auto-generated method stub
-        return null;
+        return subProtocol;
     }
 
 
@@ -343,8 +347,7 @@ public class WsSession implements Session {
 
     @Override
     public Map<String,String> getPathParameters() {
-        // TODO Auto-generated method stub
-        return null;
+        return pathParameters;
     }
 
 

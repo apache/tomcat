@@ -121,6 +121,7 @@ public class WsWebSocketContainer
         Future<Void> fConnect = channel.connect(sa);
 
         ByteBuffer response;
+        String subProtocol;
         try {
             fConnect.get();
 
@@ -141,8 +142,21 @@ public class WsWebSocketContainer
             HandshakeResponse handshakeResponse =
                     processResponse(response, channel);
             clientEndpointConfiguration.afterResponse(handshakeResponse);
+
+            // Sub-protocol
+            List<String> values = handshakeResponse.getHeaders().get(
+                    Constants.WS_PROTOCOL_HEADER_NAME);
+            if (values == null || values.size() == 0) {
+                subProtocol = null;
+            } else if (values.size() == 1) {
+                subProtocol = values.get(0);
+            } else {
+                throw new DeploymentException(
+                        sm.getString("Sec-WebSocket-Protocol"));
+            }
         } catch (ExecutionException | InterruptedException e) {
-            throw new DeploymentException("", e);
+            throw new DeploymentException(
+                    sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
         }
 
         // Switch to WebSocket
@@ -157,8 +171,9 @@ public class WsWebSocketContainer
                     "wsWebSocketContainer.endpointCreateFail", clazz.getName()),
                     e);
         }
-        WsSession wsSession =
-                new WsSession(endpoint, wsRemoteEndpointClient, this, null);
+
+        WsSession wsSession = new WsSession(endpoint, wsRemoteEndpointClient,
+                this, null, subProtocol, Collections.EMPTY_MAP);
         endpoint.onOpen(wsSession, clientEndpointConfiguration);
         registerSession(clazz, wsSession);
 
