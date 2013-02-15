@@ -57,11 +57,11 @@ class Validator {
     /**
      * A visitor to validate and extract page directive info
      */
-    static class DirectiveVisitor extends Node.Visitor {
+    private static class DirectiveVisitor extends Node.Visitor {
 
-        private PageInfo pageInfo;
+        private final PageInfo pageInfo;
 
-        private ErrorDispatcher err;
+        private final ErrorDispatcher err;
 
         private static final JspUtil.ValidAttribute[] pageDirectiveAttrs = {
             new JspUtil.ValidAttribute("language"),
@@ -414,13 +414,13 @@ class Validator {
     /**
      * A visitor for validating nodes other than page directives
      */
-    static class ValidateVisitor extends Node.Visitor {
+    private static class ValidateVisitor extends Node.Visitor {
 
-        private PageInfo pageInfo;
+        private final PageInfo pageInfo;
 
-        private ErrorDispatcher err;
+        private final ErrorDispatcher err;
 
-        private ClassLoader loader;
+        private final ClassLoader loader;
 
         private final StringBuilder buf = new StringBuilder(32);
 
@@ -1511,7 +1511,7 @@ class Validator {
 
             class FVVisitor extends ELNode.Visitor {
 
-                Node n;
+                private Node n;
 
                 FVVisitor(Node n) {
                     this.n = n;
@@ -1653,7 +1653,7 @@ class Validator {
             }
 
             class MapperELVisitor extends ELNode.Visitor {
-                ValidateFunctionMapper fmapper;
+                private ValidateFunctionMapper fmapper;
 
                 MapperELVisitor(ValidateFunctionMapper fmapper) {
                     this.fmapper = fmapper;
@@ -1705,9 +1705,9 @@ class Validator {
     /**
      * A visitor for validating TagExtraInfo classes of all tags
      */
-    static class TagExtraInfoVisitor extends Node.Visitor {
+    private static class TagExtraInfoVisitor extends Node.Visitor {
 
-        private ErrorDispatcher err;
+        private final ErrorDispatcher err;
 
         /*
          * Constructor

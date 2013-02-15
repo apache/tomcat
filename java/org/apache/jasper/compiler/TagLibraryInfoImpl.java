@@ -65,13 +65,13 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
     // Logger
     private final Log log = LogFactory.getLog(TagLibraryInfoImpl.class);
 
-    private JspCompilationContext ctxt;
+    private final JspCompilationContext ctxt;
 
-    private PageInfo pi;
+    private final PageInfo pi;
 
-    private ErrorDispatcher err;
+    private final ErrorDispatcher err;
 
-    private ParserController parserController;
+    private final ParserController parserController;
 
     private final void print(String name, String value, PrintWriter w) {
         if (value != null) {
@@ -761,5 +761,5 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         return tlv.validate(getPrefixString(), uri, thePage);
     }
 
-    protected TagLibraryValidator tagLibraryValidator;
+    private TagLibraryValidator tagLibraryValidator;
 }

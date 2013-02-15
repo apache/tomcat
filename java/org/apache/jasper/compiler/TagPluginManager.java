@@ -44,7 +44,7 @@ public class TagPluginManager {
 
     private boolean initialized = false;
     private HashMap<String, TagPlugin> tagPlugins = null;
-    private ServletContext ctxt;
+    private final ServletContext ctxt;
     private PageInfo pageInfo;
 
     public TagPluginManager(ServletContext ctxt) {
@@ -172,11 +172,11 @@ public class TagPluginManager {
         tagPlugin.doTag(tagPluginContext);
     }
 
-    static class TagPluginContextImpl implements TagPluginContext {
-        private Node.CustomTag node;
+    private static class TagPluginContextImpl implements TagPluginContext {
+        private final Node.CustomTag node;
         private Node.Nodes curNodes;
-        private PageInfo pageInfo;
-        private HashMap<String, Object> pluginAttributes;
+        private final PageInfo pageInfo;
+        private final HashMap<String, Object> pluginAttributes;
 
         TagPluginContextImpl(Node.CustomTag n, PageInfo pageInfo) {
             this.node = n;
