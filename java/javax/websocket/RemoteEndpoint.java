@@ -31,8 +31,11 @@ public interface RemoteEndpoint {
      * block until any currently batched messages have been written.
      *
      * @param batchingAllowed   New setting
+     * @throws IOException      If changing the value resulted in a call to
+     *                          {@link #flushBatch()} and that call threw an
+     *                          {@link IOException}.
      */
-    void setBatchingAllowed(boolean batchingAllowed);
+    void setBatchingAllowed(boolean batchingAllowed) throws IOException;
 
     /**
      * Obtains the current batching status of the endpoint.
