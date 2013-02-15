@@ -52,16 +52,18 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
     private final ClassLoader applicationClassLoader;
     private final ServerContainerImpl webSocketContainer;
     private final WsRequest request;
+    private final String subProtocol;
 
     private WsSession wsSession;
 
 
     public WsProtocolHandler(Endpoint ep, EndpointConfiguration endpointConfig,
-            ServerContainerImpl wsc, WsRequest request) {
+            ServerContainerImpl wsc, WsRequest request, String subProtocol) {
         this.ep = ep;
         this.endpointConfig = endpointConfig;
         this.webSocketContainer = wsc;
         this.request = request;
+        this.subProtocol = subProtocol;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
@@ -86,8 +88,9 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
         try {
             WsRemoteEndpointServer wsRemoteEndpointServer =
                     new WsRemoteEndpointServer(sos, webSocketContainer);
+            // TODO Replace null with path parameter map
             wsSession = new WsSession(ep, wsRemoteEndpointServer,
-                    webSocketContainer, request);
+                    webSocketContainer, request, subProtocol, null);
             WsFrameServer wsFrame = new WsFrameServer(
                     sis,
                     wsSession);

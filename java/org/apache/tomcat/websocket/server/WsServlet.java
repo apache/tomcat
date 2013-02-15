@@ -137,7 +137,7 @@ public class WsServlet extends HttpServlet {
         }
         WsRequest wsRequest = createWsRequest(req);
         HttpUpgradeHandler wsHandler =
-                new WsProtocolHandler(ep, sec, sc, wsRequest);
+                new WsProtocolHandler(ep, sec, sc, wsRequest, subProtocol);
         req.upgrade(wsHandler);
     }
 
