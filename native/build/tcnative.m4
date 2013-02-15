@@ -33,10 +33,12 @@ AC_DEFUN(TCN_FIND_APR,[
   sapr_version="`echo $sapr_pversion|sed -e 's/\([a-z]*\)$/.\1/'`"
   tc_save_IFS=$IFS; IFS=.; set $sapr_version; IFS=$tc_save_IFS
   if test "${1}" -lt "1"; then
-    AC_MSG_ERROR(You need APR version 1.3.0 or newer installed.)
+    AC_MSG_ERROR(You need APR version 1.2.0 or newer installed. For optimal performance version 1.3.0 or newer is needed.)
   else
-    if test "${2}" -lt "3"; then
-      AC_MSG_ERROR(You need APR version 1.3.0 or newer installed.)
+    if test "${2}" -lt "2"; then
+      AC_MSG_ERROR(You need APR version 1.2.0 or newer installed. For optimal performance version 1.3.0 or newer is needed.)
+    elif test "${2}" -lt "3"; then
+      AC_MSG_WARN(For optimal performance you need APR version 1.3.0 or newer installed.)
     fi
   fi
 

@@ -38,6 +38,14 @@
 </section>
 <section name="Changes between 1.1.26 and 1.1.27">
   <changelog>
+    <update>
+      Minimum supported APR version is now again 1.2.0. Version 1.3.0
+      of APR improves performance. (rjung)
+    </update>
+  </changelog>
+</section>
+<section name="Changes between 1.1.26 and 1.1.27">
+  <changelog>
     <fix>
       <bug>54513</bug>: Fix regression in pollset return value. (mturk)
     </fix>

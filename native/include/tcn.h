@@ -51,6 +51,21 @@
 #include <unistd.h>
 #endif
 
+#if !defined(APR_POLLSET_NOCOPY)
+/* Add missing API */
+#define APR_RING_FOREACH(ep, head, elem, link)                          \
+    for (ep = APR_RING_FIRST(head);                                     \
+         ep != APR_RING_SENTINEL(head, elem, link);                     \
+         ep = APR_RING_NEXT(ep, link))
+
+#define APR_RING_FOREACH_SAFE(ep1, ep2, head, elem, link)               \
+    for (ep1 = APR_RING_FIRST(head), ep2 = APR_RING_NEXT(ep1, link);    \
+         ep1 != APR_RING_SENTINEL(head, elem, link);                    \
+         ep1 = ep2, ep2 = APR_RING_NEXT(ep1, link))
+
+#define APR_POLLSET_NOCOPY  0
+#endif 
+
 #include "tcn_api.h"
 
 
