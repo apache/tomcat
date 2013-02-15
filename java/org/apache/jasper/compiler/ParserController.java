@@ -44,9 +44,9 @@ class ParserController implements TagConstants {
 
     private static final String CHARSET = "charset=";
 
-    private JspCompilationContext ctxt;
-    private Compiler compiler;
-    private ErrorDispatcher err;
+    private final JspCompilationContext ctxt;
+    private final Compiler compiler;
+    private final ErrorDispatcher err;
 
     /*
      * Indicates the syntax (XML or standard) of the file being processed
@@ -57,7 +57,7 @@ class ParserController implements TagConstants {
      * A stack to keep track of the 'current base directory'
      * for include directives that refer to relative paths.
      */
-    private Stack<String> baseDirStack = new Stack<>();
+    private final Stack<String> baseDirStack = new Stack<>();
 
     private boolean isEncodingSpecifiedInProlog;
     private boolean isBomPresent;
