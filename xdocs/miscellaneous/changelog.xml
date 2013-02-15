@@ -36,7 +36,7 @@
   new documentation project for Tomcat Native was started.
   </p>
 </section>
-<section name="Changes between 1.1.26 and 1.1.27">
+<section name="Changes between 1.1.27 and 1.1.28">
   <changelog>
     <update>
       Minimum supported APR version is now again 1.2.0. Version 1.3.0
