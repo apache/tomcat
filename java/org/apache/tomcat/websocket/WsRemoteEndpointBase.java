@@ -45,6 +45,10 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
 
+    private static org.apache.juli.logging.Log log =
+            org.apache.juli.logging.LogFactory.getLog(
+                    WsRemoteEndpointBase.class);
+
     private boolean messagePartInProgress = false;
     private Queue<MessagePart> messagePartQueue = new ArrayDeque<>();
     private final Object messagePartLock = new Object();
@@ -80,16 +84,11 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
 
     @Override
-    public void setBatchingAllowed(boolean batchingAllowed) {
+    public void setBatchingAllowed(boolean batchingAllowed) throws IOException {
         boolean oldValue = this.batchingAllowed.getAndSet(batchingAllowed);
 
         if (oldValue && !batchingAllowed) {
-            // Just disabled batched. Must flush.
-            try {
-                flushBatch();
-            } catch (IOException e) {
-                // TODO Log this? Runtime exception? Something else?
-            }
+            flushBatch();
         }
     }
 
@@ -234,7 +233,12 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
         synchronized (messagePartLock) {
             if (Constants.OPCODE_CLOSE == mp.getOpCode()) {
-                setBatchingAllowed(false);
+                try {
+                    setBatchingAllowed(false);
+                } catch (IOException e) {
+                    log.warn(sm.getString(
+                            "wsRemoteEndpoint.flushOnCloseFailed"), e);
+                }
             }
             if (messagePartInProgress) {
                 if (!Util.isControl(opCode)) {
@@ -417,33 +421,6 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
             endpoint.endMessage(handler, result, dataMessage);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     @Override
