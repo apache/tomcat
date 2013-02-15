@@ -18,6 +18,7 @@ package org.apache.tomcat.websocket.server;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
@@ -53,17 +54,20 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
     private final ServerContainerImpl webSocketContainer;
     private final WsRequest request;
     private final String subProtocol;
+    private final Map<String,String> pathParameters;
 
     private WsSession wsSession;
 
 
     public WsProtocolHandler(Endpoint ep, EndpointConfiguration endpointConfig,
-            ServerContainerImpl wsc, WsRequest request, String subProtocol) {
+            ServerContainerImpl wsc, WsRequest request, String subProtocol,
+            Map<String,String> pathParameters) {
         this.ep = ep;
         this.endpointConfig = endpointConfig;
         this.webSocketContainer = wsc;
         this.request = request;
         this.subProtocol = subProtocol;
+        this.pathParameters = pathParameters;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
@@ -88,9 +92,8 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
         try {
             WsRemoteEndpointServer wsRemoteEndpointServer =
                     new WsRemoteEndpointServer(sos, webSocketContainer);
-            // TODO Replace null with path parameter map
             wsSession = new WsSession(ep, wsRemoteEndpointServer,
-                    webSocketContainer, request, subProtocol, null);
+                    webSocketContainer, request, subProtocol, pathParameters);
             WsFrameServer wsFrame = new WsFrameServer(
                     sis,
                     wsSession);

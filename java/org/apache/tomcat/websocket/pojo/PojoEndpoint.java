@@ -17,6 +17,7 @@
 package org.apache.tomcat.websocket.pojo;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
@@ -32,7 +33,7 @@ import javax.websocket.Session;
 public class PojoEndpoint extends Endpoint {
 
     private Object pojo;
-    private String pathInfo;
+    private Map<String,String> pathParameters;
     private PojoMethodMapping methodMapping;
 
 
@@ -43,13 +44,13 @@ public class PojoEndpoint extends Endpoint {
                 (PojoEndpointConfiguration) endpointConfiguration;
 
         pojo = pec.createPojo();
-        pathInfo = pec.getPathInfo();
+        pathParameters = pec.getPathParameters();
         methodMapping = pec.getMethodMapping();
 
         if (methodMapping.getOnOpen() != null) {
             try {
                 methodMapping.getOnOpen().invoke(pojo,
-                        methodMapping.getOnOpenArgs(pathInfo, session));
+                        methodMapping.getOnOpenArgs(pathParameters, session));
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
                 // TODO Auto-generated catch block
@@ -57,7 +58,7 @@ public class PojoEndpoint extends Endpoint {
             }
         }
         for (MessageHandler mh : methodMapping.getMessageHandlers(pojo,
-                pathInfo, session)) {
+                pathParameters, session)) {
             session.addMessageHandler(mh);
         }
     }
@@ -68,7 +69,7 @@ public class PojoEndpoint extends Endpoint {
         if (methodMapping.getOnClose() != null) {
             try {
                 methodMapping.getOnClose().invoke(pojo,
-                        methodMapping.getOnCloseArgs(pathInfo, session));
+                        methodMapping.getOnCloseArgs(pathParameters, session));
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
                 // TODO Auto-generated catch block
@@ -84,7 +85,7 @@ public class PojoEndpoint extends Endpoint {
             try {
                 methodMapping.getOnError().invoke(
                         pojo,
-                        methodMapping.getOnErrorArgs(pathInfo, session,
+                        methodMapping.getOnErrorArgs(pathParameters, session,
                                 throwable));
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {

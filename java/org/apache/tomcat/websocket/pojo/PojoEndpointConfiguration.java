@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.websocket.pojo;
 
+import java.util.Map;
+
 import javax.websocket.server.DefaultServerConfiguration;
 
 /**
@@ -28,15 +30,15 @@ public class PojoEndpointConfiguration extends DefaultServerConfiguration {
 
     private final Class<?> pojoClass;
     private final PojoMethodMapping methodMapping;
-    private final String pathInfo;
+    private final Map<String,String> pathParameters;
 
 
     public PojoEndpointConfiguration(Class<?> pojoClass,
-            PojoMethodMapping methodMapping, String pathInfo) {
+            PojoMethodMapping methodMapping, Map<String,String> pathParameters) {
         super(PojoEndpoint.class, methodMapping.getWsPath());
         this.pojoClass = pojoClass;
         this.methodMapping = methodMapping;
-        this.pathInfo = pathInfo;
+        this.pathParameters = pathParameters;
     }
 
 
@@ -49,8 +51,8 @@ public class PojoEndpointConfiguration extends DefaultServerConfiguration {
     }
 
 
-    public String getPathInfo() {
-        return pathInfo;
+    public Map<String,String> getPathParameters() {
+        return pathParameters;
     }
 
 

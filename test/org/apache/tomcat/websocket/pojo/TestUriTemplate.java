@@ -86,4 +86,13 @@ public class TestUriTemplate {
         Assert.assertTrue(result.containsKey("a"));
         Assert.assertEquals("foo", result.get("a"));
     }
+
+
+    @Test
+    public void testNoParams() throws Exception {
+        UriTemplate t = new UriTemplate("/foo/bar");
+        Map<String,String> result = t.match("/foo/bar");
+
+        Assert.assertEquals(0, result.size());
+    }
 }

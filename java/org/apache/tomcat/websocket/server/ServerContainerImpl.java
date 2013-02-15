@@ -18,6 +18,7 @@ package org.apache.tomcat.websocket.server;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,6 +36,7 @@ import org.apache.tomcat.websocket.WsSession;
 import org.apache.tomcat.websocket.WsWebSocketContainer;
 import org.apache.tomcat.websocket.pojo.PojoEndpointConfiguration;
 import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
+import org.apache.tomcat.websocket.pojo.UriTemplate;
 
 /**
  * Provides a per class loader (i.e. per web application) instance of a
@@ -75,6 +77,8 @@ public class ServerContainerImpl extends WsWebSocketContainer {
 
     private volatile ServletContext servletContext = null;
     private Map<String,ServerEndpointConfiguration> configMap =
+            new ConcurrentHashMap<>();
+    private Map<String,UriTemplate> templateMap =
             new ConcurrentHashMap<>();
     private Map<String,Class<?>> pojoMap = new ConcurrentHashMap<>();
     private Map<Class<?>,PojoMethodMapping> pojoMethodMap =
@@ -139,7 +143,16 @@ public class ServerContainerImpl extends WsWebSocketContainer {
                     endpointClass.getName(), path,
                     servletContext.getContextPath()));
         }
-        configMap.put(servletPath.substring(0, servletPath.length() - 2), sec);
+
+        // Remove the trailing /* before adding it to the map
+        String mapPath = servletPath.substring(0, servletPath.length() - 2);
+
+        if (path.length() > servletPath.length()) {
+            templateMap.put(mapPath,
+                    new UriTemplate(path.substring(mapPath.length())));
+        }
+
+        configMap.put(mapPath, sec);
         addWsServletMapping(servletPath);
     }
 
@@ -172,11 +185,18 @@ public class ServerContainerImpl extends WsWebSocketContainer {
             log.debug(sm.getString("serverContainer.pojoDeploy",
                     pojo.getName(), wsPath, servletContext.getContextPath()));
         }
+
         String servletPath = getServletPath(wsPath);
         // Remove the trailing /* before adding it to the map
-        pojoMap.put(servletPath.substring(0, servletPath.length() - 2), pojo);
-        pojoMethodMap.put(pojo,
-                new PojoMethodMapping(pojo, wsPath, servletPath));
+        String mapPath = servletPath.substring(0, servletPath.length() - 2);
+
+        if (wsPath.length() > servletPath.length()) {
+            templateMap.put(mapPath,
+                    new UriTemplate(wsPath.substring(mapPath.length())));
+        }
+
+        pojoMap.put(mapPath, pojo);
+        pojoMethodMap.put(pojo, new PojoMethodMapping(pojo, wsPath));
         addWsServletMapping(servletPath);
     }
 
@@ -193,7 +213,7 @@ public class ServerContainerImpl extends WsWebSocketContainer {
 
 
     public ServerEndpointConfiguration getServerEndpointConfiguration(
-            String servletPath, String pathInfo) {
+            String servletPath, Map<String,String> pathParameters) {
         ServerEndpointConfiguration sec = configMap.get(servletPath);
         if (sec != null) {
             return sec;
@@ -204,12 +224,23 @@ public class ServerContainerImpl extends WsWebSocketContainer {
             if (methodMapping != null) {
                 PojoEndpointConfiguration pojoSec =
                         new PojoEndpointConfiguration(pojo, methodMapping,
-                                pathInfo);
+                                pathParameters);
                 return pojoSec;
             }
         }
         throw new IllegalStateException(sm.getString(
                 "serverContainer.missingEndpoint", servletPath));
+    }
+
+
+    public Map<String,String> getPathParameters(String servletPath,
+            String pathInfo) {
+        UriTemplate template = templateMap.get(servletPath);
+        if (template == null) {
+            return Collections.EMPTY_MAP;
+        } else {
+            return template.match(pathInfo);
+        }
     }
 
 
