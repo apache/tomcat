@@ -287,22 +287,19 @@ public class WsSession implements Session {
             try {
                 wsRemoteEndpoint.startMessageBlock(
                         Constants.OPCODE_CLOSE, msg, true);
-            } catch (IOException ioe) {
-                // Unable to send close message.
-                // TODO - Ignore?
-            }
-
-            webSocketContainer.unregisterSession(
-                    localEndpoint.getClass(), this);
-
-            // Fire the onClose event
-            Thread t = Thread.currentThread();
-            ClassLoader cl = t.getContextClassLoader();
-            t.setContextClassLoader(applicationClassLoader);
-            try {
-                localEndpoint.onClose(this, closeReason);
             } finally {
-                t.setContextClassLoader(cl);
+                webSocketContainer.unregisterSession(
+                        localEndpoint.getClass(), this);
+
+                // Fire the onClose event
+                Thread t = Thread.currentThread();
+                ClassLoader cl = t.getContextClassLoader();
+                t.setContextClassLoader(applicationClassLoader);
+                try {
+                    localEndpoint.onClose(this, closeReason);
+                } finally {
+                    t.setContextClassLoader(cl);
+                }
             }
         }
     }
