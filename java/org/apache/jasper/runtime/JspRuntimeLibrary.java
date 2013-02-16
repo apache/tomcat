@@ -59,12 +59,12 @@ public class JspRuntimeLibrary {
     protected static class PrivilegedIntrospectHelper
         implements PrivilegedExceptionAction<Void> {
 
-        private Object bean;
-        private String prop;
-        private String value;
-        private ServletRequest request;
-        private String param;
-        private boolean ignoreMethodNF;
+        private final Object bean;
+        private final String prop;
+        private final String value;
+        private final ServletRequest request;
+        private final String param;
+        private final boolean ignoreMethodNF;
 
         PrivilegedIntrospectHelper(Object bean, String prop,
                                    String value, ServletRequest request,

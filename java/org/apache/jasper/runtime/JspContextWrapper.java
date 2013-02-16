@@ -81,7 +81,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 
     private ELContext elContext = null;
 
-    private PageContext rootJspCtxt;
+    private final PageContext rootJspCtxt;
 
     public JspContextWrapper(JspContext jspContext,
             ArrayList<String> nestedVars, ArrayList<String> atBeginVars,

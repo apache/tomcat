@@ -56,16 +56,6 @@ public class JspWriterImpl extends JspWriter {
     }
 
     /**
-     * Create a buffered character-output stream that uses a default-sized
-     * output buffer.
-     *
-     * @param  response  A Servlet Response
-     */
-    public JspWriterImpl(ServletResponse response) {
-        this(response, Constants.DEFAULT_BUFFER_SIZE, true);
-    }
-
-    /**
      * Create a new buffered character-output stream that uses an output
      * buffer of the given size.
      *
@@ -340,7 +330,8 @@ public class JspWriterImpl extends JspWriter {
     }
 
 
-    static final String lineSeparator = System.getProperty("line.separator");
+    private static final String lineSeparator =
+    		System.getProperty("line.separator");
 
     /**
      * Write a line separator.  The line separator string is defined by the
