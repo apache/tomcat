@@ -54,7 +54,7 @@ public class XMLStringBuffer
     //
 
     /** Default buffer size (32). */
-    public static final int DEFAULT_SIZE = 32;
+    private static final int DEFAULT_SIZE = 32;
 
     //
     // Constructors
