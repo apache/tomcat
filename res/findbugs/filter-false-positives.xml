@@ -431,6 +431,12 @@
     <Class name="org.apache.tomcat.util.threads.ThreadPoolExecutor" />
     <Bug code="Nm" />
   </Match>
+  <Match>
+    <!-- Object creation will trigger input processing. -->
+    <Class name="org.apache.tomcat.websocket.WsWebSocketContainer" />
+    <Method name="connectToServer" />
+    <Bug code="DLS" />
+  </Match>
 
   <!-- Example code -->
   <Match>
