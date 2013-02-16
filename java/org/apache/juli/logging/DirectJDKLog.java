@@ -25,9 +25,6 @@ import java.util.logging.Logger;
 
 /**
  * Hardcoded java.util.logging commons-logging implementation.
- *
- * In addition, it curr
- *
  */
 class DirectJDKLog implements Log {
     // no reason to hide this - but good reasons to not hide
