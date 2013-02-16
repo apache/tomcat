@@ -83,7 +83,7 @@ public class PageContextImpl extends PageContext {
     private String errorPageURL;
 
     // page-scope attributes
-    private transient HashMap<String, Object> attributes;
+    private final transient HashMap<String, Object> attributes;
 
     // per-request state
     private transient ServletRequest request;

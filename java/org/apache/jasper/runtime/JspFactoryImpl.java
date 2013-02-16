@@ -174,7 +174,7 @@ public class JspFactoryImpl extends JspFactory {
         }
     }
 
-    protected static final class PageContextPool  {
+    private static final class PageContextPool  {
 
         private final PageContext[] pool;
 
