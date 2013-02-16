@@ -45,13 +45,13 @@ public class UTF8Reader
     //
 
     /** Input stream. */
-    protected InputStream fInputStream;
+    private final InputStream fInputStream;
 
     /** Byte buffer. */
-    protected byte[] fBuffer;
+    private final byte[] fBuffer;
 
     /** Offset into buffer. */
-    protected int fOffset;
+    private int fOffset;
 
     /** Surrogate character. */
     private int fSurrogate = -1;

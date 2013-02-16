@@ -38,10 +38,10 @@ public class ASCIIReader extends Reader {
     //
 
     /** Input stream. */
-    protected InputStream fInputStream;
+    private final InputStream fInputStream;
 
     /** Byte buffer. */
-    protected byte[] fBuffer;
+    private final byte[] fBuffer;
 
     //
     // Constructors

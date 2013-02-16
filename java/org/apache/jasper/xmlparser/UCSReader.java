@@ -42,7 +42,7 @@ public class UCSReader extends Reader {
      * since it's reasonable to surmise that the average UCS-4-encoded
      * file should be 4 times as large as the average ASCII-encoded file).
      */
-    public static final int DEFAULT_BUFFER_SIZE = 8192;
+    private static final int DEFAULT_BUFFER_SIZE = 8192;
 
     public static final short UCS2LE = 1;
     public static final short UCS2BE = 2;
@@ -54,13 +54,13 @@ public class UCSReader extends Reader {
     //
 
     /** Input stream. */
-    protected InputStream fInputStream;
+    private final InputStream fInputStream;
 
     /** Byte buffer. */
-    protected byte[] fBuffer;
+    private final byte[] fBuffer;
 
     // what kind of data we're dealing with
-    protected short fEncoding;
+    private final short fEncoding;
 
     //
     // Constructors
