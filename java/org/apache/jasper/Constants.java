@@ -48,11 +48,6 @@ public class Constants {
         System.getProperty("org.apache.jasper.Constants.SERVICE_METHOD_NAME", "_jspService");
 
     /**
-     * Default servlet content type.
-     */
-    public static final String SERVLET_CONTENT_TYPE = "text/html";
-
-    /**
      * These classes/packages are automatically imported by the
      * generated code.
      */
@@ -214,12 +209,6 @@ public class Constants {
      * the tomcat product installation path
      */
     public static final String CATALINA_HOME_PROP = "catalina.home";
-
-    /**
-     * Name of the system property containing
-     * the tomcat instance installation path
-     */
-    public static final String CATALINA_BASE_PROP = "catalina.base";
 
     /**
      * Name of system property containing default list of JARs to skip when
