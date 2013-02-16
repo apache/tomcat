@@ -43,15 +43,16 @@ import org.apache.jasper.Constants;
 
 public class Util {
 
-    public static final String VALID_SCHEME_CHAR =
+    private static final String VALID_SCHEME_CHAR =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+.-";
 
     public static final String DEFAULT_ENCODING =
         "ISO-8859-1";
 
-    public static final int HIGHEST_SPECIAL = '>';
+    private static final int HIGHEST_SPECIAL = '>';
 
-    private static char[][] specialCharactersRepresentation = new char[HIGHEST_SPECIAL + 1][];
+    private static final char[][] specialCharactersRepresentation =
+    		new char[HIGHEST_SPECIAL + 1][];
 
     static {
         specialCharactersRepresentation['&'] = "&amp;".toCharArray();
@@ -262,9 +263,9 @@ public class Util {
      */
     public static class ImportResponseWrapper extends HttpServletResponseWrapper{
 
-        private StringWriter sw = new StringWriter();
-        private ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        private ServletOutputStream sos = new ServletOutputStream() {
+        private final StringWriter sw = new StringWriter();
+        private final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        private final ServletOutputStream sos = new ServletOutputStream() {
             @Override
             public void write(int b) throws IOException {
                 bos.write(b);
