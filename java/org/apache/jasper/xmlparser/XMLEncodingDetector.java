@@ -57,7 +57,6 @@ public class XMLEncodingDetector {
     private int fBufferSize = DEFAULT_BUFFER_SIZE;
 
     // org.apache.xerces.impl.XMLEntityManager.ScannedEntity fields
-    private boolean literal;
     private char[] ch = new char[DEFAULT_BUFFER_SIZE];
     private int position;
     private int count;
@@ -608,9 +607,7 @@ public class XMLEncodingDetector {
         // scan literal value
         while (fCurrentEntity.position < fCurrentEntity.count) {
             c = fCurrentEntity.ch[fCurrentEntity.position++];
-            if ((c == quote &&
-                 (!fCurrentEntity.literal || external))
-                || c == '%' || !XMLChar.isContent(c)) {
+            if (c == quote || c == '%' || !XMLChar.isContent(c)) {
                 fCurrentEntity.position--;
                 break;
             }
@@ -621,12 +618,6 @@ public class XMLEncodingDetector {
         // return next character
         if (fCurrentEntity.position != fCurrentEntity.count) {
             c = fCurrentEntity.ch[fCurrentEntity.position];
-            // NOTE: We don't want to accidentally signal the
-            //       end of the literal if we're expanding an
-            //       entity appearing in the literal. -Ac
-            if (c == quote && fCurrentEntity.literal) {
-                c = -1;
-            }
         }
         else {
             c = -1;
