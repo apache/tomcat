@@ -483,11 +483,7 @@ public class EncodingMap {
     //
 
     /** fIANA2JavaMap */
-    protected static final Hashtable<String,String> fIANA2JavaMap =
-            new Hashtable<>();
-
-    /** fJava2IANAMap */
-    protected static final Hashtable<String,String> fJava2IANAMap =
+    private static final Hashtable<String,String> fIANA2JavaMap =
             new Hashtable<>();
 
     //
@@ -866,88 +862,6 @@ public class EncodingMap {
         // REVISIT:
         //   j:CNS11643 -> EUC-TW?
         //   ISO-2022-CN? ISO-2022-CN-EXT?
-
-        // add Java to IANA encoding mappings
-        //fJava2IANAMap.put("8859_1",    "US-ASCII"); // ?
-        fJava2IANAMap.put("ISO8859_1",    "ISO-8859-1");
-        fJava2IANAMap.put("ISO8859_2",    "ISO-8859-2");
-        fJava2IANAMap.put("ISO8859_3",    "ISO-8859-3");
-        fJava2IANAMap.put("ISO8859_4",    "ISO-8859-4");
-        fJava2IANAMap.put("ISO8859_5",    "ISO-8859-5");
-        fJava2IANAMap.put("ISO8859_6",    "ISO-8859-6");
-        fJava2IANAMap.put("ISO8859_7",    "ISO-8859-7");
-        fJava2IANAMap.put("ISO8859_8",    "ISO-8859-8");
-        fJava2IANAMap.put("ISO8859_9",    "ISO-8859-9");
-        fJava2IANAMap.put("ISO8859_13",    "ISO-8859-13");
-        fJava2IANAMap.put("ISO8859_15",    "ISO-8859-15");
-        fJava2IANAMap.put("ISO8859_15_FDIS",    "ISO-8859-15");
-        fJava2IANAMap.put("Big5",      "BIG5");
-        fJava2IANAMap.put("CP037",     "EBCDIC-CP-US");
-        fJava2IANAMap.put("CP273",     "IBM273");
-        fJava2IANAMap.put("CP277",     "EBCDIC-CP-DK");
-        fJava2IANAMap.put("CP278",     "EBCDIC-CP-FI");
-        fJava2IANAMap.put("CP280",     "EBCDIC-CP-IT");
-        fJava2IANAMap.put("CP284",     "EBCDIC-CP-ES");
-        fJava2IANAMap.put("CP285",     "EBCDIC-CP-GB");
-        fJava2IANAMap.put("CP290",     "EBCDIC-JP-KANA");
-        fJava2IANAMap.put("CP297",     "EBCDIC-CP-FR");
-        fJava2IANAMap.put("CP420",     "EBCDIC-CP-AR1");
-        fJava2IANAMap.put("CP424",     "EBCDIC-CP-HE");
-        fJava2IANAMap.put("CP437",     "IBM437");
-        fJava2IANAMap.put("CP500",     "EBCDIC-CP-CH");
-        fJava2IANAMap.put("CP775",     "IBM775");
-        fJava2IANAMap.put("CP850",     "IBM850");
-        fJava2IANAMap.put("CP852",     "IBM852");
-        fJava2IANAMap.put("CP855",     "IBM855");
-        fJava2IANAMap.put("CP857",     "IBM857");
-        fJava2IANAMap.put("CP858",     "IBM00858");
-        fJava2IANAMap.put("CP860",     "IBM860");
-        fJava2IANAMap.put("CP861",     "IBM861");
-        fJava2IANAMap.put("CP862",     "IBM862");
-        fJava2IANAMap.put("CP863",     "IBM863");
-        fJava2IANAMap.put("CP864",     "IBM864");
-        fJava2IANAMap.put("CP865",     "IBM865");
-        fJava2IANAMap.put("CP866",     "IBM866");
-        fJava2IANAMap.put("CP868",     "IBM868");
-        fJava2IANAMap.put("CP869",     "IBM869");
-        fJava2IANAMap.put("CP870",     "EBCDIC-CP-ROECE");
-        fJava2IANAMap.put("CP871",     "EBCDIC-CP-IS");
-        fJava2IANAMap.put("CP918",     "EBCDIC-CP-AR2");
-        fJava2IANAMap.put("CP924",     "IBM00924");
-        fJava2IANAMap.put("CP1026",     "IBM1026");
-        fJava2IANAMap.put("Cp01140",     "IBM01140");
-        fJava2IANAMap.put("Cp01141",     "IBM01141");
-        fJava2IANAMap.put("Cp01142",     "IBM01142");
-        fJava2IANAMap.put("Cp01143",     "IBM01143");
-        fJava2IANAMap.put("Cp01144",     "IBM01144");
-        fJava2IANAMap.put("Cp01145",     "IBM01145");
-        fJava2IANAMap.put("Cp01146",     "IBM01146");
-        fJava2IANAMap.put("Cp01147",     "IBM01147");
-        fJava2IANAMap.put("Cp01148",     "IBM01148");
-        fJava2IANAMap.put("Cp01149",     "IBM01149");
-        fJava2IANAMap.put("EUCJIS",    "EUC-JP");
-        fJava2IANAMap.put("KS_C_5601-1987",          "KS_C_5601-1987");
-        fJava2IANAMap.put("GB2312",    "GB2312");
-        fJava2IANAMap.put("ISO2022KR", "ISO-2022-KR");
-        fJava2IANAMap.put("ISO2022CN", "ISO-2022-CN");
-        fJava2IANAMap.put("JIS",       "ISO-2022-JP");
-        fJava2IANAMap.put("KOI8_R",    "KOI8-R");
-        fJava2IANAMap.put("KSC5601",   "EUC-KR");
-        fJava2IANAMap.put("GB18030",      "GB18030");
-        fJava2IANAMap.put("GBK",       "GBK");
-        fJava2IANAMap.put("SJIS",      "SHIFT_JIS");
-        fJava2IANAMap.put("MS932",      "WINDOWS-31J");
-        fJava2IANAMap.put("UTF8",      "UTF-8");
-        fJava2IANAMap.put("Unicode",   "UTF-16");
-        fJava2IANAMap.put("UnicodeBig",   "UTF-16BE");
-        fJava2IANAMap.put("UnicodeLittle",   "UTF-16LE");
-        fJava2IANAMap.put("JIS0201",  "X0201");
-        fJava2IANAMap.put("JIS0208",  "X0208");
-        fJava2IANAMap.put("JIS0212",  "ISO-IR-159");
-
-        // proposed addition (see above for details):
-        fJava2IANAMap.put("CP1047",    "IBM1047");
-
     }
 
     //
@@ -962,17 +876,6 @@ public class EncodingMap {
     //
 
     /**
-     * Adds an IANA to Java encoding name mapping.
-     *
-     * @param ianaEncoding The IANA encoding name.
-     * @param javaEncoding The Java encoding name.
-     */
-    public static void putIANA2JavaMapping(String ianaEncoding,
-                                           String javaEncoding) {
-        fIANA2JavaMap.put(ianaEncoding, javaEncoding);
-    }
-
-    /**
      * Returns the Java encoding name for the specified IANA encoding name.
      *
      * @param ianaEncoding The IANA encoding name.
@@ -980,43 +883,4 @@ public class EncodingMap {
     public static String getIANA2JavaMapping(String ianaEncoding) {
         return fIANA2JavaMap.get(ianaEncoding);
     }
-
-    /**
-     * Removes an IANA to Java encoding name mapping.
-     *
-     * @param ianaEncoding The IANA encoding name.
-     */
-    public static String removeIANA2JavaMapping(String ianaEncoding) {
-        return fIANA2JavaMap.remove(ianaEncoding);
-    }
-
-    /**
-     * Adds a Java to IANA encoding name mapping.
-     *
-     * @param javaEncoding The Java encoding name.
-     * @param ianaEncoding The IANA encoding name.
-     */
-    public static void putJava2IANAMapping(String javaEncoding,
-                                           String ianaEncoding) {
-        fJava2IANAMap.put(javaEncoding, ianaEncoding);
-    }
-
-    /**
-     * Returns the IANA encoding name for the specified Java encoding name.
-     *
-     * @param javaEncoding The Java encoding name.
-     */
-    public static String getJava2IANAMapping(String javaEncoding) {
-        return fJava2IANAMap.get(javaEncoding);
-    }
-
-    /**
-     * Removes a Java to IANA encoding name mapping.
-     *
-     * @param javaEncoding The Java encoding name.
-     */
-    public static String removeJava2IANAMapping(String javaEncoding) {
-        return fJava2IANAMap.remove(javaEncoding);
-    }
-
 }
