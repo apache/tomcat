@@ -50,10 +50,10 @@ public class XMLEncodingDetector {
     private Reader reader;
 
     // org.apache.xerces.impl.XMLEntityManager fields
-    public static final int DEFAULT_BUFFER_SIZE = 2048;
-    public static final int DEFAULT_XMLDECL_BUFFER_SIZE = 64;
-    private SymbolTable fSymbolTable;
-    private XMLEncodingDetector fCurrentEntity;
+    private static final int DEFAULT_BUFFER_SIZE = 2048;
+    private static final int DEFAULT_XMLDECL_BUFFER_SIZE = 64;
+    private final SymbolTable fSymbolTable;
+    private final XMLEncodingDetector fCurrentEntity;
     private int fBufferSize = DEFAULT_BUFFER_SIZE;
 
     // org.apache.xerces.impl.XMLEntityManager.ScannedEntity fields
@@ -62,15 +62,15 @@ public class XMLEncodingDetector {
     private int count;
 
     // org.apache.xerces.impl.XMLScanner fields
-    private XMLString fString = new XMLString();
-    private XMLStringBuffer fStringBuffer = new XMLStringBuffer();
-    private XMLStringBuffer fStringBuffer2 = new XMLStringBuffer();
+    private final XMLString fString = new XMLString();
+    private final XMLStringBuffer fStringBuffer = new XMLStringBuffer();
+    private final XMLStringBuffer fStringBuffer2 = new XMLStringBuffer();
     private static final String fVersionSymbol = "version";
     private static final String fEncodingSymbol = "encoding";
     private static final String fStandaloneSymbol = "standalone";
 
     // org.apache.xerces.impl.XMLDocumentFragmentScannerImpl fields
-    private String[] fStrings = new String[3];
+    private final String[] fStrings = new String[3];
 
     private ErrorDispatcher err;
 
