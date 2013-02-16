@@ -41,6 +41,8 @@ import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 public class WsSession implements Session {
@@ -48,6 +50,8 @@ public class WsSession implements Session {
     private static final Charset UTF8 = Charset.forName("UTF8");
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
+
+    private final Log log = LogFactory.getLog(WsSession.class);
 
     private final Endpoint localEndpoint;
     private final WsRemoteEndpointBase wsRemoteEndpoint;
@@ -394,7 +398,7 @@ public class WsSession implements Session {
                 close(new CloseReason(CloseCodes.GOING_AWAY,
                         sm.getString("wsSession.timeout")));
             } catch (IOException e) {
-                // TODO Log this?
+            	log.warn(sm.getString("wsSession.expireFailed"), e);
             }
         }
     }
@@ -446,7 +450,7 @@ public class WsSession implements Session {
                     superClassType.getActualTypeArguments()[
                             ((Integer) result).intValue()]);
         } else {
-            // TODO: Something went wrong. Log an error.
+        	// Error will be logged further up the call stack
             return null;
         }
     }
