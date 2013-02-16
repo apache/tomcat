@@ -124,26 +124,26 @@ public class Constants {
      * Public Id and the Resource path (of the cached copy)
      * of the DTDs for tag library descriptors.
      */
-    public static final String TAGLIB_DTD_PUBLIC_ID_11 =
+    private static final String TAGLIB_DTD_PUBLIC_ID_11 =
         "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN";
-    public static final String TAGLIB_DTD_RESOURCE_PATH_11 =
+    private static final String TAGLIB_DTD_RESOURCE_PATH_11 =
         "/javax/servlet/jsp/resources/web-jsptaglibrary_1_1.dtd";
-    public static final String TAGLIB_DTD_PUBLIC_ID_12 =
+    private static final String TAGLIB_DTD_PUBLIC_ID_12 =
         "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN";
-    public static final String TAGLIB_DTD_RESOURCE_PATH_12 =
+    private static final String TAGLIB_DTD_RESOURCE_PATH_12 =
         "/javax/servlet/jsp/resources/web-jsptaglibrary_1_2.dtd";
 
     /**
      * Public Id and the Resource path (of the cached copy)
      * of the DTDs for web application deployment descriptors
      */
-    public static final String WEBAPP_DTD_PUBLIC_ID_22 =
+    private static final String WEBAPP_DTD_PUBLIC_ID_22 =
         "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN";
-    public static final String WEBAPP_DTD_RESOURCE_PATH_22 =
+    private static final String WEBAPP_DTD_RESOURCE_PATH_22 =
         "/javax/servlet/resources/web-app_2_2.dtd";
-    public static final String WEBAPP_DTD_PUBLIC_ID_23 =
+    private static final String WEBAPP_DTD_PUBLIC_ID_23 =
         "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN";
-    public static final String WEBAPP_DTD_RESOURCE_PATH_23 =
+    private static final String WEBAPP_DTD_RESOURCE_PATH_23 =
         "/javax/servlet/resources/web-app_2_3.dtd";
 
     /**
