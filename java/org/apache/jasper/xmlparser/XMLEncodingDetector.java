@@ -61,7 +61,6 @@ public class XMLEncodingDetector {
     private char[] ch = new char[DEFAULT_BUFFER_SIZE];
     private int position;
     private int count;
-    private boolean mayReadChunks = false;
 
     // org.apache.xerces.impl.XMLScanner fields
     private XMLString fString = new XMLString();
@@ -969,11 +968,8 @@ public class XMLEncodingDetector {
         throws IOException {
 
         // read characters
-        int length = fCurrentEntity.mayReadChunks?
-            (fCurrentEntity.ch.length - offset):
-            (DEFAULT_XMLDECL_BUFFER_SIZE);
         int count = fCurrentEntity.reader.read(fCurrentEntity.ch, offset,
-                                               length);
+        		DEFAULT_XMLDECL_BUFFER_SIZE);
 
         // reset count and position
         boolean entityChanged = false;
@@ -1077,9 +1073,6 @@ public class XMLEncodingDetector {
                     return -1;
                 }
                 // better get some more for the voracious reader...
-                if (fCurrentEntity.mayReadChunks) {
-                    return fInputStream.read(b, off, len);
-                }
                 int returnedVal = read();
                 if (returnedVal == -1) {
                     fEndOffset = fOffset;
@@ -1145,8 +1138,7 @@ public class XMLEncodingDetector {
                 if (fOffset == fEndOffset) {
                     return -1;
                 }
-                return fCurrentEntity.mayReadChunks ? fInputStream.available()
-                    : 0;
+                return 0;
             }
             return bytesLeft;
         }
