@@ -667,7 +667,7 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
         @Override
         public SendResult get() throws InterruptedException,
-        ExecutionException {
+        		ExecutionException {
             latch.await();
             return result;
         }
@@ -676,7 +676,10 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
         public SendResult get(long timeout, TimeUnit unit)
                 throws InterruptedException, ExecutionException,
                 TimeoutException {
-            latch.await(timeout, unit);
+            boolean retval = latch.await(timeout, unit);
+            if (retval == false) {
+            	throw new TimeoutException();
+            }
             return result;
         }
     }
