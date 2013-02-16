@@ -271,22 +271,16 @@ public class Util {
                 bos.write(b);
             }
 
-            /**
-             * TODO SERVLET 3.1
-             */
             @Override
             public boolean isReady() {
-                // TODO Auto-generated method stub
+            	// Non-blocking IO not supported
                 return false;
             }
 
-            /**
-             * TODO SERVLET 3.1
-             */
             @Override
             public void setWriteListener(WriteListener listener) {
-                // TODO Auto-generated method stub
-
+            	// Non-blocking IO not supported
+            	throw new UnsupportedOperationException();
             }
 
 
