@@ -52,7 +52,6 @@ public class XMLEncodingDetector {
     // org.apache.xerces.impl.XMLEntityManager fields
     public static final int DEFAULT_BUFFER_SIZE = 2048;
     public static final int DEFAULT_XMLDECL_BUFFER_SIZE = 64;
-    private boolean fAllowJavaEncodings;
     private SymbolTable fSymbolTable;
     private XMLEncodingDetector fCurrentEntity;
     private int fBufferSize = DEFAULT_BUFFER_SIZE;
@@ -245,8 +244,7 @@ public class XMLEncodingDetector {
 
         // check for valid name
         boolean validIANA = XMLChar.isValidIANAEncoding(encoding);
-        boolean validJava = XMLChar.isValidJavaEncoding(encoding);
-        if (!validIANA || (fAllowJavaEncodings && !validJava)) {
+        if (!validIANA) {
             err.jspError("jsp.error.xml.encodingDeclInvalid", encoding);
             // NOTE: AndyH suggested that, on failure, we use ISO Latin 1
             //       because every byte is a valid ISO Latin 1 character.
@@ -262,13 +260,9 @@ public class XMLEncodingDetector {
         // try to use a Java reader
         String javaEncoding = EncodingMap.getIANA2JavaMapping(ENCODING);
         if (javaEncoding == null) {
-            if (fAllowJavaEncodings) {
-                javaEncoding = encoding;
-            } else {
-                err.jspError("jsp.error.xml.encodingDeclInvalid", encoding);
-                // see comment above.
-                javaEncoding = "ISO8859_1";
-            }
+            err.jspError("jsp.error.xml.encodingDeclInvalid", encoding);
+            // see comment above.
+            javaEncoding = "ISO8859_1";
         }
         return new InputStreamReader(inputStream, javaEncoding);
 
