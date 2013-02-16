@@ -68,31 +68,31 @@ public class TreeNode {
      * The attributes of this node, keyed by attribute name,
      * Instantiated only if required.
      */
-    protected HashMap<String,String> attributes = null;
+    private HashMap<String,String> attributes = null;
 
 
     /**
      * The body text associated with this node (if any).
      */
-    protected String body = null;
+    private String body = null;
 
 
     /**
      * The children of this node, instantiated only if required.
      */
-    protected ArrayList<TreeNode> children = null;
+    private ArrayList<TreeNode> children = null;
 
 
     /**
      * The name of this node.
      */
-    protected String name = null;
+    private final String name;
 
 
     /**
      * The parent node of this node.
      */
-    protected TreeNode parent = null;
+    private final TreeNode parent;
 
 
     // --------------------------------------------------------- Public Methods

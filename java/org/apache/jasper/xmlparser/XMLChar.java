@@ -61,19 +61,16 @@ public class XMLChar {
     private static final byte[] CHARS = new byte[1 << 16];
 
     /** Valid character mask. */
-    public static final int MASK_VALID = 0x01;
+    private static final int MASK_VALID = 0x01;
 
     /** Space character mask. */
-    public static final int MASK_SPACE = 0x02;
+    private static final int MASK_SPACE = 0x02;
 
     /** Name start character mask. */
-    public static final int MASK_NAME_START = 0x04;
+    private static final int MASK_NAME_START = 0x04;
 
     /** Name character mask. */
-    public static final int MASK_NAME = 0x08;
-
-    /** Pubid character mask. */
-    public static final int MASK_PUBID = 0x10;
+    private static final int MASK_NAME = 0x08;
 
     /**
      * Content character mask. Special characters are those that can
@@ -83,13 +80,7 @@ public class XMLChar {
      * <p>
      * This is an optimization for the inner loop of character scanning.
      */
-    public static final int MASK_CONTENT = 0x20;
-
-    /** NCName start character mask. */
-    public static final int MASK_NCNAME_START = 0x40;
-
-    /** NCName character mask. */
-    public static final int MASK_NCNAME = 0x80;
+    private static final int MASK_CONTENT = 0x20;
 
     //
     // Static initialization
@@ -727,15 +718,6 @@ public class XMLChar {
     //
 
     /**
-     * Returns true if the specified character is a supplemental character.
-     *
-     * @param c The character to check.
-     */
-    public static boolean isSupplemental(int c) {
-        return (c >= 0x10000 && c <= 0x10FFFF);
-    }
-
-    /**
      * Returns true the supplemental character corresponding to the given
      * surrogates.
      *
@@ -744,24 +726,6 @@ public class XMLChar {
      */
     public static int supplemental(char h, char l) {
         return (h - 0xD800) * 0x400 + (l - 0xDC00) + 0x10000;
-    }
-
-    /**
-     * Returns the high surrogate of a supplemental character
-     *
-     * @param c The supplemental character to "split".
-     */
-    public static char highSurrogate(int c) {
-        return (char) (((c - 0x00010000) >> 10) + 0xD800);
-    }
-
-    /**
-     * Returns the low surrogate of a supplemental character
-     *
-     * @param c The supplemental character to "split".
-     */
-    public static char lowSurrogate(int c) {
-        return (char) (((c - 0x00010000) & 0x3FF) + 0xDC00);
     }
 
     /**
@@ -818,16 +782,6 @@ public class XMLChar {
     } // isContent(int):boolean
 
     /**
-     * Returns true if the specified character can be considered markup.
-     * Markup characters include '&lt;', '&amp;', and '%'.
-     *
-     * @param c The character to check.
-     */
-    public static boolean isMarkup(int c) {
-        return c == '<' || c == '&' || c == '%';
-    } // isMarkup(int):boolean
-
-    /**
      * Returns true if the specified character is a space character
      * as defined by production [3] in the XML 1.0 specification.
      *
@@ -858,114 +812,6 @@ public class XMLChar {
     public static boolean isName(int c) {
         return c < 0x10000 && (CHARS[c] & MASK_NAME) != 0;
     } // isName(int):boolean
-
-    /**
-     * Returns true if the specified character is a valid NCName start
-     * character as defined by production [4] in Namespaces in XML
-     * recommendation.
-     *
-     * @param c The character to check.
-     */
-    public static boolean isNCNameStart(int c) {
-        return c < 0x10000 && (CHARS[c] & MASK_NCNAME_START) != 0;
-    } // isNCNameStart(int):boolean
-
-    /**
-     * Returns true if the specified character is a valid NCName
-     * character as defined by production [5] in Namespaces in XML
-     * recommendation.
-     *
-     * @param c The character to check.
-     */
-    public static boolean isNCName(int c) {
-        return c < 0x10000 && (CHARS[c] & MASK_NCNAME) != 0;
-    } // isNCName(int):boolean
-
-    /**
-     * Returns true if the specified character is a valid Pubid
-     * character as defined by production [13] in the XML 1.0
-     * specification.
-     *
-     * @param c The character to check.
-     */
-    public static boolean isPubid(int c) {
-        return c < 0x10000 && (CHARS[c] & MASK_PUBID) != 0;
-    } // isPubid(int):boolean
-
-    /*
-     * [5] Name ::= (Letter | '_' | ':') (NameChar)*
-     */
-    /**
-     * Check to see if a string is a valid Name according to [5]
-     * in the XML 1.0 Recommendation
-     *
-     * @param name string to check
-     * @return true if name is a valid Name
-     */
-    public static boolean isValidName(String name) {
-        if (name.length() == 0)
-            return false;
-        char ch = name.charAt(0);
-        if( isNameStart(ch) == false)
-           return false;
-        for (int i = 1; i < name.length(); i++ ) {
-           ch = name.charAt(i);
-           if( isName( ch ) == false ){
-              return false;
-           }
-        }
-        return true;
-    } // isValidName(String):boolean
-
-
-    /*
-     * from the namespace rec
-     * [4] NCName ::= (Letter | '_') (NCNameChar)*
-     */
-    /**
-     * Check to see if a string is a valid NCName according to [4]
-     * from the XML Namespaces 1.0 Recommendation
-     *
-     * @param ncName string to check
-     * @return true if name is a valid NCName
-     */
-    public static boolean isValidNCName(String ncName) {
-        if (ncName.length() == 0)
-            return false;
-        char ch = ncName.charAt(0);
-        if( isNCNameStart(ch) == false)
-           return false;
-        for (int i = 1; i < ncName.length(); i++ ) {
-           ch = ncName.charAt(i);
-           if( isNCName( ch ) == false ){
-              return false;
-           }
-        }
-        return true;
-    } // isValidNCName(String):boolean
-
-    /*
-     * [7] Nmtoken ::= (NameChar)+
-     */
-    /**
-     * Check to see if a string is a valid Nmtoken according to [7]
-     * in the XML 1.0 Recommendation
-     *
-     * @param nmtoken string to check
-     * @return true if nmtoken is a valid Nmtoken
-     */
-    public static boolean isValidNmtoken(String nmtoken) {
-        if (nmtoken.length() == 0)
-            return false;
-        for (int i = 0; i < nmtoken.length(); i++ ) {
-           char ch = nmtoken.charAt(i);
-           if(  ! isName( ch ) ){
-              return false;
-           }
-        }
-        return true;
-    } // isValidName(String):boolean
-
 
     // encodings
 
