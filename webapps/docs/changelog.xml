@@ -115,7 +115,7 @@
         <bug>54552</bug>: Servlet 3.1. Implement
         <code>HttpSessionIdListener</code> and
         <code>HttpServletRequest#changeSessionId()</code>. Patch provided by
-        Nick Williams. (markt) 
+        Nick Williams. (markt)
       </add>
     </changelog>
   </subsection>
