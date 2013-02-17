@@ -177,7 +177,7 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
     @Override
     public OutputStream getSendStream() throws IOException {
-        return new WsOuputStream(this);
+        return new WsOutputStream(this);
     }
 
 
@@ -685,12 +685,12 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     }
 
 
-    private static class WsOuputStream extends OutputStream {
+    private static class WsOutputStream extends OutputStream {
 
         private final WsRemoteEndpointBase endpoint;
         private final ByteBuffer buffer = ByteBuffer.allocate(8192);
 
-        public WsOuputStream(WsRemoteEndpointBase endpoint) {
+        public WsOutputStream(WsRemoteEndpointBase endpoint) {
             this.endpoint = endpoint;
         }
 
