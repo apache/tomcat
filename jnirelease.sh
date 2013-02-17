@@ -27,6 +27,7 @@ apr_src_dir=`pwd`/srclib/apr
 JKJNIEXT=""
 JKJNIVER=""
 SVNBASE=https://svn.apache.org/repos/asf/tomcat/native
+TCTRUNK_SVNBASE=https://svn.apache.org/repos/asf/tomcat/trunk
 
 for o
 do
@@ -130,6 +131,23 @@ fi
 echo "Using SVN repo       : \`${JKJNISVN}'"
 echo "Using version        : \`${JKJNIVER}'"
 
+# Checking for recentness of svn:externals
+externals_path=java/org/apache/tomcat
+jni_externals=`svn propget svn:externals $JKJNISVN/$externals_path | \
+    grep $externals_path/jni | \
+    sed -e 's#.*@##' -e 's# .*##'`
+jni_last_changed=`svn info --xml $TCTRUNK_SVNBASE/$externals_path/jni | \
+    tr "\n" " " | \
+    sed -e 's#.*commit  *revision="##' -e 's#".*##'`
+if [ "x$jni_externals" != "x$jni_last_changed" ]; then
+  echo "WARNING: svn:externals for jni in $externals_path is '$jni_externals',"
+  echo "         last changed revision in TC trunk is '$jni_last_changed'."
+  echo "         If you want to correct, cancel script now and run"
+  echo "         'svn propedit svn:externals' on $externals_path to fix"
+  echo "         the revision number."
+  sleep 3
+  exit 1
+fi
 
 JKJNIDIST=tomcat-native-${JKJNIVER}-src
 
