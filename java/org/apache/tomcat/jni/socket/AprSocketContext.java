@@ -76,20 +76,12 @@ public class AprSocketContext {
         public HostInfo getHostInfo(String name, int port, boolean ssl);
     }
 
-    /**
-     * Reads/writes of this size or lower are using Get/SetByteArrayRegion.
-     * Larger reads use Get/ReelaseByteArrayElements.
-     * Larger writes use malloc/free + GetByteArrayRagion.
-     */
-    static final int TCN_BUFFER_SZ = 8192;
-
-    static Logger log = Logger.getLogger("AprSocketCtx");
+    private static final Logger log = Logger.getLogger("AprSocketCtx");
 
     // If interrupt() or thread-safe poll update are not supported - the
     // poll updates will happen after the poll() timeout.
     // The poll timeout with interrupt/thread safe updates can be much higher/
-    static int FALLBACK_POLL_TIME = 2000;
-    static int MAX_POLL_SIZE = 60;
+    private static final int FALLBACK_POLL_TIME = 2000;
 
     // It seems to send the ticket, get server helo / ChangeCipherSpec, but than
     // SSL3_GET_RECORD:decryption failed or bad record mac in s3_pkt.c:480:
@@ -97,29 +89,26 @@ public class AprSocketContext {
     // ( this can save a roundtrip and CPU on TLS handshake )
     boolean USE_TICKETS = false;
 
-    boolean useFinalizer = true;
+    private final AprSocket END = new AprSocket(this);
 
-    final AprSocket END = new AprSocket(this);
+    private final static AtomicInteger contextNumber = new AtomicInteger();
+    private int contextId;
 
-    static AtomicInteger contextNumber = new AtomicInteger();
-    int contextId;
-
-    AtomicInteger threadNumber = new AtomicInteger();
+    private final AtomicInteger threadNumber = new AtomicInteger();
 
     /**
      * For now - single acceptor thread per connector.
      */
-    AcceptorThread acceptor;
-    AcceptorDispatchThread acceptorDispatch;
+    private AcceptorThread acceptor;
+    private AcceptorDispatchThread acceptorDispatch;
 
     // APR/JNI is thread safe
-    boolean threadSafe = true;
+    private boolean threadSafe = true;
 
     /**
      * Pollers.
      */
-    List<AprPoller> pollers = new ArrayList<>();
-    static int pollerCnt = 0;
+    private final List<AprPoller> pollers = new ArrayList<>();
 
     // Set on all accepted or connected sockets.
     // TODO: add the other properties
@@ -131,9 +120,10 @@ public class AprSocketContext {
 
     // onSocket() will be called in accept thread.
     // If false: use executor ( but that may choke the acceptor thread )
-    protected boolean nonBlockingAccept = false;
+    private boolean nonBlockingAccept = false;
 
-    BlockingQueue<AprSocket> acceptedQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<AprSocket> acceptedQueue =
+    		new LinkedBlockingQueue<>();
 
     /**
      * Root APR memory pool.
@@ -148,64 +138,62 @@ public class AprSocketContext {
     TlsCertVerifier tlsCertVerifier;
 
     //
-    int connectTimeout =  20000;
-    int defaultTimeout = 100000;
+    final int connectTimeout =  20000;
+    final int defaultTimeout = 100000;
+    // TODO: Use this
+    final int keepAliveTimeout = 20000;
 
-    int keepAliveTimeout = 20000;
-
-    AtomicInteger open = new AtomicInteger();
+    final AtomicInteger open = new AtomicInteger();
 
     /**
      * Poll interval, in microseconds. If the platform doesn't support
      * poll interrupt - it'll take this time to stop the poller.
      *
      */
-    protected int pollTime = 5 * 1000000;
+    private int pollTime = 5 * 1000000;
 
-    HostInfoLoader hostInfoLoader;
+    private HostInfoLoader hostInfoLoader;
 
-    RawDataHandler rawDataHandler = null;
+    final RawDataHandler rawDataHandler = null;
 
     // TODO: do we need this here ?
-    protected Map<String, HostInfo> hosts = new HashMap<>();
+    private final Map<String, HostInfo> hosts = new HashMap<>();
 
-    String[] enabledCiphers;
+    private String certFile;
+    private String keyFile;
 
-    String certFile;
-    String keyFile;
+    private byte[] spdyNPN;
 
-    byte[] spdyNPN;
-
-    byte[] ticketKey;
+    private byte[] ticketKey;
 
     // For resolving DNS ( i.e. connect ), callbacks
     private ExecutorService threadPool;
 
     // Separate executor for connect/handshakes
-    ExecutorService connectExecutor;
+    final ExecutorService connectExecutor;
 
-    boolean debugSSL = false;
-    boolean debugPoll = false;
+    final boolean debugSSL = false;
+    private boolean debugPoll = false;
 
-    protected boolean deferAccept = false;
+    private boolean deferAccept = false;
 
-    protected int backlog = 100;
+    private int backlog = 100;
 
-    protected boolean useSendfile;
+    private boolean useSendfile;
 
-    int sslProtocol = SSL.SSL_PROTOCOL_TLSV1 | SSL.SSL_PROTOCOL_SSLV3;
+    private int sslProtocol = SSL.SSL_PROTOCOL_TLSV1 | SSL.SSL_PROTOCOL_SSLV3;
 
     /**
      * Max time spent in a callback ( will be longer for blocking )
      */
-    AtomicLong maxHandlerTime = new AtomicLong();
-    AtomicLong totalHandlerTime = new AtomicLong();
-    AtomicLong handlerCount = new AtomicLong();
+    final AtomicLong maxHandlerTime = new AtomicLong();
+    final AtomicLong totalHandlerTime = new AtomicLong();
+    final AtomicLong handlerCount = new AtomicLong();
 
     /**
      * Total connections handled ( accepted or connected ).
      */
-    AtomicInteger connectionsCount = new AtomicInteger();
+    private final AtomicInteger connectionsCount = new AtomicInteger();
 
 
     public AprSocketContext() {
@@ -225,12 +213,12 @@ public class AprSocketContext {
     /**
      * Poller thread count.
      */
-    protected int pollerThreadCount = 4;
+    private int pollerThreadCount = 4;
     public void setPollerThreadCount(int pollerThreadCount) { this.pollerThreadCount = pollerThreadCount; }
     public int getPollerThreadCount() { return pollerThreadCount; }
 
     // to test the limits - default should be lower
-    int maxConnections = 64 * 1024;
+    private int maxConnections = 64 * 1024;
     public void setMaxconnections(int maxCon) {
         this.maxConnections = maxCon;
     }
@@ -330,10 +318,6 @@ public class AprSocketContext {
         tlsCertVerifier = verifier;
     }
 
-    public void setEnabledCiphers(String[] enabled) {
-        enabledCiphers = enabled;
-    }
-
     // TODO: should have a separate method for switching to tls later.
     /**
      * Set certificate, will also enable TLS mode.
@@ -349,7 +333,7 @@ public class AprSocketContext {
     /**
      * SSL cipher suite.
      */
-    protected String SSLCipherSuite = "ALL";
+    private String SSLCipherSuite = "ALL";
     public String getSSLCipherSuite() { return SSLCipherSuite; }
     public void setSSLCipherSuite(String SSLCipherSuite) { this.SSLCipherSuite = SSLCipherSuite; }
 
@@ -590,7 +574,7 @@ public class AprSocketContext {
         }
     }
 
-    static IOException noApr;
+    private static IOException noApr;
     static {
 
         try {
@@ -741,14 +725,12 @@ public class AprSocketContext {
         // Defaults to NO-OP. Parameter is used by sub-classes.
     }
 
-    class AcceptorThread extends Thread {
-        int port;
-        long serverSockPool = 0;
-        long serverSock = 0;
+    private class AcceptorThread extends Thread {
+        private final int port;
+        private long serverSockPool = 0;
+        private long serverSock = 0;
 
-        final String addressStr = null;
-
-        long inetAddress;
+        private long inetAddress;
 
         AcceptorThread(int port) {
             this.port = port;
@@ -761,8 +743,8 @@ public class AprSocketContext {
                 serverSockPool = Pool.create(getRootPool());
 
                 int family = Socket.APR_INET;
-                inetAddress = Address.info(addressStr, family,
-                        port, 0, serverSockPool);
+                inetAddress =
+                		Address.info(null, family, port, 0, serverSockPool);
 
                 // Create the APR server socket
                 serverSock = Socket.create(family,
@@ -851,7 +833,7 @@ public class AprSocketContext {
         }
     }
 
-    class AcceptorDispatchThread extends Thread {
+    private class AcceptorDispatchThread extends Thread {
 
         AcceptorDispatchThread() {
             setDaemon(true);
@@ -912,7 +894,7 @@ public class AprSocketContext {
 
     // Removed the 'thread safe' updates for now, to simplify the code
     // last test shows a small improvement, can switch later.
-    static boolean sizeLogged = false;
+    private static boolean sizeLogged = false;
 
     protected long allocatePoller(int size, long pool) {
         int flag = threadSafe ? Poll.APR_POLLSET_THREADSAFE: 0;
@@ -943,31 +925,30 @@ public class AprSocketContext {
 
     class AprPoller extends Thread {
 
-        public int id;
-        public int size;
-        protected long serverPollset = 0;
-        protected long pool = 0;
-        protected long[] desc;
+        private int id;
+        private int size;
+        private long serverPollset = 0;
+        private long pool = 0;
+        private long[] desc;
 
-        long lastPoll;
-        long lastPollTime;
-        long lastCallbackTime;
-        AtomicBoolean inPoll = new AtomicBoolean(false);
+        private long lastPoll;
+        private long lastPollTime;
+        private final AtomicBoolean inPoll = new AtomicBoolean(false);
 
         // Should be replaced with socket data.
         // used only to lookup by socket
-        Map<Long, AprSocket> channels = new HashMap<>();
+        private final Map<Long, AprSocket> channels = new HashMap<>();
 
         // Active + pending, must be < desc.length / 2
         // The channel will also have poller=this when active or pending
         // How many sockets have poller == this
-        protected AtomicInteger keepAliveCount = new AtomicInteger();
+        private final AtomicInteger keepAliveCount = new AtomicInteger();
         // Tracks desc, how many sockets are actively polled
-        protected AtomicInteger polledCount = new AtomicInteger();
+        private final AtomicInteger polledCount = new AtomicInteger();
 
-        protected AtomicInteger pollCount = new AtomicInteger();
+        private final AtomicInteger pollCount = new AtomicInteger();
 
-        private List<AprSocket> updates = new ArrayList<>();
+        private final List<AprSocket> updates = new ArrayList<>();
 
         @Override
         public void run() {
@@ -981,9 +962,6 @@ public class AprSocketContext {
             while (running) {
                 try {
                     updates();
-
-
-                    lastCallbackTime = t0 - lastPoll;
 
                     // Pool for the specified interval. Remove signaled sockets
                     synchronized (this) {
