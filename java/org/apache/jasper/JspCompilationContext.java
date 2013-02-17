@@ -62,38 +62,38 @@ public class JspCompilationContext {
 
     private final Log log = LogFactory.getLog(JspCompilationContext.class); // must not be static
 
-    protected final Map<String, JarResource> tagFileJarUrls;
+    private final Map<String, JarResource> tagFileJarUrls;
 
-    protected String className;
-    protected final String jspUri;
-    protected String basePackageName;
-    protected String derivedPackageName;
-    protected String servletJavaFileName;
-    protected String javaPath;
-    protected String classFileName;
-    protected ServletWriter writer;
-    protected final Options options;
-    protected final JspServletWrapper jsw;
-    protected Compiler jspCompiler;
-    protected String classPath;
+    private String className;
+    private final String jspUri;
+    private String basePackageName;
+    private String derivedPackageName;
+    private String servletJavaFileName;
+    private String javaPath;
+    private String classFileName;
+    private ServletWriter writer;
+    private final Options options;
+    private final JspServletWrapper jsw;
+    private Compiler jspCompiler;
+    private String classPath;
 
-    protected final String baseURI;
-    protected String outputDir;
-    protected final ServletContext context;
-    protected ClassLoader loader;
+    private final String baseURI;
+    private String outputDir;
+    private final ServletContext context;
+    private ClassLoader loader;
 
-    protected final JspRuntimeContext rctxt;
+    private final JspRuntimeContext rctxt;
 
-    protected volatile boolean removed = false;
+    private volatile boolean removed = false;
 
-    protected URLClassLoader jspLoader;
-    protected URL baseUrl;
-    protected Class<?> servletClass;
+    private URLClassLoader jspLoader;
+    private URL baseUrl;
+    private Class<?> servletClass;
 
-    protected final boolean isTagFile;
-    protected boolean protoTypeMode;
-    protected TagInfo tagInfo;
-    protected final JarResource tagJarResource;
+    private final boolean isTagFile;
+    private boolean protoTypeMode;
+    private TagInfo tagInfo;
+    private final JarResource tagJarResource;
 
     // jspURI _must_ be relative to the context
     public JspCompilationContext(String jspUri,
@@ -669,7 +669,7 @@ public class JspCompilationContext {
 
     // ==================== protected methods ====================
 
-    static final Object outputDirLock = new Object();
+    private static final Object outputDirLock = new Object();
 
     public void checkOutputDir() {
         if (outputDir != null) {
