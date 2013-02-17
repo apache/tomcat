@@ -59,33 +59,33 @@ public class AprSocket implements Runnable {
     private static final Logger log =
             Logger.getLogger("org.apache.tomcat.jni.socket.AprSocket");
 
-    static final byte[][] NO_CERTS = new byte[0][];
+    private static final byte[][] NO_CERTS = new byte[0][];
 
-    static int CONNECTING = 1;
-    static int CONNECTED = 0x2;
+    final static int CONNECTING = 0x1;
+    final static int CONNECTED = 0x2;
 
     // Current ( real ) poll status
-    static int POLLIN_ACTIVE = 0x4;
-    static int POLLOUT_ACTIVE = 0x8;
+    final static int POLLIN_ACTIVE = 0x4;
+    final static int POLLOUT_ACTIVE = 0x8;
 
-    static int POLL = 0x10;
+    final static int POLL = 0x10;
 
-    static int SSL_ATTACHED = 0x40;
+    final static int SSL_ATTACHED = 0x40;
 
     // Requested poll status. Set by read/write when needed.
     // Cleared when polled
-    static int POLLIN = 0x80;
-    static int POLLOUT = 0x100;
+    final static int POLLIN = 0x80;
+    final static int POLLOUT = 0x100;
 
-    static int ACCEPTED = 0x200;
-    static int ERROR = 0x400;
-    static int CLOSED = 0x800;
+    final static int ACCEPTED = 0x200;
+    final static int ERROR = 0x400;
+    final static int CLOSED = 0x800;
 
-    static int READING = 0x1000;
-    static int WRITING = 0x2000;
+    final static int READING = 0x1000;
+    final static int WRITING = 0x2000;
 
     // Not null
-    private AprSocketContext context;
+    private final AprSocketContext context;
 
     // only one - to save per/socket memory - context has similar callbacks.
     BlockingPollHandler handler;
