@@ -219,8 +219,6 @@
          <TransientChild>org.apache.catalina.valves.CertificatesValve</TransientChild>
          <TransientChild>org.apache.catalina.valves.ErrorReportValve</TransientChild>
          <TransientChild>org.apache.catalina.valves.RequestListenerValve</TransientChild>
-        <TransientChild>org.apache.catalina.ha.session.JvmRouteBinderValve</TransientChild>
-        <TransientChild>org.apache.catalina.ha.tcp.ReplicationValve</TransientChild>
      </Description>
      <Description
         tag="Environment"
