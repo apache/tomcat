@@ -331,7 +331,7 @@ public class JspWriterImpl extends JspWriter {
 
 
     private static final String lineSeparator =
-    		System.getProperty("line.separator");
+            System.getProperty("line.separator");
 
     /**
      * Write a line separator.  The line separator string is defined by the

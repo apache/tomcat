@@ -398,7 +398,7 @@ public class WsSession implements Session {
                 close(new CloseReason(CloseCodes.GOING_AWAY,
                         sm.getString("wsSession.timeout")));
             } catch (IOException e) {
-            	log.warn(sm.getString("wsSession.expireFailed"), e);
+                log.warn(sm.getString("wsSession.expireFailed"), e);
             }
         }
     }
@@ -450,7 +450,7 @@ public class WsSession implements Session {
                     superClassType.getActualTypeArguments()[
                             ((Integer) result).intValue()]);
         } else {
-        	// Error will be logged further up the call stack
+            // Error will be logged further up the call stack
             return null;
         }
     }

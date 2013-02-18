@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 
 public class RewriteCond {
 
-    public static abstract class Condition {
+    public abstract static class Condition {
         public abstract boolean evaluate(String value, Resolver resolver);
     }
 

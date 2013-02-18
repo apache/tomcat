@@ -52,7 +52,7 @@ public class Util {
     private static final int HIGHEST_SPECIAL = '>';
 
     private static final char[][] specialCharactersRepresentation =
-    		new char[HIGHEST_SPECIAL + 1][];
+            new char[HIGHEST_SPECIAL + 1][];
 
     static {
         specialCharactersRepresentation['&'] = "&amp;".toCharArray();
@@ -273,14 +273,14 @@ public class Util {
 
             @Override
             public boolean isReady() {
-            	// Non-blocking IO not supported
+                // Non-blocking IO not supported
                 return false;
             }
 
             @Override
             public void setWriteListener(WriteListener listener) {
-            	// Non-blocking IO not supported
-            	throw new UnsupportedOperationException();
+                // Non-blocking IO not supported
+                throw new UnsupportedOperationException();
             }
 
 
