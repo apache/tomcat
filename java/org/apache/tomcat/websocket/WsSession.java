@@ -255,7 +255,7 @@ public class WsSession implements Session {
 
     @Override
     public Set<Session> getOpenSessions() {
-        return webSocketContainer.getOpenSession(localEndpoint.getClass());
+        return webSocketContainer.getOpenSessions(localEndpoint.getClass());
     }
 
 
