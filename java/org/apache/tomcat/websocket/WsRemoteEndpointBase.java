@@ -38,6 +38,8 @@ import javax.websocket.RemoteEndpoint;
 import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
@@ -45,12 +47,10 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
 
-    private static org.apache.juli.logging.Log log =
-            org.apache.juli.logging.LogFactory.getLog(
-                    WsRemoteEndpointBase.class);
+    private final Log log = LogFactory.getLog(WsRemoteEndpointBase.class);
 
     private boolean messagePartInProgress = false;
-    private Queue<MessagePart> messagePartQueue = new ArrayDeque<>();
+    private final Queue<MessagePart> messagePartQueue = new ArrayDeque<>();
     private final Object messagePartLock = new Object();
     private boolean dataMessageInProgress = false;
 
@@ -66,7 +66,7 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     private final ByteBuffer outputBuffer = ByteBuffer.allocate(8192);
     private final CharsetEncoder encoder = Charset.forName("UTF8").newEncoder();
     private final ByteBuffer encoderBuffer = ByteBuffer.allocate(8192);
-    private AtomicBoolean batchingAllowed = new AtomicBoolean(false);
+    private final AtomicBoolean batchingAllowed = new AtomicBoolean(false);
     private volatile long asyncSendTimeout = -1;
     private WsSession wsSession;
 
