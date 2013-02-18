@@ -60,6 +60,7 @@ public class WsSession implements Session {
     private final WsRequest request;
     private final String subProtocol;
     private final Map<String,String> pathParameters;
+    private final boolean secure;
 
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
@@ -88,7 +89,8 @@ public class WsSession implements Session {
             WsRemoteEndpointBase wsRemoteEndpoint,
             WsWebSocketContainer wsWebSocketContainer,
             WsRequest request, String subProtocol,
-            Map<String,String> pathParameters) {
+            Map<String,String> pathParameters,
+            boolean secure) {
         this.localEndpoint = localEndpoint;
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);
@@ -105,6 +107,7 @@ public class WsSession implements Session {
         this.request = request;
         this.subProtocol = subProtocol;
         this.pathParameters = pathParameters;
+        this.secure = secure;
     }
 
 
@@ -206,8 +209,7 @@ public class WsSession implements Session {
 
     @Override
     public boolean isSecure() {
-        // TODO Auto-generated method stub
-        return false;
+        return secure;
     }
 
 
