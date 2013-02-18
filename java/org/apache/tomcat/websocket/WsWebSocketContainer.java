@@ -221,9 +221,11 @@ public class WsWebSocketContainer
 
     Set<Session> getOpenSessions(Class<?> endpoint) {
         HashSet<Session> result = new HashSet<>();
-        Set<WsSession> sessions = endpointSessionMap.get(endpoint);
-        if (sessions != null) {
-            result.addAll(sessions);
+        synchronized (endPointSessionMapLock) {
+            Set<WsSession> sessions = endpointSessionMap.get(endpoint);
+            if (sessions != null) {
+                result.addAll(sessions);
+            }
         }
         return result;
     }
