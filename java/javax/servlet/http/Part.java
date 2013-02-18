@@ -71,10 +71,14 @@ public interface Part {
 
     /**
      * Deletes the underlying storage for a part, including deleting any
-     * associated temporary disk file. Although this storage will be deleted
-     * automatically when the Part instance is garbage collected, this
-     * method can be used to ensure that this is done at an earlier time, thus
-     * preserving system resources.
+     * associated temporary disk file. Although the container will delete this
+     * storage automatically this method can be used to ensure that this is done
+     * at an earlier time, thus preserving system resources.
+     * <p>
+     * Containers are only required to delete the associated storage when the
+     * Part instance is garbage collected. Apache Tomcat will delete the
+     * associated storage when the associated request has finished processing.
+     * Behaviour of other containers may be different.
      */
     public void delete() throws IOException;
 
