@@ -960,7 +960,7 @@ public class XMLEncodingDetector {
 
         // read characters
         int count = fCurrentEntity.reader.read(fCurrentEntity.ch, offset,
-        		DEFAULT_XMLDECL_BUFFER_SIZE);
+                DEFAULT_XMLDECL_BUFFER_SIZE);
 
         // reset count and position
         boolean entityChanged = false;
