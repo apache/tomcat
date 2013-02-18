@@ -66,7 +66,7 @@ public class WsSession implements Session {
     private MessageHandler.Basic<PongMessage> pongMessageHandler = null;
     private volatile boolean open = true;
     private final Object closeLock = new Object();
-    private Map<String,Object> userProperties = new ConcurrentHashMap<>();
+    private final Map<String,Object> userProperties = new ConcurrentHashMap<>();
     private volatile int maxBinaryMessageBufferSize =
             Constants.DEFAULT_BUFFER_SIZE;
     private volatile int maxTextMessageBufferSize =
