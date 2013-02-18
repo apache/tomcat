@@ -95,7 +95,7 @@
       </fix>
       <fix>
         <bug>54536</bug>: Ensure the default error page is displayed if a custom
-        HHTP status code is used when calling
+        HTTP status code is used when calling
         <code>HttpServletResponse#sendError(int, String)</code>. (markt)
       </fix>
     </changelog>
