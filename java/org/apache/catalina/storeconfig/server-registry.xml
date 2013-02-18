@@ -152,6 +152,7 @@
         children="true"
         tagClass="org.apache.catalina.ha.CatalinaCluster"
         storeFactoryClass="org.apache.catalina.storeconfig.CatalinaClusterSF">
+        <TransientAttribute>clusterName</TransientAttribute>
      </Description>
      <Description
         tag="Realm"
@@ -341,13 +342,6 @@
         default="false"
         attributes="false"
         storeFactoryClass="org.apache.catalina.storeconfig.WatchedResourceSF">
-     </Description>
-     <Description
-        tag="Sender"
-        standard="false"
-        default="false"
-        tagClass="org.apache.catalina.cluster.tcp.ReplicationTransmitter"
-        storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description
         tag="Sender"
