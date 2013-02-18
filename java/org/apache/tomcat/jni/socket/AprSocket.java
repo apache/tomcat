@@ -61,28 +61,28 @@ public class AprSocket implements Runnable {
 
     private static final byte[][] NO_CERTS = new byte[0][];
 
-    final static int CONNECTING = 0x1;
-    final static int CONNECTED = 0x2;
+    static final int CONNECTING = 0x1;
+    static final int CONNECTED = 0x2;
 
     // Current ( real ) poll status
-    final static int POLLIN_ACTIVE = 0x4;
-    final static int POLLOUT_ACTIVE = 0x8;
+    static final int POLLIN_ACTIVE = 0x4;
+    static final int POLLOUT_ACTIVE = 0x8;
 
-    final static int POLL = 0x10;
+    static final int POLL = 0x10;
 
-    final static int SSL_ATTACHED = 0x40;
+    static final int SSL_ATTACHED = 0x40;
 
     // Requested poll status. Set by read/write when needed.
     // Cleared when polled
-    final static int POLLIN = 0x80;
-    final static int POLLOUT = 0x100;
+    static final int POLLIN = 0x80;
+    static final int POLLOUT = 0x100;
 
-    final static int ACCEPTED = 0x200;
-    final static int ERROR = 0x400;
-    final static int CLOSED = 0x800;
+    static final int ACCEPTED = 0x200;
+    static final int ERROR = 0x400;
+    static final int CLOSED = 0x800;
 
-    final static int READING = 0x1000;
-    final static int WRITING = 0x2000;
+    static final int READING = 0x1000;
+    static final int WRITING = 0x2000;
 
     // Not null
     private final AprSocketContext context;

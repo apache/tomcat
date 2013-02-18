@@ -91,7 +91,7 @@ public class AprSocketContext {
 
     private final AprSocket END = new AprSocket(this);
 
-    private final static AtomicInteger contextNumber = new AtomicInteger();
+    private static final AtomicInteger contextNumber = new AtomicInteger();
     private int contextId;
 
     private final AtomicInteger threadNumber = new AtomicInteger();
@@ -123,7 +123,7 @@ public class AprSocketContext {
     private boolean nonBlockingAccept = false;
 
     private final BlockingQueue<AprSocket> acceptedQueue =
-    		new LinkedBlockingQueue<>();
+            new LinkedBlockingQueue<>();
 
     /**
      * Root APR memory pool.
@@ -744,7 +744,7 @@ public class AprSocketContext {
 
                 int family = Socket.APR_INET;
                 inetAddress =
-                		Address.info(null, family, port, 0, serverSockPool);
+                        Address.info(null, family, port, 0, serverSockPool);
 
                 // Create the APR server socket
                 serverSock = Socket.create(family,
