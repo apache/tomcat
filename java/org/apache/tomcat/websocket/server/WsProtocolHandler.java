@@ -43,7 +43,7 @@ import org.apache.tomcat.websocket.WsSession;
  */
 public class WsProtocolHandler implements HttpUpgradeHandler {
 
-    private static StringManager sm =
+    private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
     private static final Log log =
             LogFactory.getLog(WsProtocolHandler.class);
@@ -55,19 +55,21 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
     private final WsRequest request;
     private final String subProtocol;
     private final Map<String,String> pathParameters;
+    private final boolean secure;
 
     private WsSession wsSession;
 
 
     public WsProtocolHandler(Endpoint ep, EndpointConfiguration endpointConfig,
             ServerContainerImpl wsc, WsRequest request, String subProtocol,
-            Map<String,String> pathParameters) {
+            Map<String,String> pathParameters, boolean secure) {
         this.ep = ep;
         this.endpointConfig = endpointConfig;
         this.webSocketContainer = wsc;
         this.request = request;
         this.subProtocol = subProtocol;
         this.pathParameters = pathParameters;
+        this.secure = secure;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
@@ -93,7 +95,8 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
             WsRemoteEndpointServer wsRemoteEndpointServer =
                     new WsRemoteEndpointServer(sos, webSocketContainer);
             wsSession = new WsSession(ep, wsRemoteEndpointServer,
-                    webSocketContainer, request, subProtocol, pathParameters);
+                    webSocketContainer, request, subProtocol, pathParameters,
+                    secure);
             WsFrameServer wsFrame = new WsFrameServer(
                     sis,
                     wsSession);
