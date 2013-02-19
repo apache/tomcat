@@ -18,6 +18,8 @@
 package org.apache.catalina.storeconfig;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.catalina.Cluster;
 import org.apache.catalina.Container;
@@ -26,6 +28,7 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
 import org.apache.catalina.core.StandardEngine;
+import org.apache.catalina.ha.ClusterValve;
 
 /**
  * Store server.xml Element Engine
@@ -71,7 +74,14 @@ public class StandardEngineSF extends StoreFactoryBase {
 
             // Store nested <Valve> elements
             Valve valves[] = engine.getPipeline().getValves();
-            storeElementArray(aWriter, indent, valves);
+            if(valves != null && valves.length > 0 ) {
+                List<Valve> engineValves = new ArrayList<>() ;
+                for(int i = 0 ; i < valves.length ; i++ ) {
+                    if(!( valves[i] instanceof ClusterValve))
+                        engineValves.add(valves[i]);
+                }
+                storeElementArray(aWriter, indent, engineValves.toArray());
+            }
 
             // store all <Cluster> elements
             Cluster cluster = engine.getCluster();
