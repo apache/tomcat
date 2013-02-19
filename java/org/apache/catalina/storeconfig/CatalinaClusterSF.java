@@ -27,7 +27,6 @@ import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterDeployer;
 import org.apache.catalina.ha.ClusterListener;
 import org.apache.catalina.ha.ClusterManager;
-import org.apache.catalina.ha.deploy.FarmWarDeployer;
 import org.apache.catalina.ha.tcp.SimpleTcpCluster;
 import org.apache.catalina.tribes.Channel;
 
@@ -86,7 +85,7 @@ public class CatalinaClusterSF extends StoreFactoryBase {
                 ClusterListener mlisteners[] = ((SimpleTcpCluster)cluster).findClusterListeners();
                 List<ClusterListener> clusterListeners = new ArrayList<>();
                 for (ClusterListener clusterListener : mlisteners) {
-                    if (!(clusterListener instanceof FarmWarDeployer)) {
+                    if (clusterListener != deployer) {
                         clusterListeners.add(clusterListener);
                     }
                 }
