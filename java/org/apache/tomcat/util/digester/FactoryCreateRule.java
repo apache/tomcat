@@ -45,52 +45,6 @@ public class FactoryCreateRule extends Rule {
     // ----------------------------------------------------------- Constructors
 
     /**
-     * Construct a factory create rule that will use the specified
-     * class name (possibly overridden by the specified attribute if present)
-     * to create an {@link ObjectCreationFactory}, which will then be used
-     * to instantiate an object instance and push it onto the stack.
-     *
-     * @param className Default Java class name of the factory class
-     * @param attributeName Attribute name which, if present, contains an
-     *  override of the class name of the object creation factory to create.
-     * @param ignoreCreateExceptions if true, exceptions thrown by the object
-     *  creation factory will be ignored.
-     */
-    public FactoryCreateRule(
-                                String className,
-                                String attributeName,
-                                boolean ignoreCreateExceptions) {
-
-        this.className = className;
-        this.attributeName = attributeName;
-        this.ignoreCreateExceptions = ignoreCreateExceptions;
-
-    }
-
-
-    /**
-     * Construct a factory create rule that will use the specified
-     * class (possibly overridden by the specified attribute if present)
-     * to create an {@link ObjectCreationFactory}, which will then be used
-     * to instantiate an object instance and push it onto the stack.
-     *
-     * @param clazz Default Java class name of the factory class
-     * @param attributeName Attribute name which, if present, contains an
-     *  override of the class name of the object creation factory to create.
-     * @param ignoreCreateExceptions if true, exceptions thrown by the object
-     *  creation factory will be ignored.
-     */
-    public FactoryCreateRule(
-                                Class<?> clazz,
-                                String attributeName,
-                                boolean ignoreCreateExceptions) {
-
-        this(clazz.getName(), attributeName, ignoreCreateExceptions);
-
-    }
-
-
-    /**
      * Construct a factory create rule using the given, already instantiated,
      * {@link ObjectCreationFactory}.
      *
