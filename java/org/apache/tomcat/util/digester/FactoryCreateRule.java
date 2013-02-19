@@ -41,42 +41,8 @@ public class FactoryCreateRule extends Rule {
     /** Stock to manage */
     private ArrayStack<Boolean> exceptionIgnoredStack;
 
+
     // ----------------------------------------------------------- Constructors
-
-
-    /**
-     * Construct a factory create rule that will use the specified
-     * class name to create an {@link ObjectCreationFactory} which will
-     * then be used to create an object and push it on the stack.
-     *
-     * @param className Java class name of the object creation factory class
-     * @param ignoreCreateExceptions if true, exceptions thrown by the object
-     *  creation factory
-     * will be ignored.
-     */
-    public FactoryCreateRule(String className, boolean ignoreCreateExceptions) {
-
-        this(className, null, ignoreCreateExceptions);
-
-    }
-
-
-    /**
-     * Construct a factory create rule that will use the specified
-     * class to create an {@link ObjectCreationFactory} which will
-     * then be used to create an object and push it on the stack.
-     *
-     * @param clazz Java class name of the object creation factory class
-     * @param ignoreCreateExceptions if true, exceptions thrown by the
-     *  object creation factory
-     * will be ignored.
-     */
-    public FactoryCreateRule(Class<?> clazz, boolean ignoreCreateExceptions) {
-
-        this(clazz, null, ignoreCreateExceptions);
-
-    }
-
 
     /**
      * Construct a factory create rule that will use the specified
