@@ -14,15 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.util.digester;
-
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EmptyStackException;
 import java.util.HashMap;
@@ -71,7 +68,6 @@ import org.xml.sax.helpers.DefaultHandler;
  * the support of XML schema. You need Xerces 2.1/2.3 and up to make
  * this class working with XML schema</p>
  */
-
 public class Digester extends DefaultHandler {
 
 
