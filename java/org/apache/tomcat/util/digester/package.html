@@ -422,9 +422,6 @@ following:</p>
     CallMethodRule within which we are nested.  You can specify that the
     parameter value be taken from a particular named attribute, or from the
     nested body content of this element.</li>
-<li><a href="NodeCreateRule.html">NodeCreateRule</a> - A specialized rule
-    that converts part of the tree into a <code>DOM Node</code> and then
-    pushes it onto the stack.</li>
 </ul>
 
 <p>You can create instances of the standard <code>Rule</code> classes and
@@ -907,31 +904,6 @@ desires to be plugged in and used just by creating one class.
 <code>Digester</code> does not (currently) ship with bridges to the major
 regex (to allow the dependencies required by <code>Digester</code>
 to be kept to a minimum).
-</p>
-
-<h4>WithDefaultsRulesWrapper</h4>
-<p>
-<a href="WithDefaultsRulesWrapper.html"> WithDefaultsRulesWrapper</a> allows
-default <code>Rule</code> instances to be added to any existing
-<code>Rules</code> implementation. These default <code>Rule</code> instances
-will be returned for any match for which the wrapped implementation does not
-return any matches.
-</p>
-<p>
-For example,
-<pre>
-    Rule alpha;
-    ...
-    WithDefaultsRulesWrapper rules = new WithDefaultsRulesWrapper(new BaseRules());
-    rules.addDefault(alpha);
-    ...
-    digester.setRules(rules);
-    ...
-</pre>
-when a pattern does not match any other rule, then rule alpha will be called.
-</p>
-<p>
-<code>WithDefaultsRulesWrapper</code> follows the <em>Decorator</em> pattern.
 </p>
 
 <a name="doc.RuleSets"></a>
