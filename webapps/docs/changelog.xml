@@ -66,6 +66,12 @@
         Add one more library from JDK 7 to the value of <code>jarsToSkip</code>
         property in the <code>catalina.properties</code> file. (kkolinko)
       </update>
+      <add>
+        <bug>53871</bug>: If annotation scanning results in a
+        <code>StackOverflowError</code> due to broken class dependencies, add
+        the class hierarchy that triggered the exception to the error message.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
