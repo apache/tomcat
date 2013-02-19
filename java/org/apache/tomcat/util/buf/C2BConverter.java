@@ -28,28 +28,14 @@ import java.nio.charset.CodingErrorAction;
  */
 public final class C2BConverter {
 
-    /**
-     * @deprecated  Will be made private in Tomcat 8.0.x
-     */
-    @Deprecated
-    protected CharsetEncoder encoder = null;
-    /**
-     * @deprecated  Will be made private in Tomcat 8.0.x
-     */
-    @Deprecated
-    protected ByteBuffer bb = null;
-    /**
-     * @deprecated  Will be made private in Tomcat 8.0.x
-     */
-    @Deprecated
-    protected CharBuffer cb = null;
+    private final CharsetEncoder encoder;
+    private ByteBuffer bb = null;
+    private CharBuffer cb = null;
 
     /**
      * Leftover buffer used for multi-characters characters.
-     * @deprecated  Will be made private in Tomcat 8.0.x
      */
-    @Deprecated
-    protected CharBuffer leftovers = null;
+    private final CharBuffer leftovers;
 
     public C2BConverter(String encoding) throws IOException {
         encoder = B2CConverter.getCharset(encoding).newEncoder();
