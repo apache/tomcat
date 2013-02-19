@@ -638,11 +638,11 @@ public class StringCache {
     // -------------------------------------------------- ByteEntry Inner Class
 
 
-    public static class ByteEntry {
+    private static class ByteEntry {
 
-        public byte[] name = null;
-        public Charset charset = null;
-        public String value = null;
+        private byte[] name = null;
+        private Charset charset = null;
+        private String value = null;
 
         @Override
         public String toString() {
@@ -666,10 +666,10 @@ public class StringCache {
     // -------------------------------------------------- CharEntry Inner Class
 
 
-    public static class CharEntry {
+    private static class CharEntry {
 
-        public char[] name = null;
-        public String value = null;
+        private char[] name = null;
+        private String value = null;
 
         @Override
         public String toString() {
