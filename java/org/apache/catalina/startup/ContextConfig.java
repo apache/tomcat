@@ -1958,13 +1958,7 @@ public class ContextConfig implements LifecycleListener {
 
         ClassParser parser = new ClassParser(is, null);
         JavaClass clazz = parser.parse();
-        try {
-            checkHandlesTypes(clazz);
-        } catch (StackOverflowError soe) {
-            throw new IllegalStateException(sm.getString(
-                    "contextConfig.annotationsStackOverflow",
-                    context.getName()), soe);
-        }
+        checkHandlesTypes(clazz);
 
         if (handlesTypesOnly) {
             return;
@@ -2015,7 +2009,14 @@ public class ContextConfig implements LifecycleListener {
             populateJavaClassCache(className, javaClass);
             JavaClassCacheEntry entry = javaClassCache.get(className);
             if (entry.getSciSet() == null) {
-                populateSCIsForCacheEntry(entry);
+                try {
+                    populateSCIsForCacheEntry(entry);
+                } catch (StackOverflowError soe) {
+                    throw new IllegalStateException(sm.getString(
+                            "contextConfig.annotationsStackOverflow",
+                            context.getName(),
+                            classHierarchyToString(className, entry)));
+                }
             }
             if (entry.getSciSet().size() > 0) {
                 // Need to try and load the class
@@ -2066,6 +2067,30 @@ public class ContextConfig implements LifecycleListener {
         }
     }
 
+
+    private String classHierarchyToString(String className,
+            JavaClassCacheEntry entry) {
+        JavaClassCacheEntry start = entry;
+        StringBuilder msg = new StringBuilder(className);
+        msg.append("->");
+
+        String parentName = entry.getSuperclassName();
+        JavaClassCacheEntry parent = javaClassCache.get(parentName);
+        int count = 0;
+
+        while (count < 100 && parent != null && parent != start) {
+            msg.append(parentName);
+            msg.append("->");
+
+            count ++;
+            parentName = parent.getSuperclassName();
+            parent = javaClassCache.get(parentName);
+        }
+
+        msg.append(parentName);
+
+        return msg.toString();
+    }
 
     private void populateJavaClassCache(String className, JavaClass javaClass) {
         if (javaClassCache.containsKey(className)) {
