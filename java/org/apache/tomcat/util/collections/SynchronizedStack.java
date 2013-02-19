@@ -29,7 +29,7 @@ public class SynchronizedStack<T> {
     private static final int DEFAULT_LIMIT = -1;
 
     private int size;
-    private int limit;
+    private final int limit;
 
     /*
      * Points to the next available object in the stack
