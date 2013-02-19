@@ -434,31 +434,6 @@ public class Digester extends DefaultHandler {
 
 
     /**
-     * Returns a flag indicating whether the requested feature is supported
-     * by the underlying implementation of <code>org.xml.sax.XMLReader</code>.
-     * See <a href="http://www.saxproject.org/apidoc/xml/sax/package-summary.html#package-description"
-     * http://www.saxproject.org/apidoc/xml/sax/package-summary.html#package-description</a>
-     * for information about the standard SAX2 feature flags.
-     *
-     * @param feature Name of the feature to inquire about
-     *
-     * @exception ParserConfigurationException if a parser configuration error
-     *  occurs
-     * @exception SAXNotRecognizedException if the property name is
-     *  not recognized
-     * @exception SAXNotSupportedException if the property name is
-     *  recognized but not supported
-     */
-    public boolean getFeature(String feature)
-        throws ParserConfigurationException, SAXNotRecognizedException,
-        SAXNotSupportedException {
-
-        return (getFactory().getFeature(feature));
-
-    }
-
-
-    /**
      * Sets a flag indicating whether the requested feature is supported
      * by the underlying implementation of <code>org.xml.sax.XMLReader</code>.
      * See <a href="http://www.saxproject.org/apidoc/xml/sax/package-summary.html#package-description"
@@ -650,29 +625,6 @@ public class Digester extends DefaultHandler {
         throws SAXNotRecognizedException, SAXNotSupportedException {
 
         return (getParser().getProperty(property));
-
-    }
-
-
-    /**
-     * Set the current value of the specified property for the underlying
-     * <code>XMLReader</code> implementation.
-     * See <a href="http://www.saxproject.org/apidoc/xml/sax/package-summary.html#package-description"
-     * http://www.saxproject.org/apidoc/xml/sax/package-summary.html#package-description</a>
-     * for information about the standard SAX2 properties.
-     *
-     * @param property Property name to be set
-     * @param value Property value to be set
-     *
-     * @exception SAXNotRecognizedException if the property name is
-     *  not recognized
-     * @exception SAXNotSupportedException if the property name is
-     *  recognized but not supported
-     */
-    public void setProperty(String property, Object value)
-        throws SAXNotRecognizedException, SAXNotSupportedException {
-
-        getParser().setProperty(property, value);
 
     }
 
@@ -1507,44 +1459,6 @@ public class Digester extends DefaultHandler {
 
 
     /**
-     * Parse the content of the specified reader using this Digester.
-     * Returns the root element from the object stack (if any).
-     *
-     * @param reader Reader containing the XML data to be parsed
-     *
-     * @exception IOException if an input/output error occurs
-     * @exception SAXException if a parsing exception occurs
-     */
-    public Object parse(Reader reader) throws IOException, SAXException {
-
-        configure();
-        InputSource is = new InputSource(reader);
-        getXMLReader().parse(is);
-        return (root);
-
-    }
-
-
-    /**
-     * Parse the content of the specified URI using this Digester.
-     * Returns the root element from the object stack (if any).
-     *
-     * @param uri URI containing the XML data to be parsed
-     *
-     * @exception IOException if an input/output error occurs
-     * @exception SAXException if a parsing exception occurs
-     */
-    public Object parse(String uri) throws IOException, SAXException {
-
-        configure();
-        InputSource is = new InputSource(uri);
-        getXMLReader().parse(is);
-        return (root);
-
-    }
-
-
-    /**
      * <p>Register the specified DTD URL for the specified public identifier.
      * This must be called before the first call to <code>parse()</code>.
      * </p><p>
@@ -1650,65 +1564,6 @@ public class Digester extends DefaultHandler {
 
 
     /**
-     * Add an "call method" rule for the specified parameters.
-     * If <code>paramCount</code> is set to zero the rule will use
-     * the body of the matched element as the single argument of the
-     * method, unless <code>paramTypes</code> is null or empty, in this
-     * case the rule will call the specified method with no arguments.
-     *
-     * @param pattern Element matching pattern
-     * @param methodName Method name to be called
-     * @param paramCount Number of expected parameters (or zero
-     *  for a single parameter from the body of this element)
-     * @param paramTypes Set of Java class names for the types
-     *  of the expected parameters
-     *  (if you wish to use a primitive type, specify the corresponding
-     *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
-     *  for a <code>boolean</code> parameter)
-     * @see CallMethodRule
-     */
-    public void addCallMethod(String pattern, String methodName,
-                              int paramCount, String paramTypes[]) {
-
-        addRule(pattern,
-                new CallMethodRule(
-                                    methodName,
-                                    paramCount,
-                                    paramTypes));
-
-    }
-
-
-    /**
-     * Add an "call method" rule for the specified parameters.
-     * If <code>paramCount</code> is set to zero the rule will use
-     * the body of the matched element as the single argument of the
-     * method, unless <code>paramTypes</code> is null or empty, in this
-     * case the rule will call the specified method with no arguments.
-     *
-     * @param pattern Element matching pattern
-     * @param methodName Method name to be called
-     * @param paramCount Number of expected parameters (or zero
-     *  for a single parameter from the body of this element)
-     * @param paramTypes The Java class names of the arguments
-     *  (if you wish to use a primitive type, specify the corresponding
-     *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
-     *  for a <code>boolean</code> parameter)
-     * @see CallMethodRule
-     */
-    public void addCallMethod(String pattern, String methodName,
-                              int paramCount, Class<?> paramTypes[]) {
-
-        addRule(pattern,
-                new CallMethodRule(
-                                    methodName,
-                                    paramCount,
-                                    paramTypes));
-
-    }
-
-
-    /**
      * Add a "call parameter" rule for the specified parameters.
      *
      * @param pattern Element matching pattern
@@ -1723,180 +1578,6 @@ public class Digester extends DefaultHandler {
 
     }
 
-
-    /**
-     * Add a "call parameter" rule for the specified parameters.
-     *
-     * @param pattern Element matching pattern
-     * @param paramIndex Zero-relative parameter index to set
-     *  (from the specified attribute)
-     * @param attributeName Attribute whose value is used as the
-     *  parameter value
-     * @see CallParamRule
-     */
-    public void addCallParam(String pattern, int paramIndex,
-                             String attributeName) {
-
-        addRule(pattern,
-                new CallParamRule(paramIndex, attributeName));
-
-    }
-
-
-    /**
-     * Add a "call parameter" rule.
-     * This will either take a parameter from the stack
-     * or from the current element body text.
-     *
-     * @param paramIndex The zero-relative parameter number
-     * @param fromStack Should the call parameter be taken from the top of the stack?
-     * @see CallParamRule
-     */
-    public void addCallParam(String pattern, int paramIndex, boolean fromStack) {
-
-        addRule(pattern,
-                new CallParamRule(paramIndex, fromStack));
-
-    }
-
-    /**
-     * Add a "call parameter" rule that sets a parameter from the stack.
-     * This takes a parameter from the given position on the stack.
-     *
-     * @param paramIndex The zero-relative parameter number
-     * @param stackIndex set the call parameter to the stackIndex'th object down the stack,
-     * where 0 is the top of the stack, 1 the next element down and so on
-     * @see CallMethodRule
-     */
-    public void addCallParam(String pattern, int paramIndex, int stackIndex) {
-
-        addRule(pattern,
-                new CallParamRule(paramIndex, stackIndex));
-
-    }
-
-    /**
-     * Add a "call parameter" rule that sets a parameter from the current
-     * <code>Digester</code> matching path.
-     * This is sometimes useful when using rules that support wildcards.
-     *
-     * @param pattern the pattern that this rule should match
-     * @param paramIndex The zero-relative parameter number
-     * @see CallMethodRule
-     */
-    public void addCallParamPath(String pattern,int paramIndex) {
-        addRule(pattern, new PathCallParamRule(paramIndex));
-    }
-
-    /**
-     * Add a "call parameter" rule that sets a parameter from a
-     * caller-provided object. This can be used to pass constants such as
-     * strings to methods; it can also be used to pass mutable objects,
-     * providing ways for objects to do things like "register" themselves
-     * with some shared object.
-     * <p>
-     * Note that when attempting to locate a matching method to invoke,
-     * the true type of the paramObj is used, so that despite the paramObj
-     * being passed in here as type Object, the target method can declare
-     * its parameters as being the true type of the object (or some ancestor
-     * type, according to the usual type-conversion rules).
-     *
-     * @param paramIndex The zero-relative parameter number
-     * @param paramObj Any arbitrary object to be passed to the target
-     * method.
-     * @see CallMethodRule
-     *
-     * @since 1.6
-     */
-    public void addObjectParam(String pattern, int paramIndex,
-                               Object paramObj) {
-
-        addRule(pattern,
-                new ObjectParamRule(paramIndex, paramObj));
-
-    }
-
-    /**
-     * Add a "factory create" rule for the specified parameters.
-     * Exceptions thrown during the object creation process will be propagated.
-     *
-     * @param pattern Element matching pattern
-     * @param className Java class name of the object creation factory class
-     * @see FactoryCreateRule
-     */
-    public void addFactoryCreate(String pattern, String className) {
-
-        addFactoryCreate(pattern, className, false);
-
-    }
-
-
-    /**
-     * Add a "factory create" rule for the specified parameters.
-     * Exceptions thrown during the object creation process will be propagated.
-     *
-     * @param pattern Element matching pattern
-     * @param clazz Java class of the object creation factory class
-     * @see FactoryCreateRule
-     */
-    public void addFactoryCreate(String pattern, Class<?> clazz) {
-
-        addFactoryCreate(pattern, clazz, false);
-
-    }
-
-
-    /**
-     * Add a "factory create" rule for the specified parameters.
-     * Exceptions thrown during the object creation process will be propagated.
-     *
-     * @param pattern Element matching pattern
-     * @param className Java class name of the object creation factory class
-     * @param attributeName Attribute name which, if present, overrides the
-     *  value specified by <code>className</code>
-     * @see FactoryCreateRule
-     */
-    public void addFactoryCreate(String pattern, String className,
-                                 String attributeName) {
-
-        addFactoryCreate(pattern, className, attributeName, false);
-
-    }
-
-
-    /**
-     * Add a "factory create" rule for the specified parameters.
-     * Exceptions thrown during the object creation process will be propagated.
-     *
-     * @param pattern Element matching pattern
-     * @param clazz Java class of the object creation factory class
-     * @param attributeName Attribute name which, if present, overrides the
-     *  value specified by <code>className</code>
-     * @see FactoryCreateRule
-     */
-    public void addFactoryCreate(String pattern, Class<?> clazz,
-                                 String attributeName) {
-
-        addFactoryCreate(pattern, clazz, attributeName, false);
-
-    }
-
-
-    /**
-     * Add a "factory create" rule for the specified parameters.
-     * Exceptions thrown during the object creation process will be propagated.
-     *
-     * @param pattern Element matching pattern
-     * @param creationFactory Previously instantiated ObjectCreationFactory
-     *  to be utilized
-     * @see FactoryCreateRule
-     */
-    public void addFactoryCreate(String pattern,
-                                 ObjectCreationFactory creationFactory) {
-
-        addFactoryCreate(pattern, creationFactory, false);
-
-    }
 
     /**
      * Add a "factory create" rule for the specified parameters.
@@ -2027,21 +1708,6 @@ public class Digester extends DefaultHandler {
      * Add an "object create" rule for the specified parameters.
      *
      * @param pattern Element matching pattern
-     * @param clazz Java class to be created
-     * @see ObjectCreateRule
-     */
-    public void addObjectCreate(String pattern, Class<?> clazz) {
-
-        addRule(pattern,
-                new ObjectCreateRule(clazz));
-
-    }
-
-
-    /**
-     * Add an "object create" rule for the specified parameters.
-     *
-     * @param pattern Element matching pattern
      * @param className Default Java class name to be created
      * @param attributeName Attribute name that optionally overrides
      *  the default Java class name to be created
@@ -2052,39 +1718,6 @@ public class Digester extends DefaultHandler {
 
         addRule(pattern,
                 new ObjectCreateRule(className, attributeName));
-
-    }
-
-
-    /**
-     * Add an "object create" rule for the specified parameters.
-     *
-     * @param pattern Element matching pattern
-     * @param attributeName Attribute name that optionally overrides
-     * @param clazz Default Java class to be created
-     *  the default Java class name to be created
-     * @see ObjectCreateRule
-     */
-    public void addObjectCreate(String pattern,
-                                String attributeName,
-                                Class<?> clazz) {
-
-        addRule(pattern,
-                new ObjectCreateRule(attributeName, clazz));
-
-    }
-
-    /**
-     * Add a "set next" rule for the specified parameters.
-     *
-     * @param pattern Element matching pattern
-     * @param methodName Method name to call on the parent element
-     * @see SetNextRule
-     */
-    public void addSetNext(String pattern, String methodName) {
-
-        addRule(pattern,
-                new SetNextRule(methodName));
 
     }
 
@@ -2110,37 +1743,6 @@ public class Digester extends DefaultHandler {
 
 
     /**
-     * Add {@link SetRootRule} with the specified parameters.
-     *
-     * @param pattern Element matching pattern
-     * @param methodName Method name to call on the root object
-     * @see SetRootRule
-     */
-    public void addSetRoot(String pattern, String methodName) {
-
-        addRule(pattern,
-                new SetRootRule(methodName));
-
-    }
-
-
-    /**
-     * Add {@link SetRootRule} with the specified parameters.
-     *
-     * @param pattern Element matching pattern
-     * @param methodName Method name to call on the root object
-     * @param paramType Java class name of the expected parameter type
-     * @see SetRootRule
-     */
-    public void addSetRoot(String pattern, String methodName,
-                           String paramType) {
-
-        addRule(pattern,
-                new SetRootRule(methodName, paramType));
-
-    }
-
-    /**
      * Add a "set properties" rule for the specified parameters.
      *
      * @param pattern Element matching pattern
@@ -2150,95 +1752,6 @@ public class Digester extends DefaultHandler {
 
         addRule(pattern,
                 new SetPropertiesRule());
-
-    }
-
-    /**
-     * Add a "set properties" rule with a single overridden parameter.
-     * See {@link SetPropertiesRule#SetPropertiesRule(String attributeName, String propertyName)}
-     *
-     * @param pattern Element matching pattern
-     * @param attributeName map this attribute
-     * @param propertyName to this property
-     * @see SetPropertiesRule
-     */
-    public void addSetProperties(
-                                String pattern,
-                                String attributeName,
-                                String propertyName) {
-
-        addRule(pattern,
-                new SetPropertiesRule(attributeName, propertyName));
-
-    }
-
-    /**
-     * Add a "set properties" rule with overridden parameters.
-     * See {@link SetPropertiesRule#SetPropertiesRule(String [] attributeNames, String [] propertyNames)}
-     *
-     * @param pattern Element matching pattern
-     * @param attributeNames names of attributes with custom mappings
-     * @param propertyNames property names these attributes map to
-     * @see SetPropertiesRule
-     */
-    public void addSetProperties(
-                                String pattern,
-                                String [] attributeNames,
-                                String [] propertyNames) {
-
-        addRule(pattern,
-                new SetPropertiesRule(attributeNames, propertyNames));
-
-    }
-
-
-    /**
-     * Add a "set property" rule for the specified parameters.
-     *
-     * @param pattern Element matching pattern
-     * @param name Attribute name containing the property name to be set
-     * @param value Attribute name containing the property value to set
-     * @see SetPropertyRule
-     */
-    public void addSetProperty(String pattern, String name, String value) {
-
-        addRule(pattern,
-                new SetPropertyRule(name, value));
-
-    }
-
-
-    /**
-     * Add a "set top" rule for the specified parameters.
-     *
-     * @param pattern Element matching pattern
-     * @param methodName Method name to call on the parent element
-     * @see SetTopRule
-     */
-    public void addSetTop(String pattern, String methodName) {
-
-        addRule(pattern,
-                new SetTopRule(methodName));
-
-    }
-
-
-    /**
-     * Add a "set top" rule for the specified parameters.
-     *
-     * @param pattern Element matching pattern
-     * @param methodName Method name to call on the parent element
-     * @param paramType Java class name of the expected parameter type
-     *  (if you wish to use a primitive type, specify the corresponding
-     *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
-     *  for a <code>boolean</code> parameter)
-     * @see SetTopRule
-     */
-    public void addSetTop(String pattern, String methodName,
-                          String paramType) {
-
-        addRule(pattern,
-                new SetTopRule(methodName, paramType));
 
     }
 
@@ -2418,18 +1931,6 @@ public class Digester extends DefaultHandler {
 
     }
 
-    // -------------------------------------------------------- Package Methods
-
-
-    /**
-     * Return the set of DTD URL registrations, keyed by public identifier.
-     */
-    Map<String,String> getRegistrations() {
-
-        return (entityValidator);
-
-    }
-
 
     /**
      * <p>Return the top object on the parameters stack without removing it.  If there are
@@ -2442,29 +1943,6 @@ public class Digester extends DefaultHandler {
 
         try {
             return (params.peek());
-        } catch (EmptyStackException e) {
-            log.warn("Empty stack (returning null)");
-            return (null);
-        }
-
-    }
-
-
-    /**
-     * <p>Return the n'th object down the parameters stack, where 0 is the top element
-     * and [getCount()-1] is the bottom element.  If the specified index
-     * is out of range, return <code>null</code>.</p>
-     *
-     * <p>The parameters stack is used to store <code>CallMethodRule</code> parameters.
-     * See {@link #params}.</p>
-     *
-     * @param n Index of the desired element, where 0 is the top of the stack,
-     *  1 is the next element down, and so on.
-     */
-    public Object peekParams(int n) {
-
-        try {
-            return (params.peek(n));
         } catch (EmptyStackException e) {
             log.warn("Empty stack (returning null)");
             return (null);
