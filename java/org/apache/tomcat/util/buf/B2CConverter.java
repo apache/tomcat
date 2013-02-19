@@ -90,13 +90,27 @@ public class B2CConverter {
         return charset;
     }
 
+    /**
+     * @deprecated  Will be made private in Tomcat 8.0.x
+     */
+    @Deprecated
     protected CharsetDecoder decoder = null;
+    /**
+     * @deprecated  Will be made private in Tomcat 8.0.x
+     */
+    @Deprecated
     protected ByteBuffer bb = null;
+    /**
+     * @deprecated  Will be made private in Tomcat 8.0.x
+     */
+    @Deprecated
     protected CharBuffer cb = null;
 
     /**
      * Leftover buffer used for incomplete characters.
+     * @deprecated  Will be made private in Tomcat 8.0.x
      */
+    @Deprecated
     protected ByteBuffer leftovers = null;
 
     public B2CConverter(String encoding) throws IOException {
