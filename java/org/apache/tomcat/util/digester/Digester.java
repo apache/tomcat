@@ -111,51 +111,6 @@ public class Digester extends DefaultHandler {
     }
 
 
-    // --------------------------------------------------------- Constructors
-
-
-    /**
-     * Construct a new Digester with default properties.
-     */
-    public Digester() {
-
-        super();
-
-    }
-
-
-    /**
-     * Construct a new Digester, allowing a SAXParser to be passed in.  This
-     * allows Digester to be used in environments which are unfriendly to
-     * JAXP1.1 (such as WebLogic 6.0).  Thanks for the request to change go to
-     * James House (james@interobjective.com).  This may help in places where
-     * you are able to load JAXP 1.1 classes yourself.
-     */
-    public Digester(SAXParser parser) {
-
-        super();
-
-        this.parser = parser;
-
-    }
-
-
-    /**
-     * Construct a new Digester, allowing an XMLReader to be passed in.  This
-     * allows Digester to be used in environments which are unfriendly to
-     * JAXP1.1 (such as WebLogic 6.0).  Note that if you use this option you
-     * have to configure namespace and validation support yourself, as these
-     * properties only affect the SAXParser and empty constructor.
-     */
-    public Digester(XMLReader reader) {
-
-        super();
-
-        this.reader = reader;
-
-    }
-
-
     // --------------------------------------------------- Instance Variables
 
 
