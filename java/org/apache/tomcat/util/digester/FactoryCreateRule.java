@@ -60,21 +60,8 @@ public class FactoryCreateRule extends Rule {
         this.ignoreCreateExceptions = ignoreCreateExceptions;
     }
 
+
     // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * The attribute containing an override class name if it is present.
-     */
-    protected String attributeName = null;
-
-
-    /**
-     * The Java class name of the ObjectCreationFactory to be created.
-     * This class must have a no-arguments constructor.
-     */
-    protected String className = null;
-
 
     /**
      * The object creation factory we will use to instantiate objects
@@ -102,7 +89,7 @@ public class FactoryCreateRule extends Rule {
             }
 
             try {
-                Object instance = getFactory(attributes).createObject(attributes);
+                Object instance = creationFactory.createObject(attributes);
 
                 if (digester.log.isDebugEnabled()) {
                     digester.log.debug("[FactoryCreateRule]{" + digester.match +
@@ -124,7 +111,7 @@ public class FactoryCreateRule extends Rule {
             }
 
         } else {
-            Object instance = getFactory(attributes).createObject(attributes);
+            Object instance = creationFactory.createObject(attributes);
 
             if (digester.log.isDebugEnabled()) {
                 digester.log.debug("[FactoryCreateRule]{" + digester.match +
@@ -172,11 +159,7 @@ public class FactoryCreateRule extends Rule {
      */
     @Override
     public void finish() throws Exception {
-
-        if (attributeName != null) {
-            creationFactory = null;
-        }
-
+        // NO-OP
     }
 
 
@@ -187,52 +170,12 @@ public class FactoryCreateRule extends Rule {
     public String toString() {
 
         StringBuilder sb = new StringBuilder("FactoryCreateRule[");
-        sb.append("className=");
-        sb.append(className);
-        sb.append(", attributeName=");
-        sb.append(attributeName);
         if (creationFactory != null) {
-            sb.append(", creationFactory=");
+            sb.append("creationFactory=");
             sb.append(creationFactory);
         }
         sb.append("]");
         return (sb.toString());
-
-    }
-
-
-    // ------------------------------------------------------ Protected Methods
-
-
-    /**
-     * Return an instance of our associated object creation factory,
-     * creating one if necessary.
-     *
-     * @param attributes Attributes passed to our factory creation element
-     *
-     * @exception Exception if any error occurs
-     */
-    protected ObjectCreationFactory getFactory(Attributes attributes)
-            throws Exception {
-
-        if (creationFactory == null) {
-            String realClassName = className;
-            if (attributeName != null) {
-                String value = attributes.getValue(attributeName);
-                if (value != null) {
-                    realClassName = value;
-                }
-            }
-            if (digester.log.isDebugEnabled()) {
-                digester.log.debug("[FactoryCreateRule]{" + digester.match +
-                        "} New factory " + realClassName);
-            }
-            Class<?> clazz = digester.getClassLoader().loadClass(realClassName);
-            creationFactory = (ObjectCreationFactory)
-                    clazz.newInstance();
-            creationFactory.setDigester(digester);
-        }
-        return (creationFactory);
 
     }
 }
