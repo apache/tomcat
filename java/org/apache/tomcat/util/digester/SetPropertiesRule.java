@@ -36,21 +36,6 @@ import org.xml.sax.Attributes;
 
 public class SetPropertiesRule extends Rule {
 
-    // ----------------------------------------------------- Instance Variables
-
-    /**
-     * Attribute names used to override natural attribute->property mapping
-     */
-    private String [] attributeNames;
-    /**
-     * Property names used to override natural attribute->property mapping
-     */
-    private String [] propertyNames;
-
-
-    // --------------------------------------------------------- Public Methods
-
-
     /**
      * Process the beginning of this element.
      *
@@ -78,38 +63,12 @@ public class SetPropertiesRule extends Rule {
             }
         }
 
-        // set up variables for custom names mappings
-        int attNamesLength = 0;
-        if (attributeNames != null) {
-            attNamesLength = attributeNames.length;
-        }
-        int propNamesLength = 0;
-        if (propertyNames != null) {
-            propNamesLength = propertyNames.length;
-        }
-
         for (int i = 0; i < attributes.getLength(); i++) {
             String name = attributes.getLocalName(i);
             if ("".equals(name)) {
                 name = attributes.getQName(i);
             }
             String value = attributes.getValue(i);
-
-            // we'll now check for custom mappings
-            for (int n = 0; n<attNamesLength; n++) {
-                if (name.equals(attributeNames[n])) {
-                    if (n < propNamesLength) {
-                        // set this to value from list
-                        name = propertyNames[n];
-
-                    } else {
-                        // set name to null
-                        // we'll check for this later
-                        name = null;
-                    }
-                    break;
-                }
-            }
 
             if (digester.log.isDebugEnabled()) {
                 digester.log.debug("[SetPropertiesRule]{" + digester.match +
