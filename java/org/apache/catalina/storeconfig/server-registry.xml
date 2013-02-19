@@ -396,7 +396,7 @@
         tag="Interceptor"
         standard="false"
         default="false"
-        children="true"
+        children="false"
         tagClass="org.apache.catalina.tribes.ChannelInterceptor"
         storeFactoryClass="org.apache.catalina.storeconfig.InterceptorSF">
      </Description>
