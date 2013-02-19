@@ -34,49 +34,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
 
 public class SetRootRule extends Rule {
 
-
     // ----------------------------------------------------------- Constructors
-
-
-    /**
-     * Construct a "set root" rule with the specified method name.  The
-     * method's argument type is assumed to be the class of the
-     * child object.
-     *
-     * @param digester The associated Digester
-     * @param methodName Method name of the parent method to call
-     *
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method.
-     * Use {@link #SetRootRule(String methodName)} instead.
-     */
-    @Deprecated
-    public SetRootRule(Digester digester, String methodName) {
-
-        this(methodName);
-
-    }
-
-
-    /**
-     * Construct a "set root" rule with the specified method name.
-     *
-     * @param digester The associated Digester
-     * @param methodName Method name of the parent method to call
-     * @param paramType Java class of the parent method's argument
-     *  (if you wish to use a primitive type, specify the corresponding
-     *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
-     *  for a <code>boolean</code> parameter)
-     *
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method.
-     * Use {@link #SetRootRule(String methodName,String paramType)} instead.
-     */
-    @Deprecated
-    public SetRootRule(Digester digester, String methodName,
-                       String paramType) {
-
-        this(methodName, paramType);
-
-    }
 
     /**
      * Construct a "set root" rule with the specified method name.  The

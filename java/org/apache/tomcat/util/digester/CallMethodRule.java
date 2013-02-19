@@ -125,45 +125,6 @@ public class CallMethodRule extends Rule {
 
 
     /**
-     * Construct a "call method" rule with the specified method name.
-     * The method should accept no parameters.
-     *
-     * @param targetOffset location of the target object. Positive numbers are
-     * relative to the top of the digester object stack. Negative numbers
-     * are relative to the bottom of the stack. Zero implies the top
-     * object on the stack.
-     * @param methodName Method name of the parent method to call
-     */
-    public CallMethodRule(int targetOffset, String methodName) {
-
-        this(targetOffset, methodName, 0, (Class[]) null);
-
-    }
-
-
-    /**
-     * Construct a "call method" rule with the specified method name and
-     * parameter types. If <code>paramCount</code> is set to zero the rule
-     * will use the body of this element as the single argument of the
-     * method, unless <code>paramTypes</code> is null or empty, in this
-     * case the rule will call the specified method with no arguments.
-     *
-     * @param methodName Method name of the parent method to call
-     * @param paramCount The number of parameters to collect, or
-     *  zero for a single argument from the body of this element
-     * @param paramTypes The Java class names of the arguments
-     *  (if you wish to use a primitive type, specify the corresponding
-     *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
-     *  for a <code>boolean</code> parameter)
-     */
-    public CallMethodRule(
-                            String methodName,
-                            int paramCount,
-                            String paramTypes[]) {
-        this(0, methodName, paramCount, paramTypes);
-    }
-
-    /**
      * Construct a "call method" rule with the specified method name and
      * parameter types. If <code>paramCount</code> is set to zero the rule
      * will use the body of this element as the single argument of the
@@ -207,29 +168,6 @@ public class CallMethodRule extends Rule {
 
     }
 
-
-    /**
-     * Construct a "call method" rule with the specified method name and
-     * parameter types. If <code>paramCount</code> is set to zero the rule
-     * will use the body of this element as the single argument of the
-     * method, unless <code>paramTypes</code> is null or empty, in this
-     * case the rule will call the specified method with no arguments.
-     *
-     * @param methodName Method name of the parent method to call
-     * @param paramCount The number of parameters to collect, or
-     *  zero for a single argument from the body of this element
-     * @param paramTypes The Java classes that represent the
-     *  parameter types of the method arguments
-     *  (if you wish to use a primitive type, specify the corresponding
-     *  Java wrapper class instead, such as <code>java.lang.Boolean.TYPE</code>
-     *  for a <code>boolean</code> parameter)
-     */
-    public CallMethodRule(
-                            String methodName,
-                            int paramCount,
-                            Class<?> paramTypes[]) {
-        this(0, methodName, paramCount, paramTypes);
-    }
 
     /**
      * Construct a "call method" rule with the specified method name and
