@@ -336,10 +336,6 @@ public class Digester extends DefaultHandler {
         LogFactory.getLog("org.apache.tomcat.util.digester.Digester.sax");
 
 
-    /** Stacks used for inter-rule communication, indexed by name String */
-    private HashMap<String,ArrayStack<Object>> stacksByName =
-            new HashMap<>();
-
     // ------------------------------------------------------------- Properties
 
     /**
@@ -2388,102 +2384,6 @@ public class Digester extends DefaultHandler {
         }
         stack.push(object);
 
-    }
-
-    /**
-     * Pushes the given object onto the stack with the given name.
-     * If no stack already exists with the given name then one will be created.
-     *
-     * @param stackName the name of the stack onto which the object should be pushed
-     * @param value the Object to be pushed onto the named stack.
-     *
-     * @since 1.6
-     */
-    public void push(String stackName, Object value) {
-        ArrayStack<Object> namedStack = stacksByName.get(stackName);
-        if (namedStack == null) {
-            namedStack = new ArrayStack<>();
-            stacksByName.put(stackName, namedStack);
-        }
-        namedStack.push(value);
-    }
-
-    /**
-     * <p>Pops (gets and removes) the top object from the stack with the given name.</p>
-     *
-     * <p><strong>Note:</strong> a stack is considered empty
-     * if no objects have been pushed onto it yet.</p>
-     *
-     * @param stackName the name of the stack from which the top value is to be popped
-     * @return the top <code>Object</code> on the stack or or null if the stack is either
-     * empty or has not been created yet
-     * @throws EmptyStackException if the named stack is empty
-     *
-     * @since 1.6
-     */
-    public Object pop(String stackName) {
-        Object result = null;
-        ArrayStack<Object> namedStack = stacksByName.get(stackName);
-        if (namedStack == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Stack '" + stackName + "' is empty");
-            }
-            throw new EmptyStackException();
-
-        } else {
-
-            result = namedStack.pop();
-        }
-        return result;
-    }
-
-    /**
-     * <p>Gets the top object from the stack with the given name.
-     * This method does not remove the object from the stack.
-     * </p>
-     * <p><strong>Note:</strong> a stack is considered empty
-     * if no objects have been pushed onto it yet.</p>
-     *
-     * @param stackName the name of the stack to be peeked
-     * @return the top <code>Object</code> on the stack or null if the stack is either
-     * empty or has not been created yet
-     * @throws EmptyStackException if the named stack is empty
-     *
-     * @since 1.6
-     */
-    public Object peek(String stackName) {
-        Object result = null;
-        ArrayStack<Object> namedStack = stacksByName.get(stackName);
-        if (namedStack == null ) {
-            if (log.isDebugEnabled()) {
-                log.debug("Stack '" + stackName + "' is empty");
-            }
-            throw new EmptyStackException();
-
-        } else {
-
-            result = namedStack.peek();
-        }
-        return result;
-    }
-
-    /**
-     * <p>Is the stack with the given name empty?</p>
-     * <p><strong>Note:</strong> a stack is considered empty
-     * if no objects have been pushed onto it yet.</p>
-     * @param stackName the name of the stack whose emptiness
-     * should be evaluated
-     * @return true if the given stack if empty
-     *
-     * @since 1.6
-     */
-    public boolean isEmpty(String stackName) {
-        boolean result = true;
-        ArrayStack<Object> namedStack = stacksByName.get(stackName);
-        if (namedStack != null ) {
-            result = namedStack.isEmpty();
-        }
-        return result;
     }
 
     /**
