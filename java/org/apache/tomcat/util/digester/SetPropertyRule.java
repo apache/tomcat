@@ -30,29 +30,7 @@ import org.xml.sax.Attributes;
 
 public class SetPropertyRule extends Rule {
 
-
     // ----------------------------------------------------------- Constructors
-
-
-    /**
-     * Construct a "set property" rule with the specified name and value
-     * attributes.
-     *
-     * @param digester The digester with which this rule is associated
-     * @param name Name of the attribute that will contain the name of the
-     *  property to be set
-     * @param value Name of the attribute that will contain the value to which
-     *  the property should be set
-     *
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method.
-     * Use {@link #SetPropertyRule(String name, String value)} instead.
-     */
-    @Deprecated
-    public SetPropertyRule(Digester digester, String name, String value) {
-
-        this(name, value);
-
-    }
 
     /**
      * Construct a "set property" rule with the specified name and value

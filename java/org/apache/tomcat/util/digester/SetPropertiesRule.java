@@ -36,24 +36,7 @@ import org.xml.sax.Attributes;
 
 public class SetPropertiesRule extends Rule {
 
-
     // ----------------------------------------------------------- Constructors
-
-
-    /**
-     * Default constructor sets only the the associated Digester.
-     *
-     * @param digester The digester with which this rule is associated
-     *
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method.
-     * Use {@link #SetPropertiesRule()} instead.
-     */
-    @Deprecated
-    public SetPropertiesRule(Digester digester) {
-
-        this();
-
-    }
 
 
     /**
@@ -225,42 +208,6 @@ public class SetPropertiesRule extends Rule {
 
 
     /**
-     * <p>Add an additional attribute name to property name mapping.
-     * This is intended to be used from the xml rules.
-     */
-    public void addAlias(String attributeName, String propertyName) {
-
-        // this is a bit tricky.
-        // we'll need to resize the array.
-        // probably should be synchronized but digester's not thread safe anyway
-        if (attributeNames == null) {
-
-            attributeNames = new String[1];
-            attributeNames[0] = attributeName;
-            propertyNames = new String[1];
-            propertyNames[0] = propertyName;
-
-        } else {
-            int length = attributeNames.length;
-            String [] tempAttributes = new String[length + 1];
-            for (int i=0; i<length; i++) {
-                tempAttributes[i] = attributeNames[i];
-            }
-            tempAttributes[length] = attributeName;
-
-            String [] tempProperties = new String[length + 1];
-            for (int i=0; i<length && i< propertyNames.length; i++) {
-                tempProperties[i] = propertyNames[i];
-            }
-            tempProperties[length] = propertyName;
-
-            propertyNames = tempProperties;
-            attributeNames = tempAttributes;
-        }
-    }
-
-
-    /**
      * Render a printable version of this Rule.
      */
     @Override
@@ -271,6 +218,4 @@ public class SetPropertiesRule extends Rule {
         return (sb.toString());
 
     }
-
-
 }
