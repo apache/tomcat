@@ -19,13 +19,13 @@ package org.apache.tomcat.spdy;
 import java.util.Map;
 
 public class SpdyFrame {
-    public static byte[] STATUS = "status".getBytes();
+    public static final byte[] STATUS = "status".getBytes();
 
-    public static byte[] VERSION = "version".getBytes();
+    public static final byte[] VERSION = "version".getBytes();
 
-    public static byte[] HTTP11 = "HTTP/1.1".getBytes();
+    public static final byte[] HTTP11 = "HTTP/1.1".getBytes();
 
-    public static byte[] OK200 = "200 OK".getBytes();
+    public static final byte[] OK200 = "200 OK".getBytes();
 
 
     // This is a bit more complicated, to avoid multiple reads/writes.

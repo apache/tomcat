@@ -42,15 +42,15 @@ public abstract class SpdyConnection { // implements Runnable {
     // TODO: this can be pooled, to avoid allocation on idle connections
     // TODO: override socket timeout
 
-    protected volatile SpdyFrame inFrame;
+    private volatile SpdyFrame inFrame;
 
-    protected CompressSupport compressSupport;
+    private CompressSupport compressSupport;
 
     // Fields stored for each spdy connection
-    Map<Integer, SpdyStream> channels = new HashMap<>();
+    private final Map<Integer, SpdyStream> channels = new HashMap<>();
 
     // --------------
-    protected static final Logger log = Logger.getLogger(SpdyConnection.class
+    private static final Logger log = Logger.getLogger(SpdyConnection.class
             .getName());
 
     public static final int TYPE_SYN_STREAM = 1;
@@ -72,9 +72,9 @@ public abstract class SpdyConnection { // implements Runnable {
     public static String[] TYPES = { "SYN_STREAM", "SYN_REPLY", "RST_STREAM",
             "SETTINGS", "5", "PING", "GOAWAY", "HEADERS", "WINDOW_UPDATE" };
 
-    static int FLAG_HALF_CLOSE = 1;
+    static final int FLAG_HALF_CLOSE = 1;
 
-    public static String[] RST_ERRORS = {
+    private final static String[] RST_ERRORS = {
             // This is a generic error, and should only be used if a more
             // specific error is not available.
             "PROTOCOL_ERROR", "INVALID_STREAM",
@@ -103,22 +103,20 @@ public abstract class SpdyConnection { // implements Runnable {
 
     // protected SpdyFrame currentOutFrame = new SpdyFrame();
 
-    protected SpdyContext spdyContext;
+    protected final SpdyContext spdyContext;
 
     protected boolean inClosed;
 
-    int lastChannel;
+    private int lastChannel;
 
-    int outStreamId = 1;
+    private int outStreamId = 1;
 
     // TODO: finer handling of priorities
-    LinkedList<SpdyFrame> prioriyQueue = new LinkedList<>();
+    private final LinkedList<SpdyFrame> prioriyQueue = new LinkedList<>();
 
-    LinkedList<SpdyFrame> outQueue = new LinkedList<>();
+    private final LinkedList<SpdyFrame> outQueue = new LinkedList<>();
 
     // --------------
-
-    public static byte[] NPN = "spdy/2".getBytes();
 
     public static final int LONG = 1;
 
@@ -129,7 +127,7 @@ public abstract class SpdyConnection { // implements Runnable {
     /**
      * Handles the out queue for blocking sockets.
      */
-    SpdyFrame out;
+    private SpdyFrame out;
 
     private int goAway = Integer.MAX_VALUE;
 
@@ -311,9 +309,7 @@ public abstract class SpdyConnection { // implements Runnable {
         getSpdyContext().getExecutor().execute(nbDrain);
     }
 
-    static int drainCnt = 0;
-
-    Runnable nbDrain = new Runnable() {
+    private final Runnable nbDrain = new Runnable() {
         @Override
         public void run() {
             drain();

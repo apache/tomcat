@@ -47,9 +47,9 @@ public final class SpdyContext {
 
     private Executor executor;
 
-    int defaultFrameSize = 8192;
+    private int defaultFrameSize = 8192;
 
-    public static boolean debug = false;
+    public static final boolean debug = false;
 
     protected boolean tls = true;
     protected boolean compression = true;

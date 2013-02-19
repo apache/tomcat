@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 public class SpdyStream implements Runnable {
     public static final Charset UTF8 = Charset.forName("UTF-8");
 
-    protected SpdyConnection spdy;
+    private final SpdyConnection spdy;
 
     public SpdyFrame reqFrame;
 
@@ -50,7 +50,7 @@ public class SpdyStream implements Runnable {
     /**
      * For blocking support.
      */
-    protected BlockingQueue<SpdyFrame> inData = new LinkedBlockingQueue<>();
+    private final BlockingQueue<SpdyFrame> inData = new LinkedBlockingQueue<>();
 
     protected boolean finSent;
 
@@ -59,7 +59,7 @@ public class SpdyStream implements Runnable {
     /**
      *  Dummy data frame to insert on reset / go away
      */
-    static SpdyFrame END_FRAME;
+    private static final SpdyFrame END_FRAME;
 
     static {
         END_FRAME = new SpdyFrame(16);
@@ -263,10 +263,9 @@ public class SpdyStream implements Runnable {
         return new SpdyInputStream();
     }
 
-    class SpdyInputStream extends InputStream {
-        SpdyFrame current = null;
-        long to = 10000; // TODO
-        int pos = 0;
+    private class SpdyInputStream extends InputStream {
+        private SpdyFrame current = null;
+        private long to = 10000; // TODO
 
         private void fill() {
             if (current == null || current.off == current.endData) {
