@@ -67,28 +67,6 @@ public class CallParamRule extends Rule {
     }
 
 
-    /**
-     * Construct a "call parameter" rule.
-     *
-     * @param paramIndex The zero-relative parameter number
-     * @param fromStack should this parameter be taken from the top of the stack?
-     */
-    public CallParamRule(int paramIndex, boolean fromStack) {
-        this(null, paramIndex, 0, fromStack);
-    }
-
-    /**
-     * Constructs a "call parameter" rule which sets a parameter from the stack.
-     * If the stack contains too few objects, then the parameter will be set to null.
-     *
-     * @param paramIndex The zero-relative parameter number
-     * @param stackIndex the index of the object which will be passed as a parameter.
-     * The zeroth object is the top of the stack, 1 is the next object down and so on.
-     */
-    public CallParamRule(int paramIndex, int stackIndex) {
-        this(null, paramIndex, stackIndex, true);
-    }
-
     private CallParamRule(String attributeName, int paramIndex, int stackIndex,
             boolean fromStack) {
         this.attributeName = attributeName;

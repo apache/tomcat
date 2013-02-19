@@ -138,51 +138,6 @@ public class CallMethodRule extends Rule {
      * @param methodName Method name of the parent method to call
      * @param paramCount The number of parameters to collect, or
      *  zero for a single argument from the body of this element
-     * @param paramTypes The Java class names of the arguments
-     *  (if you wish to use a primitive type, specify the corresponding
-     *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
-     *  for a <code>boolean</code> parameter)
-     */
-    public CallMethodRule(  int targetOffset,
-                            String methodName,
-                            int paramCount,
-                            String paramTypes[]) {
-
-        this.targetOffset = targetOffset;
-        this.methodName = methodName;
-        this.paramCount = paramCount;
-        if (paramTypes == null) {
-            this.paramTypes = new Class[paramCount];
-            for (int i = 0; i < this.paramTypes.length; i++) {
-                this.paramTypes[i] = String.class;
-            }
-            this.paramClassNames = null;
-        } else {
-            // copy the parameter class names into an array
-            // the classes will be loaded when the digester is set
-            this.paramClassNames = new String[paramTypes.length];
-            for (int i = 0; i < this.paramClassNames.length; i++) {
-                this.paramClassNames[i] = paramTypes[i];
-            }
-        }
-
-    }
-
-
-    /**
-     * Construct a "call method" rule with the specified method name and
-     * parameter types. If <code>paramCount</code> is set to zero the rule
-     * will use the body of this element as the single argument of the
-     * method, unless <code>paramTypes</code> is null or empty, in this
-     * case the rule will call the specified method with no arguments.
-     *
-     * @param targetOffset location of the target object. Positive numbers are
-     * relative to the top of the digester object stack. Negative numbers
-     * are relative to the bottom of the stack. Zero implies the top
-     * object on the stack.
-     * @param methodName Method name of the parent method to call
-     * @param paramCount The number of parameters to collect, or
-     *  zero for a single argument from the body of this element
      * @param paramTypes The Java classes that represent the
      *  parameter types of the method arguments
      *  (if you wish to use a primitive type, specify the corresponding

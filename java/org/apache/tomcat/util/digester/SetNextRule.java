@@ -37,20 +37,6 @@ public class SetNextRule extends Rule {
     // ----------------------------------------------------------- Constructors
 
     /**
-     * Construct a "set next" rule with the specified method name.  The
-     * method's argument type is assumed to be the class of the
-     * child object.
-     *
-     * @param methodName Method name of the parent method to call
-     */
-    public SetNextRule(String methodName) {
-
-        this(methodName, null);
-
-    }
-
-
-    /**
      * Construct a "set next" rule with the specified method name.
      *
      * @param methodName Method name of the parent method to call
