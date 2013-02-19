@@ -386,14 +386,6 @@ following:</p>
     pattern.  This causes the creation of a new Java object, followed by
     "configuration" of that object's properties based on the attributes
     of the same XML element that created this object.</li>
-<li><a href="SetPropertyRule.html">SetPropertyRule</a> - When the
-    <code>begin()</code> method is called, the digester calls a specified
-    property setter (where the property itself is named by an attribute)
-    with a specified value (where the value is named by another attribute),
-    on the object at the top of the digester's stack.
-    This is useful when your XML file conforms to a particular DTD, and
-    you wish to configure a particular property that does not have a
-    corresponding attribute in the DTD.</li>
 <li><a href="SetNextRule.html">SetNextRule</a> - When the
     <code>end()</code> method is called, the digester analyzes the
     next-to-top element on the stack, looking for a property setter method
@@ -401,13 +393,6 @@ following:</p>
     at the top of the stack as an argument.  This rule is commonly used to
     establish one-to-many relationships between the two objects, with the
     method name commonly being something like "addChild".</li>
-<li><a href="SetTopRule.html">SetTopRule</a> - When the
-    <code>end()</code> method is called, the digester analyzes the
-    top element on the stack, looking for a property setter method for a
-    specified property.  It then calls this method, passing the next-to-top
-    object on the stack as an argument.  This rule would be used as an
-    alternative to a SetNextRule, with a typical method name "setParent",
-    if the API supported by your object classes prefers this approach.</li>
 <li><a href="CallMethodRule.html">CallMethodRule</a> - This rule sets up a
     method call to a named method of the top object on the digester's stack,
     which will actually take place when the <code>end()</code> method is

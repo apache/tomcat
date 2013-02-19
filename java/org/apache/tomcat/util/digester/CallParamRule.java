@@ -35,7 +35,6 @@ import org.xml.sax.Attributes;
  * <li>from the top object on the stack.
  * See {@link #CallParamRule(int paramIndex, boolean fromStack)}
  * <li>the current path being processed (separate <code>Rule</code>).
- * See {@link PathCallParamRule}
  * </ul>
  * </p>
  */
