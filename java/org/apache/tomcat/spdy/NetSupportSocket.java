@@ -68,8 +68,8 @@ public class NetSupportSocket extends SpdyContext.NetSupport {
 
     }
 
-    boolean running = true;
-    ServerSocket serverSocket;
+    private boolean running = true;
+    private ServerSocket serverSocket;
 
     @Override
     public void stop() throws IOException {
@@ -121,8 +121,8 @@ public class NetSupportSocket extends SpdyContext.NetSupport {
     }
 
 
-    public static class SpdyConnectionSocket extends SpdyConnection {
-        Socket socket;
+    private static class SpdyConnectionSocket extends SpdyConnection {
+        private Socket socket;
 
 
         Runnable inputThread = new Runnable() {

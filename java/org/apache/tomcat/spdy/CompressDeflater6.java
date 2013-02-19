@@ -27,10 +27,11 @@ import org.apache.tomcat.spdy.SpdyConnection.CompressSupport;
  * Java6 Deflater with the workaround from tomcat http filters.
  */
 class CompressDeflater6 implements CompressSupport {
-    public static long DICT_ID = 3751956914L;
+    public static final long DICT_ID = 3751956914L;
 
     // Make sure to use the latest from net/spdy/spdy_framer.cc, not from spec
-    static String SPDY_DICT_S = "optionsgetheadpostputdeletetraceacceptaccept-charsetaccept-encodingaccept-"
+    private static final String SPDY_DICT_S =
+              "optionsgetheadpostputdeletetraceacceptaccept-charsetaccept-encodingaccept-"
             + "languageauthorizationexpectfromhostif-modified-sinceif-matchif-none-matchi"
             + "f-rangeif-unmodifiedsincemax-forwardsproxy-authorizationrangerefererteuser"
             + "-agent10010120020120220320420520630030130230330430530630740040140240340440"
@@ -44,25 +45,19 @@ class CompressDeflater6 implements CompressSupport {
             + "ation/xhtmltext/plainpublicmax-agecharset=iso-8859-1utf-8gzipdeflateHTTP/1"
             + ".1statusversionurl ";
 
-    public static byte[] SPDY_DICT = SPDY_DICT_S.getBytes();
+    private static final byte[] SPDY_DICT = SPDY_DICT_S.getBytes();
     // C code uses this - not in the spec
     static {
         SPDY_DICT[SPDY_DICT.length - 1] = (byte) 0;
     }
 
-    Deflater zipOut;
-    Inflater zipIn;
+    private Deflater zipOut;
+    private Inflater zipIn;
 
-    byte[] dict;
+    private byte[] decompressBuffer;
+    private int decMax;
 
-    long dictId;
-
-    byte[] decompressBuffer;
-    int decOff;
-    int decMax;
-
-    byte[] compressBuffer;
-    int compressOff;
+    private byte[] compressBuffer;
 
     public CompressDeflater6() {
     }
@@ -145,7 +140,6 @@ class CompressDeflater6 implements CompressSupport {
 
         // will read from dec buffer to frame.data
         decMax = frame.endData;
-        decOff = start;
 
         int off = start;
 

@@ -17,8 +17,6 @@
 package org.apache.tomcat.spdy;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 import org.apache.tomcat.jni.SSLExt;
 import org.apache.tomcat.jni.Status;
@@ -30,8 +28,7 @@ import org.apache.tomcat.jni.socket.AprSocketContext.TlsCertVerifier;
 
 public class NetSupportOpenSSL extends SpdyContext.NetSupport {
 
-    List<String> protos = Arrays.asList(new String[] {"spdy/2", "http/1.1"});
-    AprSocketContext con;
+    private AprSocketContext con;
 
     public NetSupportOpenSSL() {
         con = new AprSocketContext();
@@ -119,8 +116,8 @@ public class NetSupportOpenSSL extends SpdyContext.NetSupport {
     }
 
     // NB
-    static class SpdySocketHandler implements NonBlockingPollHandler {
-        SpdyConnection con;
+    private static class SpdySocketHandler implements NonBlockingPollHandler {
+        private final SpdyConnection con;
 
         SpdySocketHandler(SpdyConnection con) {
             this.con = con;
@@ -156,8 +153,8 @@ public class NetSupportOpenSSL extends SpdyContext.NetSupport {
 
     }
 
-    public static class SpdyConnectionAprSocket extends SpdyConnection {
-        AprSocket socket;
+    private static class SpdyConnectionAprSocket extends SpdyConnection {
+        private AprSocket socket;
 
         public SpdyConnectionAprSocket(SpdyContext spdyContext) {
             super(spdyContext);
