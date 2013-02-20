@@ -25,6 +25,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -34,6 +36,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.websocket.EncodeException;
+import javax.websocket.Encoder;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
@@ -69,6 +72,7 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     private final AtomicBoolean batchingAllowed = new AtomicBoolean(false);
     private volatile long asyncSendTimeout = -1;
     private WsSession wsSession;
+    private List<EncoderEntry> encoderEntries = new ArrayList<>();
 
 
     @Override
@@ -447,6 +451,15 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     }
 
 
+    protected void setEncoders(List<Encoder> encoders) {
+        encoderEntries.clear();
+        for (Encoder encoder : encoders) {
+            EncoderEntry entry =
+                    new EncoderEntry(Util.getEncoderType(encoder), encoder);
+            encoderEntries.add(entry);
+        }
+    }
+
     protected abstract void doWrite(SendHandler handler, ByteBuffer... data);
     protected abstract boolean isMasked();
     protected abstract void close();
@@ -770,6 +783,26 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
             buffer.flip();
             endpoint.sendPartialString(buffer, last);
             buffer.clear();
+        }
+    }
+
+
+    private static class EncoderEntry {
+
+        private final Class<?> clazz;
+        private final Encoder encoder;
+
+        public EncoderEntry(Class<?> clazz, Encoder encoder) {
+            this.clazz = clazz;
+            this.encoder = encoder;
+        }
+
+        public Class<?> getClazz() {
+            return clazz;
+        }
+
+        public Encoder getEncoder() {
+            return encoder;
         }
     }
 }

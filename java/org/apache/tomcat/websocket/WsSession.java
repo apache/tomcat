@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.Encoder;
 import javax.websocket.Endpoint;
 import javax.websocket.Extension;
 import javax.websocket.MessageHandler;
@@ -88,7 +89,7 @@ public class WsSession implements Session {
             WsWebSocketContainer wsWebSocketContainer,
             WsRequest request, String subProtocol,
             Map<String,String> pathParameters,
-            boolean secure) {
+            boolean secure, List<Encoder> encoders) {
         this.localEndpoint = localEndpoint;
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);
@@ -106,6 +107,7 @@ public class WsSession implements Session {
         this.subProtocol = subProtocol;
         this.pathParameters = pathParameters;
         this.secure = secure;
+        this.wsRemoteEndpoint.setEncoders(encoders);
     }
 
 
@@ -386,6 +388,7 @@ public class WsSession implements Session {
     protected void updateLastActive() {
         lastActive = System.currentTimeMillis();
     }
+
 
     protected void expire() {
         long timeout = sessionIdleTimeout;
