@@ -29,13 +29,13 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class HttpMessages {
     // XXX move message resources in this package
-    protected static final StringManager sm =
+    private static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.http.res");
 
-    static String st_200=null;
-    static String st_302=null;
-    static String st_400=null;
-    static String st_404=null;
+    private static String st_200=null;
+    private static String st_302=null;
+    private static String st_400=null;
+    private static String st_404=null;
 
     /** Get the status string associated with a status code.
      *  No I18N - return the messages defined in the HTTP spec.
