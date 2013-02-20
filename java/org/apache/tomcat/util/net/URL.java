@@ -176,28 +176,6 @@ public final class URL implements Serializable {
 
 
     /**
-     * Create a URL object from the specified components.  The default port
-     * number for the specified protocol will be used.
-     *
-     * @param protocol Name of the protocol to use
-     * @param host Name of the host addressed by this protocol
-     * @param file Filename on the specified host
-     *
-     * @exception MalformedURLException is never thrown, but present for
-     *  compatible APIs
-     *
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    public URL(String protocol, String host, String file)
-        throws MalformedURLException {
-
-        this(protocol, host, -1, file);
-
-    }
-
-
-    /**
      * Create a URL object from the specified components.  Specifying a port
      * number of -1 indicates that the URL should use the default port for
      * that protocol.  Based on logic from JDK 1.3.1's
