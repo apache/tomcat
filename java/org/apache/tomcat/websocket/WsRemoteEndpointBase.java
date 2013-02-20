@@ -496,13 +496,6 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
                 return entry.getEncoder();
             }
         }
-
-        if (obj instanceof Byte || obj instanceof Short ||
-                obj instanceof Integer || obj instanceof Long ||
-                obj instanceof Float || obj instanceof Double ||
-                obj instanceof Character || obj instanceof Boolean) {
-            return new ToStringEncoder();
-        }
         return null;
     }
 
@@ -510,15 +503,6 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     protected abstract void doWrite(SendHandler handler, ByteBuffer... data);
     protected abstract boolean isMasked();
     protected abstract void close();
-
-
-    private static class ToStringEncoder implements Encoder.Text<Object> {
-
-        @Override
-        public String encode(Object object) throws EncodeException {
-            return object.toString();
-        }
-    }
 
 
     private static void writeHeader(ByteBuffer headerBuffer, byte opCode,
