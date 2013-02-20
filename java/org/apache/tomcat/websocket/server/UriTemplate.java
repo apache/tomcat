@@ -32,7 +32,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class UriTemplate {
 
-    private static StringManager sm =
+    private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final String template;

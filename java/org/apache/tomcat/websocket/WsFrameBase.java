@@ -67,7 +67,7 @@ public abstract class WsFrameBase {
     private boolean fin = false;
     private int rsv = 0;
     private byte opCode = 0;
-    private byte[] mask = new byte[4];
+    private final byte[] mask = new byte[4];
     private int maskIndex = 0;
     private long payloadLength = 0;
     private long payloadWritten = 0;

@@ -51,12 +51,12 @@ public class ServerContainerImpl extends WsWebSocketContainer {
 
     // Needs to be a WeakHashMap to prevent memory leaks when a context is
     // stopped
-    private static Map<ClassLoader,ServerContainerImpl> classLoaderContainerMap =
-            new WeakHashMap<>();
-    private static Object classLoaderContainerMapLock = new Object();
-    private static StringManager sm =
+    private static final Map<ClassLoader,ServerContainerImpl>
+            classLoaderContainerMap = new WeakHashMap<>();
+    private static final Object classLoaderContainerMapLock = new Object();
+    private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
-    protected final Log log = LogFactory.getLog(ServerContainerImpl.class);
+    private final Log log = LogFactory.getLog(ServerContainerImpl.class);
 
 
     public static ServerContainerImpl getServerContainer() {
@@ -75,12 +75,12 @@ public class ServerContainerImpl extends WsWebSocketContainer {
     private final WsWriteTimeout wsWriteTimeout = new WsWriteTimeout();
 
     private volatile ServletContext servletContext = null;
-    private Map<String,ServerEndpointConfiguration> configMap =
+    private final Map<String,ServerEndpointConfiguration> configMap =
             new ConcurrentHashMap<>();
-    private Map<String,UriTemplate> templateMap =
+    private final Map<String,UriTemplate> templateMap =
             new ConcurrentHashMap<>();
-    private Map<String,Class<?>> pojoMap = new ConcurrentHashMap<>();
-    private Map<Class<?>,PojoMethodMapping> pojoMethodMap =
+    private final Map<String,Class<?>> pojoMap = new ConcurrentHashMap<>();
+    private final Map<Class<?>,PojoMethodMapping> pojoMethodMap =
             new ConcurrentHashMap<>();
 
 
