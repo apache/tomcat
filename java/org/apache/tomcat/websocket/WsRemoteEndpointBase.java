@@ -428,21 +428,50 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
 
     @Override
-    public void sendObject(Object o) throws IOException, EncodeException {
-        // TODO Auto-generated method stub
-
+    public void sendObject(Object obj) throws IOException, EncodeException {
+        Future<SendResult> f = sendObjectByFuture(obj);
+        try {
+            f.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
     public Future<SendResult> sendObjectByFuture(Object obj) {
-        // TODO Auto-generated method stub
-        return null;
+        FutureToSendHandler f2sh = new FutureToSendHandler();
+        sendObjectByCompletion(obj, f2sh);
+        return f2sh;
     }
 
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public void sendObjectByCompletion(Object obj, SendHandler completion) {
-        // TODO Auto-generated method stub
 
+        Encoder encoder = findEncoder(obj);
+
+        try {
+            if (encoder instanceof Encoder.Text) {
+                String msg = ((Encoder.Text) encoder).encode(obj);
+                sendStringByCompletion(msg, completion);
+            } else if (encoder instanceof Encoder.TextStream) {
+                Writer w = getSendWriter();
+                ((Encoder.TextStream) encoder).encode(obj, w);
+            } else if (encoder instanceof Encoder.Binary) {
+                ByteBuffer msg = ((Encoder.Binary) encoder).encode(obj);
+                sendBytesByCompletion(msg, completion);
+            } else if (encoder instanceof Encoder.BinaryStream) {
+                OutputStream os = getSendStream();
+                ((Encoder.BinaryStream) encoder).encode(obj, os);
+            } else {
+                throw new EncodeException(obj, sm.getString(
+                        "wsRemoteEndpoint.noEncoder", obj.getClass()));
+            }
+        } catch (EncodeException | IOException e) {
+            SendResult sr = new SendResult(e);
+            completion.setResult(sr);
+        }
     }
 
 
@@ -460,9 +489,36 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
         }
     }
 
+
+    private Encoder findEncoder(Object obj) {
+        for (EncoderEntry entry : encoderEntries) {
+            if (entry.getClazz().isAssignableFrom(obj.getClass())) {
+                return entry.getEncoder();
+            }
+        }
+
+        if (obj instanceof Byte || obj instanceof Short ||
+                obj instanceof Integer || obj instanceof Long ||
+                obj instanceof Float || obj instanceof Double ||
+                obj instanceof Character || obj instanceof Boolean) {
+            return new ToStringEncoder();
+        }
+        return null;
+    }
+
+
     protected abstract void doWrite(SendHandler handler, ByteBuffer... data);
     protected abstract boolean isMasked();
     protected abstract void close();
+
+
+    private static class ToStringEncoder implements Encoder.Text<Object> {
+
+        @Override
+        public String encode(Object object) throws EncodeException {
+            return object.toString();
+        }
+    }
 
 
     private static void writeHeader(ByteBuffer headerBuffer, byte opCode,
