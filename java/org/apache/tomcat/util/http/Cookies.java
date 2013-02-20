@@ -50,7 +50,7 @@ public final class Cookies {
     int cookieCount=0;
     boolean unprocessed=true;
 
-    MimeHeaders headers;
+    private final MimeHeaders headers;
 
     /**
      *  Construct a new cookie collection, that will extract

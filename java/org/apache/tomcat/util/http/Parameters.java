@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.log.UserDataHelper;
@@ -46,20 +45,20 @@ public final class Parameters {
 
     private static final UserDataHelper maxParamCountLog = new UserDataHelper(log);
 
-    protected static final StringManager sm =
+    private static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.http");
 
     private final HashMap<String,ArrayList<String>> paramHashValues =
             new HashMap<>();
     private boolean didQueryParameters=false;
 
-    MessageBytes queryMB;
+    private MessageBytes queryMB;
 
-    UDecoder urlDec;
-    MessageBytes decodedQuery=MessageBytes.newInstance();
+    private UDecoder urlDec;
+    private final MessageBytes decodedQuery = MessageBytes.newInstance();
 
-    String encoding=null;
-    String queryStringEncoding=null;
+    private String encoding=null;
+    private String queryStringEncoding=null;
 
     private int limit = -1;
     private int parameterCount = 0;
@@ -208,11 +207,10 @@ public final class Parameters {
     // -------------------- Parameter parsing --------------------
     // we are called from a single thread - we can do it the hard way
     // if needed
-    ByteChunk tmpName=new ByteChunk();
-    ByteChunk tmpValue=new ByteChunk();
+    private final ByteChunk tmpName=new ByteChunk();
+    private final ByteChunk tmpValue=new ByteChunk();
     private final ByteChunk origName=new ByteChunk();
     private final ByteChunk origValue=new ByteChunk();
-    CharChunk tmpNameC=new CharChunk(1024);
     public static final String DEFAULT_ENCODING = "ISO-8859-1";
     private static final Charset DEFAULT_CHARSET =
         Charset.forName(DEFAULT_ENCODING);
@@ -498,7 +496,8 @@ public final class Parameters {
     /**
      * Debug purpose
      */
-    public String paramsAsString() {
+    @Override
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, ArrayList<String>> e : paramHashValues.entrySet()) {
             sb.append(e.getKey()).append('=');

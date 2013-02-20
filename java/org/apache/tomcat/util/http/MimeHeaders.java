@@ -385,10 +385,10 @@ public class MimeHeaders {
     we want to keep add O(1).
 */
 class NamesEnumerator implements Enumeration<String> {
-    int pos;
-    int size;
-    String next;
-    MimeHeaders headers;
+    private int pos;
+    private final int size;
+    private String next;
+    private final MimeHeaders headers;
 
     public NamesEnumerator(MimeHeaders headers) {
         this.headers=headers;
@@ -435,11 +435,11 @@ class NamesEnumerator implements Enumeration<String> {
     value element.
 */
 class ValuesEnumerator implements Enumeration<String> {
-    int pos;
-    int size;
-    MessageBytes next;
-    MimeHeaders headers;
-    String name;
+    private int pos;
+    private final int size;
+    private MessageBytes next;
+    private final MimeHeaders headers;
+    private final String name;
 
     ValuesEnumerator(MimeHeaders headers, String name) {
         this.name=name;
@@ -476,8 +476,8 @@ class ValuesEnumerator implements Enumeration<String> {
 
 class MimeHeaderField {
 
-    protected final MessageBytes nameB = MessageBytes.newInstance();
-    protected final MessageBytes valueB = MessageBytes.newInstance();
+    private final MessageBytes nameB = MessageBytes.newInstance();
+    private final MessageBytes valueB = MessageBytes.newInstance();
 
     /**
      * Creates a new, uninitialized header field.
