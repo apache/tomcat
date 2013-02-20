@@ -402,6 +402,4 @@ public class WsSession implements Session {
             }
         }
     }
-
-    // Protected so unit tests can use it
 }
