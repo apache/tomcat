@@ -142,16 +142,8 @@ public class UserDataHelper {
      * Log mode for the next log message.
      */
     public static enum Mode {
-        DEBUG(false), INFO_THEN_DEBUG(true), INFO(false);
-
-        private final boolean fallToDebug;
-
-        Mode(boolean fallToDebug) {
-            this.fallToDebug = fallToDebug;
-        }
-
-        public boolean fallToDebug() {
-            return fallToDebug;
-        }
+        DEBUG,
+        INFO_THEN_DEBUG,
+        INFO;
     }
 }
