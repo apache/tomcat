@@ -36,7 +36,7 @@ import org.apache.tomcat.websocket.WsRemoteEndpointBase;
  */
 public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
 
-    private static StringManager sm =
+    private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
     private static final Log log =
             LogFactory.getLog(WsProtocolHandler.class);

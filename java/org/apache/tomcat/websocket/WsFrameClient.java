@@ -26,8 +26,8 @@ import javax.websocket.CloseReason.CloseCodes;
 
 public class WsFrameClient extends WsFrameBase {
 
-    private ByteBuffer response;
-    private AsynchronousSocketChannel channel;
+    private final ByteBuffer response;
+    private final AsynchronousSocketChannel channel;
     private final CompletionHandler<Integer,Void> handler;
 
     public WsFrameClient(ByteBuffer response, AsynchronousSocketChannel channel,
