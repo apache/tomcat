@@ -175,46 +175,6 @@ public final class URL implements Serializable {
     }
 
 
-    /**
-     * Create a URL object from the specified components.  Specifying a port
-     * number of -1 indicates that the URL should use the default port for
-     * that protocol.  Based on logic from JDK 1.3.1's
-     * <code>java.net.URL</code>.
-     *
-     * @param protocol Name of the protocol to use
-     * @param host Name of the host addressed by this protocol
-     * @param port Port number, or -1 for the default port for this protocol
-     * @param file Filename on the specified host
-     *
-     * @exception MalformedURLException is never thrown, but present for
-     *  compatible APIs
-     *
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    public URL(String protocol, String host, int port, String file)
-        throws MalformedURLException {
-
-        this.protocol = protocol;
-        this.host = host;
-        this.port = port;
-
-        int hash = file.indexOf('#');
-        this.file = hash < 0 ? file : file.substring(0, hash);
-        this.ref = hash < 0 ? null : file.substring(hash + 1);
-        int question = file.lastIndexOf('?');
-        if (question >= 0) {
-            query = file.substring(question + 1);
-            path = file.substring(0, question);
-        } else
-            path = file;
-
-        if ((host != null) && (host.length() > 0))
-            authority = (port == -1) ? host : host + ":" + port;
-
-    }
-
-
     // ----------------------------------------------------- Instance Variables
 
 
@@ -520,38 +480,6 @@ public final class URL implements Serializable {
         if (!compare(file, other.getFile()))
             return (false);
         return (true);
-
-    }
-
-
-    /**
-     * Return a string representation of this URL.  This follow the rules in
-     * RFC 2396, Section 5.2, Step 7.
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    public String toExternalForm() {
-
-        StringBuilder sb = new StringBuilder();
-        if (protocol != null) {
-            sb.append(protocol);
-            sb.append(":");
-        }
-        if (authority != null) {
-            sb.append("//");
-            sb.append(authority);
-        }
-        if (path != null)
-            sb.append(path);
-        if (query != null) {
-            sb.append('?');
-            sb.append(query);
-        }
-        if (ref != null) {
-            sb.append('#');
-            sb.append(ref);
-        }
-        return (sb.toString());
 
     }
 
