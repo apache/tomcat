@@ -74,7 +74,7 @@ public abstract class SpdyConnection { // implements Runnable {
 
     static final int FLAG_HALF_CLOSE = 1;
 
-    private final static String[] RST_ERRORS = {
+    private static final String[] RST_ERRORS = {
             // This is a generic error, and should only be used if a more
             // specific error is not available.
             "PROTOCOL_ERROR", "INVALID_STREAM",

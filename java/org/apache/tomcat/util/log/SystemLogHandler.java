@@ -58,13 +58,13 @@ public class SystemLogHandler extends PrintStream {
     /**
      * Thread <-> CaptureLog associations.
      */
-    private final static ThreadLocal<Stack<CaptureLog>> logs = new ThreadLocal<>();
+    private static final ThreadLocal<Stack<CaptureLog>> logs = new ThreadLocal<>();
 
 
     /**
      * Spare CaptureLog ready for reuse.
      */
-    private final static Stack<CaptureLog> reuse = new Stack<>();
+    private static final Stack<CaptureLog> reuse = new Stack<>();
 
 
     // --------------------------------------------------------- Public Methods
