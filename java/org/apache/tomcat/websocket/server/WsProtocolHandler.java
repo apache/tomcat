@@ -96,7 +96,7 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
                     new WsRemoteEndpointServer(sos, webSocketContainer);
             wsSession = new WsSession(ep, wsRemoteEndpointServer,
                     webSocketContainer, request, subProtocol, pathParameters,
-                    secure);
+                    secure, endpointConfig.getEncoders());
             WsFrameServer wsFrame = new WsFrameServer(
                     sis,
                     wsSession);
