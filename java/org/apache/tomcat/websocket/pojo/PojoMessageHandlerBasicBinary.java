@@ -28,8 +28,8 @@ public class PojoMessageHandlerBasicBinary
         extends PojoMessageHandlerBasicBase<ByteBuffer> {
 
     public PojoMessageHandlerBasicBinary(Object pojo, Method method,
-            Session session, Object[] params, int indexPayload, boolean wrap,
+            Session session, Object[] params, int indexPayload, boolean unwrap,
             int indexSession) {
-        super(pojo, method, session, params, indexPayload, wrap, indexSession);
+        super(pojo, method, session, params, indexPayload, unwrap, indexSession);
     }
 }

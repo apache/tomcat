@@ -36,8 +36,8 @@ public abstract class PojoMessageHandlerAsyncBase<T>
 
     public PojoMessageHandlerAsyncBase(Object pojo, Method method,
             Session session, Object[] params, int indexPayload,
-            boolean wrap, int indexBoolean, int indexSession) {
-        super(pojo, method, session, params, indexPayload, wrap,
+            boolean unwrap, int indexBoolean, int indexSession) {
+        super(pojo, method, session, params, indexPayload, unwrap,
                 indexSession);
         this.indexBoolean = indexBoolean;
     }

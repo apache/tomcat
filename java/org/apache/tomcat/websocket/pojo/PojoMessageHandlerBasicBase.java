@@ -34,8 +34,8 @@ public abstract class PojoMessageHandlerBasicBase<T>
 
     public PojoMessageHandlerBasicBase(Object pojo, Method method,
             Session session, Object[] params, int indexPayload,
-            boolean wrap, int indexSession) {
-        super(pojo, method, session, params, indexPayload, wrap,
+            boolean unwrap, int indexSession) {
+        super(pojo, method, session, params, indexPayload, unwrap,
                 indexSession);
     }
 
