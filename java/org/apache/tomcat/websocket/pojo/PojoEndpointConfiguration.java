@@ -34,7 +34,8 @@ public class PojoEndpointConfiguration extends DefaultServerConfiguration {
 
 
     public PojoEndpointConfiguration(Class<?> pojoClass,
-            PojoMethodMapping methodMapping, Map<String,String> pathParameters) {
+            PojoMethodMapping methodMapping,
+            Map<String,String> pathParameters) {
         super(PojoEndpoint.class, methodMapping.getWsPath());
         this.pojoClass = pojoClass;
         this.methodMapping = methodMapping;

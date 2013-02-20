@@ -28,9 +28,9 @@ public class PojoMessageHandlerAsyncBinary
         extends PojoMessageHandlerAsyncBase<ByteBuffer>{
 
     public PojoMessageHandlerAsyncBinary(Object pojo, Method method,
-            Session session, Object[] params, int indexPayload, boolean wrap,
+            Session session, Object[] params, int indexPayload, boolean unwrap,
             int indexBoolean, int indexSession) {
-        super(pojo, method, session, params, indexPayload, wrap, indexBoolean,
+        super(pojo, method, session, params, indexPayload, unwrap, indexBoolean,
                 indexSession);
     }
 }
