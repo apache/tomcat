@@ -23,7 +23,6 @@ public class SocketWrapper<E> {
     protected volatile long lastAccess = -1;
     protected long timeout = -1;
     protected boolean error = false;
-    protected long lastRegistered = 0;
     protected volatile int keepAliveLeft = 100;
     private boolean comet = false;
     protected boolean async = false;

@@ -1382,7 +1382,6 @@ public class NioEndpoint extends AbstractEndpoint {
             setComet(false);
             timeout = soTimeout;
             error = false;
-            lastRegistered = 0;
             sendfileData = null;
             if (readLatch != null) {
                 try {
