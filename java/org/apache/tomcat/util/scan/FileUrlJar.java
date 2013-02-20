@@ -31,7 +31,7 @@ import java.util.zip.ZipEntry;
  */
 public class FileUrlJar implements Jar {
 
-    private JarFile jarFile;
+    private final JarFile jarFile;
     private Enumeration<JarEntry> entries;
     private JarEntry entry = null;
 
