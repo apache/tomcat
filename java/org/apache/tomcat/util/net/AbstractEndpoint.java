@@ -626,7 +626,9 @@ public abstract class AbstractEndpoint {
 
         for (int i = 0; i < count; i++) {
             acceptors[i] = createAcceptor();
-            Thread t = new Thread(acceptors[i], getName() + "-Acceptor-" + i);
+            String threadName = getName() + "-Acceptor-" + i;
+            acceptors[i].setThreadName(threadName);
+            Thread t = new Thread(acceptors[i], threadName);
             t.setPriority(getAcceptorThreadPriority());
             t.setDaemon(getDaemon());
             t.start();
