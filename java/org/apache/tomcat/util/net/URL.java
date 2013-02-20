@@ -188,7 +188,10 @@ public final class URL implements Serializable {
      *
      * @exception MalformedURLException is never thrown, but present for
      *  compatible APIs
+     *
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     public URL(String protocol, String host, int port, String file)
         throws MalformedURLException {
 
@@ -524,7 +527,9 @@ public final class URL implements Serializable {
     /**
      * Return a string representation of this URL.  This follow the rules in
      * RFC 2396, Section 5.2, Step 7.
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     public String toExternalForm() {
 
         StringBuilder sb = new StringBuilder();
