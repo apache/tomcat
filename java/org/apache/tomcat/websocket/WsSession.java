@@ -407,11 +407,11 @@ public class WsSession implements Session {
 
     // Protected so unit tests can use it
     protected static Class<?> getMessageType(MessageHandler listener) {
-        return (Class<?>) getMessageType(listener.getClass());
+        return (Class<?>) getGenericType(listener.getClass());
     }
 
 
-    private static Object getMessageType(Class<? extends MessageHandler> clazz) {
+    private static Object getGenericType(Class<? extends MessageHandler> clazz) {
 
         // Look to see if this class implements the generic MessageHandler<>
         // interface
@@ -423,12 +423,12 @@ public class WsSession implements Session {
             if (iface instanceof ParameterizedType) {
                 ParameterizedType pi = (ParameterizedType) iface;
                 // Look for the MessageHandler<> interface
-                if (pi.getRawType().equals(MessageHandler.Basic.class)
-                        || pi.getRawType().equals(MessageHandler.Async.class)) {
-                    // Whichever interface it is, there is only one generic
-                    // type.
-                    return getTypeParameter(
-                            clazz, pi.getActualTypeArguments()[0]);
+                if (pi.getRawType() instanceof Class) {
+                    if (MessageHandler.class.isAssignableFrom(
+                            (Class<?>) pi.getRawType())) {
+                        return getTypeParameter(
+                                clazz, pi.getActualTypeArguments()[0]);
+                    }
                 }
             }
         }
@@ -437,7 +437,7 @@ public class WsSession implements Session {
         Class<? extends MessageHandler> superClazz =
                 (Class<? extends MessageHandler>) clazz.getSuperclass();
 
-        Object result = getMessageType(superClazz);
+        Object result = getGenericType(superClazz);
         if (result instanceof Class<?>) {
             // Superclass implements interface and defines explicit type for
             // MessageHandler<>
