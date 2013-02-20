@@ -154,49 +154,6 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
 
 
     /**
-     * Remove a notification event listener from this MBean.
-     *
-     * @param listener The listener to be removed (any and all registrations
-     *  for this listener will be eliminated)
-     * @param handback Handback object to be sent along with event
-     *  notifications
-     *
-     * @exception ListenerNotFoundException if this listener is not
-     *  registered in the MBean
-     */
-    public void removeNotificationListener(NotificationListener listener,
-                                           Object handback)
-        throws ListenerNotFoundException {
-
-        removeNotificationListener(listener);
-
-    }
-
-
-    /**
-     * Remove a notification event listener from this MBean.
-     *
-     * @param listener The listener to be removed (any and all registrations
-     *  for this listener will be eliminated)
-     * @param filter Filter object used to filter event notifications
-     *  actually delivered, or <code>null</code> for no filtering
-     * @param handback Handback object to be sent along with event
-     *  notifications
-     *
-     * @exception ListenerNotFoundException if this listener is not
-     *  registered in the MBean
-     */
-    public void removeNotificationListener(NotificationListener listener,
-                                           NotificationFilter filter,
-                                           Object handback)
-        throws ListenerNotFoundException {
-
-        removeNotificationListener(listener);
-
-    }
-
-
-    /**
      * Send the specified notification to all interested listeners.
      *
      * @param notification The notification to be sent

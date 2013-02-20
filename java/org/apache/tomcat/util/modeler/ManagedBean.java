@@ -54,7 +54,6 @@ public class ManagedBean implements java.io.Serializable {
 
     private static final String BASE_MBEAN = "org.apache.tomcat.util.modeler.BaseModelMBean";
     // ----------------------------------------------------- Instance Variables
-    static final Object[] NO_ARGS_PARAM = new Object[0];
     static final Class<?>[] NO_ARGS_PARAM_SIG = new Class[0];
 
 
@@ -272,29 +271,6 @@ public class ManagedBean implements java.io.Serializable {
      */
     public void addOperation(OperationInfo operation) {
         operations.put(operation.getName(), operation);
-    }
-
-
-    /**
-     * Create and return a <code>ModelMBean</code> that has been
-     * preconfigured with the <code>ModelMBeanInfo</code> information
-     * for this managed bean, but is not associated with any particular
-     * managed resource.  The returned <code>ModelMBean</code> will
-     * <strong>NOT</strong> have been registered with our
-     * <code>MBeanServer</code>.
-     *
-     * @exception InstanceNotFoundException if the managed resource
-     *  object cannot be found
-     * @exception MBeanException if a problem occurs instantiating the
-     *  <code>ModelMBean</code> instance
-     * @exception RuntimeOperationsException if a JMX runtime error occurs
-     */
-    public DynamicMBean createMBean()
-        throws InstanceNotFoundException,
-        MBeanException, RuntimeOperationsException {
-
-        return (createMBean(null));
-
     }
 
 
