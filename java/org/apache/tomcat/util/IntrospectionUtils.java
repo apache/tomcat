@@ -298,7 +298,7 @@ public final class IntrospectionUtils {
         objectMethods.clear();
     }
 
-    static Hashtable<Class<?>,Method[]> objectMethods = new Hashtable<>();
+    private static final Hashtable<Class<?>,Method[]> objectMethods = new Hashtable<>();
 
     public static Method[] findMethods(Class<?> c) {
         Method methods[] = objectMethods.get(c);
