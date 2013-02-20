@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.Encoder;
 import javax.websocket.MessageHandler;
 
 /**
@@ -138,6 +139,12 @@ class Util {
     static Class<?> getMessageType(MessageHandler listener) {
         return (Class<?>) Util.getGenericType(MessageHandler.class,
                 listener.getClass());
+    }
+
+
+    static Class<?> getEncoderType(Encoder encoder) {
+        return (Class<?>) Util.getGenericType(Encoder.class,
+                encoder.getClass());
     }
 
 

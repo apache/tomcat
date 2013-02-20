@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.websocket;
 
+import javax.websocket.EncodeException;
+import javax.websocket.Encoder;
 import javax.websocket.MessageHandler;
 
 import org.junit.Assert;
@@ -26,39 +28,75 @@ public class TestUtil {
     @Test
     public void testGetMessageTypeSimple() {
         Assert.assertEquals(
-                String.class, Util.getMessageType(new Simple()));
+                String.class, Util.getMessageType(new SimpleMessageHandler()));
     }
 
 
     @Test
     public void testGetMessageTypeSubclass() {
         Assert.assertEquals(String.class,
-                Util.getMessageType(new SubSimple()));
+                Util.getMessageType(new SubSimpleMessageHandler()));
     }
 
 
     @Test
     public void testGetMessageTypeGenericSubclass() {
         Assert.assertEquals(String.class,
-                Util.getMessageType(new GenericSub()));
+                Util.getMessageType(new GenericSubMessageHandler()));
     }
 
 
     @Test
     public void testGetMessageTypeGenericMultipleSubclass() {
         Assert.assertEquals(String.class,
-                Util.getMessageType(new GenericMultipleSubSub()));
+                Util.getMessageType(new GenericMultipleSubSubMessageHandler()));
     }
 
 
     @Test
     public void testGetMessageTypeGenericMultipleSubclassSwap() {
         Assert.assertEquals(String.class,
-                Util.getMessageType(new GenericMultipleSubSubSwap()));
+                Util.getMessageType(new GenericMultipleSubSubSwapMessageHandler()));
     }
 
 
-    private static class Simple implements MessageHandler.Basic<String> {
+    @Test
+    public void testGetEncoderTypeSimple() {
+        Assert.assertEquals(
+                String.class, Util.getEncoderType(new SimpleEncoder()));
+    }
+
+
+    @Test
+    public void testGetEncoderTypeSubclass() {
+        Assert.assertEquals(String.class,
+                Util.getEncoderType(new SubSimpleEncoder()));
+    }
+
+
+    @Test
+    public void testGetEncoderTypeGenericSubclass() {
+        Assert.assertEquals(String.class,
+                Util.getEncoderType(new GenericSubEncoder()));
+    }
+
+
+    @Test
+    public void testGetEncoderTypeGenericMultipleSubclass() {
+        Assert.assertEquals(String.class,
+                Util.getEncoderType(new GenericMultipleSubSubEncoder()));
+    }
+
+
+    @Test
+    public void testGetEncoderTypeGenericMultipleSubclassSwap() {
+        Assert.assertEquals(String.class,
+                Util.getEncoderType(new GenericMultipleSubSubSwapEncoder()));
+    }
+
+
+    private static class SimpleMessageHandler
+            implements MessageHandler.Basic<String> {
         @Override
         public void onMessage(String message) {
             // NO-OP
@@ -66,16 +104,17 @@ public class TestUtil {
     }
 
 
-    private static class SubSimple extends Simple {
+    private static class SubSimpleMessageHandler extends SimpleMessageHandler {
     }
 
 
-    private abstract static class Generic<T>
+    private abstract static class GenericMessageHandler<T>
             implements MessageHandler.Basic<T> {
     }
 
 
-    private static class GenericSub extends Generic<String>{
+    private static class GenericSubMessageHandler
+            extends GenericMessageHandler<String>{
 
         @Override
         public void onMessage(String message) {
@@ -89,18 +128,18 @@ public class TestUtil {
     }
 
 
-    private abstract static class GenericMultiple<A,B>
+    private abstract static class GenericMultipleMessageHandler<A,B>
             implements MessageHandler.Basic<A>, Foo<B> {
     }
 
 
-    private abstract static class GenericMultipleSub<X,Y>
-            extends GenericMultiple<X,Y> {
+    private abstract static class GenericMultipleSubMessageHandler<X,Y>
+            extends GenericMultipleMessageHandler<X,Y> {
     }
 
 
-    private static class GenericMultipleSubSub
-            extends GenericMultipleSub<String,Boolean> {
+    private static class GenericMultipleSubSubMessageHandler
+            extends GenericMultipleSubMessageHandler<String,Boolean> {
 
         @Override
         public void onMessage(String message) {
@@ -114,13 +153,13 @@ public class TestUtil {
     }
 
 
-    private abstract static class GenericMultipleSubSwap<Y,X>
-            extends GenericMultiple<X,Y> {
+    private abstract static class GenericMultipleSubSwapMessageHandler<Y,X>
+            extends GenericMultipleMessageHandler<X,Y> {
     }
 
 
-    private static class GenericMultipleSubSubSwap
-            extends GenericMultipleSubSwap<Boolean,String> {
+    private static class GenericMultipleSubSubSwapMessageHandler
+            extends GenericMultipleSubSwapMessageHandler<Boolean,String> {
 
         @Override
         public void onMessage(String message) {
@@ -134,4 +173,78 @@ public class TestUtil {
     }
 
 
+    private static class SimpleEncoder
+            implements Encoder.Text<String> {
+
+        @Override
+        public String encode(String object) throws EncodeException {
+            return null;
+        }
+    }
+
+
+    private static class SubSimpleEncoder extends SimpleEncoder {
+    }
+
+
+    private abstract static class GenericEncoder<T>
+            implements Encoder.Text<T> {
+    }
+
+
+    private static class GenericSubEncoder
+            extends GenericEncoder<String>{
+
+        @Override
+        public String encode(String object) throws EncodeException {
+            return null;
+        }
+
+    }
+
+
+    private abstract static class GenericMultipleEncoder<A,B>
+            implements Encoder.Text<A>, Foo<B> {
+    }
+
+
+    private abstract static class GenericMultipleSubEncoder<X,Y>
+            extends GenericMultipleEncoder<X,Y> {
+    }
+
+
+    private static class GenericMultipleSubSubEncoder
+            extends GenericMultipleSubEncoder<String,Boolean> {
+
+        @Override
+        public String encode(String object) throws EncodeException {
+            return null;
+        }
+
+        @Override
+        public void doSomething(Boolean thing) {
+            // NO-OP
+        }
+
+    }
+
+
+    private abstract static class GenericMultipleSubSwapEncoder<Y,X>
+            extends GenericMultipleEncoder<X,Y> {
+    }
+
+
+    private static class GenericMultipleSubSubSwapEncoder
+            extends GenericMultipleSubSwapEncoder<Boolean,String> {
+
+        @Override
+        public String encode(String object) throws EncodeException {
+            return null;
+        }
+
+        @Override
+        public void doSomething(Boolean thing) {
+            // NO-OP
+        }
+    }
 }
