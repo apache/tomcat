@@ -21,40 +21,40 @@ import javax.websocket.MessageHandler;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestWsSession {
+public class TestUtil {
 
     @Test
     public void testGetMessageTypeSimple() {
         Assert.assertEquals(
-                String.class, WsSession.getMessageType(new Simple()));
+                String.class, Util.getMessageType(new Simple()));
     }
 
 
     @Test
     public void testGetMessageTypeSubclass() {
         Assert.assertEquals(String.class,
-                WsSession.getMessageType(new SubSimple()));
+                Util.getMessageType(new SubSimple()));
     }
 
 
     @Test
     public void testGetMessageTypeGenericSubclass() {
         Assert.assertEquals(String.class,
-                WsSession.getMessageType(new GenericSub()));
+                Util.getMessageType(new GenericSub()));
     }
 
 
     @Test
     public void testGetMessageTypeGenericMultipleSubclass() {
         Assert.assertEquals(String.class,
-                WsSession.getMessageType(new GenericMultipleSubSub()));
+                Util.getMessageType(new GenericMultipleSubSub()));
     }
 
 
     @Test
     public void testGetMessageTypeGenericMultipleSubclassSwap() {
         Assert.assertEquals(String.class,
-                WsSession.getMessageType(new GenericMultipleSubSubSwap()));
+                Util.getMessageType(new GenericMultipleSubSubSwap()));
     }
 
 

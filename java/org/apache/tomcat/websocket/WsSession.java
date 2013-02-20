@@ -17,9 +17,7 @@
 package org.apache.tomcat.websocket;
 
 import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -120,7 +118,7 @@ public class WsSession implements Session {
     @SuppressWarnings("unchecked")
     @Override
     public void addMessageHandler(MessageHandler listener) {
-        Type t = getMessageType(listener);
+        Type t = Util.getMessageType(listener);
 
         if (t.equals(String.class)) {
             if (textMessageHandler != null) {
@@ -406,73 +404,4 @@ public class WsSession implements Session {
     }
 
     // Protected so unit tests can use it
-    protected static Class<?> getMessageType(MessageHandler listener) {
-        return (Class<?>) getGenericType(listener.getClass());
-    }
-
-
-    private static Object getGenericType(Class<? extends MessageHandler> clazz) {
-
-        // Look to see if this class implements the generic MessageHandler<>
-        // interface
-
-        // Get all the interfaces
-        Type[] interfaces = clazz.getGenericInterfaces();
-        for (Type iface : interfaces) {
-            // Only need to check interfaces that use generics
-            if (iface instanceof ParameterizedType) {
-                ParameterizedType pi = (ParameterizedType) iface;
-                // Look for the MessageHandler<> interface
-                if (pi.getRawType() instanceof Class) {
-                    if (MessageHandler.class.isAssignableFrom(
-                            (Class<?>) pi.getRawType())) {
-                        return getTypeParameter(
-                                clazz, pi.getActualTypeArguments()[0]);
-                    }
-                }
-            }
-        }
-
-        // Interface not found on this class. Look at the superclass.
-        Class<? extends MessageHandler> superClazz =
-                (Class<? extends MessageHandler>) clazz.getSuperclass();
-
-        Object result = getGenericType(superClazz);
-        if (result instanceof Class<?>) {
-            // Superclass implements interface and defines explicit type for
-            // MessageHandler<>
-            return result;
-        } else if (result instanceof Integer) {
-            // Superclass implements interface and defines unknown type for
-            // MessageHandler<>
-            // Map that unknown type to the generic types defined in this class
-            ParameterizedType superClassType =
-                    (ParameterizedType) clazz.getGenericSuperclass();
-            return getTypeParameter(clazz,
-                    superClassType.getActualTypeArguments()[
-                            ((Integer) result).intValue()]);
-        } else {
-            // Error will be logged further up the call stack
-            return null;
-        }
-    }
-
-
-    /*
-     * For a generic parameter, return either the Class used or if the type
-     * is unknown, the index for the type in definition of the class
-     */
-    private static Object getTypeParameter(Class<?> clazz, Type argType) {
-        if (argType instanceof Class<?>) {
-            return argType;
-        } else {
-            TypeVariable<?>[] tvs = clazz.getTypeParameters();
-            for (int i = 0; i < tvs.length; i++) {
-                if (tvs[i].equals(argType)) {
-                    return Integer.valueOf(i);
-                }
-            }
-            return null;
-        }
-    }
 }
