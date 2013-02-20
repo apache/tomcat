@@ -553,15 +553,15 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             location=url.toString();
             type=param;
             inputsource=url.openStream();
-            if( sourceType == null ) {
-                sourceType = sourceTypeFromExt(location);
+            if (sourceType == null && location.endsWith(".xml")) {
+                sourceType = "MbeansDescriptorsDigesterSource";
             }
         } else if( source instanceof File ) {
             location=((File)source).getAbsolutePath();
             inputsource=new FileInputStream((File)source);
             type=param;
-            if( sourceType == null ) {
-                sourceType = sourceTypeFromExt(location);
+            if (sourceType == null && location.endsWith(".xml")) {
+                sourceType = "MbeansDescriptorsDigesterSource";
             }
         } else if( source instanceof InputStream ) {
             type=param;
@@ -585,15 +585,6 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         return mbeans;
     }
 
-    private String sourceTypeFromExt( String s ) {
-        if( s.endsWith( ".ser")) {
-            return "MbeansDescriptorsSerSource";
-        }
-        else if( s.endsWith(".xml")) {
-            return "MbeansDescriptorsDigesterSource";
-        }
-        return null;
-    }
 
     /** Register a component
      * XXX make it private
