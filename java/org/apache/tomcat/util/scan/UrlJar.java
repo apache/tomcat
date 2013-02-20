@@ -30,7 +30,7 @@ import java.util.jar.JarEntry;
 public class UrlJar implements Jar {
 
     private NonClosingJarInputStream jarInputStream = null;
-    private URL url = null;
+    private final URL url;
     private JarEntry entry = null;
 
     public UrlJar(URL url) throws IOException {
