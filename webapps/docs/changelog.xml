@@ -72,6 +72,11 @@
         the class hierarchy that triggered the exception to the error message.
         (markt)
       </add>
+      <add>
+        Add a new option to the standard JarScanner implementation
+        (<code>scanBootstrapClassPath</code>) to control if the bootstrap
+        classpath is scanned or not. By default, it will not be scanned. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
