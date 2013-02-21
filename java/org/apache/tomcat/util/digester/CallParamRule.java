@@ -32,9 +32,6 @@ import org.xml.sax.Attributes;
  * See {@link #CallParamRule(int paramIndex, String attributeName)}
  * <li>from current the element body
  * See {@link #CallParamRule(int paramIndex)}
- * <li>from the top object on the stack.
- * See {@link #CallParamRule(int paramIndex, boolean fromStack)}
- * <li>the current path being processed (separate <code>Rule</code>).
  * </ul>
  * </p>
  */
