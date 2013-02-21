@@ -109,6 +109,18 @@ public class StandardJarScanner implements JarScanner {
     }
 
     /**
+     * Controls the testing of the bootstrap classpath which consists of the
+     * runtime classes provided by the JVM and any installed system extensions.
+     */
+    private boolean scanBootstrapClassPath = false;
+    public boolean isScanBootstrapClassPath() {
+        return scanBootstrapClassPath;
+    }
+    public void setScanBootstrapClassPath(boolean scanBootstrapClassPath) {
+        this.scanBootstrapClassPath = scanBootstrapClassPath;
+    }
+
+    /**
      * Scan the provided ServletContext and classloader for JAR files. Each JAR
      * file found will be passed to the callback handler to be processed.
      *
@@ -184,7 +196,13 @@ public class StandardJarScanner implements JarScanner {
             ClassLoader loader =
                 Thread.currentThread().getContextClassLoader();
 
-            while (loader != null) {
+            ClassLoader stopLoader = null;
+            if (!scanBootstrapClassPath) {
+                // Stop when we reach the bootstrap class loader
+                stopLoader = ClassLoader.getSystemClassLoader().getParent();
+            }
+
+            while (loader != stopLoader) {
                 if (loader instanceof URLClassLoader) {
                     URL[] urls = ((URLClassLoader) loader).getURLs();
                     for (int i=0; i<urls.length; i++) {
