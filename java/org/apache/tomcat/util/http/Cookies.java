@@ -165,9 +165,18 @@ public final class Cookies {
                 log.debug("Cookies: Parsing b[]: " + cookieValue.toString());
             }
             ByteChunk bc=cookieValue.getByteChunk();
-            processCookieHeader( bc.getBytes(),
-                                 bc.getOffset(),
-                                 bc.getLength());
+            if (CookieSupport.PRESERVE_COOKIE_HEADER) {
+                int len = bc.getLength();
+                if (len > 0) {
+                    byte[] buf = new byte[len];
+                    System.arraycopy(bc.getBytes(), bc.getOffset(), buf, 0, len);
+                    processCookieHeader(buf, 0, len);
+                }
+            } else {
+                processCookieHeader( bc.getBytes(),
+                        bc.getOffset(),
+                        bc.getLength());
+            }
             pos++;// search from the next position
         }
     }
