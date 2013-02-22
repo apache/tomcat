@@ -1036,6 +1036,8 @@ public class CoyoteAdapter implements Adapter {
                 if (conv == null) {
                     conv = new B2CConverter(enc);
                     request.setURIConverter(conv);
+                } else {
+                    conv.recycle();
                 }
             } catch (IOException e) {
                 // Ignore
