@@ -91,6 +91,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        <bug>54601</bug>: Change <code>catalina.sh</code> to consistently use
+        <code>LOGGING_MANAGER</code> variable to configure logging,
+        instead of modifying <code>JAVA_OPTS</code> one. (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.37 (markt)" rtext="2013-02-18">
   <subsection name="Catalina">
