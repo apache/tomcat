@@ -63,7 +63,7 @@ public class DOMWriter {
         int type = node.getNodeType();
         switch (type) {
             // print document
-            case Node.DOCUMENT_NODE: {
+            case Node.DOCUMENT_NODE:
                 if (!canonical) {
                     String Encoding = getWriterEncoding();
                     if (Encoding.equalsIgnoreCase("DEFAULT"))
@@ -79,10 +79,9 @@ public class DOMWriter {
                 print(((Document) node).getDocumentElement());
                 out.flush();
                 break;
-            }
 
             // print element with attributes
-            case Node.ELEMENT_NODE: {
+            case Node.ELEMENT_NODE:
                 out.print('<');
                 out.print(node.getLocalName());
                 Attr attrs[] = sortAttributes(node.getAttributes());
@@ -96,36 +95,22 @@ public class DOMWriter {
                     out.print('"');
                 }
                 out.print('>');
-                NodeList children = node.getChildNodes();
-                if (children != null) {
-                    int len = children.getLength();
-                    for (int i = 0; i < len; i++) {
-                        print(children.item(i));
-                    }
-                }
+                printChildren(node);
                 break;
-            }
 
             // handle entity reference nodes
-            case Node.ENTITY_REFERENCE_NODE: {
+            case Node.ENTITY_REFERENCE_NODE:
                 if (canonical) {
-                    NodeList children = node.getChildNodes();
-                    if (children != null) {
-                        int len = children.getLength();
-                        for (int i = 0; i < len; i++) {
-                            print(children.item(i));
-                        }
-                    }
+                    printChildren(node);
                 } else {
                     out.print('&');
                     out.print(node.getLocalName());
                     out.print(';');
                 }
                 break;
-            }
 
             // print cdata sections
-            case Node.CDATA_SECTION_NODE: {
+            case Node.CDATA_SECTION_NODE:
                 if (canonical) {
                     out.print(normalize(node.getNodeValue()));
                 } else {
@@ -134,16 +119,14 @@ public class DOMWriter {
                     out.print("]]>");
                 }
                 break;
-            }
 
             // print text
-            case Node.TEXT_NODE: {
+            case Node.TEXT_NODE:
                 out.print(normalize(node.getNodeValue()));
                 break;
-            }
 
             // print processing instruction
-            case Node.PROCESSING_INSTRUCTION_NODE: {
+            case Node.PROCESSING_INSTRUCTION_NODE:
                 out.print("<?");
                 out.print(node.getLocalName());
 
@@ -155,7 +138,6 @@ public class DOMWriter {
                 out.print("?>");
                 break;
             }
-        }
 
         if (type == Node.ELEMENT_NODE) {
             out.print("</");
@@ -166,6 +148,18 @@ public class DOMWriter {
         out.flush();
 
     } // print(Node)
+
+
+    private void printChildren(Node node) {
+        NodeList children = node.getChildNodes();
+        if (children != null) {
+            int len = children.getLength();
+            for (int i = 0; i < len; i++) {
+                print(children.item(i));
+            }
+        }
+    }
+
 
     /** Returns a sorted list of attributes. */
     protected Attr[] sortAttributes(NamedNodeMap attrs) {
@@ -213,24 +207,20 @@ public class DOMWriter {
         for (int i = 0; i < len; i++) {
             char ch = s.charAt(i);
             switch (ch) {
-                case '<': {
+                case '<':
                     str.append("&lt;");
                     break;
-                }
-                case '>': {
+                case '>':
                     str.append("&gt;");
                     break;
-                }
-                case '&': {
+                case '&':
                     str.append("&amp;");
                     break;
-                }
-                case '"': {
+                case '"':
                     str.append("&quot;");
                     break;
-                }
                 case '\r':
-                case '\n': {
+                case '\n':
                     if (canonical) {
                         str.append("&#");
                         str.append(Integer.toString(ch));
@@ -238,11 +228,9 @@ public class DOMWriter {
                         break;
                     }
                     // else, default append char
-                }
                 //$FALL-THROUGH$
-                default: {
+                default:
                     str.append(ch);
-                }
             }
         }
 
