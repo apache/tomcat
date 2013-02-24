@@ -199,21 +199,19 @@ public final class  Base64
         int dataIndex = start;
         char[] decodedData = null;
 
+        // this sizes the output array properly - rlw
+        int lastData = end - start;
+        // ignore the '=' padding
+        while (base64Data[start+lastData-1] == PAD)
         {
-            // this sizes the output array properly - rlw
-            int lastData = end - start;
-            // ignore the '=' padding
-            while (base64Data[start+lastData-1] == PAD)
+            if (--lastData == 0)
             {
-                if (--lastData == 0)
-                {
-                    return;
-                }
+                return;
             }
-            decodedDataCC.allocate(lastData - numberQuadruple, -1);
-            decodedDataCC.setEnd(lastData - numberQuadruple);
-            decodedData = decodedDataCC.getBuffer();
         }
+        decodedDataCC.allocate(lastData - numberQuadruple, -1);
+        decodedDataCC.setEnd(lastData - numberQuadruple);
+        decodedData = decodedDataCC.getBuffer();
 
         for (int i = 0; i < numberQuadruple; i++)
         {
@@ -280,21 +278,19 @@ public final class  Base64
         int dataIndex = start;
         byte[] decodedData = null;
 
+        // this sizes the output array properly - rlw
+        int lastData = end - start;
+        // ignore the '=' padding
+        while (base64Data[start+lastData-1] == PAD)
         {
-            // this sizes the output array properly - rlw
-            int lastData = end - start;
-            // ignore the '=' padding
-            while (base64Data[start+lastData-1] == PAD)
+            if (--lastData == 0)
             {
-                if (--lastData == 0)
-                {
-                    return;
-                }
+                return;
             }
-            decodedDataBC.allocate(lastData - numberQuadruple, -1);
-            decodedDataBC.setEnd(lastData - numberQuadruple);
-            decodedData = decodedDataBC.getBuffer();
         }
+        decodedDataBC.allocate(lastData - numberQuadruple, -1);
+        decodedDataBC.setEnd(lastData - numberQuadruple);
+        decodedData = decodedDataBC.getBuffer();
 
         for (int i = 0; i < numberQuadruple; i++)
         {

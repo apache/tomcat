@@ -320,39 +320,32 @@ public final class ApplicationFilterFactory {
      */
     private boolean matchDispatcher(FilterMap filterMap, DispatcherType type) {
         switch (type) {
-            case FORWARD : {
+            case FORWARD :
                 if ((filterMap.getDispatcherMapping() & FilterMap.FORWARD) > 0) {
                         return true;
                 }
                 break;
-            }
-            case INCLUDE : {
+            case INCLUDE :
                 if ((filterMap.getDispatcherMapping() & FilterMap.INCLUDE) > 0) {
                     return true;
                 }
                 break;
-            }
-            case REQUEST : {
+            case REQUEST :
                 if ((filterMap.getDispatcherMapping() & FilterMap.REQUEST) > 0) {
                     return true;
                 }
                 break;
-            }
-            case ERROR : {
+            case ERROR :
                 if ((filterMap.getDispatcherMapping() & FilterMap.ERROR) > 0) {
                     return true;
                 }
                 break;
-            }
-            case ASYNC : {
+            case ASYNC :
                 if ((filterMap.getDispatcherMapping() & FilterMap.ASYNC) > 0) {
                     return true;
                 }
                 break;
-            }
         }
         return false;
     }
-
-
 }

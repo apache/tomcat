@@ -249,10 +249,8 @@ public class RpcChannel implements ChannelListener{
                 case ALL_REPLY:
                     return destcnt == responses.size();
                 case MAJORITY_REPLY:
-                {
                     float perc = ((float)responses.size()) / ((float)destcnt);
                     return perc >= 0.50f;
-                }
                 case FIRST_REPLY:
                     return responses.size()>0;
                 default:

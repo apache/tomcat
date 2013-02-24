@@ -161,7 +161,7 @@ public class DeltaRequest implements Externalizable {
         for ( int i=0; i<actions.size(); i++ ) {
             AttributeInfo info = actions.get(i);
             switch ( info.getType() ) {
-                case TYPE_ATTRIBUTE: {
+                case TYPE_ATTRIBUTE:
                     if ( info.getAction() == ACTION_SET ) {
                         if ( log.isTraceEnabled() ) log.trace("Session.setAttribute('"+info.getName()+"', '"+info.getValue()+"')");
                         session.setAttribute(info.getName(), info.getValue(),notifyListeners,false);
@@ -171,18 +171,15 @@ public class DeltaRequest implements Externalizable {
                     }
 
                     break;
-                }//case
-                case TYPE_ISNEW: {
-                if ( log.isTraceEnabled() ) log.trace("Session.setNew('"+info.getValue()+"')");
+                case TYPE_ISNEW:
+                    if ( log.isTraceEnabled() ) log.trace("Session.setNew('"+info.getValue()+"')");
                     session.setNew(((Boolean)info.getValue()).booleanValue(),false);
                     break;
-                }//case
-                case TYPE_MAXINTERVAL: {
+                case TYPE_MAXINTERVAL:
                     if ( log.isTraceEnabled() ) log.trace("Session.setMaxInactiveInterval('"+info.getValue()+"')");
                     session.setMaxInactiveInterval(((Integer)info.getValue()).intValue(),false);
                     break;
-                }//case
-                case TYPE_PRINCIPAL: {
+                case TYPE_PRINCIPAL:
                     Principal p = null;
                     if ( info.getAction() == ACTION_SET ) {
                         SerializablePrincipal sp = (SerializablePrincipal)info.getValue();
@@ -190,16 +187,15 @@ public class DeltaRequest implements Externalizable {
                     }
                     session.setPrincipal(p,false);
                     break;
-                }//case
-                case TYPE_AUTHTYPE: {
+                case TYPE_AUTHTYPE:
                     String authType = null;
                     if ( info.getAction() == ACTION_SET ) {
                         authType = (String)info.getValue();
                     }
                     session.setAuthType(authType,false);
                     break;
-                }//case
-                default : throw new java.lang.IllegalArgumentException("Invalid attribute info type="+info);
+                default :
+                    throw new java.lang.IllegalArgumentException("Invalid attribute info type="+info);
             }//switch
         }//for
         session.endAccess();

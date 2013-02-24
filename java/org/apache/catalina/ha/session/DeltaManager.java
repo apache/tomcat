@@ -1001,7 +1001,7 @@ public class DeltaManager extends ClusterManagerBase{
                 case SessionMessage.EVT_SESSION_EXPIRED:
                 case SessionMessage.EVT_SESSION_ACCESSED:
                 case SessionMessage.EVT_SESSION_DELTA:
-                case SessionMessage.EVT_CHANGE_SESSION_ID: {
+                case SessionMessage.EVT_CHANGE_SESSION_ID:
                     synchronized(receivedMessageQueue) {
                         if(receiverQueue) {
                             receivedMessageQueue.add(msg);
@@ -1009,11 +1009,9 @@ public class DeltaManager extends ClusterManagerBase{
                         }
                     }
                    break;
-                }
-                default: {
+                default:
                     //we didn't queue, do nothing
                     break;
-                }
             } //switch
 
             messageReceived(msg, msg.getAddress() != null ? (Member) msg.getAddress() : null);
@@ -1273,46 +1271,36 @@ public class DeltaManager extends ClusterManagerBase{
             if (log.isDebugEnabled()) log.debug(sm.getString("deltaManager.receiveMessage.eventType",getName(), msg.getEventTypeString(), sender));
 
             switch (msg.getEventType()) {
-                case SessionMessage.EVT_GET_ALL_SESSIONS: {
+                case SessionMessage.EVT_GET_ALL_SESSIONS:
                     handleGET_ALL_SESSIONS(msg,sender);
                     break;
-                }
-                case SessionMessage.EVT_ALL_SESSION_DATA: {
+                case SessionMessage.EVT_ALL_SESSION_DATA:
                     handleALL_SESSION_DATA(msg,sender);
                     break;
-                }
-                case SessionMessage.EVT_ALL_SESSION_TRANSFERCOMPLETE: {
+                case SessionMessage.EVT_ALL_SESSION_TRANSFERCOMPLETE:
                     handleALL_SESSION_TRANSFERCOMPLETE(msg,sender);
                     break;
-                }
-                case SessionMessage.EVT_SESSION_CREATED: {
+                case SessionMessage.EVT_SESSION_CREATED:
                     handleSESSION_CREATED(msg,sender);
                     break;
-                }
-                case SessionMessage.EVT_SESSION_EXPIRED: {
+                case SessionMessage.EVT_SESSION_EXPIRED:
                     handleSESSION_EXPIRED(msg,sender);
                     break;
-                }
-                case SessionMessage.EVT_SESSION_ACCESSED: {
+                case SessionMessage.EVT_SESSION_ACCESSED:
                     handleSESSION_ACCESSED(msg,sender);
                     break;
-                }
-                case SessionMessage.EVT_SESSION_DELTA: {
+                case SessionMessage.EVT_SESSION_DELTA:
                    handleSESSION_DELTA(msg,sender);
                    break;
-                }
-                case SessionMessage.EVT_CHANGE_SESSION_ID: {
+                case SessionMessage.EVT_CHANGE_SESSION_ID:
                     handleCHANGE_SESSION_ID(msg,sender);
                     break;
-                 }
-                case SessionMessage.EVT_ALL_SESSION_NOCONTEXTMANAGER: {
+                case SessionMessage.EVT_ALL_SESSION_NOCONTEXTMANAGER:
                     handleALL_SESSION_NOCONTEXTMANAGER(msg,sender);
                     break;
-                 }
-                default: {
+                default:
                     //we didn't recognize the message type, do nothing
                     break;
-                }
             } //switch
         } catch (Exception x) {
             log.error(sm.getString("deltaManager.receiveMessage.error",getName()), x);
