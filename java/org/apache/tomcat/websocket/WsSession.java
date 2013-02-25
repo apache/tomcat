@@ -53,7 +53,7 @@ public class WsSession implements Session {
     private final Log log = LogFactory.getLog(WsSession.class);
 
     private final Endpoint localEndpoint;
-    private final WsRemoteEndpointBase wsRemoteEndpoint;
+    private final WsRemoteEndpointImplBase wsRemoteEndpoint;
     private final RemoteEndpoint.Async remoteEndpointAsync;
     private final RemoteEndpoint.Basic remoteEndpointBasic;
     private final ClassLoader applicationClassLoader;
@@ -87,7 +87,7 @@ public class WsSession implements Session {
      * @param wsRemoteEndpoint
      */
     public WsSession(Endpoint localEndpoint,
-            WsRemoteEndpointBase wsRemoteEndpoint,
+            WsRemoteEndpointImplBase wsRemoteEndpoint,
             WsWebSocketContainer wsWebSocketContainer,
             WsRequest request, String subProtocol,
             Map<String,String> pathParameters,

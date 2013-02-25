@@ -25,11 +25,11 @@ import java.util.concurrent.TimeUnit;
 import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
 
-public class WsRemoteEndpointClient extends WsRemoteEndpointBase {
+public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
 
     private final AsynchronousSocketChannel channel;
 
-    public WsRemoteEndpointClient(AsynchronousSocketChannel channel) {
+    public WsRemoteEndpointImplClient(AsynchronousSocketChannel channel) {
         this.channel = channel;
     }
 

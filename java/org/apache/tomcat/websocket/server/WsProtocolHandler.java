@@ -92,8 +92,8 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
         try {
-            WsRemoteEndpointServer wsRemoteEndpointServer =
-                    new WsRemoteEndpointServer(sos, webSocketContainer);
+            WsRemoteEndpointImplServer wsRemoteEndpointServer =
+                    new WsRemoteEndpointImplServer(sos, webSocketContainer);
             wsSession = new WsSession(ep, wsRemoteEndpointServer,
                     webSocketContainer, request, subProtocol, pathParameters,
                     secure, endpointConfig.getEncoders());
@@ -181,10 +181,10 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
     private static class WsWriteListener implements WriteListener {
 
         private final WsProtocolHandler wsProtocolHandler;
-        private final WsRemoteEndpointServer wsRemoteEndpointServer;
+        private final WsRemoteEndpointImplServer wsRemoteEndpointServer;
 
         private WsWriteListener(WsProtocolHandler wsProtocolHandler,
-                WsRemoteEndpointServer wsRemoteEndpointServer) {
+                WsRemoteEndpointImplServer wsRemoteEndpointServer) {
             this.wsProtocolHandler = wsProtocolHandler;
             this.wsRemoteEndpointServer = wsRemoteEndpointServer;
         }

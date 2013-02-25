@@ -160,8 +160,8 @@ public class WsWebSocketContainer
         }
 
         // Switch to WebSocket
-        WsRemoteEndpointClient wsRemoteEndpointClient =
-                new WsRemoteEndpointClient(channel);
+        WsRemoteEndpointImplClient wsRemoteEndpointClient =
+                new WsRemoteEndpointImplClient(channel);
 
         Endpoint endpoint;
         try {
