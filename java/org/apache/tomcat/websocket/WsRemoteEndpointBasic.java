@@ -27,10 +27,10 @@ import javax.websocket.RemoteEndpoint;
 //TODO Use a common base class
 public class WsRemoteEndpointBasic implements RemoteEndpoint.Basic {
 
-    private final WsRemoteEndpointBase base;
+    private final WsRemoteEndpointImplBase base;
 
 
-    WsRemoteEndpointBasic(WsRemoteEndpointBase base) {
+    WsRemoteEndpointBasic(WsRemoteEndpointImplBase base) {
         this.base = base;
     }
 

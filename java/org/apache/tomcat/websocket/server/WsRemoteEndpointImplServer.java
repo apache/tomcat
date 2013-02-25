@@ -27,14 +27,14 @@ import javax.websocket.SendResult;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.websocket.WsRemoteEndpointBase;
+import org.apache.tomcat.websocket.WsRemoteEndpointImplBase;
 
 /**
  * This is the server side {@link javax.websocket.RemoteEndpoint} implementation
  * - i.e. what the server uses to send data to the client. Communication is over
  * a {@link ServletOutputStream}.
  */
-public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
+public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
@@ -50,7 +50,7 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
     private volatile boolean close;
 
 
-    public WsRemoteEndpointServer(ServletOutputStream sos,
+    public WsRemoteEndpointImplServer(ServletOutputStream sos,
             ServerContainerImpl serverContainer) {
         this.sos = sos;
         this.wsWriteTimeout = serverContainer.getTimeout();

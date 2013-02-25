@@ -45,12 +45,12 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
+public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
 
-    private final Log log = LogFactory.getLog(WsRemoteEndpointBase.class);
+    private final Log log = LogFactory.getLog(WsRemoteEndpointImplBase.class);
 
     private boolean messagePartInProgress = false;
     private final Queue<MessagePart> messagePartQueue = new ArrayDeque<>();
@@ -348,7 +348,7 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
         private final SendHandler handler;
 
         public MessagePart(byte opCode, ByteBuffer payload, boolean last,
-                SendHandler handler, WsRemoteEndpointBase endpoint) {
+                SendHandler handler, WsRemoteEndpointImplBase endpoint) {
             this.opCode = opCode;
             this.payload = payload;
             this.last = last;
@@ -384,11 +384,11 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
      */
     private static class EndMessageHandler implements SendHandler {
 
-        private final WsRemoteEndpointBase endpoint;
+        private final WsRemoteEndpointImplBase endpoint;
         private final SendHandler handler;
         private final boolean dataMessage;
 
-        public EndMessageHandler(WsRemoteEndpointBase endpoint,
+        public EndMessageHandler(WsRemoteEndpointImplBase endpoint,
                 SendHandler handler, boolean dataMessage) {
             this.endpoint = endpoint;
             this.handler = handler;
@@ -538,12 +538,12 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
         private final boolean isLast;
         private final CharsetEncoder encoder;
         private final ByteBuffer buffer;
-        private final WsRemoteEndpointBase endpoint;
+        private final WsRemoteEndpointImplBase endpoint;
         private volatile boolean isDone = false;
 
         public TextMessageSendHandler(SendHandler handler, CharBuffer message,
                 boolean isLast, CharsetEncoder encoder,
-                ByteBuffer encoderBuffer, WsRemoteEndpointBase endpoint) {
+                ByteBuffer encoderBuffer, WsRemoteEndpointImplBase endpoint) {
             this.handler = handler;
             this.message = message;
             this.isLast = isLast;
@@ -587,13 +587,13 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
         private final byte[] mask;
         private final ByteBuffer outputBuffer;
         private volatile boolean flushRequired;
-        private final WsRemoteEndpointBase endpoint;
+        private final WsRemoteEndpointImplBase endpoint;
         private int maskIndex = 0;
 
         public OutputBufferSendHandler(SendHandler completion,
                 ByteBuffer headerBuffer, ByteBuffer payload, byte[] mask,
                 ByteBuffer outputBuffer, boolean flushRequired,
-                WsRemoteEndpointBase endpoint) {
+                WsRemoteEndpointImplBase endpoint) {
             this.handler = completion;
             this.headerBuffer = headerBuffer;
             this.payload = payload;
@@ -719,10 +719,10 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
     private static class WsOutputStream extends OutputStream {
 
-        private final WsRemoteEndpointBase endpoint;
+        private final WsRemoteEndpointImplBase endpoint;
         private final ByteBuffer buffer = ByteBuffer.allocate(8192);
 
-        public WsOutputStream(WsRemoteEndpointBase endpoint) {
+        public WsOutputStream(WsRemoteEndpointImplBase endpoint) {
             this.endpoint = endpoint;
         }
 
@@ -767,10 +767,10 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
     private static class WsWriter extends Writer {
 
-        private final WsRemoteEndpointBase endpoint;
+        private final WsRemoteEndpointImplBase endpoint;
         private final CharBuffer buffer = CharBuffer.allocate(8192);
 
-        public WsWriter(WsRemoteEndpointBase endpoint) {
+        public WsWriter(WsRemoteEndpointImplBase endpoint) {
             this.endpoint = endpoint;
         }
 

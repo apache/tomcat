@@ -26,10 +26,10 @@ import javax.websocket.SendHandler;
 // TODO Use a common base class
 public class WsRemoteEndpointAsync implements RemoteEndpoint.Async {
 
-    private final WsRemoteEndpointBase base;
+    private final WsRemoteEndpointImplBase base;
 
 
-    WsRemoteEndpointAsync(WsRemoteEndpointBase base) {
+    WsRemoteEndpointAsync(WsRemoteEndpointImplBase base) {
         this.base = base;
     }
 

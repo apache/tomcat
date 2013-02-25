@@ -33,7 +33,7 @@ import org.apache.tomcat.websocket.BackgroundProcessManager;
  */
 public class WsWriteTimeout implements BackgroundProcess {
 
-    private final Set<WsRemoteEndpointServer> endpoints =
+    private final Set<WsRemoteEndpointImplServer> endpoints =
             new ConcurrentSkipListSet<>(new EndpointComparator());
     private final AtomicInteger count = new AtomicInteger(0);
     private int backgroundProcessCount = 0;
@@ -48,9 +48,9 @@ public class WsWriteTimeout implements BackgroundProcess {
             backgroundProcessCount = 0;
 
             long now = System.currentTimeMillis();
-            Iterator<WsRemoteEndpointServer> iter = endpoints.iterator();
+            Iterator<WsRemoteEndpointImplServer> iter = endpoints.iterator();
             while (iter.hasNext()) {
-                WsRemoteEndpointServer endpoint = iter.next();
+                WsRemoteEndpointImplServer endpoint = iter.next();
                 if (endpoint.getTimeoutExpiry() < now) {
                     endpoint.onTimeout();
                 } else {
@@ -82,7 +82,7 @@ public class WsWriteTimeout implements BackgroundProcess {
     }
 
 
-    public void register(WsRemoteEndpointServer endpoint) {
+    public void register(WsRemoteEndpointImplServer endpoint) {
         boolean result = endpoints.add(endpoint);
         if (result) {
             int newCount = count.incrementAndGet();
@@ -93,7 +93,7 @@ public class WsWriteTimeout implements BackgroundProcess {
     }
 
 
-    public void unregister(WsRemoteEndpointServer endpoint) {
+    public void unregister(WsRemoteEndpointImplServer endpoint) {
         boolean result = endpoints.remove(endpoint);
         if (result) {
             int newCount = count.decrementAndGet();
@@ -108,11 +108,11 @@ public class WsWriteTimeout implements BackgroundProcess {
      * Note: this comparator imposes orderings that are inconsistent with equals
      */
     private static class EndpointComparator implements
-            Comparator<WsRemoteEndpointServer> {
+            Comparator<WsRemoteEndpointImplServer> {
 
         @Override
-        public int compare(WsRemoteEndpointServer o1,
-                WsRemoteEndpointServer o2) {
+        public int compare(WsRemoteEndpointImplServer o1,
+                WsRemoteEndpointImplServer o2) {
 
             long t1 = o1.getTimeoutExpiry();
             long t2 = o2.getTimeoutExpiry();
