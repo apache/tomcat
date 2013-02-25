@@ -23,6 +23,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface WebSocketMessage {
+public @interface OnMessage {
     long maxMessageSize() default -1;
 }

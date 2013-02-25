@@ -30,8 +30,8 @@ public class EchoEndpoint extends Endpoint{
 
     @Override
     public void onOpen(Session session, EndpointConfiguration endpointConfig) {
-        RemoteEndpoint remoteEndpoint = session.getRemote();
-        session.addMessageHandler(new EchoMessageHandler(remoteEndpoint));
+        RemoteEndpoint.Basic remoteEndpointBasic = session.getBasicRemote();
+        session.addMessageHandler(new EchoMessageHandler(remoteEndpointBasic));
     }
 
     @Override
@@ -47,17 +47,17 @@ public class EchoEndpoint extends Endpoint{
     private static class EchoMessageHandler
             implements MessageHandler.Basic<String> {
 
-        private final RemoteEndpoint remoteEndpoint;
+        private final RemoteEndpoint.Basic remoteEndpointBasic;
 
-        private EchoMessageHandler(RemoteEndpoint remoteEndpoint) {
-            this.remoteEndpoint = remoteEndpoint;
+        private EchoMessageHandler(RemoteEndpoint.Basic remoteEndpointBasic) {
+            this.remoteEndpointBasic = remoteEndpointBasic;
         }
 
         @Override
         public void onMessage(String message) {
             try {
-                if (remoteEndpoint != null) {
-                    remoteEndpoint.sendString(message);
+                if (remoteEndpointBasic != null) {
+                    remoteEndpointBasic.sendText(message);
                 }
             } catch (IOException e) {
                 // TODO Auto-generated catch block

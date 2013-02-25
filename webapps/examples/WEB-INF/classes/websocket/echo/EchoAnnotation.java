@@ -19,19 +19,19 @@ package websocket.echo;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import javax.websocket.OnMessage;
 import javax.websocket.PongMessage;
 import javax.websocket.Session;
-import javax.websocket.WebSocketMessage;
 import javax.websocket.server.WebSocketEndpoint;
 
 @WebSocketEndpoint("/websocket/echoAnnotation")
 public class EchoAnnotation {
 
-    @WebSocketMessage
+    @OnMessage
     public void echoTextMessage(Session session, String msg, boolean last) {
         try {
             if (session.isOpen()) {
-                session.getRemote().sendPartialString(msg, last);
+                session.getBasicRemote().sendText(msg, last);
             }
         } catch (IOException e) {
             try {
@@ -42,12 +42,12 @@ public class EchoAnnotation {
         }
     }
 
-    @WebSocketMessage
+    @OnMessage
     public void echoBinaryMessage(Session session, ByteBuffer bb,
             boolean last) {
         try {
             if (session.isOpen()) {
-                session.getRemote().sendPartialBytes(bb, last);
+                session.getBasicRemote().sendBinary(bb, last);
             }
         } catch (IOException e) {
             try {
@@ -63,7 +63,7 @@ public class EchoAnnotation {
      *
      * @param pm    Ignored.
      */
-    @WebSocketMessage
+    @OnMessage
     public void echoPongMessage(PongMessage pm) {
         // NO-OP
     }

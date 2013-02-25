@@ -21,10 +21,10 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.websocket.OnClose;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.WebSocketClose;
-import javax.websocket.WebSocketMessage;
-import javax.websocket.WebSocketOpen;
 import javax.websocket.server.WebSocketEndpoint;
 
 import util.HTMLFilter;
@@ -45,7 +45,7 @@ public class ChatAnnotation {
     }
 
 
-    @WebSocketOpen
+    @OnOpen
     public void start(Session session) {
         this.session = session;
         connections.add(this);
@@ -54,7 +54,7 @@ public class ChatAnnotation {
     }
 
 
-    @WebSocketClose
+    @OnClose
     public void end() {
         try {
             session.close();
@@ -69,7 +69,7 @@ public class ChatAnnotation {
     }
 
 
-    @WebSocketMessage
+    @OnMessage
     public void incoming(String message) {
         // Never trust the client
         String filteredMessage = String.format("%s: %s",
@@ -81,7 +81,7 @@ public class ChatAnnotation {
     private static void broadcast(String msg) {
         for (ChatAnnotation client : connections) {
             try {
-                client.session.getRemote().sendString(msg);
+                client.session.getBasicRemote().sendText(msg);
             } catch (IOException e) {
                 connections.remove(client);
                 try {

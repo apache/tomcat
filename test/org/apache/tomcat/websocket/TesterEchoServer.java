@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import javax.servlet.ServletContextEvent;
+import javax.websocket.OnMessage;
 import javax.websocket.Session;
-import javax.websocket.WebSocketMessage;
 
 import org.apache.tomcat.websocket.server.ServerContainerImpl;
 import org.apache.tomcat.websocket.server.WsListener;
@@ -45,10 +45,10 @@ public class TesterEchoServer {
 
     public static class Async {
 
-        @WebSocketMessage
+        @OnMessage
         public void echoTextMessage(Session session, String msg, boolean last) {
             try {
-                session.getRemote().sendPartialString(msg, last);
+                session.getBasicRemote().sendText(msg, last);
             } catch (IOException e) {
                 try {
                     session.close();
@@ -59,11 +59,11 @@ public class TesterEchoServer {
         }
 
 
-        @WebSocketMessage
+        @OnMessage
         public void echoBinaryMessage(Session session, ByteBuffer msg,
                 boolean last) {
             try {
-                session.getRemote().sendPartialBytes(msg, last);
+                session.getBasicRemote().sendBinary(msg, last);
             } catch (IOException e) {
                 try {
                     session.close();
@@ -75,10 +75,10 @@ public class TesterEchoServer {
     }
 
     public static class Basic {
-        @WebSocketMessage
+        @OnMessage
         public void echoTextMessage(Session session, String msg) {
             try {
-                session.getRemote().sendString(msg);
+                session.getBasicRemote().sendText(msg);
             } catch (IOException e) {
                 try {
                     session.close();
@@ -89,10 +89,10 @@ public class TesterEchoServer {
         }
 
 
-        @WebSocketMessage
+        @OnMessage
         public void echoBinaryMessage(Session session, ByteBuffer msg) {
             try {
-                session.getRemote().sendBytes(msg);
+                session.getBasicRemote().sendBinary(msg);
             } catch (IOException e) {
                 try {
                     session.close();

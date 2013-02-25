@@ -98,7 +98,7 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
                     // message.
                     SendHandler sh = handler;
                     handler = null;
-                    sh.setResult(new SendResult());
+                    sh.onResult(new SendResult());
                     break;
                 }
             }
@@ -108,12 +108,12 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
             close();
             SendHandler sh = handler;
             handler = null;
-            sh.setResult(new SendResult(ioe));
+            sh.onResult(new SendResult(ioe));
         }
         if (!complete) {
             // Async write is in progress
 
-            long timeout = getAsyncSendTimeout();
+            long timeout = getSendTimeout();
             if (timeout > 0) {
                 // Register with timeout thread
                 timeoutExpiry = timeout + System.currentTimeMillis();
@@ -143,7 +143,7 @@ public class WsRemoteEndpointServer extends WsRemoteEndpointBase {
 
     protected void onTimeout() {
         close();
-        handler.setResult(new SendResult(new SocketTimeoutException()));
+        handler.onResult(new SendResult(new SocketTimeoutException()));
         handler = null;
     }
 }

@@ -17,10 +17,13 @@
 package javax.websocket;
 
 import java.util.List;
+//import java.util.Map;
 
 public interface EndpointConfiguration {
 
     List<Encoder> getEncoders();
 
     List<Decoder> getDecoders();
+
+    //Map<String,Object> getUserProperties();
 }

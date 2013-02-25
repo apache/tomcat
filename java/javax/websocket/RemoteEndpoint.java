@@ -25,6 +25,108 @@ import java.util.concurrent.Future;
 
 public interface RemoteEndpoint {
 
+    interface Async extends RemoteEndpoint {
+
+        /**
+         * Obtain the timeout (in milliseconds) for sending a message
+         * asynchronously. A non-positive value means an infinite timeout. The
+         * default value is determined by
+         * {@link WebSocketContainer#getDefaultAsyncSendTimeout()}.
+         */
+        long getSendTimeout();
+
+        /**
+         * Set the timeout (in milliseconds) for sending a message asynchronously. A
+         * non-positive value means an infinite timeout. The default value is
+         * determined by {@link WebSocketContainer#getDefaultAsyncSendTimeout()}.
+         */
+        void setSendTimeout(long timeout);
+
+        /**
+         * Send the message asynchronously, using the SendHandler to signal to the
+         * client when the message has been sent.
+         * @param text          The text message to send
+         * @param completion    Used to signal to the client when the message has
+         *                      been sent
+         */
+        void sendText(String text, SendHandler completion);
+
+        /**
+         * Send the message asynchronously, using the Future to signal to the client
+         * when the message has been sent.
+         * @param text          The text message to send
+         */
+        Future<Void> sendText(String text);
+
+        /**
+         * Send the message asynchronously, using the Future to signal to the client
+         * when the message has been sent.
+         * @param data          The text message to send
+         */
+        Future<Void> sendBinary(ByteBuffer data);
+
+        /**
+         * Send the message asynchronously, using the SendHandler to signal to the
+         * client when the message has been sent.
+         * @param data          The text message to send
+         * @param completion    Used to signal to the client when the message has
+         *                      been sent
+         */
+        void sendBinary(ByteBuffer data, SendHandler completion);
+
+        Future<Void> sendObject(Object obj);
+
+        void sendObject(Object obj, SendHandler completion);
+
+    }
+
+    interface Basic extends RemoteEndpoint {
+
+        /**
+         * Send the message, blocking until the message is sent.
+         * @param text  The text message to send.
+         * @throws IOException
+         */
+        void sendText(String text) throws IOException;
+
+        /**
+         * Send the message, blocking until the message is sent.
+         * @param data  The binary message to send
+         * @throws IOException
+         */
+        void sendBinary(ByteBuffer data) throws IOException;
+
+        /**
+         * Sends part of a text message to the remote endpoint. Once the first part
+         * of a message has been sent, no other text or binary messages may be sent
+         * until all remaining parts of this message have been sent.
+         *
+         * @param fragment  The partial message to send
+         * @param isLast    <code>true</code> if this is the last part of the
+         *                  message, otherwise <code>false</code>
+         * @throws IOException
+         */
+        void sendText(String fragment, boolean isLast) throws IOException;
+
+        /**
+         * Sends part of a binary message to the remote endpoint. Once the first
+         * part of a message has been sent, no other text or binary messages may be
+         * sent until all remaining parts of this message have been sent.
+         *
+         * @param partialByte   The partial message to send
+         * @param isLast        <code>true</code> if this is the last part of the
+         *                      message, otherwise <code>false</code>
+         * @throws IOException
+         */
+        void sendBinary(ByteBuffer partialByte, boolean isLast) throws IOException;
+
+        OutputStream getSendStream() throws IOException;
+
+        Writer getSendWriter() throws IOException;
+
+        void sendObject(Object o) throws IOException, EncodeException;
+
+    }
     /**
      * Enable or disable the batching of outgoing messages for this endpoint. If
      * batching is disabled when it was previously enabled then this method will
@@ -47,101 +149,6 @@ public interface RemoteEndpoint {
      * will block until the flush completes.
      */
     void flushBatch() throws IOException;
-
-    /**
-     * Obtain the timeout (in milliseconds) for sending a message
-     * asynchronously. A non-positive value means an infinite timeout. The
-     * default value is determined by
-     * {@link WebSocketContainer#getDefaultAsyncSendTimeout()}.
-     */
-    long getAsyncSendTimeout();
-
-    /**
-     * Set the timeout (in milliseconds) for sending a message asynchronously. A
-     * non-positive value means an infinite timeout. The default value is
-     * determined by {@link WebSocketContainer#getDefaultAsyncSendTimeout()}.
-     */
-    void setAsyncSendTimeout(long timeout);
-
-    /**
-     * Send the message, blocking until the message is sent.
-     * @param text  The text message to send.
-     * @throws IOException
-     */
-    void sendString(String text) throws IOException;
-
-    /**
-     * Send the message, blocking until the message is sent.
-     * @param data  The binary message to send
-     * @throws IOException
-     */
-    void sendBytes(ByteBuffer data) throws IOException;
-
-    /**
-     * Sends part of a text message to the remote endpoint. Once the first part
-     * of a message has been sent, no other text or binary messages may be sent
-     * until all remaining parts of this message have been sent.
-     *
-     * @param fragment  The partial message to send
-     * @param isLast    <code>true</code> if this is the last part of the
-     *                  message, otherwise <code>false</code>
-     * @throws IOException
-     */
-    void sendPartialString(String fragment, boolean isLast) throws IOException;
-
-    /**
-     * Sends part of a binary message to the remote endpoint. Once the first
-     * part of a message has been sent, no other text or binary messages may be
-     * sent until all remaining parts of this message have been sent.
-     *
-     * @param partialByte   The partial message to send
-     * @param isLast        <code>true</code> if this is the last part of the
-     *                      message, otherwise <code>false</code>
-     * @throws IOException
-     */
-    void sendPartialBytes(ByteBuffer partialByte, boolean isLast) throws IOException;
-
-    OutputStream getSendStream() throws IOException;
-
-    Writer getSendWriter() throws IOException;
-
-    void sendObject(Object o) throws IOException, EncodeException;
-
-    /**
-     * Send the message asynchronously, using the SendHandler to signal to the
-     * client when the message has been sent.
-     * @param text          The text message to send
-     * @param completion    Used to signal to the client when the message has
-     *                      been sent
-     */
-    void sendStringByCompletion(String text, SendHandler completion);
-
-    /**
-     * Send the message asynchronously, using the Future to signal to the client
-     * when the message has been sent.
-     * @param text          The text message to send
-     */
-    Future<SendResult> sendStringByFuture(String text);
-
-    /**
-     * Send the message asynchronously, using the Future to signal to the client
-     * when the message has been sent.
-     * @param data          The text message to send
-     */
-    Future<SendResult> sendBytesByFuture(ByteBuffer data);
-
-    /**
-     * Send the message asynchronously, using the SendHandler to signal to the
-     * client when the message has been sent.
-     * @param data          The text message to send
-     * @param completion    Used to signal to the client when the message has
-     *                      been sent
-     */
-    void sendBytesByCompletion(ByteBuffer data, SendHandler completion);
-
-    Future<SendResult> sendObjectByFuture(Object obj);
-
-    void sendObjectByCompletion(Object obj, SendHandler completion);
 
     /**
      * Send a ping message blocking until the message has been sent. Note that

@@ -70,20 +70,18 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     private final CharsetEncoder encoder = Charset.forName("UTF8").newEncoder();
     private final ByteBuffer encoderBuffer = ByteBuffer.allocate(8192);
     private final AtomicBoolean batchingAllowed = new AtomicBoolean(false);
-    private volatile long asyncSendTimeout = -1;
+    private volatile long sendTimeout = -1;
     private WsSession wsSession;
     private List<EncoderEntry> encoderEntries = new ArrayList<>();
 
 
-    @Override
-    public long getAsyncSendTimeout() {
-        return asyncSendTimeout;
+    public long getSendTimeout() {
+        return sendTimeout;
     }
 
 
-    @Override
-    public void setAsyncSendTimeout(long timeout) {
-        this.asyncSendTimeout = timeout;
+    public void setSendTimeout(long timeout) {
+        this.sendTimeout = timeout;
     }
 
 
@@ -109,27 +107,23 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     }
 
 
-    @Override
     public void sendBytes(ByteBuffer data) throws IOException {
         startMessageBlock(Constants.OPCODE_BINARY, data, true);
     }
 
 
-    @Override
-    public Future<SendResult> sendBytesByFuture(ByteBuffer data) {
+    public Future<Void> sendBytesByFuture(ByteBuffer data) {
         FutureToSendHandler f2sh = new FutureToSendHandler();
         sendBytesByCompletion(data, f2sh);
         return f2sh;
     }
 
 
-    @Override
     public void sendBytesByCompletion(ByteBuffer data, SendHandler handler) {
         startMessage(Constants.OPCODE_BINARY, data, true, handler);
     }
 
 
-    @Override
     public void sendPartialBytes(ByteBuffer partialByte, boolean last)
             throws IOException {
         startMessageBlock(Constants.OPCODE_BINARY, partialByte, last);
@@ -150,21 +144,18 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     }
 
 
-    @Override
     public void sendString(String text) throws IOException {
         sendPartialString(CharBuffer.wrap(text), true);
     }
 
 
-    @Override
-    public Future<SendResult> sendStringByFuture(String text) {
+    public Future<Void> sendStringByFuture(String text) {
         FutureToSendHandler f2sh = new FutureToSendHandler();
         sendStringByCompletion(text, f2sh);
         return f2sh;
     }
 
 
-    @Override
     public void sendStringByCompletion(String text, SendHandler handler) {
         TextMessageSendHandler tmsh = new TextMessageSendHandler(handler,
                 CharBuffer.wrap(text), true, encoder, encoderBuffer, this);
@@ -172,28 +163,20 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
     }
 
 
-    @Override
     public void sendPartialString(String fragment, boolean isLast)
             throws IOException {
         sendPartialString(CharBuffer.wrap(fragment), isLast);
     }
 
 
-    @Override
-    public OutputStream getSendStream() throws IOException {
+    public OutputStream getSendStream() {
         return new WsOutputStream(this);
     }
 
 
-    @Override
-    public Writer getSendWriter() throws IOException {
+    public Writer getSendWriter() {
         return new WsWriter(this);
     }
-
-
-
-
-
 
 
     void sendPartialString(CharBuffer part, boolean last) throws IOException {
@@ -214,14 +197,7 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
         FutureToSendHandler f2sh = new FutureToSendHandler();
         startMessage(opCode, payload, last, f2sh);
         try {
-            SendResult sr = f2sh.get();
-            if (!sr.isOK()) {
-                if (sr.getException() == null) {
-                    throw new IOException();
-                } else {
-                    throw new IOException(sr.getException());
-                }
-            }
+            f2sh.get();
         } catch (InterruptedException | ExecutionException e) {
             throw new IOException(e);
         }
@@ -286,7 +262,7 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
         wsSession.updateLastActive();
 
-        handler.setResult(result);
+        handler.onResult(result);
     }
 
 
@@ -421,15 +397,14 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
 
         @Override
-        public void setResult(SendResult result) {
+        public void onResult(SendResult result) {
             endpoint.endMessage(handler, result, dataMessage);
         }
     }
 
 
-    @Override
-    public void sendObject(Object obj) throws IOException, EncodeException {
-        Future<SendResult> f = sendObjectByFuture(obj);
+    public void sendObject(Object obj) throws IOException {
+        Future<Void> f = sendObjectByFuture(obj);
         try {
             f.get();
         } catch (InterruptedException | ExecutionException e) {
@@ -437,8 +412,7 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
         }
     }
 
-    @Override
-    public Future<SendResult> sendObjectByFuture(Object obj) {
+    public Future<Void> sendObjectByFuture(Object obj) {
         FutureToSendHandler f2sh = new FutureToSendHandler();
         sendObjectByCompletion(obj, f2sh);
         return f2sh;
@@ -446,7 +420,6 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
 
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @Override
     public void sendObjectByCompletion(Object obj, SendHandler completion) {
 
         Encoder encoder = findEncoder(obj);
@@ -470,7 +443,7 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
             }
         } catch (EncodeException | IOException e) {
             SendResult sr = new SendResult(e);
-            completion.setResult(sr);
+            completion.onResult(sr);
         }
     }
 
@@ -592,9 +565,9 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
         }
 
         @Override
-        public void setResult(SendResult result) {
+        public void onResult(SendResult result) {
             if (isDone || !result.isOK()) {
-                handler.setResult(result);
+                handler.onResult(result);
             } else {
                 write();
             }
@@ -665,18 +638,18 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
                 flushRequired = false;
                 return;
             } else {
-                handler.setResult(new SendResult());
+                handler.onResult(new SendResult());
             }
         }
 
         // ------------------------------------------------- SendHandler methods
         @Override
-        public void setResult(SendResult result) {
+        public void onResult(SendResult result) {
             outputBuffer.clear();
             if (result.isOK()) {
                 write();
             } else {
-                handler.setResult(result);
+                handler.onResult(result);
             }
         }
     }
@@ -685,7 +658,7 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
      * Converts a Future to a SendHandler.
      */
     private static class FutureToSendHandler
-            implements Future<SendResult>, SendHandler {
+            implements Future<Void>, SendHandler {
 
         private final CountDownLatch latch = new CountDownLatch(1);
         private volatile SendResult result = null;
@@ -693,7 +666,7 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
         // --------------------------------------------------------- SendHandler
 
         @Override
-        public void setResult(SendResult result) {
+        public void onResult(SendResult result) {
             this.result = result;
             latch.countDown();
         }
@@ -719,21 +692,27 @@ public abstract class WsRemoteEndpointBase implements RemoteEndpoint {
         }
 
         @Override
-        public SendResult get() throws InterruptedException,
+        public Void get() throws InterruptedException,
                 ExecutionException {
             latch.await();
-            return result;
+            if (result.getException() != null) {
+                throw new ExecutionException(result.getException());
+            }
+            return null;
         }
 
         @Override
-        public SendResult get(long timeout, TimeUnit unit)
+        public Void get(long timeout, TimeUnit unit)
                 throws InterruptedException, ExecutionException,
                 TimeoutException {
             boolean retval = latch.await(timeout, unit);
             if (retval == false) {
                 throw new TimeoutException();
             }
-            return result;
+            if (result.getException() != null) {
+                throw new ExecutionException(result.getException());
+            }
+            return null;
         }
     }
 

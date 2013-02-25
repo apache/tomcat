@@ -25,13 +25,13 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.websocket.MessageHandler;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
 import javax.websocket.PongMessage;
 import javax.websocket.Session;
-import javax.websocket.WebSocketClose;
-import javax.websocket.WebSocketError;
-import javax.websocket.WebSocketMessage;
-import javax.websocket.WebSocketOpen;
-import javax.websocket.server.WebSocketPathParam;
+import javax.websocket.server.PathParam;
 
 /**
  * For a POJO class annotated with
@@ -58,15 +58,15 @@ public class PojoMethodMapping {
         Method error = null;
         for (Method method : clazzPojo.getMethods()) {
             if (open == null &&
-                    method.getAnnotation(WebSocketOpen.class) != null) {
+                    method.getAnnotation(OnOpen.class) != null) {
                 open = method;
             } else if (close == null &&
-                    method.getAnnotation(WebSocketClose.class) != null) {
+                    method.getAnnotation(OnClose.class) != null) {
                 close = method;
             } else if (error == null &&
-                    method.getAnnotation(WebSocketError.class) != null) {
+                    method.getAnnotation(OnError.class) != null) {
                 error = method;
-            } else if (method.getAnnotation(WebSocketMessage.class) != null) {
+            } else if (method.getAnnotation(OnMessage.class) != null) {
                 onMessage.add(new MessageMethod(method));
             }
         }
@@ -146,9 +146,9 @@ public class PojoMethodMapping {
                 Annotation[] paramAnnotations = paramsAnnotations[i];
                 for (Annotation paramAnnotation : paramAnnotations) {
                     if (paramAnnotation.annotationType().equals(
-                            WebSocketPathParam.class)) {
+                            PathParam.class)) {
                         result[i] = new PojoPathParam(type,
-                                ((WebSocketPathParam) paramAnnotation).value());
+                                ((PathParam) paramAnnotation).value());
                         break;
                     }
                 }
@@ -240,10 +240,10 @@ public class PojoMethodMapping {
                     Annotation[] paramAnnotations = paramsAnnotations[i];
                     for (Annotation paramAnnotation : paramAnnotations) {
                         if (paramAnnotation.annotationType().equals(
-                                WebSocketPathParam.class)) {
+                                PathParam.class)) {
                             indexPathParams.put(
                                     Integer.valueOf(i), new PojoPathParam(types[i],
-                                            ((WebSocketPathParam) paramAnnotation).value()));
+                                            ((PathParam) paramAnnotation).value()));
                             break;
                         }
                     }

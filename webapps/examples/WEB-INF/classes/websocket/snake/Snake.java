@@ -63,7 +63,7 @@ public class Snake {
 
     protected void sendMessage(String msg) {
         try {
-            session.getRemote().sendString(msg);
+            session.getBasicRemote().sendText(msg);
         } catch (IOException ioe) {
             // Ignore
         }
