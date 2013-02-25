@@ -32,10 +32,9 @@ import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfiguration;
 import javax.websocket.MessageHandler;
-import javax.websocket.SendResult;
+import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
-import javax.websocket.WebSocketMessage;
 import javax.websocket.server.DefaultServerConfiguration;
 
 import org.junit.Assert;
@@ -88,7 +87,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         CountDownLatch latch = new CountDownLatch(1);
         BasicText handler = new BasicText(latch);
         wsSession.addMessageHandler(handler);
-        wsSession.getRemote().sendString(MESSAGE_STRING_1);
+        wsSession.getBasicRemote().sendText(MESSAGE_STRING_1);
 
         boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
 
@@ -232,9 +231,10 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         wsSession.addMessageHandler(handler);
         if (isTextMessage) {
-            wsSession.getRemote().sendString(MESSAGE_TEXT_4K);
+            wsSession.getBasicRemote().sendText(MESSAGE_TEXT_4K);
         } else {
-            wsSession.getRemote().sendBytes(ByteBuffer.wrap(MESSAGE_BINARY_4K));
+            wsSession.getBasicRemote().sendBinary(
+                    ByteBuffer.wrap(MESSAGE_BINARY_4K));
         }
 
         boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
@@ -292,21 +292,23 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                         getPort() + BlockingConfig.PATH));
 
         if (!setTimeoutOnContainer) {
-            wsSession.getRemote().setAsyncSendTimeout(TIMEOUT_MS);
+            wsSession.getAsyncRemote().setSendTimeout(TIMEOUT_MS);
         }
 
         long lastSend = 0;
-        boolean isOK = true;
-        SendResult sr = null;
 
         // Should send quickly until the network buffers fill up and then block
         // until the timeout kicks in
-        while (isOK) {
-            Future<SendResult> f = wsSession.getRemote().sendBytesByFuture(
-                    ByteBuffer.wrap(MESSAGE_BINARY_4K));
-            lastSend = System.currentTimeMillis();
-            sr = f.get();
-            isOK = sr.isOK();
+        Exception exception = null;
+        try {
+            while (true) {
+                Future<Void> f = wsSession.getAsyncRemote().sendBinary(
+                        ByteBuffer.wrap(MESSAGE_BINARY_4K));
+                lastSend = System.currentTimeMillis();
+                f.get();
+            }
+        } catch (Exception e) {
+            exception = e;
         }
 
         long timeout = System.currentTimeMillis() - lastSend;
@@ -320,11 +322,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Check the timeout wasn't too long
         Assert.assertTrue(msg, timeout < TIMEOUT_MS * 2);
 
-        if (sr == null) {
-            Assert.fail();
-        } else {
-            Assert.assertNotNull(sr.getException());
-        }
+        Assert.assertNotNull(exception);
     }
 
 
@@ -394,13 +392,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Check the timeout wasn't too long
         Assert.assertTrue(ConstantTxEndpoint.getTimeout() < TIMEOUT_MS*2);
 
-        if (ConstantTxEndpoint.getSendResult() == null) {
-            Assert.fail();
-        } else {
-            Assert.assertNotNull(
-                    ConstantTxEndpoint.getSendResult().getException());
-        }
-
+        Assert.assertNotNull(ConstantTxEndpoint.getException());
     }
 
 
@@ -419,7 +411,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
     public static class BlockingPojo {
         @SuppressWarnings("unused")
-        @WebSocketMessage
+        @OnMessage
         public void echoTextMessage(Session session, String msg, boolean last) {
             try {
                 Thread.sleep(60000);
@@ -430,7 +422,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
 
         @SuppressWarnings("unused")
-        @WebSocketMessage
+        @OnMessage
         public void echoBinaryMessage(Session session, ByteBuffer msg,
                 boolean last) {
             try {
@@ -460,8 +452,6 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         // Have to be static to be able to retrieve results from test case
         private static volatile long timeout = -1;
-        private static volatile boolean ok = true;
-        private static volatile SendResult sr = null;
         private static volatile Exception exception = null;
         private static volatile boolean running = true;
 
@@ -471,13 +461,11 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
             // Reset everything
             timeout = -1;
-            ok = true;
-            sr = null;
             exception = null;
             running = true;
 
             if (!TestWsWebSocketContainer.timoutOnContainer) {
-                session.getRemote().setAsyncSendTimeout(TIMEOUT_MS);
+                session.getAsyncRemote().setSendTimeout(TIMEOUT_MS);
             }
 
             long lastSend = 0;
@@ -485,12 +473,11 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             // Should send quickly until the network buffers fill up and then
             // block until the timeout kicks in
             try {
-                while (ok) {
+                while (true) {
                     lastSend = System.currentTimeMillis();
-                    Future<SendResult> f = session.getRemote().sendBytesByFuture(
+                    Future<Void> f = session.getAsyncRemote().sendBinary(
                             ByteBuffer.wrap(MESSAGE_BINARY_4K));
-                    sr = f.get();
-                    ok = sr.isOK();
+                    f.get();
                 }
             } catch (ExecutionException | InterruptedException e) {
                 exception = e;
@@ -501,14 +488,6 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         public static long getTimeout() {
             return timeout;
-        }
-
-        public static boolean isOK() {
-            return ok;
-        }
-
-        public static SendResult getSendResult() {
-            return sr;
         }
 
         public static Exception getException() {
@@ -599,7 +578,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                 ContainerProvider.getWebSocketContainer();
 
         // 5 second timeout
-        wsContainer.setMaxSessionIdleTimeout(5000);
+        wsContainer.setDefaultMaxSessionIdleTimeout(5000);
         wsContainer.setProcessPeriod(1);
 
         connectToEchoServerBasic(wsContainer, EndpointA.class);
@@ -640,15 +619,15 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                 ContainerProvider.getWebSocketContainer();
 
         // 5 second timeout
-        wsContainer.setMaxSessionIdleTimeout(5000);
+        wsContainer.setDefaultMaxSessionIdleTimeout(5000);
         wsContainer.setProcessPeriod(1);
 
         Session s1a = connectToEchoServerBasic(wsContainer, EndpointA.class);
-        s1a.setTimeout(3000);
+        s1a.setMaxIdleTimeout(3000);
         Session s2a = connectToEchoServerBasic(wsContainer, EndpointA.class);
-        s2a.setTimeout(6000);
+        s2a.setMaxIdleTimeout(6000);
         Session s3a = connectToEchoServerBasic(wsContainer, EndpointA.class);
-        s3a.setTimeout(9000);
+        s3a.setMaxIdleTimeout(9000);
 
         // Check all three sessions are open
         Set<Session> setA = s3a.getOpenSessions();

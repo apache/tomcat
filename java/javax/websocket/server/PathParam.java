@@ -23,6 +23,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-public @interface WebSocketPathParam {
+public @interface PathParam {
     String value();
 }

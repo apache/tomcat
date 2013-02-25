@@ -21,10 +21,10 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.websocket.OnClose;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.WebSocketClose;
-import javax.websocket.WebSocketMessage;
-import javax.websocket.WebSocketOpen;
 import javax.websocket.server.WebSocketEndpoint;
 
 @WebSocketEndpoint(value = "/websocket/snake")
@@ -71,7 +71,7 @@ public class SnakeAnnotation {
     }
 
 
-    @WebSocketOpen
+    @OnOpen
     public void onOpen(Session session) {
         this.snake = new Snake(id, session);
         SnakeTimer.addSnake(snake);
@@ -90,7 +90,7 @@ public class SnakeAnnotation {
     }
 
 
-    @WebSocketMessage
+    @OnMessage
     public void onTextMessage(String message) {
         if ("west".equals(message)) {
             snake.setDirection(Direction.WEST);
@@ -104,7 +104,7 @@ public class SnakeAnnotation {
     }
 
 
-    @WebSocketClose
+    @OnClose
     public void onClose() {
         SnakeTimer.removeSnake(snake);
         SnakeTimer.broadcast(String.format("{'type': 'leave', 'id': %d}",

@@ -22,6 +22,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface WebSocketError {
+@Target(ElementType.TYPE)
+public @interface ClientEndpoint {
+    String[] subprotocols();
+    Class<? extends Decoder>[] decoders();
+    Class<? extends Encoder>[] encoders();
 }

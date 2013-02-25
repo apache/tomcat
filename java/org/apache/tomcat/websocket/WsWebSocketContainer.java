@@ -65,7 +65,7 @@ public class WsWebSocketContainer
     private long defaultAsyncTimeout = -1;
     private int maxBinaryMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
-    private volatile long maxSessionIdleTimeout = 0;
+    private volatile long defaultMaxSessionIdleTimeout = 0;
     private int backgroundProcessCount = 0;
     private int processPeriod = 10;
 
@@ -413,14 +413,14 @@ public class WsWebSocketContainer
 
 
     @Override
-    public long getMaxSessionIdleTimeout() {
-        return maxSessionIdleTimeout;
+    public long getDefaultMaxSessionIdleTimeout() {
+        return defaultMaxSessionIdleTimeout;
     }
 
 
     @Override
-    public void setMaxSessionIdleTimeout(long timeout) {
-        this.maxSessionIdleTimeout = timeout;
+    public void setDefaultMaxSessionIdleTimeout(long timeout) {
+        this.defaultMaxSessionIdleTimeout = timeout;
     }
 
 

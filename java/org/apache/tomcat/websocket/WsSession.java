@@ -71,7 +71,7 @@ public class WsSession implements Session {
             Constants.DEFAULT_BUFFER_SIZE;
     private volatile int maxTextMessageBufferSize =
             Constants.DEFAULT_BUFFER_SIZE;
-    private volatile long sessionIdleTimeout = 0;
+    private volatile long maxIdleTimeout = 0;
     private volatile long lastActive = System.currentTimeMillis();
 
 
@@ -95,14 +95,14 @@ public class WsSession implements Session {
         this.wsRemoteEndpoint.setSession(this);
         this.webSocketContainer = wsWebSocketContainer;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
-        wsRemoteEndpoint.setAsyncSendTimeout(
+        wsRemoteEndpoint.setSendTimeout(
                 wsWebSocketContainer.getDefaultAsyncSendTimeout());
         this.maxBinaryMessageBufferSize =
                 webSocketContainer.getDefaultMaxBinaryMessageBufferSize();
         this.maxTextMessageBufferSize =
                 webSocketContainer.getDefaultMaxTextMessageBufferSize();
-        this.sessionIdleTimeout =
-                webSocketContainer.getMaxSessionIdleTimeout();
+        this.maxIdleTimeout =
+                webSocketContainer.getDefaultMaxSessionIdleTimeout();
         this.request = request;
         this.subProtocol = subProtocol;
         this.pathParameters = pathParameters;
@@ -220,14 +220,14 @@ public class WsSession implements Session {
 
 
     @Override
-    public long getTimeout() {
-        return sessionIdleTimeout;
+    public long getMaxIdleTimeout() {
+        return maxIdleTimeout;
     }
 
 
     @Override
-    public void setTimeout(long timeout) {
-        this.sessionIdleTimeout = timeout;
+    public void setMaxIdleTimeout(long timeout) {
+        this.maxIdleTimeout = timeout;
     }
 
 
@@ -262,8 +262,16 @@ public class WsSession implements Session {
 
 
     @Override
-    public RemoteEndpoint getRemote() {
-        return wsRemoteEndpoint;
+    public RemoteEndpoint.Async getAsyncRemote() {
+        // TODO Don't create new wrappers on every call
+        return new WsRemoteEndpointAsync(wsRemoteEndpoint);
+    }
+
+
+    @Override
+    public RemoteEndpoint.Basic getBasicRemote() {
+        // TODO Don't create new wrappers on every call
+        return new WsRemoteEndpointBasic(wsRemoteEndpoint);
     }
 
 
@@ -391,7 +399,7 @@ public class WsSession implements Session {
 
 
     protected void expire() {
-        long timeout = sessionIdleTimeout;
+        long timeout = maxIdleTimeout;
         if (timeout < 1) {
             return;
         }

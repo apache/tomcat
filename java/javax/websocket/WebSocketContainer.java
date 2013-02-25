@@ -16,6 +16,7 @@
  */
 package javax.websocket;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 
@@ -34,7 +35,7 @@ public interface WebSocketContainer {
     void setAsyncSendTimeout(long timeout);
 
     Session connectToServer(Class<?> annotatedEndpointClass, URI path)
-            throws DeploymentException;
+            throws DeploymentException, IOException;
 
     /**
      * Creates a new connection to the WebSocket.
@@ -53,19 +54,19 @@ public interface WebSocketContainer {
      */
     Session connectToServer(Class<? extends Endpoint> endpoint,
             ClientEndpointConfiguration clientEndpointConfiguration, URI path)
-            throws DeploymentException;
+            throws DeploymentException, IOException;
 
     /**
      * Get the current default session idle timeout in milliseconds. Zero or
      * negative values indicate an infinite timeout.
      */
-    long getMaxSessionIdleTimeout();
+    long getDefaultMaxSessionIdleTimeout();
 
     /**
      * Set the current default session idle timeout in milliseconds. Zero or
      * negative values indicate an infinite timeout.
      */
-    void setMaxSessionIdleTimeout(long timeout);
+    void setDefaultMaxSessionIdleTimeout(long timeout);
 
     /**
      * Get the default maximum buffer size (in bytes) for binary messages.

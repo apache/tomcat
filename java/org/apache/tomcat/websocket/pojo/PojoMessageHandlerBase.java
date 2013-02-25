@@ -58,7 +58,7 @@ public abstract class PojoMessageHandlerBase<T> {
             return;
         }
 
-        RemoteEndpoint remoteEndpoint = session.getRemote();
+        RemoteEndpoint.Basic remoteEndpoint = session.getBasicRemote();
         // TODO: Remove this once sendXxx is implemented?
         if (remoteEndpoint == null) {
             return;
@@ -66,11 +66,11 @@ public abstract class PojoMessageHandlerBase<T> {
 
         try {
             if (result instanceof String) {
-                remoteEndpoint.sendString((String) result);
+                remoteEndpoint.sendText((String) result);
             } else if (result instanceof ByteBuffer) {
-                remoteEndpoint.sendBytes((ByteBuffer) result);
+                remoteEndpoint.sendBinary((ByteBuffer) result);
             } else if (result instanceof byte[]) {
-                remoteEndpoint.sendBytes(ByteBuffer.wrap((byte[]) result));
+                remoteEndpoint.sendBinary(ByteBuffer.wrap((byte[]) result));
             } else {
                 remoteEndpoint.sendObject(result);
             }

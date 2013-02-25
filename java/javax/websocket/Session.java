@@ -52,13 +52,13 @@ public interface Session extends Closeable {
      * Get the idle timeout for this session in milliseconds. Zero or negative
      * values indicate an infinite timeout.
      */
-    long getTimeout();
+    long getMaxIdleTimeout();
 
     /**
      * Set the idle timeout for this session in milliseconds. Zero or negative
      * values indicate an infinite timeout.
      */
-    void setTimeout(long seconds);
+    void setMaxIdleTimeout(long seconds);
 
     /**
      * Set the current maximum buffer size (in bytes) for binary messages.
@@ -80,7 +80,9 @@ public interface Session extends Closeable {
      */
     int getMaxTextMessageBufferSize();
 
-    RemoteEndpoint getRemote();
+    RemoteEndpoint.Async getAsyncRemote();
+
+    RemoteEndpoint.Basic getBasicRemote();
 
     String getId();
 

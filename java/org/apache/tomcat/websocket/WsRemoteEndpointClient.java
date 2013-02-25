@@ -42,14 +42,14 @@ public class WsRemoteEndpointClient extends WsRemoteEndpointBase {
 
     @Override
     protected void doWrite(SendHandler handler, ByteBuffer... data) {
-        long timeout = getAsyncSendTimeout();
+        long timeout = getSendTimeout();
         if (timeout < 1) {
             timeout = Long.MAX_VALUE;
 
         }
         SendHandlerToCompletionHandler sh2ch =
                 new SendHandlerToCompletionHandler(handler);
-        channel.write(data, 0, data.length, getAsyncSendTimeout(),
+        channel.write(data, 0, data.length, getSendTimeout(),
                 TimeUnit.MILLISECONDS, null, sh2ch);
     }
 
@@ -74,12 +74,12 @@ public class WsRemoteEndpointClient extends WsRemoteEndpointBase {
 
         @Override
         public void completed(Long result, Void attachment) {
-            handler.setResult(new SendResult());
+            handler.onResult(new SendResult());
         }
 
         @Override
         public void failed(Throwable exc, Void attachment) {
-            handler.setResult(new SendResult(exc));
+            handler.onResult(new SendResult(exc));
         }
     }
 }

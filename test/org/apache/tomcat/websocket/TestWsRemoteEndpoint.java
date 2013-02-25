@@ -74,7 +74,7 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
 
         wsSession.addMessageHandler(handler);
 
-        Writer w = wsSession.getRemote().getSendWriter();
+        Writer w = wsSession.getBasicRemote().getSendWriter();
 
         for (int i = 0; i < 8; i++) {
             w.write(TEST_MESSAGE_5K);

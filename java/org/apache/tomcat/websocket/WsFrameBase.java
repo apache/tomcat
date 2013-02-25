@@ -286,7 +286,7 @@ public abstract class WsFrameBase {
             wsSession.close(new CloseReason(Util.getCloseCode(code), reason));
         } else if (opCode == Constants.OPCODE_PING) {
             if (wsSession.isOpen()) {
-                wsSession.getRemote().sendPong(controlBufferBinary);
+                wsSession.getBasicRemote().sendPong(controlBufferBinary);
             }
         } else if (opCode == Constants.OPCODE_PONG) {
             MessageHandler.Basic<PongMessage> mhPong =

@@ -40,7 +40,7 @@ public interface HandshakeRequest {
      * Get the HTTP Session object associated with this request. Object is used
      * to avoid a direct dependency on the Servlet API.
      */
-    Object getSession();
+    Object getHttpSession();
 
     Map<String, List<String>> getParameterMap();
 
