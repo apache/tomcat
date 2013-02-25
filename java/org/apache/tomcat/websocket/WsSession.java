@@ -54,6 +54,8 @@ public class WsSession implements Session {
 
     private final Endpoint localEndpoint;
     private final WsRemoteEndpointBase wsRemoteEndpoint;
+    private final RemoteEndpoint.Async remoteEndpointAsync;
+    private final RemoteEndpoint.Basic remoteEndpointBasic;
     private final ClassLoader applicationClassLoader;
     private final WsWebSocketContainer webSocketContainer;
     private final WsRequest request;
@@ -93,6 +95,8 @@ public class WsSession implements Session {
         this.localEndpoint = localEndpoint;
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);
+        this.remoteEndpointAsync = new WsRemoteEndpointAsync(wsRemoteEndpoint);
+        this.remoteEndpointBasic = new WsRemoteEndpointBasic(wsRemoteEndpoint);
         this.webSocketContainer = wsWebSocketContainer;
         applicationClassLoader = Thread.currentThread().getContextClassLoader();
         wsRemoteEndpoint.setSendTimeout(
@@ -263,15 +267,13 @@ public class WsSession implements Session {
 
     @Override
     public RemoteEndpoint.Async getAsyncRemote() {
-        // TODO Don't create new wrappers on every call
-        return new WsRemoteEndpointAsync(wsRemoteEndpoint);
+        return remoteEndpointAsync;
     }
 
 
     @Override
     public RemoteEndpoint.Basic getBasicRemote() {
-        // TODO Don't create new wrappers on every call
-        return new WsRemoteEndpointBasic(wsRemoteEndpoint);
+        return remoteEndpointBasic;
     }
 
 
