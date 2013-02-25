@@ -16,53 +16,17 @@
  */
 package org.apache.tomcat.websocket;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.Future;
 
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.SendHandler;
 
-// TODO Use a common base class
-public class WsRemoteEndpointAsync implements RemoteEndpoint.Async {
-
-    private final WsRemoteEndpointImplBase base;
-
+public class WsRemoteEndpointAsync extends WsRemoteEndpointBase
+        implements RemoteEndpoint.Async {
 
     WsRemoteEndpointAsync(WsRemoteEndpointImplBase base) {
-        this.base = base;
-    }
-
-
-    @Override
-    public void setBatchingAllowed(boolean batchingAllowed) throws IOException {
-        base.setBatchingAllowed(batchingAllowed);
-    }
-
-
-    @Override
-    public boolean getBatchingAllowed() {
-        return base.getBatchingAllowed();
-    }
-
-
-    @Override
-    public void flushBatch() throws IOException {
-        base.flushBatch();
-    }
-
-
-    @Override
-    public void sendPing(ByteBuffer applicationData) throws IOException,
-            IllegalArgumentException {
-        base.sendPing(applicationData);
-    }
-
-
-    @Override
-    public void sendPong(ByteBuffer applicationData) throws IOException,
-            IllegalArgumentException {
-        base.sendPong(applicationData);
+        super(base);
     }
 
 

@@ -24,46 +24,11 @@ import java.nio.ByteBuffer;
 import javax.websocket.EncodeException;
 import javax.websocket.RemoteEndpoint;
 
-//TODO Use a common base class
-public class WsRemoteEndpointBasic implements RemoteEndpoint.Basic {
-
-    private final WsRemoteEndpointImplBase base;
-
+public class WsRemoteEndpointBasic extends WsRemoteEndpointBase
+        implements RemoteEndpoint.Basic {
 
     WsRemoteEndpointBasic(WsRemoteEndpointImplBase base) {
-        this.base = base;
-    }
-
-
-    @Override
-    public void setBatchingAllowed(boolean batchingAllowed) throws IOException {
-        base.setBatchingAllowed(batchingAllowed);
-    }
-
-
-    @Override
-    public boolean getBatchingAllowed() {
-        return base.getBatchingAllowed();
-    }
-
-
-    @Override
-    public void flushBatch() throws IOException {
-        base.flushBatch();
-    }
-
-
-    @Override
-    public void sendPing(ByteBuffer applicationData) throws IOException,
-            IllegalArgumentException {
-        base.sendPing(applicationData);
-    }
-
-
-    @Override
-    public void sendPong(ByteBuffer applicationData) throws IOException,
-            IllegalArgumentException {
-        base.sendPong(applicationData);
+        super(base);
     }
 
 
