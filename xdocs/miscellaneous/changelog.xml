@@ -43,7 +43,7 @@
       from Tomcat trunk using svn:externals. (rjung)
     </update>
     <update>
-      Minimum supported APR version is now again 1.2.0. Version 1.3.0
+      Minimum supported APR version is now again 1.2.1. Version 1.3.0
       of APR improves performance. (rjung)
     </update>
   </changelog>
