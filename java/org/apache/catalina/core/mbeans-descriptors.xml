@@ -246,6 +246,26 @@
                type="long"
                writeable="false" />
 
+    <attribute name="maxTime"
+               description="Maximum execution time of all servlets in this context"
+               type="long"
+               writeable="false" />
+
+    <attribute name="minTime"
+               description="Minimum execution time of all servlets in this context"
+               type="long"
+               writeable="false" />
+
+    <attribute name="requestCount"
+               description="Cumulative request count of all servlets in this context"
+               type="int"
+               writeable="false" />
+
+    <attribute name="errorCount"
+               description="Cumulative error count of all servlets in this context"
+               type="int"
+               writeable="false" />
+
     <attribute name="publicId"
                description="The public identifier of the DTD for the web application deployment descriptor version that is being parsed"
                type="java.lang.String"

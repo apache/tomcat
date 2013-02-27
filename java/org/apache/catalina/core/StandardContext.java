@@ -4375,6 +4375,96 @@ public class StandardContext extends ContainerBase
         return result;
     }
 
+    /**
+     * Gets the maximum processing time of all servlets in this
+     * StandardContext.
+     *
+     * @return Maximum processing time of all servlets in this
+     * StandardContext
+     */
+    public long getMaxTime() {
+
+        long result = 0;
+        long time;
+
+        Container[] children = findChildren();
+        if (children != null) {
+            for( int i=0; i< children.length; i++ ) {
+                time = ((StandardWrapper)children[i]).getMaxTime();
+                if (time > result)
+                    result = time;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Gets the minimum processing time of all servlets in this
+     * StandardContext.
+     *
+     * @return Minimum processing time of all servlets in this
+     * StandardContext
+     */
+    public long getMinTime() {
+
+        long result = -1;
+        long time;
+
+        Container[] children = findChildren();
+        if (children != null) {
+            for( int i=0; i< children.length; i++ ) {
+                time = ((StandardWrapper)children[i]).getMinTime();
+                if (result < 0 || time < result)
+                    result = time;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Gets the cumulative request count of all servlets in this
+     * StandardContext.
+     *
+     * @return Cumulative request count of all servlets in this
+     * StandardContext
+     */
+    public int getRequestCount() {
+
+        int result = 0;
+
+        Container[] children = findChildren();
+        if (children != null) {
+            for( int i=0; i< children.length; i++ ) {
+                result += ((StandardWrapper)children[i]).getRequestCount();
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Gets the cumulative error count of all servlets in this
+     * StandardContext.
+     *
+     * @return Cumulative error count of all servlets in this
+     * StandardContext
+     */
+    public int getErrorCount() {
+
+        int result = 0;
+
+        Container[] children = findChildren();
+        if (children != null) {
+            for( int i=0; i< children.length; i++ ) {
+                result += ((StandardWrapper)children[i]).getErrorCount();
+            }
+        }
+
+        return result;
+    }
+
 
     /**
      * Return the real path for a given virtual path, if possible; otherwise
