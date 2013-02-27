@@ -22,9 +22,9 @@ import java.nio.ByteBuffer;
 import javax.websocket.OnMessage;
 import javax.websocket.PongMessage;
 import javax.websocket.Session;
-import javax.websocket.server.WebSocketEndpoint;
+import javax.websocket.server.ServerEndpoint;
 
-@WebSocketEndpoint("/websocket/echoAnnotation")
+@ServerEndpoint("/websocket/echoAnnotation")
 public class EchoAnnotation {
 
     @OnMessage

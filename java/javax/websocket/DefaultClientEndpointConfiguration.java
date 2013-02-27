@@ -16,65 +16,64 @@
  */
 package javax.websocket;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultClientConfiguration implements ClientEndpointConfiguration {
-    private List<String> preferredSubprotocols = new ArrayList<>();
-    private List<Extension> extensions = new ArrayList<>();
-    private List<Encoder> encoders = new ArrayList<>();
-    private List<Decoder> decoders = new ArrayList<>();
+public class DefaultClientEndpointConfiguration
+        implements ClientEndpointConfiguration {
+
+    private final List<String> preferredSubprotocols;
+    private final List<Extension> extensions;
+    private final List<Encoder> encoders;
+    private final List<Decoder> decoders;
+    private final Map<String,Object> userProperties = new HashMap<>();
+    private final ClientEndpointConfigurator configurator;
+
+
+    DefaultClientEndpointConfiguration(List<String> preferredSubprotocols,
+            List<Extension> extensions, List<Encoder> encoders,
+            List<Decoder> decoders, ClientEndpointConfigurator configurator) {
+        this.preferredSubprotocols = preferredSubprotocols;
+        this.extensions = extensions;
+        this.decoders = decoders;
+        this.encoders = encoders;
+        this.configurator = configurator;
+    }
+
 
     @Override
     public List<String> getPreferredSubprotocols() {
         return preferredSubprotocols;
     }
 
-    public DefaultClientConfiguration setPreferredSubprotocols(
-            List<String> preferredSubprotocols) {
-        this.preferredSubprotocols = preferredSubprotocols;
-        return this;
-    }
 
     @Override
     public List<Extension> getExtensions() {
         return extensions;
     }
 
-    public DefaultClientConfiguration setExtensions(
-            List<Extension> extensions) {
-        this.extensions = extensions;
-        return this;
-    }
 
     @Override
     public List<Encoder> getEncoders() {
         return encoders;
     }
 
-    public DefaultClientConfiguration setEncoders(List<Encoder> encoders) {
-        this.encoders = encoders;
-        return this;
-    }
 
     @Override
     public List<Decoder> getDecoders() {
         return decoders;
     }
 
-    public DefaultClientConfiguration setDecoders(List<Decoder> decoders) {
-        this.decoders = decoders;
-        return this;
-    }
 
     @Override
-    public void beforeRequest(Map<String, List<String>> headers) {
-        // NO-OP
+    public Map<String, Object> getUserProperties() {
+        return userProperties;
     }
 
+
     @Override
-    public void afterResponse(HandshakeResponse handshakeResponse) {
-        // NO-OP
+    public ClientEndpointConfigurator getClientEndpointConfigurator() {
+        return configurator;
     }
 }

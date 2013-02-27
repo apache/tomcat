@@ -22,14 +22,14 @@ import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HandlesTypes;
-import javax.websocket.server.WebSocketEndpoint;
+import javax.websocket.server.ServerEndpoint;
 
 /**
  * Registers an interest in any class that is annotated with
- * {@link WebSocketEndpoint} so that Endpoint can be published via the WebSocket
+ * {@link ServerEndpoint} so that Endpoint can be published via the WebSocket
  * server.
  */
-@HandlesTypes({WebSocketEndpoint.class})
+@HandlesTypes({ServerEndpoint.class})
 public class WsSci implements ServletContainerInitializer {
 
     @Override
@@ -44,8 +44,8 @@ public class WsSci implements ServletContainerInitializer {
 
         ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
         for (Class<?> clazz : clazzes) {
-            WebSocketEndpoint annotation =
-                    clazz.getAnnotation(WebSocketEndpoint.class);
+            ServerEndpoint annotation =
+                    clazz.getAnnotation(ServerEndpoint.class);
             sc.publishServer(clazz, ctx, annotation.value());
         }
     }

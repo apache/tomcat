@@ -24,13 +24,19 @@ import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfiguration;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
+import javax.websocket.server.ServerEndpointConfiguration;
 
 /**
  * Wrapper class for instances of POJOs annotated with
- * {@link javax.websocket.server.WebSocketEndpoint} so they appear as standard
+ * {@link javax.websocket.server.ServerEndpoint} so they appear as standard
  * {@link Endpoint} instances.
  */
 public class PojoEndpoint extends Endpoint {
+
+    public static final String POJO_PATH_PARAM_KEY =
+            "org.apache.tomcat.websocket.pojo.PojoEndpoint.pathParams";
+    public static final String POJO_METHOD_MAPPING_KEY =
+            "org.apache.tomcat.websocket.pojo.PojoEndpoint.methodMapping";
 
     private Object pojo;
     private Map<String,String> pathParameters;
@@ -40,12 +46,21 @@ public class PojoEndpoint extends Endpoint {
     @Override
     public void onOpen(Session session,
             EndpointConfiguration endpointConfiguration) {
-        PojoEndpointConfiguration pec =
-                (PojoEndpointConfiguration) endpointConfiguration;
 
-        pojo = pec.createPojo();
-        pathParameters = pec.getPathParameters();
-        methodMapping = pec.getMethodMapping();
+        ServerEndpointConfiguration sec =
+                (ServerEndpointConfiguration) endpointConfiguration;
+
+        try {
+            pojo = sec.getEndpointClass().newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        pathParameters = (Map<String, String>) sec.getUserProperties().get(
+                POJO_PATH_PARAM_KEY);
+        methodMapping = (PojoMethodMapping) sec.getUserProperties().get(
+                POJO_METHOD_MAPPING_KEY);
 
         if (methodMapping.getOnOpen() != null) {
             try {

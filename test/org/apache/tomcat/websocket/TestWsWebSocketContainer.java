@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -26,8 +27,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContextEvent;
+import javax.websocket.ClientEndpointConfigurationBuilder;
 import javax.websocket.ContainerProvider;
-import javax.websocket.DefaultClientConfiguration;
 import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfiguration;
@@ -35,7 +36,7 @@ import javax.websocket.MessageHandler;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
-import javax.websocket.server.DefaultServerConfiguration;
+import javax.websocket.server.ServerEndpointConfigurationBuilder;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -82,8 +83,9 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         WebSocketContainer wsContainer =
                 ContainerProvider.getWebSocketContainer();
         Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
-                new DefaultClientConfiguration(), new URI("http://localhost:" +
-                        getPort() + TesterEchoServer.Config.PATH_ASYNC));
+                ClientEndpointConfigurationBuilder.create().build(),
+                new URI("http://localhost:" + getPort() +
+                        TesterEchoServer.Config.PATH_ASYNC));
         CountDownLatch latch = new CountDownLatch(1);
         BasicText handler = new BasicText(latch);
         wsSession.addMessageHandler(handler);
@@ -112,8 +114,9 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         WebSocketContainer wsContainer =
                 ContainerProvider.getWebSocketContainer();
         wsContainer.connectToServer(TesterEndpoint.class,
-                new DefaultClientConfiguration(), new URI("ftp://localhost:" +
-                        getPort() + TesterEchoServer.Config.PATH_ASYNC));
+                ClientEndpointConfigurationBuilder.create().build(),
+                new URI("ftp://localhost:" + getPort() +
+                        TesterEchoServer.Config.PATH_ASYNC));
     }
 
 
@@ -130,7 +133,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         WebSocketContainer wsContainer =
                 ContainerProvider.getWebSocketContainer();
         wsContainer.connectToServer(TesterEndpoint.class,
-                new DefaultClientConfiguration(),
+                ClientEndpointConfigurationBuilder.create().build(),
                 new URI("http://" + TesterEchoServer.Config.PATH_ASYNC));
     }
 
@@ -218,8 +221,9 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         tomcat.start();
 
         Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
-                new DefaultClientConfiguration(), new URI("http://localhost:" +
-                        getPort() + TesterEchoServer.Config.PATH_BASIC));
+                ClientEndpointConfigurationBuilder.create().build(),
+                        new URI("http://localhost:" + getPort() +
+                                TesterEchoServer.Config.PATH_BASIC));
         BasicHandler<?> handler;
         CountDownLatch latch = new CountDownLatch(1);
         wsSession.getUserProperties().put("latch", latch);
@@ -288,8 +292,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         tomcat.start();
 
         Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
-                new DefaultClientConfiguration(), new URI("http://localhost:" +
-                        getPort() + BlockingConfig.PATH));
+                ClientEndpointConfigurationBuilder.create().build(),
+                new URI("http://localhost:" + getPort() + BlockingConfig.PATH));
 
         if (!setTimeoutOnContainer) {
             wsSession.getAsyncRemote().setSendTimeout(TIMEOUT_MS);
@@ -369,8 +373,9 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         tomcat.start();
 
         Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
-                new DefaultClientConfiguration(), new URI("http://localhost:" +
-                        getPort() + ConstantTxConfig.PATH));
+                ClientEndpointConfigurationBuilder.create().build(),
+                new URI("http://localhost:" + getPort() +
+                        ConstantTxConfig.PATH));
 
         wsSession.addMessageHandler(new BlockingBinaryHandler());
 
@@ -383,16 +388,19 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             loops++;
         }
 
-        // Check nothing really bad happened
-        Assert.assertNull(ConstantTxEndpoint.getException());
+        // Check the right exception was thrown
+        Assert.assertNotNull(ConstantTxEndpoint.getException());
+        Assert.assertEquals(ExecutionException.class,
+                ConstantTxEndpoint.getException().getClass());
+        Assert.assertNotNull(ConstantTxEndpoint.getException().getCause());
+        Assert.assertEquals(SocketTimeoutException.class,
+                ConstantTxEndpoint.getException().getCause().getClass());
 
         // Check correct time passed
         Assert.assertTrue(ConstantTxEndpoint.getTimeout() >= TIMEOUT_MS);
 
         // Check the timeout wasn't too long
         Assert.assertTrue(ConstantTxEndpoint.getTimeout() < TIMEOUT_MS*2);
-
-        Assert.assertNotNull(ConstantTxEndpoint.getException());
     }
 
 
@@ -509,8 +517,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             super.contextInitialized(sce);
             ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
             try {
-                sc.publishServer(ConstantTxEndpoint.class, PATH,
-                        DefaultServerConfiguration.class);
+                sc.publishServer(ServerEndpointConfigurationBuilder.create(
+                        ConstantTxEndpoint.class, PATH).build());
                 if (TestWsWebSocketContainer.timoutOnContainer) {
                     sc.setAsyncSendTimeout(TIMEOUT_MS);
                 }
@@ -653,7 +661,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
     private Session connectToEchoServerBasic(WebSocketContainer wsContainer,
             Class<? extends Endpoint> clazz) throws Exception {
         return wsContainer.connectToServer(clazz,
-                new DefaultClientConfiguration(),
+                ClientEndpointConfigurationBuilder.create().build(),
                 new URI("http://localhost:" + getPort() +
                         TesterEchoServer.Config.PATH_BASIC));
     }

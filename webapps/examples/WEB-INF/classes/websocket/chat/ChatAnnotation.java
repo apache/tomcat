@@ -25,11 +25,11 @@ import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.server.WebSocketEndpoint;
+import javax.websocket.server.ServerEndpoint;
 
 import util.HTMLFilter;
 
-@WebSocketEndpoint(value = "/websocket/chat")
+@ServerEndpoint(value = "/websocket/chat")
 public class ChatAnnotation {
 
     private static final String GUEST_PREFIX = "Guest";

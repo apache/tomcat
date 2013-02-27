@@ -14,31 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.websocket.server;
+package javax.websocket;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.List;
+import java.util.Map;
 
-import javax.websocket.Decoder;
-import javax.websocket.Encoder;
-
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface WebSocketEndpoint {
+public abstract class ClientEndpointConfigurator {
 
     /**
-     * URI or URI-template that the annotated class should be mapped to.
+     * Provides the client with a mechanism to inspect and/or modify the headers
+     * that are sent to the server to start the WebSocket handshake.
+     *
+     * @param headers   The HTTP headers
      */
-    String value();
+    public void beforeRequest(Map<String, List<String>> headers) {
+        // NO-OP
+    }
 
-    String[] subprotocols() default {};
-
-    Class<? extends Decoder>[] decoders() default {};
-
-    Class<? extends Encoder>[] encoders() default {};
-
-    Class<? extends DefaultServerConfiguration> configuration()
-            default DefaultServerConfiguration.class;
+    /**
+     * Provides the client with a mechanism to inspect the handshake response
+     * that is returned from the server.
+     *
+     * @param handshakeResponse The response
+     */
+    public void afterResponse(HandshakeResponse handshakeResponse) {
+        // NO-OP
+    }
 }

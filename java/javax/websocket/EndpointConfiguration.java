@@ -17,7 +17,7 @@
 package javax.websocket;
 
 import java.util.List;
-//import java.util.Map;
+import java.util.Map;
 
 public interface EndpointConfiguration {
 
@@ -25,5 +25,5 @@ public interface EndpointConfiguration {
 
     List<Decoder> getDecoders();
 
-    //Map<String,Object> getUserProperties();
+    Map<String,Object> getUserProperties();
 }
