@@ -77,6 +77,10 @@
         (<code>scanBootstrapClassPath</code>) to control if the bootstrap
         classpath is scanned or not. By default, it will not be scanned. (markt)
       </add>
+      <update>
+        Provide more consolidated servlet MBean data in the webapp MBean.
+        (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Web applications">
