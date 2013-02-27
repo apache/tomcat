@@ -27,4 +27,6 @@ public @interface ClientEndpoint {
     String[] subprotocols();
     Class<? extends Decoder>[] decoders();
     Class<? extends Encoder>[] encoders();
+    public Class<? extends ClientEndpointConfigurator> configurator()
+            default ClientEndpointConfigurator.class;
 }

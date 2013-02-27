@@ -95,7 +95,8 @@ public class WsWebSocketContainer
         }
         int port = path.getPort();
         Map<String,List<String>> reqHeaders = createRequestHeaders(host, port);
-        clientEndpointConfiguration.beforeRequest(reqHeaders);
+        clientEndpointConfiguration.getClientEndpointConfigurator().
+                beforeRequest(reqHeaders);
 
         ByteBuffer request = createRequest(path.getRawPath(), reqHeaders);
 
@@ -141,7 +142,8 @@ public class WsWebSocketContainer
 
             HandshakeResponse handshakeResponse =
                     processResponse(response, channel);
-            clientEndpointConfiguration.afterResponse(handshakeResponse);
+            clientEndpointConfiguration.getClientEndpointConfigurator().
+                    afterResponse(handshakeResponse);
 
             // Sub-protocol
             List<String> values = handshakeResponse.getHeaders().get(

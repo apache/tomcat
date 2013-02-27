@@ -46,6 +46,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.apache.tomcat.websocket.Constants;
 import org.apache.tomcat.websocket.WsRequest;
+import org.apache.tomcat.websocket.pojo.PojoEndpoint;
 
 /**
  * Handles the initial HTTP connection for WebSocket connections.
@@ -98,7 +99,7 @@ public class WsServlet extends HttpServlet {
                 req.getServletPath(), pathParameters);
         // Origin check
         String origin = req.getHeader("Origin");
-        if (!sec.checkOrigin(origin)) {
+        if (!sec.getServerEndpointConfigurator().checkOrigin(origin)) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -106,7 +107,9 @@ public class WsServlet extends HttpServlet {
         List<String> subProtocols = getTokensFromHeader(req,
                 "Sec-WebSocket-Protocol");
         if (!subProtocols.isEmpty()) {
-            subProtocol = sec.getNegotiatedSubprotocol(subProtocols);
+            subProtocol = sec.getServerEndpointConfigurator().
+                    getNegotiatedSubprotocol(
+                            sec.getSubprotocols(), subProtocols);
         }
         // Extensions
         // Currently no extensions are supported by this implementation
@@ -133,7 +136,12 @@ public class WsServlet extends HttpServlet {
         }
         Endpoint ep;
         try {
-            ep = sec.getEndpointClass().newInstance();
+            Class<?> clazz = sec.getEndpointClass();
+            if (Endpoint.class.isAssignableFrom(clazz)) {
+                ep = (Endpoint) sec.getEndpointClass().newInstance();
+            } else {
+                ep = new PojoEndpoint();
+            }
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ServletException(e);
         }

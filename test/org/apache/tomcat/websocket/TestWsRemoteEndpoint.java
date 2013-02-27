@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.websocket.ClientEndpointConfigurationBuilder;
 import javax.websocket.ContainerProvider;
-import javax.websocket.DefaultClientConfiguration;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
@@ -65,8 +65,9 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
         tomcat.start();
 
         Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
-                new DefaultClientConfiguration(), new URI("http://localhost:" +
-                        getPort() + TesterEchoServer.Config.PATH_ASYNC));
+                ClientEndpointConfigurationBuilder.create().build(),
+                new URI("http://localhost:" + getPort() +
+                        TesterEchoServer.Config.PATH_ASYNC));
 
         CountDownLatch latch = new CountDownLatch(1);
         wsSession.getUserProperties().put("latch", latch);

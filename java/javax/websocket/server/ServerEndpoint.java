@@ -16,14 +16,29 @@
  */
 package javax.websocket.server;
 
-import java.util.Set;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.websocket.Endpoint;
+import javax.websocket.Decoder;
+import javax.websocket.Encoder;
 
-public interface ServerApplicationConfiguration {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface ServerEndpoint {
 
-    Set<Class<? extends ServerEndpointConfiguration>> getEndpointConfiguration(
-            Set<Class<? extends Endpoint>> scanned);
+    /**
+     * URI or URI-template that the annotated class should be mapped to.
+     */
+    String value();
 
-    Set<Class<?>> getAnnotatedEndpointClasses(Set<Class<?>> scanned);
+    String[] subprotocols() default {};
+
+    Class<? extends Decoder>[] decoders() default {};
+
+    Class<? extends Encoder>[] encoders() default {};
+
+    public Class<? extends ServerEndpointConfigurator> configurator()
+            default ServerEndpointConfigurator.class;
 }

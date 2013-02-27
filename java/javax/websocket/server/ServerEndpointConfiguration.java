@@ -16,40 +16,29 @@
  */
 package javax.websocket.server;
 
-import java.net.URI;
 import java.util.List;
 
-import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfiguration;
 import javax.websocket.Extension;
-import javax.websocket.HandshakeResponse;
 
+/**
+ * Provides configuration information for WebSocket endpoints published to a
+ * server. Applications may provide their own implementation or use
+ * {@link ServerEndpointConfigurationBuilder}.
+ */
 public interface ServerEndpointConfiguration extends EndpointConfiguration {
 
-    Class<? extends Endpoint> getEndpointClass();
+    Class<?> getEndpointClass();
 
-    String getNegotiatedSubprotocol(List<String> requestedSubprotocols);
+    List<String> getSubprotocols();
 
-    List<Extension> getNegotiatedExtensions(List<Extension> requestedExtensions);
-
-    /**
-     * Enables the WebSocket endpoint to accept or reject connections based on
-     * the HTTP origin header.
-     *
-     * @param originHeaderValue The HTTP origin header provided by the client.
-     *
-     * @return  <code>true</code> if the request should be accepted otherwise
-     *          <code>false</false>
-     */
-    boolean checkOrigin(String originHeaderValue);
-
-    boolean matchesURI(URI uri);
-
-    void modifyHandshake(HandshakeRequest request, HandshakeResponse response);
+    List<Extension> getExtensions();
 
     /**
      * Returns the path at which this WebSocket server endpoint has been
      * registered. It may be a path or a level 0 URI template.
      */
     String getPath();
+
+    ServerEndpointConfigurator getServerEndpointConfigurator();
 }

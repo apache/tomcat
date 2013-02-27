@@ -16,8 +16,6 @@
  */
 package org.apache.tomcat.websocket.server;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -26,15 +24,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import javax.websocket.DeploymentException;
-import javax.websocket.Endpoint;
 import javax.websocket.server.ServerEndpointConfiguration;
+import javax.websocket.server.ServerEndpointConfigurationBuilder;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsSession;
 import org.apache.tomcat.websocket.WsWebSocketContainer;
-import org.apache.tomcat.websocket.pojo.PojoEndpointConfiguration;
+import org.apache.tomcat.websocket.pojo.PojoEndpoint;
 import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
 
 /**
@@ -111,35 +109,21 @@ public class ServerContainerImpl extends WsWebSocketContainer {
      * the specified configuration. {@link #setServletContext(ServletContext)}
      * must be called before calling this method.
      *
-     * @param endpointClass The WebSocket server implementation to publish
-     * @param path          The path to publish the implementation at
-     * @param configClass   The configuration to use when creating endpoint
+     * @param config        The configuration to use when creating endpoint
      *                          instances
      * @throws DeploymentException
      */
-    public void publishServer(Class<? extends Endpoint> endpointClass,
-            String path,
-            Class<? extends ServerEndpointConfiguration> configClass)
+    public void publishServer(ServerEndpointConfiguration sec)
             throws DeploymentException {
         if (servletContext == null) {
             throw new IllegalArgumentException(
                     sm.getString("serverContainer.servletContextMissing"));
         }
-        ServerEndpointConfiguration sec = null;
-        try {
-            Constructor<? extends ServerEndpointConfiguration> c =
-                    configClass.getConstructor(Class.class, String.class);
-            sec = c.newInstance(endpointClass, path);
-        } catch (InstantiationException | IllegalAccessException |
-                NoSuchMethodException | SecurityException |
-                IllegalArgumentException | InvocationTargetException e) {
-            throw new DeploymentException(sm.getString("sci.newInstance.fail",
-                    endpointClass.getName()), e);
-        }
+        String path = sec.getPath();
         String servletPath = getServletPath(path);
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("serverContainer.endpointDeploy",
-                    endpointClass.getName(), path,
+                    sec.getEndpointClass(), path,
                     servletContext.getContextPath()));
         }
 
@@ -221,10 +205,13 @@ public class ServerContainerImpl extends WsWebSocketContainer {
         if (pojo != null) {
             PojoMethodMapping methodMapping = pojoMethodMap.get(pojo);
             if (methodMapping != null) {
-                PojoEndpointConfiguration pojoSec =
-                        new PojoEndpointConfiguration(pojo, methodMapping,
-                                pathParameters);
-                return pojoSec;
+                sec = ServerEndpointConfigurationBuilder.create(
+                        pojo, methodMapping.getWsPath()).build();
+                sec.getUserProperties().put(
+                        PojoEndpoint.POJO_PATH_PARAM_KEY, pathParameters);
+                sec.getUserProperties().put(
+                        PojoEndpoint.POJO_METHOD_MAPPING_KEY, methodMapping);
+                return sec;
             }
         }
         throw new IllegalStateException(sm.getString(
