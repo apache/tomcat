@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import javax.websocket.DeploymentException;
+import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfiguration;
 import javax.websocket.server.ServerEndpointConfigurationBuilder;
 
@@ -83,6 +84,7 @@ public class ServerContainerImpl extends WsWebSocketContainer {
 
 
     public void setServletContext(ServletContext servletContext) {
+
         if (this.servletContext == servletContext) {
             return;
         }
@@ -146,24 +148,17 @@ public class ServerContainerImpl extends WsWebSocketContainer {
      * WebSocket endpoints.
      *
      * @param pojo   The annotated POJO
-     * @param ctxt   The ServletContext the endpoint is to be published in
-     * @param wsPath The path at which the endpoint is to be published
      */
-    public void publishServer(Class<?> pojo, ServletContext ctxt,
-            String wsPath) {
-        if (ctxt == null) {
+    public void publishServer(Class<?> pojo) {
+
+        ServerEndpoint annotation = pojo.getAnnotation(ServerEndpoint.class);
+        if (annotation == null) {
             throw new IllegalArgumentException(
-                    sm.getString("serverContainer.servletContextMissing"));
+                    sm.getString("serverContainer.missingAnnotation",
+                            pojo.getName()));
         }
-        // Set the ServletContext if it hasn't already been set
-        if (servletContext == null) {
-            setServletContext(ctxt);
-        } else if (ctxt != servletContext) {
-            // Should never happen
-            throw new IllegalStateException(sm.getString(
-                    "serverContainer.servletContextMismatch", wsPath,
-                    servletContext.getContextPath(), ctxt.getContextPath()));
-        }
+        String wsPath = annotation.value();
+
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("serverContainer.pojoDeploy",
                     pojo.getName(), wsPath, servletContext.getContextPath()));

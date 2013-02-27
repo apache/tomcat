@@ -36,6 +36,7 @@ import javax.websocket.MessageHandler;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
+import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfigurationBuilder;
 
 import org.junit.Assert;
@@ -412,11 +413,13 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);
             ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
-            sc.publishServer(BlockingPojo.class, sce.getServletContext(), PATH);
+            sc.setServletContext(sce.getServletContext());
+            sc.publishServer(BlockingPojo.class);
         }
     }
 
 
+    @ServerEndpoint("/block")
     public static class BlockingPojo {
         @SuppressWarnings("unused")
         @OnMessage

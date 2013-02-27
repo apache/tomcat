@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import javax.servlet.ServletContextEvent;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
+import javax.websocket.server.ServerEndpoint;
 
 import org.apache.tomcat.websocket.server.ServerContainerImpl;
 import org.apache.tomcat.websocket.server.WsListener;
@@ -37,12 +38,13 @@ public class TesterEchoServer {
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);
             ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
-            sc.publishServer(Async.class, sce.getServletContext(), PATH_ASYNC);
-            sc.publishServer(
-                    Basic.class, sce.getServletContext(), PATH_BASIC);
+            sc.setServletContext(sce.getServletContext());
+            sc.publishServer(Async.class);
+            sc.publishServer(Basic.class);
         }
     }
 
+    @ServerEndpoint("/echoAsync")
     public static class Async {
 
         @OnMessage
@@ -74,6 +76,8 @@ public class TesterEchoServer {
         }
     }
 
+
+    @ServerEndpoint("/echoBasic")
     public static class Basic {
         @OnMessage
         public void echoTextMessage(Session session, String msg) {

@@ -43,10 +43,9 @@ public class WsSci implements ServletContainerInitializer {
         }
 
         ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
+        sc.setServletContext(ctx);
         for (Class<?> clazz : clazzes) {
-            ServerEndpoint annotation =
-                    clazz.getAnnotation(ServerEndpoint.class);
-            sc.publishServer(clazz, ctx, annotation.value());
+            sc.publishServer(clazz);
         }
     }
 }
