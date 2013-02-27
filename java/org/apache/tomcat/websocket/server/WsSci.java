@@ -22,6 +22,7 @@ import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HandlesTypes;
+import javax.websocket.DeploymentException;
 import javax.websocket.server.ServerEndpoint;
 
 /**
@@ -45,7 +46,11 @@ public class WsSci implements ServletContainerInitializer {
         ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
         sc.setServletContext(ctx);
         for (Class<?> clazz : clazzes) {
-            sc.publishServer(clazz);
+            try {
+                sc.deploy(clazz);
+            } catch (DeploymentException e) {
+                throw new ServletException(e);
+            }
         }
     }
 }

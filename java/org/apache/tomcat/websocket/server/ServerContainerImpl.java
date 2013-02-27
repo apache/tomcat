@@ -115,10 +115,10 @@ public class ServerContainerImpl extends WsWebSocketContainer {
      *                          instances
      * @throws DeploymentException
      */
-    public void publishServer(ServerEndpointConfiguration sec)
+    public void deploy(ServerEndpointConfiguration sec)
             throws DeploymentException {
         if (servletContext == null) {
-            throw new IllegalArgumentException(
+            throw new DeploymentException(
                     sm.getString("serverContainer.servletContextMissing"));
         }
         String path = sec.getPath();
@@ -149,11 +149,11 @@ public class ServerContainerImpl extends WsWebSocketContainer {
      *
      * @param pojo   The annotated POJO
      */
-    public void publishServer(Class<?> pojo) {
+    public void deploy(Class<?> pojo) throws DeploymentException {
 
         ServerEndpoint annotation = pojo.getAnnotation(ServerEndpoint.class);
         if (annotation == null) {
-            throw new IllegalArgumentException(
+            throw new DeploymentException(
                     sm.getString("serverContainer.missingAnnotation",
                             pojo.getName()));
         }
