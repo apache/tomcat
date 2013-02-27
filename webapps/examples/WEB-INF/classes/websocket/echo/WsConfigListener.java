@@ -32,7 +32,7 @@ public class WsConfigListener extends WsListener {
         super.contextInitialized(sce);
         ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
         try {
-            sc.publishServer(ServerEndpointConfigurationBuilder.create(
+            sc.deploy(ServerEndpointConfigurationBuilder.create(
                     EchoEndpoint.class, "/websocket/echoProgrammatic").build());
         } catch (DeploymentException e) {
             throw new IllegalStateException(e);

@@ -414,7 +414,11 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             super.contextInitialized(sce);
             ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
             sc.setServletContext(sce.getServletContext());
-            sc.publishServer(BlockingPojo.class);
+            try {
+                sc.deploy(BlockingPojo.class);
+            } catch (DeploymentException e) {
+                throw new IllegalStateException(e);
+            }
         }
     }
 
@@ -520,7 +524,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             super.contextInitialized(sce);
             ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
             try {
-                sc.publishServer(ServerEndpointConfigurationBuilder.create(
+                sc.deploy(ServerEndpointConfigurationBuilder.create(
                         ConstantTxEndpoint.class, PATH).build());
                 if (TestWsWebSocketContainer.timoutOnContainer) {
                     sc.setAsyncSendTimeout(TIMEOUT_MS);

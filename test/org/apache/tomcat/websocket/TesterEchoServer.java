@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import javax.servlet.ServletContextEvent;
+import javax.websocket.DeploymentException;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
@@ -39,8 +40,12 @@ public class TesterEchoServer {
             super.contextInitialized(sce);
             ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
             sc.setServletContext(sce.getServletContext());
-            sc.publishServer(Async.class);
-            sc.publishServer(Basic.class);
+            try {
+                sc.deploy(Async.class);
+                sc.deploy(Basic.class);
+            } catch (DeploymentException e) {
+                throw new IllegalStateException(e);
+            }
         }
     }
 
