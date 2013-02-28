@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -148,7 +148,7 @@ public class WebappLoader extends LifecycleMBeanBase
 
     /**
      * The Java class name of the ClassLoader implementation to be used.
-     * This class should extend WebappClassLoader, otherwise, a different 
+     * This class should extend WebappClassLoader, otherwise, a different
      * loader implementation must be used.
      */
     private String loaderClass =
@@ -440,7 +440,7 @@ public class WebappLoader extends LifecycleMBeanBase
     /**
      * Return the set of repositories defined for this class loader.
      * If none are defined, a zero-length array is returned.
-     * For security reason, returns a clone of the Array (since 
+     * For security reason, returns a clone of the Array (since
      * String are immutable).
      */
     @Override
@@ -481,7 +481,7 @@ public class WebappLoader extends LifecycleMBeanBase
     }
 
 
-    /** 
+    /**
      * Classpath, as set in org.apache.catalina.jsp_classpath context
      * property
      *
@@ -558,7 +558,7 @@ public class WebappLoader extends LifecycleMBeanBase
             setState(LifecycleState.STARTING);
             return;
         }
-        
+
         // Register a stream handler factory for the JNDI protocol
         URLStreamHandlerFactory streamHandlerFactory =
                 DirContextURLStreamHandlerFactory.getInstance();
@@ -572,7 +572,7 @@ public class WebappLoader extends LifecycleMBeanBase
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 // This is likely a dual registration
-                log.info("Dual registration of jndi stream handler: " 
+                log.info("Dual registration of jndi stream handler: "
                          + t.getMessage());
             }
         }
@@ -617,7 +617,7 @@ public class WebappLoader extends LifecycleMBeanBase
             String contextName = ctx.getName();
             if (!contextName.startsWith("/")) {
                 contextName = "/" + contextName;
-            }   
+            }
             ObjectName cloname = new ObjectName
                 (MBeanUtils.getDomain(ctx) + ":type=WebappClassLoader,context="
                  + contextName + ",host=" + ctx.getParent().getName());
@@ -668,7 +668,7 @@ public class WebappLoader extends LifecycleMBeanBase
             String contextName = ctx.getName();
             if (!contextName.startsWith("/")) {
                 contextName = "/" + contextName;
-            }   
+            }
             ObjectName cloname = new ObjectName
                 (MBeanUtils.getDomain(ctx) + ":type=WebappClassLoader,context="
                  + contextName + ",host=" + ctx.getParent().getName());
@@ -758,7 +758,7 @@ public class WebappLoader extends LifecycleMBeanBase
                 classLoader.addPermission
                     (new FilePermission(workDirPath, "read,write"));
                 classLoader.addPermission
-                    (new FilePermission(workDirPath + File.separator + "-", 
+                    (new FilePermission(workDirPath + File.separator + "-",
                                         "read,write,delete"));
             } catch (IOException e) {
                 // Ignore
@@ -833,7 +833,7 @@ public class WebappLoader extends LifecycleMBeanBase
     /**
      * Configure the repositories for our class loader, based on the
      * associated Context.
-     * @throws IOException 
+     * @throws IOException
      */
     private void setRepositories() throws IOException {
 
@@ -852,7 +852,7 @@ public class WebappLoader extends LifecycleMBeanBase
             log.info("No work dir for " + servletContext);
         }
 
-        if( log.isDebugEnabled() && workDir != null) 
+        if( log.isDebugEnabled() && workDir != null)
             log.debug(sm.getString("webappLoader.deploy", workDir.getAbsolutePath()));
 
         classLoader.setWorkDir(workDir);
@@ -984,12 +984,12 @@ public class WebappLoader extends LifecycleMBeanBase
                     ioe.initCause(e);
                     throw ioe;
                 }
-                
+
                 if (!(obj instanceof Resource))
                     continue;
-                    
+
                 Resource jarResource = (Resource) obj;
-                    
+
                 if (copyJars) {
                     if (!copy(jarResource.streamContent(),
                               new FileOutputStream(destFile))) {
@@ -1003,10 +1003,10 @@ public class WebappLoader extends LifecycleMBeanBase
                     classLoader.addJar(filename, jarFile, destFile);
                 } catch (Exception ex) {
                     // Catch the exception if there is an empty jar file
-                    // Should ignore and continue loading other jar files 
+                    // Should ignore and continue loading other jar files
                     // in the dir
                 }
-                    
+
                 loaderRepositories.add( filename );
             }
         }
@@ -1028,7 +1028,7 @@ public class WebappLoader extends LifecycleMBeanBase
             return;
 
         if (container instanceof StandardContext) {
-            String baseClasspath = 
+            String baseClasspath =
                 ((StandardContext) container).getCompilerClasspath();
             if (baseClasspath != null) {
                 servletContext.setAttribute(Globals.CLASS_PATH_ATTR,
@@ -1048,7 +1048,7 @@ public class WebappLoader extends LifecycleMBeanBase
                 if( cp==null ) {
                     log.info( "Unknown loader " + loader + " " + loader.getClass());
                 } else {
-                    if (n > 0) 
+                    if (n > 0)
                         classpath.append(File.pathSeparator);
                     classpath.append(cp);
                     n++;
@@ -1197,19 +1197,19 @@ public class WebappLoader extends LifecycleMBeanBase
 
     @Override
     protected String getObjectNameKeyProperties() {
-        
+
         StringBuilder name = new StringBuilder("type=Loader");
-        
+
         if (container instanceof Context) {
             name.append(",context=");
             Context context = (Context) container;
-            
+
             String contextName = context.getName();
             if (!contextName.startsWith("/")) {
                 name.append("/");
-            }   
+            }
             name.append(contextName);
-            
+
             name.append(",host=");
             name.append(context.getParent().getName());
         } else {
@@ -1217,7 +1217,7 @@ public class WebappLoader extends LifecycleMBeanBase
             name.append(",container=");
             name.append(container.getName());
         }
-        
+
         return name.toString();
     }
 
