@@ -811,11 +811,25 @@ public class WebappLoader extends LifecycleMBeanBase
 
         // Assemble the class path information from our class loader chain
         ClassLoader loader = getClassLoader();
+
+        if (delegate && loader != null) {
+            // Skip the webapp loader for now as delegation is enabled
+            loader = loader.getParent();
+        }
+
         while (loader != null) {
             if (!buildClassPath(servletContext, classpath, loader)) {
                 break;
             }
             loader = loader.getParent();
+        }
+
+        if (delegate) {
+            // Delegation was enabled, go back and add the webapp paths
+            loader = getClassLoader();
+            if (loader != null) {
+                buildClassPath(servletContext, classpath, loader);
+            }
         }
 
         this.classpath=classpath.toString();
