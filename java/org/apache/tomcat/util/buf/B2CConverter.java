@@ -43,6 +43,9 @@ public class B2CConverter {
     public static final Charset ISO_8859_1;
     public static final Charset UTF_8;
 
+    // Protected so unit tests can use it
+    protected static final int LEFTOVER_SIZE = 9;
+
     static {
         for (Charset charset: Charset.availableCharsets().values()) {
             encodingToCharsetCache.put(
@@ -100,7 +103,7 @@ public class B2CConverter {
     private final ByteBuffer leftovers;
 
     public B2CConverter(String encoding) throws IOException {
-        byte[] left = new byte[4];
+        byte[] left = new byte[LEFTOVER_SIZE];
         leftovers = ByteBuffer.wrap(left);
         decoder = getCharset(encoding).newDecoder();
     }
