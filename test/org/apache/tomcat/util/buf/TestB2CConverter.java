@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.buf;
 
 import java.nio.charset.Charset;
+import java.nio.charset.MalformedInputException;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,6 +26,10 @@ public class TestB2CConverter {
 
     private static final byte[] UTF16_MESSAGE =
             new byte[] {-2, -1, 0, 65, 0, 66, 0, 67};
+
+    private static final byte[] UTF8_INVALID = new byte[] {-8, -69, -73, -77};
+
+    private static final byte[] UTF8_PARTIAL = new byte[] {-50};
 
     @Test
     public void testSingleMessage() throws Exception {
@@ -50,7 +55,7 @@ public class TestB2CConverter {
 
         for (int i = 0; i < msgCount; i++) {
             bc.append(UTF16_MESSAGE, 0, UTF16_MESSAGE.length);
-            conv.convert(bc, cc);
+            conv.convert(bc, cc, true);
             Assert.assertEquals("ABC", cc.toString());
             bc.recycle();
             cc.recycle();
@@ -82,5 +87,53 @@ public class TestB2CConverter {
         }
         Assert.assertTrue("Limit needs to be at least " + maxLeftover,
                 maxLeftover <= B2CConverter.LEFTOVER_SIZE);
+    }
+
+    // TODO Work-around bug in UTF8 decoder
+    //@Test(expected=MalformedInputException.class)
+    public void testBug54602a() throws Exception {
+        // Check invalid input is rejected straight away
+        B2CConverter conv = new B2CConverter("UTF-8");
+        ByteChunk bc = new ByteChunk();
+        CharChunk cc = new CharChunk();
+
+        bc.append(UTF8_INVALID, 0, UTF8_INVALID.length);
+        cc.allocate(bc.getLength(), -1);
+
+        conv.convert(bc, cc, false);
+    }
+
+    @Test(expected=MalformedInputException.class)
+    public void testBug54602b() throws Exception {
+        // Check partial input is rejected
+        B2CConverter conv = new B2CConverter("UTF-8");
+        ByteChunk bc = new ByteChunk();
+        CharChunk cc = new CharChunk();
+
+        bc.append(UTF8_PARTIAL, 0, UTF8_PARTIAL.length);
+        cc.allocate(bc.getLength(), -1);
+
+        conv.convert(bc, cc, true);
+    }
+
+    @Test
+    public void testBug54602c() throws Exception {
+        // Check partial input is rejected once it is known to be all available
+        B2CConverter conv = new B2CConverter("UTF-8");
+        ByteChunk bc = new ByteChunk();
+        CharChunk cc = new CharChunk();
+
+        bc.append(UTF8_PARTIAL, 0, UTF8_PARTIAL.length);
+        cc.allocate(bc.getLength(), -1);
+
+        conv.convert(bc, cc, false);
+
+        Exception e = null;
+        try {
+            conv.convert(bc, cc, true);
+        } catch (MalformedInputException mie) {
+            e = mie;
+        }
+        Assert.assertNotNull(e);
     }
 }

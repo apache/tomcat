@@ -125,8 +125,22 @@ public class B2CConverter {
      *
      * @param bc byte input
      * @param cc char output
+     *
+     * @deprecated  Use {@link #convert(ByteChunk, CharChunk, boolean)
      */
-    public void convert(ByteChunk bc, CharChunk cc)
+    @Deprecated
+    public void convert(ByteChunk bc, CharChunk cc) throws IOException {
+        convert(bc, cc, false);
+    }
+
+    /**
+     * Convert the given bytes to characters.
+     *
+     * @param bc byte input
+     * @param cc char output
+     * @param endOfInput    Is this all of the available data
+     */
+    public void convert(ByteChunk bc, CharChunk cc, boolean endOfInput)
             throws IOException {
         if ((bb == null) || (bb.array() != bc.getBuffer())) {
             // Create a new byte buffer if anything changed
@@ -153,7 +167,7 @@ public class B2CConverter {
             do {
                 leftovers.put(bc.substractB());
                 leftovers.flip();
-                result = decoder.decode(leftovers, cb, false);
+                result = decoder.decode(leftovers, cb, endOfInput);
                 leftovers.position(leftovers.limit());
                 leftovers.limit(leftovers.array().length);
             } while (result.isUnderflow() && (cb.position() == pos));
@@ -165,7 +179,7 @@ public class B2CConverter {
         }
         // Do the decoding and get the results into the byte chunk and the char
         // chunk
-        result = decoder.decode(bb, cb, false);
+        result = decoder.decode(bb, cb, endOfInput);
         if (result.isError() || result.isMalformed()) {
             result.throwException();
         } else if (result.isOverflow()) {
