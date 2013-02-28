@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.buf;
 
+import java.nio.charset.Charset;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -56,5 +58,29 @@ public class TestB2CConverter {
         }
 
         System.out.println(cc);
+    }
+
+    @Test
+    public void testLeftoverSize() {
+        float maxLeftover = 0;
+        for (Charset charset : Charset.availableCharsets().values()) {
+            float leftover;
+            if (charset.name().toLowerCase().startsWith("x-")) {
+                // Non-standard charset that browsers won't be using
+                // Likely something used internally by the JRE
+                continue;
+            }
+            try {
+                leftover = charset.newEncoder().maxBytesPerChar();
+            } catch (UnsupportedOperationException uoe) {
+                // Skip it
+                continue;
+            }
+            if (leftover > maxLeftover) {
+                maxLeftover = leftover;
+            }
+        }
+        Assert.assertTrue("Limit needs to be at least " + maxLeftover,
+                maxLeftover <= B2CConverter.LEFTOVER_SIZE);
     }
 }
