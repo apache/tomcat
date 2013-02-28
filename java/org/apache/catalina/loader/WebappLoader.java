@@ -1041,42 +1041,25 @@ public class WebappLoader extends LifecycleMBeanBase
 
         // Assemble the class path information from our class loader chain
         ClassLoader loader = getClassLoader();
-        int n = 0;
+
+        if (delegate && loader != null) {
+            // Skip the webapp loader for now as delegation is enabled
+            loader = loader.getParent();
+        }
+
         while (loader != null) {
-            if (!(loader instanceof URLClassLoader)) {
-                String cp=getClasspath( loader );
-                if( cp==null ) {
-                    log.info( "Unknown loader " + loader + " " + loader.getClass());
-                } else {
-                    if (n > 0)
-                        classpath.append(File.pathSeparator);
-                    classpath.append(cp);
-                    n++;
-                }
+            if (!buildClassPath(servletContext, classpath, loader)) {
                 break;
-                //continue;
-            }
-            URL repositories[] =
-                ((URLClassLoader) loader).getURLs();
-            for (int i = 0; i < repositories.length; i++) {
-                String repository = repositories[i].toString();
-                if (repository.startsWith("file://"))
-                    repository = utf8Decode(repository.substring(7));
-                else if (repository.startsWith("file:"))
-                    repository = utf8Decode(repository.substring(5));
-                else if (repository.startsWith("jndi:"))
-                    repository =
-                        servletContext.getRealPath(repository.substring(5));
-                else
-                    continue;
-                if (repository == null)
-                    continue;
-                if (n > 0)
-                    classpath.append(File.pathSeparator);
-                classpath.append(repository);
-                n++;
             }
             loader = loader.getParent();
+        }
+
+        if (delegate) {
+            // Delegation was enabled, go back and add the webapp paths
+            loader = getClassLoader();
+            if (loader != null) {
+                buildClassPath(servletContext, classpath, loader);
+            }
         }
 
         this.classpath=classpath.toString();
@@ -1085,6 +1068,43 @@ public class WebappLoader extends LifecycleMBeanBase
         servletContext.setAttribute(Globals.CLASS_PATH_ATTR,
                                     classpath.toString());
 
+    }
+
+
+    private boolean buildClassPath(ServletContext servletContext,
+            StringBuilder classpath, ClassLoader loader) {
+        if (loader instanceof URLClassLoader) {
+            URL repositories[] =
+                    ((URLClassLoader) loader).getURLs();
+                for (int i = 0; i < repositories.length; i++) {
+                    String repository = repositories[i].toString();
+                    if (repository.startsWith("file://"))
+                        repository = utf8Decode(repository.substring(7));
+                    else if (repository.startsWith("file:"))
+                        repository = utf8Decode(repository.substring(5));
+                    else if (repository.startsWith("jndi:"))
+                        repository =
+                            servletContext.getRealPath(repository.substring(5));
+                    else
+                        continue;
+                    if (repository == null)
+                        continue;
+                    if (classpath.length() > 0)
+                        classpath.append(File.pathSeparator);
+                    classpath.append(repository);
+                }
+        } else {
+            String cp = getClasspath(loader);
+            if (cp == null) {
+                log.info( "Unknown loader " + loader + " " + loader.getClass());
+            } else {
+                if (classpath.length() > 0)
+                    classpath.append(File.pathSeparator);
+                classpath.append(cp);
+            }
+            return false;
+        }
+        return true;
     }
 
     private String utf8Decode(String input) {

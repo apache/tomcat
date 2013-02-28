@@ -81,6 +81,10 @@
         Provide more consolidated servlet MBean data in the webapp MBean.
         (rjung)
       </update>
+      <fix>
+        <bug>54584</bug>: Take account of the delegate attribute when building
+        the web application class path to pass to the JSP compiler. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
