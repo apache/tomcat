@@ -173,6 +173,7 @@
 
       </tr>
 
+      <xsl:if test="not(properties/no-comments)">
       <tr class="noPrint">
 
         <td width="20%" valign="top" nowrap="nowrap" class="noPrint">
@@ -220,6 +221,7 @@
           </table>
         </td>
       </tr>
+      </xsl:if>
 
       <xsl:comment>FOOTER SEPARATOR</xsl:comment>
       <tr>
