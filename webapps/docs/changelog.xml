@@ -35,6 +35,7 @@
     <author email="schultz@apache.org">Christopher Schultz</author>
     <author email="slaurent@apache.org">Sylvain Laurent</author>
     <title>Changelog</title>
+    <no-comments />
   </properties>
 
 <body>
@@ -97,6 +98,10 @@
         Correct typos in configuration samples on SSL Configuration page
         of Tomcat documentation. (kkolinko)
       </fix>
+      <update>
+        Disable support for comments on Changelog page of Tomcat
+        documentation. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
