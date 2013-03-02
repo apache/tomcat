@@ -92,19 +92,19 @@ public class TestUtf8 {
     public void testJvmDecoder1() {
         // This should trigger an error but currently passes. Once the JVM is
         // fixed, s/false/true/ and s/20/13/
-        doJvmDecoder(SRC_BYTES_1, false, 20);
+        doJvmDecoder(SRC_BYTES_1, false, false, 20);
     }
 
 
     @Test
     public void testJvmDecoder2() {
         // Ideally should fail after 2 bytes (i==1)
-        doJvmDecoder(SRC_BYTES_2, true, 3);
+        doJvmDecoder(SRC_BYTES_2, false, true, 3);
     }
 
 
-    private void doJvmDecoder(byte[] src, boolean errorExpected,
-            int failPosExpected) {
+    private void doJvmDecoder(byte[] src, boolean endOfinput,
+            boolean errorExpected, int failPosExpected) {
         CharsetDecoder decoder = B2CConverter.UTF_8.newDecoder()
                 .onMalformedInput(CodingErrorAction.REPORT)
                 .onUnmappableCharacter(CodingErrorAction.REPORT);
@@ -118,7 +118,7 @@ public class TestUtf8 {
         for (; i < src.length; i++) {
             bb.put(src[i]);
             bb.flip();
-            CoderResult cr = decoder.decode(bb, cb, false);
+            CoderResult cr = decoder.decode(bb, cb, endOfinput);
             if (cr.isError()) {
                 error = true;
                 break;
@@ -142,18 +142,18 @@ public class TestUtf8 {
 
     @Test
     public void testHarmonyDecoder1() {
-        doHarmonyDecoder(SRC_BYTES_1, true, 13);
+        doHarmonyDecoder(SRC_BYTES_1, false, true, 13);
     }
 
 
     @Test
     public void testHarmonyDecoder2() {
-        doHarmonyDecoder(SRC_BYTES_2, true, 1);
+        doHarmonyDecoder(SRC_BYTES_2, false, true, 1);
     }
 
 
-    private void doHarmonyDecoder(byte[] src, boolean errorExpected,
-            int failPosExpected) {
+    private void doHarmonyDecoder(byte[] src, boolean endOfinput,
+            boolean errorExpected, int failPosExpected) {
         CharsetDecoder decoder = new Utf8Decoder();
 
         ByteBuffer bb = ByteBuffer.allocate(src.length);
@@ -164,7 +164,7 @@ public class TestUtf8 {
         for (; i < src.length; i++) {
             bb.put(src[i]);
             bb.flip();
-            CoderResult cr = decoder.decode(bb, cb, false);
+            CoderResult cr = decoder.decode(bb, cb, endOfinput);
             if (cr.isError()) {
                 error = true;
                 break;
@@ -190,11 +190,23 @@ public class TestUtf8 {
     public void testUtf8MalformedJvm() {
         for (int i = 0 ; i < MALFORMED.length; i++) {
             // Known failures
+            // JVM UTF-8 decoder spots invalid sequences but not if they occur
+            // at the end of the input and endOfInput is not true
             if (i == 1 || i == 6 || i == 14 | i == 22) {
-                doJvmDecoder(MALFORMED[i], false, -1);
+                doJvmDecoder(MALFORMED[i], false, false, -1);
             } else {
-                doJvmDecoder(MALFORMED[i], true, -1);
+                doJvmDecoder(MALFORMED[i], false, true, -1);
             }
+        }
+    }
+
+
+    @Test
+    public void testUtf8MalformedJvm2() {
+        // JVM UTF-8 decoder spots invalid sequences but not if they occur at
+        // the end of the input and endOfInput is not true
+        for (int i = 0 ; i < MALFORMED.length; i++) {
+            doJvmDecoder(MALFORMED[i], true, true, -1);
         }
     }
 
@@ -202,7 +214,7 @@ public class TestUtf8 {
     @Test
     public void testUtf8MalformedHarmony() {
         for (byte[] input : MALFORMED) {
-            doHarmonyDecoder(input, true, -1);
+            doHarmonyDecoder(input, false, true, -1);
         }
     }
 }
