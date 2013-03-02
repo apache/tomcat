@@ -111,8 +111,7 @@ public class ServerContainerImpl extends WsWebSocketContainer {
      * the specified configuration. {@link #setServletContext(ServletContext)}
      * must be called before calling this method.
      *
-     * @param config        The configuration to use when creating endpoint
-     *                          instances
+     * @param sec   The configuration to use when creating endpoint instances
      * @throws DeploymentException
      */
     public void deploy(ServerEndpointConfiguration sec)
@@ -143,8 +142,8 @@ public class ServerContainerImpl extends WsWebSocketContainer {
 
 
     /**
-     * Provides the equivalent of {@link #publishServer(Class,String,Class)} for
-     * publishing plain old java objects (POJOs) that have been annotated as
+     * Provides the equivalent of {@link #deploy(ServerEndpointConfiguration)}
+     * for publishing plain old java objects (POJOs) that have been annotated as
      * WebSocket endpoints.
      *
      * @param pojo   The annotated POJO
