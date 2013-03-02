@@ -40,9 +40,9 @@ public class Utf8Decoder extends CharsetDecoder {
     // -------------------------------------------------------------------
     // 0 1 2 3 Value
     // -------------------------------------------------------------------
-    // oxxxxxxx 00000000 00000000 0xxxxxxx
-    // 11oyyyyy 1oxxxxxx 00000000 00000yyy yyxxxxxx
-    // 111ozzzz 1oyyyyyy 1oxxxxxx 00000000 zzzzyyyy yyxxxxxx
+    // oxxxxxxx                            00000000 00000000 0xxxxxxx
+    // 11oyyyyy 1oxxxxxx                   00000000 00000yyy yyxxxxxx
+    // 111ozzzz 1oyyyyyy 1oxxxxxx          00000000 zzzzyyyy yyxxxxxx
     // 1111ouuu 1ouuzzzz 1oyyyyyy 1oxxxxxx 000uuuuu zzzzyyyy yyxxxxxx
     private static final int remainingBytes[] = {
             // 1owwwwww
