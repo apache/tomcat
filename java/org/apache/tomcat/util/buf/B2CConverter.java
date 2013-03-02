@@ -23,6 +23,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
+import java.nio.charset.CodingErrorAction;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -103,9 +104,22 @@ public class B2CConverter {
     private final ByteBuffer leftovers;
 
     public B2CConverter(String encoding) throws IOException {
+        this(encoding, false);
+    }
+
+    public B2CConverter(String encoding, boolean replaceOnError)
+            throws IOException {
         byte[] left = new byte[LEFTOVER_SIZE];
         leftovers = ByteBuffer.wrap(left);
+        CodingErrorAction action;
+        if (replaceOnError) {
+            action = CodingErrorAction.REPLACE;
+        } else {
+            action = CodingErrorAction.REPORT;
+        }
         decoder = getCharset(encoding).newDecoder();
+        decoder.onMalformedInput(action);
+        decoder.onUnmappableCharacter(action);
     }
 
     /**

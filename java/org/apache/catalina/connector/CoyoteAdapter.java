@@ -23,6 +23,7 @@ import java.util.EnumSet;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.SessionTrackingMode;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
@@ -1034,30 +1035,30 @@ public class CoyoteAdapter implements Adapter {
             B2CConverter conv = request.getURIConverter();
             try {
                 if (conv == null) {
-                    conv = new B2CConverter(enc);
+                    conv = new B2CConverter(enc, true);
                     request.setURIConverter(conv);
                 } else {
                     conv.recycle();
                 }
             } catch (IOException e) {
-                // Ignore
                 log.error("Invalid URI encoding; using HTTP default");
                 connector.setURIEncoding(null);
             }
             if (conv != null) {
                 try {
                     conv.convert(bc, cc, true);
-                    uri.setChars(cc.getBuffer(), cc.getStart(),
-                                 cc.getLength());
+                    uri.setChars(cc.getBuffer(), cc.getStart(), cc.getLength());
                     return;
-                } catch (IOException e) {
-                    log.error("Invalid URI character encoding; trying ascii");
-                    cc.recycle();
+                } catch (IOException ioe) {
+                    // Should never happen as B2CConverter should replace
+                    // problematic characters
+                    request.getResponse().sendError(
+                            HttpServletResponse.SC_BAD_REQUEST);
                 }
             }
         }
 
-        // Default encoding: fast conversion
+        // Default encoding: fast conversion for ISO-8859-1
         byte[] bbuf = bc.getBuffer();
         char[] cbuf = cc.getBuffer();
         int start = bc.getStart();
@@ -1065,7 +1066,6 @@ public class CoyoteAdapter implements Adapter {
             cbuf[i] = (char) (bbuf[i + start] & 0xff);
         }
         uri.setChars(cbuf, 0, length);
-
     }
 
 
