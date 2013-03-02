@@ -169,11 +169,29 @@ public class Utf8Decoder extends CharsetDecoder {
                     return CoderResult.malformedForLength(1);
                 }
                 if (inIndexLimit - inIndex < 1 + tail) {
-                    // Apache Tomcat added test - detects invalid sequence as
+                    // Apache Tomcat added tests - detect invalid sequences as
                     // early as possible
                     if (jchar == 0x74 && inIndexLimit > inIndex + 1) {
                         if ((bArr[inIndex + 1] & 0xFF) > 0x8F) {
+                            // 11110100 1yyyxxxx xxxxxxxx xxxxxxxx
+                            // Any non-zero y is > max code point
                             return CoderResult.unmappableForLength(4);
+                        }
+                    }
+                    if (jchar == 0x60 && inIndexLimit > inIndex +1) {
+                        if ((bArr[inIndex + 1] & 0x7F) == 0) {
+                            // 11100000 10000000 10xxxxxx
+                            // should have been
+                            // 00xxxxxx
+                            return CoderResult.malformedForLength(3);
+                        }
+                    }
+                    if (jchar == 0x70 && inIndexLimit > inIndex +1) {
+                        if ((bArr[inIndex + 1] & 0x7F) < 0x10) {
+                            // 11110000 1000zzzz 1oyyyyyy 1oxxxxxx
+                            // should have been
+                            // 111ozzzz 1oyyyyyy 1oxxxxxx
+                            return CoderResult.malformedForLength(4);
                         }
                     }
                     break;

@@ -38,6 +38,56 @@ public class TestUtf8 {
     private static final byte[] SRC_BYTES_2 =
             new byte[] {-12, -112, -128, -128};
 
+    // Various invalid UTF-8 sequences
+    private static final byte[][] MALFORMED = {
+            // One-byte sequences:
+            {(byte)0xFF },
+            {(byte)0xC0 },
+            {(byte)0x80 },
+
+            // Two-byte sequences:
+            {(byte)0xC0, (byte)0x80}, // U+0000 zero-padded
+            {(byte)0xC1, (byte)0xBF}, // U+007F zero-padded
+            {(byte)0xFF, (byte)0xFF}, // all ones
+            {(byte)0xE0, (byte)0x80}, // 111x first byte first nibble
+            {(byte)0xA0, (byte)0x80}, // 101x first byte first nibble
+            {(byte)0xC2, (byte)0x00}, // invalid second byte
+            {(byte)0xC2, (byte)0xC0}, // invalid second byte
+
+            // Three-byte sequences
+            {(byte)0xE0, (byte)0x80, (byte)0x80 }, // U+0000 zero-padded
+            {(byte)0xE0, (byte)0x81, (byte)0xBF }, // U+007F zero-padded
+            {(byte)0xE0, (byte)0x9F, (byte)0xBF }, // U+07FF zero-padded
+            {(byte)0xFF, (byte)0xFF, (byte)0xFF }, // all ones
+            {(byte)0xF0, (byte)0x80, (byte)0x80 }, // invalid first byte
+            {(byte)0xE0, (byte)0xC0, (byte)0x80 }, // invalid second byte
+            {(byte)0xE0, (byte)0x80, (byte)0xC0 }, // invalid third byte
+
+            // Four-byte sequences
+            {(byte)0xF0, (byte)0x80, (byte)0x80, (byte)0x80 }, // U+0000 zero-padded
+            {(byte)0xF0, (byte)0x80, (byte)0x81, (byte)0xBF }, // U+007F zero-padded
+            {(byte)0xF0, (byte)0x80, (byte)0x9F, (byte)0xBF }, // U+007F zero-padded
+            {(byte)0xF0, (byte)0x8F, (byte)0xBF, (byte)0xBF }, // U+07FF zero-padded
+
+            {(byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF }, // all ones
+            {(byte)0xF8, (byte)0x80, (byte)0x80, (byte)0x80 }, // invalid first byte
+            {(byte)0xF0, (byte)0xC0, (byte)0x80, (byte)0x80 }, // invalid second byte
+            {(byte)0xF0, (byte)0x80, (byte)0xC0, (byte)0x80 }, // invalid third byte
+            {(byte)0xF0, (byte)0x80, (byte)0x80, (byte)0xC0 }, // invalid fourth byte
+
+            // Five-byte sequences
+            {(byte)0xF8, (byte)0x80, (byte)0x80, (byte)0x80, (byte)0x80 }, // U+0000 zero-padded
+            {(byte)0xF8, (byte)0x80, (byte)0x80, (byte)0x81, (byte)0xBF }, // U+007F zero-padded
+            {(byte)0xF8, (byte)0x80, (byte)0x80, (byte)0x9F, (byte)0xBF }, // U+07FF zero-padded
+            {(byte)0xF8, (byte)0x80, (byte)0x8F, (byte)0xBF, (byte)0xBF }, // U+FFFF zero-padded
+
+            // Six-byte sequences
+            {(byte)0xFC, (byte)0x80, (byte)0x80, (byte)0x80, (byte)0x80, (byte)0x80 }, // U+0000 zero-padded
+            {(byte)0xFC, (byte)0x80, (byte)0x80, (byte)0x80, (byte)0x81, (byte)0xBF }, // U+007F zero-padded
+            {(byte)0xFC, (byte)0x80, (byte)0x80, (byte)0x80, (byte)0x9F, (byte)0xBF }, // U+07FF zero-padded
+            {(byte)0xFC, (byte)0x80, (byte)0x80, (byte)0x8F, (byte)0xBF, (byte)0xBF }, // U+FFFF zero-padded
+        };
+
     @Test
     public void testJvmDecoder1() {
         // This should trigger an error but currently passes. Once the JVM is
@@ -76,8 +126,17 @@ public class TestUtf8 {
             bb.compact();
         }
 
-        assertEquals(Boolean.valueOf(errorExpected), Boolean.valueOf(error));
-        assertEquals(failPosExpected, i);
+        StringBuilder ashex = new StringBuilder(src.length * 4);
+        for (int j = 0; j < src.length; j++) {
+            if (i > 0) ashex.append(' ');
+            ashex.append(Integer.toBinaryString(src[j] & 0xff));
+        }
+
+        assertEquals(ashex.toString(),
+                Boolean.valueOf(errorExpected), Boolean.valueOf(error));
+        if (failPosExpected != -1) {
+            assertEquals(failPosExpected, i);
+        }
     }
 
 
@@ -93,7 +152,7 @@ public class TestUtf8 {
     }
 
 
-    public void doHarmonyDecoder(byte[] src, boolean errorExpected,
+    private void doHarmonyDecoder(byte[] src, boolean errorExpected,
             int failPosExpected) {
         CharsetDecoder decoder = new Utf8Decoder();
 
@@ -113,7 +172,37 @@ public class TestUtf8 {
             bb.compact();
         }
 
-        assertEquals(Boolean.valueOf(errorExpected), Boolean.valueOf(error));
-        assertEquals(failPosExpected, i);
+        StringBuilder ashex = new StringBuilder(src.length * 4);
+        for (int j = 0; j < src.length; j++) {
+            if (i > 0) ashex.append(' ');
+            ashex.append(Integer.toBinaryString(src[j] & 0xff));
+        }
+
+        assertEquals(ashex.toString(),
+                Boolean.valueOf(errorExpected), Boolean.valueOf(error));
+        if (failPosExpected != -1) {
+            assertEquals(failPosExpected, i);
+        }
+    }
+
+
+    @Test
+    public void testUtf8MalformedJvm() {
+        for (int i = 0 ; i < MALFORMED.length; i++) {
+            // Known failures
+            if (i == 1 || i == 6 || i == 14 | i == 22) {
+                doJvmDecoder(MALFORMED[i], false, -1);
+            } else {
+                doJvmDecoder(MALFORMED[i], true, -1);
+            }
+        }
+    }
+
+
+    @Test
+    public void testUtf8MalformedHarmony() {
+        for (byte[] input : MALFORMED) {
+            doHarmonyDecoder(input, true, -1);
+        }
     }
 }
