@@ -210,9 +210,6 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         //doTestUriDecoding("/foo%ed%a0%80", "UTF-8", "/foo\uFFFD");
     }
 
-    /*
-    101, 100,  105, 116, 101, 100
-*/
     private void doTestUriDecoding(String path, String encoding,
             String expectedPathInfo) throws Exception{
 
