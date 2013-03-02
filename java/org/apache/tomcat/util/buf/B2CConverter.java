@@ -126,7 +126,7 @@ public class B2CConverter {
      * @param bc byte input
      * @param cc char output
      *
-     * @deprecated  Use {@link #convert(ByteChunk, CharChunk, boolean)
+     * @deprecated  Use {@link #convert(ByteChunk, CharChunk, boolean)}
      */
     @Deprecated
     public void convert(ByteChunk bc, CharChunk cc) throws IOException {
