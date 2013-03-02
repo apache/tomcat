@@ -436,7 +436,7 @@ public class TestWebSocket extends TomcatBaseTest {
             bc.setEnd(len);
 
             B2CConverter b2c = new B2CConverter("UTF-8");
-            b2c.convert(bc, cc);
+            b2c.convert(bc, cc, true);
 
             return cc.toString();
         }
