@@ -1046,7 +1046,7 @@ public class CoyoteAdapter implements Adapter {
             }
             if (conv != null) {
                 try {
-                    conv.convert(bc, cc);
+                    conv.convert(bc, cc, true);
                     uri.setChars(cc.getBuffer(), cc.getStart(),
                                  cc.getLength());
                     return;
