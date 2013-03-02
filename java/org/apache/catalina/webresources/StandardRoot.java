@@ -462,7 +462,8 @@ public class StandardRoot extends LifecycleMBeanBase
             main = new JarResourceSet(this, f.getAbsolutePath(), "/", "/");
         } else {
             throw new IllegalArgumentException(
-                    sm.getString("standardRoot.startInvalidMain"));
+                    sm.getString("standardRoot.startInvalidMain",
+                            f.getAbsolutePath()));
         }
 
         mainResources.clear();
