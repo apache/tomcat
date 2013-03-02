@@ -25,9 +25,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -89,7 +87,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         File foo = new File(docBase, "foo");
         addDeleteOnTearDown(foo);
         if (!foo.mkdirs() && !foo.isDirectory()) {
-            fail("Unable to create foo directory in docBase");
+            Assert.fail("Unable to create foo directory in docBase");
         }
 
         Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
@@ -122,12 +120,12 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() + path);
-        assertEquals(expected, res.toString());
+        Assert.assertEquals(expected, res.toString());
     }
 
     private void testPath(String path, String expected) throws Exception {
         ByteChunk res = getUrl("http://localhost:" + getPort() + path);
-        assertEquals(expected, res.toString());
+        Assert.assertEquals(expected, res.toString());
     }
 
     private static class PathParamServlet extends HttpServlet {
@@ -176,6 +174,68 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() + path);
-        assertEquals(expected, res.toString());
+        Assert.assertEquals(expected, res.toString());
+    }
+
+    @Test
+    public void testBug54602a() throws Exception {
+        // No UTF-8
+        doTestUriDecoding("/foo", "UTF-8", "/foo");
+    }
+
+    @Test
+    public void testBug54602b() throws Exception {
+        // Valid UTF-8
+        doTestUriDecoding("/foo%c4%87", "UTF-8", "/foo\u0107");
+    }
+
+    @Test
+    public void testBug54602c() throws Exception {
+        // Partial UTF-8
+        doTestUriDecoding("/foo%c4", "UTF-8", "/foo\uFFFD");
+    }
+
+    private void doTestUriDecoding(String path, String encoding,
+            String expectedPathInfo) throws Exception{
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        tomcat.getConnector().setURIEncoding(encoding);
+
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+
+        PathInfoServlet servlet = new PathInfoServlet();
+        Tomcat.addServlet(ctx, "servlet", servlet);
+        ctx.addServletMapping("/*", "servlet");
+
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() + path,
+                new ByteChunk(), null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        Assert.assertEquals(expectedPathInfo, servlet.getPathInfo());
+    }
+
+    private static class PathInfoServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private String pathInfo = null;
+
+        public String getPathInfo() {
+            return pathInfo;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            // Not thread safe
+            pathInfo = req.getPathInfo();
+        }
     }
 }
