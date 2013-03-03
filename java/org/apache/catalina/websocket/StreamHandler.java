@@ -27,6 +27,7 @@ import java.nio.charset.UnmappableCharacterException;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
+import org.apache.tomcat.util.buf.Utf8Decoder;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 
 /**
