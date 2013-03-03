@@ -52,13 +52,13 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.Loader;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.startup.FailedContext;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
@@ -1343,15 +1343,17 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
             try {
                 if (container instanceof Context) {
-                    if (container instanceof FailedContext) {
+                    Loader loader = ((Context) container).getLoader();
+                    // Loader will be null for FailedContext instances
+                    if (loader == null) {
                         return;
                     }
                     // Ensure background processing for Contexts and Wrappers
                     // is performed under the web app's class loader
                     originalClassLoader =
                             Thread.currentThread().getContextClassLoader();
-                    Thread.currentThread().setContextClassLoader
-                            (((Context) container).getLoader().getClassLoader());
+                    Thread.currentThread().setContextClassLoader(
+                            loader.getClassLoader());
                 }
                 container.backgroundProcess();
                 Container[] children = container.findChildren();
