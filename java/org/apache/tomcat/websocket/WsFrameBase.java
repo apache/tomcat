@@ -28,6 +28,7 @@ import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.MessageHandler;
 import javax.websocket.PongMessage;
 
+import org.apache.tomcat.util.buf.Utf8Decoder;
 import org.apache.tomcat.util.res.StringManager;
 
 /**

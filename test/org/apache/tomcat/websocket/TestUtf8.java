@@ -26,6 +26,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.Utf8Decoder;
 
 public class TestUtf8 {
 
