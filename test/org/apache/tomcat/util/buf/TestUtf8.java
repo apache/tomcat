@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.websocket;
+package org.apache.tomcat.util.buf;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -24,9 +24,6 @@ import java.nio.charset.CodingErrorAction;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-
-import org.apache.tomcat.util.buf.B2CConverter;
-import org.apache.tomcat.util.buf.Utf8Decoder;
 
 public class TestUtf8 {
 
