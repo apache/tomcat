@@ -161,6 +161,41 @@ public class TestUtf8Extended {
                 new int[] {0x61, 0xF0, 0x61},
                 2,
                 "a\uFFFDa").addForJvm(REPLACE_SWALLOWS_TRAILER));
+        TEST_CASES.add(new Utf8TestCase(
+                "U+0000 zero-padded to two bytes",
+                new int[] {0x61, 0xC0, 0x80, 0x61},
+                1,
+                "a\uFFFD\uFFFDa").addForJvm(ERROR_POS_PLUS1));
+        TEST_CASES.add(new Utf8TestCase(
+                "U+007F zero-padded to two bytes",
+                new int[] {0x61, 0xC1, 0xBF, 0x61},
+                2,
+                "a\uFFFD\uFFFDa"));
+        TEST_CASES.add(new Utf8TestCase(
+                "Two bytes, all 1's",
+                new int[] {0x61, 0xFF, 0xFF, 0x61},
+                1,
+                "a\uFFFD\uFFFDa"));
+        TEST_CASES.add(new Utf8TestCase(
+                "Two bytes, 1110 first byte first nibble",
+                new int[] {0x61, 0xE0, 0x80, 0x61},
+                2,
+                "a\uFFFD\uFFFDa").addForJvm(ERROR_POS_PLUS1));
+        TEST_CASES.add(new Utf8TestCase(
+                "Two bytes, 101x first byte first nibble",
+                new int[] {0x61, 0xA0, 0x80, 0x61},
+                1,
+                "a\uFFFD\uFFFDa"));
+        TEST_CASES.add(new Utf8TestCase(
+                "Two bytes, invalid second byte",
+                new int[] {0x61, 0xC2, 0x00, 0x61},
+                2,
+                "a\uFFFD\u0000a"));
+        TEST_CASES.add(new Utf8TestCase(
+                "Two bytes, invalid second byte",
+                new int[] {0x61, 0xC2, 0xC0, 0x61},
+                2,
+                "a\uFFFD\uFFFDa"));
     }
 
     @Test

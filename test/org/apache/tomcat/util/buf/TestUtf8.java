@@ -41,15 +41,6 @@ public class TestUtf8 {
 
     // Various invalid UTF-8 sequences
     private static final byte[][] MALFORMED = {
-            // Two-byte sequences:
-            {(byte)0xC0, (byte)0x80}, // U+0000 zero-padded
-            {(byte)0xC1, (byte)0xBF}, // U+007F zero-padded
-            {(byte)0xFF, (byte)0xFF}, // all ones
-            {(byte)0xE0, (byte)0x80}, // 111x first byte first nibble
-            {(byte)0xA0, (byte)0x80}, // 101x first byte first nibble
-            {(byte)0xC2, (byte)0x00}, // invalid second byte
-            {(byte)0xC2, (byte)0xC0}, // invalid second byte
-
             // Three-byte sequences
             {(byte)0xE0, (byte)0x80, (byte)0x80 }, // U+0000 zero-padded
             {(byte)0xE0, (byte)0x81, (byte)0xBF }, // U+007F zero-padded
@@ -86,10 +77,6 @@ public class TestUtf8 {
 
     // Expected result after UTF-8 decoding with replacement
     private static final String[] MALFORMED_REPLACE_UTF8 = {
-        // two byte sequences
-        "\uFFFD\uFFFD", "\uFFFD\uFFFD", "\uFFFD\uFFFD", "\uFFFD\uFFFD",
-        "\uFFFD\uFFFD", "\uFFFD\u0000", "\uFFFD\uFFFD",
-
         // three byte sequences
         "\uFFFD\uFFFD\uFFFD", "\uFFFD\uFFFD\uFFFD", "\uFFFD\uFFFD\uFFFD",
         "\uFFFD\uFFFD\uFFFD", "\uFFFD\uFFFD\uFFFD", "\uFFFD\uFFFD\uFFFD",
@@ -204,7 +191,7 @@ public class TestUtf8 {
             // Known failures
             // JVM UTF-8 decoder spots invalid sequences but not if they occur
             // at the end of the input and endOfInput is not true
-            if (i == 3 || i == 11 | i == 19) {
+            if (i == 4 | i == 12) {
                 doJvmDecoder(MALFORMED[i], false, false, -1);
             } else {
                 doJvmDecoder(MALFORMED[i], false, true, -1);
@@ -258,8 +245,8 @@ public class TestUtf8 {
             // In all other cases first invalid byte is replaced and processing
             // continues as if the next byte is the start of a new sequence
             // This does not happen for these tests
-            if (i == 3 | i == 11 | i == 19 | i == 23 | i == 24 | i == 25 |
-                    i == 26 | i == 27 | i == 28 | i == 29 | i == 30) {
+            if (i == 4 | i == 12 | i == 16 | i == 17 | i == 18 | i == 19 |
+                    i == 20 | i == 21 | i == 22 | i == 23) {
                 expected = "\uFFFD";
             } else {
                 expected = MALFORMED_REPLACE_UTF8[i];
