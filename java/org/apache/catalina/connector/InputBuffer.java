@@ -363,10 +363,12 @@ public class InputBuffer extends Reader
             setConverter();
         }
 
+        boolean eof = false;
+
         if (bb.getLength() <= 0) {
             int nRead = realReadBytes(bb.getBytes(), 0, bb.getBytes().length);
             if (nRead < 0) {
-                return -1;
+                eof = true;
             }
         }
 
@@ -385,10 +387,13 @@ public class InputBuffer extends Reader
         }
 
         state = CHAR_STATE;
-        conv.convert(bb, cb);
+        conv.convert(bb, cb, eof);
 
-        return cb.getLength();
-
+        if (cb.getLength() == 0 && eof) {
+            return -1;
+        } else {
+            return cb.getLength();
+        }
     }
 
 

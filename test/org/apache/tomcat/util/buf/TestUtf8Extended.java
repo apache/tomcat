@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -49,116 +48,115 @@ public class TestUtf8Extended {
     // previous error
     private static final int REPLACE_SWALLOWS_TRAILER = 8;
 
-    private List<Utf8TestCase> testCases = new ArrayList<>();
+    public static final List<Utf8TestCase> TEST_CASES = new ArrayList<>();
 
-    @Before
-    public void setup() {
-        testCases.add(new Utf8TestCase(
+    static {
+        TEST_CASES.add(new Utf8TestCase(
                 "Zero length input",
                 new int[] {},
                 -1,
                 ""));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Valid one byte sequence",
                 new int[] {0x41},
                 -1,
                 "A"));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Valid two byte sequence",
                 new int[] {0xC2, 0xA9},
                 -1,
                 "\u00A9"));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Valid three byte sequence",
                 new int[] {0xE0, 0xA4, 0x87},
                 -1,
                 "\u0907"));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Valid four byte sequence",
                 new int[] {0xF0, 0x90, 0x90, 0x80},
                 -1,
                 "\uD801\uDC00"));
         // JVM decoder does not report error until all 4 bytes are available
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Invalid code point - out of range",
                 new int[] {0x41, 0xF4, 0x90, 0x80, 0x80, 0x41},
                 2,
                 "A\uFFFD\uFFFD\uFFFD\uFFFDA").addForJvm(ERROR_POS_PLUS2));
         // JVM decoder does not report error until all 2 bytes are available
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Valid sequence padded from one byte to two",
                 new int[] {0x41, 0xC0, 0xC1, 0x41},
                 1,
                 "A\uFFFD\uFFFDA").addForJvm(ERROR_POS_PLUS1));
         // JVM decoder does not report error until all 3 bytes are available
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Valid sequence padded from one byte to three",
                 new int[] {0x41, 0xE0, 0x80, 0xC1, 0x41},
                 2,
                 "A\uFFFD\uFFFD\uFFFDA").addForJvm(ERROR_POS_PLUS1));
         // JVM decoder does not report error until all 4 bytes are available
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Valid sequence padded from one byte to four",
                 new int[] {0x41, 0xF0, 0x80, 0x80, 0xC1, 0x41},
                 2,
                 "A\uFFFD\uFFFD\uFFFD\uFFFDA").addForJvm(ERROR_POS_PLUS2));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Invalid one byte 1111 1111",
                 new int[] {0x41, 0xFF, 0x41},
                 1,
                 "A\uFFFDA"));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Invalid one byte 1111 0000",
                 new int[] {0x41, 0xF0, 0x41},
                 2,
                 "A\uFFFDA").addForJvm(REPLACE_SWALLOWS_TRAILER));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Invalid one byte 1110 0000",
                 new int[] {0x41, 0xE0, 0x41},
                 2,
                 "A\uFFFDA").addForJvm(REPLACE_SWALLOWS_TRAILER));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Invalid one byte 1100 0000",
                 new int[] {0x41, 0xC0, 0x41},
                 1,
                 "A\uFFFDA").addForJvm(ERROR_POS_PLUS1));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Invalid one byte 1000 000",
                 new int[] {0x41, 0x80, 0x41},
                 1,
                 "A\uFFFDA"));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Invalid sequence from unicode 6.2 spec, table 3-8",
                 new int[] {0x61, 0xF1, 0x80, 0x80, 0xE1, 0x80, 0xC2, 0x62, 0x80,
                         0x63, 0x80, 0xBF, 0x64},
                 4,
                 "a\uFFFD\uFFFD\uFFFDb\uFFFDc\uFFFD\uFFFDd"));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Valid 4-byte sequence truncated to 3 bytes",
                 new int[] {0x61, 0xF0, 0x90, 0x90},
                 3,
                 "a\uFFFD"));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Valid 4-byte sequence truncated to 2 bytes",
                 new int[] {0x61, 0xF0, 0x90},
                 2,
                 "a\uFFFD"));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Valid 4-byte sequence truncated to 1 byte",
                 new int[] {0x61, 0xF0},
                 1,
                 "a\uFFFD"));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Valid 4-byte sequence truncated to 3 bytes with trailer",
                 new int[] {0x61, 0xF0, 0x90, 0x90, 0x61},
                 4,
                 "a\uFFFDa"));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Valid 4-byte sequence truncated to 2 bytes with trailer",
                 new int[] {0x61, 0xF0, 0x90, 0x61},
                 3,
                 "a\uFFFDa").addForJvm(REPLACE_SWALLOWS_TRAILER));
-        testCases.add(new Utf8TestCase(
+        TEST_CASES.add(new Utf8TestCase(
                 "Valid 4-byte sequence truncated to 1 byte with trailer",
                 new int[] {0x61, 0xF0, 0x61},
                 2,
@@ -168,7 +166,7 @@ public class TestUtf8Extended {
     @Test
     public void testHarmonyDecoder() {
         CharsetDecoder decoder = new Utf8Decoder();
-        for (Utf8TestCase testCase : testCases) {
+        for (Utf8TestCase testCase : TEST_CASES) {
             doTest(decoder, testCase, 0);
         }
     }
@@ -177,7 +175,7 @@ public class TestUtf8Extended {
     @Test
     public void testJvmDecoder() {
         CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
-        for (Utf8TestCase testCase : testCases) {
+        for (Utf8TestCase testCase : TEST_CASES) {
             doTest(decoder, testCase, testCase.flagsJvm);
         }
     }
@@ -256,12 +254,12 @@ public class TestUtf8Extended {
     /**
      * Encapsulates a single UTF-8 test case
      */
-    private static class Utf8TestCase {
-        private final String description;
-        private final int[] input;
-        private final int invalidIndex;
-        private final String outputReplaced;
-        private int flagsJvm = 0;
+    public static class Utf8TestCase {
+        public final String description;
+        public final int[] input;
+        public final int invalidIndex;
+        public final String outputReplaced;
+        public int flagsJvm = 0;
 
         public Utf8TestCase(String description, int[] input, int invalidIndex,
                 String outputReplaced) {
