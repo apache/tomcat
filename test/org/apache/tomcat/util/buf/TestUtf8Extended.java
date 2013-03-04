@@ -83,6 +83,12 @@ public class TestUtf8Extended {
                 new int[] {0xE0, 0x80, 0xC1},
                 1,
                 "\uFFFD\uFFFD\uFFFD").setSkipErrorForJvm(true));
+        // JVM decoder does not report error until all 4 bytes are available
+        testCases.add(new Utf8TestCase(
+                "Valid sequence padded from one byte to four",
+                new int[] {0xF0, 0x80, 0x80, 0xC1},
+                1,
+                "\uFFFD\uFFFD\uFFFD\uFFFD").setSkipErrorForJvm(true));
     }
 
     @Test

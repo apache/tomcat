@@ -188,11 +188,11 @@ public class Utf8Decoder extends CharsetDecoder {
                         }
                     }
                     if (jchar == 0x70 && inIndexLimit > inIndex + 1) {
-                        if ((bArr[inIndex + 1] & 0x7F) < 0x10) {
+                        if ((bArr[inIndex + 1] & 0x70) == 0) {
                             // 11110000 1000zzzz 1oyyyyyy 1oxxxxxx
                             // should have been
                             // 111ozzzz 1oyyyyyy 1oxxxxxx
-                            return CoderResult.malformedForLength(4);
+                            return CoderResult.malformedForLength(1);
                         }
                     }
                     break;
