@@ -21,7 +21,6 @@ import java.nio.CharBuffer;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 
-
 /**
  * Decodes bytes to UTF-8. Extracted from Apache Harmony and modified to reject
  * code points from U+D800 to U+DFFF as per RFC3629. The standard Java decoder
@@ -45,17 +44,17 @@ public class Utf8Decoder extends CharsetDecoder {
     // 1111ouuu 1ouuzzzz 1oyyyyyy 1oxxxxxx 000uuuuu zzzzyyyy yyxxxxxx
     private static final int remainingBytes[] = {
             // 1owwwwww
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             // 11oyyyyy
-            -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             // 111ozzzz
             2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
             // 1111ouuu
-            3, 3, 3, 3, 3, 3, 3, 3,
+            3, 3, 3, 3, 3, -1, -1, -1,
             // > 11110111
             -1, -1, -1, -1, -1, -1, -1, -1};
     private static final int remainingNumbers[] = {0, // 0 1 2 3
@@ -107,7 +106,7 @@ public class Utf8Decoder extends CharsetDecoder {
                     for (int i = 0; i < tail; i++) {
                         nextByte = in.get() & 0xFF;
                         if ((nextByte & 0xC0) != 0x80) {
-                            return CoderResult.malformedForLength(1 + i);
+                            return CoderResult.malformedForLength(1);
                         }
                         jchar = (jchar << 6) + nextByte;
                     }
@@ -161,40 +160,91 @@ public class Utf8Decoder extends CharsetDecoder {
             int jchar = bArr[inIndex];
             if (jchar < 0) {
                 jchar = jchar & 0x7F;
+                // If first byte is invalid, tail will be set to -1
                 int tail = remainingBytes[jchar];
                 if (tail == -1) {
                     in.position(inIndex - in.arrayOffset());
                     out.position(outIndex - out.arrayOffset());
                     return CoderResult.malformedForLength(1);
                 }
-                if (inIndexLimit - inIndex < 1 + tail) {
-                    // Apache Tomcat added tests - detect invalid sequences as
-                    // early as possible
-                    if (jchar == 0x74 && inIndexLimit > inIndex + 1) {
-                        if ((bArr[inIndex + 1] & 0xFF) > 0x8F) {
-                            // 11110100 1yyyxxxx xxxxxxxx xxxxxxxx
-                            // Any non-zero y is > max code point
-                            return CoderResult.unmappableForLength(1);
-                        }
+                // Additional checks to detect invalid sequences ASAP
+                // Checks derived from Unicode 6.2, Chapter 3, Table 3-7
+                // Check 2nd byte
+                int tailAvailable = inIndexLimit - inIndex - 1;
+                if (tailAvailable > 0) {
+                    // First byte C2..DF, second byte 80..BF
+                    if (jchar > 0x41 && jchar < 0x60 &&
+                            (bArr[inIndex + 1] & 0x80) != 0x80) {
+                        in.position(inIndex - in.arrayOffset());
+                        out.position(outIndex - out.arrayOffset());
+                        return CoderResult.malformedForLength(1);
                     }
-                    if (jchar == 0x60 && inIndexLimit > inIndex + 1) {
-                        if ((bArr[inIndex + 1] & 0x60) == 0) {
-                            // 11100000 100yyyyy 10xxxxxx
-                            // should have been
-                            // 11oyyyyy 1oxxxxxx
-                            // or possibly
-                            // 00xxxxxx
-                            return CoderResult.malformedForLength(1);
-                        }
+                    // First byte E0, second byte A0..BF
+                    if (jchar == 0x60 && (bArr[inIndex + 1] & 0xE0) != 0xA0) {
+                        in.position(inIndex - in.arrayOffset());
+                        out.position(outIndex - out.arrayOffset());
+                        return CoderResult.malformedForLength(1);
                     }
-                    if (jchar == 0x70 && inIndexLimit > inIndex + 1) {
-                        if ((bArr[inIndex + 1] & 0x70) == 0) {
-                            // 11110000 1000zzzz 1oyyyyyy 1oxxxxxx
-                            // should have been
-                            // 111ozzzz 1oyyyyyy 1oxxxxxx
-                            return CoderResult.malformedForLength(1);
-                        }
+                    // First byte E1..EC, second byte 80..BF
+                    if (jchar > 0x60 && jchar < 0x6D &&
+                            (bArr[inIndex + 1] & 0x80) != 0x80) {
+                        in.position(inIndex - in.arrayOffset());
+                        out.position(outIndex - out.arrayOffset());
+                        return CoderResult.malformedForLength(1);
                     }
+                    // First byte ED, second byte 80..9F
+                    if (jchar == 0x6D && (bArr[inIndex + 1] & 0xE0) != 0x80) {
+                        in.position(inIndex - in.arrayOffset());
+                        out.position(outIndex - out.arrayOffset());
+                        return CoderResult.malformedForLength(1);
+                    }
+                    // First byte EE..EF, second byte 80..BF
+                    if (jchar > 0x6D && jchar < 0x70 &&
+                            (bArr[inIndex + 1] & 0x80) != 0x80) {
+                        in.position(inIndex - in.arrayOffset());
+                        out.position(outIndex - out.arrayOffset());
+                        return CoderResult.malformedForLength(1);
+                    }
+                    // First byte F0, second byte 90..BF
+                    if (jchar == 0x70 &&
+                            ((bArr[inIndex + 1] & 0xFF) < 0x90 ||
+                            (bArr[inIndex + 1] & 0xFF) > 0xBF)) {
+                        in.position(inIndex - in.arrayOffset());
+                        out.position(outIndex - out.arrayOffset());
+                        return CoderResult.malformedForLength(1);
+                    }
+                    // First byte F1..F3, second byte 80..BF
+                    if (jchar > 0x70 && jchar < 0x74 &&
+                            (bArr[inIndex + 1] & 0x80) != 0x80) {
+                        in.position(inIndex - in.arrayOffset());
+                        out.position(outIndex - out.arrayOffset());
+                        return CoderResult.malformedForLength(1);
+                    }
+                    // First byte F4, second byte 80..8F
+                    if (jchar == 0x74 &&
+                            (bArr[inIndex + 1] & 0xF0) != 0x80) {
+                        in.position(inIndex - in.arrayOffset());
+                        out.position(outIndex - out.arrayOffset());
+                        return CoderResult.malformedForLength(1);
+                    }
+                }
+                // Check third byte if present and expected
+                if (tailAvailable > 1 && tail > 1) {
+                    if ((bArr[inIndex + 2] & 0x80) != 0x80) {
+                        in.position(inIndex - in.arrayOffset());
+                        out.position(outIndex - out.arrayOffset());
+                        return CoderResult.malformedForLength(2);
+                    }
+                }
+                // Check fourth byte if present and expected
+                if (tailAvailable > 2 && tail > 2) {
+                    if ((bArr[inIndex + 3] & 0x80) != 0x80) {
+                        in.position(inIndex - in.arrayOffset());
+                        out.position(outIndex - out.arrayOffset());
+                        return CoderResult.malformedForLength(3);
+                    }
+                }
+                if (tailAvailable < tail) {
                     break;
                 }
                 for (int i = 0; i < tail; i++) {
@@ -202,7 +252,7 @@ public class Utf8Decoder extends CharsetDecoder {
                     if ((nextByte & 0xC0) != 0x80) {
                         in.position(inIndex - in.arrayOffset());
                         out.position(outIndex - out.arrayOffset());
-                        return CoderResult.malformedForLength(1 + i);
+                        return CoderResult.malformedForLength(1);
                     }
                     jchar = (jchar << 6) + nextByte;
                 }

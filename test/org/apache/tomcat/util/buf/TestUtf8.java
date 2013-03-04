@@ -18,13 +18,20 @@ package org.apache.tomcat.util.buf;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Tests the behaviour of the custom UTF-8 decoder and compares it to the JVM
+ * implementation.
+ */
 public class TestUtf8 {
 
     // Invalid UTF-8
@@ -34,11 +41,6 @@ public class TestUtf8 {
 
     // Various invalid UTF-8 sequences
     private static final byte[][] MALFORMED = {
-            // One-byte sequences:
-            {(byte)0xFF },
-            {(byte)0xC0 },
-            {(byte)0x80 },
-
             // Two-byte sequences:
             {(byte)0xC0, (byte)0x80}, // U+0000 zero-padded
             {(byte)0xC1, (byte)0xBF}, // U+007F zero-padded
@@ -82,10 +84,39 @@ public class TestUtf8 {
             {(byte)0xFC, (byte)0x80, (byte)0x80, (byte)0x8F, (byte)0xBF, (byte)0xBF }, // U+FFFF zero-padded
         };
 
+    // Expected result after UTF-8 decoding with replacement
+    private static final String[] MALFORMED_REPLACE_UTF8 = {
+        // two byte sequences
+        "\uFFFD\uFFFD", "\uFFFD\uFFFD", "\uFFFD\uFFFD", "\uFFFD\uFFFD",
+        "\uFFFD\uFFFD", "\uFFFD\u0000", "\uFFFD\uFFFD",
+
+        // three byte sequences
+        "\uFFFD\uFFFD\uFFFD", "\uFFFD\uFFFD\uFFFD", "\uFFFD\uFFFD\uFFFD",
+        "\uFFFD\uFFFD\uFFFD", "\uFFFD\uFFFD\uFFFD", "\uFFFD\uFFFD\uFFFD",
+        "\uFFFD\uFFFD\uFFFD",
+
+        // four byte sequences
+        "\uFFFD\uFFFD\uFFFD\uFFFD", "\uFFFD\uFFFD\uFFFD\uFFFD",
+        "\uFFFD\uFFFD\uFFFD\uFFFD", "\uFFFD\uFFFD\uFFFD\uFFFD",
+        "\uFFFD\uFFFD\uFFFD\uFFFD", "\uFFFD\uFFFD\uFFFD\uFFFD",
+        "\uFFFD\uFFFD\uFFFD\uFFFD", "\uFFFD\uFFFD\uFFFD\uFFFD",
+        "\uFFFD\uFFFD\uFFFD\uFFFD",
+
+        // five byte sequences
+        "\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD", "\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD",
+        "\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD", "\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD",
+
+        // six byte sequences
+        "\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD",
+        "\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD",
+        "\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD",
+        "\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD" };
+
+
     @Test
     public void testJvmDecoder1() {
         // This should trigger an error but currently passes. Once the JVM is
-        // fixed, s/false/true/ and s/20/13/
+        // fixed, s/false/true/ and s/20/12/
         doJvmDecoder(SRC_BYTES_1, false, false, 20);
     }
 
@@ -129,7 +160,7 @@ public class TestUtf8 {
 
     @Test
     public void testHarmonyDecoder1() {
-        doHarmonyDecoder(SRC_BYTES_1, false, true, 13);
+        doHarmonyDecoder(SRC_BYTES_1, false, true, 12);
     }
 
 
@@ -173,7 +204,7 @@ public class TestUtf8 {
             // Known failures
             // JVM UTF-8 decoder spots invalid sequences but not if they occur
             // at the end of the input and endOfInput is not true
-            if (i == 1 || i == 6 || i == 14 | i == 22) {
+            if (i == 3 || i == 11 | i == 19) {
                 doJvmDecoder(MALFORMED[i], false, false, -1);
             } else {
                 doJvmDecoder(MALFORMED[i], false, true, -1);
@@ -194,8 +225,83 @@ public class TestUtf8 {
 
     @Test
     public void testUtf8MalformedHarmony() {
+        // Harmony UTF-8 decoder fails as soon as an invalid sequence is
+        // detected
         for (byte[] input : MALFORMED) {
             doHarmonyDecoder(input, false, true, -1);
         }
+    }
+
+
+    @Test
+    public void testUtf8MalformedReplacementHarmony() throws Exception {
+        CharsetDecoder decoder = new Utf8Decoder();
+        decoder.onMalformedInput(CodingErrorAction.REPLACE);
+        decoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
+
+        for (int i = 0; i < MALFORMED.length; i++) {
+            doMalformed(decoder, i, MALFORMED[i], MALFORMED_REPLACE_UTF8[i]);
+            decoder.reset();
+        }
+    }
+
+
+    @Test
+    public void testUtf8MalformedReplacementJvm() throws Exception {
+        CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
+        decoder.onMalformedInput(CodingErrorAction.REPLACE);
+        decoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
+
+        for (int i = 0; i < MALFORMED.length; i++) {
+            // Handle JVM inconsistencies
+            String expected;
+            // In all other cases first invalid byte is replaced and processing
+            // continues as if the next byte is the start of a new sequence
+            // This does not happen for these tests
+            if (i == 3 | i == 11 | i == 19 | i == 23 | i == 24 | i == 25 |
+                    i == 26 | i == 27 | i == 28 | i == 29 | i == 30) {
+                expected = "\uFFFD";
+            } else {
+                expected = MALFORMED_REPLACE_UTF8[i];
+            }
+            doMalformed(decoder, i, MALFORMED[i], expected);
+            decoder.reset();
+        }
+    }
+
+
+    private void doMalformed(CharsetDecoder decoder, int test, byte[] input,
+            String expected) throws Exception {
+
+        ByteBuffer bb = ByteBuffer.allocate(input.length);
+        CharBuffer cb = CharBuffer.allocate(bb.limit());
+
+        int i = 0;
+        for (; i < input.length; i++) {
+            bb.put(input[i]);
+            bb.flip();
+            CoderResult cr = decoder.decode(bb, cb, false);
+            if (cr.isError()) {
+                throw new Exception();
+            }
+            bb.compact();
+        }
+        bb.flip();
+        CoderResult cr = decoder.decode(bb, cb, true);
+        if (cr.isError()) {
+            throw new Exception();
+        }
+
+        cb.flip();
+
+        StringBuilder ashex = new StringBuilder(input.length * 4);
+        for (int j = 0; j < input.length; j++) {
+            if (i > 0) ashex.append(' ');
+            ashex.append(Integer.toBinaryString(input[j] & 0xff));
+        }
+        String hex = ashex.toString();
+
+        String result = cb.toString();
+        Assert.assertEquals(test + ": " + hex, expected, result);
     }
 }

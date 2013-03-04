@@ -36,9 +36,18 @@ import org.junit.Test;
  */
 public class TestUtf8Extended {
 
-    // Indicates that at invalid sequence is detected at the end of the sequence
-    // rather than as early as possible
-    private static final int ERROR_POS_END = 1;
+    // Indicates that at invalid sequence is detected one character later than
+    // the earliest possible moment
+    private static final int ERROR_POS_PLUS1 = 1;
+    // Indicates that at invalid sequence is detected two characters later than
+    // the earliest possible moment
+    private static final int ERROR_POS_PLUS2 = 2;
+    // Indicates that at invalid sequence is detected three characters later
+    // than the earliest possible moment
+    private static final int ERROR_POS_PLUS3 = 4;
+    // Indicates that the trailing valid byte is included in replacement of the
+    // previous error
+    private static final int REPLACE_SWALLOWS_TRAILER = 8;
 
     private List<Utf8TestCase> testCases = new ArrayList<>();
 
@@ -72,27 +81,52 @@ public class TestUtf8Extended {
         // JVM decoder does not report error until all 4 bytes are available
         testCases.add(new Utf8TestCase(
                 "Invalid code point - out of range",
-                new int[] {0xF4, 0x90, 0x80, 0x80},
-                1,
-                "\uFFFD\uFFFD\uFFFD\uFFFD").addForJvm(ERROR_POS_END));
+                new int[] {0x41, 0xF4, 0x90, 0x80, 0x80, 0x41},
+                2,
+                "A\uFFFD\uFFFD\uFFFD\uFFFDA").addForJvm(ERROR_POS_PLUS2));
         // JVM decoder does not report error until all 2 bytes are available
         testCases.add(new Utf8TestCase(
                 "Valid sequence padded from one byte to two",
-                new int[] {0xC0, 0xC1},
-                0,
-                "\uFFFD\uFFFD").addForJvm(ERROR_POS_END));
+                new int[] {0x41, 0xC0, 0xC1, 0x41},
+                1,
+                "A\uFFFD\uFFFDA").addForJvm(ERROR_POS_PLUS1));
         // JVM decoder does not report error until all 3 bytes are available
         testCases.add(new Utf8TestCase(
                 "Valid sequence padded from one byte to three",
-                new int[] {0xE0, 0x80, 0xC1},
-                1,
-                "\uFFFD\uFFFD\uFFFD").addForJvm(ERROR_POS_END));
+                new int[] {0x41, 0xE0, 0x80, 0xC1, 0x41},
+                2,
+                "A\uFFFD\uFFFD\uFFFDA").addForJvm(ERROR_POS_PLUS1));
         // JVM decoder does not report error until all 4 bytes are available
         testCases.add(new Utf8TestCase(
                 "Valid sequence padded from one byte to four",
-                new int[] {0xF0, 0x80, 0x80, 0xC1},
+                new int[] {0x41, 0xF0, 0x80, 0x80, 0xC1, 0x41},
+                2,
+                "A\uFFFD\uFFFD\uFFFD\uFFFDA").addForJvm(ERROR_POS_PLUS2));
+        testCases.add(new Utf8TestCase(
+                "Invalid one byte 1111 1111",
+                new int[] {0x41, 0xFF, 0x41},
                 1,
-                "\uFFFD\uFFFD\uFFFD\uFFFD").addForJvm(ERROR_POS_END));
+                "A\uFFFDA"));
+        testCases.add(new Utf8TestCase(
+                "Invalid one byte 1111 0000",
+                new int[] {0x41, 0xF0, 0x41},
+                2,
+                "A\uFFFDA").addForJvm(REPLACE_SWALLOWS_TRAILER));
+        testCases.add(new Utf8TestCase(
+                "Invalid one byte 1110 0000",
+                new int[] {0x41, 0xE0, 0x41},
+                2,
+                "A\uFFFDA").addForJvm(REPLACE_SWALLOWS_TRAILER));
+        testCases.add(new Utf8TestCase(
+                "Invalid one byte 1100 0000",
+                new int[] {0x41, 0xC0, 0x41},
+                1,
+                "A\uFFFDA").addForJvm(ERROR_POS_PLUS1));
+        testCases.add(new Utf8TestCase(
+                "Invalid one byte 1000 000",
+                new int[] {0x41, 0x80, 0x41},
+                1,
+                "A\uFFFDA"));
     }
 
     @Test
@@ -132,12 +166,15 @@ public class TestUtf8Extended {
             bb.flip();
             CoderResult cr = decoder.decode(bb, cb, false);
             if (cr.isError()) {
-                if ((flags & ERROR_POS_END) == 0) {
-                    Assert.assertEquals(testCase.description,
-                            testCase.invalidIndex, i);
-                } else {
-                    Assert.assertEquals(testCase.description, len - 1, i);
+                int expected =  testCase.invalidIndex;
+                if ((flags & ERROR_POS_PLUS1) != 0) {
+                    expected += 1;
+                } else if ((flags & ERROR_POS_PLUS2) != 0) {
+                    expected += 2;
+                } else if ((flags & ERROR_POS_PLUS3) != 0) {
+                    expected += 3;
                 }
+                Assert.assertEquals(testCase.description, expected, i);
                 break;
             }
             bb.compact();
@@ -168,8 +205,15 @@ public class TestUtf8Extended {
             Assert.fail(testCase.description);
         }
         cb.flip();
-        Assert.assertEquals(testCase.description, testCase.outputReplaced,
-                cb.toString());
+        if ((flags & REPLACE_SWALLOWS_TRAILER) == 0) {
+            Assert.assertEquals(testCase.description, testCase.outputReplaced,
+                    cb.toString());
+        } else {
+            Assert.assertEquals(testCase.description,
+                    testCase.outputReplaced.subSequence(0,
+                            testCase.outputReplaced.length() - 1),
+                    cb.toString());
+        }
     }
 
 
