@@ -204,10 +204,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
     @Test
     public void testBug54602e() throws Exception {
         // Invalid UTF-8
-        doTestUriDecoding("/foo%ed%a0%80", "UTF-8", "/foo\uD800");
-        // TODO Requires a switch to the Harmony based decoder to fix this
-        // Should be
-        //doTestUriDecoding("/foo%ed%a0%80", "UTF-8", "/foo\uFFFD");
+        doTestUriDecoding("/foo%ed%a0%80", "UTF-8", "/foo\uFFFD\uFFFD\uFFFD");
     }
 
     private void doTestUriDecoding(String path, String encoding,
