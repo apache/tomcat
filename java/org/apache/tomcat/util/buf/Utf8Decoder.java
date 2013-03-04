@@ -98,15 +98,14 @@ public class Utf8Decoder extends CharsetDecoder {
                     }
                     if (limit - pos < 1 + tail) {
                         // No early test for invalid sequences here as peeking
-                        // at the next byte is harder (and Tomcat's WebSocket
-                        // implementation always uses array backed buffers)
+                        // at the next byte is harder
                         return CoderResult.UNDERFLOW;
                     }
                     int nextByte;
                     for (int i = 0; i < tail; i++) {
                         nextByte = in.get() & 0xFF;
                         if ((nextByte & 0xC0) != 0x80) {
-                            return CoderResult.malformedForLength(1);
+                            return CoderResult.malformedForLength(1 + i);
                         }
                         jchar = (jchar << 6) + nextByte;
                     }
@@ -252,7 +251,7 @@ public class Utf8Decoder extends CharsetDecoder {
                     if ((nextByte & 0xC0) != 0x80) {
                         in.position(inIndex - in.arrayOffset());
                         out.position(outIndex - out.arrayOffset());
-                        return CoderResult.malformedForLength(1);
+                        return CoderResult.malformedForLength(1 + i);
                     }
                     jchar = (jchar << 6) + nextByte;
                 }
@@ -287,7 +286,8 @@ public class Utf8Decoder extends CharsetDecoder {
         }
         in.position(inIndex - in.arrayOffset());
         out.position(outIndex - out.arrayOffset());
-        return (outRemaining == 0 && inIndex < inIndexLimit) ? CoderResult.OVERFLOW
-                : CoderResult.UNDERFLOW;
+        return (outRemaining == 0 && inIndex < inIndexLimit) ?
+                CoderResult.OVERFLOW :
+                CoderResult.UNDERFLOW;
     }
 }
