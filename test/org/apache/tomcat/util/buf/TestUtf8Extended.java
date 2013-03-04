@@ -36,6 +36,10 @@ import org.junit.Test;
  */
 public class TestUtf8Extended {
 
+    // Indicates that at invalid sequence is detected at the end of the sequence
+    // rather than as early as possible
+    private static final int ERROR_POS_END = 1;
+
     private List<Utf8TestCase> testCases = new ArrayList<>();
 
     @Before
@@ -70,32 +74,32 @@ public class TestUtf8Extended {
                 "Invalid code point - out of range",
                 new int[] {0xF4, 0x90, 0x80, 0x80},
                 1,
-                "\uFFFD\uFFFD\uFFFD\uFFFD").setSkipErrorForJvm(true));
+                "\uFFFD\uFFFD\uFFFD\uFFFD").addForJvm(ERROR_POS_END));
         // JVM decoder does not report error until all 2 bytes are available
         testCases.add(new Utf8TestCase(
                 "Valid sequence padded from one byte to two",
                 new int[] {0xC0, 0xC1},
                 0,
-                "\uFFFD\uFFFD").setSkipErrorForJvm(true));
+                "\uFFFD\uFFFD").addForJvm(ERROR_POS_END));
         // JVM decoder does not report error until all 3 bytes are available
         testCases.add(new Utf8TestCase(
                 "Valid sequence padded from one byte to three",
                 new int[] {0xE0, 0x80, 0xC1},
                 1,
-                "\uFFFD\uFFFD\uFFFD").setSkipErrorForJvm(true));
+                "\uFFFD\uFFFD\uFFFD").addForJvm(ERROR_POS_END));
         // JVM decoder does not report error until all 4 bytes are available
         testCases.add(new Utf8TestCase(
                 "Valid sequence padded from one byte to four",
                 new int[] {0xF0, 0x80, 0x80, 0xC1},
                 1,
-                "\uFFFD\uFFFD\uFFFD\uFFFD").setSkipErrorForJvm(true));
+                "\uFFFD\uFFFD\uFFFD\uFFFD").addForJvm(ERROR_POS_END));
     }
 
     @Test
     public void testHarmonyDecoder() {
         CharsetDecoder decoder = new Utf8Decoder();
         for (Utf8TestCase testCase : testCases) {
-            doTest(decoder, testCase, false, false);
+            doTest(decoder, testCase, 0);
         }
     }
 
@@ -104,69 +108,68 @@ public class TestUtf8Extended {
     public void testJvmDecoder() {
         CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
         for (Utf8TestCase testCase : testCases) {
-            doTest(decoder, testCase, testCase.skipErrorForJvm,
-                    testCase.skipReplaceForJvm);
+            doTest(decoder, testCase, testCase.flagsJvm);
         }
     }
 
 
     private void doTest(CharsetDecoder decoder, Utf8TestCase testCase,
-            boolean skipError, boolean skipReplace) {
+            int flags) {
 
         int len = testCase.input.length;
         ByteBuffer bb = ByteBuffer.allocate(len);
         CharBuffer cb = CharBuffer.allocate(len);
 
-        if (!skipError) {
-            // Configure decoder to fail on an error
-            decoder.reset();
-            decoder.onMalformedInput(CodingErrorAction.REPORT);
-            decoder.onUnmappableCharacter(CodingErrorAction.REPORT);
+        // Configure decoder to fail on an error
+        decoder.reset();
+        decoder.onMalformedInput(CodingErrorAction.REPORT);
+        decoder.onUnmappableCharacter(CodingErrorAction.REPORT);
 
-            // Add each byte one at a time. The decoder should fail as soon as
-            // an invalid sequence has been provided
-            for (int i = 0; i < len; i++) {
-                bb.put((byte) testCase.input[i]);
-                bb.flip();
-                CoderResult cr = decoder.decode(bb, cb, false);
-                if (cr.isError()) {
+        // Add each byte one at a time. The decoder should fail as soon as
+        // an invalid sequence has been provided
+        for (int i = 0; i < len; i++) {
+            bb.put((byte) testCase.input[i]);
+            bb.flip();
+            CoderResult cr = decoder.decode(bb, cb, false);
+            if (cr.isError()) {
+                if ((flags & ERROR_POS_END) == 0) {
                     Assert.assertEquals(testCase.description,
                             testCase.invalidIndex, i);
-                    break;
+                } else {
+                    Assert.assertEquals(testCase.description, len - 1, i);
                 }
-                bb.compact();
+                break;
             }
+            bb.compact();
         }
 
-        if (!skipReplace) {
-            // Configure decoder to replace on an error
-            decoder.reset();
-            decoder.onMalformedInput(CodingErrorAction.REPLACE);
-            decoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
+        // Configure decoder to replace on an error
+        decoder.reset();
+        decoder.onMalformedInput(CodingErrorAction.REPLACE);
+        decoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
 
-            // Add each byte one at a time.
-            bb.clear();
-            cb.clear();
-            for (int i = 0; i < len; i++) {
-                bb.put((byte) testCase.input[i]);
-                bb.flip();
-                CoderResult cr = decoder.decode(bb, cb, false);
-                if (cr.isError()) {
-                    Assert.fail(testCase.description);
-                }
-                bb.compact();
-            }
-            // For incomplete sequences at the end of the input need to tell
-            // the decoder the input has ended
+        // Add each byte one at a time.
+        bb.clear();
+        cb.clear();
+        for (int i = 0; i < len; i++) {
+            bb.put((byte) testCase.input[i]);
             bb.flip();
-            CoderResult cr = decoder.decode(bb, cb, true);
+            CoderResult cr = decoder.decode(bb, cb, false);
             if (cr.isError()) {
                 Assert.fail(testCase.description);
             }
-            cb.flip();
-            Assert.assertEquals(testCase.description, testCase.outputReplaced,
-                    cb.toString());
+            bb.compact();
         }
+        // For incomplete sequences at the end of the input need to tell
+        // the decoder the input has ended
+        bb.flip();
+        CoderResult cr = decoder.decode(bb, cb, true);
+        if (cr.isError()) {
+            Assert.fail(testCase.description);
+        }
+        cb.flip();
+        Assert.assertEquals(testCase.description, testCase.outputReplaced,
+                cb.toString());
     }
 
 
@@ -178,8 +181,7 @@ public class TestUtf8Extended {
         private final int[] input;
         private final int invalidIndex;
         private final String outputReplaced;
-        private boolean skipErrorForJvm = false;
-        private boolean skipReplaceForJvm = false;
+        private int flagsJvm = 0;
 
         public Utf8TestCase(String description, int[] input, int invalidIndex,
                 String outputReplaced) {
@@ -190,13 +192,8 @@ public class TestUtf8Extended {
 
         }
 
-        public Utf8TestCase setSkipErrorForJvm(boolean skipErrorForJvm) {
-            this.skipErrorForJvm = skipErrorForJvm;
-            return this;
-        }
-
-        public Utf8TestCase setSkipReplaceForJvm(boolean skipReplaceForJvm) {
-            this.skipReplaceForJvm = skipReplaceForJvm;
+        public Utf8TestCase addForJvm(int flag) {
+            this.flagsJvm = this.flagsJvm | flag;
             return this;
         }
     }
