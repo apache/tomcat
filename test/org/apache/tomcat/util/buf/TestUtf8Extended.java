@@ -133,6 +133,36 @@ public class TestUtf8Extended {
                         0x63, 0x80, 0xBF, 0x64},
                 4,
                 "a\uFFFD\uFFFD\uFFFDb\uFFFDc\uFFFD\uFFFDd"));
+        testCases.add(new Utf8TestCase(
+                "Valid 4-byte sequence truncated to 3 bytes",
+                new int[] {0x61, 0xF0, 0x90, 0x90},
+                3,
+                "a\uFFFD"));
+        testCases.add(new Utf8TestCase(
+                "Valid 4-byte sequence truncated to 2 bytes",
+                new int[] {0x61, 0xF0, 0x90},
+                2,
+                "a\uFFFD"));
+        testCases.add(new Utf8TestCase(
+                "Valid 4-byte sequence truncated to 1 byte",
+                new int[] {0x61, 0xF0},
+                1,
+                "a\uFFFD"));
+        testCases.add(new Utf8TestCase(
+                "Valid 4-byte sequence truncated to 3 bytes with trailer",
+                new int[] {0x61, 0xF0, 0x90, 0x90, 0x61},
+                4,
+                "a\uFFFDa"));
+        testCases.add(new Utf8TestCase(
+                "Valid 4-byte sequence truncated to 2 bytes with trailer",
+                new int[] {0x61, 0xF0, 0x90, 0x61},
+                3,
+                "a\uFFFDa").addForJvm(REPLACE_SWALLOWS_TRAILER));
+        testCases.add(new Utf8TestCase(
+                "Valid 4-byte sequence truncated to 1 byte with trailer",
+                new int[] {0x61, 0xF0, 0x61},
+                2,
+                "a\uFFFDa").addForJvm(REPLACE_SWALLOWS_TRAILER));
     }
 
     @Test
