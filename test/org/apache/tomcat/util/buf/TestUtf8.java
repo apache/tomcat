@@ -32,10 +32,6 @@ public class TestUtf8 {
             new byte[] {-50, -70, -31,  -67, -71, -49, -125, -50, -68, -50,
                         -75, -19, -96, -128, 101, 100,  105, 116, 101, 100};
 
-    // Invalid code point (out of range)
-    private static final byte[] SRC_BYTES_2 =
-            new byte[] {-12, -112, -128, -128};
-
     // Various invalid UTF-8 sequences
     private static final byte[][] MALFORMED = {
             // One-byte sequences:
@@ -94,13 +90,6 @@ public class TestUtf8 {
     }
 
 
-    @Test
-    public void testJvmDecoder2() {
-        // Ideally should fail after 2 bytes (i==1)
-        doJvmDecoder(SRC_BYTES_2, false, true, 3);
-    }
-
-
     private void doJvmDecoder(byte[] src, boolean endOfinput,
             boolean errorExpected, int failPosExpected) {
         CharsetDecoder decoder = B2CConverter.UTF_8.newDecoder()
@@ -141,12 +130,6 @@ public class TestUtf8 {
     @Test
     public void testHarmonyDecoder1() {
         doHarmonyDecoder(SRC_BYTES_1, false, true, 13);
-    }
-
-
-    @Test
-    public void testHarmonyDecoder2() {
-        doHarmonyDecoder(SRC_BYTES_2, false, true, 1);
     }
 
 

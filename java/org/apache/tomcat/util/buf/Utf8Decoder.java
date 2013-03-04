@@ -174,18 +174,20 @@ public class Utf8Decoder extends CharsetDecoder {
                         if ((bArr[inIndex + 1] & 0xFF) > 0x8F) {
                             // 11110100 1yyyxxxx xxxxxxxx xxxxxxxx
                             // Any non-zero y is > max code point
-                            return CoderResult.unmappableForLength(4);
+                            return CoderResult.unmappableForLength(1);
                         }
                     }
-                    if (jchar == 0x60 && inIndexLimit > inIndex +1) {
-                        if ((bArr[inIndex + 1] & 0x7F) == 0) {
-                            // 11100000 10000000 10xxxxxx
+                    if (jchar == 0x60 && inIndexLimit > inIndex + 1) {
+                        if ((bArr[inIndex + 1] & 0x60) == 0) {
+                            // 11100000 100yyyyy 10xxxxxx
                             // should have been
+                            // 11oyyyyy 1oxxxxxx
+                            // or possibly
                             // 00xxxxxx
-                            return CoderResult.malformedForLength(3);
+                            return CoderResult.malformedForLength(1);
                         }
                     }
-                    if (jchar == 0x70 && inIndexLimit > inIndex +1) {
+                    if (jchar == 0x70 && inIndexLimit > inIndex + 1) {
                         if ((bArr[inIndex + 1] & 0x7F) < 0x10) {
                             // 11110000 1000zzzz 1oyyyyyy 1oxxxxxx
                             // should have been

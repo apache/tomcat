@@ -29,6 +29,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * These tests have been written with reference to
+ * <a href="http://www.unicode.org/versions/Unicode6.2.0/ch03.pdf">unicode 6.2,
+ * chapter 3, section 3.9</a>.
+ */
 public class TestUtf8Extended {
 
     private List<Utf8TestCase> testCases = new ArrayList<>();
@@ -60,22 +65,53 @@ public class TestUtf8Extended {
                 new int[] {0xF0, 0x90, 0x90, 0x80},
                 -1,
                 "\uD801\uDC00"));
+        // JVM decoder does not report error until all 4 bytes are available
+        testCases.add(new Utf8TestCase(
+                "Invalid code point - out of range",
+                new int[] {0xF4, 0x90, 0x80, 0x80},
+                1,
+                "\uFFFD\uFFFD\uFFFD\uFFFD").setSkipErrorForJvm(true));
+        // JVM decoder does not report error until all 2 bytes are available
+        testCases.add(new Utf8TestCase(
+                "Valid sequence padded from one byte to two",
+                new int[] {0xC0, 0xC1},
+                0,
+                "\uFFFD\uFFFD").setSkipErrorForJvm(true));
+        // JVM decoder does not report error until all 3 bytes are available
+        testCases.add(new Utf8TestCase(
+                "Valid sequence padded from one byte to three",
+                new int[] {0xE0, 0x80, 0xC1},
+                1,
+                "\uFFFD\uFFFD\uFFFD").setSkipErrorForJvm(true));
     }
 
     @Test
     public void testHarmonyDecoder() {
-        doTest(new Utf8Decoder());
+        CharsetDecoder decoder = new Utf8Decoder();
+        for (Utf8TestCase testCase : testCases) {
+            doTest(decoder, testCase, false, false);
+        }
     }
 
 
     @Test
     public void testJvmDecoder() {
-        doTest(Charset.forName("UTF-8").newDecoder());
+        CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
+        for (Utf8TestCase testCase : testCases) {
+            doTest(decoder, testCase, testCase.skipErrorForJvm,
+                    testCase.skipReplaceForJvm);
+        }
     }
 
 
-    private void doTest(CharsetDecoder decoder) {
-        for (Utf8TestCase testCase : testCases) {
+    private void doTest(CharsetDecoder decoder, Utf8TestCase testCase,
+            boolean skipError, boolean skipReplace) {
+
+        int len = testCase.input.length;
+        ByteBuffer bb = ByteBuffer.allocate(len);
+        CharBuffer cb = CharBuffer.allocate(len);
+
+        if (!skipError) {
             // Configure decoder to fail on an error
             decoder.reset();
             decoder.onMalformedInput(CodingErrorAction.REPORT);
@@ -83,9 +119,6 @@ public class TestUtf8Extended {
 
             // Add each byte one at a time. The decoder should fail as soon as
             // an invalid sequence has been provided
-            int len = testCase.input.length;
-            ByteBuffer bb = ByteBuffer.allocate(len);
-            CharBuffer cb = CharBuffer.allocate(len);
             for (int i = 0; i < len; i++) {
                 bb.put((byte) testCase.input[i]);
                 bb.flip();
@@ -97,7 +130,9 @@ public class TestUtf8Extended {
                 }
                 bb.compact();
             }
+        }
 
+        if (!skipReplace) {
             // Configure decoder to replace on an error
             decoder.reset();
             decoder.onMalformedInput(CodingErrorAction.REPLACE);
@@ -137,6 +172,8 @@ public class TestUtf8Extended {
         private final int[] input;
         private final int invalidIndex;
         private final String outputReplaced;
+        private boolean skipErrorForJvm = false;
+        private boolean skipReplaceForJvm = false;
 
         public Utf8TestCase(String description, int[] input, int invalidIndex,
                 String outputReplaced) {
@@ -144,6 +181,17 @@ public class TestUtf8Extended {
             this.input = input;
             this.invalidIndex = invalidIndex;
             this.outputReplaced = outputReplaced;
+
+        }
+
+        public Utf8TestCase setSkipErrorForJvm(boolean skipErrorForJvm) {
+            this.skipErrorForJvm = skipErrorForJvm;
+            return this;
+        }
+
+        public Utf8TestCase setSkipReplaceForJvm(boolean skipReplaceForJvm) {
+            this.skipReplaceForJvm = skipReplaceForJvm;
+            return this;
         }
     }
 }
