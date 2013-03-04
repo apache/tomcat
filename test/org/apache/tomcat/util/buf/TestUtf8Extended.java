@@ -53,6 +53,7 @@ public class TestUtf8Extended {
 
     @Before
     public void setup() {
+        /*
         testCases.add(new Utf8TestCase(
                 "Zero length input",
                 new int[] {},
@@ -127,6 +128,13 @@ public class TestUtf8Extended {
                 new int[] {0x41, 0x80, 0x41},
                 1,
                 "A\uFFFDA"));
+        */
+        testCases.add(new Utf8TestCase(
+                "Invalid sequence from unicode 6.2 spec, table 3-8",
+                new int[] {0x61, 0xF1, 0x80, 0x80, 0xE1, 0x80, 0xC2, 0x62, 0x80,
+                        0x63, 0x80, 0xBF, 0x64},
+                4,
+                "a\uFFFD\uFFFD\uFFFDb\uFFFDc\uFFFD\uFFFDd"));
     }
 
     @Test

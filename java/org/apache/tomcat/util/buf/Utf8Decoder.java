@@ -174,7 +174,7 @@ public class Utf8Decoder extends CharsetDecoder {
                 if (tailAvailable > 0) {
                     // First byte C2..DF, second byte 80..BF
                     if (jchar > 0x41 && jchar < 0x60 &&
-                            (bArr[inIndex + 1] & 0x80) != 0x80) {
+                            (bArr[inIndex + 1] & 0xC0) != 0x80) {
                         in.position(inIndex - in.arrayOffset());
                         out.position(outIndex - out.arrayOffset());
                         return CoderResult.malformedForLength(1);
@@ -187,7 +187,7 @@ public class Utf8Decoder extends CharsetDecoder {
                     }
                     // First byte E1..EC, second byte 80..BF
                     if (jchar > 0x60 && jchar < 0x6D &&
-                            (bArr[inIndex + 1] & 0x80) != 0x80) {
+                            (bArr[inIndex + 1] & 0xC0) != 0x80) {
                         in.position(inIndex - in.arrayOffset());
                         out.position(outIndex - out.arrayOffset());
                         return CoderResult.malformedForLength(1);
@@ -200,7 +200,7 @@ public class Utf8Decoder extends CharsetDecoder {
                     }
                     // First byte EE..EF, second byte 80..BF
                     if (jchar > 0x6D && jchar < 0x70 &&
-                            (bArr[inIndex + 1] & 0x80) != 0x80) {
+                            (bArr[inIndex + 1] & 0xC0) != 0x80) {
                         in.position(inIndex - in.arrayOffset());
                         out.position(outIndex - out.arrayOffset());
                         return CoderResult.malformedForLength(1);
@@ -215,7 +215,7 @@ public class Utf8Decoder extends CharsetDecoder {
                     }
                     // First byte F1..F3, second byte 80..BF
                     if (jchar > 0x70 && jchar < 0x74 &&
-                            (bArr[inIndex + 1] & 0x80) != 0x80) {
+                            (bArr[inIndex + 1] & 0xC0) != 0x80) {
                         in.position(inIndex - in.arrayOffset());
                         out.position(outIndex - out.arrayOffset());
                         return CoderResult.malformedForLength(1);
@@ -230,7 +230,7 @@ public class Utf8Decoder extends CharsetDecoder {
                 }
                 // Check third byte if present and expected
                 if (tailAvailable > 1 && tail > 1) {
-                    if ((bArr[inIndex + 2] & 0x80) != 0x80) {
+                    if ((bArr[inIndex + 2] & 0xC0) != 0x80) {
                         in.position(inIndex - in.arrayOffset());
                         out.position(outIndex - out.arrayOffset());
                         return CoderResult.malformedForLength(2);
@@ -238,7 +238,7 @@ public class Utf8Decoder extends CharsetDecoder {
                 }
                 // Check fourth byte if present and expected
                 if (tailAvailable > 2 && tail > 2) {
-                    if ((bArr[inIndex + 3] & 0x80) != 0x80) {
+                    if ((bArr[inIndex + 3] & 0xC0) != 0x80) {
                         in.position(inIndex - in.arrayOffset());
                         out.position(outIndex - out.arrayOffset());
                         return CoderResult.malformedForLength(3);
