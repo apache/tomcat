@@ -16,7 +16,7 @@
  */
 package javax.websocket;
 
-public class SendResult {
+public final class SendResult {
     private Throwable exception;
     private boolean ok = true;
 

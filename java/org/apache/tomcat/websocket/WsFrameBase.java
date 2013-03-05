@@ -290,7 +290,7 @@ public abstract class WsFrameBase {
                 wsSession.getBasicRemote().sendPong(controlBufferBinary);
             }
         } else if (opCode == Constants.OPCODE_PONG) {
-            MessageHandler.Basic<PongMessage> mhPong =
+            MessageHandler.Whole<PongMessage> mhPong =
                     wsSession.getPongMessageHandler();
             if (mhPong != null) {
                 mhPong.onMessage(new WsPongMessage(controlBufferBinary));
@@ -313,11 +313,11 @@ public abstract class WsFrameBase {
     private void sendMessageText(boolean last) {
         MessageHandler mh = wsSession.getTextMessageHandler();
         if (mh != null) {
-            if (mh instanceof MessageHandler.Async<?>) {
-                ((MessageHandler.Async<String>) mh).onMessage(
+            if (mh instanceof MessageHandler.Partial<?>) {
+                ((MessageHandler.Partial<String>) mh).onMessage(
                         messageBufferText.toString(), last);
             } else {
-                ((MessageHandler.Basic<String>) mh).onMessage(
+                ((MessageHandler.Whole<String>) mh).onMessage(
                         messageBufferText.toString());
             }
             messageBufferText.clear();
@@ -464,10 +464,10 @@ public abstract class WsFrameBase {
     private void sendMessageBinary(ByteBuffer msg, boolean last) {
         MessageHandler mh = wsSession.getBinaryMessageHandler();
         if (mh != null) {
-            if (mh instanceof MessageHandler.Async<?>) {
-                ((MessageHandler.Async<ByteBuffer>) mh).onMessage(msg, last);
+            if (mh instanceof MessageHandler.Partial<?>) {
+                ((MessageHandler.Partial<ByteBuffer>) mh).onMessage(msg, last);
             } else {
-                ((MessageHandler.Basic<ByteBuffer>) mh).onMessage(msg);
+                ((MessageHandler.Whole<ByteBuffer>) mh).onMessage(msg);
             }
         }
     }
@@ -530,14 +530,14 @@ public abstract class WsFrameBase {
         } else if (textMessage) {
             MessageHandler mh = wsSession.getTextMessageHandler();
             if (mh != null) {
-                return mh instanceof MessageHandler.Async<?>;
+                return mh instanceof MessageHandler.Partial<?>;
             }
             return false;
         } else {
             // Must be binary
             MessageHandler mh = wsSession.getBinaryMessageHandler();
             if (mh != null) {
-                return mh instanceof MessageHandler.Async<?>;
+                return mh instanceof MessageHandler.Partial<?>;
             }
             return false;
         }

@@ -20,8 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultClientEndpointConfiguration
-        implements ClientEndpointConfiguration {
+final class DefaultClientEndpointConfig implements ClientEndpointConfig {
 
     private final List<String> preferredSubprotocols;
     private final List<Extension> extensions;
@@ -31,7 +30,7 @@ public class DefaultClientEndpointConfiguration
     private final ClientEndpointConfigurator configurator;
 
 
-    DefaultClientEndpointConfiguration(List<String> preferredSubprotocols,
+    DefaultClientEndpointConfig(List<String> preferredSubprotocols,
             List<Extension> extensions, List<Encoder> encoders,
             List<Decoder> decoders, ClientEndpointConfigurator configurator) {
         this.preferredSubprotocols = preferredSubprotocols;
@@ -67,7 +66,7 @@ public class DefaultClientEndpointConfiguration
 
 
     @Override
-    public Map<String, Object> getUserProperties() {
+    public final Map<String, Object> getUserProperties() {
         return userProperties;
     }
 

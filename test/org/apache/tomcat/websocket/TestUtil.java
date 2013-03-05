@@ -96,7 +96,7 @@ public class TestUtil {
 
 
     private static class SimpleMessageHandler
-            implements MessageHandler.Basic<String> {
+            implements MessageHandler.Whole<String> {
         @Override
         public void onMessage(String message) {
             // NO-OP
@@ -109,7 +109,7 @@ public class TestUtil {
 
 
     private abstract static class GenericMessageHandler<T>
-            implements MessageHandler.Basic<T> {
+            implements MessageHandler.Whole<T> {
     }
 
 
@@ -129,7 +129,7 @@ public class TestUtil {
 
 
     private abstract static class GenericMultipleMessageHandler<A,B>
-            implements MessageHandler.Basic<A>, Foo<B> {
+            implements MessageHandler.Whole<A>, Foo<B> {
     }
 
 

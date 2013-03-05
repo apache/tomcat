@@ -31,7 +31,7 @@ import javax.websocket.ClientEndpointConfigurationBuilder;
 import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfiguration;
+import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
@@ -450,7 +450,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
 
     public static class BlockingBinaryHandler
-            implements MessageHandler.Async<ByteBuffer> {
+            implements MessageHandler.Partial<ByteBuffer> {
 
         @Override
         public void onMessage(ByteBuffer messagePart, boolean last) {
@@ -472,7 +472,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
 
         @Override
-        public void onOpen(Session session, EndpointConfiguration config) {
+        public void onOpen(Session session, EndpointConfig config) {
 
             // Reset everything
             timeout = -1;
@@ -676,7 +676,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
     public static final class EndpointA extends Endpoint {
 
         @Override
-        public void onOpen(Session session, EndpointConfiguration config) {
+        public void onOpen(Session session, EndpointConfig config) {
             // NO-OP
         }
     }
@@ -685,7 +685,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
     public static final class EndpointB extends Endpoint {
 
         @Override
-        public void onOpen(Session session, EndpointConfiguration config) {
+        public void onOpen(Session session, EndpointConfig config) {
             // NO-OP
         }
     }

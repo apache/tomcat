@@ -18,7 +18,7 @@ package javax.websocket;
 
 public interface MessageHandler {
 
-    interface Async<T> extends MessageHandler {
+    interface Partial<T> extends MessageHandler {
 
         /**
          * Called when part of a message is available to be processed.
@@ -30,7 +30,7 @@ public interface MessageHandler {
         void onMessage(T messagePart, boolean last);
     }
 
-    interface Basic<T> extends MessageHandler {
+    interface Whole<T> extends MessageHandler {
 
         /**
          * Called when a whole message is available to be processed.

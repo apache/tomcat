@@ -29,7 +29,7 @@ import javax.servlet.http.WebConnection;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfiguration;
+import javax.websocket.EndpointConfig;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -49,7 +49,7 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
             LogFactory.getLog(WsProtocolHandler.class);
 
     private final Endpoint ep;
-    private final EndpointConfiguration endpointConfig;
+    private final EndpointConfig endpointConfig;
     private final ClassLoader applicationClassLoader;
     private final ServerContainerImpl webSocketContainer;
     private final WsRequest request;
@@ -60,7 +60,7 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
     private WsSession wsSession;
 
 
-    public WsProtocolHandler(Endpoint ep, EndpointConfiguration endpointConfig,
+    public WsProtocolHandler(Endpoint ep, EndpointConfig endpointConfig,
             ServerContainerImpl wsc, WsRequest request, String subProtocol,
             Map<String,String> pathParameters, boolean secure) {
         this.ep = ep;
