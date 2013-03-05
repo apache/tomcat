@@ -30,7 +30,7 @@ import javax.websocket.Session;
  * @param <T>   The type of message to handle
  */
 public abstract class PojoMessageHandlerAsyncBase<T>
-        extends PojoMessageHandlerBase<T> implements MessageHandler.Async<T> {
+        extends PojoMessageHandlerBase<T> implements MessageHandler.Partial<T> {
 
     private final int indexBoolean;
 

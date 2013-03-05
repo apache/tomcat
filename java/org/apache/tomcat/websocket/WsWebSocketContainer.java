@@ -37,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import javax.websocket.ClientEndpointConfiguration;
+import javax.websocket.ClientEndpointConfig;
 import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.Extension;
@@ -79,7 +79,7 @@ public class WsWebSocketContainer
 
     @Override
     public Session connectToServer(Class<? extends Endpoint> clazz,
-            ClientEndpointConfiguration clientEndpointConfiguration, URI path)
+            ClientEndpointConfig clientEndpointConfiguration, URI path)
             throws DeploymentException {
 
         String scheme = path.getScheme();

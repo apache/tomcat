@@ -21,7 +21,7 @@ import java.util.Map;
 
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfiguration;
+import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpointConfiguration;
@@ -45,7 +45,7 @@ public class PojoEndpoint extends Endpoint {
 
     @Override
     public void onOpen(Session session,
-            EndpointConfiguration endpointConfiguration) {
+            EndpointConfig endpointConfiguration) {
 
         ServerEndpointConfiguration sec =
                 (ServerEndpointConfiguration) endpointConfiguration;

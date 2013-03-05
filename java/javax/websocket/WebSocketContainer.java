@@ -53,7 +53,7 @@ public interface WebSocketContainer {
      * @throws DeploymentException  If the connection can not be established
      */
     Session connectToServer(Class<? extends Endpoint> endpoint,
-            ClientEndpointConfiguration clientEndpointConfiguration, URI path)
+            ClientEndpointConfig clientEndpointConfiguration, URI path)
             throws DeploymentException, IOException;
 
     /**

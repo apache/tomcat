@@ -21,7 +21,7 @@ import java.io.IOException;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfiguration;
+import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
@@ -29,7 +29,7 @@ import javax.websocket.Session;
 public class EchoEndpoint extends Endpoint{
 
     @Override
-    public void onOpen(Session session, EndpointConfiguration endpointConfig) {
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
         RemoteEndpoint.Basic remoteEndpointBasic = session.getBasicRemote();
         session.addMessageHandler(new EchoMessageHandler(remoteEndpointBasic));
     }
@@ -45,7 +45,7 @@ public class EchoEndpoint extends Endpoint{
     }
 
     private static class EchoMessageHandler
-            implements MessageHandler.Basic<String> {
+            implements MessageHandler.Whole<String> {
 
         private final RemoteEndpoint.Basic remoteEndpointBasic;
 

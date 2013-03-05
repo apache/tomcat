@@ -23,7 +23,7 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfiguration;
+import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
@@ -52,14 +52,14 @@ public class TesterSingleMessageClient {
         }
 
         @Override
-        public void onOpen(Session session, EndpointConfiguration config) {
+        public void onOpen(Session session, EndpointConfig config) {
             // NO-OP
         }
     }
 
 
     public abstract static class BasicHandler<T>
-            implements MessageHandler.Basic<T> {
+            implements MessageHandler.Whole<T> {
 
         private final CountDownLatch latch;
 
@@ -110,7 +110,7 @@ public class TesterSingleMessageClient {
     }
 
     public abstract static class AsyncHandler<T>
-            implements MessageHandler.Async<T> {
+            implements MessageHandler.Partial<T> {
 
         private final CountDownLatch latch;
 

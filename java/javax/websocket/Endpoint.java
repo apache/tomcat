@@ -23,7 +23,7 @@ public abstract class Endpoint {
      *
      * @param session   The new session.
      */
-    public abstract void onOpen(Session session, EndpointConfiguration config);
+    public abstract void onOpen(Session session, EndpointConfig config);
 
     /**
      * Event that is triggered when a session has closed.

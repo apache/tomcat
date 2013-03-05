@@ -18,7 +18,7 @@ package javax.websocket.server;
 
 import java.util.List;
 
-import javax.websocket.EndpointConfiguration;
+import javax.websocket.EndpointConfig;
 import javax.websocket.Extension;
 
 /**
@@ -26,7 +26,7 @@ import javax.websocket.Extension;
  * server. Applications may provide their own implementation or use
  * {@link ServerEndpointConfigurationBuilder}.
  */
-public interface ServerEndpointConfiguration extends EndpointConfiguration {
+public interface ServerEndpointConfiguration extends EndpointConfig {
 
     Class<?> getEndpointClass();
 

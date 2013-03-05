@@ -17,12 +17,13 @@
 package javax.websocket;
 
 import java.util.List;
+import java.util.Map;
 
-public interface ClientEndpointConfiguration extends EndpointConfiguration {
+public interface EndpointConfig {
 
-    List<String> getPreferredSubprotocols();
+    List<Encoder> getEncoders();
 
-    List<Extension> getExtensions();
+    List<Decoder> getDecoders();
 
-    public ClientEndpointConfigurator getClientEndpointConfigurator();
+    Map<String,Object> getUserProperties();
 }

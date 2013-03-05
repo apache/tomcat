@@ -65,7 +65,7 @@ public class WsSession implements Session {
 
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
-    private MessageHandler.Basic<PongMessage> pongMessageHandler = null;
+    private MessageHandler.Whole<PongMessage> pongMessageHandler = null;
     private volatile boolean open = true;
     private final Object closeLock = new Object();
     private final Map<String,Object> userProperties = new ConcurrentHashMap<>();
@@ -143,9 +143,9 @@ public class WsSession implements Session {
                 throw new IllegalStateException(
                         sm.getString("wsSession.duplicateHandlerPong"));
             }
-            if (listener instanceof MessageHandler.Basic<?>) {
+            if (listener instanceof MessageHandler.Whole<?>) {
                 pongMessageHandler =
-                        (MessageHandler.Basic<PongMessage>) listener;
+                        (MessageHandler.Whole<PongMessage>) listener;
             } else {
                 throw new IllegalStateException(
                         sm.getString("wsSession.invalidHandlerTypePong"));
@@ -390,7 +390,7 @@ public class WsSession implements Session {
     }
 
 
-    protected MessageHandler.Basic<PongMessage> getPongMessageHandler() {
+    protected MessageHandler.Whole<PongMessage> getPongMessageHandler() {
         return pongMessageHandler;
     }
 

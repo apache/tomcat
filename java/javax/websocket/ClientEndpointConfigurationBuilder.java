@@ -37,8 +37,8 @@ public class ClientEndpointConfigurationBuilder {
     private List<Decoder> decoders = Collections.EMPTY_LIST;
 
 
-    public ClientEndpointConfiguration build() {
-        return new DefaultClientEndpointConfiguration(preferredSubprotocols,
+    public ClientEndpointConfig build() {
+        return new DefaultClientEndpointConfig(preferredSubprotocols,
                 extensions, encoders, decoders, configurator);
     }
 
