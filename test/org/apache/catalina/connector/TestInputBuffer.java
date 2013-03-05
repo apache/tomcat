@@ -61,8 +61,6 @@ public class TestInputBuffer extends TomcatBaseTest {
     private void doUtf8BodyTest(String description, int[] input,
             String expected) throws Exception {
 
-        System.out.println(description);
-
         byte[] bytes = new byte[input.length];
         for (int i = 0; i < input.length; i++) {
             bytes[i] = (byte) input[i];
