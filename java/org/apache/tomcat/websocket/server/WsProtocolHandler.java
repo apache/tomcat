@@ -28,6 +28,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 
@@ -105,6 +106,8 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
                     new WsWriteListener(this, wsRemoteEndpointServer));
             ep.onOpen(wsSession, endpointConfig);
             webSocketContainer.registerSession(ep.getClass(), wsSession);
+        } catch (DeploymentException e) {
+            throw new IllegalArgumentException(e);
         } finally {
             t.setContextClassLoader(cl);
         }

@@ -46,8 +46,10 @@ public interface ClientEndpointConfig extends EndpointConfig {
         private Configurator configurator = DEFAULT_CONFIGURATOR;
         private List<String> preferredSubprotocols = Collections.EMPTY_LIST;
         private List<Extension> extensions = Collections.EMPTY_LIST;
-        private List<Encoder> encoders = Collections.EMPTY_LIST;
-        private List<Decoder> decoders = Collections.EMPTY_LIST;
+        private List<Class<? extends Encoder>> encoders =
+                Collections.EMPTY_LIST;
+        private List<Class<? extends Decoder>> decoders =
+                Collections.EMPTY_LIST;
 
 
         public ClientEndpointConfig build() {
@@ -90,7 +92,7 @@ public interface ClientEndpointConfig extends EndpointConfig {
         }
 
 
-        public Builder encoders(List<Encoder> encoders) {
+        public Builder encoders(List<Class<? extends Encoder>> encoders) {
             if (encoders == null || encoders.size() == 0) {
                 this.encoders = Collections.EMPTY_LIST;
             } else {
@@ -100,7 +102,7 @@ public interface ClientEndpointConfig extends EndpointConfig {
         }
 
 
-        public Builder decoders(List<Decoder> decoders) {
+        public Builder decoders(List<Class<? extends Decoder>> decoders) {
             if (decoders == null || decoders.size() == 0) {
                 this.decoders = Collections.EMPTY_LIST;
             } else {

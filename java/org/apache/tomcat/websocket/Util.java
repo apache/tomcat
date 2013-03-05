@@ -142,9 +142,8 @@ class Util {
     }
 
 
-    static Class<?> getEncoderType(Encoder encoder) {
-        return (Class<?>) Util.getGenericType(Encoder.class,
-                encoder.getClass());
+    static Class<?> getEncoderType(Class<? extends Encoder> encoder) {
+        return (Class<?>) Util.getGenericType(Encoder.class, encoder);
     }
 
 

@@ -34,15 +34,16 @@ public class DefaultServerEndpointConfiguration
     private final String path;
     private final List<String> subprotocols;
     private final List<Extension> extensions;
-    private final List<Encoder> encoders;
-    private final List<Decoder> decoders;
+    private final List<Class<? extends Encoder>> encoders;
+    private final List<Class<? extends Decoder>> decoders;
     private final ServerEndpointConfigurator serverEndpointConfigurator;
     private final Map<String,Object> userProperties = new HashMap<>();
 
     DefaultServerEndpointConfiguration(
             Class<?> endpointClass, String path,
             List<String> subprotocols, List<Extension> extensions,
-            List<Encoder> encoders, List<Decoder> decoders,
+            List<Class<? extends Encoder>> encoders,
+            List<Class<? extends Decoder>> decoders,
             ServerEndpointConfigurator serverEndpointConfigurator) {
         this.endpointClass = endpointClass;
         this.path = path;
@@ -59,12 +60,12 @@ public class DefaultServerEndpointConfiguration
     }
 
     @Override
-    public List<Encoder> getEncoders() {
+    public List<Class<? extends Encoder>> getEncoders() {
         return this.encoders;
     }
 
     @Override
-    public List<Decoder> getDecoders() {
+    public List<Class<? extends Decoder>> getDecoders() {
         return this.decoders;
     }
 

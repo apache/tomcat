@@ -21,9 +21,9 @@ import java.util.Map;
 
 public interface EndpointConfig {
 
-    List<Encoder> getEncoders();
+    List<Class<? extends Encoder>> getEncoders();
 
-    List<Decoder> getDecoders();
+    List<Class<? extends Decoder>> getDecoders();
 
     Map<String,Object> getUserProperties();
 }

@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.websocket.DeploymentException;
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.RemoteEndpoint;
@@ -453,11 +454,20 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    protected void setEncoders(List<Encoder> encoders) {
+    protected void setEncoders(List<Class<? extends Encoder>> encoders)
+            throws DeploymentException {
         encoderEntries.clear();
-        for (Encoder encoder : encoders) {
-            EncoderEntry entry =
-                    new EncoderEntry(Util.getEncoderType(encoder), encoder);
+        for (Class<? extends Encoder> encoderClazz : encoders) {
+            Encoder instance;
+            try {
+                instance = encoderClazz.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new DeploymentException(
+                        sm.getString("wsRemoteEndpoint.invalidEncoder",
+                                encoderClazz.getName()), e);
+            }
+            EncoderEntry entry = new EncoderEntry(
+                    Util.getEncoderType(encoderClazz), instance);
             encoderEntries.add(entry);
         }
     }

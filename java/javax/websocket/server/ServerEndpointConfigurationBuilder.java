@@ -33,8 +33,8 @@ public class ServerEndpointConfigurationBuilder {
 
     private final Class<?> endpointClass;
     private final String path;
-    private List<Encoder> encoders = Collections.EMPTY_LIST;
-    private List<Decoder> decoders = Collections.EMPTY_LIST;
+    private List<Class<? extends Encoder>> encoders = Collections.EMPTY_LIST;
+    private List<Class<? extends Decoder>> decoders = Collections.EMPTY_LIST;
     private List<String> subprotocols = Collections.EMPTY_LIST;
     private List<Extension> extensions = Collections.EMPTY_LIST;
     private ServerEndpointConfigurator configurator =
@@ -53,7 +53,8 @@ public class ServerEndpointConfigurationBuilder {
     }
 
 
-    public ServerEndpointConfigurationBuilder encoders(List<Encoder> encoders) {
+    public ServerEndpointConfigurationBuilder encoders(
+            List<Class<? extends Encoder>> encoders) {
         if (encoders == null || encoders.size() == 0) {
             this.encoders = Collections.EMPTY_LIST;
         } else {
@@ -63,7 +64,8 @@ public class ServerEndpointConfigurationBuilder {
     }
 
 
-    public ServerEndpointConfigurationBuilder decoders(List<Decoder> decoders) {
+    public ServerEndpointConfigurationBuilder decoders(
+            List<Class<? extends Decoder>> decoders) {
         if (decoders == null || decoders.size() == 0) {
             this.decoders = Collections.EMPTY_LIST;
         } else {

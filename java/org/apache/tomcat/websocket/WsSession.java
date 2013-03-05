@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.DeploymentException;
 import javax.websocket.Encoder;
 import javax.websocket.Endpoint;
 import javax.websocket.Extension;
@@ -85,13 +86,15 @@ public class WsSession implements Session {
      *
      * @param localEndpoint
      * @param wsRemoteEndpoint
+     * @throws DeploymentException
      */
     public WsSession(Endpoint localEndpoint,
             WsRemoteEndpointImplBase wsRemoteEndpoint,
             WsWebSocketContainer wsWebSocketContainer,
             WsRequest request, String subProtocol,
             Map<String,String> pathParameters,
-            boolean secure, List<Encoder> encoders) {
+            boolean secure, List<Class<? extends Encoder>> encoders)
+                    throws DeploymentException {
         this.localEndpoint = localEndpoint;
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);
