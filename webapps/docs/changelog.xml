@@ -91,6 +91,11 @@
         this improved decoder for WebSocket connections. Remove the WebSocket
         specific UTF-8 decoder. (markt)
       </fix>
+      <fix>
+        <bug>54602</bug>: Recycle the byte to character converter used for URIs
+        between requests to ensure an error in one request does not trigger a
+        failure in the next request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
