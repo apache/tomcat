@@ -24,6 +24,7 @@ import java.nio.charset.CoderResult;
 
 import org.apache.catalina.util.Conversions;
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
+import org.apache.tomcat.util.buf.Utf8Decoder;
 import org.apache.tomcat.util.res.StringManager;
 
 /**

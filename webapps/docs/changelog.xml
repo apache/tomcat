@@ -86,6 +86,11 @@
         <bug>54584</bug>: Take account of the delegate attribute when building
         the web application class path to pass to the JSP compiler. (markt)
       </fix>
+      <fix>
+        Copy the updated and re-packaged UTF-8 decoder from Tomcat 8.0.x and use
+        this improved decoder for WebSocket connections. Remove the WebSocket
+        specific UTF-8 decoder. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

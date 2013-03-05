@@ -27,6 +27,7 @@ import java.nio.charset.UnmappableCharacterException;
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.UpgradeOutbound;
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
+import org.apache.tomcat.util.buf.Utf8Decoder;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 
 /**
