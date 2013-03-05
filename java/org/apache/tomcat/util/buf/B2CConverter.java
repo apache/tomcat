@@ -138,23 +138,6 @@ public class B2CConverter {
         leftovers.position(0);
     }
 
-    public boolean isUndeflow() {
-        return (leftovers.position() > 0);
-    }
-
-    /**
-     * Convert the given bytes to characters.
-     *
-     * @param bc byte input
-     * @param cc char output
-     *
-     * @deprecated  Use {@link #convert(ByteChunk, CharChunk, boolean)}
-     */
-    @Deprecated
-    public void convert(ByteChunk bc, CharChunk cc) throws IOException {
-        convert(bc, cc, false);
-    }
-
     /**
      * Convert the given bytes to characters.
      *
