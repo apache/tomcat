@@ -737,7 +737,7 @@ public class Request
     }
 
     /**
-     * URI byte to char converter (not recycled).
+     * URI byte to char converter.
      */
     protected B2CConverter URIConverter = null;
 
