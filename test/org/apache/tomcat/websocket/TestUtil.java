@@ -63,35 +63,35 @@ public class TestUtil {
     @Test
     public void testGetEncoderTypeSimple() {
         Assert.assertEquals(
-                String.class, Util.getEncoderType(new SimpleEncoder()));
+                String.class, Util.getEncoderType(SimpleEncoder.class));
     }
 
 
     @Test
     public void testGetEncoderTypeSubclass() {
         Assert.assertEquals(String.class,
-                Util.getEncoderType(new SubSimpleEncoder()));
+                Util.getEncoderType(SubSimpleEncoder.class));
     }
 
 
     @Test
     public void testGetEncoderTypeGenericSubclass() {
         Assert.assertEquals(String.class,
-                Util.getEncoderType(new GenericSubEncoder()));
+                Util.getEncoderType(GenericSubEncoder.class));
     }
 
 
     @Test
     public void testGetEncoderTypeGenericMultipleSubclass() {
         Assert.assertEquals(String.class,
-                Util.getEncoderType(new GenericMultipleSubSubEncoder()));
+                Util.getEncoderType(GenericMultipleSubSubEncoder.class));
     }
 
 
     @Test
     public void testGetEncoderTypeGenericMultipleSubclassSwap() {
         Assert.assertEquals(String.class,
-                Util.getEncoderType(new GenericMultipleSubSubSwapEncoder()));
+                Util.getEncoderType(GenericMultipleSubSubSwapEncoder.class));
     }
 
 
