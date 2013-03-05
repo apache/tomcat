@@ -33,8 +33,8 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.TestUtf8Extended;
-import org.apache.tomcat.util.buf.TestUtf8Extended.Utf8TestCase;
+import org.apache.tomcat.util.buf.TestUtf8;
+import org.apache.tomcat.util.buf.TestUtf8.Utf8TestCase;
 
 public class TestInputBuffer extends TomcatBaseTest {
 
@@ -48,7 +48,7 @@ public class TestInputBuffer extends TomcatBaseTest {
         tomcat.getConnector().setProperty("soTimeout", "300000");
         tomcat.start();
 
-        for (Utf8TestCase testCase : TestUtf8Extended.TEST_CASES) {
+        for (Utf8TestCase testCase : TestUtf8.TEST_CASES) {
             String expected = null;
             if (testCase.invalidIndex == -1) {
                 expected = testCase.outputReplaced;
