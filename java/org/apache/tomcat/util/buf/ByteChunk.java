@@ -397,6 +397,7 @@ public final class ByteChunk implements Cloneable, Serializable {
 
     }
 
+
     /**
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
@@ -420,6 +421,23 @@ public final class ByteChunk implements Cloneable, Serializable {
         return len;
 
     }
+
+
+    public byte substractB()
+        throws IOException {
+
+        if ((end - start) == 0) {
+            if (in == null)
+                return -1;
+            int n = in.realReadBytes( buff, 0, buff.length );
+            if (n < 0)
+                return -1;
+        }
+
+        return (buff[start++]);
+
+    }
+
 
     public int substract( byte src[], int off, int len )
         throws IOException {

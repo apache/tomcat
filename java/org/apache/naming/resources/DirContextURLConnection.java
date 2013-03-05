@@ -439,7 +439,9 @@ public class DirContextURLConnection extends URLConnection {
                     collection.list("/");
                 while (enumeration.hasMoreElements()) {
                     NameClassPair ncp = enumeration.nextElement();
-                    result.addElement(URL_ENCODER.encodeURL(ncp.getName()));
+                    String s = ncp.getName();
+                    result.addElement(
+                            URL_ENCODER.encodeURL(s, 0, s.length()).toString());
                 }
             } catch (NamingException e) {
                 // Unexpected exception
