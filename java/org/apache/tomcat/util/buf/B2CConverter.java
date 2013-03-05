@@ -23,6 +23,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
+import java.nio.charset.CodingErrorAction;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -103,9 +104,30 @@ public class B2CConverter {
     private final ByteBuffer leftovers;
 
     public B2CConverter(String encoding) throws IOException {
+        this(encoding, false);
+    }
+
+    public B2CConverter(String encoding, boolean replaceOnError)
+            throws IOException {
         byte[] left = new byte[LEFTOVER_SIZE];
         leftovers = ByteBuffer.wrap(left);
-        decoder = getCharset(encoding).newDecoder();
+        CodingErrorAction action;
+        if (replaceOnError) {
+            action = CodingErrorAction.REPLACE;
+        } else {
+            action = CodingErrorAction.REPORT;
+        }
+        Charset charset = getCharset(encoding);
+        // Special case. Use the Apache Harmony based UTF-8 decoder because it
+        // - a) rejects invalid sequences that the JVM decoder does not
+        // - b) fails faster for some invalid sequences
+        if (charset.equals(UTF_8)) {
+            decoder = new Utf8Decoder();
+        } else {
+            decoder = charset.newDecoder();
+        }
+        decoder.onMalformedInput(action);
+        decoder.onUnmappableCharacter(action);
     }
 
     /** 
@@ -116,17 +138,14 @@ public class B2CConverter {
         leftovers.position(0);
     }
 
-    public boolean isUndeflow() {
-        return (leftovers.position() > 0);
-    }
-
     /**
      * Convert the given bytes to characters.
      * 
      * @param bc byte input
      * @param cc char output
+     * @param endOfInput    Is this all of the available data
      */
-    public void convert(ByteChunk bc, CharChunk cc) 
+    public void convert(ByteChunk bc, CharChunk cc, boolean endOfInput)
             throws IOException {
         if ((bb == null) || (bb.array() != bc.getBuffer())) {
             // Create a new byte buffer if anything changed
@@ -153,7 +172,7 @@ public class B2CConverter {
             do {
                 leftovers.put(bc.substractB());
                 leftovers.flip();
-                result = decoder.decode(leftovers, cb, false);
+                result = decoder.decode(leftovers, cb, endOfInput);
                 leftovers.position(leftovers.limit());
                 leftovers.limit(leftovers.array().length);
             } while (result.isUnderflow() && (cb.position() == pos));
@@ -165,7 +184,7 @@ public class B2CConverter {
         }
         // Do the decoding and get the results into the byte chunk and the char
         // chunk
-        result = decoder.decode(bb, cb, false);
+        result = decoder.decode(bb, cb, endOfInput);
         if (result.isError() || result.isMalformed()) {
             result.throwException();
         } else if (result.isOverflow()) {

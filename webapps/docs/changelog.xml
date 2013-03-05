@@ -96,6 +96,18 @@
         between requests to ensure an error in one request does not trigger a
         failure in the next request. (markt)
       </fix>
+      <fix>
+        Use the newly added improved UTF-8 decoder for decoding UTF-8 encoded
+        URIs and UTF-8 encoded request bodies. Invalid UTF-8 URIs will not
+        cause an error but will make use of the replacement character when an
+        error is detected. This will allow web applications to handle the URI
+        which will most likely result in a 404 response. The fall-back to
+        decoding with ISO-8859-1 if UTF-8 decoding fails has been removed.
+        Invalid UTF-8 sequences in a request body will trigger an IOException.
+        The way the decoder is used has also been improved. The notable change
+        is that invalid sequences at the end of the input now trigger an error
+        rather than being silebtly swallowed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
