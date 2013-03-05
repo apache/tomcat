@@ -33,7 +33,7 @@ import org.junit.Test;
  * <a href="http://www.unicode.org/versions/Unicode6.2.0/ch03.pdf">unicode 6.2,
  * chapter 3, section 3.9</a>.
  */
-public class TestUtf8Extended {
+public class TestUtf8 {
 
     // Indicates that at invalid sequence is detected one character later than
     // the earliest possible moment
