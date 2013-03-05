@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.websocket.ClientEndpointConfigurationBuilder;
+import javax.websocket.ClientEndpointConfig.Builder;
 import javax.websocket.ContainerProvider;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
@@ -65,7 +65,7 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
         tomcat.start();
 
         Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
-                ClientEndpointConfigurationBuilder.create().build(),
+                Builder.create().build(),
                 new URI("http://localhost:" + getPort() +
                         TesterEchoServer.Config.PATH_ASYNC));
 

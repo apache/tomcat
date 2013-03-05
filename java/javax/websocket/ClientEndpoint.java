@@ -21,12 +21,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import javax.websocket.ClientEndpointConfig.Configurator;
+
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface ClientEndpoint {
     String[] subprotocols();
     Class<? extends Decoder>[] decoders();
     Class<? extends Encoder>[] encoders();
-    public Class<? extends ClientEndpointConfigurator> configurator()
-            default ClientEndpointConfigurator.class;
+    public Class<? extends Configurator> configurator()
+            default Configurator.class;
 }
