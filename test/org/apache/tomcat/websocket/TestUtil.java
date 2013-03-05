@@ -173,7 +173,7 @@ public class TestUtil {
     }
 
 
-    private static class SimpleEncoder
+    private static class SimpleEncoder extends Encoder.Adapter
             implements Encoder.Text<String> {
 
         @Override
@@ -187,7 +187,7 @@ public class TestUtil {
     }
 
 
-    private abstract static class GenericEncoder<T>
+    private abstract static class GenericEncoder<T> extends Encoder.Adapter
             implements Encoder.Text<T> {
     }
 
@@ -204,7 +204,7 @@ public class TestUtil {
 
 
     private abstract static class GenericMultipleEncoder<A,B>
-            implements Encoder.Text<A>, Foo<B> {
+            extends Encoder.Adapter implements Encoder.Text<A>, Foo<B> {
     }
 
 
