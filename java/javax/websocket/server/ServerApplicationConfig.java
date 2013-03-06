@@ -22,7 +22,7 @@ import javax.websocket.Endpoint;
 
 public interface ServerApplicationConfig {
 
-    Set<Class<? extends ServerEndpointConfig>> getEndpointConfiguration(
+    Set<ServerEndpointConfig> getEndpointConfigs(
             Set<Class<? extends Endpoint>> scanned);
 
     Set<Class<?>> getAnnotatedEndpointClasses(Set<Class<?>> scanned);
