@@ -50,8 +50,8 @@ import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicBinary;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicHandler;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicText;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterEndpoint;
-import org.apache.tomcat.websocket.server.ServerContainerImpl;
 import org.apache.tomcat.websocket.server.WsListener;
+import org.apache.tomcat.websocket.server.WsServerContainer;
 
 public class TestWsWebSocketContainer extends TomcatBaseTest {
 
@@ -412,10 +412,10 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         @Override
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);
-            ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
+            WsServerContainer sc = WsServerContainer.getServerContainer();
             sc.setServletContext(sce.getServletContext());
             try {
-                sc.deploy(BlockingPojo.class);
+                sc.addEndpoint(BlockingPojo.class);
             } catch (DeploymentException e) {
                 throw new IllegalStateException(e);
             }
@@ -522,9 +522,9 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         @Override
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);
-            ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
+            WsServerContainer sc = WsServerContainer.getServerContainer();
             try {
-                sc.deploy(ServerEndpointConfig.Builder.create(
+                sc.addEndpoint(ServerEndpointConfig.Builder.create(
                         ConstantTxEndpoint.class, PATH).build());
                 if (TestWsWebSocketContainer.timoutOnContainer) {
                     sc.setAsyncSendTimeout(TIMEOUT_MS);

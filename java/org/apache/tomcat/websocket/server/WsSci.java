@@ -43,11 +43,11 @@ public class WsSci implements ServletContainerInitializer {
             return;
         }
 
-        ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
+        WsServerContainer sc = WsServerContainer.getServerContainer();
         sc.setServletContext(ctx);
         for (Class<?> clazz : clazzes) {
             try {
-                sc.deploy(clazz);
+                sc.addEndpoint(clazz);
             } catch (DeploymentException e) {
                 throw new ServletException(e);
             }

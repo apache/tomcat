@@ -72,14 +72,14 @@ public class DefaultServerEndpointConfigurator
             return requestPath.equals(path);
         }
 
-        String servletPath = ServerContainerImpl.getServletPath(path);
+        String servletPath = WsServerContainer.getServletPath(path);
         if (!requestPath.startsWith(servletPath)) {
             return false;
         }
 
         Map<String,String> params;
         try {
-            params = ServerContainerImpl.getServerContainer().getPathParameters(
+            params = WsServerContainer.getServerContainer().getPathParameters(
                     servletPath, requestPath.substring(servletPath.length()));
         } catch (IllegalArgumentException iae) {
             return false;

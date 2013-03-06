@@ -52,7 +52,7 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
     private final Endpoint ep;
     private final EndpointConfig endpointConfig;
     private final ClassLoader applicationClassLoader;
-    private final ServerContainerImpl webSocketContainer;
+    private final WsServerContainer webSocketContainer;
     private final WsRequest request;
     private final String subProtocol;
     private final Map<String,String> pathParameters;
@@ -62,7 +62,7 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
 
 
     public WsProtocolHandler(Endpoint ep, EndpointConfig endpointConfig,
-            ServerContainerImpl wsc, WsRequest request, String subProtocol,
+            WsServerContainer wsc, WsRequest request, String subProtocol,
             Map<String,String> pathParameters, boolean secure) {
         this.ep = ep;
         this.endpointConfig = endpointConfig;

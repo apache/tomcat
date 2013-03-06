@@ -24,20 +24,20 @@ public class TestServerContainerImpl {
     @Test
     public void testGetServletMappingPath() throws Exception {
         Assert.assertEquals("/foo/*",
-                ServerContainerImpl.getServletPath("/foo"));
+                WsServerContainer.getServletPath("/foo"));
         Assert.assertEquals("/foo/*",
-                ServerContainerImpl.getServletPath("/foo/"));
+                WsServerContainer.getServletPath("/foo/"));
         Assert.assertEquals("/foo/bar/*",
-                ServerContainerImpl.getServletPath("/foo/bar"));
+                WsServerContainer.getServletPath("/foo/bar"));
         Assert.assertEquals("/foo/bar/*",
-                ServerContainerImpl.getServletPath("/foo/bar/"));
+                WsServerContainer.getServletPath("/foo/bar/"));
         Assert.assertEquals("/foo/*",
-                ServerContainerImpl.getServletPath("/foo/{bar}"));
+                WsServerContainer.getServletPath("/foo/{bar}"));
         Assert.assertEquals("/foo/*",
-                ServerContainerImpl.getServletPath("/foo/{bar}/"));
+                WsServerContainer.getServletPath("/foo/{bar}/"));
         Assert.assertEquals("/foo/*",
-                ServerContainerImpl.getServletPath("/foo/x{bar}"));
+                WsServerContainer.getServletPath("/foo/x{bar}"));
         Assert.assertEquals("/foo/*",
-                ServerContainerImpl.getServletPath("/foo/x{bar}/"));
+                WsServerContainer.getServletPath("/foo/x{bar}/"));
     }
 }

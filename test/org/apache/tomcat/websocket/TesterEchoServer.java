@@ -25,8 +25,8 @@ import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import org.apache.tomcat.websocket.server.ServerContainerImpl;
 import org.apache.tomcat.websocket.server.WsListener;
+import org.apache.tomcat.websocket.server.WsServerContainer;
 
 public class TesterEchoServer {
 
@@ -38,11 +38,11 @@ public class TesterEchoServer {
         @Override
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);
-            ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
+            WsServerContainer sc = WsServerContainer.getServerContainer();
             sc.setServletContext(sce.getServletContext());
             try {
-                sc.deploy(Async.class);
-                sc.deploy(Basic.class);
+                sc.addEndpoint(Async.class);
+                sc.addEndpoint(Basic.class);
             } catch (DeploymentException e) {
                 throw new IllegalStateException(e);
             }
