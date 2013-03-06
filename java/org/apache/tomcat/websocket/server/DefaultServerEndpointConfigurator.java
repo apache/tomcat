@@ -24,11 +24,10 @@ import java.util.Map;
 import javax.websocket.Extension;
 import javax.websocket.HandshakeResponse;
 import javax.websocket.server.HandshakeRequest;
-import javax.websocket.server.ServerEndpointConfiguration;
-import javax.websocket.server.ServerEndpointConfigurator;
+import javax.websocket.server.ServerEndpointConfig;
 
 public class DefaultServerEndpointConfigurator
-        extends ServerEndpointConfigurator {
+        extends ServerEndpointConfig.Configurator {
 
     @Override
     public String getNegotiatedSubprotocol(List<String> supported,
@@ -96,7 +95,7 @@ public class DefaultServerEndpointConfigurator
     }
 
     @Override
-    public void modifyHandshake(ServerEndpointConfiguration sec,
+    public void modifyHandshake(ServerEndpointConfig sec,
             HandshakeRequest request, HandshakeResponse response) {
         // NO-OP
     }

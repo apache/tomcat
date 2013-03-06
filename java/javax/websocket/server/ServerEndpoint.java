@@ -39,6 +39,6 @@ public @interface ServerEndpoint {
 
     Class<? extends Encoder>[] encoders() default {};
 
-    public Class<? extends ServerEndpointConfigurator> configurator()
-            default ServerEndpointConfigurator.class;
+    public Class<? extends ServerEndpointConfig.Configurator> configurator()
+            default ServerEndpointConfig.Configurator.class;
 }

@@ -27,8 +27,7 @@ import javax.websocket.Extension;
 /**
  * Provides the default configuration for WebSocket server endpoints.
  */
-public class DefaultServerEndpointConfiguration
-        implements ServerEndpointConfiguration {
+final class DefaultServerEndpointConfig implements ServerEndpointConfig {
 
     private final Class<?> endpointClass;
     private final String path;
@@ -36,15 +35,15 @@ public class DefaultServerEndpointConfiguration
     private final List<Extension> extensions;
     private final List<Class<? extends Encoder>> encoders;
     private final List<Class<? extends Decoder>> decoders;
-    private final ServerEndpointConfigurator serverEndpointConfigurator;
+    private final Configurator serverEndpointConfigurator;
     private final Map<String,Object> userProperties = new HashMap<>();
 
-    DefaultServerEndpointConfiguration(
+    DefaultServerEndpointConfig(
             Class<?> endpointClass, String path,
             List<String> subprotocols, List<Extension> extensions,
             List<Class<? extends Encoder>> encoders,
             List<Class<? extends Decoder>> decoders,
-            ServerEndpointConfigurator serverEndpointConfigurator) {
+            Configurator serverEndpointConfigurator) {
         this.endpointClass = endpointClass;
         this.path = path;
         this.subprotocols = subprotocols;
@@ -75,7 +74,7 @@ public class DefaultServerEndpointConfiguration
     }
 
     @Override
-    public ServerEndpointConfigurator getServerEndpointConfigurator() {
+    public Configurator getConfigurator() {
         return serverEndpointConfigurator;
     }
 
@@ -85,12 +84,12 @@ public class DefaultServerEndpointConfiguration
     }
 
     @Override
-    public List<String> getSubprotocols() {
+    public final List<String> getSubprotocols() {
         return subprotocols;
     }
 
     @Override
-    public List<Extension> getExtensions() {
+    public final List<Extension> getExtensions() {
         return extensions;
     }
 }

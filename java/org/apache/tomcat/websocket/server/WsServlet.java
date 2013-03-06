@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.websocket.Endpoint;
 import javax.websocket.Extension;
-import javax.websocket.server.ServerEndpointConfiguration;
+import javax.websocket.server.ServerEndpointConfig;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.tomcat.websocket.Constants;
@@ -95,11 +95,11 @@ public class WsServlet extends HttpServlet {
         ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
         Map<String,String> pathParameters = sc.getPathParameters(
                 req.getServletPath(),  req.getPathInfo());
-        ServerEndpointConfiguration sec = sc.getServerEndpointConfiguration(
+        ServerEndpointConfig sec = sc.getServerEndpointConfiguration(
                 req.getServletPath(), pathParameters);
         // Origin check
         String origin = req.getHeader("Origin");
-        if (!sec.getServerEndpointConfigurator().checkOrigin(origin)) {
+        if (!sec.getConfigurator().checkOrigin(origin)) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -107,7 +107,7 @@ public class WsServlet extends HttpServlet {
         List<String> subProtocols = getTokensFromHeader(req,
                 "Sec-WebSocket-Protocol");
         if (!subProtocols.isEmpty()) {
-            subProtocol = sec.getServerEndpointConfigurator().
+            subProtocol = sec.getConfigurator().
                     getNegotiatedSubprotocol(
                             sec.getSubprotocols(), subProtocols);
         }
