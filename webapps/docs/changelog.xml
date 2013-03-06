@@ -136,6 +136,11 @@
         Disable support for comments on Changelog page of Tomcat
         documentation. (kkolinko)
       </update>
+      <fix>
+        Fix several issues with <code>status.xsd</code> schema in Manager web
+        application, testing it against actual output of StatusTransformer
+        class. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
