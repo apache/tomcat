@@ -114,6 +114,11 @@
         restoring the original request preventing possible hanging when
         restoring POST requests submitted over AJP. (markt)
       </fix>
+      <fix>
+        <bug>54628</bug>: When writing binary WebSocket messages write from
+        start position in array rather than the start of the array. Patch
+        provided by blee. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

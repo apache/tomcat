@@ -399,7 +399,8 @@ public class WsOutbound {
         }
 
         // Write the content
-        upgradeOutbound.write(buffer.array(), 0, buffer.limit());
+        upgradeOutbound.write(buffer.array(), buffer.arrayOffset(),
+                buffer.limit());
         upgradeOutbound.flush();
 
         // Reset
