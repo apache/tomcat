@@ -88,12 +88,14 @@
   </subsection>
 
   <subsection name="Naming">
-  <p>When autoDeploy or deployOnStartup is used then there is a close
-  relationship between the <em>context name</em>, <em>context path</em>,
-  <em>context version</em> and the <em>base file name</em> used for the WAR
-  and/or directory that contains the web application when the WAR or directory
-  is located in the Host&apos;s appBase. When no version is specified, the rules
-  are:
+  <p>When autoDeploy or deployOnStartup the context path is derived from the
+  name of the WAR file or directory file that is automatically deployed. In this
+  case the context path may not be defined in a META-INF/context.xml embedded in
+  the application. There is, therefore, a close relationship between the
+  <em>context name</em>, <em>context path</em>, <em>context version</em> and
+  the <em>base file name</em> used for the WAR and/or directory that contains
+  the web application when the WAR or directory is located in the Host&apos;s
+  appBase. When no version is specified, the rules are:
   <ul>
     <li>contextName = contextPath</li>
     <li>If the contextPath is a zero length string, the base name is ROOT</li>
@@ -101,18 +103,34 @@
         contextPath with the leading '/' removed and any remaining '/'
         characters in the path replaced with '#'.</li>
   </ul>
-  When a version is specified, <code>##version</code> is added to the contextName and base
-  name. To help clarify these rules, some examples are given in the following
-  table.</p>
+  When a version is specified, <code>##version</code> is added to the
+  contextName and base name. To help clarify these rules, some examples are
+  given in the following table.</p>
 
   <table class="detail-table">
-    <tr><th>Context Path</th><th>Context Version</th><th>Context Name</th><th>Base filename</th></tr>
+    <tr>
+      <th>Context Path</th>
+      <th>Context Version</th>
+      <th>Context Name</th>
+      <th>Base filename</th>
+    </tr>
     <tr><td>/foo</td><td><i>None</i></td><td>/foo</td><td>foo</td></tr>
-    <tr><td>/foo/bar</td><td><i>None</i></td><td>/foo/bar</td><td>foo#bar</td></tr>
-    <tr><td><i>Empty String</i></td><td><i>None</i></td><td><i>Empty String</i></td><td>ROOT</td></tr>
+    <tr>
+      <td>/foo/bar</td><td><i>None</i></td><td>/foo/bar</td><td>foo#bar</td>
+    </tr>
+    <tr>
+      <td><i>Empty String</i></td>
+      <td><i>None</i></td>
+      <td><i>Empty String</i></td>
+      <td>ROOT</td>
+    </tr>
     <tr><td>/foo</td><td>42</td><td>/foo##42</td><td>foo##42</td></tr>
-    <tr><td>/foo/bar</td><td>42</td><td>/foo/bar##42</td><td>foo#bar##42</td></tr>
-    <tr><td><i>Empty String</i></td><td>42</td><td>##42</td><td>ROOT##42</td></tr>
+    <tr>
+      <td>/foo/bar</td><td>42</td><td>/foo/bar##42</td><td>foo#bar##42</td>
+    </tr>
+    <tr>
+      <td><i>Empty String</i></td><td>42</td><td>##42</td><td>ROOT##42</td>
+    </tr>
   </table>
 
   <p>The version component is treated as a <code>String</code> both for
