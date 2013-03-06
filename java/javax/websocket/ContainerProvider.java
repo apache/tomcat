@@ -38,7 +38,7 @@ public abstract class ContainerProvider {
                 ServiceLoader.load(ContainerProvider.class);
         Iterator<ContainerProvider> iter = serviceLoader.iterator();
         while (result == null && iter.hasNext()) {
-            result = iter.next().getContainer(WebSocketContainer.class);
+            result = iter.next().getContainer();
         }
 
         // Fall-back. Also used by unit tests
@@ -56,5 +56,5 @@ public abstract class ContainerProvider {
         return result;
     }
 
-    protected abstract <T> T getContainer(Class<T> containerClass);
+    protected abstract WebSocketContainer getContainer();
 }

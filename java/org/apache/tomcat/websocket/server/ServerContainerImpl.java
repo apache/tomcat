@@ -25,8 +25,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import javax.websocket.DeploymentException;
 import javax.websocket.server.ServerEndpoint;
-import javax.websocket.server.ServerEndpointConfiguration;
-import javax.websocket.server.ServerEndpointConfigurationBuilder;
+import javax.websocket.server.ServerEndpointConfig;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -74,7 +73,7 @@ public class ServerContainerImpl extends WsWebSocketContainer {
     private final WsWriteTimeout wsWriteTimeout = new WsWriteTimeout();
 
     private volatile ServletContext servletContext = null;
-    private final Map<String,ServerEndpointConfiguration> configMap =
+    private final Map<String,ServerEndpointConfig> configMap =
             new ConcurrentHashMap<>();
     private final Map<String,UriTemplate> templateMap =
             new ConcurrentHashMap<>();
@@ -114,7 +113,7 @@ public class ServerContainerImpl extends WsWebSocketContainer {
      * @param sec   The configuration to use when creating endpoint instances
      * @throws DeploymentException
      */
-    public void deploy(ServerEndpointConfiguration sec)
+    public void deploy(ServerEndpointConfig sec)
             throws DeploymentException {
         if (servletContext == null) {
             throw new DeploymentException(
@@ -142,7 +141,7 @@ public class ServerContainerImpl extends WsWebSocketContainer {
 
 
     /**
-     * Provides the equivalent of {@link #deploy(ServerEndpointConfiguration)}
+     * Provides the equivalent of {@link #deploy(ServerEndpointConfig)}
      * for publishing plain old java objects (POJOs) that have been annotated as
      * WebSocket endpoints.
      *
@@ -189,9 +188,9 @@ public class ServerContainerImpl extends WsWebSocketContainer {
     }
 
 
-    public ServerEndpointConfiguration getServerEndpointConfiguration(
+    public ServerEndpointConfig getServerEndpointConfiguration(
             String servletPath, Map<String,String> pathParameters) {
-        ServerEndpointConfiguration sec = configMap.get(servletPath);
+        ServerEndpointConfig sec = configMap.get(servletPath);
         if (sec != null) {
             return sec;
         }
@@ -199,7 +198,7 @@ public class ServerContainerImpl extends WsWebSocketContainer {
         if (pojo != null) {
             PojoMethodMapping methodMapping = pojoMethodMap.get(pojo);
             if (methodMapping != null) {
-                sec = ServerEndpointConfigurationBuilder.create(
+                sec = ServerEndpointConfig.Builder.create(
                         pojo, methodMapping.getWsPath()).build();
                 sec.getUserProperties().put(
                         PojoEndpoint.POJO_PATH_PARAM_KEY, pathParameters);

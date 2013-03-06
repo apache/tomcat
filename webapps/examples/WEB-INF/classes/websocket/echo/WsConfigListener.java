@@ -19,7 +19,7 @@ package websocket.echo;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
 import javax.websocket.DeploymentException;
-import javax.websocket.server.ServerEndpointConfigurationBuilder;
+import javax.websocket.server.ServerEndpointConfig;
 
 import org.apache.tomcat.websocket.server.ServerContainerImpl;
 import org.apache.tomcat.websocket.server.WsListener;
@@ -32,7 +32,7 @@ public class WsConfigListener extends WsListener {
         super.contextInitialized(sce);
         ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
         try {
-            sc.deploy(ServerEndpointConfigurationBuilder.create(
+            sc.deploy(ServerEndpointConfig.Builder.create(
                     EchoEndpoint.class, "/websocket/echoProgrammatic").build());
         } catch (DeploymentException e) {
             throw new IllegalStateException(e);

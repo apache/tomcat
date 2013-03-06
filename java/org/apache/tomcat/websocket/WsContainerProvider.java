@@ -17,18 +17,12 @@
 package org.apache.tomcat.websocket;
 
 import javax.websocket.ContainerProvider;
+import javax.websocket.WebSocketContainer;
 
 public class WsContainerProvider extends ContainerProvider {
 
     @Override
-    protected <T> T getContainer(Class<T> containerClass) {
-        if (containerClass.isAssignableFrom(WsWebSocketContainer.class)) {
-            @SuppressWarnings("unchecked")
-            T result = (T) new WsWebSocketContainer();
-            return result;
-        } else {
-            // Not supported
-            return null;
-        }
+    protected WebSocketContainer getContainer() {
+        return new WsWebSocketContainer();
     }
 }

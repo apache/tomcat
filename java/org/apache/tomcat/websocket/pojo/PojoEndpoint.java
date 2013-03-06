@@ -24,7 +24,7 @@ import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
-import javax.websocket.server.ServerEndpointConfiguration;
+import javax.websocket.server.ServerEndpointConfig;
 
 /**
  * Wrapper class for instances of POJOs annotated with
@@ -47,8 +47,8 @@ public class PojoEndpoint extends Endpoint {
     public void onOpen(Session session,
             EndpointConfig endpointConfiguration) {
 
-        ServerEndpointConfiguration sec =
-                (ServerEndpointConfiguration) endpointConfiguration;
+        ServerEndpointConfig sec =
+                (ServerEndpointConfig) endpointConfiguration;
 
         try {
             pojo = sec.getEndpointClass().newInstance();

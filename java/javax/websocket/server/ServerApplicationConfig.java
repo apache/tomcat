@@ -20,9 +20,9 @@ import java.util.Set;
 
 import javax.websocket.Endpoint;
 
-public interface ServerApplicationConfiguration {
+public interface ServerApplicationConfig {
 
-    Set<Class<? extends ServerEndpointConfiguration>> getEndpointConfiguration(
+    Set<Class<? extends ServerEndpointConfig>> getEndpointConfiguration(
             Set<Class<? extends Endpoint>> scanned);
 
     Set<Class<?>> getAnnotatedEndpointClasses(Set<Class<?>> scanned);
