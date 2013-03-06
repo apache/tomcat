@@ -141,6 +141,10 @@
         application, testing it against actual output of StatusTransformer
         class. (kkolinko)
       </fix>
+      <fix>
+        Clarify the documentation on how context paths may be configured for web
+        applications. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
