@@ -34,7 +34,29 @@ public interface WebSocketContainer {
      */
     void setAsyncSendTimeout(long timeout);
 
+    Session connectToServer(Object endpoint, URI path)
+            throws DeploymentException, IOException;
+
     Session connectToServer(Class<?> annotatedEndpointClass, URI path)
+            throws DeploymentException, IOException;
+
+    /**
+     * Creates a new connection to the WebSocket.
+     *
+     * @param endpoint
+     *            The endpoint instance that will handle responses from the
+     *            server
+     * @param clientEndpointConfiguration
+     *            Used to configure the new connection
+     * @param path
+     *            The full URL of the WebSocket endpoint to connect to
+     *
+     * @return The WebSocket session for the connection
+     *
+     * @throws DeploymentException  If the connection can not be established
+     */
+    Session connectToServer(Endpoint endpoint,
+            ClientEndpointConfig clientEndpointConfiguration, URI path)
             throws DeploymentException, IOException;
 
     /**

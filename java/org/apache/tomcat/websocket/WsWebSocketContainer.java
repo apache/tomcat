@@ -69,6 +69,16 @@ public class WsWebSocketContainer
     private int backgroundProcessCount = 0;
     private int processPeriod = 10;
 
+
+
+    @Override
+    public Session connectToServer(Object pojo, URI path)
+            throws DeploymentException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
     @Override
     public Session connectToServer(Class<?> annotatedEndpointClass, URI path)
             throws DeploymentException {
@@ -79,6 +89,24 @@ public class WsWebSocketContainer
 
     @Override
     public Session connectToServer(Class<? extends Endpoint> clazz,
+            ClientEndpointConfig clientEndpointConfiguration, URI path)
+            throws DeploymentException {
+
+        Endpoint endpoint;
+        try {
+            endpoint = clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new DeploymentException(sm.getString(
+                    "wsWebSocketContainer.endpointCreateFail", clazz.getName()),
+                    e);
+        }
+
+        return connectToServer(endpoint, clientEndpointConfiguration, path);
+    }
+
+
+    @Override
+    public Session connectToServer(Endpoint endpoint,
             ClientEndpointConfig clientEndpointConfiguration, URI path)
             throws DeploymentException {
 
@@ -165,20 +193,12 @@ public class WsWebSocketContainer
         WsRemoteEndpointImplClient wsRemoteEndpointClient =
                 new WsRemoteEndpointImplClient(channel);
 
-        Endpoint endpoint;
-        try {
-            endpoint = clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new DeploymentException(sm.getString(
-                    "wsWebSocketContainer.endpointCreateFail", clazz.getName()),
-                    e);
-        }
 
         WsSession wsSession = new WsSession(endpoint, wsRemoteEndpointClient,
                 this, null, subProtocol, Collections.EMPTY_MAP, false,
                 clientEndpointConfiguration.getEncoders());
         endpoint.onOpen(wsSession, clientEndpointConfiguration);
-        registerSession(clazz, wsSession);
+        registerSession(endpoint.getClass(), wsSession);
 
         // Object creation will trigger input processing
         @SuppressWarnings("unused")
