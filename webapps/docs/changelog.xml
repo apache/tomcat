@@ -262,6 +262,10 @@
         fully started. Stop the background thread as soon as the web application
         is stopped. (markt)
       </fix>
+      <fix>
+        Allow WebSocket Ping/Pong messages to be sent between fragments of a
+        fragmented message. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

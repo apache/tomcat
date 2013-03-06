@@ -329,7 +329,7 @@ public class WsOutbound {
             throw new IOException(sm.getString("outbound.closed"));
         }
 
-        doFlush(true);
+        doFlush(false);
 
         upgradeOutbound.write(0x80 | opcode);
         if (data == null) {
