@@ -108,6 +108,12 @@
         is that invalid sequences at the end of the input now trigger an error
         rather than being silebtly swallowed. (markt)
       </fix>
+      <fix>
+        <bug>54624</bug>: Ensure that the correct request body length is used
+        when swallowing a request body after FORM authentication prior to
+        restoring the original request preventing possible hanging when
+        restoring POST requests submitted over AJP. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
