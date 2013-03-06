@@ -209,5 +209,11 @@ public interface ServerEndpointConfig extends EndpointConfig {
                 HandshakeRequest request, HandshakeResponse response) {
             fetchContainerDefaultConfigurator().modifyHandshake(sec, request, response);
         }
+
+        public <T extends Object> T getEndpointInstance(Class<T> clazz)
+                throws InstantiationException {
+            return fetchContainerDefaultConfigurator().getEndpointInstance(
+                    clazz);
+        }
     }
 }
