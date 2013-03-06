@@ -71,7 +71,7 @@ public class TestGroupChannelMemberArrival {
         for (int i = 0; i < threads.length; i++) {
             threads[i].join();
         }
-        Thread.sleep(2000);
+        Thread.sleep(5000);
         System.out.println(System.currentTimeMillis()
                 + " All channels started.");
         for (int i = listeners.length - 1; i >= 0; i--) {
