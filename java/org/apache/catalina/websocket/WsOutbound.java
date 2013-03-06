@@ -398,7 +398,8 @@ public class WsOutbound {
         }
 
         // Write the content
-        outputStream.write(buffer.array(), 0, buffer.limit());
+        outputStream.write(buffer.array(), buffer.arrayOffset(),
+                buffer.limit());
         outputStream.flush();
 
         // Reset
