@@ -266,6 +266,11 @@
         Allow WebSocket Ping/Pong messages to be sent between fragments of a
         fragmented message. (markt)
       </fix>
+      <fix>
+        <bug>54612</bug>: Check if the socket is closed before trying to write a
+        WebSocket message to it. Also, flush any partial buffered data before
+        closing the socket. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
