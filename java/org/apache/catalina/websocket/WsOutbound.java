@@ -269,6 +269,10 @@ public class WsOutbound {
         if (closed) {
             return;
         }
+
+        // Send any partial data we have
+        doFlush(false);
+
         closed = true;
 
         outputStream.write(0x88);
@@ -354,6 +358,10 @@ public class WsOutbound {
      */
     private void doWriteBytes(ByteBuffer buffer, boolean finalFragment)
             throws IOException {
+
+        if (closed) {
+            throw new IOException(sm.getString("outbound.closed"));
+        }
 
         // Work out the first byte
         int first = 0x00;
