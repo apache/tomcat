@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import javax.websocket.DeploymentException;
+import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 
@@ -45,25 +46,26 @@ import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
  * <li>{@link Constants#TEXT_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM}</li>
  * </ul>
  */
-public class ServerContainerImpl extends WsWebSocketContainer {
+public class WsServerContainer extends WsWebSocketContainer
+        implements ServerContainer {
 
     // Needs to be a WeakHashMap to prevent memory leaks when a context is
     // stopped
-    private static final Map<ClassLoader,ServerContainerImpl>
+    private static final Map<ClassLoader,WsServerContainer>
             classLoaderContainerMap = new WeakHashMap<>();
     private static final Object classLoaderContainerMapLock = new Object();
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
-    private final Log log = LogFactory.getLog(ServerContainerImpl.class);
+    private final Log log = LogFactory.getLog(WsServerContainer.class);
 
 
-    public static ServerContainerImpl getServerContainer() {
+    public static WsServerContainer getServerContainer() {
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        ServerContainerImpl result = null;
+        WsServerContainer result = null;
         synchronized (classLoaderContainerMapLock) {
             result = classLoaderContainerMap.get(tccl);
             if (result == null) {
-                result = new ServerContainerImpl();
+                result = new WsServerContainer();
                 classLoaderContainerMap.put(tccl, result);
             }
         }
@@ -113,7 +115,8 @@ public class ServerContainerImpl extends WsWebSocketContainer {
      * @param sec   The configuration to use when creating endpoint instances
      * @throws DeploymentException
      */
-    public void deploy(ServerEndpointConfig sec)
+    @Override
+    public void addEndpoint(ServerEndpointConfig sec)
             throws DeploymentException {
         if (servletContext == null) {
             throw new DeploymentException(
@@ -141,13 +144,14 @@ public class ServerContainerImpl extends WsWebSocketContainer {
 
 
     /**
-     * Provides the equivalent of {@link #deploy(ServerEndpointConfig)}
+     * Provides the equivalent of {@link #addEndpoint(ServerEndpointConfig)}
      * for publishing plain old java objects (POJOs) that have been annotated as
      * WebSocket endpoints.
      *
      * @param pojo   The annotated POJO
      */
-    public void deploy(Class<?> pojo) throws DeploymentException {
+    @Override
+    public void addEndpoint(Class<?> pojo) throws DeploymentException {
 
         ServerEndpoint annotation = pojo.getAnnotation(ServerEndpoint.class);
         if (annotation == null) {

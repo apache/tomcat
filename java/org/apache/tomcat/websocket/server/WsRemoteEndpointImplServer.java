@@ -51,7 +51,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
 
     public WsRemoteEndpointImplServer(ServletOutputStream sos,
-            ServerContainerImpl serverContainer) {
+            WsServerContainer serverContainer) {
         this.sos = sos;
         this.wsWriteTimeout = serverContainer.getTimeout();
     }

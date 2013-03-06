@@ -21,8 +21,8 @@ import javax.servlet.annotation.WebListener;
 import javax.websocket.DeploymentException;
 import javax.websocket.server.ServerEndpointConfig;
 
-import org.apache.tomcat.websocket.server.ServerContainerImpl;
 import org.apache.tomcat.websocket.server.WsListener;
+import org.apache.tomcat.websocket.server.WsServerContainer;
 
 @WebListener
 public class WsConfigListener extends WsListener {
@@ -30,9 +30,9 @@ public class WsConfigListener extends WsListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         super.contextInitialized(sce);
-        ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
+        WsServerContainer sc = WsServerContainer.getServerContainer();
         try {
-            sc.deploy(ServerEndpointConfig.Builder.create(
+            sc.addEndpoint(ServerEndpointConfig.Builder.create(
                     EchoEndpoint.class, "/websocket/echoProgrammatic").build());
         } catch (DeploymentException e) {
             throw new IllegalStateException(e);

@@ -92,7 +92,7 @@ public class WsServlet extends HttpServlet {
             return;
         }
         // Need an Endpoint instance to progress this further
-        ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
+        WsServerContainer sc = WsServerContainer.getServerContainer();
         Map<String,String> pathParameters = sc.getPathParameters(
                 req.getServletPath(),  req.getPathInfo());
         ServerEndpointConfig sec = sc.getServerEndpointConfiguration(

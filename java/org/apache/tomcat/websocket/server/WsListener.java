@@ -29,7 +29,7 @@ public class WsListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        ServerContainerImpl sc = ServerContainerImpl.getServerContainer();
+        WsServerContainer sc = WsServerContainer.getServerContainer();
         sc.setServletContext(sce.getServletContext());
     }
 
