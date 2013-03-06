@@ -265,7 +265,7 @@ public class StatusTransformer {
                 writer.write(" usageInit='" + usage.getInit() + "'");
                 writer.write(" usageCommitted='" + usage.getCommitted() + "'");
                 writer.write(" usageMax='" + usage.getMax() + "'");
-                writer.write(" usageUsed='" + usage.getInit() + "'/>");
+                writer.write(" usageUsed='" + usage.getUsed() + "'/>");
             }
 
             writer.write("</jvm>");

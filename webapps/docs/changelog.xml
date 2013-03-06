@@ -124,6 +124,11 @@
         <code>javax.servlet.http.Part</code>. (markt)
       </fix>
       <fix>
+        <bug>54638</bug>: Fix display of "Used" memory value for memory pools
+        on the status page in Manager web application when the page is rendered
+        as XML. (kkolinko)
+      </fix>
+      <fix>
         Correct typos in configuration samples on SSL Configuration page
         of Tomcat documentation. (kkolinko)
       </fix>
