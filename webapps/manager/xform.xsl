@@ -81,9 +81,8 @@
 
   <xsl:template match="threadInfo">
     <table><tr>
-             <td><b>threadInfo </b></td>
+             <td><b>threadInfo</b></td>
              <td><b>maxThreads:</b> <xsl:value-of select="@maxThreads"/></td>
-             <td><b>minSpareThreads:</b> <xsl:value-of select="@minSpareThreads"/></td>
              <td><b>currentThreadCount:</b> <xsl:value-of select="@currentThreadCount"/></td>
              <td><b>currentThreadsBusy:</b> <xsl:value-of select="@currentThreadsBusy"/></td>
            </tr>
