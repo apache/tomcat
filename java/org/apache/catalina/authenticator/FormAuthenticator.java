@@ -515,6 +515,16 @@ public class FormAuthenticator
             return false;
         }
 
+        // Swallow any request body since we will be replacing it
+        // Need to do this before headers are restored as AJP connector uses
+        // content length header to determine how much data needs to be read for
+        // request body
+        byte[] buffer = new byte[4096];
+        InputStream is = request.createInputStream();
+        while (is.read(buffer) >= 0) {
+            // Ignore request body
+        }
+
         // Modify our current request to reflect the original one
         request.clearCookies();
         Iterator<Cookie> cookies = saved.getCookies();
@@ -551,13 +561,6 @@ public class FormAuthenticator
         request.getCoyoteRequest().getParameters().recycle();
         request.getCoyoteRequest().getParameters().setQueryStringEncoding(
                 request.getConnector().getURIEncoding());
-
-        // Swallow any request body since we will be replacing it
-        byte[] buffer = new byte[4096];
-        InputStream is = request.createInputStream();
-        while (is.read(buffer) >= 0) {
-            // Ignore request body
-        }
 
         ByteChunk body = saved.getBody();
 
