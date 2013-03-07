@@ -30,6 +30,19 @@ public class DefaultServerEndpointConfigurator
         extends ServerEndpointConfig.Configurator {
 
     @Override
+    public <T> T getEndpointInstance(Class<T> clazz)
+            throws InstantiationException {
+        try {
+            return clazz.newInstance();
+        } catch (IllegalAccessException e) {
+            InstantiationException ie = new InstantiationException();
+            ie.initCause(e);
+            throw ie;
+        }
+    }
+
+
+    @Override
     public String getNegotiatedSubprotocol(List<String> supported,
             List<String> requested) {
 
