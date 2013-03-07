@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -50,6 +51,7 @@ public class WsSession implements Session {
     private static final Charset UTF8 = Charset.forName("UTF8");
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
+    private static AtomicLong ids = new AtomicLong(0);
 
     private final Log log = LogFactory.getLog(WsSession.class);
 
@@ -63,6 +65,7 @@ public class WsSession implements Session {
     private final String subProtocol;
     private final Map<String,String> pathParameters;
     private final boolean secure;
+    private final String id;
 
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
@@ -76,7 +79,6 @@ public class WsSession implements Session {
             Constants.DEFAULT_BUFFER_SIZE;
     private volatile long maxIdleTimeout = 0;
     private volatile long lastActive = System.currentTimeMillis();
-
 
     /**
      * Creates a new WebSocket session for communication between the two
@@ -115,6 +117,8 @@ public class WsSession implements Session {
         this.pathParameters = pathParameters;
         this.secure = secure;
         this.wsRemoteEndpoint.setEncoders(encoders);
+
+        this.id = Long.toHexString(ids.getAndIncrement());
     }
 
 
@@ -372,8 +376,7 @@ public class WsSession implements Session {
 
     @Override
     public String getId() {
-        // TODO Auto-generated method stub
-        return null;
+        return id;
     }
 
 

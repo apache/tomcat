@@ -19,7 +19,10 @@ package org.apache.tomcat.websocket;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Provides a background processing mechanism that triggers roughly once a
@@ -28,6 +31,10 @@ import org.apache.tomcat.util.ExceptionUtils;
  */
 public class BackgroundProcessManager {
 
+    private static final Log log =
+            LogFactory.getLog(BackgroundProcessManager.class);
+    private static final StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
     private static final BackgroundProcessManager instance;
 
 
@@ -82,8 +89,8 @@ public class BackgroundProcessManager {
                 process.backgroundProcess();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                // Ignore anything else
-                // TODO Log this
+                log.error(sm.getString(
+                        "backgroundProcessManager.processFailed"), t);
             }
         }
     }

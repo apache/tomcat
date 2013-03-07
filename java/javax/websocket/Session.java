@@ -84,6 +84,10 @@ public interface Session extends Closeable {
 
     RemoteEndpoint.Basic getBasicRemote();
 
+    /**
+     * Provides a unique identifier for the session. This identifier should not
+     * be relied upon to be generated from a secure random source.
+     */
     String getId();
 
     /**
