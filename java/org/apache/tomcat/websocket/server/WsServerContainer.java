@@ -84,6 +84,11 @@ public class WsServerContainer extends WsWebSocketContainer
             new ConcurrentHashMap<>();
 
 
+    private WsServerContainer() {
+        // Hide default constructor
+    }
+
+
     public void setServletContext(ServletContext servletContext) {
 
         if (this.servletContext == servletContext) {

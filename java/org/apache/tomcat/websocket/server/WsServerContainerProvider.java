@@ -24,6 +24,6 @@ public class WsServerContainerProvider extends ServerContainerProvider {
 
     @Override
     protected ServerContainer getContainer() {
-        return new WsServerContainer();
+        return WsServerContainer.getServerContainer();
     }
 }
