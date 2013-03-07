@@ -60,7 +60,6 @@ public abstract class WsFrameBase {
             onUnmappableCharacter(CodingErrorAction.REPORT);
     private boolean continuationExpected = false;
     private boolean textMessage = false;
-    // TODO: May need a new ByteBuffer per message
     private ByteBuffer messageBufferBinary;
     private CharBuffer messageBufferText;
 
