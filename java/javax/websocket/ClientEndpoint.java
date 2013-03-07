@@ -26,9 +26,9 @@ import javax.websocket.ClientEndpointConfig.Configurator;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface ClientEndpoint {
-    String[] subprotocols();
-    Class<? extends Decoder>[] decoders();
-    Class<? extends Encoder>[] encoders();
+    String[] subprotocols() default {};
+    Class<? extends Decoder>[] decoders() default {};
+    Class<? extends Encoder>[] encoders() default {};
     public Class<? extends Configurator> configurator()
             default Configurator.class;
 }
