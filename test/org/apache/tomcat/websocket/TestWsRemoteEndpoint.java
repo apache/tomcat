@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.websocket.ClientEndpointConfig.Builder;
 import javax.websocket.ContainerProvider;
+import javax.websocket.Endpoint;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
@@ -35,7 +36,8 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.AsyncHandler;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.AsyncText;
-import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterEndpoint;
+import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterAnnotatedEndpoint;
+import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterProgrammaticEndpoint;
 
 public class TestWsRemoteEndpoint extends TomcatBaseTest {
 
@@ -52,7 +54,16 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
     }
 
     @Test
-    public void testWriter() throws Exception {
+    public void testWriterAnnotation() throws Exception {
+        doTestWriter(TesterAnnotatedEndpoint.class);
+    }
+
+    @Test
+    public void testWriterProgrammatic() throws Exception {
+        doTestWriter(TesterProgrammaticEndpoint.class);
+    }
+
+    private void doTestWriter(Class<?> clazz) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // Must have a real docBase - just use temp
         Context ctx =
@@ -64,10 +75,18 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
 
         tomcat.start();
 
-        Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
-                Builder.create().build(),
-                new URI("http://localhost:" + getPort() +
-                        TesterEchoServer.Config.PATH_ASYNC));
+        Session wsSession;
+        URI uri = new URI("http://localhost:" + getPort() +
+                TesterEchoServer.Config.PATH_ASYNC);
+        if (Endpoint.class.isAssignableFrom(clazz)) {
+            @SuppressWarnings("unchecked")
+            Class<? extends Endpoint> endpointClazz =
+                    (Class<? extends Endpoint>) clazz;
+            wsSession = wsContainer.connectToServer(endpointClazz,
+                    Builder.create().build(), uri);
+        } else {
+            wsSession = wsContainer.connectToServer(clazz, uri);
+        }
 
         CountDownLatch latch = new CountDownLatch(1);
         wsSession.getUserProperties().put("latch", latch);

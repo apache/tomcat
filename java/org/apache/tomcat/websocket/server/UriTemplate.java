@@ -84,7 +84,7 @@ public class UriTemplate {
         Matcher m = pattern.matcher(pathInfo);
         if (!m.matches()) {
             throw new IllegalArgumentException(sm.getString(
-                    "pojoUriTemplate.noMatch", template, pattern, pathInfo));
+                    "uriTemplate.noMatch", template, pattern, pathInfo));
         }
         int group = 2;
         for (String name : names) {

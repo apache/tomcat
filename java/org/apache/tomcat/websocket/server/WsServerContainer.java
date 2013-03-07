@@ -33,7 +33,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsSession;
 import org.apache.tomcat.websocket.WsWebSocketContainer;
-import org.apache.tomcat.websocket.pojo.PojoEndpoint;
+import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
 import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
 
 /**
@@ -210,9 +210,9 @@ public class WsServerContainer extends WsWebSocketContainer
                 sec = ServerEndpointConfig.Builder.create(
                         pojo, methodMapping.getWsPath()).build();
                 sec.getUserProperties().put(
-                        PojoEndpoint.POJO_PATH_PARAM_KEY, pathParameters);
+                        PojoEndpointServer.POJO_PATH_PARAM_KEY, pathParameters);
                 sec.getUserProperties().put(
-                        PojoEndpoint.POJO_METHOD_MAPPING_KEY, methodMapping);
+                        PojoEndpointServer.POJO_METHOD_MAPPING_KEY, methodMapping);
                 return sec;
             }
         }

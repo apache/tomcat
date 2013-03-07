@@ -37,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.websocket.ClientEndpoint;
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
@@ -49,6 +50,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
 public class WsWebSocketContainer
         implements WebSocketContainer, BackgroundProcess {
@@ -77,8 +79,28 @@ public class WsWebSocketContainer
     @Override
     public Session connectToServer(Object pojo, URI path)
             throws DeploymentException {
-        // TODO Auto-generated method stub
-        return null;
+
+        Endpoint ep = new PojoEndpointClient(pojo);
+
+        Class<? extends ClientEndpointConfig.Configurator> configuratorClazz =
+                pojo.getClass().getAnnotation(
+                        ClientEndpoint.class).configurator();
+
+        ClientEndpointConfig.Configurator configurator = null;
+        if (!ClientEndpointConfig.Configurator.class.equals(
+                configuratorClazz)) {
+            try {
+                configurator = configuratorClazz.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new DeploymentException(sm.getString(
+                        "wsWebSocketContainer.defaultConfiguratorFail"), e);
+            }
+        }
+
+        ClientEndpointConfig config =
+                ClientEndpointConfig.Builder.create().configurator(
+                        configurator).build();
+        return connectToServer(ep, config, path);
     }
 
 

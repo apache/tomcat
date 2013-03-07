@@ -21,15 +21,19 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
+import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnOpen;
 import javax.websocket.Session;
 
 public class TesterSingleMessageClient {
 
-    public static class TesterEndpoint extends Endpoint {
+    public static class TesterProgrammaticEndpoint extends Endpoint {
 
         @Override
         public void onClose(Session session, CloseReason closeReason) {
@@ -53,6 +57,36 @@ public class TesterSingleMessageClient {
 
         @Override
         public void onOpen(Session session, EndpointConfig config) {
+            // NO-OP
+        }
+    }
+
+    @ClientEndpoint
+    public static class TesterAnnotatedEndpoint {
+
+        @OnClose
+        public void onClose(Session session) {
+            clearLatch(session);
+        }
+
+        @OnError
+        public void onError(Session session,
+                @SuppressWarnings("unused") Throwable throwable) {
+            clearLatch(session);
+        }
+
+        private void clearLatch(Session session) {
+            CountDownLatch latch =
+                    (CountDownLatch) session.getUserProperties().get("latch");
+            if (latch != null) {
+                while (latch.getCount() > 0) {
+                    latch.countDown();
+                }
+            }
+        }
+
+        @OnOpen
+        public void onOpen() {
             // NO-OP
         }
     }
