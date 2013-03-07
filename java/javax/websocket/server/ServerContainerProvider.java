@@ -19,6 +19,10 @@ package javax.websocket.server;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
+/**
+ * Provides a standard mechanism for obtaining a reference to the
+ * {@link ServerContainer}.
+ */
 public abstract class ServerContainerProvider {
 
     private static final String DEFAULT_PROVIDER_CLASS_NAME =

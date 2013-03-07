@@ -21,6 +21,9 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents the HTTP request that asked to be upgraded to WebSocket.
+ */
 public interface HandshakeRequest {
 
     static final String SEC_WEBSOCKET_KEY = "Sec-WebSocket-Key";
