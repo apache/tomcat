@@ -32,4 +32,10 @@ public class PojoMessageHandlerWholeText
         super(pojo, method, session, params, indexPayload, unwrap,
                 indexSession);
     }
+
+    @Override
+    protected Object decode(String message) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
