@@ -32,4 +32,10 @@ public class PojoMessageHandlerWholeBinary
             int indexSession) {
         super(pojo, method, session, params, indexPayload, unwrap, indexSession);
     }
+
+    @Override
+    protected Object decode(ByteBuffer message) {
+        // TODO Not implemented
+        return null;
+    }
 }

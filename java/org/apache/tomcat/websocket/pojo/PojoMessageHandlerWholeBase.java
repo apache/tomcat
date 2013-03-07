@@ -42,15 +42,29 @@ public abstract class PojoMessageHandlerWholeBase<T>
 
     @Override
     public final void onMessage(T message) {
+
+        // Can this message be decoded?
+        Object payload = decode(message);
+
+        if (payload == null) {
+            // Not decoded. Unwrap if required. Unwrap only ever applies to
+            // ByteBuffers
+            if (unwrap) {
+                ByteBuffer bb = (ByteBuffer) message;
+                byte[] array = new byte[bb.remaining()];
+                bb.get(array);
+                payload = array;
+            } else {
+                payload = message;
+            }
+        }
+
         Object[] parameters = params.clone();
         if (indexSession != -1) {
             parameters[indexSession] = session;
         }
-        if (unwrap) {
-            parameters[indexPayload] = ((ByteBuffer) message).array();
-        } else {
-            parameters[indexPayload] = message;
-        }
+        parameters[indexPayload] = payload;
+
         Object result;
         try {
             result = method.invoke(pojo, parameters);
@@ -59,4 +73,7 @@ public abstract class PojoMessageHandlerWholeBase<T>
         }
         processResult(result);
     }
+
+
+    protected abstract Object decode(T message);
 }

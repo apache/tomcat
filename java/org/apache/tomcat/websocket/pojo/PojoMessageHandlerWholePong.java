@@ -32,4 +32,10 @@ public class PojoMessageHandlerWholePong
             int indexSession) {
         super(pojo, method, session, params, indexPayload, unwrap, indexSession);
     }
+
+    @Override
+    protected Object decode(PongMessage message) {
+        // Never decoded
+        return null;
+    }
 }
