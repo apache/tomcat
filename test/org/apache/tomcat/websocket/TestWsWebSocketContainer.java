@@ -49,7 +49,7 @@ import org.apache.coyote.http11.Http11Protocol;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicBinary;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicHandler;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicText;
-import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterEndpoint;
+import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterProgrammaticEndpoint;
 import org.apache.tomcat.websocket.server.WsListener;
 import org.apache.tomcat.websocket.server.WsServerContainer;
 
@@ -83,7 +83,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         WebSocketContainer wsContainer =
                 ContainerProvider.getWebSocketContainer();
-        Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
                 new URI("http://localhost:" + getPort() +
                         TesterEchoServer.Config.PATH_ASYNC));
@@ -114,7 +114,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         WebSocketContainer wsContainer =
                 ContainerProvider.getWebSocketContainer();
-        wsContainer.connectToServer(TesterEndpoint.class,
+        wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
                 new URI("ftp://localhost:" + getPort() +
                         TesterEchoServer.Config.PATH_ASYNC));
@@ -133,7 +133,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         WebSocketContainer wsContainer =
                 ContainerProvider.getWebSocketContainer();
-        wsContainer.connectToServer(TesterEndpoint.class,
+        wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
                 new URI("http://" + TesterEchoServer.Config.PATH_ASYNC));
     }
@@ -221,7 +221,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         tomcat.start();
 
-        Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
                         new URI("http://localhost:" + getPort() +
                                 TesterEchoServer.Config.PATH_BASIC));
@@ -292,7 +292,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         tomcat.start();
 
-        Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
                 new URI("http://localhost:" + getPort() + BlockingConfig.PATH));
 
@@ -373,7 +373,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         tomcat.start();
 
-        Session wsSession = wsContainer.connectToServer(TesterEndpoint.class,
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
                 new URI("http://localhost:" + getPort() +
                         ConstantTxConfig.PATH));

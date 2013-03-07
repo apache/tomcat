@@ -21,54 +21,37 @@ import java.util.Map;
 
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
-import javax.websocket.server.ServerEndpointConfig;
 
-/**
- * Wrapper class for instances of POJOs annotated with
- * {@link javax.websocket.server.ServerEndpoint} so they appear as standard
- * {@link Endpoint} instances.
- */
-public class PojoEndpoint extends Endpoint {
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
-    public static final String POJO_PATH_PARAM_KEY =
-            "org.apache.tomcat.websocket.pojo.PojoEndpoint.pathParams";
-    public static final String POJO_METHOD_MAPPING_KEY =
-            "org.apache.tomcat.websocket.pojo.PojoEndpoint.methodMapping";
+public abstract class PojoEndpointBase extends Endpoint {
+
+    private static final Log log = LogFactory.getLog(PojoEndpointBase.class);
+    private static final StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
 
     private Object pojo;
     private Map<String,String> pathParameters;
     private PojoMethodMapping methodMapping;
 
 
-    @Override
-    public void onOpen(Session session, EndpointConfig endpointConfig) {
-
-        ServerEndpointConfig sec = (ServerEndpointConfig) endpointConfig;
-
-        try {
-            pojo = sec.getConfigurator().getEndpointInstance(
-                    sec.getEndpointClass());
-        } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        pathParameters = (Map<String, String>) sec.getUserProperties().get(
-                POJO_PATH_PARAM_KEY);
-        methodMapping = (PojoMethodMapping) sec.getUserProperties().get(
-                POJO_METHOD_MAPPING_KEY);
+    protected final void doOnOpen(Session session) {
+        PojoMethodMapping methodMapping = getMethodMapping();
+        Object pojo = getPojo();
+        Map<String,String> pathParameters = getPathParameters();
 
         if (methodMapping.getOnOpen() != null) {
             try {
                 methodMapping.getOnOpen().invoke(pojo,
                         methodMapping.getOnOpenArgs(pathParameters, session));
-            } catch (IllegalAccessException | IllegalArgumentException
-                    | InvocationTargetException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new IllegalArgumentException(sm.getString(
+                        "pojoEndpointBase.onOpenFail",
+                        pojo.getClass().getName()), e);
             }
         }
         for (MessageHandler mh : methodMapping.getMessageHandlers(pojo,
@@ -79,22 +62,24 @@ public class PojoEndpoint extends Endpoint {
 
 
     @Override
-    public void onClose(Session session, CloseReason closeReason) {
+    public final void onClose(Session session, CloseReason closeReason) {
+
         if (methodMapping.getOnClose() != null) {
             try {
                 methodMapping.getOnClose().invoke(pojo,
                         methodMapping.getOnCloseArgs(pathParameters, session));
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                log.error(sm.getString("pojoEndpointBase.onCloseFail",
+                        pojo.getClass().getName()), e);
             }
         }
     }
 
 
     @Override
-    public void onError(Session session, Throwable throwable) {
+    public final void onError(Session session, Throwable throwable) {
+
         if (methodMapping.getOnError() != null) {
             try {
                 methodMapping.getOnError().invoke(
@@ -103,9 +88,24 @@ public class PojoEndpoint extends Endpoint {
                                 throwable));
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                log.error(sm.getString("pojoEndpointBase.onErrorFail",
+                        pojo.getClass().getName()), e);
             }
         }
+    }
+
+    protected Object getPojo() { return pojo; }
+    protected void setPojo(Object pojo) { this.pojo = pojo; }
+
+
+    protected Map<String,String> getPathParameters() { return pathParameters; }
+    protected void setPathParameters(Map<String,String> pathParameters) {
+        this.pathParameters = pathParameters;
+    }
+
+
+    protected PojoMethodMapping getMethodMapping() { return methodMapping; }
+    protected void setMethodMapping(PojoMethodMapping methodMapping) {
+        this.methodMapping = methodMapping;
     }
 }

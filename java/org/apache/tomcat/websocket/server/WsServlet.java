@@ -46,7 +46,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.apache.tomcat.websocket.Constants;
 import org.apache.tomcat.websocket.WsRequest;
-import org.apache.tomcat.websocket.pojo.PojoEndpoint;
+import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
 
 /**
  * Handles the initial HTTP connection for WebSocket connections.
@@ -140,7 +140,7 @@ public class WsServlet extends HttpServlet {
             if (Endpoint.class.isAssignableFrom(clazz)) {
                 ep = (Endpoint) sec.getEndpointClass().newInstance();
             } else {
-                ep = new PojoEndpoint();
+                ep = new PojoEndpointServer();
             }
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ServletException(e);
