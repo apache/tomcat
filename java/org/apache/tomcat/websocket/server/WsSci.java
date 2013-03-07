@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket.server;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.ServletContainerInitializer;
@@ -23,14 +24,18 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HandlesTypes;
 import javax.websocket.DeploymentException;
+import javax.websocket.Endpoint;
+import javax.websocket.server.ServerApplicationConfig;
 import javax.websocket.server.ServerEndpoint;
+import javax.websocket.server.ServerEndpointConfig;
 
 /**
  * Registers an interest in any class that is annotated with
  * {@link ServerEndpoint} so that Endpoint can be published via the WebSocket
  * server.
  */
-@HandlesTypes({ServerEndpoint.class})
+@HandlesTypes({ServerEndpoint.class, ServerEndpointConfig.class,
+        ServerApplicationConfig.class})
 public class WsSci implements ServletContainerInitializer {
 
     @Override
@@ -43,14 +48,62 @@ public class WsSci implements ServletContainerInitializer {
             return;
         }
 
+        // Group the discovered classes by type
+        Set<ServerApplicationConfig> serverApplicationConfigs = new HashSet<>();
+        Set<ServerEndpointConfig> scannedEndpointConfigs = new HashSet<>();
+        Set<Class<? extends Endpoint>> scannedEndpointClazzes = new HashSet<>();
+        Set<Class<?>> scannedPojoEndpoints = new HashSet<>();
+
+        try {
+            for (Class<?> clazz : clazzes) {
+                if (ServerApplicationConfig.class.isAssignableFrom(clazz)) {
+                    serverApplicationConfigs.add(
+                            (ServerApplicationConfig) clazz.newInstance());
+                }
+                if (ServerEndpointConfig.class.isAssignableFrom(clazz)) {
+                    @SuppressWarnings("unchecked")
+                    Class<? extends ServerEndpointConfig> configClazz =
+                            (Class<? extends ServerEndpointConfig>) clazz;
+                    ServerEndpointConfig config = configClazz.newInstance();
+                    scannedEndpointConfigs.add(config);
+                    scannedEndpointClazzes.add(
+                            (Class<? extends Endpoint>) config.getEndpointClass());
+                }
+                if (clazz.isAnnotationPresent(ServerEndpoint.class)) {
+                    scannedPojoEndpoints.add(clazz);
+                }
+            }
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new ServletException(e);
+        }
+
+        // Filter the results
+        Set<ServerEndpointConfig> filteredEndpointConfigs = new HashSet<>();
+        Set<Class<?>> filteredPojoEndpoints = new HashSet<>();
+
+        if (serverApplicationConfigs.isEmpty()) {
+            filteredEndpointConfigs.addAll(scannedEndpointConfigs);
+            filteredPojoEndpoints.addAll(scannedPojoEndpoints);
+        } else {
+            for (ServerApplicationConfig config : serverApplicationConfigs) {
+                filteredEndpointConfigs.addAll(
+                        config.getEndpointConfigs(scannedEndpointClazzes));
+            }
+        }
+
         WsServerContainer sc = WsServerContainer.getServerContainer();
         sc.setServletContext(ctx);
-        for (Class<?> clazz : clazzes) {
-            try {
-                sc.addEndpoint(clazz);
-            } catch (DeploymentException e) {
-                throw new ServletException(e);
+        try {
+            // Deploy endpoints
+            for (ServerEndpointConfig config : filteredEndpointConfigs) {
+                sc.addEndpoint(config);
             }
+            // Deploy POJOs
+            for (Class<?> clazz : filteredPojoEndpoints) {
+                sc.addEndpoint(clazz);
+            }
+        } catch (DeploymentException e) {
+            throw new ServletException(e);
         }
     }
 }
