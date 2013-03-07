@@ -59,11 +59,6 @@ public abstract class PojoMessageHandlerBase<T> {
         }
 
         RemoteEndpoint.Basic remoteEndpoint = session.getBasicRemote();
-        // TODO: Remove this once sendXxx is implemented?
-        if (remoteEndpoint == null) {
-            return;
-        }
-
         try {
             if (result instanceof String) {
                 remoteEndpoint.sendText((String) result);

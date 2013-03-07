@@ -46,6 +46,8 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 public class WsWebSocketContainer
@@ -57,6 +59,7 @@ public class WsWebSocketContainer
     private static final Charset iso88591 = Charset.forName("ISO-8859-1");
     private static final byte[] crlf = new byte[] {13, 10};
 
+    private final Log log = LogFactory.getLog(WsWebSocketContainer.class);
     private final Map<Class<?>, Set<WsSession>> endpointSessionMap =
             new HashMap<>();
     private final Map<WsSession,WsSession> sessions = new ConcurrentHashMap<>();
@@ -404,7 +407,7 @@ public class WsWebSocketContainer
 
         int index = line.indexOf(':');
         if (index == -1) {
-            // TODO Log invalid header
+            log.warn(sm.getString("wsWebSocketContainer.invalidHeader", line));
             return;
         }
         String headerName = line.substring(0, index).trim().toLowerCase();
