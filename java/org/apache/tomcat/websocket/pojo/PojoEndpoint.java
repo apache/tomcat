@@ -44,15 +44,14 @@ public class PojoEndpoint extends Endpoint {
 
 
     @Override
-    public void onOpen(Session session,
-            EndpointConfig endpointConfiguration) {
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
 
-        ServerEndpointConfig sec =
-                (ServerEndpointConfig) endpointConfiguration;
+        ServerEndpointConfig sec = (ServerEndpointConfig) endpointConfig;
 
         try {
-            pojo = sec.getEndpointClass().newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            pojo = sec.getConfigurator().getEndpointInstance(
+                    sec.getEndpointClass());
+        } catch (InstantiationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
