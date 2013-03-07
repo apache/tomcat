@@ -348,7 +348,7 @@ public class PojoMethodMapping {
             if (indexBoolean == -1) {
                 // Basic
                 if (indexString != -1) {
-                    mh = new PojoMessageHandlerWholeString(pojo, m,  session,
+                    mh = new PojoMessageHandlerWholeText(pojo, m,  session,
                             params, indexString, false, indexSession);
                 } else if (indexByteArray != -1) {
                     mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
@@ -363,7 +363,7 @@ public class PojoMethodMapping {
             } else {
                 // ASync
                 if (indexString != -1) {
-                    mh = new PojoMessageHandlerPartialString(pojo, m, session,
+                    mh = new PojoMessageHandlerPartialText(pojo, m, session,
                             params, indexString, false, indexBoolean,
                             indexSession);
                 } else if (indexByteArray != -1) {
