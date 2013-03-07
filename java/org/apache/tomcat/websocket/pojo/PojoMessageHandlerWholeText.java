@@ -21,12 +21,12 @@ import java.lang.reflect.Method;
 import javax.websocket.Session;
 
 /**
- * String specific concrete whole message implementation.
+ * Text specific concrete whole message implementation.
  */
-public class PojoMessageHandlerWholeString
+public class PojoMessageHandlerWholeText
         extends PojoMessageHandlerWholeBase<String> {
 
-    public PojoMessageHandlerWholeString(Object pojo, Method method,
+    public PojoMessageHandlerWholeText(Object pojo, Method method,
             Session session, Object[] params, int indexPayload, boolean unwrap,
             int indexSession) {
         super(pojo, method, session, params, indexPayload, unwrap,
