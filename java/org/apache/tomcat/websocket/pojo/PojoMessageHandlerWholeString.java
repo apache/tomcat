@@ -17,20 +17,19 @@
 package org.apache.tomcat.websocket.pojo;
 
 import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
 
 import javax.websocket.Session;
 
 /**
- * ByteBuffer specific concrete asynchronous implementation.
+ * String specific concrete whole message implementation.
  */
-public class PojoMessageHandlerAsyncBinary
-        extends PojoMessageHandlerAsyncBase<ByteBuffer>{
+public class PojoMessageHandlerWholeString
+        extends PojoMessageHandlerWholeBase<String> {
 
-    public PojoMessageHandlerAsyncBinary(Object pojo, Method method,
+    public PojoMessageHandlerWholeString(Object pojo, Method method,
             Session session, Object[] params, int indexPayload, boolean unwrap,
-            int indexBoolean, int indexSession) {
-        super(pojo, method, session, params, indexPayload, unwrap, indexBoolean,
+            int indexSession) {
+        super(pojo, method, session, params, indexPayload, unwrap,
                 indexSession);
     }
 }

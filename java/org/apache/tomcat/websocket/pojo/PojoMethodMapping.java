@@ -348,30 +348,30 @@ public class PojoMethodMapping {
             if (indexBoolean == -1) {
                 // Basic
                 if (indexString != -1) {
-                    mh = new PojoMessageHandlerBasicString(pojo, m,  session,
+                    mh = new PojoMessageHandlerWholeString(pojo, m,  session,
                             params, indexString, false, indexSession);
                 } else if (indexByteArray != -1) {
-                    mh = new PojoMessageHandlerBasicBinary(pojo, m, session,
+                    mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
                             params, indexByteArray, true, indexSession);
                 } else if (indexByteBuffer != -1) {
-                    mh = new PojoMessageHandlerBasicBinary(pojo, m, session,
+                    mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
                             params, indexByteBuffer, false, indexSession);
                 } else {
-                    mh = new PojoMessageHandlerBasicPong(pojo, m, session,
+                    mh = new PojoMessageHandlerWholePong(pojo, m, session,
                             params, indexPong, false, indexSession);
                 }
             } else {
                 // ASync
                 if (indexString != -1) {
-                    mh = new PojoMessageHandlerAsyncString(pojo, m, session,
+                    mh = new PojoMessageHandlerPartialString(pojo, m, session,
                             params, indexString, false, indexBoolean,
                             indexSession);
                 } else if (indexByteArray != -1) {
-                    mh = new PojoMessageHandlerAsyncBinary(pojo, m, session,
+                    mh = new PojoMessageHandlerPartialBinary(pojo, m, session,
                             params, indexByteArray, true, indexBoolean,
                             indexSession);
                 } else {
-                    mh = new PojoMessageHandlerAsyncBinary(pojo, m, session,
+                    mh = new PojoMessageHandlerPartialBinary(pojo, m, session,
                             params, indexByteBuffer, false, indexBoolean,
                             indexSession);
                 }

@@ -18,18 +18,18 @@ package org.apache.tomcat.websocket.pojo;
 
 import java.lang.reflect.Method;
 
+import javax.websocket.PongMessage;
 import javax.websocket.Session;
 
 /**
- * String specific concrete basic implementation.
+ * PongMessage specific concrete whole message implementation.
  */
-public class PojoMessageHandlerBasicString
-        extends PojoMessageHandlerBasicBase<String> {
+public class PojoMessageHandlerWholePong
+        extends PojoMessageHandlerWholeBase<PongMessage> {
 
-    public PojoMessageHandlerBasicString(Object pojo, Method method,
+    public PojoMessageHandlerWholePong(Object pojo, Method method,
             Session session, Object[] params, int indexPayload, boolean unwrap,
             int indexSession) {
-        super(pojo, method, session, params, indexPayload, unwrap,
-                indexSession);
+        super(pojo, method, session, params, indexPayload, unwrap, indexSession);
     }
 }
