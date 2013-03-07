@@ -85,8 +85,17 @@ public class WsWebSocketContainer
     @Override
     public Session connectToServer(Class<?> annotatedEndpointClass, URI path)
             throws DeploymentException {
-        // TODO Auto-generated method stub
-        return null;
+
+        Object pojo;
+        try {
+            pojo = annotatedEndpointClass.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new DeploymentException(sm.getString(
+                    "wsWebSocketContainer.endpointCreateFail",
+                    annotatedEndpointClass.getName()), e);
+        }
+
+        return connectToServer(pojo, path);
     }
 
 
