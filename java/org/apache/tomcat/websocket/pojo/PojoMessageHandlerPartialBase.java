@@ -24,25 +24,31 @@ import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
 /**
- * Common implementation code for the POJO basic message handlers. All the real
- * work is done in this class and in the superclass.
+ * Common implementation code for the POJO partial message handlers. All
+ * the real work is done in this class and in the superclass.
  *
  * @param <T>   The type of message to handle
  */
-public abstract class PojoMessageHandlerBasicBase<T>
-        extends PojoMessageHandlerBase<T> implements MessageHandler.Whole<T> {
+public abstract class PojoMessageHandlerPartialBase<T>
+        extends PojoMessageHandlerBase<T> implements MessageHandler.Partial<T> {
 
-    public PojoMessageHandlerBasicBase(Object pojo, Method method,
+    private final int indexBoolean;
+
+    public PojoMessageHandlerPartialBase(Object pojo, Method method,
             Session session, Object[] params, int indexPayload,
-            boolean unwrap, int indexSession) {
+            boolean unwrap, int indexBoolean, int indexSession) {
         super(pojo, method, session, params, indexPayload, unwrap,
                 indexSession);
+        this.indexBoolean = indexBoolean;
     }
 
 
     @Override
-    public final void onMessage(T message) {
+    public final void onMessage(T message, boolean last) {
         Object[] parameters = params.clone();
+        if (indexBoolean != -1) {
+            parameters[indexBoolean] = Boolean.valueOf(last);
+        }
         if (indexSession != -1) {
             parameters[indexSession] = session;
         }
@@ -55,7 +61,7 @@ public abstract class PojoMessageHandlerBasicBase<T>
         try {
             result = method.invoke(pojo, parameters);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(e);
         }
         processResult(result);
     }

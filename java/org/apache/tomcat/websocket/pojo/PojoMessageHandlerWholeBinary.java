@@ -22,12 +22,12 @@ import java.nio.ByteBuffer;
 import javax.websocket.Session;
 
 /**
- * ByteBuffer specific concrete basic implementation.
+ * ByteBuffer specific concrete whole message implementation.
  */
-public class PojoMessageHandlerBasicBinary
-        extends PojoMessageHandlerBasicBase<ByteBuffer> {
+public class PojoMessageHandlerWholeBinary
+        extends PojoMessageHandlerWholeBase<ByteBuffer> {
 
-    public PojoMessageHandlerBasicBinary(Object pojo, Method method,
+    public PojoMessageHandlerWholeBinary(Object pojo, Method method,
             Session session, Object[] params, int indexPayload, boolean unwrap,
             int indexSession) {
         super(pojo, method, session, params, indexPayload, unwrap, indexSession);

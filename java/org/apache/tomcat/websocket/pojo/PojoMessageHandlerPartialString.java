@@ -21,12 +21,12 @@ import java.lang.reflect.Method;
 import javax.websocket.Session;
 
 /**
- * String specific concrete asynchronous implementation.
+ * String specific concrete partial implementation.
  */
-public class PojoMessageHandlerAsyncString
-        extends PojoMessageHandlerAsyncBase<String>{
+public class PojoMessageHandlerPartialString
+        extends PojoMessageHandlerPartialBase<String>{
 
-    public PojoMessageHandlerAsyncString(Object pojo, Method method,
+    public PojoMessageHandlerPartialString(Object pojo, Method method,
             Session session, Object[] params, int indexPayload, boolean unwrap,
             int indexBoolean, int indexSession) {
         super(pojo, method, session, params, indexPayload, unwrap, indexBoolean,

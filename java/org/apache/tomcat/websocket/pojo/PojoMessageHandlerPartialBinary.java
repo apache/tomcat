@@ -17,19 +17,20 @@
 package org.apache.tomcat.websocket.pojo;
 
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
 
-import javax.websocket.PongMessage;
 import javax.websocket.Session;
 
 /**
- * PongMessage specific concrete basic implementation.
+ * ByteBuffer specific concrete partial implementation.
  */
-public class PojoMessageHandlerBasicPong
-        extends PojoMessageHandlerBasicBase<PongMessage> {
+public class PojoMessageHandlerPartialBinary
+        extends PojoMessageHandlerPartialBase<ByteBuffer>{
 
-    public PojoMessageHandlerBasicPong(Object pojo, Method method,
+    public PojoMessageHandlerPartialBinary(Object pojo, Method method,
             Session session, Object[] params, int indexPayload, boolean unwrap,
-            int indexSession) {
-        super(pojo, method, session, params, indexPayload, unwrap, indexSession);
+            int indexBoolean, int indexSession) {
+        super(pojo, method, session, params, indexPayload, unwrap, indexBoolean,
+                indexSession);
     }
 }
