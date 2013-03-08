@@ -18,9 +18,11 @@ package org.apache.tomcat.websocket.pojo;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.Set;
 
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
+import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
@@ -39,7 +41,7 @@ public abstract class PojoEndpointBase extends Endpoint {
     private PojoMethodMapping methodMapping;
 
 
-    protected final void doOnOpen(Session session) {
+    protected final void doOnOpen(Session session, EndpointConfig config) {
         PojoMethodMapping methodMapping = getMethodMapping();
         Object pojo = getPojo();
         Map<String,String> pathParameters = getPathParameters();
@@ -55,7 +57,7 @@ public abstract class PojoEndpointBase extends Endpoint {
             }
         }
         for (MessageHandler mh : methodMapping.getMessageHandlers(pojo,
-                pathParameters, session)) {
+                pathParameters, session, config)) {
             session.addMessageHandler(mh);
         }
     }
@@ -72,6 +74,14 @@ public abstract class PojoEndpointBase extends Endpoint {
                     | InvocationTargetException e) {
                 log.error(sm.getString("pojoEndpointBase.onCloseFail",
                         pojo.getClass().getName()), e);
+            }
+        }
+
+        // Trigger the destroy method for any associated decoders
+        Set<MessageHandler> messageHandlers = session.getMessageHandlers();
+        for (MessageHandler messageHandler : messageHandlers) {
+            if (messageHandler instanceof PojoMessageHandlerWholeBase<?>) {
+                ((PojoMessageHandlerWholeBase<?>) messageHandler).onClose();
             }
         }
     }

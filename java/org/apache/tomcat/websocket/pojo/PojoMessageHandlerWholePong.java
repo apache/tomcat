@@ -38,4 +38,10 @@ public class PojoMessageHandlerWholePong
         // Never decoded
         return null;
     }
+
+
+    @Override
+    protected void onClose() {
+        // NO-OP
+    }
 }

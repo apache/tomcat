@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -118,10 +119,12 @@ public class PojoMethodMapping {
 
 
     public Set<MessageHandler> getMessageHandlers(Object pojo,
-            Map<String,String> pathParameters, Session session) {
+            Map<String,String> pathParameters, Session session,
+            EndpointConfig config) {
         Set<MessageHandler> result = new HashSet<>();
         for (MessageMethod messageMethod : onMessage) {
-            result.add(messageMethod.getMessageHandler(pojo, pathParameters, session));
+            result.add(messageMethod.getMessageHandler(pojo, pathParameters,
+                    session, config));
         }
         return result;
     }
@@ -330,7 +333,8 @@ public class PojoMethodMapping {
 
 
         public MessageHandler getMessageHandler(Object pojo,
-                Map<String,String> pathParameters, Session session) {
+                Map<String,String> pathParameters, Session session,
+                EndpointConfig config) {
             Object[] params = new Object[m.getParameterTypes().length];
 
             for (Map.Entry<Integer,PojoPathParam> entry :
@@ -349,13 +353,14 @@ public class PojoMethodMapping {
                 // Basic
                 if (indexString != -1) {
                     mh = new PojoMessageHandlerWholeText(pojo, m,  session,
-                            params, indexString, false, indexSession);
+                            config, params, indexString, false, indexSession);
                 } else if (indexByteArray != -1) {
                     mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
-                            params, indexByteArray, true, indexSession);
+                            config, params, indexByteArray, true, indexSession);
                 } else if (indexByteBuffer != -1) {
                     mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
-                            params, indexByteBuffer, false, indexSession);
+                            config, params, indexByteBuffer, false,
+                            indexSession);
                 } else {
                     mh = new PojoMessageHandlerWholePong(pojo, m, session,
                             params, indexPong, false, indexSession);

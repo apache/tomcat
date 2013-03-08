@@ -18,7 +18,13 @@ package org.apache.tomcat.websocket.pojo;
 
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.websocket.Decoder;
+import javax.websocket.Decoder.Binary;
+import javax.websocket.Decoder.BinaryStream;
+import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
 
 /**
@@ -27,15 +33,45 @@ import javax.websocket.Session;
 public class PojoMessageHandlerWholeBinary
         extends PojoMessageHandlerWholeBase<ByteBuffer> {
 
+    private final List<Decoder> decoders = new ArrayList<>();
+
     public PojoMessageHandlerWholeBinary(Object pojo, Method method,
-            Session session, Object[] params, int indexPayload, boolean unwrap,
-            int indexSession) {
+            Session session, EndpointConfig config, Object[] params,
+            int indexPayload, boolean unwrap, int indexSession) {
         super(pojo, method, session, params, indexPayload, unwrap, indexSession);
+        try {
+            for (Class<? extends Decoder> decoderClazz : config.getDecoders()) {
+                if (Binary.class.isAssignableFrom(decoderClazz)) {
+                    Binary<?> decoder = (Binary<?>) decoderClazz.newInstance();
+                    decoder.init(config);
+                    decoders.add(decoder);
+                } else if (Decoder.TextStream.class.isAssignableFrom(
+                        decoderClazz)) {
+                    BinaryStream<?> decoder =
+                            (BinaryStream<?>) decoderClazz.newInstance();
+                    decoder.init(config);
+                    decoders.add(decoder);
+                } else {
+                    // Text decoder - ignore is
+                }
+            }
+        } catch (IllegalAccessException | InstantiationException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
+
 
     @Override
     protected Object decode(ByteBuffer message) {
         // TODO Not implemented
         return null;
+    }
+
+
+    @Override
+    protected void onClose() {
+        for (Decoder decoder : decoders) {
+            decoder.destroy();
+        }
     }
 }
