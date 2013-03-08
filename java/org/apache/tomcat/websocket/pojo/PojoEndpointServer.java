@@ -66,6 +66,6 @@ public class PojoEndpointServer extends PojoEndpointBase {
                         POJO_METHOD_MAPPING_KEY);
         setMethodMapping(methodMapping);
 
-        doOnOpen(session);
+        doOnOpen(session, endpointConfig);
     }
 }

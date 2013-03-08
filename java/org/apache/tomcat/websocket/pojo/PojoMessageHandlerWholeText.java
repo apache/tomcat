@@ -17,7 +17,13 @@
 package org.apache.tomcat.websocket.pojo;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.websocket.Decoder;
+import javax.websocket.Decoder.Text;
+import javax.websocket.Decoder.TextStream;
+import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
 
 /**
@@ -26,16 +32,46 @@ import javax.websocket.Session;
 public class PojoMessageHandlerWholeText
         extends PojoMessageHandlerWholeBase<String> {
 
+    private final List<Decoder> decoders = new ArrayList<>();
+
     public PojoMessageHandlerWholeText(Object pojo, Method method,
-            Session session, Object[] params, int indexPayload, boolean unwrap,
-            int indexSession) {
+            Session session, EndpointConfig config, Object[] params,
+            int indexPayload, boolean unwrap, int indexSession) {
         super(pojo, method, session, params, indexPayload, unwrap,
                 indexSession);
+        try {
+            for (Class<? extends Decoder> decoderClazz : config.getDecoders()) {
+                if (Text.class.isAssignableFrom(decoderClazz)) {
+                    Text<?> decoder = (Text<?>) decoderClazz.newInstance();
+                    decoder.init(config);
+                    decoders.add(decoder);
+                } else if (Decoder.TextStream.class.isAssignableFrom(
+                        decoderClazz)) {
+                    TextStream<?> decoder =
+                            (TextStream<?>) decoderClazz.newInstance();
+                    decoder.init(config);
+                    decoders.add(decoder);
+                } else {
+                    // Binary decoder - ignore is
+                }
+            }
+        } catch (IllegalAccessException | InstantiationException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
+
 
     @Override
     protected Object decode(String message) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+
+    @Override
+    protected void onClose() {
+        for (Decoder decoder : decoders) {
+            decoder.destroy();
+        }
     }
 }

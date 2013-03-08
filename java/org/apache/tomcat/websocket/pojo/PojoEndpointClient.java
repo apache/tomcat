@@ -32,6 +32,6 @@ public class PojoEndpointClient extends PojoEndpointBase {
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {
-        doOnOpen(session);
+        doOnOpen(session, config);
     }
 }

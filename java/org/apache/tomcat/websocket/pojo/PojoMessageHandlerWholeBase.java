@@ -76,4 +76,5 @@ public abstract class PojoMessageHandlerWholeBase<T>
 
 
     protected abstract Object decode(T message);
+    protected abstract void onClose();
 }
