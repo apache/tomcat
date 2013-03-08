@@ -16,21 +16,29 @@
  */
 package org.apache.tomcat.websocket.pojo;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.Decoder.Text;
 import javax.websocket.Decoder.TextStream;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Text specific concrete whole message implementation.
  */
 public class PojoMessageHandlerWholeText
         extends PojoMessageHandlerWholeBase<String> {
+
+    private static final StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final List<Decoder> decoders = new ArrayList<>();
 
@@ -52,7 +60,7 @@ public class PojoMessageHandlerWholeText
                     decoder.init(config);
                     decoders.add(decoder);
                 } else {
-                    // Binary decoder - ignore is
+                    // Binary decoder - ignore it
                 }
             }
         } catch (IllegalAccessException | InstantiationException e) {
@@ -62,8 +70,22 @@ public class PojoMessageHandlerWholeText
 
 
     @Override
-    protected Object decode(String message) {
-        // TODO Auto-generated method stub
+    protected Object decode(String message) throws DecodeException {
+        for (Decoder decoder : decoders) {
+            if (decoder instanceof Text) {
+                if (((Text<?>) decoder).willDecode(message)) {
+                    return ((Text<?>) decoder).decode(message);
+                }
+            } else {
+                StringReader r = new StringReader(message);
+                try {
+                    return ((TextStream<?>) decoder).decode(r);
+                } catch (IOException ioe) {
+                    throw new DecodeException(message, sm.getString(
+                            "pojoMessageHandlerWhole.decodeIoFail"), ioe);
+                }
+            }
+        }
         return null;
     }
 

@@ -20,8 +20,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
+import javax.websocket.DecodeException;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
+import javax.websocket.SessionException;
+
+import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.WsSession;
 
 /**
  * Common implementation code for the POJO whole message handlers. All the real
@@ -31,6 +36,9 @@ import javax.websocket.Session;
  */
 public abstract class PojoMessageHandlerWholeBase<T>
         extends PojoMessageHandlerBase<T> implements MessageHandler.Whole<T> {
+
+    private static final StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
 
     public PojoMessageHandlerWholeBase(Object pojo, Method method,
             Session session, Object[] params, int indexPayload,
@@ -44,7 +52,15 @@ public abstract class PojoMessageHandlerWholeBase<T>
     public final void onMessage(T message) {
 
         // Can this message be decoded?
-        Object payload = decode(message);
+        Object payload;
+        try {
+            payload = decode(message);
+        } catch (DecodeException de) {
+            SessionException se = new SessionException(sm.getString(
+                    "pojoMessageHandlerWhole.decodeFail"), de, session);
+            ((WsSession) session).getLocal().onError(session, se);
+            return;
+        }
 
         if (payload == null) {
             // Not decoded. Unwrap if required. Unwrap only ever applies to
@@ -75,6 +91,6 @@ public abstract class PojoMessageHandlerWholeBase<T>
     }
 
 
-    protected abstract Object decode(T message);
+    protected abstract Object decode(T message) throws DecodeException;
     protected abstract void onClose();
 }
