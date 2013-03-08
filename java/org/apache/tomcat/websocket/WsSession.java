@@ -386,6 +386,11 @@ public class WsSession implements Session {
     }
 
 
+    public Endpoint getLocal() {
+        return localEndpoint;
+    }
+
+
     protected MessageHandler getTextMessageHandler() {
         return textMessageHandler;
     }

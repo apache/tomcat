@@ -148,6 +148,9 @@
       <!-- Ideally want to remove this -->
       <allow pkg="org.apache.tomcat.websocket.pojo"/>
       <disallow pkg="javax.servlet"/>
+      <subpackage name="pojo">
+        <allow pkg="org.apache.tomcat.websocket"/>
+      </subpackage>
       <subpackage name="server">
         <allow pkg="javax.servlet"/>
         <allow pkg="org.apache.tomcat.websocket"/>

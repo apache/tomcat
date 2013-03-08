@@ -16,22 +16,30 @@
  */
 package org.apache.tomcat.websocket.pojo;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.Decoder.Binary;
 import javax.websocket.Decoder.BinaryStream;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * ByteBuffer specific concrete whole message implementation.
  */
 public class PojoMessageHandlerWholeBinary
         extends PojoMessageHandlerWholeBase<ByteBuffer> {
+
+    private static final StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final List<Decoder> decoders = new ArrayList<>();
 
@@ -52,7 +60,7 @@ public class PojoMessageHandlerWholeBinary
                     decoder.init(config);
                     decoders.add(decoder);
                 } else {
-                    // Text decoder - ignore is
+                    // Text decoder - ignore it
                 }
             }
         } catch (IllegalAccessException | InstantiationException e) {
@@ -62,8 +70,24 @@ public class PojoMessageHandlerWholeBinary
 
 
     @Override
-    protected Object decode(ByteBuffer message) {
-        // TODO Not implemented
+    protected Object decode(ByteBuffer message) throws DecodeException {
+        for (Decoder decoder : decoders) {
+            if (decoder instanceof Binary) {
+                if (((Binary<?>) decoder).willDecode(message)) {
+                    return ((Binary<?>) decoder).decode(message);
+                }
+            } else {
+                byte[] array = new byte[message.limit() - message.position()];
+                message.get(array);
+                ByteArrayInputStream bais = new ByteArrayInputStream(array);
+                try {
+                    return ((BinaryStream<?>) decoder).decode(bais);
+                } catch (IOException ioe) {
+                    throw new DecodeException(message, sm.getString(
+                            "pojoMessageHandlerWhole.decodeIoFail"), ioe);
+                }
+            }
+        }
         return null;
     }
 
