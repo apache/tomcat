@@ -18,15 +18,19 @@ package org.apache.tomcat.websocket.pojo;
 
 import java.util.Collections;
 
+import javax.websocket.Decoder;
+import javax.websocket.DeploymentException;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
 
 
 public class PojoEndpointClient extends PojoEndpointBase {
 
-    public PojoEndpointClient(Object pojo) {
+    public PojoEndpointClient(Object pojo,
+            Class<? extends Decoder>[] decoders) throws DeploymentException {
         setPojo(pojo);
-        setMethodMapping(new PojoMethodMapping(pojo.getClass(), null));
+        setMethodMapping(
+                new PojoMethodMapping(pojo.getClass(), decoders, null));
         setPathParameters(Collections.EMPTY_MAP);
     }
 

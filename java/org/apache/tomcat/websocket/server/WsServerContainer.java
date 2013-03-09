@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket.server;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -27,6 +28,7 @@ import javax.websocket.DeploymentException;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
+import javax.websocket.server.ServerEndpointConfig.Configurator;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -181,7 +183,8 @@ public class WsServerContainer extends WsWebSocketContainer
         }
 
         pojoMap.put(mapPath, pojo);
-        pojoMethodMap.put(pojo, new PojoMethodMapping(pojo, wsPath));
+        pojoMethodMap.put(pojo,
+                new PojoMethodMapping(pojo, annotation.decoders(), wsPath));
         addWsServletMapping(servletPath);
     }
 
@@ -205,14 +208,31 @@ public class WsServerContainer extends WsWebSocketContainer
         }
         Class<?> pojo = pojoMap.get(servletPath);
         if (pojo != null) {
+            ServerEndpoint annotation =
+                    pojo.getAnnotation(ServerEndpoint.class);
             PojoMethodMapping methodMapping = pojoMethodMap.get(pojo);
             if (methodMapping != null) {
+                Configurator configurator;
+                try {
+                    configurator = annotation.configurator().newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
+                    throw new IllegalStateException(sm.getString(
+                            "serverContainer.configuratorFail",
+                            annotation.configurator().getName(),
+                            pojo.getClass().getName()), e);
+                }
                 sec = ServerEndpointConfig.Builder.create(
-                        pojo, methodMapping.getWsPath()).build();
+                        pojo, methodMapping.getWsPath()).
+                        decoders(Arrays.asList(annotation.decoders())).
+                        encoders(Arrays.asList(annotation.encoders())).
+                        configurator(configurator).
+                        build();
                 sec.getUserProperties().put(
-                        PojoEndpointServer.POJO_PATH_PARAM_KEY, pathParameters);
+                        PojoEndpointServer.POJO_PATH_PARAM_KEY,
+                        pathParameters);
                 sec.getUserProperties().put(
-                        PojoEndpointServer.POJO_METHOD_MAPPING_KEY, methodMapping);
+                        PojoEndpointServer.POJO_METHOD_MAPPING_KEY,
+                        methodMapping);
                 return sec;
             }
         }

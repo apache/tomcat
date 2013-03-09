@@ -24,6 +24,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -80,7 +81,15 @@ public class WsWebSocketContainer
     public Session connectToServer(Object pojo, URI path)
             throws DeploymentException {
 
-        Endpoint ep = new PojoEndpointClient(pojo);
+        ClientEndpoint annotation =
+                pojo.getClass().getAnnotation(ClientEndpoint.class);
+        if (annotation == null) {
+            throw new DeploymentException(
+                    sm.getString("wsWebSocketContainer.missingAnnotation",
+                            pojo.getClass().getName()));
+        }
+
+        Endpoint ep = new PojoEndpointClient(pojo, annotation.decoders());
 
         Class<? extends ClientEndpointConfig.Configurator> configuratorClazz =
                 pojo.getClass().getAnnotation(
@@ -97,9 +106,11 @@ public class WsWebSocketContainer
             }
         }
 
-        ClientEndpointConfig config =
-                ClientEndpointConfig.Builder.create().configurator(
-                        configurator).build();
+        ClientEndpointConfig config = ClientEndpointConfig.Builder.create().
+                configurator(configurator).
+                decoders(Arrays.asList(annotation.decoders())).
+                encoders(Arrays.asList(annotation.encoders())).
+                build();
         return connectToServer(ep, config, path);
     }
 

@@ -19,11 +19,17 @@ package org.apache.tomcat.websocket.pojo;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.websocket.Decoder;
+import javax.websocket.Decoder.Binary;
+import javax.websocket.Decoder.BinaryStream;
+import javax.websocket.DeploymentException;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.OnClose;
@@ -34,6 +40,9 @@ import javax.websocket.PongMessage;
 import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 
+import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.Util;
+
 /**
  * For a POJO class annotated with
  * {@link javax.websocket.server.ServerEndpoint}, an instance of this class
@@ -41,6 +50,9 @@ import javax.websocket.server.PathParam;
  * onXXX calls.
  */
 public class PojoMethodMapping {
+
+    private static final StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final Method onOpen;
     private final Method onClose;
@@ -52,8 +64,13 @@ public class PojoMethodMapping {
     private final String wsPath;
 
 
-    public PojoMethodMapping(Class<?> clazzPojo, String wsPath) {
+    public PojoMethodMapping(Class<?> clazzPojo,
+            Class<? extends Decoder>[] decoderClazzes, String wsPath)
+                    throws DeploymentException {
+
         this.wsPath = wsPath;
+
+        List<DecoderEntry> decoders = getDecoders(decoderClazzes);
         Method open = null;
         Method close = null;
         Method error = null;
@@ -68,7 +85,7 @@ public class PojoMethodMapping {
                     method.getAnnotation(OnError.class) != null) {
                 error = method;
             } else if (method.getAnnotation(OnMessage.class) != null) {
-                onMessage.add(new MessageMethod(method));
+                onMessage.add(new MessageMethod(method, decoders));
             }
         }
         this.onOpen = open;
@@ -126,6 +143,29 @@ public class PojoMethodMapping {
             result.add(messageMethod.getMessageHandler(pojo, pathParameters,
                     session, config));
         }
+        return result;
+    }
+
+
+    private static List<DecoderEntry> getDecoders(
+            Class<? extends Decoder>[] decoderClazzes)
+                    throws DeploymentException{
+
+        List<DecoderEntry> result = new ArrayList<>();
+        for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
+            Decoder instance;
+            try {
+                instance = decoderClazz.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new DeploymentException(
+                        sm.getString("wsRemoteEndpoint.invalidEncoder",
+                                decoderClazz.getName()), e);
+            }
+            DecoderEntry entry = new DecoderEntry(
+                    Util.getDecoderType(decoderClazz), instance);
+            result.add(entry);
+        }
+
         return result;
     }
 
@@ -232,7 +272,7 @@ public class PojoMethodMapping {
         private int indexPayload = -1;
 
 
-        public MessageMethod(Method m) {
+        public MessageMethod(Method m, List<DecoderEntry> decoderEntries) {
             this.m = m;
 
             Class<?>[] types = m.getParameterTypes();
@@ -290,6 +330,31 @@ public class PojoMethodMapping {
                     } else {
                         // TODO i18n
                         throw new IllegalArgumentException();
+                    }
+                } else {
+                    for (DecoderEntry decoderEntry : decoderEntries) {
+                        if (decoderEntry.getClazz().isAssignableFrom(
+                                types[i])) {
+                            if (Binary.class.isAssignableFrom(
+                                        decoderEntry.getDecoder().getClass()) ||
+                                    BinaryStream.class.isAssignableFrom(
+                                            decoderEntry.getDecoder().getClass())) {
+                                if (indexByteBuffer == -1) {
+                                    indexByteBuffer = i;
+                                } else {
+                                    // TODO i18n
+                                    throw new IllegalArgumentException();
+                                }
+                                break;
+                            } else {
+                                if (indexString == -1) {
+                                    indexString = i;
+                                } else {
+                                    // TODO i18n
+                                    throw new IllegalArgumentException();
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -382,6 +447,26 @@ public class PojoMethodMapping {
                 }
             }
             return mh;
+        }
+    }
+
+
+    private static class DecoderEntry {
+
+        private final Class<?> clazz;
+        private final Decoder decoder;
+
+        public DecoderEntry(Class<?> clazz, Decoder decoder) {
+            this.clazz = clazz;
+            this.decoder = decoder;
+        }
+
+        public Class<?> getClazz() {
+            return clazz;
+        }
+
+        public Decoder getDecoder() {
+            return decoder;
         }
     }
 }

@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.Decoder;
 import javax.websocket.Encoder;
 import javax.websocket.MessageHandler;
 
@@ -33,7 +34,7 @@ import javax.websocket.MessageHandler;
  * Utility class for internal use only within the
  * {@link org.apache.tomcat.websocket} package.
  */
-class Util {
+public class Util {
 
     private static final Queue<SecureRandom> randoms =
             new ConcurrentLinkedQueue<>();
@@ -139,6 +140,11 @@ class Util {
     static Class<?> getMessageType(MessageHandler listener) {
         return (Class<?>) Util.getGenericType(MessageHandler.class,
                 listener.getClass());
+    }
+
+
+    public static Class<?> getDecoderType(Class<? extends Decoder> Decoder) {
+        return (Class<?>) Util.getGenericType(Decoder.class, Decoder);
     }
 
 
