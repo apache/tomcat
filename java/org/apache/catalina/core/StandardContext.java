@@ -5199,7 +5199,7 @@ public class StandardContext extends ContainerBase
                     entry.getKey().onStartup(entry.getValue(),
                             getServletContext());
                 } catch (ServletException e) {
-                    // TODO: Log error
+                    log.error(sm.getString("standardContext.sciFail"), e);
                     ok = false;
                     break;
                 }
