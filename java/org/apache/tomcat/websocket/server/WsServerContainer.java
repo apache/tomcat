@@ -212,14 +212,19 @@ public class WsServerContainer extends WsWebSocketContainer
                     pojo.getAnnotation(ServerEndpoint.class);
             PojoMethodMapping methodMapping = pojoMethodMap.get(pojo);
             if (methodMapping != null) {
-                Configurator configurator;
-                try {
-                    configurator = annotation.configurator().newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
-                    throw new IllegalStateException(sm.getString(
-                            "serverContainer.configuratorFail",
-                            annotation.configurator().getName(),
-                            pojo.getClass().getName()), e);
+                Class<? extends Configurator> configuratorClazz =
+                        annotation.configurator();
+                Configurator configurator = null;
+                if (!configuratorClazz.equals(Configurator.class)) {
+                    try {
+                        configurator = annotation.configurator().newInstance();
+                    } catch (InstantiationException |
+                            IllegalAccessException e) {
+                        throw new IllegalStateException(sm.getString(
+                                "serverContainer.configuratorFail",
+                                annotation.configurator().getName(),
+                                pojo.getClass().getName()), e);
+                    }
                 }
                 sec = ServerEndpointConfig.Builder.create(
                         pojo, methodMapping.getWsPath()).
