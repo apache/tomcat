@@ -76,6 +76,13 @@ public class TestB2CConverter {
                 // Likely something used internally by the JRE
                 continue;
             }
+            if (charset.name().equals("COMPOUND_TEXT")) {
+                // Java for-internal-use-only charset
+                // See:
+                // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6392670
+                // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6381697
+                continue;
+            }
             try {
                 leftover = charset.newEncoder().maxBytesPerChar();
             } catch (UnsupportedOperationException uoe) {
