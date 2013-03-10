@@ -23,6 +23,7 @@ import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HandlesTypes;
+import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.server.ServerApplicationConfig;
@@ -56,6 +57,11 @@ public class WsSci implements ServletContainerInitializer {
 
         try {
             for (Class<?> clazz : clazzes) {
+                // Protect against scanning the WebSocket API JARs
+                if (clazz.getPackage().getName().startsWith(
+                        ContainerProvider.class.getPackage().getName())) {
+                    continue;
+                }
                 if (ServerApplicationConfig.class.isAssignableFrom(clazz)) {
                     serverApplicationConfigs.add(
                             (ServerApplicationConfig) clazz.newInstance());
