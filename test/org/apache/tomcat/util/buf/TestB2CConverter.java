@@ -68,6 +68,7 @@ public class TestB2CConverter {
     @Test
     public void testLeftoverSize() {
         float maxLeftover = 0;
+        String charsetName = "UNSET";
         for (Charset charset : Charset.availableCharsets().values()) {
             float leftover;
             if (charset.name().toLowerCase().startsWith("x-")) {
@@ -83,9 +84,11 @@ public class TestB2CConverter {
             }
             if (leftover > maxLeftover) {
                 maxLeftover = leftover;
+                charsetName = charset.name();
             }
         }
-        Assert.assertTrue("Limit needs to be at least " + maxLeftover,
+        Assert.assertTrue("Limit needs to be at least " + maxLeftover +
+                " (used in charset '" + charsetName + "')",
                 maxLeftover <= B2CConverter.LEFTOVER_SIZE);
     }
 
