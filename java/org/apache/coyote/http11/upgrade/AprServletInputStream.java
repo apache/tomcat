@@ -18,7 +18,6 @@ package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.tomcat.jni.Socket;
@@ -29,8 +28,6 @@ public class AprServletInputStream extends AbstractServletInputStream {
 
     private final SocketWrapper<Long> wrapper;
     private final long socket;
-    private final Lock blockingStatusReadLock;
-    private final WriteLock blockingStatusWriteLock;
     private volatile boolean eagain = false;
     private volatile boolean closed = false;
 
@@ -38,9 +35,6 @@ public class AprServletInputStream extends AbstractServletInputStream {
     public AprServletInputStream(SocketWrapper<Long> wrapper) {
         this.wrapper = wrapper;
         this.socket = wrapper.getSocket().longValue();
-        ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-        this.blockingStatusReadLock = lock.readLock();
-        this.blockingStatusWriteLock =lock.writeLock();
     }
 
 
@@ -48,10 +42,13 @@ public class AprServletInputStream extends AbstractServletInputStream {
     protected int doRead(boolean block, byte[] b, int off, int len)
             throws IOException {
 
+        Lock readLock = wrapper.getBlockingStatusReadLock();
+        WriteLock writeLock = wrapper.getBlockingStatusWriteLock();
+
         boolean readDone = false;
         int result = 0;
         try {
-            blockingStatusReadLock.lock();
+            readLock.lock();
             if (wrapper.getBlockingStatus() == block) {
                 if (closed) {
                     throw new IOException(sm.getString("apr.closed"));
@@ -60,31 +57,31 @@ public class AprServletInputStream extends AbstractServletInputStream {
                 readDone = true;
             }
         } finally {
-            blockingStatusReadLock.unlock();
+            readLock.unlock();
         }
 
         if (!readDone) {
             try {
-                blockingStatusWriteLock.lock();
+                writeLock.lock();
                 wrapper.setBlockingStatus(block);
                 // Set the current settings for this socket
                 Socket.optSet(socket, Socket.APR_SO_NONBLOCK, (block ? 0 : 1));
                 // Downgrade the lock
                 try {
-                    blockingStatusReadLock.lock();
-                    blockingStatusWriteLock.unlock();
+                    readLock.lock();
+                    writeLock.unlock();
                     if (closed) {
                         throw new IOException(sm.getString("apr.closed"));
                     }
                     result = Socket.recv(socket, b, off, len);
                 } finally {
-                    blockingStatusReadLock.unlock();
+                    readLock.unlock();
                 }
             } finally {
                 // Should have been released above but may not have been on some
                 // exception paths
-                if (blockingStatusWriteLock.isHeldByCurrentThread()) {
-                    blockingStatusWriteLock.unlock();
+                if (writeLock.isHeldByCurrentThread()) {
+                    writeLock.unlock();
                 }
             }
         }
