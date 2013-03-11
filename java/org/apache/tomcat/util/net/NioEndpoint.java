@@ -1548,7 +1548,22 @@ public class NioEndpoint extends AbstractEndpoint {
                 int handshake = -1;
 
                 try {
-                    if (key!=null) handshake = socket.handshake(key.isReadable(), key.isWritable());
+                    if (key != null) {
+                        if (socket.isHandshakeComplete()) {
+                            handshake = 0;
+                        } else {
+                            handshake = socket.handshake(
+                                    key.isReadable(), key.isWritable());
+                            // The handshake process reads/writes from/to the
+                            // socket. status may therefore be OPEN_WRITE once
+                            // the handshake completes. However, the handshake
+                            // happens when the socket is opened so the status
+                            // must always be OPEN_READ after it completes. It
+                            // is OK to always set this as it is only used if
+                            // the handshake completes.
+                            status = SocketStatus.OPEN_READ;
+                        }
+                    }
                 }catch ( IOException x ) {
                     handshake = -1;
                     if ( log.isDebugEnabled() ) log.debug("Error during SSL handshake",x);
