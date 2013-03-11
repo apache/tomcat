@@ -68,17 +68,19 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        preWriteChecks();
-
-        writeInternal(new byte[] { (byte) b }, 0, 1);
+        synchronized (writeLock) {
+            preWriteChecks();
+            writeInternal(new byte[] { (byte) b }, 0, 1);
+        }
     }
 
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        preWriteChecks();
-
-        writeInternal(b, off, len);
+        synchronized (writeLock) {
+            preWriteChecks();
+            writeInternal(b, off, len);
+        }
     }
 
 
@@ -97,51 +99,50 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
 
 
     private void writeInternal(byte[] b, int off, int len) throws IOException {
-        synchronized (writeLock) {
-            if (listener == null) {
-                // Simple case - blocking IO
-                doWrite(true, b, off, len);
+        if (listener == null) {
+            // Simple case - blocking IO
+            doWrite(true, b, off, len);
+        } else {
+            // Non-blocking IO
+            // If the non-blocking read does not complete, doWrite() will add
+            // the socket back into the poller. The poller way trigger a new
+            // write event before this method has finished updating buffer. This
+            // sync makes sure that buffer is updated before the next write
+            // executes.
+            int written = doWrite(false, b, off, len);
+            if (written < len) {
+                // TODO: - Reuse the buffer
+                //       - Only reallocate if it gets too big (>8k?)
+                buffer = new byte[len - written];
+                System.arraycopy(b, off + written, buffer, 0, len - written);
             } else {
-                // Non-blocking IO
-                // If the non-blocking read does not complete, doWrite() will add
-                // the socket back into the poller. The poller way trigger a new
-                // write event before this method has finished updating buffer. This
-                // sync makes sure that buffer is updated before the next write
-                // executes.
-                int written = doWrite(false, b, off, len);
-                if (written < len) {
-                    // TODO: - Reuse the buffer
-                    //       - Only reallocate if it gets too big (>8k?)
-                    buffer = new byte[len - written];
-                    System.arraycopy(b, off + written, buffer, 0, len - written);
-                } else {
-                    buffer = null;
-                }
+                buffer = null;
             }
         }
     }
 
 
     protected final void onWritePossible() {
-        try {
-            writeInternal(buffer, 0, buffer.length);
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
-        }
-        // Make sure isReady() and onWritePossible() have a consistent view of
-        // buffer and fireListener when determining if the listener should fire
-        boolean fire = false;
+        synchronized (writeLock) {
+            try {
+                writeInternal(buffer, 0, buffer.length);
+            } catch (IOException ioe) {
+                throw new RuntimeException(ioe);
+            }
+            // Make sure isReady() and onWritePossible() have a consistent view of
+            // buffer and fireListener when determining if the listener should fire
+            boolean fire = false;
 
-        synchronized (fireListenerLock) {
-            if (buffer == null && fireListener) {
-                fireListener = false;
-                fire = true;
+            synchronized (fireListenerLock) {
+                if (buffer == null && fireListener) {
+                    fireListener = false;
+                    fire = true;
+                }
+            }
+            if (fire) {
+                listener.onWritePossible();
             }
         }
-        if (fire) {
-            listener.onWritePossible();
-        }
-
     }
 
     /**
