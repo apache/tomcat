@@ -44,7 +44,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
                     sm.getString("upgrade.sos.canWrite.is"));
         }
 
-        // Make sure canWrite() and onWritePossible() have a consistent view of
+        // Make sure isReady() and onWritePossible() have a consistent view of
         // buffer and fireListener when determining if the listener should fire
         synchronized (fireListenerLock) {
             boolean result = (buffer == null);
@@ -128,7 +128,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
-        // Make sure canWrite() and onWritePossible() have a consistent view of
+        // Make sure isReady() and onWritePossible() have a consistent view of
         // buffer and fireListener when determining if the listener should fire
         boolean fire = false;
 
