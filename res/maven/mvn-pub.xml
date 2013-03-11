@@ -312,6 +312,8 @@
     <doMavenDeploy artifactId="tomcat-util"/>
     <doMavenDeploy artifactId="tomcat-coyote"/>
     <doMavenDeploy artifactId="tomcat-dbcp"/>
+    <doMavenDeploy artifactId="tomcat-websocket"/>
+    <doMavenDeploy artifactId="tomcat-websocket-api"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-es"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-fr"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-ja"/>
