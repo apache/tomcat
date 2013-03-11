@@ -32,7 +32,7 @@ public abstract class ServerContainerProvider {
      * Use the service loader API to obtain a reference to the
      * {@link ServerContainer}.
      */
-    static ServerContainer getServerContainer() {
+    public static ServerContainer getServerContainer() {
         ServerContainer result = null;
 
         ServiceLoader<ServerContainerProvider> serviceLoader =
