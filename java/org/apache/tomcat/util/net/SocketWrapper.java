@@ -16,6 +16,10 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
 public class SocketWrapper<E> {
 
     protected volatile E socket;
@@ -39,12 +43,18 @@ public class SocketWrapper<E> {
     private String remoteAddr = null;
     /*
      * Used if block/non-blocking is set at the socket level. The client is
-     * responsible for the thread-safe use of this field.
+     * responsible for the thread-safe use of this field via the locks provided.
      */
     private volatile boolean blockingStatus = true;
+    private final Lock blockingStatusReadLock;
+    private final WriteLock blockingStatusWriteLock;
+
 
     public SocketWrapper(E socket) {
         this.socket = socket;
+        ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+        this.blockingStatusReadLock = lock.readLock();
+        this.blockingStatusWriteLock =lock.writeLock();
     }
 
     public E getSocket() {
@@ -83,5 +93,9 @@ public class SocketWrapper<E> {
     public boolean getBlockingStatus() { return blockingStatus; }
     public void setBlockingStatus(boolean blockingStatus) {
         this.blockingStatus = blockingStatus;
+    }
+    public Lock getBlockingStatusReadLock() { return blockingStatusReadLock; }
+    public WriteLock getBlockingStatusWriteLock() {
+        return blockingStatusWriteLock;
     }
 }
