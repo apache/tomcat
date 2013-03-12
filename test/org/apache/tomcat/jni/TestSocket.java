@@ -27,8 +27,6 @@ import org.junit.Test;
 public class TestSocket {
 
     private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
-    private static final Object clientWait = new Object();
-    private static final Object serverWait = new Object();
 
     @Test
     public void testNonBlockingEagain() throws Exception {
@@ -64,17 +62,27 @@ public class TestSocket {
         // Read the first 20 digits.
         data = clientRead(is, bb, data, 20);
 
-        // Block until the server fills up it's send buffers
-        synchronized (clientWait) {
-            clientWait.wait();
+        // Block until the server fills up it's send buffers and then sleep for
+        // 5 seconds
+        int count = 0;
+        while (count < 5) {
+            java.lang.Thread.sleep(1000);
+            if (s.isPolling()) {
+                count ++;
+            }
         }
 
-        // Read the next 1000 digits
-        data = clientRead(is, bb, data, 1000);
+        // Read the next 10000 digits
+        data = clientRead(is, bb, data, 10000);
 
-        // Unblock the server
-        synchronized (serverWait) {
-            serverWait.notify();
+        // Block until the server fills up it's send buffers and then sleep for
+        // 5 seconds
+        count = 0;
+        while (count < 5) {
+            java.lang.Thread.sleep(1000);
+            if (s.isPolling()) {
+                count ++;
+            }
         }
 
         // Read to the end
@@ -116,7 +124,12 @@ public class TestSocket {
     private static final class Server implements Runnable {
 
         private final long rootPool;
-        private final long serverSock;
+        private final long serverSocket;
+        private final long serverSocketPool;
+        private final long pollerPool;
+        private final long poller;
+
+        private volatile boolean polling = false;
 
         public Server() throws Exception {
             rootPool = Pool.create(0);
@@ -125,40 +138,47 @@ public class TestSocket {
             /*long serverSockPool = */ Pool.create(rootPool);
             long inetAddress =
                     Address.info(null, Socket.APR_INET, 0, 0, rootPool);
-            serverSock = Socket.create(
+            serverSocket = Socket.create(
                     Address.getInfo(inetAddress).family,
                     Socket.SOCK_STREAM,
                     Socket.APR_PROTO_TCP,
                     rootPool);
 
-            int ret = Socket.bind(serverSock, inetAddress);
+            int ret = Socket.bind(serverSocket, inetAddress);
             if (ret != 0) {
                 throw new IOException("Bind failed [" + ret + "]");
             }
-            ret = Socket.listen(serverSock, 100);
+            ret = Socket.listen(serverSocket, 100);
             if (ret != 0) {
                 throw new IOException("Listen failed [" + ret + "]");
             }
+
+            // Poller
+            serverSocketPool = Pool.create(rootPool);
+            pollerPool = Pool.create(serverSocketPool);
+            poller = Poll.create(10, pollerPool, 0, -1);
         }
 
 
         public int getPort() throws Exception {
-            long sa = Address.get(Socket.APR_LOCAL, serverSock);
+            long sa = Address.get(Socket.APR_LOCAL, serverSocket);
             Sockaddr addr = Address.getInfo(sa);
             return addr.port;
         }
 
 
+        public boolean isPolling() {
+            return polling;
+        }
+
         @Override
         public void run() {
             try {
                 // Accept an incoming connection
-                long socket = Socket.accept(serverSock);
+                long socket = Socket.accept(serverSocket);
 
                 // Make socket non-blocking
                 Socket.timeoutSet(socket, 0);
-
-                boolean first = true;
 
                 int data = 0;
                 do {
@@ -185,18 +205,29 @@ public class TestSocket {
                         len -= written;
 
                         if (written == 0 && len > 0) {
-                            if (first) {
-                                first = false;
-                                // Stop client from blocking to free up some
-                                // space so the server can write
-                                synchronized (clientWait) {
-                                    clientWait.notify();
-                                }
-                                // Wait for the client
-                                synchronized (serverWait) {
-                                    serverWait.wait();
+                            // Write buffer is full. Poll until there is space
+                            Poll.add(poller, socket, Poll.APR_POLLOUT);
+                            polling = true;
+
+                            int rv = 0;
+                            long[] desc = new long[2];
+
+                            while (rv == 0) {
+                                System.out.println("Poll");
+                                rv = Poll.poll(poller, 1000000, desc, true);
+                                if (rv > 0) {
+                                    // There is space. Continue to write.
+                                } else if (-rv == Status.TIMEUP) {
+                                    // Poll timed out. Poll again.
+                                } else if (rv < 0) {
+                                    // Something went wrong
+                                    System.err.println(
+                                            "Poller failure [" + -rv + "]");
+                                } else {
+                                    // rv == 0. Poll again.
                                 }
                             }
+                            polling = false;
                         }
                     } while (len > 0);
 
