@@ -16,13 +16,20 @@
  */
 package org.apache.tomcat.jni;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.security.SecureRandom;
+
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.tomcat.util.net.TesterSupport;
 
 public class TestSocket {
 
@@ -50,7 +57,13 @@ public class TestSocket {
 
         // Open a connection to the server
         String host = null;
-        java.net.Socket socket = new java.net.Socket(host, port);
+        javax.net.ssl.SSLContext sc =
+                javax.net.ssl.SSLContext.getInstance("SSL");
+        sc.init(null, new TrustManager[] {new TesterSupport.TrustAllCerts()} ,
+                new SecureRandom());
+        SSLSocketFactory factory = sc.getSocketFactory();
+        java.net.Socket socket = factory.createSocket(host, port);
+
         // Infinite timeout
         socket.setSoTimeout(0);
         InputStream is = socket.getInputStream();
@@ -126,6 +139,7 @@ public class TestSocket {
         private final long rootPool;
         private final long serverSocket;
         private final long serverSocketPool;
+        private final long sslContext;
         private final long pollerPool;
         private final long poller;
 
@@ -153,6 +167,20 @@ public class TestSocket {
                 throw new IOException("Listen failed [" + ret + "]");
             }
 
+            // Setup SSL
+            SSL.randSet("builtin");
+            SSL.initialize(null);
+            sslContext = SSLContext.make(
+                    rootPool, SSL.SSL_PROTOCOL_ALL, SSL.SSL_MODE_SERVER);
+            SSLContext.setCipherSuite(sslContext, "ALL");
+            File certFile = new File(
+                    "test/org/apache/tomcat/util/net/localhost-cert.pem");
+            File keyFile = new File(
+                    "test/org/apache/tomcat/util/net/localhost-key.pem");
+            SSLContext.setCertificate(sslContext, certFile.getAbsolutePath(),
+                    keyFile.getAbsolutePath(), null, SSL.SSL_AIDX_RSA);
+            SSLContext.setVerify(sslContext, SSL.SSL_CVERIFY_NONE, 10);
+
             // Poller
             serverSocketPool = Pool.create(rootPool);
             pollerPool = Pool.create(serverSocketPool);
@@ -177,8 +205,15 @@ public class TestSocket {
                 // Accept an incoming connection
                 long socket = Socket.accept(serverSocket);
 
+                // Configure SSL
+                SSLSocket.attach(sslContext, socket);
+                if (SSLSocket.handshake(socket) != 0) {
+                    System.err.println("SSL handshake failed");
+                }
+
                 // Make socket non-blocking
                 Socket.timeoutSet(socket, 0);
+
 
                 int data = 0;
                 do {
