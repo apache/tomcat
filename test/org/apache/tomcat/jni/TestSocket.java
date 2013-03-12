@@ -65,11 +65,9 @@ public class TestSocket {
         data = clientRead(is, bb, data, 20);
 
         // Block until the server fills up it's send buffers
-        /*
         synchronized (clientWait) {
             clientWait.wait();
         }
-    */
 
         // Read the next 1000 digits
         data = clientRead(is, bb, data, 1000);
@@ -175,7 +173,7 @@ public class TestSocket {
                         written = Socket.send(socket, b, start, len);
                         if (written < 0) {
                             if (Status.APR_STATUS_IS_EAGAIN(-written)) {
-                                System.out.println("EAGAIN");
+                                // System.out.println("EAGAIN");
                                 written = 0;
                             } else {
                                 System.out.println("Error code [" + -written + "]");
