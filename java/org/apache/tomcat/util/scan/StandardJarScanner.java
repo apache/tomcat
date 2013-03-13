@@ -220,7 +220,7 @@ public class StandardJarScanner implements JarScanner {
             // already scanned WEB-INF/lib and WEB-INF/classes
             ClassLoader loader = classloader.getParent();
 
-            while (loader != stopLoader) {
+            while (loader != null && loader != stopLoader) {
                 if (loader instanceof URLClassLoader) {
                     URL[] urls = ((URLClassLoader) loader).getURLs();
                     for (int i=0; i<urls.length; i++) {
