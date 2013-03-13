@@ -71,6 +71,12 @@
         <code>ClassNotFoundException<code> when running in OSGi environment.
         (violetagg)
       </fix>
+      <fix>
+        <bug>52318</bug>: Version for imported package
+        <code>org.apache.juli.logging</code> is extended to include also 7.0.x
+        versions. The fix is applicable only when running in OSGi environment.
+        Patch provided by Martin Lichtin. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>
