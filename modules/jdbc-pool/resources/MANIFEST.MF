@@ -20,4 +20,4 @@ Import-Package:
   javax.naming;version="0",
   javax.naming.spi;version="0",
   javax.sql;version="0",
-  org.apache.juli.logging;version="[6.0.18, 7.0.0)"
+  org.apache.juli.logging;version="[6.0.18, 7.1.0)"
