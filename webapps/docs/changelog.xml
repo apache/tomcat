@@ -67,8 +67,8 @@
     <changelog>
       <fix>
         <bug>54684</bug>: Add <code>javax.naming.spi</code> to 
-        <code>Import-Package<code> header in MANIFEST.MF in order to resolve
-        <code>ClassNotFoundException<code> when running in OSGi environment.
+        <code>Import-Package</code> header in MANIFEST.MF in order to resolve
+        <code>ClassNotFoundException</code> when running in OSGi environment.
         (violetagg)
       </fix>
       <fix>
