@@ -98,6 +98,9 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
     }
 
 
+    /**
+     * Must hold writeLock to call this method.
+     */
     private void writeInternal(byte[] b, int off, int len) throws IOException {
         if (listener == null) {
             // Simple case - blocking IO
@@ -106,9 +109,9 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
             // Non-blocking IO
             // If the non-blocking read does not complete, doWrite() will add
             // the socket back into the poller. The poller way trigger a new
-            // write event before this method has finished updating buffer. This
-            // sync makes sure that buffer is updated before the next write
-            // executes.
+            // write event before this method has finished updating buffer. The
+            // writeLock sync makes sure that buffer is updated before the next
+            // write executes.
             int written = doWrite(false, b, off, len);
             if (written < len) {
                 // TODO: - Reuse the buffer
