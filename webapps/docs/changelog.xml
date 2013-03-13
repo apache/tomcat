@@ -61,6 +61,11 @@
         Ensure a log message is generated when a web application fails to start
         due to an error processing a ServletContainerInitializer. (markt)
       </fix>
+      <fix>
+        Prevent NPE in JAR scanning when running in an environment where the
+        bootstrap class loader is not an ancestor of the web application class
+        loader such as OSGi environments. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
