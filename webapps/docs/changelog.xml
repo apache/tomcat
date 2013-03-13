@@ -63,6 +63,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>54684</bug>: Add <code>javax.naming.spi</code> to 
+        <code>Import-Package<code> header in MANIFEST.MF in order to resolve
+        <code>ClassNotFoundException<code> when running in OSGi environment.
+        (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.38 (markt)">
   <subsection name="Catalina">
