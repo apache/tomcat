@@ -17,6 +17,7 @@
 package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
@@ -27,16 +28,25 @@ import org.apache.tomcat.util.net.SocketWrapper;
 
 public class AprServletOutputStream extends AbstractServletOutputStream {
 
+    private static final int SSL_OUTPUT_BUFFER_SIZE = 8192;
+
     private final AprEndpoint endpoint;
     private final SocketWrapper<Long> wrapper;
     private final long socket;
     private volatile boolean closed = false;
+    private final ByteBuffer sslOutputBuffer;
 
     public AprServletOutputStream(SocketWrapper<Long> wrapper,
             AprEndpoint endpoint) {
         this.endpoint = endpoint;
         this.wrapper = wrapper;
         this.socket = wrapper.getSocket().longValue();
+        if (endpoint.isSSLEnabled()) {
+            sslOutputBuffer = ByteBuffer.allocateDirect(SSL_OUTPUT_BUFFER_SIZE);
+            sslOutputBuffer.position(SSL_OUTPUT_BUFFER_SIZE);
+        } else {
+            sslOutputBuffer = null;
+        }
     }
 
 
@@ -97,9 +107,30 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
         int written;
 
         do {
-            written = Socket.send(socket, b, start, left);
+            if (endpoint.isSSLEnabled()) {
+                if (sslOutputBuffer.remaining() == 0) {
+                    // Buffer was fully written last time around
+                    sslOutputBuffer.clear();
+                    if (left < SSL_OUTPUT_BUFFER_SIZE) {
+                        sslOutputBuffer.put(b, start, left);
+                    } else {
+                        sslOutputBuffer.put(b, start, SSL_OUTPUT_BUFFER_SIZE);
+                    }
+                    sslOutputBuffer.flip();
+                } else {
+                    // Buffer still has data from previous attempt to write
+                    // APR + SSL requires that exactly the same parameters are
+                    // passed when re-attempting the write
+                }
+                written = Socket.sendb(socket, sslOutputBuffer, start, left);
+                if (written > 0) {
+                    sslOutputBuffer.position(
+                            sslOutputBuffer.position() + written);
+                }
+            } else {
+                written = Socket.send(socket, b, start, left);
+            }
             if (Status.APR_STATUS_IS_EAGAIN(-written)) {
-                endpoint.getPoller().add(socket, -1, false, true);
                 written = 0;
             } else if (written < 0) {
                 throw new IOException(sm.getString("apr.write.error",
