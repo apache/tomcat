@@ -40,6 +40,8 @@ public class TestSocket {
     // 10,000,000   Shows strange return values for written more clearly
     private static final int LIMIT = 100000;
     private static final byte[] DATA;
+    // Drop the chunk size to 2 and the problem occurs more often than not.
+    private static final int CHUNK_SIZE = 8;
     private static final boolean ENABLE_SSL = true;
 
     static {
@@ -107,7 +109,7 @@ public class TestSocket {
         // Block until the server fills up it's send buffers and then sleep for
         // 5 seconds
         int count = 0;
-        while (count < 3) {
+        while (count < 5) {
             java.lang.Thread.sleep(1000);
             if (s.isPolling()) {
                 count ++;
@@ -121,7 +123,7 @@ public class TestSocket {
         // Block until the server fills up it's send buffers and then sleep for
         // 5 seconds
         count = 0;
-        while (count < 3) {
+        while (count < 5) {
             java.lang.Thread.sleep(1000);
             if (s.isPolling()) {
                 count ++;
@@ -137,7 +139,7 @@ public class TestSocket {
 
 
     private int clientRead(InputStream is, ByteBuffer bb, int data, int limit)
-            throws IOException {
+            throws Exception {
         while (data < limit) {
             byte[] readBuffer = new byte[10];
             byte[] dataBuffer = new byte[10];
@@ -160,7 +162,7 @@ public class TestSocket {
                 len = expected.length();
                 bb.compact();
                 if (data%1000 == 0) {
-                    System.out.println("Client read to  [" + data + "]");
+                    System.out.println("Client read to [" + data + "]");
                 }
             }
         }
@@ -254,65 +256,88 @@ public class TestSocket {
                 // Make socket non-blocking
                 Socket.timeoutSet(socket, 0);
 
-                int start = 0;
-                int left = DATA.length;
-                int written;
+                int dataStart = 0;
+                int dataLeft = DATA.length;
 
-                System.out.println("To write [" + left + "]");
+                byte[] chunk = new byte[CHUNK_SIZE];
+                int chunkStart;
+                int chunkLeft;
+                int chunkWritten;
+
+
+
+                System.out.println("Data write [" + dataLeft + "]");
                 do {
-                    written = Socket.send(socket, DATA, start, left);
-                    if (written < 0) {
-                        if (Status.APR_STATUS_IS_EAGAIN(-written)) {
-                            System.out.println("EAGAIN");
-                            written = 0;
-                        } else {
-                            System.out.println("Error code [" + -written + "]");
-                            throw new RuntimeException();
-                        }
+                    chunkStart = 0;
+                    if (dataLeft < CHUNK_SIZE) {
+                        chunkLeft = dataLeft;
+                    } else {
+                        chunkLeft = CHUNK_SIZE;
                     }
 
-                    start += written;
-                    left -= written;
-                    System.out.println(
-                            "Written: [" +written + "], Left [" + left + "]");
+                    System.arraycopy(DATA, dataStart, chunk, chunkStart,
+                            chunkLeft);
+                    dataStart += chunkLeft;
+                    dataLeft -= chunkLeft;
 
-                    if (written == 0 && left > 0) {
-                        // Write buffer is full. Poll until there is space
-                        Poll.add(poller, socket, Poll.APR_POLLOUT);
-                        polling = true;
-                        int pollCount = 0;
-
-                        int rv = 0;
-                        long[] desc = new long[2];
-
-                        while (rv == 0) {
-                            System.out.println("Poll. Left [" + left + "]");
-                            rv = Poll.poll(poller, 1000000, desc, true);
-                            pollCount++;
-
-                            if (rv > 0) {
-                                // There is space. Continue to write.
-                            } else if (-rv == Status.TIMEUP) {
-                                rv = 0;
-                                // Poll timed out. Poll again.
-                            } else if (rv < 0) {
-                                // Something went wrong
-                                System.err.println(
-                                        "Poller failure [" + -rv + "]");
+                    do {
+                        chunkWritten = Socket.send(
+                                socket, chunk, chunkStart, chunkLeft);
+                        if (chunkWritten < 0) {
+                            if (Status.APR_STATUS_IS_EAGAIN(-chunkWritten)) {
+                                System.out.println("EAGAIN");
+                                chunkWritten = 0;
                             } else {
-                                // rv == 0. Poll again.
-                            }
-
-                            if (pollCount > 10) {
-                                // Should never get stuck in a polling loop
-                                // for this long.
-                                System.err.println(
-                                        "Polling loop [" + pollCount + "]");
+                                System.out.println(
+                                        "Error code [" + -chunkWritten + "]");
+                                throw new RuntimeException();
                             }
                         }
-                        polling = false;
-                    }
-                } while (left > 0);
+
+                        chunkStart += chunkWritten;
+                        chunkLeft -= chunkWritten;
+                        System.out.println("Chunk written: [" + chunkStart +
+                                "], Left [" + chunkLeft + "]");
+
+                        if (chunkWritten == 0 && chunkLeft > 0) {
+                            // Write buffer is full. Poll until there is space
+                            Poll.add(poller, socket, Poll.APR_POLLOUT);
+                            polling = true;
+                            int pollCount = 0;
+
+                            int rv = 0;
+                            long[] desc = new long[2];
+
+                            while (rv == 0) {
+                                System.out.println(
+                                        "Poll. Left [" + chunkLeft + "]");
+                                rv = Poll.poll(poller, 1000000, desc, true);
+                                pollCount++;
+
+                                if (rv > 0) {
+                                    // There is space. Continue to write.
+                                } else if (-rv == Status.TIMEUP) {
+                                    rv = 0;
+                                    // Poll timed out. Poll again.
+                                } else if (rv < 0) {
+                                    // Something went wrong
+                                    System.err.println(
+                                            "Poller failure [" + -rv + "]");
+                                } else {
+                                    // rv == 0. Poll again.
+                                }
+
+                                if (pollCount > 10) {
+                                    // Should never get stuck in a polling loop
+                                    // for this long.
+                                    System.err.println(
+                                            "Polling loop [" + pollCount + "]");
+                                }
+                            }
+                            polling = false;
+                        }
+                    } while (chunkLeft > 0);
+                } while (dataLeft > 0);
             } catch (Exception e) {
                 // May need to do something here
                 e.printStackTrace();
