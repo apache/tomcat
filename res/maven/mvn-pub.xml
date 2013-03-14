@@ -306,6 +306,10 @@
                   jarFileName="servlet-api.jar"
                srcJarFileName="servlet-api-src.jar"/>
 
+    <doMavenDeploy artifactId="tomcat-websocket-api"
+                  jarFileName="websocket-api.jar"
+               srcJarFileName="websocket-api-src.jar"/>
+
     <doMavenDeploy artifactId="tomcat-api"/>
     <doMavenDeploy artifactId="tomcat-jni"/>
     <doMavenDeploy artifactId="tomcat-spdy"/>
@@ -313,7 +317,6 @@
     <doMavenDeploy artifactId="tomcat-coyote"/>
     <doMavenDeploy artifactId="tomcat-dbcp"/>
     <doMavenDeploy artifactId="tomcat-websocket"/>
-    <doMavenDeploy artifactId="tomcat-websocket-api"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-es"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-fr"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-ja"/>
