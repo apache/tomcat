@@ -128,10 +128,21 @@ public class ApplicationPart implements Part {
         return fileItem.getString(encoding);
     }
 
+    /**
+     * Calls {@link #getSubmittedFileName()}.
+     *
+     * @deprecated Use {@link #getSubmittedFileName()} from Servlet 3.1 instead.
+     */
+    @Deprecated
+    public String getFilename() {
+        return getSubmittedFileName();
+    }
+
     /*
      * Adapted from FileUploadBase.getFileName()
      */
-    public String getFilename() {
+    @Override
+    public String getSubmittedFileName() {
         String fileName = null;
         String cd = getHeader("Content-Disposition");
         if (cd != null) {

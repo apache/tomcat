@@ -34,7 +34,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -55,7 +54,6 @@ import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
-import org.apache.tomcat.util.http.fileupload.ParameterParser;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -262,8 +260,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                             "htmlManagerServlet.deployUploadNoFile");
                     break;
                 }
-                filename =
-                    extractFilename(warPart.getHeader("Content-Disposition"));
+                filename = warPart.getSubmittedFileName();
                 if (!filename.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                     message = smClient.getString(
                             "htmlManagerServlet.deployUploadNotWar", filename);
@@ -322,35 +319,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
             warPart = null;
         }
         return message;
-    }
-
-    /*
-     * Adapted from FileUploadBase.getFileName()
-     */
-    private String extractFilename(String cd) {
-        String fileName = null;
-        if (cd != null) {
-            String cdl = cd.toLowerCase(Locale.ENGLISH);
-            if (cdl.startsWith("form-data") || cdl.startsWith("attachment")) {
-                ParameterParser parser = new ParameterParser();
-                parser.setLowerCaseNames(true);
-                // Parameter parser can handle null input
-                Map<String,String> params =
-                    parser.parse(cd, ';');
-                if (params.containsKey("filename")) {
-                    fileName = params.get("filename");
-                    if (fileName != null) {
-                        fileName = fileName.trim();
-                    } else {
-                        // Even if there is no value, the parameter is present,
-                        // so we return an empty file name rather than no file
-                        // name.
-                        fileName = "";
-                    }
-                }
-            }
-        }
-        return fileName;
     }
 
     /**

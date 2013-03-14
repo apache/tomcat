@@ -2606,7 +2606,7 @@ public class Request
                 for (FileItem item : items) {
                     ApplicationPart part = new ApplicationPart(item, mce);
                     parts.add(part);
-                    if (part.getFilename() == null) {
+                    if (part.getSubmittedFileName() == null) {
                         String name = part.getName();
                         String value = null;
                         try {
