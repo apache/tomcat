@@ -21,19 +21,16 @@ import java.nio.ByteBuffer;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.servlet.ServletContextEvent;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.ContainerProvider;
 import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
-import javax.websocket.DeploymentException;
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import javax.websocket.server.ServerEndpoint;
-import javax.websocket.server.ServerEndpointConfig.Configurator;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,8 +38,8 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.websocket.server.WsListener;
-import org.apache.tomcat.websocket.server.WsServerContainer;
+import org.apache.tomcat.websocket.pojo.Util.ServerConfigListener;
+import org.apache.tomcat.websocket.pojo.Util.SingletonConfigurator;
 
 public class TestEncodingDecoding extends TomcatBaseTest {
 
@@ -50,6 +47,12 @@ public class TestEncodingDecoding extends TomcatBaseTest {
 
     @Test
     public void test() throws Exception {
+
+        // Set up utility classes
+        Server server = new Server();
+        SingletonConfigurator.setInstance(server);
+        ServerConfigListener.setPojoClazz(Server.class);
+
         Tomcat tomcat = getTomcatInstance();
         // Must have a real docBase - just use temp
         Context ctx =
@@ -58,6 +61,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
 
         WebSocketContainer wsContainer =
                 ContainerProvider.getWebSocketContainer();
+
 
         tomcat.start();
 
@@ -68,8 +72,6 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         MsgString msg1 = new MsgString();
         msg1.setData(MESSAGE_ONE);
         session.getBasicRemote().sendObject(msg1);
-
-        Server server = ServerConfigurator.getServerInstance();
 
         // Should not take very long
         int i = 0;
@@ -111,13 +113,9 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     @ServerEndpoint(value="/",
             decoders={MsgStringDecoder.class, MsgByteDecoder.class},
             encoders={MsgStringEncoder.class, MsgByteEncoder.class},
-            configurator=ServerConfigurator.class)
+            configurator=SingletonConfigurator.class)
     public static class Server {
         private Queue<Object> received = new ConcurrentLinkedQueue<>();
-
-        public Server() {
-            System.out.println("Server created");
-        }
 
         @OnMessage
         public MsgString rx(MsgString in) {
@@ -134,38 +132,6 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         }
     }
 
-
-    public static class ServerConfigurator extends Configurator {
-
-        private static final Server server = new Server();
-
-        @Override
-        public <T> T getEndpointInstance(Class<T> clazz)
-                throws InstantiationException {
-            @SuppressWarnings("unchecked")
-            T result = (T) server;
-            return result;
-        }
-
-        public static Server getServerInstance() {
-            return server;
-        }
-    }
-
-    public static class ServerConfigListener extends WsListener {
-
-        @Override
-        public void contextInitialized(ServletContextEvent sce) {
-            super.contextInitialized(sce);
-            WsServerContainer sc = WsServerContainer.getServerContainer();
-            sc.setServletContext(sce.getServletContext());
-            try {
-                sc.addEndpoint(Server.class);
-            } catch (DeploymentException e) {
-                throw new IllegalStateException(e);
-            }
-        }
-    }
 
     public static class MsgString {
         private String data;
