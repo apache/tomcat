@@ -147,7 +147,7 @@
         Invalid UTF-8 sequences in a request body will trigger an IOException.
         The way the decoder is used has also been improved. The notable change
         is that invalid sequences at the end of the input now trigger an error
-        rather than being silebtly swallowed. (markt)
+        rather than being silently swallowed. (markt)
       </fix>
       <fix>
         <bug>54624</bug>: Ensure that the correct request body length is used
