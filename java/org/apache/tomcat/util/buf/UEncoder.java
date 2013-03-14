@@ -51,9 +51,12 @@ public final class UEncoder {
     }
 
 
-    /** URL Encode string, using a specified encoding.
+   /**
+    * URL Encode string, using a specified encoding.
     *
     * @param s string to be encoded
+    * @param start the beginning index, inclusive
+    * @param end the ending index, exclusive
     * @throws IOException If an I/O error occurs
     */
    public CharChunk encodeURL(String s, int start, int end)
@@ -66,6 +69,7 @@ public final class UEncoder {
        } else {
            bb.recycle();
            cb.recycle();
+           output.recycle();
        }
 
        for (int i = start; i < end; i++) {
