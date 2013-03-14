@@ -128,10 +128,22 @@ public class ApplicationPart implements Part {
         return fileItem.getString(encoding);
     }
 
-    /*
-     * Adapted from FileUploadBase.getFileName()
+    /**
+     * Calls {@link #getSubmittedFileName()}.
+     *
+     * @deprecated Use {@link #getSubmittedFileName()} from Servlet 3.1 instead.
+     *             This method will be removed in Tomcat 8.
      */
+    @Deprecated
     public String getFilename() {
+        return getSubmittedFileName();
+    }
+
+    /**
+     * Adapted from FileUploadBase.getFileName(). Method name chosen to be
+     * consistent with Servlet 3.1.
+     */
+    public String getSubmittedFileName() {
         String fileName = null;
         String cd = getHeader("Content-Disposition");
         if (cd != null) {
