@@ -89,6 +89,9 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
 
     private static final boolean RFC_5746_SUPPORTED;
 
+    private static final String[] DEFAULT_SERVER_PROTOCOLS;
+    private static final String[] DEAFULT_SERVER_CIPHER_SUITES;
+
     // Defaults - made public where re-used
     private static final String defaultProtocol = "TLS";
     private static final String defaultKeystoreType = "JKS";
@@ -102,23 +105,40 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
     static {
         boolean result = false;
         SSLContext context;
+        String[] ciphers = null;
+        String[] protocols = null;
         try {
             context = SSLContext.getInstance("TLS");
             context.init(null, null, null);
             SSLServerSocketFactory ssf = context.getServerSocketFactory();
-            String ciphers[] = ssf.getSupportedCipherSuites();
-            for (String cipher : ciphers) {
+            String supportedCiphers[] = ssf.getSupportedCipherSuites();
+            for (String cipher : supportedCiphers) {
                 if ("TLS_EMPTY_RENEGOTIATION_INFO_SCSV".equals(cipher)) {
                     result = true;
                     break;
                 }
             }
+
+            // There is no API to obtain the default server protocols and cipher
+            // suites. Having inspected the OpenJDK code there the same results
+            // can be achieved via the standard API but there is no guarantee
+            // that every JVM implementation determines the defaults the same
+            // way. Therefore the defaults are determined by creating a server
+            // socket and requested the configured values.
+
+            SSLServerSocket socket = (SSLServerSocket) ssf.createServerSocket();
+            ciphers = socket.getEnabledCipherSuites();
+            protocols = socket.getEnabledProtocols();
         } catch (NoSuchAlgorithmException e) {
             // Assume no RFC 5746 support
         } catch (KeyManagementException e) {
             // Assume no RFC 5746 support
+        } catch (IOException e) {
+            // Unable to determine default ciphers/protocols so use none
         }
         RFC_5746_SUPPORTED = result;
+        DEAFULT_SERVER_CIPHER_SUITES = ciphers;
+        DEFAULT_SERVER_PROTOCOLS = protocols;
     }
 
 
@@ -211,7 +231,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         }
         if ((requestedCiphersStr == null)
                 || (requestedCiphersStr.trim().length() == 0)) {
-            return context.getDefaultSSLParameters().getCipherSuites();
+            return DEAFULT_SERVER_CIPHER_SUITES;
         }
 
         List<String> requestedCiphers = new ArrayList<>();
@@ -222,7 +242,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
             }
         }
         if (requestedCiphers.isEmpty()) {
-            return context.getDefaultSSLParameters().getCipherSuites();
+            return DEAFULT_SERVER_CIPHER_SUITES;
         }
         List<String> ciphers = new ArrayList<>(requestedCiphers);
         ciphers.retainAll(Arrays.asList(context.getSupportedSSLParameters()
@@ -681,7 +701,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
     public String[] getEnableableProtocols(SSLContext context) {
         String[] requestedProtocols = endpoint.getSslEnabledProtocolsArray();
         if ((requestedProtocols == null) || (requestedProtocols.length == 0)) {
-            return context.getDefaultSSLParameters().getProtocols();
+            return DEFAULT_SERVER_PROTOCOLS;
         }
 
         List<String> protocols = new ArrayList<>(
