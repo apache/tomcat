@@ -117,7 +117,7 @@
             The locations for Context Descriptors are:
         </p>
         <ol>
-                <li>$CATALINA_BASE/conf/[enginename]/[hostname]/context.xml</li>
+                <li>$CATALINA_BASE/conf/[enginename]/[hostname]/[webappname].xml</li>
                 <li>$CATALINA_BASE/webapps/[webappname]/META-INF/context.xml</li>
         </ol>
         <p>
