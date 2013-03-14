@@ -68,6 +68,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>54690</bug>: Fix a regression caused by the previous fix for
+        <bug>54406</bug>. If no values are specified for sslEnabledProtocols or
+        ciphers use the default values for server sockets rather than the
+        default values for client sockets. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
