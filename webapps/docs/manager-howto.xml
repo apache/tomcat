@@ -442,7 +442,8 @@ http://localhost:8080/manager/text/deploy?config=file:/path/context.xml
 configuration ".xml" file and a web application ".war" file located
 on the server.</p>
 <source>
-http://localhost:8080/manager/text/deploy?config=file:/path/context.xml&amp;war=jar:file:/path/bar.war!/
+http://localhost:8080/manager/text/deploy
+ ?config=file:/path/context.xml&amp;war=jar:file:/path/bar.war!/
 </source>
 
 
@@ -1297,9 +1298,9 @@ http://webserver/manager/jmxproxy/?qry=STUFF
     fetch the value of a specific MBean's attribute. The general form of
     the <code>get</code> command is:
 
-    <source>
-      http://webserver/manager/jmxproxy/?get=BEANNAME&amp;att=MYATTRIBUTE&amp;key=MYKEY
-    </source>
+<source>
+http://webserver/manager/jmxproxy/?get=BEANNAME&amp;att=MYATTRIBUTE&amp;key=MYKEY
+</source>
 
     You must provide the following parameters:
     <ol>
@@ -1312,15 +1313,16 @@ http://webserver/manager/jmxproxy/?qry=STUFF
     be shown. For example, let's say we wish to fetch the current heap memory
     data:
 
-    <source>
-      http://webserver/manager/jmxproxy/?get=java.lang:type=Memory&amp;att=HeapMemoryUsage
-    </source>
+<source>
+http://webserver/manager/jmxproxy/?get=java.lang:type=Memory&amp;att=HeapMemoryUsage
+</source>
 
     Or, if you only want the "used" key:
 
-    <source>
-      http://webserver/manager/jmxproxy/?get=java.lang:type=Memory&amp;att=HeapMemoryUsage&amp;key=used
-    </source>
+<source>
+http://webserver/manager/jmxproxy/
+ ?get=java.lang:type=Memory&amp;att=HeapMemoryUsage&amp;key=used
+</source>
   </subsection>
 
   <subsection name="JMX Set command">
@@ -1340,7 +1342,8 @@ http://webserver/manager/jmxproxy/?set=BEANNAME&amp;att=MYATTRIBUTE&amp;val=NEWV
     <code>ErrorReportValve</code>. The following will set debugging to 10.
 <source>
 http://localhost:8080/manager/jmxproxy/
-?set=Catalina%3Atype%3DValve%2Cname%3DErrorReportValve%2Chost%3Dlocalhost&amp;att=debug&amp;val=10
+ ?set=Catalina%3Atype%3DValve%2Cname%3DErrorReportValve%2Chost%3Dlocalhost
+ &amp;att=debug&amp;val=10
 </source>
     and my result is (YMMV):
 <source>
@@ -1348,14 +1351,15 @@ Result: ok
 </source>
 
     Here is what I see if I pass in a bad value. Here is the URL I used,
-    I try set debugging equal to 'cowbell':
+    I try set debugging equal to 'cow':
 <source>
 http://localhost:8080/manager/jmxproxy/
-?set=Catalina%3Atype%3DValve%2Cname%3DErrorReportValve%2Chost%3Dlocalhost&amp;att=debug&amp;val=cowbell
+ ?set=Catalina%3Atype%3DValve%2Cname%3DErrorReportValve%2Chost%3Dlocalhost
+ &amp;att=debug&amp;val=cow
 </source>
     When I try that, my result is
 <source>
-Error: java.lang.NumberFormatException: For input string: "cowbell"
+Error: java.lang.NumberFormatException: For input string: "cow"
 </source>
   </subsection>
 
@@ -1363,12 +1367,14 @@ Error: java.lang.NumberFormatException: For input string: "cowbell"
     <p>The <code>invoke</code> command enables methods to be called on MBeans. The
     general form of the command is:</p>
 <source>
-http://webserver/manager/jmxproxy/?invoke=BEANNAME&amp;op=METHODNAME&amp;ps=COMMASEPARATEDPARAMETERS
+http://webserver/manager/jmxproxy/
+ ?invoke=BEANNAME&amp;op=METHODNAME&amp;ps=COMMASEPARATEDPARAMETERS
 </source>
     <p>For example, to call the <code>findConnectors()</code> method of the
     <strong>Service</strong> use:</p>
 <source>
-http://localhost:8080/manager/jmxproxy/?invoke=Catalina%3Atype%3DService&amp;op=findConnectors&amp;ps=
+http://localhost:8080/manager/jmxproxy/
+ ?invoke=Catalina%3Atype%3DService&amp;op=findConnectors&amp;ps=
 </source>
   </subsection>
 </section>
