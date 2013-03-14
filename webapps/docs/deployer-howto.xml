@@ -45,17 +45,29 @@
         <ul>
                 <li>Statically; the web application is setup before Tomcat is started</li>
                 <li>
-                    Dynamically; in conjunction with the Tomcat Manager web application or
-                    manipulating already deployed web applications
+                    Dynamically; by directly manipulating already deployed web
+                    applications (relying on <em>auto-deployment</em>
+                    feature) or remotely by using the Tomcat Manager web
+                    application
                 </li>
         </ul>
         <p>
-            The Tomcat Manager is a tool that allows URL-based web application
-            deployment features. There is also a tool called the Client Deployer,
-            which is a command shell based script that interacts with the Tomcat
-            Manager but provides additional functionality such as compiling and
-            validating web applications as well as packaging web application into
-            web application resource (WAR) files.
+            The <a href="manager-howto.html">Tomcat Manager</a> is a web
+            application that can be used interactively (via HTML GUI) or
+            programmatically (via URL-based API) to deploy and manage web
+            applications.
+        </p>
+        <p>
+            There are a number of ways to perform deployment that rely on
+            the Manager web application. Apache Tomcat provides tasks
+            for Apache Ant build tool.
+            <a href="http://tomcat.apache.org/maven-plugin.html">Apache Tomcat Maven Plugin</a>
+            project provides integration with Apache Maven.
+            There is also a tool called the Client Deployer, which can be
+            used from a command line and provides additional functionality
+            such as compiling and validating web applications as well as
+            packaging web application into web application resource (WAR)
+            files.
         </p>
     </section>
 
@@ -65,7 +77,8 @@
             applications as this is provided out of the box by Tomcat. Nor is any
             installation required for deployment functions with the Tomcat Manager,
             although some configuration is required as detailed in the
-            Tomcat Manager manual. An installation is however required if you wish
+            <a href="manager-howto.html">Tomcat Manager manual</a>.
+            An installation is however required if you wish
             to use the Tomcat Client Deployer (TCD).
         </p>
         <p>
