@@ -66,6 +66,10 @@
         bootstrap class loader is not an ancestor of the web application class
         loader such as OSGi environments. (violetagg)
       </fix>
+      <fix>
+        Ensure that, if a call to UEncoder#encodeURL is made, all internal
+        structures are properly cleaned. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
