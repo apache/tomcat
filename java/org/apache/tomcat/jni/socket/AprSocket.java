@@ -730,7 +730,8 @@ public class AprSocket implements Runnable {
 
                     setStatus(CONNECTED);
                     if (context.sslMode) {
-                        Socket.timeoutSet(socket, context.connectTimeout * 1000);
+                        Socket.timeoutSet(socket,
+                                context.connectTimeout * 1000L);
                         blockingStartTLS();
                     }
                     setNonBlocking(); // call again, to set the bits ( connect was blocking )
