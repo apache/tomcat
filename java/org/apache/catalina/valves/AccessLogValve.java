@@ -856,7 +856,18 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      *  Set the date format date based log rotation.
      */
     public void setFileDateFormat(String fileDateFormat) {
-        this.fileDateFormat = fileDateFormat;
+        String newFormat;
+        if (fileDateFormat == null) {
+            newFormat = "";
+        } else {
+            newFormat = fileDateFormat;
+        }
+        this.fileDateFormat = newFormat;
+
+        synchronized (this) {
+            fileDateFormatter = new SimpleDateFormat(newFormat, Locale.US);
+            fileDateFormatter.setTimeZone(TimeZone.getDefault());
+        }
     }
 
 
@@ -965,6 +976,34 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         log(result.toString());
     }
 
+
+    /**
+     * Rotate the log file if necessary.
+     */
+    public void rotate() {
+        if (rotatable) {
+            // Only do a logfile switch check once a second, max.
+            long systime = System.currentTimeMillis();
+            if ((systime - rotationLastChecked) > 1000) {
+                synchronized(this) {
+                    if ((systime - rotationLastChecked) > 1000) {
+                        rotationLastChecked = systime;
+
+                        String tsDate;
+                        // Check for a change of date
+                        tsDate = fileDateFormatter.format(new Date(systime));
+
+                        // If the date has changed, switch log files
+                        if (!dateStamp.equals(tsDate)) {
+                            close(true);
+                            dateStamp = tsDate;
+                            open();
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Rename the existing log file to something else. Then open the
@@ -1097,28 +1136,8 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * @param message Message to be logged
      */
     public void log(String message) {
-        if (rotatable) {
-            // Only do a logfile switch check once a second, max.
-            long systime = System.currentTimeMillis();
-            if ((systime - rotationLastChecked) > 1000) {
-                synchronized(this) {
-                    if ((systime - rotationLastChecked) > 1000) {
-                        rotationLastChecked = systime;
 
-                        String tsDate;
-                        // Check for a change of date
-                        tsDate = fileDateFormatter.format(new Date(systime));
-
-                        // If the date has changed, switch log files
-                        if (!dateStamp.equals(tsDate)) {
-                            close(true);
-                            dateStamp = tsDate;
-                            open();
-                        }
-                    }
-                }
-            }
-        }
+        rotate();
 
         /* In case something external rotated the file instead */
         if (checkExists) {
@@ -1230,10 +1249,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
         // Initialize the Date formatters
         String format = getFileDateFormat();
-        if (format == null || format.length() == 0) {
-            format = "yyyy-MM-dd";
-            setFileDateFormat(format);
-        }
         fileDateFormatter = new SimpleDateFormat(format, Locale.US);
         fileDateFormatter.setTimeZone(TimeZone.getDefault());
         dateStamp = fileDateFormatter.format(new Date(System.currentTimeMillis()));

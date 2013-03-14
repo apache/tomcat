@@ -70,6 +70,12 @@
         Ensure that, if a call to UEncoder#encodeURL is made, all internal
         structures are properly cleaned. (violetagg)
       </fix>
+      <add>
+        <bug>54660</bug>: Enable the modification of an access log's
+        <code>fileDateFormat</code> attribute while the access log is in use.
+        The change will take effect when the next entry is made to the access
+        log. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
