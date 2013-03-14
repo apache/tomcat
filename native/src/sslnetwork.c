@@ -513,6 +513,9 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
                     con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
                     return rv;
                 break;
+                case SSL_ERROR_SSL:
+                    /* Probably caused by buffer missmatch */
+                    rv = APR_EINVAL;
                 case SSL_ERROR_ZERO_RETURN:
                     if (s == 0) {
                         con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
