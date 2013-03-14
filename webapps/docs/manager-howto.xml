@@ -71,8 +71,10 @@ Manager web application <code>Context</code> to a new host install the
 <code>$CATALINA_BASE/conf/[enginename]/[hostname]</code> folder. Here is an
 example:</p>
 <pre>
-&lt;Context privileged="true"
-         docBase="/usr/local/kinetic/tomcat7/server/webapps/manager"&gt;
+&lt;Context privileged="true" antiResourceLocking="false"
+         docBase="${catalina.home}/webapps/manager"&gt;
+  &lt;Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         allow="127\.0\.0\.1" /&gt;
 &lt;/Context&gt;
 </pre>
 
