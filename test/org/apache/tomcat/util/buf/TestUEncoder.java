@@ -17,10 +17,9 @@
 
 package org.apache.tomcat.util.buf;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /**
