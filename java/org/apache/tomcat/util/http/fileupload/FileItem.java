@@ -43,11 +43,6 @@ import java.io.UnsupportedEncodingException;
  * implementation of this interface to also implement
  * <code>javax.activation.DataSource</code> with minimal additional work.
  *
- * @author <a href="mailto:Rafal.Krzewski@e-point.pl">Rafal Krzewski</a>
- * @author <a href="mailto:sean@informage.net">Sean Legassick</a>
- * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
- * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
- *
  * @version $Id$
  * @since 1.3 additionally implements FileItemHeadersSupport
  */

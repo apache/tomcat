@@ -20,6 +20,8 @@ import java.io.IOException;
 
 /**
  * Interface of an object, which may be closed.
+ *
+ * @version $Id$
  */
 public interface Closeable {
 

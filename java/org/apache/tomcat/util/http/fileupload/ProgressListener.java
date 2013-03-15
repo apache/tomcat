@@ -19,6 +19,8 @@ package org.apache.tomcat.util.http.fileupload;
 /**
  * The {@link ProgressListener} may be used to display a progress bar
  * or do stuff like that.
+ *
+ * @version $Id$
  */
 public interface ProgressListener {
 

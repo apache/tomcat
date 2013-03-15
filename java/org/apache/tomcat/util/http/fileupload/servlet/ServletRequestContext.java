@@ -29,8 +29,6 @@ import org.apache.tomcat.util.http.fileupload.RequestContext;
  * <p>Provides access to the request information needed for a request made to
  * an HTTP servlet.</p>
  *
- * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
- *
  * @since FileUpload 1.1
  *
  * @version $Id$
@@ -89,7 +87,7 @@ public class ServletRequestContext implements RequestContext {
         try {
             size = Long.parseLong(request.getHeader(FileUploadBase.CONTENT_LENGTH));
         } catch (NumberFormatException e) {
-            size = -1;
+            size = request.getContentLength();
         }
         return size;
     }

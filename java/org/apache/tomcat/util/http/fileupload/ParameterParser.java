@@ -31,7 +31,7 @@ import java.util.Map;
  *  <code>param1 = value; param2 = "anything goes; really"; param3</code>
  * </p>
  *
- * @author <a href="mailto:oleg@ural.ru">Oleg Kalnichevski</a>
+ * @version $Id$
  */
 public class ParameterParser {
 
@@ -101,13 +101,12 @@ public class ParameterParser {
             i2--;
         }
         // Strip away quotation marks if necessary
-        if (quoted) {
-            if (((i2 - i1) >= 2)
-                && (chars[i1] == '"')
-                && (chars[i2 - 1] == '"')) {
-                i1++;
-                i2--;
-            }
+        if (quoted
+            && ((i2 - i1) >= 2)
+            && (chars[i1] == '"')
+            && (chars[i2 - 1] == '"')) {
+            i1++;
+            i2--;
         }
         String result = null;
         if (i2 > i1) {
@@ -235,11 +234,9 @@ public class ParameterParser {
             int idx = str.length();
             for (int i = 0;  i < separators.length;  i++) {
                 int tmp = str.indexOf(separators[i]);
-                if (tmp != -1) {
-                    if (tmp < idx) {
-                        idx = tmp;
-                        separator = separators[i];
-                    }
+                if (tmp != -1 && tmp < idx) {
+                    idx = tmp;
+                    separator = separators[i];
                 }
             }
         }

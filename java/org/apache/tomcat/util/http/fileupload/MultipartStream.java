@@ -79,10 +79,6 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  *   }
  * </pre>
  *
- * @author <a href="mailto:Rafal.Krzewski@e-point.pl">Rafal Krzewski</a>
- * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
- * @author Sean C. Sullivan
- *
  * @version $Id$
  */
 public class MultipartStream {
@@ -806,10 +802,8 @@ public class MultipartStream {
             if (closed) {
                 throw new FileItemStream.ItemSkippedException();
             }
-            if (available() == 0) {
-                if (makeAvailable() == 0) {
-                    return -1;
-                }
+            if (available() == 0 && makeAvailable() == 0) {
+                return -1;
             }
             ++total;
             int b = buffer[head++];
