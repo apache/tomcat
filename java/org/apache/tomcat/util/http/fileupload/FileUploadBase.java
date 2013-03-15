@@ -303,10 +303,8 @@ public abstract class FileUploadBase {
                             String.format("Processing of %s request failed. ",
                                     MULTIPART_FORM_DATA, e.getMessage()), e);
                 }
-                if (fileItem instanceof FileItemHeadersSupport) {
-                    final FileItemHeaders fih = item.getHeaders();
-                    fileItem.setHeaders(fih);
-                }
+                final FileItemHeaders fih = item.getHeaders();
+                fileItem.setHeaders(fih);
             }
             successful = true;
             return items;
