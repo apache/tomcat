@@ -206,6 +206,7 @@ public class DiskFileItemFactory implements FileItemFactory {
     /**
      * Returns the tracker, which is responsible for deleting temporary
      * files.
+     *
      * @return An instance of {@link FileCleaningTracker}, or null
      *   (default), if temporary files aren't tracked.
      */
@@ -216,6 +217,7 @@ public class DiskFileItemFactory implements FileItemFactory {
     /**
      * Sets the tracker, which is responsible for deleting temporary
      * files.
+     *
      * @param pTracker An instance of {@link FileCleaningTracker},
      *   which will from now on track the created files, or null
      *   (default), to disable tracking.

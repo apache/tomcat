@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
+import org.apache.tomcat.util.http.fileupload.FileUploadBase.FileUploadIOException;
 import org.apache.tomcat.util.http.fileupload.util.Closeable;
 import org.apache.tomcat.util.http.fileupload.util.Streams;
 
@@ -184,24 +185,24 @@ public class MultipartStream {
      * A byte sequence that marks the end of <code>header-part</code>
      * (<code>CRLFCRLF</code>).
      */
-    protected static final byte[] HEADER_SEPARATOR = { CR, LF, CR, LF };
+    protected static final byte[] HEADER_SEPARATOR = {CR, LF, CR, LF};
 
     /**
      * A byte sequence that that follows a delimiter that will be
      * followed by an encapsulation (<code>CRLF</code>).
      */
-    protected static final byte[] FIELD_SEPARATOR = { CR, LF};
+    protected static final byte[] FIELD_SEPARATOR = {CR, LF};
 
     /**
      * A byte sequence that that follows a delimiter of the last
      * encapsulation in the stream (<code>--</code>).
      */
-    protected static final byte[] STREAM_TERMINATOR = { DASH, DASH};
+    protected static final byte[] STREAM_TERMINATOR = {DASH, DASH};
 
     /**
      * A byte sequence that precedes a boundary (<code>CRLF--</code>).
      */
-    protected static final byte[] BOUNDARY_PREFIX = { CR, LF, DASH, DASH};
+    protected static final byte[] BOUNDARY_PREFIX = {CR, LF, DASH, DASH};
 
     // ----------------------------------------------------------- Data members
 
@@ -377,11 +378,12 @@ public class MultipartStream {
      * @return <code>true</code> if there are more encapsulations in
      *         this stream; <code>false</code> otherwise.
      *
-     * @throws MalformedStreamException if the stream ends unexpecetedly or
+     * @throws FileUploadIOException if the bytes read from the stream exceeded the size limits
+     * @throws MalformedStreamException if the stream ends unexpectedly or
      *                                  fails to follow required syntax.
      */
     public boolean readBoundary()
-            throws MalformedStreamException {
+            throws FileUploadIOException, MalformedStreamException {
         byte[] marker = new byte[2];
         boolean nextChunk = false;
 
@@ -407,6 +409,9 @@ public class MultipartStream {
                 throw new MalformedStreamException(
                 "Unexpected characters follow a boundary");
             }
+        } catch (FileUploadIOException e) {
+            // wraps a SizeException, re-throw as it will be unwrapped later
+            throw e;
         } catch (IOException e) {
             throw new MalformedStreamException("Stream ended unexpectedly");
         }
@@ -455,9 +460,10 @@ public class MultipartStream {
      *
      * @return The <code>header-part</code> of the current encapsulation.
      *
-     * @throws MalformedStreamException if the stream ends unexpecetedly.
+     * @throws FileUploadIOException if the bytes read from the stream exceeded the size limits.
+     * @throws MalformedStreamException if the stream ends unexpectedly.
      */
-    public String readHeaders() throws MalformedStreamException {
+    public String readHeaders() throws FileUploadIOException, MalformedStreamException {
         int i = 0;
         byte b;
         // to support multi-byte characters
@@ -466,6 +472,9 @@ public class MultipartStream {
         while (i < HEADER_SEPARATOR.length) {
             try {
                 b = readByte();
+            } catch (FileUploadIOException e) {
+                // wraps a SizeException, re-throw as it will be unwrapped later
+                throw e;
             } catch (IOException e) {
                 throw new MalformedStreamException("Stream ended unexpectedly");
             }

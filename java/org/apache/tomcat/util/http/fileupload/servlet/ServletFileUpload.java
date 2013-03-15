@@ -17,13 +17,16 @@
 package org.apache.tomcat.util.http.fileupload.servlet;
 
 import java.io.IOException;
-import java.util.Locale;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.FileItemFactory;
 import org.apache.tomcat.util.http.fileupload.FileItemIterator;
 import org.apache.tomcat.util.http.fileupload.FileUpload;
+import org.apache.tomcat.util.http.fileupload.FileUploadBase;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 
 
@@ -45,6 +48,11 @@ import org.apache.tomcat.util.http.fileupload.FileUploadException;
  */
 public class ServletFileUpload extends FileUpload {
 
+    /**
+     * Constant for HTTP POST method.
+     */
+    private static final String POST_METHOD = "POST";
+
     // ---------------------------------------------------------- Class methods
 
     /**
@@ -58,17 +66,10 @@ public class ServletFileUpload extends FileUpload {
      */
     public static final boolean isMultipartContent(
             HttpServletRequest request) {
-        if (!"post".equals(request.getMethod().toLowerCase(Locale.ENGLISH))) {
+        if (!POST_METHOD.equalsIgnoreCase(request.getMethod())) {
             return false;
         }
-        String contentType = request.getContentType();
-        if (contentType == null) {
-            return false;
-        }
-        if (contentType.toLowerCase(Locale.ENGLISH).startsWith(MULTIPART)) {
-            return true;
-        }
-        return false;
+        return FileUploadBase.isMultipartContent(new ServletRequestContext(request));
     }
 
     // ----------------------------------------------------------- Constructors
@@ -96,6 +97,24 @@ public class ServletFileUpload extends FileUpload {
     }
 
     // --------------------------------------------------------- Public methods
+
+    /**
+     * Processes an <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>
+     * compliant <code>multipart/form-data</code> stream.
+     *
+     * @param request The servlet request to be parsed.
+     *
+     * @return A map of <code>FileItem</code> instances parsed from the request.
+     *
+     * @throws FileUploadException if there are problems reading/parsing
+     *                             the request or storing files.
+     *
+     * @since 1.3
+     */
+    public Map<String, List<FileItem>> parseParameterMap(HttpServletRequest request)
+            throws FileUploadException {
+        return parseParameterMap(new ServletRequestContext(request));
+    }
 
     /**
      * Processes an <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>

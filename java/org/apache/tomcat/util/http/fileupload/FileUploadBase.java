@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -256,7 +257,12 @@ public abstract class FileUploadBase {
      */
     public FileItemIterator getItemIterator(RequestContext ctx)
     throws FileUploadException, IOException {
-        return new FileItemIteratorImpl(ctx);
+        try {
+            return new FileItemIteratorImpl(ctx);
+        } catch (FileUploadIOException e) {
+            // unwrap encapsulated SizeException
+            throw (FileUploadException) e.getCause();
+        }
     }
 
     /**
@@ -279,20 +285,17 @@ public abstract class FileUploadBase {
             FileItemIterator iter = getItemIterator(ctx);
             FileItemFactory fac = getFileItemFactory();
             if (fac == null) {
-                throw new NullPointerException(
-                    "No FileItemFactory has been set.");
+                throw new NullPointerException("No FileItemFactory has been set.");
             }
             while (iter.hasNext()) {
                 final FileItemStream item = iter.next();
                 // Don't use getName() here to prevent an InvalidFileNameException.
                 final String fileName = ((FileItemIteratorImpl.FileItemStreamImpl) item).name;
-                FileItem fileItem = fac.createItem(item.getFieldName(),
-                        item.getContentType(), item.isFormField(),
-                        fileName);
+                FileItem fileItem = fac.createItem(item.getFieldName(), item.getContentType(),
+                                                   item.isFormField(), fileName);
                 items.add(fileItem);
                 try {
-                    Streams.copy(item.openStream(), fileItem.getOutputStream(),
-                            true);
+                    Streams.copy(item.openStream(), fileItem.getOutputStream(), true);
                 } catch (FileUploadIOException e) {
                     throw (FileUploadException) e.getCause();
                 } catch (IOException e) {
@@ -322,6 +325,39 @@ public abstract class FileUploadBase {
                 }
             }
         }
+    }
+
+    /**
+     * Processes an <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>
+     * compliant <code>multipart/form-data</code> stream.
+     *
+     * @param ctx The context for the request to be parsed.
+     *
+     * @return A map of <code>FileItem</code> instances parsed from the request.
+     *
+     * @throws FileUploadException if there are problems reading/parsing
+     *                             the request or storing files.
+     *
+     * @since 1.3
+     */
+    public Map<String, List<FileItem>> parseParameterMap(RequestContext ctx)
+            throws FileUploadException {
+        final List<FileItem> items = parseRequest(ctx);
+        final Map<String, List<FileItem>> itemsMap = new HashMap<>(items.size());
+
+        for (FileItem fileItem : items) {
+            String fieldName = fileItem.getFieldName();
+            List<FileItem> mappedItems = itemsMap.get(fieldName);
+
+            if (mappedItems == null) {
+                mappedItems = new ArrayList<>();
+                itemsMap.put(fieldName, mappedItems);
+            }
+
+            mappedItems.add(fileItem);
+        }
+
+        return itemsMap;
     }
 
     // ------------------------------------------------------ Protected methods
@@ -776,17 +812,15 @@ public abstract class FileUploadBase {
 
             InputStream input = ctx.getInputStream();
 
-            if (sizeMax >= 0) {
-                long requestSize = ctx.contentLength();
+            final long requestSize = ((UploadContext) ctx).contentLength();
 
-                if (requestSize != -1) {
-                    if (requestSize > sizeMax) {
-                        throw new SizeLimitExceededException(String.format(
-                                "the request was rejected because its size (%s) exceeds the configured maximum (%s)",
-                                Long.valueOf(requestSize),
-                                Long.valueOf(sizeMax)),
-                                requestSize, sizeMax);
-                    }
+            if (sizeMax >= 0) {
+                if (requestSize != -1 && requestSize > sizeMax) {
+                    throw new SizeLimitExceededException(String.format(
+                            "the request was rejected because its size (%s) exceeds the configured maximum (%s)",
+                            Long.valueOf(requestSize),
+                            Long.valueOf(sizeMax)),
+                            requestSize, sizeMax);
                 }
                 input = new LimitedInputStream(input, sizeMax) {
                     @Override
@@ -811,8 +845,7 @@ public abstract class FileUploadBase {
                 throw new FileUploadException("the request was rejected because no multipart boundary was found");
             }
 
-            notifier = new MultipartStream.ProgressNotifier(listener,
-                    ctx.contentLength());
+            notifier = new MultipartStream.ProgressNotifier(listener, requestSize);
             multi = new MultipartStream(input, boundary, notifier);
             multi.setHeaderEncoding(charEncoding);
 
@@ -920,7 +953,12 @@ public abstract class FileUploadBase {
             if (itemValid) {
                 return true;
             }
-            return findNextItem();
+            try {
+                return findNextItem();
+            } catch (FileUploadIOException e) {
+                // unwrap encapsulated SizeException
+                throw (FileUploadException) e.getCause();
+            }
         }
 
         /**
