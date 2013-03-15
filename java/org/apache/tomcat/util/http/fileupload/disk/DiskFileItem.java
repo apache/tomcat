@@ -29,6 +29,8 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.tomcat.util.http.fileupload.DeferredFileOutputStream;
 import org.apache.tomcat.util.http.fileupload.FileItem;
@@ -101,13 +103,12 @@ public class DiskFileItem
      * UID used in unique file name generation.
      */
     private static final String UID =
-            new java.rmi.server.UID().toString()
-                .replace(':', '_').replace('-', '_');
+            UUID.randomUUID().toString().replace('-', '_');
 
     /**
      * Counter used in unique identifier generation.
      */
-    private static int counter = 0;
+    private static final AtomicInteger counter = new AtomicInteger(0);
 
     /**
      * The name of the form field as provided by the browser.
@@ -319,10 +320,10 @@ public class DiskFileItem
         }
 
         byte[] fileData = new byte[(int) getSize()];
-        FileInputStream fis = null;
+        InputStream fis = null;
 
         try {
-            fis = new FileInputStream(dfos.getFile());
+            fis = new BufferedInputStream(new FileInputStream(dfos.getFile()));
             fis.read(fileData);
         } catch (IOException e) {
             fileData = null;
@@ -362,9 +363,9 @@ public class DiskFileItem
      * character encoding.  This method uses {@link #get()} to retrieve the
      * contents of the file.
      *
-     * @return The contents of the file, as a string.
+     * <b>TODO</b> Consider making this method throw UnsupportedEncodingException.
      *
-     * TODO Consider making this method throw UnsupportedEncodingException.
+     * @return The contents of the file, as a string.
      */
     @Override
     public String getString() {
@@ -617,10 +618,7 @@ public class DiskFileItem
      */
     private static String getUniqueId() {
         final int limit = 100000000;
-        int current;
-        synchronized (DiskFileItem.class) {
-            current = counter++;
-        }
+        int current = counter.getAndIncrement();
         String id = Integer.toString(current);
 
         // If you manage to get more than 100 million of ids, you'll

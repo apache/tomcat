@@ -42,7 +42,7 @@ public class ServletRequestContext implements RequestContext {
     /**
      * The request for which the context is being provided.
      */
-    private HttpServletRequest request;
+    private final HttpServletRequest request;
 
     // ----------------------------------------------------------- Constructors
 
