@@ -62,8 +62,10 @@
   by the web application deployment.</p>
 
   <p>You may define as many <strong>Context</strong> elements as you
-  wish.  Each such Context MUST have a unique context name. In
-  addition, a Context must be present with a context path equal to
+  wish.  Each such Context MUST have a unique context name within a virtual
+  host. The context path does not need to be unique (see <em>parallel
+  deployment</em> below). In addition, a Context must be present with a
+  context path equal to
   a zero-length string.  This Context becomes the <em>default</em>
   web application for this virtual host, and is used to process all
   requests that do not match any other Context's context path.</p>
@@ -88,31 +90,51 @@
   </subsection>
 
   <subsection name="Naming">
-  <p>When autoDeploy or deployOnStartup the context path is derived from the
-  name of the WAR file or directory file that is automatically deployed. In this
-  case the context path may not be defined in a META-INF/context.xml embedded in
+  <p>When <code>autoDeploy</code> or <code>deployOnStartup</code> operations
+  are performed by a Host, the web application is specified by a context XML
+  file in <a href="host.html">Host</a>&apos;s <code>xmlBase</code>
+  directory or by a WAR file or a directory file in Host&apos;s
+  <code>appBase</code> directory.
+  In this case the context path is derived from the name of the file that
+  is being deployed. Consequently, the context path <strong>may not</strong>
+  be defined in a <code>META-INF/context.xml</code> embedded in
   the application. There is, therefore, a close relationship between the
   <em>context name</em>, <em>context path</em>, <em>context version</em> and
-  the <em>base file name</em> used for the WAR and/or directory that contains
-  the web application when the WAR or directory is located in the Host&apos;s
-  appBase. When no version is specified, the rules are:
+  the <em>base file name</em> (the name minus <code>.war</code> or
+  <code>.xml</code> suffix) of the file.</p>
+
+  <p>Lets assume that you want to deploy your application to respond to
+  requests to URIs starting with certain context path. According to the
+  Servlet specification, the context path may be an empty string, or a
+  string starting with '/'. The rules to define the names for this context
+  path are the following:</p>
+
   <ul>
-    <li>contextName = contextPath</li>
-    <li>If the contextPath is a zero length string, the base name is ROOT</li>
-    <li>If the contextPath is not a zero length string, the base name is the
-        contextPath with the leading '/' removed and any remaining '/'
-        characters in the path replaced with '#'.</li>
+    <li><em>context name</em> is equal to context path</li>
+    <li>If the context path is a zero length string, the <em>base name</em> is
+    <code>"ROOT"</code> (uppercase)</li>
+    <li>If the context path is not a zero length string, the <em>base
+    name</em> is the context path with the leading '/' removed and any
+    remaining '/' characters in the path replaced with '#'.</li>
   </ul>
-  When a version is specified, <code>##version</code> is added to the
-  contextName and base name. To help clarify these rules, some examples are
-  given in the following table.</p>
+
+  <p>When a version is specified, to deploy several applications for the
+  same context path, the above values are modified as follows:</p>
+
+  <ul>
+    <li><code>"##" + version</code> is added as a suffix to <em>context name</em>
+    and <em>base name</em>.</li>
+  </ul>
+
+  <p>To help clarify these rules, some examples are given in the following
+  table.</p>
 
   <table class="detail-table">
     <tr>
       <th>Context Path</th>
       <th>Context Version</th>
       <th>Context Name</th>
-      <th>Base filename</th>
+      <th>Base File Name</th>
     </tr>
     <tr><td>/foo</td><td><i>None</i></td><td>/foo</td><td>foo</td></tr>
     <tr>
