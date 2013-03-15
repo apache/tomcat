@@ -105,10 +105,9 @@ public class ServletRequestContext implements RequestContext {
      */
     @Override
     public String toString() {
-        return "ContentLength="
-            + this.getContentLength()
-            + ", ContentType="
-            + this.getContentType();
+        return String.format("ContentLength=%s, ContentType=%s",
+                      Integer.valueOf(this.getContentLength()),
+                      this.getContentType());
     }
 
 }
