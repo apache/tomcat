@@ -109,6 +109,12 @@
                type="java.lang.String"/>
 
     <operation name="rotate"
+               description="Check if the log file is due to be rotated and rotate if it is"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+
+    <operation name="rotate"
                description="Move the existing log file to a new name"
                impact="ACTION"
                returnType="boolean">
@@ -265,6 +271,12 @@
     <attribute name="suffix"
                description="The suffix that is added to log file filenames"
                type="java.lang.String"/>
+
+    <operation name="rotate"
+               description="Check if the log file is due to be rotated and rotate if it is"
+               impact="ACTION"
+               returnType="void">
+    </operation>
 
     <operation name="rotate"
                description="Move the existing log file to a new name"
