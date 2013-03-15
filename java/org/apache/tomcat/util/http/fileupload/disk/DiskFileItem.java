@@ -108,7 +108,7 @@ public class DiskFileItem
     /**
      * Counter used in unique identifier generation.
      */
-    private static final AtomicInteger counter = new AtomicInteger(0);
+    private static final AtomicInteger COUNTER = new AtomicInteger(0);
 
     /**
      * The name of the form field as provided by the browser.
@@ -261,7 +261,8 @@ public class DiskFileItem
      * @throws org.apache.tomcat.util.http.fileupload.InvalidFileNameException
      *   The file name contains a NUL character, which might be an indicator of
      *   a security attack. If you intend to use the file name anyways, catch
-     *   the exception and use InvalidFileNameException#getName().
+     *   the exception and use {@link
+     *   org.apache.tomcat.util.http.fileupload.InvalidFileNameException#getName()}.
      */
     @Override
     public String getName() {
@@ -568,7 +569,10 @@ public class DiskFileItem
      *         memory.
      */
     public File getStoreLocation() {
-        return dfos == null ? null : dfos.getFile();
+        if (dfos == null) {
+            return null;
+        }
+        return dfos.getFile();
     }
 
     // ------------------------------------------------------ Protected methods
@@ -618,7 +622,7 @@ public class DiskFileItem
      */
     private static String getUniqueId() {
         final int limit = 100000000;
-        int current = counter.getAndIncrement();
+        int current = COUNTER.getAndIncrement();
         String id = Integer.toString(current);
 
         // If you manage to get more than 100 million of ids, you'll
