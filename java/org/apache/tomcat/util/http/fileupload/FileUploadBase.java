@@ -46,13 +46,6 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  * used to create them; a given part may be in memory, on disk, or somewhere
  * else.</p>
  *
- * @author <a href="mailto:Rafal.Krzewski@e-point.pl">Rafal Krzewski</a>
- * @author <a href="mailto:dlr@collab.net">Daniel Rall</a>
- * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
- * @author <a href="mailto:jmcnally@collab.net">John McNally</a>
- * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
- * @author Sean C. Sullivan
- *
  * @version $Id$
  */
 public abstract class FileUploadBase {
@@ -292,7 +285,7 @@ public abstract class FileUploadBase {
             while (iter.hasNext()) {
                 final FileItemStream item = iter.next();
                 // Don't use getName() here to prevent an InvalidFileNameException.
-                final String fileName = ((org.apache.tomcat.util.http.fileupload.FileUploadBase.FileItemIteratorImpl.FileItemStreamImpl) item).name;
+                final String fileName = ((FileItemIteratorImpl.FileItemStreamImpl) item).name;
                 FileItem fileItem = fac.createItem(item.getFieldName(),
                         item.getContentType(), item.isFormField(),
                         fileName);
@@ -785,21 +778,9 @@ public abstract class FileUploadBase {
 
             if (sizeMax >= 0) {
                 long requestSize = ctx.contentLength();
-                if (requestSize == -1) {
-                    input = new LimitedInputStream(input, sizeMax) {
-                        @Override
-                        protected void raiseError(long pSizeMax, long pCount)
-                                throws IOException {
-                            FileUploadException ex = new SizeLimitExceededException(String.format(
-                                    "the request was rejected because its size (%s) exceeds the configured maximum (%s)",
-                                    Long.valueOf(pCount),
-                                    Long.valueOf(pSizeMax)),
-                                    pCount, pSizeMax);
-                            throw new FileUploadIOException(ex);
-                        }
-                    };
-                } else {
-                    if (sizeMax >= 0 && requestSize > sizeMax) {
+
+                if (requestSize != -1) {
+                    if (requestSize > sizeMax) {
                         throw new SizeLimitExceededException(String.format(
                                 "the request was rejected because its size (%s) exceeds the configured maximum (%s)",
                                 Long.valueOf(requestSize),
@@ -807,6 +788,17 @@ public abstract class FileUploadBase {
                                 requestSize, sizeMax);
                     }
                 }
+                input = new LimitedInputStream(input, sizeMax) {
+                    @Override
+                    protected void raiseError(long pSizeMax, long pCount)
+                            throws IOException {
+                        FileUploadException ex = new SizeLimitExceededException(
+                        String.format("the request was rejected because its size (%s) exceeds the configured maximum (%s)",
+                               Long.valueOf(pCount), Long.valueOf(pSizeMax)),
+                               pCount, pSizeMax);
+                        throw new FileUploadIOException(ex);
+                    }
+                };
             }
 
             String charEncoding = headerEncoding;

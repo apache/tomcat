@@ -68,13 +68,6 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  * your web application ends. See the section on "Resource cleanup"
  * in the users guide of commons-fileupload.</p>
  *
- * @author <a href="mailto:Rafal.Krzewski@e-point.pl">Rafal Krzewski</a>
- * @author <a href="mailto:sean@informage.net">Sean Legassick</a>
- * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
- * @author <a href="mailto:jmcnally@apache.org">John McNally</a>
- * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
- * @author Sean C. Sullivan
- *
  * @since FileUpload 1.1
  *
  * @version $Id$

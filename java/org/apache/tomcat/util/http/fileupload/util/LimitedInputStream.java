@@ -23,6 +23,8 @@ import java.io.InputStream;
 /**
  * An input stream, which limits its data size. This stream is
  * used, if the content length is unknown.
+ *
+ * @version $Id$
  */
 public abstract class LimitedInputStream extends FilterInputStream implements Closeable {
 
