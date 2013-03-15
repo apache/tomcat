@@ -21,6 +21,7 @@ import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.tomcat.util.http.fileupload.FileUploadBase;
 import org.apache.tomcat.util.http.fileupload.RequestContext;
 
 
@@ -80,10 +81,17 @@ public class ServletRequestContext implements RequestContext {
      * Retrieve the content length of the request.
      *
      * @return The content length of the request.
+     * @since 1.3
      */
     @Override
-    public int getContentLength() {
-        return request.getContentLength();
+    public long contentLength() {
+        long size;
+        try {
+            size = Long.parseLong(request.getHeader(FileUploadBase.CONTENT_LENGTH));
+        } catch (NumberFormatException e) {
+            size = -1;
+        }
+        return size;
     }
 
     /**
@@ -106,7 +114,7 @@ public class ServletRequestContext implements RequestContext {
     @Override
     public String toString() {
         return String.format("ContentLength=%s, ContentType=%s",
-                      Integer.valueOf(this.getContentLength()),
+                      Long.valueOf(this.contentLength()),
                       this.getContentType());
     }
 
