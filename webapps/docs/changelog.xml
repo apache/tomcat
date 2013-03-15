@@ -82,6 +82,11 @@
         revision 1456918 and the associated extract from Commons IO to 2.4.
         (markt)
       </update>
+      <fix>
+        <bug>54702</bug>: Prevent file descriptors leak and ensure that files
+        are closed when parsing web application deployment descriptors.
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
