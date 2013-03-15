@@ -103,7 +103,7 @@
   the <em>base file name</em> (the name minus <code>.war</code> or
   <code>.xml</code> extension) of the file.</p>
 
-  <p>Lets assume that you want to deploy your application to respond to
+  <p>Let us assume that you want to deploy your application to respond to
   requests to URIs starting with certain context path. According to the
   Servlet specification, the context path may be an empty string, or a
   string starting with '/'. The rules to define the names for this context
