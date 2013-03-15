@@ -19,7 +19,6 @@ package org.apache.tomcat.util.http.fileupload;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +34,7 @@ import java.util.List;
  * this class can be called after the stream has been closed without
  * generating an <tt>IOException</tt>.
  * <p>
- * This is an alternative implementation of the java.io.ByteArrayOutputStream
+ * This is an alternative implementation of the {@link java.io.ByteArrayOutputStream}
  * class. The original implementation only allocates 32 bytes at the beginning.
  * As this class is designed for heavy duty it starts at 1024 bytes. In contrast
  * to the original it doesn't reallocate the whole memory block but allocates
@@ -44,8 +43,6 @@ import java.util.List;
  * designed to behave exactly like the original. The only exception is the
  * deprecated toString(int) method that has been ignored.
  *
- * @author <a href="mailto:jeremias@apache.org">Jeremias Maerki</a>
- * @author Holger Hoffstatte
  * @version $Id$
  */
 public class ByteArrayOutputStream extends OutputStream {
@@ -54,7 +51,7 @@ public class ByteArrayOutputStream extends OutputStream {
     private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 
     /** The list of buffers, which grows and never reduces. */
-    private List<byte[]> buffers = new ArrayList<>();
+    private final List<byte[]> buffers = new ArrayList<>();
     /** The index of the current buffer. */
     private int currentBufferIndex;
     /** The total count of bytes in all the filled buffers. */
@@ -84,18 +81,9 @@ public class ByteArrayOutputStream extends OutputStream {
             throw new IllegalArgumentException(
                 "Negative initial size: " + size);
         }
-        needNewBuffer(size);
-    }
-
-    /**
-     * Return the appropriate <code>byte[]</code> buffer
-     * specified by index.
-     *
-     * @param index  the index of the buffer required
-     * @return the buffer
-     */
-    private byte[] getBuffer(int index) {
-        return buffers.get(index);
+        synchronized (this) {
+            needNewBuffer(size);
+        }
     }
 
     /**
@@ -110,7 +98,7 @@ public class ByteArrayOutputStream extends OutputStream {
             filledBufferSum += currentBuffer.length;
 
             currentBufferIndex++;
-            currentBuffer = getBuffer(currentBufferIndex);
+            currentBuffer = buffers.get(currentBufferIndex);
         } else {
             //Creating new buffer
             int newBufferSize;
@@ -188,7 +176,7 @@ public class ByteArrayOutputStream extends OutputStream {
      * @return total number of bytes read from the input stream
      *         (and written to this stream)
      * @throws IOException if an I/O error occurs while reading the input stream
-     * @since Commons IO 1.4
+     * @since 1.4
      */
     public synchronized int write(InputStream in) throws IOException {
         int readCount = 0;
@@ -208,14 +196,6 @@ public class ByteArrayOutputStream extends OutputStream {
     }
 
     /**
-     * Return the current size of the byte array.
-     * @return the current size of the byte array
-     */
-    public synchronized int size() {
-        return count;
-    }
-
-    /**
      * Closing a <tt>ByteArrayOutputStream</tt> has no effect. The methods in
      * this class can be called after the stream has been closed without
      * generating an <tt>IOException</tt>.
@@ -229,16 +209,6 @@ public class ByteArrayOutputStream extends OutputStream {
     }
 
     /**
-     * @see java.io.ByteArrayOutputStream#reset()
-     */
-    public synchronized void reset() {
-        count = 0;
-        filledBufferSum = 0;
-        currentBufferIndex = 0;
-        currentBuffer = getBuffer(currentBufferIndex);
-    }
-
-    /**
      * Writes the entire contents of this byte stream to the
      * specified output stream.
      *
@@ -248,8 +218,7 @@ public class ByteArrayOutputStream extends OutputStream {
      */
     public synchronized void writeTo(OutputStream out) throws IOException {
         int remaining = count;
-        for (int i = 0; i < buffers.size(); i++) {
-            byte[] buf = getBuffer(i);
+        for (byte[] buf : buffers) {
             int c = Math.min(buf.length, remaining);
             out.write(buf, 0, c);
             remaining -= c;
@@ -273,8 +242,7 @@ public class ByteArrayOutputStream extends OutputStream {
         }
         byte newbuf[] = new byte[remaining];
         int pos = 0;
-        for (int i = 0; i < buffers.size(); i++) {
-            byte[] buf = getBuffer(i);
+        for (byte[] buf : buffers) {
             int c = Math.min(buf.length, remaining);
             System.arraycopy(buf, 0, newbuf, pos, c);
             pos += c;
@@ -295,18 +263,4 @@ public class ByteArrayOutputStream extends OutputStream {
     public String toString() {
         return new String(toByteArray());
     }
-
-    /**
-     * Gets the curent contents of this byte stream as a string
-     * using the specified encoding.
-     *
-     * @param enc  the name of the character encoding
-     * @return the string converted from the byte array
-     * @throws UnsupportedEncodingException if the encoding is not supported
-     * @see java.io.ByteArrayOutputStream#toString(String)
-     */
-    public String toString(String enc) throws UnsupportedEncodingException {
-        return new String(toByteArray(), enc);
-    }
-
 }

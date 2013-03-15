@@ -17,7 +17,6 @@
 package org.apache.tomcat.util.http.fileupload;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,9 +32,6 @@ import java.io.OutputStream;
  * not know in advance the size of the file being uploaded. If the file is small
  * you want to store it in memory (for speed), but if the file is large you want
  * to store it to file (to avoid memory issues).
- *
- * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
- * @author gaxzerow
  *
  * @version $Id$
  */
@@ -69,23 +65,17 @@ public class DeferredFileOutputStream
     /**
      * The temporary file prefix.
      */
-    private String prefix;
+    private final String prefix;
 
     /**
      * The temporary file suffix.
      */
-    private String suffix;
+    private final String suffix;
 
     /**
      * The directory to use for temporary files.
      */
-    private File directory;
-
-
-    /**
-     * True when close() has been called successfully.
-     */
-    private boolean closed = false;
+    private final File directory;
 
     // ----------------------------------------------------------- Constructors
 
@@ -99,31 +89,26 @@ public class DeferredFileOutputStream
      */
     public DeferredFileOutputStream(int threshold, File outputFile)
     {
-        super(threshold);
-        this.outputFile = outputFile;
-
-        memoryOutputStream = new ByteArrayOutputStream();
-        currentOutputStream = memoryOutputStream;
+        this(threshold,  outputFile, null, null, null);
     }
 
 
     /**
      * Constructs an instance of this class which will trigger an event at the
-     * specified threshold, and save data to a temporary file beyond that point.
+     * specified threshold, and save data either to a file beyond that point.
      *
      * @param threshold  The number of bytes at which to trigger an event.
+     * @param outputFile The file to which data is saved beyond the threshold.
      * @param prefix Prefix to use for the temporary file.
      * @param suffix Suffix to use for the temporary file.
      * @param directory Temporary file directory.
-     *
-     * @since Commons IO 1.4
      */
-    public DeferredFileOutputStream(int threshold, String prefix, String suffix, File directory)
-    {
-        this(threshold, (File)null);
-        if (prefix == null) {
-            throw new IllegalArgumentException("Temporary file prefix is missing");
-        }
+    private DeferredFileOutputStream(int threshold, File outputFile, String prefix, String suffix, File directory) {
+        super(threshold);
+        this.outputFile = outputFile;
+
+        memoryOutputStream = new ByteArrayOutputStream();
+        currentOutputStream = memoryOutputStream;
         this.prefix = prefix;
         this.suffix = suffix;
         this.directory = directory;
@@ -176,21 +161,21 @@ public class DeferredFileOutputStream
      * Determines whether or not the data for this output stream has been
      * retained in memory.
      *
-     * @return <code>true</code> if the data is available in memory;
-     *         <code>false</code> otherwise.
+     * @return {@code true} if the data is available in memory;
+     *         {@code false} otherwise.
      */
     public boolean isInMemory()
     {
-        return (!isThresholdExceeded());
+        return !isThresholdExceeded();
     }
 
 
     /**
      * Returns the data for this output stream as an array of bytes, assuming
      * that the data has been retained in memory. If the data was written to
-     * disk, this method returns <code>null</code>.
+     * disk, this method returns {@code null}.
      *
-     * @return The data for this output stream, or <code>null</code> if no such
+     * @return The data for this output stream, or {@code null} if no such
      *         data is available.
      */
     public byte[] getData()
@@ -208,13 +193,13 @@ public class DeferredFileOutputStream
      * the temporary file created or null.
      * <p>
      * If the constructor specifying the file is used then it returns that
-     * same output file, even when threashold has not been reached.
+     * same output file, even when threshold has not been reached.
      * <p>
      * If constructor specifying a temporary file prefix/suffix is used
-     * then the temporary file created once the threashold is reached is returned
-     * If the threshold was not reached then <code>null</code> is returned.
+     * then the temporary file created once the threshold is reached is returned
+     * If the threshold was not reached then {@code null} is returned.
      *
-     * @return The file for this output stream, or <code>null</code> if no such
+     * @return The file for this output stream, or {@code null} if no such
      *         file exists.
      */
     public File getFile()
@@ -232,39 +217,5 @@ public class DeferredFileOutputStream
     public void close() throws IOException
     {
         super.close();
-        closed = true;
-    }
-
-
-    /**
-     * Writes the data from this output stream to the specified output stream,
-     * after it has been closed.
-     *
-     * @param out output stream to write to.
-     * @exception IOException if this stream is not yet closed or an error occurs.
-     */
-    public void writeTo(OutputStream out) throws IOException
-    {
-        // we may only need to check if this is closed if we are working with a file
-        // but we should force the habit of closing wether we are working with
-        // a file or memory.
-        if (!closed)
-        {
-            throw new IOException("Stream not closed");
-        }
-
-        if(isInMemory())
-        {
-            memoryOutputStream.writeTo(out);
-        }
-        else
-        {
-            FileInputStream fis = new FileInputStream(outputFile);
-            try {
-                IOUtils.copy(fis, out);
-            } finally {
-                IOUtils.closeQuietly(fis);
-            }
-        }
     }
 }

@@ -40,20 +40,6 @@ import java.io.IOException;
  * <p>
  * Origin of code: Excalibur, Alexandria, Commons-Utils
  *
- * @author <a href="mailto:burton@relativity.yi.org">Kevin A. Burton</A>
- * @author <a href="mailto:sanders@apache.org">Scott Sanders</a>
- * @author <a href="mailto:dlr@finemaltcoding.com">Daniel Rall</a>
- * @author <a href="mailto:Christoph.Reck@dlr.de">Christoph.Reck</a>
- * @author <a href="mailto:peter@apache.org">Peter Donald</a>
- * @author <a href="mailto:jefft@apache.org">Jeff Turner</a>
- * @author Matthew Hawthorne
- * @author <a href="mailto:jeremias@apache.org">Jeremias Maerki</a>
- * @author Stephen Colebourne
- * @author Ian Springer
- * @author Chris Eldredge
- * @author Jim Harrington
- * @author Niall Pemberton
- * @author Sandy McArthur
  * @version $Id$
  */
 public class FileUtils {
@@ -77,14 +63,16 @@ public class FileUtils {
             return;
         }
 
-        cleanDirectory(directory);
+        if (!isSymlink(directory)) {
+            cleanDirectory(directory);
+        }
+
         if (!directory.delete()) {
             String message =
                 "Unable to delete directory " + directory + ".";
             throw new IOException(message);
         }
     }
-
 
     /**
      * Cleans a directory without deleting it.
@@ -109,8 +97,7 @@ public class FileUtils {
         }
 
         IOException exception = null;
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
+        for (File file : files) {
             try {
                 forceDelete(file);
             } catch (IOException ioe) {
@@ -123,7 +110,6 @@ public class FileUtils {
         }
     }
 
-
     //-----------------------------------------------------------------------
     /**
      * Deletes a file. If file is a directory, delete it and all sub-directories.
@@ -135,8 +121,8 @@ public class FileUtils {
      *      (java.io.File methods returns a boolean)</li>
      * </ul>
      *
-     * @param file  file or directory to delete, must not be <code>null</code>
-     * @throws NullPointerException if the directory is <code>null</code>
+     * @param file  file or directory to delete, must not be {@code null}
+     * @throws NullPointerException if the directory is {@code null}
      * @throws FileNotFoundException if the file was not found
      * @throws IOException in case deletion is unsuccessful
      */
@@ -160,8 +146,8 @@ public class FileUtils {
      * Schedules a file to be deleted when JVM exits.
      * If file is directory delete it and all sub-directories.
      *
-     * @param file  file or directory to delete, must not be <code>null</code>
-     * @throws NullPointerException if the file is <code>null</code>
+     * @param file  file or directory to delete, must not be {@code null}
+     * @throws NullPointerException if the file is {@code null}
      * @throws IOException in case deletion is unsuccessful
      */
     public static void forceDeleteOnExit(File file) throws IOException {
@@ -175,8 +161,8 @@ public class FileUtils {
     /**
      * Schedules a directory recursively for deletion on JVM exit.
      *
-     * @param directory  directory to delete, must not be <code>null</code>
-     * @throws NullPointerException if the directory is <code>null</code>
+     * @param directory  directory to delete, must not be {@code null}
+     * @throws NullPointerException if the directory is {@code null}
      * @throws IOException in case deletion is unsuccessful
      */
     private static void deleteDirectoryOnExit(File directory) throws IOException {
@@ -184,15 +170,17 @@ public class FileUtils {
             return;
         }
 
-        cleanDirectoryOnExit(directory);
         directory.deleteOnExit();
+        if (!isSymlink(directory)) {
+            cleanDirectoryOnExit(directory);
+        }
     }
 
     /**
      * Cleans a directory without deleting it.
      *
-     * @param directory  directory to clean, must not be <code>null</code>
-     * @throws NullPointerException if the directory is <code>null</code>
+     * @param directory  directory to clean, must not be {@code null}
+     * @throws NullPointerException if the directory is {@code null}
      * @throws IOException in case cleaning is unsuccessful
      */
     private static void cleanDirectoryOnExit(File directory) throws IOException {
@@ -212,8 +200,7 @@ public class FileUtils {
         }
 
         IOException exception = null;
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
+        for (File file : files) {
             try {
                 forceDeleteOnExit(file);
             } catch (IOException ioe) {
@@ -223,6 +210,45 @@ public class FileUtils {
 
         if (null != exception) {
             throw exception;
+        }
+    }
+
+
+    /**
+     * Determines whether the specified file is a Symbolic Link rather than an actual file.
+     * <p>
+     * Will not return true if there is a Symbolic Link anywhere in the path,
+     * only if the specific file is.
+     * <p>
+     * <b>Note:</b> the current implementation always returns {@code false} if
+     * the system is detected as Windows using
+     * {@link File#separatorChar} == '\\'
+     *
+     * @param file the file to check
+     * @return true if the file is a Symbolic Link
+     * @throws IOException if an IO error occurs while checking the file
+     * @since 2.0
+     */
+    public static boolean isSymlink(File file) throws IOException {
+        if (file == null) {
+            throw new NullPointerException("File must not be null");
+        }
+        //FilenameUtils.isSystemWindows()
+        if (File.separatorChar == '\\') {
+            return false;
+        }
+        File fileInCanonicalDir = null;
+        if (file.getParent() == null) {
+            fileInCanonicalDir = file;
+        } else {
+            File canonicalDir = file.getParentFile().getCanonicalFile();
+            fileInCanonicalDir = new File(canonicalDir, file.getName());
+        }
+
+        if (fileInCanonicalDir.getCanonicalFile().equals(fileInCanonicalDir.getAbsoluteFile())) {
+            return false;
+        } else {
+            return true;
         }
     }
 }
