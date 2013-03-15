@@ -602,7 +602,7 @@ public class StandardHost extends ContainerBase implements Host {
 
     /**
      * Return the regular expression that defines the files and directories in
-     * the host's {@link #appBase} that will be ignored by the automatic
+     * the host's {@link #getAppBase} that will be ignored by the automatic
      * deployment process.
      */
     @Override
@@ -616,7 +616,7 @@ public class StandardHost extends ContainerBase implements Host {
 
     /**
      * Return the compiled regular expression that defines the files and
-     * directories in the host's {@link #appBase} that will be ignored by the
+     * directories in the host's {@link #getAppBase} that will be ignored by the
      * automatic deployment process.
      */
     @Override
@@ -627,7 +627,7 @@ public class StandardHost extends ContainerBase implements Host {
 
     /**
      * Set the regular expression that defines the files and directories in
-     * the host's {@link #appBase} that will be ignored by the automatic
+     * the host's {@link #getAppBase} that will be ignored by the automatic
      * deployment process.
      */
     @Override
