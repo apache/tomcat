@@ -107,7 +107,8 @@
   <subsection name="Web applications">
     <changelog>
       <update>
-        Correct Deployer and Manager pages of Tomcat documentation. (kkolinko)
+        Correct Deployer, Manager and Context pages of Tomcat documentation.
+        (kkolinko)
       </update>
     </changelog>
   </subsection>
