@@ -16,41 +16,24 @@
  */
 package org.apache.tomcat.util.http.fileupload;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
- * <p>Abstracts access to the request information needed for file uploads. This
- * interface should be implemented for each type of request that may be
- * handled by FileUpload, such as servlets and portlets.</p>
+ * Enhanced access to the request information needed for file uploads,
+ * which fixes the Content Length data access in {@link RequestContext}.
  *
- * @since FileUpload 1.1
+ * The reason of introducing this new interface is just for backward compatibility
+ * and it might vanish for a refactored 2.x version moving the new method into
+ * RequestContext again.
  *
- * @version $Id$
+ * @since 1.3
  */
-public interface RequestContext {
+public interface UploadContext extends RequestContext {
 
     /**
-     * Retrieve the character encoding for the request.
+     * Retrieve the content length of the request.
      *
-     * @return The character encoding for the request.
+     * @return The content length of the request.
+     * @since 1.3
      */
-    String getCharacterEncoding();
-
-    /**
-     * Retrieve the content type of the request.
-     *
-     * @return The content type of the request.
-     */
-    String getContentType();
-
-    /**
-     * Retrieve the input stream for the request.
-     *
-     * @return The input stream for the request.
-     *
-     * @throws IOException if a problem occurs.
-     */
-    InputStream getInputStream() throws IOException;
+    long contentLength();
 
 }

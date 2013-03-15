@@ -22,7 +22,7 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.tomcat.util.http.fileupload.FileUploadBase;
-import org.apache.tomcat.util.http.fileupload.RequestContext;
+import org.apache.tomcat.util.http.fileupload.UploadContext;
 
 
 /**
@@ -33,7 +33,7 @@ import org.apache.tomcat.util.http.fileupload.RequestContext;
  *
  * @version $Id$
  */
-public class ServletRequestContext implements RequestContext {
+public class ServletRequestContext implements UploadContext {
 
     // ----------------------------------------------------- Instance Variables
 
