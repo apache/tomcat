@@ -33,7 +33,6 @@ import java.util.Map;
 import org.apache.tomcat.util.http.fileupload.DeferredFileOutputStream;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.FileItemHeaders;
-import org.apache.tomcat.util.http.fileupload.FileItemHeadersSupport;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.apache.tomcat.util.http.fileupload.ParameterParser;
@@ -80,7 +79,7 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  * @version $Id$
  */
 public class DiskFileItem
-    implements FileItem, FileItemHeadersSupport {
+    implements FileItem {
 
     // ----------------------------------------------------- Manifest constants
 

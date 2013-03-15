@@ -44,34 +44,29 @@ public interface FileItemHeaders {
     /**
      * <p>
      * Returns all the values of the specified item header as an
-     * <code>Enumeration</code> of <code>String</code> objects.
+     * <code>Iterator</code> of <code>String</code> objects.
      * </p>
      * <p>
      * If the item did not include any headers of the specified name, this
-     * method returns an empty <code>Enumeration</code>. The header name is
+     * method returns an empty <code>Iterator</code>. The header name is
      * case insensitive.
      * </p>
      *
      * @param name a <code>String</code> specifying the header name
-     * @return an <code>Enumeration</code> containing the values of the
+     * @return an <code>Iterator</code> containing the values of the
      *         requested header. If the item does not have any headers of
-     *         that name, return an empty <code>Enumeration</code>
+     *         that name, return an empty <code>Iterator</code>
      */
     Iterator<String> getHeaders(String name);
 
     /**
      * <p>
-     * Returns an <code>Enumeration</code> of all the header names.
-     * </p>
-     * <p>
-     * If the item did not include any headers of the specified name, this
-     * method returns an empty <code>Enumeration</code>. The header name is
-     * case insensitive.
+     * Returns an <code>Iterator</code> of all the header names.
      * </p>
      *
-     * @return an <code>Enumeration</code> containing the values of the
-     *         requested header. If the item does not have any headers of
-     *         that name return an empty <code>Enumeration</code>
+     * @return an <code>Iterator</code> containing all of the names of
+     *         headers provided with this file item. If the item does not have
+     *         any headers return an empty <code>Iterator</code>
      */
     Iterator<String> getHeaderNames();
 }
