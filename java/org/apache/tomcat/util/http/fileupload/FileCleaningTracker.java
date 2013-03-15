@@ -45,23 +45,23 @@ public class FileCleaningTracker {
     /**
      * Queue of <code>Tracker</code> instances being watched.
      */
-    ReferenceQueue<Object> q = new ReferenceQueue<>();
+    private final ReferenceQueue<Object> q = new ReferenceQueue<>();
     /**
      * Collection of <code>Tracker</code> instances in existence.
      */
-    final Collection<Tracker> trackers = Collections.synchronizedSet(new HashSet<Tracker>()); // synchronized
+    private final Collection<Tracker> trackers = Collections.synchronizedSet(new HashSet<Tracker>()); // synchronized
     /**
      * Collection of File paths that failed to delete.
      */
-    final List<String> deleteFailures = Collections.synchronizedList(new ArrayList<String>());
+    private final List<String> deleteFailures = Collections.synchronizedList(new ArrayList<String>());
     /**
      * Whether to terminate the thread when the tracking is complete.
      */
-    volatile boolean exitWhenFinished = false;
+    private volatile boolean exitWhenFinished = false;
     /**
      * The thread that will clean up registered files.
      */
-    Thread reaper;
+    private Thread reaper;
 
     //-----------------------------------------------------------------------
     /**
@@ -95,36 +95,6 @@ public class FileCleaningTracker {
     }
 
     /**
-     * Track the specified file, using the provided marker, deleting the file
-     * when the marker instance is garbage collected.
-     * The {@link FileDeleteStrategy#NORMAL normal} deletion strategy will be used.
-     *
-     * @param path  the full path to the file to be tracked, not null
-     * @param marker  the marker object used to track the file, not null
-     * @throws NullPointerException if the path is null
-     */
-    public void track(String path, Object marker) {
-        track(path, marker, (FileDeleteStrategy) null);
-    }
-
-    /**
-     * Track the specified file, using the provided marker, deleting the file
-     * when the marker instance is garbage collected.
-     * The speified deletion strategy is used.
-     *
-     * @param path  the full path to the file to be tracked, not null
-     * @param marker  the marker object used to track the file, not null
-     * @param deleteStrategy  the strategy to delete the file, null means normal
-     * @throws NullPointerException if the path is null
-     */
-    public void track(String path, Object marker, FileDeleteStrategy deleteStrategy) {
-        if (path == null) {
-            throw new NullPointerException("The path must not be null");
-        }
-        addTracker(path, marker, deleteStrategy);
-    }
-
-    /**
      * Adds a tracker to the list of trackers.
      *
      * @param path  the full path to the file to be tracked, not null
@@ -141,57 +111,6 @@ public class FileCleaningTracker {
             reaper.start();
         }
         trackers.add(new Tracker(path, deleteStrategy, marker, q));
-    }
-
-    //-----------------------------------------------------------------------
-    /**
-     * Retrieve the number of files currently being tracked, and therefore
-     * awaiting deletion.
-     *
-     * @return the number of files being tracked
-     */
-    public int getTrackCount() {
-        return trackers.size();
-    }
-
-    /**
-     * Return the file paths that failed to delete.
-     *
-     * @return the file paths that failed to delete
-     */
-    public List<String> getDeleteFailures() {
-        return deleteFailures;
-    }
-
-    /**
-     * Call this method to cause the file cleaner thread to terminate when
-     * there are no more objects being tracked for deletion.
-     * <p>
-     * In a simple environment, you don't need this method as the file cleaner
-     * thread will simply exit when the JVM exits. In a more complex environment,
-     * with multiple class loaders (such as an application server), you should be
-     * aware that the file cleaner thread will continue running even if the class
-     * loader it was started from terminates. This can consitute a memory leak.
-     * <p>
-     * For example, suppose that you have developed a web application, which
-     * contains the commons-io jar file in your WEB-INF/lib directory. In other
-     * words, the FileCleaner class is loaded through the class loader of your
-     * web application. If the web application is terminated, but the servlet
-     * container is still running, then the file cleaner thread will still exist,
-     * posing a memory leak.
-     * <p>
-     * This method allows the thread to be terminated. Simply call this method
-     * in the resource cleanup code, such as {@link javax.servlet.ServletContextListener#contextDestroyed}.
-     * Once called, no new objects can be tracked by the file cleaner.
-     */
-    public synchronized void exitWhenFinished() {
-        // synchronized block protects reaper
-        exitWhenFinished = true;
-        if (reaper != null) {
-            synchronized (reaper) {
-                reaper.interrupt();
-            }
-        }
     }
 
     //-----------------------------------------------------------------------
