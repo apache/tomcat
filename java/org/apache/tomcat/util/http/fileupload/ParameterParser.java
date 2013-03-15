@@ -266,24 +266,24 @@ public class ParameterParser {
      * Extracts a map of name/value pairs from the given array of
      * characters. Names are expected to be unique.
      *
-     * @param inputChars the array of characters that contains a sequence of
+     * @param chars the array of characters that contains a sequence of
      * name/value pairs
      * @param separator the name/value pairs separator
      *
      * @return a map of name/value pairs
      */
-    public Map<String,String> parse(final char[] inputChars, char separator) {
-        if (inputChars == null) {
+    public Map<String,String> parse(final char[] chars, char separator) {
+        if (chars == null) {
             return new HashMap<>();
         }
-        return parse(inputChars, 0, inputChars.length, separator);
+        return parse(chars, 0, chars.length, separator);
     }
 
     /**
      * Extracts a map of name/value pairs from the given array of
      * characters. Names are expected to be unique.
      *
-     * @param inputChars the array of characters that contains a sequence of
+     * @param chars the array of characters that contains a sequence of
      * name/value pairs
      * @param offset - the initial offset.
      * @param length - the length.
@@ -292,16 +292,16 @@ public class ParameterParser {
      * @return a map of name/value pairs
      */
     public Map<String,String> parse(
-        final char[] inputChars,
+        final char[] chars,
         int offset,
         int length,
         char separator) {
 
-        if (inputChars == null) {
+        if (chars == null) {
             return new HashMap<>();
         }
         HashMap<String,String> params = new HashMap<>();
-        this.chars = inputChars;
+        this.chars = chars;
         this.pos = offset;
         this.len = length;
 

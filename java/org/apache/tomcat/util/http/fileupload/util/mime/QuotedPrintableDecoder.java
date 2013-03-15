@@ -38,7 +38,7 @@ final class QuotedPrintableDecoder {
     private static final int OUT_SHIFT = 4;
 
     /**
-     * The decoding table size.
+     * the decoding table size.
      */
     private static final int DECODING_TABLE_SIZE = 128;
 
