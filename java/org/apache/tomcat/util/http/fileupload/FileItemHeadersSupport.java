@@ -21,7 +21,7 @@ package org.apache.tomcat.util.http.fileupload;
  * implementations will accept the headers read for the item.
  *
  * @author Michael C. Macaluso
- * @since 1.3
+ * @since 1.2.1
  *
  * @see FileItem
  * @see FileItemStream
@@ -45,4 +45,5 @@ public interface FileItemHeadersSupport {
      *         for this instance.
      */
     void setHeaders(FileItemHeaders headers);
+
 }

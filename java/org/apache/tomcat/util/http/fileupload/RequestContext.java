@@ -50,8 +50,9 @@ public interface RequestContext {
      * Retrieve the content length of the request.
      *
      * @return The content length of the request.
+     * @since 1.3
      */
-    int getContentLength();
+    long contentLength();
 
     /**
      * Retrieve the input stream for the request.

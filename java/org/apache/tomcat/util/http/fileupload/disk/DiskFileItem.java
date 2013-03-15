@@ -600,7 +600,7 @@ public class DiskFileItem
             }
 
             String tempFileName =
-                "upload_" + UID + "_" + getUniqueId() + ".tmp";
+                    String.format("upload_%s_%s.tmp", UID, getUniqueId());
 
             tempFile = new File(tempDir, tempFileName);
         }
@@ -638,15 +638,9 @@ public class DiskFileItem
      */
     @Override
     public String toString() {
-        return "name=" + this.getName()
-            + ", StoreLocation="
-            + String.valueOf(this.getStoreLocation())
-            + ", size="
-            + this.getSize()
-            + "bytes, "
-            + "isFormField=" + isFormField()
-            + ", FieldName="
-            + this.getFieldName();
+        return String.format("name=%s, StoreLocation=%s, size=%s bytes, isFormField=%s, FieldName=%s",
+                      getName(), getStoreLocation(), Long.valueOf(getSize()),
+                      Boolean.valueOf(isFormField()), getFieldName());
     }
 
     // -------------------------------------------------- Serialization methods

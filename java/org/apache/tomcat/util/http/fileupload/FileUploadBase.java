@@ -321,8 +321,8 @@ public abstract class FileUploadBase {
                     throw (FileUploadException) e.getCause();
                 } catch (IOException e) {
                     throw new IOFileUploadException(
-                            "Processing of " + MULTIPART_FORM_DATA
-                            + " request failed. " + e.getMessage(), e);
+                            String.format("Processing of %s request failed. ",
+                                    MULTIPART_FORM_DATA, e.getMessage()), e);
                 }
                 if (fileItem instanceof FileItemHeadersSupport) {
                     final FileItemHeaders fih = item.getHeaders();
@@ -476,7 +476,7 @@ public abstract class FileUploadBase {
             if (start == end) {
                 break;
             }
-            String header = headerPart.substring(start, end);
+            StringBuilder header = new StringBuilder(headerPart.substring(start, end));
             start = end + 2;
             while (start < len) {
                 int nonWs = start;
@@ -492,10 +492,10 @@ public abstract class FileUploadBase {
                 }
                 // Continuation line found
                 end = parseEndOfLine(headerPart, nonWs);
-                header += " " + headerPart.substring(nonWs, end);
+                header.append(" ").append(headerPart.substring(nonWs, end));
                 start = end + 2;
             }
-            parseHeaderLine(headers, header);
+            parseHeaderLine(headers, header.toString());
         }
         return headers;
     }
@@ -601,12 +601,10 @@ public abstract class FileUploadBase {
                     if (pContentLength != -1
                             &&  pContentLength > fileSizeMax) {
                         FileSizeLimitExceededException e =
-                            new FileSizeLimitExceededException(
-                                "The field " + fieldName
-                                + " exceeds its maximum permitted "
-                                + " size of " + fileSizeMax
-                                + " bytes.",
-                                pContentLength, fileSizeMax);
+                                new FileSizeLimitExceededException(String.format(
+                                        "The field %s exceeds its maximum permitted size of %s bytes.",
+                                        fieldName, Long.valueOf(fileSizeMax)),
+                                        pContentLength, fileSizeMax);
                         e.setFileName(pName);
                         e.setFieldName(pFieldName);
                         throw new FileUploadIOException(e);
@@ -617,12 +615,10 @@ public abstract class FileUploadBase {
                                 throws IOException {
                             itemStream.close(true);
                             FileSizeLimitExceededException e =
-                                new FileSizeLimitExceededException(
-                                    "The field " + fieldName
-                                    + " exceeds its maximum permitted "
-                                    + " size of " + pSizeMax
-                                    + " bytes.",
-                                    pCount, pSizeMax);
+                                    new FileSizeLimitExceededException(String.format(
+                                            "The field %s exceeds its maximum permitted size of %s bytes.",
+                                           fieldName, Long.valueOf(pSizeMax)),
+                                           pCount, pSizeMax);
                             e.setFieldName(fieldName);
                             e.setFileName(name);
                             throw new FileUploadIOException(e);
@@ -768,41 +764,34 @@ public abstract class FileUploadBase {
             String contentType = ctx.getContentType();
             if ((null == contentType)
                     || (!contentType.toLowerCase(Locale.ENGLISH).startsWith(MULTIPART))) {
-                throw new InvalidContentTypeException(
-                        "the request doesn't contain a "
-                        + MULTIPART_FORM_DATA
-                        + " or "
-                        + MULTIPART_MIXED
-                        + " stream, content type header is "
-                        + contentType);
+                throw new InvalidContentTypeException(String.format(
+                        "the request doesn't contain a %s or %s stream, content type header is %s",
+                        MULTIPART_FORM_DATA, MULTIPART_FORM_DATA, contentType));
             }
 
             InputStream input = ctx.getInputStream();
 
             if (sizeMax >= 0) {
-                int requestSize = ctx.getContentLength();
+                long requestSize = ctx.contentLength();
                 if (requestSize == -1) {
                     input = new LimitedInputStream(input, sizeMax) {
                         @Override
                         protected void raiseError(long pSizeMax, long pCount)
                                 throws IOException {
-                            FileUploadException ex =
-                                new SizeLimitExceededException(
-                                    "the request was rejected because"
-                                    + " its size (" + pCount
-                                    + ") exceeds the configured maximum"
-                                    + " (" + pSizeMax + ")",
+                            FileUploadException ex = new SizeLimitExceededException(String.format(
+                                    "the request was rejected because its size (%s) exceeds the configured maximum (%s)",
+                                    Long.valueOf(pCount),
+                                    Long.valueOf(pSizeMax)),
                                     pCount, pSizeMax);
                             throw new FileUploadIOException(ex);
                         }
                     };
                 } else {
                     if (sizeMax >= 0 && requestSize > sizeMax) {
-                        throw new SizeLimitExceededException(
-                                "the request was rejected because its size ("
-                                + requestSize
-                                + ") exceeds the configured maximum ("
-                                + sizeMax + ")",
+                        throw new SizeLimitExceededException(String.format(
+                                "the request was rejected because its size (%s) exceeds the configured maximum (%s)",
+                                Long.valueOf(requestSize),
+                                Long.valueOf(sizeMax)),
                                 requestSize, sizeMax);
                     }
                 }
@@ -815,13 +804,11 @@ public abstract class FileUploadBase {
 
             boundary = getBoundary(contentType);
             if (boundary == null) {
-                throw new FileUploadException(
-                        "the request was rejected because "
-                        + "no multipart boundary was found");
+                throw new FileUploadException("the request was rejected because no multipart boundary was found");
             }
 
             notifier = new MultipartStream.ProgressNotifier(listener,
-                    ctx.getContentLength());
+                    ctx.contentLength());
             multi = new MultipartStream(input, boundary, notifier);
             multi.setHeaderEncoding(charEncoding);
 
@@ -1060,6 +1047,7 @@ public abstract class FileUploadBase {
          * Retrieves the actual size of the request.
          *
          * @return The actual size of the request.
+         * @since 1.3
          */
         public long getActualSize() {
             return actual;
@@ -1069,6 +1057,7 @@ public abstract class FileUploadBase {
          * Retrieves the permitted size of the request.
          *
          * @return The permitted size of the request.
+         * @since 1.3
          */
         public long getPermittedSize() {
             return permitted;

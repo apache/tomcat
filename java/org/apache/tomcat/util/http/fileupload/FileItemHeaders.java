@@ -24,7 +24,7 @@ import java.util.Iterator;
  * request.</p>
  *
  * @author Michael C. Macaluso
- * @since 1.3
+ * @since 1.2.1
  */
 public interface FileItemHeaders {
 
@@ -71,4 +71,5 @@ public interface FileItemHeaders {
      *         any headers return an empty <code>Iterator</code>
      */
     Iterator<String> getHeaderNames();
+
 }

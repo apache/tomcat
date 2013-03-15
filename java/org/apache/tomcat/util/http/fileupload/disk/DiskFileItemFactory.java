@@ -33,12 +33,23 @@ import org.apache.tomcat.util.http.fileupload.FileItemFactory;
  * created.</p>
  *
  * <p>If not otherwise configured, the default configuration values are as
- * follows:
+ * follows:</p>
  * <ul>
  *   <li>Size threshold is 10KB.</li>
  *   <li>Repository is the system default temp directory, as returned by
  *       <code>System.getProperty("java.io.tmpdir")</code>.</li>
  * </ul>
+ * <p>
+ * <b>NOTE</b>: Files are created in the system default temp directory with
+ * predictable names. This means that a local attacker with write access to that
+ * directory can perform a TOUTOC attack to replace any uploaded file with a
+ * file of the attackers choice. The implications of this will depend on how the
+ * uploaded file is used but could be significant. When using this
+ * implementation in an environment with local, untrusted users,
+ * {@link #setRepository(File)} MUST be used to configure a repository location
+ * that is not publicly writable. In a Servlet container the location identified
+ * by the ServletContext attribute <code>javax.servlet.context.tempdir</code>
+ * may be used.
  * </p>
  *
  * <p>Temporary files, which are created for file items, should be

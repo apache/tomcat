@@ -49,6 +49,7 @@ import java.io.UnsupportedEncodingException;
  * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
  *
  * @version $Id$
+ * @since 1.3 additionally implements FileItemHeadersSupport
  */
 public interface FileItem extends Serializable, FileItemHeadersSupport {
 
