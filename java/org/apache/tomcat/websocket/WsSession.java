@@ -70,7 +70,7 @@ public class WsSession implements Session {
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
     private MessageHandler.Whole<PongMessage> pongMessageHandler = null;
-    private State state = State.OPEN;
+    private volatile State state = State.OPEN;
     private final Object stateLock = new Object();
     private final Map<String,Object> userProperties = new ConcurrentHashMap<>();
     private volatile int maxBinaryMessageBufferSize =
@@ -292,7 +292,7 @@ public class WsSession implements Session {
 
     @Override
     public void close(CloseReason closeReason) throws IOException {
-        // Double-checked locking. OK because open is volatile
+        // Double-checked locking. OK because state is volatile
         if (state != State.OPEN) {
             return;
         }
