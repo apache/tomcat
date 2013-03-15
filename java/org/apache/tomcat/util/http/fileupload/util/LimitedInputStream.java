@@ -29,7 +29,7 @@ public abstract class LimitedInputStream extends FilterInputStream implements Cl
     /**
      * The maximum size of an item, in bytes.
      */
-    private long sizeMax;
+    private final long sizeMax;
 
     /**
      * The current number of bytes.

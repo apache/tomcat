@@ -200,7 +200,7 @@ public class DiskFileItemFactory implements FileItemFactory {
                 isFormField, fileName, sizeThreshold, repository);
         FileCleaningTracker tracker = getFileCleaningTracker();
         if (tracker != null) {
-            tracker.track(result.getTempFile(), this);
+            tracker.track(result.getTempFile(), result);
         }
         return result;
     }
