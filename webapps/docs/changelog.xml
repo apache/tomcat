@@ -24,16 +24,17 @@
   &project;
 
   <properties>
-    <author email="remm@apache.org">Remy Maucherat</author>
-    <author email="fhanik@apache.org">Filip Hanik</author>
-    <author email="rjung@apache.org">Rainer Jung</author>
-    <author email="kkolinko@apache.org">Konstantin Kolinko</author>
-    <author email="pero@apache.org">Peter Rossbach</author>
-    <author email="kfujino@apache.org">Keiichi Fujino</author>
-    <author email="timw@apache.org">Tim Whittington</author>   
-    <author email="mturk@apache.org">Mladen Turk</author>
-    <author email="schultz@apache.org">Christopher Schultz</author>
-    <author email="slaurent@apache.org">Sylvain Laurent</author>
+    <author email="remm at apache.org">Remy Maucherat</author>
+    <author email="fhanik at apache.org">Filip Hanik</author>
+    <author email="rjung at apache.org">Rainer Jung</author>
+    <author email="kkolinko at apache.org">Konstantin Kolinko</author>
+    <author email="pero at apache.org">Peter Rossbach</author>
+    <author email="kfujino at apache.org">Keiichi Fujino</author>
+    <author email="timw at apache.org">Tim Whittington</author>   
+    <author email="mturk at apache.org">Mladen Turk</author>
+    <author email="schultz at apache.org">Christopher Schultz</author>
+    <author email="slaurent at apache.org">Sylvain Laurent</author>
+    <author email="violetagg at apache.org">Violeta Georgieva</author>
     <title>Changelog</title>
     <no-comments />
   </properties>
