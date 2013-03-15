@@ -19,8 +19,8 @@ package org.apache.tomcat.util.http.fileupload.util;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -42,14 +42,7 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
      * <code>String</code> instances.
      */
     private final Map<String,List<String>> headerNameToValueListMap =
-            new HashMap<>();
-
-    /**
-     * List to preserve order of headers as added.  This would not be
-     * needed if a <code>LinkedHashMap</code> could be used, but don't
-     * want to depend on 1.4.
-     */
-    private final List<String> headerNameList = new ArrayList<>();
+            new LinkedHashMap<>();
 
     @Override
     public String getHeader(String name) {
@@ -63,7 +56,7 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
 
     @Override
     public Iterator<String> getHeaderNames() {
-        return headerNameList.iterator();
+        return headerNameToValueListMap.keySet().iterator();
     }
 
     @Override
@@ -71,7 +64,7 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
         String nameLower = name.toLowerCase(Locale.ENGLISH);
         List<String> headerValueList = headerNameToValueListMap.get(nameLower);
         if (null == headerValueList) {
-            return Collections.<String>emptyList().iterator();
+            headerValueList = Collections.emptyList();
         }
         return headerValueList.iterator();
     }
@@ -88,7 +81,6 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
         if (null == headerValueList) {
             headerValueList = new ArrayList<>();
             headerNameToValueListMap.put(nameLower, headerValueList);
-            headerNameList.add(nameLower);
         }
         headerValueList.add(value);
     }
