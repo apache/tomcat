@@ -596,10 +596,10 @@ public abstract class FileUploadBase {
                     if (pContentLength != -1
                             &&  pContentLength > fileSizeMax) {
                         FileSizeLimitExceededException e =
-                                new FileSizeLimitExceededException(String.format(
-                                        "The field %s exceeds its maximum permitted size of %s bytes.",
+                            new FileSizeLimitExceededException(
+                                String.format("The field %s exceeds its maximum permitted size of %s bytes.",
                                         fieldName, Long.valueOf(fileSizeMax)),
-                                        pContentLength, fileSizeMax);
+                                pContentLength, fileSizeMax);
                         e.setFileName(pName);
                         e.setFieldName(pFieldName);
                         throw new FileUploadIOException(e);
@@ -610,10 +610,10 @@ public abstract class FileUploadBase {
                                 throws IOException {
                             itemStream.close(true);
                             FileSizeLimitExceededException e =
-                                    new FileSizeLimitExceededException(String.format(
-                                            "The field %s exceeds its maximum permitted size of %s bytes.",
+                                new FileSizeLimitExceededException(
+                                    String.format("The field %s exceeds its maximum permitted size of %s bytes.",
                                            fieldName, Long.valueOf(pSizeMax)),
-                                           pCount, pSizeMax);
+                                    pCount, pSizeMax);
                             e.setFieldName(fieldName);
                             e.setFileName(name);
                             throw new FileUploadIOException(e);
@@ -1039,7 +1039,9 @@ public abstract class FileUploadBase {
      */
     public abstract static class SizeException extends FileUploadException {
 
-
+        /**
+         * Serial version UID, being used, if serialized.
+         */
         private static final long serialVersionUID = -8776225574705254126L;
 
         /**
@@ -1200,6 +1202,8 @@ public abstract class FileUploadBase {
         /**
          * Sets the file name of the item, which caused the
          * exception.
+         *
+         * @param pFileName the file name of the item, which caused the exception.
          */
         public void setFileName(String pFileName) {
             fileName = pFileName;
@@ -1218,6 +1222,9 @@ public abstract class FileUploadBase {
         /**
          * Sets the field name of the item, which caused the
          * exception.
+         *
+         * @param pFieldName the field name of the item,
+         *        which caused the exception.
          */
         public void setFieldName(String pFieldName) {
             fieldName = pFieldName;

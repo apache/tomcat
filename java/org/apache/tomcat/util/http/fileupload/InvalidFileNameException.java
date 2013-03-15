@@ -28,8 +28,15 @@ package org.apache.tomcat.util.http.fileupload;
  */
 public class InvalidFileNameException extends RuntimeException {
 
+    /**
+     * Serial version UID, being used, if the exception
+     * is serialized.
+     */
     private static final long serialVersionUID = 7922042602454350470L;
 
+    /**
+     * The file name causing the exception.
+     */
     private final String name;
 
     /**
@@ -45,6 +52,8 @@ public class InvalidFileNameException extends RuntimeException {
 
     /**
      * Returns the invalid file name.
+     *
+     * @return the invalid file name.
      */
     public String getName() {
         return name;
