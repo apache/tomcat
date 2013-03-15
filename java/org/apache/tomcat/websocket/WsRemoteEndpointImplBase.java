@@ -243,12 +243,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             boolean dataMessage) {
         synchronized (messagePartLock) {
 
-            if (closed) {
-                close();
-            } else {
-                fragmented = nextFragmented;
-                text = nextText;
-            }
+            fragmented = nextFragmented;
+            text = nextText;
 
             if (dataMessage) {
                 dataMessageInProgress = false;

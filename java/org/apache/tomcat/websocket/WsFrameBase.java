@@ -283,7 +283,7 @@ public abstract class WsFrameBase {
                     reason = controlBufferText.toString();
                 }
             }
-            wsSession.close(new CloseReason(Util.getCloseCode(code), reason));
+            wsSession.onClose(new CloseReason(Util.getCloseCode(code), reason));
         } else if (opCode == Constants.OPCODE_PING) {
             if (wsSession.isOpen()) {
                 wsSession.getBasicRemote().sendPong(controlBufferBinary);

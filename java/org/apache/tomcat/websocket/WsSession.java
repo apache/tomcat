@@ -70,8 +70,8 @@ public class WsSession implements Session {
     private MessageHandler textMessageHandler = null;
     private MessageHandler binaryMessageHandler = null;
     private MessageHandler.Whole<PongMessage> pongMessageHandler = null;
-    private volatile boolean open = true;
-    private final Object closeLock = new Object();
+    private State state = State.OPEN;
+    private final Object stateLock = new Object();
     private final Map<String,Object> userProperties = new ConcurrentHashMap<>();
     private volatile int maxBinaryMessageBufferSize =
             Constants.DEFAULT_BUFFER_SIZE;
@@ -226,7 +226,7 @@ public class WsSession implements Session {
 
     @Override
     public boolean isOpen() {
-        return open;
+        return state == State.OPEN;
     }
 
 
@@ -293,42 +293,81 @@ public class WsSession implements Session {
     @Override
     public void close(CloseReason closeReason) throws IOException {
         // Double-checked locking. OK because open is volatile
-        if (!open) {
+        if (state != State.OPEN) {
             return;
         }
-        synchronized (closeLock) {
-            if (!open) {
+        synchronized (stateLock) {
+            if (state != State.OPEN) {
                 return;
             }
-            open = false;
+            state = State.CLOSING;
 
-            // Send the close message
-            // 125 is maximum size for the payload of a control message
-            ByteBuffer msg = ByteBuffer.allocate(125);
-            msg.putShort((short) closeReason.getCloseCode().getCode());
-            String reason = closeReason.getReasonPhrase();
-            if (reason != null && reason.length() > 0) {
-                msg.put(reason.getBytes(UTF8));
+            sendCloseMessage(closeReason);
+        }
+    }
+
+
+    /**
+     * Called when a close message is received. Should only ever happen once.
+     */
+    void onClose(CloseReason closeReason) {
+
+        boolean sendCloseMessage = false;
+
+        synchronized (stateLock) {
+            if (state == State.OPEN) {
+                sendCloseMessage = true;
             }
-            msg.flip();
-            try {
-                wsRemoteEndpoint.startMessageBlock(
-                        Constants.OPCODE_CLOSE, msg, true);
-            } finally {
-                webSocketContainer.unregisterSession(
-                        localEndpoint.getClass(), this);
 
-                // Fire the onClose event
-                Thread t = Thread.currentThread();
-                ClassLoader cl = t.getContextClassLoader();
-                t.setContextClassLoader(applicationClassLoader);
+            state = State.CLOSED;
+
+            if (sendCloseMessage) {
                 try {
-                    localEndpoint.onClose(this, closeReason);
-                } finally {
-                    t.setContextClassLoader(cl);
+                    sendCloseMessage(closeReason);
+                } catch (IOException ioe) {
+                    log.error(sm.getString("wsSession.sendCloseFail"), ioe);
                 }
             }
+
+            // Close the socket
+            wsRemoteEndpoint.close();
         }
+    }
+
+
+    private void sendCloseMessage(CloseReason closeReason) throws IOException {
+        // 125 is maximum size for the payload of a control message
+        ByteBuffer msg = ByteBuffer.allocate(125);
+        msg.putShort((short) closeReason.getCloseCode().getCode());
+        String reason = closeReason.getReasonPhrase();
+        if (reason != null && reason.length() > 0) {
+            msg.put(reason.getBytes(UTF8));
+        }
+        msg.flip();
+        try {
+            wsRemoteEndpoint.startMessageBlock(
+                    Constants.OPCODE_CLOSE, msg, true);
+        } catch (IOException ioe) {
+            // Failed to send close message. Close the socket and let the caller
+            // deal with the Exception
+            log.error(sm.getString("wsSession.sendCloseFail"), ioe);
+            wsRemoteEndpoint.close();
+            throw ioe;
+        } finally {
+            webSocketContainer.unregisterSession(
+                    localEndpoint.getClass(), this);
+
+            // Fire the onClose event
+            Thread t = Thread.currentThread();
+            ClassLoader cl = t.getContextClassLoader();
+            t.setContextClassLoader(applicationClassLoader);
+            try {
+                localEndpoint.onClose(this, closeReason);
+            } finally {
+                t.setContextClassLoader(cl);
+            }
+        }
+
     }
 
 
@@ -425,5 +464,12 @@ public class WsSession implements Session {
                 log.warn(sm.getString("wsSession.expireFailed"), e);
             }
         }
+    }
+
+
+    private static enum State {
+        OPEN,
+        CLOSING,
+        CLOSED
     }
 }
