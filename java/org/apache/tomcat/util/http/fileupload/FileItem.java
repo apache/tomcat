@@ -43,18 +43,12 @@ import java.io.UnsupportedEncodingException;
  * implementation of this interface to also implement
  * <code>javax.activation.DataSource</code> with minimal additional work.
  *
- * @author <a href="mailto:Rafal.Krzewski@e-point.pl">Rafal Krzewski</a>
- * @author <a href="mailto:sean@informage.net">Sean Legassick</a>
- * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
- * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
- *
  * @version $Id$
+ * @since 1.3 additionally implements FileItemHeadersSupport
  */
 public interface FileItem extends Serializable, FileItemHeadersSupport {
 
-
     // ------------------------------- Methods from javax.activation.DataSource
-
 
     /**
      * Returns an {@link java.io.InputStream InputStream} that can be
@@ -67,7 +61,6 @@ public interface FileItem extends Serializable, FileItemHeadersSupport {
      */
     InputStream getInputStream() throws IOException;
 
-
     /**
      * Returns the content type passed by the browser or <code>null</code> if
      * not defined.
@@ -76,7 +69,6 @@ public interface FileItem extends Serializable, FileItemHeadersSupport {
      *         not defined.
      */
     String getContentType();
-
 
     /**
      * Returns the original filename in the client's filesystem, as provided by
@@ -92,9 +84,7 @@ public interface FileItem extends Serializable, FileItemHeadersSupport {
      */
     String getName();
 
-
     // ------------------------------------------------------- FileItem methods
-
 
     /**
      * Provides a hint as to whether or not the file contents will be read
@@ -105,7 +95,6 @@ public interface FileItem extends Serializable, FileItemHeadersSupport {
      */
     boolean isInMemory();
 
-
     /**
      * Returns the size of the file item.
      *
@@ -113,14 +102,12 @@ public interface FileItem extends Serializable, FileItemHeadersSupport {
      */
     long getSize();
 
-
     /**
      * Returns the contents of the file item as an array of bytes.
      *
      * @return The contents of the file item as an array of bytes.
      */
     byte[] get();
-
 
     /**
      * Returns the contents of the file item as a String, using the specified
@@ -136,7 +123,6 @@ public interface FileItem extends Serializable, FileItemHeadersSupport {
      */
     String getString(String encoding) throws UnsupportedEncodingException;
 
-
     /**
      * Returns the contents of the file item as a String, using the default
      * character encoding.  This method uses {@link #get()} to retrieve the
@@ -145,7 +131,6 @@ public interface FileItem extends Serializable, FileItemHeadersSupport {
      * @return The contents of the item, as a string.
      */
     String getString();
-
 
     /**
      * A convenience method to write an uploaded item to disk. The client code
@@ -165,7 +150,6 @@ public interface FileItem extends Serializable, FileItemHeadersSupport {
      */
     void write(File file) throws Exception;
 
-
     /**
      * Deletes the underlying storage for a file item, including deleting any
      * associated temporary disk file. Although this storage will be deleted
@@ -175,7 +159,6 @@ public interface FileItem extends Serializable, FileItemHeadersSupport {
      */
     void delete();
 
-
     /**
      * Returns the name of the field in the multipart form corresponding to
      * this file item.
@@ -184,14 +167,12 @@ public interface FileItem extends Serializable, FileItemHeadersSupport {
      */
     String getFieldName();
 
-
     /**
      * Sets the field name used to reference this file item.
      *
      * @param name The name of the form field.
      */
     void setFieldName(String name);
-
 
     /**
      * Determines whether or not a <code>FileItem</code> instance represents
@@ -202,7 +183,6 @@ public interface FileItem extends Serializable, FileItemHeadersSupport {
      */
     boolean isFormField();
 
-
     /**
      * Specifies whether or not a <code>FileItem</code> instance represents
      * a simple form field.
@@ -211,7 +191,6 @@ public interface FileItem extends Serializable, FileItemHeadersSupport {
      *              field; <code>false</code> if it represents an uploaded file.
      */
     void setFormField(boolean state);
-
 
     /**
      * Returns an {@link java.io.OutputStream OutputStream} that can

@@ -31,10 +31,15 @@ import org.apache.tomcat.util.http.fileupload.FileItemHeaders;
 /**
  * Default implementation of the {@link FileItemHeaders} interface.
  *
- * @author Michael C. Macaluso
- * @since 1.3
+ * @since 1.2.1
+ *
+ * @version $Id$
  */
 public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
+
+    /**
+     * Serial version UID, being used, if serialized.
+     */
     private static final long serialVersionUID = -4455695752627032559L;
 
     /**
@@ -44,6 +49,9 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
     private final Map<String,List<String>> headerNameToValueListMap =
             new LinkedHashMap<String,List<String>>();
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getHeader(String name) {
         String nameLower = name.toLowerCase(Locale.ENGLISH);
@@ -54,11 +62,17 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
         return headerValueList.get(0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Iterator<String> getHeaderNames() {
         return headerNameToValueListMap.keySet().iterator();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Iterator<String> getHeaders(String name) {
         String nameLower = name.toLowerCase(Locale.ENGLISH);
@@ -84,4 +98,5 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
         }
         headerValueList.add(value);
     }
+
 }

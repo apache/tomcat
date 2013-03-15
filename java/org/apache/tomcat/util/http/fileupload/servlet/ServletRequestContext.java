@@ -21,28 +21,26 @@ import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.tomcat.util.http.fileupload.RequestContext;
+import org.apache.tomcat.util.http.fileupload.FileUploadBase;
+import org.apache.tomcat.util.http.fileupload.UploadContext;
 
 
 /**
  * <p>Provides access to the request information needed for a request made to
  * an HTTP servlet.</p>
  *
- * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
- *
  * @since FileUpload 1.1
  *
  * @version $Id$
  */
-public class ServletRequestContext implements RequestContext {
+public class ServletRequestContext implements UploadContext {
 
     // ----------------------------------------------------- Instance Variables
 
     /**
      * The request for which the context is being provided.
      */
-    private HttpServletRequest request;
-
+    private final HttpServletRequest request;
 
     // ----------------------------------------------------------- Constructors
 
@@ -54,7 +52,6 @@ public class ServletRequestContext implements RequestContext {
     public ServletRequestContext(HttpServletRequest request) {
         this.request = request;
     }
-
 
     // --------------------------------------------------------- Public Methods
 
@@ -82,10 +79,17 @@ public class ServletRequestContext implements RequestContext {
      * Retrieve the content length of the request.
      *
      * @return The content length of the request.
+     * @since 1.3
      */
     @Override
-    public int getContentLength() {
-        return request.getContentLength();
+    public long contentLength() {
+        long size;
+        try {
+            size = Long.parseLong(request.getHeader(FileUploadBase.CONTENT_LENGTH));
+        } catch (NumberFormatException e) {
+            size = request.getContentLength();
+        }
+        return size;
     }
 
     /**
@@ -107,9 +111,9 @@ public class ServletRequestContext implements RequestContext {
      */
     @Override
     public String toString() {
-        return "ContentLength="
-            + this.getContentLength()
-            + ", ContentType="
-            + this.getContentType();
+        return String.format("ContentLength=%s, ContentType=%s",
+                      Long.valueOf(this.contentLength()),
+                      this.getContentType());
     }
+
 }

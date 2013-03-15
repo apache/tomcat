@@ -23,10 +23,13 @@ import java.io.OutputStream;
 
 import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 
-
-/** Utility class for working with streams.
+/**
+ * Utility class for working with streams.
+ *
+ * @version $Id$
  */
 public final class Streams {
+
     /**
      * Private constructor, to prevent instantiation.
      * This class has only static methods.
@@ -47,6 +50,7 @@ public final class Streams {
      * <pre>
      *   copy(pInputStream, pOutputStream, new byte[8192]);
      * </pre>
+     *
      * @param pInputStream The input stream, which is being read.
      * It is guaranteed, that {@link InputStream#close()} is called
      * on the stream.
@@ -70,6 +74,7 @@ public final class Streams {
     /**
      * Copies the contents of the given {@link InputStream}
      * to the given {@link OutputStream}.
+     *
      * @param pIn The input stream, which is being read.
      *   It is guaranteed, that {@link InputStream#close()} is called
      *   on the stream.
@@ -138,6 +143,7 @@ public final class Streams {
      * {@link org.apache.tomcat.util.http.fileupload.FileItemStream}'s
      * content into a string. The platform's default character encoding
      * is used for converting bytes into characters.
+     *
      * @param pStream The input stream to read.
      * @see #asString(InputStream, String)
      * @return The streams contents, as a string.
@@ -153,6 +159,7 @@ public final class Streams {
      * This convenience method allows to read a
      * {@link org.apache.tomcat.util.http.fileupload.FileItemStream}'s
      * content into a string, using the given character encoding.
+     *
      * @param pStream The input stream to read.
      * @param pEncoding The character encoding, typically "UTF-8".
      * @see #asString(InputStream)
@@ -171,6 +178,7 @@ public final class Streams {
      * that it doesn't contain any NUL characters. If the file name
      * is valid, it will be returned without any modifications. Otherwise,
      * an {@link InvalidFileNameException} is raised.
+     *
      * @param pFileName The file name to check
      * @return Unmodified file name, if valid.
      * @throws InvalidFileNameException The file name was found to be invalid.
@@ -195,4 +203,5 @@ public final class Streams {
         }
         return pFileName;
     }
+
 }

@@ -16,9 +16,12 @@
  */
 package org.apache.tomcat.util.http.fileupload;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import org.apache.tomcat.util.http.fileupload.util.mime.MimeUtility;
 
 /**
  * A simple parser intended to parse sequences of name/value pairs.
@@ -31,7 +34,7 @@ import java.util.Map;
  *  <code>param1 = value; param2 = "anything goes; really"; param3</code>
  * </p>
  *
- * @author <a href="mailto:oleg@ural.ru">Oleg Kalnichevski</a>
+ * @version $Id$
  */
 public class ParameterParser {
 
@@ -101,13 +104,12 @@ public class ParameterParser {
             i2--;
         }
         // Strip away quotation marks if necessary
-        if (quoted) {
-            if (((i2 - i1) >= 2)
-                && (chars[i1] == '"')
-                && (chars[i2 - 1] == '"')) {
-                i1++;
-                i2--;
-            }
+        if (quoted
+            && ((i2 - i1) >= 2)
+            && (chars[i1] == '"')
+            && (chars[i2 - 1] == '"')) {
+            i1++;
+            i2--;
         }
         String result = null;
         if (i2 > i1) {
@@ -235,11 +237,9 @@ public class ParameterParser {
             int idx = str.length();
             for (int i = 0;  i < separators.length;  i++) {
                 int tmp = str.indexOf(separators[i]);
-                if (tmp != -1) {
-                    if (tmp < idx) {
-                        idx = tmp;
-                        separator = separators[i];
-                    }
+                if (tmp != -1 && tmp < idx) {
+                    idx = tmp;
+                    separator = separators[i];
                 }
             }
         }
@@ -266,24 +266,24 @@ public class ParameterParser {
      * Extracts a map of name/value pairs from the given array of
      * characters. Names are expected to be unique.
      *
-     * @param inputChars the array of characters that contains a sequence of
+     * @param chars the array of characters that contains a sequence of
      * name/value pairs
      * @param separator the name/value pairs separator
      *
      * @return a map of name/value pairs
      */
-    public Map<String,String> parse(final char[] inputChars, char separator) {
-        if (inputChars == null) {
+    public Map<String,String> parse(final char[] chars, char separator) {
+        if (chars == null) {
             return new HashMap<String,String>();
         }
-        return parse(inputChars, 0, inputChars.length, separator);
+        return parse(chars, 0, chars.length, separator);
     }
 
     /**
      * Extracts a map of name/value pairs from the given array of
      * characters. Names are expected to be unique.
      *
-     * @param inputChars the array of characters that contains a sequence of
+     * @param chars the array of characters that contains a sequence of
      * name/value pairs
      * @param offset - the initial offset.
      * @param length - the length.
@@ -292,16 +292,16 @@ public class ParameterParser {
      * @return a map of name/value pairs
      */
     public Map<String,String> parse(
-        final char[] inputChars,
+        final char[] chars,
         int offset,
         int length,
         char separator) {
 
-        if (inputChars == null) {
+        if (chars == null) {
             return new HashMap<String,String>();
         }
         HashMap<String,String> params = new HashMap<String,String>();
-        this.chars = inputChars;
+        this.chars = chars;
         this.pos = offset;
         this.len = length;
 
@@ -315,6 +315,14 @@ public class ParameterParser {
                 pos++; // skip '='
                 paramValue = parseQuotedToken(new char[] {
                         separator });
+
+                if (paramValue != null) {
+                    try {
+                        paramValue = MimeUtility.decodeText(paramValue);
+                    } catch (UnsupportedEncodingException e) {
+                        // let's keep the original value in this case
+                    }
+                }
             }
             if (hasChar() && (chars[pos] == separator)) {
                 pos++; // skip separator
@@ -323,6 +331,7 @@ public class ParameterParser {
                 if (this.lowerCaseNames) {
                     paramName = paramName.toLowerCase(Locale.ENGLISH);
                 }
+
                 params.put(paramName, paramValue);
             }
         }

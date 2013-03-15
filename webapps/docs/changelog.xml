@@ -77,6 +77,10 @@
         The change will take effect when the next entry is made to the access
         log. (markt)
       </add>
+      <update>
+        Update Tomcat's internal copy of Commons FileUpload to FileUpload trunk,
+        revision 1456918. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

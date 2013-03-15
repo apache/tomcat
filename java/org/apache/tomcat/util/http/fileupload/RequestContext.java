@@ -21,10 +21,8 @@ import java.io.InputStream;
 
 /**
  * <p>Abstracts access to the request information needed for file uploads. This
- * interfsace should be implemented for each type of request that may be
+ * interface should be implemented for each type of request that may be
  * handled by FileUpload, such as servlets and portlets.</p>
- *
- * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
  *
  * @since FileUpload 1.1
  *
@@ -45,13 +43,6 @@ public interface RequestContext {
      * @return The content type of the request.
      */
     String getContentType();
-
-    /**
-     * Retrieve the content length of the request.
-     *
-     * @return The content length of the request.
-     */
-    int getContentLength();
 
     /**
      * Retrieve the input stream for the request.
