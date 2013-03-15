@@ -50,7 +50,7 @@ import java.io.UnsupportedEncodingException;
  *
  * @version $Id$
  */
-public interface FileItem extends Serializable {
+public interface FileItem extends Serializable, FileItemHeadersSupport {
 
 
     // ------------------------------- Methods from javax.activation.DataSource
