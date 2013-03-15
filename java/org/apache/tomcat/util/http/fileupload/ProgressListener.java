@@ -16,13 +16,15 @@
  */
 package org.apache.tomcat.util.http.fileupload;
 
-
 /**
  * The {@link ProgressListener} may be used to display a progress bar
  * or do stuff like that.
  */
 public interface ProgressListener {
-    /** Updates the listeners status information.
+
+    /**
+     * Updates the listeners status information.
+     *
      * @param pBytesRead The total number of bytes, which have been read
      *   so far.
      * @param pContentLength The total number of bytes, which are being
@@ -31,4 +33,5 @@ public interface ProgressListener {
      *   read. (0 = no item so far, 1 = first item is being read, ...)
      */
     void update(long pBytesRead, long pContentLength, int pItems);
+
 }
