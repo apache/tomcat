@@ -522,7 +522,7 @@ public class Connector extends LifecycleMBeanBase  {
 
     /**
      * Return the port number on which this connector is listening to requests.
-     * If the special value for {@link #port} of zero is used then this method
+     * If the special value for {@link #getPort} of zero is used then this method
      * will report the actual port bound.
      */
     public int getLocalPort() {
