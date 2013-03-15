@@ -101,7 +101,7 @@
   the application. There is, therefore, a close relationship between the
   <em>context name</em>, <em>context path</em>, <em>context version</em> and
   the <em>base file name</em> (the name minus <code>.war</code> or
-  <code>.xml</code> suffix) of the file.</p>
+  <code>.xml</code> extension) of the file.</p>
 
   <p>Lets assume that you want to deploy your application to respond to
   requests to URIs starting with certain context path. According to the
@@ -174,7 +174,7 @@
   </p>
   <ul>
   <li>Disable autoDeploy and deployOnStartup and define all
-  <Strong>Context</Strong>s in server.xml</li>
+  <strong>Context</strong>s in server.xml</li>
   <li>Locate the WAR and/or directory outside of the Host&apos;s appBase and use
       a context.xml file with a docBase attribute to define it.</li>
   </ul>
@@ -215,11 +215,11 @@
   </p>
   <ul>
   <li>In the <code>$CATALINA_BASE/conf/context.xml</code> file:
-  the Context element information will be loaded by all webapps.</li>
+  the Context element information will be loaded by all web applications.</li>
   <li>In the
   <code>$CATALINA_BASE/conf/[enginename]/[hostname]/context.xml.default</code>
-  file: the Context element information will be loaded by all webapps of that
-  host.</li>
+  file: the Context element information will be loaded by all web applications
+  of that host.</li>
   </ul>
 
   <p>With the exception of server.xml, files that define <strong>Context
@@ -233,11 +233,10 @@
   <a href="host.html#User Web Applications">User Web Applications</a>
   for more information.</p>
 
-  <p>To define multiple <Strong>Context</Strong>s that use a single WAR file or
-  directory, use one of the options described above for creating a
-  <Strong>Context</Strong> that has a path that is not related to the base file
-  name and create multiple <Strong>Context</Strong> definitions.
-  </p>
+  <p>To define multiple contexts that use a single WAR file or directory,
+  use one of the options described in the <a href="#Naming">Naming</a>
+  section above for creating a <strong>Context</strong> that has a path
+  that is not related to the base file name.</p>
   </subsection>
 </section>
 
