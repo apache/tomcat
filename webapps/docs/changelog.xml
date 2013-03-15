@@ -79,7 +79,8 @@
       </add>
       <update>
         Update Tomcat's internal copy of Commons FileUpload to FileUpload trunk,
-        revision 1456918. (markt)
+        revision 1456918 and the associated extract from Commons IO to 2.4.
+        (markt)
       </update>
     </changelog>
   </subsection>
