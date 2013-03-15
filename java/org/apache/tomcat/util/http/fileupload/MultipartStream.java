@@ -86,25 +86,36 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  * @version $Id$
  */
 public class MultipartStream {
+
     /**
      * Internal class, which is used to invoke the
      * {@link ProgressListener}.
      */
     public static class ProgressNotifier {
-        /** The listener to invoke.
+        /**
+         * The listener to invoke.
          */
         private final ProgressListener listener;
-        /** Number of expected bytes, if known, or -1.
+
+        /**
+         * Number of expected bytes, if known, or -1.
          */
         private final long contentLength;
-        /** Number of bytes, which have been read so far.
+
+        /**
+         * Number of bytes, which have been read so far.
          */
         private long bytesRead;
-        /** Number of items, which have been read so far.
+
+        /**
+         * Number of items, which have been read so far.
          */
         private int items;
-        /** Creates a new instance with the given listener
+
+        /**
+         * Creates a new instance with the given listener
          * and content length.
+         *
          * @param pListener The listener to invoke.
          * @param pContentLength The expected content length.
          */
@@ -112,7 +123,10 @@ public class MultipartStream {
             listener = pListener;
             contentLength = pContentLength;
         }
-        /** Called to indicate that bytes have been read.
+
+        /**
+         * Called to indicate that bytes have been read.
+         *
          * @param pBytes Number of bytes, which have been read.
          */
         void noteBytesRead(int pBytes) {
@@ -122,41 +136,42 @@ public class MultipartStream {
             bytesRead += pBytes;
             notifyListener();
         }
-        /** Called to indicate, that a new file item has been detected.
+
+        /**
+         * Called to indicate, that a new file item has been detected.
          */
         void noteItem() {
             ++items;
             notifyListener();
         }
-        /** Called for notifying the listener.
+
+        /**
+         * Called for notifying the listener.
          */
         private void notifyListener() {
             if (listener != null) {
                 listener.update(bytesRead, contentLength, items);
             }
         }
+
     }
 
     // ----------------------------------------------------- Manifest constants
-
 
     /**
      * The Carriage Return ASCII character value.
      */
     public static final byte CR = 0x0D;
 
-
     /**
      * The Line Feed ASCII character value.
      */
     public static final byte LF = 0x0A;
 
-
     /**
      * The dash (-) ASCII character value.
      */
     public static final byte DASH = 0x2D;
-
 
     /**
      * The maximum length of <code>header-part</code> that will be
@@ -164,58 +179,45 @@ public class MultipartStream {
      */
     public static final int HEADER_PART_SIZE_MAX = 10240;
 
-
     /**
      * The default length of the buffer used for processing a request.
      */
     protected static final int DEFAULT_BUFSIZE = 4096;
 
-
     /**
      * A byte sequence that marks the end of <code>header-part</code>
      * (<code>CRLFCRLF</code>).
      */
-    protected static final byte[] HEADER_SEPARATOR = {
-        CR, LF, CR, LF };
-
+    protected static final byte[] HEADER_SEPARATOR = { CR, LF, CR, LF };
 
     /**
      * A byte sequence that that follows a delimiter that will be
      * followed by an encapsulation (<code>CRLF</code>).
      */
-    protected static final byte[] FIELD_SEPARATOR = {
-        CR, LF};
-
+    protected static final byte[] FIELD_SEPARATOR = { CR, LF};
 
     /**
      * A byte sequence that that follows a delimiter of the last
      * encapsulation in the stream (<code>--</code>).
      */
-    protected static final byte[] STREAM_TERMINATOR = {
-        DASH, DASH};
-
+    protected static final byte[] STREAM_TERMINATOR = { DASH, DASH};
 
     /**
      * A byte sequence that precedes a boundary (<code>CRLF--</code>).
      */
-    protected static final byte[] BOUNDARY_PREFIX = {
-        CR, LF, DASH, DASH};
-
+    protected static final byte[] BOUNDARY_PREFIX = { CR, LF, DASH, DASH};
 
     // ----------------------------------------------------------- Data members
-
 
     /**
      * The input stream from which data is read.
      */
     private final InputStream input;
 
-
     /**
      * The length of the boundary token plus the leading <code>CRLF--</code>.
      */
     private int boundaryLength;
-
 
     /**
      * The amount of data, in bytes, that must be kept in the buffer in order
@@ -223,24 +225,20 @@ public class MultipartStream {
      */
     private int keepRegion;
 
-
     /**
      * The byte sequence that partitions the stream.
      */
     private byte[] boundary;
-
 
     /**
      * The length of the buffer used for processing the request.
      */
     private final int bufSize;
 
-
     /**
      * The buffer used for processing the request.
      */
     private final byte[] buffer;
-
 
     /**
      * The index of first valid character in the buffer.
@@ -249,7 +247,6 @@ public class MultipartStream {
      */
     private int head;
 
-
     /**
      * The index of last valid character in the buffer + 1.
      * <br>
@@ -257,12 +254,10 @@ public class MultipartStream {
      */
     private int tail;
 
-
     /**
      * The content encoding to use when reading headers.
      */
     private String headerEncoding;
-
 
     /**
      * The progress notifier, if any, or null.
@@ -312,7 +307,6 @@ public class MultipartStream {
         tail = 0;
     }
 
-
     /**
      * <p> Constructs a <code>MultipartStream</code> with a default size buffer.
      *
@@ -333,19 +327,16 @@ public class MultipartStream {
 
     // --------------------------------------------------------- Public methods
 
-
     /**
      * Retrieves the character encoding used when reading the headers of an
      * individual part. When not specified, or <code>null</code>, the platform
      * default encoding is used.
-
      *
      * @return The encoding used to read part headers.
      */
     public String getHeaderEncoding() {
         return headerEncoding;
     }
-
 
     /**
      * Specifies the character encoding to be used when reading the headers of
@@ -357,7 +348,6 @@ public class MultipartStream {
     public void setHeaderEncoding(String encoding) {
         headerEncoding = encoding;
     }
-
 
     /**
      * Reads a byte from the <code>buffer</code>, and refills it as
@@ -383,7 +373,6 @@ public class MultipartStream {
         }
         return buffer[head++];
     }
-
 
     /**
      * Skips a <code>boundary</code> token, and checks whether more
@@ -428,7 +417,6 @@ public class MultipartStream {
         return nextChunk;
     }
 
-
     /**
      * <p>Changes the boundary token used for partitioning the stream.
      *
@@ -458,7 +446,6 @@ public class MultipartStream {
                 boundary.length);
     }
 
-
     /**
      * <p>Reads the <code>header-part</code> of the current
      * <code>encapsulation</code>.
@@ -474,8 +461,7 @@ public class MultipartStream {
      *
      * @throws MalformedStreamException if the stream ends unexpecetedly.
      */
-    public String readHeaders()
-    throws MalformedStreamException {
+    public String readHeaders() throws MalformedStreamException {
         int i = 0;
         byte b;
         // to support multi-byte characters
@@ -515,7 +501,6 @@ public class MultipartStream {
 
         return headers;
     }
-
 
     /**
      * <p>Reads <code>body-data</code> from the current
@@ -562,12 +547,9 @@ public class MultipartStream {
      * @throws MalformedStreamException if the stream ends unexpectedly.
      * @throws IOException              if an i/o error occurs.
      */
-    public int discardBodyData()
-    throws MalformedStreamException,
-    IOException {
+    public int discardBodyData() throws MalformedStreamException, IOException {
         return readBodyData(null);
     }
-
 
     /**
      * Finds the beginning of the first <code>encapsulation</code>.
@@ -577,8 +559,7 @@ public class MultipartStream {
      *
      * @throws IOException if an i/o error occurs.
      */
-    public boolean skipPreamble()
-    throws IOException {
+    public boolean skipPreamble() throws IOException {
         // First delimiter may be not preceeded with a CRLF.
         System.arraycopy(boundary, 2, boundary, 0, boundary.length - 2);
         boundaryLength = boundary.length - 2;
@@ -599,7 +580,6 @@ public class MultipartStream {
             boundary[1] = LF;
         }
     }
-
 
     /**
      * Compares <code>count</code> first bytes in the arrays
@@ -623,7 +603,6 @@ public class MultipartStream {
         return true;
     }
 
-
     /**
      * Searches for a byte of specified value in the <code>buffer</code>,
      * starting at the specified <code>position</code>.
@@ -644,7 +623,6 @@ public class MultipartStream {
 
         return -1;
     }
-
 
     /**
      * Searches for the <code>boundary</code> in the <code>buffer</code>
@@ -681,10 +659,12 @@ public class MultipartStream {
      * Thrown to indicate that the input stream fails to follow the
      * required syntax.
      */
-    public static class MalformedStreamException
-            extends IOException {
+    public static class MalformedStreamException extends IOException {
 
-        private static final long serialVersionUID = 1L;
+        /**
+         * The UID to use when serializing this instance.
+         */
+        private static final long serialVersionUID = 6466926458059796677L;
 
         /**
          * Constructs a <code>MalformedStreamException</code> with no
@@ -703,16 +683,19 @@ public class MultipartStream {
         public MalformedStreamException(String message) {
             super(message);
         }
-    }
 
+    }
 
     /**
      * Thrown upon attempt of setting an invalid boundary token.
      */
-    public static class IllegalBoundaryException
-            extends IOException {
+    public static class IllegalBoundaryException extends IOException {
 
-        private static final long serialVersionUID = 1L;
+
+        /**
+         * The UID to use when serializing this instance.
+         */
+        private static final long serialVersionUID = -161533165102632918L;
 
         /**
          * Constructs an <code>IllegalBoundaryException</code> with no
@@ -731,23 +714,32 @@ public class MultipartStream {
         public IllegalBoundaryException(String message) {
             super(message);
         }
+
     }
 
     /**
      * An {@link InputStream} for reading an items contents.
      */
     public class ItemInputStream extends InputStream implements Closeable {
-        /** The number of bytes, which have been read so far.
+
+        /**
+         * The number of bytes, which have been read so far.
          */
         private long total;
-        /** The number of bytes, which must be hold, because
+
+        /**
+         * The number of bytes, which must be hold, because
          * they might be a part of the boundary.
          */
         private int pad;
-        /** The current offset in the buffer.
+
+        /**
+         * The current offset in the buffer.
          */
         private int pos;
-        /** Whether the stream is already closed.
+
+        /**
+         * Whether the stream is already closed.
          */
         private boolean closed;
 
@@ -775,6 +767,7 @@ public class MultipartStream {
         /**
          * Returns the number of bytes, which have been read
          * by the stream.
+         *
          * @return Number of bytes, which have been read so far.
          */
         public long getBytesRead() {
@@ -784,6 +777,7 @@ public class MultipartStream {
         /**
          * Returns the number of bytes, which are currently
          * available, without blocking.
+         *
          * @throws IOException An I/O error occurs.
          * @return Number of bytes in the buffer.
          */
@@ -795,12 +789,14 @@ public class MultipartStream {
             return pos - head;
         }
 
-        /** Offset when converting negative bytes to integers.
+        /**
+         * Offset when converting negative bytes to integers.
          */
         private static final int BYTE_POSITIVE_OFFSET = 256;
 
         /**
          * Returns the next byte in the stream.
+         *
          * @return The next byte in the stream, as a non-negative
          *   integer, or -1 for EOF.
          * @throws IOException An I/O error occurred.
@@ -825,6 +821,7 @@ public class MultipartStream {
 
         /**
          * Reads bytes into the given buffer.
+         *
          * @param b The destination buffer, where to write to.
          * @param off Offset of the first byte in the buffer.
          * @param len Maximum number of bytes to read.
@@ -856,6 +853,7 @@ public class MultipartStream {
 
         /**
          * Closes the input stream.
+         *
          * @throws IOException An I/O error occurred.
          */
         @Override
@@ -865,6 +863,7 @@ public class MultipartStream {
 
         /**
          * Closes the input stream.
+         *
          * @param pCloseUnderlying Whether to close the underlying stream
          *   (hard close)
          * @throws IOException An I/O error occurred.
@@ -893,6 +892,7 @@ public class MultipartStream {
 
         /**
          * Skips the given number of bytes.
+         *
          * @param bytes Number of bytes to skip.
          * @return The number of bytes, which have actually been
          *   skipped.
@@ -917,6 +917,7 @@ public class MultipartStream {
 
         /**
          * Attempts to read more data.
+         *
          * @return Number of available bytes
          * @throws IOException An I/O error occurred.
          */
@@ -958,11 +959,14 @@ public class MultipartStream {
 
         /**
          * Returns, whether the stream is closed.
+         *
          * @return True, if the stream is closed, otherwise false.
          */
         @Override
         public boolean isClosed() {
             return closed;
         }
+
     }
+
 }

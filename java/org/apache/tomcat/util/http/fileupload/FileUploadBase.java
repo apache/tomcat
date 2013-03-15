@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -327,7 +326,7 @@ public abstract class FileUploadBase {
                 }
                 if (fileItem instanceof FileItemHeadersSupport) {
                     final FileItemHeaders fih = item.getHeaders();
-                    ((FileItemHeadersSupport) fileItem).setHeaders(fih);
+                    fileItem.setHeaders(fih);
                 }
             }
             successful = true;
@@ -338,8 +337,7 @@ public abstract class FileUploadBase {
             throw new FileUploadException(e.getMessage(), e);
         } finally {
             if (!successful) {
-                for (Iterator<FileItem> iterator = items.iterator(); iterator.hasNext();) {
-                    FileItem fileItem = iterator.next();
+                for (FileItem fileItem : items) {
                     try {
                         fileItem.delete();
                     } catch (Exception e) {
@@ -367,7 +365,7 @@ public abstract class FileUploadBase {
         parser.setLowerCaseNames(true);
         // Parameter parser can handle null input
         Map<String,String> params =
-            parser.parse(contentType, new char[] {';', ','});
+                parser.parse(contentType, new char[] {';', ','});
         String boundaryStr = params.get("boundary");
 
         if (boundaryStr == null) {
@@ -448,8 +446,7 @@ public abstract class FileUploadBase {
             ParameterParser parser = new ParameterParser();
             parser.setLowerCaseNames(true);
             // Parameter parser can handle null input
-            Map<String,String> params =
-                parser.parse(pContentDisposition, ';');
+            Map<String,String> params = parser.parse(pContentDisposition, ';');
             fieldName = params.get("name");
             if (fieldName != null) {
                 fieldName = fieldName.trim();
