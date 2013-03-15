@@ -279,17 +279,22 @@ public class PojoMethodMapping {
             Annotation[][] paramsAnnotations = m.getParameterAnnotations();
 
             for (int i = 0; i < types.length; i++) {
-                if (types[i] == String.class) {
-                    Annotation[] paramAnnotations = paramsAnnotations[i];
-                    for (Annotation paramAnnotation : paramAnnotations) {
-                        if (paramAnnotation.annotationType().equals(
-                                PathParam.class)) {
-                            indexPathParams.put(
-                                    Integer.valueOf(i), new PojoPathParam(types[i],
-                                            ((PathParam) paramAnnotation).value()));
-                            break;
-                        }
+                boolean paramFound = false;
+                Annotation[] paramAnnotations = paramsAnnotations[i];
+                for (Annotation paramAnnotation : paramAnnotations) {
+                    if (paramAnnotation.annotationType().equals(
+                            PathParam.class)) {
+                        indexPathParams.put(
+                                Integer.valueOf(i), new PojoPathParam(types[i],
+                                        ((PathParam) paramAnnotation).value()));
+                        paramFound = true;
+                        break;
                     }
+                }
+                if (paramFound) {
+                    continue;
+                }
+                if (types[i] == String.class) {
                     if (indexString == -1) {
                         indexString = i;
                     } else {
