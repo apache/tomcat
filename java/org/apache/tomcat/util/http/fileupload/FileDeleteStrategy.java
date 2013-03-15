@@ -28,9 +28,8 @@ import java.io.IOException;
  * <p>
  * This class captures the strategy to use and is designed for user subclassing.
  *
- * @author Stephen Colebourne
  * @version $Id$
- * @since Commons IO 1.3
+ * @since 1.3
  */
 public class FileDeleteStrategy {
 
@@ -39,11 +38,6 @@ public class FileDeleteStrategy {
      * the deletion of directories that are not empty.
      */
     public static final FileDeleteStrategy NORMAL = new FileDeleteStrategy("Normal");
-    /**
-     * The singleton instance for forced file deletion, which always deletes,
-     * even if the file represents a non-empty directory.
-     */
-    public static final FileDeleteStrategy FORCE = new ForceFileDeleteStrategy();
 
     /** The name of the strategy. */
     private final String name;
@@ -77,22 +71,6 @@ public class FileDeleteStrategy {
             return doDelete(fileToDelete);
         } catch (IOException ex) {
             return false;
-        }
-    }
-
-    /**
-     * Deletes the file object, which may be a file or a directory.
-     * If the file does not exist, the method just returns.
-     * <p>
-     * Subclass writers should override {@link #doDelete(File)}, not this method.
-     *
-     * @param fileToDelete  the file to delete, not null
-     * @throws NullPointerException if the file is null
-     * @throws IOException if an error occurs during file deletion
-     */
-    public void delete(File fileToDelete) throws IOException {
-        if (fileToDelete.exists() && doDelete(fileToDelete) == false) {
-            throw new IOException("Deletion failed: " + fileToDelete);
         }
     }
 
@@ -144,7 +122,7 @@ public class FileDeleteStrategy {
          * if the file exists.
          *
          * @param fileToDelete  the file to delete, not null
-         * @return Always returns <code>true</code>
+         * @return Always returns {@code true}
          * @throws NullPointerException if the file is null
          * @throws IOException if an error occurs during file deletion
          */
