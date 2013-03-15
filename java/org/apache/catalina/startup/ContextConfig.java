@@ -1850,6 +1850,17 @@ public class ContextConfig implements LifecycleListener {
     }
 
 
+    /**
+     * Parses the given source and stores the parsed data in the given web.xml
+     * representation. The byte stream will be closed at the end of the parse
+     * operation.
+     *
+     * @param source Input source containing the XML data to be parsed
+     * @param dest The object representation of common elements of web.xml and
+     *             web-fragment.xml
+     * @param fragment Specifies whether the source is web-fragment.xml or
+     *                 web.xml
+     */
     protected void parseWebXml(InputSource source, WebXml dest,
             boolean fragment) {
 
@@ -1897,6 +1908,15 @@ public class ContextConfig implements LifecycleListener {
         } finally {
             digester.reset();
             ruleSet.recycle();
+
+            InputStream is = source.getByteStream();
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                }
+            }
         }
     }
 
@@ -2662,13 +2682,6 @@ public class ContextConfig implements LifecycleListener {
                     parseWebXml(source, fragment, true);
                 }
             } finally {
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException ioe) {
-                        // Ignore
-                    }
-                }
                 if (jar != null) {
                     jar.close();
                 }
@@ -2708,13 +2721,6 @@ public class ContextConfig implements LifecycleListener {
                     parseWebXml(source, fragment, true);
                 }
             } finally {
-                if (stream != null) {
-                    try {
-                        stream.close();
-                    } catch (Throwable t) {
-                        ExceptionUtils.handleThrowable(t);
-                    }
-                }
                 fragment.setURL(file.toURI().toURL());
                 if (fragment.getName() == null) {
                     fragment.setName(fragment.getURL().toString());
