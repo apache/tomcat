@@ -14,26 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.util.http.fileupload;
+package org.apache.tomcat.util.http.fileupload.util.mime;
 
 /**
- * The {@link ProgressListener} may be used to display a progress bar
- * or do stuff like that.
- *
- * @version $Id$
+ * @since 1.3
  */
-public interface ProgressListener {
+final class ParseException extends Exception {
 
     /**
-     * Updates the listeners status information.
-     *
-     * @param pBytesRead The total number of bytes, which have been read
-     *   so far.
-     * @param pContentLength The total number of bytes, which are being
-     *   read. May be -1, if this number is unknown.
-     * @param pItems The number of the field, which is currently being
-     *   read. (0 = no item so far, 1 = first item is being read, ...)
+     * The UID to use when serializing this instance.
      */
-    void update(long pBytesRead, long pContentLength, int pItems);
+    private static final long serialVersionUID = 5355281266579392077L;
+
+    /**
+     * Constructs a new exception with the specified detail message.
+     *
+     * @param message the detail message.
+     */
+    public ParseException(String message) {
+        super(message);
+    }
 
 }

@@ -17,23 +17,23 @@
 package org.apache.tomcat.util.http.fileupload;
 
 /**
- * The {@link ProgressListener} may be used to display a progress bar
- * or do stuff like that.
+ * Enhanced access to the request information needed for file uploads,
+ * which fixes the Content Length data access in {@link RequestContext}.
  *
- * @version $Id$
+ * The reason of introducing this new interface is just for backward compatibility
+ * and it might vanish for a refactored 2.x version moving the new method into
+ * RequestContext again.
+ *
+ * @since 1.3
  */
-public interface ProgressListener {
+public interface UploadContext extends RequestContext {
 
     /**
-     * Updates the listeners status information.
+     * Retrieve the content length of the request.
      *
-     * @param pBytesRead The total number of bytes, which have been read
-     *   so far.
-     * @param pContentLength The total number of bytes, which are being
-     *   read. May be -1, if this number is unknown.
-     * @param pItems The number of the field, which is currently being
-     *   read. (0 = no item so far, 1 = first item is being read, ...)
+     * @return The content length of the request.
+     * @since 1.3
      */
-    void update(long pBytesRead, long pContentLength, int pItems);
+    long contentLength();
 
 }

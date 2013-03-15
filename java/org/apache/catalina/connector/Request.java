@@ -91,6 +91,7 @@ import org.apache.tomcat.util.http.fileupload.FileUploadBase.InvalidContentTypeE
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
+import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
 import org.apache.tomcat.util.http.mapper.MappingData;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -2718,7 +2719,8 @@ public class Request
 
             parts = new ArrayList<Part>();
             try {
-                List<FileItem> items = upload.parseRequest(this);
+                List<FileItem> items =
+                        upload.parseRequest(new ServletRequestContext(this));
                 int maxPostSize = getConnector().getMaxPostSize();
                 int postSize = 0;
                 String enc = getCharacterEncoding();

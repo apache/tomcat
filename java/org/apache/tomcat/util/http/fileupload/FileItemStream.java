@@ -19,7 +19,6 @@ package org.apache.tomcat.util.http.fileupload;
 import java.io.IOException;
 import java.io.InputStream;
 
-
 /**
  * <p> This interface provides access to a file or form item that was
  * received within a <code>multipart/form-data</code> POST request.
@@ -31,8 +30,11 @@ import java.io.InputStream;
  * its associated instances of {@link FileItemStream}: By invoking
  * {@link java.util.Iterator#hasNext()} on the iterator, you discard all data,
  * which hasn't been read so far from the previous data.</p>
+ *
+ * @version $Id$
  */
 public interface FileItemStream extends FileItemHeadersSupport {
+
     /**
      * This exception is thrown, if an attempt is made to read
      * data from the {@link InputStream}, which has been returned
@@ -41,15 +43,19 @@ public interface FileItemStream extends FileItemHeadersSupport {
      * iterator, which created the {@link FileItemStream}.
      */
     public static class ItemSkippedException extends IOException {
+
         /**
          * The exceptions serial version UID, which is being used
          * when serializing an exception instance.
          */
         private static final long serialVersionUID = -7280778431581963740L;
+
     }
 
-    /** Creates an {@link InputStream}, which allows to read the
+    /**
+     * Creates an {@link InputStream}, which allows to read the
      * items contents.
+     *
      * @return The input stream, from which the items data may
      *   be read.
      * @throws IllegalStateException The method was already invoked on
@@ -94,4 +100,5 @@ public interface FileItemStream extends FileItemHeadersSupport {
      *         field; <code>false</code> if it represents an uploaded file.
      */
     boolean isFormField();
+
 }

@@ -23,12 +23,15 @@ import java.util.Iterator;
  * item that was received within a <code>multipart/form-data</code> POST
  * request.</p>
  *
- * @author Michael C. Macaluso
- * @since 1.3
+ * @since 1.2.1
+ *
+ * @version $Id$
  */
 public interface FileItemHeaders {
+
     /**
      * Returns the value of the specified part header as a <code>String</code>.
+     *
      * If the part did not include a header of the specified name, this method
      * return <code>null</code>.  If there are multiple headers with the same
      * name, this method returns the first header in the item.  The header
@@ -69,4 +72,5 @@ public interface FileItemHeaders {
      *         any headers return an empty <code>Iterator</code>
      */
     Iterator<String> getHeaderNames();
+
 }
