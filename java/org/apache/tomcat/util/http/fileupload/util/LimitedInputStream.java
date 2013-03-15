@@ -20,21 +20,22 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-
 /**
  * An input stream, which limits its data size. This stream is
  * used, if the content length is unknown.
  */
-public abstract class LimitedInputStream
-        extends FilterInputStream implements Closeable {
+public abstract class LimitedInputStream extends FilterInputStream implements Closeable {
+
     /**
      * The maximum size of an item, in bytes.
      */
     private long sizeMax;
+
     /**
      * The current number of bytes.
      */
     private long count;
+
     /**
      * Whether this stream is already closed.
      */
@@ -42,6 +43,7 @@ public abstract class LimitedInputStream
 
     /**
      * Creates a new instance.
+     *
      * @param pIn The input stream, which shall be limited.
      * @param pSizeMax The limit; no more than this number of bytes
      *   shall be returned by the source stream.
@@ -54,6 +56,7 @@ public abstract class LimitedInputStream
     /**
      * Called to indicate, that the input streams limit has
      * been exceeded.
+     *
      * @param pSizeMax The input streams limit, in bytes.
      * @param pCount The actual number of bytes.
      * @throws IOException The called method is expected
@@ -62,8 +65,10 @@ public abstract class LimitedInputStream
     protected abstract void raiseError(long pSizeMax, long pCount)
             throws IOException;
 
-    /** Called to check, whether the input streams
+    /**
+     * Called to check, whether the input streams
      * limit is reached.
+     *
      * @throws IOException The given limit is exceeded.
      */
     private void checkLimit() throws IOException {
@@ -134,6 +139,7 @@ public abstract class LimitedInputStream
 
     /**
      * Returns, whether this stream is already closed.
+     *
      * @return True, if the stream is closed, otherwise false.
      * @throws IOException An I/O error occurred.
      */
@@ -156,4 +162,5 @@ public abstract class LimitedInputStream
         closed = true;
         super.close();
     }
+
 }
