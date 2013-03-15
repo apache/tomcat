@@ -27,8 +27,10 @@ import java.util.Iterator;
  * @since 1.3
  */
 public interface FileItemHeaders {
+
     /**
      * Returns the value of the specified part header as a <code>String</code>.
+     *
      * If the part did not include a header of the specified name, this method
      * return <code>null</code>.  If there are multiple headers with the same
      * name, this method returns the first header in the item.  The header

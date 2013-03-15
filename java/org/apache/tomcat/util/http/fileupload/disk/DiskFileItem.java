@@ -38,7 +38,6 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.apache.tomcat.util.http.fileupload.ParameterParser;
 import org.apache.tomcat.util.http.fileupload.util.Streams;
 
-
 /**
  * <p> The default implementation of the
  * {@link org.apache.tomcat.util.http.fileupload.FileItem FileItem} interface.
@@ -88,7 +87,6 @@ public class DiskFileItem
      */
     private static final long serialVersionUID = 2237570099615271025L;
 
-
     /**
      * Default content charset to be used when no explicit charset
      * parameter is provided by the sender. Media subtypes of the
@@ -97,9 +95,7 @@ public class DiskFileItem
      */
     public static final String DEFAULT_CHARSET = "ISO-8859-1";
 
-
     // ----------------------------------------------------------- Data members
-
 
     /**
      * UID used in unique file name generation.
@@ -113,12 +109,10 @@ public class DiskFileItem
      */
     private static int counter = 0;
 
-
     /**
      * The name of the form field as provided by the browser.
      */
     private String fieldName;
-
 
     /**
      * The content type passed by the browser, or <code>null</code> if
@@ -126,18 +120,15 @@ public class DiskFileItem
      */
     private String contentType;
 
-
     /**
      * Whether or not this item is a simple form field.
      */
     private boolean isFormField;
 
-
     /**
      * The original filename in the user's filesystem.
      */
     private String fileName;
-
 
     /**
      * The size of the item, in bytes. This is used to cache the size when a
@@ -151,18 +142,15 @@ public class DiskFileItem
      */
     private int sizeThreshold;
 
-
     /**
      * The directory in which uploaded files will be stored, if stored on disk.
      */
     private File repository;
 
-
     /**
      * Cached contents of the file.
      */
     private byte[] cachedContent;
-
 
     /**
      * Output stream for this item.
@@ -185,7 +173,6 @@ public class DiskFileItem
     private FileItemHeaders headers;
 
     // ----------------------------------------------------------- Constructors
-
 
     /**
      * Constructs a new <code>DiskFileItem</code> instance.
@@ -215,9 +202,7 @@ public class DiskFileItem
         this.repository = repository;
     }
 
-
     // ------------------------------- Methods from javax.activation.DataSource
-
 
     /**
      * Returns an {@link java.io.InputStream InputStream} that can be
@@ -241,7 +226,6 @@ public class DiskFileItem
         return new ByteArrayInputStream(cachedContent);
     }
 
-
     /**
      * Returns the content type passed by the agent or <code>null</code> if
      * not defined.
@@ -253,7 +237,6 @@ public class DiskFileItem
     public String getContentType() {
         return contentType;
     }
-
 
     /**
      * Returns the content charset passed by the agent or <code>null</code> if
@@ -270,7 +253,6 @@ public class DiskFileItem
         return params.get("charset");
     }
 
-
     /**
      * Returns the original filename in the client's filesystem.
      *
@@ -285,9 +267,7 @@ public class DiskFileItem
         return Streams.checkFileName(fileName);
     }
 
-
     // ------------------------------------------------------- FileItem methods
-
 
     /**
      * Provides a hint as to whether or not the file contents will be read
@@ -303,7 +283,6 @@ public class DiskFileItem
         }
         return dfos.isInMemory();
     }
-
 
     /**
      * Returns the size of the file.
@@ -322,7 +301,6 @@ public class DiskFileItem
             return dfos.getFile().length();
         }
     }
-
 
     /**
      * Returns the contents of the file as an array of bytes.  If the
@@ -361,7 +339,6 @@ public class DiskFileItem
         return fileData;
     }
 
-
     /**
      * Returns the contents of the file as a String, using the specified
      * encoding.  This method uses {@link #get()} to retrieve the
@@ -379,7 +356,6 @@ public class DiskFileItem
         throws UnsupportedEncodingException {
         return new String(get(), charset);
     }
-
 
     /**
      * Returns the contents of the file as a String, using the default
@@ -403,7 +379,6 @@ public class DiskFileItem
             return new String(rawdata);
         }
     }
-
 
     /**
      * A convenience method to write an uploaded item to disk. The client code
@@ -484,7 +459,6 @@ public class DiskFileItem
         }
     }
 
-
     /**
      * Deletes the underlying storage for a file item, including deleting any
      * associated temporary disk file. Although this storage will be deleted
@@ -501,7 +475,6 @@ public class DiskFileItem
         }
     }
 
-
     /**
      * Returns the name of the field in the multipart form corresponding to
      * this file item.
@@ -516,7 +489,6 @@ public class DiskFileItem
         return fieldName;
     }
 
-
     /**
      * Sets the field name used to reference this file item.
      *
@@ -529,7 +501,6 @@ public class DiskFileItem
     public void setFieldName(String fieldName) {
         this.fieldName = fieldName;
     }
-
 
     /**
      * Determines whether or not a <code>FileItem</code> instance represents
@@ -546,7 +517,6 @@ public class DiskFileItem
         return isFormField;
     }
 
-
     /**
      * Specifies whether or not a <code>FileItem</code> instance represents
      * a simple form field.
@@ -561,7 +531,6 @@ public class DiskFileItem
     public void setFormField(boolean state) {
         isFormField = state;
     }
-
 
     /**
      * Returns an {@link java.io.OutputStream OutputStream} that can
@@ -582,9 +551,7 @@ public class DiskFileItem
         return dfos;
     }
 
-
     // --------------------------------------------------------- Public methods
-
 
     /**
      * Returns the {@link java.io.File} object for the <code>FileItem</code>'s
@@ -603,9 +570,7 @@ public class DiskFileItem
         return dfos == null ? null : dfos.getFile();
     }
 
-
     // ------------------------------------------------------ Protected methods
-
 
     /**
      * Removes the file contents from the temporary storage.
@@ -618,7 +583,6 @@ public class DiskFileItem
             outputFile.delete();
         }
     }
-
 
     /**
      * Creates and returns a {@link java.io.File File} representing a uniquely
@@ -643,9 +607,7 @@ public class DiskFileItem
         return tempFile;
     }
 
-
     // -------------------------------------------------------- Private methods
-
 
     /**
      * Returns an identifier that is unique within the class loader used to
@@ -669,7 +631,6 @@ public class DiskFileItem
         return id;
     }
 
-
     /**
      * Returns a string representation of this object.
      *
@@ -688,9 +649,7 @@ public class DiskFileItem
             + this.getFieldName();
     }
 
-
     // -------------------------------------------------- Serialization methods
-
 
     /**
      * Writes the state of this object during serialization.
@@ -756,4 +715,5 @@ public class DiskFileItem
     public void setHeaders(FileItemHeaders pHeaders) {
         headers = pHeaders;
     }
+
 }

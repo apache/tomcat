@@ -27,6 +27,7 @@ package org.apache.tomcat.util.http.fileupload;
  * @see FileItemStream
  */
 public interface FileItemHeadersSupport {
+
     /**
      * Returns the collection of headers defined locally within this item.
      *
