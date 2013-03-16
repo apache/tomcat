@@ -48,8 +48,7 @@ public class HttpParser {
     private static final Integer FIELD_TYPE_QUOTED_STRING = Integer.valueOf(1);
     private static final Integer FIELD_TYPE_TOKEN_OR_QUOTED_STRING = Integer.valueOf(2);
     private static final Integer FIELD_TYPE_LHEX = Integer.valueOf(3);
-    private static final Integer FIELD_TYPE_QUOTED_LHEX = Integer.valueOf(4);
-    private static final Integer FIELD_TYPE_QUOTED_TOKEN = Integer.valueOf(5);
+    private static final Integer FIELD_TYPE_QUOTED_TOKEN = Integer.valueOf(4);
 
     private static final Map<String,Integer> fieldTypes = new HashMap<>();
 
@@ -58,16 +57,23 @@ public class HttpParser {
     private static final boolean isHex[] = new boolean[128];
 
     static {
-        // Digest field types
+        // Digest field types.
+        // Note: These are more relaxed than RFC2617. This adheres to the
+        //       recommendation of RFC2616 that servers are tolerant of buggy
+        //       clients when they can be so without ambiguity.
         fieldTypes.put("username", FIELD_TYPE_QUOTED_STRING);
         fieldTypes.put("realm", FIELD_TYPE_QUOTED_STRING);
         fieldTypes.put("nonce", FIELD_TYPE_QUOTED_STRING);
         fieldTypes.put("digest-uri", FIELD_TYPE_QUOTED_STRING);
-        fieldTypes.put("response", FIELD_TYPE_QUOTED_LHEX);
+        // RFC2617 says response is <">32LHEX<">. 32LHEX will also be accepted
+        fieldTypes.put("response", FIELD_TYPE_LHEX);
+        // RFC2617 says algorithm is token. <">token<"> will also be accepted
         fieldTypes.put("algorithm", FIELD_TYPE_QUOTED_TOKEN);
         fieldTypes.put("cnonce", FIELD_TYPE_QUOTED_STRING);
         fieldTypes.put("opaque", FIELD_TYPE_QUOTED_STRING);
+        // RFC2617 says qop is token. <">token<"> will also be accepted
         fieldTypes.put("qop", FIELD_TYPE_QUOTED_TOKEN);
+        // RFC2617 says nc is 8LHEX. <">8LHEX<"> will also be accepted
         fieldTypes.put("nc", FIELD_TYPE_LHEX);
 
         // Setup the flag arrays
@@ -144,14 +150,10 @@ public class HttpParser {
                     value = readTokenOrQuotedString(input, false);
                     break;
                 case 3:
-                    // FIELD_TYPE_LHEX
+                    // FIELD_TYPE_QUOTED_LHEX
                     value = readLhex(input);
                     break;
                 case 4:
-                    // FIELD_TYPE_QUOTED_LHEX
-                    value = readQuotedLhex(input);
-                    break;
-                case 5:
                     // FIELD_TYPE_QUOTED_TOKEN
                     value = readQuotedToken(input);
                     break;
@@ -263,6 +265,8 @@ public class HttpParser {
         int len = constant.length();
 
         int c = input.read();
+
+        // Skip lws
         while (c == 32 || c == 9) {
             c = input.read();
         }
@@ -359,9 +363,10 @@ public class HttpParser {
 
     private static String readTokenOrQuotedString(StringReader input,
             boolean returnQuoted) throws IOException {
-        input.mark(1);
+
         int c = input.read();
-        input.reset();
+        // Skip back so first character is available to be read again
+        input.skip(-1);
 
         if (c == '"') {
             return readQuotedString(input, returnQuoted);
@@ -371,9 +376,12 @@ public class HttpParser {
     }
 
     /**
+     * Token can be read unambiguously with or without surrounding quotes so
+     * this parsing method for token permits optional surrounding double quotes.
      * This is not defined in any RFC. It is a special case to handle data from
-     * buggy clients (known buggy clients include Microsoft IE 8 & 9, Apple
-     * Safari for OSX and iOS) that add quotes to values that should be tokens.
+     * buggy clients (known buggy clients for DIGEST auth include Microsoft IE 8
+     * & 9, Apple Safari for OSX and iOS) that add quotes to values that should
+     * be tokens.
      *
      * @return the token if one was found, null if data other than a token or
      *         quoted token was found or null if the end of data was reached
@@ -394,7 +402,7 @@ public class HttpParser {
 
         if (c == '"') {
             quoted = true;
-        } else if (c == -1) {
+        } else if (c == -1 || !isToken(c)) {
             return null;
         } else {
             result.append((char) c);
@@ -423,14 +431,19 @@ public class HttpParser {
     }
 
     /**
-     * Parses lower case hex but permits upper case hex to be used (converting
-     * it to lower case before returning).
+     * LHEX can be read unambiguously with or without surrounding quotes so this
+     * parsing method for LHEX permits optional surrounding double quotes. Some
+     * buggy clients (libwww-perl for DIGEST auth) are known to send quoted LHEX
+     * when the specification requires just LHEX.
      *
-     * @return the lower case hex if present or <code>null</code> if data other
-     *         than lower case hex was found
+     * @return  the sequence of LHEX (minus any surrounding quotes) if any was
+     *          found, or <code>null</code> if data other LHEX was found
      */
-    private static String readLhex(StringReader input) throws IOException {
+    private static String readLhex(StringReader input)
+            throws IOException {
+
         StringBuilder result = new StringBuilder();
+        boolean quoted = false;
 
         int c = input.read();
 
@@ -439,32 +452,34 @@ public class HttpParser {
             c = input.read();
         }
 
+        if (c == '"') {
+            quoted = true;
+        } else if (c == -1 || !isHex(c)) {
+            return null;
+        } else {
+            result.append((char) c);
+        }
+        c = input.read();
+
         while (c != -1 && isHex(c)) {
             result.append((char) c);
             c = input.read();
         }
-        // Skip back so non-hex character is available for next read
-        input.skip(-1);
 
-        if (result.length() == 0) {
+        if (quoted) {
+            if (c != '"') {
+                return null;
+            }
+        } else {
+            // Skip back so non-token character is available for next read
+            input.skip(-1);
+        }
+
+        if (c != -1 && result.length() == 0) {
             return null;
         } else {
             return result.toString().toLowerCase(Locale.US);
         }
-    }
-
-    private static String readQuotedLhex(StringReader input)
-            throws IOException {
-
-        if (skipConstant(input, "\"") != SkipConstantResult.FOUND) {
-            return null;
-        }
-        String result = readLhex(input);
-        if (skipConstant(input, "\"") == SkipConstantResult.NOT_FOUND) {
-            return null;
-        }
-
-        return result;
     }
 
     private static enum SkipConstantResult {
