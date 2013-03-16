@@ -87,6 +87,11 @@
         are closed when parsing web application deployment descriptors.
         (violetagg)
       </fix>
+      <fix>
+        <bug>54707</bug>: Further relax the parsing of DIGEST authentication
+        headers to allow for buggy clients that quote values that RFC2617 states
+        should not be quoted. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
