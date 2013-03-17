@@ -364,9 +364,12 @@ public class HttpParser {
     private static String readTokenOrQuotedString(StringReader input,
             boolean returnQuoted) throws IOException {
 
+        // Use mark/reset as skip(-1) fails when reading the last character of
+        // the input
+        input.mark(1);
         int c = input.read();
-        // Skip back so first character is available to be read again
-        input.skip(-1);
+        // Go back so first character is available to be read again
+        input.reset();
 
         if (c == '"') {
             return readQuotedString(input, returnQuoted);
