@@ -150,7 +150,7 @@ public class HttpParser {
                     value = readTokenOrQuotedString(input, false);
                     break;
                 case 3:
-                    // FIELD_TYPE_QUOTED_LHEX
+                    // FIELD_TYPE_LHEX
                     value = readLhex(input);
                     break;
                 case 4:
@@ -380,8 +380,8 @@ public class HttpParser {
      * this parsing method for token permits optional surrounding double quotes.
      * This is not defined in any RFC. It is a special case to handle data from
      * buggy clients (known buggy clients for DIGEST auth include Microsoft IE 8
-     * & 9, Apple Safari for OSX and iOS) that add quotes to values that should
-     * be tokens.
+     * &amp; 9, Apple Safari for OSX and iOS) that add quotes to values that
+     * should be tokens.
      *
      * @return the token if one was found, null if data other than a token or
      *         quoted token was found or null if the end of data was reached
@@ -436,6 +436,11 @@ public class HttpParser {
      * buggy clients (libwww-perl for DIGEST auth) are known to send quoted LHEX
      * when the specification requires just LHEX.
      *
+     * <p>
+     * LHEX are, literally, lower-case hexadecimal digits. This implementation
+     * allows for upper-case digits as well, converting the returned value to
+     * lower-case.
+     *
      * @return  the sequence of LHEX (minus any surrounding quotes) if any was
      *          found, or <code>null</code> if data other LHEX was found
      */
@@ -457,11 +462,17 @@ public class HttpParser {
         } else if (c == -1 || !isHex(c)) {
             return null;
         } else {
+            if ('A' <= c && c <= 'F') {
+                c -= ('A' - 'a');
+            }
             result.append((char) c);
         }
         c = input.read();
 
         while (c != -1 && isHex(c)) {
+            if ('A' <= c && c <= 'F') {
+                c -= ('A' - 'a');
+            }
             result.append((char) c);
             c = input.read();
         }
@@ -471,14 +482,14 @@ public class HttpParser {
                 return null;
             }
         } else {
-            // Skip back so non-token character is available for next read
+            // Skip back so non-hex character is available for next read
             input.skip(-1);
         }
 
         if (c != -1 && result.length() == 0) {
             return null;
         } else {
-            return result.toString().toLowerCase(Locale.US);
+            return result.toString();
         }
     }
 
