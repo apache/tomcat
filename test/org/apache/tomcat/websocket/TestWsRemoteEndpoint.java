@@ -76,7 +76,7 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
         tomcat.start();
 
         Session wsSession;
-        URI uri = new URI("http://localhost:" + getPort() +
+        URI uri = new URI("ws://localhost:" + getPort() +
                 TesterEchoServer.Config.PATH_ASYNC);
         if (Endpoint.class.isAssignableFrom(clazz)) {
             @SuppressWarnings("unchecked")

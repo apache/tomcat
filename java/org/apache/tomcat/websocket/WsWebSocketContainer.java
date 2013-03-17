@@ -156,8 +156,8 @@ public class WsWebSocketContainer
             throws DeploymentException {
 
         String scheme = path.getScheme();
-        if (!("http".equalsIgnoreCase(scheme) ||
-                "https".equalsIgnoreCase(scheme))) {
+        if (!("ws".equalsIgnoreCase(scheme) ||
+                "wss".equalsIgnoreCase(scheme))) {
             throw new DeploymentException(sm.getString(
                     "wsWebSocketContainer.pathWrongScheme", scheme));
         }
@@ -175,7 +175,7 @@ public class WsWebSocketContainer
 
         SocketAddress sa;
         if (port == -1) {
-            if ("http".equalsIgnoreCase(scheme)) {
+            if ("ws".equalsIgnoreCase(scheme)) {
                 sa = new InetSocketAddress(host, 80);
             } else {
                 // TODO HTTPS support
