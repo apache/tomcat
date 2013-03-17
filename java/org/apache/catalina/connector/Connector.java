@@ -768,7 +768,7 @@ public class Connector extends LifecycleMBeanBase  {
          if (URIEncoding == null) {
              URIEncodingLower = null;
          } else {
-             this.URIEncodingLower = URIEncoding.toLowerCase(Locale.US);
+             this.URIEncodingLower = URIEncoding.toLowerCase(Locale.ENGLISH);
          }
          setProperty("uRIEncoding", URIEncoding);
      }

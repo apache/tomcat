@@ -60,7 +60,7 @@ public abstract class SimpleHttpClient {
 
     protected static final String SESSION_COOKIE_NAME = "JSESSIONID";
     protected static final String SESSION_PARAMETER_NAME =
-            SESSION_COOKIE_NAME.toLowerCase(Locale.US);
+            SESSION_COOKIE_NAME.toLowerCase(Locale.ENGLISH);
 
     private static final String COOKIE_HEADER_PREFIX = "Set-Cookie: ";
     private static final String SESSION_COOKIE_HEADER_PREFIX =

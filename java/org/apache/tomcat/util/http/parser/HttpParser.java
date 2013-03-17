@@ -131,7 +131,7 @@ public class HttpParser {
                 return null;
             }
             String value = null;
-            Integer type = fieldTypes.get(field.toLowerCase(Locale.US));
+            Integer type = fieldTypes.get(field.toLowerCase(Locale.ENGLISH));
             if (type == null) {
                 // auth-param = token "=" ( token | quoted-string )
                 type = FIELD_TYPE_TOKEN_OR_QUOTED_STRING;
@@ -210,9 +210,9 @@ public class HttpParser {
 
             if (skipConstant(input, "=") == SkipConstantResult.FOUND) {
                 String value = readTokenOrQuotedString(input, true);
-                parameters.put(attribute.toLowerCase(Locale.US), value);
+                parameters.put(attribute.toLowerCase(Locale.ENGLISH), value);
             } else {
-                parameters.put(attribute.toLowerCase(Locale.US), "");
+                parameters.put(attribute.toLowerCase(Locale.ENGLISH), "");
             }
 
             lookForSemiColon = skipConstant(input, ";");
