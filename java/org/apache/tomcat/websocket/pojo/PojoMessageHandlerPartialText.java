@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 import javax.websocket.Session;
 
 /**
- * Text specific concrete partial implementation.
+ * Text specific concrete implementation for handling partial messages.
  */
 public class PojoMessageHandlerPartialText
         extends PojoMessageHandlerPartialBase<String>{
