@@ -76,7 +76,6 @@ public class WsWebSocketContainer
     private int processPeriod = 10;
 
 
-
     @Override
     public Session connectToServer(Object pojo, URI path)
             throws DeploymentException {
@@ -410,7 +409,7 @@ public class WsWebSocketContainer
             Future<Integer> written = channel.read(response);
             written.get();
             response.flip();
-            while (response.hasRemaining()) {
+            while (response.hasRemaining() && !readHeaders) {
                 if (line == null) {
                     line = readLine(response);
                 } else {
@@ -470,9 +469,12 @@ public class WsWebSocketContainer
         StringBuilder sb = new StringBuilder();
 
         char c = 0;
-        while (response.hasRemaining() && c != 10) {
+        while (response.hasRemaining()) {
             c = (char) response.get();
             sb.append(c);
+            if (c == 10) {
+                break;
+            }
         }
 
         return sb.toString();
