@@ -90,7 +90,7 @@
       <fix>
         <bug>54707</bug>: Further relax the parsing of DIGEST authentication
         headers to allow for buggy clients that quote values that RFC2617 states
-        should not be quoted. (markt)
+        should not be quoted. (markt/kkolinko)
       </fix>
     </changelog>
   </subsection>
