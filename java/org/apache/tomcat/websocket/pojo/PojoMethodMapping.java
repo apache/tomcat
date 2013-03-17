@@ -170,11 +170,11 @@ public class PojoMethodMapping {
     }
 
 
-    private static PojoPathParam[] getPathParams(Method m, boolean isError) {
+    private static PojoPathParam[] getPathParams(Method m, boolean isOnError) {
         if (m == null) {
             return new PojoPathParam[0];
         }
-        boolean foundError = !isError;
+        boolean foundThrowable = !isOnError;
         Class<?>[] types = m.getParameterTypes();
         Annotation[][] paramsAnnotations = m.getParameterAnnotations();
         PojoPathParam[] result = new PojoPathParam[types.length];
@@ -182,8 +182,8 @@ public class PojoMethodMapping {
             Class<?> type = types[i];
             if (type.equals(Session.class)) {
                 result[i] = new PojoPathParam(type, null);
-            } else if (type.equals(Throwable.class)) {
-                foundError = true;
+            } else if (isOnError && type.equals(Throwable.class)) {
+                foundThrowable = true;
                 result[i] = new PojoPathParam(type, null);
             } else {
                 Annotation[] paramAnnotations = paramsAnnotations[i];
@@ -201,7 +201,7 @@ public class PojoMethodMapping {
                 }
             }
         }
-        if (!foundError) {
+        if (!foundThrowable) {
             // TODO i18n
             throw new IllegalArgumentException();
         }
