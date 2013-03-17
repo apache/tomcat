@@ -322,11 +322,7 @@ public class WsSession implements Session {
             state = State.CLOSED;
 
             if (sendCloseMessage) {
-                try {
-                    sendCloseMessage(closeReason);
-                } catch (IOException ioe) {
-                    log.error(sm.getString("wsSession.sendCloseFail"), ioe);
-                }
+                sendCloseMessage(closeReason);
             }
 
             // Close the socket
@@ -335,7 +331,7 @@ public class WsSession implements Session {
     }
 
 
-    private void sendCloseMessage(CloseReason closeReason) throws IOException {
+    private void sendCloseMessage(CloseReason closeReason) {
         // 125 is maximum size for the payload of a control message
         ByteBuffer msg = ByteBuffer.allocate(125);
         msg.putShort((short) closeReason.getCloseCode().getCode());
