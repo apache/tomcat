@@ -22,7 +22,7 @@ import java.nio.ByteBuffer;
 import javax.websocket.Session;
 
 /**
- * ByteBuffer specific concrete partial implementation.
+ * ByteBuffer specific concrete implementation for handling partial messages.
  */
 public class PojoMessageHandlerPartialBinary
         extends PojoMessageHandlerPartialBase<ByteBuffer>{

@@ -22,7 +22,7 @@ import javax.websocket.PongMessage;
 import javax.websocket.Session;
 
 /**
- * PongMessage specific concrete whole message implementation.
+ * PongMessage specific concrete implementation for handling whole messages.
  */
 public class PojoMessageHandlerWholePong
         extends PojoMessageHandlerWholeBase<PongMessage> {

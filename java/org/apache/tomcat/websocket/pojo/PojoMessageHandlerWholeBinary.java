@@ -33,7 +33,7 @@ import javax.websocket.Session;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * ByteBuffer specific concrete whole message implementation.
+ * ByteBuffer specific concrete implementation for handling whole messages.
  */
 public class PojoMessageHandlerWholeBinary
         extends PojoMessageHandlerWholeBase<ByteBuffer> {

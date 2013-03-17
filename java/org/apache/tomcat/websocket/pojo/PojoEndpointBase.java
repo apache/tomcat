@@ -30,6 +30,11 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Base implementation (client and server have different concrete
+ * implementations) of the wrapper that converts a POJO instance into a
+ * WebSocket endpoint instance.
+ */
 public abstract class PojoEndpointBase extends Endpoint {
 
     private static final Log log = LogFactory.getLog(PojoEndpointBase.class);

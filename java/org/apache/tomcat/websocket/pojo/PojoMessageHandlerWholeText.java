@@ -32,7 +32,7 @@ import javax.websocket.Session;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Text specific concrete whole message implementation.
+ * Text specific concrete implementation for handling whole messages.
  */
 public class PojoMessageHandlerWholeText
         extends PojoMessageHandlerWholeBase<String> {

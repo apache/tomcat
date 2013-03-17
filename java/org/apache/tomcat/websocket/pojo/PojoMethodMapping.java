@@ -46,8 +46,8 @@ import org.apache.tomcat.websocket.Util;
 /**
  * For a POJO class annotated with
  * {@link javax.websocket.server.ServerEndpoint}, an instance of this class
- * caches the method handlers and the method and parameter information for the
- * onXXX calls.
+ * creates and caches the method handler, method information and parameter
+ * information for the onXXX calls.
  */
 public class PojoMethodMapping {
 
