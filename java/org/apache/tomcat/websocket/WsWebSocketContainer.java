@@ -170,7 +170,7 @@ public class WsWebSocketContainer
         clientEndpointConfiguration.getConfigurator().
                 beforeRequest(reqHeaders);
 
-        ByteBuffer request = createRequest(path.getRawPath(), reqHeaders);
+        ByteBuffer request = createRequest(path, reqHeaders);
 
         SocketAddress sa;
         if (port == -1) {
@@ -343,13 +343,18 @@ public class WsWebSocketContainer
     }
 
 
-    private ByteBuffer createRequest(String rawPath,
+    private ByteBuffer createRequest(URI uri,
             Map<String,List<String>> reqHeaders) {
         ByteBuffer result = ByteBuffer.allocate(4 * 1024);
 
         // Request line
         result.put("GET ".getBytes(iso88591));
-        result.put(rawPath.getBytes(iso88591));
+        result.put(uri.getRawPath().getBytes(iso88591));
+        String query = uri.getRawQuery();
+        if (query != null) {
+            result.put((byte) '?');
+            result.put(query.getBytes(iso88591));
+        }
         result.put(" HTTP/1.1\r\n".getBytes(iso88591));
 
         // Headers
