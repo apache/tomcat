@@ -23,7 +23,7 @@ import java.util.Locale;
  * conversions between baseName, path and version take place.
  */
 public final class ContextName {
-    private static final String ROOT_NAME = "ROOT";
+    public static final String ROOT_NAME = "ROOT";
     private static final String VERSION_MARKER = "##";
     private static final String FWD_SLASH_REPLACEMENT = "#";
 

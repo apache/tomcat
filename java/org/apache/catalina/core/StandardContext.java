@@ -6047,7 +6047,7 @@ public class StandardContext extends ContainerBase
             temp = temp.replace('/', '_');
             temp = temp.replace('\\', '_');
             if (temp.length() < 1)
-                temp = "_";
+                temp = ContextName.ROOT_NAME;
             if (hostWorkDir != null ) {
                 workDir = hostWorkDir + File.separator + temp;
             } else {

@@ -118,6 +118,11 @@
         <code>HttpServletRequest#changeSessionId()</code>. Patch provided by
         Nick Williams. (markt)
       </add>
+      <fix>
+        <bug>54708</bug>: Change the name of the working directory for the ROOT
+        application (located under $CATALINA_BASE/work by default) from _ to
+        ROOT. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
