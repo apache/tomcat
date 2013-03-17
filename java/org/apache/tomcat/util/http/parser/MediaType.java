@@ -60,7 +60,7 @@ public class MediaType {
     }
 
     public String getParameterValue(String parameter) {
-        return parameters.get(parameter.toLowerCase(Locale.US));
+        return parameters.get(parameter.toLowerCase(Locale.ENGLISH));
     }
 
     @Override

@@ -50,10 +50,10 @@ public class B2CConverter {
     static {
         for (Charset charset: Charset.availableCharsets().values()) {
             encodingToCharsetCache.put(
-                    charset.name().toLowerCase(Locale.US), charset);
+                    charset.name().toLowerCase(Locale.ENGLISH), charset);
             for (String alias : charset.aliases()) {
                 encodingToCharsetCache.put(
-                        alias.toLowerCase(Locale.US), charset);
+                        alias.toLowerCase(Locale.ENGLISH), charset);
             }
         }
         Charset iso88591 = null;
@@ -73,7 +73,7 @@ public class B2CConverter {
             throws UnsupportedEncodingException {
 
         // Encoding names should all be ASCII
-        String lowerCaseEnc = enc.toLowerCase(Locale.US);
+        String lowerCaseEnc = enc.toLowerCase(Locale.ENGLISH);
 
         return getCharsetLower(lowerCaseEnc);
     }

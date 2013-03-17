@@ -806,7 +806,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 final String[] prefix = new String[] {"get","is"};
                 for (int j=0; j<prefix.length; j++) {
 
-                    String name = prefix[j] + fields[i].substring(0, 1).toUpperCase(Locale.US) +
+                    String name = prefix[j] + fields[i].substring(0, 1).toUpperCase(Locale.ENGLISH) +
                                   fields[i].substring(1);
                     Method m = null;
                     try {
