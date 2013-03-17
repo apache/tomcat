@@ -85,7 +85,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                 ContainerProvider.getWebSocketContainer();
         Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
-                new URI("http://localhost:" + getPort() +
+                new URI("ws://localhost:" + getPort() +
                         TesterEchoServer.Config.PATH_ASYNC));
         CountDownLatch latch = new CountDownLatch(1);
         BasicText handler = new BasicText(latch);
@@ -135,7 +135,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                 ContainerProvider.getWebSocketContainer();
         wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
-                new URI("http://" + TesterEchoServer.Config.PATH_ASYNC));
+                new URI("ws://" + TesterEchoServer.Config.PATH_ASYNC));
     }
 
 
@@ -223,7 +223,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
-                        new URI("http://localhost:" + getPort() +
+                        new URI("ws://localhost:" + getPort() +
                                 TesterEchoServer.Config.PATH_BASIC));
         BasicHandler<?> handler;
         CountDownLatch latch = new CountDownLatch(1);
@@ -294,7 +294,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
-                new URI("http://localhost:" + getPort() + BlockingConfig.PATH));
+                new URI("ws://localhost:" + getPort() + BlockingConfig.PATH));
 
         if (!setTimeoutOnContainer) {
             wsSession.getAsyncRemote().setSendTimeout(TIMEOUT_MS);
@@ -375,7 +375,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
-                new URI("http://localhost:" + getPort() +
+                new URI("ws://localhost:" + getPort() +
                         ConstantTxConfig.PATH));
 
         wsSession.addMessageHandler(new BlockingBinaryHandler());
@@ -669,7 +669,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             Class<? extends Endpoint> clazz) throws Exception {
         return wsContainer.connectToServer(clazz,
                 ClientEndpointConfig.Builder.create().build(),
-                new URI("http://localhost:" + getPort() +
+                new URI("ws://localhost:" + getPort() +
                         TesterEchoServer.Config.PATH_BASIC));
     }
 

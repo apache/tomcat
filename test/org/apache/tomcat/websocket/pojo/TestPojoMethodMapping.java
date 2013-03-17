@@ -66,7 +66,7 @@ public class TestPojoMethodMapping extends TomcatBaseTest {
         tomcat.start();
 
         Client client = new Client();
-        URI uri = new URI("http://localhost:" + getPort() + "/" + PARAM_ONE +
+        URI uri = new URI("ws://localhost:" + getPort() + "/" + PARAM_ONE +
                 "/" + PARAM_TWO + "/" + PARAM_THREE);
 
         Session session = wsContainer.connectToServer(client, uri);

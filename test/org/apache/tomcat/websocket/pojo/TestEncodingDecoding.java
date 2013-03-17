@@ -66,7 +66,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         tomcat.start();
 
         Client client = new Client();
-        URI uri = new URI("http://localhost:" + getPort() + "/");
+        URI uri = new URI("ws://localhost:" + getPort() + "/");
         Session session = wsContainer.connectToServer(client, uri);
 
         MsgString msg1 = new MsgString();
