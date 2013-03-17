@@ -352,7 +352,7 @@ public class WsSession implements Session {
             // deal with the Exception
             log.error(sm.getString("wsSession.sendCloseFail"), ioe);
             wsRemoteEndpoint.close();
-            throw ioe;
+            localEndpoint.onError(this, ioe);
         } finally {
             webSocketContainer.unregisterSession(
                     localEndpoint.getClass(), this);
