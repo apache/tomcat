@@ -127,13 +127,24 @@ public class TestAuthorizationDigest {
 
     @Test
     public void testQuotedLhex() throws Exception {
-        String header = "Digest nc=\"00000001\"";
+        String header = "Digest nc=\"09abcdef\"";
 
         StringReader input = new StringReader(header);
 
         Map<String,String> result = HttpParser.parseAuthorizationDigest(input);
 
-        Assert.assertEquals("00000001", result.get("nc"));
+        Assert.assertEquals("09abcdef", result.get("nc"));
+    }
+
+    @Test
+    public void testQuotedLhexUppercase() throws Exception {
+        String header = "Digest nc=\"00ABCDEF\"";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = HttpParser.parseAuthorizationDigest(input);
+
+        Assert.assertEquals("00abcdef", result.get("nc"));
     }
 
     @Test
