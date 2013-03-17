@@ -193,12 +193,28 @@ For a quick rebuild of only modified code you can use:
 
 (5) Special builds
 
-Some Tomcat components, that are included in the full release, but are not
-built during the default "deploy" build, can also be built separately.
+There are several targets in Tomcat build files that are useful to be
+called separately. They build components that you may want to build
+quickly, or ones that are included in the full release and are not built
+during the default "deploy" build.
 
-(5.1) Building API documentation (Javadoc)
+(5.1) Building documentation
 
-The API documentation can be easily built:
+The documentation web application is built during the default "deploy"
+build.
+
+It can be built quickly by using the following commands:
+
+    cd ${tomcat.source}
+    ant build-docs
+
+The output of this command will be found in the following directory:
+
+    output/build/webapps/docs
+
+
+The API documentation (Javadoc) is built during a "release" build. It is
+easy to build it separately by using the following commands:
 
     cd ${tomcat.source}
     ant javadoc
@@ -210,12 +226,23 @@ The output of this command will be found in the following directories:
     output/dist/webapps/docs/jspapi
     output/dist/webapps/docs/servletapi
 
+
 (5.2) Building the extras (commons-logging, webservices etc.)
+
+These components are documented on the "Additional Components"
+(extras.html) page of documentation. They are built during a "release"
+build.
+
+You can build them by using the following commands:
 
     cd ${tomcat.source}
     ant extras
 
 (5.3) Building the embedded packages
+
+These are built during a "release" build.
+
+You can build them by using the following commands:
 
     cd ${tomcat.source}
     ant embed
