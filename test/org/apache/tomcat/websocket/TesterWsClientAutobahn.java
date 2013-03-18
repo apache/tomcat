@@ -33,7 +33,7 @@ import javax.websocket.WebSocketContainer;
  * Runs the Autobahn test suite in client mode for testing the WebSocket client
  * implementation.
  */
-public class TestWsClientAutobahn {
+public class TesterWsClientAutobahn {
 
     private static final String HOST = "localhost";
     private static final int PORT = 9001;
