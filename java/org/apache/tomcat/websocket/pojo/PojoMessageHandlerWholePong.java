@@ -28,9 +28,9 @@ public class PojoMessageHandlerWholePong
         extends PojoMessageHandlerWholeBase<PongMessage> {
 
     public PojoMessageHandlerWholePong(Object pojo, Method method,
-            Session session, Object[] params, int indexPayload, boolean unwrap,
+            Session session, Object[] params, int indexPayload, boolean convert,
             int indexSession) {
-        super(pojo, method, session, params, indexPayload, unwrap, indexSession);
+        super(pojo, method, session, params, indexPayload, convert, indexSession);
     }
 
     @Override

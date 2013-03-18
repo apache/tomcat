@@ -28,9 +28,9 @@ public class PojoMessageHandlerPartialBinary
         extends PojoMessageHandlerPartialBase<ByteBuffer>{
 
     public PojoMessageHandlerPartialBinary(Object pojo, Method method,
-            Session session, Object[] params, int indexPayload, boolean unwrap,
+            Session session, Object[] params, int indexPayload, boolean convert,
             int indexBoolean, int indexSession) {
-        super(pojo, method, session, params, indexPayload, unwrap, indexBoolean,
+        super(pojo, method, session, params, indexPayload, convert, indexBoolean,
                 indexSession);
     }
 }

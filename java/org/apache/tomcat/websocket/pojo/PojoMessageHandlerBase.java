@@ -36,19 +36,19 @@ public abstract class PojoMessageHandlerBase<T> {
     protected final Session session;
     protected final Object[] params;
     protected final int indexPayload;
-    protected final boolean unwrap;
+    protected final boolean convert;
     protected final int indexSession;
 
 
     public PojoMessageHandlerBase(Object pojo, Method method,
-            Session session, Object[] params, int indexPayload, boolean unwrap,
+            Session session, Object[] params, int indexPayload, boolean convert,
             int indexSession) {
         this.pojo = pojo;
         this.method = method;
         this.session = session;
         this.params = params;
         this.indexPayload = indexPayload;
-        this.unwrap = unwrap;
+        this.convert = convert;
         this.indexSession = indexSession;
     }
 

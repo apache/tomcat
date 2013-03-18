@@ -74,7 +74,7 @@ public abstract class PojoEndpointBase extends Endpoint {
         if (methodMapping.getOnClose() != null) {
             try {
                 methodMapping.getOnClose().invoke(pojo,
-                        methodMapping.getOnCloseArgs(pathParameters, session));
+                        methodMapping.getOnCloseArgs(pathParameters, session, closeReason));
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
                 log.error(sm.getString("pojoEndpointBase.onCloseFail",

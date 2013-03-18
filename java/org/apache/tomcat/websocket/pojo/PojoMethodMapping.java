@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.websocket.pojo;
 
+import java.io.InputStream;
+import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.websocket.CloseReason;
 import javax.websocket.Decoder;
 import javax.websocket.Decoder.Binary;
 import javax.websocket.Decoder.BinaryStream;
@@ -91,9 +94,9 @@ public class PojoMethodMapping {
         this.onOpen = open;
         this.onClose = close;
         this.onError = error;
-        onOpenParams = getPathParams(onOpen, false);
-        onCloseParams = getPathParams(onClose, false);
-        onErrorParams = getPathParams(onError, true);
+        onOpenParams = getPathParams(onOpen, false, false);
+        onCloseParams = getPathParams(onClose, false, true);
+        onErrorParams = getPathParams(onError, true, false);
     }
 
 
@@ -109,7 +112,7 @@ public class PojoMethodMapping {
 
     public Object[] getOnOpenArgs(Map<String,String> pathParameters,
             Session session) {
-        return buildArgs(onOpenParams, pathParameters, session, null);
+        return buildArgs(onOpenParams, pathParameters, session, null, null);
     }
 
 
@@ -119,8 +122,9 @@ public class PojoMethodMapping {
 
 
     public Object[] getOnCloseArgs(Map<String,String> pathParameters,
-            Session session) {
-        return buildArgs(onCloseParams, pathParameters, session, null);
+            Session session, CloseReason closeReason) {
+        return buildArgs(
+                onCloseParams, pathParameters, session, null, closeReason);
     }
 
 
@@ -131,7 +135,8 @@ public class PojoMethodMapping {
 
     public Object[] getOnErrorArgs(Map<String,String> pathParameters,
             Session session, Throwable throwable) {
-        return buildArgs(onErrorParams, pathParameters, session, throwable);
+        return buildArgs(
+                onErrorParams, pathParameters, session, throwable, null);
     }
 
 
@@ -170,7 +175,8 @@ public class PojoMethodMapping {
     }
 
 
-    private static PojoPathParam[] getPathParams(Method m, boolean isOnError) {
+    private static PojoPathParam[] getPathParams(Method m, boolean isOnError,
+            boolean isClose) {
         if (m == null) {
             return new PojoPathParam[0];
         }
@@ -184,6 +190,8 @@ public class PojoMethodMapping {
                 result[i] = new PojoPathParam(type, null);
             } else if (isOnError && type.equals(Throwable.class)) {
                 foundThrowable = true;
+                result[i] = new PojoPathParam(type, null);
+            } else if (isClose && type.equals(CloseReason.class)) {
                 result[i] = new PojoPathParam(type, null);
             } else {
                 Annotation[] paramAnnotations = paramsAnnotations[i];
@@ -212,7 +220,7 @@ public class PojoMethodMapping {
 
     private static Object[] buildArgs(PojoPathParam[] pathParams,
             Map<String,String> pathParameters, Session session,
-            Throwable throwable) {
+            Throwable throwable, CloseReason closeReason) {
         Object[] result = new Object[pathParams.length];
         for (int i = 0; i < pathParams.length; i++) {
             Class<?> type = pathParams[i].getType();
@@ -220,6 +228,8 @@ public class PojoMethodMapping {
                 result[i] = session;
             } else if (type.equals(Throwable.class)) {
                 result[i] = throwable;
+            } else if (type.equals(CloseReason.class)) {
+                result[i] = closeReason;
             } else {
                 String name = pathParams[i].getName();
                 String value = pathParameters.get(name);
@@ -260,6 +270,7 @@ public class PojoMethodMapping {
         }
     }
 
+
     private static class MessageMethod {
 
         private final Method m;
@@ -269,6 +280,8 @@ public class PojoMethodMapping {
         private int indexPong = -1;
         private int indexBoolean = -1;
         private int indexSession = -1;
+        private int indexInputStream = -1;
+        private int indexReader = -1;
         private Map<Integer,PojoPathParam> indexPathParams = new HashMap<>();
         private int indexPayload = -1;
 
@@ -303,6 +316,14 @@ public class PojoMethodMapping {
                                 "pojoMethodMapping.duplicateMessageParam",
                                 m.getName(), m.getClass().getName()));
                     }
+                } else if (types[i] == Reader.class) {
+                    if (indexReader == -1) {
+                        indexReader = i;
+                    } else {
+                        throw new IllegalArgumentException(sm.getString(
+                                "pojoMethodMapping.duplicateMessageParam",
+                                m.getName(), m.getClass().getName()));
+                    }
                 } else if (types[i] == boolean.class) {
                     if (indexBoolean == -1) {
                         indexBoolean = i;
@@ -322,6 +343,14 @@ public class PojoMethodMapping {
                 } else if (types[i] == byte[].class) {
                     if (indexByteArray == -1) {
                         indexByteArray = i;
+                    } else {
+                        throw new IllegalArgumentException(sm.getString(
+                                "pojoMethodMapping.duplicateMessageParam",
+                                m.getName(), m.getClass().getName()));
+                    }
+                } else if (types[i] == InputStream.class) {
+                    if (indexInputStream == -1) {
+                        indexInputStream = i;
                     } else {
                         throw new IllegalArgumentException(sm.getString(
                                 "pojoMethodMapping.duplicateMessageParam",
@@ -376,6 +405,15 @@ public class PojoMethodMapping {
             if (indexString != -1) {
                 indexPayload = indexString;
             }
+            if (indexReader != -1) {
+                if (indexPayload != -1) {
+                    throw new IllegalArgumentException(sm.getString(
+                            "pojoMethodMapping.duplicateMessageParam",
+                            m.getName(), m.getClass().getName()));
+                } else {
+                    indexPayload = indexReader;
+                }
+            }
             if (indexByteArray != -1) {
                 if (indexPayload != -1) {
                     throw new IllegalArgumentException(sm.getString(
@@ -392,6 +430,15 @@ public class PojoMethodMapping {
                             m.getName(), m.getClass().getName()));
                 } else {
                     indexPayload = indexByteBuffer;
+                }
+            }
+            if (indexInputStream != -1) {
+                if (indexPayload != -1) {
+                    throw new IllegalArgumentException(sm.getString(
+                            "pojoMethodMapping.duplicateMessageParam",
+                            m.getName(), m.getClass().getName()));
+                } else {
+                    indexPayload = indexInputStream;
                 }
             }
             if (indexPong != -1) {
@@ -411,6 +458,16 @@ public class PojoMethodMapping {
             if (indexPong != -1 && indexBoolean != -1) {
                 throw new IllegalArgumentException(sm.getString(
                         "pojoMethodMapping.partialPong",
+                        m.getName(), m.getClass().getName()));
+            }
+            if(indexReader != -1 && indexBoolean != -1) {
+                throw new IllegalArgumentException(sm.getString(
+                        "pojoMethodMapping.partialReader",
+                        m.getName(), m.getClass().getName()));
+            }
+            if(indexInputStream != -1 && indexBoolean != -1) {
+                throw new IllegalArgumentException(sm.getString(
+                        "pojoMethodMapping.partialInputStream",
                         m.getName(), m.getClass().getName()));
             }
         }
@@ -440,11 +497,19 @@ public class PojoMethodMapping {
                             config, params, indexString, false, indexSession);
                 } else if (indexByteArray != -1) {
                     mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
-                            config, params, indexByteArray, true, indexSession);
+                            config, params, indexByteArray, true, indexSession,
+                            false);
                 } else if (indexByteBuffer != -1) {
                     mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
                             config, params, indexByteBuffer, false,
-                            indexSession);
+                            indexSession, false);
+                } else if (indexInputStream != -1) {
+                    mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
+                            config, params, indexInputStream, true, indexSession,
+                            true);
+                } else if (indexReader != -1) {
+                    mh = new PojoMessageHandlerWholeText(pojo, m, session,
+                            config, params, indexReader, true, indexSession);
                 } else {
                     mh = new PojoMessageHandlerWholePong(pojo, m, session,
                             params, indexPong, false, indexSession);

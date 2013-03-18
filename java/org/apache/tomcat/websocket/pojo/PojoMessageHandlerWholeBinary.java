@@ -43,18 +43,21 @@ public class PojoMessageHandlerWholeBinary
 
     private final List<Decoder> decoders = new ArrayList<>();
 
+    private final boolean isForInputStream;
+
     public PojoMessageHandlerWholeBinary(Object pojo, Method method,
             Session session, EndpointConfig config, Object[] params,
-            int indexPayload, boolean unwrap, int indexSession) {
-        super(pojo, method, session, params, indexPayload, unwrap, indexSession);
+            int indexPayload, boolean convert, int indexSession,
+            boolean isForInputStream) {
+        super(pojo, method, session, params, indexPayload, convert,
+                indexSession);
         try {
             for (Class<? extends Decoder> decoderClazz : config.getDecoders()) {
                 if (Binary.class.isAssignableFrom(decoderClazz)) {
                     Binary<?> decoder = (Binary<?>) decoderClazz.newInstance();
                     decoder.init(config);
                     decoders.add(decoder);
-                } else if (Decoder.TextStream.class.isAssignableFrom(
-                        decoderClazz)) {
+                } else if (BinaryStream.class.isAssignableFrom(decoderClazz)) {
                     BinaryStream<?> decoder =
                             (BinaryStream<?>) decoderClazz.newInstance();
                     decoder.init(config);
@@ -66,6 +69,7 @@ public class PojoMessageHandlerWholeBinary
         } catch (IllegalAccessException | InstantiationException e) {
             throw new IllegalArgumentException(e);
         }
+        this.isForInputStream = isForInputStream;
     }
 
 
@@ -89,6 +93,18 @@ public class PojoMessageHandlerWholeBinary
             }
         }
         return null;
+    }
+
+
+    @Override
+    protected Object convert(ByteBuffer message) {
+        byte[] array = new byte[message.remaining()];
+        message.get(array);
+        if (isForInputStream) {
+            return new ByteArrayInputStream(array);
+        } else {
+            return array;
+        }
     }
 
 
