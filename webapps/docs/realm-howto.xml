@@ -1180,7 +1180,7 @@ UserDatabase Realm and a DataSource Realm.</p>
     synchronisation in this Realm.</p>
 
     <p>This Realm does not require modification to the underlying Realms or the
-    associated user storage mecahisms. It achieves this by recording all failed
+    associated user storage mechanisms. It achieves this by recording all failed
     logins, including those for users that do not exist. To prevent a DOS by
     deliberating making requests with invalid users (and hence causing this
     cache to grow) the size of the list of users that have failed authentication
