@@ -174,7 +174,7 @@ public class PojoMethodMapping {
         if (m == null) {
             return new PojoPathParam[0];
         }
-        boolean foundThrowable = !isOnError;
+        boolean foundThrowable = false;
         Class<?>[] types = m.getParameterTypes();
         Annotation[][] paramsAnnotations = m.getParameterAnnotations();
         PojoPathParam[] result = new PojoPathParam[types.length];
@@ -201,7 +201,7 @@ public class PojoMethodMapping {
                 }
             }
         }
-        if (!foundThrowable) {
+        if (isOnError && !foundThrowable) {
             throw new IllegalArgumentException(sm.getString(
                     "pojoMethodMapping.onErrorNoThrowable",
                     m.getName(), m.getClass().getName()));
