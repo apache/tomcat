@@ -270,7 +270,7 @@ public class ManagedBean implements java.io.Serializable {
      * @param operation The new operation descriptor
      */
     public void addOperation(OperationInfo operation) {
-        operations.put(operation.getName(), operation);
+        operations.put(createOperationKey(operation), operation);
     }
 
 
@@ -527,7 +527,8 @@ public class ManagedBean implements java.io.Serializable {
 
         // Acquire the ModelMBeanOperationInfo information for
         // the requested operation
-        OperationInfo opInfo = operations.get(aname);
+        OperationInfo opInfo =
+                operations.get(createOperationKey(aname, signature));
         if (opInfo == null)
             throw new MBeanException(new ServiceNotFoundException(
                     "Cannot find operation " + aname),
@@ -568,4 +569,31 @@ public class ManagedBean implements java.io.Serializable {
     }
 
 
+    private String createOperationKey(OperationInfo operation) {
+        StringBuilder key = new StringBuilder(operation.getName());
+        key.append('(');
+        for (ParameterInfo parameterInfo: operation.getSignature()) {
+            key.append(parameterInfo.getType());
+            // Note: A trailing ',' does not matter in this case
+            key.append(',');
+        }
+        key.append(')');
+
+        return key.toString();
+    }
+
+
+    private String createOperationKey(String methodName,
+            String[] parameterTypes) {
+        StringBuilder key = new StringBuilder(methodName);
+        key.append('(');
+        for (String parameter: parameterTypes) {
+            key.append(parameter);
+            // Note: A trailing ',' does not matter in this case
+            key.append(',');
+        }
+        key.append(')');
+
+        return key.toString();
+    }
 }
