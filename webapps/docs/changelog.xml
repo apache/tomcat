@@ -51,6 +51,10 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        Implement JSR 356 - WebSockets. The JSR 356 implementation includes
+        contributions from Nick Williams. (markt)
+      </add>
+      <add>
         <bug>45995</bug>: Align Tomcat with Apache httpd and perform MIME type
         mapping based on file extension in a case insensitive manner. (markt)
       </add>
