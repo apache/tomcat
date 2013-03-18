@@ -247,6 +247,7 @@ public class OutputBuffer extends Writer
 
         gotEnc = false;
         enc = null;
+        listener = null;
 
     }
 
@@ -663,6 +664,7 @@ public class OutputBuffer extends Writer
 
     private volatile WriteListener listener;
     public void setWriteListener(WriteListener listener) {
+        if (getWriteListener()!=null) throw new IllegalStateException("Write listener already set.");
         this.listener = listener;
         coyoteResponse.action(ActionCode.SET_WRITE_LISTENER, listener);
     }
