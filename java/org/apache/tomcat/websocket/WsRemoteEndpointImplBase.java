@@ -730,6 +730,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         private final WsRemoteEndpointImplBase endpoint;
         private final ByteBuffer buffer = ByteBuffer.allocate(8192);
+        private final Object closeLock = new Object();
+        private volatile boolean closed = false;
 
         public WsOutputStream(WsRemoteEndpointImplBase endpoint) {
             this.endpoint = endpoint;
@@ -737,6 +739,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         @Override
         public void write(int b) throws IOException {
+            if (closed) {
+                throw new IllegalStateException(
+                        sm.getString("wsRemoteEndpoint.closedOutputStream"));
+            }
+
             if (buffer.remaining() == 0) {
                 flush();
             }
@@ -745,10 +752,25 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
+            if (closed) {
+                throw new IllegalStateException(
+                        sm.getString("wsRemoteEndpoint.closedOutputStream"));
+            }
+            if (len == 0) {
+                return;
+            }
+            if ((off < 0) || (off > b.length) || (len < 0) ||
+                ((off + len) > b.length) || ((off + len) < 0)) {
+                throw new IndexOutOfBoundsException();
+            }
+
+            if (buffer.remaining() == 0) {
+                flush();
+            }
             int remaining = buffer.remaining();
             int written = 0;
 
-            while (remaining < len) {
+            while (remaining < len - written) {
                 buffer.put(b, off + written, remaining);
                 written += remaining;
                 flush();
@@ -759,15 +781,28 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         @Override
         public void flush() throws IOException {
+            if (closed) {
+                throw new IllegalStateException(
+                        sm.getString("wsRemoteEndpoint.closedOutputStream"));
+            }
+
             doWrite(false);
         }
 
         @Override
         public void close() throws IOException {
+            synchronized (closeLock) {
+                if (closed) {
+                    return;
+                }
+                closed = true;
+            }
+
             doWrite(true);
         }
 
         private void doWrite(boolean last) throws IOException {
+            buffer.flip();
             endpoint.sendPartialBytes(buffer, last);
             buffer.clear();
         }
@@ -778,6 +813,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         private final WsRemoteEndpointImplBase endpoint;
         private final CharBuffer buffer = CharBuffer.allocate(8192);
+        private final Object closeLock = new Object();
+        private volatile boolean closed = false;
 
         public WsWriter(WsRemoteEndpointImplBase endpoint) {
             this.endpoint = endpoint;
@@ -785,10 +822,25 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         @Override
         public void write(char[] cbuf, int off, int len) throws IOException {
+            if (closed) {
+                throw new IllegalStateException(
+                        sm.getString("wsRemoteEndpoint.closedWriter"));
+            }
+            if (len == 0) {
+                return;
+            }
+            if ((off < 0) || (off > cbuf.length) || (len < 0) ||
+                    ((off + len) > cbuf.length) || ((off + len) < 0)) {
+                throw new IndexOutOfBoundsException();
+            }
+
+            if (buffer.remaining() == 0) {
+                flush();
+            }
             int remaining = buffer.remaining();
             int written = 0;
 
-            while (remaining < len) {
+            while (remaining < len - written) {
                 buffer.put(cbuf, off + written, remaining);
                 written += remaining;
                 flush();
@@ -799,11 +851,23 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         @Override
         public void flush() throws IOException {
+            if (closed) {
+                throw new IllegalStateException(
+                        sm.getString("wsRemoteEndpoint.closedWriter"));
+            }
+
             doWrite(false);
         }
 
         @Override
         public void close() throws IOException {
+            synchronized (closeLock) {
+                if (closed) {
+                    return;
+                }
+                closed = true;
+            }
+
             doWrite(true);
         }
 
