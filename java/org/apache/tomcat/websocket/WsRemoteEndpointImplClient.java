@@ -49,8 +49,8 @@ public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
         }
         SendHandlerToCompletionHandler sh2ch =
                 new SendHandlerToCompletionHandler(handler);
-        channel.write(data, 0, data.length, getSendTimeout(),
-                TimeUnit.MILLISECONDS, null, sh2ch);
+        channel.write(data, 0, data.length, timeout, TimeUnit.MILLISECONDS,
+                null, sh2ch);
     }
 
     @Override
