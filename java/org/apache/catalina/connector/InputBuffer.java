@@ -210,6 +210,7 @@ public class InputBuffer extends Reader
 
         gotEnc = false;
         enc = null;
+        listener = null;
 
     }
 
@@ -251,6 +252,7 @@ public class InputBuffer extends Reader
 
     private volatile ReadListener listener;
     public void setReadListener(ReadListener listener) {
+        if (getReadListener()!=null) throw new IllegalStateException("Read listener already set.");
         this.listener = listener;
         coyoteRequest.action(ActionCode.SET_READ_LISTENER, listener);
     }
