@@ -36,8 +36,8 @@ public abstract class PojoMessageHandlerPartialBase<T>
 
     public PojoMessageHandlerPartialBase(Object pojo, Method method,
             Session session, Object[] params, int indexPayload,
-            boolean unwrap, int indexBoolean, int indexSession) {
-        super(pojo, method, session, params, indexPayload, unwrap,
+            boolean convert, int indexBoolean, int indexSession) {
+        super(pojo, method, session, params, indexPayload, convert,
                 indexSession);
         this.indexBoolean = indexBoolean;
     }
@@ -52,7 +52,7 @@ public abstract class PojoMessageHandlerPartialBase<T>
         if (indexSession != -1) {
             parameters[indexSession] = session;
         }
-        if (unwrap) {
+        if (convert) {
             parameters[indexPayload] = ((ByteBuffer) message).array();
         } else {
             parameters[indexPayload] = message;

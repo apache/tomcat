@@ -18,7 +18,6 @@ package org.apache.tomcat.websocket.pojo;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
 
 import javax.websocket.DecodeException;
 import javax.websocket.MessageHandler;
@@ -42,8 +41,8 @@ public abstract class PojoMessageHandlerWholeBase<T>
 
     public PojoMessageHandlerWholeBase(Object pojo, Method method,
             Session session, Object[] params, int indexPayload,
-            boolean unwrap, int indexSession) {
-        super(pojo, method, session, params, indexPayload, unwrap,
+            boolean convert, int indexSession) {
+        super(pojo, method, session, params, indexPayload, convert,
                 indexSession);
     }
 
@@ -63,13 +62,9 @@ public abstract class PojoMessageHandlerWholeBase<T>
         }
 
         if (payload == null) {
-            // Not decoded. Unwrap if required. Unwrap only ever applies to
-            // ByteBuffers
-            if (unwrap) {
-                ByteBuffer bb = (ByteBuffer) message;
-                byte[] array = new byte[bb.remaining()];
-                bb.get(array);
-                payload = array;
+            // Not decoded. Convert if required.
+            if (convert) {
+                payload = convert(message);
             } else {
                 payload = message;
             }
@@ -88,6 +83,10 @@ public abstract class PojoMessageHandlerWholeBase<T>
             throw new IllegalArgumentException();
         }
         processResult(result);
+    }
+
+    protected Object convert(T message) {
+        return message;
     }
 
 

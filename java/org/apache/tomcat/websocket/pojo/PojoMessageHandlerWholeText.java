@@ -44,8 +44,8 @@ public class PojoMessageHandlerWholeText
 
     public PojoMessageHandlerWholeText(Object pojo, Method method,
             Session session, EndpointConfig config, Object[] params,
-            int indexPayload, boolean unwrap, int indexSession) {
-        super(pojo, method, session, params, indexPayload, unwrap,
+            int indexPayload, boolean convert, int indexSession) {
+        super(pojo, method, session, params, indexPayload, convert,
                 indexSession);
         try {
             for (Class<? extends Decoder> decoderClazz : config.getDecoders()) {
@@ -53,8 +53,7 @@ public class PojoMessageHandlerWholeText
                     Text<?> decoder = (Text<?>) decoderClazz.newInstance();
                     decoder.init(config);
                     decoders.add(decoder);
-                } else if (Decoder.TextStream.class.isAssignableFrom(
-                        decoderClazz)) {
+                } else if (TextStream.class.isAssignableFrom(decoderClazz)) {
                     TextStream<?> decoder =
                             (TextStream<?>) decoderClazz.newInstance();
                     decoder.init(config);
@@ -87,6 +86,12 @@ public class PojoMessageHandlerWholeText
             }
         }
         return null;
+    }
+
+
+    @Override
+    protected Object convert(String message) {
+        return new StringReader(message);
     }
 
 
