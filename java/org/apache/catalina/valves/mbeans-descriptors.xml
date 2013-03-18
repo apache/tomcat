@@ -84,11 +84,6 @@
                description="The prefix that is added to log file filenames"
                type="java.lang.String"/>
 
-    <attribute name="resolveHosts"
-               description="Resolve hosts"
-               is="true"
-               type="boolean"/>
-
     <attribute name="rotatable"
                description="Flag to indicate automatic log rotation."
                is="true"
@@ -252,11 +247,6 @@
     <attribute name="prefix"
                description="The prefix that is added to log file filenames"
                type="java.lang.String"/>
-
-    <attribute name="resolveHosts"
-               description="Resolve hosts"
-               is="true"
-               type="boolean"/>
 
     <attribute name="rotatable"
                description="Flag to indicate automatic log rotation."
