@@ -639,10 +639,13 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             }
 
             if (flushRequired) {
-                outputBuffer.flip();
-                endpoint.doWrite(this, outputBuffer);
                 flushRequired = false;
-                return;
+                outputBuffer.flip();
+                if (outputBuffer.remaining() == 0) {
+                    handler.onResult(new SendResult());
+                } else {
+                    endpoint.doWrite(this, outputBuffer);
+                }
             } else {
                 handler.onResult(new SendResult());
             }
