@@ -92,6 +92,10 @@
         headers to allow for buggy clients that quote values that RFC2617 states
         should not be quoted. (markt/kkolinko)
       </fix>
+      <fix>
+        Enable support for MBeans with multiple operations with the same name
+        but different signatures. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
