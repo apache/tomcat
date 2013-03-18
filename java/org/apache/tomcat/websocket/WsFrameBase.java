@@ -198,7 +198,12 @@ public abstract class WsFrameBase {
      */
     private boolean processRemainingHeader() throws IOException {
         // Ignore the 2 bytes already read. 4 for the mask
-        int headerLength = 4;
+        int headerLength;
+        if (isMasked()) {
+            headerLength = 4;
+        } else {
+            headerLength = 0;
+        }
         // Add additional bytes depending on length
         if (payloadLength == 126) {
             headerLength += 2;
