@@ -426,14 +426,18 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 String msg = ((Encoder.Text) encoder).encode(obj);
                 sendStringByCompletion(msg, completion);
             } else if (encoder instanceof Encoder.TextStream) {
-                Writer w = getSendWriter();
-                ((Encoder.TextStream) encoder).encode(obj, w);
+                try (Writer w = getSendWriter()) {
+                    ((Encoder.TextStream) encoder).encode(obj, w);
+                }
+                completion.onResult(new SendResult());
             } else if (encoder instanceof Encoder.Binary) {
                 ByteBuffer msg = ((Encoder.Binary) encoder).encode(obj);
                 sendBytesByCompletion(msg, completion);
             } else if (encoder instanceof Encoder.BinaryStream) {
-                OutputStream os = getSendStream();
-                ((Encoder.BinaryStream) encoder).encode(obj, os);
+                try (OutputStream os = getSendStream()) {
+                    ((Encoder.BinaryStream) encoder).encode(obj, os);
+                }
+                completion.onResult(new SendResult());
             } else {
                 throw new EncodeException(obj, sm.getString(
                         "wsRemoteEndpoint.noEncoder", obj.getClass()));
