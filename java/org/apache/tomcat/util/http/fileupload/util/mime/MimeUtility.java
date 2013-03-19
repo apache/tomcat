@@ -67,14 +67,14 @@ public final class MimeUtility {
 
     /**
      * Decode a string of text obtained from a mail header into
-     * it's proper form.  The text generally will consist of a
+     * its proper form.  The text generally will consist of a
      * string of tokens, some of which may be encoded using
      * base64 encoding.
      *
      * @param text   The text to decode.
      *
-     * @return The decoded test string.
-     * @throws UnsupportedEncodingException
+     * @return The decoded text string.
+     * @throws UnsupportedEncodingException if the detected encoding in the input text is not supported.
      */
     public static String decodeText(String text) throws UnsupportedEncodingException {
         // if the text contains any encoded tokens, those tokens will be marked with "=?".  If the
