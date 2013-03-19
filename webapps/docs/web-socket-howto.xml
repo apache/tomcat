@@ -58,9 +58,9 @@
 
 <p>There are also several example applications that demonstrate how the
    WebSocket API can be used. You'll need to look at both the client side <a
-   href="http://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/websocket/">
+   href="http://svn.apache.org/viewvc/tomcat/tc7.0.x/trunk/webapps/examples/websocket/">
    html</a> and the server side <a
-   href="http://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/WEB-INF/classes/websocket/">
+   href="http://svn.apache.org/viewvc/tomcat/tc7.0.x/trunk/webapps/examples/WEB-INF/classes/websocket/">
    code</a>.</p>
 
 <p>Do keep in mind that the API is fluid and is likely to change, possibly
