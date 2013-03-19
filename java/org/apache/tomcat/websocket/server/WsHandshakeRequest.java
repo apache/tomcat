@@ -35,37 +35,37 @@ import javax.websocket.server.HandshakeRequest;
  */
 public class WsHandshakeRequest implements HandshakeRequest {
 
+    private final URI requestUri;
+    private final Map<String,List<String>> parameterMap;
+    private final String queryString;
+    private final Principal userPrincipal;
+    private final Map<String,List<String>> headers;
+    private final Object httpSession;
+
     private volatile HttpServletRequest request;
 
+
     public WsHandshakeRequest(HttpServletRequest request) {
+
         this.request = request;
-    }
 
-    @Override
-    public URI getRequestURI() {
-        validate();
-        // Calculate every time as only likely to be zero or one calls
-        String queryString = request.getQueryString();
+        queryString = request.getQueryString();
+        userPrincipal = request.getUserPrincipal();
+        httpSession = request.getSession(false);
 
+        // URI
         StringBuffer sb = request.getRequestURL();
         if (queryString != null) {
             sb.append("?");
             sb.append(queryString);
         }
-        URI requestURI;
         try {
-            requestURI = new URI(sb.toString());
+            requestUri = new URI(sb.toString());
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
 
-        return requestURI;
-    }
-
-    @Override
-    public Map<String,List<String>> getParameterMap() {
-        validate();
-
+        // ParameterMap
         Map<String,String[]> originalParameters = request.getParameterMap();
         Map<String,List<String>> newParameters =
                 new HashMap<>(originalParameters.size());
@@ -74,26 +74,9 @@ public class WsHandshakeRequest implements HandshakeRequest {
                     Collections.unmodifiableList(
                             Arrays.asList(entry.getValue())));
         }
+        parameterMap = Collections.unmodifiableMap(newParameters);
 
-        return Collections.unmodifiableMap(newParameters);
-    }
-
-    @Override
-    public String getQueryString() {
-        validate();
-        return request.getQueryString();
-    }
-
-    @Override
-    public Principal getUserPrincipal() {
-        validate();
-        return request.getUserPrincipal();
-    }
-
-    @Override
-    public Map<String,List<String>> getHeaders() {
-        validate();
-
+        // Headers
         Map<String,List<String>> newHeaders = new HashMap<>();
 
         Enumeration<String> headerNames = request.getHeaderNames();
@@ -104,19 +87,46 @@ public class WsHandshakeRequest implements HandshakeRequest {
                     Collections.list(request.getHeaders(headerName))));
         }
 
-        return Collections.unmodifiableMap(newHeaders);
+        headers = Collections.unmodifiableMap(newHeaders);
+    }
+
+    @Override
+    public URI getRequestURI() {
+        return requestUri;
+    }
+
+    @Override
+    public Map<String,List<String>> getParameterMap() {
+        return parameterMap;
+    }
+
+    @Override
+    public String getQueryString() {
+        return queryString;
+    }
+
+    @Override
+    public Principal getUserPrincipal() {
+        return userPrincipal;
+    }
+
+    @Override
+    public Map<String,List<String>> getHeaders() {
+        return headers;
     }
 
     @Override
     public boolean isUserInRole(String role) {
-        validate();
+        if (request == null) {
+            throw new IllegalStateException();
+        }
+
         return request.isUserInRole(role);
     }
 
     @Override
     public Object getHttpSession() {
-        validate();
-        return request.getSession(false);
+        return httpSession;
     }
 
     /**
@@ -129,11 +139,5 @@ public class WsHandshakeRequest implements HandshakeRequest {
      */
     void finished() {
         request = null;
-    }
-
-    private void validate() {
-        if (request == null) {
-            throw new IllegalStateException();
-        }
     }
 }

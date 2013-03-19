@@ -145,6 +145,7 @@ public class WsServlet extends HttpServlet {
         WsHandshakeRequest wsRequest = new WsHandshakeRequest(req);
         WsHandshakeResponse wsResponse = new WsHandshakeResponse();
         sec.getConfigurator().modifyHandshake(sec, wsRequest, wsResponse);
+        wsRequest.finished();
 
         // Add any additional headers
         for (Entry<String,List<String>> entry :
