@@ -71,7 +71,7 @@ public class BackgroundProcessManager {
     public void unregister(BackgroundProcess process) {
         synchronized (processesLock) {
             processes.remove(process);
-            if (processes.size() == 0) {
+            if (wsBackgroundThread != null && processes.size() == 0) {
                 wsBackgroundThread.halt();
                 wsBackgroundThread = null;
             }

@@ -256,6 +256,10 @@ public class WsWebSocketContainer
 
 
     protected void registerSession(Class<?> endpoint, WsSession wsSession) {
+        if (!wsSession.isOpen()) {
+            // The session was closed during onOpen. No need to register it.
+            return;
+        }
         synchronized (endPointSessionMapLock) {
             if (endpointSessionMap.size() == 0) {
                 BackgroundProcessManager.getInstance().register(this);
