@@ -29,6 +29,8 @@ import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
+import org.apache.tomcat.util.ExceptionUtils;
+
 /**
  * Runs the Autobahn test suite in client mode for testing the WebSocket client
  * implementation.
@@ -52,7 +54,12 @@ public class TesterWsClientAutobahn {
             } else {
                 System.out.print('.');
             }
-            executeTestCase(wsc, testCase);
+            try {
+                executeTestCase(wsc, testCase);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                t.printStackTrace();
+            }
 
         }
         System.out.println("Testing complete");
