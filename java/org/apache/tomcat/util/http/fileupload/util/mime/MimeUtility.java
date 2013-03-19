@@ -31,9 +31,29 @@ import java.util.Map;
 public final class MimeUtility {
 
     /**
+     * The {@code US-ASCII} charset identifier constant.
+     */
+    private static final String US_ASCII_CHARSET = "US-ASCII";
+
+    /**
+     * The marker to indicate text is encoded with BASE64 algorithm.
+     */
+    private static final String BASE64_ENCODING_MARKER = "B";
+
+    /**
+     * The marker to indicate text is encoded with QuotedPrintable algorithm.
+     */
+    private static final String QUOTEDPRINTABLE_ENCODING_MARKER = "Q";
+
+    /**
      * If the text contains any encoded tokens, those tokens will be marked with "=?".
      */
     private static final String ENCODED_TOKEN_MARKER = "=?";
+
+    /**
+     * If the text contains any encoded tokens, those tokens will terminate with "=?".
+     */
+    private static final String ENCODED_TOKEN_FINISHER = "?=";
 
     /**
      * The linear whitespace chars sequence.
@@ -97,12 +117,12 @@ public final class MimeUtility {
             char ch = text.charAt(offset);
 
             // is this a whitespace character?
-            if (LINEAR_WHITESPACE.indexOf(ch) != -1) {
+            if (LINEAR_WHITESPACE.indexOf(ch) != -1) { // whitespace found
                 startWhiteSpace = offset;
                 while (offset < endOffset) {
                     // step over the white space characters.
                     ch = text.charAt(offset);
-                    if (LINEAR_WHITESPACE.indexOf(ch) != -1) {
+                    if (LINEAR_WHITESPACE.indexOf(ch) != -1) { // whitespace found
                         offset++;
                     } else {
                         // record the location of the first non lwsp and drop down to process the
@@ -116,9 +136,9 @@ public final class MimeUtility {
                 int wordStart = offset;
 
                 while (offset < endOffset) {
-                    // step over the white space characters.
+                    // step over the non white space characters.
                     ch = text.charAt(offset);
-                    if (LINEAR_WHITESPACE.indexOf(ch) == -1) {
+                    if (LINEAR_WHITESPACE.indexOf(ch) == -1) { // not white space
                         offset++;
                     } else {
                         break;
@@ -203,7 +223,7 @@ public final class MimeUtility {
         String encoding = word.substring(charsetPos + 1, encodingPos);
 
         // and finally the encoded text.
-        int encodedTextPos = word.indexOf("?=", encodingPos + 1);
+        int encodedTextPos = word.indexOf(ENCODED_TOKEN_FINISHER, encodingPos + 1);
         if (encodedTextPos == -1) {
             throw new ParseException("Missing encoded text in RFC 2047 encoded-word: " + word);
         }
@@ -219,13 +239,13 @@ public final class MimeUtility {
             // the decoder writes directly to an output stream.
             ByteArrayOutputStream out = new ByteArrayOutputStream(encodedText.length());
 
-            byte[] encodedData = encodedText.getBytes("US-ASCII");
+            byte[] encodedData = encodedText.getBytes(US_ASCII_CHARSET);
 
             // Base64 encoded?
-            if (encoding.equals("B")) {
-                Base64Decoder.decode(encodedData, 0, encodedData.length, out);
-            } else if (encoding.equals("Q")) { // maybe quoted printable.
-                QuotedPrintableDecoder.decode(encodedData, 0, encodedData.length, out);
+            if (encoding.equals(BASE64_ENCODING_MARKER)) {
+                Base64Decoder.decode(encodedData, out);
+            } else if (encoding.equals(QUOTEDPRINTABLE_ENCODING_MARKER)) { // maybe quoted printable.
+                QuotedPrintableDecoder.decode(encodedData, out);
             } else {
                 throw new UnsupportedEncodingException("Unknown RFC 2047 encoding: " + encoding);
             }

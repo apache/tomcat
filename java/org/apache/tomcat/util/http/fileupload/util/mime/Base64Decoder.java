@@ -82,17 +82,19 @@ final class Base64Decoder {
      * whitespace characters will be ignored.
      *
      * @param data the buffer containing the Base64-encoded data
-     * @param off the start offset (zero-based)
-     * @param length the number of bytes to convert
      * @param out the output stream to hold the decoded bytes
      *
      * @return the number of bytes produced.
      */
-    public static int decode(byte[] data, int off, int length, OutputStream out) throws IOException {
+    public static int decode(byte[] data, OutputStream out) throws IOException {
         byte    b1, b2, b3, b4;
         int        outLen = 0;
 
-        int        end = off + length;
+        if (data.length == 0) {
+            return outLen;
+        }
+
+        int        end = data.length;
 
         while (end > 0) {
             if (!ignore((char) data[end - 1])) {
@@ -102,7 +104,7 @@ final class Base64Decoder {
             end--;
         }
 
-        int  i = off;
+        int  i = 0;
         // CHECKSTYLE IGNORE MagicNumber FOR NEXT 1 LINE
         int  finish = end - 4; // last set of 4 bytes might include padding
 
@@ -158,12 +160,13 @@ final class Base64Decoder {
         if (p1 != PADDING) { // Nothing more to do if p1 == PADDING
             // CHECKSTYLE IGNORE MagicNumber FOR NEXT 1 LINE
             out.write((b2 << 4) | (b3 >> 2)); // 4 bits of b2 plus 4 bits of b3
-            outLen++;
-        } else if (p2 != PADDING) { // Nothing more to do if p2 == PADDING
-            b4 = DECODING_TABLE[p2];
-            // CHECKSTYLE IGNORE MagicNumber FOR NEXT 1 LINE
-            out.write((b3 << 6) | b4);        // 2 bits of b3 plus 6 bits of b4
-            outLen++;
+            outLen++; 
+            if (p2 != PADDING) { // Nothing more to do if p2 == PADDING
+                b4 = DECODING_TABLE[p2];
+                // CHECKSTYLE IGNORE MagicNumber FOR NEXT 1 LINE
+                out.write((b3 << 6) | b4);        // 2 bits of b3 plus 6 bits of b4
+                outLen++;
+            }
         }
 
         return outLen;
