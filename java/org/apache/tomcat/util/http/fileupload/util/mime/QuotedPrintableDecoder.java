@@ -33,19 +33,17 @@ final class QuotedPrintableDecoder {
     };
 
     /**
-     * The default number of byte shift for decode.
+     * The shift value required to create the upper nibble
+     * from the first of 2 byte values converted from ascii hex.
      */
-    private static final int OUT_SHIFT = 4;
+    private static final int UPPER_NIBBLE_SHIFT = Byte.SIZE / 2;
 
     /**
-     * the decoding table size.
+     * Set up the decoding table; this is indexed by a byte converted to an int,
+     * so must be at least as large as the number of different byte values,
+     * positive and negative and zero.
      */
-    private static final int DECODING_TABLE_SIZE = 128;
-
-    /**
-     * Set up the decoding table.
-     */
-    private static final byte[] DECODING_TABLE = new byte[DECODING_TABLE_SIZE];
+    private static final byte[] DECODING_TABLE = new byte[Byte.MAX_VALUE - Byte.MIN_VALUE + 1];
 
     static {
         // initialize the decoding table
@@ -62,7 +60,7 @@ final class QuotedPrintableDecoder {
     }
 
     /**
-     * Decode the unencoded byte data writing it to the given output stream.
+     * Decode the encoded byte data writing it to the given output stream.
      *
      * @param data   The array of byte data to decode.
      * @param off    Starting offset within the array.
@@ -72,7 +70,7 @@ final class QuotedPrintableDecoder {
      * @return the number of bytes produced.
      * @exception IOException
      */
-    public static int decodeWord(byte[] data, int off, int length, OutputStream out) throws IOException {
+    public static int decode(byte[] data, int off, int length, OutputStream out) throws IOException {
         int endOffset = off + length;
         int bytesWritten = 0;
 
@@ -103,7 +101,7 @@ final class QuotedPrintableDecoder {
                     // this is a hex pair we need to convert back to a single byte.
                     byte c1 = DECODING_TABLE[b1];
                     byte c2 = DECODING_TABLE[b2];
-                    out.write((c1 << OUT_SHIFT) | c2);
+                    out.write((c1 << UPPER_NIBBLE_SHIFT) | c2);
                     // 3 bytes in, one byte out
                     bytesWritten++;
                 }
