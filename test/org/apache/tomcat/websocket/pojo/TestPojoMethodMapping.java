@@ -20,7 +20,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.websocket.ClientEndpoint;
 import javax.websocket.ContainerProvider;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
@@ -37,6 +36,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.pojo.Util.ServerConfigListener;
+import org.apache.tomcat.websocket.pojo.Util.SimpleClient;
 import org.apache.tomcat.websocket.pojo.Util.SingletonConfigurator;
 
 public class TestPojoMethodMapping extends TomcatBaseTest {
@@ -65,7 +65,7 @@ public class TestPojoMethodMapping extends TomcatBaseTest {
 
         tomcat.start();
 
-        Client client = new Client();
+        SimpleClient client = new SimpleClient();
         URI uri = new URI("ws://localhost:" + getPort() + "/" + PARAM_ONE +
                 "/" + PARAM_TWO + "/" + PARAM_THREE);
 
@@ -93,11 +93,6 @@ public class TestPojoMethodMapping extends TomcatBaseTest {
             System.err.println(error);
         }
         Assert.assertEquals("Found errors", 0, errors.size());
-    }
-
-
-    @ClientEndpoint
-    public static final class Client {
     }
 
 

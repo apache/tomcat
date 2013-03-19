@@ -17,6 +17,7 @@
 package org.apache.tomcat.websocket.pojo;
 
 import javax.servlet.ServletContextEvent;
+import javax.websocket.ClientEndpoint;
 import javax.websocket.DeploymentException;
 import javax.websocket.server.ServerEndpointConfig.Configurator;
 
@@ -62,5 +63,10 @@ public class Util {
             T result = (T) instance;
             return result;
         }
+    }
+
+
+    @ClientEndpoint
+    public static final class SimpleClient {
     }
 }
