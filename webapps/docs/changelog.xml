@@ -79,7 +79,7 @@
       </add>
       <update>
         Update Tomcat's internal copy of Commons FileUpload to FileUpload trunk,
-        revision 1458080 and the associated extract from Commons IO to 2.4.
+        revision 1458500 and the associated extract from Commons IO to 2.4.
         (markt)
       </update>
       <fix>
