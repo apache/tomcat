@@ -17,16 +17,12 @@
 package org.apache.tomcat.websocket.server;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +41,7 @@ import javax.websocket.server.ServerEndpointConfig;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.tomcat.websocket.Constants;
-import org.apache.tomcat.websocket.WsRequest;
+import org.apache.tomcat.websocket.WsHandshakeResponse;
 import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
 
 /**
@@ -145,42 +141,22 @@ public class WsServlet extends HttpServlet {
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ServletException(e);
         }
-        WsRequest wsRequest = createWsRequest(req);
+
+        WsHandshakeRequest wsRequest = new WsHandshakeRequest(req);
+        WsHandshakeResponse wsResponse = new WsHandshakeResponse();
+        sec.getConfigurator().modifyHandshake(sec, wsRequest, wsResponse);
+
+        // Add any additional headers
+        for (Entry<String,List<String>> entry :
+                wsResponse.getHeaders().entrySet()) {
+            for (String headerValue: entry.getValue()) {
+                resp.addHeader(entry.getKey(), headerValue);
+            }
+        }
+
         HttpUpgradeHandler wsHandler = new WsProtocolHandler(ep, sec, sc,
                 wsRequest, subProtocol, pathParameters, req.isSecure());
         req.upgrade(wsHandler);
-    }
-
-
-    private WsRequest createWsRequest(HttpServletRequest req)
-            throws ServletException {
-
-        String queryString = req.getQueryString();
-
-        StringBuffer sb = req.getRequestURL();
-        if (queryString != null) {
-            sb.append("?");
-            sb.append(queryString);
-        }
-        URI requestURI;
-        try {
-            requestURI = new URI(sb.toString());
-        } catch (URISyntaxException e) {
-            throw new ServletException(e);
-        }
-
-        Map<String,String[]> originalParameters = req.getParameterMap();
-        Map<String,List<String>> newParameters = new HashMap<>();
-        for (Entry<String,String[]> entry : originalParameters.entrySet()) {
-            newParameters.put(entry.getKey(),
-                    Collections.unmodifiableList(
-                            Arrays.asList(entry.getValue())));
-        }
-        Map<String,List<String>> parameterMap =
-                Collections.unmodifiableMap(newParameters);
-
-        return new WsRequest(requestURI, parameterMap, queryString,
-                req.getUserPrincipal());
     }
 
 

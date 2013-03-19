@@ -239,8 +239,10 @@ public class WsWebSocketContainer
 
 
         WsSession wsSession = new WsSession(endpoint, wsRemoteEndpointClient,
-                this, null, subProtocol, Collections.EMPTY_MAP, false,
-                clientEndpointConfiguration.getEncoders());
+                this, null, null, null, null, subProtocol,
+                Collections.EMPTY_MAP, false,
+                clientEndpointConfiguration.getEncoders(),
+                clientEndpointConfiguration.getUserProperties());
         endpoint.onOpen(wsSession, clientEndpointConfiguration);
         registerSession(endpoint.getClass(), wsSession);
 
@@ -553,21 +555,6 @@ public class WsWebSocketContainer
     public void setAsyncSendTimeout(long timeout) {
         this.defaultAsyncTimeout = timeout;
     }
-
-    private static class WsHandshakeResponse implements HandshakeResponse {
-
-        private final Map<String,List<String>> headers;
-
-        public WsHandshakeResponse(Map<String,List<String>> headers) {
-            this.headers = headers;
-        }
-
-        @Override
-        public Map<String,List<String>> getHeaders() {
-            return headers;
-        }
-    }
-
 
     // ----------------------------------------------- BackgroundProcess methods
 

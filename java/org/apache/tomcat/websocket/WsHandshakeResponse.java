@@ -16,42 +16,32 @@
  */
 package org.apache.tomcat.websocket;
 
-import java.net.URI;
-import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.websocket.HandshakeResponse;
+
 /**
- * Represents the request that this session was opened under.
+ * Represents the response to a WebSocket handshake.
  */
-public class WsRequest {
+public class WsHandshakeResponse implements HandshakeResponse {
 
-    private final URI requestURI;
-    private final Map<String,List<String>> parameterMap;
-    private final String queryString;
-    private final Principal userPrincipal;
+    private final Map<String,List<String>> headers;
 
-    public WsRequest(URI requestURI, Map<String,List<String>> parameterMap,
-            String queryString, Principal userPrincipal) {
-        this.requestURI = requestURI;
-        this.parameterMap = parameterMap;
-        this.queryString = queryString;
-        this.userPrincipal = userPrincipal;
+
+    public WsHandshakeResponse() {
+        this(new HashMap<String,List<String>>());
     }
 
-    public URI getRequestURI() {
-        return requestURI;
+
+    public WsHandshakeResponse(Map<String,List<String>> headers) {
+        this.headers = headers;
     }
 
-    public Map<String,List<String>> getRequestParameterMap() {
-        return parameterMap;
-    }
 
-    public String getQueryString() {
-        return queryString;
-    }
-
-    public Principal getUserPrincipal() {
-        return userPrincipal;
+    @Override
+    public Map<String,List<String>> getHeaders() {
+        return headers;
     }
 }
