@@ -74,6 +74,7 @@ public abstract class WsFrameBase {
 
     // Attributes tracking state
     private State state = State.NEW_FRAME;
+    private boolean closed = false;
     private int readPos = 0;
     protected int writePos = 0;
 
@@ -93,6 +94,9 @@ public abstract class WsFrameBase {
             wsSession.updateLastActive();
 
             if (state == State.NEW_FRAME) {
+                if (closed) {
+                    throw new IOException(sm.getString("wsFrame.closed"));
+                }
                 if (!processInitialHeader()) {
                     break;
                 }
@@ -261,6 +265,7 @@ public abstract class WsFrameBase {
         }
         controlBufferBinary.flip();
         if (opCode == Constants.OPCODE_CLOSE) {
+            closed = true;
             String reason = null;
             int code = CloseCodes.NORMAL_CLOSURE.getCode();
             if (controlBufferBinary.remaining() == 1) {
