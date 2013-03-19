@@ -33,9 +33,10 @@ final class QuotedPrintableDecoder {
     };
 
     /**
-     * The default number of byte shift for decode.
+     * The shift value required to create the upper nibble
+     * from the first of 2 byte values converted from ascii hex.
      */
-    private static final int OUT_SHIFT = 4;
+    private static final int UPPER_NIBBLE_SHIFT = Byte.SIZE / 2;
 
     /**
      * Set up the decoding table; this is indexed by a byte converted to an int,
@@ -59,7 +60,7 @@ final class QuotedPrintableDecoder {
     }
 
     /**
-     * Decode the unencoded byte data writing it to the given output stream.
+     * Decode the encoded byte data writing it to the given output stream.
      *
      * @param data   The array of byte data to decode.
      * @param off    Starting offset within the array.
@@ -100,7 +101,7 @@ final class QuotedPrintableDecoder {
                     // this is a hex pair we need to convert back to a single byte.
                     byte c1 = DECODING_TABLE[b1];
                     byte c2 = DECODING_TABLE[b2];
-                    out.write((c1 << OUT_SHIFT) | c2);
+                    out.write((c1 << UPPER_NIBBLE_SHIFT) | c2);
                     // 3 bytes in, one byte out
                     bytesWritten++;
                 }

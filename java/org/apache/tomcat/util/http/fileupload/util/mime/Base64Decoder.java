@@ -35,8 +35,7 @@ final class Base64Decoder {
         (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd', (byte) 'e', (byte) 'f', (byte) 'g',
         (byte) 'h', (byte) 'i', (byte) 'j', (byte) 'k', (byte) 'l', (byte) 'm', (byte) 'n',
         (byte) 'o', (byte) 'p', (byte) 'q', (byte) 'r', (byte) 's', (byte) 't', (byte) 'u',
-        (byte) 'v',
-        (byte) 'w', (byte) 'x', (byte) 'y', (byte) 'z',
+        (byte) 'v', (byte) 'w', (byte) 'x', (byte) 'y', (byte) 'z',
         (byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4', (byte) '5', (byte) '6',
         (byte) '7', (byte) '8', (byte) '9',
         (byte) '+', (byte) '/'
@@ -69,9 +68,10 @@ final class Base64Decoder {
 
     /**
      * Checks if the input char must be skipped from the decode.
+     * The method skips whitespace characters LF, CR, horizontal tab and space.
      *
-     * @param c the char has to be checked.
-     * @return true, if the input char has to be checked, false otherwise.
+     * @param c the char to be checked.
+     * @return true, if the input char has to be skipped, false otherwise.
      */
     private static boolean ignore(char c) {
         return (c == '\n' || c == '\r' || c == '\t' || c == ' ');
@@ -80,6 +80,11 @@ final class Base64Decoder {
     /**
      * Decode the base 64 encoded byte data writing it to the given output stream,
      * whitespace characters will be ignored.
+     *
+     * @param data the buffer containing the Base64-encoded data
+     * @param off the start offset (zero-based)
+     * @param length the number of bytes to convert
+     * @param out the output stream to hold the decoded bytes
      *
      * @return the number of bytes produced.
      */
