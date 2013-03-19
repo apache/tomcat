@@ -300,7 +300,7 @@ public abstract class FileUploadBase {
                     throw (FileUploadException) e.getCause();
                 } catch (IOException e) {
                     throw new IOFileUploadException(
-                            String.format("Processing of %s request failed. ",
+                            String.format("Processing of %s request failed. %s",
                                     MULTIPART_FORM_DATA, e.getMessage()), e);
                 }
                 final FileItemHeaders fih = item.getHeaders();
