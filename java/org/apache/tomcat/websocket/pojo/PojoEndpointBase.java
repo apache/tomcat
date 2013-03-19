@@ -58,22 +58,26 @@ public abstract class PojoEndpointBase extends Endpoint {
                 methodMapping.getOnOpen().invoke(pojo,
                         methodMapping.getOnOpenArgs(pathParameters, session));
 
-                for (MessageHandler mh : methodMapping.getMessageHandlers(pojo,
-                        pathParameters, session, config)) {
-                    session.addMessageHandler(mh);
-                }
             } catch (IllegalAccessException e) {
                 // Reflection related problems
                 log.error(sm.getString(
                         "pojoEndpointBase.onOpenFail",
                         pojo.getClass().getName()), e);
                 handleOnOpenError(session, e);
+                return;
             } catch (InvocationTargetException e) {
                 Throwable cause = e.getCause();
                 handleOnOpenError(session, cause);
+                return;
             } catch (Throwable t) {
                 handleOnOpenError(session, t);
+                return;
             }
+        }
+
+        for (MessageHandler mh : methodMapping.getMessageHandlers(pojo,
+                pathParameters, session, config)) {
+            session.addMessageHandler(mh);
         }
     }
 
