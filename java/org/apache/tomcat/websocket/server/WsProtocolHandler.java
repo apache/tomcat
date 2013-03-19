@@ -32,9 +32,6 @@ import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsIOException;
 import org.apache.tomcat.websocket.WsSession;
 
@@ -42,11 +39,6 @@ import org.apache.tomcat.websocket.WsSession;
  * Servlet 3.1 HTTP upgrade handler for WebSocket connections.
  */
 public class WsProtocolHandler implements HttpUpgradeHandler {
-
-    private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
-    private static final Log log =
-            LogFactory.getLog(WsProtocolHandler.class);
 
     private final Endpoint ep;
     private final EndpointConfig endpointConfig;
@@ -132,13 +124,15 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
 
 
     private void close(CloseReason cr) {
-        try {
-            wsSession.close(cr);
-        } catch (IOException e) {
-            if (log.isInfoEnabled()) {
-                log.info(sm.getString("wsProtocolHandler.closeFailed"), e);
-            }
-        }
+        /*
+         * Any call to this method is a result of a problem reading from the
+         * client. At this point that state of the connection is unknown.
+         * Attempt to send a close frame to the client and then close the socket
+         * immediately. There is no point in waiting for a close frame from the
+         * client because there is no guarantee that we can recover from
+         * whatever messed up state the client put the connection into.
+         */
+        wsSession.onClose(cr);
     }
 
 
