@@ -31,6 +31,11 @@ import java.util.Map;
 public final class MimeUtility {
 
     /**
+     * If the text contains any encoded tokens, those tokens will be marked with "=?".
+     */
+    private static final String ENCODED_TOKEN_MARKER = "=?";
+
+    /**
      * The linear whitespace chars sequence.
      */
     private static final String LINEAR_WHITESPACE = " \t\r\n";
@@ -63,19 +68,19 @@ public final class MimeUtility {
 
     /**
      * Decode a string of text obtained from a mail header into
-     * it's proper form.  The text generally will consist of a
+     * its proper form.  The text generally will consist of a
      * string of tokens, some of which may be encoded using
      * base64 encoding.
      *
      * @param text   The text to decode.
      *
-     * @return The decoded test string.
-     * @throws UnsupportedEncodingException
+     * @return The decoded text string.
+     * @throws UnsupportedEncodingException if the detected encoding in the input text is not supported.
      */
     public static String decodeText(String text) throws UnsupportedEncodingException {
         // if the text contains any encoded tokens, those tokens will be marked with "=?".  If the
         // source string doesn't contain that sequent, no decoding is required.
-        if (text.indexOf("=?") < 0) {
+        if (text.indexOf(ENCODED_TOKEN_MARKER) < 0) {
             return text;
         }
 
@@ -85,7 +90,7 @@ public final class MimeUtility {
         int startWhiteSpace = -1;
         int endWhiteSpace = -1;
 
-        StringBuffer decodedText = new StringBuffer(text.length());
+        StringBuilder decodedText = new StringBuilder(text.length());
 
         boolean previousTokenEncoded = false;
 
@@ -125,7 +130,7 @@ public final class MimeUtility {
                 // pull out the word token.
                 String word = text.substring(wordStart, offset);
                 // is the token encoded?  decode the word
-                if (word.startsWith("=?")) {
+                if (word.startsWith(ENCODED_TOKEN_MARKER)) {
                     try {
                         // if this gives a parsing failure, treat it like a non-encoded word.
                         String decodedWord = decodeWord(word);
@@ -178,7 +183,7 @@ public final class MimeUtility {
         // encoded words start with the characters "=?".  If this not an encoded word, we throw a
         // ParseException for the caller.
 
-        if (!word.startsWith("=?")) {
+        if (!word.startsWith(ENCODED_TOKEN_MARKER)) {
             throw new ParseException("Invalid RFC 2047 encoded-word: " + word);
         }
 
@@ -221,7 +226,7 @@ public final class MimeUtility {
             if (encoding.equals("B")) {
                 Base64Decoder.decode(encodedData, 0, encodedData.length, out);
             } else if (encoding.equals("Q")) { // maybe quoted printable.
-                QuotedPrintableDecoder.decodeWord(encodedData, 0, encodedData.length, out);
+                QuotedPrintableDecoder.decode(encodedData, 0, encodedData.length, out);
             } else {
                 throw new UnsupportedEncodingException("Unknown RFC 2047 encoding: " + encoding);
             }
