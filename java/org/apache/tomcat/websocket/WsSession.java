@@ -345,8 +345,10 @@ public class WsSession implements Session {
 
     /**
      * Called when a close message is received. Should only ever happen once.
+     * Also called after a protocol error when the ProtocolHandler needs to
+     * force the closing of the connection.
      */
-    void onClose(CloseReason closeReason) {
+    public void onClose(CloseReason closeReason) {
 
         boolean sendCloseMessage = false;
 
