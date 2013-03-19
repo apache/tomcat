@@ -80,7 +80,7 @@ base-maven.loc=http://repo2.maven.org/maven2
 # - log4j
 # - logkit
 # - servletapi
-commons-logging.version=1.1.1
+commons-logging.version=1.1.2
 commons-logging.home=${base.path}/commons-logging-${commons-logging.version}
 commons-logging-src.loc.1=${base-commons.loc.1}/logging/source/commons-logging-${commons-logging.version}-src.tar.gz
 commons-logging-src.loc.2=${base-commons.loc.2}/logging/source/commons-logging-${commons-logging.version}-src.tar.gz
