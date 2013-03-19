@@ -1123,7 +1123,7 @@
       failonerror="false"/>
     <copy file="${jdt.jar}" todir="${tomcat.embed}" />
 
-    <!-- Note the meta-int below will work as long as there is only one JAR
+    <!-- Note the meta-inf below will work as long as there is only one JAR
          that needs to add entries. If there is more than one a more complex
          solution will be required. -->
     <jarIt jarfile="${tomcat-embed-core.jar}"
