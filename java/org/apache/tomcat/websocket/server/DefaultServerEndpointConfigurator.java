@@ -16,10 +16,8 @@
  */
 package org.apache.tomcat.websocket.server;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.websocket.Extension;
 import javax.websocket.HandshakeResponse;
@@ -71,39 +69,6 @@ public class DefaultServerEndpointConfigurator
 
     @Override
     public boolean checkOrigin(String originHeaderValue) {
-        return true;
-    }
-
-    @Override
-    public boolean matchesURI(String path, URI requestUri,
-            Map<String, String> templateExpansion) {
-
-        String requestPath = requestUri.getPath();
-
-        if (path.indexOf('{') == -1) {
-            // Simple case - not a template
-            return requestPath.equals(path);
-        }
-
-        String servletPath = WsServerContainer.getServletPath(path);
-        if (!requestPath.startsWith(servletPath)) {
-            return false;
-        }
-
-        Map<String,String> params;
-        try {
-            params = WsServerContainer.getServerContainer().getPathParameters(
-                    servletPath, requestPath.substring(servletPath.length()));
-        } catch (IllegalArgumentException iae) {
-            return false;
-        }
-
-        if (params.size() == 0) {
-            return false;
-        }
-
-        templateExpansion.putAll(params);
-
         return true;
     }
 

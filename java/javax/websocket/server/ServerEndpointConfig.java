@@ -16,11 +16,9 @@
  */
 package javax.websocket.server;
 
-import java.net.URI;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.ServiceLoader;
 
 import javax.websocket.Decoder;
@@ -187,23 +185,14 @@ public interface ServerEndpointConfig extends EndpointConfig {
             return fetchContainerDefaultConfigurator().getNegotiatedSubprotocol(supported, requested);
         }
 
-
         public List<Extension> getNegotiatedExtensions(List<Extension> installed,
                 List<Extension> requested) {
             return fetchContainerDefaultConfigurator().getNegotiatedExtensions(installed, requested);
         }
 
-
         public boolean checkOrigin(String originHeaderValue) {
             return fetchContainerDefaultConfigurator().checkOrigin(originHeaderValue);
         }
-
-
-        public boolean matchesURI(String path, URI requestUri,
-                Map<String, String> templateExpansion) {
-            return fetchContainerDefaultConfigurator().matchesURI(path, requestUri, templateExpansion);
-        }
-
 
         public void modifyHandshake(ServerEndpointConfig sec,
                 HandshakeRequest request, HandshakeResponse response) {
