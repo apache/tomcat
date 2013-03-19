@@ -125,7 +125,7 @@
       <fix>
         <bug>54708</bug>: Change the name of the working directory for the ROOT
         application (located under $CATALINA_BASE/work by default) from _ to
-        ROOT. (markt) 
+        ROOT. (markt)
       </fix>
     </changelog>
   </subsection>
