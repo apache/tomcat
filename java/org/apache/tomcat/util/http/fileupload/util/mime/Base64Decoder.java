@@ -25,26 +25,6 @@ import java.io.OutputStream;
 final class Base64Decoder {
 
     /**
-     * Bytes per undecoded block.
-     */
-    private static final int BYTES_PER_UNENCODED_BLOCK = 3;
-
-    /**
-     * 2 bits mask.
-     */
-    private static final int MASK_2BITS = 2;
-
-    /**
-     * 4 bits mask.
-     */
-    private static final int MASK_4BITS = 4;
-
-    /**
-     * 6 bits mask.
-     */
-    private static final int MASK_6BITS = 6;
-
-    /**
      * Set up the encoding table.
      */
     private static final byte[] ENCODING_TABLE = {
@@ -68,14 +48,11 @@ final class Base64Decoder {
     private static final byte PADDING = (byte) '=';
 
     /**
-     * The decoding table size.
+     * Set up the decoding table; this is indexed by a byte converted to an int,
+     * so must be at least as large as the number of different byte values,
+     * positive and negative and zero.
      */
-    private static final int DECODING_TABLE_SIZE = 256;
-
-    /**
-     * Set up the decoding table.
-     */
-    private static final byte[] DECODING_TABLE = new byte[DECODING_TABLE_SIZE];
+    private static final byte[] DECODING_TABLE = new byte[Byte.MAX_VALUE - Byte.MIN_VALUE + 1];
 
     static {
         for (int i = 0; i < ENCODING_TABLE.length; i++) {
@@ -121,7 +98,8 @@ final class Base64Decoder {
         }
 
         int  i = off;
-        int  finish = end - MASK_4BITS;
+        // CHECKSTYLE IGNORE MagicNumber FOR NEXT 1 LINE
+        int  finish = end - 4; // last set of 4 bytes might include padding
 
         while (i < finish) {
             while ((i < finish) && ignore((char) data[i])) {
@@ -148,40 +126,39 @@ final class Base64Decoder {
 
             b4 = DECODING_TABLE[data[i++]];
 
-            out.write((b1 << MASK_2BITS) | (b2 >> MASK_4BITS));
-            out.write((b2 << MASK_4BITS) | (b3 >> MASK_2BITS));
-            out.write((b3 << MASK_6BITS) | b4);
+            // Convert 4 6-bit bytes to 3 8-bit bytes
+            // CHECKSTYLE IGNORE MagicNumber FOR NEXT 3 LINES
+            out.write((b1 << 2) | (b2 >> 4)); // 6 bits of b1 plus 2 bits of b2
+            out.write((b2 << 4) | (b3 >> 2)); // 4 bits of b2 plus 4 bits of b3
+            out.write((b3 << 6) | b4);        // 2 bits of b3 plus 6 bits of b4
 
-            outLen += BYTES_PER_UNENCODED_BLOCK;
+            // CHECKSTYLE IGNORE MagicNumber FOR NEXT 1 LINE
+            outLen += 3;
         }
 
-        if (data[end - MASK_2BITS] == PADDING) {
-            b1 = DECODING_TABLE[data[end - MASK_4BITS]];
-            b2 = DECODING_TABLE[data[end - BYTES_PER_UNENCODED_BLOCK]];
+        // Get the last 4 bytes; only last two can be padding
+        b1 = DECODING_TABLE[data[i++]];
+        b2 = DECODING_TABLE[data[i++]];
 
-            out.write((b1 << MASK_2BITS) | (b2 >> MASK_4BITS));
+        // always write the first byte
+        // CHECKSTYLE IGNORE MagicNumber FOR NEXT 1 LINE
+        out.write((b1 << 2) | (b2 >> 4)); // 6 bits of b1 plus 2 bits of b2
+        outLen++;
 
-            outLen += 1;
-        } else if (data[end - 1] == PADDING) {
-            b1 = DECODING_TABLE[data[end - MASK_4BITS]];
-            b2 = DECODING_TABLE[data[end - BYTES_PER_UNENCODED_BLOCK]];
-            b3 = DECODING_TABLE[data[end - MASK_2BITS]];
+        byte p1 = data[i++];
+        byte p2 = data[i++];
 
-            out.write((b1 << MASK_2BITS) | (b2 >> MASK_4BITS));
-            out.write((b2 << MASK_4BITS) | (b3 >> MASK_2BITS));
+        b3 = DECODING_TABLE[p1]; // may be needed later
 
-            outLen += MASK_2BITS;
-        } else {
-            b1 = DECODING_TABLE[data[end - MASK_4BITS]];
-            b2 = DECODING_TABLE[data[end - BYTES_PER_UNENCODED_BLOCK]];
-            b3 = DECODING_TABLE[data[end - MASK_2BITS]];
-            b4 = DECODING_TABLE[data[end - 1]];
-
-            out.write((b1 << MASK_2BITS) | (b2 >> MASK_4BITS));
-            out.write((b2 << MASK_4BITS) | (b3 >> MASK_2BITS));
-            out.write((b3 << MASK_6BITS) | b4);
-
-            outLen += BYTES_PER_UNENCODED_BLOCK;
+        if (p1 != PADDING) { // Nothing more to do if p1 == PADDING
+            // CHECKSTYLE IGNORE MagicNumber FOR NEXT 1 LINE
+            out.write((b2 << 4) | (b3 >> 2)); // 4 bits of b2 plus 4 bits of b3
+            outLen++;
+        } else if (p2 != PADDING) { // Nothing more to do if p2 == PADDING
+            b4 = DECODING_TABLE[p2];
+            // CHECKSTYLE IGNORE MagicNumber FOR NEXT 1 LINE
+            out.write((b3 << 6) | b4);        // 2 bits of b3 plus 6 bits of b4
+            outLen++;
         }
 
         return outLen;

@@ -225,7 +225,7 @@ public final class MimeUtility {
             if (encoding.equals("B")) {
                 Base64Decoder.decode(encodedData, 0, encodedData.length, out);
             } else if (encoding.equals("Q")) { // maybe quoted printable.
-                QuotedPrintableDecoder.decodeWord(encodedData, 0, encodedData.length, out);
+                QuotedPrintableDecoder.decode(encodedData, 0, encodedData.length, out);
             } else {
                 throw new UnsupportedEncodingException("Unknown RFC 2047 encoding: " + encoding);
             }

@@ -38,14 +38,11 @@ final class QuotedPrintableDecoder {
     private static final int OUT_SHIFT = 4;
 
     /**
-     * the decoding table size.
+     * Set up the decoding table; this is indexed by a byte converted to an int,
+     * so must be at least as large as the number of different byte values,
+     * positive and negative and zero.
      */
-    private static final int DECODING_TABLE_SIZE = 128;
-
-    /**
-     * Set up the decoding table.
-     */
-    private static final byte[] DECODING_TABLE = new byte[DECODING_TABLE_SIZE];
+    private static final byte[] DECODING_TABLE = new byte[Byte.MAX_VALUE - Byte.MIN_VALUE + 1];
 
     static {
         // initialize the decoding table
@@ -72,7 +69,7 @@ final class QuotedPrintableDecoder {
      * @return the number of bytes produced.
      * @exception IOException
      */
-    public static int decodeWord(byte[] data, int off, int length, OutputStream out) throws IOException {
+    public static int decode(byte[] data, int off, int length, OutputStream out) throws IOException {
         int endOffset = off + length;
         int bytesWritten = 0;
 
