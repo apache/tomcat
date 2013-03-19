@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket.pojo;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +29,7 @@ import javax.websocket.Session;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -55,18 +57,39 @@ public abstract class PojoEndpointBase extends Endpoint {
             try {
                 methodMapping.getOnOpen().invoke(pojo,
                         methodMapping.getOnOpenArgs(pathParameters, session));
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new IllegalArgumentException(sm.getString(
+
+                for (MessageHandler mh : methodMapping.getMessageHandlers(pojo,
+                        pathParameters, session, config)) {
+                    session.addMessageHandler(mh);
+                }
+            } catch (IllegalAccessException e) {
+                // Reflection related problems
+                log.error(sm.getString(
                         "pojoEndpointBase.onOpenFail",
                         pojo.getClass().getName()), e);
+                handleOnOpenError(session, e);
+            } catch (InvocationTargetException e) {
+                Throwable cause = e.getCause();
+                handleOnOpenError(session, cause);
+            } catch (Throwable t) {
+                handleOnOpenError(session, t);
             }
-        }
-        for (MessageHandler mh : methodMapping.getMessageHandlers(pojo,
-                pathParameters, session, config)) {
-            session.addMessageHandler(mh);
         }
     }
 
+
+    private void handleOnOpenError(Session session, Throwable t) {
+        // If really fatal - re-throw
+        ExceptionUtils.handleThrowable(t);
+
+        // Trigger the error handler and close the session
+        onError(session, t);
+        try {
+            session.close();
+        } catch (IOException ioe) {
+            log.warn(sm.getString("pojoEndpointBase.closeSessionFail"), ioe);
+        }
+    }
 
     @Override
     public final void onClose(Session session, CloseReason closeReason) {
@@ -75,10 +98,10 @@ public abstract class PojoEndpointBase extends Endpoint {
             try {
                 methodMapping.getOnClose().invoke(pojo,
                         methodMapping.getOnCloseArgs(pathParameters, session, closeReason));
-            } catch (IllegalAccessException | IllegalArgumentException
-                    | InvocationTargetException e) {
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 log.error(sm.getString("pojoEndpointBase.onCloseFail",
-                        pojo.getClass().getName()), e);
+                        pojo.getClass().getName()), t);
             }
         }
 
@@ -101,10 +124,10 @@ public abstract class PojoEndpointBase extends Endpoint {
                         pojo,
                         methodMapping.getOnErrorArgs(pathParameters, session,
                                 throwable));
-            } catch (IllegalAccessException | IllegalArgumentException
-                    | InvocationTargetException e) {
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 log.error(sm.getString("pojoEndpointBase.onErrorFail",
-                        pojo.getClass().getName()), e);
+                        pojo.getClass().getName()), t);
             }
         }
     }
