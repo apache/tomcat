@@ -108,6 +108,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <update>
+        Correct Deployer, Manager and Context pages of Tomcat documentation.
+        (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
@@ -124,12 +132,13 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="Web applications">
+  <subsection name="Other">
     <changelog>
-      <update>
-        Correct Deployer, Manager and Context pages of Tomcat documentation.
-        (kkolinko)
-      </update>
+      <fix>
+        Update to Apache Commons Daemon 1.0.14 to resolve <bug>54609</bug>
+        which meant that installation of Windows service could fail
+        producing incorrect service launch command. (mturk)
+      </fix>
     </changelog>
   </subsection>
 </section>
@@ -454,7 +463,7 @@
   <subsection name="Other">
     <changelog>
       <update>
-        Update to Commons Daemon 1.0.12. (markt)
+        Update to Apache Commons Daemon 1.0.12. (markt)
       </update>
     </changelog>
   </subsection>
