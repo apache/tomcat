@@ -138,6 +138,7 @@ public class WsSession implements Session {
 
     @Override
     public WebSocketContainer getContainer() {
+        checkState();
         return webSocketContainer;
     }
 
@@ -145,6 +146,9 @@ public class WsSession implements Session {
     @SuppressWarnings("unchecked")
     @Override
     public void addMessageHandler(MessageHandler listener) {
+
+        checkState();
+
         Type t = Util.getMessageType(listener);
 
         if (t.equals(String.class)) {
@@ -180,6 +184,7 @@ public class WsSession implements Session {
 
     @Override
     public Set<MessageHandler> getMessageHandlers() {
+        checkState();
         Set<MessageHandler> result = new HashSet<>();
         if (binaryMessageHandler != null) {
             result.add(binaryMessageHandler);
@@ -196,6 +201,7 @@ public class WsSession implements Session {
 
     @Override
     public void removeMessageHandler(MessageHandler listener) {
+        checkState();
         if (listener == null) {
             return;
         }
@@ -216,24 +222,28 @@ public class WsSession implements Session {
 
     @Override
     public String getProtocolVersion() {
+        checkState();
         return Constants.WS_VERSION_HEADER_VALUE;
     }
 
 
     @Override
     public String getNegotiatedSubprotocol() {
+        checkState();
         return subProtocol;
     }
 
 
     @Override
     public List<Extension> getNegotiatedExtensions() {
+        checkState();
         return Collections.EMPTY_LIST;
     }
 
 
     @Override
     public boolean isSecure() {
+        checkState();
         return secure;
     }
 
@@ -246,54 +256,63 @@ public class WsSession implements Session {
 
     @Override
     public long getMaxIdleTimeout() {
+        checkState();
         return maxIdleTimeout;
     }
 
 
     @Override
     public void setMaxIdleTimeout(long timeout) {
+        checkState();
         this.maxIdleTimeout = timeout;
     }
 
 
     @Override
     public void setMaxBinaryMessageBufferSize(int max) {
+        checkState();
         this.maxBinaryMessageBufferSize = max;
     }
 
 
     @Override
     public int getMaxBinaryMessageBufferSize() {
+        checkState();
         return maxBinaryMessageBufferSize;
     }
 
 
     @Override
     public void setMaxTextMessageBufferSize(int max) {
+        checkState();
         this.maxTextMessageBufferSize = max;
     }
 
 
     @Override
     public int getMaxTextMessageBufferSize() {
+        checkState();
         return maxTextMessageBufferSize;
     }
 
 
     @Override
     public Set<Session> getOpenSessions() {
+        checkState();
         return webSocketContainer.getOpenSessions(localEndpoint.getClass());
     }
 
 
     @Override
     public RemoteEndpoint.Async getAsyncRemote() {
+        checkState();
         return remoteEndpointAsync;
     }
 
 
     @Override
     public RemoteEndpoint.Basic getBasicRemote() {
+        checkState();
         return remoteEndpointBasic;
     }
 
@@ -314,6 +333,9 @@ public class WsSession implements Session {
             if (state != State.OPEN) {
                 return;
             }
+
+            fireEndpointOnClose(closeReason);
+
             state = State.CLOSING;
 
             sendCloseMessage(closeReason);
@@ -331,6 +353,7 @@ public class WsSession implements Session {
         synchronized (stateLock) {
             if (state == State.OPEN) {
                 sendCloseMessage = true;
+                fireEndpointOnClose(closeReason);
             }
 
             state = State.CLOSED;
@@ -344,6 +367,19 @@ public class WsSession implements Session {
         }
     }
 
+
+    private void fireEndpointOnClose(CloseReason closeReason) {
+
+        // Fire the onClose event
+        Thread t = Thread.currentThread();
+        ClassLoader cl = t.getContextClassLoader();
+        t.setContextClassLoader(applicationClassLoader);
+        try {
+            localEndpoint.onClose(this, closeReason);
+        } finally {
+            t.setContextClassLoader(cl);
+        }
+    }
 
     private void sendCloseMessage(CloseReason closeReason) {
         // 125 is maximum size for the payload of a control message
@@ -366,16 +402,6 @@ public class WsSession implements Session {
         } finally {
             webSocketContainer.unregisterSession(
                     localEndpoint.getClass(), this);
-
-            // Fire the onClose event
-            Thread t = Thread.currentThread();
-            ClassLoader cl = t.getContextClassLoader();
-            t.setContextClassLoader(applicationClassLoader);
-            try {
-                localEndpoint.onClose(this, closeReason);
-            } finally {
-                t.setContextClassLoader(cl);
-            }
         }
 
     }
@@ -383,30 +409,35 @@ public class WsSession implements Session {
 
     @Override
     public URI getRequestURI() {
+        checkState();
         return requestUri;
     }
 
 
     @Override
     public Map<String,List<String>> getRequestParameterMap() {
+        checkState();
         return requestParameterMap;
     }
 
 
     @Override
     public String getQueryString() {
+        checkState();
         return queryString;
     }
 
 
     @Override
     public Principal getUserPrincipal() {
+        checkState();
         return userPrincipal;
     }
 
 
     @Override
     public Map<String,String> getPathParameters() {
+        checkState();
         return pathParameters;
     }
 
@@ -419,6 +450,7 @@ public class WsSession implements Session {
 
     @Override
     public Map<String,Object> getUserProperties() {
+        checkState();
         return userProperties;
     }
 
@@ -464,6 +496,12 @@ public class WsSession implements Session {
         }
     }
 
+
+    private void checkState() {
+        if (!isOpen()) {
+            throw new IllegalStateException(sm.getString("wsSession.closed"));
+        }
+    }
 
     private static enum State {
         OPEN,

@@ -605,15 +605,26 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Assert.assertEquals(3, setA.size());
 
         int count = 0;
-        setA = s3a.getOpenSessions();
-        while (setA.size() > 0 && count < 8) {
+        boolean isOpen = true;
+        while (isOpen && count < 8) {
             count ++;
             Thread.sleep(1000);
-            setA = s3a.getOpenSessions();
+            isOpen = false;
+            for (Session session : setA) {
+                if (session.isOpen()) {
+                    isOpen = true;
+                }
+            }
         }
 
-        if (setA.size() > 0) {
-            Assert.fail("There were [" + setA.size() + "] open sessions");
+        if (isOpen) {
+            for (Session session : setA) {
+                if (session.isOpen()) {
+                    System.err.println("Session with ID [" + session.getId() +
+                            "] is open");
+                }
+            }
+            Assert.fail("There were open sessions");
         }
     }
 
@@ -649,21 +660,30 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         int expected = 3;
         while (expected > 0) {
-            Assert.assertEquals(expected, setA.size());
+            Assert.assertEquals(expected, getOpenCount(setA));
 
             int count = 0;
-            while (setA.size() == expected && count < 5) {
+            while (getOpenCount(setA) == expected && count < 5) {
                 count ++;
                 Thread.sleep(1000);
-                setA = s3a.getOpenSessions();
             }
 
             expected--;
         }
 
-        Assert.assertEquals(0, setA.size());
+        Assert.assertEquals(0, getOpenCount(setA));
     }
 
+
+    private int getOpenCount(Set<Session> sessions) {
+        int result = 0;
+        for (Session session : sessions) {
+            if (session.isOpen()) {
+                result++;
+            }
+        }
+        return result;
+    }
 
     private Session connectToEchoServerBasic(WebSocketContainer wsContainer,
             Class<? extends Endpoint> clazz) throws Exception {
