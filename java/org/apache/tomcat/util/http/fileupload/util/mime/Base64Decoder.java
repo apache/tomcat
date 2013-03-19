@@ -25,7 +25,27 @@ import java.io.OutputStream;
 final class Base64Decoder {
 
     /**
-     * set up the encoding table.
+     * Bytes per undecoded block.
+     */
+    private static final int BYTES_PER_UNENCODED_BLOCK = 3;
+
+    /**
+     * 2 bits mask.
+     */
+    private static final int MASK_2BITS = 2;
+
+    /**
+     * 4 bits mask.
+     */
+    private static final int MASK_4BITS = 4;
+
+    /**
+     * 6 bits mask.
+     */
+    private static final int MASK_6BITS = 6;
+
+    /**
+     * Set up the encoding table.
      */
     private static final byte[] ENCODING_TABLE = {
         (byte) 'A', (byte) 'B', (byte) 'C', (byte) 'D', (byte) 'E', (byte) 'F', (byte) 'G',
@@ -48,12 +68,12 @@ final class Base64Decoder {
     private static final byte PADDING = (byte) '=';
 
     /**
-     * the decoding table size.
+     * The decoding table size.
      */
     private static final int DECODING_TABLE_SIZE = 256;
 
     /**
-     * set up the decoding table.
+     * Set up the decoding table.
      */
     private static final byte[] DECODING_TABLE = new byte[DECODING_TABLE_SIZE];
 
@@ -76,23 +96,17 @@ final class Base64Decoder {
      * @param c the char has to be checked.
      * @return true, if the input char has to be checked, false otherwise.
      */
-    private static boolean ignore(
-        char    c) {
+    private static boolean ignore(char c) {
         return (c == '\n' || c == '\r' || c == '\t' || c == ' ');
     }
 
     /**
-     * decode the base 64 encoded byte data writing it to the given output stream,
+     * Decode the base 64 encoded byte data writing it to the given output stream,
      * whitespace characters will be ignored.
      *
      * @return the number of bytes produced.
      */
-    public static int decode(
-        byte[]                data,
-        int                    off,
-        int                    length,
-        OutputStream    out)
-        throws IOException {
+    public static int decode(byte[] data, int off, int length, OutputStream out) throws IOException {
         byte    b1, b2, b3, b4;
         int        outLen = 0;
 
@@ -107,7 +121,7 @@ final class Base64Decoder {
         }
 
         int  i = off;
-        int  finish = end - 4;
+        int  finish = end - MASK_4BITS;
 
         while (i < finish) {
             while ((i < finish) && ignore((char) data[i])) {
@@ -134,40 +148,40 @@ final class Base64Decoder {
 
             b4 = DECODING_TABLE[data[i++]];
 
-            out.write((b1 << 2) | (b2 >> 4));
-            out.write((b2 << 4) | (b3 >> 2));
-            out.write((b3 << 6) | b4);
+            out.write((b1 << MASK_2BITS) | (b2 >> MASK_4BITS));
+            out.write((b2 << MASK_4BITS) | (b3 >> MASK_2BITS));
+            out.write((b3 << MASK_6BITS) | b4);
 
-            outLen += 3;
+            outLen += BYTES_PER_UNENCODED_BLOCK;
         }
 
-        if (data[end - 2] == PADDING) {
-            b1 = DECODING_TABLE[data[end - 4]];
-            b2 = DECODING_TABLE[data[end - 3]];
+        if (data[end - MASK_2BITS] == PADDING) {
+            b1 = DECODING_TABLE[data[end - MASK_4BITS]];
+            b2 = DECODING_TABLE[data[end - BYTES_PER_UNENCODED_BLOCK]];
 
-            out.write((b1 << 2) | (b2 >> 4));
+            out.write((b1 << MASK_2BITS) | (b2 >> MASK_4BITS));
 
             outLen += 1;
         } else if (data[end - 1] == PADDING) {
-            b1 = DECODING_TABLE[data[end - 4]];
-            b2 = DECODING_TABLE[data[end - 3]];
-            b3 = DECODING_TABLE[data[end - 2]];
+            b1 = DECODING_TABLE[data[end - MASK_4BITS]];
+            b2 = DECODING_TABLE[data[end - BYTES_PER_UNENCODED_BLOCK]];
+            b3 = DECODING_TABLE[data[end - MASK_2BITS]];
 
-            out.write((b1 << 2) | (b2 >> 4));
-            out.write((b2 << 4) | (b3 >> 2));
+            out.write((b1 << MASK_2BITS) | (b2 >> MASK_4BITS));
+            out.write((b2 << MASK_4BITS) | (b3 >> MASK_2BITS));
 
-            outLen += 2;
+            outLen += MASK_2BITS;
         } else {
-            b1 = DECODING_TABLE[data[end - 4]];
-            b2 = DECODING_TABLE[data[end - 3]];
-            b3 = DECODING_TABLE[data[end - 2]];
+            b1 = DECODING_TABLE[data[end - MASK_4BITS]];
+            b2 = DECODING_TABLE[data[end - BYTES_PER_UNENCODED_BLOCK]];
+            b3 = DECODING_TABLE[data[end - MASK_2BITS]];
             b4 = DECODING_TABLE[data[end - 1]];
 
-            out.write((b1 << 2) | (b2 >> 4));
-            out.write((b2 << 4) | (b3 >> 2));
-            out.write((b3 << 6) | b4);
+            out.write((b1 << MASK_2BITS) | (b2 >> MASK_4BITS));
+            out.write((b2 << MASK_4BITS) | (b3 >> MASK_2BITS));
+            out.write((b3 << MASK_6BITS) | b4);
 
-            outLen += 3;
+            outLen += BYTES_PER_UNENCODED_BLOCK;
         }
 
         return outLen;
