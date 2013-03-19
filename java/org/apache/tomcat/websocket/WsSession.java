@@ -61,7 +61,11 @@ public class WsSession implements Session {
     private final RemoteEndpoint.Basic remoteEndpointBasic;
     private final ClassLoader applicationClassLoader;
     private final WsWebSocketContainer webSocketContainer;
-    private final WsRequest request;
+    private final URI requestUri;
+    private final Map<String,List<String>> requestParameterMap;
+    private final String queryString;
+    private final Principal userPrincipal;
+
     private final String subProtocol;
     private final Map<String,String> pathParameters;
     private final boolean secure;
@@ -93,9 +97,11 @@ public class WsSession implements Session {
     public WsSession(Endpoint localEndpoint,
             WsRemoteEndpointImplBase wsRemoteEndpoint,
             WsWebSocketContainer wsWebSocketContainer,
-            WsRequest request, String subProtocol,
+            URI requestUri, Map<String,List<String>> requestParameterMap,
+            String queryString, Principal userPrincipal, String subProtocol,
             Map<String,String> pathParameters,
-            boolean secure, List<Class<? extends Encoder>> encoders)
+            boolean secure, List<Class<? extends Encoder>> encoders,
+            Map<String,Object> userProperties)
                     throws DeploymentException {
         this.localEndpoint = localEndpoint;
         this.wsRemoteEndpoint = wsRemoteEndpoint;
@@ -112,12 +118,20 @@ public class WsSession implements Session {
                 webSocketContainer.getDefaultMaxTextMessageBufferSize();
         this.maxIdleTimeout =
                 webSocketContainer.getDefaultMaxSessionIdleTimeout();
-        this.request = request;
+        this.requestUri = requestUri;
+        if (requestParameterMap == null) {
+            this.requestParameterMap = Collections.EMPTY_MAP;
+        } else {
+            this.requestParameterMap = requestParameterMap;
+        }
+        this.queryString = queryString;
+        this.userPrincipal = userPrincipal;
         this.subProtocol = subProtocol;
         this.pathParameters = pathParameters;
         this.secure = secure;
         this.wsRemoteEndpoint.setEncoders(encoders);
 
+        this.userProperties.putAll(userProperties);
         this.id = Long.toHexString(ids.getAndIncrement());
     }
 
@@ -369,37 +383,25 @@ public class WsSession implements Session {
 
     @Override
     public URI getRequestURI() {
-        if (request == null) {
-            return null;
-        }
-        return request.getRequestURI();
+        return requestUri;
     }
 
 
     @Override
     public Map<String,List<String>> getRequestParameterMap() {
-        if (request == null) {
-            return Collections.EMPTY_MAP;
-        }
-        return request.getRequestParameterMap();
+        return requestParameterMap;
     }
 
 
     @Override
     public String getQueryString() {
-        if (request == null) {
-            return null;
-        }
-        return request.getQueryString();
+        return queryString;
     }
 
 
     @Override
     public Principal getUserPrincipal() {
-        if (request == null) {
-            return null;
-        }
-        return request.getUserPrincipal();
+        return userPrincipal;
     }
 
 

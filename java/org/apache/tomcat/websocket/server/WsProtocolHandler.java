@@ -36,7 +36,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsIOException;
-import org.apache.tomcat.websocket.WsRequest;
 import org.apache.tomcat.websocket.WsSession;
 
 /**
@@ -53,7 +52,7 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
     private final EndpointConfig endpointConfig;
     private final ClassLoader applicationClassLoader;
     private final WsServerContainer webSocketContainer;
-    private final WsRequest request;
+    private final WsHandshakeRequest handshakeRequest;
     private final String subProtocol;
     private final Map<String,String> pathParameters;
     private final boolean secure;
@@ -62,12 +61,13 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
 
 
     public WsProtocolHandler(Endpoint ep, EndpointConfig endpointConfig,
-            WsServerContainer wsc, WsRequest request, String subProtocol,
-            Map<String,String> pathParameters, boolean secure) {
+            WsServerContainer wsc, WsHandshakeRequest handshakeRequest,
+            String subProtocol, Map<String,String> pathParameters,
+            boolean secure) {
         this.ep = ep;
         this.endpointConfig = endpointConfig;
         this.webSocketContainer = wsc;
-        this.request = request;
+        this.handshakeRequest = handshakeRequest;
         this.subProtocol = subProtocol;
         this.pathParameters = pathParameters;
         this.secure = secure;
@@ -96,8 +96,12 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
             WsRemoteEndpointImplServer wsRemoteEndpointServer =
                     new WsRemoteEndpointImplServer(sos, webSocketContainer);
             wsSession = new WsSession(ep, wsRemoteEndpointServer,
-                    webSocketContainer, request, subProtocol, pathParameters,
-                    secure, endpointConfig.getEncoders());
+                    webSocketContainer, handshakeRequest.getRequestURI(),
+                    handshakeRequest.getParameterMap(),
+                    handshakeRequest.getQueryString(),
+                    handshakeRequest.getUserPrincipal(), subProtocol,
+                    pathParameters, secure, endpointConfig.getEncoders(),
+                    endpointConfig.getUserProperties());
             WsFrameServer wsFrame = new WsFrameServer(
                     sis,
                     wsSession);
