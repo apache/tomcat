@@ -454,7 +454,7 @@
     </attribute>
 
     <attribute name="restrictedUserAgents" required="false">
-      <p>The value is a regular expression (using <code>java.util.regex</code>) matching
+      <p>The value is a regular expression (using <code>java.util.regex</code>)
       matching the <code>user-agent</code> header of HTTP clients for which
       HTTP/1.1 or HTTP/1.0 keep alive should not be used, even if the clients
       advertise support for these features.
