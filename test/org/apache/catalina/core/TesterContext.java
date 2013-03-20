@@ -56,6 +56,7 @@ import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.juli.logging.Log;
+import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
 
 /**
@@ -1152,5 +1153,15 @@ public class TesterContext implements Context {
     @Override
     public Map<String,String> findPreDestroyMethods() {
         return null;
+    }
+
+    @Override
+    public InstanceManager getInstanceManager() {
+        return null;
+    }
+
+    @Override
+    public void setInstanceManager(InstanceManager instanceManager) {
+        // NO-OP
     }
 }
