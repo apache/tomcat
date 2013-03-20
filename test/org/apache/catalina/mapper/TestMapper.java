@@ -198,10 +198,10 @@ public class TestMapper extends LoggingBaseTest {
 
     @Test
     public void testPerformance() throws Exception {
-        // Takes ~1s on markt's laptop. If this takes more than 4s something
+        // Takes ~1s on markt's laptop. If this takes more than 5s something
         // probably needs looking at. If this fails repeatedly then we may need
         // to increase this limit.
-        final long maxTime = 4000;
+        final long maxTime = 5000;
         long time = testPerformanceImpl();
         if (time >= maxTime) {
             // Rerun to reject occasional failures, e.g. because of gc
