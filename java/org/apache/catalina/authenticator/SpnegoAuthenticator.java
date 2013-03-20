@@ -187,8 +187,6 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         }
 
         authorizationBC.setOffset(authorizationBC.getOffset() + 10);
-        // FIXME: Add trimming
-        // authorizationBC.trim();
 
         // Create the String directly as this will change on each request and we
         // don't want to use the StringCache

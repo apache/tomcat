@@ -110,8 +110,6 @@ public class BasicAuthenticator
             ByteChunk authorizationBC = authorization.getByteChunk();
             if (authorizationBC.startsWithIgnoreCase("basic ", 0)) {
                 authorizationBC.setOffset(authorizationBC.getOffset() + 6);
-                // FIXME: Add trimming
-                // authorizationBC.trim();
 
                 // Use the StringCache as these will be the same between
                 // requests
