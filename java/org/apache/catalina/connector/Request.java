@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
@@ -40,6 +41,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.naming.NamingException;
 import javax.security.auth.Subject;
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
@@ -1884,14 +1886,15 @@ public class Request
      *
      * @since Servlet 3.1
      */
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(
             Class<T> httpUpgradeHandlerClass) throws java.io.IOException {
 
         T handler;
         try {
-            handler = httpUpgradeHandlerClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            handler = (T) context.getInstanceManager().newInstance(httpUpgradeHandlerClass);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NamingException e) {
             throw new IOException(e);
         }
 

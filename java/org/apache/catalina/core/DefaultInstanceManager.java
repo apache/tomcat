@@ -132,6 +132,11 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
     @Override
+    public Object newInstance(Class<?> clazz) throws IllegalAccessException, InvocationTargetException, NamingException, InstantiationException {
+        return newInstance(clazz.newInstance(), clazz);
+    }
+
+    @Override
     public Object newInstance(String className) throws IllegalAccessException, InvocationTargetException, NamingException, InstantiationException, ClassNotFoundException {
         Class<?> clazz = loadClassMaybePrivileged(className, classLoader);
         return newInstance(clazz.newInstance(), clazz);
