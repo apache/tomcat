@@ -750,8 +750,12 @@ class NoBodyResponse extends HttpServletResponseWrapper {
 
     // file private
     void setContentLength() {
-        if (!didSetContentLength)
-          super.setContentLength(noBody.getContentLength());
+        if (!didSetContentLength) {
+            if (writer != null) {
+                writer.flush();
+            }
+            super.setContentLength(noBody.getContentLength());
+        }
     }
 
 
