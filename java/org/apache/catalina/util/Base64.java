@@ -17,8 +17,6 @@
 
 package org.apache.catalina.util;
 
-import javax.xml.bind.DatatypeConverter;
-
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
 
@@ -74,20 +72,6 @@ public final class  Base64
 
         lookUpBase64Alphabet[62] = (byte) '+';
         lookUpBase64Alphabet[63] = (byte) '/';
-    }
-
-    /**
-     * Encodes hex octets into Base64.
-     *
-     * @param binaryData Array containing binary data to encode.
-     * @return Base64-encoded data.
-     *
-     * @deprecated  Use {@link DatatypeConverter#printBase64Binary(byte[])}.
-     *              This method will be removed in Tomcat 8.0.x.
-     */
-    @Deprecated
-    public static String encode(byte[] binaryData) {
-        return DatatypeConverter.printBase64Binary(binaryData);
     }
 
     /**
