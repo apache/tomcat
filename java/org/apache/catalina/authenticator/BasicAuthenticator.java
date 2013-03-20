@@ -113,7 +113,7 @@ public class BasicAuthenticator
 
                 // Use the StringCache as these will be the same between
                 // requests
-                String encoded = authorizationBC.toString();
+                String encoded = authorizationBC.toStringInternal();
                 byte[] decoded = DatatypeConverter.parseBase64Binary(encoded);
 
                 // Get username and password
