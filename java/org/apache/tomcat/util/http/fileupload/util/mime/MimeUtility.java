@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.xml.bind.DatatypeConverter;
+
 /**
  * Utility class to decode MIME texts.
  *
@@ -239,18 +241,18 @@ public final class MimeUtility {
             // the decoder writes directly to an output stream.
             ByteArrayOutputStream out = new ByteArrayOutputStream(encodedText.length());
 
-            byte[] encodedData = encodedText.getBytes(US_ASCII_CHARSET);
-
+            byte[] decodedData;
             // Base64 encoded?
             if (encoding.equals(BASE64_ENCODING_MARKER)) {
-                Base64Decoder.decode(encodedData, out);
+                decodedData = DatatypeConverter.parseBase64Binary(encodedText);
             } else if (encoding.equals(QUOTEDPRINTABLE_ENCODING_MARKER)) { // maybe quoted printable.
+                byte[] encodedData = encodedText.getBytes(US_ASCII_CHARSET);
                 QuotedPrintableDecoder.decode(encodedData, out);
+                decodedData = out.toByteArray();
             } else {
                 throw new UnsupportedEncodingException("Unknown RFC 2047 encoding: " + encoding);
             }
-            // get the decoded byte data and convert into a string.
-            byte[] decodedData = out.toByteArray();
+            // Convert decoded byte data into a string.
             return new String(decodedData, javaCharset(charset));
         } catch (IOException e) {
             throw new UnsupportedEncodingException("Invalid RFC 2047 encoding");
