@@ -1885,13 +1885,24 @@ public class Request
      * @since Servlet 3.1
      */
     @Override
-    public void upgrade(HttpUpgradeHandler handler) throws IOException {
+    public <T extends HttpUpgradeHandler> T upgrade(
+            Class<T> httpUpgradeHandlerClass) throws java.io.IOException {
+
+        T handler;
+        try {
+            handler = httpUpgradeHandlerClass.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new IOException(e);
+        }
+
         coyoteRequest.action(ActionCode.UPGRADE, handler);
 
         // Output required by RFC2616. Protocol specific headers should have
         // already been set.
         response.setStatus(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
         response.flushBuffer();
+
+        return handler;
     }
 
     /**

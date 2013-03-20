@@ -39,7 +39,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
     private static final Log log =
-            LogFactory.getLog(WsProtocolHandler.class);
+            LogFactory.getLog(WsHttpUpgradeHandler.class);
 
     private final ServletOutputStream sos;
     private final WsWriteTimeout wsWriteTimeout;

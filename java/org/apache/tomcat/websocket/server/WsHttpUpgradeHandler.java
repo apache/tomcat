@@ -32,27 +32,37 @@ import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsIOException;
 import org.apache.tomcat.websocket.WsSession;
 
 /**
  * Servlet 3.1 HTTP upgrade handler for WebSocket connections.
  */
-public class WsProtocolHandler implements HttpUpgradeHandler {
+public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
 
-    private final Endpoint ep;
-    private final EndpointConfig endpointConfig;
     private final ClassLoader applicationClassLoader;
-    private final WsServerContainer webSocketContainer;
-    private final WsHandshakeRequest handshakeRequest;
-    private final String subProtocol;
-    private final Map<String,String> pathParameters;
-    private final boolean secure;
+
+    private Endpoint ep;
+    private EndpointConfig endpointConfig;
+    private WsServerContainer webSocketContainer;
+    private WsHandshakeRequest handshakeRequest;
+    private String subProtocol;
+    private Map<String,String> pathParameters;
+    private boolean secure;
 
     private WsSession wsSession;
 
+    private static final StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
 
-    public WsProtocolHandler(Endpoint ep, EndpointConfig endpointConfig,
+
+    public WsHttpUpgradeHandler() {
+        applicationClassLoader = Thread.currentThread().getContextClassLoader();
+    }
+
+
+    public void preInit(Endpoint ep, EndpointConfig endpointConfig,
             WsServerContainer wsc, WsHandshakeRequest handshakeRequest,
             String subProtocol, Map<String,String> pathParameters,
             boolean secure) {
@@ -63,12 +73,16 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
         this.subProtocol = subProtocol;
         this.pathParameters = pathParameters;
         this.secure = secure;
-        applicationClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
 
     @Override
     public void init(WebConnection connection) {
+        if (ep == null) {
+            throw new IllegalStateException(
+                    sm.getString("wsHttpUpgradeHandler.noPreInit"));
+        }
+
         ServletInputStream sis;
         ServletOutputStream sos;
         try {
@@ -110,6 +124,12 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
     }
 
 
+    @Override
+    public void destroy() {
+        // NO-OP
+    }
+
+
     private void onError(Throwable throwable) {
         // Need to call onError using the web application's class loader
         Thread t = Thread.currentThread();
@@ -138,11 +158,11 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
 
     private static class WsReadListener implements ReadListener {
 
-        private final WsProtocolHandler wsProtocolHandler;
+        private final WsHttpUpgradeHandler wsProtocolHandler;
         private final WsFrameServer wsFrame;
 
 
-        private WsReadListener(WsProtocolHandler wsProtocolHandler,
+        private WsReadListener(WsHttpUpgradeHandler wsProtocolHandler,
                 WsFrameServer wsFrame) {
             this.wsProtocolHandler = wsProtocolHandler;
             this.wsFrame = wsFrame;
@@ -181,10 +201,10 @@ public class WsProtocolHandler implements HttpUpgradeHandler {
 
     private static class WsWriteListener implements WriteListener {
 
-        private final WsProtocolHandler wsProtocolHandler;
+        private final WsHttpUpgradeHandler wsProtocolHandler;
         private final WsRemoteEndpointImplServer wsRemoteEndpointServer;
 
-        private WsWriteListener(WsProtocolHandler wsProtocolHandler,
+        private WsWriteListener(WsHttpUpgradeHandler wsProtocolHandler,
                 WsRemoteEndpointImplServer wsRemoteEndpointServer) {
             this.wsProtocolHandler = wsProtocolHandler;
             this.wsRemoteEndpointServer = wsRemoteEndpointServer;

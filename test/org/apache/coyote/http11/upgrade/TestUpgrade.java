@@ -159,14 +159,7 @@ public class TestUpgrade extends TomcatBaseTest {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
 
-            HttpUpgradeHandler upgradeHandler;
-            try {
-                upgradeHandler = upgradeHandlerClass.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new ServletException(e);
-            }
-
-            req.upgrade(upgradeHandler);
+            req.upgrade(upgradeHandlerClass);
         }
     }
 
@@ -189,7 +182,7 @@ public class TestUpgrade extends TomcatBaseTest {
     }
 
 
-    protected static class EchoBlocking implements HttpUpgradeHandler {
+    public static class EchoBlocking implements HttpUpgradeHandler {
         @Override
         public void init(WebConnection connection) {
 
@@ -201,10 +194,15 @@ public class TestUpgrade extends TomcatBaseTest {
                 throw new IllegalStateException(ioe);
             }
         }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
     }
 
 
-    protected static class EchoNonBlocking implements HttpUpgradeHandler {
+    public static class EchoNonBlocking implements HttpUpgradeHandler {
 
         private ServletInputStream sis;
         private ServletOutputStream sos;
@@ -221,6 +219,11 @@ public class TestUpgrade extends TomcatBaseTest {
 
             sis.setReadListener(new EchoReadListener());
             sos.setWriteListener(new EchoWriteListener());
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
         }
 
         private class EchoReadListener implements ReadListener {
@@ -253,8 +256,7 @@ public class TestUpgrade extends TomcatBaseTest {
 
             @Override
             public void onError(Throwable throwable) {
-                // TODO Auto-generated method stub
-
+                // NO-OP
             }
         }
 
@@ -262,14 +264,12 @@ public class TestUpgrade extends TomcatBaseTest {
 
             @Override
             public void onWritePossible() {
-                // TODO Auto-generated method stub
-
+                // NO-OP
             }
 
             @Override
             public void onError(Throwable throwable) {
-                // TODO Auto-generated method stub
-
+                // NO-OP
             }
         }
     }
