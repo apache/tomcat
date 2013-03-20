@@ -96,6 +96,10 @@
         Enable support for MBeans with multiple operations with the same name
         but different signatures. (markt)
       </fix>
+      <scode>
+        Deprecate Tomcat&apos;s internal Base 64 encoder/decoder and switch to
+        using the JRE provided implementation. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
