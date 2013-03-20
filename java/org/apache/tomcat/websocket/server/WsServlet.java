@@ -34,7 +34,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpUpgradeHandler;
 import javax.websocket.Endpoint;
 import javax.websocket.Extension;
 import javax.websocket.server.ServerEndpointConfig;
@@ -155,9 +154,10 @@ public class WsServlet extends HttpServlet {
             }
         }
 
-        HttpUpgradeHandler wsHandler = new WsProtocolHandler(ep, sec, sc,
-                wsRequest, subProtocol, pathParameters, req.isSecure());
-        req.upgrade(wsHandler);
+        WsHttpUpgradeHandler wsHandler =
+                req.upgrade(WsHttpUpgradeHandler.class);
+        wsHandler.preInit(ep, sec, sc, wsRequest, subProtocol, pathParameters,
+                req.isSecure());
     }
 
 
