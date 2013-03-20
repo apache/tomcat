@@ -27,6 +27,7 @@ import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
@@ -279,7 +280,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
         // Send response token on success and failure
         response.setHeader("WWW-Authenticate", "Negotiate "
-                + Base64.encode(outToken));
+                + DatatypeConverter.printBase64Binary(outToken));
 
         if (principal != null) {
             register(request, response, principal, Constants.SPNEGO_METHOD,

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.DatatypeConverter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -36,7 +37,6 @@ import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.catalina.util.Base64;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -608,7 +608,8 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
             password = aPassword;
             String userCredentials = username + ":" + password;
             byte[] credentialsBytes = ByteChunk.convertToBytes(userCredentials);
-            String base64auth = Base64.encode(credentialsBytes);
+            String base64auth =
+                    DatatypeConverter.printBase64Binary(credentialsBytes);
             credentials= method + " " + base64auth;
         }
 

@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.DatatypeConverter;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -34,7 +36,6 @@ import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.catalina.util.Base64;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -235,7 +236,8 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         // the second access attempt should be sucessful
         String credentials = user + ":" + pwd;
         byte[] credentialsBytes = ByteChunk.convertToBytes(credentials);
-        String base64auth = Base64.encode(credentialsBytes);
+        String base64auth =
+                DatatypeConverter.printBase64Binary(credentialsBytes);
         String authLine = "Basic " + base64auth;
 
         List<String> auth = new ArrayList<>();

@@ -51,6 +51,7 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.util.Base64;
@@ -1556,7 +1557,8 @@ public class JNDIRealm extends RealmBase {
                     password = password.substring(5);
                     md.reset();
                     md.update(credentials.getBytes(B2CConverter.ISO_8859_1));
-                    String digestedPassword = Base64.encode(md.digest());
+                    String digestedPassword =
+                            DatatypeConverter.printBase64Binary(md.digest());
                     validated = password.equals(digestedPassword);
                 }
             } else if (password.startsWith("{SSHA}")) {
