@@ -143,6 +143,10 @@
         which meant that installation of Windows service could fail
         producing incorrect service launch command. (mturk)
       </fix>
+      <fix>
+        Ensure HEAD requests return the correct content length when the
+        requested resource uses a Writer. Patch by Nick Williams. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
