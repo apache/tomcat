@@ -31,9 +31,9 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.util.Base64;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.ietf.jgss.GSSContext;
@@ -190,10 +190,15 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         // FIXME: Add trimming
         // authorizationBC.trim();
 
-        ByteChunk decoded = new ByteChunk();
-        Base64.decode(authorizationBC, decoded);
+        // Create the String directly as this will change on each request and we
+        // don't want to use the StringCache
+        String encoded = new String(authorizationBC.getBuffer(),
+                authorizationBC.getOffset(),
+                authorizationBC.getLength(), B2CConverter.ISO_8859_1);
 
-        if (decoded.getLength() == 0) {
+        byte[] decoded = DatatypeConverter.parseBase64Binary(encoded);
+
+        if (decoded.length == 0) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString(
                         "spnegoAuthenticator.authHeaderNoToken"));
@@ -232,8 +237,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                 };
             gssContext = manager.createContext(Subject.doAs(lc.getSubject(), action));
 
-            outToken = gssContext.acceptSecContext(decoded.getBytes(),
-                    decoded.getOffset(), decoded.getLength());
+            outToken = gssContext.acceptSecContext(decoded, 0, decoded.length);
 
             if (outToken == null) {
                 if (log.isDebugEnabled()) {

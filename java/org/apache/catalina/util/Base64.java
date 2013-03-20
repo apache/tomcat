@@ -29,7 +29,12 @@ import org.apache.tomcat.util.buf.CharChunk;
  *
  * @author Jeffrey Rodriguez
  * @version $Id$
+ *
+ * @deprecated  Use {@link
+ *              javax.xml.bind.DatatypeConverter#parseBase64Binary(String)}.
+ *              This class will be removed in Tomcat 8.
  */
+@Deprecated
 public final class  Base64
 {
     private static final int  BASELENGTH              = 255;

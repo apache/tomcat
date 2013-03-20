@@ -24,13 +24,13 @@ import java.security.Principal;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.util.Base64;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 
 
@@ -113,18 +113,28 @@ public class BasicAuthenticator
                 // FIXME: Add trimming
                 // authorizationBC.trim();
 
-                CharChunk authorizationCC = authorization.getCharChunk();
-                Base64.decode(authorizationBC, authorizationCC);
+                // Use the StringCache as these will be the same between
+                // requests
+                String encoded = authorizationBC.toString();
+                byte[] decoded = DatatypeConverter.parseBase64Binary(encoded);
 
                 // Get username and password
-                int colon = authorizationCC.indexOf(':');
+                int colon = -1;
+                for (int i = 0; i < decoded.length; i++) {
+                    if (decoded[i] == ':') {
+                        colon = i;
+                        break;
+                    }
+                }
+
                 if (colon < 0) {
-                    username = authorizationCC.toString();
+                    username = new String(decoded, B2CConverter.ISO_8859_1);
                 } else {
-                    char[] buf = authorizationCC.getBuffer();
-                    username = new String(buf, 0, colon);
-                    password = new String(buf, colon + 1,
-                            authorizationCC.getEnd() - colon - 1);
+                    username = new String(
+                            decoded, 0, colon, B2CConverter.ISO_8859_1);
+                    password = new String(
+                            decoded, colon + 1, decoded.length - colon - 1,
+                            B2CConverter.ISO_8859_1);
                 }
 
                 authorizationBC.setOffset(authorizationBC.getOffset() - 6);
