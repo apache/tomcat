@@ -82,7 +82,8 @@ public final class  Base64
      * @param binaryData Array containing binary data to encode.
      * @return Base64-encoded data.
      *
-     * @deprecated  Use {@link DatatypeConverter#printBase64Binary(byte[])}
+     * @deprecated  Use {@link DatatypeConverter#printBase64Binary(byte[])}.
+     *              This method will be removed in Tomcat 8.0.x.
      */
     @Deprecated
     public static String encode(byte[] binaryData) {
