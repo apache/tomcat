@@ -17,7 +17,6 @@
 
 package org.apache.catalina.realm;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
@@ -54,10 +53,7 @@ import javax.naming.directory.SearchResult;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.util.Base64;
 import org.apache.tomcat.util.buf.B2CConverter;
-import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.CharChunk;
 import org.ietf.jgss.GSSCredential;
 
 /**
@@ -1571,29 +1567,15 @@ public class JNDIRealm extends RealmBase {
                     md.update(credentials.getBytes(B2CConverter.ISO_8859_1));
 
                     // Decode stored password.
-                    ByteChunk pwbc = new ByteChunk(password.length());
-                    try {
-                        pwbc.append(password.getBytes(B2CConverter.ISO_8859_1),
-                                0, password.length());
-                    } catch (IOException e) {
-                        // Should never happen
-                        containerLog.error("Could not append password bytes to chunk: ", e);
-                    }
-
-                    CharChunk decoded = new CharChunk();
-                    Base64.decode(pwbc, decoded);
-                    char[] pwarray = decoded.getBuffer();
+                    byte[] decoded =
+                            DatatypeConverter.parseBase64Binary(password);
 
                     // Split decoded password into hash and salt.
                     final int saltpos = 20;
                     byte[] hash = new byte[saltpos];
-                    for (int i=0; i< hash.length; i++) {
-                        hash[i] = (byte) pwarray[i];
-                    }
-
-                    byte[] salt = new byte[pwarray.length - saltpos];
-                    for (int i=0; i< salt.length; i++)
-                        salt[i] = (byte)pwarray[i+saltpos];
+                    System.arraycopy(decoded, 0, hash, 0, saltpos);
+                    byte[] salt = new byte[decoded.length - saltpos];
+                    System.arraycopy(decoded, saltpos, salt, 0, salt.length);
 
                     md.update(salt);
                     byte[] dp = md.digest();
