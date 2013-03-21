@@ -24,7 +24,6 @@ import java.security.Principal;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.catalina.connector.Request;
 import org.apache.juli.logging.Log;
@@ -32,6 +31,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.codec.binary.Base64;
 
 
 
@@ -111,10 +111,10 @@ public class BasicAuthenticator
             if (authorizationBC.startsWithIgnoreCase("basic ", 0)) {
                 authorizationBC.setOffset(authorizationBC.getOffset() + 6);
 
-                // Use the StringCache as these will be the same between
-                // requests
-                String encoded = authorizationBC.toStringInternal();
-                byte[] decoded = DatatypeConverter.parseBase64Binary(encoded);
+                byte[] decoded = Base64.decodeBase64(
+                        authorizationBC.getBuffer(),
+                        authorizationBC.getOffset(),
+                        authorizationBC.getLength());
 
                 // Get username and password
                 int colon = -1;

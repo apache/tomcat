@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.xml.bind.DatatypeConverter;
+import org.apache.tomcat.util.codec.binary.Base64;
 
 /**
  * Utility class to decode MIME texts.
@@ -244,7 +244,7 @@ public final class MimeUtility {
             byte[] decodedData;
             // Base64 encoded?
             if (encoding.equals(BASE64_ENCODING_MARKER)) {
-                decodedData = DatatypeConverter.parseBase64Binary(encodedText);
+                decodedData = Base64.decodeBase64(encodedText);
             } else if (encoding.equals(QUOTEDPRINTABLE_ENCODING_MARKER)) { // maybe quoted printable.
                 byte[] encodedData = encodedText.getBytes(US_ASCII_CHARSET);
                 QuotedPrintableDecoder.decode(encodedData, out);

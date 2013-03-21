@@ -37,8 +37,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.websocket.Endpoint;
 import javax.websocket.Extension;
 import javax.websocket.server.ServerEndpointConfig;
-import javax.xml.bind.DatatypeConverter;
 
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.websocket.Constants;
 import org.apache.tomcat.websocket.WsHandshakeResponse;
 import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
@@ -211,7 +211,7 @@ public class WsServlet extends HttpServlet {
         }
         sha1Helper.reset();
         sha1Helper.update(key.getBytes(ISO_8859_1));
-        String result = DatatypeConverter.printBase64Binary(sha1Helper.digest(WS_ACCEPT));
+        String result = Base64.encodeBase64String(sha1Helper.digest(WS_ACCEPT));
         sha1Helpers.add(sha1Helper);
         return result;
     }

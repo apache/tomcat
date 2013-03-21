@@ -50,10 +50,10 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.ietf.jgss.GSSCredential;
 
 /**
@@ -1553,8 +1553,9 @@ public class JNDIRealm extends RealmBase {
                     password = password.substring(5);
                     md.reset();
                     md.update(credentials.getBytes(B2CConverter.ISO_8859_1));
+                    byte[] decoded = Base64.decodeBase64(md.digest());
                     String digestedPassword =
-                            DatatypeConverter.printBase64Binary(md.digest());
+                            new String(decoded, B2CConverter.ISO_8859_1);
                     validated = password.equals(digestedPassword);
                 }
             } else if (password.startsWith("{SSHA}")) {
@@ -1567,17 +1568,15 @@ public class JNDIRealm extends RealmBase {
                     md.update(credentials.getBytes(B2CConverter.ISO_8859_1));
 
                     // Decode stored password.
-                    byte[] decoded =
-                            DatatypeConverter.parseBase64Binary(password);
+                    byte[] decoded = Base64.decodeBase64(password);
 
                     // Split decoded password into hash and salt.
                     final int saltpos = 20;
                     byte[] hash = new byte[saltpos];
                     System.arraycopy(decoded, 0, hash, 0, saltpos);
-                    byte[] salt = new byte[decoded.length - saltpos];
-                    System.arraycopy(decoded, saltpos, salt, 0, salt.length);
 
-                    md.update(salt);
+                    md.update(decoded, saltpos, decoded.length - saltpos);
+
                     byte[] dp = md.digest();
 
                     validated = Arrays.equals(dp, hash);

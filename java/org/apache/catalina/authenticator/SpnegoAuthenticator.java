@@ -27,15 +27,14 @@ import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -188,13 +187,9 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
         authorizationBC.setOffset(authorizationBC.getOffset() + 10);
 
-        // Create the String directly as this will change on each request and we
-        // don't want to use the StringCache
-        String encoded = new String(authorizationBC.getBuffer(),
+        byte[] decoded = Base64.decodeBase64(authorizationBC.getBuffer(),
                 authorizationBC.getOffset(),
-                authorizationBC.getLength(), B2CConverter.ISO_8859_1);
-
-        byte[] decoded = DatatypeConverter.parseBase64Binary(encoded);
+                authorizationBC.getLength());
 
         if (decoded.length == 0) {
             if (log.isDebugEnabled()) {
@@ -282,7 +277,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
         // Send response token on success and failure
         response.setHeader("WWW-Authenticate", "Negotiate "
-                + DatatypeConverter.printBase64Binary(outToken));
+                + Base64.encodeBase64String(outToken));
 
         if (principal != null) {
             register(request, response, principal, Constants.SPNEGO_METHOD,
