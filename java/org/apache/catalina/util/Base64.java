@@ -32,8 +32,7 @@ import org.apache.tomcat.util.buf.CharChunk;
  * @author Jeffrey Rodriguez
  * @version $Id$
  *
- * @deprecated  Use {@link
- *              javax.xml.bind.DatatypeConverter#parseBase64Binary(String)}.
+ * @deprecated  Use {@link org.apache.tomcat.util.codec.binary.Base64}
  *              This class will be removed in Tomcat 8.
  */
 @Deprecated

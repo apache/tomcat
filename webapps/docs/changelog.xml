@@ -98,7 +98,8 @@
       </fix>
       <scode>
         Deprecate Tomcat&apos;s internal Base 64 encoder/decoder and switch to
-        using the JRE provided implementation. (markt)
+        using a package renamed copy of the Commons Codec implementation.
+        (markt)
       </scode>
       <fix>
         Ensure that StandardJarScanner#scan will use the provided class loader
