@@ -1298,9 +1298,10 @@ public class AprEndpoint extends AbstractEndpoint {
                 // Adjust poller size so that it won't reach the limit. This is
                 // a limitation of XP / Server 2003 that has been fixed in
                 // Vista / Server 2008 onwards.
-                defaultPollerSize = 1024;
+                actualPollerSize = 1024;
+            } else {
+                actualPollerSize = defaultPollerSize;
             }
-            actualPollerSize = defaultPollerSize;
 
             timeouts = new SocketTimeouts(defaultPollerSize);
 
@@ -1335,7 +1336,6 @@ public class AprEndpoint extends AbstractEndpoint {
             connectionCount = 0;
             addList = new SocketList(defaultPollerSize);
             localAddList = new SocketList(defaultPollerSize);
-
         }
 
 
