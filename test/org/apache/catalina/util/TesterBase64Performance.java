@@ -29,7 +29,7 @@ import org.apache.tomcat.util.buf.CharChunk;
 
 public class TesterBase64Performance {
 
-    private static final int SIZE = 1000000;
+    private static final int SIZE = 10000000;
 
     @SuppressWarnings("deprecation")
     @Test
