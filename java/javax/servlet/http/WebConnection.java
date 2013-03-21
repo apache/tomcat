@@ -27,7 +27,7 @@ import javax.servlet.ServletOutputStream;
  *
  * @since Servlet 3.1
  */
-public interface WebConnection {
+public interface WebConnection extends AutoCloseable {
 
     /**
      * Provides access to the {@link ServletInputStream} for reading data from

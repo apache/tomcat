@@ -32,6 +32,8 @@ import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsIOException;
 import org.apache.tomcat.websocket.WsSession;
@@ -40,6 +42,11 @@ import org.apache.tomcat.websocket.WsSession;
  * Servlet 3.1 HTTP upgrade handler for WebSocket connections.
  */
 public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
+
+    private static final Log log =
+            LogFactory.getLog(WsHttpUpgradeHandler.class);
+    private static final StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final ClassLoader applicationClassLoader;
 
@@ -50,11 +57,9 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
     private String subProtocol;
     private Map<String,String> pathParameters;
     private boolean secure;
+    WebConnection connection;
 
     private WsSession wsSession;
-
-    private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
 
 
     public WsHttpUpgradeHandler() {
@@ -82,6 +87,8 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
             throw new IllegalStateException(
                     sm.getString("wsHttpUpgradeHandler.noPreInit"));
         }
+
+        this.connection = connection;
 
         ServletInputStream sis;
         ServletOutputStream sos;
@@ -126,7 +133,11 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
 
     @Override
     public void destroy() {
-        // NO-OP
+        try {
+            connection.close();
+        } catch (Exception e) {
+            log.error(sm.getString("wsHttpUpgradeHandler.destroyFailed"), e);
+        }
     }
 
 
