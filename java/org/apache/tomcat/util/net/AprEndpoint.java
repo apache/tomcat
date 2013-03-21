@@ -1629,9 +1629,6 @@ public class AprEndpoint extends AbstractEndpoint {
                                 AprSocketWrapper wrapper = connections.get(
                                         Long.valueOf(desc[n*2+1]));
                                 wrapper.pollerFlags = wrapper.pollerFlags & ~((int) desc[n*2]);
-                                if (wrapper.pollerFlags != 0) {
-                                    add(desc[n*2+1], 1, wrapper.pollerFlags);
-                                }
                                 // Check for failed sockets and hand this socket off to a worker
                                 if (wrapper.isComet()) {
                                     // Event processes either a read or a write depending on what the poller returns
@@ -1643,11 +1640,17 @@ public class AprEndpoint extends AbstractEndpoint {
                                             destroySocket(desc[n*2+1]);
                                         }
                                     } else if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
+                                        if (wrapper.pollerFlags != 0) {
+                                            add(desc[n*2+1], 1, wrapper.pollerFlags);
+                                        }
                                         if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
                                             // Close socket and clear pool
                                             destroySocket(desc[n*2+1]);
                                         }
                                     } else if ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
+                                        if (wrapper.pollerFlags != 0) {
+                                            add(desc[n*2+1], 1, wrapper.pollerFlags);
+                                        }
                                         if (!processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
                                             // Close socket and clear pool
                                             destroySocket(desc[n*2+1]);
