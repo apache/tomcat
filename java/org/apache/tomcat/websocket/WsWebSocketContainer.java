@@ -46,10 +46,10 @@ import javax.websocket.Extension;
 import javax.websocket.HandshakeResponse;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
@@ -345,7 +345,7 @@ public class WsWebSocketContainer
     private String generateWsKeyValue() {
         byte[] keyBytes = new byte[16];
         random.nextBytes(keyBytes);
-        return DatatypeConverter.printBase64Binary(keyBytes);
+        return Base64.encodeBase64String(keyBytes);
     }
 
 
