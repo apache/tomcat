@@ -23,11 +23,11 @@ ideal. These include:
 - potential conflicts if a web application ships with the same JAR
 - a large JAR where Tomcat only depends on a small fraction
 
-There are various approaches taken to dealing with this. Once of those
-approaches is to svn copy the classes to the Tomcat source tree, modify them
-(always a package rename, sometimes additional changes) and then keep them in
-sync with the original via regular svn merges. This file keeps track of these
-copies to assist committers in keeping them up to date.
+There are various approaches taken to dealing with this. One of those approaches
+is to svn copy the classes to the Tomcat source tree, modify them (always with a
+package rename, sometimes with additional changes) and then keep them in sync
+with the original via regular svn merges. This file keeps track of these copies
+to assist committers in keeping them up to date.
 
 BCEL
 org.apache.tomcat.util.bcel is copied from:
