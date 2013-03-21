@@ -693,7 +693,12 @@ public class Base64 extends BaseNCodec {
      * @return Array containing decoded data.
      */
     public static byte[] decodeBase64(final byte[] base64Data) {
-        return new Base64().decode(base64Data);
+        return decodeBase64(base64Data, 0, base64Data.length);
+    }
+
+    public  static byte[] decodeBase64(
+            final byte[] base64Data, final int off, final int len) {
+        return new Base64().decode(base64Data, off, len);
     }
 
     // Implementation of the Encoder Interface
