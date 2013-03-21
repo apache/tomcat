@@ -52,6 +52,15 @@ public abstract class AbstractProcessor<S>
     }
 
 
+    // --------------------------------------------------- AutoCloseable methods
+
+    @Override
+    public void close() throws Exception {
+        upgradeServletInputStream.close();
+        upgradeServletOutputStream.close();
+    }
+
+
     // --------------------------------------------------- WebConnection methods
 
     @Override
