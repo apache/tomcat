@@ -140,7 +140,7 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
      * Defines the default buffer size - currently {@value}
      * - must be large enough for at least one encoded block+separator
      */
-    private static final int DEFAULT_BUFFER_SIZE = 8192;
+    private static final int DEFAULT_BUFFER_SIZE = 128;
 
     /** Mask used to extract 8 bits, used in decoding bytes */
     protected static final int MASK_8BITS = 0xff;
