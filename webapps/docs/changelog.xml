@@ -100,6 +100,10 @@
         Deprecate Tomcat&apos;s internal Base 64 encoder/decoder and switch to
         using the JRE provided implementation. (markt)
       </scode>
+      <fix>
+        Ensure that StandardJarScanner#scan will use the provided class loader
+        when scanning the class loader hierarchy. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
