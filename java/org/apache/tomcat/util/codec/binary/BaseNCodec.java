@@ -377,12 +377,16 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
      */
     @Override
     public byte[] decode(final byte[] pArray) {
-        if (pArray == null || pArray.length == 0) {
-            return pArray;
+        return decode(pArray, 0, pArray.length);
+    }
+
+    public byte[] decode(final byte[] pArray, final int off, final int len) {
+        if (pArray == null || len == 0) {
+            return new byte[0];
         }
         final Context context = new Context();
-        decode(pArray, 0, pArray.length, context);
-        decode(pArray, 0, EOF, context); // Notify decoder of EOF.
+        decode(pArray, off, len, context);
+        decode(pArray, off, EOF, context); // Notify decoder of EOF.
         final byte[] result = new byte[context.pos];
         readResults(result, 0, result.length, context);
         return result;
