@@ -33,7 +33,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestMaxConnections extends TomcatBaseTest {
-    public static final int soTimeout = 3000;
+    public static final int soTimeout = 5000;
     public static final int connectTimeout = 1000;
 
     @Test
