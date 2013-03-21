@@ -188,13 +188,12 @@ public class StandardJarScanner implements JarScanner {
         }
 
         // Scan the classpath
-        if (scanClassPath) {
+        if (scanClassPath && classloader != null) {
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("jarScan.classloaderStart"));
             }
 
-            ClassLoader loader =
-                Thread.currentThread().getContextClassLoader();
+            ClassLoader loader = classloader;
 
             ClassLoader stopLoader = null;
             if (!scanBootstrapClassPath) {
