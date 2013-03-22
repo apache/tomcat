@@ -92,8 +92,17 @@ public class WsSci implements ServletContainerInitializer {
             filteredPojoEndpoints.addAll(scannedPojoEndpoints);
         } else {
             for (ServerApplicationConfig config : serverApplicationConfigs) {
-                filteredEndpointConfigs.addAll(
-                        config.getEndpointConfigs(scannedEndpointClazzes));
+                Set<ServerEndpointConfig> configFilteredEndpoints =
+                        config.getEndpointConfigs(scannedEndpointClazzes);
+                if (configFilteredEndpoints != null) {
+                    filteredEndpointConfigs.addAll(configFilteredEndpoints);
+                }
+                Set<Class<?>> configFilteredPojos =
+                        config.getAnnotatedEndpointClasses(
+                                scannedPojoEndpoints);
+                if (configFilteredPojos != null) {
+                    filteredPojoEndpoints.addAll(configFilteredPojos);
+                }
             }
         }
 
