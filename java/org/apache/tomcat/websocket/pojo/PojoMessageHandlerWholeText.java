@@ -30,6 +30,8 @@ import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
 
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.Util;
+
 
 /**
  * Text specific concrete implementation for handling whole messages.
@@ -41,12 +43,23 @@ public class PojoMessageHandlerWholeText
             StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final List<Decoder> decoders = new ArrayList<>();
+    private final Class<?> primitiveType;
 
     public PojoMessageHandlerWholeText(Object pojo, Method method,
             Session session, EndpointConfig config, Object[] params,
             int indexPayload, boolean convert, int indexSession) {
         super(pojo, method, session, params, indexPayload, convert,
                 indexSession);
+
+        // Check for primitives
+        Class<?> type = method.getParameterTypes()[indexPayload];
+        if (Util.isPrimitive(type)) {
+            primitiveType = type;
+            return;
+        } else {
+            primitiveType = null;
+        }
+
         try {
             for (Class<? extends Decoder> decoderClazz : config.getDecoders()) {
                 if (Text.class.isAssignableFrom(decoderClazz)) {
@@ -70,6 +83,11 @@ public class PojoMessageHandlerWholeText
 
     @Override
     protected Object decode(String message) throws DecodeException {
+        // Handle primitives
+        if (primitiveType != null) {
+            return Util.coerceToType(primitiveType, message);
+        }
+        // Handle full decoders
         for (Decoder decoder : decoders) {
             if (decoder instanceof Text) {
                 if (((Text<?>) decoder).willDecode(message)) {

@@ -30,12 +30,16 @@ import javax.websocket.Decoder;
 import javax.websocket.Encoder;
 import javax.websocket.MessageHandler;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Utility class for internal use only within the
  * {@link org.apache.tomcat.websocket} package.
  */
 public class Util {
 
+    private static final StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
     private static final Queue<SecureRandom> randoms =
             new ConcurrentLinkedQueue<>();
 
@@ -233,5 +237,32 @@ public class Util {
             return true;
         }
         return false;
+    }
+
+
+    public static Object coerceToType(Class<?> type, String value) {
+        if (type.equals(String.class)) {
+            return value;
+        } else if (type.equals(boolean.class) || type.equals(Boolean.class)) {
+            return Boolean.valueOf(value);
+        } else if (type.equals(byte.class) || type.equals(Byte.class)) {
+            return Byte.valueOf(value);
+        } else if (value.length() == 1 &&
+                (type.equals(char.class) || type.equals(Character.class))) {
+            return Character.valueOf(value.charAt(0));
+        } else if (type.equals(double.class) || type.equals(Double.class)) {
+            return Double.valueOf(value);
+        } else if (type.equals(float.class) || type.equals(Float.class)) {
+            return Float.valueOf(value);
+        } else if (type.equals(int.class) || type.equals(Integer.class)) {
+            return Integer.valueOf(value);
+        } else if (type.equals(long.class) || type.equals(Long.class)) {
+            return Long.valueOf(value);
+        } else if (type.equals(short.class) || type.equals(Short.class)) {
+            return Short.valueOf(value);
+        } else {
+            throw new IllegalArgumentException(sm.getString(
+                    "util.invalidType", value, type.getName()));
+        }
     }
 }

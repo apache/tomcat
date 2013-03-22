@@ -236,38 +236,11 @@ public class PojoMethodMapping {
                 if (value == null) {
                     result[i] = null;
                 } else {
-                    result[i] = coerceToType(type, value);
+                    result[i] = Util.coerceToType(type, value);
                 }
             }
         }
         return result;
-    }
-
-
-    private static Object coerceToType(Class<?> type, String value) {
-        if (type.equals(String.class)) {
-            return value;
-        } else if (type.equals(boolean.class) || type.equals(Boolean.class)) {
-            return Boolean.valueOf(value);
-        } else if (type.equals(byte.class) || type.equals(Byte.class)) {
-            return Byte.valueOf(value);
-        } else if (value.length() == 1 &&
-                (type.equals(char.class) || type.equals(Character.class))) {
-            return Character.valueOf(value.charAt(0));
-        } else if (type.equals(double.class) || type.equals(Double.class)) {
-            return Double.valueOf(value);
-        } else if (type.equals(float.class) || type.equals(Float.class)) {
-            return Float.valueOf(value);
-        } else if (type.equals(int.class) || type.equals(Integer.class)) {
-            return Integer.valueOf(value);
-        } else if (type.equals(long.class) || type.equals(Long.class)) {
-            return Long.valueOf(value);
-        } else if (type.equals(short.class) || type.equals(Short.class)) {
-            return Short.valueOf(value);
-        } else {
-            throw new IllegalArgumentException(sm.getString(
-                    "pojoMethodMapping.invalidType", value, type.getName()));
-        }
     }
 
 
@@ -509,7 +482,7 @@ public class PojoMethodMapping {
                 String valueString = pathParameters.get(pathParam.getName());
                 Object value = null;
                 if (valueString != null) {
-                    value = coerceToType(pathParam.getType(), valueString);
+                    value = Util.coerceToType(pathParam.getType(), valueString);
                 }
                 params[entry.getKey().intValue()] = value;
             }
