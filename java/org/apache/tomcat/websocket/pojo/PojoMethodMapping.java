@@ -472,6 +472,7 @@ public class PojoMethodMapping {
                     indexBoolean != -1) {
                 // The boolean we found is a payload, not an last flag
                 indexPayload = indexBoolean;
+                indexPrimitive = indexBoolean;
                 indexBoolean = -1;
             }
             if (indexPayload == -1) {
