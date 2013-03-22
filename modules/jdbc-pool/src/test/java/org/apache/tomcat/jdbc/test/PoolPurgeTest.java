@@ -18,16 +18,13 @@ package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Test;
+
 import org.apache.tomcat.jdbc.test.driver.Driver;
 
-/**
- * @author Filip Hanik
- * @version 1.0
- */
 public class PoolPurgeTest extends DefaultTestCase {
-    public PoolPurgeTest(String name) {
-        super(name);
-    }
 
     static final int expectedSize = 2;
 
@@ -49,43 +46,41 @@ public class PoolPurgeTest extends DefaultTestCase {
 
 
     @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         Driver.reset();
         super.tearDown();
     }
 
 
-
+    @Test
     public void testPoolPurge() throws Exception {
-        init();
         this.datasource.getConnection().close();
-        assertEquals("Nr of connections should be "+expectedSize, expectedSize , datasource.getSize());
+        Assert.assertEquals("Nr of connections should be "+expectedSize, expectedSize , datasource.getSize());
         this.datasource.purge();
-        assertEquals("Nr of connections should be 0", 0 , datasource.getSize());
-        tearDown();
+        Assert.assertEquals("Nr of connections should be 0", 0 , datasource.getSize());
     }
 
+    @Test
     public void testPoolPurgeWithActive() throws Exception {
-        init();
         Connection con = datasource.getConnection();
-        assertEquals("Nr of connections should be "+expectedSize, expectedSize , datasource.getSize());
+        Assert.assertEquals("Nr of connections should be "+expectedSize, expectedSize , datasource.getSize());
         this.datasource.purge();
-        assertEquals("Nr of connections should be "+(expectedSize-1), (expectedSize-1) , datasource.getSize());
+        Assert.assertEquals("Nr of connections should be "+(expectedSize-1), (expectedSize-1) , datasource.getSize());
         con.close();
-        assertEquals("Nr of connections should be 0", 0 , datasource.getSize());
-        tearDown();
+        Assert.assertEquals("Nr of connections should be 0", 0 , datasource.getSize());
     }
 
+    @Test
     public void testPoolPurgeOnReturn() throws Exception {
         init();
         Connection con = datasource.getConnection();
-        assertEquals("Nr of connections should be "+expectedSize, expectedSize , datasource.getSize());
+        Assert.assertEquals("Nr of connections should be "+expectedSize, expectedSize , datasource.getSize());
         this.datasource.purgeOnReturn();
-        assertEquals("Nr of connections should be "+expectedSize, expectedSize , datasource.getSize());
+        Assert.assertEquals("Nr of connections should be "+expectedSize, expectedSize , datasource.getSize());
         con.close();
-        assertEquals("Nr of connections should be "+(expectedSize-1), (expectedSize-1) , datasource.getSize());
+        Assert.assertEquals("Nr of connections should be "+(expectedSize-1), (expectedSize-1) , datasource.getSize());
         tearDown();
     }
-
 }
 

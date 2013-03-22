@@ -14,17 +14,16 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 public class TwoDataSources extends DefaultTestCase {
 
-    public TwoDataSources(String name) {
-        super(name);
-    }
-
+    @Test
     public void testTwoDataSources() throws Exception {
         org.apache.tomcat.jdbc.pool.DataSource d1 = this.createDefaultDataSource();
         org.apache.tomcat.jdbc.pool.DataSource d2 = this.createDefaultDataSource();
@@ -37,29 +36,26 @@ public class TwoDataSources extends DefaultTestCase {
         Thread.sleep(5000);
         try {
             c1.createStatement();
-            assertTrue("Connection should have been abandoned.",false);
+            Assert.assertTrue("Connection should have been abandoned.",false);
         }catch (Exception x) {
-            assertTrue("This is correct, c1 is abandoned",true);
+            Assert.assertTrue("This is correct, c1 is abandoned",true);
         }
 
         try {
             c2.createStatement();
-            assertTrue("Connection should not have been abandoned.",true);
+            Assert.assertTrue("Connection should not have been abandoned.",true);
         }catch (Exception x) {
-            assertTrue("Connection c2 should be working",false);
+            Assert.assertTrue("Connection c2 should be working",false);
         }
         try {
-            assertTrue("Connection should have been closed.",c1.isClosed());
+            Assert.assertTrue("Connection should have been closed.",c1.isClosed());
         }catch (Exception x) {
-            assertTrue("This is correct, c1 is closed",true);
+            Assert.assertTrue("This is correct, c1 is closed",true);
         }
         try {
-            assertFalse("Connection c2 should not have been closed.",c2.isClosed());
+            Assert.assertFalse("Connection c2 should not have been closed.",c2.isClosed());
         }catch (Exception x) {
-            assertTrue("Connection c2 should be working",false);
+            Assert.assertTrue("Connection c2 should be working",false);
         }
-
-
     }
-
 }

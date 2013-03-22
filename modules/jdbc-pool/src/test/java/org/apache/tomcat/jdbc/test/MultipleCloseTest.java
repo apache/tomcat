@@ -14,18 +14,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Test;
+
 import org.apache.tomcat.jdbc.test.driver.Driver;
 
 public class MultipleCloseTest extends DefaultTestCase {
-
-    public MultipleCloseTest(String name) {
-        super(name);
-    }
 
     @Override
     public org.apache.tomcat.jdbc.pool.DataSource createDefaultDataSource() {
@@ -40,29 +39,31 @@ public class MultipleCloseTest extends DefaultTestCase {
         return ds;
     }
 
+    @After
     @Override
-    protected void tearDown() throws Exception {
+    public void tearDown() throws Exception {
         Driver.reset();
         super.tearDown();
     }
 
+    @Test
     public void testClosedConnectionsNotReused() throws Exception {
         this.init();
 
         Connection con1 = datasource.getConnection();
 
         // A new connection is open
-        assertFalse(con1.isClosed());
+        Assert.assertFalse(con1.isClosed());
 
         con1.close();
 
         // Confirm that a closed connection is closed
-        assertTrue(con1.isClosed());
+        Assert.assertTrue(con1.isClosed());
 
         // Open a new connection (This will re-use the previous pooled connection)
         datasource.getConnection();
 
         // A connection, once closed, should stay closed
-        assertTrue(con1.isClosed());
+        Assert.assertTrue(con1.isClosed());
     }
 }

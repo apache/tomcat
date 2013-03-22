@@ -20,19 +20,18 @@ import java.sql.Connection;
 
 import javax.sql.PooledConnection;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import org.apache.tomcat.jdbc.test.driver.Driver;
 
 public class EqualsHashCodeTest extends DefaultTestCase{
     public static final String password = "password";
     public static final String username = "username";
 
-    public EqualsHashCodeTest(String s) {
-        super(s);
-    }
-
-    @Override
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         this.datasource.setPassword(password);
@@ -44,30 +43,32 @@ public class EqualsHashCodeTest extends DefaultTestCase{
         datasource.createPool();
     }
 
+    @Test
     public void testEquals() throws Exception {
         Connection con1 = datasource.getConnection();
         Connection real1 = ((PooledConnection)con1).getConnection();
-        assertEquals(con1, con1);
+        Assert.assertEquals(con1, con1);
         con1.close();
-        assertEquals(con1, con1);
+        Assert.assertEquals(con1, con1);
         Connection con2 = datasource.getConnection();
         Connection real2 = ((PooledConnection)con2).getConnection();
-        assertEquals(real1,real2);
-        assertEquals(con2, con2);
-        assertNotSame(con1, con2);
+        Assert.assertEquals(real1,real2);
+        Assert.assertEquals(con2, con2);
+        Assert.assertNotSame(con1, con2);
         con2.close();
-        assertEquals(con2, con2);
+        Assert.assertEquals(con2, con2);
     }
 
+    @Test
     public void testHashCode() throws Exception {
         Connection con1 = datasource.getConnection();
-        assertEquals(con1.hashCode(), con1.hashCode());
+        Assert.assertEquals(con1.hashCode(), con1.hashCode());
         con1.close();
-        assertEquals(con1.hashCode(), con1.hashCode());
+        Assert.assertEquals(con1.hashCode(), con1.hashCode());
         Connection con2 = datasource.getConnection();
-        assertEquals(con2.hashCode(), con2.hashCode());
-        assertTrue(con1.hashCode() != con2.hashCode());
+        Assert.assertEquals(con2.hashCode(), con2.hashCode());
+        Assert.assertTrue(con1.hashCode() != con2.hashCode());
         con2.close();
-        assertEquals(con2.hashCode(), con2.hashCode());
+        Assert.assertEquals(con2.hashCode(), con2.hashCode());
     }
 }
