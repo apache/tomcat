@@ -65,6 +65,10 @@
         Fix minor threading issue in <code>ConnectionPool</code>.
         (markt/kkolinko)
       </fix>
+      <fix>
+        <bug>54732</bug>: Fix leak of statements in <code>StatementCache</code>
+        interceptor. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
