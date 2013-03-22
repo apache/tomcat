@@ -519,6 +519,10 @@ public class PojoMethodMapping {
                 if (indexString != -1) {
                     mh = new PojoMessageHandlerWholeText(pojo, m,  session,
                             config, params, indexString, false, indexSession);
+                } else if (indexPrimitive != -1) {
+                    mh = new PojoMessageHandlerWholeText(pojo, m, session,
+                            config, params, indexPrimitive, false,
+                            indexSession);
                 } else if (indexByteArray != -1) {
                     mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
                             config, params, indexByteArray, true, indexSession,
