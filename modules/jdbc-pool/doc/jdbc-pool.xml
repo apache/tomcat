@@ -568,6 +568,36 @@
     <attributes>
     </attributes>
   </subsection>
+  <subsection name="org.apache.tomcat.jdbc.pool.interceptor.StatementCache">
+    <p>Caches <code>PreparedStatement</code> and/or <code>CallableStatement</code>
+       instances on a connection.
+    </p>
+    <p>The statements are cached per connection.
+       The count limit is counted globally for all connections that belong to
+       the same pool. Once the count reaches <code>max</code>, subsequent
+       statements are not returned to the cache and are closed immediately.
+    </p>
+    <attributes>
+      <attribute name="prepared" required="false">
+        <p>(boolean as String) Enable caching of <code>PreparedStatement</code>
+           instances created using <code>prepareStatement</code> calls.
+           The default value is <code>true</code>.
+        </p>
+      </attribute>
+      <attribute name="callable" required="false">
+        <p>(boolean as String) Enable caching of <code>CallableStatement</code>
+           instances created using <code>prepareCall</code> calls.
+           The default value is <code>false</code>.
+        </p>
+      </attribute>
+      <attribute name="max" required="false">
+        <p>(int as String) Limit on the count of cached statements across
+           the connection pool.
+           The default value is <code>50</code>.
+        </p>
+      </attribute>
+    </attributes>
+  </subsection>
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.StatementDecoratorInterceptor">
     <p>See <bug>48392</bug>. Interceptor to wrap statements and result sets in order to prevent access to the actual connection
        using the methods <code>ResultSet.getStatement().getConnection()</code> and <code>Statement.getConnection()</code>
