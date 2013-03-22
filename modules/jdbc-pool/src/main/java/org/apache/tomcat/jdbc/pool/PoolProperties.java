@@ -802,28 +802,33 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         StringBuilder buf = new StringBuilder("ConnectionPool[");
         try {
             String[] fields = DataSourceFactory.ALL_PROPERTIES;
-            for (int i=0; i<fields.length; i++) {
+            for (String field: fields) {
                 final String[] prefix = new String[] {"get","is"};
                 for (int j=0; j<prefix.length; j++) {
 
-                    String name = prefix[j] + fields[i].substring(0, 1).toUpperCase(Locale.ENGLISH) +
-                                  fields[i].substring(1);
+                    String name = prefix[j]
+                            + field.substring(0, 1).toUpperCase(Locale.ENGLISH)
+                            + field.substring(1);
                     Method m = null;
                     try {
                         m = getClass().getMethod(name);
                     }catch (NoSuchMethodException nm) {
                         continue;
                     }
-                    buf.append(fields[i]);
+                    buf.append(field);
                     buf.append("=");
-                    buf.append(m.invoke(this, new Object[0]));
+                    if (DataSourceFactory.PROP_PASSWORD.equals(field)) {
+                        buf.append("********");
+                    } else {
+                        buf.append(m.invoke(this, new Object[0]));
+                    }
                     buf.append("; ");
                     break;
                 }
             }
         }catch (Exception x) {
-            //shouldn;t happen
-            x.printStackTrace();
+            //shouldn't happen
+            log.debug("toString() call failed", x);
         }
         return buf.toString();
     }

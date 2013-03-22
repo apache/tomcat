@@ -134,6 +134,11 @@
         Patch provided by Martin Lichtin. (violetagg)
       </fix>
       <fix>
+        <bug>54599</bug>: Do not print connection password in
+        <code>PoolProperties.toString()</code>. Based on a patch by
+        Daniel Mikusa. (kkolinko)
+      </fix>
+      <fix>
         <bug>54684</bug>: Add <code>javax.naming.spi</code> to 
         <code>Import-Package</code> header in MANIFEST.MF in order to resolve
         <code>ClassNotFoundException</code> when running in OSGi environment.
