@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.websocket.Endpoint;
 import javax.websocket.Extension;
+import javax.websocket.HandshakeResponse;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -114,7 +115,8 @@ public class WsServlet extends HttpServlet {
                 Constants.UPGRADE_HEADER_VALUE);
         resp.setHeader(Constants.CONNECTION_HEADER_NAME,
                 Constants.CONNECTION_HEADER_VALUE);
-        resp.setHeader("Sec-WebSocket-Accept", getWebSocketAccept(key));
+        resp.setHeader(HandshakeResponse.SEC_WEBSOCKET_ACCEPT,
+                getWebSocketAccept(key));
         if (subProtocol != null) {
             resp.setHeader("Sec-WebSocket-Protocol", subProtocol);
         }
