@@ -1171,7 +1171,7 @@ public class ConnectionPool {
         Future<PooledConnection> pcFuture = null;
         AtomicBoolean configured = new AtomicBoolean(false);
         CountDownLatch latch = new CountDownLatch(1);
-        Connection result = null;
+        volatile Connection result = null;
         SQLException cause = null;
         AtomicBoolean cancelled = new AtomicBoolean(false);
         volatile PooledConnection pc = null;
