@@ -20,7 +20,6 @@ import java.sql.Connection;
 
 import javax.sql.PooledConnection;
 
-import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.test.driver.Driver;
 
 public class EqualsHashCodeTest extends DefaultTestCase{
@@ -42,7 +41,7 @@ public class EqualsHashCodeTest extends DefaultTestCase{
         this.datasource.setMaxIdle(datasource.getMaxActive());
         this.datasource.setUsername(username);
         this.datasource.getConnection().close();
-        ConnectionPool pool = datasource.createPool();
+        datasource.createPool();
     }
 
     public void testEquals() throws Exception {
@@ -67,7 +66,7 @@ public class EqualsHashCodeTest extends DefaultTestCase{
         assertEquals(con1.hashCode(), con1.hashCode());
         Connection con2 = datasource.getConnection();
         assertEquals(con2.hashCode(), con2.hashCode());
-        assertNotSame(con1.hashCode(), con2.hashCode());
+        assertTrue(con1.hashCode() != con2.hashCode());
         con2.close();
         assertEquals(con2.hashCode(), con2.hashCode());
     }
