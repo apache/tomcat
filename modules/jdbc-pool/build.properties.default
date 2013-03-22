@@ -62,11 +62,11 @@ testdb.validationQuery=SELECT 1
 #testdb.driverClassName=org.apache.derby.jdbc.EmbeddedDriver
 #testdb.validationQuery=VALUES 1
 
-# ----- JUnit Unit Test Suite, version 3.7 or later -----
-junit.home=${base.path}/junit3.8.2
+# ----- JUnit Unit Test Suite, version 4.8 or later -----
+junit.home=${base.path}/junit4.8.2
 junit.lib=${junit.home}
-junit.jar=${junit.lib}/junit.jar
-junit.loc=http://downloads.sourceforge.net/junit/junit3.8.2.zip
+junit.jar=${junit.lib}/junit-4.8.2.jar
+junit.loc=http://cloud.github.com/downloads/KentBeck/junit/junit4.8.2.zip
 
 c3p0.home=${base.path}/c3p0-0.9.1.2
 c3p0.jar=${c3p0.home}/lib/c3p0-0.9.1.2.jar
