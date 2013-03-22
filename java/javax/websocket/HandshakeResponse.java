@@ -21,8 +21,10 @@ import java.util.Map;
 
 public interface HandshakeResponse {
 
-    public static final String SEC_WEBSOCKET_ACCEPT =
-            "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+    /**
+     * Name of the WebSocket accept HTTP header.
+     */
+    public static final String SEC_WEBSOCKET_ACCEPT = "Sec-WebSocket-Accept";
 
     Map<String,List<String>> getHeaders();
 }
