@@ -282,6 +282,7 @@ public class PojoMethodMapping {
         private int indexSession = -1;
         private int indexInputStream = -1;
         private int indexReader = -1;
+        private int indexPrimitive = -1;
         private Map<Integer,PojoPathParam> indexPathParams = new HashMap<>();
         private int indexPayload = -1;
 
@@ -351,6 +352,14 @@ public class PojoMethodMapping {
                 } else if (types[i] == InputStream.class) {
                     if (indexInputStream == -1) {
                         indexInputStream = i;
+                    } else {
+                        throw new IllegalArgumentException(sm.getString(
+                                "pojoMethodMapping.duplicateMessageParam",
+                                m.getName(), m.getDeclaringClass().getName()));
+                    }
+                } else if (isPrimitive(types[i])) {
+                    if (indexPrimitive == -1) {
+                        indexPrimitive = i;
                     } else {
                         throw new IllegalArgumentException(sm.getString(
                                 "pojoMethodMapping.duplicateMessageParam",
@@ -441,6 +450,15 @@ public class PojoMethodMapping {
                     indexPayload = indexInputStream;
                 }
             }
+            if (indexPrimitive != -1) {
+                if (indexPayload != -1) {
+                    throw new IllegalArgumentException(sm.getString(
+                            "pojoMethodMapping.duplicateMessageParam",
+                            m.getName(), m.getDeclaringClass().getName()));
+                } else {
+                    indexPayload = indexPrimitive;
+                }
+            }
             if (indexPong != -1) {
                 if (indexPayload != -1) {
                     throw new IllegalArgumentException(sm.getString(
@@ -449,6 +467,12 @@ public class PojoMethodMapping {
                 } else {
                     indexPayload = indexPong;
                 }
+            }
+            if (indexPayload == -1 && indexPrimitive == -1 &&
+                    indexBoolean != -1) {
+                // The boolean we found is a payload, not an last flag
+                indexPayload = indexBoolean;
+                indexBoolean = -1;
             }
             if (indexPayload == -1) {
                 throw new IllegalArgumentException(sm.getString(
@@ -470,6 +494,23 @@ public class PojoMethodMapping {
                         "pojoMethodMapping.partialInputStream",
                         m.getName(), m.getDeclaringClass().getName()));
             }
+        }
+
+
+        private boolean isPrimitive(Class<?> clazz) {
+            if (clazz.isPrimitive()) {
+                return true;
+            } else if(clazz.equals(Boolean.class) ||
+                    clazz.equals(Byte.class) ||
+                    clazz.equals(Character.class) ||
+                    clazz.equals(Double.class) ||
+                    clazz.equals(Float.class) ||
+                    clazz.equals(Integer.class) ||
+                    clazz.equals(Long.class) ||
+                    clazz.equals(Short.class)) {
+                return true;
+            }
+            return false;
         }
 
 
