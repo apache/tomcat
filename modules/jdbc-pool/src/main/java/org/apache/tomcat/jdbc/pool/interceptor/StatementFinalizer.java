@@ -38,7 +38,6 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
 
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
-        // TODO Auto-generated method stub
         try {
             if (statement instanceof Statement)
                 statements.add(new WeakReference<>((Statement)statement));
