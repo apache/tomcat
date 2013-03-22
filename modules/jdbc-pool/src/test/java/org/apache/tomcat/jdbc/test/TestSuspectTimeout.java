@@ -14,22 +14,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
 
-import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.junit.Assert;
+import org.junit.Test;
 
+import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 public class TestSuspectTimeout extends DefaultTestCase {
 
-    public TestSuspectTimeout(String name) {
-        super(name);
-    }
-
+    @Test
     public void testSuspect() throws Exception {
-        this.init();
         this.datasource.setMaxActive(100);
         this.datasource.setMaxIdle(100);
         this.datasource.setInitialSize(0);
@@ -40,10 +37,10 @@ public class TestSuspectTimeout extends DefaultTestCase {
         this.datasource.getPoolProperties().setSuspectTimeout(1);
         this.datasource.getPoolProperties().setLogAbandoned(true);
         Connection con = datasource.getConnection();
-        assertEquals("Number of connections active/busy should be 1",1,datasource.getPool().getActive());
+        Assert.assertEquals("Number of connections active/busy should be 1",1,datasource.getPool().getActive());
         Thread.sleep(3000);
         PooledConnection pcon = con.unwrap(PooledConnection.class);
-        assertTrue("Connection should be marked suspect",pcon.isSuspect());
+        Assert.assertTrue("Connection should be marked suspect",pcon.isSuspect());
         con.close();
     }
 }

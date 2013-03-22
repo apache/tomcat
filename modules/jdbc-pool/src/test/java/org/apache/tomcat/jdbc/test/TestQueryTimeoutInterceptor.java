@@ -14,40 +14,37 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
 import java.sql.Statement;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor;
 import org.apache.tomcat.jdbc.test.driver.Driver;
 
-
 public class TestQueryTimeoutInterceptor extends DefaultTestCase {
 
-    public TestQueryTimeoutInterceptor(String name) {
-        super(name);
-    }
-
+    @Test
     public void testTimeout() throws Exception {
         int timeout = 10;
         int withoutuser =10;
         int withuser = withoutuser;
-        this.init();
         this.datasource.setMaxActive(withuser+withoutuser);
         this.datasource.setJdbcInterceptors(QueryTimeoutInterceptor.class.getName()+"(queryTimeout="+timeout+")");
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         Connection con = this.datasource.getConnection();
         Statement st = con.createStatement();
-        assertEquals(st.getClass().getName(),timeout,st.getQueryTimeout());
+        Assert.assertEquals(st.getClass().getName(),timeout,st.getQueryTimeout());
         st.close();
         st = con.prepareStatement("");
-        assertEquals(st.getClass().getName(),timeout,st.getQueryTimeout());
+        Assert.assertEquals(st.getClass().getName(),timeout,st.getQueryTimeout());
         st.close();
         st = con.prepareCall("");
-        assertEquals(st.getClass().getName(),timeout,st.getQueryTimeout());
+        Assert.assertEquals(st.getClass().getName(),timeout,st.getQueryTimeout());
         st.close();
         con.close();
     }
