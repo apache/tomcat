@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.AttributeChangeNotification;
 import javax.management.Notification;
@@ -122,7 +123,7 @@ public class TestSlowQueryReport extends DefaultTestCase {
             st.close();
         }
         System.out.println("Stats:"+stats);
-        assertEquals("Expecting to have received "+(2*count)+" notifications.",2*count, listener.notificationCount);
+        assertEquals("Expecting to have received "+(2*count)+" notifications.",2*count, listener.notificationCount.get());
         con.close();
         tearDown();
         //make sure we actually did clean up when the pool closed
@@ -184,11 +185,11 @@ public class TestSlowQueryReport extends DefaultTestCase {
 
 
     public class ClientListener implements NotificationListener {
-        volatile int notificationCount = 0;
+        AtomicInteger notificationCount = new AtomicInteger(0);
         @Override
         public void handleNotification(Notification notification,
                                        Object handback) {
-            notificationCount++;
+            notificationCount.incrementAndGet();
             System.out.println("\nReceived notification:");
             System.out.println("\tClassName: " + notification.getClass().getName());
             System.out.println("\tSource: " + notification.getSource());
