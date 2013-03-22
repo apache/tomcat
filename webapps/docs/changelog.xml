@@ -55,6 +55,27 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.40 (markt)">
+  <subsection name="jdbc-pool">
+    <changelog>
+      <update>
+        Document <code>StatementCache</code> interceptor. (kkolinko)
+      </update>
+      <fix>
+        Fix minor threading issue in <code>ConnectionPool</code>.
+        (markt/kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Convert remaining unit tests to JUnit 4 and enable Checkstyle rule
+        that forbids use of methods from JUnit 3. (markt/kkolinko)
+      </update>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.39 (markt)">
   <subsection name="Catalina">
     <changelog>
