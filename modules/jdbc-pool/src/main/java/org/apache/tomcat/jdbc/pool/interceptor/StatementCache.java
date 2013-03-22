@@ -27,6 +27,10 @@ import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 
+/**
+ * Interceptor that caches {@code PreparedStatement} and/or
+ * {@code CallableStatement} instances on a connection.
+ */
 public class StatementCache extends StatementDecoratorInterceptor {
     protected static final String[] ALL_TYPES = new String[] {PREPARE_STATEMENT,PREPARE_CALL};
     protected static final String[] CALLABLE_TYPE = new String[] {PREPARE_CALL};
