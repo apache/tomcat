@@ -419,6 +419,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void sendObjectByCompletion(Object obj, SendHandler completion) {
 
+        if (Util.isPrimitive(obj.getClass())) {
+            String msg = obj.toString();
+            sendStringByCompletion(msg, completion);
+            return;
+        }
+
         Encoder encoder = findEncoder(obj);
 
         try {
