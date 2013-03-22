@@ -242,11 +242,11 @@ public class StatementCache extends StatementDecoratorInterceptor {
                     removeStatement(proxy);
                 }
             }
-            closed = true;
-            delegate = null;
             if (shouldClose) {
                 super.closeInvoked();
             }
+            closed = true;
+            delegate = null;
 
         }
 

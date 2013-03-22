@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.jdbc.test;
 
+import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
@@ -23,7 +24,9 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
+import org.apache.tomcat.jdbc.pool.interceptor.StatementCounterInterceptor;
 
 public class TestStatementCache extends DefaultTestCase {
 
@@ -108,6 +111,55 @@ public class TestStatementCache extends DefaultTestCase {
     }
 
     @Test
+    public void testStatementClose1() throws Exception {
+        init();
+        datasource.setJdbcInterceptors(
+                TestStatementCacheInterceptor.class.getName()
+                + "(prepared=true,callable=false,max=1);"
+                + StatementCounterInterceptor.class.getName());
+        Connection con = datasource.getConnection();
+        StatementCounterInterceptor counter = findInterceptor(con, StatementCounterInterceptor.class);
+        PreparedStatement ps1, ps2;
+
+        ps1 = con.prepareStatement("select 1");
+        Assert.assertEquals(1, counter.getActiveCount());
+        ps1.close();
+        Assert.assertEquals("Statement goes into cache, not closed", 1, counter.getActiveCount());
+
+        ps1 = con.prepareStatement("select 1");
+        Assert.assertEquals("Reusing statement from cache", 1, counter.getActiveCount());
+        ps2 = con.prepareStatement("select 1");
+        Assert.assertEquals("Reusing statement from cache", 2, counter.getActiveCount());
+
+        ps2.close();
+        Assert.assertEquals("Statement goes into cache, not closed", 2, counter.getActiveCount());
+        ps1.close();
+        // Cache has "max=1". The following tests BZ 54732.
+        Assert.assertEquals("Statement does not go into cache, closed", 1, counter.getActiveCount());
+
+        con.close();
+        Assert.assertEquals("Connection returned to the pool. Statement is in cache", 1, counter.getActiveCount());
+
+        datasource.close();
+        Assert.assertEquals("Pool cleared. All statements in cache are closed", 0, counter.getActiveCount());
+    }
+
+    @Test
+    public void testStatementClose2() throws Exception {
+        init();
+        datasource.setJdbcInterceptors(
+                TestStatementCacheInterceptor.class.getName()
+                + "(prepared=false,callable=false,max=10);"
+                + StatementCounterInterceptor.class.getName());
+        Connection con = datasource.getConnection();
+        StatementCounterInterceptor counter = findInterceptor(con, StatementCounterInterceptor.class);
+        PreparedStatement ps1 = con.prepareStatement("select 1");
+        Assert.assertEquals(1, counter.getActiveCount());
+        ps1.close();
+        Assert.assertEquals("Statement is not pooled, closes immediately", 0, counter.getActiveCount());
+    }
+
+    @Test
     public void testMaxCacheSize() throws Exception {
         init();
         config(true,false,100);
@@ -129,5 +181,28 @@ public class TestStatementCache extends DefaultTestCase {
         public TestStatementCacheInterceptor() {
             TestStatementCache.interceptor = this;
         }
+    }
+
+    /**
+     * Helper method that finds interceptor instance in interceptor chain of a
+     * proxied class.
+     *
+     * @param proxy
+     *            Proxy class
+     * @param clazz
+     *            Interceptor class that we are looking for
+     * @return Instance of <code>clazz</code>
+     */
+    private static <T extends JdbcInterceptor> T findInterceptor(Object proxy,
+            Class<T> clazz) {
+        JdbcInterceptor interceptor = (JdbcInterceptor) Proxy
+                .getInvocationHandler(proxy);
+        while (interceptor != null) {
+            if (clazz.isInstance(interceptor)) {
+                return clazz.cast(interceptor);
+            }
+            interceptor = interceptor.getNext();
+        }
+        return null;
     }
 }
