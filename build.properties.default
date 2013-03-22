@@ -181,7 +181,7 @@ commons-daemon.native.src.loc.2=${base-commons.loc.2}/daemon/source/commons-daem
 commons-daemon.native.win.loc.1=${base-commons.loc.1}/daemon/binaries/windows/commons-daemon-${commons-daemon.version}-bin-windows.zip
 commons-daemon.native.win.loc.2=${base-commons.loc.2}/daemon/binaries/windows/commons-daemon-${commons-daemon.version}-bin-windows.zip
 
-# ----- JUnit Unit Test Suite, version 3.7 or later -----
+# ----- JUnit Unit Test Suite, version 4.8 or later -----
 junit.home=${base.path}/junit4.8.2
 junit.lib=${junit.home}
 junit.jar=${junit.lib}/junit-4.8.2.jar
