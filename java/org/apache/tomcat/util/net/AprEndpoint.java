@@ -99,7 +99,7 @@ public class AprEndpoint extends AbstractEndpoint {
     protected ConcurrentLinkedQueue<SocketWrapper<Long>> waitingRequests =
             new ConcurrentLinkedQueue<>();
 
-    private Map<Long,AprSocketWrapper> connections = new ConcurrentHashMap<>();
+    private final Map<Long,AprSocketWrapper> connections = new ConcurrentHashMap<>();
 
     // ------------------------------------------------------------ Constructor
 
