@@ -150,6 +150,10 @@ public class UserDataHelper {
             this.fallToDebug = fallToDebug;
         }
 
+        /**
+         * @deprecated Unused, removed in Tomcat 8.
+         */
+        @Deprecated
         public boolean fallToDebug() {
             return fallToDebug;
         }
