@@ -312,7 +312,7 @@ public final class Parameters {
                 UserDataHelper.Mode logMode = userDataLog.getNextMode();
                 if (logMode != null) {
                     String extract;
-                    if (valueEnd >= nameStart) {
+                    if (valueEnd > nameStart) {
                         extract = new String(bytes, nameStart, valueEnd
                                 - nameStart, DEFAULT_CHARSET);
                     } else {
