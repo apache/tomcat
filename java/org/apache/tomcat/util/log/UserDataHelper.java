@@ -144,6 +144,6 @@ public class UserDataHelper {
     public static enum Mode {
         DEBUG,
         INFO_THEN_DEBUG,
-        INFO;
+        INFO
     }
 }
