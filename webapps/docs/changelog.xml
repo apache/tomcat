@@ -77,6 +77,11 @@
         Convert remaining unit tests to JUnit 4 and enable Checkstyle rule
         that forbids use of methods from JUnit 3. (markt/kkolinko)
       </update>
+      <fix>
+        Remove unneeded permissions for reading UserDataHelper properties
+        from <code>catalina.policy</code> file. The class that needed those
+        was moved in 7.0.26. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
