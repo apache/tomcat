@@ -290,6 +290,7 @@ public abstract class WsFrameBase {
                     // There will be no overflow as the output buffer is big
                     // enough. There will be no underflow as all the data is
                     // passed to the decoder in a single call.
+                    controlBufferText.flip();
                     reason = controlBufferText.toString();
                 }
             }
