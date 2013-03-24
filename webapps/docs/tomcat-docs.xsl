@@ -190,15 +190,16 @@
             <tr><td>
             <blockquote>
             <p class="notice">
-              <strong>Notice: </strong>This is not a Q&amp;A section.
-              The Apache Comments System is explained
-              <a href="{$commentslink}">here</a>.
-              Comments should be pointed towards suggestions on improving the documentation
-              or server, and may be removed again by our moderators if they are either
-              implemented or considered invalid/off-topic.<br/><br/>
-              Questions on how to configure or use Apache Tomcat should be directed
-              to our <a href="http://tomcat.apache.org/lists.html">mailing lists</a>.
-              If you need help, ask on the users mailing list.</p>
+              <strong>Notice: </strong>This comments section collects your suggestions
+              on improving documentation for Apache Tomcat.<br/><br/>
+              If you have trouble and need help, read
+              <a href="http://tomcat.apache.org/findhelp.html">Find Help</a> page
+              and ask your question on the tomcat-users
+              <a href="http://tomcat.apache.org/lists.html">mailing list</a>.
+              Do not ask such questions here. This is not a Q&amp;A section.<br/><br/>
+              The Apache Comments System is explained <a href="{$commentslink}">here</a>.
+              Comments may be removed by our moderators if they are either
+              implemented or considered invalid/off-topic.</p>
               <script type="text/javascript">
               <xsl:text disable-output-escaping="yes"><![CDATA[<!--//--><![CDATA[//><!--
               var comments_shortname = 'tomcat';
