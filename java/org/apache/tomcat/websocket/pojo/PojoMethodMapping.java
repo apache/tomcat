@@ -286,7 +286,7 @@ public class PojoMethodMapping {
                 if (paramFound) {
                     continue;
                 }
-                if (types[i] == String.class) {
+                if (String.class.isAssignableFrom(types[i])) {
                     if (indexString == -1) {
                         indexString = i;
                     } else {
@@ -294,7 +294,7 @@ public class PojoMethodMapping {
                                 "pojoMethodMapping.duplicateMessageParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
-                } else if (types[i] == Reader.class) {
+                } else if (Reader.class.isAssignableFrom(types[i])) {
                     if (indexReader == -1) {
                         indexReader = i;
                     } else {
@@ -302,7 +302,7 @@ public class PojoMethodMapping {
                                 "pojoMethodMapping.duplicateMessageParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
-                } else if (types[i] == boolean.class) {
+                } else if (boolean.class == types[i]) {
                     if (indexBoolean == -1) {
                         indexBoolean = i;
                     } else {
@@ -310,7 +310,7 @@ public class PojoMethodMapping {
                                 "pojoMethodMapping.duplicateLastParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
-                } else if (types[i] == ByteBuffer.class) {
+                } else if (ByteBuffer.class.isAssignableFrom(types[i])) {
                     if (indexByteBuffer == -1) {
                         indexByteBuffer = i;
                     } else {
@@ -318,7 +318,7 @@ public class PojoMethodMapping {
                                 "pojoMethodMapping.duplicateMessageParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
-                } else if (types[i] == byte[].class) {
+                } else if (byte[].class == types[i]) {
                     if (indexByteArray == -1) {
                         indexByteArray = i;
                     } else {
@@ -326,7 +326,7 @@ public class PojoMethodMapping {
                                 "pojoMethodMapping.duplicateMessageParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
-                } else if (types[i] == InputStream.class) {
+                } else if (InputStream.class.isAssignableFrom(types[i])) {
                     if (indexInputStream == -1) {
                         indexInputStream = i;
                     } else {
@@ -342,7 +342,7 @@ public class PojoMethodMapping {
                                 "pojoMethodMapping.duplicateMessageParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
-                } else if (types[i] == Session.class) {
+                } else if (Session.class.isAssignableFrom(types[i])) {
                     if (indexSession == -1) {
                         indexSession = i;
                     } else {
@@ -350,7 +350,7 @@ public class PojoMethodMapping {
                                 "pojoMethodMapping.duplicateSessionParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
-                } else if (types[i] == PongMessage.class) {
+                } else if (PongMessage.class.isAssignableFrom(types[i])) {
                     if (indexPong == -1) {
                         indexPong = i;
                     } else {
@@ -447,7 +447,7 @@ public class PojoMethodMapping {
             }
             if (indexPayload == -1 && indexPrimitive == -1 &&
                     indexBoolean != -1) {
-                // The boolean we found is a payload, not an last flag
+                // The boolean we found is a payload, not a last flag
                 indexPayload = indexBoolean;
                 indexPrimitive = indexBoolean;
                 indexBoolean = -1;
