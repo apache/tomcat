@@ -402,6 +402,13 @@ public abstract class WsFrameBase {
                 // End of frame and possible message as well.
 
                 if (continuationExpected) {
+                    // If partial messages are supported, send what we have
+                    // managed to decode
+                    if (usePartial()) {
+                        messageBufferText.flip();
+                        sendMessageText(false);
+                        messageBufferText.clear();
+                    }
                     messageBufferBinary.compact();
                     newFrame();
                     // Process next frame
