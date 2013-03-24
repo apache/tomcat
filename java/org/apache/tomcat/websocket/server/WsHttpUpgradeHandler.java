@@ -57,7 +57,7 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
     private String subProtocol;
     private Map<String,String> pathParameters;
     private boolean secure;
-    WebConnection connection;
+    private WebConnection connection;
 
     private WsSession wsSession;
 
