@@ -69,6 +69,10 @@
         <bug>54732</bug>: Fix leak of statements in <code>StatementCache</code>
         interceptor. (kkolinko)
       </fix>
+      <fix>
+        Fix NPE in <code>SlowQueryReportJmx</code> when running
+        <code>TestSlowQueryReport</code> test. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

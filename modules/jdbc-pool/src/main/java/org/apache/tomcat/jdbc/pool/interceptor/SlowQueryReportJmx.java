@@ -270,9 +270,10 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
 
     public ObjectName getObjectName(Class<?> clazz, String poolName) throws MalformedObjectNameException {
-        ObjectName oname = null;
-        if (getProperties().containsKey(objectNameAttribute)) {
-            oname = new ObjectName(getProperties().get(objectNameAttribute).getValue());
+        ObjectName oname;
+        Map<String,InterceptorProperty> properties = getProperties();
+        if (properties != null && properties.containsKey(objectNameAttribute)) {
+            oname = new ObjectName(properties.get(objectNameAttribute).getValue());
         } else {
             oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX+clazz.getName()+",name=" + poolName);
         }
