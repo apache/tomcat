@@ -54,7 +54,7 @@ public class WsHandshakeRequest implements HandshakeRequest {
         httpSession = request.getSession(false);
 
         // URI
-        StringBuffer sb = request.getRequestURL();
+        StringBuffer sb = new StringBuffer(request.getRequestURI());
         if (queryString != null) {
             sb.append("?");
             sb.append(queryString);
