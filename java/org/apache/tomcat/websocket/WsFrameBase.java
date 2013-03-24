@@ -450,18 +450,24 @@ public abstract class WsFrameBase {
         }
 
         // Frame is fully received
-        if (continuationExpected) {
-            // More data for this message expected
-            newFrame();
-        } else {
-            // Message is complete - send it
+        // Send the message if either:
+        // - partial messages are supported
+        // - the message is complete
+        if (usePartial() || !continuationExpected) {
             messageBufferBinary.flip();
             ByteBuffer copy =
                     ByteBuffer.allocate(messageBufferBinary.limit());
             copy.put(messageBufferBinary);
             copy.flip();
-            sendMessageBinary(copy, true);
+            sendMessageBinary(copy, !continuationExpected);
             messageBufferBinary.clear();
+        }
+
+        if (continuationExpected) {
+            // More data for this message expected, start a new frame
+            newFrame();
+        } else {
+            // Message is complete, start a new message
             newMessage();
         }
 
