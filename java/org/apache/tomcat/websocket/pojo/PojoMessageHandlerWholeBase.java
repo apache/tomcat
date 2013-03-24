@@ -22,9 +22,7 @@ import java.lang.reflect.Method;
 import javax.websocket.DecodeException;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
-import javax.websocket.SessionException;
 
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsSession;
 
 /**
@@ -35,9 +33,6 @@ import org.apache.tomcat.websocket.WsSession;
  */
 public abstract class PojoMessageHandlerWholeBase<T>
         extends PojoMessageHandlerBase<T> implements MessageHandler.Whole<T> {
-
-    private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
 
     public PojoMessageHandlerWholeBase(Object pojo, Method method,
             Session session, Object[] params, int indexPayload,
@@ -50,14 +45,19 @@ public abstract class PojoMessageHandlerWholeBase<T>
     @Override
     public final void onMessage(T message) {
 
+        if (params != null && params.length == 1 &&
+                params[0] instanceof DecodeException) {
+            ((WsSession) session).getLocal().onError(session,
+                    (DecodeException) params[0]);
+            return;
+        }
+
         // Can this message be decoded?
         Object payload;
         try {
             payload = decode(message);
         } catch (DecodeException de) {
-            SessionException se = new SessionException(sm.getString(
-                    "pojoMessageHandlerWhole.decodeFail"), de, session);
-            ((WsSession) session).getLocal().onError(session, se);
+            ((WsSession) session).getLocal().onError(session, de);
             return;
         }
 
