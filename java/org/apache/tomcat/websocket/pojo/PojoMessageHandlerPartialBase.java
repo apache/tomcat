@@ -20,8 +20,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
+import javax.websocket.DecodeException;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
+
+import org.apache.tomcat.websocket.WsSession;
 
 /**
  * Common implementation code for the POJO partial message handlers. All
@@ -45,6 +48,12 @@ public abstract class PojoMessageHandlerPartialBase<T>
 
     @Override
     public final void onMessage(T message, boolean last) {
+        if (params != null && params.length == 1 &&
+                params[0] instanceof DecodeException) {
+            ((WsSession) session).getLocal().onError(session,
+                    (DecodeException) params[0]);
+            return;
+        }
         Object[] parameters = params.clone();
         if (indexBoolean != -1) {
             parameters[indexBoolean] = Boolean.valueOf(last);

@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.websocket.CloseReason;
+import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.Decoder.Binary;
 import javax.websocket.Decoder.BinaryStream;
@@ -111,7 +112,7 @@ public class PojoMethodMapping {
 
 
     public Object[] getOnOpenArgs(Map<String,String> pathParameters,
-            Session session) {
+            Session session) throws DecodeException {
         return buildArgs(onOpenParams, pathParameters, session, null, null);
     }
 
@@ -122,7 +123,7 @@ public class PojoMethodMapping {
 
 
     public Object[] getOnCloseArgs(Map<String,String> pathParameters,
-            Session session, CloseReason closeReason) {
+            Session session, CloseReason closeReason) throws DecodeException {
         return buildArgs(
                 onCloseParams, pathParameters, session, null, closeReason);
     }
@@ -134,7 +135,7 @@ public class PojoMethodMapping {
 
 
     public Object[] getOnErrorArgs(Map<String,String> pathParameters,
-            Session session, Throwable throwable) {
+            Session session, Throwable throwable) throws DecodeException {
         return buildArgs(
                 onErrorParams, pathParameters, session, throwable, null);
     }
@@ -220,7 +221,8 @@ public class PojoMethodMapping {
 
     private static Object[] buildArgs(PojoPathParam[] pathParams,
             Map<String,String> pathParameters, Session session,
-            Throwable throwable, CloseReason closeReason) {
+            Throwable throwable, CloseReason closeReason)
+            throws DecodeException {
         Object[] result = new Object[pathParams.length];
         for (int i = 0; i < pathParams.length; i++) {
             Class<?> type = pathParams[i].getType();
@@ -233,10 +235,12 @@ public class PojoMethodMapping {
             } else {
                 String name = pathParams[i].getName();
                 String value = pathParameters.get(name);
-                if (value == null) {
-                    result[i] = null;
-                } else {
+                try {
                     result[i] = Util.coerceToType(type, value);
+                } catch (Exception e) {
+                    throw new DecodeException(value, sm.getString(
+                            "pojoMethodMapping.decodePathParamFail",
+                            value, type), e);
                 }
             }
         }
@@ -481,8 +485,14 @@ public class PojoMethodMapping {
                 PojoPathParam pathParam = entry.getValue();
                 String valueString = pathParameters.get(pathParam.getName());
                 Object value = null;
-                if (valueString != null) {
+                try {
                     value = Util.coerceToType(pathParam.getType(), valueString);
+                } catch (Exception e) {
+                    DecodeException de =  new DecodeException(valueString,
+                            sm.getString(
+                                    "pojoMethodMapping.decodePathParamFail",
+                                    valueString, pathParam.getType()), e);
+                    params = new Object[] { de };
                 }
                 params[entry.getKey().intValue()] = value;
             }
