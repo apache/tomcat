@@ -5869,6 +5869,10 @@ public class StandardContext extends ContainerBase
     }
 
 
+    /**
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x.
+     */
+    @Deprecated
     public String getHostname() {
         Container parentHost = getParent();
         if (parentHost != null) {
