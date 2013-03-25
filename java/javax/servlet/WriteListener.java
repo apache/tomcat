@@ -16,11 +16,13 @@
  */
 package javax.servlet;
 
+import java.io.IOException;
+
 /**
  * TODO SERVLET 3.1
  *
  */
 public interface WriteListener extends java.util.EventListener{
-    public void onWritePossible();
+    public void onWritePossible() throws IOException;
     public void onError(java.lang.Throwable throwable);
 }
