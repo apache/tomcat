@@ -22,6 +22,9 @@ import java.nio.channels.CompletionHandler;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Wraps the {@link AsynchronousSocketChannel} with SSL/TLS.
+ */
 public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
 
     private final AsynchronousSocketChannel socketChannel;

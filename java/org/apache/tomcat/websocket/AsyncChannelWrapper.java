@@ -21,6 +21,11 @@ import java.nio.channels.CompletionHandler;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * This is a wrapper for a {@link java.nio.channels.AsynchronousSocketChannel}
+ * that limits the methods available thereby simplifying the process of
+ * implementing SSL/TLS support since there are fewer methods to intercept.
+ */
 public interface AsyncChannelWrapper {
 
     Future<Integer> read(ByteBuffer dst);

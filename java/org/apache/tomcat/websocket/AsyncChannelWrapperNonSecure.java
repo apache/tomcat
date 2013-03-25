@@ -23,6 +23,11 @@ import java.nio.channels.CompletionHandler;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Generally, just passes calls straight to the wrapped
+ * {@link AsynchronousSocketChannel}. In some cases exceptions may be swallowed
+ * to save them being swallowed by the calling code.
+ */
 public class AsyncChannelWrapperNonSecure implements AsyncChannelWrapper {
 
     private final AsynchronousSocketChannel socketChannel;
