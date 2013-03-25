@@ -41,7 +41,7 @@ public class WsFrameServer extends WsFrameBase {
      */
     public void onDataAvailable() throws IOException {
         synchronized (connectionReadLock) {
-            while (sis.isReady()) {
+            while (isOpen() && sis.isReady()) {
                 // Fill up the input buffer with as much data as we can
                 int read = sis.read(
                         inputBuffer, writePos, inputBuffer.length - writePos);

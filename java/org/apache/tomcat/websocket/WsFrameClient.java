@@ -63,7 +63,9 @@ public class WsFrameClient extends WsFrameBase {
         response.clear();
 
         // Get some more data
-        channel.read(response, null, handler);
+        if (isOpen()) {
+            channel.read(response, null, handler);
+        }
     }
 
 
