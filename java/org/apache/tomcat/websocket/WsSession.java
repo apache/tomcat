@@ -207,10 +207,13 @@ public class WsSession implements Session {
         }
         if (listener.equals(textMessageHandler)) {
             textMessageHandler = null;
+            return;
         } else if (listener.equals(binaryMessageHandler)) {
             binaryMessageHandler = null;
+            return;
         } else if (listener.equals(pongMessageHandler)) {
             pongMessageHandler = null;
+            return;
         }
 
         // ISE for now. Could swallow this silently / log this if the ISE
