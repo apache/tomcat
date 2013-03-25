@@ -756,6 +756,17 @@ public class ApplicationContextFacade implements ServletContext {
         }
     }
 
+
+    @Override
+    public String getVirtualServerName() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (String) doPrivileged("getVirtualServerName", null);
+        } else  {
+            return context.getVirtualServerName();
+        }
+    }
+
+
     /**
      * Use reflection to invoke the requested method. Cache the method object
      * to speed up the process
@@ -882,5 +893,4 @@ public class ApplicationContextFacade implements ServletContext {
 
         throw realException;
     }
-
 }

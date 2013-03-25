@@ -717,4 +717,10 @@ public interface ServletContext {
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public void declareRoles(String... roleNames);
+
+    /**
+     * Returns the primary name of the virtual host on which this context is
+     * deployed. The name may or may not be a valid host name.
+     */
+    public String getVirtualServerName();
 }
