@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket.server;
 
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,7 +37,7 @@ import javax.websocket.server.ServerEndpointConfig;
  * server.
  */
 @HandlesTypes({ServerEndpoint.class, ServerEndpointConfig.class,
-        ServerApplicationConfig.class})
+        Endpoint.class})
 public class WsSci implements ServletContainerInitializer {
 
     @Override
@@ -51,7 +52,6 @@ public class WsSci implements ServletContainerInitializer {
 
         // Group the discovered classes by type
         Set<ServerApplicationConfig> serverApplicationConfigs = new HashSet<>();
-        Set<ServerEndpointConfig> scannedEndpointConfigs = new HashSet<>();
         Set<Class<? extends Endpoint>> scannedEndpointClazzes = new HashSet<>();
         Set<Class<?>> scannedPojoEndpoints = new HashSet<>();
 
@@ -60,6 +60,12 @@ public class WsSci implements ServletContainerInitializer {
             String wsPackage = ContainerProvider.class.getName();
             wsPackage = wsPackage.substring(0, wsPackage.lastIndexOf('.') + 1);
             for (Class<?> clazz : clazzes) {
+                int modifiers = clazz.getModifiers();
+                if (!Modifier.isPublic(clazz.getModifiers()) ||
+                        Modifier.isAbstract(modifiers)) {
+                    // Non-public or abstract - skip it.
+                    continue;
+                }
                 // Protect against scanning the WebSocket API JARs
                 if (clazz.getName().startsWith(wsPackage)) {
                     continue;
@@ -68,14 +74,11 @@ public class WsSci implements ServletContainerInitializer {
                     serverApplicationConfigs.add(
                             (ServerApplicationConfig) clazz.newInstance());
                 }
-                if (ServerEndpointConfig.class.isAssignableFrom(clazz)) {
+                if (Endpoint.class.isAssignableFrom(clazz)) {
                     @SuppressWarnings("unchecked")
-                    Class<? extends ServerEndpointConfig> configClazz =
-                            (Class<? extends ServerEndpointConfig>) clazz;
-                    ServerEndpointConfig config = configClazz.newInstance();
-                    scannedEndpointConfigs.add(config);
-                    scannedEndpointClazzes.add(
-                            (Class<? extends Endpoint>) config.getEndpointClass());
+                    Class<? extends Endpoint> endpoint =
+                            (Class<? extends Endpoint>) clazz;
+                    scannedEndpointClazzes.add(endpoint);
                 }
                 if (clazz.isAnnotationPresent(ServerEndpoint.class)) {
                     scannedPojoEndpoints.add(clazz);
@@ -90,7 +93,6 @@ public class WsSci implements ServletContainerInitializer {
         Set<Class<?>> filteredPojoEndpoints = new HashSet<>();
 
         if (serverApplicationConfigs.isEmpty()) {
-            filteredEndpointConfigs.addAll(scannedEndpointConfigs);
             filteredPojoEndpoints.addAll(scannedPojoEndpoints);
         } else {
             for (ServerApplicationConfig config : serverApplicationConfigs) {
