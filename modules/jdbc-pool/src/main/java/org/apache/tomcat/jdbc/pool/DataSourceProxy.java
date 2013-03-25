@@ -1288,9 +1288,6 @@ public class DataSourceProxy implements PoolConfiguration {
         getPoolProperties().setPropagateInterruptState(propagateInterruptState);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void purge()  {
         try {
             createPool().purge();
@@ -1299,9 +1296,6 @@ public class DataSourceProxy implements PoolConfiguration {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void purgeOnReturn() {
         try {
             createPool().purgeOnReturn();
