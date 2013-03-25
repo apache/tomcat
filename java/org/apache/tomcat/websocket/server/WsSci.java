@@ -61,7 +61,7 @@ public class WsSci implements ServletContainerInitializer {
             wsPackage = wsPackage.substring(0, wsPackage.lastIndexOf('.') + 1);
             for (Class<?> clazz : clazzes) {
                 int modifiers = clazz.getModifiers();
-                if (!Modifier.isPublic(clazz.getModifiers()) ||
+                if (!Modifier.isPublic(modifiers) ||
                         Modifier.isAbstract(modifiers)) {
                     // Non-public or abstract - skip it.
                     continue;
