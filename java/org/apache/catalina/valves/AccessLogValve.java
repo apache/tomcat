@@ -769,7 +769,10 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * Set the resolve hosts flag.
      *
      * @param resolveHosts The new resolve hosts value
+     * @deprecated Unused, removed in Tomcat 8.
+     * See org.apache.catalina.connector.Connector.setEnableLookups(boolean).
      */
+    @Deprecated
     public void setResolveHosts(boolean resolveHosts) {
         this.resolveHosts = resolveHosts;
     }
@@ -777,7 +780,10 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Get the value of the resolve hosts flag.
+     * @deprecated Unused, removed in Tomcat 8.
+     * See org.apache.catalina.connector.Connector.setEnableLookups(boolean).
      */
+    @Deprecated
     public boolean isResolveHosts() {
         return resolveHosts;
     }
