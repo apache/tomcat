@@ -17,40 +17,22 @@
 package org.apache.tomcat.websocket;
 
 import java.nio.ByteBuffer;
+import java.nio.channels.CompletionHandler;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import javax.websocket.SendHandler;
+public interface AsyncChannelWrapper {
 
-public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
+    Future<Integer> read(ByteBuffer dst);
 
-    private final AsyncChannelWrapper channel;
+    <A> void read(ByteBuffer dst, A attachment,
+            CompletionHandler<Integer,? super A> handler);
 
-    public WsRemoteEndpointImplClient(AsyncChannelWrapper channel) {
-        this.channel = channel;
-    }
+    Future<Integer> write(ByteBuffer src);
 
+    <A> void write(ByteBuffer[] srcs, int offset, int length, long timeout,
+            TimeUnit unit, A attachment,
+            CompletionHandler<Long,? super A> handler);
 
-    @Override
-    protected boolean isMasked() {
-        return true;
-    }
-
-
-    @Override
-    protected void doWrite(SendHandler handler, ByteBuffer... data) {
-        long timeout = getSendTimeout();
-        if (timeout < 1) {
-            timeout = Long.MAX_VALUE;
-
-        }
-        SendHandlerToCompletionHandler sh2ch =
-                new SendHandlerToCompletionHandler(handler);
-        channel.write(data, 0, data.length, timeout, TimeUnit.MILLISECONDS,
-                null, sh2ch);
-    }
-
-    @Override
-    protected void close() {
-        channel.close();
-    }
+    void close();
 }
