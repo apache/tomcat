@@ -257,7 +257,7 @@ public class WsSession implements Session {
 
     @Override
     public boolean isOpen() {
-        return state == State.OPEN;
+        return state == State.OPEN || state == State.PRE_CLOSING;
     }
 
 
@@ -336,10 +336,15 @@ public class WsSession implements Session {
         if (state != State.OPEN) {
             return;
         }
+
         synchronized (stateLock) {
             if (state != State.OPEN) {
                 return;
             }
+
+            // This state exists to protect against recursive calls to close()
+            // from Endpoint.onClose()
+            state = State.PRE_CLOSING;
 
             fireEndpointOnClose(closeReason);
 
@@ -514,6 +519,7 @@ public class WsSession implements Session {
 
     private static enum State {
         OPEN,
+        PRE_CLOSING,
         CLOSING,
         CLOSED
     }
