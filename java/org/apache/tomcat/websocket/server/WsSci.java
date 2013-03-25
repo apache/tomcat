@@ -36,7 +36,7 @@ import javax.websocket.server.ServerEndpointConfig;
  * {@link ServerEndpoint} so that Endpoint can be published via the WebSocket
  * server.
  */
-@HandlesTypes({ServerEndpoint.class, ServerEndpointConfig.class,
+@HandlesTypes({ServerEndpoint.class, ServerApplicationConfig.class,
         Endpoint.class})
 public class WsSci implements ServletContainerInitializer {
 
