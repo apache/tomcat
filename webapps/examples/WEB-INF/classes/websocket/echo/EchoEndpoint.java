@@ -18,8 +18,6 @@ package websocket.echo;
 
 import java.io.IOException;
 
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
@@ -32,16 +30,6 @@ public class EchoEndpoint extends Endpoint{
     public void onOpen(Session session, EndpointConfig endpointConfig) {
         RemoteEndpoint.Basic remoteEndpointBasic = session.getBasicRemote();
         session.addMessageHandler(new EchoMessageHandler(remoteEndpointBasic));
-    }
-
-    @Override
-    public void onClose(Session session, CloseReason closeReason) {
-        try {
-            session.close(new CloseReason(CloseCodes.NORMAL_CLOSURE, null));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     private static class EchoMessageHandler
