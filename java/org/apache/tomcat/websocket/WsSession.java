@@ -151,19 +151,19 @@ public class WsSession implements Session {
 
         Type t = Util.getMessageType(listener);
 
-        if (t.equals(String.class)) {
+        if (String.class.isAssignableFrom((Class<?>) t)) {
             if (textMessageHandler != null) {
                 throw new IllegalStateException(
                         sm.getString("wsSession.duplicateHandlerText"));
             }
             textMessageHandler = listener;
-        } else if (t.equals(ByteBuffer.class)) {
+        } else if (ByteBuffer.class.isAssignableFrom((Class<?>) t)) {
             if (binaryMessageHandler != null) {
                 throw new IllegalStateException(
                         sm.getString("wsSession.duplicateHandlerBinary"));
             }
             binaryMessageHandler = listener;
-        } else if (t.equals(PongMessage.class)) {
+        } else if (PongMessage.class.isAssignableFrom((Class<?>) t)) {
             if (pongMessageHandler != null) {
                 throw new IllegalStateException(
                         sm.getString("wsSession.duplicateHandlerPong"));
