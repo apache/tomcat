@@ -327,6 +327,7 @@ public abstract class WsFrameBase {
                 ((MessageHandler.Partial<String>) mh).onMessage(
                         messageBufferText.toString(), last);
             } else {
+                // Caller ensures last == true if this branch is used
                 ((MessageHandler.Whole<String>) mh).onMessage(
                         messageBufferText.toString());
             }
@@ -490,6 +491,7 @@ public abstract class WsFrameBase {
             if (mh instanceof MessageHandler.Partial<?>) {
                 ((MessageHandler.Partial<ByteBuffer>) mh).onMessage(msg, last);
             } else {
+                // Caller ensures last == true if this branch is used
                 ((MessageHandler.Whole<ByteBuffer>) mh).onMessage(msg);
             }
         }
