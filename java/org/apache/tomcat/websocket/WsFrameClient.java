@@ -18,7 +18,6 @@ package org.apache.tomcat.websocket;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 
 import javax.websocket.CloseReason;
@@ -27,10 +26,10 @@ import javax.websocket.CloseReason.CloseCodes;
 public class WsFrameClient extends WsFrameBase {
 
     private final ByteBuffer response;
-    private final AsynchronousSocketChannel channel;
+    private final AsyncChannelWrapper channel;
     private final CompletionHandler<Integer,Void> handler;
 
-    public WsFrameClient(ByteBuffer response, AsynchronousSocketChannel channel,
+    public WsFrameClient(ByteBuffer response, AsyncChannelWrapper channel,
             WsSession wsSession) {
         super(wsSession);
         this.response = response;

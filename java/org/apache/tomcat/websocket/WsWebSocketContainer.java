@@ -169,6 +169,8 @@ public class WsWebSocketContainer
             ClientEndpointConfig clientEndpointConfiguration, URI path)
             throws DeploymentException {
 
+        boolean secure = false;
+
         String scheme = path.getScheme();
         if (!("ws".equalsIgnoreCase(scheme) ||
                 "wss".equalsIgnoreCase(scheme))) {
@@ -192,28 +194,38 @@ public class WsWebSocketContainer
         if (port == -1) {
             if ("ws".equalsIgnoreCase(scheme)) {
                 sa = new InetSocketAddress(host, 80);
+            } else if ("wss".equalsIgnoreCase(scheme)) {
+                sa = new InetSocketAddress(host, 443);
+                secure = true;
             } else {
-                // TODO HTTPS support
-                // sa = new InetSocketAddress(host, 443);
-                throw new DeploymentException("TODO: HTTPS");
+                throw new DeploymentException(
+                        sm.getString("wsWebSocketContainer.invalidScheme"));
             }
         } else {
             sa = new InetSocketAddress(host, port);
         }
 
-        AsynchronousSocketChannel channel;
+        AsynchronousSocketChannel socketChannel;
         try {
-            channel = AsynchronousSocketChannel.open();
+            socketChannel = AsynchronousSocketChannel.open();
         } catch (IOException ioe) {
             throw new DeploymentException("TODO", ioe);
         }
-        Future<Void> fConnect = channel.connect(sa);
+
+        Future<Void> fConnect = socketChannel.connect(sa);
+
+        AsyncChannelWrapper channel;
+        if (secure) {
+            channel = new AsyncChannelWrapperSecure(socketChannel);
+        } else {
+            channel = new AsyncChannelWrapperNonSecure(socketChannel);
+        }
+
 
         ByteBuffer response;
         String subProtocol;
         try {
             fConnect.get();
-
             int toWrite = request.limit();
 
             Future<Integer> fWrite = channel.write(request);
@@ -427,7 +439,7 @@ public class WsWebSocketContainer
      * @throws DeploymentException
      */
     private HandshakeResponse processResponse(ByteBuffer response,
-            AsynchronousSocketChannel channel) throws InterruptedException,
+            AsyncChannelWrapper channel) throws InterruptedException,
             ExecutionException, DeploymentException {
 
         Map<String,List<String>> headers = new HashMap<>();
