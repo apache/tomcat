@@ -126,7 +126,11 @@ public class WsSession implements Session {
         }
         this.queryString = queryString;
         this.userPrincipal = userPrincipal;
-        this.subProtocol = subProtocol;
+        if (subProtocol == null) {
+            this.subProtocol = "";
+        } else {
+            this.subProtocol = subProtocol;
+        }
         this.pathParameters = pathParameters;
         this.secure = secure;
         this.wsRemoteEndpoint.setEncoders(encoders);
