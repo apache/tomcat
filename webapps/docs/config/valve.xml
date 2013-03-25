@@ -590,7 +590,7 @@
 
   <subsection name="Introduction">
 
-    <p>The <em>Single Sign On Vale</em> is utilized when you wish to give users
+    <p>The <em>Single Sign On Valve</em> is utilized when you wish to give users
     the ability to sign on to any one of the web applications associated with
     your virtual host, and then have their identity recognized by all other
     web applications on the same virtual host.</p>
