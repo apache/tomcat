@@ -1437,6 +1437,13 @@ public class ApplicationContext
     }
 
 
+    @Override
+    public String getVirtualServerName() {
+        // Constructor will fail if context or its parent is null
+        return ((Host) context.getParent()).getName();
+    }
+
+
     // -------------------------------------------------------- Package Methods
     protected StandardContext getContext() {
         return this.context;
@@ -1506,6 +1513,4 @@ public class ApplicationContext
             mappingData = new MappingData();
         }
     }
-
-
 }
