@@ -205,12 +205,6 @@ public class StandardContext extends ContainerBase
     private InstanceManager instanceManager = null;
 
 
-   /**
-     * Associated host name.
-     */
-    private String hostName;
-
-
     /**
      * The antiJARLocking flag for this Context.
      */
@@ -5866,21 +5860,6 @@ public class StandardContext extends ContainerBase
 
         return (this.paused);
 
-    }
-
-
-    /**
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x.
-     */
-    @Deprecated
-    public String getHostname() {
-        Container parentHost = getParent();
-        if (parentHost != null) {
-            hostName = parentHost.getName();
-        }
-        if ((hostName == null) || (hostName.length() < 1))
-            hostName = "_";
-        return hostName;
     }
 
 
