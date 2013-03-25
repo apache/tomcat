@@ -297,4 +297,28 @@ public class TestAuthorizationDigest {
         Map<String,String> result = HttpParser.parseAuthorizationDigest(input);
         Assert.assertNull(result);
     }
+
+    @Test
+    public void testParseAuthParamA() throws Exception {
+        // Test for HttpParser.readTokenOrQuotedString()
+        // auth-param = token "=" ( token | quoted-string )
+        String header = "Digest a=b";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = HttpParser.parseAuthorizationDigest(input);
+        Assert.assertEquals("b", result.get("a"));
+    }
+
+    @Test
+    public void testParseAuthParamB() throws Exception {
+        // Test for HttpParser.readTokenOrQuotedString()
+        // auth-param = token "=" ( token | quoted-string )
+        String header = "Digest a=\"b\"";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = HttpParser.parseAuthorizationDigest(input);
+        Assert.assertEquals("b", result.get("a"));
+    }
 }
