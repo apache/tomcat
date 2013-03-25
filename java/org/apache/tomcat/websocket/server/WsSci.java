@@ -56,10 +56,12 @@ public class WsSci implements ServletContainerInitializer {
         Set<Class<?>> scannedPojoEndpoints = new HashSet<>();
 
         try {
+            // wsPackage is "javax.websocket."
+            String wsPackage = ContainerProvider.class.getName();
+            wsPackage = wsPackage.substring(0, wsPackage.lastIndexOf('.') + 1);
             for (Class<?> clazz : clazzes) {
                 // Protect against scanning the WebSocket API JARs
-                if (clazz.getPackage().getName().startsWith(
-                        ContainerProvider.class.getPackage().getName())) {
+                if (clazz.getName().startsWith(wsPackage)) {
                     continue;
                 }
                 if (ServerApplicationConfig.class.isAssignableFrom(clazz)) {
