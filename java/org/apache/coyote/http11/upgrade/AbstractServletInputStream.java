@@ -164,7 +164,7 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
     }
 
 
-    protected final void onDataAvailable() {
+    protected final void onDataAvailable() throws IOException {
         ready = Boolean.TRUE;
         listener.onDataAvailable();
     }

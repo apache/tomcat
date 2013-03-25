@@ -15,12 +15,15 @@
  * limitations under the License.
  */
 package javax.servlet;
+
+import java.io.IOException;
+
 /**
  * TODO SERVLET 3.1
  *
  */
 public interface ReadListener extends java.util.EventListener{
-    public abstract void onDataAvailable();
-    public abstract void onAllDataRead();
+    public abstract void onDataAvailable() throws IOException;
+    public abstract void onAllDataRead() throws IOException;
     public abstract void onError(java.lang.Throwable throwable);
 }

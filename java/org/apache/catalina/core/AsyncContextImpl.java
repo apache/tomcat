@@ -148,7 +148,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         return true;
     }
 
-    public boolean canWrite() {
+    public boolean canWrite() throws IOException {
         if (request.getResponse().getCoyoteResponse().getWriteListener()==null) return false;
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
         ClassLoader newCL = request.getContext().getLoader().getClassLoader();

@@ -125,14 +125,11 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
     }
 
 
-    protected final void onWritePossible() {
+    protected final void onWritePossible() throws IOException {
         synchronized (writeLock) {
-            try {
-                writeInternal(buffer, 0, buffer.length);
-            } catch (IOException ioe) {
-                throw new RuntimeException(ioe);
-            }
-            // Make sure isReady() and onWritePossible() have a consistent view of
+            writeInternal(buffer, 0, buffer.length);
+
+           // Make sure isReady() and onWritePossible() have a consistent view of
             // buffer and fireListener when determining if the listener should fire
             boolean fire = false;
 
