@@ -79,8 +79,8 @@ public class FileDeleteStrategy {
      * <p>
      * This method is designed for subclasses to override.
      * The implementation may return either false or an <code>IOException</code>
-     * when deletion fails. The {@link #delete(File)} and {@link #deleteQuietly(File)}
-     * methods will handle either response appropriately.
+     * when deletion fails. The {@link #deleteQuietly(File)} method will handle
+     * either response appropriately.
      * A check has been made to ensure that the file will exist.
      * <p>
      * This implementation uses {@link File#delete()}.
