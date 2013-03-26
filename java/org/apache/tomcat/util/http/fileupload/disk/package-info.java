@@ -18,20 +18,18 @@
 /**
  *    <p>
  *      A disk-based implementation of the
- *      {@link org.apache.commons.fileupload.FileItem FileItem}
+ *      {@link org.apache.tomcat.util.http.fileupload.FileItem FileItem}
  *      interface. This implementation retains smaller items in memory, while
  *      writing larger ones to disk. The threshold between these two is
  *      configurable, as is the location of files that are written to disk.
  *    </p>
  *    <p>
  *      In typical usage, an instance of
- *      {@link org.apache.commons.fileupload.disk.DiskFileItemFactory DiskFileItemFactory}
+ *      {@link org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory DiskFileItemFactory}
  *      would be created, configured, and then passed to a
- *      {@link org.apache.commons.fileupload.FileUpload FileUpload}
+ *      {@link org.apache.tomcat.util.http.fileupload.FileUpload FileUpload}
  *      implementation such as
- *      {@link org.apache.commons.fileupload.servlet.ServletFileUpload ServletFileUpload}
- *      or
- *      {@link org.apache.commons.fileupload.portlet.PortletFileUpload PortletFileUpload}.
+ *      {@link org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload ServletFileUpload}.
  *    </p>
  *    <p>
  *      The following code fragment demonstrates this usage.
