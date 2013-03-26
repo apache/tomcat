@@ -3069,6 +3069,11 @@
         JAR is now required by the Ant tasks. Patch provided by Volker Krebs.
         (markt)
       </fix>
+      <add>
+        Add sample Apache Commons Daemon JSVC wrapper script
+        <code>bin/daemon.sh</code> that can be used with <code>/etc/init.d</code>.
+        (mturk)
+      </add>
     </changelog>
   </subsection>
 </section>
