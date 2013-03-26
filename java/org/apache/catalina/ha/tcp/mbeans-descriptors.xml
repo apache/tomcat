@@ -53,20 +53,6 @@
       type="java.lang.String"
       writeable="false"/>
     <operation
-      name="setProperty"
-      description="set a property to all cluster managers (with prefix 'manager.')"
-      impact="ACTION"
-      returnType="void">
-      <parameter
-        name="key"
-        description="Property name"
-        type="java.lang.String"/>
-      <parameter
-        name="value"
-        description="Property value"
-        type="java.lang.String"/>
-    </operation>
-    <operation
       name="send"
       description="send message to all cluster members"
       impact="ACTION"

@@ -154,11 +154,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
      */
     private boolean notifyLifecycleListenerOnFailure = false;
 
-    /**
-     * dynamic sender <code>properties</code>
-     */
-    private final Map<String, Object> properties = new HashMap<>();
-
     private int channelSendOptions = Channel.SEND_OPTIONS_ASYNCHRONOUS;
 
     private int channelStartOptions = Channel.DEFAULT;
@@ -373,83 +368,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         return channel.getLocalMember(true);
     }
 
-    // ------------------------------------------------------------- dynamic
-    // manager property handling
-
-    /**
-     * JMX hack to direct use at jconsole
-     *
-     * @param name
-     * @param value
-     */
-    public boolean setProperty(String name, String value) {
-        return setProperty(name, (Object) value);
-    }
-
-    /**
-     * set config attributes with reflect and propagate to all managers
-     *
-     * @param name
-     * @param value
-     */
-    public boolean setProperty(String name, Object value) {
-        if (log.isTraceEnabled())
-            log.trace(sm.getString("SimpleTcpCluster.setProperty", name, value,properties.get(name)));
-        properties.put(name, value);
-        //using a dynamic way of setting properties is nice, but a security risk
-        //if exposed through JMX. This way you can sit and try to guess property names,
-        //we will only allow explicit property names
-        log.warn("Dynamic setProperty("+name+",value) has been disabled, please use explicit properties for the element you are trying to identify");
-        return false;
-    }
-
-    /**
-     * get current config
-     *
-     * @param key
-     * @return The property
-     */
-    public Object getProperty(String key) {
-        if (log.isTraceEnabled())
-            log.trace(sm.getString("SimpleTcpCluster.getProperty", key));
-        return properties.get(key);
-    }
-
-    /**
-     * Get all properties keys
-     *
-     * @return An iterator over the property names.
-     */
-    public Iterator<String> getPropertyNames() {
-        return properties.keySet().iterator();
-    }
-
-    /**
-     * remove a configured property.
-     *
-     * @param key
-     */
-    public void removeProperty(String key) {
-        properties.remove(key);
-    }
-
-    /**
-     * transfer properties from cluster configuration to subelement bean.
-     * @param prefix
-     * @param bean
-     */
-    protected void transferProperty(String prefix, Object bean) {
-        if (prefix != null) {
-            for (Iterator<String> iter = getPropertyNames(); iter.hasNext();) {
-                String pkey = iter.next();
-                if (pkey.startsWith(prefix)) {
-                    String key = pkey.substring(prefix.length() + 1);
-                    Object value = getProperty(pkey);
-                    IntrospectionUtils.setProperty(bean, key, value.toString());
-                }
-            }
-        }
-    }
 
     // --------------------------------------------------------- Public Methods
 
