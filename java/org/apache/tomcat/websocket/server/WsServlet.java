@@ -135,11 +135,12 @@ public class WsServlet extends HttpServlet {
         try {
             Class<?> clazz = sec.getEndpointClass();
             if (Endpoint.class.isAssignableFrom(clazz)) {
-                ep = (Endpoint) sec.getEndpointClass().newInstance();
+                ep = (Endpoint) sec.getConfigurator().getEndpointInstance(
+                        sec.getEndpointClass());
             } else {
                 ep = new PojoEndpointServer();
             }
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException e) {
             throw new ServletException(e);
         }
 
