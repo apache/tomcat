@@ -19,6 +19,7 @@ package org.apache.catalina.connector;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.MalformedInputException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -71,8 +72,8 @@ public class TestInputBuffer extends TomcatBaseTest {
                 null);
 
         if (expected == null) {
-            Assert.assertEquals(description,
-                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+            Assert.assertEquals(description, HttpServletResponse.SC_OK, rc);
+            Assert.assertEquals(description, "FAILED", bc.toString());
         } else if (expected.length() == 0) {
             Assert.assertNull(description, bc.toString());
         } else {
@@ -103,13 +104,18 @@ public class TestInputBuffer extends TomcatBaseTest {
             resp.setContentType("text/plain");
             Writer w = resp.getWriter();
 
-            // Copy one character at a time
-            int c = r.read();
-            while (c != -1) {
-                w.write(c);
-                c = r.read();
+            try {
+                // Copy one character at a time
+                int c = r.read();
+                while (c != -1) {
+                    w.write(c);
+                    c = r.read();
+                }
+                w.close();
+            } catch (MalformedInputException mie) {
+                resp.resetBuffer();
+                w.write("FAILED");
             }
-            w.close();
         }
     }
 }
