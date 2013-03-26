@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Generally, just passes calls straight to the wrapped
@@ -29,6 +31,8 @@ import java.util.concurrent.TimeUnit;
  * to save them being swallowed by the calling code.
  */
 public class AsyncChannelWrapperNonSecure implements AsyncChannelWrapper {
+
+    private static final Future<Void> NOOP_FUTURE = new NoOpFuture();
 
     private final AsynchronousSocketChannel socketChannel;
 
@@ -67,6 +71,42 @@ public class AsyncChannelWrapperNonSecure implements AsyncChannelWrapper {
             socketChannel.close();
         } catch (IOException e) {
             // Ignore
+        }
+    }
+
+    @Override
+    public Future<Void> handshake() {
+        return NOOP_FUTURE;
+    }
+
+
+    private static final class NoOpFuture implements Future<Void> {
+
+        @Override
+        public boolean cancel(boolean mayInterruptIfRunning) {
+            return false;
+        }
+
+        @Override
+        public boolean isCancelled() {
+            return false;
+        }
+
+        @Override
+        public boolean isDone() {
+            return true;
+        }
+
+        @Override
+        public Void get() throws InterruptedException, ExecutionException {
+            return null;
+        }
+
+        @Override
+        public Void get(long timeout, TimeUnit unit)
+                throws InterruptedException, ExecutionException,
+                TimeoutException {
+            return null;
         }
     }
 }

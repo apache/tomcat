@@ -21,6 +21,8 @@ import java.nio.channels.CompletionHandler;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.SSLException;
+
 /**
  * This is a wrapper for a {@link java.nio.channels.AsynchronousSocketChannel}
  * that limits the methods available thereby simplifying the process of
@@ -40,4 +42,6 @@ public interface AsyncChannelWrapper {
             CompletionHandler<Long,? super A> handler);
 
     void close();
+
+    Future<Void> handshake() throws SSLException;
 }
