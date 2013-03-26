@@ -1203,7 +1203,7 @@
 
     <attribute name="SSLDisableCompression" required="false">
       <p>Disables compression if set to <code>true</code> and OpenSSL supports
-      disabling comprssion. Default is <code>false</code> which inherits the
+      disabling compression. Default is <code>false</code> which inherits the
       default compression setting in OpenSSL.</p>
     </attribute>
 
