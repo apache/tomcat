@@ -46,6 +46,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.coyote.http11.Http11Protocol;
+import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicBinary;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicHandler;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicText;
@@ -710,4 +711,43 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         }
     }
 
+
+    @Test
+    public void testConnectToServerEndpointSSL() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+
+        TesterSupport.initSsl(tomcat);
+
+        tomcat.start();
+
+        WebSocketContainer wsContainer =
+                ContainerProvider.getWebSocketContainer();
+        ClientEndpointConfig clientEndpointConfig =
+                ClientEndpointConfig.Builder.create().build();
+        clientEndpointConfig.getUserProperties().put(
+                WsWebSocketContainer.SSL_TRUSTSTORE_PROPERTY,
+                "test/org/apache/tomcat/util/net/ca.jks");
+        Session wsSession = wsContainer.connectToServer(
+                TesterProgrammaticEndpoint.class,
+                clientEndpointConfig,
+                new URI("wss://localhost:" + getPort() +
+                        TesterEchoServer.Config.PATH_ASYNC));
+        CountDownLatch latch = new CountDownLatch(1);
+        BasicText handler = new BasicText(latch);
+        wsSession.addMessageHandler(handler);
+        wsSession.getBasicRemote().sendText(MESSAGE_STRING_1);
+
+        boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
+
+        Assert.assertTrue(latchResult);
+
+        List<String> messages = handler.getMessages();
+        Assert.assertEquals(1, messages.size());
+        Assert.assertEquals(MESSAGE_STRING_1, messages.get(0));
+    }
 }

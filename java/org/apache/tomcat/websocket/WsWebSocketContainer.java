@@ -16,13 +16,17 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.Charset;
+import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,6 +42,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.TrustManagerFactory;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ClientEndpointConfig.Builder;
@@ -56,6 +64,19 @@ import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
 public class WsWebSocketContainer
         implements WebSocketContainer, BackgroundProcess {
+
+    /**
+     * Property name to set to configure the value that is passed to
+     * {@link SSLEngine#setEnabledProtocols(String[])}. The value should be a
+     * comma separated string.
+     */
+    public static final String SSL_PROTOCOLS_PROPERTY =
+            "org.apache.tomcat.websocket.SSL_PROTOCOLS";
+    public static final String SSL_TRUSTSTORE_PROPERTY =
+            "org.apache.tomcat.websocket.SSL_TRUSTSTORE";
+    public static final String SSL_TRUSTSTORE_PWD_PROPERTY =
+            "org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD";
+    public static final String SSL_TRUSTSTORE_PWD_DEFAULT = "changeit";
 
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
@@ -202,6 +223,9 @@ public class WsWebSocketContainer
                         sm.getString("wsWebSocketContainer.invalidScheme"));
             }
         } else {
+            if ("wss".equalsIgnoreCase(scheme)) {
+                secure = true;
+            }
             sa = new InetSocketAddress(host, port);
         }
 
@@ -216,16 +240,21 @@ public class WsWebSocketContainer
 
         AsyncChannelWrapper channel;
         if (secure) {
-            channel = new AsyncChannelWrapperSecure(socketChannel);
+            SSLEngine sslEngine = createSSLEngine(
+                    clientEndpointConfiguration.getUserProperties());
+            channel = new AsyncChannelWrapperSecure(socketChannel, sslEngine);
         } else {
             channel = new AsyncChannelWrapperNonSecure(socketChannel);
         }
-
 
         ByteBuffer response;
         String subProtocol;
         try {
             fConnect.get();
+
+            Future<Void> fHandshake = channel.handshake();
+            fHandshake.get();
+
             int toWrite = request.limit();
 
             Future<Integer> fWrite = channel.write(request);
@@ -256,7 +285,7 @@ public class WsWebSocketContainer
                 throw new DeploymentException(
                         sm.getString("Sec-WebSocket-Protocol"));
             }
-        } catch (ExecutionException | InterruptedException e) {
+        } catch (ExecutionException | InterruptedException | SSLException e) {
             throw new DeploymentException(
                     sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
         }
@@ -521,6 +550,55 @@ public class WsWebSocketContainer
         }
 
         return sb.toString();
+    }
+
+
+    private SSLEngine createSSLEngine(Map<String,Object> userProperties)
+            throws DeploymentException {
+
+        try {
+            // Create the SSL Context
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+
+            // Trust store
+            String sslTrustStoreValue =
+                    (String) userProperties.get(SSL_TRUSTSTORE_PROPERTY);
+            if (sslTrustStoreValue != null) {
+                String sslTrustStorePwdValue = (String) userProperties.get(
+                        SSL_TRUSTSTORE_PWD_PROPERTY);
+                if (sslTrustStorePwdValue == null) {
+                    sslTrustStorePwdValue = SSL_TRUSTSTORE_PWD_DEFAULT;
+                }
+
+                File keyStoreFile = new File(sslTrustStoreValue);
+                KeyStore ks = KeyStore.getInstance("JKS");
+                try (InputStream is = new FileInputStream(keyStoreFile)) {
+                    ks.load(is, sslTrustStorePwdValue.toCharArray());
+                }
+
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(
+                        TrustManagerFactory.getDefaultAlgorithm());
+                tmf.init(ks);
+
+                sslContext.init(null, tmf.getTrustManagers(), null);
+            } else {
+                sslContext.init(null, null, null);
+            }
+
+            SSLEngine engine = sslContext.createSSLEngine();
+
+            String sslProtocolsValue =
+                    (String) userProperties.get(SSL_PROTOCOLS_PROPERTY);
+            if (sslProtocolsValue != null) {
+                engine.setEnabledProtocols(sslProtocolsValue.split(","));
+            }
+
+            engine.setUseClientMode(true);
+
+            return engine;
+        } catch (Exception e) {
+            throw new DeploymentException("TODO", e);
+        }
     }
 
 
