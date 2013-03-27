@@ -112,7 +112,7 @@ public class DiskFileItem
      * The content type passed by the browser, or <code>null</code> if
      * not defined.
      */
-    private String contentType;
+    private final String contentType;
 
     /**
      * Whether or not this item is a simple form field.
@@ -122,7 +122,7 @@ public class DiskFileItem
     /**
      * The original filename in the user's filesystem.
      */
-    private String fileName;
+    private final String fileName;
 
     /**
      * The size of the item, in bytes. This is used to cache the size when a
@@ -134,12 +134,12 @@ public class DiskFileItem
     /**
      * The threshold above which uploads will be stored on disk.
      */
-    private int sizeThreshold;
+    private final int sizeThreshold;
 
     /**
      * The directory in which uploaded files will be stored, if stored on disk.
      */
-    private File repository;
+    private final File repository;
 
     /**
      * Cached contents of the file.
