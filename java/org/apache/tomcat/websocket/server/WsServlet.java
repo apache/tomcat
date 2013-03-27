@@ -136,7 +136,7 @@ public class WsServlet extends HttpServlet {
             Class<?> clazz = sec.getEndpointClass();
             if (Endpoint.class.isAssignableFrom(clazz)) {
                 ep = (Endpoint) sec.getConfigurator().getEndpointInstance(
-                        sec.getEndpointClass());
+                        clazz);
             } else {
                 ep = new PojoEndpointServer();
             }
