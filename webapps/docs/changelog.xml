@@ -56,6 +56,14 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.40 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Update Tomcat's internal copy of Commons FileUpload to FileUpload 1.3.
+        (markt) 
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <update>
