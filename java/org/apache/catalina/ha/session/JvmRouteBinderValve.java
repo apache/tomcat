@@ -21,7 +21,6 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 
 import org.apache.catalina.Container;
-import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
@@ -379,29 +378,6 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
         }
     }
 
-    /**
-     * Send the changed Sessionid to all clusternodes.
-     *
-     * @see JvmRouteSessionIDBinderListener#messageReceived(
-     *            org.apache.catalina.ha.ClusterMessage)
-     * @param sessionId
-     *            current failed sessionid
-     * @param newSessionID
-     *            new session id, bind to the new cluster node
-     */
-    protected void sendSessionIDClusterBackup(Request request, String sessionId,
-            String newSessionID) {
-        CatalinaCluster c = getCluster();
-        if (c != null && !(getManager(request) instanceof BackupManager)) {
-            SessionIDMessage msg = new SessionIDMessage();
-            msg.setOrignalSessionID(sessionId);
-            msg.setBackupSessionID(newSessionID);
-            Context context = request.getContext();
-            msg.setContextName(context.getName());
-            msg.setHost(context.getParent().getName());
-            c.send(msg);
-        }
-    }
 
     /**
      * Start this component and implement the requirements
