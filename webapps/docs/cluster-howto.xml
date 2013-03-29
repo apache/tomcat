@@ -57,7 +57,7 @@
     2. Multicast port is 45564 (the port and the address together determine cluster membership.<br/>
     3. The IP broadcasted is <code>java.net.InetAddress.getLocalHost().getHostAddress()</code> (make sure you don't broadcast 127.0.0.1, this is a common error)<br/>
     4. The TCP port listening for replication messages is the first available server socket in range <code>4000-4100</code><br/>
-    5. Two listeners are configured <code>ClusterSessionListener</code> and <code>JvmRouteSessionIDBinderListener</code><br/>
+    5. Two listeners are configured <code>ClusterSessionListener</code><br/>
     6. Two interceptors are configured <code>TcpFailureDetector</code> and <code>MessageDispatch15Interceptor</code><br/>
     The following is the default cluster configuration:<br/>
     <source>
@@ -98,7 +98,6 @@
                     watchDir=&quot;/tmp/war-listen/&quot;
                     watchEnabled=&quot;false&quot;/&gt;
 
-          &lt;ClusterListener className=&quot;org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener&quot;/&gt;
           &lt;ClusterListener className=&quot;org.apache.catalina.ha.session.ClusterSessionListener&quot;/&gt;
         &lt;/Cluster&gt;
     </source>
@@ -212,11 +211,8 @@ should be completed:</p>
     Not having this valve in place, will make it harder to ensure stickiness in case of a failure for the mod_jk module.
 </p>
 <p>
-    By default, if no valves are configured, the JvmRouteBinderValve is added on.
-    The cluster message listener called JvmRouteSessionIDBinderListener is also defined by default and is used to actually rewrite the
-    session id on the other nodes in the cluster once a fail over has occurred.
-    Remember, if you are adding your own valves or cluster listeners in server.xml then the defaults are no longer valid,
-    make sure that you add in all the appropriate valves and listeners as defined by the default.
+    Remember, if you are adding your own valves in server.xml then the defaults are no longer valid,
+    make sure that you add in all the appropriate valves as defined by the default.
 </p>
 <p>
     <b>Hint:</b><br/>
@@ -472,7 +468,6 @@ should be completed:</p>
                                          -- ClusterListener
                                          |      \
                                          |       -- ClusterSessionListener
-                                         |       -- JvmRouteSessionIDBinderListener
                                          |
                                          -- Deployer
                                                 \
