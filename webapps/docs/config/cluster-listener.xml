@@ -46,14 +46,6 @@
    to the manager through this listener.
    </p>
 </section>
-<section name="org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener">
-  <p>
-   Listens for session Id changes. This listener is only used if you are using mod_jk
-   along with the <code>jvmRoute</code> attribute where the session Id can change.
-   In the event of a change, the <code>JvmRouteBinderValve</code> will broadcast the
-   session change and it will get picked up by this listener.
-   </p>
-</section>
 
 <section name="Attributes">
 
