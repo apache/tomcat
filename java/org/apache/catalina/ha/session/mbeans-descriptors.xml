@@ -64,18 +64,6 @@
       returnType="void"/>
   </mbean>
   <mbean
-    name="JvmRouteSessionIDBinderListener"
-    description="Monitors the jvmRoute activity"
-    domain="Catalina"
-    group="Listener"
-    type="org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener">
-    <attribute
-      name="numberOfSessions"
-      description="number of jvmRoute session corrections"
-      type="long"
-      writeable="false"/>
-  </mbean>
-  <mbean
     name="DeltaManager"
     description="Cluster Manager implementation of the Manager interface"
     domain="Catalina"
