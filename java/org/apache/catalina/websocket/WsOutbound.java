@@ -271,9 +271,11 @@ public class WsOutbound {
         }
 
         // Send any partial data we have
-        doFlush(false);
-
-        closed = true;
+        try {
+            doFlush(false);
+        } finally {
+            closed = true;
+        }
 
         upgradeOutbound.write(0x88);
         if (status == 0) {
