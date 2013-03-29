@@ -43,6 +43,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.coyote.http11.Http11Protocol;
@@ -79,12 +80,15 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
         WebSocketContainer wsContainer =
                 ContainerProvider.getWebSocketContainer();
-        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
+        Session wsSession = wsContainer.connectToServer(
+                TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
                 new URI("ws://localhost:" + getPort() +
                         TesterEchoServer.Config.PATH_ASYNC));
@@ -196,6 +200,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
 
         WebSocketContainer wsContainer =
                 ContainerProvider.getWebSocketContainer();
@@ -282,6 +288,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.addApplicationListener(BlockingConfig.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
 
         WebSocketContainer wsContainer =
                 ContainerProvider.getWebSocketContainer();
@@ -368,6 +376,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.addApplicationListener(WsListener.class.getName());
         ctx.addApplicationListener(ConstantTxConfig.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
 
         WebSocketContainer wsContainer =
                 ContainerProvider.getWebSocketContainer();
@@ -544,6 +554,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -586,6 +598,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -638,6 +652,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -720,6 +736,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
 
         TesterSupport.initSsl(tomcat);
 

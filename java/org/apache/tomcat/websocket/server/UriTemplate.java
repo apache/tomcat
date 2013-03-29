@@ -17,14 +17,10 @@
 package org.apache.tomcat.websocket.server;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Extracts path parameters from URIs used to create web socket connections
@@ -32,68 +28,119 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class UriTemplate {
 
-    private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
-
-    private final String template;
-    private final Pattern pattern;
-    private final List<String> names = new ArrayList<>();
+    private final String normalized;
+    private final List<Segment> segments = new ArrayList<>();
+    private final boolean hasParameters;
 
 
-    public UriTemplate(String template) {
-        this.template = template;
-        // +10 is just a guess at this point
-        StringBuilder pattern = new StringBuilder(template.length() + 10);
-        int pos = 0;
-        int end = 0;
-        int start = template.indexOf('{');
-        while (start > -1) {
-            end = template.indexOf('}', start);
-            pattern.append('(');
-            pattern.append(Pattern.quote(template.substring(pos, start)));
-            pattern.append(")([^/]*)");
-            names.add(template.substring(start + 1, end));
-            pos = end + 1;
-            start = template.indexOf('{', pos);
-        }
-        // No more matches, append current position to end
-        if (pos < template.length()) {
-            pattern.append('(');
-            pattern.append(template.substring(pos));
-            pattern.append(")?");
-        }
-        this.pattern = Pattern.compile(pattern.toString());
-    }
+    public UriTemplate(String path) {
+        StringBuilder normalized = new StringBuilder(path.length());
 
+        String[] segments = path.split("/");
+        int paramCount = 0;
+        int segmentCount = 0;
 
-    public boolean contains(String name) {
-        return names.contains(name);
-    }
-
-
-    /**
-     * Extract the path parameters from the provided pathInfo based on the
-     * template with which this UriTemplate was constructed.
-     *
-     * @param pathInfo The pathInfo from which the path parameters are to be
-     *            extracted
-     * @return A map of parameter names to values
-     */
-    public Map<String,String> match(String pathInfo) {
-        Map<String,String> result = new HashMap<>();
-        Matcher m = pattern.matcher(pathInfo);
-        if (!m.matches()) {
-            throw new IllegalArgumentException(sm.getString(
-                    "uriTemplate.noMatch", template, pattern, pathInfo));
-        }
-        int group = 2;
-        for (String name : names) {
-            String value = m.group(group);
-            if (value != null && value.length() > 0) {
-                result.put(name, value);
+        for (int i = 0; i < segments.length; i++) {
+            String segment = segments[i];
+            if (segment.length() == 0) {
+                continue;
             }
-            group += 2;
+            normalized.append('/');
+            int index = -1;
+            if (segment.startsWith("{") && segment.endsWith("}")) {
+                index = segmentCount;
+                segment = segment.substring(1, segment.length() - 1);
+                normalized.append('{');
+                normalized.append(paramCount++);
+                normalized.append('}');
+            } else {
+                if (segment.contains("{") || segment.contains("}")) {
+                    // TODO i18n
+                    throw new IllegalArgumentException();
+                }
+                normalized.append(segment);
+            }
+            this.segments.add(new Segment(index, segment));
+            segmentCount++;
         }
-        return Collections.unmodifiableMap(result);
+
+        this.normalized = normalized.toString();
+        this.hasParameters = paramCount > 0;
+    }
+
+
+    public Map<String,String> match(UriTemplate candidate) {
+
+        Map<String,String> result = new HashMap<>();
+
+        // Should not happen but for safety
+        if (candidate.getSegmentCount() != getSegmentCount()) {
+            return null;
+        }
+
+        Iterator<Segment> candidateSegments =
+                candidate.getSegments().iterator();
+        Iterator<Segment> targetSegments = segments.iterator();
+
+        while (candidateSegments.hasNext()) {
+            Segment candidateSegment = candidateSegments.next();
+            Segment targetSegment = targetSegments.next();
+
+            if (targetSegment.getParameterIndex() == -1) {
+                // Not a parameter - values must match
+                if (!targetSegment.getValue().equals(
+                        candidateSegment.getValue())) {
+                    // Not a match. Stop here
+                    return null;
+                }
+            } else {
+                // Parameter
+                result.put(targetSegment.getValue(),
+                        candidateSegment.getValue());
+            }
+        }
+
+        return result;
+    }
+
+
+    public boolean hasParameters() {
+        return hasParameters;
+    }
+
+
+    public int getSegmentCount() {
+        return segments.size();
+    }
+
+
+    public String getNormalizedPath() {
+        return normalized;
+    }
+
+
+    private List<Segment> getSegments() {
+        return segments;
+    }
+
+
+    private static class Segment {
+        private final int parameterIndex;
+        private final String value;
+
+        public Segment(int parameterIndex, String value) {
+            this.parameterIndex = parameterIndex;
+            this.value = value;
+        }
+
+
+        public int getParameterIndex() {
+            return parameterIndex;
+        }
+
+
+        public String getValue() {
+            return value;
+        }
     }
 }

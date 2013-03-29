@@ -25,13 +25,16 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.websocket.Endpoint;
@@ -47,29 +50,49 @@ import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
 /**
  * Handles the initial HTTP connection for WebSocket connections.
  */
-public class WsServlet extends HttpServlet {
+public class WsFilter implements Filter {
 
-    private static final long serialVersionUID = 1L;
     private static final Charset ISO_8859_1;
     static {
         ISO_8859_1 = Charset.forName("ISO-8859-1");
     }
-    private static final byte[] WS_ACCEPT = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(ISO_8859_1);
-    private final Queue<MessageDigest> sha1Helpers = new ConcurrentLinkedQueue<>();
+    private static final byte[] WS_ACCEPT =
+            "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(ISO_8859_1);
+    private final Queue<MessageDigest> sha1Helpers =
+            new ConcurrentLinkedQueue<>();
 
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        // Information required to send the server handshake message
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // NO-OP
+    }
+
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response,
+            FilterChain chain) throws IOException, ServletException {
+
+        // This filter only needs to handle WebSocket upgrade requests
+        if (!(request instanceof HttpServletRequest) ||
+                !(response instanceof HttpServletResponse) ||
+                !headerContainsToken((HttpServletRequest) request,
+                        Constants.UPGRADE_HEADER_NAME,
+                        Constants.UPGRADE_HEADER_VALUE)) {
+            // Note an HTTP request that includes a valid upgrade request to
+            // web socket
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // HTTP request with an upgrade header for WebSocket present
+        // Validate the rest of the headers and reject the request if that
+        // validation fails
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse resp = (HttpServletResponse) response;
+
         String key;
         String subProtocol = null;
         List<Extension> extensions = Collections.emptyList();
-        if (!headerContainsToken(req, Constants.UPGRADE_HEADER_NAME,
-                Constants.UPGRADE_HEADER_VALUE)) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
         if (!headerContainsToken(req, Constants.CONNECTION_HEADER_NAME,
                 Constants.CONNECTION_HEADER_VALUE)) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -87,12 +110,20 @@ public class WsServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
+
         // Need an Endpoint instance to progress this further
         WsServerContainer sc = WsServerContainer.getServerContainer();
-        Map<String,String> pathParameters = sc.getPathParameters(
-                req.getServletPath(),  req.getPathInfo());
-        ServerEndpointConfig sec = sc.getServerEndpointConfiguration(
-                req.getServletPath(), pathParameters);
+        String path;
+        String pathInfo = req.getPathInfo();
+        if (pathInfo == null) {
+            path = req.getServletPath();
+        } else {
+            path = req.getServletPath() + pathInfo;
+        }
+        WsMappingResult mappingResult = sc.findMapping(path);
+
+        ServerEndpointConfig sec = mappingResult.getConfig();
+
         // Origin check
         String origin = req.getHeader("Origin");
         if (!sec.getConfigurator().checkOrigin(origin)) {
@@ -159,8 +190,15 @@ public class WsServlet extends HttpServlet {
 
         WsHttpUpgradeHandler wsHandler =
                 req.upgrade(WsHttpUpgradeHandler.class);
-        wsHandler.preInit(ep, sec, sc, wsRequest, subProtocol, pathParameters,
-                req.isSecure());
+        wsHandler.preInit(ep, sec, sc, wsRequest, subProtocol,
+                mappingResult.getPathParams(), req.isSecure());
+
+    }
+
+
+    @Override
+    public void destroy() {
+        // NO-OP
     }
 
 

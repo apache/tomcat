@@ -32,6 +32,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.AsyncHandler;
@@ -69,6 +70,8 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
 
         WebSocketContainer wsContainer =
                 ContainerProvider.getWebSocketContainer();
