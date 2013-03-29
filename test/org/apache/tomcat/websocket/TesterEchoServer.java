@@ -39,7 +39,6 @@ public class TesterEchoServer {
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);
             WsServerContainer sc = WsServerContainer.getServerContainer();
-            sc.setServletContext(sce.getServletContext());
             try {
                 sc.addEndpoint(Async.class);
                 sc.addEndpoint(Basic.class);

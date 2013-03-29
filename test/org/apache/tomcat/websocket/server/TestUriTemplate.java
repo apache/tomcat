@@ -26,72 +26,63 @@ public class TestUriTemplate {
     @Test
     public void testBasic() throws Exception {
         UriTemplate t = new UriTemplate("/{a}/{b}");
-        Map<String,String> result = t.match("/foo/bar");
+        Map<String,String> result = t.match(new UriTemplate("/foo/bar"));
 
         Assert.assertEquals(2, result.size());
         Assert.assertTrue(result.containsKey("a"));
         Assert.assertTrue(result.containsKey("b"));
         Assert.assertEquals("foo", result.get("a"));
         Assert.assertEquals("bar", result.get("b"));
-    }
-
-
-    @Test(expected=java.lang.IllegalArgumentException.class)
-    public void testOneOfTwo() throws Exception {
-        UriTemplate t = new UriTemplate("/{a}/{b}");
-        t.match("/foo");
     }
 
 
     @Test
-    public void testBasicPrefix() throws Exception {
-        UriTemplate t = new UriTemplate("/x{a}/y{b}");
-        Map<String,String> result = t.match("/xfoo/ybar");
+    public void testOneOfTwo() throws Exception {
+        UriTemplate t = new UriTemplate("/{a}/{b}");
+        Map<String,String> result = t.match(new UriTemplate("/foo"));
+        Assert.assertNull(result);
+    }
 
-        Assert.assertEquals(2, result.size());
-        Assert.assertTrue(result.containsKey("a"));
-        Assert.assertTrue(result.containsKey("b"));
-        Assert.assertEquals("foo", result.get("a"));
-        Assert.assertEquals("bar", result.get("b"));
+
+    @Test(expected=java.lang.IllegalArgumentException.class)
+    public void testBasicPrefix() throws Exception {
+        @SuppressWarnings("unused")
+        UriTemplate t = new UriTemplate("/x{a}/y{b}");
     }
 
 
     @Test(expected=java.lang.IllegalArgumentException.class)
     public void testPrefixOneOfTwo() throws Exception {
         UriTemplate t = new UriTemplate("/x{a}/y{b}");
-        t.match("/xfoo");
+        t.match(new UriTemplate("/xfoo"));
     }
 
 
     @Test(expected=java.lang.IllegalArgumentException.class)
     public void testPrefixTwoOfTwo() throws Exception {
         UriTemplate t = new UriTemplate("/x{a}/y{b}");
-        t.match("/ybar");
+        t.match(new UriTemplate("/ybar"));
     }
 
 
     @Test(expected=java.lang.IllegalArgumentException.class)
     public void testQuote1() throws Exception {
         UriTemplate t = new UriTemplate("/.{a}");
-        t.match("/yfoo");
+        t.match(new UriTemplate("/yfoo"));
     }
 
 
-    @Test
+    @Test(expected=java.lang.IllegalArgumentException.class)
     public void testQuote2() throws Exception {
+        @SuppressWarnings("unused")
         UriTemplate t = new UriTemplate("/.{a}");
-        Map<String,String> result = t.match("/.foo");
-
-        Assert.assertEquals(1, result.size());
-        Assert.assertTrue(result.containsKey("a"));
-        Assert.assertEquals("foo", result.get("a"));
     }
 
 
     @Test
     public void testNoParams() throws Exception {
         UriTemplate t = new UriTemplate("/foo/bar");
-        Map<String,String> result = t.match("/foo/bar");
+        Map<String,String> result = t.match(new UriTemplate("/foo/bar"));
 
         Assert.assertEquals(0, result.size());
     }

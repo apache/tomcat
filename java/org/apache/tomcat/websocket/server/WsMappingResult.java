@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,20 +16,29 @@
  */
 package org.apache.tomcat.websocket.server;
 
-/**
- * Internal implementation constants.
- */
-public class Constants {
+import java.util.Map;
 
-    protected static final String PACKAGE_NAME =
-            Constants.class.getPackage().getName();
+import javax.websocket.server.ServerEndpointConfig;
 
-    public static final String BINARY_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM =
-            "org.apache.tomcat.websocket.binaryBufferSize";
-    public static final String TEXT_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM =
-            "org.apache.tomcat.websocket.textBufferSize";
+class WsMappingResult {
 
-    private Constants() {
-        // Hide default constructor
+    private final ServerEndpointConfig config;
+    private final Map<String,String> pathParams;
+
+
+    WsMappingResult(ServerEndpointConfig config,
+            Map<String,String> pathParams) {
+        this.config = config;
+        this.pathParams = pathParams;
+    }
+
+
+    ServerEndpointConfig getConfig() {
+        return config;
+    }
+
+
+    Map<String,String> getPathParams() {
+        return pathParams;
     }
 }
