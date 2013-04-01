@@ -37,7 +37,9 @@ import org.apache.tomcat.util.res.StringManager;
  * 
  * @author Peter Rossbach
  * @version $Id$
+ * @deprecated Will be removed in Tomcat 8.0.x
  */
+@Deprecated
 public class JvmRouteSessionIDBinderListener extends ClusterListener {
 
     private static final Log log =

@@ -24,6 +24,7 @@ import org.apache.catalina.ha.ClusterMessageBase;
  * @author Peter Rossbach
  * 
  * @version $Id$
+ * @deprecated Will be removed in Tomcat 8.0.x
  */
 public class SessionIDMessage extends ClusterMessageBase {
 
