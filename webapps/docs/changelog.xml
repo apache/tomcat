@@ -150,6 +150,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <scode>
+        Remove unused JvmRouteSessionIDBinderListener and SessionIDMessage.
+        (kfujino)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
