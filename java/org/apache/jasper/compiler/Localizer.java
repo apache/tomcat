@@ -151,7 +151,7 @@ public class Localizer {
         String errMsg = errCode;
         try {
             errMsg = bundle.getString(errCode);
-            if (args != null) {
+            if (args != null && args.length > 0) {
                 MessageFormat formatter = new MessageFormat(errMsg);
                 errMsg = formatter.format(args);
             }

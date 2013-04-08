@@ -150,6 +150,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <scode>
+        Simplify API of <code>ErrorDispatcher</code> class by using varargs.
+        (kkolinko)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <scode>
