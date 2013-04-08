@@ -282,15 +282,6 @@ public class ErrorDispatcher {
         dispatch(null, errCode, new Object[] {arg}, e);
     }
 
-    /**
-     * @deprecated Replaced by jspError(Exception, String, String)
-     */
-    @Deprecated
-    public void jspError(String errCode, String arg, Exception e)
-            throws JasperException {
-        jspError(e, errCode, arg);
-    }
-
     /*
      * Dispatches the given JSP parse error to the configured error handler.
      *
@@ -306,15 +297,6 @@ public class ErrorDispatcher {
     public void jspError(Node n, Exception e, String errCode, String arg)
                 throws JasperException {
         dispatch(n.getStart(), errCode, new Object[] {arg}, e);
-    }
-
-    /**
-     * @deprecated Replaced by jspError(Node, Exception, String, String)
-     */
-    @Deprecated
-    public void jspError(Node n, String errCode, String arg, Exception e)
-            throws JasperException {
-        jspError(n, e, errCode, arg);
     }
 
     /**
