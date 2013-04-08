@@ -3968,8 +3968,8 @@ class Generator {
                                 .getPropertyEditorClass());
                 }
             } catch (IntrospectionException ie) {
-                err.jspError(n, "jsp.error.introspect.taghandler",
-                        tagHandlerClass.getName(), ie);
+                err.jspError(n, ie, "jsp.error.introspect.taghandler",
+                        tagHandlerClass.getName());
             }
         }
 

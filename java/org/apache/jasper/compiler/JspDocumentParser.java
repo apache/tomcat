@@ -200,7 +200,7 @@ class JspDocumentParser
             pageNodes = new Node.Nodes(dummyRoot);
 
         } catch (IOException ioe) {
-            jspDocParser.err.jspError("jsp.error.data.file.read", path, ioe);
+            jspDocParser.err.jspError(ioe, "jsp.error.data.file.read", path);
         } catch (SAXParseException e) {
             jspDocParser.err.jspError
                 (new Mark(jspDocParser.ctxt, path, e.getLineNumber(),
