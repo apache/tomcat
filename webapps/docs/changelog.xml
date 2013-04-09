@@ -64,6 +64,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>54802</bug>: Provide location information for exceptions thrown
+        by JspDocumentParser. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <update>
