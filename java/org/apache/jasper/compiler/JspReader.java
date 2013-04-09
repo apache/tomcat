@@ -110,7 +110,7 @@ class JspReader {
                      ErrorDispatcher err)
             throws JasperException, FileNotFoundException, IOException {
 
-        this(ctxt, fname, encoding,
+        this(ctxt, fname,
              JspUtil.getReader(fname, encoding, jarFile, ctxt, err),
              err);
     }
@@ -121,7 +121,6 @@ class JspReader {
      */
     public JspReader(JspCompilationContext ctxt,
                      String fname,
-                     String encoding,
                      InputStreamReader reader,
                      ErrorDispatcher err)
             throws JasperException {
@@ -131,7 +130,7 @@ class JspReader {
         sourceFiles = new Vector<>();
         currFileId = 0;
         singleFile = false;
-        pushFile(fname, encoding, reader);
+        pushFile(fname, reader);
     }
 
     /**
@@ -625,7 +624,7 @@ class JspReader {
      * Push a file (and its associated Stream) on the file stack.  THe
      * current position in the current file is remembered.
      */
-    private void pushFile(String file, String encoding,
+    private void pushFile(String file,
                            InputStreamReader reader) throws JasperException {
 
         // Register the file
@@ -656,10 +655,10 @@ class JspReader {
             caw.close();
             if (current == null) {
                 current = new Mark(this, caw.toCharArray(), fileid,
-                                   getFile(fileid), master, encoding);
+                                   getFile(fileid), master);
             } else {
                 current.pushStream(caw.toCharArray(), fileid, getFile(fileid),
-                                   longName, encoding);
+                                   longName);
             }
         } catch (Throwable ex) {
             ExceptionUtils.handleThrowable(ex);
