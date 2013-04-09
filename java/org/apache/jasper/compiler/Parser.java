@@ -1408,7 +1408,7 @@ class Parser implements TagConstants {
                     parseELExpression(parent, (char) ch);
 
                     start = reader.mark();
-                    ttext = new CharArrayWriter();
+                    ttext.reset();
                 } else {
                     ttext.write(ch);
                 }
