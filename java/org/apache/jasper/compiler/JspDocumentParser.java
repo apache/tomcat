@@ -207,9 +207,9 @@ class JspDocumentParser
             jspDocParser.err.jspError
                 (new Mark(jspDocParser.ctxt, path, e.getLineNumber(),
                           e.getColumnNumber()),
-                 e.getMessage());
+                e, e.getMessage());
         } catch (Exception e) {
-            jspDocParser.err.jspError(e);
+            jspDocParser.err.jspError(e, "jsp.error.data.file.processing", path);
         }
 
         return pageNodes;
@@ -1185,8 +1185,9 @@ class JspDocumentParser
         TagInfo tagInfo = tagLibInfo.getTag(localName);
         TagFileInfo tagFileInfo = tagLibInfo.getTagFile(localName);
         if (tagInfo == null && tagFileInfo == null) {
-            throw new SAXException(
-                Localizer.getMessage("jsp.error.xml.bad_tag", localName, uri));
+            throw new SAXParseException(
+                Localizer.getMessage("jsp.error.xml.bad_tag", localName, uri),
+                locator);
         }
         Class<?> tagHandlerClass = null;
         if (tagInfo != null) {
@@ -1195,11 +1196,11 @@ class JspDocumentParser
                 tagHandlerClass =
                     ctxt.getClassLoader().loadClass(handlerClassName);
             } catch (Exception e) {
-                throw new SAXException(
+                throw new SAXParseException(
                     Localizer.getMessage("jsp.error.loadclass.taghandler",
                                          handlerClassName,
                                          qName),
-                    e);
+                    locator, e);
             }
         }
 
@@ -1330,7 +1331,7 @@ class JspDocumentParser
                         Localizer.getMessage(
                             "jsp.error.parse.xml.scripting.invalid.body",
                             elemType);
-                    throw new SAXException(msg);
+                    throw new SAXParseException(msg, locator);
                 }
             }
         }
@@ -1358,7 +1359,7 @@ class JspDocumentParser
                 locator,
                 fnfe);
         } catch (Exception e) {
-            throw new SAXException(e);
+            throw new SAXParseException(e.getMessage(), locator, e);
         }
     }
 
