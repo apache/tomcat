@@ -106,7 +106,7 @@ controlRole tomcat
    <em>Note:</em> The <code>name</code> attribute value was wrapped here to be
    more readable. It has to be all on the same line, without spaces.</p>
    <table border="1">
-   <tr><td><p><pre>
+   <tr><td><pre>
 &lt;project name="Catalina Ant JMX"
       xmlns:jmx="antlib:org.apache.catalina.ant.jmx"
       default="state"
@@ -130,7 +130,7 @@ senderAddress=${cluster.server.address},senderPort=${cluster.server.port}"
       resultproperty="IDataSender.backup.connected"
       echo="false"
     /&gt;
-   &lt;jmx:get
+    &lt;jmx:get
       name="Catalina:type=ClusterSender,host=localhost"
       attribute="senderObjectNames"
       resultproperty="senderObjectNames"
@@ -140,7 +140,7 @@ senderAddress=${cluster.server.address},senderPort=${cluster.server.port}"
        echo it to Ant output and store at
        property &lt;em&gt;clustertest.maxActiveSessions.orginal&lt;/em&gt;
     --&gt;
-   &lt;jmx:get
+    &lt;jmx:get
       name="Catalina:type=Manager,context=/ClusterTest,host=localhost"
       attribute="maxActiveSessions"
       resultproperty="clustertest.maxActiveSessions.orginal"
@@ -204,7 +204,7 @@ manager.ClusterTest.0.counterSend_EVT_GET_ALL_SESSIONS:
   &lt;/target&gt;
 
 &lt;/project&gt;
-   </pre></p>
+</pre>
    </td></tr>
 </table>
    <p><b>import:</b> Import the JMX Accessor Project with
@@ -715,8 +715,8 @@ List of Attributes<br/>
 Get all Manager ObjectNames from all services and Hosts <br/>
 <source>
   &lt;jmx:query
-           name="Catalina:type=Manager,*
-           resultproperty="manager" /&gt;
+    name="Catalina:type=Manager,*
+    resultproperty="manager" /&gt;
 </source>
 Now you can find the Session Manager at <em>${manager.[0..N].name}</em>
 properties and access the result object counter with ${manager.length} property.
@@ -725,9 +725,9 @@ properties and access the result object counter with ${manager.length} property.
 Example to get the Manager from <em>servlet-examples</em> application an bind all MBean properties<br/>
 <source>
   &lt;jmx:query
-           name="Catalina:type=Manager,context=/servlet-examples,host=localhost*"
-           attributebinding="true"
-           resultproperty="manager.servletExamples" /&gt;
+    name="Catalina:type=Manager,context=/servlet-examples,host=localhost*"
+    attributebinding="true"
+    resultproperty="manager.servletExamples" /&gt;
 </source>
 Now you can find the manager at <em>${manager.servletExamples.0.name}</em> property
 and can access all properties from this manager with <em>${manager.servletExamples.0.[manager attribute names]</em>}.
@@ -766,8 +766,8 @@ Example to get all MBeans from a server and store inside an external XML propert
     format="xml"/&gt;
 
   &lt;!-- Print results --&gt;
-  &lt;echo
-    message="Number of MBeans in server ${jmx.host}:${jmx.port} is ${mbeans.length}"/&gt;
+  &lt;echo message=
+    "Number of MBeans in server ${jmx.host}:${jmx.port} is ${mbeans.length}"/&gt;
 &lt;/target&gt;
 &lt;/project&gt;
 </source>
