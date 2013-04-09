@@ -50,9 +50,6 @@ final class Mark {
      */
     private Stack<IncludeState> includeStack = null;
 
-    // encoding of current file
-    private String encoding = null;
-
     // reader that owns this mark (so we can look up fileid's)
     private JspReader reader;
 
@@ -66,10 +63,9 @@ final class Mark {
      * @param fileId id of requested jsp file
      * @param name JSP file name
      * @param inBaseDir base directory of requested jsp file
-     * @param inEncoding encoding of current file
      */
     Mark(JspReader reader, char[] inStream, int fileId, String name,
-         String inBaseDir, String inEncoding) {
+         String inBaseDir) {
 
         this.reader = reader;
         this.ctxt = reader.getJspCompilationContext();
@@ -80,7 +76,6 @@ final class Mark {
         this.fileId = fileId;
         this.fileName = name;
         this.baseDir = inBaseDir;
-        this.encoding = inEncoding;
         this.includeStack = new Stack<>();
     }
 
@@ -110,7 +105,6 @@ final class Mark {
             this.fileId = other.fileId;
             this.fileName = other.fileName;
             this.baseDir = other.baseDir;
-            this.encoding = other.encoding;
 
             if (includeStack == null) {
                 includeStack = new Stack<>();
@@ -138,7 +132,6 @@ final class Mark {
         this.fileId = -1;
         this.fileName = filename;
         this.baseDir = "le-basedir";
-        this.encoding = "le-endocing";
         this.includeStack = null;
     }
 
@@ -153,12 +146,12 @@ final class Mark {
      * @param inEncoding encoding of new file
      */
     public void pushStream(char[] inStream, int inFileId, String name,
-                           String inBaseDir, String inEncoding)
+                           String inBaseDir)
     {
         // store current state in stack
         includeStack.push(new IncludeState(cursor, line, col, fileId,
                                            fileName, baseDir,
-                                           encoding, stream) );
+                                           stream) );
 
         // set new variables
         cursor = 0;
@@ -167,7 +160,6 @@ final class Mark {
         fileId = inFileId;
         fileName = name;
         baseDir = inBaseDir;
-        encoding = inEncoding;
         stream = inStream;
     }
 
@@ -257,7 +249,7 @@ final class Mark {
      * included file. In other words, it's the parser's continuation to be
      * reinstalled after the included file parsing is done.
      */
-    private class IncludeState {
+    private static class IncludeState {
         private final int cursor, line, col;
         private final int fileId;
         private final String fileName;
@@ -265,7 +257,7 @@ final class Mark {
         private final char[] stream;
 
         IncludeState(int inCursor, int inLine, int inCol, int inFileId,
-                     String name, String inBaseDir, String inEncoding,
+                     String name, String inBaseDir,
                      char[] inStream) {
             cursor = inCursor;
             line = inLine;
@@ -273,7 +265,6 @@ final class Mark {
             fileId = inFileId;
             fileName = name;
             baseDir = inBaseDir;
-            encoding = inEncoding;
             stream = inStream;
         }
     }
