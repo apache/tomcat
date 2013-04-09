@@ -58,7 +58,7 @@
     to be on the same line. It is wrapped to be more readable. If Tomcat is
     running as a Windows service, use its configuration dialog to set
     java options for the service.
-    For Unixes, remove <code>"set "</code> from beginning of the line.
+    For un*xes remove <code>"set "</code> from beginning of the line.
     </p>
 <source>
 set CATALINA_OPTS=-Dcom.sun.management.jmxremote
