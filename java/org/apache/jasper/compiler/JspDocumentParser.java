@@ -205,9 +205,9 @@ class JspDocumentParser
             jspDocParser.err.jspError
                 (new Mark(jspDocParser.ctxt, path, e.getLineNumber(),
                           e.getColumnNumber()),
-                 e.getMessage());
+                e, e.getMessage());
         } catch (Exception e) {
-            jspDocParser.err.jspError(e);
+            jspDocParser.err.jspError(e, "jsp.error.data.file.processing", path);
         }
 
         return pageNodes;
