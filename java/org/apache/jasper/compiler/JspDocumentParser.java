@@ -471,10 +471,8 @@ class JspDocumentParser
         if (!(current instanceof Node.JspText)
             && !(current instanceof Node.NamedAttribute)) {
             for (int i = 0; i < charBuffer.length(); i++) {
-                if (!(charBuffer.charAt(i) == ' '
-                    || charBuffer.charAt(i) == '\n'
-                    || charBuffer.charAt(i) == '\r'
-                    || charBuffer.charAt(i) == '\t')) {
+                char ch = charBuffer.charAt(i);
+                if (!(ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t')) {
                     isAllSpace = false;
                     break;
                 }
@@ -522,7 +520,7 @@ class JspDocumentParser
                         @SuppressWarnings("unused")
                         Node unused = new Node.TemplateText(
                                 ttext.toString(), startMark, current);
-                        ttext = new CharArrayWriter();
+                        ttext.reset();
                         //We subtract two from the column number to
                         //account for the '[$,#]{' that we've already parsed
                         startMark = new Mark(ctxt, path, line, column - 2);
@@ -558,7 +556,7 @@ class JspDocumentParser
                             Node unused = new Node.ELExpression(
                                     (char) elType, ttext.toString(),
                                     startMark, current);
-                            ttext = new CharArrayWriter();
+                            ttext.reset();
                             startMark = new Mark(ctxt, path, line, column);
                             break;
                         }
