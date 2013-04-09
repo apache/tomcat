@@ -125,12 +125,12 @@ public class ErrorDispatcher {
      * message.
      *
      * @param errCode Error code
-     * @param arg Argument for parametric replacement
+     * @param args Arguments for parametric replacement
      * @param e Parsing exception
      */
-    public void jspError(Exception e, String errCode, String arg)
+    public void jspError(Exception e, String errCode, String... args)
                 throws JasperException {
-        dispatch(null, errCode, new Object[] {arg}, e);
+        dispatch(null, errCode, args, e);
     }
 
     /*
@@ -142,12 +142,12 @@ public class ErrorDispatcher {
      *
      * @param n Node that caused the error
      * @param errCode Error code
-     * @param arg Argument for parametric replacement
+     * @param args Arguments for parametric replacement
      * @param e Parsing exception
      */
-    public void jspError(Node n, Exception e, String errCode, String arg)
+    public void jspError(Node n, Exception e, String errCode, String... args)
                 throws JasperException {
-        dispatch(n.getStart(), errCode, new Object[] {arg}, e);
+        dispatch(n.getStart(), errCode, args, e);
     }
 
     /**
