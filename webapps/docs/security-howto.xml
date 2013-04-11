@@ -229,7 +229,7 @@
       </p>
 
       <p>In a hosted environment where web applications may not be trusted, set
-      the <strong>deployXml</strong> attribute to false to ignore any
+      the <strong>deployXML</strong> attribute to <code>false</code> to ignore any
       context.xml packaged with the web application that may try to assign
       increased privileges to the web application. </p>
     </subsection>
