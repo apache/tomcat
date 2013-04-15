@@ -34,28 +34,53 @@
 </section>
 
 <section name="Introduction">
-  <p>TODO - Complete documentation</p>
-
-
+  <p>The Farm War Deployer can deploy and undeploy web applications on the other
+  nodes in the cluster.</p>
+  <p><strong>Note: </strong>FarmWarDeployer can be configured at host level
+  cluster only.
+  </p>
 </section>
 
 
-<section name="Attributes">
+<section name="org.apache.catalina.ha.deploy.FarmWarDeployer">
 
-  <subsection name="Common Attributes">
+  <subsection name="Attributes">
 
-  <attributes>
-
-    <attribute name="className" required="true">
-
-    </attribute>
-
-
-  </attributes>
-
+    <attributes>
+      <attribute name="className" required="true">
+        The cluster deployer class, currently only one is available,
+        <code>org.apache.catalina.ha.deploy.FarmWarDeployer.</code>
+      </attribute>
+      <attribute name="deployDir" required="true">
+        Deployment directory. This is the pathname of a directory where deploy
+        the web applications. In the current implementation, this attribute must
+        be the same value as the <strong>Host's appBase</strong>.
+      </attribute>
+      <attribute name="tempDir" required="true">
+        The temporaryDirectory to store binary data when downloading a war from
+        the cluster.
+      </attribute>
+      <attribute name="watchDir" required="false">
+        This is the pathname of a directory where watch for changes(add/modify/remove)
+        of web applications. <strong>Note: </strong> if <strong>watchEnabled</strong>
+        is false, this attribute will have no effect.
+      </attribute>
+      <attribute name="watchEnabled" required="false">
+        Set to true if you want to watch for changes of web applications.
+        Only when this attribute set to true, you can trigger a deploy/undeploy
+        of web applications. The flag's value defaults to false. 
+      </attribute>
+      <attribute name="processDeployFrequency" required="false">
+        Frequency of the Farm watchDir check. Cluster wide deployment will be
+        done once for the specified amount of backgrondProcess calls (ie, the
+        lower the amount, the most often the checks will occur). The minimum
+        value is 1, and the default value is 2.
+        <strong>Note: </strong> if <strong>watchEnabled</strong> is false, this
+        attribute will have no effect.
+      </attribute>
+    </attributes>
 
   </subsection>
-
 
 </section>
 
