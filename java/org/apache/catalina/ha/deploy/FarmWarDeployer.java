@@ -67,7 +67,7 @@ public class FarmWarDeployer extends ClusterListener
         StringManager.getManager(Constants.Package);
 
     /*--Instance Variables--------------------------------------*/
-    protected boolean started = false; //default 5 seconds
+    protected boolean started = false;
 
     protected final HashMap<String, FileMessageFactory> fileFactories =
         new HashMap<>();
