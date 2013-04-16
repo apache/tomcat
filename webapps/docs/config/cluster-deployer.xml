@@ -53,17 +53,22 @@
       </attribute>
       <attribute name="deployDir" required="true">
         Deployment directory. This is the pathname of a directory where deploy
-        the web applications. In the current implementation, this attribute must
-        be the same value as the <strong>Host's appBase</strong>.
+        the web applications. You may specify an absolute pathname, or a
+        pathname that is relative to the $CATALINA_BASE directory. In the
+        current implementation, this attribute must be the same value as the
+        <strong>Host's appBase</strong>.
       </attribute>
       <attribute name="tempDir" required="true">
         The temporaryDirectory to store binary data when downloading a war from
-        the cluster.
+        the cluster. You may specify an absolute pathname, or a pathname that is
+        relative to the $CATALINA_BASE directory.
       </attribute>
       <attribute name="watchDir" required="false">
         This is the pathname of a directory where watch for changes(add/modify/remove)
-        of web applications. <strong>Note: </strong> if <strong>watchEnabled</strong>
-        is false, this attribute will have no effect.
+        of web applications. You may specify an absolute pathname, or a pathname
+        that is relative to the $CATALINA_BASE directory.
+        <strong>Note: </strong> if <strong>watchEnabled</strong> is false, this
+        attribute will have no effect.
       </attribute>
       <attribute name="watchEnabled" required="false">
         Set to true if you want to watch for changes of web applications.
