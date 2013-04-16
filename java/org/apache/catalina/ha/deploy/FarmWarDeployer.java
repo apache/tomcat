@@ -437,11 +437,6 @@ public class FarmWarDeployer extends ClusterListener
             if (log.isInfoEnabled())
                 log.info(sm.getString("farmWarDeployer.modInstall",
                         cn.getName(), deployWar.getAbsolutePath()));
-            try {
-                remove(cn.getName(), false);
-            } catch (Exception x) {
-                log.error(sm.getString("farmWarDeployer.modRemoveFail"), x);
-            }
             install(cn.getName(), deployWar);
         } catch (Exception x) {
             log.error(sm.getString("farmWarDeployer.modInstallFail"), x);
