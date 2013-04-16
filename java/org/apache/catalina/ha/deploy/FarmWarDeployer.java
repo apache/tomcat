@@ -72,11 +72,23 @@ public class FarmWarDeployer extends ClusterListener
     protected final HashMap<String, FileMessageFactory> fileFactories =
         new HashMap<>();
 
+    /**
+     * Deployment directory.
+     */
     protected String deployDir;
+    private File deployDirFile = null;
 
+    /**
+     * Temporary directory.
+     */
     protected String tempDir;
+    private File tempDirFile = null;
 
+    /**
+     * Watch directory. 
+     */
     protected String watchDir;
+    private File watchDirFile = null;
 
     protected boolean watchEnabled = false;
 
@@ -149,7 +161,7 @@ public class FarmWarDeployer extends ClusterListener
             return;
         }
         if (watchEnabled) {
-            watcher = new WarWatcher(this, new File(getWatchDir()));
+            watcher = new WarWatcher(this, getWatchDirFile());
             if (log.isInfoEnabled()) {
                 log.info(sm.getString(
                         "farmWarDeployer.watchDir", getWatchDir()));
@@ -213,7 +225,7 @@ public class FarmWarDeployer extends ClusterListener
                     String name = factory.getFile().getName();
                     if (!name.endsWith(".war"))
                         name = name + ".war";
-                    File deployable = new File(getDeployDir(), name);
+                    File deployable = new File(getDeployDirFile(), name);
                     try {
                         String contextName = fmsg.getContextName();
                         if (!isServiced(contextName)) {
@@ -284,7 +296,7 @@ public class FarmWarDeployer extends ClusterListener
      */
     public synchronized FileMessageFactory getFactory(FileMessage msg)
             throws java.io.FileNotFoundException, java.io.IOException {
-        File writeToFile = new File(getTempDir(), msg.getFileName());
+        File writeToFile = new File(getTempDirFile(), msg.getFileName());
         FileMessageFactory factory = fileFactories.get(msg.getFileName());
         if (factory == null) {
             factory = FileMessageFactory.getInstance(writeToFile, true);
@@ -431,7 +443,7 @@ public class FarmWarDeployer extends ClusterListener
     @Override
     public void fileModified(File newWar) {
         try {
-            File deployWar = new File(getDeployDir(), newWar.getName());
+            File deployWar = new File(getDeployDirFile(), newWar.getName());
             copy(newWar, deployWar);
             ContextName cn = new ContextName(deployWar.getName());
             if (log.isInfoEnabled())
@@ -593,6 +605,14 @@ public class FarmWarDeployer extends ClusterListener
         return deployDir;
     }
 
+    public File getDeployDirFile() {
+        if (deployDirFile != null) return deployDirFile;
+
+        File dir = getAbsolutePath(getDeployDir());
+        this.deployDirFile = dir;
+        return dir;
+    }
+
     public void setDeployDir(String deployDir) {
         this.deployDir = deployDir;
     }
@@ -601,12 +621,28 @@ public class FarmWarDeployer extends ClusterListener
         return tempDir;
     }
 
+    public File getTempDirFile() {
+        if (tempDirFile != null) return tempDirFile;
+
+        File dir = getAbsolutePath(getTempDir());
+        this.tempDirFile = dir;
+        return dir;
+    }
+
     public void setTempDir(String tempDir) {
         this.tempDir = tempDir;
     }
 
     public String getWatchDir() {
         return watchDir;
+    }
+
+    public File getWatchDirFile() {
+        if (watchDirFile != null) return watchDirFile;
+
+        File dir = getAbsolutePath(getWatchDir());
+        this.watchDirFile = dir;
+        return dir;
     }
 
     public void setWatchDir(String watchDir) {
@@ -682,4 +718,16 @@ public class FarmWarDeployer extends ClusterListener
         return true;
     }
 
+    private File getAbsolutePath(String path) {
+        File dir = new File(path);
+        if (!dir.isAbsolute()) {
+            dir = new File(getCluster().getContainer().getCatalinaBase(),
+                    dir.getPath());
+        }
+        try {
+            dir = dir.getCanonicalFile();
+        } catch (IOException e) {// ignore
+        }
+        return dir;
+    }
 }
