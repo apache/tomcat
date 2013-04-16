@@ -2574,6 +2574,10 @@ public class ContextConfig implements LifecycleListener {
                         new InputSource(fragmentFile.toURI().toURL().toString());
                     source.setByteStream(stream);
                     parseWebXml(source, fragment, true);
+                } else {
+                    // If there is no web.xml, normal folder no impact on
+                    // distributable
+                    fragment.setDistributable(true);
                 }
             } finally {
                 fragment.setURL(file.toURI().toURL());
