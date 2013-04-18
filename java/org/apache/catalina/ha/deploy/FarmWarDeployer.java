@@ -444,11 +444,23 @@ public class FarmWarDeployer extends ClusterListener
     public void fileModified(File newWar) {
         try {
             File deployWar = new File(getDeployDirFile(), newWar.getName());
-            copy(newWar, deployWar);
             ContextName cn = new ContextName(deployWar.getName());
             if (log.isInfoEnabled())
                 log.info(sm.getString("farmWarDeployer.modInstall",
                         cn.getName(), deployWar.getAbsolutePath()));
+            // install local
+            if (!isServiced(cn.getName())) {
+                addServiced(cn.getName());
+                try {
+                    copy(newWar, deployWar);
+                    check(cn.getName());
+                } finally {
+                    removeServiced(cn.getName());
+                }
+            } else {
+                log.error(sm.getString("farmWarDeployer.servicingDeploy",
+                        cn.getName(), deployWar.getName()));
+            }
             install(cn.getName(), deployWar);
         } catch (Exception x) {
             log.error(sm.getString("farmWarDeployer.modInstallFail"), x);
