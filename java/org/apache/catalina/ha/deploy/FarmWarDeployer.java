@@ -168,9 +168,7 @@ public class FarmWarDeployer extends ClusterListener
             }
         }
 
-        configBase = new File(engine.getCatalinaBase(), "conf");
-        configBase = new File(configBase, engine.getName());
-        configBase = new File(configBase, hostname);
+        configBase = host.getConfigBaseFile();
 
         // Retrieve the MBean server
         mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
