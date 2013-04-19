@@ -19,10 +19,11 @@ package org.apache.tomcat.websocket.pojo;
 import javax.servlet.ServletContextEvent;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.DeploymentException;
+import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig.Configurator;
 
+import org.apache.tomcat.websocket.server.Constants;
 import org.apache.tomcat.websocket.server.WsListener;
-import org.apache.tomcat.websocket.server.WsServerContainer;
 
 public class Util {
 
@@ -37,8 +38,9 @@ public class Util {
         @Override
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);
-            WsServerContainer sc = WsServerContainer.getServerContainer();
-            sc.setServletContext(sce.getServletContext());
+            ServerContainer sc =
+                    (ServerContainer) sce.getServletContext().getAttribute(
+                            Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
             try {
                 sc.addEndpoint(pojoClazz);
             } catch (DeploymentException e) {

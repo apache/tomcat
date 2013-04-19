@@ -36,6 +36,7 @@ import javax.websocket.MessageHandler;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
+import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 
@@ -52,8 +53,8 @@ import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicBinary;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicHandler;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicText;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterProgrammaticEndpoint;
+import org.apache.tomcat.websocket.server.Constants;
 import org.apache.tomcat.websocket.server.WsListener;
-import org.apache.tomcat.websocket.server.WsServerContainer;
 
 public class TestWsWebSocketContainer extends TomcatBaseTest {
 
@@ -422,8 +423,9 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         @Override
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);
-            WsServerContainer sc = WsServerContainer.getServerContainer();
-            sc.setServletContext(sce.getServletContext());
+            ServerContainer sc =
+                    (ServerContainer) sce.getServletContext().getAttribute(
+                            Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
             try {
                 sc.addEndpoint(BlockingPojo.class);
             } catch (DeploymentException e) {
@@ -532,7 +534,9 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         @Override
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);
-            WsServerContainer sc = WsServerContainer.getServerContainer();
+            ServerContainer sc =
+                    (ServerContainer) sce.getServletContext().getAttribute(
+                            Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
             try {
                 sc.addEndpoint(ServerEndpointConfig.Builder.create(
                         ConstantTxEndpoint.class, PATH).build());
