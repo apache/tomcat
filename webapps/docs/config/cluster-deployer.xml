@@ -73,7 +73,7 @@
       <attribute name="watchEnabled" required="false">
         Set to true if you want to watch for changes of web applications.
         Only when this attribute set to true, you can trigger a deploy/undeploy
-        of web applications. The flag's value defaults to false. 
+        of web applications. The flag's value defaults to false.
       </attribute>
       <attribute name="processDeployFrequency" required="false">
         Frequency of the Farm watchDir check. Cluster wide deployment will be
