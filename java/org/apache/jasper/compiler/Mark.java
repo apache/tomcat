@@ -143,7 +143,6 @@ final class Mark {
      * @param inStream new stream for mark
      * @param inFileId id of new file from which stream comes from
      * @param inBaseDir directory of file
-     * @param inEncoding encoding of new file
      */
     public void pushStream(char[] inStream, int inFileId, String name,
                            String inBaseDir)
