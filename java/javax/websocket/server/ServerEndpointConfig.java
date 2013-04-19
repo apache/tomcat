@@ -134,7 +134,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
     }
 
 
-    public abstract class Configurator {
+    public class Configurator {
 
         private static volatile Configurator defaultImpl = null;
         private static final Object defaultImplLock = new Object();

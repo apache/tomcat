@@ -18,6 +18,7 @@ package org.apache.tomcat.websocket;
 
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
+import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 
 import org.junit.Assert;
@@ -173,8 +174,17 @@ public class TestUtil {
     }
 
 
-    private static class SimpleEncoder extends Encoder.Adapter
-            implements Encoder.Text<String> {
+    private static class SimpleEncoder implements Encoder.Text<String> {
+
+        @Override
+        public void init(EndpointConfig endpointConfig) {
+            // NO-OP
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
 
         @Override
         public String encode(String object) throws EncodeException {
@@ -187,8 +197,17 @@ public class TestUtil {
     }
 
 
-    private abstract static class GenericEncoder<T> extends Encoder.Adapter
-            implements Encoder.Text<T> {
+    private abstract static class GenericEncoder<T> implements Encoder.Text<T> {
+
+        @Override
+        public void init(EndpointConfig endpointConfig) {
+            // NO-OP
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
     }
 
 
@@ -204,7 +223,17 @@ public class TestUtil {
 
 
     private abstract static class GenericMultipleEncoder<A,B>
-            extends Encoder.Adapter implements Encoder.Text<A>, Foo<B> {
+            implements Encoder.Text<A>, Foo<B> {
+
+        @Override
+        public void init(EndpointConfig endpointConfig) {
+            // NO-OP
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
     }
 
 

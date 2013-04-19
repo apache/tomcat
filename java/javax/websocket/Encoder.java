@@ -27,19 +27,6 @@ public interface Encoder {
 
     abstract void destroy();
 
-    abstract class Adapter implements Encoder {
-
-        @Override
-        public void init(EndpointConfig endpointConfig) {
-            // NO-OP
-        }
-
-        @Override
-        public void destroy() {
-            // NO_OP
-        }
-    }
-
     interface Text<T> extends Encoder {
 
         String encode(T object) throws EncodeException;

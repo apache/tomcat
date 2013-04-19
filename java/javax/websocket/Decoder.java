@@ -27,19 +27,6 @@ public interface Decoder {
 
     abstract void destroy();
 
-    abstract class Adapter implements Decoder {
-
-        @Override
-        public void init(EndpointConfig endpointConfig) {
-            // NO-OP
-        }
-
-        @Override
-        public void destroy() {
-            // NO_OP
-        }
-    }
-
     interface Binary<T> extends Decoder {
 
         T decode(ByteBuffer bytes) throws DecodeException;
