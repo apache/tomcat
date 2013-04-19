@@ -113,7 +113,7 @@ public interface ClientEndpointConfig extends EndpointConfig {
     }
 
 
-    public abstract class Configurator {
+    public class Configurator {
 
         /**
          * Provides the client with a mechanism to inspect and/or modify the headers

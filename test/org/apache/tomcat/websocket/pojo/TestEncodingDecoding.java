@@ -27,6 +27,7 @@ import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
+import javax.websocket.EndpointConfig;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
@@ -144,8 +145,17 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     }
 
 
-    public static class MsgStringEncoder extends Encoder.Adapter
-            implements Encoder.Text<MsgString> {
+    public static class MsgStringEncoder implements Encoder.Text<MsgString> {
+
+        @Override
+        public void init(EndpointConfig endpointConfig) {
+            // NO-OP
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
 
         @Override
         public String encode(MsgString msg) throws EncodeException {
@@ -154,8 +164,17 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     }
 
 
-    public static class MsgStringDecoder extends Decoder.Adapter
-            implements Decoder.Text<MsgString> {
+    public static class MsgStringDecoder implements Decoder.Text<MsgString> {
+
+        @Override
+        public void init(EndpointConfig endpointConfig) {
+            // NO-OP
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
 
         @Override
         public MsgString decode(String s) throws DecodeException {
@@ -179,8 +198,17 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     }
 
 
-    public static class MsgByteEncoder extends Encoder.Adapter
-            implements Encoder.Binary<MsgByte> {
+    public static class MsgByteEncoder implements Encoder.Binary<MsgByte> {
+
+        @Override
+        public void init(EndpointConfig endpointConfig) {
+            // NO-OP
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
 
         @Override
         public ByteBuffer encode(MsgByte msg) throws EncodeException {
@@ -194,8 +222,17 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     }
 
 
-    public static class MsgByteDecoder extends Decoder.Adapter
-            implements Decoder.Binary<MsgByte> {
+    public static class MsgByteDecoder implements Decoder.Binary<MsgByte> {
+
+        @Override
+        public void init(EndpointConfig endpointConfig) {
+            // NO-OP
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
 
         @Override
         public MsgByte decode(ByteBuffer bb) throws DecodeException {
