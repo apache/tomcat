@@ -85,7 +85,7 @@ public class FarmWarDeployer extends ClusterListener
     private File tempDirFile = null;
 
     /**
-     * Watch directory. 
+     * Watch directory.
      */
     protected String watchDir;
     private File watchDirFile = null;
