@@ -50,15 +50,6 @@ import org.apache.tomcat.util.res.StringManager;
  * restarted!
  *
  * <p>
- * For this valve to function correctly, so that all nodes of the cluster
- * receive the sessionid change notifications that it generates, the following
- * ClusterListener MUST be configured at all nodes of the cluster:
- * {@link org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener
- * JvmRouteSessionIDBinderListener} since Tomcat 5.5.10, and both
- * JvmRouteSessionIDBinderListener and JvmRouteSessionIDBinderLifecycleListener
- * for earlier versions of Tomcat.
- *
- * <p>
  * Add this Valve to your host definition at conf/server.xml .
  *
  * Since 5.5.10 as direct cluster valve:<br/>
