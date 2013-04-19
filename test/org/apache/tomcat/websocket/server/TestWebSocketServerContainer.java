@@ -18,6 +18,7 @@ package org.apache.tomcat.websocket.server;
 
 import javax.servlet.ServletContextEvent;
 import javax.websocket.DeploymentException;
+import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
@@ -55,7 +56,9 @@ public class TestWebSocketServerContainer extends TomcatBaseTest {
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);
 
-            WsServerContainer sc = WsServerContainer.getServerContainer();
+            ServerContainer sc =
+                    (ServerContainer) sce.getServletContext().getAttribute(
+                            Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
 
             ServerEndpointConfig sec = ServerEndpointConfig.Builder.create(
                     TesterEchoServer.Basic.class, "/{param}").build();

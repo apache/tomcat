@@ -40,10 +40,6 @@ import javax.websocket.server.ServerEndpointConfig;
         Endpoint.class})
 public class WsSci implements ServletContainerInitializer {
 
-    private static final String SERVER_CONTAINER_CONTEXT_ATTRIBUTE =
-            "javax.websocket.server.ServerContainer";
-
-
     @Override
     public void onStartup(Set<Class<?>> clazzes, ServletContext ctx)
             throws ServletException {
@@ -133,7 +129,8 @@ public class WsSci implements ServletContainerInitializer {
         WsServerContainer sc = WsServerContainer.getServerContainer();
         sc.setServletContext(servletContext);
 
-        servletContext.setAttribute(SERVER_CONTAINER_CONTEXT_ATTRIBUTE, sc);
+        servletContext.setAttribute(
+                Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE, sc);
 
         return sc;
     }
