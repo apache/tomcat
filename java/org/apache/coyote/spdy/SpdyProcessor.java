@@ -533,7 +533,22 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
                 if (valueLen > frame.remaining()) {
                     throw new IOException("Name too long");
                 }
-                request.requestURI().setBytes(frame.data, frame.off, valueLen);
+
+                request.unparsedURI().setBytes(frame.data, frame.off, valueLen);
+                int questionPos = -1;
+                int end = frame.off + valueLen;
+                for(int k = frame.off; k < end; k ++) {
+                    if (frame.data[k] == '?') {
+                        questionPos = k;
+                    }
+                }
+
+                if (questionPos >= 0) {
+                    request.queryString().setBytes(frame.data, questionPos + 1, end - questionPos - 1);
+                    request.requestURI().setBytes(frame.data, frame.off, questionPos - frame.off);
+                } else {
+                    request.requestURI().setBytes(frame.data, frame.off, valueLen);
+                }
                 if (SpdyContext.debug) {
                     System.err.println("URL= " + request.requestURI());
                 }
