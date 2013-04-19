@@ -540,6 +540,7 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
                 for(int k = frame.off; k < end; k ++) {
                     if (frame.data[k] == '?') {
                         questionPos = k;
+                        break;
                     }
                 }
 
