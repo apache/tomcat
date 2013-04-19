@@ -355,6 +355,8 @@ public class FarmWarDeployer extends ClusterListener
     @Override
     public void install(String contextName, File webapp) throws IOException {
         Member[] members = getCluster().getMembers();
+        if (members.length == 0) return;
+
         Member localMember = getCluster().getLocalMember();
         FileMessageFactory factory =
             FileMessageFactory.getInstance(webapp, false);
@@ -402,15 +404,17 @@ public class FarmWarDeployer extends ClusterListener
     @Override
     public void remove(String contextName, boolean undeploy)
             throws IOException {
-        if (log.isInfoEnabled())
-            log.info(sm.getString("farmWarDeployer.removeStart", contextName));
-        Member localMember = getCluster().getLocalMember();
-        UndeployMessage msg = new UndeployMessage(localMember, System
-                .currentTimeMillis(), "Undeploy:" + contextName + ":"
-                + System.currentTimeMillis(), contextName);
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("farmWarDeployer.removeTxMsg", contextName));
-        cluster.send(msg);
+        if (getCluster().getMembers().length > 0) {
+            if (log.isInfoEnabled())
+                log.info(sm.getString("farmWarDeployer.removeStart", contextName));
+            Member localMember = getCluster().getLocalMember();
+            UndeployMessage msg = new UndeployMessage(localMember, System
+                    .currentTimeMillis(), "Undeploy:" + contextName + ":"
+                    + System.currentTimeMillis(), contextName);
+            if (log.isDebugEnabled())
+                log.debug(sm.getString("farmWarDeployer.removeTxMsg", contextName));
+            cluster.send(msg);
+        }
         // remove locally
         if (undeploy) {
             try {
@@ -551,9 +555,9 @@ public class FarmWarDeployer extends ClusterListener
      */
     @Override
     public void backgroundProcess() {
-        if (started) {
+        if (started && watchEnabled) {
             count = (count + 1) % processDeployFrequency;
-            if (count == 0 && watchEnabled) {
+            if (count == 0) {
                 watcher.check();
             }
         }
