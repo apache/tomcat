@@ -145,8 +145,8 @@ final class Mark {
      * @param inBaseDir directory of file
      */
     public void pushStream(char[] inStream, int inFileId, String name,
-                           String inBaseDir)
-    {
+                           String inBaseDir) {
+
         // store current state in stack
         includeStack.push(new IncludeState(cursor, line, col, fileId,
                                            fileName, baseDir,
@@ -267,6 +267,4 @@ final class Mark {
             stream = inStream;
         }
     }
-
 }
-
