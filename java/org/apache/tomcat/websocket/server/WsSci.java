@@ -40,11 +40,15 @@ import javax.websocket.server.ServerEndpointConfig;
         Endpoint.class})
 public class WsSci implements ServletContainerInitializer {
 
+    private static final String SERVER_CONTAINER_CONTEXT_ATTRIBUTE =
+            "javax.websocket.server.ServerContainer";
+
+
     @Override
     public void onStartup(Set<Class<?>> clazzes, ServletContext ctx)
             throws ServletException {
 
-        ctx.addListener(WsListener.class);
+        WsServerContainer sc = init(ctx);
 
         if (clazzes == null || clazzes.size() == 0) {
             return;
@@ -110,8 +114,6 @@ public class WsSci implements ServletContainerInitializer {
             }
         }
 
-        WsServerContainer sc = WsServerContainer.getServerContainer();
-        sc.setServletContext(ctx);
         try {
             // Deploy endpoints
             for (ServerEndpointConfig config : filteredEndpointConfigs) {
@@ -124,5 +126,15 @@ public class WsSci implements ServletContainerInitializer {
         } catch (DeploymentException e) {
             throw new ServletException(e);
         }
+    }
+
+
+    static WsServerContainer init(ServletContext servletContext) {
+        WsServerContainer sc = WsServerContainer.getServerContainer();
+        sc.setServletContext(servletContext);
+
+        servletContext.setAttribute(SERVER_CONTAINER_CONTEXT_ATTRIBUTE, sc);
+
+        return sc;
     }
 }
