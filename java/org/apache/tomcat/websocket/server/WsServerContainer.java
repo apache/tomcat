@@ -138,7 +138,8 @@ public class WsServerContainer extends WsWebSocketContainer
             SortedSet<TemplatePathMatch> templateMatches =
                     configTemplateMatchMap.get(key);
             if (templateMatches == null) {
-                templateMatches = new TreeSet<>();
+                templateMatches = new TreeSet<>(
+                        TemplatePathMatchComparator.getInstance());
                 configTemplateMatchMap.put(key, templateMatches);
             }
             templateMatches.add(new TemplatePathMatch(sec, uriTemplate));
@@ -204,8 +205,8 @@ public class WsServerContainer extends WsWebSocketContainer
             SortedSet<TemplatePathMatch> templateMatches =
                     configTemplateMatchMap.get(key);
             if (templateMatches == null) {
-                templateMatches =
-                        new TreeSet<>(new TemplatePathMatchComparator());
+                templateMatches = new TreeSet<>(
+                        TemplatePathMatchComparator.getInstance());
                 configTemplateMatchMap.put(key, templateMatches);
             }
             templateMatches.add(new TemplatePathMatch(sec, uriTemplate));
@@ -308,8 +309,23 @@ public class WsServerContainer extends WsWebSocketContainer
     }
 
 
+    /**
+     * This Comparator implementation is thread-safe so only create a single
+     * instance.
+     */
     private static class TemplatePathMatchComparator
             implements Comparator<TemplatePathMatch> {
+
+        private static final TemplatePathMatchComparator INSTANCE =
+                new TemplatePathMatchComparator();
+
+        public static TemplatePathMatchComparator getInstance() {
+            return INSTANCE;
+        }
+
+        private TemplatePathMatchComparator() {
+            // Hide default constructor
+        }
 
         @Override
         public int compare(TemplatePathMatch tpm1, TemplatePathMatch tpm2) {
