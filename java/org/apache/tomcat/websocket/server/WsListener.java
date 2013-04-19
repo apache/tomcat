@@ -20,17 +20,17 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 /**
- * This will be added automatically to a {@link javax.servlet.ServletContext} by
- * the {@link WsSci}. If the {@link WsSci} is disabled, this listener must be
- * added manually to every {@link javax.servlet.ServletContext} that uses
- * WebSocket.
+ * In normal usage, this {@link ServletContextListener} is not required as the
+ * {@link WsSci} performs all the necessary bootstrap. If the {@link WsSci} is
+ * disabled, this listener must be added manually to every
+ * {@link javax.servlet.ServletContext} that uses WebSocket to bootstrap the
+ * {@link WsServerContainer} correctly.
  */
 public class WsListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        WsServerContainer sc = WsServerContainer.getServerContainer();
-        sc.setServletContext(sce.getServletContext());
+        WsSci.init(sce.getServletContext());
     }
 
     @Override
