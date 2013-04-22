@@ -77,6 +77,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>54872</bug>: Correct Cluster Receiver page of Tomcat
+        documentation. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <update>
