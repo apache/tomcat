@@ -24,8 +24,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
@@ -76,11 +74,6 @@ public class DiskFileItem
     implements FileItem {
 
     // ----------------------------------------------------- Manifest constants
-
-    /**
-     * The UID to use when serializing this instance.
-     */
-    private static final long serialVersionUID = 2237570099615271025L;
 
     /**
      * Default content charset to be used when no explicit charset
@@ -155,11 +148,6 @@ public class DiskFileItem
      * The temporary file to use.
      */
     private transient File tempFile;
-
-    /**
-     * File to allow for serialization of the content of this item.
-     */
-    private File dfosFile;
 
     /**
      * The file items headers.
@@ -636,55 +624,6 @@ public class DiskFileItem
         return String.format("name=%s, StoreLocation=%s, size=%s bytes, isFormField=%s, FieldName=%s",
                       getName(), getStoreLocation(), Long.valueOf(getSize()),
                       Boolean.valueOf(isFormField()), getFieldName());
-    }
-
-    // -------------------------------------------------- Serialization methods
-
-    /**
-     * Writes the state of this object during serialization.
-     *
-     * @param out The stream to which the state should be written.
-     *
-     * @throws IOException if an error occurs.
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        // Read the data
-        if (dfos.isInMemory()) {
-            cachedContent = get();
-        } else {
-            cachedContent = null;
-            dfosFile = dfos.getFile();
-        }
-
-        // write out values
-        out.defaultWriteObject();
-    }
-
-    /**
-     * Reads the state of this object during deserialization.
-     *
-     * @param in The stream from which the state should be read.
-     *
-     * @throws IOException if an error occurs.
-     * @throws ClassNotFoundException if class cannot be found.
-     */
-    private void readObject(ObjectInputStream in)
-            throws IOException, ClassNotFoundException {
-        // read values
-        in.defaultReadObject();
-
-        OutputStream output = getOutputStream();
-        if (cachedContent != null) {
-            output.write(cachedContent);
-        } else {
-            FileInputStream input = new FileInputStream(dfosFile);
-            IOUtils.copy(input, output);
-            dfosFile.delete();
-            dfosFile = null;
-        }
-        output.close();
-
-        cachedContent = null;
     }
 
     /**
