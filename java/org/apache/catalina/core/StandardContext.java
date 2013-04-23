@@ -6026,7 +6026,7 @@ public class StandardContext extends ContainerBase
             if ((engineName == null) || (engineName.length() < 1))
                 engineName = "_";
 
-            String temp = getName();
+            String temp = getBaseName();
             if (temp.startsWith("/"))
                 temp = temp.substring(1);
             temp = temp.replace('/', '_');
