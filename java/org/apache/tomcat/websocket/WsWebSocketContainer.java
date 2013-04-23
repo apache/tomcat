@@ -24,6 +24,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.Charset;
 import java.security.KeyStore;
@@ -40,7 +41,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -60,6 +66,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
 public class WsWebSocketContainer
@@ -83,6 +90,43 @@ public class WsWebSocketContainer
     private static final Random random = new Random();
     private static final Charset iso88591 = Charset.forName("ISO-8859-1");
     private static final byte[] crlf = new byte[] {13, 10};
+    private static final AsynchronousChannelGroup asynchronousChannelGroup;
+
+    static {
+        AsynchronousChannelGroup result = null;
+
+        // Need to do this with the right thread context class loader else the
+        // first web app to call this will trigger a leak
+        ClassLoader original = Thread.currentThread().getContextClassLoader();
+
+        try {
+            Thread.currentThread().setContextClassLoader(
+                    AsyncIOThreadFactory.class.getClassLoader());
+
+            // These are the same settings as the default
+            // AsynchronousChannelGroup
+            int initialSize = Runtime.getRuntime().availableProcessors();
+            ExecutorService executorService = new ThreadPoolExecutor(
+                    0,
+                    Integer.MAX_VALUE,
+                    Long.MAX_VALUE, TimeUnit.MILLISECONDS,
+                    new SynchronousQueue<Runnable>(),
+                    new AsyncIOThreadFactory());
+
+            try {
+                result = AsynchronousChannelGroup.withCachedThreadPool(
+                        executorService, initialSize);
+            } catch (IOException e) {
+                // No good reason for this to happen.
+                throw new IllegalStateException(sm.getString(
+                        "wsWebSocketContainer.asynchronousChannelGroupFail"));
+            }
+        } finally {
+            Thread.currentThread().setContextClassLoader(original);
+        }
+
+        asynchronousChannelGroup = result;
+    }
 
     private final Log log = LogFactory.getLog(WsWebSocketContainer.class);
     private final Map<Class<?>, Set<WsSession>> endpointSessionMap =
@@ -231,9 +275,11 @@ public class WsWebSocketContainer
 
         AsynchronousSocketChannel socketChannel;
         try {
-            socketChannel = AsynchronousSocketChannel.open();
+            socketChannel =
+                    AsynchronousSocketChannel.open(asynchronousChannelGroup);
         } catch (IOException ioe) {
-            throw new DeploymentException("TODO", ioe);
+            throw new DeploymentException(sm.getString(
+                    "wsWebSocketContainer.asynchronousSocketChannelFail"), ioe);
         }
 
         Future<Void> fConnect = socketChannel.connect(sa);
@@ -597,7 +643,8 @@ public class WsWebSocketContainer
 
             return engine;
         } catch (Exception e) {
-            throw new DeploymentException("TODO", e);
+            throw new DeploymentException(sm.getString(
+                    "wsWebSocketContainer.sslEngineFail"), e);
         }
     }
 
@@ -703,5 +750,24 @@ public class WsWebSocketContainer
     @Override
     public int getProcessPeriod() {
         return processPeriod;
+    }
+
+
+    /**
+     * Create threads for AsyncIO that have the right context class loader to
+     * prevent memory leaks.
+     */
+    private static class AsyncIOThreadFactory implements ThreadFactory {
+
+        private AtomicInteger count = new AtomicInteger(0);
+
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(r);
+            t.setName("WebSocketClient-AsyncIO-" + count.incrementAndGet());
+            t.setContextClassLoader(this.getClass().getClassLoader());
+            t.setDaemon(true);
+            return t;
+        }
     }
 }
