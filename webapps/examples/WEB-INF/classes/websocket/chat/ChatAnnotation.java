@@ -56,12 +56,6 @@ public class ChatAnnotation {
 
     @OnClose
     public void end() {
-        try {
-            session.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         connections.remove(this);
         String message = String.format("* %s %s",
                 nickname, "has disconnected.");
