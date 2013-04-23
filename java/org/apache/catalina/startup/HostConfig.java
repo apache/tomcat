@@ -1397,9 +1397,8 @@ public class HostConfig
         DeployedApplication app = deployed.get(name);
         if (app != null) {
             checkResources(app);
-        } else {
-            deployApps(name);
         }
+        deployApps(name);
     }
 
     /**
