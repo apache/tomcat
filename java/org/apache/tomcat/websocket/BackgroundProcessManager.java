@@ -60,6 +60,8 @@ public class BackgroundProcessManager {
         synchronized (processesLock) {
             if (processes.size() == 0) {
                 wsBackgroundThread = new WsBackgroundThread(this);
+                wsBackgroundThread.setContextClassLoader(
+                        this.getClass().getClassLoader());
                 wsBackgroundThread.setDaemon(true);
                 wsBackgroundThread.start();
             }
