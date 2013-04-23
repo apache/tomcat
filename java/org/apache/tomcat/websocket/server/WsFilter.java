@@ -78,7 +78,7 @@ public class WsFilter implements Filter {
                 !headerContainsToken((HttpServletRequest) request,
                         Constants.UPGRADE_HEADER_NAME,
                         Constants.UPGRADE_HEADER_VALUE)) {
-            // Note an HTTP request that includes a valid upgrade request to
+            // Not an HTTP request that includes a valid upgrade request to
             // web socket
             chain.doFilter(request, response);
             return;
@@ -121,6 +121,13 @@ public class WsFilter implements Filter {
             path = req.getServletPath() + pathInfo;
         }
         WsMappingResult mappingResult = sc.findMapping(path);
+
+        if (mappingResult == null) {
+            // No endpoint registered for the requested path. Let the
+            // application handle it (it might redirect or forward for example)
+            chain.doFilter(request, response);
+            return;
+        }
 
         ServerEndpointConfig sec = mappingResult.getConfig();
 

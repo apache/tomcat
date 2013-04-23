@@ -19,12 +19,14 @@ package org.apache.tomcat.websocket.server;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.websocket.DeploymentException;
@@ -111,7 +113,11 @@ public class WsServerContainer extends WsWebSocketContainer
 
         FilterRegistration fr = servletContext.addFilter(
                 WsFilter.class.getName(), WsFilter.class);
-        fr.addMappingForUrlPatterns(null, false, "/*");
+
+        EnumSet<DispatcherType> types = EnumSet.of(DispatcherType.REQUEST,
+                DispatcherType.FORWARD);
+
+        fr.addMappingForUrlPatterns(types, false, "/*");
     }
 
 
@@ -232,6 +238,12 @@ public class WsServerContainer extends WsWebSocketContainer
         Integer key = Integer.valueOf(pathUriTemplate.getSegmentCount());
         SortedSet<TemplatePathMatch> templateMatches =
                 configTemplateMatchMap.get(key);
+
+        if (templateMatches == null) {
+            // No templates with an equal number of segments so there will be
+            // no matches
+            return null;
+        }
 
         // List is in alphabetical order of normalised templates.
         // Correct match is the first one that matches.
