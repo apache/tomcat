@@ -447,6 +447,11 @@ public class FarmWarDeployer extends ClusterListener
         try {
             File deployWar = new File(getDeployDirFile(), newWar.getName());
             ContextName cn = new ContextName(deployWar.getName());
+            if (deployWar.exists() && deployWar.lastModified() > newWar.lastModified()) {
+                if (log.isInfoEnabled())
+                    log.info(sm.getString("farmWarDeployer.alreadyDeployed", cn.getName()));
+                return;
+            }
             if (log.isInfoEnabled())
                 log.info(sm.getString("farmWarDeployer.modInstall",
                         cn.getName(), deployWar.getAbsolutePath()));
