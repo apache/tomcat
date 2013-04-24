@@ -73,16 +73,28 @@ public class FarmWarDeployer extends ClusterListener
     private static final String info = "FarmWarDeployer/1.2";
 
     /*--Instance Variables--------------------------------------*/
-    protected boolean started = false; //default 5 seconds
+    protected boolean started = false;
 
     protected HashMap<String, FileMessageFactory> fileFactories =
         new HashMap<String, FileMessageFactory>();
 
+    /**
+     * Deployment directory.
+     */
     protected String deployDir;
+    private File deployDirFile = null;
 
+    /**
+     * Temporary directory.
+     */
     protected String tempDir;
+    private File tempDirFile = null;
 
+    /**
+     * Watch directory.
+     */
     protected String watchDir;
+    private File watchDirFile = null;
 
     protected boolean watchEnabled = false;
 
@@ -171,17 +183,23 @@ public class FarmWarDeployer extends ClusterListener
             return;
         }
         if (watchEnabled) {
-            watcher = new WarWatcher(this, new File(getWatchDir()));
+            watcher = new WarWatcher(this, getWatchDirFile());
             if (log.isInfoEnabled()) {
                 log.info(sm.getString(
                         "farmWarDeployer.watchDir", getWatchDir()));
             }
         }
-         
-        configBase = new File(
-                System.getProperty(Globals.CATALINA_BASE_PROP), "conf");
-        configBase = new File(configBase, engine.getName());
-        configBase = new File(configBase, hostname);
+
+        if (host.getXmlBase()!=null) {
+            configBase = getAbsolutePath(host.getXmlBase());
+        } else {
+            StringBuilder xmlDir = new StringBuilder("conf");
+            xmlDir.append('/');
+            xmlDir.append(engine.getName());
+            xmlDir.append('/');
+            xmlDir.append(host.getName());
+            configBase = getAbsolutePath(xmlDir.toString());
+        }
 
         // Retrieve the MBean server
         mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
@@ -241,7 +259,7 @@ public class FarmWarDeployer extends ClusterListener
                     String name = factory.getFile().getName();
                     if (!name.endsWith(".war"))
                         name = name + ".war";
-                    File deployable = new File(getDeployDir(), name);
+                    File deployable = new File(getDeployDirFile(), name);
                     try {
                         String contextName = fmsg.getContextName();
                         if (!isServiced(contextName)) {
@@ -312,7 +330,7 @@ public class FarmWarDeployer extends ClusterListener
      */
     public synchronized FileMessageFactory getFactory(FileMessage msg)
             throws java.io.FileNotFoundException, java.io.IOException {
-        File writeToFile = new File(getTempDir(), msg.getFileName());
+        File writeToFile = new File(getTempDirFile(), msg.getFileName());
         FileMessageFactory factory = fileFactories.get(msg.getFileName());
         if (factory == null) {
             factory = FileMessageFactory.getInstance(writeToFile, true);
@@ -373,6 +391,8 @@ public class FarmWarDeployer extends ClusterListener
     @Override
     public void install(String contextName, File webapp) throws IOException {
         Member[] members = getCluster().getMembers();
+        if (members.length == 0) return;
+
         Member localMember = getCluster().getLocalMember();
         FileMessageFactory factory =
             FileMessageFactory.getInstance(webapp, false);
@@ -420,15 +440,17 @@ public class FarmWarDeployer extends ClusterListener
     @Override
     public void remove(String contextName, boolean undeploy)
             throws IOException {
-        if (log.isInfoEnabled())
-            log.info(sm.getString("farmWarDeployer.removeStart", contextName));
-        Member localMember = getCluster().getLocalMember();
-        UndeployMessage msg = new UndeployMessage(localMember, System
-                .currentTimeMillis(), "Undeploy:" + contextName + ":"
-                + System.currentTimeMillis(), contextName, undeploy);
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("farmWarDeployer.removeTxMsg", contextName));
-        cluster.send(msg);
+        if (getCluster().getMembers().length > 0) {
+            if (log.isInfoEnabled())
+                log.info(sm.getString("farmWarDeployer.removeStart", contextName));
+            Member localMember = getCluster().getLocalMember();
+            UndeployMessage msg = new UndeployMessage(localMember, System
+                    .currentTimeMillis(), "Undeploy:" + contextName + ":"
+                    + System.currentTimeMillis(), contextName, undeploy);
+            if (log.isDebugEnabled())
+                log.debug(sm.getString("farmWarDeployer.removeTxMsg", contextName));
+            cluster.send(msg);
+        }
         // remove locally
         if (undeploy) {
             try {
@@ -459,16 +481,28 @@ public class FarmWarDeployer extends ClusterListener
     @Override
     public void fileModified(File newWar) {
         try {
-            File deployWar = new File(getDeployDir(), newWar.getName());
-            copy(newWar, deployWar);
+            File deployWar = new File(getDeployDirFile(), newWar.getName());
             ContextName cn = new ContextName(deployWar.getName());
+            if (deployWar.exists() && deployWar.lastModified() > newWar.lastModified()) {
+                if (log.isInfoEnabled())
+                    log.info(sm.getString("farmWarDeployer.alreadyDeployed", cn.getName()));
+                return;
+            }
             if (log.isInfoEnabled())
                 log.info(sm.getString("farmWarDeployer.modInstall",
                         cn.getName(), deployWar.getAbsolutePath()));
-            try {
-                remove(cn.getName(), false);
-            } catch (Exception x) {
-                log.error(sm.getString("farmWarDeployer.modRemoveFail"), x);
+            // install local
+            if (!isServiced(cn.getName())) {
+                addServiced(cn.getName());
+                try {
+                    copy(newWar, deployWar);
+                    check(cn.getName());
+                } finally {
+                    removeServiced(cn.getName());
+                }
+            } else {
+                log.error(sm.getString("farmWarDeployer.servicingDeploy",
+                        cn.getName(), deployWar.getName()));
             }
             install(cn.getName(), deployWar);
         } catch (Exception x) {
@@ -585,9 +619,9 @@ public class FarmWarDeployer extends ClusterListener
      */
     @Override
     public void backgroundProcess() {
-        if (started) {
+        if (started && watchEnabled) {
             count = (count + 1) % processDeployFrequency;
-            if (count == 0 && watchEnabled) {
+            if (count == 0) {
                 watcher.check();
             }
         }
@@ -649,6 +683,14 @@ public class FarmWarDeployer extends ClusterListener
         return deployDir;
     }
 
+    public File getDeployDirFile() {
+        if (deployDirFile != null) return deployDirFile;
+
+        File dir = getAbsolutePath(getDeployDir());
+        this.deployDirFile = dir;
+        return dir;
+    }
+
     public void setDeployDir(String deployDir) {
         this.deployDir = deployDir;
     }
@@ -657,12 +699,28 @@ public class FarmWarDeployer extends ClusterListener
         return tempDir;
     }
 
+    public File getTempDirFile() {
+        if (tempDirFile != null) return tempDirFile;
+
+        File dir = getAbsolutePath(getTempDir());
+        this.tempDirFile = dir;
+        return dir;
+    }
+
     public void setTempDir(String tempDir) {
         this.tempDir = tempDir;
     }
 
     public String getWatchDir() {
         return watchDir;
+    }
+
+    public File getWatchDirFile() {
+        if (watchDirFile != null) return watchDirFile;
+
+        File dir = getAbsolutePath(getWatchDir());
+        this.watchDirFile = dir;
+        return dir;
     }
 
     public void setWatchDir(String watchDir) {
@@ -738,4 +796,16 @@ public class FarmWarDeployer extends ClusterListener
         return true;
     }
 
+    private File getAbsolutePath(String path) {
+        File dir = new File(path);
+        File base = new File(System.getProperty(Globals.CATALINA_BASE_PROP));
+        if (!dir.isAbsolute()) {
+            dir = new File(base, dir.getPath());
+        }
+        try {
+            dir = dir.getCanonicalFile();
+        } catch (IOException e) {// ignore
+        }
+        return dir;
+    }
 }
