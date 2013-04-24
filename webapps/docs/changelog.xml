@@ -74,6 +74,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Ensure write errors when using HTTP Upgrade with the APR/native
+        connector result in <code>IOException</code>s rather than errors being
+        silently swallowed. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>

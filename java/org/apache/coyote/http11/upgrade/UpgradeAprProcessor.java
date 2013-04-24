@@ -49,13 +49,21 @@ public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
 
     @Override
     public void write(int b) throws IOException {
-        Socket.send(socket, new byte[] {(byte) b}, 0, 1);
+        int result = Socket.send(socket, new byte[] {(byte) b}, 0, 1);
+        if (result != 1) {
+            throw new IOException(sm.getString("apr.write.error",
+                    Integer.valueOf(-result)));
+        }
     }
 
 
     @Override
     public void write(byte[]b, int off, int len) throws IOException {
-        Socket.send(socket, b, off, len);
+        int result = Socket.send(socket, b, off, len);
+        if (result != len) {
+            throw new IOException(sm.getString("apr.write.error",
+                    Integer.valueOf(-result)));
+        }
     }
 
 
@@ -87,7 +95,7 @@ public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
             } else if (-result == Status.EAGAIN) {
                 return 0;
             } else {
-                throw new IOException(sm.getString("apr.error",
+                throw new IOException(sm.getString("apr.read.error",
                         Integer.valueOf(-result)));
             }
         } finally {
