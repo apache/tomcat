@@ -1188,7 +1188,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        private int status = 200;
+        private int status;
 
         public AsyncStatusServlet(int status) {
             this.status = status;
@@ -1626,6 +1626,110 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                     // Impossible
                     break;
             }
+        }
+    }
+
+    @Test
+    public void testBug54178() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        Bug54178ServletA bug54178ServletA = new Bug54178ServletA();
+        Wrapper wrapper =
+            Tomcat.addServlet(ctx, "bug54178ServletA", bug54178ServletA);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/bug54178ServletA", "bug54178ServletA");
+
+        Bug54178ServletB bug54178ServletB = new Bug54178ServletB();
+        Tomcat.addServlet(ctx, "bug54178ServletB", bug54178ServletB);
+        ctx.addServletMapping("/bug54178ServletB", "bug54178ServletB");
+
+        tomcat.start();
+
+        ByteChunk body = new ByteChunk();
+        int rc = -1;
+
+        try {
+            rc = getUrl("http://localhost:" + getPort() + "/bug54178ServletA?" +
+                    Bug54178ServletA.PARAM_NAME + "=bar",
+                    body, null);
+        } catch (IOException ioe) {
+            // This may happen if test fails. Output the exception in case it is
+            // useful and let asserts handle the failure
+            ioe.printStackTrace();
+        }
+
+        assertEquals(HttpServletResponse.SC_OK, rc);
+
+        body.recycle();
+
+        rc = getUrl("http://localhost:" + getPort() + "/bug54178ServletB",
+                body, null);
+
+        assertEquals(HttpServletResponse.SC_OK, rc);
+        assertEquals("OK", body.toString());
+    }
+
+    private static class Bug54178ServletA extends HttpServlet {
+
+        public static final String PARAM_NAME = "foo";
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            req.getParameter(PARAM_NAME);
+            AsyncContext actxt = req.startAsync();
+            actxt.addListener(new Bug54178AsyncListener());
+            actxt.complete();
+        }
+    }
+
+    private static class Bug54178ServletB extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            resp.setContentType("text/plain");
+            PrintWriter pw = resp.getWriter();
+            String result = req.getParameter(Bug54178ServletA.PARAM_NAME);
+            if (result == null) {
+                pw.write("OK");
+            } else {
+                pw.write("FAIL");
+            }
+        }
+    }
+
+    private static class Bug54178AsyncListener implements AsyncListener {
+
+        @Override
+        public void onComplete(AsyncEvent event) throws IOException {
+            throw new RuntimeException("Testing Bug54178");
+        }
+
+        @Override
+        public void onTimeout(AsyncEvent event) throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        public void onError(AsyncEvent event) throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        public void onStartAsync(AsyncEvent event) throws IOException {
+            // NO-OP
         }
     }
 }

@@ -116,9 +116,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             for (AsyncListenerWrapper listener : listenersCopy) {
                 try {
                     listener.fireOnComplete(event);
-                } catch (IOException ioe) {
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     log.warn("onComplete() failed for listener of type [" +
-                            listener.getClass().getName() + "]", ioe);
+                            listener.getClass().getName() + "]", t);
                 }
             }
         } finally {
@@ -202,9 +203,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 for (AsyncListenerWrapper listener : listenersCopy) {
                     try {
                         listener.fireOnTimeout(event);
-                    } catch (IOException ioe) {
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
                         log.warn("onTimeout() failed for listener of type [" +
-                                listener.getClass().getName() + "]", ioe);
+                                listener.getClass().getName() + "]", t);
                     }
                 }
                 request.getCoyoteRequest().action(
@@ -381,9 +383,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         for (AsyncListenerWrapper listener : listenersCopy) {
             try {
                 listener.fireOnStartAsync(event);
-            } catch (IOException ioe) {
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 log.warn("onStartAsync() failed for listener of type [" +
-                        listener.getClass().getName() + "]", ioe);
+                        listener.getClass().getName() + "]", t);
             }
         }
         listeners.clear();
@@ -445,9 +448,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             for (AsyncListenerWrapper listener : listenersCopy) {
                 try {
                     listener.fireOnError(errorEvent);
-                } catch (IOException ioe) {
+                } catch (Throwable t2) {
+                    ExceptionUtils.handleThrowable(t);
                     log.warn("onError() failed for listener of type [" +
-                            listener.getClass().getName() + "]", ioe);
+                            listener.getClass().getName() + "]", t2);
                 }
             }
         }
