@@ -68,6 +68,11 @@
         an event. (markt) 
       </fix>
       <fix>
+        <bug>54791</bug>: Restore <code>tools.jar</code> entry in
+        <code>jarsToSkip</code> property to prevent warnings when running Tomcat
+        from Eclipse. (markt)
+      </fix>
+      <fix>
         <bug>54851</bug>: When scanning for web fragments, directories without
         any web-fragment.xml should not impact the status of distributable
         element. Patch provided by Trask Stalnaker. (violetagg)
