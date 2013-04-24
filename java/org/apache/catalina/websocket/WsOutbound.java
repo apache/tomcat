@@ -39,6 +39,7 @@ public class WsOutbound {
     public static final int DEFAULT_BUFFER_SIZE = 8192;
 
     private UpgradeOutbound upgradeOutbound;
+    private StreamInbound streamInbound;
     private ByteBuffer bb;
     private CharBuffer cb;
     private boolean closed = false;
@@ -46,14 +47,17 @@ public class WsOutbound {
     private boolean firstFrame = true;
 
 
-    public WsOutbound(UpgradeOutbound upgradeOutbound) {
-        this(upgradeOutbound, DEFAULT_BUFFER_SIZE, DEFAULT_BUFFER_SIZE);
+    public WsOutbound(UpgradeOutbound upgradeOutbound,
+            StreamInbound streamInbound) {
+        this(upgradeOutbound, streamInbound, DEFAULT_BUFFER_SIZE,
+                DEFAULT_BUFFER_SIZE);
     }
 
 
-    public WsOutbound(UpgradeOutbound upgradeOutbound, int byteBufferSize,
-            int charBufferSize) {
+    public WsOutbound(UpgradeOutbound upgradeOutbound, StreamInbound streamInbound,
+            int byteBufferSize, int charBufferSize) {
         this.upgradeOutbound = upgradeOutbound;
+        this.streamInbound = streamInbound;
         this.bb = ByteBuffer.allocate(byteBufferSize);
         this.cb = CharBuffer.allocate(charBufferSize);
     }
@@ -365,54 +369,60 @@ public class WsOutbound {
             throw new IOException(sm.getString("outbound.closed"));
         }
 
-        // Work out the first byte
-        int first = 0x00;
-        if (finalFragment) {
-            first = first + 0x80;
-        }
-        if (firstFrame) {
-            if (text.booleanValue()) {
-                first = first + 0x1;
-            } else {
-                first = first + 0x2;
+        try {
+            // Work out the first byte
+            int first = 0x00;
+            if (finalFragment) {
+                first = first + 0x80;
             }
+            if (firstFrame) {
+                if (text.booleanValue()) {
+                    first = first + 0x1;
+                } else {
+                    first = first + 0x2;
+                }
+            }
+            // Continuation frame is OpCode 0
+            upgradeOutbound.write(first);
+    
+            if (buffer.limit() < 126) {
+                upgradeOutbound.write(buffer.limit());
+            } else if (buffer.limit() < 65536) {
+                upgradeOutbound.write(126);
+                upgradeOutbound.write(buffer.limit() >>> 8);
+                upgradeOutbound.write(buffer.limit() & 0xFF);
+            } else {
+                // Will never be more than 2^31-1
+                upgradeOutbound.write(127);
+                upgradeOutbound.write(0);
+                upgradeOutbound.write(0);
+                upgradeOutbound.write(0);
+                upgradeOutbound.write(0);
+                upgradeOutbound.write(buffer.limit() >>> 24);
+                upgradeOutbound.write(buffer.limit() >>> 16);
+                upgradeOutbound.write(buffer.limit() >>> 8);
+                upgradeOutbound.write(buffer.limit() & 0xFF);
+            }
+    
+            // Write the content
+            upgradeOutbound.write(buffer.array(), buffer.arrayOffset(),
+                    buffer.limit());
+            upgradeOutbound.flush();
+    
+            // Reset
+            if (finalFragment) {
+                text = null;
+                firstFrame = true;
+            } else {
+                firstFrame = false;
+            }
+            bb.clear();
+        } catch (IOException ioe) {
+            // Any IOException is terminal. Make sure the Inbound side knows
+            // that something went wrong.
+            streamInbound.doOnClose(Constants.STATUS_CLOSED_UNEXPECTEDLY);
+            throw ioe;
         }
-        // Continuation frame is OpCode 0
-        upgradeOutbound.write(first);
-
-        if (buffer.limit() < 126) {
-            upgradeOutbound.write(buffer.limit());
-        } else if (buffer.limit() < 65536) {
-            upgradeOutbound.write(126);
-            upgradeOutbound.write(buffer.limit() >>> 8);
-            upgradeOutbound.write(buffer.limit() & 0xFF);
-        } else {
-            // Will never be more than 2^31-1
-            upgradeOutbound.write(127);
-            upgradeOutbound.write(0);
-            upgradeOutbound.write(0);
-            upgradeOutbound.write(0);
-            upgradeOutbound.write(0);
-            upgradeOutbound.write(buffer.limit() >>> 24);
-            upgradeOutbound.write(buffer.limit() >>> 16);
-            upgradeOutbound.write(buffer.limit() >>> 8);
-            upgradeOutbound.write(buffer.limit() & 0xFF);
-
-        }
-
-        // Write the content
-        upgradeOutbound.write(buffer.array(), buffer.arrayOffset(),
-                buffer.limit());
-        upgradeOutbound.flush();
-
-        // Reset
-        if (finalFragment) {
-            text = null;
-            firstFrame = true;
-        } else {
-            firstFrame = false;
-        }
-        bb.clear();
     }
 
 
