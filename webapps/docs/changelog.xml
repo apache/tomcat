@@ -63,6 +63,11 @@
         (markt) 
       </update>
       <fix>
+        <bug>54178</bug>: Protect against <code>AsyncListener</code>
+        implementations that throw <code>RuntimeException</code>s in response to
+        an event. (markt) 
+      </fix>
+      <fix>
         <bug>54851</bug>: When scanning for web fragments, directories without
         any web-fragment.xml should not impact the status of distributable
         element. Patch provided by Trask Stalnaker. (violetagg)
