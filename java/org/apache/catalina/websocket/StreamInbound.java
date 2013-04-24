@@ -88,7 +88,7 @@ public abstract class StreamInbound implements UpgradeInbound {
 
     @Override
     public final void setUpgradeOutbound(UpgradeOutbound upgradeOutbound) {
-        outbound = new WsOutbound(upgradeOutbound, outboundByteBufferSize,
+        outbound = new WsOutbound(upgradeOutbound, this, outboundByteBufferSize,
                 outboundCharBufferSize);
     }
 
@@ -207,7 +207,13 @@ public abstract class StreamInbound implements UpgradeInbound {
         }
     }
 
-    private void doOnClose(int status) {
+    /**
+     * Package private so the outbound connection can signal that the connection
+     * has been closed - usually due to an error.
+     *  
+     * @param status    The WebSocket status code to report to the application
+     */
+    void doOnClose(int status) {
         // Need to call onClose using the web application's class loader
         Thread t = Thread.currentThread();
         ClassLoader cl = t.getContextClassLoader();

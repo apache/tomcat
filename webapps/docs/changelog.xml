@@ -72,6 +72,12 @@
         any web-fragment.xml should not impact the status of distributable
         element. Patch provided by Trask Stalnaker. (violetagg)
       </fix>
+      <fix>
+        When an error occurs during the sending of a WebSocket message, notify
+        the Inbound side (where all the events occur that the application reacts
+        to) that an error has occurred and that the connection is being closed.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
