@@ -264,6 +264,18 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                         messages.get(0));
             }
         } else {
+            // When the message exceeds the buffer size, the WebSocket is
+            // closed. The endpoint ensures that the latch is cleared when the
+            // WebSocket closes. However, the session isn't marked as closed
+            // until after the onClose() method completes so there is a small
+            // window where this test could fail. Therefore, wait briefly to
+            // give the session a chance to complete the close process.
+            for (int i = 0; i < 500; i++) {
+                if (!wsSession.isOpen()) {
+                    break;
+                }
+                Thread.sleep(10);
+            }
             Assert.assertFalse(wsSession.isOpen());
         }
     }
