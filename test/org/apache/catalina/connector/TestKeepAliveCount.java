@@ -62,7 +62,6 @@ public class TestKeepAliveCount extends TomcatBaseTest {
             tomcat.getConnector().setProperty("maxKeepAliveRequests", "5");
             tomcat.getConnector().setProperty("soTimeout", "20000");
             tomcat.getConnector().setProperty("keepAliveTimeout", "50000");
-            tomcat.getConnector().setProperty("port", "8080");
             init = true;
         }
 
@@ -70,6 +69,8 @@ public class TestKeepAliveCount extends TomcatBaseTest {
             Tomcat tomcat = getTomcatInstance();
             init();
             tomcat.start();
+            setPort(tomcat.getConnector().getLocalPort());
+
             // Open connection
             connect();
 
@@ -91,6 +92,8 @@ public class TestKeepAliveCount extends TomcatBaseTest {
             Tomcat tomcat = getTomcatInstance();
             init();
             tomcat.start();
+            setPort(tomcat.getConnector().getLocalPort());
+
             // Open connection
             connect();
 
