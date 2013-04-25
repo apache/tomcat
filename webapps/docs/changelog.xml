@@ -60,12 +60,12 @@
     <changelog>
       <update>
         Update Tomcat's internal copy of Commons FileUpload to FileUpload 1.3.
-        (markt) 
+        (markt)
       </update>
       <fix>
         <bug>54178</bug>: Protect against <code>AsyncListener</code>
         implementations that throw <code>RuntimeException</code>s in response to
-        an event. (markt) 
+        an event. (markt)
       </fix>
       <fix>
         <bug>54791</bug>: Restore <code>tools.jar</code> entry in
