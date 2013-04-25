@@ -484,7 +484,8 @@ class JspDocumentParser
             tagDependentNesting++;
         }
 
-        if (tagDependentNesting > 0) {
+        if (tagDependentNesting > 0 || pageInfo.isELIgnored() ||
+                current instanceof Node.ScriptingElement) {
             if (charBuffer.length() > 0) {
                 @SuppressWarnings("unused")
                 Node unused = new Node.TemplateText(
