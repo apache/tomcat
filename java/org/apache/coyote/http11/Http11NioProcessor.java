@@ -234,7 +234,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         SocketState state = super.process(socketWrapper);
         final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
         //return if we have more data to write
-        if (isRegisteredForWrite(attach)) {
+        if (attach != null && isRegisteredForWrite(attach)) {
             return SocketState.LONG;
         } else {
             return state;
