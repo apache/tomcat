@@ -22,9 +22,7 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
@@ -47,7 +45,7 @@ public class TestJspDocumentParser extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug47977.jspx", new ByteChunk(), null);
 
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
     @Test
@@ -69,6 +67,48 @@ public class TestJspDocumentParser extends TomcatBaseTest {
         }
 
         // Should not fail
-        assertNull(e);
+        Assert.assertNull(e);
     }
+
+    @Test
+    public void testBug54801() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug5nnnn/bug54801a.jspx", bc, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        bc.recycle();
+        rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug5nnnn/bug54801b.jspx", bc, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+    }
+
+    @Test
+    public void testBug54821() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug5nnnn/bug54821a.jspx", bc, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        bc.recycle();
+        rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug5nnnn/bug54821b.jspx", bc, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+   }
 }
