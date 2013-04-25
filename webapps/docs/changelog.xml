@@ -100,6 +100,16 @@
         <bug>54802</bug>: Provide location information for exceptions thrown
         by JspDocumentParser. (kkolinko)
       </fix>
+      <fix>
+        <bug>54801</bug>: Do not attempt to parse text that looks like an EL
+        expressions inside a scriptlet in a JSP document because EL expressions
+        are not permitted in scriptlets. (kkolinko/markt)
+      </fix>
+      <fix>
+        <bug>54821</bug>: Do not attept to parse text that looks like an EL
+        expressions in a JSP document if EL expressions have been disabled.
+        (kkolinko/markt)  
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

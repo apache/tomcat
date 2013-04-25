@@ -488,7 +488,8 @@ class JspDocumentParser
             tagDependentNesting++;
         }
 
-        if (tagDependentNesting > 0) {
+        if (tagDependentNesting > 0 || pageInfo.isELIgnored() ||
+                current instanceof Node.ScriptingElement) {
             if (charBuffer.length() > 0) {
                 new Node.TemplateText(charBuffer.toString(), startMark, current);
             }
