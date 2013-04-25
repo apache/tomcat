@@ -460,15 +460,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             expected.append("requestDestroyed");
         } else if (completeOnTimeout.booleanValue()) {
             expected.append("onTimeout-");
-            if (dispatchUrl == null) {
-                expected.append("onComplete-");
-                expected.append("requestDestroyed");
-            } else {
-                // Error - no further output
-                // There is no onComplete- since the complete event would be
-                // fired during post processing but since there is an error that
-                // never happens.
-            }
+            expected.append("onComplete-");
+            expected.append("requestDestroyed");
         } else {
             expected.append("onTimeout-");
             if (dispatchUrl != null) {
@@ -487,11 +480,6 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             alv.validateAccessLog(1, 500, TimeoutServlet.ASYNC_TIMEOUT,
                     TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
                     REQUEST_TIME);
-        } else if (completeOnTimeout.booleanValue() && dispatchUrl != null) {
-            // This error is written into Host-level AccessLogValve only
-            alvGlobal.validateAccessLog(1, 500, 0, TimeoutServlet.ASYNC_TIMEOUT
-                    + TIMEOUT_MARGIN + REQUEST_TIME);
-            alv.validateAccessLog(0, 500, 0, 0);
         } else {
             alvGlobal.validateAccessLog(1, 200, TimeoutServlet.ASYNC_TIMEOUT,
                     TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
