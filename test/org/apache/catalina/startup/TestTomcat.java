@@ -50,6 +50,7 @@ import org.apache.catalina.deploy.ContextResourceLink;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.websocket.server.WsListener;
 
 public class TestTomcat extends TomcatBaseTest {
 
@@ -259,8 +260,9 @@ public class TestTomcat extends TomcatBaseTest {
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
-        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
-
+        org.apache.catalina.Context ctxt  = tomcat.addWebapp(
+                null, "/examples", appDir.getAbsolutePath());
+        ctxt.addApplicationListener(WsListener.class.getName());
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
@@ -274,7 +276,9 @@ public class TestTomcat extends TomcatBaseTest {
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
-        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        org.apache.catalina.Context ctxt  = tomcat.addWebapp(
+                null, "/examples", appDir.getAbsolutePath());
+        ctxt.addApplicationListener(WsListener.class.getName());
 
         tomcat.start();
 
@@ -394,6 +398,7 @@ public class TestTomcat extends TomcatBaseTest {
         // app dir is relative to server home
         org.apache.catalina.Context ctx =
             tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        ctx.addApplicationListener(WsListener.class.getName());
 
         Tomcat.addServlet(ctx, "testGetResource", new GetResource());
         ctx.addServletMapping("/testGetResource", "testGetResource");

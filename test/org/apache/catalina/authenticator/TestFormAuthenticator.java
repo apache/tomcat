@@ -28,6 +28,7 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.websocket.server.WsListener;
 
 public class TestFormAuthenticator extends TomcatBaseTest {
 
@@ -109,6 +110,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             File appDir = new File(getBuildDirectory(), "webapps/examples");
             Context ctx = tomcat.addWebapp(null, "/examples",
                     appDir.getAbsolutePath());
+            ctx.addApplicationListener(WsListener.class.getName());
 
             MapRealm realm = new MapRealm();
             realm.addUser("tomcat", "tomcat");

@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.websocket.server.WsListener;
 
 /**
  * The keys and certificates used in this file are all available in svn and were
@@ -53,7 +54,9 @@ public class TestSsl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
-        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        org.apache.catalina.Context ctxt  = tomcat.addWebapp(
+                null, "/examples", appDir.getAbsolutePath());
+        ctxt.addApplicationListener(WsListener.class.getName());
 
         TesterSupport.initSsl(tomcat);
 
@@ -70,7 +73,9 @@ public class TestSsl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
-        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        org.apache.catalina.Context ctxt  = tomcat.addWebapp(
+                null, "/examples", appDir.getAbsolutePath());
+        ctxt.addApplicationListener(WsListener.class.getName());
 
         TesterSupport.initSsl(tomcat, "localhost-copy1.jks", "changeit",
                 "tomcatpass");

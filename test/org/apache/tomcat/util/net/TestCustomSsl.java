@@ -27,6 +27,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -34,6 +35,7 @@ import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.jsse.TesterBug50640SslImpl;
+import org.apache.tomcat.websocket.server.WsListener;
 
 /**
  * The keys and certificates used in this file are all available in svn and were
@@ -70,7 +72,9 @@ public class TestCustomSsl extends TomcatBaseTest {
         connector.setProperty("SSLEnabled", "true");
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
-        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        Context ctxt  = tomcat.addWebapp(
+                null, "/examples", appDir.getAbsolutePath());
+        ctxt.addApplicationListener(WsListener.class.getName());
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
