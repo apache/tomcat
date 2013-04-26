@@ -4870,7 +4870,11 @@ public class StandardContext extends ContainerBase
         resources.setCacheMaxSize(getCacheMaxSize());
         resources.setCacheMaxObjectSize(getCacheObjectMaxSize());
 
-        resources.start();
+        // May have been started (but not fully configured) in init() so no need
+        // to start the resources if they are already available
+        if (!resources.getState().isAvailable()) {
+            resources.start();
+        }
 
         if (effectiveMajorVersion >=3 && addWebinfClassesResources) {
             WebResource webinfClassesResource = resources.getResource(
