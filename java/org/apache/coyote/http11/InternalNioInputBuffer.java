@@ -789,6 +789,10 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             AbstractEndpoint endpoint) throws IOException {
 
         socket = socketWrapper.getSocket();
+        if (socket == null) {
+            // Socket has been closed in another thread
+            throw new IOException(sm.getString("iib.socketClosed"));
+        }
         socketReadBufferSize =
             socket.getBufHandler().getReadBuffer().capacity();
 
