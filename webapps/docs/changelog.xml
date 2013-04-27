@@ -152,6 +152,9 @@
         Update to Eclipse JDT Compiler 4.2.2. (kkolinko)
       </update>
       <update>
+        <bug>54890</bug>: Update to Apache Commons Daemon 1.0.15. (mturk)
+      </update>
+      <update>
         Convert remaining unit tests to JUnit 4 and enable Checkstyle rule
         that forbids use of methods from JUnit 3. (markt/kkolinko)
       </update>
