@@ -323,7 +323,7 @@ public class TestVirtualContext extends TomcatBaseTest {
     private void assertPageContains(String pageUrl, String expectedBody,
         int expectedStatus) throws IOException {
         ByteChunk res = new ByteChunk();
-        int sc = getUrl("http://localhost:" + getPort() + pageUrl, res, 3000,
+        int sc = getUrl("http://localhost:" + getPort() + pageUrl, res, 30000,
                 null, null);
 
         assertEquals(expectedStatus, sc);
