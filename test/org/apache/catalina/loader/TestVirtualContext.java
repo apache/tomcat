@@ -323,7 +323,13 @@ public class TestVirtualContext extends TomcatBaseTest {
     private void assertPageContains(String pageUrl, String expectedBody,
         int expectedStatus) throws IOException {
         ByteChunk res = new ByteChunk();
-        int sc = getUrl("http://localhost:" + getPort() + pageUrl, res, 30000,
+        // Note: With a read timeout of 3s the ASF CI buildbot was consistently
+        //       seeing failures with this test. The failures were due to the
+        //       JSP initialisation taking longer than the read timeout. The
+        //       root cause of this is the frequent poor IO performance of the
+        //       VM running the buildbot instance. Increasing this to 10s should
+        //       avoid these failures.
+        int sc = getUrl("http://localhost:" + getPort() + pageUrl, res, 10000,
                 null, null);
 
         assertEquals(expectedStatus, sc);
