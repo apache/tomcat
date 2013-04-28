@@ -1403,7 +1403,8 @@ public class StandardWrapper extends ContainerBase
             while ((nRetries < 21) && (countAllocated.get() > 0)) {
                 if ((nRetries % 10) == 0) {
                     log.info(sm.getString("standardWrapper.waiting",
-                                          countAllocated.toString()));
+                                          countAllocated.toString(),
+                                          getName()));
                 }
                 try {
                     Thread.sleep(delay);
