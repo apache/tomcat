@@ -633,8 +633,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             } else {
                 throw new IllegalStateException("Calling canWrite asynchronously is illegal.");
             }
-        } else if (actionCode == ActionCode.ASYNC_DISPATCH_FOR_OPERATION) {
-            asyncStateMachine.asyncOperation();
         }
     }
 
