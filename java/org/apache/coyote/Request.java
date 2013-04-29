@@ -166,6 +166,7 @@ public final class Request {
         }
 
         this.listener = listener;
+        setBlocking(false);
     }
 
     protected volatile boolean blocking = true;
