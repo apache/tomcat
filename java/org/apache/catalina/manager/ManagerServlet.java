@@ -57,6 +57,7 @@ import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.tomcat.util.Diagnostics;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
@@ -366,6 +367,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             undeploy(writer, cn, smClient);
         } else if (command.equals("/findleaks")) {
             findleaks(statusLine, writer, smClient);
+        } else if (command.equals("/vminfo")) {
+            vmInfo(writer, smClient);
+        } else if (command.equals("/threaddump")) {
+            threadDump(writer, smClient);
         } else if (command.equals("/sslConnectorCiphers")) {
             sslConnectorCiphers(writer);
         } else {
@@ -531,6 +536,26 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
     }
 
+
+    /**
+     *
+     * Write some VM info
+     *
+     * @param writer
+     */
+    protected void vmInfo(PrintWriter writer, StringManager smClient) {
+        writer.print(Diagnostics.getVMInfo());
+    }
+
+    /**
+     *
+     * Write a JVM thread dump
+     *
+     * @param writer
+     */
+    protected void threadDump(PrintWriter writer, StringManager smClient) {
+        writer.print(Diagnostics.getThreadDump());
+    }
 
     protected void sslConnectorCiphers(PrintWriter writer) {
         writer.println("OK - Connector / SSL Cipher information");
