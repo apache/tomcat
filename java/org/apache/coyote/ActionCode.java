@@ -137,13 +137,6 @@ public enum ActionCode {
     ASYNC_DISPATCH,
 
     /**
-     * Callback when an async call is
-     * {@link javax.servlet.ReadListener#onDataAvailable()} or
-     * {@link javax.servlet.WriteListener#onWritePossible()}
-     */
-    ASYNC_DISPATCH_FOR_OPERATION,
-
-    /**
      * Callback to indicate the the actual dispatch has started and that the
      * async state needs change.
      */
