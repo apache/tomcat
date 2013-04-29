@@ -23,7 +23,6 @@ import java.nio.channels.SelectionKey;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.SSLEngine;
-import javax.servlet.ReadListener;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.WriteListener;
 
@@ -600,9 +599,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             if (asyncStateMachine.asyncDispatch()) {
                 ((NioEndpoint)endpoint).dispatchForEvent(this.socket.getSocket(),SocketStatus.OPEN_READ, true);
             }
-        } else if (actionCode == ActionCode.SET_READ_LISTENER) {
-            ReadListener listener = (ReadListener)param;
-            request.setReadListener(listener);
         } else if (actionCode == ActionCode.SET_WRITE_LISTENER) {
             WriteListener listener = (WriteListener)param;
             response.setWriteListener(listener);
