@@ -254,9 +254,6 @@ public class CoyoteInputStream
     }
 
 
-    /**
-     * TODO SERVLET 3.1
-     */
     @Override
     public void setReadListener(ReadListener listener) {
         ib.setReadListener(listener);
