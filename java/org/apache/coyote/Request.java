@@ -14,11 +14,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.ReadListener;
 
@@ -29,6 +29,7 @@ import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.Parameters;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This is a low-level, efficient representation of a server request. Most
@@ -59,20 +60,19 @@ import org.apache.tomcat.util.http.Parameters;
  */
 public final class Request {
 
+    private static final StringManager sm =
+            StringManager.getManager(Constants.Package);
+
 
     // ----------------------------------------------------------- Constructors
 
-
     public Request() {
-
         parameters.setQuery(queryMB);
         parameters.setURLDecoder(urlDecoder);
-
     }
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     private int serverPort = -1;
     private final MessageBytes serverNameMB = MessageBytes.newInstance();
@@ -141,8 +141,6 @@ public final class Request {
     private final RequestInfo reqProcessorMX=new RequestInfo(this);
 
 
-    // ------------------------------------------------------------- TODO SERVLET 3.1 IN PROGRESS
-
     protected volatile ReadListener listener;
 
     public ReadListener getReadListener() {
@@ -150,8 +148,23 @@ public final class Request {
     }
 
     public void setReadListener(ReadListener listener) {
-        //TODO SERVLET 3.1 is it allowed to switch from non block to blocking?
-        setBlocking(listener==null);
+        if (listener == null) {
+            throw new NullPointerException(
+                    sm.getString("request.nullReadListener"));
+        }
+        if (getReadListener() != null) {
+            throw new IllegalStateException(
+                    sm.getString("request.readListenerSet"));
+        }
+        // Note: This class is not used for HTTP upgrade so only need to test
+        //       for async
+        AtomicBoolean result = new AtomicBoolean(false);
+        action(ActionCode.ASYNC_IS_ASYNC, result);
+        if (!result.get()) {
+            throw new IllegalStateException(
+                    sm.getString("request.notAsync"));
+        }
+
         this.listener = listener;
     }
 

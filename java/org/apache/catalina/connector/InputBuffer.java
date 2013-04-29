@@ -22,7 +22,6 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.ReadListener;
 
@@ -33,7 +32,6 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.res.StringManager;
-
 
 /**
  * The buffer used by Tomcat request. This is a derivative of the Tomcat 3.3
@@ -211,8 +209,6 @@ public class InputBuffer extends Reader
 
         gotEnc = false;
         enc = null;
-        listener = null;
-
     }
 
 
@@ -251,32 +247,8 @@ public class InputBuffer extends Reader
     }
 
 
-    private volatile ReadListener listener;
     public void setReadListener(ReadListener listener) {
-        if (listener == null) {
-            throw new NullPointerException(
-                    sm.getString("inputBuffer.nullListener"));
-        }
-        if (getReadListener() != null) {
-            throw new IllegalStateException(
-                    sm.getString("inputBuffer.listenerSet"));
-        }
-        // Note: This class is not used for HTTP upgrade so only need to test
-        //       for async
-        AtomicBoolean result = new AtomicBoolean(false);
-        coyoteRequest.action(ActionCode.ASYNC_IS_ASYNC, result);
-        if (!result.get()) {
-            throw new IllegalStateException(
-                    sm.getString("inputBuffer.notAsync"));
-        }
-
-        this.listener = listener;
         coyoteRequest.setReadListener(listener);
-    }
-
-
-    public ReadListener getReadListener() {
-        return listener;
     }
 
 
@@ -286,7 +258,9 @@ public class InputBuffer extends Reader
 
 
     public boolean isReady() {
-        if (getReadListener()==null) throw new IllegalStateException("not in non blocking mode.");
+        if (coyoteRequest.getReadListener() == null) {
+            throw new IllegalStateException("not in non blocking mode.");
+        }
         int available = available();
         boolean result = available > 0;
         if (!result) {
