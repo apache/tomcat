@@ -19,6 +19,7 @@ package org.apache.coyote;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.WriteListener;
 
@@ -27,6 +28,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.http.parser.MediaType;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Response object.
@@ -39,6 +41,9 @@ import org.apache.tomcat.util.http.parser.MediaType;
  * @author Remy Maucherat
  */
 public final class Response {
+
+    private static final StringManager sm =
+            StringManager.getManager(Constants.Package);
 
     // ----------------------------------------------------- Class Variables
 
@@ -549,8 +554,27 @@ public final class Response {
 }
 
     public void setWriteListener(WriteListener listener) {
-        //TODO SERVLET 3.1 is it allowed to switch from non block to blocking?
-        setBlocking(listener==null);
+        if (listener == null) {
+            throw new NullPointerException(
+                    sm.getString("response.nullWriteListener"));
+        }
+        if (getWriteListener() != null) {
+            throw new IllegalStateException(
+                    sm.getString("response.writeListenerSet"));
+        }
+        // Note: This class is not used for HTTP upgrade so only need to test
+        //       for async
+        AtomicBoolean result = new AtomicBoolean(false);
+        action(ActionCode.ASYNC_IS_ASYNC, result);
+        if (!result.get()) {
+            throw new IllegalStateException(
+                    sm.getString("response.notAsync"));
+        }
+
+        this.listener = listener;
+        action(ActionCode.SET_WRITE_LISTENER, null);
+
+        setBlocking(false);
         this.listener = listener;
     }
 

@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.connector;
 
-
 import java.io.IOException;
 import java.io.Writer;
 import java.security.AccessController;
@@ -33,8 +32,6 @@ import org.apache.coyote.Response;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharChunk;
-import org.apache.tomcat.util.res.StringManager;
-
 
 /**
  * The buffer used by Tomcat response. This is a derivative of the Tomcat 3.3
@@ -46,10 +43,6 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class OutputBuffer extends Writer
     implements ByteChunk.ByteOutputChannel, CharChunk.CharOutputChannel {
-
-    private static final StringManager sm =
-            StringManager.getManager(Constants.Package);
-
 
     // -------------------------------------------------------------- Constants
 
@@ -249,8 +242,6 @@ public class OutputBuffer extends Writer
 
         gotEnc = false;
         enc = null;
-        listener = null;
-
     }
 
 
@@ -656,42 +647,16 @@ public class OutputBuffer extends Writer
 
 
     public boolean canWrite() {
-        if (getWriteListener()==null) throw new IllegalStateException("not in non blocking mode.");
+        if (coyoteResponse.getWriteListener() == null) {
+            throw new IllegalStateException("not in non blocking mode.");
+        }
         AtomicBoolean canWrite = new AtomicBoolean(true);
         coyoteResponse.action(ActionCode.NB_WRITE_INTEREST, canWrite);
         return canWrite.get();
-}
+    }
 
 
-
-    private volatile WriteListener listener;
     public void setWriteListener(WriteListener listener) {
-        if (listener == null) {
-            throw new NullPointerException(
-                    sm.getString("outputBuffer.nullListener"));
-        }
-        if (getWriteListener() != null) {
-            throw new IllegalStateException(
-                    sm.getString("outputBuffer.listenerSet"));
-        }
-        // Note: This class is not used for HTTP upgrade so only need to test
-        //       for async
-        AtomicBoolean result = new AtomicBoolean(false);
-        coyoteResponse.action(ActionCode.ASYNC_IS_ASYNC, result);
-        if (!result.get()) {
-            throw new IllegalStateException(
-                    sm.getString("outputBuffer.notAsync"));
-        }
-
-        this.listener = listener;
         coyoteResponse.setWriteListener(listener);
-        coyoteResponse.action(ActionCode.SET_WRITE_LISTENER, null);
     }
-
-    public WriteListener getWriteListener() {
-        return listener;
-    }
-
-
-
 }
