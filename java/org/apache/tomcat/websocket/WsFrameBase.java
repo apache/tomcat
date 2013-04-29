@@ -159,25 +159,32 @@ public abstract class WsFrameBase {
                             sm.getString("wsFrame.noContinuation")));
                 }
             } else {
-                if (opCode == Constants.OPCODE_BINARY) {
-                    // New binary message
-                    textMessage = false;
-                    int size = wsSession.getMaxBinaryMessageBufferSize();
-                    if (size != messageBufferBinary.capacity()) {
-                        messageBufferBinary = ByteBuffer.allocate(size);
+                try {
+                    if (opCode == Constants.OPCODE_BINARY) {
+                        // New binary message
+                        textMessage = false;
+                        int size = wsSession.getMaxBinaryMessageBufferSize();
+                        if (size != messageBufferBinary.capacity()) {
+                            messageBufferBinary = ByteBuffer.allocate(size);
+                        }
+                    } else if (opCode == Constants.OPCODE_TEXT) {
+                        // New text message
+                        textMessage = true;
+                        int size = wsSession.getMaxTextMessageBufferSize();
+                        if (size != messageBufferText.capacity()) {
+                            messageBufferText = CharBuffer.allocate(size);
+                        }
+                    } else {
+                        throw new WsIOException(new CloseReason(
+                                CloseCodes.PROTOCOL_ERROR,
+                                sm.getString("wsFrame.invalidOpCode",
+                                        Integer.valueOf(opCode))));
                     }
-                } else if (opCode == Constants.OPCODE_TEXT) {
-                    // New text message
-                    textMessage = true;
-                    int size = wsSession.getMaxTextMessageBufferSize();
-                    if (size != messageBufferText.capacity()) {
-                        messageBufferText = CharBuffer.allocate(size);
-                    }
-                } else {
+                } catch (IllegalStateException ise) {
+                    // Thrown if the session is already closed
                     throw new WsIOException(new CloseReason(
                             CloseCodes.PROTOCOL_ERROR,
-                            sm.getString("wsFrame.invalidOpCode",
-                                    Integer.valueOf(opCode))));
+                            sm.getString("wsFrame.sessionClosed")));
                 }
             }
             continuationExpected = !fin;
