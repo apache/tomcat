@@ -33,6 +33,7 @@ import org.apache.coyote.Response;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharChunk;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -46,9 +47,11 @@ import org.apache.tomcat.util.buf.CharChunk;
 public class OutputBuffer extends Writer
     implements ByteChunk.ByteOutputChannel, CharChunk.CharOutputChannel {
 
+    private static final StringManager sm =
+            StringManager.getManager(Constants.Package);
+
 
     // -------------------------------------------------------------- Constants
-
 
     public static final String DEFAULT_ENCODING =
         org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
@@ -56,7 +59,6 @@ public class OutputBuffer extends Writer
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * The byte buffer.
@@ -664,9 +666,26 @@ public class OutputBuffer extends Writer
 
     private volatile WriteListener listener;
     public void setWriteListener(WriteListener listener) {
-        if (getWriteListener()!=null) throw new IllegalStateException("Write listener already set.");
+        if (listener == null) {
+            throw new NullPointerException(
+                    sm.getString("outputBuffer.nullListener"));
+        }
+        if (getWriteListener() != null) {
+            throw new IllegalStateException(
+                    sm.getString("outputBuffer.listenerSet"));
+        }
+        // Note: This class is not used for HTTP upgrade so only need to test
+        //       for async
+        AtomicBoolean result = new AtomicBoolean(false);
+        coyoteResponse.action(ActionCode.ASYNC_IS_ASYNC, result);
+        if (!result.get()) {
+            throw new IllegalStateException(
+                    sm.getString("outputBuffer.notAsync"));
+        }
+
         this.listener = listener;
-        coyoteResponse.action(ActionCode.SET_WRITE_LISTENER, listener);
+        coyoteResponse.setWriteListener(listener);
+        coyoteResponse.action(ActionCode.SET_WRITE_LISTENER, null);
     }
 
     public WriteListener getWriteListener() {

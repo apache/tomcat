@@ -119,7 +119,5 @@ public class CoyoteOutputStream
     public void setWriteListener(WriteListener listener) {
         ob.setWriteListener(listener);
     }
-
-
 }
 
