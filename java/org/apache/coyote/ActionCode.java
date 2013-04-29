@@ -206,11 +206,6 @@ public enum ActionCode {
     UPGRADE,
 
     /**
-     * Callback to trigger setting the ReadListener
-     */
-    SET_READ_LISTENER,
-
-    /**
      * Callback to trigger setting the WriteListener
      */
     SET_WRITE_LISTENER,

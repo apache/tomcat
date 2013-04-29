@@ -22,6 +22,7 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.ReadListener;
 
@@ -252,9 +253,25 @@ public class InputBuffer extends Reader
 
     private volatile ReadListener listener;
     public void setReadListener(ReadListener listener) {
-        if (getReadListener()!=null) throw new IllegalStateException("Read listener already set.");
+        if (listener == null) {
+            throw new NullPointerException(
+                    sm.getString("inputBuffer.nullListener"));
+        }
+        if (getReadListener() != null) {
+            throw new IllegalStateException(
+                    sm.getString("inputBuffer.listenerSet"));
+        }
+        // Note: This class is not used for HTTP upgrade so only need to test
+        //       for async
+        AtomicBoolean result = new AtomicBoolean(false);
+        coyoteRequest.action(ActionCode.ASYNC_IS_ASYNC, result);
+        if (!result.get()) {
+            throw new IllegalStateException(
+                    sm.getString("inputBuffer.notAsync"));
+        }
+
         this.listener = listener;
-        coyoteRequest.action(ActionCode.SET_READ_LISTENER, listener);
+        coyoteRequest.setReadListener(listener);
     }
 
 
