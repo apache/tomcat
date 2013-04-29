@@ -110,6 +110,10 @@
         expressions in a JSP document if EL expressions have been disabled.
         (kkolinko/markt)  
       </fix>
+      <fix>
+        <bug>54888</bug>: Add support for CSV lists with the ForEach tag plugin.
+        Patch provided by Sheldon Shao. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
