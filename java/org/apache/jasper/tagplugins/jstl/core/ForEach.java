@@ -155,6 +155,10 @@ public final class ForEach implements TagPlugin {
         ctxt.generateJavaSource("else if (" + itemsV + " instanceof Map)");
         ctxt.generateJavaSource(iterV + "=((Map)" + itemsV + ").entrySet().iterator();");
 
+        // String
+        ctxt.generateJavaSource("else if (" + itemsV + " instanceof String)");
+        ctxt.generateJavaSource(iterV + "=toIterator(new StringTokenizer((String)" + itemsV + ", \",\"));");
+
         // Not null
         ctxt.generateJavaSource("if (" + iterV + " != null) {");
 
