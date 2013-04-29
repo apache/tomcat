@@ -97,7 +97,17 @@ public abstract class ServletInputStream extends InputStream {
     public abstract boolean isReady();
 
     /**
-     * Sets the {@link ReadListener} for this {@link ServletInputStream}.
+     * Sets the {@link ReadListener} for this {@link ServletInputStream} and
+     * thereby switching to non-blocking IO. It is only valid to switch to
+     * non-blocking IO within async processing or HTTP upgrade processing.
+     *
+     * @param listener  The non-blocking IO read listener
+     *
+     * @throws IllegalStateException    If this method is called if neither
+     *                                  async nor HTTP upgrade is in progress or
+     *                                  if the {@link ReadListener} has already
+     *                                  been set
+     * @throws NullPointerException     If listener is null
      */
     public abstract void setReadListener(ReadListener listener);
 }
