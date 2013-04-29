@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.WriteListener;
 
-import org.apache.coyote.http11.AbstractOutputBuffer;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.HttpParser;
@@ -525,6 +524,7 @@ public final class Response {
         commited = false;
         errorException = null;
         headers.clear();
+        listener = null;
 
         // update counters
         contentWritten=0;
@@ -574,20 +574,6 @@ public final class Response {
         this.listener = listener;
         action(ActionCode.SET_WRITE_LISTENER, null);
 
-        setBlocking(false);
         this.listener = listener;
-    }
-
-    protected volatile boolean blocking = true;
-
-    public boolean isBlocking() {
-        return blocking;
-    }
-
-    public void setBlocking(boolean blocking) throws IllegalStateException {
-        @SuppressWarnings("rawtypes")
-        AbstractOutputBuffer buf = (AbstractOutputBuffer)outputBuffer;
-        if (!blocking && !buf.supportsNonBlocking()) throw new IllegalStateException();
-        this.blocking = blocking;
     }
 }

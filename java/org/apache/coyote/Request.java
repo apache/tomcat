@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.ReadListener;
 
-import org.apache.coyote.http11.AbstractInputBuffer;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
@@ -166,21 +165,8 @@ public final class Request {
         }
 
         this.listener = listener;
-        setBlocking(false);
     }
 
-    protected volatile boolean blocking = true;
-
-    public boolean isBlocking() {
-        return blocking;
-    }
-
-    public void setBlocking(boolean blocking) throws IllegalStateException {
-        @SuppressWarnings("rawtypes")
-        AbstractInputBuffer buf = (AbstractInputBuffer)inputBuffer;
-        if (!blocking && !buf.supportsNonBlocking()) throw new IllegalStateException();
-        this.blocking = blocking;
-    }
     // ------------------------------------------------------------- Properties
 
 
@@ -551,7 +537,6 @@ public final class Request {
         authType.recycle();
         attributes.clear();
 
-        blocking = true;
         listener = null;
 
         startTime = -1;
