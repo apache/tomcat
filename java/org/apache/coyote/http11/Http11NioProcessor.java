@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.SSLEngine;
 import javax.servlet.RequestDispatcher;
-import javax.servlet.WriteListener;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.RequestInfo;
@@ -600,9 +599,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 ((NioEndpoint)endpoint).dispatchForEvent(this.socket.getSocket(),SocketStatus.OPEN_READ, true);
             }
         } else if (actionCode == ActionCode.SET_WRITE_LISTENER) {
-            WriteListener listener = (WriteListener)param;
-            response.setWriteListener(listener);
-            outputBuffer.setBlocking(listener==null);
+            outputBuffer.setBlocking(false);
         } else if (actionCode == ActionCode.NB_READ_INTEREST) {
             if (socket==null || socket.getSocket().getAttachment(false)==null) {
                 return;
