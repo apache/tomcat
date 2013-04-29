@@ -98,7 +98,7 @@ public abstract class ServletInputStream extends InputStream {
 
     /**
      * Sets the {@link ReadListener} for this {@link ServletInputStream} and
-     * thereby switching to non-blocking IO. It is only valid to switch to
+     * thereby switches to non-blocking IO. It is only valid to switch to
      * non-blocking IO within async processing or HTTP upgrade processing.
      *
      * @param listener  The non-blocking IO read listener
