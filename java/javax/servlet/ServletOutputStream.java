@@ -281,7 +281,17 @@ public abstract class ServletOutputStream extends OutputStream {
     public abstract boolean isReady();
 
     /**
-     * TODO SERVLET 3.1
+     * Sets the {@link WriteListener} for this {@link ServletOutputStream} and
+     * thereby switches to non-blocking IO. It is only valid to switch to
+     * non-blocking IO within async processing or HTTP upgrade processing.
+     *
+     * @param listener  The non-blocking IO write listener
+     *
+     * @throws IllegalStateException    If this method is called if neither
+     *                                  async nor HTTP upgrade is in progress or
+     *                                  if the {@link WriteListener} has already
+     *                                  been set
+     * @throws NullPointerException     If listener is null
      */
     public abstract void setWriteListener(javax.servlet.WriteListener listener);
 }
