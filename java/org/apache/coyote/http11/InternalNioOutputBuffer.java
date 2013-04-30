@@ -456,7 +456,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         return bufferedWriteSize;
     }
 
-    public boolean isWritable() {
+    public boolean isReady() {
         return !hasDataToWrite();
     }
 }

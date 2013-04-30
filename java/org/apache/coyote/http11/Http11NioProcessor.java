@@ -614,11 +614,11 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             if (socket==null || socket.getSocket().getAttachment(false)==null) {
                 return;
             }
-            AtomicBoolean canWrite = (AtomicBoolean)param;
-            if (outputBuffer.isWritable()) {
-                canWrite.set(true);
+            AtomicBoolean isReady = (AtomicBoolean)param;
+            if (outputBuffer.isReady()) {
+                isReady.set(true);
             } else {
-                canWrite.set(false);
+                isReady.set(false);
             }
         }
     }
