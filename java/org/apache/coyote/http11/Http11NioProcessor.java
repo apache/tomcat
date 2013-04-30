@@ -196,7 +196,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 if (status == SocketStatus.OPEN_WRITE && isRegisteredForWrite(attach)) {
                     return SocketState.LONG;
                 }
-            }catch (IllegalStateException x) {
+            } catch (IllegalStateException x) {
                 attach.interestOps(attach.interestOps() | SelectionKey.OP_WRITE);
             }
         } else if (status == SocketStatus.OPEN_READ) {

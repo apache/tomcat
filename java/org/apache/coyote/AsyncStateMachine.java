@@ -71,26 +71,28 @@ import org.apache.tomcat.util.res.StringManager;
  * |   |      |       |               |                 |             |     /-----------|         |
  * |   |      |       ^               |dispatch()       |             |    /                      |
  * |   |      |       |               |                 |             |   /                       |
- * |   |      |       |              \|/                /            \|/ /      postProcess()     |
+ * |   |      |       |              \|/                /            \|/ /    postProcess()       |
  * |   |      |       |         MUST_DISPATCH          /           STARTED<---------<---------|   |
- * |   |      |       |           |                   /            /|  \                      |   |
- * |   |      |       |           |postProcess()     /            / |   \                     |   |
- * ^   |      ^       |           |                 /  dispatch()/  |    \                    |   |
- * |   |      |       |           |                /            /   |     \                   |   |
- * |   |      |       |           |   |---------- / -----------/    |auto  \                  |   |
- * |   |      |       |           |   |          /                  |       \                 |   |
- * |   |      |       |           |   |   |-----/                   |       |                 |   |
- * |   |      |       | auto     \|/ \|/ \|/                       \|/      |                 |   |
- * |   |      |       |---<------DISPATCHING<-----------------TIMING_OUT    |                 |   |
- * |   |      |                               dispatch()        |   |       |asyncOperation() ^   |
- * |   |      |                                                 |   |      \|/                |   ^
- * |   |      |-------<----------------------------------<------|   |     READ_WRITE_OP->-----|   |
- * |   |                          complete()                        |        |      |             |
- * |   |                                                            |        |      |  error()    |
- * |<- | ----<-------------------<-------------------------------<--|        |      |->-----------|
- *     |                           error()                                   |
- *     |                                                  complete()         |
- *     |---------------------------------------------------------------------|
+ * |   |      |       |           |                   /           / |   |                     |   |
+ * |   |      |       |           |postProcess()     /           /  |   |                     ^   |
+ * ^   |      ^       |           |                 /           /   |   |asyncOperation()     |   |
+ * |   |      |       |           |                /           /    |   |                     |   |
+ * |   |      |       |           |   |---------- / ----------/     |   |--READ_WRITE_OP-->---|   |
+ * |   |      |       |           |   |          /   dispatch()     |            |  |  |          |
+ * |   |      |       |           |   |   |-----/               auto|            |  |  |   error()|
+ * |   |      |       | auto     \|/ \|/ \|/                        |  dispatch()|  |  |->--------|
+ * |   |      |       |---<------DISPATCHING<--------<------------- | ------<----|  |
+ * |   |      |                      /|\                            |               |
+ * |   |      |                       |       dispatch()           \|/              |
+ * |   |      |                       |-----------------------TIMING_OUT            |
+ * |   |      |                                                 |   |               |
+ * |   |      |-------<----------------------------------<------|   |               |
+ * |   |                          complete()                        |               |
+ * |   |                                                            |               |
+ * |<- | ----<-------------------<-------------------------------<--|               |
+ *     |                           error()                                          |
+ *     |                                                  complete()                |
+ *     |----------------------------------------------------------------------------|
  * </pre>
  */
 public class AsyncStateMachine<S> {
@@ -151,10 +153,6 @@ public class AsyncStateMachine<S> {
 
     public boolean isAsync() {
         return state.isAsync();
-    }
-
-    public boolean isAsyncOperation() {
-        return state == AsyncState.READ_WRITE_OP;
     }
 
     public boolean isAsyncDispatching() {
