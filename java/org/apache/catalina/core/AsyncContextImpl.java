@@ -132,62 +132,6 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
     }
 
-    public boolean canRead() throws IOException {
-        if (request.getCoyoteRequest().getReadListener()==null) return false;
-
-        ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
-        ClassLoader newCL = request.getContext().getLoader().getClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(newCL);
-            request.getCoyoteRequest().getReadListener().onDataAvailable();
-            if (request.getInputStream().isFinished()) {
-                request.getCoyoteRequest().getReadListener().onAllDataRead();
-            }
-        }finally {
-            Thread.currentThread().setContextClassLoader(oldCL);
-        }
-        return true;
-    }
-
-    public boolean canWrite() throws IOException {
-        if (request.getResponse().getCoyoteResponse().getWriteListener()==null) return false;
-        ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
-        ClassLoader newCL = request.getContext().getLoader().getClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(newCL);
-            request.getResponse().getCoyoteResponse().getWriteListener().onWritePossible();
-        }finally {
-            Thread.currentThread().setContextClassLoader(oldCL);
-    }
-        return true;
-    }
-
-    public boolean notifyWriteError(Throwable error) {
-        if (request.getResponse().getCoyoteResponse().getWriteListener()==null) return false;
-        ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
-        ClassLoader newCL = request.getContext().getLoader().getClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(newCL);
-            request.getResponse().getCoyoteResponse().getWriteListener().onError(error);
-            return true;
-        } finally {
-            Thread.currentThread().setContextClassLoader(oldCL);
-        }
-    }
-
-    public boolean notifyReadError(Throwable error) {
-        if (request.getCoyoteRequest().getReadListener()==null) return false;
-        ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
-        ClassLoader newCL = request.getContext().getLoader().getClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(newCL);
-            request.getCoyoteRequest().getReadListener().onError(error);
-            return true;
-        } finally {
-            Thread.currentThread().setContextClassLoader(oldCL);
-        }
-    }
-
     public boolean timeout() {
         AtomicBoolean result = new AtomicBoolean();
         request.getCoyoteRequest().action(ActionCode.ASYNC_TIMEOUT, result);

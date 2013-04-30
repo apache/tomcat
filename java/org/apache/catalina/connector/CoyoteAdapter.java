@@ -305,32 +305,85 @@ public class CoyoteAdapter implements Adapter {
                 }
             } else if (status==SocketStatus.ASYNC_READ_ERROR) {
                 success = true;
-                Throwable t = (Throwable)req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+                Throwable t = (Throwable)req.getAttribute(
+                        RequestDispatcher.ERROR_EXCEPTION);
                 req.getAttributes().remove(RequestDispatcher.ERROR_EXCEPTION);
-                asyncConImpl.notifyReadError(t);
+                if (req.getReadListener() != null) {
+                    ClassLoader oldCL =
+                            Thread.currentThread().getContextClassLoader();
+                    ClassLoader newCL =
+                            request.getContext().getLoader().getClassLoader();
+                    try {
+                        Thread.currentThread().setContextClassLoader(newCL);
+                        req.getReadListener().onError(t);
+                    } finally {
+                        Thread.currentThread().setContextClassLoader(oldCL);
+                    }
+                }
                 if (t != null) {
                     asyncConImpl.setErrorState(t, true);
                 }
             } else if (status==SocketStatus.ASYNC_WRITE_ERROR) {
                 success = true;
-                Throwable t = (Throwable)req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+                Throwable t = (Throwable)req.getAttribute(
+                        RequestDispatcher.ERROR_EXCEPTION);
                 req.getAttributes().remove(RequestDispatcher.ERROR_EXCEPTION);
-                asyncConImpl.notifyWriteError(t);
+                if (res.getWriteListener() != null) {
+                    ClassLoader oldCL =
+                            Thread.currentThread().getContextClassLoader();
+                    ClassLoader newCL =
+                            request.getContext().getLoader().getClassLoader();
+                    try {
+                        Thread.currentThread().setContextClassLoader(newCL);
+                        res.getWriteListener().onError(t);
+                    } finally {
+                        Thread.currentThread().setContextClassLoader(oldCL);
+                    }
+                }
                 if (t != null) {
                     asyncConImpl.setErrorState(t, true);
                 }
             }
 
 
-            if (!request.isAsyncDispatching() && request.isAsync() && request.isAsyncOperation()) {
+            if (!request.isAsyncDispatching() && request.isAsync() &&
+                    request.isAsyncOperation()) {
                 if (status == SocketStatus.OPEN_WRITE) {
-                    // TODO Notify write listener
-                    success = asyncConImpl.canWrite();
+                    if (res.getWriteListener() == null) {
+                        success = false;
+                    } else {
+                        ClassLoader oldCL =
+                                Thread.currentThread().getContextClassLoader();
+                        ClassLoader newCL =
+                                request.getContext().getLoader().getClassLoader();
+                        try {
+                            Thread.currentThread().setContextClassLoader(newCL);
+                            res.getWriteListener().onWritePossible();
+                        } finally {
+                            Thread.currentThread().setContextClassLoader(oldCL);
+                        }
+                        success = true;
+                    }
                 } else if (status == SocketStatus.OPEN_READ) {
-                    // TODO Notify read listener
-                    success = asyncConImpl.canRead();
+                    if (req.getReadListener() == null) {
+                        success = false;
+                    } else {
+                        ClassLoader oldCL =
+                                Thread.currentThread().getContextClassLoader();
+                        ClassLoader newCL =
+                                request.getContext().getLoader().getClassLoader();
+                        try {
+                            Thread.currentThread().setContextClassLoader(newCL);
+                            req.getReadListener().onDataAvailable();
+                            if (request.getInputStream().isFinished()) {
+                                req.getReadListener().onAllDataRead();
+                            }
+                        } finally {
+                            Thread.currentThread().setContextClassLoader(oldCL);
+                        }
+                        success = true;
+                    }
                 }
-
             }
 
             if (request.isAsyncDispatching()) {
