@@ -111,7 +111,7 @@ public class CoyoteOutputStream
 
     @Override
     public boolean isReady() {
-        return ob.canWrite();
+        return ob.isReady();
     }
 
 
