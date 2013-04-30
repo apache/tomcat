@@ -1661,16 +1661,6 @@ public class Request
         return result.get();
     }
 
-    public boolean isAsyncOperation() {
-        if (asyncContext == null) {
-            return false;
-        }
-
-        AtomicBoolean result = new AtomicBoolean(false);
-        coyoteRequest.action(ActionCode.ASYNC_IS_ASYNC_OPERATION, result);
-        return result.get();
-    }
-
     @Override
     public boolean isAsyncSupported() {
         if (this.asyncSupported == null) {

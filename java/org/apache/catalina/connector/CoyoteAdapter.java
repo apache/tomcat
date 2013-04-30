@@ -345,44 +345,37 @@ public class CoyoteAdapter implements Adapter {
                 }
             }
 
-
-            if (!request.isAsyncDispatching() && request.isAsync() &&
-                    request.isAsyncOperation()) {
-                if (status == SocketStatus.OPEN_WRITE) {
-                    if (res.getWriteListener() == null) {
-                        success = false;
-                    } else {
-                        ClassLoader oldCL =
-                                Thread.currentThread().getContextClassLoader();
-                        ClassLoader newCL =
-                                request.getContext().getLoader().getClassLoader();
-                        try {
-                            Thread.currentThread().setContextClassLoader(newCL);
-                            res.getWriteListener().onWritePossible();
-                        } finally {
-                            Thread.currentThread().setContextClassLoader(oldCL);
-                        }
-                        success = true;
+            // Check to see if non-blocking writes are reads are being used
+            if (!request.isAsyncDispatching() && request.isAsync()) {
+                if (res.getWriteListener() != null &&
+                        status == SocketStatus.OPEN_WRITE) {
+                    ClassLoader oldCL =
+                            Thread.currentThread().getContextClassLoader();
+                    ClassLoader newCL =
+                            request.getContext().getLoader().getClassLoader();
+                    try {
+                        Thread.currentThread().setContextClassLoader(newCL);
+                        res.getWriteListener().onWritePossible();
+                    } finally {
+                        Thread.currentThread().setContextClassLoader(oldCL);
                     }
-                } else if (status == SocketStatus.OPEN_READ) {
-                    if (req.getReadListener() == null) {
-                        success = false;
-                    } else {
-                        ClassLoader oldCL =
-                                Thread.currentThread().getContextClassLoader();
-                        ClassLoader newCL =
-                                request.getContext().getLoader().getClassLoader();
-                        try {
-                            Thread.currentThread().setContextClassLoader(newCL);
-                            req.getReadListener().onDataAvailable();
-                            if (request.getInputStream().isFinished()) {
-                                req.getReadListener().onAllDataRead();
-                            }
-                        } finally {
-                            Thread.currentThread().setContextClassLoader(oldCL);
+                    success = true;
+                } else if (req.getReadListener() != null &&
+                        status == SocketStatus.OPEN_READ) {
+                    ClassLoader oldCL =
+                            Thread.currentThread().getContextClassLoader();
+                    ClassLoader newCL =
+                            request.getContext().getLoader().getClassLoader();
+                    try {
+                        Thread.currentThread().setContextClassLoader(newCL);
+                        req.getReadListener().onDataAvailable();
+                        if (request.getInputStream().isFinished()) {
+                            req.getReadListener().onAllDataRead();
                         }
-                        success = true;
+                    } finally {
+                        Thread.currentThread().setContextClassLoader(oldCL);
                     }
+                    success = true;
                 }
             }
 
