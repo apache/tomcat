@@ -187,7 +187,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                         //System.out.println("Attempting data flush!!");
                         outputBuffer.flushBuffer(false);
                     }
-                }catch (IOException x) {
+                } catch (IOException x) {
                     if (log.isDebugEnabled()) log.debug("Unable to write async data.",x);
                     status = SocketStatus.ASYNC_WRITE_ERROR;
                     request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
@@ -205,13 +205,12 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     if (inputBuffer.nbRead()>0) {
                         asyncStateMachine.asyncOperation();
                     }
-                }catch (IOException x) {
+                } catch (IOException x) {
                     if (log.isDebugEnabled()) log.debug("Unable to read async data.",x);
                     status = SocketStatus.ASYNC_READ_ERROR;
                     request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
                 }
-                //return if we have more data to write
-            }catch (IllegalStateException x) {
+            } catch (IllegalStateException x) {
                 attach.interestOps(attach.interestOps() | SelectionKey.OP_READ);
             }
         }
