@@ -615,15 +615,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 return;
             }
             AtomicBoolean canWrite = (AtomicBoolean)param;
-            RequestInfo rp = request.getRequestProcessor();
-            if (rp.getStage() == org.apache.coyote.Constants.STAGE_SERVICE) {
-                if (outputBuffer.isWritable()) {
-                    canWrite.set(true);
-                } else {
-                    canWrite.set(false);
-                }
+            if (outputBuffer.isWritable()) {
+                canWrite.set(true);
             } else {
-                throw new IllegalStateException("Calling canWrite asynchronously is illegal.");
+                canWrite.set(false);
             }
         }
     }
