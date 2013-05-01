@@ -106,7 +106,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         super.flush();
 
         // Flush the current buffer
-        flushBuffer();
+        flushBuffer(isBlocking());
     }
 
 
@@ -147,7 +147,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         if (lastActiveFilter != -1)
             activeFilters[lastActiveFilter].end();
 
-        flushBuffer();
+        flushBuffer(true);
 
         finished = true;
 
@@ -198,14 +198,18 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     /**
      * Callback to write data from the buffer.
      */
-    private void flushBuffer()
-        throws IOException {
+    @Override
+    protected boolean flushBuffer(boolean block) throws IOException {
+        // TODO: Non-blocking IO not yet implemented so always block parameter
+        //       ignored
         if (bbuf.position() > 0) {
             if (Socket.sendbb(socket, 0, bbuf.position()) < 0) {
                 throw new IOException();
             }
             bbuf.clear();
         }
+        // TODO: Non-blocking IO not yet implemented so always returns false
+        return false;
     }
 
 
@@ -225,7 +229,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
 
     @Override
-    protected boolean flushBuffer(boolean block) throws IOException {
+    public boolean isBlocking() {
         // TODO
         return false;
     }
@@ -253,7 +257,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
             while (len > 0) {
                 int thisTime = len;
                 if (bbuf.position() == bbuf.capacity()) {
-                    flushBuffer();
+                    flushBuffer(isBlocking());
                 }
                 if (thisTime > bbuf.capacity() - bbuf.position()) {
                     thisTime = bbuf.capacity() - bbuf.position();

@@ -152,12 +152,9 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
      * @throws IOException an underlying I/O error occurred
      */
     @Override
-    public void endRequest()
-        throws IOException {
+    public void endRequest() throws IOException {
         super.endRequest();
-        if (useSocketBuffer) {
-            socketBuffer.flushBuffer();
-        }
+        flushBuffer(true);
     }
 
 
@@ -233,8 +230,20 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
 
     @Override
-    protected boolean flushBuffer(boolean block) throws IOException {
+    public boolean isBlocking() {
         // TODO
+        return false;
+    }
+
+
+    @Override
+    protected boolean flushBuffer(boolean block) throws IOException {
+        // Blocking connector so ignore block parameter as this will always use
+        // blocking IO.
+        if (useSocketBuffer) {
+            socketBuffer.flushBuffer();
+        }
+        // Always blocks so never any data left over.
         return false;
     }
 
