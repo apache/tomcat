@@ -84,7 +84,8 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         // Extend timeout to 5 mins for debugging
-        int rc = getUrl("http://localhost:" + getPort() + "/", bc, 300000, null, null);
+        int rc = getUrl("http://localhost:" + getPort() + "/", bc, 300000, null,
+                null);
 
         int totalCount = asyncWriteTarget + syncWriteTarget;
         StringBuilder sb = new StringBuilder(totalCount * 16);
@@ -122,7 +123,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
 
 
             AsyncContext asyncCtxt = req.startAsync();
-            // Inifinite timeout for debugging
+            // Infinite timeout for debugging
             asyncCtxt.setTimeout(0);
             asyncCtxt.start(new AsyncTask(asyncCtxt, sos));
         }
