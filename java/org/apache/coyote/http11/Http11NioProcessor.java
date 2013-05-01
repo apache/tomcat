@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.nio.channels.SelectionKey;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.SSLEngine;
 import javax.servlet.RequestDispatcher;
@@ -603,16 +602,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 attach.interestOps(attach.interestOps() | SelectionKey.OP_READ);
             } else {
                 throw new IllegalStateException("Calling isReady asynchronously is illegal.");
-            }
-        } else if (actionCode == ActionCode.NB_WRITE_INTEREST) {
-            if (socket==null || socket.getSocket().getAttachment(false)==null) {
-                return;
-            }
-            AtomicBoolean isReady = (AtomicBoolean)param;
-            if (outputBuffer.isReady()) {
-                isReady.set(true);
-            } else {
-                isReady.set(false);
             }
         }
     }
