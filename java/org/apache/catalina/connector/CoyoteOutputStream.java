@@ -107,8 +107,8 @@ public class CoyoteOutputStream extends ServletOutputStream {
      * Will send the buffer to the client.
      */
     @Override
-    public void flush()
-        throws IOException {
+    public void flush() throws IOException {
+        checkNonBlockingWrite();
         ob.flush();
     }
 
