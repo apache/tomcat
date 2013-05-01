@@ -146,22 +146,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Flush the response.
-     *
-     * @throws IOException an underlying I/O error occurred
-     *
-     */
-    @Override
-    public void flush() throws IOException {
-
-        super.flush();
-        // Flush the current buffer
-        flushBuffer(isBlocking());
-
-    }
-
-
-    /**
      * Recycle the output buffer. This should be called when closing the
      * connection.
      */
