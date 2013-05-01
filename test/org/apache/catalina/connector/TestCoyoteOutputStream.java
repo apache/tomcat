@@ -17,7 +17,6 @@
 package org.apache.catalina.connector;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.AsyncContext;
@@ -35,6 +34,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestCoyoteOutputStream extends TomcatBaseTest {
@@ -83,7 +83,8 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk bc = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() + "/", bc, null, null);
+        // Extend timeout to 5 mins for debugging
+        int rc = getUrl("http://localhost:" + getPort() + "/", bc, 300000, null, null);
 
         int totalCount = asyncWriteTarget + syncWriteTarget;
         StringBuilder sb = new StringBuilder(totalCount * 16);
@@ -121,17 +122,20 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
 
 
             AsyncContext asyncCtxt = req.startAsync();
+            // Inifinite timeout for debugging
+            asyncCtxt.setTimeout(0);
             asyncCtxt.start(new AsyncTask(asyncCtxt, sos));
         }
 
         private void doAsyncWrite(AsyncContext asyncCtxt,
-                ServletOutputStream sos) {
-            PrintWriter pw = new PrintWriter(sos);
+                ServletOutputStream sos) throws IOException {
             while (sos.isReady()) {
                 int next = asyncWriteCount.getAndIncrement();
                 if (next < asyncWriteTarget) {
-                    pw.println("OK - " + next);
-                    pw.flush();
+                    sos.write(
+                            ("OK - " + next + System.lineSeparator()).getBytes(
+                                    B2CConverter.UTF_8));
+                    sos.flush();
                 } else {
                     doSyncWrite(asyncCtxt, sos);
                     break;
@@ -140,13 +144,12 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
         }
 
         private void doSyncWrite(AsyncContext asyncCtxt,
-                ServletOutputStream sos) {
+                ServletOutputStream sos) throws IOException {
             asyncCtxt.complete();
-            PrintWriter pw = new PrintWriter(sos);
             for (int i = asyncWriteTarget;
                     i < syncWriteTarget + asyncWriteTarget; i++) {
-                pw.println("OK - " + i);
-                pw.flush();
+                sos.write(("OK - " + i + System.lineSeparator()).getBytes(
+                        B2CConverter.UTF_8));
             }
         }
 
@@ -163,7 +166,11 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
             @Override
             public void run() {
                 sos.setWriteListener(new MyWriteListener(asyncCtxt, sos));
-                doAsyncWrite(asyncCtxt, sos);
+                try {
+                    doAsyncWrite(asyncCtxt, sos);
+                } catch (IOException ioe) {
+                    throw new RuntimeException(ioe);
+                }
             }
         }
 
