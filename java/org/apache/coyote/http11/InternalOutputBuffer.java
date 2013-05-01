@@ -127,20 +127,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
     }
 
 
-    /**
-     * End request.
-     *
-     * @throws IOException an underlying I/O error occurred
-     */
-    @Override
-    public void endRequest() throws IOException {
-        super.endRequest();
-        flushBuffer(true);
-    }
-
-
     // ------------------------------------------------ HTTP/1.1 Output Methods
-
 
     /**
      * Send an acknowledgment.

@@ -310,21 +310,19 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
         byteCount = 0;
     }
 
+
     /**
      * End request.
      *
      * @throws IOException an underlying I/O error occurred
      */
-    public void endRequest()
-        throws IOException {
+    public void endRequest() throws IOException {
 
         if (!committed) {
-
             // Send the connector a request for commit. The connector should
             // then validate the headers, send them (using sendHeader) and
             // set the filters accordingly.
             response.action(ActionCode.COMMIT, null);
-
         }
 
         if (finished)
@@ -332,6 +330,9 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
         if (lastActiveFilter != -1)
             activeFilters[lastActiveFilter].end();
+
+        flushBuffer(true);
+
         finished = true;
     }
 

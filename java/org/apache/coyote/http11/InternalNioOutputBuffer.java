@@ -162,19 +162,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     }
 
 
-    /**
-     * End request.
-     *
-     * @throws IOException an underlying I/O error occurred
-     */
-    @Override
-    public void endRequest() throws IOException {
-        super.endRequest();
-        flushBuffer(true);
-    }
-
     // ------------------------------------------------ HTTP/1.1 Output Methods
-
 
     /**
      * Send an acknowledgment.
