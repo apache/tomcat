@@ -81,17 +81,12 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     private NioSelectorPool pool;
 
     /**
-     * Flag used only for Comet requests/responses
-     */
-    protected volatile boolean blocking = true;
-
-    /**
      * Track if the byte buffer is flipped
      */
     protected volatile boolean flipped = false;
 
     /**
-     * For "non-blocking" writes use an external buffer
+     * For "non-blocking" writes use an external buffer.
      */
     protected volatile LinkedBlockingDeque<ByteBufferHolder> bufferedWrite = null;
 
@@ -421,7 +416,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     @Override
     public void setBlocking(boolean blocking) {
-        this.blocking = blocking;
         if (blocking)
             bufferedWrite = null;
         else
@@ -433,7 +427,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     }
 
     public boolean isBlocking() {
-        return blocking;
+        return bufferedWrite == null;
     }
 
     private boolean hasBufferedData() {
