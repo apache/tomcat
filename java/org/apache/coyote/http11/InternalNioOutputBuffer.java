@@ -380,39 +380,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     }
 
 
-    // ----------------------------------- OutputStreamOutputBuffer Inner Class
-
-    /**
-     * This class is an output buffer which will write data to an output
-     * stream.
-     */
-    protected class SocketOutputBuffer
-        implements OutputBuffer {
-
-
-        /**
-         * Write chunk.
-         */
-        @Override
-        public int doWrite(ByteChunk chunk, Response res)
-            throws IOException {
-
-            int len = chunk.getLength();
-            int start = chunk.getStart();
-            byte[] b = chunk.getBuffer();
-            addToBB(b, start, len);
-            byteCount += chunk.getLength();
-            return chunk.getLength();
-        }
-
-        @Override
-        public long getBytesWritten() {
-            return byteCount;
-        }
-    }
-
-
-    //------------------------------------------------------ Non-blocking writes
+    //-------------------------------------------------- Non-blocking IO methods
 
     @Override
     public void setBlocking(boolean blocking) {
@@ -448,5 +416,37 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     public int getBufferedWriteSize() {
         return bufferedWriteSize;
+    }
+
+
+    // ----------------------------------- OutputStreamOutputBuffer Inner Class
+
+    /**
+     * This class is an output buffer which will write data to an output
+     * stream.
+     */
+    protected class SocketOutputBuffer
+        implements OutputBuffer {
+
+
+        /**
+         * Write chunk.
+         */
+        @Override
+        public int doWrite(ByteChunk chunk, Response res)
+            throws IOException {
+
+            int len = chunk.getLength();
+            int start = chunk.getStart();
+            byte[] b = chunk.getBuffer();
+            addToBB(b, start, len);
+            byteCount += chunk.getLength();
+            return chunk.getLength();
+        }
+
+        @Override
+        public long getBytesWritten() {
+            return byteCount;
+        }
     }
 }

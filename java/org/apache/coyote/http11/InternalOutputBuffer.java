@@ -217,7 +217,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
     }
 
 
-    //------------------------------------------------------ Non-blocking writes
+    //-------------------------------------------------- Non-blocking IO methods
 
     @Override
     protected boolean hasDataToWrite() {
