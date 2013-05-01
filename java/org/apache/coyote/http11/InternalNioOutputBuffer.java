@@ -100,7 +100,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      */
     protected final AtomicInteger lastWrite = new AtomicInteger(1);
 
-    protected class ByteBufferHolder {
+    protected static class ByteBufferHolder {
         private final ByteBuffer buf;
         private final AtomicBoolean flipped;
         public ByteBufferHolder(ByteBuffer buf, boolean flipped) {
@@ -302,7 +302,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             //we must buffer as long as it fits
             //ByteBufferHolder tail = bufferedWrite.
             addToBuffers(buf, offset, length);
-    }
+        }
     }
 
     private void addToBuffers(byte[] buf, int offset, int length) {
