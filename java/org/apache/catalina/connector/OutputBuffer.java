@@ -659,4 +659,9 @@ public class OutputBuffer extends Writer
     public void setWriteListener(WriteListener listener) {
         coyoteResponse.setWriteListener(listener);
     }
+
+
+    public boolean isBlocking() {
+        return coyoteResponse.getWriteListener() == null;
+    }
 }

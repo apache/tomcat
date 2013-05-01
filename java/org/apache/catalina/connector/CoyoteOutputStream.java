@@ -21,18 +21,21 @@ import java.io.IOException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Coyote implementation of the servlet output stream.
  *
  * @author Costin Manolache
  * @author Remy Maucherat
  */
-public class CoyoteOutputStream
-    extends ServletOutputStream {
+public class CoyoteOutputStream extends ServletOutputStream {
+
+    protected static final StringManager sm =
+            StringManager.getManager(Constants.Package);
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     protected OutputBuffer ob;
 
@@ -73,23 +76,30 @@ public class CoyoteOutputStream
 
 
     @Override
-    public void write(int i)
-        throws IOException {
+    public void write(int i) throws IOException {
+        checkNonBlockingWrite();
         ob.writeByte(i);
     }
 
 
     @Override
-    public void write(byte[] b)
-        throws IOException {
+    public void write(byte[] b) throws IOException {
         write(b, 0, b.length);
     }
 
 
     @Override
-    public void write(byte[] b, int off, int len)
-        throws IOException {
+    public void write(byte[] b, int off, int len) throws IOException {
+        checkNonBlockingWrite();
         ob.write(b, off, len);
+    }
+
+
+    private void checkNonBlockingWrite() {
+        if (!ob.isBlocking() && !ob.isReady()) {
+            throw new IllegalStateException(
+                    sm.getString("coyoteOutputStream.nbNotready"));
+        }
     }
 
 
