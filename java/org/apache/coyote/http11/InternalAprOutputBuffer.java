@@ -209,7 +209,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     }
 
 
-    //------------------------------------------------------ Non-blocking writes
+    //-------------------------------------------------- Non-blocking IO methods
 
     @Override
     protected boolean hasDataToWrite() {
