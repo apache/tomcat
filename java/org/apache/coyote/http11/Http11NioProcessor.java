@@ -87,12 +87,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
 
     /**
-     * Output.
-     */
-    protected final InternalNioOutputBuffer outputBuffer;
-
-
-    /**
      * Sendfile data.
      */
     protected NioEndpoint.SendfileData sendfileData = null;

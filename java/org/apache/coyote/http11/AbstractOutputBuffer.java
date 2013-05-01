@@ -32,7 +32,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
+public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
     // ----------------------------------------------------- Instance Variables
 
@@ -95,8 +95,13 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
      */
     protected long byteCount = 0;
 
-    // -------------------------------------------------------------- Variables
+    /**
+     * Socket buffering.
+     */
+    protected int socketBuffer = -1;
 
+
+    // -------------------------------------------------------------- Variables
 
     /**
      * The string manager for this package.
@@ -163,8 +168,23 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
     }
 
 
- // --------------------------------------------------- OutputBuffer Methods
+    /**
+     * Set the socket buffer flag.
+     */
+    public void setSocketBuffer(int socketBuffer) {
+        this.socketBuffer = socketBuffer;
+    }
 
+
+    /**
+     * Get the socket buffer flag.
+     */
+    public int getSocketBuffer() {
+        return socketBuffer;
+    }
+
+
+    // --------------------------------------------------- OutputBuffer Methods
 
     /**
      * Write the contents of a byte chunk.
@@ -548,9 +568,15 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
         }
     }
 
-    // --------------------------------------------------------- Public Methods
+
+    //------------------------------------------------------ Non-blocking writes
+
+    protected abstract boolean hasDataToWrite();
+    protected abstract void setBlocking(boolean blocking);
+    protected abstract boolean flushBuffer(boolean block) throws IOException;
 
 
-    public abstract boolean supportsNonBlocking();
-
+    protected final boolean isReady() {
+        return !hasDataToWrite();
+    }
 }

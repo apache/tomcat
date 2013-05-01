@@ -81,6 +81,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
     /**
      * Set the socket buffer size.
      */
+    @Override
     public void setSocketBuffer(int socketBufferSize) {
 
         if (socketBufferSize > 500) {
@@ -89,16 +90,10 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
         } else {
             useSocketBuffer = false;
         }
-
     }
 
 
     // --------------------------------------------------------- Public Methods
-
-    @Override
-    public boolean supportsNonBlocking() {
-        return false;
-    }
 
     @Override
     public void init(SocketWrapper<Socket> socketWrapper,
@@ -222,8 +217,29 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
     }
 
 
-    // ----------------------------------- OutputStreamOutputBuffer Inner Class
+    //------------------------------------------------------ Non-blocking writes
 
+    @Override
+    protected boolean hasDataToWrite() {
+        // TODO
+        return false;
+    }
+
+
+    @Override
+    protected void setBlocking(boolean blocking) {
+        // TODO
+    }
+
+
+    @Override
+    protected boolean flushBuffer(boolean block) throws IOException {
+        // TODO
+        return false;
+    }
+
+
+    // ----------------------------------- OutputStreamOutputBuffer Inner Class
 
     /**
      * This class is an output buffer which will write data to an output

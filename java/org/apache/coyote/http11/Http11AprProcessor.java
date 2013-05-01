@@ -82,12 +82,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
 
     /**
-     * Output.
-     */
-    protected final InternalAprOutputBuffer outputBuffer;
-
-
-    /**
      * Sendfile data.
      */
     protected AprEndpoint.SendfileData sendfileData = null;

@@ -56,11 +56,19 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     protected abstract Log getLog();
 
+
     /**
      * The string manager for this package.
      */
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
+
+
+    /**
+     * Output.
+     */
+    protected AbstractOutputBuffer<S> outputBuffer;
+
 
     /*
      * Tracks how many internal filters are in the filter library so they
@@ -181,12 +189,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * Minimum content size to make compression.
      */
     protected int compressionMinSize = 2048;
-
-
-    /**
-     * Socket buffering.
-     */
-    protected int socketBuffer = -1;
 
 
     /**
@@ -458,14 +460,14 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * Set the socket buffer flag.
      */
     public void setSocketBuffer(int socketBuffer) {
-        this.socketBuffer = socketBuffer;
+        outputBuffer.setSocketBuffer(socketBuffer);
     }
 
     /**
      * Get the socket buffer flag.
      */
     public int getSocketBuffer() {
-        return socketBuffer;
+        return outputBuffer.getSocketBuffer();
     }
 
     /**
