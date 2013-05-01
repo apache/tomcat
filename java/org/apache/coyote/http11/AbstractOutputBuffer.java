@@ -256,7 +256,11 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
                 break;
             }
         }
+
+        // Flush the current buffer(s)
+        flushBuffer(isBlocking());
     }
+
 
     /**
      * Reset current response.
