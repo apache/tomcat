@@ -86,11 +86,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     // --------------------------------------------------------- Public Methods
 
     @Override
-    public boolean supportsNonBlocking() {
-        return false;
-    }
-
-    @Override
     public void init(SocketWrapper<Long> socketWrapper,
             AbstractEndpoint endpoint) throws IOException {
 
@@ -214,8 +209,29 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     }
 
 
-    // ----------------------------------- OutputStreamOutputBuffer Inner Class
+    //------------------------------------------------------ Non-blocking writes
 
+    @Override
+    protected boolean hasDataToWrite() {
+        // TODO
+        return false;
+    }
+
+
+    @Override
+    protected void setBlocking(boolean blocking) {
+        // TODO
+    }
+
+
+    @Override
+    protected boolean flushBuffer(boolean block) throws IOException {
+        // TODO
+        return false;
+    }
+
+
+    // ----------------------------------- OutputStreamOutputBuffer Inner Class
 
     /**
      * This class is an output buffer which will write data to an output

@@ -150,11 +150,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     // --------------------------------------------------------- Public Methods
 
-    @Override
-    public boolean supportsNonBlocking() {
-        return true;
-    }
-
     /**
      * Flush the response.
      *
@@ -329,6 +324,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     /**
      * Callback to write data from the buffer.
      */
+    @Override
     protected boolean flushBuffer(boolean block) throws IOException {
 
         //prevent timeout for async,
@@ -420,14 +416,17 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         }
     }
 
-    //----------------------------------------non blocking writes -----------------
+
+    //------------------------------------------------------ Non-blocking writes
+
+    @Override
     public void setBlocking(boolean blocking) {
         this.blocking = blocking;
         if (blocking)
             bufferedWrite = null;
         else
             bufferedWrite = new LinkedBlockingDeque<>();
-}
+    }
 
     public void setBufferedWriteSize(int bufferedWriteSize) {
         this.bufferedWriteSize = bufferedWriteSize;
@@ -448,15 +447,12 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         return result;
     }
 
+    @Override
     public boolean hasDataToWrite() {
         return hasMoreDataToFlush() || hasBufferedData();
     }
 
     public int getBufferedWriteSize() {
         return bufferedWriteSize;
-    }
-
-    public boolean isReady() {
-        return !hasDataToWrite();
     }
 }

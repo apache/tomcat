@@ -74,12 +74,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
 
     /**
-     * Output.
-     */
-    protected final InternalOutputBuffer outputBuffer;
-
-
-    /**
      * SSL information.
      */
     protected SSLSupport sslSupport;
