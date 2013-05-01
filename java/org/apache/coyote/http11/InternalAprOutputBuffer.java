@@ -20,7 +20,6 @@ package org.apache.coyote.http11;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.apache.coyote.ActionCode;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.tomcat.jni.Socket;
@@ -104,37 +103,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         super.recycle();
 
         bbuf.clear();
-    }
-
-
-    /**
-     * End request.
-     *
-     * @throws IOException an underlying I/O error occurred
-     */
-    @Override
-    public void endRequest()
-        throws IOException {
-
-        if (!committed) {
-
-            // Send the connector a request for commit. The connector should
-            // then validate the headers, send them (using sendHeader) and
-            // set the filters accordingly.
-            response.action(ActionCode.COMMIT, null);
-
-        }
-
-        if (finished)
-            return;
-
-        if (lastActiveFilter != -1)
-            activeFilters[lastActiveFilter].end();
-
-        flushBuffer(true);
-
-        finished = true;
-
     }
 
 
