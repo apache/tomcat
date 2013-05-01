@@ -573,6 +573,15 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
     protected abstract boolean hasDataToWrite();
     protected abstract void setBlocking(boolean blocking);
+
+    /**
+     * Writes any remaining buffered data.
+     *
+     * @param block     Should this method block until the buffer is empty
+     * @return  <code>true</code> if data remains in the buffer (which can only
+     *          happen in non-blocking mode else <code>false</code>.
+     * @throws IOException
+     */
     protected abstract boolean flushBuffer(boolean block) throws IOException;
 
 
