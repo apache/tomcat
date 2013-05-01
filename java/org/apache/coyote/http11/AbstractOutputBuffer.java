@@ -573,6 +573,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
     protected abstract boolean hasDataToWrite();
     protected abstract void setBlocking(boolean blocking);
+    protected abstract boolean isBlocking();
 
     /**
      * Writes any remaining buffered data.
