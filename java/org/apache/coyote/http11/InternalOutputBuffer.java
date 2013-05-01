@@ -114,10 +114,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
         super.flush();
 
-        // Flush the current buffer
-        if (useSocketBuffer) {
-            socketBuffer.flushBuffer();
-        }
+        flushBuffer(isBlocking());
 
     }
 
