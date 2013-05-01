@@ -83,7 +83,8 @@
 
     <attribute name="asyncTimeout" required="false">
       <p>The default timeout for asynchronous requests in milliseconds. If not
-      specified, this attribute is set to 10000 (10 seconds).</p>
+      specified, this attribute is set to the Servlet specification default of
+      30000 (30 seconds).</p>
     </attribute>
 
     <attribute name="enableLookups" required="false">

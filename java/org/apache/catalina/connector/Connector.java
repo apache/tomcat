@@ -98,7 +98,7 @@ public class Connector extends LifecycleMBeanBase  {
     /**
      * Default timeout for asynchronous requests (ms).
      */
-    protected  long asyncTimeout = 10000;
+    protected  long asyncTimeout =30000;
 
 
     /**
