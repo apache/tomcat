@@ -108,7 +108,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
     // ------------------------------------------------ HTTP/1.1 Output Methods
 
-
     /**
      * Send an acknowledgment.
      */

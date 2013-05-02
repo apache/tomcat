@@ -186,7 +186,10 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
     @Override
     protected boolean hasMoreDataToFlush() {
-        // Blocking IO so always returns false.
+        // The blocking connector always blocks until the previous write is
+        // complete so there is never data remaining to flush. This effectively
+        // allows non-blocking code to work with the blocking connector but -
+        // obviously - every write will always block.
         return false;
     }
 
