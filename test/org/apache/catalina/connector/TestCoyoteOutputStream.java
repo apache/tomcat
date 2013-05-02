@@ -76,16 +76,20 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
 
         Context root = tomcat.addContext("", TEMP_DIR);
         Wrapper w = Tomcat.addServlet(root, "nbWrite",
-                new NonBlockingWriteServlet(asyncWriteTarget, syncWriteTarget));
+                new NonBlockingWriteServlet(asyncWriteTarget));
         w.setAsyncSupported(true);
-        root.addServletMapping("/", "nbWrite");
+        root.addServletMapping("/nbWrite", "nbWrite");
+        Tomcat.addServlet(root, "write",
+                new BlockingWriteServlet(asyncWriteTarget, syncWriteTarget));
+        w.setAsyncSupported(true);
+        root.addServletMapping("/write", "write");
 
         tomcat.start();
 
         ByteChunk bc = new ByteChunk();
         // Extend timeout to 5 mins for debugging
-        int rc = getUrl("http://localhost:" + getPort() + "/", bc, 300000, null,
-                null);
+        int rc = getUrl("http://localhost:" + getPort() + "/nbWrite", bc,
+                300000, null, null);
 
         int totalCount = asyncWriteTarget + syncWriteTarget;
         StringBuilder sb = new StringBuilder(totalCount * 16);
@@ -103,14 +107,12 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
     private static final class NonBlockingWriteServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
+
         private final int asyncWriteTarget;
-        private final int syncWriteTarget;
         private final AtomicInteger asyncWriteCount = new AtomicInteger(0);
 
-        public NonBlockingWriteServlet(int asyncWriteTarget,
-                int syncWriteTarget) {
+        public NonBlockingWriteServlet(int asyncWriteTarget) {
             this.asyncWriteTarget = asyncWriteTarget;
-            this.syncWriteTarget = syncWriteTarget;
         }
 
         @Override
@@ -138,19 +140,9 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
                                     B2CConverter.UTF_8));
                     sos.flush();
                 } else {
-                    doSyncWrite(asyncCtxt, sos);
+                    asyncCtxt.dispatch("/write");
                     break;
                 }
-            }
-        }
-
-        private void doSyncWrite(AsyncContext asyncCtxt,
-                ServletOutputStream sos) throws IOException {
-            asyncCtxt.complete();
-            for (int i = asyncWriteTarget;
-                    i < syncWriteTarget + asyncWriteTarget; i++) {
-                sos.write(("OK - " + i + System.lineSeparator()).getBytes(
-                        B2CConverter.UTF_8));
             }
         }
 
@@ -194,6 +186,33 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
             @Override
             public void onError(Throwable throwable) {
                 // TODO Auto-generated method stub
+            }
+        }
+    }
+
+    private static final class BlockingWriteServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final int start;
+        private final int len;
+
+        public BlockingWriteServlet(int start, int len) {
+            this.start = start;
+            this.len = len;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+            ServletOutputStream sos = resp.getOutputStream();
+
+            for (int i = start; i < start + len; i++) {
+                sos.write(("OK - " + i + System.lineSeparator()).getBytes(
+                        B2CConverter.UTF_8));
             }
         }
     }
