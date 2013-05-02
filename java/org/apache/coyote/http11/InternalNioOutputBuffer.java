@@ -50,7 +50,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
         this.response = response;
 
-        buf = new byte[headerBufferSize];
+        headerBuffer = new byte[headerBufferSize];
 
         outputStreamOutputBuffer = new SocketOutputBuffer();
 
@@ -185,18 +185,22 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
         if (pos > 0) {
             // Sending the response header buffer
-            addToBB(buf, 0, pos);
+            addToBB(headerBuffer, 0, pos);
         }
 
     }
 
 
-    private synchronized void addToBB(byte[] buf, int offset, int length) throws IOException {
-        //try to write to socket first
-        if (length==0) return;
+    private synchronized void addToBB(byte[] buf, int offset, int length)
+            throws IOException {
 
+        if (length == 0) return;
+
+        // Try to flush any data in the socket's write buffer first
         boolean dataLeft = flushBuffer(isBlocking());
 
+        // Keep writing until all the data is written or a non-blocking write
+        // leaves data in the buffer
         while (!dataLeft && length>0) {
             int thisTime = transfer(buf,offset,length,socket.getBufHandler().getWriteBuffer());
             length = length - thisTime;
@@ -214,6 +218,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             addToBuffers(buf, offset, length);
         }
     }
+
 
     private void addToBuffers(byte[] buf, int offset, int length) {
         ByteBufferHolder holder = bufferedWrites.peekLast();
@@ -264,9 +269,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             }
         }
 
-        dataLeft = hasMoreDataToFlush();
-
-        return dataLeft;
+        return hasMoreDataToFlush();
     }
 
     @Override
@@ -281,13 +284,12 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         return max;
     }
 
-    private int transfer(ByteBuffer from, ByteBuffer to) {
+    private void transfer(ByteBuffer from, ByteBuffer to) {
         int max = Math.min(from.remaining(), to.remaining());
         ByteBuffer tmp = from.duplicate ();
         tmp.limit (tmp.position() + max);
         to.put (tmp);
         from.position(from.position() + max);
-        return max;
     }
 
 
@@ -297,16 +299,14 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      * This class is an output buffer which will write data to an output
      * stream.
      */
-    protected class SocketOutputBuffer
-        implements OutputBuffer {
+    protected class SocketOutputBuffer implements OutputBuffer {
 
 
         /**
          * Write chunk.
          */
         @Override
-        public int doWrite(ByteChunk chunk, Response res)
-            throws IOException {
+        public int doWrite(ByteChunk chunk, Response res) throws IOException {
 
             int len = chunk.getLength();
             int start = chunk.getStart();
