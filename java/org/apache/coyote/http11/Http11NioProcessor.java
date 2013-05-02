@@ -189,7 +189,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
                 }
             } catch (IllegalStateException x) {
-                registerForEvent(SelectionKey.OP_WRITE);
+                registerForEvent(false, true);
             }
         } else if (status == SocketStatus.OPEN_READ) {
             try {
@@ -203,7 +203,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
                 }
             } catch (IllegalStateException x) {
-                registerForEvent(SelectionKey.OP_READ);
+                registerForEvent(false, true);
             }
         }
 
@@ -229,7 +229,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     protected boolean registerForWrite() {
         // Register for write if we have more data to write
         if (outputBuffer.hasDataToWrite()) {
-            registerForEvent(SelectionKey.OP_WRITE);
+            registerForEvent(false, true);
             return true;
         } else {
             return false;
@@ -237,12 +237,18 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     }
 
 
-    protected void registerForEvent(int event) {
+    protected void registerForEvent(boolean read, boolean write) {
         final NioEndpoint.KeyAttachment attach =
                 (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(
                         false);
-        if (attach != null) {
-            attach.interestOps(attach.interestOps() | event);
+        if (attach == null) {
+            return;
+        }
+        if (read) {
+            attach.interestOps(attach.interestOps() | SelectionKey.OP_READ);
+        }
+        if (write) {
+            attach.interestOps(attach.interestOps() | SelectionKey.OP_WRITE);
         }
     }
 
