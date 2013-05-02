@@ -221,12 +221,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     public SocketState process(SocketWrapper<NioChannel> socketWrapper)
             throws IOException {
         SocketState state = super.process(socketWrapper);
-        final NioEndpoint.KeyAttachment attach =
-                (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(
-                        false);
-        if (attach != null) {
-            registerForWrite();
-        }
+        registerForWrite();
         return state;
     }
 
@@ -244,8 +239,11 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
     protected void registerForEvent(int event) {
         final NioEndpoint.KeyAttachment attach =
-                (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
-        attach.interestOps(attach.interestOps() | event);
+                (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(
+                        false);
+        if (attach != null) {
+            attach.interestOps(attach.interestOps() | event);
+        }
     }
 
 
