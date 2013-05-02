@@ -185,7 +185,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
     //-------------------------------------------------- Non-blocking IO methods
 
     @Override
-    protected boolean hasDataToWrite() {
+    protected boolean hasMoreDataToFlush() {
         // TODO
         return false;
     }

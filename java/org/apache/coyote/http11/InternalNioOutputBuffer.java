@@ -269,7 +269,8 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         return dataLeft;
     }
 
-    private boolean hasMoreDataToFlush() {
+    @Override
+    protected boolean hasMoreDataToFlush() {
         return (flipped && socket.getBufHandler().getWriteBuffer().remaining()>0) ||
         (!flipped && socket.getBufHandler().getWriteBuffer().position() > 0);
     }
@@ -287,25 +288,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         to.put (tmp);
         from.position(from.position() + max);
         return max;
-    }
-
-
-    //-------------------------------------------------- Non-blocking IO methods
-
-    private boolean hasBufferedData() {
-        boolean result = false;
-        if (bufferedWrites!=null) {
-            Iterator<ByteBufferHolder> iter = bufferedWrites.iterator();
-            while (!result && iter.hasNext()) {
-                result = iter.next().hasData();
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public boolean hasDataToWrite() {
-        return hasMoreDataToFlush() || hasBufferedData();
     }
 
 
