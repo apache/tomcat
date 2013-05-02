@@ -24,7 +24,6 @@ import java.nio.channels.Selector;
 import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
@@ -95,11 +94,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      */
     protected int bufferedWriteSize = 64*1024; //64k default write buffer
 
-    /**
-     * Number of bytes last written
-     */
-    protected final AtomicInteger lastWrite = new AtomicInteger(1);
-
     protected static class ByteBufferHolder {
         private final ByteBuffer buf;
         private final AtomicBoolean flipped;
@@ -156,7 +150,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             socket.getBufHandler().getWriteBuffer().clear();
             socket = null;
         }
-        lastWrite.set(1);
         setBlocking(true);
         flipped = false;
     }
