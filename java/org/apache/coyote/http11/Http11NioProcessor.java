@@ -216,27 +216,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     }
 
 
-
     @Override
-    public SocketState process(SocketWrapper<NioChannel> socketWrapper)
-            throws IOException {
-        SocketState state = super.process(socketWrapper);
-        registerForWrite();
-        return state;
-    }
-
-
-    protected boolean registerForWrite() {
-        // Register for write if we have more data to write
-        if (outputBuffer.hasDataToWrite()) {
-            registerForEvent(false, true);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
     protected void registerForEvent(boolean read, boolean write) {
         final NioEndpoint.KeyAttachment attach =
                 (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(

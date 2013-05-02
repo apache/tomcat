@@ -206,8 +206,13 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
 
     @Override
+    protected void registerForEvent(boolean read, boolean write) {
+        // NO-OP for BIO
+    }
+
+    @Override
     protected void resetTimeouts() {
-        // NOOP for BIO
+        // NO-OP for BIO
     }
 
 

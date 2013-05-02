@@ -1045,6 +1045,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
+        registerForWrite();
+
         if (error || endpoint.isPaused()) {
             return SocketState.CLOSED;
         } else if (isAsync() || comet) {
@@ -1067,6 +1069,32 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             }
         }
     }
+
+
+    /**
+     * Register the socket for write possible events of there is data in the
+     * output buffer still to write.
+     *
+     * @return <code>true</code> if the socket was registered for write possible
+     *         events, otherwise <code>false</code>
+     */
+    protected boolean registerForWrite() {
+        if (outputBuffer.hasDataToWrite()) {
+            registerForEvent(false, true);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Regsiter the socket for the specified events.
+     *
+     * @param read  Register the socket for read events
+     * @param write Regsiter the socket for write events
+     */
+    protected abstract void registerForEvent(boolean read, boolean write);
 
 
     /**
