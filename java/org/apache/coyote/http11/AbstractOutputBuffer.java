@@ -62,7 +62,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     /**
      * The buffer used for header composition.
      */
-    protected byte[] buf;
+    protected byte[] headerBuffer;
 
 
     /**
@@ -380,7 +380,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
         // Write protocol name
         write(Constants.HTTP_11_BYTES);
-        buf[pos++] = Constants.SP;
+        headerBuffer[pos++] = Constants.SP;
 
         // Write status code
         int status = response.getStatus();
@@ -398,7 +398,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
             write(status);
         }
 
-        buf[pos++] = Constants.SP;
+        headerBuffer[pos++] = Constants.SP;
 
         // Write message
         String message = null;
@@ -418,15 +418,15 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
                 new PrivilegedAction<Void>(){
                     @Override
                     public Void run(){
-                        buf[pos++] = Constants.CR;
-                        buf[pos++] = Constants.LF;
+                        headerBuffer[pos++] = Constants.CR;
+                        headerBuffer[pos++] = Constants.LF;
                         return null;
                     }
                 }
            );
         } else {
-            buf[pos++] = Constants.CR;
-            buf[pos++] = Constants.LF;
+            headerBuffer[pos++] = Constants.CR;
+            headerBuffer[pos++] = Constants.LF;
         }
 
     }
@@ -441,11 +441,11 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     public void sendHeader(MessageBytes name, MessageBytes value) {
 
         write(name);
-        buf[pos++] = Constants.COLON;
-        buf[pos++] = Constants.SP;
+        headerBuffer[pos++] = Constants.COLON;
+        headerBuffer[pos++] = Constants.SP;
         write(value);
-        buf[pos++] = Constants.CR;
-        buf[pos++] = Constants.LF;
+        headerBuffer[pos++] = Constants.CR;
+        headerBuffer[pos++] = Constants.LF;
 
     }
 
@@ -455,8 +455,8 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
      */
     public void endHeaders() {
 
-        buf[pos++] = Constants.CR;
-        buf[pos++] = Constants.LF;
+        headerBuffer[pos++] = Constants.CR;
+        headerBuffer[pos++] = Constants.LF;
 
     }
 
@@ -495,7 +495,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
         // Writing the byte chunk to the output buffer
         int length = bc.getLength();
         checkLengthBeforeWrite(length);
-        System.arraycopy(bc.getBytes(), bc.getStart(), buf, pos, length);
+        System.arraycopy(bc.getBytes(), bc.getStart(), headerBuffer, pos, length);
         pos = pos + length;
 
     }
@@ -523,7 +523,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
             if (((c <= 31) && (c != 9)) || c == 127 || c > 255) {
                 c = ' ';
             }
-            buf[pos++] = (byte) c;
+            headerBuffer[pos++] = (byte) c;
         }
 
     }
@@ -540,7 +540,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
         checkLengthBeforeWrite(b.length);
 
         // Writing the byte chunk to the output buffer
-        System.arraycopy(b, 0, buf, pos, b.length);
+        System.arraycopy(b, 0, headerBuffer, pos, b.length);
         pos = pos + b.length;
 
     }
@@ -570,7 +570,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
             if (((c <= 31) && (c != 9)) || c == 127 || c > 255) {
                 c = ' ';
             }
-            buf[pos++] = (byte) c;
+            headerBuffer[pos++] = (byte) c;
         }
 
     }
@@ -595,7 +595,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
      * requested number of bytes.
      */
     private void checkLengthBeforeWrite(int length) {
-        if (pos + length > buf.length) {
+        if (pos + length > headerBuffer.length) {
             throw new HeadersTooLargeException(
                     sm.getString("iob.responseheadertoolarge.error"));
         }

@@ -44,7 +44,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
         this.response = response;
 
-        buf = new byte[headerBufferSize];
+        headerBuffer = new byte[headerBufferSize];
 
         outputStreamOutputBuffer = new OutputStreamOutputBuffer();
 
@@ -161,9 +161,9 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
         if (pos > 0) {
             // Sending the response header buffer
             if (useSocketBuffer) {
-                socketBuffer.append(buf, 0, pos);
+                socketBuffer.append(headerBuffer, 0, pos);
             } else {
-                outputStream.write(buf, 0, pos);
+                outputStream.write(headerBuffer, 0, pos);
             }
         }
 
@@ -186,7 +186,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
     @Override
     protected boolean hasMoreDataToFlush() {
-        // TODO
+        // Blocking IO so always returns false.
         return false;
     }
 

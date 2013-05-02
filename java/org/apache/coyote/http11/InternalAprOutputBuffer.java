@@ -19,6 +19,7 @@ package org.apache.coyote.http11;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Iterator;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
@@ -35,7 +36,6 @@ import org.apache.tomcat.util.net.SocketWrapper;
  */
 public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
-
     // ----------------------------------------------------------- Constructors
 
     /**
@@ -45,7 +45,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
         this.response = response;
 
-        buf = new byte[headerBufferSize];
+        headerBuffer = new byte[headerBufferSize];
         if (headerBufferSize < (8 * 1024)) {
             bbuf = ByteBuffer.allocateDirect(6 * 1500);
         } else {
@@ -141,9 +141,53 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
         if (pos > 0) {
             // Sending the response header buffer
-            bbuf.put(buf, 0, pos);
+            bbuf.put(headerBuffer, 0, pos);
         }
 
+    }
+
+
+    private synchronized void addToBB(byte[] buf, int offset, int length)
+            throws IOException {
+
+        if (length == 0) return;
+
+        // Try to flush any data in the socket's write buffer first
+        boolean dataLeft = flushBuffer(isBlocking());
+
+        // Keep writing until all the data is written or a non-blocking write
+        // leaves data in the buffer
+        while (!dataLeft && length > 0) {
+            int thisTime = length;
+            if (bbuf.position() == bbuf.capacity()) {
+                flushBuffer(isBlocking());
+            }
+            if (thisTime > bbuf.capacity() - bbuf.position()) {
+                thisTime = bbuf.capacity() - bbuf.position();
+            }
+            bbuf.put(buf, offset, thisTime);
+            length = length - thisTime;
+            offset = offset + thisTime;
+        }
+
+        // TODO: Review how to update the SocketWrapper's last accessed time
+
+        if (!isBlocking() && length>0) {
+            // Buffer the remaining data
+            addToBuffers(buf, offset, length);
+        }
+
+    }
+
+
+    private void addToBuffers(byte[] buf, int offset, int length) {
+        ByteBufferHolder holder = bufferedWrites.peekLast();
+        if (holder==null || holder.isFlipped() || holder.getBuf().remaining()<length) {
+            ByteBuffer buffer = ByteBuffer.allocate(Math.max(bufferedWriteSize,length));
+            holder = new ByteBufferHolder(buffer,false);
+            bufferedWrites.add(holder);
+        }
+        holder.getBuf().put(buf,offset,length);
     }
 
 
@@ -152,16 +196,53 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
      */
     @Override
     protected boolean flushBuffer(boolean block) throws IOException {
-        // TODO: Non-blocking IO not yet implemented so always block parameter
-        //       ignored
-        if (bbuf.position() > 0) {
-            if (Socket.sendbb(socket, 0, bbuf.position()) < 0) {
-                throw new IOException();
-            }
-            bbuf.clear();
+
+        // TODO: Review how to update the SocketWrapper's last accessed time
+
+        boolean dataLeft = hasMoreDataToFlush();
+
+        if (dataLeft) {
+            writeToSocket();
         }
-        // TODO: Non-blocking IO not yet implemented so always returns false
-        return false;
+
+        if (!dataLeft && bufferedWrites!=null) {
+            Iterator<ByteBufferHolder> bufIter = bufferedWrites.iterator();
+            while (!hasMoreDataToFlush() && bufIter.hasNext()) {
+                ByteBufferHolder buffer = bufIter.next();
+                buffer.flip();
+                while (!hasMoreDataToFlush() && buffer.getBuf().remaining()>0) {
+                    transfer(buffer.getBuf(), bbuf);
+                    if (buffer.getBuf().remaining() == 0) {
+                        bufIter.remove();
+                    }
+                    writeToSocket();
+                    //here we must break if we didn't finish the write
+                }
+            }
+        }
+
+        dataLeft = hasMoreDataToFlush();
+
+        return hasMoreDataToFlush();
+    }
+
+
+    private void writeToSocket() throws IOException {
+        // TODO Implement non-blocking writes
+        if (Socket.sendbb(socket, 0, bbuf.position()) < 0) {
+            throw new IOException();
+        }
+        bbuf.clear();
+
+    }
+
+
+    private void transfer(ByteBuffer from, ByteBuffer to) {
+        int max = Math.min(from.remaining(), to.remaining());
+        ByteBuffer tmp = from.duplicate ();
+        tmp.limit (tmp.position() + max);
+        to.put (tmp);
+        from.position(from.position() + max);
     }
 
 
@@ -169,8 +250,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
     @Override
     protected boolean hasMoreDataToFlush() {
-        // TODO
-        return false;
+        return bbuf.position() > 0;
     }
 
 
@@ -187,24 +267,12 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
          * Write chunk.
          */
         @Override
-        public int doWrite(ByteChunk chunk, Response res)
-            throws IOException {
+        public int doWrite(ByteChunk chunk, Response res) throws IOException {
 
             int len = chunk.getLength();
             int start = chunk.getStart();
             byte[] b = chunk.getBuffer();
-            while (len > 0) {
-                int thisTime = len;
-                if (bbuf.position() == bbuf.capacity()) {
-                    flushBuffer(isBlocking());
-                }
-                if (thisTime > bbuf.capacity() - bbuf.position()) {
-                    thisTime = bbuf.capacity() - bbuf.position();
-                }
-                bbuf.put(b, start, thisTime);
-                len = len - thisTime;
-                start = start + thisTime;
-            }
+            addToBB(b, start,len);
             byteCount += chunk.getLength();
             return chunk.getLength();
         }
