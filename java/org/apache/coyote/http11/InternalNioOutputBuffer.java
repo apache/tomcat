@@ -88,7 +88,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     /**
      * For "non-blocking" writes use an external buffer.
      */
-    protected volatile LinkedBlockingDeque<ByteBufferHolder> bufferedWrite = null;
+    protected volatile LinkedBlockingDeque<ByteBufferHolder> bufferedWrites = null;
 
     /**
      * The max size of the buffered write buffer
@@ -278,11 +278,11 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     }
 
     private void addToBuffers(byte[] buf, int offset, int length) {
-        ByteBufferHolder holder = bufferedWrite.peekLast();
+        ByteBufferHolder holder = bufferedWrites.peekLast();
         if (holder==null || holder.isFlipped() || holder.getBuf().remaining()<length) {
             ByteBuffer buffer = ByteBuffer.allocate(Math.max(bufferedWriteSize,length));
             holder = new ByteBufferHolder(buffer,false);
-            bufferedWrite.add(holder);
+            bufferedWrites.add(holder);
         }
         holder.getBuf().put(buf,offset,length);
     }
@@ -310,8 +310,8 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
         dataLeft = hasMoreDataToFlush();
 
-        if (!dataLeft && bufferedWrite!=null) {
-            Iterator<ByteBufferHolder> bufIter = bufferedWrite.iterator();
+        if (!dataLeft && bufferedWrites!=null) {
+            Iterator<ByteBufferHolder> bufIter = bufferedWrites.iterator();
             while (!hasMoreDataToFlush() && bufIter.hasNext()) {
                 ByteBufferHolder buffer = bufIter.next();
                 buffer.flip();
@@ -357,9 +357,9 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     @Override
     public void setBlocking(boolean blocking) {
         if (blocking)
-            bufferedWrite = null;
+            bufferedWrites = null;
         else
-            bufferedWrite = new LinkedBlockingDeque<>();
+            bufferedWrites = new LinkedBlockingDeque<>();
     }
 
     public void setBufferedWriteSize(int bufferedWriteSize) {
@@ -368,8 +368,8 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     private boolean hasBufferedData() {
         boolean result = false;
-        if (bufferedWrite!=null) {
-            Iterator<ByteBufferHolder> iter = bufferedWrite.iterator();
+        if (bufferedWrites!=null) {
+            Iterator<ByteBufferHolder> iter = bufferedWrites.iterator();
             while (!result && iter.hasNext()) {
                 result = iter.next().hasData();
             }
