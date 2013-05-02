@@ -168,7 +168,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     //-------------------------------------------------- Non-blocking IO methods
 
     @Override
-    protected boolean hasDataToWrite() {
+    protected boolean hasMoreDataToFlush() {
         // TODO
         return false;
     }

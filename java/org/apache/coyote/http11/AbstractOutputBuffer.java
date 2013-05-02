@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -603,7 +604,8 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
     //------------------------------------------------------ Non-blocking writes
 
-    protected abstract boolean hasDataToWrite();
+    protected abstract boolean hasMoreDataToFlush();
+
 
     /**
      * Writes any remaining buffered data.
@@ -637,6 +639,23 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
     protected final boolean isReady() {
         return !hasDataToWrite();
+    }
+
+
+    public final boolean hasDataToWrite() {
+        return hasMoreDataToFlush() || hasBufferedData();
+    }
+
+
+    private boolean hasBufferedData() {
+        boolean result = false;
+        if (bufferedWrites!=null) {
+            Iterator<ByteBufferHolder> iter = bufferedWrites.iterator();
+            while (!result && iter.hasNext()) {
+                result = iter.next().hasData();
+            }
+        }
+        return result;
     }
 
 
