@@ -169,7 +169,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
     @Override
     public SocketState asyncDispatch(SocketStatus status) {
-        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
 
 
         if (status == SocketStatus.OPEN_WRITE) {
@@ -180,17 +179,17 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                         //System.out.println("Attempting data flush!!");
                         outputBuffer.flushBuffer(false);
                     }
+                    //return if we have more data to write
+                    if (registerForWrite()) {
+                        return SocketState.LONG;
+                    }
                 } catch (IOException x) {
                     if (log.isDebugEnabled()) log.debug("Unable to write async data.",x);
                     status = SocketStatus.ASYNC_WRITE_ERROR;
                     request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
                 }
-                //return if we have more data to write
-                if (status == SocketStatus.OPEN_WRITE && isRegisteredForWrite(attach)) {
-                    return SocketState.LONG;
-                }
             } catch (IllegalStateException x) {
-                attach.interestOps(attach.interestOps() | SelectionKey.OP_WRITE);
+                registerForEvent(SelectionKey.OP_WRITE);
             }
         } else if (status == SocketStatus.OPEN_READ) {
             try {
@@ -204,45 +203,51 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
                 }
             } catch (IllegalStateException x) {
-                attach.interestOps(attach.interestOps() | SelectionKey.OP_READ);
+                registerForEvent(SelectionKey.OP_READ);
             }
         }
 
         SocketState state = super.asyncDispatch(status);
-        //return if we have more data to write
-        if (state == SocketState.LONG && isRegisteredForWrite(attach)) {
-            return SocketState.LONG;
-        } else {
-            return state;
+        if (state == SocketState.LONG) {
+            registerForWrite();
         }
+
+        return state;
     }
 
 
 
     @Override
-    public SocketState process(SocketWrapper<NioChannel> socketWrapper) throws IOException {
+    public SocketState process(SocketWrapper<NioChannel> socketWrapper)
+            throws IOException {
         SocketState state = super.process(socketWrapper);
-        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
-        //return if we have more data to write
-        if (attach != null && isRegisteredForWrite(attach)) {
-            return SocketState.LONG;
-        } else {
-            return state;
+        final NioEndpoint.KeyAttachment attach =
+                (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(
+                        false);
+        if (attach != null) {
+            registerForWrite();
         }
+        return state;
     }
 
 
-
-
-    protected boolean isRegisteredForWrite(KeyAttachment attach) {
-        //return if we have more data to write
+    protected boolean registerForWrite() {
+        // Register for write if we have more data to write
         if (outputBuffer.hasDataToWrite()) {
-            attach.interestOps(attach.interestOps() | SelectionKey.OP_WRITE);
+            registerForEvent(SelectionKey.OP_WRITE);
             return true;
         } else {
             return false;
         }
     }
+
+
+    protected void registerForEvent(int event) {
+        final NioEndpoint.KeyAttachment attach =
+                (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
+        attach.interestOps(attach.interestOps() | event);
+    }
+
 
     @Override
     protected void resetTimeouts() {
