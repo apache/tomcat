@@ -198,13 +198,6 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
 
     @Override
-    public boolean isBlocking() {
-        // TODO
-        return false;
-    }
-
-
-    @Override
     protected boolean flushBuffer(boolean block) throws IOException {
         // Blocking connector so ignore block parameter as this will always use
         // blocking IO.

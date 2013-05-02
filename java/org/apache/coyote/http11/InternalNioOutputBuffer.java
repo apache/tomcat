@@ -366,11 +366,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         this.bufferedWriteSize = bufferedWriteSize;
     }
 
-    @Override
-    public boolean isBlocking() {
-        return bufferedWrite == null;
-    }
-
     private boolean hasBufferedData() {
         boolean result = false;
         if (bufferedWrite!=null) {

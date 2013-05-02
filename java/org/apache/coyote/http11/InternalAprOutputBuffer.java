@@ -180,13 +180,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     }
 
 
-    @Override
-    public boolean isBlocking() {
-        // TODO
-        return false;
-    }
-
-
     // ----------------------------------- OutputStreamOutputBuffer Inner Class
 
     /**

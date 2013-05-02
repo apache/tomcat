@@ -578,7 +578,6 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
     protected abstract boolean hasDataToWrite();
     protected abstract void setBlocking(boolean blocking);
-    protected abstract boolean isBlocking();
 
     /**
      * Writes any remaining buffered data.
@@ -589,6 +588,14 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
      * @throws IOException
      */
     protected abstract boolean flushBuffer(boolean block) throws IOException;
+
+
+    /**
+     * Is standard Servlet blocking IO being used for output?
+     */
+    protected final boolean isBlocking() {
+        return response.getWriteListener() == null;
+    }
 
 
     protected final boolean isReady() {
