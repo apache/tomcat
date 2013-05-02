@@ -174,12 +174,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     }
 
 
-    @Override
-    protected void setBlocking(boolean blocking) {
-        // TODO
-    }
-
-
     // ----------------------------------- OutputStreamOutputBuffer Inner Class
 
     /**

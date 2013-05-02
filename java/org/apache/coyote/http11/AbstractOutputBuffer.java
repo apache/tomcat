@@ -17,8 +17,11 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.OutputBuffer;
@@ -99,6 +102,20 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
      * Socket buffering.
      */
     protected int socketBuffer = -1;
+
+    /**
+     * For "non-blocking" writes use an external set of buffers. Although the
+     * API only allows one non-blocking write at a time, due to buffering and
+     * the possible need to write HTTP headers, there may be more than one write
+     * to the OutputBuffer.
+     */
+    protected volatile LinkedBlockingDeque<ByteBufferHolder> bufferedWrites =
+            null;
+
+    /**
+     * The max size of the buffered write buffer
+     */
+    protected int bufferedWriteSize = 64*1024; //64k default write buffer
 
 
     // -------------------------------------------------------------- Variables
@@ -181,6 +198,16 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
      */
     public int getSocketBuffer() {
         return socketBuffer;
+    }
+
+
+    public void setBufferedWriteSize(int bufferedWriteSize) {
+        this.bufferedWriteSize = bufferedWriteSize;
+    }
+
+
+    public int getBufferedWriteSize() {
+        return bufferedWriteSize;
     }
 
 
@@ -577,7 +604,6 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     //------------------------------------------------------ Non-blocking writes
 
     protected abstract boolean hasDataToWrite();
-    protected abstract void setBlocking(boolean blocking);
 
     /**
      * Writes any remaining buffered data.
@@ -591,6 +617,17 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
 
     /**
+     * Configure the blocking behaviour of the OutputBuffer.
+     */
+    public final void setBlocking(boolean blocking) {
+        if (blocking)
+            bufferedWrites = null;
+        else
+            bufferedWrites = new LinkedBlockingDeque<>();
+    }
+
+
+    /**
      * Is standard Servlet blocking IO being used for output?
      */
     protected final boolean isBlocking() {
@@ -600,5 +637,49 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
     protected final boolean isReady() {
         return !hasDataToWrite();
+    }
+
+
+    protected static class ByteBufferHolder {
+        private final ByteBuffer buf;
+        private final AtomicBoolean flipped;
+        public ByteBufferHolder(ByteBuffer buf, boolean flipped) {
+           this.buf = buf;
+           this.flipped = new AtomicBoolean(flipped);
+        }
+        public ByteBuffer getBuf() {
+            return buf;
+        }
+        public boolean isFlipped() {
+            return flipped.get();
+        }
+
+        public boolean flip() {
+            if (flipped.compareAndSet(false, true)) {
+                buf.flip();
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public boolean hasData() {
+            if (flipped.get()) {
+                return buf.remaining()>0;
+            } else {
+                return buf.position()>0;
+            }
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder(super.toString());
+            builder.append("[flipped=");
+            builder.append(isFlipped()?"true, remaining=" : "false, position=");
+            builder.append(isFlipped()? buf.remaining(): buf.position());
+            builder.append("]");
+            return builder.toString();
+        }
+
     }
 }

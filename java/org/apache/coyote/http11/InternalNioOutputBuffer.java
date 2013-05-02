@@ -22,8 +22,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
@@ -83,59 +81,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      * Track if the byte buffer is flipped
      */
     protected volatile boolean flipped = false;
-
-    /**
-     * For "non-blocking" writes use an external buffer.
-     */
-    protected volatile LinkedBlockingDeque<ByteBufferHolder> bufferedWrites = null;
-
-    /**
-     * The max size of the buffered write buffer
-     */
-    protected int bufferedWriteSize = 64*1024; //64k default write buffer
-
-    protected static class ByteBufferHolder {
-        private final ByteBuffer buf;
-        private final AtomicBoolean flipped;
-        public ByteBufferHolder(ByteBuffer buf, boolean flipped) {
-           this.buf = buf;
-           this.flipped = new AtomicBoolean(flipped);
-        }
-        public ByteBuffer getBuf() {
-            return buf;
-        }
-        public boolean isFlipped() {
-            return flipped.get();
-        }
-
-        public boolean flip() {
-            if (flipped.compareAndSet(false, true)) {
-                buf.flip();
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        public boolean hasData() {
-            if (flipped.get()) {
-                return buf.remaining()>0;
-            } else {
-                return buf.position()>0;
-            }
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder builder = new StringBuilder(super.toString());
-            builder.append("[flipped=");
-            builder.append(isFlipped()?"true, remaining=" : "false, position=");
-            builder.append(isFlipped()? buf.remaining(): buf.position());
-            builder.append("]");
-            return builder.toString();
-        }
-
-    }
 
     // --------------------------------------------------------- Public Methods
 
@@ -347,18 +292,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     //-------------------------------------------------- Non-blocking IO methods
 
-    @Override
-    public void setBlocking(boolean blocking) {
-        if (blocking)
-            bufferedWrites = null;
-        else
-            bufferedWrites = new LinkedBlockingDeque<>();
-    }
-
-    public void setBufferedWriteSize(int bufferedWriteSize) {
-        this.bufferedWriteSize = bufferedWriteSize;
-    }
-
     private boolean hasBufferedData() {
         boolean result = false;
         if (bufferedWrites!=null) {
@@ -373,10 +306,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     @Override
     public boolean hasDataToWrite() {
         return hasMoreDataToFlush() || hasBufferedData();
-    }
-
-    public int getBufferedWriteSize() {
-        return bufferedWriteSize;
     }
 
 
