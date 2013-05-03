@@ -104,13 +104,6 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     }
 
 
-    @Override
-    public boolean supportsNonBlocking() {
-        //TODO SERVLET 3.1
-        return false;
-    }
-
-
     /**
      * Read the request line. This function is meant to be used during the
      * HTTP request header parsing. Do NOT attempt to read the request body
@@ -631,8 +624,8 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
     @Override
     protected int nbRead() throws IOException {
-        // TODO Auto-generated method stub
-        return 0;
+        // TODO
+        throw new UnsupportedOperationException("APR non-blocking read");
     }
 
 
