@@ -297,8 +297,9 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
      */
     public void reset() {
 
-        if (committed)
-            throw new IllegalStateException(/*FIXME:Put an error message*/);
+        if (committed) {
+            throw new IllegalStateException(sm.getString("iob.illegalreset"));
+        }
 
         // Recycle Request object
         response.recycle();
