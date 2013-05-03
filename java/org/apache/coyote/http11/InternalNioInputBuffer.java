@@ -159,12 +159,6 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
     // --------------------------------------------------------- Public Methods
 
     @Override
-    public boolean supportsNonBlocking() {
-        return true;
-    }
-
-
-    @Override
     public int available() {
 
         int available = super.available();

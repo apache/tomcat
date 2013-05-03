@@ -162,11 +162,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
     protected int lastActiveFilter;
 
 
-    // ------------------------------------------------------------- TODO SERVLET 3.1 IN PROGRESS
-    public abstract boolean supportsNonBlocking();
-
     // ------------------------------------------------------------- Properties
-
 
     /**
      * Add an input filter to the filter library.
