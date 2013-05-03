@@ -23,6 +23,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProcessor;
@@ -1540,6 +1541,46 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     @Override
     public SocketState asyncDispatch(SocketStatus status) {
 
+        if (status == SocketStatus.OPEN_WRITE) {
+            try {
+                asyncStateMachine.asyncOperation();
+                try {
+                    if (outputBuffer.hasDataToWrite()) {
+                        //System.out.println("Attempting data flush!!");
+                        outputBuffer.flushBuffer(false);
+                    }
+                    //return if we have more data to write
+                    if (registerForWrite()) {
+                        return SocketState.LONG;
+                    }
+                } catch (IOException x) {
+                    if (getLog().isDebugEnabled()) {
+                        getLog().debug("Unable to write async data.",x);
+                    }
+                    status = SocketStatus.ASYNC_WRITE_ERROR;
+                    request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
+                }
+            } catch (IllegalStateException x) {
+                registerForEvent(false, true);
+            }
+        } else if (status == SocketStatus.OPEN_READ) {
+            try {
+                try {
+                    if (inputBuffer.nbRead()>0) {
+                        asyncStateMachine.asyncOperation();
+                    }
+                } catch (IOException x) {
+                    if (getLog().isDebugEnabled()) {
+                        getLog().debug("Unable to read async data.",x);
+                    }
+                    status = SocketStatus.ASYNC_READ_ERROR;
+                    request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
+                }
+            } catch (IllegalStateException x) {
+                registerForEvent(false, true);
+            }
+        }
+
         RequestInfo rp = request.getRequestProcessor();
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
@@ -1564,6 +1605,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         if (error) {
             return SocketState.CLOSED;
         } else if (isAsync()) {
+            registerForWrite();
             return SocketState.LONG;
         } else {
             if (!keepAlive) {
