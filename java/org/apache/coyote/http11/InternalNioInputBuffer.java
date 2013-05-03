@@ -189,15 +189,11 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
         return available;
     }
 
-    /**
-     * Issues a non blocking read
-     * @return int - nr of bytes read
-     * @throws IOException
-     */
+
+    @Override
     public int nbRead() throws IOException {
         return readSocket(true,false);
     }
-
 
 
     /**

@@ -238,9 +238,14 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
     protected abstract void init(SocketWrapper<S> socketWrapper,
             AbstractEndpoint endpoint) throws IOException;
 
+    /**
+     * Issues a non blocking read.
+     * @return int  Number of bytes read
+     */
+    protected abstract int nbRead() throws IOException;
+
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Recycle the input buffer. This should be called when closing the

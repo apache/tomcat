@@ -79,11 +79,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
 
     // ----------------------------------------------------- Instance Variables
-    /**
-     * Input.
-     */
-    protected final InternalNioInputBuffer inputBuffer;
-
 
     /**
      * Sendfile data.
@@ -283,7 +278,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         // open
         openSocket = true;
         // Check to see if we have read any of the request line yet
-        if (inputBuffer.getParsingRequestLinePhase() < 2) {
+        if (((InternalNioInputBuffer)
+                inputBuffer).getParsingRequestLinePhase() < 2) {
             if (socket.getLastAccess() > -1 || keptAlive) {
                 // Haven't read the request line and have previously processed a
                 // request. Must be keep-alive. Make sure poller uses keepAlive.

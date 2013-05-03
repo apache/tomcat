@@ -65,6 +65,12 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
+     * Input.
+     */
+    protected AbstractInputBuffer<S> inputBuffer ;
+
+
+    /**
      * Output.
      */
     protected AbstractOutputBuffer<S> outputBuffer;
