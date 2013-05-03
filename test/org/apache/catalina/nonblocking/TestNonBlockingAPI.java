@@ -45,7 +45,6 @@ import org.apache.catalina.startup.BytesStreamer;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.ByteChunk.ByteOutputChannel;
 
@@ -53,20 +52,23 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     public static final long bytesToDownload = 1024 * 1024 * 5;
 
-    @Override
-    protected String getProtocol() {
-        return Http11NioProtocol.class.getName();
-    }
-
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
 
     @Test
     public void testNonBlockingRead() throws Exception {
-        // Configure a context with digest auth and a single protected resource
         Tomcat tomcat = getTomcatInstance();
+
+        // TODO Faking non-blocking reads is not yet implemented for BIO.
+        if (tomcat.getConnector().getProtocolHandlerClassName().equals(
+                "org.apache.coyote.http11.Http11Protocol")) {
+            return;
+        }
+
+        // TODO Non-blocking reads are not yet implemented for APR.
+        if (tomcat.getConnector().getProtocolHandlerClassName().equals(
+                "org.apache.coyote.http11.Http11AprProtocol")) {
+            return;
+        }
+
         // Must have a real docBase - just use temp
         StandardContext ctx = (StandardContext) tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
@@ -83,10 +85,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }
 
+
     @Test
     public void testNonBlockingWrite() throws Exception {
-        String bind = "localhost";
-        // Configure a context with digest auth and a single protected resource
         Tomcat tomcat = getTomcatInstance();
         // Must have a real docBase - just use temp
         StandardContext ctx = (StandardContext) tomcat.addContext("", System.getProperty("java.io.tmpdir"));
@@ -96,8 +97,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMapping("/", servletName);
         tomcat.getConnector().setProperty("socket.txBufSize", "1024");
-        tomcat.getConnector().setProperty("address", bind);
-        System.out.println(tomcat.getConnector().getProperty("address"));
         tomcat.start();
 
         Map<String, List<String>> resHeaders = new HashMap<>();
@@ -130,7 +129,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 }
             }
         });
-        int rc = postUrl(true, new DataWriter(0), "http://" + bind + ":" + getPort() + "/", slowReader, resHeaders,
+        int rc = postUrl(true, new DataWriter(0), "http://localhost:" + getPort() + "/", slowReader, resHeaders,
                 null);
         slowReader.flushBuffer();
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
@@ -139,9 +138,23 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingWriteError() throws Exception {
-        String bind = "localhost";
-        // Configure a context with digest auth and a single protected resource
         Tomcat tomcat = getTomcatInstance();
+
+        // Not applicable to BIO. This test does not start a new thread for the
+        // write so with BIO all the writes happen in the service() mehtod just
+        // like blocking IO.
+        if (tomcat.getConnector().getProtocolHandlerClassName().equals(
+                "org.apache.coyote.http11.Http11Protocol")) {
+            return;
+        }
+
+        // TODO Non-blocking reads are not yet implemented for APR so this test
+        // will not pass.
+        if (tomcat.getConnector().getProtocolHandlerClassName().equals(
+                "org.apache.coyote.http11.Http11AprProtocol")) {
+            return;
+        }
+
         // Must have a real docBase - just use temp
         StandardContext ctx = (StandardContext) tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
@@ -150,8 +163,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMapping("/", servletName);
         tomcat.getConnector().setProperty("socket.txBufSize", "1024");
-        tomcat.getConnector().setProperty("address", bind);
-        System.out.println(tomcat.getConnector().getProperty("address"));
         tomcat.start();
 
         Map<String, List<String>> resHeaders = new HashMap<>();
@@ -184,7 +195,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 }
             }
         });
-        int rc = postUrlWithDisconnect(true, new DataWriter(0), "http://" + bind + ":" + getPort() + "/", resHeaders,
+        int rc = postUrlWithDisconnect(true, new DataWriter(0), "http://localhost:" + getPort() + "/", resHeaders,
                 null);
         slowReader.flushBuffer();
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
@@ -194,9 +205,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         } catch (Exception e) {
         }
         Assert.assertTrue("Error listener should have been invoked.", servlet.wlistener.onErrorInvoked);
-
     }
-
 
 
     public static class DataWriter implements BytesStreamer {
@@ -288,10 +297,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             while (in.isReady()) {
                 listener.onDataAvailable();
             }
-            // step 3 - notify that we wish to read
-            // ServletOutputStream out = resp.getOutputStream();
-            // out.setWriteListener(new TestWriteListener(actx));
-
         }
 
 
