@@ -74,13 +74,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
     // ----------------------------------------------------- Instance Variables
 
-
-    /**
-     * Input.
-     */
-    protected final InternalAprInputBuffer inputBuffer;
-
-
     /**
      * Sendfile data.
      */

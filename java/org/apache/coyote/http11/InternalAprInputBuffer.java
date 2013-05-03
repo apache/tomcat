@@ -629,8 +629,14 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     }
 
 
-    // ------------------------------------- InputStreamInputBuffer Inner Class
+    @Override
+    protected int nbRead() throws IOException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
+
+    // ------------------------------------- InputStreamInputBuffer Inner Class
 
     /**
      * This class is an input buffer which will read its data from an input

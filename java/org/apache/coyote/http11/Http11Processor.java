@@ -66,13 +66,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
     // ----------------------------------------------------- Instance Variables
 
-
-    /**
-     * Input.
-     */
-    protected final InternalInputBuffer inputBuffer ;
-
-
     /**
      * SSL information.
      */
@@ -164,7 +157,8 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                 }
             }
             socket.getSocket().setSoTimeout(firstReadTimeout);
-            if (!inputBuffer.fill()) {
+            // Blocking IO so fill() always blocks
+            if (!inputBuffer.fill(true)) {
                 throw new EOFException(sm.getString("iib.eof.error"));
             }
             // Once the first byte has been read, the standard timeout should be
