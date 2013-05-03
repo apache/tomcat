@@ -22,7 +22,6 @@ import java.net.InetAddress;
 import java.nio.channels.SelectionKey;
 
 import javax.net.ssl.SSLEngine;
-import javax.servlet.RequestDispatcher;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.RequestInfo;
@@ -157,57 +156,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         } else {
             return SocketState.LONG;
         }
-    }
-
-
-
-
-    @Override
-    public SocketState asyncDispatch(SocketStatus status) {
-
-
-        if (status == SocketStatus.OPEN_WRITE) {
-            try {
-                asyncStateMachine.asyncOperation();
-                try {
-                    if (outputBuffer.hasDataToWrite()) {
-                        //System.out.println("Attempting data flush!!");
-                        outputBuffer.flushBuffer(false);
-                    }
-                    //return if we have more data to write
-                    if (registerForWrite()) {
-                        return SocketState.LONG;
-                    }
-                } catch (IOException x) {
-                    if (log.isDebugEnabled()) log.debug("Unable to write async data.",x);
-                    status = SocketStatus.ASYNC_WRITE_ERROR;
-                    request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
-                }
-            } catch (IllegalStateException x) {
-                registerForEvent(false, true);
-            }
-        } else if (status == SocketStatus.OPEN_READ) {
-            try {
-                try {
-                    if (inputBuffer.nbRead()>0) {
-                        asyncStateMachine.asyncOperation();
-                    }
-                } catch (IOException x) {
-                    if (log.isDebugEnabled()) log.debug("Unable to read async data.",x);
-                    status = SocketStatus.ASYNC_READ_ERROR;
-                    request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
-                }
-            } catch (IllegalStateException x) {
-                registerForEvent(false, true);
-            }
-        }
-
-        SocketState state = super.asyncDispatch(status);
-        if (state == SocketState.LONG) {
-            registerForWrite();
-        }
-
-        return state;
     }
 
 
