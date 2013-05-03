@@ -57,12 +57,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     public void testNonBlockingRead() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // TODO Faking non-blocking reads is not yet implemented for BIO.
-        if (tomcat.getConnector().getProtocolHandlerClassName().equals(
-                "org.apache.coyote.http11.Http11Protocol")) {
-            return;
-        }
-
         // TODO Non-blocking reads are not yet implemented for APR.
         if (tomcat.getConnector().getProtocolHandlerClassName().equals(
                 "org.apache.coyote.http11.Http11AprProtocol")) {
@@ -294,12 +288,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             listener = new TestReadListener(actx);
             in.setReadListener(listener);
 
-            while (in.isReady()) {
-                listener.onDataAvailable();
-            }
+            listener.onDataAvailable();
         }
-
-
     }
 
     @WebServlet(asyncSupported = true)
@@ -365,12 +355,16 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 ServletInputStream in = ctx.getRequest().getInputStream();
                 String s = "";
                 byte[] b = new byte[8192];
-                while (in.isReady()) {
-                    int read = in.read(b);
+                int read = 0;
+                do {
+                    read = in.read(b);
+                    if (read == -1) {
+                        break;
+                    }
                     s += new String(b, 0, read);
-                }
+                } while (in.isReady());
                 System.out.println(s);
-                if ("FINISHED".equals(s)) {
+                if (s.endsWith("FINISHED")) {
                     ctx.complete();
                     ctx.getResponse().getWriter().print("OK");
                 } else {

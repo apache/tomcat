@@ -472,9 +472,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     log.warn(sm.getString("http11processor.socket.ssl"), e);
                 }
             }
-
-        } else if (actionCode == ActionCode.AVAILABLE) {
-            request.setAvailable(inputBuffer.available());
         } else if (actionCode == ActionCode.COMET_BEGIN) {
             comet = true;
         } else if (actionCode == ActionCode.COMET_END) {
