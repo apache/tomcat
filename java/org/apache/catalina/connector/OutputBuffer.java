@@ -650,7 +650,8 @@ public class OutputBuffer extends Writer
         if (coyoteResponse.getWriteListener() == null) {
             throw new IllegalStateException("not in non blocking mode.");
         }
-        AtomicBoolean isReady = new AtomicBoolean(true);
+        // Assume write is not possible
+        AtomicBoolean isReady = new AtomicBoolean(false);
         coyoteResponse.action(ActionCode.NB_WRITE_INTEREST, isReady);
         return isReady.get();
     }
