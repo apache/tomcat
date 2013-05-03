@@ -813,6 +813,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         } else if (actionCode == ActionCode.NB_WRITE_INTEREST) {
             AtomicBoolean isReady = (AtomicBoolean)param;
             isReady.set(getOutputBuffer().isReady());
+        } else if (actionCode == ActionCode.NB_READ_INTEREST) {
+            registerForEvent(true, false);
         } else if (actionCode == ActionCode.UPGRADE) {
             httpUpgradeHandler = (HttpUpgradeHandler) param;
             // Stop further HTTP output
