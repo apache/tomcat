@@ -172,13 +172,14 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
         }
         try {
             available = nbRead();
-        }catch (IOException x) {
-            //TODO SERVLET 3.1 -
-            //we should not swallow this exception
-
+        }catch (IOException ioe) {
             if (log.isDebugEnabled()) {
-                log.debug("Unable to issue non blocking read.", x);
+                log.debug(sm.getString("iib.available.readFail"), ioe);
             }
+            // Not ideal. This will indicate that data is available which should
+            // trigger a read which in turn will trigger another IOException and
+            // that one can be thrown.
+            available = 1;
         }
         return available;
     }
