@@ -166,10 +166,14 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
     /**
      * Add an input filter to the filter library.
+     *
+     * @throws NullPointerException if the supplied filter is null
      */
     public void addFilter(InputFilter filter) {
 
-        // FIXME: Check for null ?
+        if (filter == null) {
+            throw new NullPointerException(sm.getString("iib.filter.npe"));
+        }
 
         InputFilter[] newFilterLibrary =
             new InputFilter[filterLibrary.length + 1];
@@ -180,7 +184,6 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
         filterLibrary = newFilterLibrary;
 
         activeFilters = new InputFilter[filterLibrary.length];
-
     }
 
 
