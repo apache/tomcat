@@ -525,17 +525,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             }
         } else if (actionCode == ActionCode.SET_WRITE_LISTENER) {
             outputBuffer.setBlocking(false);
-        } else if (actionCode == ActionCode.NB_READ_INTEREST) {
-            if (socket==null || socket.getSocket().getAttachment(false)==null) {
-                return;
-            }
-            RequestInfo rp = request.getRequestProcessor();
-            if (rp.getStage() == org.apache.coyote.Constants.STAGE_SERVICE) {
-                NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
-                attach.interestOps(attach.interestOps() | SelectionKey.OP_READ);
-            } else {
-                throw new IllegalStateException("Calling isReady asynchronously is illegal.");
-            }
         }
     }
 
