@@ -71,6 +71,17 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
 
     /**
+     * Data is always available for blocking IO (if you wait long enough) so
+     * return a value of 1. Note that the actual value is never used it is only
+     * tested for == 0 or > 0.
+     */
+    @Override
+    public int available() {
+        return 1;
+    }
+
+
+    /**
      * Read the request line. This function is meant to be used during the
      * HTTP request header parsing. Do NOT attempt to read the request body
      * using it.
@@ -543,8 +554,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
     @Override
     protected int nbRead() throws IOException {
-        // TODO Auto-generated method stub
-        return 0;
+        throw new IllegalStateException("This method is unused for BIO");
     }
 
 
