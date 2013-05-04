@@ -85,11 +85,29 @@ public class WsFilter implements Filter {
         }
 
         // HTTP request with an upgrade header for WebSocket present
-        // Validate the rest of the headers and reject the request if that
-        // validation fails
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
 
+        // Check to see if this WebSocket implementation has a matching mapping
+        WsServerContainer sc = WsServerContainer.getServerContainer();
+        String path;
+        String pathInfo = req.getPathInfo();
+        if (pathInfo == null) {
+            path = req.getServletPath();
+        } else {
+            path = req.getServletPath() + pathInfo;
+        }
+        WsMappingResult mappingResult = sc.findMapping(path);
+
+        if (mappingResult == null) {
+            // No endpoint registered for the requested path. Let the
+            // application handle it (it might redirect or forward for example)
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // Validate the rest of the headers and reject the request if that
+        // validation fails
         String key;
         String subProtocol = null;
         List<Extension> extensions = Collections.emptyList();
@@ -111,24 +129,6 @@ public class WsFilter implements Filter {
             return;
         }
 
-        // Need an Endpoint instance to progress this further
-        WsServerContainer sc = WsServerContainer.getServerContainer();
-        String path;
-        String pathInfo = req.getPathInfo();
-        if (pathInfo == null) {
-            path = req.getServletPath();
-        } else {
-            path = req.getServletPath() + pathInfo;
-        }
-        WsMappingResult mappingResult = sc.findMapping(path);
-
-        if (mappingResult == null) {
-            // No endpoint registered for the requested path. Let the
-            // application handle it (it might redirect or forward for example)
-            chain.doFilter(request, response);
-            return;
-        }
-
         ServerEndpointConfig sec = mappingResult.getConfig();
 
         // Origin check
@@ -145,6 +145,7 @@ public class WsFilter implements Filter {
                     getNegotiatedSubprotocol(
                             sec.getSubprotocols(), subProtocols);
         }
+
         // Extensions
         // Currently no extensions are supported by this implementation
 
@@ -199,7 +200,6 @@ public class WsFilter implements Filter {
                 req.upgrade(WsHttpUpgradeHandler.class);
         wsHandler.preInit(ep, sec, sc, wsRequest, subProtocol,
                 mappingResult.getPathParams(), req.isSecure());
-
     }
 
 
