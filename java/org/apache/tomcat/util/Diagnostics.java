@@ -27,12 +27,12 @@ package org.apache.tomcat.util;
 
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.CompilationMXBean;
-import java.lang.management.GarbageCollectorMXBean;
+//import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.LockInfo;
 import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.MemoryManagerMXBean;
-import java.lang.management.MemoryPoolMXBean;
+//import java.lang.management.MemoryMXBean;
+//import java.lang.management.MemoryManagerMXBean;
+//import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MonitorInfo;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
@@ -40,7 +40,7 @@ import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
+//import java.util.List;
 import java.util.Map;
 import java.util.logging.LogManager;
 import java.util.logging.LoggingMXBean;
@@ -76,6 +76,8 @@ public class Diagnostics {
     // dynamically in the MBeanServer.
     private static final LoggingMXBean loggingMXBean =
         LogManager.getLoggingMXBean();
+    // TODO - Use these
+    /*
     private static final MemoryMXBean memoryMXBeans =
         ManagementFactory.getMemoryMXBean();
     private static final List<GarbageCollectorMXBean> garbageCollectorMXBean =
@@ -84,6 +86,7 @@ public class Diagnostics {
         ManagementFactory.getMemoryManagerMXBeans();
     private static final List<MemoryPoolMXBean> memoryPoolMXBeans =
         ManagementFactory.getMemoryPoolMXBeans();
+    */
 
     /**
      * Check whether thread contention monitoring is enabled.
