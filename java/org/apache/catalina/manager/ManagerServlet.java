@@ -372,7 +372,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         } else if (command.equals("/threaddump")) {
             threadDump(writer, smClient);
         } else if (command.equals("/sslConnectorCiphers")) {
-            sslConnectorCiphers(writer);
+            sslConnectorCiphers(writer, smClient);
         } else {
             writer.println(smClient.getString("managerServlet.unknownCommand",
                     command));
@@ -557,8 +557,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         writer.print(Diagnostics.getThreadDump());
     }
 
-    protected void sslConnectorCiphers(PrintWriter writer) {
-        writer.println("OK - Connector / SSL Cipher information");
+    protected void sslConnectorCiphers(PrintWriter writer,
+            StringManager smClient) {
+        writer.println(smClient.getString(
+                "managerServlet.sslConnectorCiphers"));
         Map<String,Set<String>> connectorCiphers = getConnectorCiphers();
         for (Map.Entry<String,Set<String>> entry : connectorCiphers.entrySet()) {
             writer.println(entry.getKey());
