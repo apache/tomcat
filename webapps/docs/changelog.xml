@@ -83,6 +83,13 @@
         to) that an error has occurred and that the connection is being closed.
         (markt)
       </fix>
+      <fix>
+        <bug>54906</bug>: Better error message if a
+        <code>ConcurrentModificationException</code> occurs while checking for
+        memory leaks when a web application stops. Also ensure that the
+        exception does not cause remaining checks to be skipped. Based on a
+        patch by NateC.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
