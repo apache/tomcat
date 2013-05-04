@@ -368,9 +368,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         } else if (command.equals("/findleaks")) {
             findleaks(statusLine, writer, smClient);
         } else if (command.equals("/vminfo")) {
-            vmInfo(writer, smClient);
+            vmInfo(writer, request.getLocales());
         } else if (command.equals("/threaddump")) {
-            threadDump(writer, smClient);
+            threadDump(writer, request.getLocales());
         } else if (command.equals("/sslConnectorCiphers")) {
             sslConnectorCiphers(writer, smClient);
         } else {
@@ -543,8 +543,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      *
      * @param writer
      */
-    protected void vmInfo(PrintWriter writer, StringManager smClient) {
-        writer.print(Diagnostics.getVMInfo());
+    protected void vmInfo(PrintWriter writer,
+            Enumeration<Locale> requestedLocales) {
+        writer.print(Diagnostics.getVMInfo(requestedLocales));
     }
 
     /**
@@ -553,8 +554,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      *
      * @param writer
      */
-    protected void threadDump(PrintWriter writer, StringManager smClient) {
-        writer.print(Diagnostics.getThreadDump());
+    protected void threadDump(PrintWriter writer,
+            Enumeration<Locale> requestedLocales) {
+        writer.print(Diagnostics.getThreadDump(requestedLocales));
     }
 
     protected void sslConnectorCiphers(PrintWriter writer,
