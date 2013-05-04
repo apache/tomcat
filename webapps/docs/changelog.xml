@@ -90,6 +90,10 @@
         exception does not cause remaining checks to be skipped. Based on a
         patch by NateC.
       </fix>
+      <fix>
+        Allow 204 responses (no content) to include entity headers as required
+        by RFC2616. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
