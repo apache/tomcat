@@ -41,6 +41,7 @@ import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -2312,11 +2313,17 @@ public class WebappClassLoader
 
         if (o instanceof Collection<?>) {
             Iterator<?> iter = ((Collection<?>) o).iterator();
-            while (iter.hasNext()) {
-                Object entry = iter.next();
-                if (loadedByThisOrChild(entry)) {
-                    return true;
+            try {
+                while (iter.hasNext()) {
+                    Object entry = iter.next();
+                    if (loadedByThisOrChild(entry)) {
+                        return true;
+                    }
                 }
+            } catch (ConcurrentModificationException e) {
+                log.warn(sm.getString(
+                        "webappClassLoader", clazz.getName(), getContextName()),
+                        e);
             }
         }
         return false;
