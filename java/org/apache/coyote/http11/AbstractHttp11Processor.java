@@ -1378,7 +1378,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
         MimeHeaders headers = response.getMimeHeaders();
-        if (!entityBody) {
+        // A SC_NO_CONTENT (204) response may include entity headers
+        if (!entityBody && statusCode != 204) {
             response.setContentLength(-1);
         } else {
             String contentType = response.getContentType();
