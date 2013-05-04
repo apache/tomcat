@@ -27,21 +27,6 @@
     </description>
     <display-name>Servlet and JSP Examples</display-name>
 
-    <!--
-    If you are running the Autobahn WebSocket testsuite - or any other testsuite
-    that uses large messages - uncomment the following to improve performance
-    -->
-    <!--
-    <context-param>
-        <param-name>org.apache.tomcat.websocket.binaryBufferSize</param-name>
-        <param-value>2097152</param-value>
-    </context-param>
-    <context-param>
-        <param-name>org.apache.tomcat.websocket.textBufferSize</param-name>
-        <param-value>2097152</param-value>
-    </context-param>
-    -->
-
     <!-- Define example filters -->
     <filter>
         <filter-name>Timing filter</filter-name>
