@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProcessor;
@@ -1362,7 +1363,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
         MimeHeaders headers = response.getMimeHeaders();
-        if (!entityBody) {
+        // A SC_NO_CONTENT response may include entity headers
+        if (!entityBody && statusCode != HttpServletResponse.SC_NO_CONTENT) {
             response.setContentLength(-1);
         } else {
             String contentType = response.getContentType();
