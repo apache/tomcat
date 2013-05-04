@@ -16,7 +16,6 @@
  */
 
 // XXX TODO: Source code line length
-// XXX TODO: StringManager
 // XXX TODO: Sort logger names and system property keys in getVMInfo()
 // XXX TODO: Add memory and GC MBeans to getVMInfo()
 // XXX Optional: Wire setters to the manager:
@@ -40,12 +39,19 @@ import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.Locale;
 //import java.util.List;
 import java.util.Map;
 import java.util.logging.LogManager;
 import java.util.logging.LoggingMXBean;
 
+import org.apache.tomcat.util.res.StringManager;
+
 public class Diagnostics {
+
+    private static final String PACKAGE = "org.apache.tomcat.util";
+    private static final StringManager sm = StringManager.getManager(PACKAGE);
 
     private static final String INDENT1 = "  ";
     private static final String INDENT2 = "\t";
@@ -288,11 +294,32 @@ public class Diagnostics {
         return "";
     }
 
+    private static StringManager getStringManager(
+            Enumeration<Locale> requestedLocales) {
+        while (requestedLocales.hasMoreElements()) {
+            Locale locale = requestedLocales.nextElement();
+            StringManager result = StringManager.getManager(PACKAGE, locale);
+            if (result.getLocale().equals(locale)) {
+                return result;
+            }
+        }
+        // Return the default
+        return sm;
+    }
+
+    public static String getThreadDump() {
+        return getThreadDump(sm);
+    }
+
+    public static String getThreadDump(Enumeration<Locale> requestedLocales) {
+        return getThreadDump(getStringManager(requestedLocales));
+    }
+
     /**
      * Retrieve a formatted JVM thread dump.
      * @return the thread dump
      */
-    public static String getThreadDump() {
+    public static String getThreadDump(StringManager requestedSm) {
         StringBuilder sb = new StringBuilder();
 
         synchronized(timeformat) {
@@ -300,7 +327,8 @@ public class Diagnostics {
         }
         sb.append(CRLF);
 
-        sb.append("Full thread dump ");
+        sb.append(requestedSm.getString("diagnostics.threadDumpTitle"));
+        sb.append(" ");
         sb.append(runtimeMXBean.getVmName());
         sb.append(" (");
         sb.append(runtimeMXBean.getVmVersion());
@@ -318,11 +346,19 @@ public class Diagnostics {
         return sb.toString();
     }
 
+    public static String getVMInfo() {
+        return getVMInfo(sm);
+    }
+
+    public static String getVMInfo(Enumeration<Locale> requestedLocales) {
+        return getVMInfo(getStringManager(requestedLocales));
+    }
+
     /**
      * Retrieve a formatted JVM thread dump.
      * @return the thread dump
      */
-    public static String getVMInfo() {
+    public static String getVMInfo(StringManager requestedSm) {
         StringBuilder sb = new StringBuilder();
 
         synchronized(timeformat) {
@@ -330,7 +366,8 @@ public class Diagnostics {
         }
         sb.append(CRLF);
 
-        sb.append("Runtime information:" + CRLF);
+        sb.append(requestedSm.getString("diagnostics.vmInfoRuntime"));
+        sb.append(":" + CRLF);
         sb.append(INDENT1 + "vmName: " + runtimeMXBean.getVmName() + CRLF);
         sb.append(INDENT1 + "vmVersion: " + runtimeMXBean.getVmVersion() + CRLF);
         sb.append(INDENT1 + "vmVendor: " + runtimeMXBean.getVmVendor() + CRLF);
@@ -346,7 +383,8 @@ public class Diagnostics {
                   runtimeMXBean.isBootClassPathSupported() + CRLF);
         sb.append(CRLF);
 
-        sb.append("OS information:" + CRLF);
+        sb.append(requestedSm.getString("diagnostics.vmInfoOs"));
+        sb.append(":" + CRLF);
         sb.append(INDENT1 + "name: " + operatingSystemMXBean.getName() + CRLF);
         sb.append(INDENT1 + "version: " + operatingSystemMXBean.getVersion() + CRLF);
         sb.append(INDENT1 + "architecture: " + operatingSystemMXBean.getArch() + CRLF);
@@ -356,7 +394,8 @@ public class Diagnostics {
                   operatingSystemMXBean.getSystemLoadAverage() + CRLF);
         sb.append(CRLF);
 
-        sb.append("ThreadMXBean capabilities:" + CRLF);
+        sb.append(requestedSm.getString("diagnostics.vmInfoThreadMxBean"));
+        sb.append(":" + CRLF);
         sb.append(INDENT1 + "isCurrentThreadCpuTimeSupported: " +
                   threadMXBean.isCurrentThreadCpuTimeSupported() + CRLF);
         sb.append(INDENT1 + "isThreadCpuTimeSupported: " +
@@ -373,7 +412,8 @@ public class Diagnostics {
                   threadMXBean.isThreadContentionMonitoringEnabled() + CRLF);
         sb.append(CRLF);
 
-        sb.append("Thread counts:" + CRLF);
+        sb.append(requestedSm.getString("diagnostics.vmInfoThreadCounts"));
+        sb.append(":" + CRLF);
         sb.append(INDENT1 + "daemon: " + threadMXBean.getDaemonThreadCount() + CRLF);
         sb.append(INDENT1 + "total: " + threadMXBean.getThreadCount() + CRLF);
         sb.append(INDENT1 + "peak: " + threadMXBean.getPeakThreadCount() + CRLF);
@@ -381,7 +421,8 @@ public class Diagnostics {
                   threadMXBean.getTotalStartedThreadCount() + CRLF);
         sb.append(CRLF);
 
-        sb.append("Class loading:" + CRLF);
+        sb.append(requestedSm.getString("diagnostics.vmInfoClassLoading"));
+        sb.append(":" + CRLF);
         sb.append(INDENT1 + "loaded: " +
                   classLoadingMXBean.getLoadedClassCount() + CRLF);
         sb.append(INDENT1 + "unloaded: " +
@@ -392,7 +433,8 @@ public class Diagnostics {
                   classLoadingMXBean.isVerbose() + CRLF);
         sb.append(CRLF);
 
-        sb.append("Class compilation:" + CRLF);
+        sb.append(requestedSm.getString("diagnostics.vmInfoClassCompilation"));
+        sb.append(":" + CRLF);
         sb.append(INDENT1 + "name: " + compilationMXBean.getName() + CRLF);
         sb.append(INDENT1 + "totalCompilationTime: " +
                   compilationMXBean.getTotalCompilationTime() + CRLF);
@@ -400,26 +442,30 @@ public class Diagnostics {
                   compilationMXBean.isCompilationTimeMonitoringSupported() + CRLF);
         sb.append(CRLF);
 
-        sb.append("Path information:" + CRLF);
+        sb.append(requestedSm.getString("diagnostics.vmInfoPath"));
+        sb.append(":" + CRLF);
         sb.append(INDENT1 + "bootClassPath: " + runtimeMXBean.getBootClassPath() + CRLF);
         sb.append(INDENT1 + "classPath: " + runtimeMXBean.getClassPath() + CRLF);
         sb.append(INDENT1 + "libraryPath: " + runtimeMXBean.getLibraryPath() + CRLF);
         sb.append(CRLF);
 
-        sb.append("Startup arguments:" + CRLF);
+        sb.append(requestedSm.getString("diagnostics.vmInfoStartup"));
+        sb.append(":" + CRLF);
         for (String arg: runtimeMXBean.getInputArguments()) {
             sb.append(INDENT1 + arg + CRLF);
         }
         sb.append(CRLF);
 
-        sb.append("System properties:" + CRLF);
+        sb.append(requestedSm.getString("diagnostics.vmInfoSystem"));
+        sb.append(":" + CRLF);
         Map<String,String> props = runtimeMXBean.getSystemProperties();
         for (String prop: props.keySet()) {
             sb.append(INDENT1 + prop + ": " + props.get(prop) + CRLF);
         }
         sb.append(CRLF);
 
-        sb.append("Logger information:" + CRLF);
+        sb.append(requestedSm.getString("diagnostics.vmInfoLogger"));
+        sb.append(":" + CRLF);
         for (String logger: loggingMXBean.getLoggerNames()) {
             sb.append(INDENT1 + logger +
                       ": level=" + loggingMXBean.getLoggerLevel(logger) +
