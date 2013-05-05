@@ -816,7 +816,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             InputFilter savedBody = new SavedRequestInputFilter(body);
             savedBody.setRequest(request);
 
-            @SuppressWarnings("unchecked")
             AbstractInputBuffer<S> internalBuffer = (AbstractInputBuffer<S>)
                 request.getInputBuffer();
             internalBuffer.addActiveFilter(savedBody);
@@ -1378,10 +1377,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
         MimeHeaders headers = response.getMimeHeaders();
-        // A SC_NO_CONTENT (204) response may include entity headers
-        if (!entityBody && statusCode != 204) {
+        if (!entityBody) {
             response.setContentLength(-1);
-        } else {
+        }
+        // A SC_NO_CONTENT response may include entity headers
+        if (entityBody || statusCode == 204) {
             String contentType = response.getContentType();
             if (contentType != null) {
                 headers.setValue("Content-Type").setString(contentType);
