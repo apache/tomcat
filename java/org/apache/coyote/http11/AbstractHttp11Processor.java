@@ -1363,10 +1363,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
         MimeHeaders headers = response.getMimeHeaders();
-        // A SC_NO_CONTENT response may include entity headers
-        if (!entityBody && statusCode != HttpServletResponse.SC_NO_CONTENT) {
+        if (!entityBody) {
             response.setContentLength(-1);
-        } else {
+        }
+        // A SC_NO_CONTENT response may include entity headers
+        if (entityBody || statusCode == HttpServletResponse.SC_NO_CONTENT) {
             String contentType = response.getContentType();
             if (contentType != null) {
                 headers.setValue("Content-Type").setString(contentType);
