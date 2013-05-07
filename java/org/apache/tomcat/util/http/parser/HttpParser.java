@@ -260,16 +260,33 @@ public class HttpParser {
         }
     }
 
+    // Skip any LWS and return the next char
+    private static int skipLws(StringReader input, boolean withReset)
+            throws IOException {
+
+        if (withReset) {
+            input.mark(1);
+        }
+        int c = input.read();
+
+        while (c == 32 || c == 9 || c == 10 || c == 13) {
+            if (withReset) {
+                input.mark(1);
+            }
+            c = input.read();
+        }
+
+        if (withReset) {
+            input.reset();
+        }
+        return c;
+    }
+
     private static SkipConstantResult skipConstant(StringReader input,
             String constant) throws IOException {
         int len = constant.length();
 
-        int c = input.read();
-
-        // Skip lws
-        while (c == 32 || c == 9) {
-            c = input.read();
-        }
+        int c = skipLws(input, false);
 
         for (int i = 0; i < len; i++) {
             if (i == 0 && c == -1) {
@@ -294,12 +311,7 @@ public class HttpParser {
     private static String readToken(StringReader input) throws IOException {
         StringBuilder result = new StringBuilder();
 
-        int c = input.read();
-
-        // Skip lws
-        while (c == 32 || c == 9) {
-            c = input.read();
-        }
+        int c = skipLws(input, false);
 
         while (c != -1 && isToken(c)) {
             result.append((char) c);
@@ -323,12 +335,7 @@ public class HttpParser {
     private static String readQuotedString(StringReader input,
             boolean returnQuoted) throws IOException {
 
-        int c = input.read();
-
-        // Skip lws
-        while (c == 32 || c == 9) {
-            c = input.read();
-        }
+        int c = skipLws(input, false);
 
         if (c != '"') {
             return null;
@@ -364,12 +371,8 @@ public class HttpParser {
     private static String readTokenOrQuotedString(StringReader input,
             boolean returnQuoted) throws IOException {
 
-        // Use mark/reset as skip(-1) fails when reading the last character of
-        // the input
-        input.mark(1);
-        int c = input.read();
-        // Go back so first character is available to be read again
-        input.reset();
+        // Go back so first non-LWS character is available to be read again
+        int c = skipLws(input, true);
 
         if (c == '"') {
             return readQuotedString(input, returnQuoted);
@@ -396,12 +399,7 @@ public class HttpParser {
         StringBuilder result = new StringBuilder();
         boolean quoted = false;
 
-        int c = input.read();
-
-        // Skip lws
-        while (c == 32 || c == 9) {
-            c = input.read();
-        }
+        int c = skipLws(input, false);
 
         if (c == '"') {
             quoted = true;
@@ -453,12 +451,7 @@ public class HttpParser {
         StringBuilder result = new StringBuilder();
         boolean quoted = false;
 
-        int c = input.read();
-
-        // Skip lws
-        while (c == 32 || c == 9) {
-            c = input.read();
-        }
+        int c = skipLws(input, false);
 
         if (c == '"') {
             quoted = true;
