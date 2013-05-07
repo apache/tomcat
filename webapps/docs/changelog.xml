@@ -55,6 +55,17 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.41 (markt)">
+  <subsection name="Cluster">
+    <changelog>
+      <add>
+        Add <code>maxValidTime</code> attribute to prevent the leak of
+        <code>FileMessageFactory</code> in <code>FarmWarDeployer</code>.
+        (kfujino)
+      </add>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.40 (markt)">
   <subsection name="Catalina">
     <changelog>

@@ -83,6 +83,16 @@
         <strong>Note: </strong> if <strong>watchEnabled</strong> is false, this
         attribute will have no effect.
       </attribute>
+      <attribute name="maxValidTime" required="false">
+        The maximum valid time(in seconds) of FileMessageFactory.
+        FileMessageFactory will be removed immediately after receiving the
+        complete WAR file but when failing to receive a FileMessage which was
+        sent dividing, FileMessageFactory will leak without being removed.
+        FileMessageFactory that is leaking will be automatically removed after
+        maxValidTime. If a negative value specified, FileMessageFactory will
+        never be removed. If the attribute is not provided, a default of 300
+        seconds (5 minutes) is used.
+      </attribute>
     </attributes>
 
   </subsection>
