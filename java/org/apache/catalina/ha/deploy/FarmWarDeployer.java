@@ -126,6 +126,11 @@ public class FarmWarDeployer extends ClusterListener
      */
     protected ObjectName oname = null;
 
+    /**
+     * The maximum valid time(in seconds) for FileMessageFactory.
+     */
+    protected int maxValidTime = 5 * 60;
+
     /*--Constructor---------------------------------------------*/
     public FarmWarDeployer() {
     }
@@ -298,6 +303,7 @@ public class FarmWarDeployer extends ClusterListener
         FileMessageFactory factory = fileFactories.get(msg.getFileName());
         if (factory == null) {
             factory = FileMessageFactory.getInstance(writeToFile, true);
+            factory.setMaxValidTime(maxValidTime);
             fileFactories.put(msg.getFileName(), factory);
         }
         return factory;
@@ -560,11 +566,14 @@ public class FarmWarDeployer extends ClusterListener
      */
     @Override
     public void backgroundProcess() {
-        if (started && watchEnabled) {
-            count = (count + 1) % processDeployFrequency;
-            if (count == 0) {
-                watcher.check();
+        if (started) {
+            if (watchEnabled) {
+                count = (count + 1) % processDeployFrequency;
+                if (count == 0) {
+                    watcher.check();
+                }
             }
+            removeInvalidFileFactories();
         }
 
     }
@@ -703,6 +712,14 @@ public class FarmWarDeployer extends ClusterListener
         this.processDeployFrequency = processExpiresFrequency;
     }
 
+    public int getMaxValidTime() {
+        return maxValidTime;
+    }
+
+    public void setMaxValidTime(int maxValidTime) {
+        this.maxValidTime = maxValidTime;
+    }
+
     /**
      * Copy a file to the specified temp directory.
      * @param from copy from temp
@@ -735,6 +752,16 @@ public class FarmWarDeployer extends ClusterListener
             return false;
         }
         return true;
+    }
+
+    protected void removeInvalidFileFactories() {
+        String[] fileNames = fileFactories.keySet().toArray(new String[0]);
+        for (String fileName : fileNames) {
+            FileMessageFactory factory = fileFactories.get(fileName);
+            if (!factory.isValid()) {
+                fileFactories.remove(fileName);
+            }
+        }
     }
 
     private File getAbsolutePath(String path) {
