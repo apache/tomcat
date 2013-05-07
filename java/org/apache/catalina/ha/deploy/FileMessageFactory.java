@@ -121,6 +121,16 @@ public class FileMessageFactory {
     protected boolean isWriting = false;
 
     /**
+     * The time this instance was created. (in milliseconds)
+     */
+    protected long creationTime = 0;
+
+    /**
+     * The maximum valid time(in seconds) from creationTime.
+     */
+    protected int maxValidTime = -1;
+
+    /**
      * Private constructor, either instantiates a factory to read or write. <BR>
      * When openForWrite==true, then a the file, f, will be created and an
      * output stream is opened to write to it. <BR>
@@ -155,7 +165,7 @@ public class FileMessageFactory {
             totalNrOfMessages = (size / READ_SIZE) + 1;
             in = new FileInputStream(f);
         }//end if
-
+        creationTime = System.currentTimeMillis();
     }
 
     /**
@@ -377,6 +387,26 @@ public class FileMessageFactory {
 
     public File getFile() {
         return file;
+    }
+
+    public boolean isValid() {
+        if (maxValidTime > 0) {
+            long timeNow = System.currentTimeMillis();
+            int timeIdle = (int) ((timeNow - creationTime) / 1000L);
+            if (timeIdle > maxValidTime) {
+                cleanup();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public int getMaxValidTime() {
+        return maxValidTime;
+    }
+
+    public void setMaxValidTime(int maxValidTime) {
+        this.maxValidTime = maxValidTime;
     }
 
 }
