@@ -56,6 +56,16 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.41 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>54703</bug>: Make parsing of HTTP Content-Type headers tolerant of
+        any CR or LF characters that appear in the value passed by the
+        application. Also fix some whitespace parsing issues identified by the
+        additional test cases. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <add>
