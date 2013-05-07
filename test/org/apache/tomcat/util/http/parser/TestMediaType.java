@@ -46,6 +46,7 @@ public class TestMediaType {
             new Parameter("z", "\"\"");
     private static final Parameter PARAM_COMPLEX_QUOTED =
             new Parameter("w", "\"foo'bar,a=b;x=y\"");
+
     private static final String CHARSET = "UTF-8";
     private static final String WS_CHARSET = " \tUTF-8";
     private static final String CHARSET_WS = "UTF-8 \t";
@@ -59,6 +60,11 @@ public class TestMediaType {
             new Parameter("charset", CHARSET_WS);
     private static final Parameter PARAM_CHARSET_QUOTED =
             new Parameter("charset", CHARSET_QUOTED);
+
+
+    private static final String[] LWS_VALUES = new String[] {
+            "", " ", "\t", "\r", "\n", "\r\n", " \r", " \n", " \r\n",
+            "\r ", "\n ", "\r\n ", " \r ", " \n ", " \r\n " };
 
 
     @Test
@@ -207,10 +213,17 @@ public class TestMediaType {
 
 
     private void doTest(Parameter... parameters) throws IOException {
+        for (String lws : LWS_VALUES) {
+            doTest(lws, parameters);
+        }
+    }
+
+    private void doTest(String lws, Parameter... parameters)
+            throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append(TYPES);
         for (Parameter p : parameters) {
-            sb.append(p.toString());
+            sb.append(p.toString(lws));
         }
 
         StringReader sr = new StringReader(sb.toString());
@@ -250,14 +263,23 @@ public class TestMediaType {
 
         @Override
         public String toString() {
+            return toString("");
+        }
+
+        public String toString(String lws) {
             StringBuilder sb = new StringBuilder();
+            sb.append(lws);
             sb.append(";");
+            sb.append(lws);
             sb.append(name);
+            sb.append(lws);
             sb.append("=");
+            sb.append(lws);
             sb.append(value);
+            sb.append(lws);
             return sb.toString();
         }
-    }
+}
 
     @Test
     public void testCase() throws Exception {
