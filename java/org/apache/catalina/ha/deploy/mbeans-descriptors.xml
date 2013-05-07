@@ -43,5 +43,9 @@
       name="processDeployFrequency"
       description="Frequency of the Farm watchDir check."
       type="int"/>
+    <attribute
+      name="maxValidTime"
+      description="The maximum valid time of FileMessageFactory."
+      type="int"/>
   </mbean>
 </mbeans-descriptors>
