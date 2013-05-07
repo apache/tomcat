@@ -1584,7 +1584,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
                 }
             } catch (IllegalStateException x) {
-                registerForEvent(false, true);
+                registerForEvent(true, false);
             }
         }
 
