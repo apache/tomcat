@@ -135,14 +135,14 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // Not applicable to BIO. This test does not start a new thread for the
-        // write so with BIO all the writes happen in the service() mehtod just
+        // write so with BIO all the writes happen in the service() method just
         // like blocking IO.
         if (tomcat.getConnector().getProtocolHandlerClassName().equals(
                 "org.apache.coyote.http11.Http11Protocol")) {
             return;
         }
 
-        // TODO Non-blocking reads are not yet implemented for APR so this test
+        // TODO Non-blocking writes are not yet implemented for APR so this test
         // will not pass.
         if (tomcat.getConnector().getProtocolHandlerClassName().equals(
                 "org.apache.coyote.http11.Http11AprProtocol")) {
