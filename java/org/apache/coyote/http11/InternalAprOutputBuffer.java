@@ -76,6 +76,9 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     private long socket;
 
 
+    private SocketWrapper<Long> wrapper;
+
+
     /**
      * Direct byte buffer used for writing.
      */
@@ -88,6 +91,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     public void init(SocketWrapper<Long> socketWrapper,
             AbstractEndpoint endpoint) throws IOException {
 
+        wrapper = socketWrapper;
         socket = socketWrapper.getSocket().longValue();
         Socket.setsbb(this.socket, bbuf);
     }
@@ -103,6 +107,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         super.recycle();
 
         bbuf.clear();
+        wrapper = null;
     }
 
 
@@ -169,7 +174,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
             offset = offset + thisTime;
         }
 
-        // TODO: Review how to update the SocketWrapper's last accessed time
+        wrapper.access();
 
         if (!isBlocking() && length>0) {
             // Buffer the remaining data
@@ -196,7 +201,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     @Override
     protected boolean flushBuffer(boolean block) throws IOException {
 
-        // TODO: Review how to update the SocketWrapper's last accessed time
+        wrapper.access();
 
         boolean dataLeft = hasMoreDataToFlush();
 
