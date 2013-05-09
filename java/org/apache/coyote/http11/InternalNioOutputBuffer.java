@@ -96,7 +96,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             socket = null;
         }
         flipped = false;
-        bufferedWrites.clear();
     }
 
 
@@ -252,7 +251,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
         dataLeft = hasMoreDataToFlush();
 
-        if (!dataLeft && bufferedWrites!=null) {
+        if (!dataLeft && bufferedWrites.size() > 0) {
             Iterator<ByteBufferHolder> bufIter = bufferedWrites.iterator();
             while (!hasMoreDataToFlush() && bufIter.hasNext()) {
                 ByteBufferHolder buffer = bufIter.next();

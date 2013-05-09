@@ -316,6 +316,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     public void recycle() {
         // Sub-classes may wish to do more than this.
         nextRequest();
+        bufferedWrites.clear();
     }
 
     /**
