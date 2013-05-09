@@ -345,7 +345,7 @@ public class CoyoteAdapter implements Adapter {
                 }
             }
 
-            // Check to see if non-blocking writes are reads are being used
+            // Check to see if non-blocking writes or reads are being used
             if (!request.isAsyncDispatching() && request.isAsync()) {
                 if (res.getWriteListener() != null &&
                         status == SocketStatus.OPEN_WRITE) {
