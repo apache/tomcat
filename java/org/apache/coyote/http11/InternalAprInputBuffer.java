@@ -624,8 +624,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
     @Override
     protected int nbRead() throws IOException {
+        return 0;
         // TODO
-        throw new UnsupportedOperationException("APR non-blocking read");
+        // throw new UnsupportedOperationException("APR non-blocking read");
     }
 
 
