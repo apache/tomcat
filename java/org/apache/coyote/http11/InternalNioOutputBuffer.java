@@ -95,8 +95,8 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             socket.getBufHandler().getWriteBuffer().clear();
             socket = null;
         }
-        setBlocking(true);
         flipped = false;
+        bufferedWrites.clear();
     }
 
 

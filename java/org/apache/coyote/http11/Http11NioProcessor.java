@@ -520,8 +520,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             if (asyncStateMachine.asyncDispatch()) {
                 ((NioEndpoint)endpoint).dispatchForEvent(this.socket.getSocket(),SocketStatus.OPEN_READ, true);
             }
-        } else if (actionCode == ActionCode.SET_WRITE_LISTENER) {
-            outputBuffer.setBlocking(false);
         }
     }
 

@@ -201,11 +201,6 @@ public enum ActionCode {
     UPGRADE,
 
     /**
-     * Callback to trigger setting the WriteListener
-     */
-    SET_WRITE_LISTENER,
-
-    /**
      * Indicator that Servlet is interested in being
      * notified when data is available to be read
      */
