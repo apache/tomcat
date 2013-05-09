@@ -110,8 +110,8 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
      * the possible need to write HTTP headers, there may be more than one write
      * to the OutputBuffer.
      */
-    protected volatile LinkedBlockingDeque<ByteBufferHolder> bufferedWrites =
-            null;
+    protected final LinkedBlockingDeque<ByteBufferHolder> bufferedWrites =
+            new LinkedBlockingDeque<>();
 
     /**
      * The max size of the buffered write buffer
@@ -617,17 +617,6 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
      * @throws IOException
      */
     protected abstract boolean flushBuffer(boolean block) throws IOException;
-
-
-    /**
-     * Configure the blocking behaviour of the OutputBuffer.
-     */
-    public final void setBlocking(boolean blocking) {
-        if (blocking)
-            bufferedWrites = null;
-        else
-            bufferedWrites = new LinkedBlockingDeque<>();
-    }
 
 
     /**

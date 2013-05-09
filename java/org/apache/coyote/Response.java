@@ -572,8 +572,5 @@ public final class Response {
         }
 
         this.listener = listener;
-        action(ActionCode.SET_WRITE_LISTENER, null);
-
-        this.listener = listener;
     }
 }
