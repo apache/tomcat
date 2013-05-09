@@ -223,7 +223,7 @@ public class ContainerMBean extends BaseModelMBean {
      *
      * @param type ClassName of the listener to add
      */
-    public void addLifeCycleListener(String type) throws MBeanException{
+    public void addLifecycleListener(String type) throws MBeanException{
         LifecycleListener listener = null;
         try {
             listener = (LifecycleListener)Class.forName(type).newInstance();
@@ -255,7 +255,7 @@ public class ContainerMBean extends BaseModelMBean {
      * @param type The ClassName of the listeners to be removed.
      * Note that all the listeners having given ClassName will be removed.
      */
-    public void removeLifeCycleListeners(String type) throws MBeanException{
+    public void removeLifecycleListeners(String type) throws MBeanException{
         Container container=null;
         try {
             container = (Container)getManagedResource();
