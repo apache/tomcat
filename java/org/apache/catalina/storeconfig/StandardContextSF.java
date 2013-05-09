@@ -254,7 +254,7 @@ public class StandardContextSF extends StoreFactoryBase {
             storeElement(aWriter, indent, loader);
 
             // Store nested <Manager> elements
-            if (context.getCluster() == null) {
+            if (context.getCluster() == null || !context.getManager().getDistributable()) {
                 Manager manager = context.getManager();
                 storeElement(aWriter, indent, manager);
             }
