@@ -510,8 +510,8 @@
         <exclude name="**/org/apache/tomcat/dbcp/**"/>
         <exclude name="**/tomcat-deps/**"/>
         <!-- Exclude simple test files -->
-        <exclude name="test/webapp-3.0/bug53257/**/*.txt"/>
-        <exclude name="test/webapp-3.0-fragments/WEB-INF/classes/*.txt"/>
+        <exclude name="test/webapp/bug53257/**/*.txt"/>
+        <exclude name="test/webapp-fragments/WEB-INF/classes/*.txt"/>
         <exclude name="test/webresources/**"/>
       </fileset>
       <fileset dir="modules/jdbc-pool" >
@@ -1831,8 +1831,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
             <filename name="**/.project"/>
             <filename name="**/output/**"/>
             <!-- Commented out, because
-                 test/webapp-3.0-virtual-library and
-                 test/webapp-3.0-virtual-webapp use it:
+                 test/webapp-virtual-library and
+                 test/webapp-virtual-webapp use it:
             <filename name="**/target/**"/>
             -->
             <filename name="**/build.properties"/>

@@ -190,7 +190,7 @@ public class TestStandardContext extends TomcatBaseTest {
         ((ContainerBase) tomcat.getHost()).setStartChildren(false);
 
         FailingWebappLoader loader = new FailingWebappLoader();
-        File root = new File("test/webapp-3.0");
+        File root = new File("test/webapp");
         Context context = tomcat.addWebapp("", root.getAbsolutePath());
         context.setLoader(loader);
 
@@ -226,7 +226,7 @@ public class TestStandardContext extends TomcatBaseTest {
         ((ContainerBase) tomcat.getHost()).setStartChildren(false);
 
         FailingLifecycleListener listener = new FailingLifecycleListener();
-        File root = new File("test/webapp-3.0");
+        File root = new File("test/webapp");
         Context context = tomcat.addWebapp("", root.getAbsolutePath());
         context.addLifecycleListener(listener);
 
@@ -286,7 +286,7 @@ public class TestStandardContext extends TomcatBaseTest {
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
 
-        File root = new File("test/webapp-3.0");
+        File root = new File("test/webapp");
         tomcat.addWebapp("", root.getAbsolutePath());
 
         tomcat.start();

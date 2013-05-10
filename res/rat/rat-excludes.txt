@@ -51,7 +51,7 @@ output/dist/webapps/docs/api/package-list
 output/dist/webapps/docs/elapi/package-list
 output/dist/webapps/docs/jspapi/package-list
 output/dist/webapps/docs/servletapi/package-list
-output/dist/src/test/webapp-3.0/bug53257/*.txt
-output/dist/src/test/webapp-3.0-fragments/WEB-INF/classes/*.txt
-test/webapp-3.0/bug53257/*.txt
-test/webapp-3.0-fragments/WEB-INF/classes/*.txt
+output/dist/src/test/webapp/bug53257/*.txt
+output/dist/src/test/webapp-fragments/WEB-INF/classes/*.txt
+test/webapp/bug53257/*.txt
+test/webapp-fragments/WEB-INF/classes/*.txt

@@ -32,7 +32,7 @@ public class TestJspReader extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir =
-            new File("test/webapp-3.0");
+            new File("test/webapp");
         tomcat.addWebapp(null, "", appDir.getAbsolutePath());
 
         tomcat.start();

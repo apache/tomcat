@@ -51,7 +51,7 @@ public class TestWarDirContext extends TomcatBaseTest {
     public void testLookupException() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-fragments");
+        File appDir = new File("test/webapp-fragments");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
@@ -72,7 +72,7 @@ public class TestWarDirContext extends TomcatBaseTest {
     public void testReservedJNDIFileNamesWithCache() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-fragments");
+        File appDir = new File("test/webapp-fragments");
         // app dir is relative to server home
         StandardContext ctxt = (StandardContext) tomcat.addWebapp(
                 null, "/test", appDir.getAbsolutePath());
@@ -102,7 +102,7 @@ public class TestWarDirContext extends TomcatBaseTest {
     public void testReservedJNDIFileNamesNoCache() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-fragments");
+        File appDir = new File("test/webapp-fragments");
         // app dir is relative to server home
         StandardContext ctxt = (StandardContext) tomcat.addWebapp(
                 null, "/test", appDir.getAbsolutePath());
