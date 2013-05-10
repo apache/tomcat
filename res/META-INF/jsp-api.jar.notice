@@ -6,4 +6,7 @@ The Apache Software Foundation (http://www.apache.org/).
 
 The original XML Schemas for Java EE Deployment Descriptors:
  - jsp_2_2.xsd
-may be obtained from http://java.sun.com/xml/ns/javaee/
+ - jsp_2_3.xsd
+
+may be obtained from:
+http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/index.html
