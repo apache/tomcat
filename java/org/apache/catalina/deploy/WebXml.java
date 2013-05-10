@@ -184,6 +184,13 @@ public class WebXml {
         // Update major and minor version
         if (publicId == null) {
             // skip
+        } else if (org.apache.catalina.startup.Constants.WebSchemaPublicId_31.
+                equalsIgnoreCase(publicId) ||
+                org.apache.catalina.startup.Constants.WebFragmentSchemaPublicId_31.
+                equalsIgnoreCase(publicId)) {
+            majorVersion = 3;
+            minorVersion = 1;
+            this.publicId = publicId;
         } else if (org.apache.catalina.startup.Constants.WebSchemaPublicId_30.
                 equalsIgnoreCase(publicId) ||
                 org.apache.catalina.startup.Constants.WebFragmentSchemaPublicId_30.

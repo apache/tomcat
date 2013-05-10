@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.startup;
-
 
 /**
  * String constants for the startup package.
@@ -26,7 +23,6 @@ package org.apache.catalina.startup;
  * @author Jean-Francois Arcand
  * @version $Id$
  */
-
 public final class Constants {
 
     public static final String Package = "org.apache.catalina.startup";
@@ -73,6 +69,11 @@ public final class Constants {
     public static final String JavaeeSchemaResourcePath_6 =
         "/javax/servlet/resources/javaee_6.xsd";
 
+    public static final String JavaeeSchemaPublicId_7 =
+            "javaee_7.xsd";
+        public static final String JavaeeSchemaResourcePath_7 =
+            "/javax/servlet/resources/javaee_6.xsd";
+
 
     // W3C
     public static final String W3cSchemaPublicId_10 =
@@ -106,6 +107,11 @@ public final class Constants {
         "jsp_2_2.xsd";
     public static final String JspSchemaResourcePath_22 =
         "/javax/servlet/jsp/resources/jsp_2_2.xsd";
+
+    public static final String JspSchemaPublicId_23 =
+            "jsp_2_3.xsd";
+        public static final String JspSchemaResourcePath_23 =
+            "/javax/servlet/jsp/resources/jsp_2_3.xsd";
 
 
     // TLD
@@ -166,6 +172,22 @@ public final class Constants {
     public static final String WebFragmentSchemaResourcePath_30 =
         "/javax/servlet/resources/web-fragment_3_0.xsd";
 
+    public static final String WebSchemaPublicId_31 =
+        "web-app_3_1.xsd";
+    public static final String WebSchemaResourcePath_31 =
+        "/javax/servlet/resources/web-app_3_1.xsd";
+
+    public static final String WebCommonSchemaPublicId_31 =
+        "web-common_3_1.xsd";
+    public static final String WebCommonSchemaResourcePath_31 =
+        "/javax/servlet/resources/web-common_3_1.xsd";
+
+    public static final String WebFragmentSchemaPublicId_31 =
+        "web-fragment_3_1.xsd";
+    public static final String WebFragmentSchemaResourcePath_31 =
+        "/javax/servlet/resources/web-fragment_3_1.xsd";
+
+
     // Web service
     public static final String J2eeWebServiceSchemaPublicId_11 =
             "j2ee_web_services_1_1.xsd";
@@ -197,4 +219,13 @@ public final class Constants {
     public static final String JavaeeWebServiceClientSchemaResourcePath_13 =
         "/javax/servlet/resources/javaee_web_services_client_1_3.xsd";
 
+    public static final String JavaeeWebServiceSchemaPublicId_14 =
+        "javaee_web_services_1_4.xsd";
+    public static final String JavaeeWebServiceSchemaResourcePath_14 =
+        "/javax/servlet/resources/javaee_web_services_1_4.xsd";
+
+    public static final String JavaeeWebServiceClientSchemaPublicId_14 =
+        "javaee_web_services_client_1_4.xsd";
+    public static final String JavaeeWebServiceClientSchemaResourcePath_14 =
+        "/javax/servlet/resources/javaee_web_services_client_1_4.xsd";
 }
