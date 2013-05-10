@@ -1057,8 +1057,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        registerForWrite();
-
         if (error || endpoint.isPaused()) {
             return SocketState.CLOSED;
         } else if (isAsync() || comet) {
@@ -1612,7 +1610,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         if (error) {
             return SocketState.CLOSED;
         } else if (isAsync()) {
-            registerForWrite();
             return SocketState.LONG;
         } else {
             if (!keepAlive) {
