@@ -142,13 +142,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             return;
         }
 
-        // TODO Non-blocking writes are not yet implemented for APR so this test
-        // will not pass.
-        if (tomcat.getConnector().getProtocolHandlerClassName().equals(
-                "org.apache.coyote.http11.Http11AprProtocol")) {
-            return;
-        }
-
         // Must have a real docBase - just use temp
         StandardContext ctx = (StandardContext) tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
