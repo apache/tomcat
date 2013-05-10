@@ -630,12 +630,12 @@ public class WebXml {
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 
         // Root element
-        sb.append("<web-app xmlns=\"http://java.sun.com/xml/ns/javaee\"\n");
+        sb.append("<web-app xmlns=\"http://xmlns.jcp.org/xml/ns/javaee\"\n");
         sb.append("         xmlns:xsi=");
         sb.append("\"http://www.w3.org/2001/XMLSchema-instance\"\n");
         sb.append("         xsi:schemaLocation=");
-        sb.append("\"http://java.sun.com/xml/ns/javaee" +
-                  " http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd\"\n");
+        sb.append("\"http://xmlns.jcp.org/xml/ns/javaee" +
+                  " http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd\"\n");
         sb.append("         version=\"");
         sb.append(getVersion());
         sb.append("\"\n");
