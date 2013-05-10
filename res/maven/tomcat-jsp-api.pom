@@ -35,7 +35,7 @@
       <distribution>repo</distribution>
       <comments>
         The Apache License, version 2.0 applies to all files apart from
-        jsp_2_2.xsd to which the CDDL version 1.0 applies.
+        jsp_2_2.xsd and jsp_2_3.xsd to which the CDDL version 1.0 applies.
       </comments>
     </license>
   </licenses>
