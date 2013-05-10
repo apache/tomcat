@@ -70,9 +70,9 @@ public final class Constants {
         "/javax/servlet/resources/javaee_6.xsd";
 
     public static final String JavaeeSchemaPublicId_7 =
-            "javaee_7.xsd";
-        public static final String JavaeeSchemaResourcePath_7 =
-            "/javax/servlet/resources/javaee_6.xsd";
+        "javaee_7.xsd";
+    public static final String JavaeeSchemaResourcePath_7 =
+        "/javax/servlet/resources/javaee_7.xsd";
 
 
     // W3C
@@ -109,9 +109,9 @@ public final class Constants {
         "/javax/servlet/jsp/resources/jsp_2_2.xsd";
 
     public static final String JspSchemaPublicId_23 =
-            "jsp_2_3.xsd";
-        public static final String JspSchemaResourcePath_23 =
-            "/javax/servlet/jsp/resources/jsp_2_3.xsd";
+        "jsp_2_3.xsd";
+    public static final String JspSchemaResourcePath_23 =
+        "/javax/servlet/jsp/resources/jsp_2_3.xsd";
 
 
     // TLD
