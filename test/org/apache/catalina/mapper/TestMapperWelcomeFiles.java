@@ -39,7 +39,7 @@ public class TestMapperWelcomeFiles extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
 
         StandardContext ctxt = (StandardContext) tomcat.addWebapp(null, "/test",
                 appDir.getAbsolutePath());
@@ -67,7 +67,7 @@ public class TestMapperWelcomeFiles extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
 
         StandardContext ctxt = (StandardContext) tomcat.addWebapp(null, "/test",
                 appDir.getAbsolutePath());

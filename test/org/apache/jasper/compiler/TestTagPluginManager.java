@@ -41,7 +41,7 @@ public class TestTagPluginManager extends TomcatBaseTest {
     public void testBug54240() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         Context ctx = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 

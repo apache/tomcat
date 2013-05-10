@@ -101,7 +101,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-fragments");
+        File appDir = new File("test/webapp-fragments");
         tomcat.addWebapp(null, "", appDir.getAbsolutePath());
 
         tomcat.start();
@@ -122,7 +122,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "", appDir.getAbsolutePath());
 
         tomcat.start();
@@ -152,7 +152,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-servletsecurity");
+        File appDir = new File("test/webapp-servletsecurity");
         tomcat.addWebapp(null, "", appDir.getAbsolutePath());
 
         tomcat.start();
@@ -171,7 +171,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-servletsecurity2");
+        File appDir = new File("test/webapp-servletsecurity2");
         tomcat.addWebapp(null, "", appDir.getAbsolutePath());
 
         tomcat.start();

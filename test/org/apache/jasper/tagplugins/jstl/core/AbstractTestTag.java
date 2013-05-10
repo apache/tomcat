@@ -35,7 +35,7 @@ public abstract class AbstractTestTag extends TomcatBaseTest {
         super.setUp();
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         Context ctx = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         ctx.setResources(new StandardRoot(ctx));
