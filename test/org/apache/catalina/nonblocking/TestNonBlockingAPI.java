@@ -57,14 +57,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     public void testNonBlockingRead() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // TODO Non-blocking reads are not yet implemented for APR.
-        if (tomcat.getConnector().getProtocolHandlerClassName().equals(
-                "org.apache.coyote.http11.Http11AprProtocol")) {
-            return;
-        }
-
         // Must have a real docBase - just use temp
-        StandardContext ctx = (StandardContext) tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        StandardContext ctx = (StandardContext) tomcat.addContext("",
+                System.getProperty("java.io.tmpdir"));
 
         NBReadServlet servlet = new NBReadServlet();
         String servletName = NBReadServlet.class.getName();
@@ -74,8 +69,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         tomcat.start();
 
         Map<String, List<String>> resHeaders = new HashMap<>();
-        int rc = postUrl(true, new DataWriter(500), "http://localhost:" + getPort() + "/", new ByteChunk(),
-                resHeaders, null);
+        int rc = postUrl(true, new DataWriter(500), "http://localhost:" +
+                getPort() + "/", new ByteChunk(), resHeaders, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }
 
@@ -84,7 +79,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     public void testNonBlockingWrite() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // Must have a real docBase - just use temp
-        StandardContext ctx = (StandardContext) tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        StandardContext ctx = (StandardContext) tomcat.addContext("",
+                System.getProperty("java.io.tmpdir"));
 
         NBWriteServlet servlet = new NBWriteServlet();
         String servletName = NBWriteServlet.class.getName();

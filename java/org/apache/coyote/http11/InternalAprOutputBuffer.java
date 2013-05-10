@@ -125,6 +125,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         bbuf.clear();
         flipped = false;
 
+        socket = 0;
         wrapper = null;
     }
 
