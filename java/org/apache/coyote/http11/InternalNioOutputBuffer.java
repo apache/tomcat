@@ -153,6 +153,10 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             bytebuffer.clear();
             flipped = false;
         }
+        if (flipped) {
+            // Still have data to write
+            att.getPoller().add(socket, SelectionKey.OP_WRITE);
+        }
         return written;
     }
 
