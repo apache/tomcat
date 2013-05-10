@@ -138,6 +138,18 @@ public class TestWebXml {
     }
 
     @Test
+    public void testParsePublicIdVersion31() {
+
+        WebXml webxml = new WebXml();
+
+        webxml.setPublicId(
+                org.apache.catalina.startup.Constants.WebSchemaPublicId_31);
+        Assert.assertEquals(3, webxml.getMajorVersion());
+        Assert.assertEquals(1, webxml.getMinorVersion());
+        Assert.assertEquals("3.1", webxml.getVersion());
+    }
+
+    @Test
     public void testLifecycleMethodsWebXml() {
         WebXml webxml = new WebXml();
         webxml.addPostConstructMethods("a", "a");

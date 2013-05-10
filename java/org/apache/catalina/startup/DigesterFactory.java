@@ -82,6 +82,10 @@ public class DigesterFactory {
                 Constants.JavaeeSchemaPublicId_6,
                 schemaResolver);
 
+        register(Constants.JavaeeSchemaResourcePath_7,
+                Constants.JavaeeSchemaPublicId_7,
+                schemaResolver);
+
         // W3C
         register(Constants.W3cSchemaResourcePath_10,
                  Constants.W3cSchemaPublicId_10,
@@ -106,6 +110,10 @@ public class DigesterFactory {
 
         register(Constants.JspSchemaResourcePath_22,
                 Constants.JspSchemaPublicId_22,
+                schemaResolver);
+
+        register(Constants.JspSchemaResourcePath_23,
+                Constants.JspSchemaPublicId_23,
                 schemaResolver);
 
         // TLD
@@ -154,6 +162,18 @@ public class DigesterFactory {
                 Constants.WebFragmentSchemaPublicId_30,
                 schemaResolver);
 
+        register(Constants.WebSchemaResourcePath_31,
+                Constants.WebSchemaPublicId_31,
+                schemaResolver);
+
+        register(Constants.WebCommonSchemaResourcePath_31,
+                Constants.WebCommonSchemaPublicId_31,
+                schemaResolver);
+
+        register(Constants.WebFragmentSchemaResourcePath_31,
+                Constants.WebFragmentSchemaPublicId_31,
+                schemaResolver);
+
         // Web Service
         register(Constants.J2eeWebServiceSchemaResourcePath_11,
                  Constants.J2eeWebServiceSchemaPublicId_11,
@@ -178,6 +198,14 @@ public class DigesterFactory {
         register(Constants.JavaeeWebServiceClientSchemaResourcePath_13,
                 Constants.JavaeeWebServiceClientSchemaPublicId_13,
                 schemaResolver);
+
+        register(Constants.JavaeeWebServiceSchemaResourcePath_14,
+                Constants.JavaeeWebServiceSchemaPublicId_14,
+                schemaResolver);
+
+        register(Constants.JavaeeWebServiceClientSchemaResourcePath_14,
+                Constants.JavaeeWebServiceClientSchemaPublicId_14,
+                schemaResolver);
     }
 
 
@@ -194,5 +222,4 @@ public class DigesterFactory {
             schemaResolver.register(resourcePublicId , url.toString() );
         }
     }
-
 }
