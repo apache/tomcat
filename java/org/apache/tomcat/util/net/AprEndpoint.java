@@ -671,9 +671,6 @@ public class AprEndpoint extends AbstractEndpoint {
                 // Ignore
             }
             poller = null;
-            if (log.isTraceEnabled()) {
-                log.trace("stopInternal() clearing connections map");
-            }
             connections.clear();
             if (useSendfile) {
                 try {
@@ -797,8 +794,8 @@ public class AprEndpoint extends AbstractEndpoint {
         try {
             // During shutdown, executor may be null - avoid NPE
             if (running) {
-                if (log.isTraceEnabled()) {
-                    log.trace("processSocketWithOptions(long): " + socket);
+                if (log.isDebugEnabled()) {
+                    log.debug("processSocketWithOptions(long): " + socket);
                 }
                 AprSocketWrapper wrapper =
                         new AprSocketWrapper(Long.valueOf(socket));
@@ -898,9 +895,6 @@ public class AprEndpoint extends AbstractEndpoint {
     }
 
     private void destroySocket(long socket) {
-        if (log.isTraceEnabled()) {
-            log.trace("destroySocket(long): " + socket);
-        }
         // If not running the socket will be destroyed by
         // parent pool or acceptor socket.
         // In any case disable double free which would cause JVM core.
@@ -914,6 +908,14 @@ public class AprEndpoint extends AbstractEndpoint {
     }
 
     private void destroySocket(long socket, boolean doIt) {
+        if (log.isDebugEnabled()) {
+            String msg = "destroySocket(long,boolean): " + socket + " " + doIt;
+            if (log.isTraceEnabled()) {
+                log.trace(msg, new Exception());
+            } else {
+                log.debug(msg);
+            }
+        }
         // Be VERY careful if you call this method directly. If it is called
         // twice for the same socket the JVM will core. Currently this is only
         // called from Poller.closePollset() to ensure kept alive connections
@@ -1424,6 +1426,15 @@ public class AprEndpoint extends AbstractEndpoint {
         }
 
         private void add(long socket, int timeout, int flags) {
+            if (log.isDebugEnabled()) {
+                String msg = "Poller.add(long,int,int) " + socket + " " +
+                        timeout + " " + flags;
+                if (log.isTraceEnabled()) {
+                    log.trace(msg, new Exception());
+                } else {
+                    log.debug(msg);
+                }
+            }
             if (timeout < 0) {
                 timeout = getSoTimeout();
             }
@@ -1504,8 +1515,8 @@ public class AprEndpoint extends AbstractEndpoint {
             }
             long socket = timeouts.check(date);
             while (socket != 0) {
-                if (log.isTraceEnabled()) {
-                    log.trace("Poller maintain() timing out socket: " + socket);
+                if (log.isDebugEnabled()) {
+                    log.debug("Poller maintain() timing out socket: " + socket);
                 }
                 removeFromPoller(socket);
                 boolean comet = connections.get(
@@ -1587,8 +1598,8 @@ public class AprEndpoint extends AbstractEndpoint {
                         }
                         SocketInfo info = localAddList.get();
                         while (info != null) {
-                            if (log.isTraceEnabled()) {
-                                log.trace("Poller run() adding socket: " +
+                            if (log.isDebugEnabled()) {
+                                log.debug("Poller run() adding socket: " +
                                         info.socket);
                             }
                             removeFromPoller(info.socket);
