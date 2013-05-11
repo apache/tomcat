@@ -19,13 +19,18 @@
 // XXX TODO: More JavaDoc
 // XXX Optional: Add support for com.sun.management specific mbean
 //               (http://docs.oracle.com/javase/7/docs/jre/api/management/extension/index.html)
-// XXX Optional: Wire setters to the manager:
-//               log level setter, verbose class loading setter,
-//               setVerbose() and gc() in MemoryMXBean,
-//               resetPeakUsage(), setUsageThreshold() and
-//               setCollectionUsageThreshold() in MemoryPoolMXBean,
-//               and threadMXBean setters, probably even for
-//               com.sun.management like HotSpotDiagnosticMXBean.
+// XXX Optional: Wire additional public static methods implemented here
+//               to the manager (think about manager access roles!)
+//                 setLoggerLevel(),
+//                 setVerboseClassLoading(),
+//                 setThreadContentionMonitoringEnabled(),
+//                 setThreadCpuTimeEnabled(),
+//                 resetPeakThreadCount(),
+//                 setVerboseGarbageCollection()
+//                 gc(),
+//                 resetPeakUsage(),
+//                 setUsageThreshold(),
+//                 setCollectionUsageThreshold()
 
 package org.apache.tomcat.util;
 
@@ -181,6 +186,84 @@ public class Diagnostics {
                       loggerName + "' to '" + levelName +
                       "', got '" + checkValue + "' instead");
         }
+    }
+
+    /**
+     * Set verbose garbage collection logging
+     *
+     * @param verbose whether to enable verbose gc logging
+     */
+    public static void setVerboseGarbageCollection(boolean verbose) {
+        memoryMXBean.setVerbose(verbose);
+        boolean checkValue = memoryMXBean.isVerbose();
+        if (verbose != checkValue) {
+            log.error("Could not set verbose garbage collection logging to " + verbose +
+                      ", got " + checkValue + " instead");
+        }
+    }
+
+    /**
+     * Initiate garbage collection via MX Bean
+     */
+    public static void gc() {
+        memoryMXBean.gc();
+    }
+
+    /**
+     * Reset peak memory usage data in MemoryPoolMXBean
+     *
+     * @param name name of the MemoryPoolMXBean or "all"
+     */
+    public static void resetPeakUsage(String name) {
+        for (MemoryPoolMXBean mbean: memoryPoolMXBeans) {
+            if (name.equals("all") || name.equals(mbean.getName())) {
+                mbean.resetPeakUsage();
+            }
+        }
+    }
+
+    /**
+     * Reset peak memory usage data in MemoryPoolMXBean
+     *
+     * @param name name of the MemoryPoolMXBean
+     */
+    public static boolean setUsageThreshold(String name, long threshold) {
+        for (MemoryPoolMXBean mbean: memoryPoolMXBeans) {
+            if (name.equals(mbean.getName())) {
+                try {
+                    mbean.setUsageThreshold(threshold);
+                    return true;
+                } catch (IllegalArgumentException ex) {
+                    // IGNORE
+                } catch (UnsupportedOperationException ex) {
+                    // IGNORE
+                }
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Reset peak memory collection usage data in MemoryPoolMXBean
+     *
+     * @param name name of the MemoryPoolMXBean
+     */
+    public static boolean setCollectionUsageThreshold(String name, long threshold) {
+        for (MemoryPoolMXBean mbean: memoryPoolMXBeans) {
+            if (name.equals(mbean.getName())) {
+                try {
+                    mbean.setCollectionUsageThreshold(threshold);
+                    return true;
+                } catch (IllegalArgumentException ex) {
+                    // IGNORE
+                } catch (UnsupportedOperationException ex) {
+                    // IGNORE
+                }
+                return false;
+            }
+        }
+        return false;
     }
 
     /**
