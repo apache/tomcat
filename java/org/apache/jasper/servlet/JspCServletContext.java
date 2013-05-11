@@ -207,7 +207,7 @@ public class JspCServletContext implements ServletContext {
     @Override
     public int getMinorVersion() {
 
-        return (0);
+        return (1);
 
     }
 
