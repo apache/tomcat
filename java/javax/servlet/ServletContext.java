@@ -99,7 +99,7 @@ public interface ServletContext {
      * supports. All implementations that comply with Version 3.1 must have this
      * method return the integer 1.
      *
-     * @return 0
+     * @return 1
      */
     public int getMinorVersion();
 
