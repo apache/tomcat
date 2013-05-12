@@ -77,7 +77,7 @@ public class Diagnostics {
         org.apache.juli.logging.LogFactory.getLog(Diagnostics.class);
 
     private static final SimpleDateFormat timeformat =
-        new SimpleDateFormat("yyyy-MM-DD HH:mm:ss.SSS");
+        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     /* Some platform MBeans */
     private static final ClassLoadingMXBean classLoadingMXBean =
