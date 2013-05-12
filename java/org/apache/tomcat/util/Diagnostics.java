@@ -223,9 +223,11 @@ public class Diagnostics {
     }
 
     /**
-     * Reset peak memory usage data in MemoryPoolMXBean
+     * Set usage threshold in MemoryPoolMXBean
      *
      * @param name name of the MemoryPoolMXBean
+     * @param threshold the threshold to set
+     * @return true if setting the threshold succeeded
      */
     public static boolean setUsageThreshold(String name, long threshold) {
         for (MemoryPoolMXBean mbean: memoryPoolMXBeans) {
@@ -245,9 +247,11 @@ public class Diagnostics {
     }
 
     /**
-     * Reset peak memory collection usage data in MemoryPoolMXBean
+     * Set collection usage threshold in MemoryPoolMXBean
      *
      * @param name name of the MemoryPoolMXBean
+     * @param threshold the collection threshold to set
+     * @return true if setting the threshold succeeded
      */
     public static boolean setCollectionUsageThreshold(String name, long threshold) {
         for (MemoryPoolMXBean mbean: memoryPoolMXBeans) {
@@ -383,6 +387,14 @@ public class Diagnostics {
         return "";
     }
 
+    /**
+     * Retrieve the StringManager for a list of Locales.
+     * The first StringManager found will be returned.
+     *
+     * @param requestedLocales the list of locales
+     * @return the found StringManager or the default
+     *         StringManager
+     */
     private static StringManager getStringManager(
             Enumeration<Locale> requestedLocales) {
         while (requestedLocales.hasMoreElements()) {
@@ -396,17 +408,34 @@ public class Diagnostics {
         return sm;
     }
 
+    /**
+     * Retrieves a formatted JVM thread dump.
+     * The default StringManager will be used.
+     *
+     * @return the formatted JVM thread dump
+     */
     public static String getThreadDump() {
         return getThreadDump(sm);
     }
 
+    /**
+     * Retrieves a formatted JVM thread dump.
+     * The given list of locales will be used
+     * to retrieve a StringManager.
+     *
+     * @requestedLocales list of locales to use
+     * @return the formatted JVM thread dump
+     */
     public static String getThreadDump(Enumeration<Locale> requestedLocales) {
         return getThreadDump(getStringManager(requestedLocales));
     }
 
     /**
-     * Retrieve a formatted JVM thread dump.
-     * @return the thread dump
+     * Retrieve a JVM thread dump formatted
+     * using the given StringManager.
+     *
+     * @requestedSm the StringManager to use
+     * @return the formatted JVM thread dump
      */
     public static String getThreadDump(StringManager requestedSm) {
         StringBuilder sb = new StringBuilder();
@@ -435,19 +464,13 @@ public class Diagnostics {
         return sb.toString();
     }
 
-    public static String getVMInfo() {
-        return getVMInfo(sm);
-    }
-
-    public static String getVMInfo(Enumeration<Locale> requestedLocales) {
-        return getVMInfo(getStringManager(requestedLocales));
-    }
-
     /**
      * Format contents of a MemoryUsage object.
+     * @param name a text prefix used in formatting
+     * @param usage the MemoryUsage object to format
      * @return the formatted contents
      */
-    public static String formatMemoryUsage(String name, MemoryUsage usage) {
+    private static String formatMemoryUsage(String name, MemoryUsage usage) {
         if (usage != null) {
             StringBuilder sb = new StringBuilder();
             sb.append(INDENT1 + name + " init: " + usage.getInit() + CRLF);
@@ -460,8 +483,33 @@ public class Diagnostics {
     }
 
     /**
-     * Retrieve a formatted JVM thread dump.
-     * @return the thread dump
+     * Retrieves a formatted JVM information text.
+     * The default StringManager will be used.
+     *
+     * @return the formatted JVM information text
+     */
+    public static String getVMInfo() {
+        return getVMInfo(sm);
+    }
+
+    /**
+     * Retrieves a formatted JVM information text.
+     * The given list of locales will be used
+     * to retrieve a StringManager.
+     *
+     * @requestedLocales list of locales to use
+     * @return the formatted JVM information text
+     */
+    public static String getVMInfo(Enumeration<Locale> requestedLocales) {
+        return getVMInfo(getStringManager(requestedLocales));
+    }
+
+    /**
+     * Retrieve a JVM information text formatted
+     * using the given StringManager.
+     *
+     * @requestedSm the StringManager to use
+     * @return the formatted JVM information text
      */
     public static String getVMInfo(StringManager requestedSm) {
         StringBuilder sb = new StringBuilder();
