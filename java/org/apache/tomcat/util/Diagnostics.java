@@ -423,7 +423,7 @@ public class Diagnostics {
      * The given list of locales will be used
      * to retrieve a StringManager.
      *
-     * @requestedLocales list of locales to use
+     * @param requestedLocales list of locales to use
      * @return the formatted JVM thread dump
      */
     public static String getThreadDump(Enumeration<Locale> requestedLocales) {
@@ -434,7 +434,7 @@ public class Diagnostics {
      * Retrieve a JVM thread dump formatted
      * using the given StringManager.
      *
-     * @requestedSm the StringManager to use
+     * @param requestedSm the StringManager to use
      * @return the formatted JVM thread dump
      */
     public static String getThreadDump(StringManager requestedSm) {
@@ -497,7 +497,7 @@ public class Diagnostics {
      * The given list of locales will be used
      * to retrieve a StringManager.
      *
-     * @requestedLocales list of locales to use
+     * @param requestedLocales list of locales to use
      * @return the formatted JVM information text
      */
     public static String getVMInfo(Enumeration<Locale> requestedLocales) {
@@ -508,7 +508,7 @@ public class Diagnostics {
      * Retrieve a JVM information text formatted
      * using the given StringManager.
      *
-     * @requestedSm the StringManager to use
+     * @param requestedSm the StringManager to use
      * @return the formatted JVM information text
      */
     public static String getVMInfo(StringManager requestedSm) {
