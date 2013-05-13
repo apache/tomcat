@@ -120,5 +120,11 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         }
     }
 
+
+    @Override
+    protected void destroyInternal() throws LifecycleException {
+        // NO-OP
+    }
+
     protected abstract void checkType(File file);
 }

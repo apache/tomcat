@@ -268,4 +268,13 @@ public class JarResourceSet extends AbstractResourceSet {
             throw new IllegalArgumentException(e);
         }
     }
+
+    @Override
+    protected void destroyInternal() throws LifecycleException {
+        try {
+            this.base.close();
+        } catch (IOException ioe) {
+            throw new LifecycleException(ioe);
+        }
+    }
 }
