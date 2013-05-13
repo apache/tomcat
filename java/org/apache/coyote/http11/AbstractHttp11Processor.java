@@ -1082,23 +1082,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Register the socket for write possible events of there is data in the
-     * output buffer still to write.
-     *
-     * @return <code>true</code> if the socket was registered for write possible
-     *         events, otherwise <code>false</code>
-     */
-    protected boolean registerForWrite() {
-        if (outputBuffer.hasDataToWrite()) {
-            registerForEvent(false, true);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
-    /**
      * Regsiter the socket for the specified events.
      *
      * @param read  Register the socket for read events
@@ -1555,7 +1538,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                         outputBuffer.flushBuffer(false);
                     }
                     //return if we have more data to write
-                    if (registerForWrite()) {
+                    if (outputBuffer.hasDataToWrite()) {
+                        registerForEvent(false, true);
                         return SocketState.LONG;
                     }
                 } catch (IOException x) {
