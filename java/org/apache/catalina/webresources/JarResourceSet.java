@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -36,7 +38,7 @@ import org.apache.catalina.util.ResourceSet;
  */
 public class JarResourceSet extends AbstractResourceSet {
 
-    private JarFile base;
+    private HashMap<String,JarEntry> jarFileEntries = new HashMap<>();
     private String baseUrl;
     private final String internalPath;
 
@@ -90,8 +92,8 @@ public class JarResourceSet extends AbstractResourceSet {
          * requested without the '/' subsequent calls to JarEntry.isDirectory()
          * will return false.
          *
-         *  Paths in JARs never start with '/'. Leading '/' need to be removed
-         *  before any JarFile.getEntry() call.
+         * Paths in JARs never start with '/'. Leading '/' need to be removed
+         * before any JarFile.getEntry() call.
          */
 
         // If the JAR has been mounted below the web application root, return
@@ -106,23 +108,23 @@ public class JarResourceSet extends AbstractResourceSet {
             }
             if (pathInJar.equals("")) {
                 // Special case
-                return new JarResourceRoot(root, new File(base.getName()),
+                return new JarResourceRoot(root, new File(getBase()),
                         pathInJar, path);
             } else {
                 JarEntry jarEntry = null;
                 if (!(pathInJar.charAt(pathInJar.length() - 1) == '/')) {
-                    jarEntry = base.getJarEntry(pathInJar + '/');
+                    jarEntry = jarFileEntries.get(pathInJar + '/');
                     if (jarEntry != null) {
                         path = path + '/';
                     }
                 }
                 if (jarEntry == null) {
-                    jarEntry = base.getJarEntry(pathInJar);
+                    jarEntry = jarFileEntries.get(pathInJar);
                 }
                 if (jarEntry == null) {
                     return new EmptyResource(root, path);
                 } else {
-                    return new JarResource(root, base, baseUrl, jarEntry,
+                    return new JarResource(root, getBase(), baseUrl, jarEntry,
                             internalPath, path);
                 }
             }
@@ -144,10 +146,9 @@ public class JarResourceSet extends AbstractResourceSet {
             if (pathInJar.charAt(0) == '/') {
                 pathInJar = pathInJar.substring(1);
             }
-            Enumeration<JarEntry> entries = base.entries();
-            while (entries.hasMoreElements()) {
-                JarEntry entry = entries.nextElement();
-                String name = entry.getName();
+            Iterator<String> entries = jarFileEntries.keySet().iterator();
+            while (entries.hasNext()) {
+                String name = entries.next();
                 if (name.length() > pathInJar.length() &&
                         name.startsWith(pathInJar)) {
                     if (name.charAt(name.length() - 1) == '/') {
@@ -202,10 +203,9 @@ public class JarResourceSet extends AbstractResourceSet {
                 pathInJar = pathInJar.substring(1);
             }
 
-            Enumeration<JarEntry> entries = base.entries();
-            while (entries.hasMoreElements()) {
-                JarEntry entry = entries.nextElement();
-                String name = entry.getName();
+            Iterator<String> entries = jarFileEntries.keySet().iterator();
+            while (entries.hasNext()) {
+                String name = entries.next();
                 if (name.length() > pathInJar.length() &&
                         name.startsWith(pathInJar)) {
                     int nextSlash = name.indexOf('/', pathInJar.length());
@@ -257,24 +257,20 @@ public class JarResourceSet extends AbstractResourceSet {
     @Override
     protected void initInternal() throws LifecycleException {
 
-        try {
-            this.base = new JarFile(getBase());
+        try (JarFile jarFile = new JarFile(getBase())) {
+            Enumeration<JarEntry> entries = jarFile.entries();
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
+                jarFileEntries.put(entry.getName(), entry);
+            }
         } catch (IOException ioe) {
             throw new IllegalArgumentException(ioe);
         }
+
         try {
             this.baseUrl = (new File(getBase())).toURI().toURL().toString();
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(e);
-        }
-    }
-
-    @Override
-    protected void destroyInternal() throws LifecycleException {
-        try {
-            this.base.close();
-        } catch (IOException ioe) {
-            throw new LifecycleException(ioe);
         }
     }
 }

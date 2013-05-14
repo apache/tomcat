@@ -35,12 +35,12 @@ public class JarResource extends AbstractResource {
 
     private static final Log log = LogFactory.getLog(JarResource.class);
 
-    private final JarFile base;
+    private final String base;
     private final String baseUrl;
     private final JarEntry resource;
     private final String name;
 
-    public JarResource(WebResourceRoot root, JarFile base, String baseUrl,
+    public JarResource(WebResourceRoot root, String base, String baseUrl,
             JarEntry jarEntry, String internalPath, String webAppPath) {
         super(root, webAppPath);
         this.base = base;
@@ -117,7 +117,9 @@ public class JarResource extends AbstractResource {
     @Override
     public InputStream getInputStream() {
         try {
-            return base.getInputStream(resource);
+            JarFile jarFile = new JarFile(base);
+            InputStream is = jarFile.getInputStream(resource);
+            return new JarInputStreamWrapper(jarFile, is);
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("fileResource.getInputStreamFail",
@@ -148,5 +150,73 @@ public class JarResource extends AbstractResource {
     @Override
     protected Log getLog() {
         return log;
+    }
+
+    private static class JarInputStreamWrapper extends InputStream {
+
+        private final JarFile jarFile;
+        private final InputStream is;
+
+
+        public JarInputStreamWrapper(JarFile jarFile, InputStream is) {
+            this.jarFile = jarFile;
+            this.is = is;
+        }
+
+
+        @Override
+        public int read() throws IOException {
+            return is.read();
+        }
+
+
+        @Override
+        public int read(byte[] b) throws IOException {
+            return is.read(b);
+        }
+
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            return is.read(b, off, len);
+        }
+
+
+        @Override
+        public long skip(long n) throws IOException {
+            return is.skip(n);
+        }
+
+
+        @Override
+        public int available() throws IOException {
+            return is.available();
+        }
+
+
+        @Override
+        public void close() throws IOException {
+            // Closing the JarFile releases the file lock on the JAR and also
+            // closes all input streams created from the JarFile.
+            jarFile.close();
+        }
+
+
+        @Override
+        public synchronized void mark(int readlimit) {
+            is.mark(readlimit);
+        }
+
+
+        @Override
+        public synchronized void reset() throws IOException {
+            is.reset();
+        }
+
+
+        @Override
+        public boolean markSupported() {
+            return is.markSupported();
+        }
     }
 }

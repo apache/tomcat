@@ -91,4 +91,9 @@ public abstract class AbstractResourceSet extends LifecycleBase
     protected final void stopInternal() throws LifecycleException {
         setState(LifecycleState.STOPPING);
     }
+
+    @Override
+    protected final void destroyInternal() throws LifecycleException {
+        // NO-OP
+    }
 }
