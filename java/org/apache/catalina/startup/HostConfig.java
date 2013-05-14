@@ -282,9 +282,6 @@ public class HostConfig
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
 
-        if (event.getType().equals(Lifecycle.PERIODIC_EVENT))
-            check();
-
         // Identify the host we are associated with
         try {
             host = (Host) event.getLifecycle();
@@ -299,11 +296,13 @@ public class HostConfig
         }
 
         // Process the event that has occurred
-        if (event.getType().equals(Lifecycle.START_EVENT))
+        if (event.getType().equals(Lifecycle.PERIODIC_EVENT)) {
+            check();
+        } else if (event.getType().equals(Lifecycle.START_EVENT)) {
             start();
-        else if (event.getType().equals(Lifecycle.STOP_EVENT))
+        } else if (event.getType().equals(Lifecycle.STOP_EVENT)) {
             stop();
-
+        }
     }
 
 
