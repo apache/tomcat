@@ -698,7 +698,7 @@ public class Diagnostics {
         sb.append(requestedSm.getString("diagnostics.vmInfoSystem"));
         sb.append(":" + CRLF);
         Map<String,String> props = runtimeMXBean.getSystemProperties();
-        ArrayList<String> keys = new ArrayList<String>(props.keySet());
+        ArrayList<String> keys = new ArrayList<>(props.keySet());
         Collections.sort(keys);
         for (String prop: keys) {
             sb.append(INDENT1 + prop + ": " + props.get(prop) + CRLF);
