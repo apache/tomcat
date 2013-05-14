@@ -64,6 +64,12 @@
         application. Also fix some whitespace parsing issues identified by the
         additional test cases. (markt)
       </fix>
+      <fix>
+        Prevent possible WAR file locking when reading a context.xml file from
+        an unexpanded WAR file. Note that in normal usage, the
+        <code>JreMemoryLeakPreventionListener</code> would protect against this.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

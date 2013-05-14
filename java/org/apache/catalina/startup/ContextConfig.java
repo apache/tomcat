@@ -615,7 +615,9 @@ public class ContextConfig implements LifecycleListener {
 
         try {
             source = new InputSource(contextXml.toString());
-            stream = contextXml.openStream();
+            URLConnection xmlConn = contextXml.openConnection();
+            xmlConn.setUseCaches(false);
+            stream = xmlConn.getInputStream();
         } catch (Exception e) {
             log.error(sm.getString("contextConfig.contextMissing",
                       contextXml) , e);
