@@ -70,6 +70,10 @@
         <code>JreMemoryLeakPreventionListener</code> would protect against this.
         (markt)
       </fix>
+      <fix>
+        Ensure that when auto deployment runs for a Host, it uses the latest
+        values for copyXML, deployXML and unpackWARs. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
