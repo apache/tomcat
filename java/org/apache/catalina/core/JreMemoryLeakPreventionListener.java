@@ -264,7 +264,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 // Trigger the creation of the AWT (AWT-Windows, AWT-XAWT,
                 // etc.) thread
                 if (awtThreadProtection) {
-                  java.awt.Toolkit.getDefaultToolkit();
+                    java.awt.Toolkit.getDefaultToolkit();
                 }
 
                 // Trigger the creation of the "Java2D Disposer" thread.
@@ -272,8 +272,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 if(java2dDisposerProtection) {
                     try {
                         Class.forName("sun.java2d.Disposer");
-                    }
-                    catch (ClassNotFoundException cnfe) {
+                    } catch (ClassNotFoundException cnfe) {
                         // Ignore this case: we must be running on a
                         // non-Sun-based JRE.
                     }
