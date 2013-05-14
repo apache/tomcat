@@ -648,8 +648,7 @@ public class ContextConfig implements LifecycleListener {
         if (host instanceof StandardHost &&
                 context instanceof StandardContext) {
             unpackWARs = ((StandardHost) host).isUnpackWARs() &&
-                    ((StandardContext) context).getUnpackWAR() &&
-                    (docBase.startsWith(host.getAppBaseFile().getPath()));
+                    ((StandardContext) context).getUnpackWAR();
         }
 
         if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war") && !file.isDirectory() && unpackWARs) {
