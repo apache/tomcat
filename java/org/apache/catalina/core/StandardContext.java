@@ -5755,7 +5755,7 @@ public class StandardContext extends ContainerBase
         ClassLoader oldContextClassLoader =
             Thread.currentThread().getContextClassLoader();
 
-        if (getLoader().getClassLoader() != null) {
+        if (getLoader() != null && getLoader().getClassLoader() != null) {
             Thread.currentThread().setContextClassLoader
                 (getLoader().getClassLoader());
         }
