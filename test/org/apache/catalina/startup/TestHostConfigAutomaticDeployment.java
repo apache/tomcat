@@ -775,6 +775,36 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 null);
     }
 
+    @Test
+    public void testDeleteXmlWarRemoveWar() throws Exception {
+        doTestDelete(true, false, false, true, false, WAR, true, false, false,
+                XML_COOKIE_NAME);
+    }
+
+    @Test
+    public void testDeleteXmlWarRemoveXml() throws Exception {
+        doTestDelete(true, false, false, true, false, XML, false, false, false,
+                null);
+    }
+
+    @Test
+    public void testDeleteXmlWarDirRemoveDir() throws Exception {
+        doTestDelete(true, false, false, true, true, DIR, true, true, true,
+                XML_COOKIE_NAME);
+    }
+
+    @Test
+    public void testDeleteXmlWarDirRemoveWar() throws Exception {
+        doTestDelete(true, false, false, true, true, WAR, true, false, false,
+                XML_COOKIE_NAME);
+    }
+
+    @Test
+    public void testDeleteXmlWarDirRemoveXml() throws Exception {
+        doTestDelete(true, false, false, true, true, XML, false, false, false,
+                null);
+    }
+
     private void doTestDelete(boolean startXml, boolean startExternalWar,
             boolean startExternalDir, boolean startWar, boolean startDir,
             int toDelete, boolean resultXml, boolean resultWar,
