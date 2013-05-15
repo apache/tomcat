@@ -108,6 +108,13 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>54932</bug>: Correct the link to Tribes documentation. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.40 (markt)" rtext="2013-05-09">
   <subsection name="Catalina">
