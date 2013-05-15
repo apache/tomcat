@@ -543,7 +543,10 @@ public class HostConfig
         Context context = null;
         boolean isExternalWar = false;
         boolean isExternal = false;
-        File expandedDocBase = null;
+
+        // context.xml is always first
+        deployedApp.redeployResources.put(contextXml.getAbsolutePath(),
+                Long.valueOf(contextXml.lastModified()));
 
         try (FileInputStream fis = new FileInputStream(contextXml)) {
             synchronized (digester) {
@@ -563,30 +566,32 @@ public class HostConfig
 
             Class<?> clazz = Class.forName(host.getConfigClass());
             LifecycleListener listener =
-                (LifecycleListener) clazz.newInstance();
+                    (LifecycleListener) clazz.newInstance();
             context.addLifecycleListener(listener);
 
             context.setConfigFile(contextXml.toURI().toURL());
             context.setName(cn.getName());
             context.setPath(cn.getPath());
             context.setWebappVersion(cn.getVersion());
-            // Add the associated docBase to the redeployed list if it's a WAR
+
+            // Validate the docBase
             if (context.getDocBase() != null) {
                 File docBase = new File(context.getDocBase());
                 if (!docBase.isAbsolute()) {
                     docBase = new File(host.getAppBaseFile(), context.getDocBase());
                 }
-                // If external docBase, register .xml as redeploy first
                 if (!docBase.getCanonicalPath().startsWith(
                         host.getAppBaseFile().getAbsolutePath() + File.separator)) {
                     isExternal = true;
-                    deployedApp.redeployResources.put(
-                            contextXml.getAbsolutePath(),
-                            Long.valueOf(contextXml.lastModified()));
-                    deployedApp.redeployResources.put(docBase.getAbsolutePath(),
-                            Long.valueOf(docBase.lastModified()));
                     if (docBase.getAbsolutePath().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                         isExternalWar = true;
+                    }
+                    // Valid external docBase - add it to redeploy list
+                    deployedApp.redeployResources.put(docBase.getAbsolutePath(),
+                            Long.valueOf(docBase.lastModified()));
+                    if (!isExternalWar) {
+                        addWatchedResources(deployedApp,
+                                docBase.getAbsolutePath(), context);
                     }
                 } else {
                     log.warn(sm.getString("hostConfig.deployDescriptor.localDocBaseSpecified",
@@ -603,48 +608,52 @@ public class HostConfig
                                    contextXml.getAbsolutePath()), t);
         } finally {
             // Get paths for WAR and expanded WAR in appBase
-
-            // default to appBase dir + name
-            expandedDocBase = new File(host.getAppBaseFile(), cn.getBaseName());
-            if (context.getDocBase() != null) {
+            File expandedDocBase = null;
+            if (context.getDocBase() == null) {
+                // default to appBase dir + name
+                expandedDocBase =
+                        new File(host.getAppBaseFile(), cn.getBaseName());
+            } else {
                 // first assume docBase is absolute
                 expandedDocBase = new File(context.getDocBase());
                 if (!expandedDocBase.isAbsolute()) {
-                    // if docBase specified and relative, it must be relative to appBase
+                    // if docBase specified and relative, it must be relative to
+                    // appBase
                     expandedDocBase = new File(host.getAppBaseFile(), context.getDocBase());
                 }
+            }
+            File warDocBase =
+                    new File(expandedDocBase.getAbsolutePath() + ".war");
+
+            if (isExternalWar && warDocBase.exists()) {
+               // TODO log warning
             }
 
             // Add the eventual unpacked WAR and all the resources which will be
             // watched inside it
-            if (isExternalWar && unpackWARs) {
-                deployedApp.redeployResources.put(expandedDocBase.getAbsolutePath(),
-                        Long.valueOf(expandedDocBase.lastModified()));
-                deployedApp.redeployResources.put(contextXml.getAbsolutePath(),
-                        Long.valueOf(contextXml.lastModified()));
-                addWatchedResources(deployedApp, expandedDocBase.getAbsolutePath(), context);
-            } else {
+            if (isExternalWar) {
+                if (unpackWARs) {
+                    deployedApp.redeployResources.put(
+                            expandedDocBase.getAbsolutePath(),
+                            Long.valueOf(expandedDocBase.lastModified()));
+                    addWatchedResources(deployedApp,
+                            expandedDocBase.getAbsolutePath(), context);
+                }
+            } else if (!isExternal) {
                 // Find an existing matching war and expanded folder
-                if (!isExternal) {
-                    File warDocBase = new File(expandedDocBase.getAbsolutePath() + ".war");
-                    if (warDocBase.exists()) {
-                        deployedApp.redeployResources.put(warDocBase.getAbsolutePath(),
-                                Long.valueOf(warDocBase.lastModified()));
-                    }
+                if (warDocBase.exists()) {
+                    deployedApp.redeployResources.put(
+                            warDocBase.getAbsolutePath(),
+                            Long.valueOf(warDocBase.lastModified()));
                 }
                 if (expandedDocBase.exists()) {
-                    deployedApp.redeployResources.put(expandedDocBase.getAbsolutePath(),
+                    deployedApp.redeployResources.put(
+                            expandedDocBase.getAbsolutePath(),
                             Long.valueOf(expandedDocBase.lastModified()));
                     addWatchedResources(deployedApp,
                             expandedDocBase.getAbsolutePath(), context);
                 } else {
                     addWatchedResources(deployedApp, null, context);
-                }
-                // Add the context XML to the list of files which should trigger a redeployment
-                if (!isExternal) {
-                    deployedApp.redeployResources.put(
-                            contextXml.getAbsolutePath(),
-                            Long.valueOf(contextXml.lastModified()));
                 }
             }
             // Add the global redeploy resources (which are never deleted) at
