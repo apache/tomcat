@@ -120,7 +120,8 @@ public class ApplicationContext
     public ApplicationContext(StandardContext context) {
         super();
         this.context = context;
-        
+        this.sessionCookieConfig = new ApplicationSessionCookieConfig(context);
+
         // Populate session tracking modes
         populateSessionTrackingModes();
     }
@@ -190,9 +191,8 @@ public class ApplicationContext
     /**
      * Session Cookie config
      */
-    private SessionCookieConfig sessionCookieConfig =
-        new ApplicationSessionCookieConfig();
-    
+    private SessionCookieConfig sessionCookieConfig;
+
     /**
      * Session tracking modes
      */
