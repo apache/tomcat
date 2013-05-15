@@ -329,7 +329,7 @@ public class ReplicationValve
                     return ;
                 }
                 if(cluster.hasMembers()) {
-                    sendReplicationMessage(request, totalstart, isCrossContext, clusterManager, cluster);
+                    sendReplicationMessage(request, totalstart, isCrossContext, clusterManager);
                 } else {
                     resetReplicationRequest(request,isCrossContext);
                 }
@@ -392,9 +392,8 @@ public class ReplicationValve
      * @param totalstart
      * @param isCrossContext
      * @param clusterManager
-     * @param containerCluster
      */
-    protected void sendReplicationMessage(Request request, long totalstart, boolean isCrossContext, ClusterManager clusterManager, CatalinaCluster containerCluster) {
+    protected void sendReplicationMessage(Request request, long totalstart, boolean isCrossContext, ClusterManager clusterManager) {
         //this happens after the request
         long start = 0;
         if(doStatistics()) {
@@ -404,12 +403,12 @@ public class ReplicationValve
             // send invalid sessions
             // DeltaManager returns String[0]
             if (!(clusterManager instanceof DeltaManager)) {
-                sendInvalidSessions(clusterManager, containerCluster);
+                sendInvalidSessions(clusterManager);
             }
             // send replication
-            sendSessionReplicationMessage(request, clusterManager, containerCluster);
+            sendSessionReplicationMessage(request, clusterManager);
             if(isCrossContext) {
-                sendCrossContextSession(containerCluster);
+                sendCrossContextSession();
             }
         } catch (Exception x) {
             // FIXME we have a lot of sends, but the trouble with one node stops the correct replication to other nodes!
@@ -424,9 +423,8 @@ public class ReplicationValve
 
     /**
      * Send all changed cross context sessions to backups
-     * @param containerCluster
      */
-    protected void sendCrossContextSession(CatalinaCluster containerCluster) {
+    protected void sendCrossContextSession() {
         List<DeltaSession> sessions = crossContextSessions.get();
         if(sessions != null && sessions.size() >0) {
             for(Iterator<DeltaSession> iter = sessions.iterator(); iter.hasNext() ;) {
@@ -435,7 +433,7 @@ public class ReplicationValve
                     log.debug(sm.getString("ReplicationValve.crossContext.sendDelta",
                             session.getManager().getContext().getName() ));
                 }
-                sendMessage(session,(ClusterManager)session.getManager(),containerCluster);
+                sendMessage(session,(ClusterManager)session.getManager());
                 if(doStatistics()) {
                     nrOfCrossContextSendRequests++;
                 }
@@ -486,10 +484,9 @@ public class ReplicationValve
      * Send Cluster Replication Request
      * @param request current request
      * @param manager session manager
-     * @param cluster replication cluster
      */
     protected void sendSessionReplicationMessage(Request request,
-            ClusterManager manager, CatalinaCluster cluster) {
+            ClusterManager manager) {
         Session session = request.getSessionInternal(false);
         if (session != null) {
             String uri = request.getDecodedRequestURI();
@@ -498,7 +495,7 @@ public class ReplicationValve
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("ReplicationValve.invoke.uri", uri));
                 }
-                sendMessage(session,manager,cluster);
+                sendMessage(session,manager);
             } else
                 if(doStatistics()) {
                     nrOfFilterRequests++;
@@ -511,27 +508,25 @@ public class ReplicationValve
     * Send message delta message from request session
     * @param session current session
     * @param manager session manager
-    * @param cluster replication cluster
     */
     protected void sendMessage(Session session,
-             ClusterManager manager, CatalinaCluster cluster) {
+             ClusterManager manager) {
         String id = session.getIdInternal();
         if (id != null) {
-            send(manager, cluster, id);
+            send(manager, id);
         }
     }
 
     /**
      * send manager requestCompleted message to cluster
      * @param manager SessionManager
-     * @param cluster replication cluster
      * @param sessionId sessionid from the manager
      * @see DeltaManager#requestCompleted(String)
      * @see SimpleTcpCluster#send(ClusterMessage)
      */
-    protected void send(ClusterManager manager, CatalinaCluster cluster, String sessionId) {
+    protected void send(ClusterManager manager, String sessionId) {
         ClusterMessage msg = manager.requestCompleted(sessionId);
-        if (msg != null) {
+        if (msg != null && cluster != null) {
             cluster.send(msg);
             if(doStatistics()) {
                 nrOfSendRequests++;
@@ -542,14 +537,13 @@ public class ReplicationValve
     /**
      * check for session invalidations
      * @param manager
-     * @param cluster
      */
-    protected void sendInvalidSessions(ClusterManager manager, CatalinaCluster cluster) {
+    protected void sendInvalidSessions(ClusterManager manager) {
         String[] invalidIds=manager.getInvalidatedSessions();
         if ( invalidIds.length > 0 ) {
             for ( int i=0;i<invalidIds.length; i++ ) {
                 try {
-                    send(manager,cluster,invalidIds[i]);
+                    send(manager,invalidIds[i]);
                 } catch ( Exception x ) {
                     log.error(sm.getString("ReplicationValve.send.invalid.failure",invalidIds[i]),x);
                 }
