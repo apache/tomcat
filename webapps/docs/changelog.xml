@@ -76,6 +76,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>54968</bug>: Return the correct version number (2.2) of the JSP
+        specification that is supported by the JSP engine when
+        javax.servlet.jsp.JspEngineInfo#getSpecificationVersion() is invoked.
+        (violetagg) 
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <add>
