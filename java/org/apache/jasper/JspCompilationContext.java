@@ -96,33 +96,23 @@ public class JspCompilationContext {
     private final JarResource tagJarResource;
 
     // jspURI _must_ be relative to the context
-    public JspCompilationContext(String jspUri,
-                                 Options options,
-                                 ServletContext context,
-                                 JspServletWrapper jsw,
-                                 JspRuntimeContext rctxt) {
+    public JspCompilationContext(String jspUri, Options options,
+            ServletContext context, JspServletWrapper jsw,
+            JspRuntimeContext rctxt) {
 
         this(jspUri, null, options, context, jsw, rctxt, null, false);
     }
 
-    public JspCompilationContext(String tagfile,
-                                 TagInfo tagInfo,
-                                 Options options,
-                                 ServletContext context,
-                                 JspServletWrapper jsw,
-                                 JspRuntimeContext rctxt,
-                                 JarResource tagJarResource) {
+    public JspCompilationContext(String tagfile, TagInfo tagInfo,
+            Options options, ServletContext context, JspServletWrapper jsw,
+            JspRuntimeContext rctxt, JarResource tagJarResource) {
         this(tagfile, tagInfo, options, context, jsw, rctxt, tagJarResource,
                 true);
     }
 
-    private JspCompilationContext(String jspUri,
-            TagInfo tagInfo,
-            Options options,
-            ServletContext context,
-            JspServletWrapper jsw,
-            JspRuntimeContext rctxt,
-            JarResource tagJarResource,
+    private JspCompilationContext(String jspUri, TagInfo tagInfo,
+            Options options, ServletContext context, JspServletWrapper jsw,
+            JspRuntimeContext rctxt, JarResource tagJarResource,
             boolean isTagFile) {
 
         this.jspUri = canonicalURI(jspUri);
@@ -193,9 +183,9 @@ public class JspCompilationContext {
     public ClassLoader getJspLoader() {
         if( jspLoader == null ) {
             jspLoader = new JasperLoader
-            (new URL[] {baseUrl},
-                    getClassLoader(),
-                    rctxt.getPermissionCollection());
+                    (new URL[] {baseUrl},
+                            getClassLoader(),
+                            rctxt.getPermissionCollection());
         }
         return jspLoader;
     }
@@ -314,9 +304,9 @@ public class JspCompilationContext {
                 result = context.getResource(canonicalURI(res));
             }
         } else if (res.startsWith("jar:jndi:")) {
-                // This is a tag file packaged in a jar that is being checked
-                // for a dependency
-                result = new URL(res);
+            // This is a tag file packaged in a jar that is being checked
+            // for a dependency
+            result = new URL(res);
 
         } else {
             result = context.getResource(canonicalURI(res));
@@ -544,7 +534,7 @@ public class JspCompilationContext {
             javaPath = tagName.replace('.', '/') + ".java";
         } else {
             javaPath = getServletPackageName().replace('.', '/') + '/' +
-                       getServletClassName() + ".java";
+                    getServletClassName() + ".java";
         }
         return javaPath;
     }
@@ -578,7 +568,7 @@ public class JspCompilationContext {
      */
     public TldLocation getTldLocation(String uri) throws JasperException {
         TldLocation location =
-            getOptions().getTldLocationsCache().getLocation(uri);
+                getOptions().getTldLocationsCache().getLocation(uri);
         return location;
     }
 
@@ -629,8 +619,8 @@ public class JspCompilationContext {
                 throw fnfe;
             } catch (Exception ex) {
                 JasperException je = new JasperException(
-                            Localizer.getMessage("jsp.error.unable.compile"),
-                            ex);
+                        Localizer.getMessage("jsp.error.unable.compile"),
+                        ex);
                 // Cache compilation exception
                 jsw.setCompilationException(je);
                 throw je;
@@ -648,10 +638,10 @@ public class JspCompilationContext {
             servletClass = jspLoader.loadClass(name);
         } catch (ClassNotFoundException cex) {
             throw new JasperException(Localizer.getMessage("jsp.error.unable.load"),
-                                      cex);
+                    cex);
         } catch (Exception ex) {
             throw new JasperException(Localizer.getMessage("jsp.error.unable.compile"),
-                                      ex);
+                    ex);
         }
         removed = false;
         return servletClass;
@@ -698,86 +688,86 @@ public class JspCompilationContext {
             path = getServletPackageName().replace('.',File.separatorChar);
         }
 
-            // Append servlet or tag handler path to scratch dir
-            try {
-                File base = options.getScratchDir();
-                baseUrl = base.toURI().toURL();
-                outputDir = base.getAbsolutePath() + File.separator + path +
+        // Append servlet or tag handler path to scratch dir
+        try {
+            File base = options.getScratchDir();
+            baseUrl = base.toURI().toURL();
+            outputDir = base.getAbsolutePath() + File.separator + path +
                     File.separator;
-                if (!makeOutputDir()) {
-                    throw new IllegalStateException(Localizer.getMessage("jsp.error.outputfolder"));
-                }
-            } catch (MalformedURLException e) {
-                throw new IllegalStateException(Localizer.getMessage("jsp.error.outputfolder"), e);
+            if (!makeOutputDir()) {
+                throw new IllegalStateException(Localizer.getMessage("jsp.error.outputfolder"));
             }
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException(Localizer.getMessage("jsp.error.outputfolder"), e);
+        }
     }
 
     protected static final boolean isPathSeparator(char c) {
-       return (c == '/' || c == '\\');
+        return (c == '/' || c == '\\');
     }
 
     protected static final String canonicalURI(String s) {
-       if (s == null) {
-        return null;
-    }
-       StringBuilder result = new StringBuilder();
-       final int len = s.length();
-       int pos = 0;
-       while (pos < len) {
-           char c = s.charAt(pos);
-           if ( isPathSeparator(c) ) {
-               /*
-                * multiple path separators.
-                * 'foo///bar' -> 'foo/bar'
-                */
-               while (pos+1 < len && isPathSeparator(s.charAt(pos+1))) {
-                   ++pos;
-               }
-
-               if (pos+1 < len && s.charAt(pos+1) == '.') {
-                   /*
-                    * a single dot at the end of the path - we are done.
-                    */
-                   if (pos+2 >= len) {
-                    break;
+        if (s == null) {
+            return null;
+        }
+        StringBuilder result = new StringBuilder();
+        final int len = s.length();
+        int pos = 0;
+        while (pos < len) {
+            char c = s.charAt(pos);
+            if ( isPathSeparator(c) ) {
+                /*
+                 * multiple path separators.
+                 * 'foo///bar' -> 'foo/bar'
+                 */
+                while (pos+1 < len && isPathSeparator(s.charAt(pos+1))) {
+                    ++pos;
                 }
 
-                   switch (s.charAt(pos+2)) {
-                       /*
-                        * self directory in path
-                        * foo/./bar -> foo/bar
-                        */
-                   case '/':
-                   case '\\':
-                       pos += 2;
-                       continue;
+                if (pos+1 < len && s.charAt(pos+1) == '.') {
+                    /*
+                     * a single dot at the end of the path - we are done.
+                     */
+                    if (pos+2 >= len) {
+                        break;
+                    }
 
-                       /*
-                        * two dots in a path: go back one hierarchy.
-                        * foo/bar/../baz -> foo/baz
-                        */
-                   case '.':
-                       // only if we have exactly _two_ dots.
-                       if (pos+3 < len && isPathSeparator(s.charAt(pos+3))) {
-                           pos += 3;
-                           int separatorPos = result.length()-1;
-                           while (separatorPos >= 0 &&
-                                  ! isPathSeparator(result
-                                                    .charAt(separatorPos))) {
-                               --separatorPos;
-                           }
-                           if (separatorPos >= 0) {
-                            result.setLength(separatorPos);
+                    switch (s.charAt(pos+2)) {
+                        /*
+                         * self directory in path
+                         * foo/./bar -> foo/bar
+                         */
+                        case '/':
+                        case '\\':
+                            pos += 2;
+                            continue;
+
+                            /*
+                             * two dots in a path: go back one hierarchy.
+                             * foo/bar/../baz -> foo/baz
+                             */
+                        case '.':
+                            // only if we have exactly _two_ dots.
+                            if (pos+3 < len && isPathSeparator(s.charAt(pos+3))) {
+                                pos += 3;
+                                int separatorPos = result.length()-1;
+                                while (separatorPos >= 0 &&
+                                        ! isPathSeparator(result
+                                                .charAt(separatorPos))) {
+                                    --separatorPos;
+                                }
+                                if (separatorPos >= 0) {
+                                    result.setLength(separatorPos);
+                                }
+                                continue;
                         }
-                           continue;
-                       }
-                   }
-               }
-           }
-           result.append(c);
-           ++pos;
-       }
-       return result.toString();
+                    }
+                }
+            }
+            result.append(c);
+            ++pos;
+        }
+        return result.toString();
     }
 }
 
