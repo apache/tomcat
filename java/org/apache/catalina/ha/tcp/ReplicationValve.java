@@ -319,21 +319,19 @@ public class ReplicationValve
                 crossContextSessions.set(new ArrayList<DeltaSession>());
             }
             getNext().invoke(request, response);
-            if(context != null && cluster != null) {
-                Manager manager = context.getManager();
-                if (manager != null && manager instanceof ClusterManager) {
-                    ClusterManager clusterManager = (ClusterManager) manager;
+            if(context != null && cluster != null
+                    && context.getManager() instanceof ClusterManager) {
+                ClusterManager clusterManager = (ClusterManager) context.getManager();
 
-                    // valve cluster can access manager - other cluster handle replication
-                    // at host level - hopefully!
-                    if(cluster.getManager(clusterManager.getName()) == null) {
-                        return ;
-                    }
-                    if(cluster.hasMembers()) {
-                        sendReplicationMessage(request, totalstart, isCrossContext, clusterManager, cluster);
-                    } else {
-                        resetReplicationRequest(request,isCrossContext);
-                    }
+                // valve cluster can access manager - other cluster handle replication
+                // at host level - hopefully!
+                if(cluster.getManager(clusterManager.getName()) == null) {
+                    return ;
+                }
+                if(cluster.hasMembers()) {
+                    sendReplicationMessage(request, totalstart, isCrossContext, clusterManager, cluster);
+                } else {
+                    resetReplicationRequest(request,isCrossContext);
                 }
             }
         } finally {
