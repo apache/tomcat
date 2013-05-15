@@ -164,6 +164,10 @@
         Remove unused JvmRouteSessionIDBinderListener and SessionIDMessage.
         (kfujino)
       </scode>
+      <scode>
+        Modify method signature in ReplicationValve. Cluster instance is not
+        necessary to argument of method. (kfujino)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Web applications">
