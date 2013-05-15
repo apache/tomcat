@@ -721,9 +721,57 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 null);
     }
 
-    // @Test Disable as this currently fails
+    @Test
     public void testDeleteXmlDirRemoveDir() throws Exception {
         doTestDelete(true, false, false, false, true, DIR, true, false, false,
+                XML_COOKIE_NAME);
+    }
+
+    @Test
+    public void testDeleteXmlDirRemoveXml() throws Exception {
+        doTestDelete(true, false, false, false, true, XML, false, false, false,
+                null);
+    }
+
+    @Test
+    public void testDeleteXmlExtwarRemoveExt() throws Exception {
+        doTestDelete(true, true, false, false, false, EXT, true, false, false,
+                XML_COOKIE_NAME);
+    }
+
+    @Test
+    public void testDeleteXmlExtdirRemoveExt() throws Exception {
+        doTestDelete(true, false, true, false, false, EXT, true, false, false,
+                XML_COOKIE_NAME);
+    }
+
+    @Test
+    public void testDeleteXmlExtwarRemoveXml() throws Exception {
+        doTestDelete(true, true, false, false, false, XML, false, false, false,
+                null);
+    }
+
+    @Test
+    public void testDeleteXmlExtdirRemoveXml() throws Exception {
+        doTestDelete(true, false, true, false, false, XML, false, false, false,
+                null);
+    }
+
+    @Test
+    public void testDeleteXmlExtwarDirRemoveDir() throws Exception {
+        doTestDelete(true, true, false, false, true, DIR, true, false, true,
+                XML_COOKIE_NAME);
+    }
+
+    @Test
+    public void testDeleteXmlExtwarDirRemoveExt() throws Exception {
+        doTestDelete(true, true, false, false, true, EXT, true, false, false,
+                XML_COOKIE_NAME);
+    }
+
+    @Test
+    public void testDeleteXmlExtwarDirRemoveXml() throws Exception {
+        doTestDelete(true, true, false, false, true, XML, false, false, false,
                 null);
     }
 
@@ -741,7 +789,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         File war = null;
         File dir = null;
 
-        if (startXml) {
+        if (startXml && !startExternalWar && !startExternalDir) {
             xml = new File(host.getConfigBaseFile(), APP_NAME + ".xml");
             File parent = xml.getParentFile();
             if (!parent.isDirectory()) {
@@ -799,7 +847,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             recurrsiveCopy(DIR_XML_SOURCE.toPath(), dir.toPath());
         }
 
-        if (startWar && !startDir) {
+        if ((startWar || startExternalWar) && !startDir) {
             host.setUnpackWARs(false);
         }
 
@@ -831,6 +879,31 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         Context ctxt = (Context) host.findChild(APP_NAME.getName());
 
         // Check the results
+        // External WAR and DIR should only be deleted if the test is testing
+        // behaviour when the external resource is deleted
+        if (toDelete == EXT) {
+            if (ext == null) {
+                Assert.fail();
+            } else {
+                Assert.assertFalse(ext.exists());
+            }
+        } else {
+            if (startExternalWar) {
+                if (ext == null) {
+                    Assert.fail();
+                } else {
+                    Assert.assertTrue(ext.isFile());
+                }
+            }
+            if (startExternalDir) {
+                if (ext == null) {
+                    Assert.fail();
+                } else {
+                    Assert.assertTrue(ext.isDirectory());
+                }
+            }
+        }
+
         if (resultXml) {
             if (xml == null) {
                 Assert.fail();
@@ -857,7 +930,11 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             Assert.assertNull(ctxt);
         }
         if (!resultWar && !resultDir) {
-            Assert.assertNull(ctxt);
+            if (resultXml) {
+                Assert.assertEquals(LifecycleState.FAILED, ctxt.getState());
+            } else {
+                Assert.assertNull(ctxt);
+            }
         }
 
         if (ctxt != null) {
