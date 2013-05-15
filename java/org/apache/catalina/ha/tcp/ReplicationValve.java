@@ -26,7 +26,9 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.ServletException;
 
+import org.apache.catalina.Cluster;
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.connector.Request;
@@ -317,24 +319,18 @@ public class ReplicationValve
                 crossContextSessions.set(new ArrayList<DeltaSession>());
             }
             getNext().invoke(request, response);
-            if(context != null) {
+            if(context != null && cluster != null) {
                 Manager manager = context.getManager();
                 if (manager != null && manager instanceof ClusterManager) {
                     ClusterManager clusterManager = (ClusterManager) manager;
-                    CatalinaCluster containerCluster = (CatalinaCluster) getContainer().getCluster();
-                    if (containerCluster == null) {
-                        if (log.isWarnEnabled()) {
-                            log.warn(sm.getString("ReplicationValve.nocluster"));
-                        }
-                        return;
-                    }
+
                     // valve cluster can access manager - other cluster handle replication
                     // at host level - hopefully!
-                    if(containerCluster.getManager(clusterManager.getName()) == null) {
+                    if(cluster.getManager(clusterManager.getName()) == null) {
                         return ;
                     }
-                    if(containerCluster.hasMembers()) {
-                        sendReplicationMessage(request, totalstart, isCrossContext, clusterManager, containerCluster);
+                    if(cluster.hasMembers()) {
+                        sendReplicationMessage(request, totalstart, isCrossContext, clusterManager, cluster);
                     } else {
                         resetReplicationRequest(request,isCrossContext);
                     }
@@ -366,6 +362,28 @@ public class ReplicationValve
         nrOfRequests = 0 ;
         nrOfSendRequests = 0;
         nrOfCrossContextSendRequests = 0;
+    }
+
+    /**
+     * Start this component and implement the requirements
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
+     */
+    @Override
+    protected synchronized void startInternal() throws LifecycleException {
+        if (cluster == null) {
+            Cluster containerCluster = getContainer().getCluster();
+            if (containerCluster instanceof CatalinaCluster) {
+                setCluster((CatalinaCluster)containerCluster);
+            } else {
+                if (log.isWarnEnabled()) {
+                    log.warn(sm.getString("ReplicationValve.nocluster"));
+                }
+            }
+        }
+        super.startInternal();
     }
 
 
