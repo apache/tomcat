@@ -74,6 +74,14 @@
         Ensure that when auto deployment runs for a Host, it uses the latest
         values for copyXML, deployXML and unpackWARs. (markt)
       </fix>
+      <fix>
+        <bug>54974</bug>: Ensure that 
+        <code>SessionCookieConfig#set&lt;methods&gt;</code>
+        will throw <code>IllegalStateException</code> if the
+        <code>ServletContext</code> from which this 
+        <code>SessionCookieConfig</code> was acquired has already been
+        initialized. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -81,8 +89,8 @@
       <fix>
         <bug>54968</bug>: Return the correct version number (2.2) of the JSP
         specification that is supported by the JSP engine when
-        javax.servlet.jsp.JspEngineInfo#getSpecificationVersion() is invoked.
-        (violetagg) 
+        <code>javax.servlet.jsp.JspEngineInfo#getSpecificationVersion()</code>
+        is invoked. (violetagg) 
       </fix>
     </changelog>
   </subsection>
