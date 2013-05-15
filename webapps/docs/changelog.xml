@@ -83,6 +83,11 @@
         <code>FileMessageFactory</code> in <code>FarmWarDeployer</code>.
         (kfujino)
       </add>
+      <scode>
+        Simplify the code of <code>ReplicationValve</code>: Rather than get
+        cluster instance from container on every request, use instance variable.
+        (kfujino)
+      </scode>
     </changelog>
   </subsection>
 </section>
