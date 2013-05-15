@@ -117,6 +117,7 @@ public class ApplicationContext
         super();
         this.context = context;
         this.service = ((Engine) context.getParent().getParent()).getService();
+        this.sessionCookieConfig = new ApplicationSessionCookieConfig(context);
 
         // Populate session tracking modes
         populateSessionTrackingModes();
@@ -192,8 +193,7 @@ public class ApplicationContext
     /**
      * Session Cookie config
      */
-    private final SessionCookieConfig sessionCookieConfig =
-        new ApplicationSessionCookieConfig();
+    private SessionCookieConfig sessionCookieConfig;
 
     /**
      * Session tracking modes
