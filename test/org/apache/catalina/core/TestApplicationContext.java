@@ -98,6 +98,25 @@ public class TestApplicationContext extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testGetJspConfigDescriptor() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0");
+        // app dir is relative to server home
+        StandardContext standardContext = (StandardContext) tomcat.addWebapp(
+                null, "/test", appDir.getAbsolutePath());
+
+        ServletContext servletContext = standardContext.getServletContext();
+
+        Assert.assertNull(servletContext.getJspConfigDescriptor());
+
+        tomcat.start();
+
+        Assert.assertNotNull(servletContext.getJspConfigDescriptor());
+    }
+
+
     private ServletContext getServletContext() {
         Tomcat tomcat = getTomcatInstance();
 
