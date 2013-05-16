@@ -1096,6 +1096,66 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 true, false, false, XML_COOKIE_NAME, NONE);
     }
 
+    @Test
+    public void testModifyXmlExtwarUpdateXml() throws Exception {
+        doTestModify(true, true, false, false, false, XML,
+                true, false, false, XML_COOKIE_NAME, REDEPLOY);
+    }
+
+    @Test
+    public void testModifyXmlExtdirUpdateXml() throws Exception {
+        doTestModify(true, false, true, false, false, XML,
+                true, false, false, XML_COOKIE_NAME, REDEPLOY);
+    }
+
+    @Test
+    public void testModifyXmlExtwarDirUpdateDir() throws Exception {
+        doTestModify(true, true, false, false, true, DIR,
+                true, false, false, XML_COOKIE_NAME, NONE);
+    }
+
+    @Test
+    public void testModifyXmlExtwarDirUpdateExt() throws Exception {
+        doTestModify(true, true, false, false, true, EXT,
+                true, false, true, XML_COOKIE_NAME, RELOAD);
+    }
+
+    @Test
+    public void testModifyXmlExtwarDirUpdateXml() throws Exception {
+        doTestModify(true, true, false, false, true, XML,
+                true, false, false, XML_COOKIE_NAME, REDEPLOY);
+    }
+
+    @Test
+    public void testModifyXmlWarUpdateWar() throws Exception {
+        doTestModify(true, false, false, true, false, WAR,
+                true, true, false, XML_COOKIE_NAME, RELOAD);
+    }
+
+    @Test
+    public void testModifyXmlWarUpdateXml() throws Exception {
+        doTestModify(true, false, false, true, false, XML,
+                true, true, false, XML_COOKIE_NAME, REDEPLOY);
+    }
+
+    @Test
+    public void testModifyXmlWarDirUpdateDir() throws Exception {
+        doTestModify(true, false, false, true, true, DIR,
+                true, true, true, XML_COOKIE_NAME, NONE);
+    }
+
+    @Test
+    public void testModifyXmlWarDirUpdateWar() throws Exception {
+        doTestModify(true, false, false, true, true, WAR,
+                true, true, true, XML_COOKIE_NAME, RELOAD);
+    }
+
+    @Test
+    public void testModifyXmlWarDirUpdateXml() throws Exception {
+        doTestModify(true, false, false, true, true, XML,
+                true, true, true, XML_COOKIE_NAME, REDEPLOY);
+    }
+
     private void doTestModify(boolean startXml, boolean startExternalWar,
             boolean startExternalDir, boolean startWar, boolean startDir,
             int toModify, boolean resultXml, boolean resultWar,
