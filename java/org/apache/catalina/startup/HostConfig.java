@@ -1183,6 +1183,7 @@ public class HostConfig
                         }
                     }
                     // This will trigger a redeploy
+                    undeploy(app);
                     deleteRedeployResources(app, resources, i, false);
                     return;
                 }
@@ -1204,6 +1205,7 @@ public class HostConfig
                     continue;
                 }
                 // Undeploy application
+                undeploy(app);
                 deleteRedeployResources(app, resources, i, true);
                 return;
             }
@@ -1250,10 +1252,7 @@ public class HostConfig
     }
 
 
-    private void deleteRedeployResources(DeployedApplication app,
-            String[] resources, int i, boolean deleteReloadResources) {
-
-        // Delete redeploy resources
+    private void undeploy(DeployedApplication app) {
         if (log.isInfoEnabled())
             log.info(sm.getString("hostConfig.undeploy", app.name));
         Container context = host.findChild(app.name);
@@ -1264,6 +1263,13 @@ public class HostConfig
             log.warn(sm.getString
                      ("hostConfig.context.remove", app.name), t);
         }
+        deployed.remove(app.name);
+    }
+
+
+    private void deleteRedeployResources(DeployedApplication app,
+            String[] resources, int i, boolean deleteReloadResources) {
+
         // Delete other redeploy resources
         for (int j = i + 1; j < resources.length; j++) {
             try {
@@ -1314,7 +1320,6 @@ public class HostConfig
             }
 
         }
-        deployed.remove(app.name);
     }
 
 
@@ -1476,6 +1481,7 @@ public class HostConfig
                             // Version is unused - undeploy it completely
                             // The -1 is a 'trick' to ensure all redeploy
                             // resources are removed
+                            undeploy(app);
                             deleteRedeployResources(app, resources, -1,
                                     true);
                         }
