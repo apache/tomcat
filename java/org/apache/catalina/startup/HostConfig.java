@@ -1167,7 +1167,22 @@ public class HostConfig
                     app.redeployResources.get(resources[i]).longValue();
                 if ((!resource.isDirectory()) &&
                         resource.lastModified() > lastModified) {
-                    // Undeploy application
+                    // Skip over resources we can't delete such as external WARs
+                    while (!isDeletableResource(resource)) {
+                        // Update last modified for this resource so this
+                        // doesn't trigger again next check
+                        app.redeployResources.put(resources[i],
+                                Long.valueOf(System.currentTimeMillis()));
+                        i++;
+                        if (i < resources.length) {
+                            resource = new File(resources[i]);
+                        } else {
+                            // Modified resource - need to reload
+                            reload(app);
+                            return;
+                        }
+                    }
+                    // This will trigger a redeploy
                     deleteRedeployResources(app, resources, i, false);
                     return;
                 }
@@ -1204,27 +1219,32 @@ public class HostConfig
             if ((!resource.exists() && lastModified != 0L)
                 || (resource.lastModified() != lastModified)) {
                 // Reload application
-                if(log.isInfoEnabled())
-                    log.info(sm.getString("hostConfig.reload", app.name));
-                Context context = (Context) host.findChild(app.name);
-                if (context.getState().isAvailable()) {
-                    // Reload catches and logs exceptions
-                    context.reload();
-                } else {
-                    // If the context was not started (for example an error
-                    // in web.xml) we'll still get to try to start
-                    try {
-                        context.start();
-                    } catch (Exception e) {
-                        log.warn(sm.getString
-                                 ("hostConfig.context.restart", app.name), e);
-                    }
-                }
+                reload(app);
                 // Update times
                 app.reloadResources.put(resources[i],
                         Long.valueOf(resource.lastModified()));
                 app.timestamp = System.currentTimeMillis();
                 return;
+            }
+        }
+    }
+
+
+    private void reload(DeployedApplication app) {
+        if(log.isInfoEnabled())
+            log.info(sm.getString("hostConfig.reload", app.name));
+        Context context = (Context) host.findChild(app.name);
+        if (context.getState().isAvailable()) {
+            // Reload catches and logs exceptions
+            context.reload();
+        } else {
+            // If the context was not started (for example an error
+            // in web.xml) we'll still get to try to start
+            try {
+                context.start();
+            } catch (Exception e) {
+                log.warn(sm.getString
+                         ("hostConfig.context.restart", app.name), e);
             }
         }
     }
@@ -1256,11 +1276,7 @@ public class HostConfig
                 }
                 // Only delete resources in the appBase or the
                 // host's configBase
-                if ((current.getAbsolutePath().startsWith(
-                        host.getAppBaseFile().getAbsolutePath() +
-                        File.separator))
-                        || (current.getAbsolutePath().startsWith(
-                                host.getConfigBaseFile().getAbsolutePath()))) {
+                if (isDeletableResource(current)) {
                     if (log.isDebugEnabled())
                         log.debug("Delete " + current);
                     ExpandWar.delete(current);
@@ -1286,11 +1302,7 @@ public class HostConfig
                     }
                     // Only delete resources in the appBase or the host's
                     // configBase
-                    if ((current.getAbsolutePath().startsWith(
-                            host.getAppBaseFile().getAbsolutePath() + File.separator))
-                        || ((current.getAbsolutePath().startsWith(
-                                host.getConfigBaseFile().getAbsolutePath())
-                             && (current.getAbsolutePath().endsWith(".xml"))))) {
+                    if (isDeletableResource(current)) {
                         if (log.isDebugEnabled())
                             log.debug("Delete " + current);
                         ExpandWar.delete(current);
@@ -1304,6 +1316,19 @@ public class HostConfig
         }
         deployed.remove(app.name);
     }
+
+
+    private boolean isDeletableResource(File resource) {
+        if ((resource.getAbsolutePath().startsWith(
+                host.getAppBaseFile().getAbsolutePath() + File.separator))
+            || ((resource.getAbsolutePath().startsWith(
+                    host.getConfigBaseFile().getAbsolutePath())
+                 && (resource.getAbsolutePath().endsWith(".xml"))))) {
+            return true;
+        }
+        return false;
+    }
+
 
     /**
      * Process a "start" event for this Host.
