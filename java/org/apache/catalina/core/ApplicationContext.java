@@ -1418,7 +1418,14 @@ public class ApplicationContext
 
     @Override
     public JspConfigDescriptor getJspConfigDescriptor() {
-        return context.getJspConfigDescriptor();
+        JspConfigDescriptor jspConfigDescriptor = context
+                .getJspConfigDescriptor();
+        if (jspConfigDescriptor.getJspPropertyGroups().isEmpty()
+                && jspConfigDescriptor.getTaglibs().isEmpty()) {
+            return null;
+        } else {
+            return jspConfigDescriptor;
+        }
     }
 
 
