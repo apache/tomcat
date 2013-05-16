@@ -532,7 +532,8 @@ public class HostConfig
     @SuppressWarnings("null") // context is not null
     protected void deployDescriptor(ContextName cn, File contextXml) {
 
-        DeployedApplication deployedApp = new DeployedApplication(cn.getName());
+        DeployedApplication deployedApp =
+                new DeployedApplication(cn.getName(), true);
 
         // Assume this is a configuration descriptor and deploy it
         if(log.isInfoEnabled()) {
@@ -825,7 +826,8 @@ public class HostConfig
             }
         }
 
-        DeployedApplication deployedApp = new DeployedApplication(cn.getName());
+        DeployedApplication deployedApp = new DeployedApplication(cn.getName(),
+                xml.exists() && deployXML && copyXML);
 
         // Deploy the application in this WAR file
         if(log.isInfoEnabled())
@@ -988,7 +990,6 @@ public class HostConfig
      */
     protected void deployDirectory(ContextName cn, File dir) {
 
-        DeployedApplication deployedApp = new DeployedApplication(cn.getName());
 
         // Deploy the application in this directory
         if( log.isInfoEnabled() )
@@ -998,6 +999,10 @@ public class HostConfig
         Context context = null;
         File xml = new File(dir, Constants.ApplicationContextXml);
         File xmlCopy = null;
+
+        DeployedApplication deployedApp = new DeployedApplication(cn.getName(),
+                xml.exists() && deployXML && copyXML);
+
         try {
             if (deployXML && xml.exists()) {
                 synchronized (digester) {
@@ -1165,27 +1170,42 @@ public class HostConfig
             if (resource.exists()) {
                 long lastModified =
                     app.redeployResources.get(resources[i]).longValue();
-                if ((!resource.isDirectory()) &&
-                        resource.lastModified() > lastModified) {
-                    // Skip over resources we can't delete such as external WARs
-                    while (!isDeletableResource(resource)) {
-                        // Update last modified for this resource so this
-                        // doesn't trigger again next check
+                if (resource.lastModified() > lastModified) {
+                    if (resource.isDirectory()) {
+                        // No action required for modified directory
                         app.redeployResources.put(resources[i],
-                                Long.valueOf(System.currentTimeMillis()));
-                        i++;
-                        if (i < resources.length) {
-                            resource = new File(resources[i]);
-                        } else {
-                            // Modified resource - need to reload
-                            reload(app);
-                            return;
+                                Long.valueOf(resource.lastModified()));
+                    } else if (app.hasDescriptor &&
+                            resource.getName().toLowerCase(
+                                    Locale.ENGLISH).endsWith(".war")) {
+                        // Modified WAR triggers a reload if there is an XML
+                        // file present
+                        // The only resource that should be deleted is the
+                        // expanded WAR (if any)
+                        Context context = (Context) host.findChild(app.name);
+                        String docBase = context.getDocBase();
+                        docBase = docBase.toLowerCase(Locale.ENGLISH);
+                        if (!docBase.endsWith(".war")) {
+                            // This is an expanded directory
+                            File docBaseFile = new File(docBase);
+                            if (!docBaseFile.isAbsolute()) {
+                                docBaseFile = new File(host.getAppBaseFile(),
+                                        docBase);
+                            }
+                            ExpandWar.delete(docBaseFile);
+                            // Reset the docBase to trigger re-expansion of the
+                            // WAR
+                            context.setDocBase(resource.getAbsolutePath());
                         }
+                        reload(app);
+                        return;
+                    } else {
+                        // Everything else triggers a redeploy
+                        // (just need to undeploy here, deploy will follow)
+                        deleteRedeployResources(app, resources, i, false);
+                        undeploy(app);
+                        return;
                     }
-                    // This will trigger a redeploy
-                    undeploy(app);
-                    deleteRedeployResources(app, resources, i, false);
-                    return;
                 }
             } else {
                 // There is a chance the the resource was only missing
@@ -1503,7 +1523,8 @@ public class HostConfig
         if (deployed.containsKey(contextName))
             return;
 
-        DeployedApplication deployedApp = new DeployedApplication(contextName);
+        DeployedApplication deployedApp =
+                new DeployedApplication(contextName, false);
 
         // Add the associated docBase to the redeployed list if it's a WAR
         boolean isWar = false;
@@ -1551,8 +1572,9 @@ public class HostConfig
      * the monitored resources.
      */
     protected static class DeployedApplication {
-        public DeployedApplication(String name) {
+        public DeployedApplication(String name, boolean hasDescriptor) {
             this.name = name;
+            this.hasDescriptor = hasDescriptor;
         }
 
         /**
@@ -1560,6 +1582,12 @@ public class HostConfig
          * (host.getChild(name) != null).
          */
         public final String name;
+
+        /**
+         * Does this application have a context.xml descriptor file on the
+         * host's configBase?
+         */
+        public final boolean hasDescriptor;
 
         /**
          * Any modification of the specified (static) resources will cause a
