@@ -67,6 +67,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     private static final String XML_COOKIE_NAME = "XML_CONTEXT";
     private static final String WAR_COOKIE_NAME = "WAR_CONTEXT";
     private static final String DIR_COOKIE_NAME = "DIR_CONTEXT";
+    // private static final String DEFAULT_COOKIE_NAME = "JSESSIONID";
 
     private File external;
 
@@ -674,29 +675,31 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
 
 
     /*
-     * Expected behaviour for deletion of files.
+     * Expected behaviour for the deletion of files.
      *
-     * Artifacts present(6)   Artifact     Artifacts remaining
+     * Artifacts present     Artifact     Artifacts remaining
      *  XML  WAR  EXT  DIR    Removed     XML  WAR  EXT DIR    Notes
      *   N    N    N    Y       DIR        -    -    -   N
      *   N    Y    N    N       WAR        -    N    -   -
-     *   N    Y    N    Y       DIR        -    Y    -   R     8
+     *   N    Y    N    Y       DIR        -    Y    -   R     1
      *   N    Y    N    Y       WAR        -    N    -   N
      *   Y    N    N    N       XML        N    -    -   -
-     *   Y    N    N    Y       DIR        Y    -    -   N     2
-     *   Y    N    N    Y       XML        N    -    -   N
-     *   Y    N    Y    N       EXT        Y    -    N   -     2
-     *   Y    N    Y    N       XML        N    -    Y   -     9
-     *   Y    N    Y    Y       DIR        Y    -    Y   R     10,8
-     *   Y    N    Y    Y       EXT        Y    -    N   N     2
+     *   Y    N    N    Y       DIR        N    -    -   N
+     *   Y    N    N    Y       XML        R    -    -   Y     2
+     *   Y    N    Y    N       EXT        Y    -    N   -
+     *   Y    N    Y    N       XML        N    -    Y   -
+     *   Y    N    Y    Y       DIR        R    -    Y   R     1,2
+     *   Y    N    Y    Y       EXT        Y    -    N   N
      *   Y    N    Y    Y       XML        N    -    Y   N
-     *   Y    Y    N    N       WAR        Y    N    -   -     2
+     *   Y    Y    N    N       WAR        N    N    -   -
      *   Y    Y    N    N       XML        N    N    -   -
-     *   Y    Y    N    Y       DIR        Y    Y    -   R     8
-     *   Y    Y    N    Y       WAR        Y    N    -   -     2
-     *   Y    Y    N    Y       XML        N    N    -   N
+     *   Y    Y    N    Y       DIR        R    Y    -   R     1,2
+     *   Y    Y    N    Y       WAR        N    N    -   -
+     *   Y    Y    N    Y       XML        R    Y    -   Y
      *
-     *   Notes:
+     * Notes: 1. The DIR will be re-created since unpackWARs is true.
+     *        2. The XML will be extracted from the WAR/DIR if deployXML and
+     *           copyXML are true.
      */
     @Test
     public void testDeleteDirRemoveDir() throws Exception {
@@ -730,14 +733,21 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
 
     @Test
     public void testDeleteXmlDirRemoveDir() throws Exception {
-        doTestDelete(true, false, false, false, true, DIR, true, false, false,
-                XML_COOKIE_NAME);
+        doTestDelete(true, false, false, false, true, DIR, false, false, false,
+                null);
     }
 
     @Test
     public void testDeleteXmlDirRemoveXml() throws Exception {
-        doTestDelete(true, false, false, false, true, XML, false, false, false,
-                null);
+        doTestDelete(true, false, false, false, true, XML, false, false, true,
+                DIR_COOKIE_NAME);
+    }
+
+    @Test
+    public void testDeleteXmlDirRemoveXmlCopyXml() throws Exception {
+        ((StandardHost) getTomcatInstance().getHost()).setCopyXML(true);
+        doTestDelete(true, false, false, false, true, XML, true, false, true,
+                DIR_COOKIE_NAME);
     }
 
     @Test
@@ -784,32 +794,60 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
 
     @Test
     public void testDeleteXmlWarRemoveWar() throws Exception {
-        doTestDelete(true, false, false, true, false, WAR, true, false, false,
-                XML_COOKIE_NAME);
+        doTestDelete(true, false, false, true, false, WAR, false, false, false,
+                null);
     }
 
     @Test
     public void testDeleteXmlWarRemoveXml() throws Exception {
-        doTestDelete(true, false, false, true, false, XML, false, false, false,
-                null);
+        doTestDelete(true, false, false, true, false, XML, false, true, false,
+                WAR_COOKIE_NAME);
+    }
+
+    @Test
+    public void testDeleteXmlWarRemoveXmlCopyXml() throws Exception {
+        ((StandardHost) getTomcatInstance().getHost()).setCopyXML(true);
+        doTestDelete(true, false, false, true, false, XML, true, true, false,
+                WAR_COOKIE_NAME);
     }
 
     @Test
     public void testDeleteXmlWarDirRemoveDir() throws Exception {
+        doTestDelete(true, false, false, true, true, DIR, false, true, true,
+                WAR_COOKIE_NAME);
+    }
+
+    @Test
+    public void testDeleteXmlWarDirRemoveDirCopyXml() throws Exception {
+        ((StandardHost) getTomcatInstance().getHost()).setCopyXML(true);
         doTestDelete(true, false, false, true, true, DIR, true, true, true,
-                XML_COOKIE_NAME);
+                WAR_COOKIE_NAME);
     }
 
     @Test
     public void testDeleteXmlWarDirRemoveWar() throws Exception {
-        doTestDelete(true, false, false, true, true, WAR, true, false, false,
-                XML_COOKIE_NAME);
+        doTestDelete(true, false, false, true, true, WAR, false, false, false,
+                null);
+    }
+
+    @Test
+    public void testDeleteXmlWarDirRemoveWarCopyXml() throws Exception {
+        ((StandardHost) getTomcatInstance().getHost()).setCopyXML(true);
+        doTestDelete(true, false, false, true, true, WAR, false, false, false,
+                null);
     }
 
     @Test
     public void testDeleteXmlWarDirRemoveXml() throws Exception {
-        doTestDelete(true, false, false, true, true, XML, false, false, false,
-                null);
+        doTestDelete(true, false, false, true, true, XML, false, true, true,
+                DIR_COOKIE_NAME);
+    }
+
+    @Test
+    public void testDeleteXmlWarDirRemoveXmlCopyXml() throws Exception {
+        ((StandardHost) getTomcatInstance().getHost()).setCopyXML(true);
+        doTestDelete(true, false, false, true, true, XML, true, true, true,
+                WAR_COOKIE_NAME);
     }
 
     private void doTestDelete(boolean startXml, boolean startExternalWar,
@@ -1040,6 +1078,24 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 true, false, true, XML_COOKIE_NAME, NONE);
     }
 
+    @Test
+    public void testModifyXmlDirUpdateXml() throws Exception {
+        doTestModify(true, false, false, false, true, XML,
+                true, false, true, XML_COOKIE_NAME, REDEPLOY);
+    }
+
+    @Test
+    public void testModifyXmlExtwarUpdateExtwar() throws Exception {
+        doTestModify(true, true, false, false, false, EXT,
+                true, false, false, XML_COOKIE_NAME, RELOAD);
+    }
+
+    @Test
+    public void testModifyXmlExtdirUpdateExtdir() throws Exception {
+        doTestModify(true, false, true, false, false, EXT,
+                true, false, false, XML_COOKIE_NAME, NONE);
+    }
+
     private void doTestModify(boolean startXml, boolean startExternalWar,
             boolean startExternalDir, boolean startWar, boolean startDir,
             int toModify, boolean resultXml, boolean resultWar,
@@ -1191,15 +1247,22 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             Assert.assertNull(newContext);
         }
         if (!resultWar && !resultDir) {
-            if (resultXml && !startExternalWar && !startExternalDir) {
-                Assert.assertEquals(LifecycleState.FAILED, newContext.getState());
+            if (resultXml) {
+                if (!startExternalWar && !startExternalDir) {
+                    Assert.assertEquals(LifecycleState.FAILED,
+                            newContext.getState());
+                } else {
+                    Assert.assertEquals(LifecycleState.STARTED,
+                            newContext.getState());
+                }
             } else {
                 Assert.assertNull(newContext);
             }
         }
 
         if (newContext != null) {
-            Assert.assertEquals(resultCookieName, newContext.getSessionCookieName());
+            Assert.assertEquals(resultCookieName,
+                    newContext.getSessionCookieName());
         }
 
         if (resultAction == NONE) {
