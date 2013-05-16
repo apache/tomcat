@@ -82,6 +82,12 @@
         <code>SessionCookieConfig</code> was acquired has already been
         initialized. (violetagg)
       </fix>
+      <fix>
+        <bug>54981</bug>: Ensure that
+        <code>ServletContext#getJspConfigDescriptor()</code> will return
+        <code>null</code> when there is no jsp configuration provided by
+        web.xml/web-fragment.xml. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
