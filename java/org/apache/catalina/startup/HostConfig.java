@@ -1019,7 +1019,9 @@ public class HostConfig
 
         Context context = null;
         File xml = new File(dir, Constants.ApplicationContextXml);
-        File xmlCopy = null;
+        File xmlCopy =
+                new File(host.getConfigBaseFile(), cn.getBaseName() + ".xml");
+
 
         DeployedApplication deployedApp = new DeployedApplication(cn.getName(),
                 xml.exists() && deployXML && copyXML);
@@ -1041,7 +1043,6 @@ public class HostConfig
                     }
                 }
                 if (copyXML) {
-                    xmlCopy = new File(host.getConfigBaseFile(), cn.getBaseName() + ".xml");
                     InputStream is = null;
                     OutputStream os = null;
                     try {
@@ -1084,18 +1085,33 @@ public class HostConfig
             log.error(sm.getString("hostConfig.deployDir.error",
                     dir.getAbsolutePath()), t);
         } finally {
+            // Fake re-deploy resource to detect if a WAR is added at a later
+            // point
+            deployedApp.redeployResources.put(dir.getAbsolutePath() + ".war",
+                    Long.valueOf(0));
             deployedApp.redeployResources.put(dir.getAbsolutePath(),
                     Long.valueOf(dir.lastModified()));
             if (deployXML && xml.exists()) {
-                if (xmlCopy == null) {
-                    deployedApp.redeployResources.put(
-                            xml.getAbsolutePath(),
-                            Long.valueOf(xml.lastModified()));
-                } else {
+                if (copyXML) {
                     deployedApp.redeployResources.put(
                             xmlCopy.getAbsolutePath(),
                             Long.valueOf(xmlCopy.lastModified()));
+                } else {
+                    deployedApp.redeployResources.put(
+                            xml.getAbsolutePath(),
+                            Long.valueOf(xml.lastModified()));
+                    // Fake re-deploy resource to detect if a context.xml file is
+                    // added at a later point
+                    deployedApp.redeployResources.put(
+                            xmlCopy.getAbsolutePath(),
+                            Long.valueOf(0));
                 }
+            } else {
+                // Fake re-deploy resource to detect if a context.xml file is
+                // added at a later point
+                deployedApp.redeployResources.put(
+                        xmlCopy.getAbsolutePath(),
+                        Long.valueOf(0));
             }
             addWatchedResources(deployedApp, dir.getAbsolutePath(), context);
             // Add the global redeploy resources (which are never deleted) at
@@ -1188,9 +1204,9 @@ public class HostConfig
             if (log.isDebugEnabled())
                 log.debug("Checking context[" + app.name +
                         "] redeploy resource " + resource);
-            if (resource.exists()) {
-                long lastModified =
+            long lastModified =
                     app.redeployResources.get(resources[i]).longValue();
+            if (resource.exists() || lastModified == 0) {
                 if (resource.lastModified() > lastModified) {
                     if (resource.isDirectory()) {
                         // No action required for modified directory
@@ -1240,8 +1256,6 @@ public class HostConfig
                 if (resource.exists()) {
                     continue;
                 }
-                long lastModified =
-                    app.redeployResources.get(resources[i]).longValue();
                 if (lastModified == 0L) {
                     continue;
                 }
