@@ -1302,22 +1302,20 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     /*
      * Expected behaviour for the addition of files.
      *
-     * Artifacts present      Artifact   Artifacts remaining
-     * XML  WAR  EXT  DIR    Modified    XML  WAR  EXT DIR   Action
+     * Artifacts present     Artifact   Artifacts remaining
+     * XML  WAR  EXT  DIR     Added      XML  WAR  EXT DIR   Action
      *  N    Y    N    Y       DIR        -    Y    -   M     None
      *  N    Y    N    Y       WAR        -    M    -   R   Redeploy
      *  Y    N    N    Y       DIR        Y    -    -   M     None
      *  Y    N    N    Y       XML        M    -    -   Y   Redeploy
-     *  Y    N    Y    N       EXT        Y    -    M   -   Reload if WAR
-     *  Y    N    Y    N       XML        M    -    Y   -   Redeploy
-     *  Y    N    Y    Y       DIR        Y    -    Y   M     None
-     *  Y    N    Y    Y       EXT        Y    -    M   R    Reload
-     *  Y    N    Y    Y       XML        M    -    Y   Y   Redeploy
      *  Y    Y    N    N       WAR        Y    M    -   -    Reload
      *  Y    Y    N    N       XML        M    Y    -   -   Redeploy
      *  Y    Y    N    Y       DIR        Y    Y    -   M     None
      *  Y    Y    N    Y       WAR        Y    M    -   -    Reload
      *  Y    Y    N    Y       XML        M    Y    -   Y   Redeploy
+     *  Y    N    Y    Y       DIR        Y    -    Y   M     None
+     *  Y    N    Y    Y       EXT        Y    -    M   R    Reload
+     *  Y    N    Y    Y       XML        M    -    Y   Y   Redeploy
      *
      * Addition of a file  is treated as if the added file has been modified
      * with the following additional actions:
@@ -1356,6 +1354,18 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     public void testAdditionDirAddXml() throws Exception {
         doTestAddition(false, false, false, false, true, XML,
                 true, false, true, XML_COOKIE_NAME, REDEPLOY);
+    }
+
+    @Test
+    public void testAdditionXmlAddWar() throws Exception {
+        doTestAddition(true, false, false, false, false, WAR,
+                true, true, false, XML_COOKIE_NAME, RELOAD);
+    }
+
+    @Test
+    public void testAdditionWarAddXml() throws Exception {
+        doTestAddition(false, false, false, true, false, XML,
+                true, true, false, XML_COOKIE_NAME, REDEPLOY);
     }
 
     private void doTestAddition(boolean startXml, boolean startExternalWar,
