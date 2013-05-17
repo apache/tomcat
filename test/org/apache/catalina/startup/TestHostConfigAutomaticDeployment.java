@@ -29,6 +29,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
@@ -106,69 +107,58 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
      */
     @Test
     public void testDeploymentXmlFFF() throws Exception {
-        initTestDeploymentXml();
+        createXmlInConfigBaseForAppbase();
         doTestDeployment(false, false, false,
                 LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlFFT() throws Exception {
-        initTestDeploymentXml();
+        createXmlInConfigBaseForAppbase();
         doTestDeployment(false, false, true,
                 LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlFTF() throws Exception {
-        initTestDeploymentXml();
+        createXmlInConfigBaseForAppbase();
         doTestDeployment(false, true, false,
                 LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlFTT() throws Exception {
-        initTestDeploymentXml();
+        createXmlInConfigBaseForAppbase();
         doTestDeployment(false, true, true,
                 LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlTFF() throws Exception {
-        initTestDeploymentXml();
+        createXmlInConfigBaseForAppbase();
         doTestDeployment(true, false, false,
                 LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlTFT() throws Exception {
-        initTestDeploymentXml();
+        createXmlInConfigBaseForAppbase();
         doTestDeployment(true, false, true,
                 LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlTTF() throws Exception {
-        initTestDeploymentXml();
+        createXmlInConfigBaseForAppbase();
         doTestDeployment(true, true, false,
                 LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlTTT() throws Exception {
-        initTestDeploymentXml();
+        createXmlInConfigBaseForAppbase();
         doTestDeployment(true, true, true,
                 LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
-    }
-
-    private void initTestDeploymentXml() throws IOException {
-        File xml = new File(getTomcatInstance().getHost().getConfigBaseFile(),
-                APP_NAME + ".xml");
-        File parent = xml.getParentFile();
-        if (!parent.isDirectory()) {
-            Assert.assertTrue(parent.mkdirs());
-        }
-
-        Files.copy(XML_SOURCE.toPath(), xml.toPath());
     }
 
 
@@ -357,65 +347,58 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
      */
     @Test
     public void testDeploymentWarXmlFFF() throws Exception {
-        initTestDeploymentWarXml();
+        createWarInAppbase(true);
         doTestDeployment(false, false, false,
                 LifecycleState.STARTED, null, false, true, false);
     }
 
     @Test
     public void testDeploymentWarXmlFFT() throws Exception {
-        initTestDeploymentWarXml();
+        createWarInAppbase(true);
         doTestDeployment(false, false, true,
                 LifecycleState.STARTED, null, false, true, true);
     }
 
     @Test
     public void testDeploymentWarXmlFTF() throws Exception {
-        initTestDeploymentWarXml();
+        createWarInAppbase(true);
         doTestDeployment(false, true, false,
                 LifecycleState.STARTED, null, false, true, false);
     }
 
     @Test
     public void testDeploymentWarXmlFTT() throws Exception {
-        initTestDeploymentWarXml();
+        createWarInAppbase(true);
         doTestDeployment(false, true, true,
                 LifecycleState.STARTED, null, false, true, true);
     }
 
     @Test
     public void testDeploymentWarXmlTFF() throws Exception {
-        initTestDeploymentWarXml();
+        createWarInAppbase(true);
         doTestDeployment(true, false, false,
                 LifecycleState.STARTED, WAR_COOKIE_NAME, false, true, false);
     }
 
     @Test
     public void testDeploymentWarXmlTFT() throws Exception {
-        initTestDeploymentWarXml();
+        createWarInAppbase(true);
         doTestDeployment(true, false, true,
                 LifecycleState.STARTED, WAR_COOKIE_NAME, false, true, true);
     }
 
     @Test
     public void testDeploymentWarXmlTTF() throws Exception {
-        initTestDeploymentWarXml();
+        createWarInAppbase(true);
         doTestDeployment(true, true, false,
                 LifecycleState.STARTED, WAR_COOKIE_NAME, true, true, false);
     }
 
     @Test
     public void testDeploymentWarXmlTTT() throws Exception {
-        initTestDeploymentWarXml();
+        createWarInAppbase(true);
         doTestDeployment(true, true, true,
                 LifecycleState.STARTED, WAR_COOKIE_NAME, true, true, true);
-    }
-
-    private void initTestDeploymentWarXml() throws IOException {
-        // Copy the test WAR file to the appBase
-        File dest = new File(getTomcatInstance().getHost().getAppBaseFile(),
-                APP_NAME.getBaseName() + ".war");
-        Files.copy(WAR_XML_SOURCE.toPath(), dest.toPath());
     }
 
 
@@ -427,65 +410,58 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
      */
     @Test
     public void testDeploymentWarFFF() throws Exception {
-        initTestDeploymentWar();
+        createWarInAppbase(false);
         doTestDeployment(false, false, false,
                 LifecycleState.STARTED, null, false, true, false);
     }
 
     @Test
     public void testDeploymentWarFFT() throws Exception {
-        initTestDeploymentWar();
+        createWarInAppbase(false);
         doTestDeployment(false, false, true,
                 LifecycleState.STARTED, null, false, true, true);
     }
 
     @Test
     public void testDeploymentWarFTF() throws Exception {
-        initTestDeploymentWar();
+        createWarInAppbase(false);
         doTestDeployment(false, true, false,
                 LifecycleState.STARTED, null, false, true, false);
     }
 
     @Test
     public void testDeploymentWarFTT() throws Exception {
-        initTestDeploymentWar();
+        createWarInAppbase(false);
         doTestDeployment(false, true, true,
                 LifecycleState.STARTED, null, false, true, true);
     }
 
     @Test
     public void testDeploymentWarTFF() throws Exception {
-        initTestDeploymentWar();
+        createWarInAppbase(false);
         doTestDeployment(true, false, false,
                 LifecycleState.STARTED, null, false, true, false);
     }
 
     @Test
     public void testDeploymentWarTFT() throws Exception {
-        initTestDeploymentWar();
+        createWarInAppbase(false);
         doTestDeployment(true, false, true,
                 LifecycleState.STARTED, null, false, true, true);
     }
 
     @Test
     public void testDeploymentWarTTF() throws Exception {
-        initTestDeploymentWar();
+        createWarInAppbase(false);
         doTestDeployment(true, true, false,
                 LifecycleState.STARTED, null, false, true, false);
     }
 
     @Test
     public void testDeploymentWarTTT() throws Exception {
-        initTestDeploymentWar();
+        createWarInAppbase(false);
         doTestDeployment(true, true, true,
                 LifecycleState.STARTED, null, false, true, true);
-    }
-
-    private void initTestDeploymentWar() throws IOException {
-        // Copy the test WAR file to the appBase
-        File dest = new File(getTomcatInstance().getHost().getAppBaseFile(),
-                APP_NAME.getBaseName() + ".war");
-        Files.copy(WAR_SOURCE.toPath(), dest.toPath());
     }
 
 
@@ -857,12 +833,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         File dir = null;
 
         if (startXml && !startExternalWar && !startExternalDir) {
-            xml = new File(host.getConfigBaseFile(), APP_NAME + ".xml");
-            File parent = xml.getParentFile();
-            if (!parent.isDirectory()) {
-                Assert.assertTrue(parent.mkdirs());
-            }
-            Files.copy(XML_SOURCE.toPath(), xml.toPath());
+            xml = createXmlInConfigBaseForAppbase();
         }
         if (startExternalWar) {
             // Copy the test WAR file to the external directory
@@ -902,10 +873,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             }
         }
         if (startWar) {
-            // Copy the test WAR file to the appBase
-            war = new File(getTomcatInstance().getHost().getAppBaseFile(),
-                    APP_NAME.getBaseName() + ".war");
-            Files.copy(WAR_XML_SOURCE.toPath(), war.toPath());
+            war = createWarInAppbase(true);
         }
         if (startDir) {
             dir = createDirInAppbase(true);
@@ -1058,7 +1026,8 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     @Test
     public void testModifyXmlUpdateXml() throws Exception {
         doTestModify(true, false, false, false, false, XML,
-                true, false, false, XML_COOKIE_NAME, REDEPLOY);
+                true, false, false, XML_COOKIE_NAME, REDEPLOY,
+                LifecycleState.FAILED);
     }
 
     @Test
@@ -1150,6 +1119,16 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             int toModify, boolean resultXml, boolean resultWar,
             boolean resultDir, String resultCookieName, int resultAction)
             throws Exception {
+        doTestModify(startXml, startExternalWar, startExternalDir, startWar,
+                startDir, toModify, resultXml, resultWar, resultDir,
+                resultCookieName, resultAction, LifecycleState.STARTED);
+    }
+
+    private void doTestModify(boolean startXml, boolean startExternalWar,
+            boolean startExternalDir, boolean startWar, boolean startDir,
+            int toModify, boolean resultXml, boolean resultWar,
+            boolean resultDir, String resultCookieName, int resultAction,
+            LifecycleState resultState) throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
         StandardHost host = (StandardHost) tomcat.getHost();
@@ -1161,12 +1140,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         File dir = null;
 
         if (startXml && !startExternalWar && !startExternalDir) {
-            xml = new File(host.getConfigBaseFile(), APP_NAME + ".xml");
-            File parent = xml.getParentFile();
-            if (!parent.isDirectory()) {
-                Assert.assertTrue(parent.mkdirs());
-            }
-            Files.copy(XML_SOURCE.toPath(), xml.toPath());
+            xml = createXmlInConfigBaseForAppbase();
         }
         if (startExternalWar) {
             // Copy the test WAR file to the external directory
@@ -1206,10 +1180,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             }
         }
         if (startWar) {
-            // Copy the test WAR file to the appBase
-            war = new File(getTomcatInstance().getHost().getAppBaseFile(),
-                    APP_NAME.getBaseName() + ".war");
-            Files.copy(WAR_XML_SOURCE.toPath(), war.toPath());
+            war = createWarInAppbase(true);
         }
         if (startDir) {
             dir = createDirInAppbase(true);
@@ -1309,6 +1280,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         if (newContext != null) {
             Assert.assertEquals(resultCookieName,
                     newContext.getSessionCookieName());
+            Assert.assertEquals(resultState, newContext.getState());
         }
 
         if (resultAction == NONE) {
@@ -1363,12 +1335,30 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
      *   the previous bullet point.
      */
     @Test
-    public void testWarAddDir() throws Exception {
-        doTestAdd(false, false, false, true, false, DIR,
+    public void testAdditionWarAddDir() throws Exception {
+        doTestAddition(false, false, false, true, false, DIR,
                 false, true, true, WAR_COOKIE_NAME, NONE);
     }
 
-    private void doTestAdd(boolean startXml, boolean startExternalWar,
+    @Test
+    public void testAdditionDirAddWar() throws Exception {
+        doTestAddition(false, false, false, false, true, WAR,
+                false, true, true, WAR_COOKIE_NAME, REDEPLOY);
+    }
+
+    @Test
+    public void testAdditionXmlAddDir() throws Exception {
+        doTestAddition(true, false, false, false, false, DIR,
+                true, false, true, XML_COOKIE_NAME, NONE);
+    }
+
+    @Test
+    public void testAdditionDirAddXml() throws Exception {
+        doTestAddition(false, false, false, false, true, XML,
+                true, false, true, XML_COOKIE_NAME, REDEPLOY);
+    }
+
+    private void doTestAddition(boolean startXml, boolean startExternalWar,
             boolean startExternalDir, boolean startWar, boolean startDir,
             int toAdd, boolean resultXml, boolean resultWar,
             boolean resultDir, String resultCookieName, int resultAction)
@@ -1384,12 +1374,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         File dir = null;
 
         if (startXml && !startExternalWar && !startExternalDir) {
-            xml = new File(host.getConfigBaseFile(), APP_NAME + ".xml");
-            File parent = xml.getParentFile();
-            if (!parent.isDirectory()) {
-                Assert.assertTrue(parent.mkdirs());
-            }
-            Files.copy(XML_SOURCE.toPath(), xml.toPath());
+            xml = createXmlInConfigBaseForAppbase();
         }
         if (startExternalWar) {
             // Copy the test WAR file to the external directory
@@ -1429,10 +1414,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             }
         }
         if (startWar) {
-            // Copy the test WAR file to the appBase
-            war = new File(getTomcatInstance().getHost().getAppBaseFile(),
-                    APP_NAME.getBaseName() + ".war");
-            Files.copy(WAR_XML_SOURCE.toPath(), war.toPath());
+            war = createWarInAppbase(true);
         }
         if (startDir) {
             dir = createDirInAppbase(true);
@@ -1450,9 +1432,9 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         switch (toAdd) {
             case XML:
                 if (xml == null) {
-                    Assert.fail();
+                    xml = createXmlInConfigBaseForAppbase();
                 } else {
-                    xml.setLastModified(System.currentTimeMillis());
+                    Assert.fail();
                 }
                 break;
             case EXT:
@@ -1464,9 +1446,9 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 break;
             case WAR:
                 if (war == null) {
-                    Assert.fail();
+                    war = createWarInAppbase(true);
                 } else {
-                    war.setLastModified(System.currentTimeMillis());
+                    Assert.fail();
                 }
                 break;
             case DIR:
@@ -1541,6 +1523,12 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             Assert.assertSame(oldContext, newContext);
             Assert.assertEquals("stopstart", tracker.getHistory());
         } else if (resultAction == REDEPLOY) {
+            if (newContext == null) {
+                Assert.fail();
+            } else {
+                Assert.assertEquals(
+                        LifecycleState.STARTED, newContext.getState());
+            }
             Assert.assertNotSame(oldContext, newContext);
             // No init or start as that will be in a new context object
             Assert.assertEquals("stopafter_destroy", tracker.getHistory());
@@ -1559,6 +1547,28 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             recurrsiveCopy(DIR_SOURCE.toPath(), dir.toPath());
         }
         return dir;
+    }
+
+    private File createWarInAppbase(boolean withXml) throws IOException {
+        File war = new File(getTomcatInstance().getHost().getAppBaseFile(),
+                APP_NAME.getBaseName() + ".war");
+        if (withXml) {
+            Files.copy(WAR_XML_SOURCE.toPath(), war.toPath());
+        } else {
+            Files.copy(WAR_SOURCE.toPath(), war.toPath());
+        }
+        return war;
+    }
+
+    private File createXmlInConfigBaseForAppbase() throws IOException {
+        Host host = getTomcatInstance().getHost();
+        File xml = new File(host.getConfigBaseFile(), APP_NAME + ".xml");
+        File parent = xml.getParentFile();
+        if (!parent.isDirectory()) {
+            Assert.assertTrue(parent.mkdirs());
+        }
+        Files.copy(XML_SOURCE.toPath(), xml.toPath());
+        return xml;
     }
 
     private static void recurrsiveCopy(final Path src, final Path dest)
