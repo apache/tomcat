@@ -677,13 +677,34 @@ public class HostConfig
             if (files[i].equalsIgnoreCase("WEB-INF"))
                 continue;
             File war = new File(appBase, files[i]);
-            if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".war") && war.isFile()
-                    && !invalidWars.contains(files[i]) ) {
+            if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".war") &&
+                    war.isFile() && !invalidWars.contains(files[i]) ) {
 
                 ContextName cn = new ContextName(files[i]);
 
-                if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
+                if (isServiced(cn.getName())) {
                     continue;
+                }
+                if (deploymentExists(cn.getName())) {
+                    DeployedApplication app = deployed.get(cn.getName());
+                    if (!unpackWARs && app != null) {
+                        // Need to check for a directory that should not be
+                        // there
+                        File dir = new File(appBase, cn.getBaseName());
+                        if (dir.exists()) {
+                            if (!app.loggedDirWarning) {
+                                log.warn(sm.getString(
+                                        "hostConfig.deployWar.hiddenDir",
+                                        dir.getAbsoluteFile(),
+                                        war.getAbsoluteFile()));
+                                app.loggedDirWarning = true;
+                            }
+                        } else {
+                            app.loggedDirWarning = false;
+                        }
+                    }
+                    continue;
+                }
 
                 // Check for WARs with /../ /./ or similar sequences in the name
                 if (!validateContextPath(appBase, cn.getBaseName())) {
@@ -1612,6 +1633,14 @@ public class HostConfig
          * Instant where the application was last put in service.
          */
         public long timestamp = System.currentTimeMillis();
+
+        /**
+         * In some circumstances, such as when unpackWARs is true, a directory
+         * may be added to the appBase that is ignored. This flag indicates that
+         * the user has been warned so that the warning is not logged on every
+         * run of the auto deployer.
+         */
+        public boolean loggedDirWarning = false;
     }
 
     private static class DeployDescriptor implements Runnable {
