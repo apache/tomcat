@@ -631,6 +631,11 @@ public class HostConfig
                     if (warDocBase.exists()) {
                         deployedApp.redeployResources.put(warDocBase.getAbsolutePath(),
                                 Long.valueOf(warDocBase.lastModified()));
+                    } else {
+                        // Trigger a reload if a WAR is added
+                        deployedApp.reloadResources.put(
+                                warDocBase.getAbsolutePath(),
+                                Long.valueOf(0));
                     }
                 }
                 if (expandedDocBase.exists()) {
@@ -639,6 +644,12 @@ public class HostConfig
                     addWatchedResources(deployedApp,
                             expandedDocBase.getAbsolutePath(), context);
                 } else {
+                    if (!isExternal && !unpackWARs) {
+                        // Trigger a reload if a DIR is added
+                        deployedApp.reloadResources.put(
+                                expandedDocBase.getAbsolutePath(),
+                                Long.valueOf(0));
+                    }
                     addWatchedResources(deployedApp, null, context);
                 }
                 // Add the context XML to the list of files which should trigger a redeployment
@@ -923,6 +934,12 @@ public class HostConfig
             if (deployXML && xml.exists() && copyXML) {
                 deployedApp.redeployResources.put(xml.getAbsolutePath(),
                         Long.valueOf(xml.lastModified()));
+            } else if (!copyXML ) {
+                // In case an XML file is added to the config base later
+                deployedApp.redeployResources.put(
+                        (new File(host.getConfigBaseFile(),
+                                cn.getBaseName() + ".xml")).getAbsolutePath(),
+                        Long.valueOf(0));
             }
 
             Class<?> clazz = Class.forName(host.getConfigClass());
