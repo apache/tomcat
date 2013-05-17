@@ -1024,9 +1024,9 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
      * Artifacts present      Artifact   Artifacts remaining
      * XML  WAR  EXT  DIR    Modified    XML  WAR  EXT DIR   Action
      *  N    N    N    Y       DIR        -    -    -   M     None
-     *  N    Y    N    N       WAR        -    M    -   -    Reload
+     *  N    Y    N    N       WAR        -    M    -   -   Redeploy
      *  N    Y    N    Y       DIR        -    Y    -   M     None
-     *  N    Y    N    Y       WAR        -    M    -   R    Reload
+     *  N    Y    N    Y       WAR        -    M    -   R   Redeploy
      *  Y    N    N    N       XML        M    -    -   -   Redeploy
      *  Y    N    N    Y       DIR        Y    -    -   M     None
      *  Y    N    N    Y       XML        M    -    -   Y   Redeploy
@@ -1039,7 +1039,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
      *  Y    Y    N    N       XML        M    Y    -   -   Redeploy
      *  Y    Y    N    Y       DIR        Y    Y    -   M     None
      *  Y    Y    N    Y       WAR        Y    M    -   -    Reload
-     *  Y    Y    N    Y       XML        M    Y    -   Y    Reload
+     *  Y    Y    N    Y       XML        M    Y    -   Y   Redeploy
      */
     @Test
     public void testModifyDirUpdateDir() throws Exception {
@@ -1237,7 +1237,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         tomcat.start();
         host.backgroundProcess();
 
-        // Remove the specified file
+        // Change the specified file
         switch (toModify) {
             case XML:
                 if (xml == null) {
