@@ -567,67 +567,59 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
      */
     @Test
     public void testDeploymentDirFFF() throws Exception {
-        initTestDeploymentDir();
+        createDirInAppbase(false);
         doTestDeployment(false, false, false,
                 LifecycleState.STARTED, null, false, false, true);
     }
 
     @Test
     public void testDeploymentDirFFT() throws Exception {
-        initTestDeploymentDir();
+        createDirInAppbase(false);
         doTestDeployment(false, false, true,
                 LifecycleState.STARTED, null, false, false, true);
     }
 
     @Test
     public void testDeploymentDirFTF() throws Exception {
-        initTestDeploymentDir();
+        createDirInAppbase(false);
         doTestDeployment(false, true, false,
                 LifecycleState.STARTED, null, false, false, true);
     }
 
     @Test
     public void testDeploymentDirFTT() throws Exception {
-        initTestDeploymentDir();
+        createDirInAppbase(false);
         doTestDeployment(false, true, true,
                 LifecycleState.STARTED, null, false, false, true);
     }
 
     @Test
     public void testDeploymentDirTFF() throws Exception {
-        initTestDeploymentDir();
+        createDirInAppbase(false);
         doTestDeployment(true, false, false,
                 LifecycleState.STARTED, null, false, false, true);
     }
 
     @Test
     public void testDeploymentDirTFT() throws Exception {
-        initTestDeploymentDir();
+        createDirInAppbase(false);
         doTestDeployment(true, false, true,
                 LifecycleState.STARTED, null, false, false, true);
     }
 
     @Test
     public void testDeploymentDirTTF() throws Exception {
-        initTestDeploymentDir();
+        createDirInAppbase(false);
         doTestDeployment(true, true, false,
                 LifecycleState.STARTED, null, false, false, true);
     }
 
     @Test
     public void testDeploymentDirTTT() throws Exception {
-        initTestDeploymentDir();
+        createDirInAppbase(false);
         doTestDeployment(true, true, true,
                 LifecycleState.STARTED, null, false, false, true);
     }
-
-    private void initTestDeploymentDir() throws IOException {
-        // Copy the test DIR file to the appBase
-        File dest = new File(getTomcatInstance().getHost().getAppBaseFile(),
-                APP_NAME.getBaseName());
-        recurrsiveCopy(DIR_SOURCE.toPath(), dest.toPath());
-    }
-
 
     private void doTestDeployment(boolean deployXML, boolean copyXML,
             boolean unpackWARs, LifecycleState resultState, String cookieName,
@@ -916,10 +908,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             Files.copy(WAR_XML_SOURCE.toPath(), war.toPath());
         }
         if (startDir) {
-            // Copy the test DIR file to the appBase
-            dir = new File(getTomcatInstance().getHost().getAppBaseFile(),
-                    APP_NAME.getBaseName());
-            recurrsiveCopy(DIR_XML_SOURCE.toPath(), dir.toPath());
+            dir = createDirInAppbase(true);
         }
 
         if ((startWar || startExternalWar) && !startDir) {
@@ -1223,10 +1212,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             Files.copy(WAR_XML_SOURCE.toPath(), war.toPath());
         }
         if (startDir) {
-            // Copy the test DIR file to the appBase
-            dir = new File(getTomcatInstance().getHost().getAppBaseFile(),
-                    APP_NAME.getBaseName());
-            recurrsiveCopy(DIR_XML_SOURCE.toPath(), dir.toPath());
+            dir = createDirInAppbase(true);
         }
 
         if ((startWar || startExternalWar) && !startDir) {
@@ -1340,6 +1326,240 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         }
     }
 
+
+    /*
+     * Expected behaviour for the addition of files.
+     *
+     * Artifacts present      Artifact   Artifacts remaining
+     * XML  WAR  EXT  DIR    Modified    XML  WAR  EXT DIR   Action
+     *  N    Y    N    Y       DIR        -    Y    -   M     None
+     *  N    Y    N    Y       WAR        -    M    -   R   Redeploy
+     *  Y    N    N    Y       DIR        Y    -    -   M     None
+     *  Y    N    N    Y       XML        M    -    -   Y   Redeploy
+     *  Y    N    Y    N       EXT        Y    -    M   -   Reload if WAR
+     *  Y    N    Y    N       XML        M    -    Y   -   Redeploy
+     *  Y    N    Y    Y       DIR        Y    -    Y   M     None
+     *  Y    N    Y    Y       EXT        Y    -    M   R    Reload
+     *  Y    N    Y    Y       XML        M    -    Y   Y   Redeploy
+     *  Y    Y    N    N       WAR        Y    M    -   -    Reload
+     *  Y    Y    N    N       XML        M    Y    -   -   Redeploy
+     *  Y    Y    N    Y       DIR        Y    Y    -   M     None
+     *  Y    Y    N    Y       WAR        Y    M    -   -    Reload
+     *  Y    Y    N    Y       XML        M    Y    -   Y   Redeploy
+     *
+     * Addition of a file  is treated as if the added file has been modified
+     * with the following additional actions:
+     * - If a WAR is added, any DIR is removed and may be recreated depending on
+     *   unpackWARs.
+     * - If an XML file is added that refers to an external docBase any WAR or
+     *   DIR in the appBase will be removed. The DIR may be recreated if the
+     *   external resource is a WAR and unpackWARs is true.
+     * - If a DIR is added when a WAR already exists and unpackWARs is false,
+     *   the DIR will be ignored but a warning will be logged when the DIR is
+     *   first detected. If the WAR is removed, the DIR will be left and may be
+     *   deployed via automatic deployment.
+     * - If a WAR is added when an external WAR already exists for the same
+     *   context, the WAR will be treated the same way as a DIR is treated in
+     *   the previous bullet point.
+     */
+    @Test
+    public void testWarAddDir() throws Exception {
+        doTestAdd(false, false, false, true, false, DIR,
+                false, true, true, WAR_COOKIE_NAME, NONE);
+    }
+
+    private void doTestAdd(boolean startXml, boolean startExternalWar,
+            boolean startExternalDir, boolean startWar, boolean startDir,
+            int toAdd, boolean resultXml, boolean resultWar,
+            boolean resultDir, String resultCookieName, int resultAction)
+            throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+
+        // Init
+        File xml = null;
+        File ext = null;
+        File war = null;
+        File dir = null;
+
+        if (startXml && !startExternalWar && !startExternalDir) {
+            xml = new File(host.getConfigBaseFile(), APP_NAME + ".xml");
+            File parent = xml.getParentFile();
+            if (!parent.isDirectory()) {
+                Assert.assertTrue(parent.mkdirs());
+            }
+            Files.copy(XML_SOURCE.toPath(), xml.toPath());
+        }
+        if (startExternalWar) {
+            // Copy the test WAR file to the external directory
+            ext = new File(external, "external" + ".war");
+            Files.copy(WAR_XML_SOURCE.toPath(), ext.toPath());
+
+            // Create the XML file
+            xml = new File(host.getConfigBaseFile(), APP_NAME + ".xml");
+            File parent = xml.getParentFile();
+            if (!parent.isDirectory()) {
+                Assert.assertTrue(parent.mkdirs());
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(xml)) {
+                fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
+                        "\" docBase=\"" + ext.getAbsolutePath() +
+                        "\" />").getBytes(B2CConverter.ISO_8859_1));
+            }
+        }
+        if (startExternalDir) {
+            // Copy the test DIR file to the external directory
+            ext = new File(external, "external");
+            recurrsiveCopy(DIR_XML_SOURCE.toPath(), ext.toPath());
+
+            // Create the XML file
+            xml = new File(getTomcatInstance().getHost().getConfigBaseFile(),
+                    APP_NAME + ".xml");
+            File parent = xml.getParentFile();
+            if (!parent.isDirectory()) {
+                Assert.assertTrue(parent.mkdirs());
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(xml)) {
+                fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
+                        "\" docBase=\"" + ext.getAbsolutePath() +
+                        "\" />").getBytes(B2CConverter.ISO_8859_1));
+            }
+        }
+        if (startWar) {
+            // Copy the test WAR file to the appBase
+            war = new File(getTomcatInstance().getHost().getAppBaseFile(),
+                    APP_NAME.getBaseName() + ".war");
+            Files.copy(WAR_XML_SOURCE.toPath(), war.toPath());
+        }
+        if (startDir) {
+            dir = createDirInAppbase(true);
+        }
+
+        if ((startWar || startExternalWar) && !startDir) {
+            host.setUnpackWARs(false);
+        }
+
+        // Deploy the files we copied
+        tomcat.start();
+        host.backgroundProcess();
+
+        // Change the specified file
+        switch (toAdd) {
+            case XML:
+                if (xml == null) {
+                    Assert.fail();
+                } else {
+                    xml.setLastModified(System.currentTimeMillis());
+                }
+                break;
+            case EXT:
+                if (ext == null) {
+                    Assert.fail();
+                } else {
+                    ext.setLastModified(System.currentTimeMillis());
+                }
+                break;
+            case WAR:
+                if (war == null) {
+                    Assert.fail();
+                } else {
+                    war.setLastModified(System.currentTimeMillis());
+                }
+                break;
+            case DIR:
+                if (dir == null) {
+                    dir = createDirInAppbase(true);
+                } else {
+                    Assert.fail();
+                }
+                break;
+            default:
+                Assert.fail();
+        }
+
+        Context oldContext = (Context) host.findChild(APP_NAME.getName());
+        StateTracker tracker = new StateTracker();
+        oldContext.addLifecycleListener(tracker);
+
+        // Trigger an auto-deployment cycle
+        host.backgroundProcess();
+
+        Context newContext = (Context) host.findChild(APP_NAME.getName());
+
+        // Check the results
+        if (resultXml) {
+            if (xml == null) {
+                Assert.fail();
+            } else {
+                Assert.assertTrue(xml.isFile());
+            }
+        }
+        if (resultWar) {
+            if (war == null) {
+                Assert.fail();
+            } else {
+                Assert.assertTrue(war.isFile());
+            }
+        }
+        if (resultDir) {
+            if (dir == null) {
+                Assert.fail();
+            } else {
+                Assert.assertTrue(dir.isDirectory());
+            }
+        }
+
+        if (!resultXml && (startExternalWar || startExternalDir)) {
+            Assert.assertNull(newContext);
+        }
+        if (!resultWar && !resultDir) {
+            if (resultXml) {
+                if (!startExternalWar && !startExternalDir) {
+                    Assert.assertEquals(LifecycleState.FAILED,
+                            newContext.getState());
+                } else {
+                    Assert.assertEquals(LifecycleState.STARTED,
+                            newContext.getState());
+                }
+            } else {
+                Assert.assertNull(newContext);
+            }
+        }
+
+        if (newContext != null) {
+            Assert.assertEquals(resultCookieName,
+                    newContext.getSessionCookieName());
+        }
+
+        if (resultAction == NONE) {
+            Assert.assertSame(oldContext, newContext);
+            Assert.assertEquals("", tracker.getHistory());
+        } else if (resultAction == RELOAD) {
+            Assert.assertSame(oldContext, newContext);
+            Assert.assertEquals("stopstart", tracker.getHistory());
+        } else if (resultAction == REDEPLOY) {
+            Assert.assertNotSame(oldContext, newContext);
+            // No init or start as that will be in a new context object
+            Assert.assertEquals("stopafter_destroy", tracker.getHistory());
+        } else {
+            Assert.fail();
+        }
+    }
+
+
+    private File createDirInAppbase(boolean withXml) throws IOException {
+        File dir = new File(getTomcatInstance().getHost().getAppBaseFile(),
+                APP_NAME.getBaseName());
+        if (withXml) {
+            recurrsiveCopy(DIR_XML_SOURCE.toPath(), dir.toPath());
+        } else {
+            recurrsiveCopy(DIR_SOURCE.toPath(), dir.toPath());
+        }
+        return dir;
+    }
 
     private static void recurrsiveCopy(final Path src, final Path dest)
             throws IOException {
