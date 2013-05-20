@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<!--
+  NetBeans IDE and NetBeans Platform are based on software from netbeans.org,
+  which has been dual licensed under the Common Development and Distribution
+  License (CDDL) and the GNU General Public License version 2 with Classpath
+  exception. For more information, please visit
+
+      http://www.netbeans.org/
+-->
+
+<!--
+  Supplementary build targets for the tomcat project under netbeans.
+
+  Use the project root as basedir to be consistent with standard build.
+-->
+
+<project basedir=".." name="Tomcat_8.0">
+
+  <!--
+       load the standard and user tomcat build properties now,
+       so they can be used in the netbeans-specific targets below.
+       Note: inheritall==false will still pass all of these user
+             properties to the tomcat ant build targets.
+  -->
+  <property file="./build.properties"/>
+  <property file="./build.properties.default"/>
+
+  <!-- load the extra tomcat netbeans build properties, which can    -->
+  <!-- use the standard properties symbolic variables.               -->
+  <!-- Note: inheritall==false will still pass all of these user     -->
+  <!--       properties to the tomcat ant build targets.             -->
+  <property file="./nbproject/nb-tomcat-build.properties"/>
+
+  <target name="deploy">
+    <ant target="deploy" inheritall="false"/>
+  </target>
+
+  <target name="clean">
+    <ant target="clean" inheritall="false"/>
+  </target>
+
+  <target name="javadoc" depends="-package-project">
+    <ant target="javadoc" inheritall="false"/>
+  </target>
+
+  <target name="test" depends="-package-project">
+    <ant target="test" inheritall="false"/>
+  </target>
+
+  <target name="-package-project"
+          description="ensure tomcat is ready to use">
+    <ant target="deploy" inheritall="false"/>
+  </target>
+
+  <target name="-compile-all-tests"
+          description="needed to prepare some dependencies">
+    <ant target="test-compile" inheritall="false"/>
+  </target>
+
+  <target name="compile-selected-files-in-test"
+          depends="-package-project"
+          description="compile one or more selected test (not main) classes">
+    <fail unless="netbeans.home">This target can only run under NetBeans.</fail>
+    <fail unless="files">Property 'files' must be set in project.xml.</fail>
+    <echo level="verbose" message="compiling tests: ${files}"/>
+    <echo level="verbose" message="compiling tests into: ${test.classes}"/>
+    <mkdir dir="${test.classes}"/>
+    <javac srcdir="test"
+           destdir="${test.classes}"
+           includes="${files}"
+           debug="true"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           optimize="${compile.optimize}"
+           encoding="ISO-8859-1"
+           includeantruntime="false">
+      <classpath path="${nb-test.classpath}"/>
+    </javac>
+  </target>
+
+  <target name="test-selected-file"
+          description="execute a single unit test class (-Dtest.entry=nnn)">
+    <fail unless="test.entry"
+          message="Property 'test.entry' must be set in project.xml."/>
+    <!--
+         the runtests macro runs a single test if test.entry is a class name
+         Note: we must ONLY run one of the test targets, otherwise test-apr
+               will run last and wipe out the test results!
+         Note: the test targets all depend on deploy
+      -->
+    <ant target="test-nio" inheritall="false">
+      <property name="junit.formatter.type" value="brief" />
+      <property name="junit.formatter.usefile" value="false" />
+    </ant>
+  </target>
+
+  <target name="debug-selected-file-in-test"
+          depends="-package-project"
+          description="debug the single selected unit test class">
+    <echo message="debugging test: ${test.entry}"/>
+    <fail unless="netbeans.home">This target can only run under NetBeans.</fail>
+    <fail unless="test.entry"
+          message="Property 'test.entry' must be set in project.xml."/>
+    <nbjpdastart name="${test.entry}"
+                 addressproperty="jpda.address"
+                 transport="dt_socket" >
+      <classpath path="${nb-test.classpath}"/>
+      <sourcepath>
+        <path path="test"/>
+      </sourcepath>
+    </nbjpdastart>
+    <junit printsummary="yes" fork="yes" dir="." showoutput="yes"
+           errorproperty="test.result.error"
+           failureproperty="test.result.failure"
+           haltonfailure="${test.haltonfailure}" >
+
+      <jvmarg value="-Xdebug"/>
+      <jvmarg value="-Xnoagent"/>
+      <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+      <jvmarg value="-Djava.compiler=none"/>
+
+      <jvmarg value="${test.jvmarg.egd}"/>
+      <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
+      <jvmarg value="${nb-junit.formatter}"/>
+
+      <classpath path="${nb-test.classpath}" />
+
+      <sysproperty key="tomcat.test.temp" value="${test.temp}" />
+      <sysproperty key="tomcat.test.tomcatbuild" value="${tomcat.build}" />
+      <sysproperty key="tomcat.test.protocol" value="${nb-test.io-method}"/>
+      <sysproperty key="tomcat.test.accesslog" value="${test.accesslog}" />
+
+      <!-- define a non-file junit formatter for netbeans to capture and display -->
+      <formatter usefile="false" type="brief" />
+      <!-- and also a file formatter for checking later -->
+      <formatter type="${nb-junit.formatter.type}"
+                 usefile="${nb-junit.formatter.usefile}"
+                 extension="@NB-DBG${nb-junit.formatter.extension}"/>
+
+      <!-- run the chosen junit test class under the debugger -->
+      <test todir="${tomcat.build}/logs" name="${test.entry}"/>
+    </junit>
+  </target>
+</project>

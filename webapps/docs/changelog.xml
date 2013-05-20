@@ -208,6 +208,10 @@
         <bug>53529</bug>: Clean-up the handling of
         <code>InterruptedException</code> throughout the code base. (markt)
       </fix>
+      <add>
+        <bug>54899</bug>: Provide an initial implementation of NetBeans support.
+        Patch provided by Brian Burch. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
