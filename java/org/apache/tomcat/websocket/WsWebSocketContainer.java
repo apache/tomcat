@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -331,7 +332,8 @@ public class WsWebSocketContainer
                 throw new DeploymentException(
                         sm.getString("Sec-WebSocket-Protocol"));
             }
-        } catch (ExecutionException | InterruptedException | SSLException e) {
+        } catch (ExecutionException | InterruptedException | SSLException |
+                EOFException e) {
             throw new DeploymentException(
                     sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
         }
@@ -515,7 +517,7 @@ public class WsWebSocketContainer
      */
     private HandshakeResponse processResponse(ByteBuffer response,
             AsyncChannelWrapper channel) throws InterruptedException,
-            ExecutionException, DeploymentException {
+            ExecutionException, DeploymentException, EOFException {
 
         Map<String,List<String>> headers = new HashMap<>();
 
@@ -524,8 +526,11 @@ public class WsWebSocketContainer
         String line = null;
         while (!readHeaders) {
             // Blocking read
-            Future<Integer> written = channel.read(response);
-            written.get();
+            Future<Integer> read = channel.read(response);
+            Integer bytesRead = read.get();
+            if (bytesRead.intValue() == -1) {
+                throw new EOFException();
+            }
             response.flip();
             while (response.hasRemaining() && !readHeaders) {
                 if (line == null) {
