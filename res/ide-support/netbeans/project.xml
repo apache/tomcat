@@ -24,16 +24,16 @@
       http://www.netbeans.org/
 -->
 <!--
-  Free-Form project definition for tomcat under netbeans.
+  Free-Form project definition for Tomcat under NetBeans.
 
   Paths are all relative to the project root.
 
   Warning: Do NOT use the NetBeans GUI Project Properties customizer
            for this project, otherwise you might trigger unwanted
            changes to this critical file, which must be maintained
-           by the tomcat developers!
+           by the Tomcat developers!
 
-  Note:    As specified in the tomcat BUILDING.txt, the code completion
+  Note:    As specified in the BUILDING.txt file of Tomcat, the code completion
            classpaths below depend on the ANT_HOME environment
            variable being properly defined.
 -->
@@ -44,10 +44,10 @@
             <!-- Do not use Project Properties customizer when editing this file manually. -->
             <name>Tomcat 8.0</name>
             <properties>
-              <!-- load the local tomcat build.properties, especially base.path. -->
+              <!-- load the local Tomcat build.properties, especially base.path. -->
               <property-file>./build.properties</property-file>
-              <!-- prime some tomcat netbeans build properties, which will   -->
-              <!-- also be defined in the standard properties.               -->
+              <!-- prime some NetBeans build properties for Tomcat, which will   -->
+              <!-- also be defined in the standard properties.                   -->
               <property-file>./nbproject/nb-tomcat-project.properties</property-file>
             </properties>
             <folders>
@@ -74,9 +74,9 @@
             </folders>
             <ide-actions>
                 <!--
-                     Note: all netbeans actions are delegated to an external
+                     Note: all NetBeans actions are delegated to an external
                            script, so that Properties can be used consistently
-                           with the standard tomcat build.
+                           with the standard Tomcat build.
                  -->
                 <action name="build">
                     <script>nbproject/nb-tomcat.xml</script>
@@ -174,12 +174,12 @@
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/3">
             <!--
                  Warning: the classpath elements used below CANNOT include any
-                 Properties because netbeans will not expand them! Sadly,
+                 Properties because NetBeans will not expand them! Sadly,
                  this means (with nb 7.2.1, at least) every path MUST be
                  coded explicitly - with the potential for errors. These
                  errors will be flagged in the project navigation and
                  editors windows, although they will not affect the build
-                 or any special netbeans targets, e.g. debugging.
+                 or any special NetBeans targets, e.g. debugging.
 
                  Note: the classpath elements used below CAN include environment
                  variables as Properties, e.g. ANT_HOME becomes ${ant.home}!

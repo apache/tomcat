@@ -26,7 +26,7 @@
 -->
 
 <!--
-  Supplementary build targets for the tomcat project under netbeans.
+  Supplementary build targets for the Tomcat project under NetBeans.
 
   Use the project root as basedir to be consistent with standard build.
 -->
@@ -34,18 +34,18 @@
 <project basedir=".." name="Tomcat_8.0">
 
   <!--
-       load the standard and user tomcat build properties now,
-       so they can be used in the netbeans-specific targets below.
+       load the standard and user Tomcat build properties now,
+       so they can be used in the NetBeans-specific targets below.
        Note: inheritall==false will still pass all of these user
-             properties to the tomcat ant build targets.
+             properties to the Ant build targets of Tomcat.
   -->
   <property file="./build.properties"/>
   <property file="./build.properties.default"/>
 
-  <!-- load the extra tomcat netbeans build properties, which can    -->
-  <!-- use the standard properties symbolic variables.               -->
-  <!-- Note: inheritall==false will still pass all of these user     -->
-  <!--       properties to the tomcat ant build targets.             -->
+  <!-- load the extra NetBeans build properties for Tomcat, which can -->
+  <!-- use the standard properties symbolic variables.                -->
+  <!-- Note: inheritall==false will still pass all of these user      -->
+  <!--       properties to the Ant build targets of Tomcat            -->
   <property file="./nbproject/nb-tomcat-build.properties"/>
 
   <target name="deploy">
@@ -65,7 +65,7 @@
   </target>
 
   <target name="-package-project"
-          description="ensure tomcat is ready to use">
+          description="ensure Tomcat is ready to use">
     <ant target="deploy" inheritall="false"/>
   </target>
 
@@ -147,14 +147,14 @@
       <sysproperty key="tomcat.test.protocol" value="${nb-test.io-method}"/>
       <sysproperty key="tomcat.test.accesslog" value="${test.accesslog}" />
 
-      <!-- define a non-file junit formatter for netbeans to capture and display -->
+      <!-- define a non-file JUnit formatter for NetBeans to capture and display -->
       <formatter usefile="false" type="brief" />
       <!-- and also a file formatter for checking later -->
       <formatter type="${nb-junit.formatter.type}"
                  usefile="${nb-junit.formatter.usefile}"
                  extension="@NB-DBG${nb-junit.formatter.extension}"/>
 
-      <!-- run the chosen junit test class under the debugger -->
+      <!-- run the chosen JUnit test class under the debugger -->
       <test todir="${tomcat.build}/logs" name="${test.entry}"/>
     </junit>
   </target>
