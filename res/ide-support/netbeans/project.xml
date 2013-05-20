@@ -16,14 +16,6 @@
   limitations under the License.
 -->
 <!--
-  NetBeans IDE and NetBeans Platform are based on software from netbeans.org,
-  which has been dual licensed under the Common Development and Distribution
-  License (CDDL) and the GNU General Public License version 2 with Classpath
-  exception. For more information, please visit
-
-      http://www.netbeans.org/
--->
-<!--
   Free-Form project definition for Tomcat under NetBeans.
 
   Paths are all relative to the project root.
