@@ -15,22 +15,10 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-
-<!--
-  NetBeans IDE and NetBeans Platform are based on software from netbeans.org,
-  which has been dual licensed under the Common Development and Distribution
-  License (CDDL) and the GNU General Public License version 2 with Classpath
-  exception. For more information, please visit
-
-      http://www.netbeans.org/
--->
-
 <!--
   Supplementary build targets for the Tomcat project under NetBeans.
-
   Use the project root as basedir to be consistent with standard build.
 -->
-
 <project basedir=".." name="Tomcat_8.0">
 
   <!--
