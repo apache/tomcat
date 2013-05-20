@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!--
+  NetBeans IDE and NetBeans Platform are based on software from netbeans.org,
+  which has been dual licensed under the Common Development and Distribution
+  License (CDDL) and the GNU General Public License version 2 with Classpath
+  exception. For more information, please visit
+
+      http://www.netbeans.org/
+-->
+<!--
+  Free-Form project definition for tomcat under netbeans.
+
+  Paths are all relative to the project root.
+
+  Warning: Do NOT use the NetBeans GUI Project Properties customizer
+           for this project, otherwise you might trigger unwanted
+           changes to this critical file, which must be maintained
+           by the tomcat developers!
+
+  Note:    As specified in the tomcat BUILDING.txt, the code completion
+           classpaths below depend on the ANT_HOME environment
+           variable being properly defined.
+-->
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <!-- Do not use Project Properties customizer when editing this file manually. -->
+            <name>Tomcat 8.0</name>
+            <properties>
+              <!-- load the local tomcat build.properties, especially base.path. -->
+              <property-file>./build.properties</property-file>
+              <!-- prime some tomcat netbeans build properties, which will   -->
+              <!-- also be defined in the standard properties.               -->
+              <property-file>./nbproject/nb-tomcat-project.properties</property-file>
+            </properties>
+            <folders>
+                <source-folder>
+                    <label>java</label>
+                    <type>java</type>
+                    <location>java</location>
+                </source-folder>
+                <source-folder>
+                    <label>webapps/docs/appdev/sample/src</label>
+                    <type>java</type>
+                    <location>webapps/docs/appdev/sample/src</location>
+                </source-folder>
+                <source-folder>
+                    <label>modules/tomcat-lite/test</label>
+                    <type>java</type>
+                    <location>modules/tomcat-lite/test</location>
+                </source-folder>
+                <source-folder>
+                    <label>test</label>
+                    <type>java</type>
+                    <location>test</location>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <!--
+                     Note: all netbeans actions are delegated to an external
+                           script, so that Properties can be used consistently
+                           with the standard tomcat build.
+                 -->
+                <action name="build">
+                    <script>nbproject/nb-tomcat.xml</script>
+                    <target>deploy</target>
+                </action>
+                <action name="clean">
+                    <script>nbproject/nb-tomcat.xml</script>
+                    <target>clean</target>
+                </action>
+                <action name="javadoc">
+                    <script>nbproject/nb-tomcat.xml</script>
+                    <target>javadoc</target>
+                </action>
+                <action name="test">
+                    <script>nbproject/nb-tomcat.xml</script>
+                    <target>test</target>
+                </action>
+                <action name="rebuild">
+                    <script>nbproject/nb-tomcat.xml</script>
+                    <target>clean</target>
+                    <target>deploy</target>
+                </action>
+                <action name="compileAllTests">
+                    <script>nbproject/nb-tomcat.xml</script>
+                    <target>-compile-all-tests</target>
+                </action>
+                <action name="compile.single">
+                    <script>nbproject/nb-tomcat.xml</script>
+                    <target>compile-selected-files-in-test</target>
+                    <context>
+                        <property>files</property>
+                        <folder>test</folder>
+                        <pattern>\.java$</pattern>
+                        <format>relative-path</format>
+                        <arity>
+                            <separated-files>,</separated-files>
+                        </arity>
+                    </context>
+                </action>
+                <action name="run.single">
+                    <script>nbproject/nb-tomcat.xml</script>
+                    <target>test-selected-file</target>
+                    <context>
+                        <property>test.entry</property>
+                        <folder>test</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+                <action name="debug.single">
+                    <script>nbproject/nb-tomcat.xml</script>
+                    <target>debug-selected-file-in-test</target>
+                    <context>
+                        <property>test.entry</property>
+                        <folder>test</folder>
+                        <pattern>\.java$</pattern>
+                        <format>java-name</format>
+                        <arity>
+                            <one-file-only/>
+                        </arity>
+                    </context>
+                </action>
+            </ide-actions>
+            <view>
+                <items>
+                    <source-folder style="packages">
+                        <label>java</label>
+                        <location>java</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>webapps/docs/appdev/sample/src</label>
+                        <location>webapps/docs/appdev/sample/src</location>
+                    </source-folder>
+                    <source-folder style="packages">
+                        <label>test</label>
+                        <location>test</location>
+                    </source-folder>
+                    <source-file>
+                        <location>build.xml</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="build"/>
+                    <ide-action name="rebuild"/>
+                    <ide-action name="clean"/>
+                    <ide-action name="javadoc"/>
+                    <ide-action name="test"/>
+                </context-menu>
+            </view>
+            <subprojects/>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/3">
+            <!--
+                 Warning: the classpath elements used below CANNOT include any
+                 Properties because netbeans will not expand them! Sadly,
+                 this means (with nb 7.2.1, at least) every path MUST be
+                 coded explicitly - with the potential for errors. These
+                 errors will be flagged in the project navigation and
+                 editors windows, although they will not affect the build
+                 or any special netbeans targets, e.g. debugging.
+
+                 Note: the classpath elements used below CAN include environment
+                 variables as Properties, e.g. ANT_HOME becomes ${ant.home}!
+            -->
+            <compilation-unit>
+                <package-root>java</package-root>
+                <classpath mode="compile">${base.path}/jaxrpc-1.1-rc4/geronimo-spec-jaxrpc-1.1-rc4.jar:${base.path}/wsdl4j-1.6.2/wsdl4j-1.6.2.jar:${base.path}/ecj-4.2.2/ecj-4.2.2.jar:${ant.includes}/</classpath>
+                <source-level>1.7</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>webapps/docs/appdev/sample/src</package-root>
+                <classpath mode="compile">${base.path}/servletapi-2.3/servletapi-2.3.jar</classpath>
+                <source-level>1.7</source-level>
+            </compilation-unit>
+            <compilation-unit>
+                <package-root>test</package-root>
+                <unit-tests/>
+                <classpath mode="compile">output/classes:output/testclasses:${base.path}/junit4.8.2/junit-4.8.2.jar</classpath>
+                <source-level>1.7</source-level>
+            </compilation-unit>
+        </java-data>
+    </configuration>
+</project>

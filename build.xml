@@ -55,6 +55,7 @@
 
   <!-- Locations to create build artifacts -->
   <property name="tomcat.home"           value="${basedir}"/>
+  <property name="tomcat-nb.home"        value="${basedir}/nbproject" />
   <property name="tomcat.output"         value="${basedir}/output"/>
   <property name="tomcat.build"          value="${tomcat.output}/build"/>
   <property name="tomcat.classes"        value="${tomcat.output}/classes"/>
@@ -494,6 +495,7 @@
         <include name="**/*.sh"/>
         <exclude name="bin/setenv.*"/>
         <exclude name=".*/**"/>
+        <exclude name="nbproject/**"/>
         <exclude name="output/**"/>
         <exclude name="modules/**"/>
         <exclude name="**/*.mdl"/>
@@ -536,7 +538,6 @@
 
   <target name="validate-eoln" depends="build-prepare,compile-prepare"
     description="Validate that the source files have correct line ends">
-
     <!-- Compile the CheckEol class only. Note that the class depends on
     Ant only. There is no need to download additional dependencies nor
     add them to the class path. The rest should be the same as in "compile"
@@ -566,6 +567,7 @@
         <include name="**/*.bat"/>
         <include name="**/*.sh"/>
         <exclude name=".*/**"/>
+        <exclude name="nbproject/**"/>
         <exclude name="output/**"/>
         <exclude name="modules/**"/>
         <!-- Exclude these else Gump runs validate on them -->
@@ -1829,6 +1831,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
             <filename name="**/.classpath"/>
             <filename name="**/.checkstyle"/>
             <filename name="**/.project"/>
+            <filename name="**/nbproject/**"/>
             <filename name="**/output/**"/>
             <!-- Commented out, because
                  test/webapp-virtual-library and
@@ -2706,6 +2709,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- ============================ IDE Support ============================ -->
 
+  <!-- ============================ Eclipse ================================ -->
+
   <target name="ide-eclipse" depends="deploy, extras-webservices-prepare"
           description="Prepares the source tree to be built in Eclipse">
 
@@ -2716,6 +2721,45 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <echo>Eclipse project files created.
 Read the Building page on the Apache Tomcat documentation site for details on how to configure your Eclipse workplace.</echo>
   </target>
+
+  <!-- ============================ Netbeans =============================== -->
+
+  <target name="ide-netbeans"
+          depends="-ide-netbeans-protect,-ide-netbeans-create"
+          description="Create netbeans project files only if none exist">
+  </target>
+
+  <target name="-ide-netbeans-protect"
+          if="tomcat-nb.home.exists"
+          depends="-ide-netbeans-check">
+    <!-- Protect existing netbeans project files -->
+    <echo>Netbeans project files already exist and have been protected!
+Use the "ide-netbeans-replace" target if you wish to overwrite them.</echo>
+  </target>
+
+  <target name="-ide-netbeans-check">
+    <!-- protect existing files if the netbeans project directory exists  -->
+    <condition property="tomcat-nb.home.exists">
+        <available file="${tomcat-nb.home}" type="dir"/>
+    </condition>
+  </target>
+
+  <target name="ide-netbeans-replace" depends="-ide-netbeans-create">
+    <!-- Bypass protection of any existing netbeans project files -->
+  </target>
+
+  <target name="-ide-netbeans-create"
+          unless="tomcat-nb.home.exists">
+    <!-- Unconditionally create or ovverwrite default netbeans project files -->
+    <property name="tomcat-nb.dist" value="${tomcat.home}/res/ide-support/netbeans" />
+    <mkdir dir="${tomcat-nb.home}/"/>
+    <copy todir="${tomcat-nb.home}" overwrite="true">
+      <fileset dir="${tomcat-nb.dist}"/>
+    </copy>
+    <echo>Netbeans project files created.
+Read the Building page on the Apache Tomcat documentation site for details on how to customise your Netbeans project.</echo>
+  </target>
+
 
   <!-- ======================= Macros, Taskdefs etc ======================== -->
 
