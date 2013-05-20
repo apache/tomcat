@@ -2722,42 +2722,42 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 Read the Building page on the Apache Tomcat documentation site for details on how to configure your Eclipse workplace.</echo>
   </target>
 
-  <!-- ============================ Netbeans =============================== -->
+  <!-- ============================ NetBeans =============================== -->
 
   <target name="ide-netbeans"
           depends="-ide-netbeans-protect,-ide-netbeans-create"
-          description="Create netbeans project files only if none exist">
+          description="Create NetBeans project files only if none exist">
   </target>
 
   <target name="-ide-netbeans-protect"
           if="tomcat-nb.home.exists"
           depends="-ide-netbeans-check">
-    <!-- Protect existing netbeans project files -->
-    <echo>Netbeans project files already exist and have been protected!
+    <!-- Protect existing NetBeans project files -->
+    <echo>NetBeans project files already exist and have been protected!
 Use the "ide-netbeans-replace" target if you wish to overwrite them.</echo>
   </target>
 
   <target name="-ide-netbeans-check">
-    <!-- protect existing files if the netbeans project directory exists  -->
+    <!-- protect existing files if the NetBeans project directory exists  -->
     <condition property="tomcat-nb.home.exists">
         <available file="${tomcat-nb.home}" type="dir"/>
     </condition>
   </target>
 
   <target name="ide-netbeans-replace" depends="-ide-netbeans-create">
-    <!-- Bypass protection of any existing netbeans project files -->
+    <!-- Bypass protection of any existing NetBeans project files -->
   </target>
 
   <target name="-ide-netbeans-create"
           unless="tomcat-nb.home.exists">
-    <!-- Unconditionally create or ovverwrite default netbeans project files -->
+    <!-- Unconditionally create or ovverwrite default NetBeans project files -->
     <property name="tomcat-nb.dist" value="${tomcat.home}/res/ide-support/netbeans" />
     <mkdir dir="${tomcat-nb.home}/"/>
     <copy todir="${tomcat-nb.home}" overwrite="true">
       <fileset dir="${tomcat-nb.dist}"/>
     </copy>
-    <echo>Netbeans project files created.
-Read the Building page on the Apache Tomcat documentation site for details on how to customise your Netbeans project.</echo>
+    <echo>NetBeans project files created.
+Read the Building page on the Apache Tomcat documentation site for details on how to customise your NetBeans project.</echo>
   </target>
 
 
