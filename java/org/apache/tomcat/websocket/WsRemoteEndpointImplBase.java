@@ -602,7 +602,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         private final ByteBuffer payload;
         private final byte[] mask;
         private final ByteBuffer outputBuffer;
-        private volatile boolean flushRequired;
+        private final boolean flushRequired;
         private final WsRemoteEndpointImplBase endpoint;
         private int maskIndex = 0;
 
@@ -626,7 +626,6 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             }
             if (headerBuffer.hasRemaining()) {
                 // Still more headers to write, need to flush
-                flushRequired = true;
                 outputBuffer.flip();
                 endpoint.doWrite(this, outputBuffer);
                 return;
@@ -642,14 +641,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             }
             if (payload.hasRemaining()) {
                 // Still more headers to write, need to flush
-                flushRequired = true;
                 outputBuffer.flip();
                 endpoint.doWrite(this, outputBuffer);
                 return;
             }
 
             if (flushRequired) {
-                flushRequired = false;
                 outputBuffer.flip();
                 if (outputBuffer.remaining() == 0) {
                     handler.onResult(new SendResult());
