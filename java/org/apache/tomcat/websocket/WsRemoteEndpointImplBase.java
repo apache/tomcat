@@ -661,9 +661,13 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         // ------------------------------------------------- SendHandler methods
         @Override
         public void onResult(SendResult result) {
-            outputBuffer.clear();
             if (result.isOK()) {
-                write();
+                if (outputBuffer.hasRemaining()) {
+                    endpoint.doWrite(this, outputBuffer);
+                } else {
+                    outputBuffer.clear();
+                    write();
+                }
             } else {
                 handler.onResult(result);
             }
