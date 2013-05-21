@@ -75,6 +75,11 @@
         values for copyXML, deployXML and unpackWARs. (markt)
       </fix>
       <fix>
+        <bug>54955</bug>: When a reload of the application is performed ensure
+        that a subsequent request to the context root does not result in a 404
+        response. (violetagg)
+      </fix>
+      <fix>
         <bug>54974</bug>: Ensure that 
         <code>SessionCookieConfig#set&lt;methods&gt;</code>
         will throw <code>IllegalStateException</code> if the

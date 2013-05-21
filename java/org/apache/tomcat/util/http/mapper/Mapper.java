@@ -501,7 +501,14 @@ public final class Mapper {
                 context.defaultWrapper = null;
             } else {
                 // Exact wrapper
-                String name = path;
+                String name;
+                if (path.length() == 0) {
+                    // Special case for the Context Root mapping which is
+                    // treated as an exact match
+                    name = "/";
+                } else {
+                    name = path;
+                }
                 Wrapper[] oldWrappers = context.exactWrappers;
                 if (oldWrappers.length == 0) {
                     return;
