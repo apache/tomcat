@@ -213,6 +213,12 @@ public class ContextConfig implements LifecycleListener {
 
 
     /**
+     * Anti-locking docBase
+     */
+    private String antiLockingDocBase = null;
+
+
+    /**
      * Map of ServletContainerInitializer to classes they expressed interest in.
      */
     protected final Map<ServletContainerInitializer, Set<Class<?>>> initializerClassMap =
@@ -325,16 +331,9 @@ public class ContextConfig implements LifecycleListener {
         } else if (event.getType().equals(Lifecycle.AFTER_START_EVENT)) {
             // Restore docBase for management tools
             if (originalDocBase != null) {
-                String docBase = context.getDocBase();
                 context.setDocBase(originalDocBase);
-                originalDocBase = docBase;
             }
         } else if (event.getType().equals(Lifecycle.CONFIGURE_STOP_EVENT)) {
-            if (originalDocBase != null) {
-                String docBase = context.getDocBase();
-                context.setDocBase(originalDocBase);
-                originalDocBase = docBase;
-            }
             configureStop();
         } else if (event.getType().equals(Lifecycle.AFTER_INIT_EVENT)) {
             init();
@@ -714,11 +713,8 @@ public class ContextConfig implements LifecycleListener {
             if (docBase == null) {
                 return;
             }
-            if (originalDocBase == null) {
-                originalDocBase = docBase;
-            } else {
-                docBase = originalDocBase;
-            }
+            originalDocBase = docBase;
+
             File docBaseFile = new File(docBase);
             if (!docBaseFile.isAbsolute()) {
                 docBaseFile = new File(host.getAppBaseFile(), docBase);
@@ -745,12 +741,12 @@ public class ContextConfig implements LifecycleListener {
                         + "] setting docBase to " + file);
             }
 
+            antiLockingDocBase = file.getAbsolutePath();
             // Cleanup just in case an old deployment is lying around
             ExpandWar.delete(file);
             if (ExpandWar.copy(docBaseFile, file)) {
-                context.setDocBase(file.getAbsolutePath());
+                context.setDocBase(antiLockingDocBase);
             }
-
         }
 
     }
@@ -999,8 +995,8 @@ public class ContextConfig implements LifecycleListener {
         // Remove (partially) folders and files created by antiLocking
         Host host = (Host) context.getParent();
         String docBase = context.getDocBase();
-        if ((docBase != null) && (originalDocBase != null)) {
-            File docBaseFile = new File(docBase);
+        if (antiLockingDocBase != null) {
+            File docBaseFile = new File(antiLockingDocBase);
             if (!docBaseFile.isAbsolute()) {
                 docBaseFile = new File(host.getAppBaseFile(), docBase);
             }
