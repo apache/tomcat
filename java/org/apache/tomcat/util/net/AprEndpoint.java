@@ -1602,12 +1602,14 @@ public class AprEndpoint extends AbstractEndpoint {
                                 log.debug("Poller run() adding socket: " +
                                         info.socket);
                             }
-                            removeFromPoller(info.socket);
                             timeouts.remove(info.socket);
                             if (info.read() || info.write()) {
                                 AprSocketWrapper wrapper = connections.get(
                                         Long.valueOf(info.socket));
                                 boolean comet = wrapper.isComet();
+                                if (comet || wrapper.pollerFlags != 0) {
+                                    removeFromPoller(info.socket);
+                                }
                                 wrapper.pollerFlags = wrapper.pollerFlags |
                                         (info.read() ? Poll.APR_POLLIN : 0) |
                                         (info.write() ? Poll.APR_POLLOUT : 0);
@@ -1649,6 +1651,11 @@ public class AprEndpoint extends AbstractEndpoint {
                             pollerSpace[i] += rv;
                             connectionCount -= rv;
                             for (int n = 0; n < rv; n++) {
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Poller run() poll() of socket " +
+                                            desc[n*2+1] + " with flags " +
+                                            desc[n*2]);
+                                }
                                 timeouts.remove(desc[n*2+1]);
                                 AprSocketWrapper wrapper = connections.get(
                                         Long.valueOf(desc[n*2+1]));
@@ -1665,7 +1672,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                         }
                                     } else if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
                                         if (wrapper.pollerFlags != 0) {
-                                            add(desc[n*2+1], 1, wrapper.pollerFlags);
+                                            add(desc[n*2+1], 0, wrapper.pollerFlags);
                                         }
                                         if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
                                             // Close socket and clear pool
@@ -1673,7 +1680,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                         }
                                     } else if ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
                                         if (wrapper.pollerFlags != 0) {
-                                            add(desc[n*2+1], 1, wrapper.pollerFlags);
+                                            add(desc[n*2+1], 0, wrapper.pollerFlags);
                                         }
                                         if (!processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
                                             // Close socket and clear pool
