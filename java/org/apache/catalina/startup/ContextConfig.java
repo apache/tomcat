@@ -233,7 +233,7 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Anti-locking docBase
      */
-    private String antiLockingDocBase = null;
+    private File antiLockingDocBase = null;
 
 
     /**
@@ -794,27 +794,27 @@ public class ContextConfig implements LifecycleListener {
             ContextName cn = new ContextName(path, context.getWebappVersion());
             docBase = cn.getBaseName();
 
-            File file = null;
             if (originalDocBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
-                file = new File(System.getProperty("java.io.tmpdir"),
+                antiLockingDocBase = new File(
+                        System.getProperty("java.io.tmpdir"),
                         deploymentCount++ + "-" + docBase + ".war");
             } else {
-                file = new File(System.getProperty("java.io.tmpdir"),
+                antiLockingDocBase = new File(
+                        System.getProperty("java.io.tmpdir"),
                         deploymentCount++ + "-" + docBase);
             }
 
             if (log.isDebugEnabled())
                 log.debug("Anti locking context[" + context.getName()
-                        + "] setting docBase to " + file);
+                        + "] setting docBase to " +
+                        antiLockingDocBase.getAbsolutePath());
 
-            antiLockingDocBase = file.getAbsolutePath();
             // Cleanup just in case an old deployment is lying around
-            ExpandWar.delete(file);
-            if (ExpandWar.copy(docBaseFile, file)) {
-                context.setDocBase(antiLockingDocBase);
+            ExpandWar.delete(antiLockingDocBase);
+            if (ExpandWar.copy(docBaseFile, antiLockingDocBase)) {
+                context.setDocBase(antiLockingDocBase.getAbsolutePath());
             }
         }
-
     }
 
 
@@ -1056,16 +1056,9 @@ public class ContextConfig implements LifecycleListener {
         }
 
         // Remove (partially) folders and files created by antiLocking
-        Host host = (Host) context.getParent();
-        String appBase = host.getAppBase();
-        String docBase = context.getDocBase();
         if (antiLockingDocBase != null) {
-            File docBaseFile = new File(antiLockingDocBase);
-            if (!docBaseFile.isAbsolute()) {
-                docBaseFile = new File(appBase, docBase);
-            }
             // No need to log failure - it is expected in this case
-            ExpandWar.delete(docBaseFile, false);
+            ExpandWar.delete(antiLockingDocBase, false);
         }
 
         // Reset ServletContextInitializer scanning
