@@ -33,21 +33,31 @@ import javax.websocket.Session;
 
 public class TesterSingleMessageClient {
 
-    public static class TesterProgrammaticEndpoint extends Endpoint {
+    public interface TesterEndpoint {
+        void setLatch(CountDownLatch latch);
+    }
+
+    public static class TesterProgrammaticEndpoint
+            extends Endpoint implements TesterEndpoint {
+
+        private CountDownLatch latch = null;
+
+        @Override
+        public void setLatch(CountDownLatch latch) {
+            this.latch = latch;
+        }
 
         @Override
         public void onClose(Session session, CloseReason closeReason) {
-            clearLatch(session);
+            clearLatch();
         }
 
         @Override
         public void onError(Session session, Throwable throwable) {
-            clearLatch(session);
+            clearLatch();
         }
 
-        private void clearLatch(Session session) {
-            CountDownLatch latch =
-                    (CountDownLatch) session.getUserProperties().get("latch");
+        private void clearLatch() {
             if (latch != null) {
                 while (latch.getCount() > 0) {
                     latch.countDown();
@@ -57,27 +67,31 @@ public class TesterSingleMessageClient {
 
         @Override
         public void onOpen(Session session, EndpointConfig config) {
-            // NO-OP
+            session.getUserProperties().put("endpoint", this);
         }
     }
 
     @ClientEndpoint
-    public static class TesterAnnotatedEndpoint {
+    public static class TesterAnnotatedEndpoint implements TesterEndpoint {
+
+        private CountDownLatch latch = null;
+
+        @Override
+        public void setLatch(CountDownLatch latch) {
+            this.latch = latch;
+        }
 
         @OnClose
-        public void onClose(Session session) {
-            clearLatch(session);
+        public void onClose() {
+            clearLatch();
         }
 
         @OnError
-        public void onError(Session session,
-                @SuppressWarnings("unused") Throwable throwable) {
-            clearLatch(session);
+        public void onError(@SuppressWarnings("unused") Throwable throwable) {
+            clearLatch();
         }
 
-        private void clearLatch(Session session) {
-            CountDownLatch latch =
-                    (CountDownLatch) session.getUserProperties().get("latch");
+        private void clearLatch() {
             if (latch != null) {
                 while (latch.getCount() > 0) {
                     latch.countDown();
@@ -86,8 +100,8 @@ public class TesterSingleMessageClient {
         }
 
         @OnOpen
-        public void onOpen() {
-            // NO-OP
+        public void onOpen(Session session) {
+            session.getUserProperties().put("endpoint", this);
         }
     }
 

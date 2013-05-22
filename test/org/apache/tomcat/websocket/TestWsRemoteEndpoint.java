@@ -38,6 +38,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.AsyncHandler;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.AsyncText;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterAnnotatedEndpoint;
+import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterEndpoint;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterProgrammaticEndpoint;
 
 public class TestWsRemoteEndpoint extends TomcatBaseTest {
@@ -92,7 +93,9 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
         }
 
         CountDownLatch latch = new CountDownLatch(1);
-        wsSession.getUserProperties().put("latch", latch);
+        TesterEndpoint tep =
+                (TesterEndpoint) wsSession.getUserProperties().get("endpoint");
+        tep.setLatch(latch);
         AsyncHandler<?> handler = new AsyncText(latch);
 
         wsSession.addMessageHandler(handler);

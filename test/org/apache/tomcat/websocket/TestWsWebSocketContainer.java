@@ -52,6 +52,7 @@ import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicBinary;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicHandler;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicText;
+import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterEndpoint;
 import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterProgrammaticEndpoint;
 import org.apache.tomcat.websocket.server.Constants;
 import org.apache.tomcat.websocket.server.WsListener;
@@ -235,7 +236,9 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                                 TesterEchoServer.Config.PATH_BASIC));
         BasicHandler<?> handler;
         CountDownLatch latch = new CountDownLatch(1);
-        wsSession.getUserProperties().put("latch", latch);
+        TesterEndpoint tep =
+                (TesterEndpoint) wsSession.getUserProperties().get("endpoint");
+        tep.setLatch(latch);
         if (isTextMessage) {
             handler = new BasicText(latch);
         } else {
