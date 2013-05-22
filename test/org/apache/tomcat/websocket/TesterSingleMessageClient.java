@@ -35,19 +35,19 @@ public class TesterSingleMessageClient {
 
     public static class TesterProgrammaticEndpoint extends Endpoint {
 
-        private CountDownLatch latch = null;
-
         @Override
         public void onClose(Session session, CloseReason closeReason) {
-            clearLatch();
+            clearLatch(session);
         }
 
         @Override
         public void onError(Session session, Throwable throwable) {
-            clearLatch();
+            clearLatch(session);
         }
 
-        private void clearLatch() {
+        private void clearLatch(Session session) {
+            CountDownLatch latch =
+                    (CountDownLatch) session.getUserProperties().get("latch");
             if (latch != null) {
                 while (latch.getCount() > 0) {
                     latch.countDown();
@@ -57,26 +57,27 @@ public class TesterSingleMessageClient {
 
         @Override
         public void onOpen(Session session, EndpointConfig config) {
-            latch = (CountDownLatch) session.getUserProperties().get("latch");
+            // NO-OP
         }
     }
 
     @ClientEndpoint
     public static class TesterAnnotatedEndpoint {
 
-        private CountDownLatch latch = null;
-
         @OnClose
-        public void onClose() {
-            clearLatch();
+        public void onClose(Session session) {
+            clearLatch(session);
         }
 
         @OnError
-        public void onError(@SuppressWarnings("unused") Throwable throwable) {
-            clearLatch();
+        public void onError(Session session,
+                @SuppressWarnings("unused") Throwable throwable) {
+            clearLatch(session);
         }
 
-        private void clearLatch() {
+        private void clearLatch(Session session) {
+            CountDownLatch latch =
+                    (CountDownLatch) session.getUserProperties().get("latch");
             if (latch != null) {
                 while (latch.getCount() > 0) {
                     latch.countDown();
@@ -85,8 +86,8 @@ public class TesterSingleMessageClient {
         }
 
         @OnOpen
-        public void onOpen(Session session) {
-            latch = (CountDownLatch) session.getUserProperties().get("latch");
+        public void onOpen() {
+            // NO-OP
         }
     }
 
