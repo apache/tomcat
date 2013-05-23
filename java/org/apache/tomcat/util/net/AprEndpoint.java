@@ -1600,9 +1600,12 @@ public class AprEndpoint extends AbstractEndpoint {
                                         info.socket);
                             }
                             timeouts.remove(info.socket);
+                            AprSocketWrapper wrapper = connections.get(
+                                    Long.valueOf(info.socket));
+                            if (wrapper == null) {
+                                continue;
+                            }
                             if (info.read() || info.write()) {
-                                AprSocketWrapper wrapper = connections.get(
-                                        Long.valueOf(info.socket));
                                 boolean comet = wrapper.isComet();
                                 if (comet || wrapper.pollerFlags != 0) {
                                     removeFromPoller(info.socket);
