@@ -1435,9 +1435,6 @@ public class AprEndpoint extends AbstractEndpoint {
                     log.debug(msg);
                 }
             }
-            if (timeout < 0) {
-                timeout = getSoTimeout();
-            }
             if (timeout <= 0) {
                 // Always put a timeout in
                 timeout = Integer.MAX_VALUE;
