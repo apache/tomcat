@@ -96,7 +96,7 @@ public abstract class SimpleHttpClient {
     private String responseBody;
     private List<String> bodyUriElements = null;
 
-    protected void setPort(int thePort) {
+    public void setPort(int thePort) {
         port = thePort;
     }
 
