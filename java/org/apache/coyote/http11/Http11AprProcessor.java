@@ -464,8 +464,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 }
             }
 
-        } else if (actionCode == ActionCode.AVAILABLE) {
-            request.setAvailable(inputBuffer.available());
         } else if (actionCode == ActionCode.COMET_BEGIN) {
             comet = true;
         } else if (actionCode == ActionCode.COMET_END) {
