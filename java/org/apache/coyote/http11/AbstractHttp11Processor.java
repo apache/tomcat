@@ -1552,7 +1552,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             } catch (IllegalStateException x) {
                 registerForEvent(false, true);
             }
-        } else if (status == SocketStatus.OPEN_READ) {
+        } else if (status == SocketStatus.OPEN_READ &&
+                request.getReadListener() != null) {
             try {
                 try {
                     if (inputBuffer.nbRead()>0) {
