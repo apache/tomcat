@@ -634,7 +634,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
         } else if (-nRead == Status.EAGAIN) {
             return 0;
         } else {
-            throw new IOException(sm.getString("iib.failedread",
+            throw new IOException(sm.getString("iib.failedread.apr",
                     Integer.valueOf(-nRead)));
         }
     }
