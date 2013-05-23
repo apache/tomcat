@@ -1599,12 +1599,14 @@ public class AprEndpoint extends AbstractEndpoint {
                                 log.debug("Poller run() adding socket: " +
                                         info.socket);
                             }
-                            removeFromPoller(info.socket);
                             timeouts.remove(info.socket);
                             if (info.read() || info.write()) {
                                 AprSocketWrapper wrapper = connections.get(
                                         Long.valueOf(info.socket));
                                 boolean comet = wrapper.isComet();
+                                if (comet || wrapper.pollerFlags != 0) {
+                                    removeFromPoller(info.socket);
+                                }
                                 wrapper.pollerFlags = wrapper.pollerFlags |
                                         (info.read() ? Poll.APR_POLLIN : 0) |
                                         (info.write() ? Poll.APR_POLLOUT : 0);
