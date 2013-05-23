@@ -81,7 +81,7 @@ public class TestOrderInterceptor {
         TesterUtil.addRandomDomain(channels);
         for ( int i=0; i<channelCount; i++ ) threads[i].start();
         for ( int i=0; i<channelCount; i++ ) threads[i].join();
-        Thread.sleep(1000);
+        Thread.sleep(1500);
     }
 
     @Test
