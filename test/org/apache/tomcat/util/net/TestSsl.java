@@ -35,6 +35,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -167,7 +168,9 @@ public class TestSsl extends TomcatBaseTest {
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
-        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        Context ctx = tomcat.addWebapp(null, "/examples",
+                appDir.getAbsolutePath());
+        ctx.addApplicationListener(WsListener.class.getName());
 
         TesterSupport.initSsl(tomcat);
 
