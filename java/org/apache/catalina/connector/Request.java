@@ -2629,7 +2629,11 @@ public class Request
                         try {
                             String encoding = parameters.getEncoding();
                             if (encoding == null) {
-                                encoding = Parameters.DEFAULT_ENCODING;
+                                if (enc == null) {
+                                    encoding = Parameters.DEFAULT_ENCODING;
+                                } else {
+                                    encoding = enc;
+                                }
                             }
                             value = part.getString(encoding);
                         } catch (UnsupportedEncodingException uee) {
