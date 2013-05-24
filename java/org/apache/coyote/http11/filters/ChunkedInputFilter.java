@@ -537,4 +537,9 @@ public class ChunkedInputFilter implements InputFilter {
 
         return true;
     }
+
+    @Override
+    public boolean isFinished() {
+        return endChunk;
+    }
 }

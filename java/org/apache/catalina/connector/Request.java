@@ -2443,6 +2443,18 @@ public class Request
         return (inputBuffer.available() > 0);
     }
 
+
+    /**
+     * Return true if an attempt has been made to read the request body and all
+     * of the request body has been read
+     */
+    public boolean isFinished() {
+        AtomicBoolean result = new AtomicBoolean(false);
+        coyoteRequest.action(ActionCode.REQUEST_BODY_FULLY_READ, result);
+        return result.get();
+    }
+
+
     /**
      * Disable swallowing of remaining input if configured
      */

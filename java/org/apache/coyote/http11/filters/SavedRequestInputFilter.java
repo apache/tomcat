@@ -115,4 +115,8 @@ public class SavedRequestInputFilter implements InputFilter {
         return 0;
     }
 
+    @Override
+    public boolean isFinished() {
+        return input.getOffset() >= input.getEnd();
+    }
 }
