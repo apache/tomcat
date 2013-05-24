@@ -1694,8 +1694,38 @@ public class AprEndpoint extends AbstractEndpoint {
                                 } else if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                                         || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
                                         || ((desc[n*2] & Poll.APR_POLLNVAL) == Poll.APR_POLLNVAL)) {
-                                    // Close socket and clear pool
-                                    destroySocket(desc[n*2+1]);
+                                    if (wrapper.isAsync()) {
+                                        // Must be using non-blocking IO for the socket to be in the
+                                        // poller during async processing. Need to trigger error
+                                        // handling. Poller will return error codes plus the flags it
+                                        // was waiting for.We could return ASYNC_[WRITE|READ]_ERROR
+                                        // error here but if we do, there will be no exception
+                                        // associated with the error. By signalling read/write is
+                                        // possible, a read/write will be attempted, fail and that
+                                        // will trigger an exception
+                                        if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
+                                            System.out.println("Poller socket error read");
+                                            // Must be doing a non-blocking read
+                                            if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
+                                                // Close socket and clear pool
+                                                destroySocket(desc[n*2+1]);
+                                            }
+                                        } else if ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
+                                            System.out.println("Poller socket error write");
+                                            // Must be doing an non-blocking write write
+                                            if (!processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
+                                                // Close socket and clear pool
+                                                destroySocket(desc[n*2+1]);
+                                            }
+                                        } else {
+                                            System.out.println("Poller socket error other: " + wrapper.pollerFlags + " " + desc[n*2]);
+                                            // Close socket and clear pool
+                                            destroySocket(desc[n*2+1]);
+                                        }
+                                    } else {
+                                        // Close socket and clear pool
+                                        destroySocket(desc[n*2+1]);
+                                    }
                                 } else if (((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN)
                                         || ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT)) {
                                     boolean error = false;
