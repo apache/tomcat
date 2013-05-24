@@ -796,18 +796,14 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
     }
 
 
-    /**
-     * Fill the internal buffer using data from the underlying input stream.
-     *
-     * @return false if at end of stream
-     */
     @Override
     protected boolean fill(boolean block) throws IOException, EOFException {
         return fill(true,block);
     }
 
-    protected boolean fill(boolean timeout, boolean block) throws IOException, EOFException {
 
+    protected boolean fill(boolean timeout, boolean block)
+            throws IOException, EOFException {
 
         boolean read = false;
 
