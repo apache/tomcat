@@ -18,8 +18,10 @@ package org.apache.catalina.connector;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,8 +31,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
+import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestCoyoteAdapter extends TomcatBaseTest {
@@ -248,6 +253,96 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
 
             // Not thread safe
             pathInfo = req.getPathInfo();
+        }
+    }
+
+
+    @Test
+    public void testBug54928() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+
+        AsyncServlet servlet = new AsyncServlet();
+        Wrapper w = Tomcat.addServlet(ctx, "async", servlet);
+        w.setAsyncSupported(true);
+        ctx.addServletMapping("/async", "async");
+
+        tomcat.start();
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+
+        String request = "GET /async HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: a" + SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+
+        client.setPort(getPort());
+        client.setRequest(new String[] {request});
+
+        client.connect();
+        client.sendRequest();
+
+        for (int i = 0; i < 10; i++) {
+            System.out.println(client.readLine());
+        }
+
+        client.disconnect();
+
+        // Wait for server thread to stop
+        while (servlet.getThread().isAlive()) {
+            Thread.sleep(250);
+        }
+    }
+
+    private static class AsyncServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        // This is a hack that won't work generally as servlets are expected to
+        // handle more than one request.
+        private Thread t;
+
+        public Thread getThread() {
+            return t;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            final OutputStream os = resp.getOutputStream();
+
+            final AsyncContext asyncCtxt = req.startAsync();
+            asyncCtxt.setTimeout(3000);
+
+            t = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    while (true) {
+                        try {
+                            os.write("TEST".getBytes(B2CConverter.UTF_8));
+                            os.flush();
+                            Thread.sleep(1000);
+                        } catch (Exception e) {
+                            asyncCtxt.complete();
+                            break;
+                        }
+                    }
+                }
+            });
+            t.setName("testBug54928");
+            t.start();
         }
     }
 }
