@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.http11.filters;
 
 import java.io.IOException;
@@ -36,13 +35,11 @@ public class VoidInputFilter implements InputFilter {
 
     // -------------------------------------------------------------- Constants
 
-
     protected static final String ENCODING_NAME = "void";
     protected static final ByteChunk ENCODING = new ByteChunk();
 
 
     // ----------------------------------------------------- Static Initializer
-
 
     static {
         ENCODING.setBytes(ENCODING_NAME.getBytes(B2CConverter.ISO_8859_1), 0,
@@ -52,9 +49,11 @@ public class VoidInputFilter implements InputFilter {
 
     // ----------------------------------------------------- Instance Variables
 
+    // Tracks if an attempt has been made to read data
+    private boolean read = false;
 
-    // --------------------------------------------------- OutputBuffer Methods
 
+    // ---------------------------------------------------- InputBuffer Methods
 
     /**
      * Write some bytes.
@@ -62,16 +61,13 @@ public class VoidInputFilter implements InputFilter {
      * @return number of bytes written by the filter
      */
     @Override
-    public int doRead(ByteChunk chunk, Request req)
-        throws IOException {
-
+    public int doRead(ByteChunk chunk, Request req) throws IOException {
+        read = true;
         return -1;
-
     }
 
 
-    // --------------------------------------------------- OutputFilter Methods
-
+    // ---------------------------------------------------- InputFilter Methods
 
     /**
      * Set the associated request.
@@ -96,7 +92,7 @@ public class VoidInputFilter implements InputFilter {
      */
     @Override
     public void recycle() {
-        // NOOP: Nothing to recycle
+        read = false;
     }
 
 
@@ -120,18 +116,19 @@ public class VoidInputFilter implements InputFilter {
      * Note: It is recommended that extra bytes be swallowed by the filter.
      */
     @Override
-    public long end()
-        throws IOException {
+    public long end() throws IOException {
         return 0;
     }
 
 
-    /**
-     * Amount of bytes still available in a buffer.
-     */
     @Override
     public int available() {
         return 0;
     }
 
+
+    @Override
+    public boolean isFinished() {
+        return read;
+    }
 }

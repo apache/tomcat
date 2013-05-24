@@ -822,6 +822,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             httpUpgradeHandler = (HttpUpgradeHandler) param;
             // Stop further HTTP output
             getOutputBuffer().finished = true;
+        } else if (actionCode == ActionCode.REQUEST_BODY_FULLY_READ) {
+            AtomicBoolean result = (AtomicBoolean) param;
+            result.set(getInputBuffer().isFinished());
         } else {
             actionInternal(actionCode, param);
         }

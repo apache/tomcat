@@ -85,4 +85,8 @@ public interface InputFilter extends InputBuffer {
     public int available();
 
 
+    /**
+     * Has the request body been read fully?
+     */
+    public boolean isFinished();
 }

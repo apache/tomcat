@@ -344,6 +344,37 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
     }
 
 
+    /**
+     * Has all of the request body been read? There are subtle differences
+     * between this and available() > 0 primarily because of having to handle
+     * faking non-blocking reads with the blocking IO connector.
+     */
+    public boolean isFinished() {
+        if (lastValid > pos) {
+            // Data to read in the buffer so not finished
+            return false;
+        }
+
+        /*
+         * Don't use fill(false) here because in the following circumstances
+         * BIO will block - possibly indefinitely
+         * - client is using keep-alive and connection is still open
+         * - client has sent the complete request
+         * - client has not sent any of the next request (i.e. no pipelining)
+         * - application has read the complete request
+         */
+
+        // Check the InputFilters
+
+        if (lastActiveFilter >= 0) {
+            return activeFilters[lastActiveFilter].isFinished();
+        } else {
+            // No filters. Assume request is not finished. EOF will signal end of
+            // request.
+            return false;
+        }
+    }
+
     // ---------------------------------------------------- InputBuffer Methods
 
     /**

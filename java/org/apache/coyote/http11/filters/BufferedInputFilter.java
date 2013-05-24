@@ -138,4 +138,9 @@ public class BufferedInputFilter implements InputFilter {
         return buffered.getLength();
     }
 
+
+    @Override
+    public boolean isFinished() {
+        return hasRead || buffered.getLength() <= 0;
+    }
 }

@@ -210,5 +210,10 @@ public enum ActionCode {
      *Indicator that the Servlet is interested
      *in being notified when it can write data
      */
-    NB_WRITE_INTEREST
+    NB_WRITE_INTEREST,
+
+    /**
+     * Indicates if the request body has been fully read.
+     */
+    REQUEST_BODY_FULLY_READ
 }
