@@ -49,6 +49,9 @@ public class SavedRequestInputFilter implements InputFilter {
     @Override
     public int doRead(ByteChunk chunk, org.apache.coyote.Request request)
             throws IOException {
+        if(input.getOffset()>= input.getEnd())
+            return -1;
+
         int writeLength = 0;
 
         if (chunk.getLimit() > 0 && chunk.getLimit() < input.getLength()) {
@@ -56,9 +59,6 @@ public class SavedRequestInputFilter implements InputFilter {
         } else {
             writeLength = input.getLength();
         }
-
-        if(input.getOffset()>= input.getEnd())
-            return -1;
 
         input.substract(chunk.getBuffer(), 0, writeLength);
         chunk.setOffset(0);
