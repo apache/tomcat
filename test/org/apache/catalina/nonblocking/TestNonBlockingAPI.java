@@ -332,7 +332,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     }
     private class TestReadListener implements ReadListener {
-        AsyncContext ctx;
+        private final AsyncContext ctx;
+        private final StringBuilder body = new StringBuilder();
 
         public TestReadListener(AsyncContext ctx) {
             this.ctx = ctx;
@@ -353,23 +354,28 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                     s += new String(b, 0, read);
                 } while (in.isReady());
                 System.out.println(s);
-                if (s.endsWith("FINISHED")) {
-                    ctx.complete();
-                    ctx.getResponse().getWriter().print("OK");
-                } else {
-                    in.isReady();
-                }
+                body.append(s);
             } catch (Exception x) {
                 x.printStackTrace();
                 ctx.complete();
             }
-
         }
 
         @Override
         public void onAllDataRead() {
             System.out.println("onAllDataRead");
-
+            String msg;
+            if (body.toString().endsWith("FINISHED")) {
+                msg = "OK";
+            } else {
+                msg = "FAILED";
+            }
+            try {
+                ctx.getResponse().getWriter().print(msg);
+            } catch (IOException ioe) {
+                // Ignore
+            }
+            ctx.complete();
         }
 
         @Override
