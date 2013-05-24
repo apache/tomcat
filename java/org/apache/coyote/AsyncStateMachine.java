@@ -236,6 +236,7 @@ public class AsyncStateMachine<S> {
                 state == AsyncState.ERROR) {
             state = AsyncState.MUST_COMPLETE;
         } else if (state == AsyncState.READ_WRITE_OP) {
+            clearNonBlockingListeners();
             state = AsyncState.MUST_COMPLETE;
         } else {
             throw new IllegalStateException(
@@ -297,6 +298,7 @@ public class AsyncStateMachine<S> {
         if (state == AsyncState.DISPATCHED ||
                 state == AsyncState.TIMING_OUT ||
                 state == AsyncState.READ_WRITE_OP) {
+            clearNonBlockingListeners();
             state = AsyncState.ERROR;
         } else {
             throw new IllegalStateException(
@@ -348,6 +350,12 @@ public class AsyncStateMachine<S> {
     public synchronized void recycle() {
         asyncCtxt = null;
         state = AsyncState.DISPATCHED;
+    }
+
+
+    private void clearNonBlockingListeners() {
+        processor.getRequest().listener = null;
+        processor.getRequest().getResponse().listener = null;
     }
 
 
