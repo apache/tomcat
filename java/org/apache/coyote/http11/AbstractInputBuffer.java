@@ -232,6 +232,12 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
     public abstract boolean parseHeaders() throws IOException;
 
+    /**
+     * Attempts to read some data into the input buffer.
+     *
+     * @return <code>true</code> if more data was added to the input buffer
+     *         otherwise <code>false</code>
+     */
     protected abstract boolean fill(boolean block) throws IOException;
 
     protected abstract void init(SocketWrapper<S> socketWrapper,

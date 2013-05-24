@@ -554,12 +554,6 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     }
 
 
-    /**
-     * Attempts to read some data into the input buffer.
-     *
-     * @return <code>true</code> if more data was added to the input buffer
-     *         otherwise <code>false</code>
-     */
     @Override
     protected boolean fill(boolean block) throws IOException {
         // Ignore the block parameter
