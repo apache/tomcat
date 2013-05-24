@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.EnumSet;
 
+import javax.servlet.ReadListener;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.http.HttpServletResponse;
@@ -369,7 +370,7 @@ public class CoyoteAdapter implements Adapter {
                     try {
                         Thread.currentThread().setContextClassLoader(newCL);
                         req.getReadListener().onDataAvailable();
-                        if (request.getInputStream().isFinished()) {
+                        if (request.isFinished()) {
                             req.getReadListener().onAllDataRead();
                         }
                     } finally {
@@ -515,6 +516,24 @@ public class CoyoteAdapter implements Adapter {
             AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
             if (asyncConImpl != null) {
                 async = true;
+                ReadListener readListener =
+                        request.getCoyoteRequest().getReadListener();
+                if (readListener != null) {
+                    // Possible the all data may have been read during service()
+                    // method so this needs to be checked here
+                    ClassLoader oldCL =
+                            Thread.currentThread().getContextClassLoader();
+                    ClassLoader newCL =
+                            request.getContext().getLoader().getClassLoader();
+                    try {
+                        Thread.currentThread().setContextClassLoader(newCL);
+                        if (request.isFinished()) {
+                            req.getReadListener().onAllDataRead();
+                        }
+                    } finally {
+                        Thread.currentThread().setContextClassLoader(oldCL);
+                    }
+                }
             } else if (!comet) {
                 request.finishRequest();
                 response.finishResponse();
