@@ -1704,21 +1704,18 @@ public class AprEndpoint extends AbstractEndpoint {
                                         // possible, a read/write will be attempted, fail and that
                                         // will trigger an exception
                                         if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
-                                            System.out.println("Poller socket error read");
                                             // Must be doing a non-blocking read
                                             if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
                                                 // Close socket and clear pool
                                                 destroySocket(desc[n*2+1]);
                                             }
                                         } else if ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
-                                            System.out.println("Poller socket error write");
                                             // Must be doing an non-blocking write write
                                             if (!processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
                                                 // Close socket and clear pool
                                                 destroySocket(desc[n*2+1]);
                                             }
                                         } else {
-                                            System.out.println("Poller socket error other: " + wrapper.pollerFlags + " " + desc[n*2]);
                                             // Close socket and clear pool
                                             destroySocket(desc[n*2+1]);
                                         }
