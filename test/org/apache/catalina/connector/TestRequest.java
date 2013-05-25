@@ -639,6 +639,10 @@ public class TestRequest extends TomcatBaseTest {
             }
 
             req.getPart("part");
+
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
             resp.getWriter().println("Part " + req.getParameter("part"));
         }
     }
@@ -679,12 +683,12 @@ public class TestRequest extends TomcatBaseTest {
             BufferedReader reader = null;
             try {
                 reader = new BufferedReader(new InputStreamReader(
-                        conn.getInputStream()));
+                        conn.getInputStream(), "UTF-8"));
                 String line = null;
                 while ((line = reader.readLine()) != null) {
                     response.add(line);
                 }
-                //assertTrue(response.contains("Part дц"));
+                assertTrue(response.contains("Part дц"));
             } catch (Exception e) {
                 if (reader != null) {
                     reader.close();
