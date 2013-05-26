@@ -689,7 +689,7 @@ public class TestRequest extends TomcatBaseTest {
                     response.add(line);
                 }
                 assertTrue(response.contains("Part дц"));
-            } catch (Exception e) {
+            } finally {
                 if (reader != null) {
                     reader.close();
                 }
