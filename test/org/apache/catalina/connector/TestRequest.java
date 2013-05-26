@@ -17,12 +17,17 @@
 
 package org.apache.catalina.connector;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.TreeMap;
 
 import javax.servlet.ServletException;
@@ -33,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
@@ -362,7 +368,7 @@ public class TestRequest extends TomcatBaseTest {
         root.addServletMapping("/", "Bug37794");
         tomcat.start();
 
-        HttpURLConnection conn = getConnection();
+        HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/");
         InputStream is = conn.getInputStream();
         assertNotNull(is);
     }
@@ -376,7 +382,7 @@ public class TestRequest extends TomcatBaseTest {
         root.addServletMapping("/", "Bug37794");
         tomcat.start();
 
-        HttpURLConnection conn = getConnection();
+        HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/");
         conn.setChunkedStreamingMode(8 * 1024);
         InputStream is = conn.getInputStream();
         assertNotNull(is);
@@ -457,6 +463,34 @@ public class TestRequest extends TomcatBaseTest {
                                     String requestBody,
                                     boolean allowBody) {
         */
+    }
+
+    @Test
+    public void testBug54984() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("",
+                System.getProperty("java.io.tmpdir"));
+        root.setAllowCasualMultipartParsing(true);
+        Tomcat.addServlet(root, "Bug54984", new Bug54984Servlet());
+        root.addServletMapping("/", "Bug54984");
+        tomcat.start();
+
+        HttpURLConnection conn = getConnection("http://localhost:" + getPort()
+                + "/parseParametersBeforeParseParts");
+
+        prepareRequestBug54984(conn);
+
+        checkResponseBug54984(conn);
+
+        conn.disconnect();
+
+        conn = getConnection("http://localhost:" + getPort() + "/");
+
+        prepareRequestBug54984(conn);
+
+        checkResponseBug54984(conn);
+
+        conn.disconnect();
     }
 
     /**
@@ -576,8 +610,7 @@ public class TestRequest extends TomcatBaseTest {
         }
     }
 
-    private HttpURLConnection getConnection() throws IOException {
-        final String query = "http://localhost:" + getPort() + "/";
+    private HttpURLConnection getConnection(String query) throws IOException {
         URL postURL;
         postURL = new URL(query);
         HttpURLConnection conn = (HttpURLConnection) postURL.openConnection();
@@ -589,5 +622,79 @@ public class TestRequest extends TomcatBaseTest {
         conn.setAllowUserInteraction(false);
 
         return conn;
+    }
+
+    private static class Bug54984Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            req.setCharacterEncoding("UTF-8");
+
+            if (req.getRequestURI().endsWith("parseParametersBeforeParseParts")) {
+                req.getParameterNames();
+            }
+
+            req.getPart("part");
+
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            resp.getWriter().println("Part " + req.getParameter("part"));
+        }
+    }
+
+    private void prepareRequestBug54984(HttpURLConnection conn)
+            throws Exception {
+        String boundary = "-----" + System.currentTimeMillis();
+        conn.setRequestProperty("Content-Type",
+                "multipart/form-data; boundary=" + boundary);
+
+        PrintWriter writer = null;
+        try {
+            writer = new PrintWriter(new OutputStreamWriter(
+                    conn.getOutputStream(), "UTF-8"), true);
+            writer.append("--" + boundary).append("\r\n");
+            writer.append("Content-Disposition: form-data; name=\"part\"\r\n");
+            writer.append("Content-Type: text/plain; charset=UTF-8\r\n");
+            writer.append("\r\n");
+            writer.append("дц").append("\r\n");
+            writer.flush();
+
+            writer.append("\r\n");
+            writer.flush();
+
+            writer.append("--" + boundary + "--").append("\r\n");
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
+        }
+    }
+
+    private void checkResponseBug54984(HttpURLConnection conn)
+            throws Exception {
+        List<String> response = new ArrayList<String>();
+        int status = conn.getResponseCode();
+        if (status == HttpURLConnection.HTTP_OK) {
+            BufferedReader reader = null;
+            try {
+                reader = new BufferedReader(new InputStreamReader(
+                        conn.getInputStream(), "UTF-8"));
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    response.add(line);
+                }
+                assertTrue(response.contains("Part дц"));
+            } finally {
+                if (reader != null) {
+                    reader.close();
+                }
+            }
+        } else {
+            fail("OK status was expected: " + status);
+        }
     }
 }

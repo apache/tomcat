@@ -98,6 +98,11 @@
         that the temporary copy of the web application and not the original is
         removed when the web application stops. (markt) 
       </fix>
+      <fix>
+        <bug>54984</bug>: Use the correct encoding when processing a form data
+        posted as multipart/form-data even when the request parameters are not
+        parsed. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
