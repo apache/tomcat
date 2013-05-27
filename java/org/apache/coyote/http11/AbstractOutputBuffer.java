@@ -38,11 +38,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
-    public AbstractOutputBuffer() {
-        // Cause loading of Constants
-        int foo = Constants.HTTP_11_BYTES[0];
-    }
-
     // ----------------------------------------------------- Instance Variables
 
 
