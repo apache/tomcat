@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.core;
 
 import java.io.File;
@@ -28,7 +27,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 
 import org.apache.tomcat.util.http.fileupload.FileItem;
@@ -43,11 +41,11 @@ import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
 public class ApplicationPart implements Part {
 
     private final FileItem fileItem;
-    private final MultipartConfigElement mce;
+    private final File location;
 
-    public ApplicationPart(FileItem fileItem, MultipartConfigElement mce) {
+    public ApplicationPart(FileItem fileItem, File location) {
         this.fileItem = fileItem;
-        this.mce = mce;
+        this.location = location;
     }
 
     @Override
@@ -115,7 +113,7 @@ public class ApplicationPart implements Part {
     public void write(String fileName) throws IOException {
         File file = new File(fileName);
         if (!file.isAbsolute()) {
-            file = new File(mce.getLocation(), fileName);
+            file = new File(location, fileName);
         }
         try {
             fileItem.write(file);
