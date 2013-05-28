@@ -74,6 +74,10 @@
         Ensure that when auto deployment runs for a Host, it uses the latest
         values for copyXML, deployXML and unpackWARs. (markt)
       </fix>
+      <add>
+        <bug>54944</bug>: Enhancements to the unit tests for FORM
+        authentication. Patch provided by Brian Burch. (markt)
+      </add>
       <fix>
         <bug>54955</bug>: When a reload of the application is performed ensure
         that a subsequent request to the context root does not result in a 404
