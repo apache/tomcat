@@ -80,7 +80,6 @@ public class NetSupportSocket extends SpdyContext.NetSupport {
     @Override
     public void onAccept(Object socket) {
         SpdyConnectionSocket ch = new SpdyConnectionSocket(ctx, (Socket) socket);
-        ctx.getExecutor().execute(ch.inputThread);
         ch.onBlockingSocket();
     }
 
