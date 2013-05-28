@@ -55,6 +55,8 @@ public class SpdyProxyProtocol extends AbstractProtocol {
     private final JIoEndpoint.Handler cHandler = new TomcatJioHandler();
     private SpdyContext spdyContext;
 
+    private boolean compress = false;
+
     public SpdyProxyProtocol() {
         endpoint = new JIoEndpoint();
         ((JIoEndpoint) endpoint).setHandler(cHandler);
@@ -87,7 +89,7 @@ public class SpdyProxyProtocol extends AbstractProtocol {
     public void start() throws Exception {
         super.start();
         spdyContext = new SpdyContext();
-        spdyContext.setTlsComprression(false, false);
+        spdyContext.setTlsComprression(false, compress);
         spdyContext.setHandler(new SpdyHandler() {
             @Override
             public void onStream(SpdyConnection con, SpdyStream ch) throws IOException {
@@ -98,6 +100,14 @@ public class SpdyProxyProtocol extends AbstractProtocol {
         });
         spdyContext.setNetSupport(new NetSupportSocket());
         spdyContext.setExecutor(endpoint.getExecutor());
+    }
+
+    public boolean isCompress() {
+        return compress;
+    }
+
+    public void setCompress(boolean compress) {
+        this.compress = compress;
     }
 
     public class TomcatJioHandler implements JIoEndpoint.Handler {
