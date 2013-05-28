@@ -415,4 +415,67 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
     }
 
 
+    /**
+     * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=54947
+     */
+    @Test
+    public void testBug54947() {
+
+        Bug54947Client client = new Bug54947Client();
+
+        client.doRequest();
+        assertTrue(client.isResponse200());
+        assertTrue(client.isResponseBodyOK());
+    }
+
+
+    /**
+     * Bug 54947 test client.
+     */
+    private class Bug54947Client extends SimpleHttpClient {
+
+        private Exception doRequest() {
+
+            Tomcat tomcat = getTomcatInstance();
+
+            Context root = tomcat.addContext("", TEMP_DIR);
+            Tomcat.addServlet(root, "Bug54947", new TesterServlet());
+            root.addServletMapping("/test", "Bug54947");
+
+            try {
+                tomcat.start();
+                setPort(tomcat.getConnector().getLocalPort());
+
+                // Open connection
+                connect();
+
+                String[] request = new String[2];
+                request[0] = "GET http://localhost:8080/test HTTP/1.1" + CR;
+                request[1] = LF +
+                        "Connection: close" + CRLF +
+                        CRLF;
+
+                setRequest(request);
+                processRequest(); // blocks until response has been read
+
+                // Close the connection
+                disconnect();
+            } catch (Exception e) {
+                return e;
+            }
+            return null;
+        }
+
+        @Override
+        public boolean isResponseBodyOK() {
+            if (getResponseBody() == null) {
+                return false;
+            }
+            if (!getResponseBody().contains("OK")) {
+                return false;
+            }
+            return true;
+        }
+
+    }
 }
