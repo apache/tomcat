@@ -17,6 +17,8 @@
 package org.apache.catalina.authenticator;
 
 import java.io.File;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -24,91 +26,360 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Valve;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
+/*
+ * Test FORM authentication for sessions that do and do not use cookies.
+ *
+ * 1. A client that can accept and respond to a Set-Cookie for JSESSIONID
+ *    will be able to maintain its authenticated session, no matter whether
+ *    the session ID is changed once, many times, or not at all.
+ *
+ * 2. A client that cannot accept cookies will only be able to maintain a
+ *    persistent session IF the server sends the correct (current) jsessionid
+ *    as a path parameter appended to ALL urls within its response. That is
+ *    achievable with servlets, jsps, jstl (all of which which can ask for an
+ *    encoded url to be inserted into the dynamic web page). It cannot work
+ *    with static html.
+ *    note: this test class uses the tomcat somaple jsps, which conform.
+ *
+ * 3. Therefore, any webapp that MIGHT need to authenticate a client that
+ *    does not accept cookies MUST generate EVERY protected resource url
+ *    dynamically (so that it will include the current session ID).
+ *
+ * 4. Any webapp that cannot satify case 3 MUST turn off
+ *    changeSessionIdOnAuthentication for its Context and thus degrade the
+ *    session fixation protection for ALL of its clients.
+ *    note from MarkT: Not sure I agree with this. If the URLs aren't
+ *      being encoded, then the session is going to break regardless of
+ *      whether or not the session ID changes.
+ *
+ * Unlike a "proper browser", this unit test class does a quite lot of
+ * screen-scraping and cheating of headers and urls (not very elegant,
+ * but it makes no claims to generality).
+ *
+ */
 public class TestFormAuthenticator extends TomcatBaseTest {
 
+    // these should really be singletons to be type-safe,
+    // we are in a unit test and don't need to paranoid.
+    protected static final boolean USE_100_CONTINUE = true;
+    protected static final boolean NO_100_CONTINUE = !USE_100_CONTINUE;
+
+    protected static final boolean CLIENT_USE_COOKIES = true;
+    protected static final boolean CLIENT_NO_COOKIES = !CLIENT_USE_COOKIES;
+
+    protected static final boolean SERVER_USE_COOKIES = true;
+    protected static final boolean SERVER_NO_COOKIES = !SERVER_USE_COOKIES;
+
+    protected static final boolean SERVER_CHANGE_SESSID = true;
+    protected static final boolean SERVER_FREEZE_SESSID = !SERVER_CHANGE_SESSID;
+
+    // minimum session timeout
+    private static final int TIMEOUT_MINS = 1;
+    private static final long TIMEOUT_DELAY_MSECS =
+                            (((TIMEOUT_MINS * 60) + 10) * 1000);
+
+    private FormAuthClient client;
+
+    // first, a set of tests where the server uses a cookie to carry
+    // the current session ID during and after authentication, and
+    // the client is prepared to return cookies with each request
+
     @Test
-    public void testGet() throws Exception {
-        doTest("GET", "GET", false);
+    public void testGetWithCookies() throws Exception {
+        doTest("GET", "GET", NO_100_CONTINUE,
+                CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     @Test
-    public void testPostNoContinue() throws Exception {
-        doTest("POST", "GET", false);
+    public void testPostNoContinueWithCookies() throws Exception {
+        doTest("POST", "GET", NO_100_CONTINUE,
+                CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     @Test
-    public void testPostWithContinue() throws Exception {
-        doTest("POST", "GET", true);
+    public void testPostWithContinueAndCookies() throws Exception {
+        doTest("POST", "GET", USE_100_CONTINUE,
+               CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     // Bug 49779
     @Test
-    public void testPostNoContinuePostRedirect() throws Exception {
-        doTest("POST", "POST", false);
+    public void testPostNoContinuePostRedirectWithCookies() throws Exception {
+        doTest("POST", "POST", NO_100_CONTINUE,
+                CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     // Bug 49779
     @Test
-    public void testPostWithContinuePostRedirect() throws Exception {
-        doTest("POST", "POST", true);
+    public void testPostWithContinuePostRedirectWithCookies() throws Exception {
+        doTest("POST", "POST", USE_100_CONTINUE,
+                CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
-    private void doTest(String resourceMethod, String redirectMethod,
-            boolean useContinue) throws Exception {
-        FormAuthClient client = new FormAuthClient();
 
-        // First request for authenticated resource
+    // next, a set of tests where the server Context is configured to never
+    // use cookies and the session ID is only carried as a url path parameter
+
+    // Bug 53584
+    @Test
+    public void testGetNoServerCookies() throws Exception {
+        doTest("GET", "GET", NO_100_CONTINUE,
+                CLIENT_NO_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
+    }
+
+    @Test
+    public void testPostNoContinueNoServerCookies() throws Exception {
+        doTest("POST", "GET", NO_100_CONTINUE,
+                CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
+    }
+
+    @Test
+    public void testPostWithContinueNoServerCookies() throws Exception {
+        doTest("POST", "GET", USE_100_CONTINUE,
+                CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
+    }
+
+    // variant of Bug 49779
+    @Test
+    public void testPostNoContinuePostRedirectNoServerCookies()
+            throws Exception {
+        doTest("POST", "POST", NO_100_CONTINUE,
+                CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
+    }
+
+    // variant of Bug 49779
+    @Test
+    public void testPostWithContinuePostRedirectNoServerCookies()
+            throws Exception {
+        doTest("POST", "POST", USE_100_CONTINUE,
+                CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
+    }
+
+
+    // next, a set of tests where the server Context uses cookies,
+    // but the client refuses to return them and tries to use
+    // the session ID if carried as a url path parameter
+
+    @Test
+    public void testGetNoClientCookies() throws Exception {
+        doTest("GET", "GET", NO_100_CONTINUE,
+                CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+    }
+
+    @Test
+    public void testPostNoContinueNoClientCookies() throws Exception {
+        doTest("POST", "GET", NO_100_CONTINUE,
+                CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+    }
+
+    @Test
+    public void testPostWithContinueNoClientCookies() throws Exception {
+        doTest("POST", "GET", USE_100_CONTINUE,
+                CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+    }
+
+    // variant of Bug 49779
+    @Test
+    public void testPostNoContinuePostRedirectNoClientCookies()
+            throws Exception {
+        doTest("POST", "POST", NO_100_CONTINUE,
+                CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+    }
+
+    // variant of Bug 49779
+    @Test
+    public void testPostWithContinuePostRedirectNoClientCookies()
+            throws Exception {
+        doTest("POST", "POST", USE_100_CONTINUE,
+                CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+    }
+
+
+    // finally, a set of tests to explore quirky situations
+    // but there is not need to replicate all the scenarios above.
+
+    @Test
+    public void testNoChangedSessidWithCookies() throws Exception {
+        doTest("GET", "GET", NO_100_CONTINUE,
+                CLIENT_USE_COOKIES, SERVER_USE_COOKIES,
+                SERVER_FREEZE_SESSID);
+    }
+
+    @Test
+    public void testNoChangedSessidWithoutCookies() throws Exception {
+        doTest("GET", "GET", NO_100_CONTINUE,
+                CLIENT_NO_COOKIES, SERVER_USE_COOKIES,
+                SERVER_FREEZE_SESSID);
+    }
+
+    @Test
+    public void testTimeoutWithoutCookies() throws Exception {
+        String protectedUri = doTest("GET", "GET", NO_100_CONTINUE,
+                CLIENT_NO_COOKIES, SERVER_USE_COOKIES,
+                SERVER_FREEZE_SESSID);
+
+        // wait long enough for my session to expire
+        Thread.sleep(TIMEOUT_DELAY_MSECS);
+
+        // then try to continue using the expired session to get the
+        // protected resource once more.
+        // should get login challenge or timeout status 408
+        doTestProtected("GET", protectedUri, NO_100_CONTINUE,
+                FormAuthClient.LOGIN_REQUIRED, 1);
+    }
+
+    /*
+     * Choreograph the steps of the test dialogue with the server
+     *  1. while not authenticated, try to access a protected resource
+     *  2. respond to the login challenge with good credentials
+     *  3. after successful login, follow the redirect to the original page
+     *  4. repeatedly access the protected resource to demonstrate
+     *     persistence of the authenticated session
+     *
+     * @param resourceMethod HTTP method for accessing the protected resource
+     * @param redirectMethod HTTP method for the login FORM reply
+     * @param useContinue whether the HTTP client should expect a 100 Continue
+     * @param clientShouldUseCookies whether the client should send cookies
+     * @param serverWillUseCookies whether the server should send cookies
+     *
+     */
+    private String doTest(String resourceMethod, String redirectMethod,
+            boolean useContinue, boolean clientShouldUseCookies,
+            boolean serverWillUseCookies, boolean serverWillChangeSessid)
+            throws Exception {
+
+        client = new FormAuthClient(clientShouldUseCookies,
+                serverWillUseCookies, serverWillChangeSessid);
+
+        // First request for protected resource gets the login page
         client.setUseContinue(useContinue);
-        client.doResourceRequest(resourceMethod);
+        client.doResourceRequest(resourceMethod, false, null, null);
         assertTrue(client.isResponse200());
         assertTrue(client.isResponseBodyOK());
+        String loginUri = client.extractBodyUri(
+                FormAuthClient.LOGIN_PARAM_TAG,
+                FormAuthClient.LOGIN_RESOURCE);
+        String originalSessionId = null;
+        if (serverWillUseCookies && clientShouldUseCookies) {
+            originalSessionId = client.getSessionId();
+        }
+        else {
+            originalSessionId = client.extractPathSessionId(loginUri);
+        }
         client.reset();
 
-        // Second request for the login page
+        // Second request replies to the login challenge
         client.setUseContinue(useContinue);
-        client.doLoginRequest();
-        assertTrue(client.isResponse302());
+        client.doLoginRequest(loginUri);
+        assertTrue("login failed " + client.getResponseLine(),
+                client.isResponse302());
         assertTrue(client.isResponseBodyOK());
+        String redirectUri = client.getRedirectUri();
         client.reset();
 
-        // Third request - follow the redirect
-        client.doResourceRequest(redirectMethod);
+        // Third request - the login was successful so
+        // follow the redirect to the protected resource
+        client.doResourceRequest(redirectMethod, true, redirectUri, null);
         if ("POST".equals(redirectMethod)) {
             client.setUseContinue(useContinue);
         }
         assertTrue(client.isResponse200());
         assertTrue(client.isResponseBodyOK());
+        String protectedUri = client.extractBodyUri(
+                FormAuthClient.RESOURCE_PARAM_TAG,
+                FormAuthClient.PROTECTED_RESOURCE);
+        String newSessionId = null;
+        if (serverWillUseCookies && clientShouldUseCookies) {
+            newSessionId = client.getSessionId();
+        }
+        else {
+            newSessionId = client.extractPathSessionId(protectedUri);
+        }
+        boolean sessionIdIsChanged = !(originalSessionId.equals(newSessionId));
+        assertTrue(sessionIdIsChanged == serverWillChangeSessid);
         client.reset();
 
-        // Subsequent requests - direct to the resource
-        for (int i = 0; i < 5; i++) {
+        // Subsequent requests - keep accessing the protected resource
+        doTestProtected(resourceMethod, protectedUri, useContinue,
+                FormAuthClient.LOGIN_SUCCESSFUL, 5);
+
+        return protectedUri;        // in case more requests will be issued
+    }
+
+    /*
+     * Repeatedly access the protected resource after the client has
+     * successfully logged-in to the webapp. The current session attributes
+     * will be used and cannot be changed.
+     *  3. after successful login, follow the redirect to the original page
+     *  4. repeatedly access the protected resource to demonstrate
+     *     persistence of the authenticated session
+     *
+     * @param resourceMethod HTTP method for accessing the protected resource
+     * @param protectedUri to access (with or withour sessionid)
+     * @param useContinue whether the HTTP client should expect a 100 Continue
+     * @param clientShouldUseCookies whether the client should send cookies
+     * @param serverWillUseCookies whether the server should send cookies
+     *
+     */
+    private void doTestProtected(String resourceMethod, String protectedUri,
+            boolean useContinue, int phase, int repeatCount)
+            throws Exception {
+
+        // Subsequent requests - keep accessing the protected resource
+        for (int i = 0; i < repeatCount; i++) {
             client.setUseContinue(useContinue);
-            client.doResourceRequest(resourceMethod);
+            client.doResourceRequest(resourceMethod, false, protectedUri, null);
             assertTrue(client.isResponse200());
-            assertTrue(client.isResponseBodyOK());
+            assertTrue(client.isResponseBodyOK(phase));
             client.reset();
         }
     }
 
+    /*
+     * Encapsulate the logic needed to run a suitably-configured tomcat
+     * instance, send it an HTTP request and process the server response
+     */
     private final class FormAuthClient extends SimpleHttpClient {
 
-        private static final String LOGIN_PAGE = "j_security_check";
+        protected static final String LOGIN_PARAM_TAG = "action=";
+        protected static final String LOGIN_RESOURCE = "j_security_check";
+        protected static final String LOGIN_REPLY =
+                "j_username=tomcat&j_password=tomcat";
 
-        private String protectedPage = "index.jsp";
-        private String protectedLocation = "/examples/jsp/security/protected/";
+        protected static final String PROTECTED_RELATIVE_PATH =
+                "/examples/jsp/security/protected/";
+        protected static final String PROTECTED_RESOURCE = "index.jsp";
+        private static final String PROTECTED_RESOURCE_URL =
+                PROTECTED_RELATIVE_PATH + PROTECTED_RESOURCE;
+        protected static final String RESOURCE_PARAM_TAG = "href=";
+        private static final char PARAM_DELIM = '?';
+
+        // primitive tracking of the test phases to verify the HTML body
+        protected static final int LOGIN_REQUIRED = 1;
+        protected static final int REDIRECTING = 2;
+        protected static final int LOGIN_SUCCESSFUL = 3;
         private int requestCount = 0;
-        private String sessionId = null;
 
-        private FormAuthClient() throws Exception {
+        // todo: forgot this change and making it up again!
+        protected final String SESSION_PARAMETER_START =
+            SESSION_PARAMETER_NAME + "=";
+
+        private FormAuthClient(boolean clientShouldUseCookies,
+                boolean serverShouldUseCookies,
+                boolean serverShouldChangeSessid) throws Exception {
+
             Tomcat tomcat = getTomcatInstance();
             File appDir = new File(getBuildDirectory(), "webapps/examples");
             Context ctx = tomcat.addWebapp(null, "/examples",
                     appDir.getAbsolutePath());
+            setUseCookies(clientShouldUseCookies);
+            ctx.setCookies(serverShouldUseCookies);
 
             MapRealm realm = new MapRealm();
             realm.addUser("tomcat", "tomcat");
@@ -117,108 +388,199 @@ public class TestFormAuthenticator extends TomcatBaseTest {
 
             tomcat.start();
 
+            // perhaps this does not work until tomcat has started?
+            ctx.setSessionTimeout(TIMEOUT_MINS);
+
+            // Valve pipeline is only established after tomcat starts
+            Valve[] valves = ctx.getPipeline().getValves();
+            for (Valve valve : valves) {
+                if (valve instanceof AuthenticatorBase) {
+                    ((AuthenticatorBase)valve)
+                            .setChangeSessionIdOnAuthentication(
+                                                serverShouldChangeSessid);
+                    break;
+                }
+            }
+
             // Port only known after Tomcat starts
             setPort(getPort());
         }
 
-        private void doResourceRequest(String method) throws Exception {
+        private void doLoginRequest(String loginUri) throws Exception {
+
+            doResourceRequest("POST", true,
+                    PROTECTED_RELATIVE_PATH + loginUri, LOGIN_REPLY);
+        }
+
+        /*
+         * Prepare the resource request HTTP headers and issue the request.
+         * Three kinds of uri are supported:
+         *   1. fully qualified uri.
+         *   2. minimal uri without webapp path.
+         *   3. null - use the default protected resource
+         * Cookies are sent if available and supported by the test. Otherwise, the
+         * caller is expected to have provided a session id as a path parameter.
+         */
+        private void doResourceRequest(String method, boolean isFullQualUri,
+                String resourceUri, String requestTail) throws Exception {
+
+            // build the HTTP request while assembling the uri
             StringBuilder requestHead = new StringBuilder(128);
-            String requestTail;
-            requestHead.append(method).append(" ").append(protectedLocation)
-                    .append(protectedPage);
-            if ("GET".equals(method)) {
-                requestHead.append("?role=bar");
+            requestHead.append(method).append(" ");
+            if (isFullQualUri) {
+                requestHead.append(resourceUri);
+            }
+            else {
+                if (resourceUri == null) {
+                    // the default relative url
+                    requestHead.append(PROTECTED_RESOURCE_URL);
+                }
+                else {
+                    requestHead.append(PROTECTED_RELATIVE_PATH)
+                            .append(resourceUri);
+                }
+                if ("GET".equals(method)) {
+                    requestHead.append("?role=bar");
+                }
             }
             requestHead.append(" HTTP/1.1").append(CRLF);
+
+            // next, add the constant http headers
             requestHead.append("Host: localhost").append(CRLF);
             requestHead.append("Connection: close").append(CRLF);
+
+            // then any optional http headers
             if (getUseContinue()) {
                 requestHead.append("Expect: 100-continue").append(CRLF);
             }
-            if (sessionId != null) {
-                requestHead.append("Cookie: JSESSIONID=").append(sessionId)
-                        .append(CRLF);
+            if (getUseCookies()) {
+                String sessionId = getSessionId();
+                if (sessionId != null) {
+                    requestHead.append("Cookie: ")
+                            .append(SESSION_COOKIE_NAME)
+                            .append("=").append(sessionId).append(CRLF);
+                }
             }
+
+            // finally, for posts only, deal with the request content
             if ("POST".equals(method)) {
+                if (requestTail == null) {
+                    requestTail = "role=bar";
+                }
                 requestHead.append(
                         "Content-Type: application/x-www-form-urlencoded")
                         .append(CRLF);
-                requestHead.append("Content-length: 8").append(CRLF);
-                requestHead.append(CRLF);
-                requestTail = "role=bar";
-            } else {
-                requestTail = CRLF;
+                // calculate post data length
+                String len = Integer.toString(requestTail.length());
+                requestHead.append("Content-length: ").append(len).append(CRLF);
             }
+
+            // always put an empty line after the headers
+            requestHead.append(CRLF);
+
             String request[] = new String[2];
             request[0] = requestHead.toString();
             request[1] = requestTail;
             doRequest(request);
         }
 
-        private void doLoginRequest() throws Exception {
-            StringBuilder requestHead = new StringBuilder(128);
-            requestHead.append("POST ").append(protectedLocation)
-                    .append(LOGIN_PAGE).append(" HTTP/1.1").append(CRLF);
-            requestHead.append("Host: localhost").append(CRLF);
-            requestHead.append("Connection: close").append(CRLF);
-            if (getUseContinue()) {
-                requestHead.append("Expect: 100-continue").append(CRLF);
-            }
-            if (sessionId != null) {
-                requestHead.append("Cookie: JSESSIONID=").append(sessionId)
-                        .append(CRLF);
-            }
-            requestHead.append(
-                    "Content-Type: application/x-www-form-urlencoded").append(
-                    CRLF);
-            requestHead.append("Content-length: 35").append(CRLF);
-            requestHead.append(CRLF);
-            String request[] = new String[2];
-            request[0] = requestHead.toString();
-            request[1] = "j_username=tomcat&j_password=tomcat";
-
-            doRequest(request);
-        }
-
         private void doRequest(String request[]) throws Exception {
             setRequest(request);
-
             connect();
             processRequest();
-            String newSessionId = getSessionId();
-            if (newSessionId != null) {
-                sessionId = newSessionId;
-            }
             disconnect();
-
             requestCount++;
         }
 
+        /*
+         * verify the server response html body is the page we expect,
+         * based on the dialogue position within doTest.
+         */
         @Override
         public boolean isResponseBodyOK() {
-            if (requestCount == 1) {
-                // First request should result in the login page
-                assertContains(getResponseBody(),
-                        "<title>Login Page for Examples</title>");
-                return true;
-            } else if (requestCount == 2) {
-                // Second request should result in a redirect
-                return true;
-            } else {
-                // Subsequent requests should result in the protected page
-                // The role parameter should have reached the page
-                String body = getResponseBody();
-                assertContains(body,
-                        "<title>Protected Page for Examples</title>");
-                assertContains(body,
-                        "<input type=\"text\" name=\"role\" value=\"bar\"");
-                return true;
+            return isResponseBodyOK(requestCount);
+        }
+
+        /*
+         * verify the server response html body is the page we expect,
+         * based on the dialogue position given by the caller.
+         */
+        public boolean isResponseBodyOK(int testPhase) {
+            switch (testPhase) {
+                case LOGIN_REQUIRED:
+                    // First request should return in the login page
+                    assertContains(getResponseBody(),
+                            "<title>Login Page for Examples</title>");
+                    return true;
+                case REDIRECTING:
+                    // Second request should result in redirect without a body
+                    return true;
+                default:
+                    // Subsequent requests should return in the protected page.
+                    // Our role parameter should be appear in the page.
+                    String body = getResponseBody();
+                    assertContains(body,
+                            "<title>Protected Page for Examples</title>");
+                    assertContains(body,
+                            "<input type=\"text\" name=\"role\" value=\"bar\"");
+                    return true;
             }
         }
 
+        /*
+         * Scan the server response body and extract the given
+         * url, including any path elements.
+         */
+        private String extractBodyUri(String paramTag, String resource) {
+            extractUriElements();
+            List<String> elements = getResponseBodyUriElements();
+            String fullPath = null;
+            for (String element : elements) {
+                int ix = element.indexOf(paramTag);
+                if (ix > -1) {
+                    ix += paramTag.length();
+                    char delim = element.charAt(ix);
+                    int iy = element.indexOf(resource, ix);
+                    if (iy > -1) {
+                        int lastCharIx = element.indexOf(delim, iy);
+                        fullPath = element.substring(iy, lastCharIx);
+                        // remove any trailing parameters
+                        int paramDelim = fullPath.indexOf(PARAM_DELIM);
+                        if (paramDelim > -1) {
+                            fullPath = fullPath.substring(0, paramDelim);
+                        }
+                        break;
+                    }
+                }
+            }
+            return fullPath;
+        }
+
+    /*
+     * extract the session id path element (if it exists in the given url)
+     */
+    private String extractPathSessionId(String url) {
+        String sessionId = null;
+        int iStart = url.indexOf(SESSION_PARAMETER_START);
+        if (iStart > -1) {
+            iStart += SESSION_PARAMETER_START.length();
+            String remainder = url.substring(iStart);
+            StringTokenizer parser =
+                    new StringTokenizer(remainder, SESSION_PATH_PARAMETER_TAILS);
+            if (parser.hasMoreElements()) {
+                sessionId = parser.nextToken();
+            }
+            else {
+                sessionId = url.substring(iStart);
+            }
+        }
+        return sessionId;
+    }
+
         private void assertContains(String body, String expected) {
             if (!body.contains(expected)) {
-                fail("Response body check failure.\n"
+                fail("Response number " + requestCount
+                        + ": body check failure.\n"
                         + "Expected to contain substring: [" + expected
                         + "]\nActual: [" + body + "]");
             }
