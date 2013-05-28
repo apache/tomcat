@@ -80,7 +80,7 @@ public final class SpdyContext {
     public SpdyContext() {
     }
 
-    public void setTlsComprression(boolean tls, boolean compress) {
+    public void setTlsCompression(boolean tls, boolean compress) {
         this.tls = tls;
         this.compression = compress;
     }

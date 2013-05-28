@@ -89,7 +89,7 @@ public class SpdyProxyProtocol extends AbstractProtocol {
     public void start() throws Exception {
         super.start();
         spdyContext = new SpdyContext();
-        spdyContext.setTlsComprression(false, compress);
+        spdyContext.setTlsCompression(false, compress);
         spdyContext.setHandler(new SpdyHandler() {
             @Override
             public void onStream(SpdyConnection con, SpdyStream ch) throws IOException {
