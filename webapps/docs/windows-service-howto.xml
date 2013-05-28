@@ -320,9 +320,16 @@ Install the service named 'Tomcat7'
 C:\> service.bat install
 </source>
 </p>
+<p>There is a 2nd optional parameter that lets you specify the name of the
+service, as displayed in Windows services.</p>
 <p>
-If using tomcat7.exe, you need to use the <b>//IS//</b> parameter.
+<source>
+Install the service named 'MyService'
+C:\> service.bat install MyService
+</source>
 </p>
+<p>
+If using tomcat7.exe, you need to use the <b>//IS//</b> parameter.</p>
 <p>
 <source>
 Install the service named 'Tomcat7'
@@ -345,16 +352,32 @@ C:\> tomcat7 //US//Tomcat7 --Description="Apache Tomcat Server - http://tomcat.a
 C:\> --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bootstrap.jar
 </source>
 </p>
+<p>If you gave the service an optional name, you need to specify it like this:
+</p>
+<p>
+<source>
+Update the service named 'MyService'
+C:\> tomcat7 //US//MyService --Description="Apache Tomcat Server - http://tomcat.apache.org/ " \
+C:\> --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bootstrap.jar
+</source>
+</p>
 </section>
 <section name="Removing services">
 <p>
 To remove the service, you need to use the <b>//DS//</b> parameter.<br/>
-If the service is running it will be stopped and then deleted.
-</p>
+If the service is running it will be stopped and then deleted.</p>
 <p>
 <source>
 Remove the service named 'Tomcat7'
 C:\> tomcat7 //DS//Tomcat7
+</source>
+</p>
+<p>If you gave the service an optional name, you need to specify it like this:
+</p>
+<p>
+<source>
+Remove the service named 'MyService'
+C:\> tomcat7 //DS//MyService
 </source>
 </p>
 </section>
@@ -364,14 +387,68 @@ To run the service in console mode, you need to use the <b>//TS//</b> parameter.
 The service shutdown can be initiated by pressing <b>CTRL+C</b> or
 <b>CTRL+BREAK</b>.
 If you rename the tomcat7.exe to testservice.exe then you can just execute the
-testservice.exe and this command mode will be executed by default.
-</p>
+testservice.exe and this command mode will be executed by default.</p>
 <p>
 <source>
 Run the service named 'Tomcat7' in console mode
 C:\> tomcat7 //TS//Tomcat7 [additional arguments]
 Or simply execute:
 C:\> tomcat7
+</source>
+</p>
+</section>
+<section name="Multiple Instances">
+<p>
+Tomcat supports installation of multiple instances. You can have a single
+installation of Tomcat with multiple instances running on different IP/port
+combinations, or multiple Tomcat versions, each running one or more instances on
+different IP/ports.</p>
+<p>
+Each instance folder will need the following structure:
+</p>
+<ul>
+<li>conf</li>
+<li>logs</li>
+<li>temp</li>
+<li>webapps</li>
+<li>work</li>
+</ul>
+<p>
+At a minimum, conf should contain a copy of the following files from
+CATALINA_HOME\conf\. Any files not copied and edited, will be picked up by
+default from CATALINA_HOME\conf, i.e. CATALINA_BASE\conf files override defaults
+from CATALINA_HOME\conf.</p>
+<ul>
+<li>server.xml</li>
+<li>web.xml</li>
+</ul>
+<p>
+You must edit CATALINA_BASE\conf\server.xml to specify a unique IP/port for the
+instance to listen on. Find the line that contains
+<pre>&lt;Connector port="8080" ...</pre> and add an address attribute and/or
+update the port number so as to specify a unique IP/port combination.</p>
+<p>
+To install an instance, first set the CATALINA_HOME environment variable to the
+name of the Tomcat installation directory. Then create a second environment
+variable CATALINA_BASE and point this to the instance folder. Then run "service
+install" command specifying a service name.</p>
+<p>
+<source>
+set CATALINA_HOME=c:\tomcat_7
+set CATALINA_BASE=c:\tomcat_7\instances\instance1
+service install instance1
+</source>
+</p>
+<p>
+To modify the service settings, you can run <b>tomcat7w //ES//instance1</b>.
+</p>
+<p>
+For additional instances, create additional instance folder, update the
+CATALINA_BASE environment variable, and run the service install again.</p>
+<p>
+<source>
+set CATALINA_BASE=c:\tomcat_7\instances\instance2
+service install instance2
 </source>
 </p>
 </section>

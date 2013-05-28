@@ -132,6 +132,11 @@
   <subsection name="Web applications">
     <changelog>
       <fix>
+        <bug>54931</bug>: Add information to the Window Service how-to about
+        installing and running multiple instances. Based on a patch by Chris
+        Derham. (markt)
+      </fix>
+      <fix>
         <bug>54932</bug>: Correct the link to Tribes documentation. (violetagg)
       </fix>
     </changelog>
