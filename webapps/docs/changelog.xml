@@ -121,6 +121,10 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
+        <bug>54964</bug>: Allow tag plug-ins to be packaged with a web
+        application. Patch provided by Sheldon Shao. (markt)
+      </fix>
+      <fix>
         <bug>54968</bug>: Return the correct version number (2.2) of the JSP
         specification that is supported by the JSP engine when
         <code>javax.servlet.jsp.JspEngineInfo#getSpecificationVersion()</code>
