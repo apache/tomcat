@@ -70,7 +70,7 @@ public class SpdyAprNpnHandler implements NpnHandler<Long> {
         spdyContext = new SpdyContext();
         if (sslContext == 0) {
             // Apr endpoint without SSL - proxy mode.
-            spdyContext.setTlsComprression(false, false);
+            spdyContext.setTlsCompression(false, false);
             return;
         }
         if (0 != SSLExt.setNPN(sslContext, SpdyContext.SPDY_NPN_OUT)) {
