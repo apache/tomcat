@@ -2733,7 +2733,7 @@ public class Request
                     }
                 }
                 for (FileItem item : items) {
-                    ApplicationPart part = new ApplicationPart(item, mce);
+                    ApplicationPart part = new ApplicationPart(item, location);
                     parts.add(part);
                     if (part.getSubmittedFileName() == null) {
                         String name = part.getName();

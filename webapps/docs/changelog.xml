@@ -84,6 +84,10 @@
         response. (violetagg)
       </fix>
       <fix>
+        <bug>54971</bug>: Ensure that the correct location is used when writing
+        files via <code>avax.servlet.http.Part.write(String)</code>. (markt)
+      </fix>
+      <fix>
         <bug>54974</bug>: Ensure that 
         <code>SessionCookieConfig#set&lt;methods&gt;</code>
         will throw <code>IllegalStateException</code> if the
