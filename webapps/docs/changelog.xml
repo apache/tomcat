@@ -109,6 +109,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>54947</bug>: Fix the HTTP NIO connector that incorrectly rejected a
+        request if the CRLF terminating the request line was split across
+        multiple packets. Patch by Konstantin Preißer. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>

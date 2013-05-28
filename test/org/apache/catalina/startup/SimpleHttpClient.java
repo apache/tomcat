@@ -42,7 +42,9 @@ public abstract class SimpleHttpClient {
     public static final String TEMP_DIR =
             System.getProperty("java.io.tmpdir");
 
-    public static final String CRLF = "\r\n";
+    public static final String CR = "\r";
+    public static final String LF = "\n";
+    public static final String CRLF = CR + LF;
 
     public static final String INFO_100 = "HTTP/1.1 100";
     public static final String OK_200 = "HTTP/1.1 200";
