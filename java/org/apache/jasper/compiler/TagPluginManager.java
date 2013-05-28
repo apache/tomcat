@@ -142,7 +142,8 @@ public class TagPluginManager {
             String pluginClassStr = pluginClassNode.getBody();
             TagPlugin tagPlugin = null;
             try {
-                Class<?> pluginClass = Class.forName(pluginClassStr);
+                Class<?> pluginClass =
+                        ctxt.getClassLoader().loadClass(pluginClassStr);
                 tagPlugin = (TagPlugin) pluginClass.newInstance();
             } catch (Exception e) {
                 throw new JasperException(e);
