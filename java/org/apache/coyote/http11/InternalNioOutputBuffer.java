@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
@@ -82,6 +83,8 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      */
     protected volatile boolean flipped = false;
 
+    private final AtomicLong bytesWritten = new AtomicLong(0);
+
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -96,6 +99,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             socket = null;
         }
         flipped = false;
+        bytesWritten.set(0);
     }
 
 
@@ -157,6 +161,10 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             // Still have data to write
             registerWriteInterest();
         }
+        if (written == 0) {
+            (new Exception("written == 0")).printStackTrace();
+        }
+        System.out.println("Total written " + bytesWritten.addAndGet(written));
         return written;
     }
 
@@ -198,6 +206,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
         if (length == 0) return;
 
+        System.out.println("addToBB");
         // Try to flush any data in the socket's write buffer first
         boolean dataLeft = flushBuffer(isBlocking());
 

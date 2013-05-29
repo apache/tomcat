@@ -595,16 +595,9 @@ public final class Response {
     }
 
     public void onWritePossible() throws IOException {
-        // Flush the lower level buffers
-        // If data left in buffers wait for next onWritePossible. Socket will
-        // have been placed in poller if buffers weren't emptied.
-        AtomicBoolean isDataLeftInBuffers = new AtomicBoolean(true);
-        action(ActionCode.NB_WRITE_FLUSH, isDataLeftInBuffers);
-        if (isDataLeftInBuffers.get()) {
-            return;
-        }
-
-        // No data in lower level buffers. Ready for app to write more data.
+        // Any buffered data left over from a previous non-blocking write is
+        // written in the Processor so if this point is reached the app is able
+        // to write data.
         boolean fire = false;
         synchronized (fireListenerLock) {
             if (fireListener) {
