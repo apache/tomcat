@@ -548,6 +548,8 @@ public final class Response {
     }
 
     protected volatile WriteListener listener;
+    private boolean fireListener = false;
+    private final Object fireListenerLock = new Object();
 
     public WriteListener getWriteListener() {
         return listener;
@@ -572,5 +574,46 @@ public final class Response {
         }
 
         this.listener = listener;
+    }
+
+    public boolean isReady() {
+        if (listener == null) {
+            // TODO i18n
+            throw new IllegalStateException("not in non blocking mode.");
+        }
+        // Assume write is not possible
+        AtomicBoolean isReady = new AtomicBoolean(false);
+        synchronized (fireListenerLock) {
+            if (fireListener) {
+                // isReady() has already returned false
+                return true;
+            }
+            action(ActionCode.NB_WRITE_INTEREST, isReady);
+            fireListener = !isReady.get();
+        }
+        return isReady.get();
+    }
+
+    public void onWritePossible() throws IOException {
+        // Flush the lower level buffers
+        // If data left in buffers wait for next onWritePossible. Socket will
+        // have been placed in poller if buffers weren't emptied.
+        AtomicBoolean isDataLeftInBuffers = new AtomicBoolean(true);
+        action(ActionCode.NB_WRITE_FLUSH, isDataLeftInBuffers);
+        if (isDataLeftInBuffers.get()) {
+            return;
+        }
+
+        // No data in lower level buffers. Ready for app to write more data.
+        boolean fire = false;
+        synchronized (fireListenerLock) {
+            if (fireListener) {
+                fireListener = false;
+                fire = true;
+            }
+        }
+        if (fire) {
+            listener.onWritePossible();
+        }
     }
 }

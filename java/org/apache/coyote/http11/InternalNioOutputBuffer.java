@@ -155,7 +155,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         }
         if (flipped) {
             // Still have data to write
-            att.getPoller().add(socket, SelectionKey.OP_WRITE);
+            registerWriteInterest();
         }
         return written;
     }
@@ -274,17 +274,30 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         return hasMoreDataToFlush();
     }
 
+
     @Override
     protected boolean hasMoreDataToFlush() {
         return (flipped && socket.getBufHandler().getWriteBuffer().remaining()>0) ||
         (!flipped && socket.getBufHandler().getWriteBuffer().position() > 0);
     }
 
+
+    @Override
+    protected void registerWriteInterest() throws IOException {
+        NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+        if (att == null) {
+            throw new IOException("Key must be cancelled");
+        }
+        att.getPoller().add(socket, SelectionKey.OP_WRITE);
+    }
+
+
     private int transfer(byte[] from, int offset, int length, ByteBuffer to) {
         int max = Math.min(length, to.remaining());
         to.put(from, offset, max);
         return max;
     }
+
 
     private void transfer(ByteBuffer from, ByteBuffer to) {
         int max = Math.min(from.remaining(), to.remaining());

@@ -316,7 +316,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
             bbuf.clear();
             flipped = false;
         } else {
-            ((AprEndpoint) endpoint).getPoller().add(socket, -1, false, true);
+            registerWriteInterest();
         }
     }
 
@@ -336,6 +336,12 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     protected boolean hasMoreDataToFlush() {
         return (flipped && bbuf.remaining() > 0) ||
                 (!flipped && bbuf.position() > 0);
+    }
+
+
+    @Override
+    protected void registerWriteInterest() {
+        ((AprEndpoint) endpoint).getPoller().add(socket, -1, false, true);
     }
 
 

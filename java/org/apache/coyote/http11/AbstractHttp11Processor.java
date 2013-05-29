@@ -815,7 +815,20 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             request.setAvailable(inputBuffer.available());
         } else if (actionCode == ActionCode.NB_WRITE_INTEREST) {
             AtomicBoolean isReady = (AtomicBoolean)param;
-            isReady.set(getOutputBuffer().isReady());
+            try {
+                isReady.set(getOutputBuffer().isReady());
+            } catch (IOException e) {
+                // TODO
+                throw new IllegalStateException();
+            }
+        } else if (actionCode == ActionCode.NB_WRITE_FLUSH) {
+            AtomicBoolean isDataLeftInBuffers = (AtomicBoolean)param;
+            try {
+                isDataLeftInBuffers.set(getOutputBuffer().flushBuffer(false));
+            } catch (IOException e) {
+                // TODO
+                throw new IllegalStateException();
+            }
         } else if (actionCode == ActionCode.NB_READ_INTEREST) {
             registerForEvent(true, false);
         } else if (actionCode == ActionCode.UPGRADE) {
