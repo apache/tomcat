@@ -317,6 +317,9 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
 
         private final WrapperFuture<Void,Void> hFuture;
 
+        private HandshakeStatus handshakeStatus;
+        private Status resultStatus;
+
         public WebSocketSslHandshakeThread(WrapperFuture<Void,Void> hFuture) {
             this.hFuture = hFuture;
         }
@@ -328,8 +331,9 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                 // So the first compact does the right thing
                 socketReadBuffer.position(socketReadBuffer.limit());
 
-                HandshakeStatus handshakeStatus =
-                        sslEngine.getHandshakeStatus();
+                handshakeStatus = sslEngine.getHandshakeStatus();
+                resultStatus = Status.OK;
+
                 boolean handshaking = true;
 
                 while(handshaking) {
@@ -338,7 +342,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             socketWriteBuffer.clear();
                             SSLEngineResult r =
                                     sslEngine.wrap(DUMMY, socketWriteBuffer);
-                            handshakeStatus = checkResult(r, true);
+                            checkResult(r, true);
                             socketWriteBuffer.flip();
                             Future<Integer> fWrite =
                                     socketChannel.write(socketWriteBuffer);
@@ -347,7 +351,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                         }
                         case NEED_UNWRAP: {
                             socketReadBuffer.compact();
-                            if (socketReadBuffer.position() == 0) {
+                            if (socketReadBuffer.position() == 0 ||
+                                    resultStatus == Status.BUFFER_UNDERFLOW) {
                                 Future<Integer> fRead =
                                         socketChannel.read(socketReadBuffer);
                                 fRead.get();
@@ -355,7 +360,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             socketReadBuffer.flip();
                             SSLEngineResult r =
                                     sslEngine.unwrap(socketReadBuffer, DUMMY);
-                            handshakeStatus = checkResult(r, false);
+                            checkResult(r, false);
                             break;
                         }
                         case NEED_TASK: {
@@ -383,10 +388,14 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
             hFuture.complete(null);
         }
 
-        private HandshakeStatus checkResult(SSLEngineResult result,
-                boolean wrap) throws SSLException {
+        private void checkResult(SSLEngineResult result, boolean wrap)
+                throws SSLException {
 
-            if (result.getStatus() != Status.OK) {
+            handshakeStatus = result.getHandshakeStatus();
+            resultStatus = result.getStatus();
+
+            if (resultStatus != Status.OK &&
+                    (wrap || resultStatus != Status.BUFFER_UNDERFLOW)) {
                 throw new SSLException("TODO");
             }
             if (wrap && result.bytesConsumed() != 0) {
@@ -395,7 +404,6 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
             if (!wrap && result.bytesProduced() != 0) {
                 throw new SSLException("TODO");
             }
-            return result.getHandshakeStatus();
         }
     }
 
