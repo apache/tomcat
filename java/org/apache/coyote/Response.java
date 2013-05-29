@@ -586,7 +586,7 @@ public final class Response {
         synchronized (fireListenerLock) {
             if (fireListener) {
                 // isReady() has already returned false
-                return true;
+                return false;
             }
             action(ActionCode.NB_WRITE_INTEREST, isReady);
             fireListener = !isReady.get();
