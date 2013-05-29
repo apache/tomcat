@@ -607,6 +607,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     //------------------------------------------------------ Non-blocking writes
 
     protected abstract boolean hasMoreDataToFlush();
+    protected abstract void registerWriteInterest() throws IOException;
 
 
     /**
@@ -628,8 +629,12 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     }
 
 
-    protected final boolean isReady() {
-        return !hasDataToWrite();
+    protected final boolean isReady() throws IOException {
+        boolean result = !hasDataToWrite();
+        if (!result) {
+            registerWriteInterest();
+        }
+        return result;
     }
 
 

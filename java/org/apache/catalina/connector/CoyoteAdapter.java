@@ -356,7 +356,7 @@ public class CoyoteAdapter implements Adapter {
                             request.getContext().getLoader().getClassLoader();
                     try {
                         Thread.currentThread().setContextClassLoader(newCL);
-                        res.getWriteListener().onWritePossible();
+                        res.onWritePossible();
                     } finally {
                         Thread.currentThread().setContextClassLoader(oldCL);
                     }

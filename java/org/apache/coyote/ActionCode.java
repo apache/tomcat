@@ -213,6 +213,12 @@ public enum ActionCode {
     NB_WRITE_INTEREST,
 
     /**
+     * Flush the lower level buffers and re-register the socket with the poller
+     * if the buffers cannot be completely flushed.
+     */
+    NB_WRITE_FLUSH,
+
+    /**
      * Indicates if the request body has been fully read.
      */
     REQUEST_BODY_FULLY_READ

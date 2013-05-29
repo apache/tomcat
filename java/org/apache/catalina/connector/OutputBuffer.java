@@ -22,7 +22,6 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.WriteListener;
 
@@ -647,13 +646,7 @@ public class OutputBuffer extends Writer
 
 
     public boolean isReady() {
-        if (coyoteResponse.getWriteListener() == null) {
-            throw new IllegalStateException("not in non blocking mode.");
-        }
-        // Assume write is not possible
-        AtomicBoolean isReady = new AtomicBoolean(false);
-        coyoteResponse.action(ActionCode.NB_WRITE_INTEREST, isReady);
-        return isReady.get();
+        return coyoteResponse.isReady();
     }
 
 
