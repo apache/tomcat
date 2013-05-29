@@ -202,7 +202,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
         if (length == 0) return;
 
-        System.out.println("addToBB");
         // Try to flush any data in the socket's write buffer first
         boolean dataLeft = flushBuffer(isBlocking());
 
