@@ -1542,13 +1542,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 asyncStateMachine.asyncOperation();
                 try {
                     if (outputBuffer.hasDataToWrite()) {
-                        //System.out.println("Attempting data flush!!");
-                        outputBuffer.flushBuffer(false);
-                    }
-                    //return if we have more data to write
-                    if (outputBuffer.hasDataToWrite()) {
-                        registerForEvent(false, true);
-                        return SocketState.LONG;
+                        if (outputBuffer.flushBuffer(false)) {
+                            registerForEvent(false, true);
+                            return SocketState.LONG;
+                        }
                     }
                 } catch (IOException x) {
                     if (getLog().isDebugEnabled()) {
