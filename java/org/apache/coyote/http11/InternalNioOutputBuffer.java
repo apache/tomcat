@@ -161,10 +161,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             // Still have data to write
             registerWriteInterest();
         }
-        if (written == 0) {
-            (new Exception("written == 0")).printStackTrace();
-        }
-        System.out.println("Total written " + bytesWritten.addAndGet(written));
         return written;
     }
 
