@@ -226,13 +226,10 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         private static final int limitSize = 100;
         private static final int hugeSize = 400000;
 
-        private boolean init;
         private Context context;
 
         private synchronized void init(boolean limited, boolean swallow)
                 throws Exception {
-            if (init)
-                return;
 
             Tomcat tomcat = getTomcatInstance();
             context = tomcat.addContext("", TEMP_DIR);
@@ -253,8 +250,6 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
 
             tomcat.start();
             setPort(tomcat.getConnector().getLocalPort());
-
-            init = true;
         }
 
         private Exception doRequest(boolean limited, boolean swallow) {
@@ -347,13 +342,10 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         private static final String servletName = "uploadAborted";
         private static final int hugeSize = 400000;
 
-        private boolean init;
         private Context context;
 
         private synchronized void init(int status, boolean swallow)
                 throws Exception {
-            if (init)
-                return;
 
             Tomcat tomcat = getTomcatInstance();
             context = tomcat.addContext("", TEMP_DIR);
@@ -367,8 +359,6 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
             tomcat.start();
 
             setPort(tomcat.getConnector().getLocalPort());
-
-            init = true;
         }
 
         private Exception doRequest(int status, boolean swallow) {
