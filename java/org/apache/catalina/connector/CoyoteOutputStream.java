@@ -77,8 +77,11 @@ public class CoyoteOutputStream extends ServletOutputStream {
 
     @Override
     public void write(int i) throws IOException {
-        checkNonBlockingWrite();
+        boolean nonBlocking = checkNonBlockingWrite();
         ob.writeByte(i);
+        if (nonBlocking) {
+            checkRegisterForWrite();
+        }
     }
 
 
@@ -90,15 +93,10 @@ public class CoyoteOutputStream extends ServletOutputStream {
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        checkNonBlockingWrite();
+        boolean nonBlocking = checkNonBlockingWrite();
         ob.write(b, off, len);
-    }
-
-
-    private void checkNonBlockingWrite() {
-        if (!ob.isBlocking() && !ob.isReady()) {
-            throw new IllegalStateException(
-                    sm.getString("coyoteOutputStream.nbNotready"));
+        if (nonBlocking) {
+            checkRegisterForWrite();
         }
     }
 
@@ -108,8 +106,42 @@ public class CoyoteOutputStream extends ServletOutputStream {
      */
     @Override
     public void flush() throws IOException {
-        checkNonBlockingWrite();
+        boolean nonBlocking = checkNonBlockingWrite();
         ob.flush();
+        if (nonBlocking) {
+            checkRegisterForWrite();
+        }
+    }
+
+
+    /**
+     * Checks for concurrent writes which are not permitted. This object has no
+     * state information so the call chain is
+     * CoyoyeOutputStream->OutputBuffer->CoyoteResponse.
+     *
+     * @return <code>true</code> if this OutputStream is currently in
+     *         non-blocking mode.
+     */
+    private boolean checkNonBlockingWrite() {
+        boolean nonBlocking = !ob.isBlocking();
+        if (nonBlocking && !ob.isReady()) {
+            throw new IllegalStateException(
+                    sm.getString("coyoteOutputStream.nbNotready"));
+        }
+        return nonBlocking;
+    }
+
+
+    /**
+     * Checks to see if there is data left in the Coyote output buffers (NOT the
+     * servlet output buffer) and if so registers the associated socket for
+     * write so the buffers will be emptied. The container will take care of
+     * this. As far as the app is concerned, there is a non-blocking write in
+     * progress. It doesn't have visibility of whether the data is buffered in
+     * the socket buffer or the Coyote buffers.
+     */
+    private void checkRegisterForWrite() {
+        ob.checkRegisterForWrite();
     }
 
 

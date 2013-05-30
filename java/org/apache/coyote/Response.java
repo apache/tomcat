@@ -547,9 +547,15 @@ public final class Response {
         return outputBuffer.getBytesWritten();
     }
 
+    /*
+     * State for non-blocking output is maintained here as it is the one point
+     * easily reachable from the CoyoteOutputStream and the Processor which both
+     * need access to state.
+     */
     protected volatile WriteListener listener;
     private boolean fireListener = false;
-    private final Object fireListenerLock = new Object();
+    private boolean registeredForWrite = false;
+    private final Object nonBlockingStateLock = new Object();
 
     public WriteListener getWriteListener() {
         return listener;
@@ -582,16 +588,27 @@ public final class Response {
             throw new IllegalStateException("not in non blocking mode.");
         }
         // Assume write is not possible
-        AtomicBoolean isReady = new AtomicBoolean(false);
-        synchronized (fireListenerLock) {
-            if (fireListener) {
-                // isReady() has already returned false
+        boolean ready = false;
+        synchronized (nonBlockingStateLock) {
+            if (registeredForWrite) {
+                fireListener = true;
                 return false;
             }
-            action(ActionCode.NB_WRITE_INTEREST, isReady);
-            fireListener = !isReady.get();
+            ready = checkRegisterForWrite(false);
+            fireListener = !ready;
         }
-        return isReady.get();
+        return ready;
+    }
+
+    public boolean checkRegisterForWrite(boolean internal) {
+        AtomicBoolean ready = new AtomicBoolean(false);
+        synchronized (nonBlockingStateLock) {
+            if (!registeredForWrite || internal) {
+                action(ActionCode.NB_WRITE_INTEREST, ready);
+                registeredForWrite = !ready.get();
+            }
+        }
+        return ready.get();
     }
 
     public void onWritePossible() throws IOException {
@@ -599,7 +616,8 @@ public final class Response {
         // written in the Processor so if this point is reached the app is able
         // to write data.
         boolean fire = false;
-        synchronized (fireListenerLock) {
+        synchronized (nonBlockingStateLock) {
+            registeredForWrite = false;
             if (fireListener) {
                 fireListener = false;
                 fire = true;
