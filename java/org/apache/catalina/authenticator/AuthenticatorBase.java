@@ -775,6 +775,7 @@ public abstract class AuthenticatorBase extends ValveBase
             if (principal == null) {
                 // Registering a programmatic logout
                 sso.deregister(ssoId);
+                request.removeNote(Constants.REQ_SSOID_NOTE);
                 return;
             } else {
                 // Update the SSO session with the latest authentication data

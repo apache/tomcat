@@ -111,6 +111,11 @@
         posted as multipart/form-data even when the request parameters are not
         parsed. (violetagg)
       </fix>
+      <fix>
+        <bug>54999</bug>: The old JSESSIONIDSSAO needs to be removed when SSO is
+        being used and logout() and login() occur within a single request. Patch
+        provided by Keith Mashinter. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
