@@ -24,6 +24,23 @@ import java.net.UnknownHostException;
 /**
  * A simple multicast test that replicates the core elements of Tomcat's
  * multicast membership. If this works then multicast membership should work.
+ * Useful notes for various operating systems follow.<p>
+ * OSX
+ * <ul>
+ * <li>Multicast is not routed by default.</li>
+ * <li>Check if multicast is routed by looking at the routing table via
+ *     <code>netstat -nr</code>. If there is no line the output for 228.0.0.4
+ *     then multicast will not work.</li>
+ * <li>Add a route for multicast using
+ *     <code>sudo route -nv add -net 228.0.0.4 -interface en0</code></li>
+ * <li>The firewall blocks multicast bewteen processes on the local machine so
+ *     you will need to disable the OSX forewall before the test below will
+ *     work.</li>
+ * </ul>
+ * Windows Server 2008
+ * <ul>
+ * <li>This works out of the box</li>
+ * </ul>
  */
 public class TesterMulticast {
 
