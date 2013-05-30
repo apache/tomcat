@@ -397,7 +397,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         @Override
         public void onWritePossible() {
-            System.out.println("onWritePossible");
             try {
                 long left = Math.max(bytesToDownload, 0);
                 long start = System.currentTimeMillis();
