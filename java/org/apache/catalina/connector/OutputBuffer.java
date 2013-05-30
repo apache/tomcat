@@ -645,6 +645,11 @@ public class OutputBuffer extends Writer
     }
 
 
+    /*
+     * All the non-blocking write state information is held in the Response so
+     * it is visible / accessible to all the code that needs it.
+     */
+
     public boolean isReady() {
         return coyoteResponse.isReady();
     }
@@ -657,5 +662,9 @@ public class OutputBuffer extends Writer
 
     public boolean isBlocking() {
         return coyoteResponse.getWriteListener() == null;
+    }
+
+    public void checkRegisterForWrite() {
+        coyoteResponse.checkRegisterForWrite(true);
     }
 }

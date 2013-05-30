@@ -315,9 +315,11 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         if (bbuf.remaining() == 0) {
             bbuf.clear();
             flipped = false;
-        } else {
-            registerWriteInterest();
         }
+        // If there is data left in the buffer the socket will be registered for
+        // write further up the stack. This is to ensure the socket is only
+        // registered for write once as both container and user code can trigger
+        // write registration.
     }
 
 

@@ -1543,7 +1543,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 try {
                     if (outputBuffer.hasDataToWrite()) {
                         if (outputBuffer.flushBuffer(false)) {
-                            registerForEvent(false, true);
+                            // There is data to write but go via Response to
+                            // maintain a consistent view of non-blocking state
+                            response.checkRegisterForWrite(true);
                             return SocketState.LONG;
                         }
                     }

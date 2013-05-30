@@ -157,10 +157,10 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             bytebuffer.clear();
             flipped = false;
         }
-        if (flipped) {
-            // Still have data to write
-            registerWriteInterest();
-        }
+        // If there is data left in the buffer the socket will be registered for
+        // write further up the stack. This is to ensure the socket is only
+        // registered for write once as both container and user code can trigger
+        // write registration.
         return written;
     }
 
@@ -211,8 +211,13 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             int thisTime = transfer(buf,offset,length,socket.getBufHandler().getWriteBuffer());
             length = length - thisTime;
             offset = offset + thisTime;
-            writeToSocket(socket.getBufHandler().getWriteBuffer(), isBlocking(), true);
-            dataLeft = flushBuffer(isBlocking());
+            int written = writeToSocket(socket.getBufHandler().getWriteBuffer(),
+                    isBlocking(), true);
+            if (written == 0) {
+                dataLeft = true;
+            } else {
+                dataLeft = flushBuffer(isBlocking());
+            }
         }
 
         NioEndpoint.KeyAttachment ka = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
