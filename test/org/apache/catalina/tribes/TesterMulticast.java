@@ -27,8 +27,8 @@ import java.net.UnknownHostException;
  * Useful notes for various operating systems follow.<p>
  * OSX
  * <ul>
- * <li>The firewall blocks multicast bewteen processes on the local machine so
- *     you will need to disable the OSX forewall before the test below will
+ * <li>The firewall blocks multicast between processes on the local machine so
+ *     you will need to disable the OSX firewall before the test below will
  *     work.</li>
  * </ul>
  * Windows Server 2008
