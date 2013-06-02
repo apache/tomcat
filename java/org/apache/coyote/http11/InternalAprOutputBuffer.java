@@ -219,9 +219,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     }
 
 
-    /**
-     * Callback to write data from the buffer.
-     */
     @Override
     protected synchronized boolean flushBuffer(boolean block)
             throws IOException {
