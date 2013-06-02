@@ -249,7 +249,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     }
 
 
-    private void writeToSocket(boolean block) throws IOException {
+    private synchronized void writeToSocket(boolean block) throws IOException {
 
         Lock readLock = wrapper.getBlockingStatusReadLock();
         WriteLock writeLock = wrapper.getBlockingStatusWriteLock();
@@ -291,7 +291,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         }
     }
 
-    private void writeToSocket() throws IOException {
+    private synchronized void writeToSocket() throws IOException {
         if (!flipped) {
             flipped = true;
             bbuf.flip();
@@ -332,7 +332,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     //-------------------------------------------------- Non-blocking IO methods
 
     @Override
-    protected boolean hasMoreDataToFlush() {
+    protected synchronized boolean hasMoreDataToFlush() {
         return (flipped && bbuf.remaining() > 0) ||
                 (!flipped && bbuf.position() > 0);
     }
