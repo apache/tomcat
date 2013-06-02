@@ -1698,7 +1698,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                         // Must be using non-blocking IO for the socket to be in the
                                         // poller during async processing. Need to trigger error
                                         // handling. Poller will return error codes plus the flags it
-                                        // was waiting for.We could return ASYNC_[WRITE|READ]_ERROR
+                                        // was waiting for. We could return ASYNC_[WRITE|READ]_ERROR
                                         // error here but if we do, there will be no exception
                                         // associated with the error. By signalling read/write is
                                         // possible, a read/write will be attempted, fail and that
