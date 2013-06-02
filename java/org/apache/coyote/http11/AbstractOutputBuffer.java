@@ -615,7 +615,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
      *
      * @param block     Should this method block until the buffer is empty
      * @return  <code>true</code> if data remains in the buffer (which can only
-     *          happen in non-blocking mode else <code>false</code>.
+     *          happen in non-blocking mode) else <code>false</code>.
      * @throws IOException
      */
     protected abstract boolean flushBuffer(boolean block) throws IOException;
