@@ -830,7 +830,10 @@ public class AprEndpoint extends AbstractEndpoint {
             } else {
                 SocketWrapper<Long> wrapper =
                         connections.get(Long.valueOf(socket));
-                executor.execute(new SocketProcessor(wrapper, status));
+                // Make sure connection hasn't been closed
+                if (wrapper != null) {
+                    executor.execute(new SocketProcessor(wrapper, status));
+                }
             }
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
@@ -2238,10 +2241,15 @@ public class AprEndpoint extends AbstractEndpoint {
 
         private void doRun() {
             // Process the request from this socket
+            if (socket.getSocket() == null) {
+                // Closed in another thread
+                return;
+            }
             SocketState state = handler.process(socket, status);
             if (state == Handler.SocketState.CLOSED) {
                 // Close socket and pool
                 destroySocket(socket.getSocket().longValue());
+                socket.socket = null;
             } else if (state == Handler.SocketState.LONG) {
                 socket.access();
                 if (socket.async) {
