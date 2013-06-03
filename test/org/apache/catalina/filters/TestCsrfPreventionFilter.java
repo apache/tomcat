@@ -102,7 +102,7 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         }
     }
 
-    private static class NonEncodingResponse extends TesterResponse {
+    private static class NonEncodingResponse extends TesterHttpServletResponse {
 
         @Override
         public String encodeRedirectURL(String url) {

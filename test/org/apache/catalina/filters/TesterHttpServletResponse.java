@@ -34,9 +34,9 @@ import org.apache.catalina.connector.Request;
 /**
  * Mock HttpServletResponse
  */
-public class TesterResponse implements HttpServletResponse {
+public class TesterHttpServletResponse implements HttpServletResponse {
 
-    public TesterResponse() {
+    public TesterHttpServletResponse() {
         // NOOP
     }
 
