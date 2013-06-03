@@ -38,7 +38,7 @@ import org.apache.tools.ant.BuildException;
  * @version $Id$
  * @since 4.1
  */
-public class DeployTask extends AbstractCatalinaTask {
+public class DeployTask extends AbstractCatalinaCommandTask {
 
 
     // ------------------------------------------------------------- Properties
@@ -70,20 +70,6 @@ public class DeployTask extends AbstractCatalinaTask {
 
     public void setLocalWar(String localWar) {
         this.localWar = localWar;
-    }
-
-
-    /**
-     * The context path of the web application we are managing.
-     */
-    protected String path = null;
-
-    public String getPath() {
-        return (this.path);
-    }
-
-    public void setPath(String path) {
-        this.path = path;
     }
 
 
@@ -186,9 +172,8 @@ public class DeployTask extends AbstractCatalinaTask {
         }
 
         // Building URL
-        StringBuilder sb = new StringBuilder("/deploy?path=");
+        StringBuilder sb = createQueryString("/deploy");
         try {
-            sb.append(URLEncoder.encode(this.path, getCharset()));
             if ((war == null) && (config != null)) {
                 sb.append("&config=");
                 sb.append(URLEncoder.encode(config, getCharset()));

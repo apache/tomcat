@@ -116,6 +116,11 @@
         being used and logout() and login() occur within a single request. Patch
         provided by Keith Mashinter. (markt) 
       </fix>
+      <add>
+        <bug>55035</bug>: Add support for the version attribute to the deploy
+        command of the Ant tasks for interfacing with the text based Manager
+        application. Patch provided by  Sergey Tcherednichenko. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
