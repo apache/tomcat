@@ -153,6 +153,14 @@
         cluster instance from container on every request, use instance variable.
         (kfujino)
       </scode>
+      <add>
+        Add <code>maxWait</code> attribute that the senderPool will wait when
+        there are no available senders. (kfujino)
+      </add>
+      <add>
+        Improve error message by including specified timeout if failed to
+        retrieve a data sender. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

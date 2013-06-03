@@ -42,6 +42,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
     
     private SenderQueue queue = null;
     private int poolSize = 25;
+    private long maxWait = 3000;
     public PooledSender() {
         queue = new SenderQueue(this,poolSize);
     }
@@ -49,7 +50,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
     public abstract DataSender getNewDataSender();
     
     public DataSender getSender() {
-        return queue.getSender(getTimeout());
+        return queue.getSender(getMaxWait());
     }
     
     public void returnSender(DataSender sender) {
@@ -87,6 +88,14 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
 
     public int getPoolSize() {
         return poolSize;
+    }
+
+    public long getMaxWait() {
+        return maxWait;
+    }
+
+    public void setMaxWait(long maxWait) {
+        this.maxWait = maxWait;
     }
 
     @Override
