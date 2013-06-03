@@ -142,6 +142,21 @@
   </subsection>
   <subsection name="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector Attributes">
    <attributes>
+     <attribute name="connectTimeout" required="false">
+       Specifies the timeout, in milliseconds, to use when attempting a TCP connection
+       to the suspect node. Default is 1000.
+     </attribute>
+     <attribute name="performSendTest" required="false">
+       If true is set, send a test message to the suspect node. Default is true.
+     </attribute>
+     <attribute name="performReadTest" required="false">
+       If true is set, read the response of the test message that sent. Default is false.
+       <strong>Note: </strong>if <code>performSendTest</code> is false, this attribute will have no effect.
+     </attribute>
+     <attribute name="readTestTimeout" required="false">
+       Specifies the timeout, in milliseconds, to use when performing a read test
+       to the suspicious node. Default is 5000.
+     </attribute>
    </attributes>
   </subsection>
   <subsection name="org.apache.catalina.tribes.group.interceptors.TcpPingInterceptor Attributes">
