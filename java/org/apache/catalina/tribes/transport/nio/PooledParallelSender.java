@@ -46,7 +46,7 @@ public class PooledParallelSender extends PooledSender {
         if ( !connected ) throw new ChannelException("Sender not connected.");
         ParallelNioSender sender = (ParallelNioSender)getSender();
         if (sender == null) {
-            ChannelException cx = new ChannelException("Unable to retrieve a data sender, time out error.");
+            ChannelException cx = new ChannelException("Unable to retrieve a data sender, time out("+getMaxWait()+" ms) error.");
             for (int i = 0; i < destination.length; i++) cx.addFaultyMember(destination[i], new NullPointerException("Unable to retrieve a sender from the sender pool"));
             throw cx;
         } else {
