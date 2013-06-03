@@ -117,7 +117,7 @@ public class WsServerContainer extends WsWebSocketContainer
         EnumSet<DispatcherType> types = EnumSet.of(DispatcherType.REQUEST,
                 DispatcherType.FORWARD);
 
-        fr.addMappingForUrlPatterns(types, false, "/*");
+        fr.addMappingForUrlPatterns(types, true, "/*");
     }
 
 
