@@ -162,14 +162,18 @@
       </attribute>
     </attributes>
   </subsection>
-  <subsection name="PooledParallelSender Attributes">
+  <subsection name="Common PooledSender Attributes">
     <attributes>
       <attribute name="poolSize" required="false">
         The maximum number of concurrent connections from A to B.
         The value is based on a per-destination count.
         The default value is <code>25</code>
       </attribute>
-
+      <attribute name="maxWait" required="false">
+        The maximum number of milliseconds that the senderPool will wait when
+        there are no available senders. The default value is <code>3000</code>
+        milliseconds.(3 seconds).
+      </attribute>
     </attributes>
   </subsection>
 </section>
