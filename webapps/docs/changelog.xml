@@ -165,6 +165,11 @@
       <fix>
         <bug>54932</bug>: Correct the link to Tribes documentation. (violetagg)
       </fix>
+      <add>
+        Add document for
+        <code>o.a.c.tribes.group.interceptors.TcpFailureDetector</code>.
+        (kfujino)
+      </add>
     </changelog>
   </subsection>
 </section>
