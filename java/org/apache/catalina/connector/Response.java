@@ -144,6 +144,9 @@ public class Response
         outputBuffer.setResponse(coyoteResponse);
     }
 
+    /**
+     * Get the Coyote response.
+     */
     public org.apache.coyote.Response getCoyoteResponse() {
         return this.coyoteResponse;
     }
