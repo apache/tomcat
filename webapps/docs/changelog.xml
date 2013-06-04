@@ -121,6 +121,11 @@
         command of the Ant tasks for interfacing with the text based Manager
         application. Patch provided by  Sergey Tcherednichenko. (markt)
       </add>
+      <add>
+        <bug>55052</bug>: JULI&apos;s LogManager now additionally looks for
+        logging properties without prefixes if the property cannot be found with
+        a prefix. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
