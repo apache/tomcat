@@ -75,25 +75,25 @@ base-maven.loc=http://repo2.maven.org/maven2
 # base-sf.loc=http://sunet.dl.sourceforge.net
 
 # ----- Commons Logging, version 1.1 or later -----
-# If this version is updated, check the versions required for the deps
+# If this version is updated, check the versions required for the dependencies below
 # - avalon-framework
 # - log4j
 # - logkit
 # - servletapi
-commons-logging.version=1.1.2
+commons-logging.version=1.1.3
 commons-logging.home=${base.path}/commons-logging-${commons-logging.version}
 commons-logging-src.loc.1=${base-commons.loc.1}/logging/source/commons-logging-${commons-logging.version}-src.tar.gz
 commons-logging-src.loc.2=${base-commons.loc.2}/logging/source/commons-logging-${commons-logging.version}-src.tar.gz
 commons-logging-src.tar.gz=${commons-logging.home}/commons-logging-${commons-logging.version}-src.tar.gz
 
 # ----- Avalon Framework (required by commons logging) -----
-avalon-framework.version=4.1.3
+avalon-framework.version=4.1.5
 avalon-framework.home=${base.path}/avalon-framework-${avalon-framework.version}
 avalon-framework.loc=${base-maven.loc}/avalon-framework/avalon-framework/${avalon-framework.version}/avalon-framework-${avalon-framework.version}.jar
 avalon-framework.jar=${avalon-framework.home}/avalon-framework-${avalon-framework.version}.jar
 
 # ----- log4j (required by commons logging) -----
-log4j.version=1.2.12
+log4j.version=1.2.17
 log4j.home=${base.path}/log4j-${log4j.version}
 log4j.loc=${base-maven.loc}/log4j/log4j/${log4j.version}/log4j-${log4j.version}.jar
 log4j.jar=${log4j.home}/log4j-${log4j.version}.jar
