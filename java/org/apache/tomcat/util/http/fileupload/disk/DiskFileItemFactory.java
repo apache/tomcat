@@ -18,7 +18,6 @@ package org.apache.tomcat.util.http.fileupload.disk;
 
 import java.io.File;
 
-import org.apache.tomcat.util.http.fileupload.FileCleaningTracker;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.FileItemFactory;
 
@@ -53,18 +52,7 @@ import org.apache.tomcat.util.http.fileupload.FileItemFactory;
  * </p>
  *
  * <p>Temporary files, which are created for file items, should be
- * deleted later on. The best way to do this is using a
- * {@link FileCleaningTracker}, which you can set on the
- * {@link DiskFileItemFactory}. However, if you do use such a tracker,
- * then you must consider the following: Temporary files are automatically
- * deleted as soon as they are no longer needed. (More precisely, when the
- * corresponding instance of {@link java.io.File} is garbage collected.)
- * This is done by the so-called reaper thread, which is started
- * automatically when the class
- * {@link org.apache.tomcat.util.http.fileupload.FileCleaningTracker} is loaded.
- * It might make sense to terminate that thread, for example, if
- * your web application ends. See the section on "Resource cleanup"
- * in the users guide of commons-fileupload.</p>
+ * deleted later on.</p>
  *
  * @since FileUpload 1.1
  *
@@ -90,13 +78,6 @@ public class DiskFileItemFactory implements FileItemFactory {
      * The threshold above which uploads will be stored on disk.
      */
     private int sizeThreshold = DEFAULT_SIZE_THRESHOLD;
-
-    /**
-     * <p>The instance of {@link FileCleaningTracker}, which is responsible
-     * for deleting temporary files.</p>
-     * <p>May be null, if tracking files is not required.</p>
-     */
-    private FileCleaningTracker fileCleaningTracker;
 
     // ----------------------------------------------------------- Constructors
 
@@ -194,36 +175,7 @@ public class DiskFileItemFactory implements FileItemFactory {
     @Override
     public FileItem createItem(String fieldName, String contentType,
             boolean isFormField, String fileName) {
-        DiskFileItem result = new DiskFileItem(fieldName, contentType,
+        return new DiskFileItem(fieldName, contentType,
                 isFormField, fileName, sizeThreshold, repository);
-        FileCleaningTracker tracker = getFileCleaningTracker();
-        if (tracker != null) {
-            tracker.track(result.getTempFile(), result);
-        }
-        return result;
     }
-
-    /**
-     * Returns the tracker, which is responsible for deleting temporary
-     * files.
-     *
-     * @return An instance of {@link FileCleaningTracker}, or null
-     *   (default), if temporary files aren't tracked.
-     */
-    public FileCleaningTracker getFileCleaningTracker() {
-        return fileCleaningTracker;
-    }
-
-    /**
-     * Sets the tracker, which is responsible for deleting temporary
-     * files.
-     *
-     * @param pTracker An instance of {@link FileCleaningTracker},
-     *   which will from now on track the created files, or null
-     *   (default), to disable tracking.
-     */
-    public void setFileCleaningTracker(FileCleaningTracker pTracker) {
-        fileCleaningTracker = pTracker;
-    }
-
 }
