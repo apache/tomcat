@@ -21,6 +21,7 @@ package org.apache.juli;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -372,7 +373,8 @@ public class FileHandler
 
         // Open the current log file
         writerLock.writeLock().lock();
-        try {
+        FileOutputStream fos = null;
+        OutputStream os = null;        try {
             File pathname = new File(dir.getAbsoluteFile(), prefix
                     + (rotatable ? date : "") + suffix);
             File parent = pathname.getParentFile();
@@ -383,8 +385,8 @@ public class FileHandler
                 return;
             }
             String encoding = getEncoding();
-            FileOutputStream fos = new FileOutputStream(pathname, true);
-            OutputStream os = bufferSize>0?new BufferedOutputStream(fos,bufferSize):fos;
+            fos = new FileOutputStream(pathname, true);
+            os = bufferSize>0?new BufferedOutputStream(fos,bufferSize):fos;
             writer = new PrintWriter(
                     (encoding != null) ? new OutputStreamWriter(os, encoding)
                                        : new OutputStreamWriter(os), false);
@@ -392,6 +394,20 @@ public class FileHandler
         } catch (Exception e) {
             reportError(null, e, ErrorManager.OPEN_FAILURE);
             writer = null;
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e1) {
+                    // Ignore
+                }
+            }
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e1) {
+                    // Ignore
+                }
+            }
         } finally {
             writerLock.writeLock().unlock();
         }
