@@ -486,6 +486,12 @@ public class StandardContext extends ContainerBase
 
 
     /**
+     * Context level override for default {@link StandardHost#isCopyXML()}.
+     */
+    private boolean copyXML = false;
+
+
+    /**
      * The default context override flag for this web application.
      */
     private boolean override = false;
@@ -2375,6 +2381,17 @@ public class StandardContext extends ContainerBase
         this.unpackWAR = unpackWAR;
 
     }
+
+
+    public boolean getCopyXML() {
+        return copyXML;
+    }
+
+
+    public void setCopyXML(boolean copyXML) {
+        this.copyXML = copyXML;
+    }
+
 
     /**
      * Return the Java class name of the Wrapper implementation used
