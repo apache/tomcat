@@ -784,68 +784,25 @@ public class HostConfig
 
         // Checking for a nested /META-INF/context.xml
         JarFile jar = null;
-        JarEntry entry = null;
         InputStream istream = null;
         FileOutputStream fos = null;
         BufferedOutputStream ostream = null;
-        File xml;
-        if (copyXML) {
-            xml = new File(host.getConfigBaseFile(), cn.getBaseName() + ".xml");
-        } else {
-            xml = new File(host.getAppBaseFile(),
-                    cn.getBaseName() + "/META-INF/context.xml");
-        }
-        boolean xmlInWar = false;
 
-        if (deployXML && !xml.exists()) {
+        File xml = new File(host.getAppBaseFile(),
+                cn.getBaseName() + "/META-INF/context.xml");
+
+        boolean xmlInWar = false;
+        if (deployXML) {
+            JarEntry entry = null;
             try {
                 jar = new JarFile(war);
                 entry = jar.getJarEntry(Constants.ApplicationContextXml);
                 if (entry != null) {
                     xmlInWar = true;
                 }
-                if ((copyXML || unpackWARs) && xmlInWar) {
-                    istream = jar.getInputStream(entry);
-
-                    fos = new FileOutputStream(xml);
-                    ostream = new BufferedOutputStream(fos, 1024);
-                    byte buffer[] = new byte[1024];
-                    while (true) {
-                        int n = istream.read(buffer);
-                        if (n < 0) {
-                            break;
-                        }
-                        ostream.write(buffer, 0, n);
-                    }
-                    ostream.flush();
-                }
             } catch (IOException e) {
                 /* Ignore */
             } finally {
-                if (ostream != null) {
-                    try {
-                        ostream.close();
-                    } catch (IOException ioe) {
-                        // Ignore
-                    }
-                    ostream = null;
-                }
-                if (fos != null) {
-                    try {
-                        fos.close();
-                    } catch (IOException ioe) {
-                        // Ignore
-                    }
-                    fos = null;
-                }
-                if (istream != null) {
-                    try {
-                        istream.close();
-                    } catch (IOException ioe) {
-                        // Ignore
-                    }
-                    istream = null;
-                }
                 entry = null;
                 if (jar != null) {
                     try {
@@ -858,17 +815,9 @@ public class HostConfig
             }
         }
 
-        DeployedApplication deployedApp = new DeployedApplication(cn.getName(),
-                xml.exists() && deployXML && copyXML);
-
-        // Deploy the application in this WAR file
-        if(log.isInfoEnabled())
-            log.info(sm.getString("hostConfig.deployWar",
-                    war.getAbsolutePath()));
-
         Context context = null;
         try {
-            if (deployXML && xml.exists()) {
+            if (deployXML && xml.exists() && !copyXML) {
                 synchronized (digester) {
                     try {
                         context = (Context) digester.parse(xml);
@@ -886,6 +835,7 @@ public class HostConfig
                 context.setConfigFile(xml.toURI().toURL());
             } else if (deployXML && xmlInWar) {
                 synchronized (digester) {
+                    JarEntry entry = null;
                     try {
                         jar = new JarFile(war);
                         entry =
@@ -926,7 +876,101 @@ public class HostConfig
             } else {
                 context = (Context) Class.forName(contextClass).newInstance();
             }
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.error(sm.getString("hostConfig.deployWar.error",
+                    war.getAbsolutePath()), t);
+        } finally {
+            if (context == null) {
+                context = new FailedContext();
+            }
+        }
 
+        boolean copyThisXml = false;
+        if (deployXML) {
+            if (host instanceof StandardHost) {
+                copyThisXml = ((StandardHost) host).isCopyXML();
+            }
+
+            /**
+             * TODO
+             *
+            // If Host is using default value Context can override it.
+            if (!copyXML && context instanceof StandardContext) {
+                copyXML = ((StandardContext) context).getCopyXML();
+            }
+            */
+
+            if (xmlInWar && copyThisXml) {
+                // Change location of XML file to config base
+                xml = new File(host.getConfigBaseFile(),
+                        cn.getBaseName() + ".xml");
+                JarEntry entry = null;
+                try {
+                    jar = new JarFile(war);
+                    entry =
+                        jar.getJarEntry(Constants.ApplicationContextXml);
+                    istream = jar.getInputStream(entry);
+
+                    fos = new FileOutputStream(xml);
+                    ostream = new BufferedOutputStream(fos, 1024);
+                    byte buffer[] = new byte[1024];
+                    while (true) {
+                        int n = istream.read(buffer);
+                        if (n < 0) {
+                            break;
+                        }
+                        ostream.write(buffer, 0, n);
+                    }
+                    ostream.flush();
+                } catch (IOException e) {
+                    /* Ignore */
+                } finally {
+                    if (ostream != null) {
+                        try {
+                            ostream.close();
+                        } catch (IOException ioe) {
+                            // Ignore
+                        }
+                        ostream = null;
+                    }
+                    if (fos != null) {
+                        try {
+                            fos.close();
+                        } catch (IOException ioe) {
+                            // Ignore
+                        }
+                        fos = null;
+                    }
+                    if (istream != null) {
+                        try {
+                            istream.close();
+                        } catch (IOException ioe) {
+                            // Ignore
+                        }
+                        istream = null;
+                    }
+                    if (jar != null) {
+                        try {
+                            jar.close();
+                        } catch (IOException ioe) {
+                            // Ignore;
+                        }
+                        jar = null;
+                    }
+                }
+            }
+        }
+
+        DeployedApplication deployedApp = new DeployedApplication(cn.getName(),
+                xml.exists() && deployXML && copyXML);
+
+        // Deploy the application in this WAR file
+        if(log.isInfoEnabled())
+            log.info(sm.getString("hostConfig.deployWar",
+                    war.getAbsolutePath()));
+
+        try {
             // Populate redeploy resources with the WAR file
             deployedApp.redeployResources.put
                 (war.getAbsolutePath(), Long.valueOf(war.lastModified()));
