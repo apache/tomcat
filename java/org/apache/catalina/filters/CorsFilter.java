@@ -759,7 +759,7 @@ public final class CorsFilter implements Filter {
                 }
             } catch (NumberFormatException e) {
                 throw new ServletException(
-                        sm.getString("corsFilter.invalidPreFlightMaxAge"), e);
+                        sm.getString("corsFilter.invalidPreflightMaxAge"), e);
             }
         }
 
