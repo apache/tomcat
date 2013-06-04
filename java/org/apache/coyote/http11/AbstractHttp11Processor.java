@@ -45,6 +45,7 @@ import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -54,6 +55,7 @@ import org.apache.tomcat.util.res.StringManager;
 public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     protected abstract Log getLog();
+    private final UserDataHelper userDataHelper;
 
     /**
      * The string manager for this package.
@@ -263,6 +265,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     public AbstractHttp11Processor(AbstractEndpoint endpoint) {
         super(endpoint);
+        userDataHelper = new UserDataHelper(getLog());
     }
 
 
@@ -966,9 +969,21 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 break;
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug(
-                            sm.getString("http11processor.header.parse"), t);
+                UserDataHelper.Mode logMode = userDataHelper.getNextMode();
+                if (logMode != null) {
+                    String message = sm.getString(
+                            "http11processor.header.parse");
+                    switch (logMode) {
+                        case INFO_THEN_DEBUG:
+                            message += sm.getString(
+                                    "http11processor.fallToDebug");
+                            //$FALL-THROUGH$
+                        case INFO:
+                            getLog().info(message);
+                            break;
+                        case DEBUG:
+                            getLog().debug(message);
+                    }
                 }
                 // 400 - Bad Request
                 response.setStatus(400);
