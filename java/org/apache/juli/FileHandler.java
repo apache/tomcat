@@ -374,7 +374,8 @@ public class FileHandler
         // Open the current log file
         writerLock.writeLock().lock();
         FileOutputStream fos = null;
-        OutputStream os = null;        try {
+        OutputStream os = null;
+        try {
             File pathname = new File(dir.getAbsoluteFile(), prefix
                     + (rotatable ? date : "") + suffix);
             File parent = pathname.getParentFile();
