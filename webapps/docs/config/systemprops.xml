@@ -484,7 +484,7 @@
     <property name="org.apache.juli. AsyncLoggerPollInterval">
       <p>The poll interval in milliseconds for the asynchronous logger thread in milliseconds.
          If the log queue is empty, the async thread will issue a poll(poll interval)
-         in order to not wake up to often.</p>
+         in order to not wake up too often.</p>
       <p>The default value is <code>1000</code> milliseconds.</p>
     </property>
 
@@ -500,7 +500,10 @@
       <p>The errors currently logged using this system are:
          <ul>
          <li>invalid cookies;</li>
-         <li>invalid parameters.</li>
+         <li>invalid parameters;</li>
+         <li>too many headers, too many parameters (hitting
+           <code>maxHeaderCount</code> or <code>maxParameterCount</code> limits
+           of a <a href="http.html">connector</a>).</li>
          </ul>
          Other errors triggered by invalid input data may be added to this
          system in later versions.</p>
