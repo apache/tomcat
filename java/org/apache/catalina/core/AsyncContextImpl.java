@@ -185,6 +185,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             logDebug("dispatch   ");
         }
         check();
+        if (dispatch != null) {
+            throw new IllegalStateException(
+                    sm.getString("asyncContextImpl.dispatchingStarted"));
+        }
         if (request.getAttribute(ASYNC_REQUEST_URI)==null) {
             request.setAttribute(ASYNC_REQUEST_URI, request.getRequestURI());
             request.setAttribute(ASYNC_CONTEXT_PATH, request.getContextPath());
@@ -347,7 +351,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             logDebug("intDispatch");
         }
         try {
-            dispatch.run();
+            Runnable runnable = dispatch;
+            dispatch = null;
+            runnable.run();
             if (!request.isAsync()) {
                 fireOnComplete();
             }

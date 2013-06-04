@@ -1720,4 +1720,63 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             // NO-OP
         }
     }
+
+    @Test
+    public void testForbiddenDispatching() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        NonAsyncServlet nonAsyncServlet = new NonAsyncServlet();
+        Wrapper wrapper = Tomcat.addServlet(ctx, "nonAsyncServlet",
+                nonAsyncServlet);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/nonAsyncServlet", "nonAsyncServlet");
+
+        ForbiddenDispatchingServlet forbiddenDispatchingServlet = new ForbiddenDispatchingServlet();
+        Wrapper wrapper1 = Tomcat.addServlet(ctx,
+                "forbiddenDispatchingServlet", forbiddenDispatchingServlet);
+        wrapper1.setAsyncSupported(true);
+        ctx.addServletMapping("/forbiddenDispatchingServlet",
+                "forbiddenDispatchingServlet");
+
+        tomcat.start();
+
+        ByteChunk body = new ByteChunk();
+
+        try {
+            getUrl("http://localhost:" + getPort()
+                    + "/forbiddenDispatchingServlet", body, null);
+        } catch (IOException ioe) {
+            // This may happen if test fails. Output the exception in case it is
+            // useful and let asserts handle the failure
+            ioe.printStackTrace();
+        }
+
+        assertTrue(body.toString().contains("OK"));
+        assertTrue(body.toString().contains("NonAsyncServletGet"));
+    }
+
+    private static class ForbiddenDispatchingServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            AsyncContext asyncContext = req.startAsync();
+            asyncContext.dispatch("/nonAsyncServlet");
+            try {
+                asyncContext.dispatch("/nonExistingServlet");
+                resp.getWriter().println("FAIL");
+            } catch (IllegalStateException e) {
+                resp.getWriter().println("OK");
+            }
+        }
+
+    }
 }
