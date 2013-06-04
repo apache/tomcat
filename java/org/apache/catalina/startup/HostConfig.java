@@ -53,6 +53,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Manager;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.IOTools;
@@ -892,14 +893,10 @@ public class HostConfig
                 copyThisXml = ((StandardHost) host).isCopyXML();
             }
 
-            /**
-             * TODO
-             *
             // If Host is using default value Context can override it.
             if (!copyXML && context instanceof StandardContext) {
                 copyXML = ((StandardContext) context).getCopyXML();
             }
-            */
 
             if (xmlInWar && copyThisXml) {
                 // Change location of XML file to config base
@@ -1084,8 +1081,7 @@ public class HostConfig
                 new File(host.getConfigBaseFile(), cn.getBaseName() + ".xml");
 
 
-        DeployedApplication deployedApp = new DeployedApplication(cn.getName(),
-                xml.exists() && deployXML && copyXML);
+        DeployedApplication deployedApp;
 
         try {
             if (deployXML && xml.exists()) {
@@ -1103,6 +1099,12 @@ public class HostConfig
                         digester.reset();
                     }
                 }
+
+                if (copyXML == false && context instanceof StandardContext) {
+                    // Host is using default value. Context may override it.
+                    copyXML = ((StandardContext) context).getCopyXML();
+                }
+
                 if (copyXML) {
                     InputStream is = null;
                     OutputStream os = null;
@@ -1146,6 +1148,9 @@ public class HostConfig
             log.error(sm.getString("hostConfig.deployDir.error",
                     dir.getAbsolutePath()), t);
         } finally {
+            deployedApp = new DeployedApplication(cn.getName(),
+                    xml.exists() && deployXML && copyXML);
+
             // Fake re-deploy resource to detect if a WAR is added at a later
             // point
             deployedApp.redeployResources.put(dir.getAbsolutePath() + ".war",
