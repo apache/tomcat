@@ -461,7 +461,7 @@ public class StandardHost extends ContainerBase implements Host {
      */
     public boolean isDeployXML() {
 
-        return (deployXML);
+        return deployXML;
 
     }
 
@@ -481,7 +481,7 @@ public class StandardHost extends ContainerBase implements Host {
      */
     public boolean isCopyXML() {
 
-        return (this.copyXML);
+        return this.copyXML;
 
     }
 
@@ -493,7 +493,7 @@ public class StandardHost extends ContainerBase implements Host {
      */
     public void setCopyXML(boolean copyXML) {
 
-        this.copyXML= copyXML;
+        this.copyXML = copyXML;
 
     }
 
