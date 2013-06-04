@@ -175,7 +175,6 @@ public class Response
     /**
      * Get the Coyote response.
      */
-    @Deprecated
     public org.apache.coyote.Response getCoyoteResponse() {
         return (coyoteResponse);
     }
