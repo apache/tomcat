@@ -98,6 +98,157 @@
 
 </section>
 
+<section name="CORS Filter">
+  <subsection name="Introduction">
+    <p>This filter is an implementation of W3C's CORS (Cross-Origin Resource
+    Sharing) <a href="http://www.w3.org/TR/cors/">specification</a>, which is a
+    mechanism that enables cross-origin requests.</p>
+    <p>The filter works by adding required <code>Access-Control-*</code> headers
+    to HttpServletResponse object. The filter also protects against HTTP
+    response splitting. If request is invalid, or is not permitted, then request
+    is rejected with HTTP status code 403 (Forbidden). A
+    <a href="../images/cors-flowchart.png">flowchart</a> that
+    demonstrates request processing by this filter is available.</p>
+    <p>The minimal configuration required to use this filter is:</p>
+    <source>
+&lt;filter&gt;
+  &lt;filter-name&gt;CORSFilter&lt;/filter-name&gt;
+  &lt;filter-class&gt;org.apache.catalina.filters.CORSFilter&lt;/filter-class&gt;
+&lt;/filter&gt;
+&lt;filter-mapping&gt;
+  &lt;filter-name>CORSFilter&lt;/filter-name&gt;
+  &lt;url-pattern>/*&lt;/url-pattern&gt;
+&lt;/filter-mapping&gt;
+    </source>
+  </subsection>
+  <subsection name="Filter Class Name">
+    <p>The filter class name for the CORS Filter is
+    <strong><code>org.apache.catalina.filters.CORSFilter</code></strong>.</p>
+  </subsection>
+  <subsection name="Initialisation parameters">
+    <p>The CORS Filter supports following initialisation parameters:</p>
+    <attributes>
+      <attribute name="cors.allowed.origins" required="false">
+        <p>A list of <a href="http://tools.ietf.org/html/rfc6454">origins</a>
+        that are allowed to access the resource. A <code>'*'</code> can be
+        specified to enable access to resource from any origin. Otherwise, a
+        whitelist of comma separated origins can be provided. Eg:
+        http://www.w3.org, https://www.apache.org.
+        <strong>Defaults:</strong> <code>*</code> (Any origin is allowed to
+        access the resource).</p>
+      </attribute>
+      <attribute name="cors.allowed.methods" required="false">
+        <p>A comma separated list of HTTP methods that can be used to access the
+        resource, using cross-origin requests. These are the methods which will
+        also be included as part of 'Access-Control-Allow-Methods' header in a
+        pre-flight response. Eg: <code>GET,POST</code>.
+        <strong>Defaults:</strong> <code>GET,POST,HEAD,OPTIONS</code></p>
+      </attribute>
+      <attribute name="cors.allowed.headers" required="false">
+        <p>A comma separated list of request headers that can be used when
+        making an actual request. These header will also be returned as part of
+        <code>'Access-Control-Allow-Headers'</code> header in a pre-flight
+        response. Eg: <code>Origin,Accept</code>. <strong>Defaults:</strong>
+        <code>Origin, Accept, X-Requested-With, Content-Type,
+        Access-Control-Request-Method, Access-Control-Request-Headers</code></p>
+      </attribute>
+      <attribute name="cors.exposed.headers" required="false">
+        <p>A comma separated list of headers other than the simple response
+        headers that browsers are allowed to access. These are the headers which
+        will also be included as part of 'Access-Control-Expose-Headers' header
+        in the pre-flight response. Eg:
+        <code>X-CUSTOM-HEADER-PING,X-CUSTOM-HEADER-PONG</code>.
+        <strong>Default:</strong> None. Non-simple headers are not exposed by
+        default.</p>
+      </attribute>
+      <attribute name="cors.preflight.maxage" required="false">
+        <p>The amount of seconds, browser is allowed to cache the result of the
+        pre-flight request. This will be included as part of
+        <code>'Access-Control-Max-Age'</code> header in the pre-flight response.
+        A negative value will prevent CORS Filter from adding this response
+        header from pre-flight response. <strong>Defaults:</strong>
+        <code>1800</code></p>
+      </attribute>
+      <attribute name="cors.support.credentials" required="false">
+        <p>A flag that indicates whether the resource supports user credentials.
+        This flag is exposed as part of
+        <code>'Access-Control-Allow-Credentials'</code> header in a pre-flight
+        response. It helps browser determine whether or not an actual request
+        can be made using credentials. <strong>Defaults:</strong>
+        <code>true</code></p>
+      </attribute>
+      <attribute name="cors.request.decorate" required="false">
+        <p>A flag to control if CORS specific attributes should be added to
+        HttpServletRequest object or not. <strong>Defaults:</strong>
+        <code>true</code></p>
+      </attribute>
+    </attributes>
+    <p>Here's an example of a more advanced configuration, that overrides
+    defaults:</p>
+    <source>
+&lt;filter&gt;
+  &lt;filter-name&gt;CORSFilter&lt;/filter-name&gt;
+  &lt;filter-class&gt;org.apache.catalina.filters.CORSFilter&lt;/filter-class&gt;
+  &lt;init-param&gt;
+    &lt;param-name&gt;cors.allowed.origins&lt;/param-name&gt;
+    &lt;param-value&gt;*&lt;/param-value&gt;
+  &lt;/init-param&gt;
+  &lt;init-param&gt;
+    &lt;param-name&gt;cors.allowed.methods&lt;/param-name&gt;
+    &lt;param-value&gt;GET,POST,HEAD,OPTIONS,PUT&lt;/param-value&gt;
+  &lt;/init-param&gt;
+  &lt;init-param&gt;
+    &lt;param-name&gt;cors.allowed.headers&lt;/param-name&gt;
+    &lt;param-value&gt;Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers&lt;/param-value&gt;
+  &lt;/init-param&gt;
+  &lt;init-param&gt;
+    &lt;param-name&gt;cors.exposed.headers&lt;/param-name&gt;
+    &lt;param-value&gt;Access-Control-Allow-Origin,Access-Control-Allow-Credentials&lt;/param-value&gt;
+  &lt;/init-param&gt;
+  &lt;init-param&gt;
+    &lt;param-name&gt;cors.support.credentials&lt;/param-name&gt;
+    &lt;param-value&gt;true&lt;/param-value&gt;
+  &lt;/init-param&gt;
+  &lt;init-param&gt;
+    &lt;param-name&gt;cors.preflight.maxage&lt;/param-name&gt;
+    &lt;param-value&gt;10&lt;/param-value&gt;
+  &lt;/init-param&gt;
+&lt;/filter&gt;
+&lt;filter-mapping&gt;
+  &lt;filter-name&gt;CORS Filter&lt;/filter-name&gt;
+  &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+&lt;/filter-mapping&gt;
+    </source>
+  </subsection>
+  <subsection name="CORS Filter and HttpServletRequest attributes">
+    <p>CORS Filter adds information about a request, in the HttpServletRequest
+    object, for consumption downstream. Following attributes are set, if
+    <code>cors.request.decorate</code> initialisation parameter is
+    <code>true</code>:</p>
+    <ul>
+      <li><strong>cors.isCorsRequest:</strong> Flag to determine if a request is
+          a CORS request.</li>
+      <li><strong>cors.request.origin:</strong> The Origin URL, i.e. the URL of
+          the page from where the request is originated.</li>
+      <li><strong>cors.request.type:</strong> Type of CORS request. Possible
+          values:
+        <ul>
+          <li><code>SIMPLE</code>: A request which is not preceded by a
+              pre-flight request.</li>
+          <li><code>ACTUAL</code>: A request which is preceded by a pre-flight
+              request.</li>
+          <li><code>PRE_FLIGHT</code>: A pre-flight request.</li>
+          <li><code>NOT_CORS</code>: A normal same-origin request.</li>
+          <li><code>INVALID_CORS</code>: A cross-origin request, which is
+              invalid.</li>
+        </ul>
+      </li>
+      <li><strong>cors.request.headers:</strong> Request headers sent as
+          'Access-Control-Request-Headers' header, for a pre-flight request.
+          </li>
+    </ul>
+  </subsection>
+</section>
 
 <section name="CSRF Prevention Filter">
 
@@ -521,6 +672,49 @@ Mar 26, 2010 2:10:27 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteR
 FINE: Request "/docs/config/manager.html" with response status "200"
  content-type "text/html", no expiration configured
     </source>
+  </subsection>
+
+</section>
+
+<section name="Failed Request Filter">
+
+  <subsection name="Introduction">
+
+    <p>This filter triggers parameters parsing in a request and rejects the
+    request if some parameters were skipped during parameter parsing because
+    of parsing errors or request size limitations (such as
+    <code>maxParameterCount</code> attribute in a
+    <a href="http.html">Connector</a>).
+    This filter can be used to ensure that none parameter values submitted by
+    client are lost.</p>
+
+    <p>Note that parameter parsing may consume the body of an HTTP request, so
+    caution is needed if the servlet protected by this filter uses
+    <code>request.getInputStream()</code> or <code>request.getReader()</code>
+    calls. In general the risk of breaking a web application by adding this
+    filter is not so high, because parameter parsing does check content type
+    of the request before consuming the request body.</p>
+
+    <p>Note, that for the POST requests to be parsed correctly, a
+    <code>SetCharacterEncodingFilter</code> filter must be configured above
+    this one. See CharacterEncoding page in the FAQ for details.</p>
+
+    <p>The request is rejected with HTTP status code 400 (Bad Request).</p>
+
+  </subsection>
+
+  <subsection name="Filter Class Name">
+
+    <p>The filter class name for the Failed Request Filter is
+    <strong><code>org.apache.catalina.filters.FailedRequestFilter</code>
+    </strong>.</p>
+
+  </subsection>
+
+  <subsection name="Initialisation parameters">
+
+    <p>The Failed Request Filter does not support any initialization parameters.</p>
+
   </subsection>
 
 </section>
@@ -1265,52 +1459,6 @@ org.apache.catalina.filters.RequestDumperFilter.handlers = \
 
 </section>
 
-
-<section name="Failed Request Filter">
-
-  <subsection name="Introduction">
-
-    <p>This filter triggers parameters parsing in a request and rejects the
-    request if some parameters were skipped during parameter parsing because
-    of parsing errors or request size limitations (such as
-    <code>maxParameterCount</code> attribute in a
-    <a href="http.html">Connector</a>).
-    This filter can be used to ensure that none parameter values submitted by
-    client are lost.</p>
-
-    <p>Note that parameter parsing may consume the body of an HTTP request, so
-    caution is needed if the servlet protected by this filter uses
-    <code>request.getInputStream()</code> or <code>request.getReader()</code>
-    calls. In general the risk of breaking a web application by adding this
-    filter is not so high, because parameter parsing does check content type
-    of the request before consuming the request body.</p>
-
-    <p>Note, that for the POST requests to be parsed correctly, a
-    <code>SetCharacterEncodingFilter</code> filter must be configured above
-    this one. See CharacterEncoding page in the FAQ for details.</p>
-
-    <p>The request is rejected with HTTP status code 400 (Bad Request).</p>
-
-  </subsection>
-
-  <subsection name="Filter Class Name">
-
-    <p>The filter class name for the Failed Request Filter is
-    <strong><code>org.apache.catalina.filters.FailedRequestFilter</code>
-    </strong>.</p>
-
-  </subsection>
-
-  <subsection name="Initialisation parameters">
-
-    <p>The Failed Request Filter does not support any initialization parameters.</p>
-
-  </subsection>
-
-</section>
-
-
 </body>
-
 
 </document>
