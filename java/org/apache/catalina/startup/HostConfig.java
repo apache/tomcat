@@ -894,8 +894,8 @@ public class HostConfig
             }
 
             // If Host is using default value Context can override it.
-            if (!copyXML && context instanceof StandardContext) {
-                copyXML = ((StandardContext) context).getCopyXML();
+            if (!copyThisXml && context instanceof StandardContext) {
+                copyThisXml = ((StandardContext) context).getCopyXML();
             }
 
             if (xmlInWar && copyThisXml) {

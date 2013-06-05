@@ -49,6 +49,10 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             new File("test/deployment/context.xml");
     private static final File WAR_XML_SOURCE =
             new File("test/deployment/context.war");
+    private static final File WAR_XML_COPYXML_FALSE_SOURCE =
+            new File("test/deployment/contextCopyXMLFalse.war");
+    private static final File WAR_XML_COPYXML_TRUE_SOURCE =
+            new File("test/deployment/contextCopyXMLTrue.war");
     private static final File WAR_XML_UNPACKWAR_FALSE_SOURCE =
             new File("test/deployment/contextUnpackWARFalse.war");
     private static final File WAR_XML_UNPACKWAR_TRUE_SOURCE =
@@ -1724,6 +1728,89 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
 
         public String getHistory() {
             return stateHistory.toString();
+        }
+    }
+
+
+    /*
+     * Test context copyXML setting.
+     * If context.copyXML != Host.copyXML the Host wins.
+     * For external WARs, a context.xml must always already exist
+     */
+    @Test
+    public void testCopyXMLFFF() throws Exception  {
+        doTestCopyXML(false, false, false, false);
+    }
+
+    @Test
+    public void testCopyXMLFFT() throws Exception  {
+        doTestCopyXML(false, false, true, true);
+    }
+
+    @Test
+    public void testCopyXMLFTF() throws Exception  {
+        doTestCopyXML(false, true, false, true);
+    }
+
+    @Test
+    public void testCopyXMLFTT() throws Exception  {
+        doTestCopyXML(false, true, true, true);
+    }
+
+    @Test
+    public void testCopyXMLTFF() throws Exception  {
+        doTestCopyXML(true, false, false, true);
+    }
+
+    @Test
+    public void testCopyXMLTFT() throws Exception  {
+        doTestCopyXML(true, false, true, true);
+    }
+
+    @Test
+    public void testCopyXMLTTF() throws Exception  {
+        doTestCopyXML(true, true, false, true);
+    }
+
+    @Test
+    public void testCopyXMLTTT() throws Exception  {
+        doTestCopyXML(true, true, true, true);
+    }
+
+    private void doTestCopyXML(boolean copyXmlHost, boolean copyXmlWar,
+            boolean external, boolean resultXml) throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+
+        host.setCopyXML(copyXmlHost);
+
+        tomcat.start();
+
+        File war;
+        if (copyXmlWar) {
+            war = createWar(WAR_XML_COPYXML_TRUE_SOURCE, !external);
+        } else {
+            war = createWar(WAR_XML_COPYXML_FALSE_SOURCE, !external);
+        }
+        if (external) {
+            createXmlInConfigBaseForExternal(war);
+        }
+
+        host.backgroundProcess();
+
+        File xml = new File(host.getConfigBaseFile(),
+                APP_NAME.getBaseName() + ".xml");
+        Assert.assertEquals(
+                Boolean.valueOf(resultXml), Boolean.valueOf(xml.isFile()));
+
+        Context context = (Context) host.findChild(APP_NAME.getName());
+        if (external) {
+            Assert.assertEquals(XML_COOKIE_NAME,
+                    context.getSessionCookieName());
+        } else {
+            Assert.assertEquals(WAR_COOKIE_NAME,
+                    context.getSessionCookieName());
         }
     }
 }
