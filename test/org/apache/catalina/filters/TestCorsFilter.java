@@ -1166,7 +1166,7 @@ public class TestCorsFilter {
 
     @Test
     public void testJoin() {
-        Set<String> elements = new LinkedHashSet<>();
+        Set<String> elements = new LinkedHashSet<String>();
         String separator = ",";
         elements.add("world");
         elements.add("peace");
@@ -1176,7 +1176,7 @@ public class TestCorsFilter {
 
     @Test
     public void testJoinSingleElement() {
-        Set<String> elements = new LinkedHashSet<>();
+        Set<String> elements = new LinkedHashSet<String>();
         String separator = ",";
         elements.add("world");
         String join = CorsFilter.join(elements, separator);
@@ -1185,7 +1185,7 @@ public class TestCorsFilter {
 
     @Test
     public void testJoinSepNull() {
-        Set<String> elements = new LinkedHashSet<>();
+        Set<String> elements = new LinkedHashSet<String>();
         String separator = null;
         elements.add("world");
         elements.add("peace");
@@ -1204,7 +1204,7 @@ public class TestCorsFilter {
 
     @Test
     public void testJoinOneNullElement() {
-        Set<String> elements = new LinkedHashSet<>();
+        Set<String> elements = new LinkedHashSet<String>();
         String separator = ",";
         elements.add(null);
         elements.add("peace");
@@ -1214,7 +1214,7 @@ public class TestCorsFilter {
 
     @Test
     public void testJoinAllNullElements() {
-        Set<String> elements = new LinkedHashSet<>();
+        Set<String> elements = new LinkedHashSet<String>();
         String separator = ",";
         elements.add(null);
         elements.add(null);
@@ -1224,7 +1224,7 @@ public class TestCorsFilter {
 
     @Test
     public void testJoinAllEmptyElements() {
-        Set<String> elements = new LinkedHashSet<>();
+        Set<String> elements = new LinkedHashSet<String>();
         String separator = ",";
         elements.add("");
         elements.add("");
@@ -1234,7 +1234,7 @@ public class TestCorsFilter {
 
     @Test
     public void testJoinPipeSeparator() {
-        Set<String> elements = new LinkedHashSet<>();
+        Set<String> elements = new LinkedHashSet<String>();
         String separator = "|";
         elements.add("world");
         elements.add("peace");

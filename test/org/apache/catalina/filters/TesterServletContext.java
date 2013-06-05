@@ -311,10 +311,4 @@ public class TesterServletContext implements ServletContext {
     public void declareRoles(String... roleNames) {
         throw new RuntimeException("Not implemented");
     }
-
-    @Override
-    public String getVirtualServerName() {
-        throw new RuntimeException("Not implemented");
-    }
-
 }

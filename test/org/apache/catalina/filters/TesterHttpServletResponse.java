@@ -40,8 +40,8 @@ import org.apache.catalina.connector.Request;
 public class TesterHttpServletResponse implements HttpServletResponse {
 
     private PrintWriter pw;
-    private List<String> headerNames = new ArrayList<>();
-    private List<String> headerValues = new ArrayList<>();
+    private List<String> headerNames = new ArrayList<String>();
+    private List<String> headerValues = new ArrayList<String>();
     private int status;
 
     public TesterHttpServletResponse() {
