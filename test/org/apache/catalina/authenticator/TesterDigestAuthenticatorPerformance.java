@@ -30,7 +30,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
-import org.apache.catalina.filters.TesterResponse;
+import org.apache.catalina.filters.TesterHttpServletResponse;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.util.ConcurrentMessageDigest;
 import org.apache.catalina.util.MD5Encoder;
@@ -157,7 +157,7 @@ public class TesterDigestAuthenticatorPerformance {
 
             request = new TesterDigestRequest();
 
-            response = new TesterResponse();
+            response = new TesterHttpServletResponse();
 
             config = new LoginConfig();
             config.setRealmName(REALM);
