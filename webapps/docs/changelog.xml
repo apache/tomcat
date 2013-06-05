@@ -126,6 +126,11 @@
         application. Patch provided by  Sergey Tcherednichenko. (markt)
       </add>
       <add>
+        <bug>55046</bug>: Add a Servlet Filter that implements
+        <a href="http://www.w3.org/TR/cors/">CORS</a>. Patch provided by Mohit
+        Soni. (markt)
+      </add>
+      <add>
         <bug>55052</bug>: JULI&apos;s LogManager now additionally looks for
         logging properties without prefixes if the property cannot be found with
         a prefix. (markt)

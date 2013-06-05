@@ -19,7 +19,10 @@ package org.apache.catalina.filters;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
@@ -36,9 +39,65 @@ import org.apache.catalina.connector.Request;
  */
 public class TesterHttpServletResponse implements HttpServletResponse {
 
+    private PrintWriter pw;
+    private List<String> headerNames = new ArrayList<>();
+    private List<String> headerValues = new ArrayList<>();
+    private int status;
+
     public TesterHttpServletResponse() {
         // NOOP
     }
+
+
+    @Override
+    public PrintWriter getWriter() throws IOException {
+        if (pw == null) {
+            pw = new PrintWriter(new StringWriter());
+        }
+        return pw;
+    }
+
+
+    @Override
+    public String getHeader(String name) {
+        int index = headerNames.indexOf(name);
+        if (index != -1) {
+            return headerValues.get(index);
+        }
+        return null;
+    }
+
+
+    @Override
+    public void setHeader(String name, String value) {
+        int index = headerNames.indexOf(name);
+        if (index != -1) {
+            headerValues.set(index, value);
+        } else {
+            headerNames.add(name);
+            headerValues.add(value);
+        }
+    }
+
+
+    @Override
+    public void addHeader(String name, String value) {
+        headerNames.add(name);
+        headerValues.add(value);
+    }
+
+
+    @Override
+    public int getStatus() {
+        return status;
+    }
+
+
+    @Override
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
 
     public void setAppCommitted(
             @SuppressWarnings("unused") boolean appCommitted) {/* NOOP */}
@@ -124,8 +183,6 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     @Override
     public Locale getLocale() { return null; }
     @Override
-    public PrintWriter getWriter() throws IOException { return null; }
-    @Override
     public boolean isCommitted() { return false; }
     @Override
     public void reset() {/* NOOP */}
@@ -140,22 +197,16 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     @Override
     public void setLocale(Locale locale) {/* NOOP */}
     @Override
-    public String getHeader(String name) { return null; }
-    @Override
     public Collection<String> getHeaderNames() { return null; }
     @Override
     public Collection<String> getHeaders(String name) { return null; }
     public String getMessage() { return null; }
-    @Override
-    public int getStatus() { return -1; }
     public void reset(@SuppressWarnings("unused") int status,
             @SuppressWarnings("unused") String message) {/* NOOP */}
     @Override
     public void addCookie(Cookie cookie) {/* NOOP */}
     @Override
     public void addDateHeader(String name, long value) {/* NOOP */}
-    @Override
-    public void addHeader(String name, String value) {/* NOOP */}
     @Override
     public void addIntHeader(String name, int value) {/* NOOP */}
     @Override
@@ -188,11 +239,7 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     @Override
     public void setDateHeader(String name, long value) {/* NOOP */}
     @Override
-    public void setHeader(String name, String value) {/* NOOP */}
-    @Override
     public void setIntHeader(String name, int value) {/* NOOP */}
-    @Override
-    public void setStatus(int status) {/* NOOP */}
     /** @deprecated */
     @Override
     @Deprecated
