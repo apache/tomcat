@@ -157,6 +157,13 @@
        Specifies the timeout, in milliseconds, to use when performing a read test
        to the suspicious node. Default is 5000.
      </attribute>
+     <attribute name="removeSuspectsTimeout" required="false">
+       The maximum time(in seconds)  for remove from removeSuspects. Member of
+       removeSuspects will be automatically removed after removeSuspectsTimeout.
+       If a negative value specified, the removeSuspects members never be
+       removed until disappeared really. If the attribute is not provided,
+       a default of 300 milliseconds (5 minutes) is used.
+     </attribute>
    </attributes>
   </subsection>
   <subsection name="org.apache.catalina.tribes.group.interceptors.TcpPingInterceptor Attributes">
