@@ -181,6 +181,10 @@
         Improve error message by including specified timeout if failed to
         retrieve a data sender. (kfujino)
       </add>
+      <add>
+        Add <code>removeSuspectsTimeout</code> attribute in order to remove a
+        suspect node in TcpFailureDetector. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
