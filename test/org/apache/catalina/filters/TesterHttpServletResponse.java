@@ -34,9 +34,9 @@ import org.apache.catalina.connector.Request;
 /**
  * Mock HttpServletResponse
  */
-public class TesterResponse implements HttpServletResponse {
+public class TesterHttpServletResponse implements HttpServletResponse {
 
-    public TesterResponse() {
+    public TesterHttpServletResponse() {
         // NOOP
     }
 
@@ -56,7 +56,6 @@ public class TesterResponse implements HttpServletResponse {
     public void setIncluded(@SuppressWarnings("unused") boolean included) {
         // NOOP
     }
-    public String getInfo() { return null; }
     public Request getRequest() { return null; }
     public void setRequest(@SuppressWarnings("unused") Request request) {
         // NOOP
@@ -73,15 +72,12 @@ public class TesterResponse implements HttpServletResponse {
     public void setError() {/* NOOP */}
     public boolean isError() { return false; }
     /**
-     *
-     * @return
      * @throws IOException
      */
     public ServletOutputStream createOutputStream() throws IOException {
         return null;
     }
     /**
-     *
      * @throws IOException
      */
     public void finishResponse() throws IOException {/* NOOP */}
@@ -91,7 +87,6 @@ public class TesterResponse implements HttpServletResponse {
     public PrintWriter getReporter() { return null; }
     public void recycle() {/* NOOP */}
     /**
-     *
      * @param b
      * @throws IOException
      */
@@ -99,7 +94,6 @@ public class TesterResponse implements HttpServletResponse {
         // NOOP
     }
     /**
-     *
      * @param b
      * @throws IOException
      */
@@ -107,7 +101,6 @@ public class TesterResponse implements HttpServletResponse {
         // NOOP
     }
     /**
-     *
      * @param b
      * @param off
      * @param len
