@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.filters;
-
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,21 +31,14 @@ import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 
-
 /**
- * Dummy response object, used for JSP precompilation.
- *
- * @author Remy Maucherat
- * @version $Id$
+ * Mock HttpServletResponse
  */
-
-public class TesterResponse
-    implements HttpServletResponse {
+public class TesterResponse implements HttpServletResponse {
 
     public TesterResponse() {
         // NOOP
     }
-
 
     public void setAppCommitted(
             @SuppressWarnings("unused") boolean appCommitted) {/* NOOP */}
