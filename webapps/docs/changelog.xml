@@ -130,6 +130,12 @@
         logging properties without prefixes if the property cannot be found with
         a prefix. (markt)
       </add>
+      <fix>
+        Ensure that only the first asynchronous dispatch operation for a given
+        asynchronous cycle will be performed. Any subsequent asynchronous
+        dispatch operation for the same asynchronous cycle will be ignored and
+        <code>IllegalStateException</code> will be thrown. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
