@@ -89,7 +89,7 @@
       </fix>
       <fix>
         <bug>54971</bug>: Ensure that the correct location is used when writing
-        files via <code>avax.servlet.http.Part.write(String)</code>. (markt)
+        files via <code>javax.servlet.http.Part.write(String)</code>. (markt)
       </fix>
       <fix>
         <bug>54974</bug>: Ensure that 
@@ -116,7 +116,7 @@
         parsed. (violetagg)
       </fix>
       <fix>
-        <bug>54999</bug>: The old JSESSIONIDSSAO needs to be removed when SSO is
+        <bug>54999</bug>: The old JSESSIONIDSSO needs to be removed when SSO is
         being used and logout() and login() occur within a single request. Patch
         provided by Keith Mashinter. (markt) 
       </fix>
