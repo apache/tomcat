@@ -91,43 +91,25 @@
 
   <subsection name="Naming">
   <p>When <code>autoDeploy</code> or <code>deployOnStartup</code> operations
-  are performed by a Host, the web application is specified by a context XML
-  file in <a href="host.html">Host</a>&apos;s <code>xmlBase</code>
-  directory or by a WAR file or a directory file in Host&apos;s
-  <code>appBase</code> directory.
-  In this case the context path is derived from the name of the file that
-  is being deployed. Consequently, the context path <strong>may not</strong>
-  be defined in a <code>META-INF/context.xml</code> embedded in
-  the application. There is, therefore, a close relationship between the
-  <em>context name</em>, <em>context path</em>, <em>context version</em> and
-  the <em>base file name</em> (the name minus <code>.war</code> or
-  <code>.xml</code> extension) of the file.</p>
+  are performed by a Host, the name and context path of the web application are
+  derived from the name(s) of the file(s) that define(s) the web application.
+  Consequently, the context path <strong>may not</strong> be defined in a
+  <code>META-INF/context.xml</code> embedded in the application and there is a
+  close relationship between the <em>context name</em>, <em>context path</em>,
+  <em>context version</em> and the <em>base file name</em> (the name minus any
+  <code>.war</code> or <code>.xml</code> extension) of the file.</p>
 
-  <p>Let us assume that you want to deploy your application to respond to
-  requests to URIs starting with certain context path. According to the
-  Servlet specification, the context path may be an empty string, or a
-  string starting with '/'. The rules to define the names for this context
-  path are the following:</p>
+  <p>If no version is specified then the <em>context name</em> is always the
+  same as the <em>context path</em>. If the <em>context path</em> is the empty
+  string them the <em>base name</em> will be ROOT (always in upper case)
+  otherwise the <em>base name</em> will be the <em>context path</em> with the
+  leading '/' removed and any remaining '/' characters replaced with '#'.</p>
 
-  <ul>
-    <li><em>context name</em> is equal to context path</li>
-    <li>If the context path is a zero length string, the <em>base name</em> is
-    <code>"ROOT"</code> (uppercase)</li>
-    <li>If the context path is not a zero length string, the <em>base
-    name</em> is the context path with the leading '/' removed and any
-    remaining '/' characters in the path replaced with '#'.</li>
-  </ul>
+  <p>If a version is specified then the <em>context path</em> remains unchanged
+  and both the <em>context name</em> and the <em>base name</em> have the string
+  '##' appended to them followed by the version identifier.</p>
 
-  <p>When a version is specified, to deploy several applications for the
-  same context path, the above values are modified as follows:</p>
-
-  <ul>
-    <li><code>"##" + version</code> is added as a suffix to <em>context name</em>
-    and <em>base name</em>.</li>
-  </ul>
-
-  <p>To help clarify these rules, some examples are given in the following
-  table.</p>
+  <p>Some examples of these naming conventions are given below.</p>
 
   <table class="detail-table">
     <tr>
@@ -135,23 +117,49 @@
       <th>Context Version</th>
       <th>Context Name</th>
       <th>Base File Name</th>
+      <th>Example File Names (.xml, .war &amp; directory)</th>
     </tr>
-    <tr><td>/foo</td><td><i>None</i></td><td>/foo</td><td>foo</td></tr>
     <tr>
-      <td>/foo/bar</td><td><i>None</i></td><td>/foo/bar</td><td>foo#bar</td>
+      <td>/foo</td>
+      <td><i>None</i></td>
+      <td>/foo</td>
+      <td>foo</td>
+      <td>foo.xml, foo.war, foo</td>
+    </tr>
+    <tr>
+      <td>/foo/bar</td>
+      <td><i>None</i></td>
+      <td>/foo/bar</td>
+      <td>foo#bar</td>
+      <td>foo#bar.xml, foo#bar.war, foo#bar</td>
     </tr>
     <tr>
       <td><i>Empty String</i></td>
       <td><i>None</i></td>
       <td><i>Empty String</i></td>
       <td>ROOT</td>
-    </tr>
-    <tr><td>/foo</td><td>42</td><td>/foo##42</td><td>foo##42</td></tr>
-    <tr>
-      <td>/foo/bar</td><td>42</td><td>/foo/bar##42</td><td>foo#bar##42</td>
+      <td>ROOT.xml, ROOT.war, ROOT</td>
     </tr>
     <tr>
-      <td><i>Empty String</i></td><td>42</td><td>##42</td><td>ROOT##42</td>
+      <td>/foo</td>
+      <td>42</td>
+      <td>/foo##42</td>
+      <td>foo##42</td>
+      <td>foo##42.xml, foo##42.war, foo##42</td>
+    </tr>
+    <tr>
+      <td>/foo/bar</td>
+      <td>42</td>
+      <td>/foo/bar##42</td>
+      <td>foo#bar##42</td>
+      <td>foo#bar##42.xml, foo#bar##42.war, foo#bar##42</td>
+    </tr>
+    <tr>
+      <td><i>Empty String</i></td>
+      <td>42</td>
+      <td>##42</td>
+      <td>ROOT##42</td>
+      <td>ROOT##42.xml, ROOT##42.war, ROOT##42</td>
     </tr>
   </table>
 
