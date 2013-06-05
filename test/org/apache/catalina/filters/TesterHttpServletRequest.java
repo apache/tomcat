@@ -41,13 +41,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
 public class TesterHttpServletRequest implements HttpServletRequest {
 
-    private Map<String, Object> attributes = new HashMap<>();
-    private Map<String, List<String>> headers = new HashMap<>();
+    private Map<String, Object> attributes = new HashMap<String,Object>();
+    private Map<String, List<String>> headers =
+            new HashMap<String,List<String>>();
     private String method;
     private String contentType;
 
@@ -253,7 +253,7 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     }
 
     public void setHeader(String name, String value) {
-        List<String> values = new ArrayList<>();
+        List<String> values = new ArrayList<String>();
         values.add(value);
         headers.put(name, values);
     }
@@ -387,11 +387,6 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public long getContentLengthLong() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
     public ServletContext getServletContext() {
         throw new RuntimeException("Not implemented");
     }
@@ -428,11 +423,6 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public String changeSessionId() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
     public boolean authenticate(HttpServletResponse response)
             throws IOException, ServletException {
         throw new RuntimeException("Not implemented");
@@ -458,11 +448,4 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     public Part getPart(String name) throws IOException, ServletException {
         throw new RuntimeException("Not implemented");
     }
-
-    @Override
-    public <T extends HttpUpgradeHandler> T upgrade(
-            Class<T> httpUpgradeHandlerClass) throws IOException {
-        throw new RuntimeException("Not implemented");
-    }
-
 }
