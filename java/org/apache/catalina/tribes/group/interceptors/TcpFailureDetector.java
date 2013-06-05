@@ -83,6 +83,8 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
 
     protected final HashMap<Member, Long> addSuspects = new HashMap<>();
 
+    protected int removeSuspectsTimeout = 300; // 5 minutes
+
     @Override
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
         try {
@@ -271,7 +273,15 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
                 removeSuspects.remove(m);
                 if(log.isInfoEnabled())
                     log.info("Suspect member, confirmed dead.["+m+"]");
-            } //end if
+            } else {
+                if (removeSuspectsTimeout > 0) {
+                    long timeNow = System.currentTimeMillis();
+                    int timeIdle = (int) ((timeNow - removeSuspects.get(m)) / 1000L);
+                    if (timeIdle > removeSuspectsTimeout) {
+                        removeSuspects.remove(m); // remove suspect member 
+                    }
+                }
+            }
         }
 
         //check add suspects members if they are alive now,
@@ -362,6 +372,10 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         return connectTimeout;
     }
 
+    public int getRemoveSuspectsTimeout() {
+        return removeSuspectsTimeout;
+    }
+
     public void setPerformConnectTest(boolean performConnectTest) {
         this.performConnectTest = performConnectTest;
     }
@@ -380,6 +394,10 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
 
     public void setConnectTimeout(long connectTimeout) {
         this.connectTimeout = connectTimeout;
+    }
+
+    public void setRemoveSuspectsTimeout(int removeSuspectsTimeout) {
+        this.removeSuspectsTimeout = removeSuspectsTimeout;
     }
 
 }
