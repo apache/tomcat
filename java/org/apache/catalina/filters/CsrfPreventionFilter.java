@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,15 +52,15 @@ public class CsrfPreventionFilter extends FilterBase {
 
     private static final Log log =
         LogFactory.getLog(CsrfPreventionFilter.class);
-    
+
     private String randomClass = SecureRandom.class.getName();
-    
+
     private Random randomSource;
 
     private int denyStatus = HttpServletResponse.SC_FORBIDDEN;
 
     private final Set<String> entryPoints = new HashSet<String>();
-    
+
     private int nonceCacheSize = 5;
 
     @Override
@@ -92,7 +92,7 @@ public class CsrfPreventionFilter extends FilterBase {
      * application after navigating away from it. Entry points will be limited
      * to HTTP GET requests and should not trigger any security sensitive
      * actions.
-     * 
+     *
      * @param entryPoints   Comma separated list of URLs to be configured as
      *                      entry points.
      */
@@ -109,17 +109,17 @@ public class CsrfPreventionFilter extends FilterBase {
      * in the browser and similar behaviors that may result in the submission
      * of a previous nonce rather than the current one. If not set, the default
      * value of 5 will be used.
-     * 
+     *
      * @param nonceCacheSize    The number of nonces to cache
      */
     public void setNonceCacheSize(int nonceCacheSize) {
         this.nonceCacheSize = nonceCacheSize;
     }
-    
+
     /**
      * Specify the class to use to generate the nonces. Must be in instance of
      * {@link Random}.
-     * 
+     *
      * @param randomClass   The name of the class to use
      */
     public void setRandomClass(String randomClass) {
@@ -130,7 +130,7 @@ public class CsrfPreventionFilter extends FilterBase {
     public void init(FilterConfig filterConfig) throws ServletException {
         // Set the parameters
         super.init(filterConfig);
-        
+
         try {
             Class<?> clazz = Class.forName(randomClass);
             randomSource = (Random) clazz.newInstance();
@@ -154,21 +154,21 @@ public class CsrfPreventionFilter extends FilterBase {
             FilterChain chain) throws IOException, ServletException {
 
         ServletResponse wResponse = null;
-        
+
         if (request instanceof HttpServletRequest &&
                 response instanceof HttpServletResponse) {
-            
+
             HttpServletRequest req = (HttpServletRequest) request;
             HttpServletResponse res = (HttpServletResponse) response;
 
             boolean skipNonceCheck = false;
-            
+
             if (Constants.METHOD_GET.equals(req.getMethod())) {
                 String path = req.getServletPath();
                 if (req.getPathInfo() != null) {
                     path = path + req.getPathInfo();
                 }
-                
+
                 if (entryPoints.contains(path)) {
                     skipNonceCheck = true;
                 }
@@ -176,7 +176,6 @@ public class CsrfPreventionFilter extends FilterBase {
 
             HttpSession session = req.getSession(false);
 
-            @SuppressWarnings("unchecked")
             LruCache<String> nonceCache = (session == null) ? null
                     : (LruCache<String>) session.getAttribute(
                             Constants.CSRF_NONCE_SESSION_ATTR_NAME);
@@ -191,7 +190,7 @@ public class CsrfPreventionFilter extends FilterBase {
                     return;
                 }
             }
-            
+
             if (nonceCache == null) {
                 nonceCache = new LruCache<String>(nonceCacheSize);
                 if (session == null) {
@@ -200,16 +199,16 @@ public class CsrfPreventionFilter extends FilterBase {
                 session.setAttribute(
                         Constants.CSRF_NONCE_SESSION_ATTR_NAME, nonceCache);
             }
-            
+
             String newNonce = generateNonce();
-            
+
             nonceCache.add(newNonce);
-            
+
             wResponse = new CsrfResponseWrapper(res, newNonce);
         } else {
             wResponse = response;
         }
-        
+
         chain.doFilter(request, wResponse);
     }
 
@@ -224,7 +223,7 @@ public class CsrfPreventionFilter extends FilterBase {
      * Generate a once time token (nonce) for authenticating subsequent
      * requests. This will also add the token to the session. The nonce
      * generation is a simplified version of ManagerBase.generateSessionId().
-     * 
+     *
      */
     protected String generateNonce() {
         byte random[] = new byte[16];
@@ -233,7 +232,7 @@ public class CsrfPreventionFilter extends FilterBase {
         StringBuilder buffer = new StringBuilder();
 
         randomSource.nextBytes(random);
-       
+
         for (int j = 0; j < random.length; j++) {
             byte b1 = (byte) ((random[j] & 0xf0) >> 4);
             byte b2 = (byte) (random[j] & 0x0f);
@@ -283,9 +282,9 @@ public class CsrfPreventionFilter extends FilterBase {
         public String encodeURL(String url) {
             return addNonce(super.encodeURL(url));
         }
-        
+
         /**
-         * Return the specified URL with the nonce added to the query string. 
+         * Return the specified URL with the nonce added to the query string.
          *
          * @param url URL to be modified
          * @param nonce The nonce to add
@@ -323,7 +322,7 @@ public class CsrfPreventionFilter extends FilterBase {
             return (sb.toString());
         }
     }
-    
+
     protected static class LruCache<T> implements Serializable {
 
         private static final long serialVersionUID = 1L;
@@ -331,7 +330,7 @@ public class CsrfPreventionFilter extends FilterBase {
         // Although the internal implementation uses a Map, this cache
         // implementation is only concerned with the keys.
         private final Map<T,T> cache;
-        
+
         public LruCache(final int cacheSize) {
             cache = new LinkedHashMap<T,T>() {
                 private static final long serialVersionUID = 1L;
@@ -344,7 +343,7 @@ public class CsrfPreventionFilter extends FilterBase {
                 }
             };
         }
-        
+
         public void add(T key) {
             synchronized (cache) {
                 cache.put(key, null);
