@@ -38,11 +38,10 @@ http://tomcat.apache.org/tomcat-7.0-doc/apr.html.
 Building
 --------
 
-To build the Java API
-> cd jni
+To build the Java API. Note that Java 1.7 is required to build the Java API.
 > ant
 
-To build the native part see jni/native/BUILDING
+To build the native part see native/BUILDING
 
 
 Running the tests
