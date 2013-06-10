@@ -69,7 +69,8 @@ base-tomcat.loc.1=${base-apache.loc.1}/tomcat
 base-tomcat.loc.2=${base-apache.loc.2}/tomcat
 
 base-sf.loc=http://downloads.sourceforge.net
-base-maven.loc=http://repo2.maven.org/maven2
+# repo.maven.apache.org is the same as repo2.maven.org
+base-maven.loc=http://repo.maven.apache.org/maven2
 
 # Mirror, was used when there were problems with the main SF downloads site
 # base-sf.loc=http://sunet.dl.sourceforge.net
