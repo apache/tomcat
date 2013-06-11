@@ -89,6 +89,25 @@
       <td>DIR+XML</td>
       <td>A directory located in the Host&apos;s <em>appBase</em>. The director
           does include an embedded context.xml file.</td>
+    </tr><tr>
+      <td>redeploy</td>
+      <td>The Context object that represents the web application is destroyed
+          and a new Context object created. If present and permitted by the
+          configuration, this new Context object is created by parsing the
+          context.xml file. The web.xml file is parsed during the application
+          start process. Any sessions stored in the standard Manager in the
+          default configuration will not be persisted. Any requests to the web
+          application during the redeploy will be handled as if the web
+          application is not deployed.</td>
+    </tr><tr>
+      <td>reload</td>
+      <td>The Context object that represents the web application is stopped and
+          then started. The web.xml file is parsed during the application start
+          process. Any sessions stored in the standard Manager in the default
+          configuration will not be persisted. Any requests to the web
+          application during the reload will be held until the reload completes
+          at which point they will continue using the reloaded web application.
+          </td>
     </tr>
   </table>
 
@@ -351,14 +370,151 @@
 
 <section name="Modified files">
 
-  <p>TODO</p>
+  <p>This section describes Tomcat&apos;s behaviour when the automatic
+  deployment process detects that a web application file has been modified.</p>
+
+  <p>In the following table:</p>
+
+  <ul>
+    <li>'-' means "unchanged from not present". i.e. the artifact wasn't present
+        before the change and isn't present after it either. '-' rather than 'N'
+        is used to focus attention on what changes.</li>
+    <li>'M' means that the artifact has been modified.</li>
+    <li>'R' means that the directory is re-created by expanding the WAR file.
+        This will only happen if <em>unpackWARs</em> is <code>true</code>.</li>
+  </ul>
+
+  <table class="detail-table">
+    <tr>
+      <th colspan="3">Artifacts present</th>
+      <th rowspan="2">Artifact modified</th>
+      <th colspan="4">Artifacts remaining</th>
+    </tr>
+    <tr>
+      <th>XML</th><th>WAR</th><th>DIR</th>
+      <th>XML</th><th>WAR</th><th>DIR</th><th>Action</th>
+    </tr>
+    <tr>
+      <td>N</td><td>N</td><td>Y</td>
+      <td>DIR</td>
+      <td>-</td><td>-</td><td>M</td><td>None</td>
+    </tr>
+    <tr>
+      <td>N</td><td>Y</td><td>N</td>
+      <td>WAR</td>
+      <td>-</td><td>M</td><td>-</td><td>Redeploy</td>
+    </tr>
+    <tr>
+      <td>N</td><td>Y</td><td>Y</td>
+      <td>DIR</td>
+      <td>-</td><td>Y</td><td>M</td><td>None</td>
+    </tr>
+    <tr>
+      <td>N</td><td>Y</td><td>Y</td>
+      <td>WAR</td>
+      <td>-</td><td>M</td><td>R</td><td>Redeploy</td>
+    </tr>
+    <tr>
+      <td>Y</td><td>N</td><td>N</td>
+      <td>XML</td>
+      <td>M</td><td>-</td><td>-</td><td>Redeploy</td>
+    </tr>
+    <tr>
+      <td>Y</td><td>N</td><td>Y</td>
+      <td>DIR</td>
+      <td>Y</td><td>-</td><td>M</td><td>None</td>
+    </tr>
+    <tr>
+      <td>Y</td><td>N</td><td>Y</td>
+      <td>XML</td>
+      <td>M</td><td>-</td><td>Y</td><td>Redeploy</td>
+    </tr>
+    <tr>
+      <td>Y</td><td>Y</td><td>N</td>
+      <td>WAR</td>
+      <td>Y</td><td>M</td><td>-</td><td>Reload</td>
+    </tr>
+    <tr>
+      <td>Y</td><td>Y</td><td>N</td>
+      <td>XML</td>
+      <td>M</td><td>Y</td><td>-</td><td>Redeploy</td>
+    </tr>
+    <tr>
+      <td>Y</td><td>Y</td><td>Y</td>
+      <td>DIR</td>
+      <td>Y</td><td>Y</td><td>M</td><td>None</td>
+    </tr>
+    <tr>
+      <td>Y</td><td>Y</td><td>Y</td>
+      <td>WAR</td>
+      <td>Y</td><td>M</td><td>Y</td><td>Reload</td>
+    </tr>
+    <tr>
+      <td>Y</td><td>Y</td><td>Y</td>
+      <td>XML</td>
+      <td>M</td><td>Y</td><td>Y</td><td>Redeploy</td>
+    </tr>
+    <tr>
+      <td>Y</td><td>Y(external)</td><td>N</td>
+      <td>WAR</td>
+      <td>Y</td><td>M(external)</td><td>-</td><td>Reload</td>
+    </tr>
+    <tr>
+      <td>Y</td><td>Y(external)</td><td>N</td>
+      <td>XML</td>
+      <td>M</td><td>Y(external)</td><td>-</td><td>Redeploy</td>
+    </tr>
+    <tr>
+      <td>Y</td><td>N</td><td>Y(external)</td>
+      <td>DIR</td>
+      <td>Y</td><td>-</td><td>M(external)</td><td>None</td>
+    </tr>
+    <tr>
+      <td>Y</td><td>N</td><td>Y(external)</td>
+      <td>XML</td>
+      <td>M</td><td>-</td><td>Y(external)</td><td>Redeploy</td>
+    </tr>
+    <tr>
+      <td>Y</td><td>Y(external)</td><td>Y</td>
+      <td>DIR</td>
+      <td>Y</td><td>Y(external)</td><td>M</td><td>None</td>
+    </tr>
+    <tr>
+      <td>Y</td><td>Y(external)</td><td>Y</td>
+      <td>WAR</td>
+      <td>Y</td><td>M(external)</td><td>R</td><td>Reload</td>
+    </tr>
+    <tr>
+      <td>Y</td><td>Y(external)</td><td>Y</td>
+      <td>XML</td>
+      <td>M</td><td>Y(external)</td><td>Y</td><td>Redeploy</td>
+    </tr>
+  </table>
 
 </section>
 
 
 <section name="Added files">
 
-  <p>TODO</p>
+  <p>This is treated as if the added file has been modified with the following
+  additional actions:</p>
+
+  <ul>
+    <li>If a WAR is added, any DIR is removed and may be recreated depending on
+        <em>unpackWARs</em>.</li>
+    <li>If an XML file is added that refers to an external <em>docBase</em> any
+        WAR or DIR in the appBase will be removed. The DIR may be recreated if
+        the external resource is a WAR and <em>unpackWARs</em> is true.</li>
+    <li>If a DIR is added when a WAR already exists and <em>unpackWARs</em> is
+        <code>false</code>, the DIR will be ignored but a warning will be
+        logged when the DIR is first detected. If the WAR is removed, the DIR
+        will be left and may be deployed via automatic deployment.</li>
+    <li>If a WAR is added to the <em>appBase</em> when an external WAR already
+        exists, the WAR in the <em>appBase</em> will be ignored but a warning
+        will be logged when the WAR in the <em>appBase</em> is first detected.
+        If the external WAR is removed, the WAR in the <em>appBaase</em> will be
+        left and may be deployed via automatic deployment.</li>
+  </ul>
 
 </section>
 
