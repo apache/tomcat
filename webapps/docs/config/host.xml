@@ -361,7 +361,7 @@
     files in the <em>configBase</em> are automatically deployed when Tomcat
     starts (the <code>deployOnStartup</code> property defaults to
     <code>true</code>) and reloaded or redeployed (as appropriate) when a change
-    is detected while Tomcat is running (the \ attribute
+    is detected while Tomcat is running (the <code>autoDeploy</code> attribute
     also defaults to <code>true</code>).</p>
 
     <p><code>deployOnStartup</code> and <code>autoDeploy</code> trigger
