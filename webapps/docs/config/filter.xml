@@ -140,13 +140,13 @@
       <attribute name="cors.allowed.methods" required="false">
         <p>A comma separated list of HTTP methods that can be used to access the
         resource, using cross-origin requests. These are the methods which will
-        also be included as part of <code>Access-Control-Allow-Methods</code> 
+        also be included as part of <code>Access-Control-Allow-Methods</code>
         header in pre-flight response. Eg: <code>GET, POST</code>.
         <strong>Defaults:</strong> <code>GET, POST, HEAD, OPTIONS</code></p>
       </attribute>
       <attribute name="cors.allowed.headers" required="false">
         <p>A comma separated list of request headers that can be used when
-        making an actual request. These headers will also be returned as part 
+        making an actual request. These headers will also be returned as part
         of <code>Access-Control-Allow-Headers</code> header in a pre-flight
         response. Eg: <code>Origin,Accept</code>. <strong>Defaults:</strong>
         <code>Origin, Accept, X-Requested-With, Content-Type,
@@ -154,8 +154,8 @@
       </attribute>
       <attribute name="cors.exposed.headers" required="false">
         <p>A comma separated list of headers other than simple response headers
-        that browsers are allowed to access. These are the headers which will 
-        also be included as part of <code>Access-Control-Expose-Headers</code> 
+        that browsers are allowed to access. These are the headers which will
+        also be included as part of <code>Access-Control-Expose-Headers</code>
         header in the pre-flight response. Eg:
         <code>X-CUSTOM-HEADER-PING,X-CUSTOM-HEADER-PONG</code>.
         <strong>Default:</strong> None. Non-simple headers are not exposed by
@@ -244,7 +244,7 @@
         </ul>
       </li>
       <li><strong>cors.request.headers:</strong> Request headers sent as
-          <code>Access-Control-Request-Headers</code> header, for a pre-flight 
+          <code>Access-Control-Request-Headers</code> header, for a pre-flight
           request.
       </li>
     </ul>
