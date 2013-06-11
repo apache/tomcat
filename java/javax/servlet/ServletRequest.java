@@ -299,8 +299,9 @@ public interface ServletRequest {
      * {@link RequestDispatcher}.
      * <p>
      * Attribute names should follow the same conventions as package names.
-     * Names beginning with <code>java.*</code>, <code>javax.*</code>, and
-     * <code>com.sun.*</code>, are reserved for use by Sun Microsystems. <br>
+     * Names beginning with <code>java.*</code>, <code>javax.*</code>,
+     * <code>sun.*</code>, <code>com.sun.*</code>, <code>oracle.*</code> and
+     * <code>com.oracle.*</code) are reserved for use by Oracle Corporation.<br>
      * If the object passed in is null, the effect is the same as calling
      * {@link #removeAttribute}. <br>
      * It is warned that when the request is dispatched from the servlet resides
@@ -321,8 +322,9 @@ public interface ServletRequest {
      * handled.
      * <p>
      * Attribute names should follow the same conventions as package names.
-     * Names beginning with <code>java.*</code>, <code>javax.*</code>, and
-     * <code>com.sun.*</code>, are reserved for use by Sun Microsystems.
+     * Names beginning with <code>java.*</code>, <code>javax.*</code>,
+     * <code>sun.*</code>, <code>com.sun.*</code>, <code>oracle.*</code> and
+     * <code>com.oracle.*</code) are reserved for use by Oracle Corporation.
      *
      * @param name
      *            a <code>String</code> specifying the name of the attribute to
