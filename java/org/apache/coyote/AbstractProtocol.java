@@ -29,6 +29,7 @@ import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -631,7 +632,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
                     if (state == SocketState.UPGRADING) {
                         // Get the HTTP upgrade handler
-                        javax.servlet.http.HttpUpgradeHandler httpUpgradeHandler =
+                        HttpUpgradeHandler httpUpgradeHandler =
                                 processor.getHttpUpgradeHandler();
                         // Release the Http11 processor to be re-used
                         release(wrapper, processor, false, false);
@@ -727,8 +728,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                 boolean addToPoller);
         protected abstract Processor<S> createUpgradeProcessor(
                 SocketWrapper<S> socket,
-                javax.servlet.http.HttpUpgradeHandler httpUpgradeProcessor)
-                        throws IOException;
+                HttpUpgradeHandler httpUpgradeProcessor) throws IOException;
 
         protected void register(AbstractProcessor<S> processor) {
             if (getProtocol().getDomain() != null) {

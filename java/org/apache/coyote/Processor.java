@@ -19,6 +19,8 @@ package org.apache.coyote;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 
+import javax.servlet.http.HttpUpgradeHandler;
+
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -38,7 +40,7 @@ public interface Processor<S> {
     SocketState asyncDispatch(SocketStatus status);
     SocketState asyncPostProcess();
 
-    javax.servlet.http.HttpUpgradeHandler getHttpUpgradeHandler();
+    HttpUpgradeHandler getHttpUpgradeHandler();
     SocketState upgradeDispatch(SocketStatus status) throws IOException;
 
     boolean isComet();
