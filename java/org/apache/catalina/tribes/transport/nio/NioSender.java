@@ -325,8 +325,6 @@ public class NioSender extends AbstractSender {
         remaining = 0;
         complete = false;
         setAttempt(0);
-        setRequestCount(0);
-        setConnectTime(-1);
         setUdpBased(false);
     }
 
