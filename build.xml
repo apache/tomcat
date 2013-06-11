@@ -2505,10 +2505,10 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <target name="download-test-compile"
           description="Download additional components for the tests" >
 
-    <antcall target="downloadzip">
+    <antcall target="downloadfile">
       <param name="sourcefile" value="${junit.loc}"/>
       <param name="destfile" value="${junit.jar}"/>
-      <param name="destdir" value="${base.path}"/>
+      <param name="destdir" value="${junit.home}"/>
     </antcall>
 
   </target>
