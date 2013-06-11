@@ -142,8 +142,8 @@
       </add>
       <add>
         <bug>55046</bug>: Add a Servlet Filter that implements
-        <a href="http://www.w3.org/TR/cors/">CORS</a>. Patch provided by Mohit
-        Soni. (markt)
+        <a href="http://www.w3.org/TR/cors/" rel="nofollow">CORS</a>. Patch
+        provided by Mohit Soni. (markt)
       </add>
       <add>
         <bug>55052</bug>: JULI&apos;s LogManager now additionally looks for
@@ -2759,8 +2759,9 @@
       <update>
         <bug>52405</bug>: Align the Servlet 3.0 implementation with the changes
         defined in the first maintenance release (also know as Rev. A). See the
-        <a href="http://jcp.org/aboutJava/communityprocess/maintenance/jsr315/servlet3-mr-reva.html">
-        JCP documentation</a> for a detailed list of changes. (markt) 
+        <a href="http://jcp.org/aboutJava/communityprocess/maintenance/jsr315/servlet3-mr-reva.html"
+        rel="nofollow">JCP documentation</a> for a detailed list of changes
+        (markt) 
       </update>
       <fix>
         Improve JMX names for objects related to Connectors that have the
@@ -3216,10 +3217,10 @@
         <code>DeltaSession.setId(String)</code>. (kkolinko)
       </fix>
       <fix>
-        Work around a <a href="http://bugs.sun.com/view_bug.do?bug_id=6427854">
-        known JVM bug</a> that is fixed in 1.7.0_01 but still present in
-        1.6.0_29 and was triggering intermittent unit test failures for
-        <code>org.apache.catalina.tribes.group.
+        Work around a <a href="http://bugs.sun.com/view_bug.do?bug_id=6427854"
+        rel="nofollow">known JVM bug</a> that is fixed in 1.7.0_01 but still
+        present in 1.6.0_29 and was triggering intermittent unit test failure
+        for <code>org.apache.catalina.tribes.group.
         TestGroupChannelMemberArrival.testMemberArrival</code>.
         The bug affects any components that use NIO although it was more likely
         to be observed in the clustering module than the HTTP or AJP NIO
