@@ -19,6 +19,8 @@ package org.apache.coyote;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 
+import javax.servlet.http.HttpUpgradeHandler;
+
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -153,5 +155,5 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
             throws IOException;
 
     @Override
-    public abstract javax.servlet.http.HttpUpgradeHandler getHttpUpgradeHandler();
+    public abstract HttpUpgradeHandler getHttpUpgradeHandler();
 }
