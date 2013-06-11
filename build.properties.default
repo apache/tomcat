@@ -69,7 +69,8 @@ base-tomcat.loc.1=${base-apache.loc.1}/tomcat
 base-tomcat.loc.2=${base-apache.loc.2}/tomcat
 
 base-sf.loc=http://downloads.sourceforge.net
-base-maven.loc=http://repo2.maven.org/maven2
+# repo.maven.apache.org is the same as repo2.maven.org
+base-maven.loc=http://repo.maven.apache.org/maven2
 
 # Mirror, was used when there were problems with the main SF downloads site
 # base-sf.loc=http://sunet.dl.sourceforge.net
@@ -176,10 +177,10 @@ commons-daemon.native.win.loc.1=${base-commons.loc.1}/daemon/binaries/windows/co
 commons-daemon.native.win.loc.2=${base-commons.loc.2}/daemon/binaries/windows/commons-daemon-${commons-daemon.version}-bin-windows.zip
 
 # ----- JUnit Unit Test Suite, version 4.8 or later -----
-junit.home=${base.path}/junit4.8.2
-junit.lib=${junit.home}
-junit.jar=${junit.lib}/junit-4.8.2.jar
-junit.loc=http://cloud.github.com/downloads/KentBeck/junit/junit4.8.2.zip
+junit.version=4.9
+junit.home=${base.path}/junit${junit.version}
+junit.jar=${junit.home}/junit-${junit.version}.jar
+junit.loc=${base-maven.loc}/junit/junit/${junit.version}/junit-${junit.version}.jar
 
 # ----- Checkstyle, version 5.1 or later -----
 checkstyle.version=5.6

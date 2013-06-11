@@ -69,6 +69,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update Maven Cental location used to download dependencies at build time
+        to be <code>repo.maven.apache.org</code>. (kkolinko)
+      </update>
+      <update>
+        Update JUnit to version 4.9. (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.41 (markt)" rtext="2013-06-10">
   <subsection name="Catalina">
