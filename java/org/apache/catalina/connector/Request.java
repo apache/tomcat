@@ -1892,7 +1892,6 @@ public class Request
         // Output required by RFC2616. Protocol specific headers should have
         // already been set.
         response.setStatus(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
-        response.flushBuffer();
 
         return handler;
     }
