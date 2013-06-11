@@ -70,6 +70,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     private boolean hasOriginalRequestAndResponse = true;
     private volatile Runnable dispatch = null;
     private Context context = null;
+    // Default of 30000 (30s) is set by the connector
     private long timeout = -1;
     private AsyncEvent event = null;
     private Request request;
