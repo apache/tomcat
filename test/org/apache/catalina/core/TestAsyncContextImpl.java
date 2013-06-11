@@ -759,14 +759,14 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         @Override
         public void onComplete(AsyncEvent event) throws IOException {
-            ServletResponse resp = event.getAsyncContext().getResponse();
+            ServletResponse resp = event.getSuppliedResponse();
             resp.getWriter().write("onComplete-");
             resp.flushBuffer();
         }
 
         @Override
         public void onTimeout(AsyncEvent event) throws IOException {
-            ServletResponse resp = event.getAsyncContext().getResponse();
+            ServletResponse resp = event.getSuppliedResponse();
             resp.getWriter().write("onTimeout-");
             resp.flushBuffer();
             if (completeOnTimeout){
@@ -779,7 +779,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         @Override
         public void onError(AsyncEvent event) throws IOException {
-            ServletResponse resp = event.getAsyncContext().getResponse();
+            ServletResponse resp = event.getSuppliedResponse();
             resp.getWriter().write("onError-");
             resp.flushBuffer();
             if (completeOnError) {
@@ -789,7 +789,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         @Override
         public void onStartAsync(AsyncEvent event) throws IOException {
-            ServletResponse resp = event.getAsyncContext().getResponse();
+            ServletResponse resp = event.getSuppliedResponse();
             resp.getWriter().write("onStartAsync-");
             resp.flushBuffer();
         }
