@@ -1777,6 +1777,77 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 resp.getWriter().println("OK");
             }
         }
+    }
 
+
+    @Test
+    public void testGetRequestISE() throws Exception {
+        doTestAsyncISE(true);
+    }
+
+
+    @Test
+    public void testGetResponseISE() throws Exception {
+        doTestAsyncISE(false);
+    }
+
+
+    private void doTestAsyncISE(boolean useGetRequest) throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        Wrapper w = Tomcat.addServlet(ctx, "AsyncISEServlet",
+                new AsyncISEServlet(useGetRequest));
+        w.setAsyncSupported(true);
+        ctx.addServletMapping("/test", "AsyncISEServlet");
+
+        tomcat.start();
+
+        ByteChunk response = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() +"/test", response,
+                null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals("OK", response.toString());
+    }
+
+
+    private static class AsyncISEServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private boolean useGetRequest = false;
+
+        public AsyncISEServlet(boolean useGetRequest) {
+            this.useGetRequest = useGetRequest;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            resp.setContentType("text/plain;UTF-8");
+            PrintWriter pw = resp.getWriter();
+
+            AsyncContext async = req.startAsync();
+            // This will commit the response
+            async.complete();
+
+            try {
+                if (useGetRequest) {
+                    async.getRequest();
+                } else {
+                    async.getResponse();
+                }
+                pw.print("FAIL");
+            } catch (IllegalStateException ise) {
+                pw.print("OK");
+            }
+        }
     }
 }
