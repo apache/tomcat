@@ -630,6 +630,11 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public void addApplicationListener(String listener) {
+        // NO-OP
+    }
+
+    @Override
     public void addApplicationParameter(ApplicationParameter parameter) {
         // NO-OP
     }
@@ -726,7 +731,7 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public ApplicationListener[] findApplicationListeners() {
+    public String[] findApplicationListeners() {
         return null;
     }
 

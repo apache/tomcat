@@ -56,6 +56,16 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.42 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Enforce the restriction described in section 4.4 of the Servlet 3.0
+        specification that requires the new pluggability methods only to be
+        available to <code>ServletContextListener</code>s defined in one of the
+        specified ways. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>

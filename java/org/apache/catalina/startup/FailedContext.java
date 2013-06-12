@@ -450,7 +450,9 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     @Override
     public void addApplicationListener(ApplicationListener listener) { /* NO-OP */ }
     @Override
-    public ApplicationListener[] findApplicationListeners() { return null; }
+    public void addApplicationListener(String listener) { /* NO-OP */ }
+    @Override
+    public String[] findApplicationListeners() { return null; }
     @Override
     public void removeApplicationListener(String listener) { /* NO-OP */ }
 

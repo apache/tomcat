@@ -2780,6 +2780,12 @@ public class StandardContext extends ContainerBase
     // -------------------------------------------------------- Context Methods
 
 
+    @Override
+    public void addApplicationListener(String listener) {
+        addApplicationListener(new ApplicationListener(listener, false));
+    }
+    
+    
     /**
      * Add a new Listener class name to the set of Listeners
      * configured for this application.
@@ -3423,9 +3429,15 @@ public class StandardContext extends ContainerBase
      * for this application.
      */
     @Override
-    public ApplicationListener[] findApplicationListeners() {
+    public String[] findApplicationListeners() {
 
-        return (applicationListeners);
+        ArrayList<String> list =
+                new ArrayList<String>(applicationListeners.length);
+        for (ApplicationListener applicationListener: applicationListeners) {
+            list.add(applicationListener.getClassName());
+        }
+        
+        return list.toArray(new String[list.size()]);
 
     }
 
@@ -4824,7 +4836,7 @@ public class StandardContext extends ContainerBase
             log.debug("Configuring application event listeners");
 
         // Instantiate the required listeners
-        ApplicationListener listeners[] = findApplicationListeners();
+        ApplicationListener listeners[] = applicationListeners;
         Object results[] = new Object[listeners.length];
         boolean ok = true;
         Set<Object> tldListeners = new HashSet<Object>();
