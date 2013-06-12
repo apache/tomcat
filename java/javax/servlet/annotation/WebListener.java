@@ -33,7 +33,8 @@ import java.lang.annotation.Target;
  * {@link javax.servlet.ServletContextAttributeListener},
  * {@link javax.servlet.ServletContextListener},
  * {@link javax.servlet.ServletRequestAttributeListener},
- * {@link javax.servlet.ServletRequestListener} <br />
+ * {@link javax.servlet.ServletRequestListener} or
+ * {@link javax.servlet.http.HttpSessionIdListener}
  * <br />
  *
  * E.g. <code>@WebListener</code><br />
