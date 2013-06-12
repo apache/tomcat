@@ -24,6 +24,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 
 import javax.servlet.WriteListener;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Globals;
 import org.apache.coyote.ActionCode;
@@ -284,7 +285,12 @@ public class OutputBuffer extends Writer
             }
         }
 
-        doFlush(false);
+        if (coyoteResponse.getStatus() ==
+                HttpServletResponse.SC_SWITCHING_PROTOCOLS) {
+            doFlush(true);
+        } else {
+            doFlush(false);
+        }
         closed = true;
 
         // The request should have been completely read by the time the response
