@@ -116,7 +116,7 @@ public class TestUpgrade extends TomcatBaseTest {
         Socket socket =
                 SocketFactory.getDefault().createSocket("localhost", getPort());
 
-        socket.setSoTimeout(300000);
+        socket.setSoTimeout(10000);
 
         InputStream is = socket.getInputStream();
         OutputStream os = socket.getOutputStream();
