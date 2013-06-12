@@ -23,12 +23,12 @@ package org.apache.catalina.deploy;
 public class ApplicationListener {
 
     private final String className;
-    private final boolean allowedPluggability;
+    private final boolean pluggabilityBlocked;
 
     public ApplicationListener(String className,
-            boolean allowedPluggability) {
+            boolean pluggabilityBlocked) {
         this.className = className;
-        this.allowedPluggability = allowedPluggability;
+        this.pluggabilityBlocked = pluggabilityBlocked;
     }
 
 
@@ -37,7 +37,7 @@ public class ApplicationListener {
     }
 
 
-    public boolean isAllowedPluggability() {
-        return allowedPluggability;
+    public boolean isPluggabilityBlocked() {
+        return pluggabilityBlocked;
     }
 }
