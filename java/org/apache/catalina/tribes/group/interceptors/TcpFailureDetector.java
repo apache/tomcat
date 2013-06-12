@@ -276,7 +276,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
             } else {
                 if (removeSuspectsTimeout > 0) {
                     long timeNow = System.currentTimeMillis();
-                    int timeIdle = (int) ((timeNow - removeSuspects.get(m)) / 1000L);
+                    int timeIdle = (int) ((timeNow - removeSuspects.get(m).longValue()) / 1000L);
                     if (timeIdle > removeSuspectsTimeout) {
                         removeSuspects.remove(m); // remove suspect member
                     }
