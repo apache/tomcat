@@ -36,6 +36,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -57,7 +58,8 @@ public class TestSsl extends TomcatBaseTest {
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         org.apache.catalina.Context ctxt  = tomcat.addWebapp(
                 null, "/examples", appDir.getAbsolutePath());
-        ctxt.addApplicationListener(WsListener.class.getName());
+        ctxt.addApplicationListener(new ApplicationListener(
+                WsListener.class.getName(), false));
 
         TesterSupport.initSsl(tomcat);
 
@@ -76,7 +78,8 @@ public class TestSsl extends TomcatBaseTest {
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         org.apache.catalina.Context ctxt  = tomcat.addWebapp(
                 null, "/examples", appDir.getAbsolutePath());
-        ctxt.addApplicationListener(WsListener.class.getName());
+        ctxt.addApplicationListener(new ApplicationListener(
+                WsListener.class.getName(), false));
 
         TesterSupport.initSsl(tomcat, "localhost-copy1.jks", "changeit",
                 "tomcatpass");
@@ -168,9 +171,10 @@ public class TestSsl extends TomcatBaseTest {
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
-        Context ctx = tomcat.addWebapp(null, "/examples",
+        Context ctxt = tomcat.addWebapp(null, "/examples",
                 appDir.getAbsolutePath());
-        ctx.addApplicationListener(WsListener.class.getName());
+        ctxt.addApplicationListener(new ApplicationListener(
+                WsListener.class.getName(), false));
 
         TesterSupport.initSsl(tomcat);
 

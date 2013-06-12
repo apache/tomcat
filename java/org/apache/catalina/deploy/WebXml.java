@@ -1273,7 +1273,8 @@ public class WebXml {
                     descriptor);
         }
         for (String listener : listeners) {
-            context.addApplicationListener(listener);
+            context.addApplicationListener(
+                    new ApplicationListener(listener, false));
         }
         for (Entry<String, String> entry : localeEncodingMappings.entrySet()) {
             context.addLocaleEncodingMappingParameter(entry.getKey(),

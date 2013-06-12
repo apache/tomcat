@@ -105,14 +105,27 @@ public interface ServletContext {
 
     /**
      * @return TODO
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
+     *
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public int getEffectiveMajorVersion();
 
     /**
      * @return TODO
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public int getEffectiveMinorVersion();
@@ -429,7 +442,13 @@ public interface ServletContext {
      * @param value
      * @return TODO
      * @throws IllegalStateException
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public boolean setInitParameter(String name, String value);
@@ -518,6 +537,13 @@ public interface ServletContext {
      * @return TODO
      * @throws IllegalStateException
      *             If the context has already been initialised
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public ServletRegistration.Dynamic addServlet(String servletName,
@@ -529,6 +555,13 @@ public interface ServletContext {
      * @return TODO
      * @throws IllegalStateException
      *             If the context has already been initialised
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public ServletRegistration.Dynamic addServlet(String servletName,
@@ -540,6 +573,13 @@ public interface ServletContext {
      * @return TODO
      * @throws IllegalStateException
      *             If the context has already been initialised
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public ServletRegistration.Dynamic addServlet(String servletName,
@@ -549,6 +589,13 @@ public interface ServletContext {
      * @param c
      * @return TODO
      * @throws ServletException
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public <T extends Servlet> T createServlet(Class<T> c)
@@ -563,7 +610,13 @@ public interface ServletContext {
      *          <code>null</code> if no Servlet has been registered with the
      *          given name
      *
-     * @throws UnsupportedOperationException TODO SERVLET3 - Add comments
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      *
      * @since Servlet 3.0
      */
@@ -571,7 +624,13 @@ public interface ServletContext {
 
     /**
      * @return TODO
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public Map<String, ? extends ServletRegistration> getServletRegistrations();
@@ -580,6 +639,13 @@ public interface ServletContext {
      * @param filterName
      * @param className
      * @return TODO
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @throws IllegalStateException
      *             If the context has already been initialised
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
@@ -591,6 +657,13 @@ public interface ServletContext {
      * @param filterName
      * @param filter
      * @return TODO
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @throws IllegalStateException
      *             If the context has already been initialised
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
@@ -601,6 +674,13 @@ public interface ServletContext {
      * @param filterName
      * @param filterClass
      * @return TODO
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @throws IllegalStateException
      *             If the context has already been initialised
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
@@ -611,6 +691,13 @@ public interface ServletContext {
     /**
      * @param c
      * @return TODO
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @throws ServletException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
@@ -620,21 +707,39 @@ public interface ServletContext {
     /**
      * @param filterName
      * @return TODO
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public FilterRegistration getFilterRegistration(String filterName);
 
     /**
      * @return TODO
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public Map<String, ? extends FilterRegistration> getFilterRegistrations();
 
     /**
      * @return TODO
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public SessionCookieConfig getSessionCookieConfig();
@@ -647,7 +752,13 @@ public interface ServletContext {
      *             {@link SessionTrackingMode}
      * @throws IllegalStateException
      *             If the context has already been initialised
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public void setSessionTrackingModes(
@@ -655,18 +766,39 @@ public interface ServletContext {
 
     /**
      * @return TODO
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public Set<SessionTrackingMode> getDefaultSessionTrackingModes();
 
     /**
      * @return TODO
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public Set<SessionTrackingMode> getEffectiveSessionTrackingModes();
 
     /**
      * @param className
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public void addListener(String className);
@@ -674,12 +806,26 @@ public interface ServletContext {
     /**
      * @param <T>
      * @param t
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public <T extends EventListener> void addListener(T t);
 
     /**
      * @param listenerClass
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public void addListener(Class<? extends EventListener> listenerClass);
@@ -689,6 +835,13 @@ public interface ServletContext {
      * @param c
      * @return TODO
      * @throws ServletException
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public <T extends EventListener> T createListener(Class<T> c)
@@ -696,14 +849,26 @@ public interface ServletContext {
 
     /**
      * @return TODO
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public JspConfigDescriptor getJspConfigDescriptor();
 
     /**
      * @return TODO
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @throws SecurityException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
@@ -711,7 +876,13 @@ public interface ServletContext {
 
     /**
      * @param roleNames
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
      * @throws IllegalArgumentException
      * @throws IllegalStateException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments

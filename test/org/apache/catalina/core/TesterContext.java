@@ -48,6 +48,7 @@ import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.deploy.FilterDef;
@@ -638,7 +639,7 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public void addApplicationListener(String listener) {
+    public void addApplicationListener(ApplicationListener listener) {
         // NO-OP
     }
 
@@ -739,7 +740,7 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public String[] findApplicationListeners() {
+    public ApplicationListener[] findApplicationListeners() {
         return null;
     }
 

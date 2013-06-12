@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Valve;
+import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
@@ -381,7 +382,8 @@ public class TestFormAuthenticator extends TomcatBaseTest {
                     appDir.getAbsolutePath());
             setUseCookies(clientShouldUseCookies);
             ctx.setCookies(serverShouldUseCookies);
-            ctx.addApplicationListener(WsListener.class.getName());
+            ctx.addApplicationListener(new ApplicationListener(
+                    WsListener.class.getName(), false));
 
             MapRealm realm = new MapRealm();
             realm.addUser("tomcat", "tomcat");
