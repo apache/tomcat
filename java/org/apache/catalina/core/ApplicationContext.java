@@ -985,7 +985,6 @@ public class ApplicationContext
     public <T extends Filter> T createFilter(Class<T> c)
     throws ServletException {
         try {
-            @SuppressWarnings("unchecked")
             T filter = (T) context.getInstanceManager().newInstance(c.getName());
             return filter;
         } catch (IllegalAccessException e) {
@@ -1128,7 +1127,6 @@ public class ApplicationContext
     public <T extends Servlet> T createServlet(Class<T> c)
     throws ServletException {
         try {
-            @SuppressWarnings("unchecked")
             T servlet = (T) context.getInstanceManager().newInstance(c.getName());
             context.dynamicServletCreated(servlet);
             return servlet;
@@ -1353,7 +1351,6 @@ public class ApplicationContext
     public <T extends EventListener> T createListener(Class<T> c)
             throws ServletException {
         try {
-            @SuppressWarnings("unchecked")
             T listener =
                 (T) context.getInstanceManager().newInstance(c.getName());
             if (listener instanceof ServletContextListener ||
