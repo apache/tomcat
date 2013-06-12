@@ -52,9 +52,11 @@ public interface ServletRequest {
      * This allows information to be embedded into a request before a
      * {@link RequestDispatcher} call.
      * <p>
-     * Attribute names should follow the same conventions as package names. This
-     * specification reserves names matching <code>java.*</code>,
-     * <code>javax.*</code>, and <code>sun.*</code>.
+     * Attribute names should follow the same conventions as package names.
+     * Names beginning with <code>java.*</code> and <code>javax.*</code> are
+     * reserved for use by the Servlet specification. Names beginning with
+     * <code>sun.*</code>, <code>com.sun.*</code>, <code>oracle.*</code> and
+     * <code>com.oracle.*</code>) are reserved for use by Oracle Corporation.
      *
      * @param name
      *            a <code>String</code> specifying the name of the attribute
@@ -299,9 +301,11 @@ public interface ServletRequest {
      * {@link RequestDispatcher}.
      * <p>
      * Attribute names should follow the same conventions as package names.
-     * Names beginning with <code>java.*</code>, <code>javax.*</code>,
+     * Names beginning with <code>java.*</code> and <code>javax.*</code> are
+     * reserved for use by the Servlet specification. Names beginning with
      * <code>sun.*</code>, <code>com.sun.*</code>, <code>oracle.*</code> and
-     * <code>com.oracle.*</code) are reserved for use by Oracle Corporation.<br>
+     * <code>com.oracle.*</code>) are reserved for use by Oracle Corporation.
+     * <br>
      * If the object passed in is null, the effect is the same as calling
      * {@link #removeAttribute}. <br>
      * It is warned that when the request is dispatched from the servlet resides
@@ -322,9 +326,10 @@ public interface ServletRequest {
      * handled.
      * <p>
      * Attribute names should follow the same conventions as package names.
-     * Names beginning with <code>java.*</code>, <code>javax.*</code>,
+     * Names beginning with <code>java.*</code> and <code>javax.*</code> are
+     * reserved for use by the Servlet specification. Names beginning with
      * <code>sun.*</code>, <code>com.sun.*</code>, <code>oracle.*</code> and
-     * <code>com.oracle.*</code) are reserved for use by Oracle Corporation.
+     * <code>com.oracle.*</code>) are reserved for use by Oracle Corporation.
      *
      * @param name
      *            a <code>String</code> specifying the name of the attribute to
