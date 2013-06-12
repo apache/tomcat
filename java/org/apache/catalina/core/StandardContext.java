@@ -4730,7 +4730,7 @@ public class StandardContext extends ContainerBase
                 ApplicationListener listener = listeners[i];
                 results[i] = instanceManager.newInstance(
                         listener.getClassName());
-                if (listener.isFromTLD()) {
+                if (listener.isAllowedPluggability()) {
                     tldListeners.add(results[i]);
                 }
             } catch (Throwable t) {
@@ -4792,7 +4792,7 @@ public class StandardContext extends ContainerBase
                 new ServletContextEvent(getServletContext());
         ServletContextEvent tldEvent = null;
         if (tldListeners.size() > 0) {
-            tldEvent = new ServletContextEvent(new TldListenerServletContext(
+            tldEvent = new ServletContextEvent(new NoPluggabilityServletContext(
                     getServletContext()));
         }
         for (int i = 0; i < instances.length; i++) {
@@ -6538,11 +6538,12 @@ public class StandardContext extends ContainerBase
     }
 
 
-    private static class TldListenerServletContext implements ServletContext {
+    private static class NoPluggabilityServletContext
+            implements ServletContext {
 
         private final ServletContext sc;
 
-        public TldListenerServletContext(ServletContext sc) {
+        public NoPluggabilityServletContext(ServletContext sc) {
             this.sc = sc;
         }
 
