@@ -31,6 +31,7 @@ import javax.servlet.ServletSecurityElement;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
 import org.apache.catalina.core.ApplicationServletRegistration;
+import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.deploy.FilterDef;
@@ -720,7 +721,7 @@ public interface Context extends Container {
      *
      * @param listener Java class name of a listener class
      */
-    public void addApplicationListener(String listener);
+    public void addApplicationListener(ApplicationListener listener);
 
 
     /**
@@ -898,7 +899,7 @@ public interface Context extends Container {
      * Return the set of application listener class names configured
      * for this application.
      */
-    public String[] findApplicationListeners();
+    public ApplicationListener[] findApplicationListeners();
 
 
     /**

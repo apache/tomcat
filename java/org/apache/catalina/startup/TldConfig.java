@@ -36,6 +36,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -286,7 +287,8 @@ public final class TldConfig  implements LifecycleListener {
                     Integer.valueOf(list.length)));
 
         for( int i=0; list!=null && i<list.length; i++ ) {
-            context.addApplicationListener(list[i]);
+            context.addApplicationListener(
+                    new ApplicationListener(list[i], true));
         }
 
         long t2=System.currentTimeMillis();
