@@ -22,8 +22,8 @@ $Id$
             ====================================================
 
 This subproject contains the source code for Tomcat @VERSION_MAJOR_MINOR@, a container that
-implements the Servlet 3.1 and JSP 2.2 specifications from the Java
-Community Process <http://www.jcp.org/>.
+implements the Servlet 3.1, JSP 2.3, EL 3.0 and WebSocket 1.0 specifications
+from the Java Community Process <http://www.jcp.org/>.
 
 Note: If you just need to run Apache Tomcat, it is not necessary to build
 it. You may simply download a binary distribution. It is cross-platform.
