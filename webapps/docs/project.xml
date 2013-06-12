@@ -84,6 +84,8 @@
         <item name="Servlet Javadocs"      href="servletapi/index.html"/>
         <item name="JSP 2.3 Javadocs"      href="jspapi/index.html"/>
         <item name="EL 3.0 Javadocs"       href="elapi/index.html"/>
+        <item name="WebSocket 1.0 Javadocs"
+              href="websocketapi/index.html"/>
         <item name="JK 1.2 Documentation"
               href="http://tomcat.apache.org/connectors-doc/"/>
     </menu>
