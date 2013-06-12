@@ -17,14 +17,16 @@
 package org.apache.catalina.nonblocking;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.Socket;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.SocketFactory;
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
@@ -45,13 +47,24 @@ import org.apache.catalina.startup.BytesStreamer;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.ByteChunk.ByteOutputChannel;
 
 public class TestNonBlockingAPI extends TomcatBaseTest {
 
-    public static final long bytesToDownload = 1024 * 1024 * 5;
+    private static final byte[] CHUNK = new byte[1024 * 1024];
+    private static final long WRITE_SIZE  = CHUNK.length * 5;
 
+    static {
+        byte[] seq = new byte[] {'0', '1', '2', '3', '4', '5', '6', '7',
+                '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+        int i = 0;
+        while (i < CHUNK.length) {
+            System.arraycopy(seq, 0, CHUNK, i, 16);
+            i += 16;
+        }
+    }
 
     @Test
     public void testNonBlockingRead() throws Exception {
@@ -89,40 +102,104 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         tomcat.getConnector().setProperty("socket.txBufSize", "1024");
         tomcat.start();
 
-        Map<String, List<String>> resHeaders = new HashMap<>();
-        ByteChunk slowReader = new ByteChunk();
-        slowReader.setLimit(1); // FIXME BUFFER IS BROKEN, 0 doesn't work
-        slowReader.setByteOutputChannel(new ByteOutputChannel() {
-            long counter = 0;
-            long delta = 0;
+        SocketFactory factory = SocketFactory.getDefault();
+        Socket s = factory.createSocket("localhost", getPort());
 
-            @Override
-            public void realWriteBytes(byte[] cbuf, int off, int len) throws IOException {
-                try {
-                    if (len == 0)
-                        return;
-                    counter += len;
-                    delta += len;
-                    if (counter > bytesToDownload) {
-                        System.out.println("ERROR Downloaded more than expected ERROR");
-                    } else if (counter == bytesToDownload) {
-                        System.out.println("Download complete(" + bytesToDownload + " bytes)");
-                        // } else if (counter > (1966086)) {
-                        // System.out.println("Download almost complete, missing bytes ("+counter+")");
-                    } else if (delta > (bytesToDownload / 16)) {
-                        System.out.println("Read " + counter + " bytes.");
-                        delta = 0;
-                        Thread.sleep(500);
-                    }
-                } catch (Exception x) {
-                    throw new IOException(x);
-                }
+        ByteChunk result = new ByteChunk();
+        OutputStream os = s.getOutputStream();
+        os.write(("GET / HTTP/1.1\r\n" +
+                "Host: localhost:" + getPort() + "\r\n" +
+                "Connection: close\r\n" +
+                "\r\n").getBytes(B2CConverter.ISO_8859_1));
+        os.flush();
+
+        InputStream is = s.getInputStream();
+        byte[] buffer = new byte[8192];
+
+        int read = 0;
+        int readSinceLastPause = 0;
+        while (read != -1) {
+            read = is.read(buffer);
+            if (read > 0) {
+                result.append(buffer, 0, read);
             }
-        });
-        int rc = postUrl(true, new DataWriter(0), "http://localhost:" + getPort() + "/", slowReader, resHeaders,
-                null);
-        slowReader.flushBuffer();
-        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+            readSinceLastPause += read;
+            if (readSinceLastPause > WRITE_SIZE / 16) {
+                readSinceLastPause = 0;
+                Thread.sleep(500);
+            }
+        }
+
+        os.close();
+        is.close();
+        s.close();
+
+        // Validate the result.
+        // Response line
+        String resultString = result.toString();
+        System.out.println("Read " + resultString.length() + " bytes");
+        int lineStart = 0;
+        int lineEnd = resultString.indexOf('\n', 0);
+        String line = resultString.substring(lineStart, lineEnd + 1);
+        Assert.assertEquals("HTTP/1.1 200 OK\r\n", line);
+
+        // Check headers - looking to see if response is chunked (it should be)
+        boolean chunked = false;
+        while (line.length() > 2) {
+            lineStart = lineEnd + 1;
+            lineEnd = resultString.indexOf('\n', lineStart);
+            line = resultString.substring(lineStart, lineEnd + 1);
+            if (line.startsWith("Transfer-Encoding:")) {
+                Assert.assertEquals("Transfer-Encoding: chunked\r\n", line);
+                chunked = true;
+            }
+        }
+        Assert.assertTrue(chunked);
+
+        // Now check body size
+        int totalBodyRead = 0;
+        int chunkSize = -1;
+
+        while (chunkSize != 0) {
+            // Chunk size in hex
+            lineStart = lineEnd + 1;
+            lineEnd = resultString.indexOf('\n', lineStart);
+            line = resultString.substring(lineStart, lineEnd + 1);
+            Assert.assertTrue(line.endsWith("\r\n"));
+            line = line.substring(0, line.length() - 2);
+            System.out.println("[" + line + "]");
+            chunkSize = Integer.parseInt(line, 16);
+
+            // Read the chunk
+            lineStart = lineEnd + 1;
+            lineEnd = resultString.indexOf('\n', lineStart);
+            System.out.println("Start : "  + lineStart + ", End: " + lineEnd);
+            line = resultString.substring(lineStart, lineEnd + 1);
+            if (line.length() > 40) {
+                System.out.println(line.substring(0, 32));
+            } else {
+                System.out.println(line);
+                }
+            Assert.assertTrue(line.endsWith("\r\n"));
+            if (chunkSize + 2 != line.length()) {
+                System.out.println("Chunk wrong length. Was " + line.length() +
+                        " Expected " + (chunkSize + 2));
+                // look for failed position
+                int pos = 0;
+                String seq = "0123456789ABCDEF";
+                // Assume starts with 0
+                while (line.subSequence(pos, pos + seq.length()).equals(seq)) {
+                    pos += seq.length();
+                }
+                System.out.println("Failed at position " + pos + " " +
+                        line.substring(pos, pos + seq.length()));
+            }
+            Assert.assertEquals(chunkSize + 2, line.length());
+
+            totalBodyRead += chunkSize;
+        }
+
+        Assert.assertEquals(WRITE_SIZE, totalBodyRead);
     }
 
 
@@ -162,13 +239,13 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                         return;
                     counter += len;
                     delta += len;
-                    if (counter > bytesToDownload) {
+                    if (counter > WRITE_SIZE) {
                         System.out.println("ERROR Downloaded more than expected ERROR");
-                    } else if (counter == bytesToDownload) {
-                        System.out.println("Download complete(" + bytesToDownload + " bytes)");
+                    } else if (counter == WRITE_SIZE) {
+                        System.out.println("Download complete(" + WRITE_SIZE + " bytes)");
                         // } else if (counter > (1966086)) {
                         // System.out.println("Download almost complete, missing bytes ("+counter+")");
-                    } else if (delta > (bytesToDownload / 16)) {
+                    } else if (delta > (WRITE_SIZE / 16)) {
                         System.out.println("Read " + counter + " bytes.");
                         delta = 0;
                         Thread.sleep(500);
@@ -386,9 +463,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     }
 
     private class TestWriteListener implements WriteListener {
-        long chunk = 1024 * 1024;
         AsyncContext ctx;
-        long bytesToDownload = TestNonBlockingAPI.bytesToDownload;
+        long bytesToDownload = TestNonBlockingAPI.WRITE_SIZE;
         public volatile boolean onErrorInvoked = false;
 
         public TestWriteListener(AsyncContext ctx) {
@@ -403,10 +479,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 long end = System.currentTimeMillis();
                 long before = left;
                 while (left > 0 && ctx.getResponse().getOutputStream().isReady()) {
-                    byte[] b = new byte[(int) Math.min(chunk, bytesToDownload)];
-                    Arrays.fill(b, (byte) 'X');
-                    ctx.getResponse().getOutputStream().write(b);
-                    bytesToDownload -= b.length;
+                    ctx.getResponse().getOutputStream().write(CHUNK);
+                    bytesToDownload -= CHUNK.length;
                     left = Math.max(bytesToDownload, 0);
                 }
                 System.out.println("Write took:" + (end - start) + " ms. Bytes before=" + before + " after=" + left);
