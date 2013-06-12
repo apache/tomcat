@@ -59,7 +59,7 @@ public class TestMapperContextRoot extends TomcatBaseTest{
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            // Confirm behaviour as per Servler 12.2
+            // Confirm behaviour as per Servlet 12.2
             boolean pass = "/".equals(req.getPathInfo());
             if (pass) {
                 pass = "".equals(req.getServletPath());

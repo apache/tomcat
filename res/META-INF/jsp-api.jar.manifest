@@ -4,8 +4,8 @@ X-Compile-Target-JDK: @target.jdk@
 
 Name: javax/servlet/jsp/
 Specification-Title: Java API for JavaServer Pages
-Specification-Version: 2.2
+Specification-Version: 2.3
 Specification-Vendor: Sun Microsystems, Inc.
 Implementation-Title: javax.servlet.jsp
-Implementation-Version: 2.2.@jsp.revision@
+Implementation-Version: 2.3.@jsp.revision@
 Implementation-Vendor: Apache Software Foundation

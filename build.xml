@@ -657,7 +657,7 @@
       filesId="files.annotations-api"
       manifest="${tomcat.manifests}/annotations-api.jar.manifest" />
 
-    <!-- Servlet 3.0 Implementation JAR File -->
+    <!-- Servlet 3.1 Implementation JAR File -->
     <jarIt jarfile="${servlet-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.servlet-api"
@@ -665,7 +665,7 @@
       notice="${tomcat.manifests}/servlet-api.jar.notice"
       license="${tomcat.manifests}/servlet-api.jar.license" />
 
-    <!-- JSP 2.2 Implementation JAR File -->
+    <!-- JSP 2.3 Implementation JAR File -->
     <jarIt jarfile="${jsp-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.jsp-api"
@@ -673,7 +673,7 @@
       notice="${tomcat.manifests}/jsp-api.jar.notice"
       license="${tomcat.manifests}/jsp-api.jar.license" />
 
-    <!-- JSP 2.2 EL Implementation JAR File -->
+    <!-- EL 3.0 Implementation JAR File -->
     <jarIt jarfile="${el-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.el-api"
@@ -1689,9 +1689,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/jspapi"
       version="true"
-      windowtitle="JSP 2.2 API Documentation - Apache Tomcat ${version}"
-      doctitle="JSP 2.2 API - Apache Tomcat ${version}"
-      header="&lt;b&gt;JSP 2.2 - Apache Tomcat ${version}&lt;/b&gt;"
+      windowtitle="JSP 2.3 API Documentation - Apache Tomcat ${version}"
+      doctitle="JSP 2.3 API - Apache Tomcat ${version}"
+      header="&lt;b&gt;JSP 2.3 - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
       additionalparam="-breakiterator"
@@ -1706,9 +1706,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/elapi"
       version="true"
-      windowtitle="EL 2.2 API Documentation - Apache Tomcat ${version}"
-      doctitle="EL 2.2 API - Apache Tomcat ${version}"
-      header="&lt;b&gt;EL 2.2 - Apache Tomcat ${version}&lt;/b&gt;"
+      windowtitle="EL 3.0 API Documentation - Apache Tomcat ${version}"
+      doctitle="EL 3.0 API - Apache Tomcat ${version}"
+      header="&lt;b&gt;EL 3.0 - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
       additionalparam="-breakiterator"
@@ -2297,7 +2297,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       notice="${tomcat.manifests}/servlet-api.jar.notice"
       license="${tomcat.manifests}/servlet-api.jar.license" />
 
-    <!-- JSP 2.2 Implementation JAR File -->
+    <!-- JSP 2.3 Implementation JAR File -->
     <jarIt jarfile="${jsp-api-src.jar}"
       filesDir="java"
       filesId="files.jsp-api"
@@ -2305,7 +2305,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       notice="${tomcat.manifests}/jsp-api.jar.notice"
       license="${tomcat.manifests}/jsp-api.jar.license" />
 
-    <!-- JSP 2.2 EL Implementation JAR File -->
+    <!-- JSP EL 3.0 Implementation JAR File -->
     <jarIt jarfile="${el-api-src.jar}"
       filesDir="java"
       filesId="files.el-api"

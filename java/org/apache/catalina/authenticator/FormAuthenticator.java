@@ -44,7 +44,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
 
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of FORM BASED
- * Authentication, as described in the Servlet API Specification, Version 2.2.
+ * Authentication, as described in the Servlet API Specification.
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
