@@ -85,6 +85,8 @@ public abstract class ServletInputStream extends InputStream {
     /**
      * Returns <code>true</code> if all the data has been read from the stream,
      * else <code>false</code>.
+     *
+     * @since Servlet 3.1
      */
     public abstract boolean isFinished();
 
@@ -93,6 +95,8 @@ public abstract class ServletInputStream extends InputStream {
      * <code>false</code>. If this method is called and returns false, the
      * container will invoke {@link ReadListener#onDataAvailable()} when data is
      * available.
+     *
+     * @since Servlet 3.1
      */
     public abstract boolean isReady();
 
@@ -108,6 +112,8 @@ public abstract class ServletInputStream extends InputStream {
      *                                  if the {@link ReadListener} has already
      *                                  been set
      * @throws NullPointerException     If listener is null
+     *
+     * @since Servlet 3.1
      */
     public abstract void setReadListener(ReadListener listener);
 }
