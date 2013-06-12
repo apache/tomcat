@@ -4836,7 +4836,7 @@ public class StandardContext extends ContainerBase
                 ApplicationListener listener = listeners[i];
                 results[i] = instanceManager.newInstance(
                         listener.getClassName());
-                if (listener.isAllowedPluggability()) {
+                if (listener.isPluggabilityBlocked()) {
                     tldListeners.add(results[i]);
                 }
             } catch (Throwable t) {
