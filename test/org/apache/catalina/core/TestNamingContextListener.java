@@ -27,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -61,7 +62,8 @@ public class TestNamingContextListener extends TomcatBaseTest {
         environment.setValue(BUG49132_VALUE);
         ctx.getNamingResources().addEnvironment(environment);
 
-        ctx.addApplicationListener(Bug49132Listener.class.getName());
+        ctx.addApplicationListener(new ApplicationListener(
+                Bug49132Listener.class.getName(), false));
 
         tomcat.start();
 
@@ -115,7 +117,8 @@ public class TestNamingContextListener extends TomcatBaseTest {
         environmentB.setValue(BUG54096_ValueB);
         ctx.getNamingResources().addEnvironment(environmentB);
 
-        ctx.addApplicationListener(Bug54096Listener.class.getName());
+        ctx.addApplicationListener(new ApplicationListener(
+                Bug54096Listener.class.getName(), false));
 
         tomcat.start();
 

@@ -39,6 +39,7 @@ import org.junit.Test;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 
+import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -101,7 +102,8 @@ public class TestDefaultServlet extends TomcatBaseTest {
         // app dir is relative to server home
         org.apache.catalina.Context ctx =
             tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
-        ctx.addApplicationListener(WsListener.class.getName());
+        ctx.addApplicationListener(new ApplicationListener(
+                WsListener.class.getName(), false));
 
         // Override the default servlet with our own mappings
         Tomcat.addServlet(ctx, "default2", new DefaultServlet());

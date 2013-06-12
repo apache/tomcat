@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.coyote.ProtocolHandler;
@@ -74,7 +75,8 @@ public class TestCustomSsl extends TomcatBaseTest {
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         Context ctxt  = tomcat.addWebapp(
                 null, "/examples", appDir.getAbsolutePath());
-        ctxt.addApplicationListener(WsListener.class.getName());
+        ctxt.addApplicationListener(new ApplicationListener(
+                WsListener.class.getName(), false));
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +

@@ -46,6 +46,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -785,5 +786,24 @@ public class TestStandardContext extends TomcatBaseTest {
         StandardContext standardContext = new StandardContext();
         standardContext.addPreDestroyMethod("a", "a");
         standardContext.addPreDestroyMethod("a", "b");
+    }
+
+    @Test
+    public void testTldListener() throws Exception {
+        // Set up a container
+        Tomcat tomcat = getTomcatInstance();
+
+        File docBase = new File("test/webapp-3.0");
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        // Start the context
+        tomcat.start();
+
+        // Stop the context
+        ctx.stop();
+
+        String log = TesterTldListener.getLog();
+        Assert.assertTrue(log, log.contains("PASS"));
+        Assert.assertFalse(log, log.contains("FAIL"));
     }
 }

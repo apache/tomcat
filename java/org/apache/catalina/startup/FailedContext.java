@@ -48,6 +48,7 @@ import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.deploy.FilterDef;
@@ -471,9 +472,9 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public boolean getLogEffectiveWebXml() { return false; }
 
     @Override
-    public void addApplicationListener(String listener) { /* NO-OP */ }
+    public void addApplicationListener(ApplicationListener listener) { /* NO-OP */ }
     @Override
-    public String[] findApplicationListeners() { return null; }
+    public ApplicationListener[] findApplicationListeners() { return null; }
     @Override
     public void removeApplicationListener(String listener) { /* NO-OP */ }
 
