@@ -897,13 +897,6 @@ public class ApplicationContext
                             getContextPath()));
         }
 
-        // TODO SERVLET3
-        // throw UnsupportedOperationException - if this context was passed to the
-        // {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
-        // method of a {@link ServletContextListener} that was not declared
-        // in web.xml, a web-fragment or annotated with
-        // {@link javax.servlet.annotation.WebListener}.
-
         FilterDef filterDef = context.findFilterDef(filterName);
 
         // Assume a 'complete' FilterRegistration is one that has a class and
@@ -1040,13 +1033,6 @@ public class ApplicationContext
                     sm.getString("applicationContext.addServlet.ise",
                             getContextPath()));
         }
-
-        // TODO SERVLET3
-        // throw UnsupportedOperationException - if this context was passed to the
-        // {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
-        // method of a {@link ServletContextListener} that was not declared
-        // in web.xml, a web-fragment or annotated with
-        // {@link javax.servlet.annotation.WebListener}.
 
         Wrapper wrapper = (Wrapper) context.findChild(servletName);
 
@@ -1271,13 +1257,6 @@ public class ApplicationContext
                     sm.getString("applicationContext.addListener.ise",
                             getContextPath()));
         }
-
-        // TODO SERVLET3
-        // throw UnsupportedOperationException - if this context was passed to the
-        // {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
-        // method of a {@link ServletContextListener} that was not declared
-        // in web.xml, a web-fragment or annotated with
-        // {@link javax.servlet.annotation.WebListener}.
 
         boolean match = false;
         if (t instanceof ServletContextAttributeListener ||
