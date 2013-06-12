@@ -23,11 +23,12 @@ package org.apache.catalina.deploy;
 public class ApplicationListener {
 
     private final String className;
-    private final boolean fromTLD;
+    private final boolean allowedPluggability;
 
-    public ApplicationListener(String className, boolean fromTLD) {
+    public ApplicationListener(String className,
+            boolean allowedPluggability) {
         this.className = className;
-        this.fromTLD = fromTLD;
+        this.allowedPluggability = allowedPluggability;
     }
 
 
@@ -36,7 +37,7 @@ public class ApplicationListener {
     }
 
 
-    public boolean isFromTLD() {
-        return fromTLD;
+    public boolean isAllowedPluggability() {
+        return allowedPluggability;
     }
 }
