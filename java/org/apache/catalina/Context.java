@@ -725,6 +725,18 @@ public interface Context extends Container {
 
 
     /**
+     * Add a new Listener class name to the set of Listeners
+     * configured for this application.
+     *
+     * @param listener Java class name of a listener class
+     * 
+     * @deprecated Use {@link #addApplicationListener(ApplicationListener)}
+     */
+    @Deprecated
+    public void addApplicationListener(String listener);
+
+
+    /**
      * Add a new application parameter for this application.
      *
      * @param parameter The new application parameter
@@ -898,8 +910,12 @@ public interface Context extends Container {
     /**
      * Return the set of application listener class names configured
      * for this application.
+     * 
+     * @deprecated  The return type of this method will be changing to
+     *              {@link ApplicationListener}[] in Tomcat 8 
      */
-    public ApplicationListener[] findApplicationListeners();
+    @Deprecated
+    public String[] findApplicationListeners();
 
 
     /**
