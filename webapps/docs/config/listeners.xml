@@ -348,7 +348,7 @@
     and a username to a directory (commonly named public_html) in that user's
     home directory on the server.</p>
 
-    <p>See the <a href="host.html#User Web Applications">User Web Applications</a>
+    <p>See the <a href="host.html#User_Web_Applications">User Web Applications</a>
     special feature on the <strong>Host</strong> element for more information.</p>
 
     <p>The following additional attributes are supported by the
