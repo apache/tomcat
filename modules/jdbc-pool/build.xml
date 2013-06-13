@@ -71,6 +71,7 @@
     <pathelement location="${c3p0.jar}"/>
     <pathelement location="${mysql.jar}"/>
     <pathelement location="${junit.jar}"/>
+    <pathelement location="${hamcrest.jar}"/>
     <pathelement location="${tomcat.dbcp.jar}"/>
     <pathelement location="${derby.jar}"/>
     <pathelement location="${h2.jar}"/>
@@ -397,10 +398,15 @@
       <param name="destfile" value="${h2.jar}"/>
       <param name="destdir" value="${base.path}"/>
     </antcall>
-    <antcall target="downloadzip">
+    <antcall target="downloadfile">
       <param name="sourcefile" value="${junit.loc}"/>
       <param name="destfile" value="${junit.jar}"/>
-      <param name="destdir" value="${base.path}"/>
+      <param name="destdir" value="${junit.home}"/>
+    </antcall>
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${hamcrest.loc}"/>
+      <param name="destfile" value="${hamcrest.jar}"/>
+      <param name="destdir" value="${hamcrest.home}"/>
     </antcall>
 
   </target>
@@ -419,10 +425,15 @@
       <param name="destfile" value="${h2.jar}"/>
       <param name="destdir" value="${base.path}"/>
     </antcall>
-    <antcall target="downloadzip">
+    <antcall target="downloadfile">
       <param name="sourcefile" value="${junit.loc}"/>
       <param name="destfile" value="${junit.jar}"/>
-      <param name="destdir" value="${base.path}"/>
+      <param name="destdir" value="${junit.home}"/>
+    </antcall>
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${hamcrest.loc}"/>
+      <param name="destfile" value="${hamcrest.jar}"/>
+      <param name="destdir" value="${hamcrest.home}"/>
     </antcall>
   </target>
 
