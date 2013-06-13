@@ -137,6 +137,8 @@ loaders as it is initialized:</p>
         container portion of Tomcat.</li>
     <li><em>catalina-ant.jar</em> &#8212; Tomcat Catalina Ant tasks.</li>
     <li><em>catalina-ha.jar</em> &#8212; High availability package.</li>
+    <li><em>catalina-storeconfig.jar</em> &#8212; Generation of XML
+        configuration files from current state</li>
     <li><em>catalina-tribes.jar</em> &#8212; Group communication package.</li>
     <li><em>ecj-*.jar</em> &#8212; Eclipse JDT Java compiler.</li>
     <li><em>el-api.jar</em> &#8212; EL 3.0 API.</li>
@@ -156,8 +158,11 @@ loaders as it is initialized:</p>
     <li><em>tomcat-jdbc.jar</em> &#8212; An alternative database connection pool
         implementation, known as Tomcat JDBC pool. See
         <a href="jdbc-pool.html">documentation</a> for more details.</li>
+    <li><em>tomcat-spdy.jar</em> &#8212; SPDY implementation</li>
     <li><em>tomcat-util.jar</em> &#8212; Common classes used by various components of
         Apache Tomcat.</li>
+    <li><em>tomcat-websocket.jar</em> &#8212; WebSocket 1.0 implementation</li>
+    <li><em>websocketapi.jar</em> &#8212; WebSocket 1.0 API</li>
     </ul></li>
 <li><p><strong>WebappX</strong> &#8212; A class loader is created for each web
     application that is deployed in a single Tomcat instance.  All unpacked
