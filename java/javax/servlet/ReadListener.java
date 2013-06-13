@@ -37,7 +37,7 @@ public interface ReadListener extends java.util.EventListener{
     public abstract void onDataAvailable() throws IOException;
 
     /**
-     * Invoked when the request bdy has been fully read.
+     * Invoked when the request body has been fully read.
      *
      * @throws IOException
      */
