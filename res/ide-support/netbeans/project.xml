@@ -189,7 +189,7 @@
             <compilation-unit>
                 <package-root>test</package-root>
                 <unit-tests/>
-                <classpath mode="compile">output/classes:output/testclasses:${base.path}/junit4.8.2/junit-4.8.2.jar</classpath>
+                <classpath mode="compile">output/classes:output/testclasses:${base.path}/junit4.11/junit-4.11.jar</classpath>
                 <source-level>1.7</source-level>
             </compilation-unit>
         </java-data>
