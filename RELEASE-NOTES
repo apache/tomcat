@@ -103,6 +103,7 @@ for use by web applications (by placing them in "lib"):
 * catalina.jar (Tomcat Catalina implementation)
 * catalina-ant.jar (Tomcat Catalina Ant tasks)
 * catalina-ha.jar (High availability package)
+* catalina-storeconfig.jar (Generation of XML configuration from current state)
 * catalina-tribes.jar (Group communication)
 * ecj-@JDT_VERSION@.jar (Eclipse JDT Java compiler)
 * el-api.jar (EL 3.0 API)
@@ -113,6 +114,12 @@ for use by web applications (by placing them in "lib"):
 * tomcat-api.jar (Interfaces shared by Catalina and Jasper)
 * tomcat-coyote.jar (Tomcat connectors and utility classes)
 * tomcat-dbcp.jar (package renamed database connection pool based on Commons DBCP)
+* tomcat-jdbc.jar (Tomcat's database connection pooling solution)
+* tomcat-jni.jar (Interface to the native component of the APR/native connector)
+* tomcat-spdy.jar (SPDY implementation)
+* tomcat-util.jar (Various utilities)
+* tomcat-websocket.jar (WebSocket 1.0 implementation)
+* webspcketapi.jar (WebSocket 1.0 API)
 
 You can make additional APIs available to all of your web applications by
 putting unpacked classes into a "classes" directory (not created by default),
