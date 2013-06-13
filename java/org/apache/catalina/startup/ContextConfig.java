@@ -38,14 +38,19 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
+import javax.servlet.SessionCookieConfig;
 import javax.servlet.annotation.HandlesTypes;
+import javax.servlet.descriptor.JspPropertyGroupDescriptor;
+import javax.servlet.descriptor.TaglibDescriptor;
 
 import org.apache.catalina.Authenticator;
 import org.apache.catalina.Container;
@@ -63,14 +68,28 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.core.ApplicationJspPropertyGroupDescriptor;
+import org.apache.catalina.core.ApplicationTaglibDescriptor;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
+import org.apache.catalina.deploy.ApplicationListener;
+import org.apache.catalina.deploy.ContextEjb;
+import org.apache.catalina.deploy.ContextEnvironment;
+import org.apache.catalina.deploy.ContextLocalEjb;
+import org.apache.catalina.deploy.ContextResource;
+import org.apache.catalina.deploy.ContextResourceEnvRef;
+import org.apache.catalina.deploy.ContextService;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
+import org.apache.catalina.deploy.JspPropertyGroup;
 import org.apache.catalina.deploy.LoginConfig;
+import org.apache.catalina.deploy.MessageDestinationRef;
+import org.apache.catalina.deploy.MultipartDef;
 import org.apache.catalina.deploy.SecurityConstraint;
+import org.apache.catalina.deploy.SecurityRoleRef;
 import org.apache.catalina.deploy.ServletDef;
+import org.apache.catalina.deploy.SessionConfig;
 import org.apache.catalina.deploy.WebXml;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.Introspection;
@@ -1208,12 +1227,12 @@ public class ContextConfig implements LifecycleListener {
 
             // Step 9. Apply merged web.xml to Context
             if (ok) {
-                webXml.configureContext(context);
+                configureContext(webXml);
             }
         } else {
             webXml.merge(defaults);
             convertJsps(webXml);
-            webXml.configureContext(context);
+            configureContext(webXml);
         }
 
         // Step 9a. Make the merged web.xml available to other
@@ -1265,6 +1284,225 @@ public class ContextConfig implements LifecycleListener {
             }
         }
     }
+
+
+    private void configureContext(WebXml webxml) {
+        // As far as possible, process in alphabetical order so it is easy to
+        // check everything is present
+        // Some validation depends on correct public ID
+        context.setPublicId(webxml.getPublicId());
+
+        // Everything else in order
+        context.setEffectiveMajorVersion(webxml.getMajorVersion());
+        context.setEffectiveMinorVersion(webxml.getMinorVersion());
+
+        for (Entry<String, String> entry : webxml.getContextParams().entrySet()) {
+            context.addParameter(entry.getKey(), entry.getValue());
+        }
+        context.setDisplayName(webxml.getDisplayName());
+        context.setDistributable(webxml.isDistributable());
+        for (ContextLocalEjb ejbLocalRef : webxml.getEjbLocalRefs().values()) {
+            context.getNamingResources().addLocalEjb(ejbLocalRef);
+        }
+        for (ContextEjb ejbRef : webxml.getEjbRefs().values()) {
+            context.getNamingResources().addEjb(ejbRef);
+        }
+        for (ContextEnvironment environment : webxml.getEnvEntries().values()) {
+            context.getNamingResources().addEnvironment(environment);
+        }
+        for (ErrorPage errorPage : webxml.getErrorPages().values()) {
+            context.addErrorPage(errorPage);
+        }
+        for (FilterDef filter : webxml.getFilters().values()) {
+            if (filter.getAsyncSupported() == null) {
+                filter.setAsyncSupported("false");
+            }
+            context.addFilterDef(filter);
+        }
+        for (FilterMap filterMap : webxml.getFilterMappings()) {
+            context.addFilterMap(filterMap);
+        }
+        for (JspPropertyGroup jspPropertyGroup :
+                webxml.getJspPropertyGroups()) {
+            JspPropertyGroupDescriptor descriptor =
+                new ApplicationJspPropertyGroupDescriptor(jspPropertyGroup);
+            context.getJspConfigDescriptor().getJspPropertyGroups().add(
+                    descriptor);
+        }
+        for (String listener : webxml.getListeners()) {
+            context.addApplicationListener(
+                    new ApplicationListener(listener, false));
+        }
+        for (Entry<String, String> entry :
+                webxml.getLocaleEncodingMappings().entrySet()) {
+            context.addLocaleEncodingMappingParameter(entry.getKey(),
+                    entry.getValue());
+        }
+        // Prevents IAE
+        if (webxml.getLoginConfig() != null) {
+            context.setLoginConfig(webxml.getLoginConfig());
+        }
+        for (MessageDestinationRef mdr :
+                webxml.getMessageDestinationRefs().values()) {
+            context.getNamingResources().addMessageDestinationRef(mdr);
+        }
+
+        // messageDestinations were ignored in Tomcat 6, so ignore here
+
+        context.setIgnoreAnnotations(webxml.isMetadataComplete());
+        for (Entry<String, String> entry :
+                webxml.getMimeMappings().entrySet()) {
+            context.addMimeMapping(entry.getKey(), entry.getValue());
+        }
+        // Name is just used for ordering
+        for (ContextResourceEnvRef resource :
+                webxml.getResourceEnvRefs().values()) {
+            context.getNamingResources().addResourceEnvRef(resource);
+        }
+        for (ContextResource resource : webxml.getResourceRefs().values()) {
+            context.getNamingResources().addResource(resource);
+        }
+        for (SecurityConstraint constraint : webxml.getSecurityConstraints()) {
+            context.addConstraint(constraint);
+        }
+        for (String role : webxml.getSecurityRoles()) {
+            context.addSecurityRole(role);
+        }
+        for (ContextService service : webxml.getServiceRefs().values()) {
+            context.getNamingResources().addService(service);
+        }
+        for (ServletDef servlet : webxml.getServlets().values()) {
+            Wrapper wrapper = context.createWrapper();
+            // Description is ignored
+            // Display name is ignored
+            // Icons are ignored
+
+            // jsp-file gets passed to the JSP Servlet as an init-param
+
+            if (servlet.getLoadOnStartup() != null) {
+                wrapper.setLoadOnStartup(servlet.getLoadOnStartup().intValue());
+            }
+            if (servlet.getEnabled() != null) {
+                wrapper.setEnabled(servlet.getEnabled().booleanValue());
+            }
+            wrapper.setName(servlet.getServletName());
+            Map<String,String> params = servlet.getParameterMap();
+            for (Entry<String, String> entry : params.entrySet()) {
+                wrapper.addInitParameter(entry.getKey(), entry.getValue());
+            }
+            wrapper.setRunAs(servlet.getRunAs());
+            Set<SecurityRoleRef> roleRefs = servlet.getSecurityRoleRefs();
+            for (SecurityRoleRef roleRef : roleRefs) {
+                wrapper.addSecurityReference(
+                        roleRef.getName(), roleRef.getLink());
+            }
+            wrapper.setServletClass(servlet.getServletClass());
+            MultipartDef multipartdef = servlet.getMultipartDef();
+            if (multipartdef != null) {
+                if (multipartdef.getMaxFileSize() != null &&
+                        multipartdef.getMaxRequestSize()!= null &&
+                        multipartdef.getFileSizeThreshold() != null) {
+                    wrapper.setMultipartConfigElement(new MultipartConfigElement(
+                            multipartdef.getLocation(),
+                            Long.parseLong(multipartdef.getMaxFileSize()),
+                            Long.parseLong(multipartdef.getMaxRequestSize()),
+                            Integer.parseInt(
+                                    multipartdef.getFileSizeThreshold())));
+                } else {
+                    wrapper.setMultipartConfigElement(new MultipartConfigElement(
+                            multipartdef.getLocation()));
+                }
+            }
+            if (servlet.getAsyncSupported() != null) {
+                wrapper.setAsyncSupported(
+                        servlet.getAsyncSupported().booleanValue());
+            }
+            wrapper.setOverridable(servlet.isOverridable());
+            context.addChild(wrapper);
+        }
+        for (Entry<String, String> entry :
+                webxml.getServletMappings().entrySet()) {
+            context.addServletMapping(entry.getKey(), entry.getValue());
+        }
+        SessionConfig sessionConfig = webxml.getSessionConfig();
+        if (sessionConfig != null) {
+            if (sessionConfig.getSessionTimeout() != null) {
+                context.setSessionTimeout(
+                        sessionConfig.getSessionTimeout().intValue());
+            }
+            SessionCookieConfig scc =
+                context.getServletContext().getSessionCookieConfig();
+            scc.setName(sessionConfig.getCookieName());
+            scc.setDomain(sessionConfig.getCookieDomain());
+            scc.setPath(sessionConfig.getCookiePath());
+            scc.setComment(sessionConfig.getCookieComment());
+            if (sessionConfig.getCookieHttpOnly() != null) {
+                scc.setHttpOnly(sessionConfig.getCookieHttpOnly().booleanValue());
+            }
+            if (sessionConfig.getCookieSecure() != null) {
+                scc.setSecure(sessionConfig.getCookieSecure().booleanValue());
+            }
+            if (sessionConfig.getCookieMaxAge() != null) {
+                scc.setMaxAge(sessionConfig.getCookieMaxAge().intValue());
+            }
+            if (sessionConfig.getSessionTrackingModes().size() > 0) {
+                context.getServletContext().setSessionTrackingModes(
+                        sessionConfig.getSessionTrackingModes());
+            }
+        }
+        for (Entry<String, String> entry : webxml.getTaglibs().entrySet()) {
+            TaglibDescriptor descriptor = new ApplicationTaglibDescriptor(
+                    entry.getValue(), entry.getKey());
+            context.getJspConfigDescriptor().getTaglibs().add(descriptor);
+        }
+
+        // Context doesn't use version directly
+
+        for (String welcomeFile : webxml.getWelcomeFiles()) {
+            /*
+             * The following will result in a welcome file of "" so don't add
+             * that to the context
+             * <welcome-file-list>
+             *   <welcome-file/>
+             * </welcome-file-list>
+             */
+            if (welcomeFile != null && welcomeFile.length() > 0) {
+                context.addWelcomeFile(welcomeFile);
+            }
+        }
+
+        // Do this last as it depends on servlets
+        for (JspPropertyGroup jspPropertyGroup :
+                webxml.getJspPropertyGroups()) {
+            String jspServletName = context.findServletMapping("*.jsp");
+            if (jspServletName == null) {
+                jspServletName = "jsp";
+            }
+            if (context.findChild(jspServletName) != null) {
+                for (String urlPattern : jspPropertyGroup.getUrlPatterns()) {
+                    context.addServletMapping(urlPattern, jspServletName, true);
+                }
+            } else {
+                if(log.isDebugEnabled()) {
+                    for (String urlPattern : jspPropertyGroup.getUrlPatterns()) {
+                        log.debug("Skiping " + urlPattern + " , no servlet " +
+                                jspServletName);
+                    }
+                }
+            }
+        }
+
+        for (Entry<String, String> entry :
+                webxml.getPostConstructMethods().entrySet()) {
+            context.addPostConstructMethod(entry.getKey(), entry.getValue());
+        }
+
+        for (Entry<String, String> entry :
+            webxml.getPreDestroyMethods().entrySet()) {
+            context.addPreDestroyMethod(entry.getKey(), entry.getValue());
+        }
+    }
+
 
     private WebXml getDefaultWebXmlFragment() {
 
