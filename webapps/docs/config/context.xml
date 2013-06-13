@@ -236,9 +236,9 @@
 
   <p>In addition to explicitly specified Context elements, there are
   several techniques by which Context elements can be created automatically
-  for you.  See <a href="host.html#Automatic Application Deployment">
+  for you.  See <a href="host.html#Automatic_Application_Deployment">
   Automatic Application Deployment</a> and
-  <a href="host.html#User Web Applications">User Web Applications</a>
+  <a href="host.html#User_Web_Applications">User Web Applications</a>
   for more information.</p>
 
   <p>To define multiple contexts that use a single WAR file or directory,
