@@ -182,11 +182,17 @@ commons-daemon.native.src.loc.2=${base-commons.loc.2}/daemon/source/commons-daem
 commons-daemon.native.win.loc.1=${base-commons.loc.1}/daemon/binaries/windows/commons-daemon-${commons-daemon.version}-bin-windows.zip
 commons-daemon.native.win.loc.2=${base-commons.loc.2}/daemon/binaries/windows/commons-daemon-${commons-daemon.version}-bin-windows.zip
 
-# ----- JUnit Unit Test Suite, version 4.8 or later -----
-junit.version=4.9
-junit.home=${base.path}/junit${junit.version}
+# ----- JUnit Unit Test Suite, version 4.11 or later -----
+junit.version=4.11
+junit.home=${base.path}/junit-${junit.version}
 junit.jar=${junit.home}/junit-${junit.version}.jar
 junit.loc=${base-maven.loc}/junit/junit/${junit.version}/junit-${junit.version}.jar
+
+# ----- Hamcrest Library, used by JUnit, version 1.3 or later ----
+hamcrest.version=1.3
+hamcrest.home=${base.path}/hamcrest-${hamcrest.version}
+hamcrest.jar=${hamcrest.home}/hamcrest-core-${hamcrest.version}.jar
+hamcrest.loc=${base-maven.loc}/org/hamcrest/hamcrest-core/${hamcrest.version}/hamcrest-core-${hamcrest.version}.jar
 
 # ----- Checkstyle, version 5.1 or later -----
 checkstyle.version=5.6
