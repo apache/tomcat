@@ -280,6 +280,8 @@ public abstract class ServletOutputStream extends OutputStream {
      * until the contain calls {@link WriteListener#onWritePossible()}.
      *
      * @return <code>true</code> if data can be written, else <code>false</code>
+     *
+     * @since Servlet 3.1
      */
     public abstract boolean isReady();
 
@@ -295,6 +297,8 @@ public abstract class ServletOutputStream extends OutputStream {
      *                                  if the {@link WriteListener} has already
      *                                  been set
      * @throws NullPointerException     If listener is null
+     *
+     * @since Servlet 3.1
      */
     public abstract void setWriteListener(javax.servlet.WriteListener listener);
 }
