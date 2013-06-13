@@ -273,10 +273,13 @@ public abstract class ServletOutputStream extends OutputStream {
     }
 
     /**
-     * If this returns false, it will cause a callback to
-     * {@link WriteListener#onWritePossible()} when the buffer has emptied
-     * TODO SERVLET 3.1
-     * @return  TODO
+     * Checks if a non-blocking write will succeed. If this returns
+     * <code>false</code>, it will cause a callback to
+     * {@link WriteListener#onWritePossible()} when the buffer has emptied. If
+     * this method returns <code>false</code> no further data must be written
+     * until the contain calls {@link WriteListener#onWritePossible()}.
+     *
+     * @return <code>true</code> if data can be written, else <code>false</code>
      */
     public abstract boolean isReady();
 
