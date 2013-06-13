@@ -37,8 +37,6 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.pojo.Util.ServerConfigListener;
 import org.apache.tomcat.websocket.pojo.Util.SingletonConfigurator;
-import org.apache.tomcat.websocket.server.WsListener;
-
 
 public class TestPojoEndpointBase extends TomcatBaseTest {
 
@@ -54,7 +52,7 @@ public class TestPojoEndpointBase extends TomcatBaseTest {
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.addApplicationListener(new ApplicationListener(
-                WsListener.class.getName(), false));
+                ServerConfigListener.class.getName(), false));
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 
