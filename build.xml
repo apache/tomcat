@@ -189,6 +189,7 @@
     <pathelement location="${tomcat.build}/webapps/examples/WEB-INF/classes"/>
     <pathelement location="${test.classes}"/>
     <pathelement location="${junit.jar}"/>
+    <pathelement location="${hamcrest.jar}"/>
     <path refid="compile.classpath" />
     <path refid="tomcat.classpath" />
   </path>
@@ -2509,6 +2510,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="sourcefile" value="${junit.loc}"/>
       <param name="destfile" value="${junit.jar}"/>
       <param name="destdir" value="${junit.home}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${hamcrest.loc}"/>
+      <param name="destfile" value="${hamcrest.jar}"/>
+      <param name="destdir" value="${hamcrest.home}"/>
     </antcall>
 
   </target>
