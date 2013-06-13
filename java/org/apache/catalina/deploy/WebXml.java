@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.deploy;
 
 import java.net.URL;
@@ -31,17 +29,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
-import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
-import javax.servlet.descriptor.JspPropertyGroupDescriptor;
-import javax.servlet.descriptor.TaglibDescriptor;
 
-import org.apache.catalina.Context;
-import org.apache.catalina.Wrapper;
-import org.apache.catalina.core.ApplicationJspPropertyGroupDescriptor;
-import org.apache.catalina.core.ApplicationTaglibDescriptor;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -569,7 +559,7 @@ public class WebXml {
     public void addLocaleEncodingMapping(String locale, String encoding) {
         localeEncodingMappings.put(locale, encoding);
     }
-    public Map<String,String> getLocalEncodingMappings() {
+    public Map<String,String> getLocaleEncodingMappings() {
         return localeEncodingMappings;
     }
 
@@ -1226,218 +1216,6 @@ public class WebXml {
 
 
     /**
-     * Configure a {@link Context} using the stored web.xml representation.
-     *
-     * @param context   The context to be configured
-     */
-    public void configureContext(Context context) {
-        // As far as possible, process in alphabetical order so it is easy to
-        // check everything is present
-        // Some validation depends on correct public ID
-        context.setPublicId(publicId);
-
-        // Everything else in order
-        context.setEffectiveMajorVersion(getMajorVersion());
-        context.setEffectiveMinorVersion(getMinorVersion());
-
-        for (Entry<String, String> entry : contextParams.entrySet()) {
-            context.addParameter(entry.getKey(), entry.getValue());
-        }
-        context.setDisplayName(displayName);
-        context.setDistributable(distributable);
-        for (ContextLocalEjb ejbLocalRef : ejbLocalRefs.values()) {
-            context.getNamingResources().addLocalEjb(ejbLocalRef);
-        }
-        for (ContextEjb ejbRef : ejbRefs.values()) {
-            context.getNamingResources().addEjb(ejbRef);
-        }
-        for (ContextEnvironment environment : envEntries.values()) {
-            context.getNamingResources().addEnvironment(environment);
-        }
-        for (ErrorPage errorPage : errorPages.values()) {
-            context.addErrorPage(errorPage);
-        }
-        for (FilterDef filter : filters.values()) {
-            if (filter.getAsyncSupported() == null) {
-                filter.setAsyncSupported("false");
-            }
-            context.addFilterDef(filter);
-        }
-        for (FilterMap filterMap : filterMaps) {
-            context.addFilterMap(filterMap);
-        }
-        for (JspPropertyGroup jspPropertyGroup : jspPropertyGroups) {
-            JspPropertyGroupDescriptor descriptor =
-                new ApplicationJspPropertyGroupDescriptor(jspPropertyGroup);
-            context.getJspConfigDescriptor().getJspPropertyGroups().add(
-                    descriptor);
-        }
-        for (String listener : listeners) {
-            context.addApplicationListener(
-                    new ApplicationListener(listener, false));
-        }
-        for (Entry<String, String> entry : localeEncodingMappings.entrySet()) {
-            context.addLocaleEncodingMappingParameter(entry.getKey(),
-                    entry.getValue());
-        }
-        // Prevents IAE
-        if (loginConfig != null) {
-            context.setLoginConfig(loginConfig);
-        }
-        for (MessageDestinationRef mdr : messageDestinationRefs.values()) {
-            context.getNamingResources().addMessageDestinationRef(mdr);
-        }
-
-        // messageDestinations were ignored in Tomcat 6, so ignore here
-
-        context.setIgnoreAnnotations(metadataComplete);
-        for (Entry<String, String> entry : mimeMappings.entrySet()) {
-            context.addMimeMapping(entry.getKey(), entry.getValue());
-        }
-        // Name is just used for ordering
-        for (ContextResourceEnvRef resource : resourceEnvRefs.values()) {
-            context.getNamingResources().addResourceEnvRef(resource);
-        }
-        for (ContextResource resource : resourceRefs.values()) {
-            context.getNamingResources().addResource(resource);
-        }
-        for (SecurityConstraint constraint : securityConstraints) {
-            context.addConstraint(constraint);
-        }
-        for (String role : securityRoles) {
-            context.addSecurityRole(role);
-        }
-        for (ContextService service : serviceRefs.values()) {
-            context.getNamingResources().addService(service);
-        }
-        for (ServletDef servlet : servlets.values()) {
-            Wrapper wrapper = context.createWrapper();
-            // Description is ignored
-            // Display name is ignored
-            // Icons are ignored
-
-            // jsp-file gets passed to the JSP Servlet as an init-param
-
-            if (servlet.getLoadOnStartup() != null) {
-                wrapper.setLoadOnStartup(servlet.getLoadOnStartup().intValue());
-            }
-            if (servlet.getEnabled() != null) {
-                wrapper.setEnabled(servlet.getEnabled().booleanValue());
-            }
-            wrapper.setName(servlet.getServletName());
-            Map<String,String> params = servlet.getParameterMap();
-            for (Entry<String, String> entry : params.entrySet()) {
-                wrapper.addInitParameter(entry.getKey(), entry.getValue());
-            }
-            wrapper.setRunAs(servlet.getRunAs());
-            Set<SecurityRoleRef> roleRefs = servlet.getSecurityRoleRefs();
-            for (SecurityRoleRef roleRef : roleRefs) {
-                wrapper.addSecurityReference(
-                        roleRef.getName(), roleRef.getLink());
-            }
-            wrapper.setServletClass(servlet.getServletClass());
-            MultipartDef multipartdef = servlet.getMultipartDef();
-            if (multipartdef != null) {
-                if (multipartdef.getMaxFileSize() != null &&
-                        multipartdef.getMaxRequestSize()!= null &&
-                        multipartdef.getFileSizeThreshold() != null) {
-                    wrapper.setMultipartConfigElement(new MultipartConfigElement(
-                            multipartdef.getLocation(),
-                            Long.parseLong(multipartdef.getMaxFileSize()),
-                            Long.parseLong(multipartdef.getMaxRequestSize()),
-                            Integer.parseInt(
-                                    multipartdef.getFileSizeThreshold())));
-                } else {
-                    wrapper.setMultipartConfigElement(new MultipartConfigElement(
-                            multipartdef.getLocation()));
-                }
-            }
-            if (servlet.getAsyncSupported() != null) {
-                wrapper.setAsyncSupported(
-                        servlet.getAsyncSupported().booleanValue());
-            }
-            wrapper.setOverridable(servlet.isOverridable());
-            context.addChild(wrapper);
-        }
-        for (Entry<String, String> entry : servletMappings.entrySet()) {
-            context.addServletMapping(entry.getKey(), entry.getValue());
-        }
-        if (sessionConfig != null) {
-            if (sessionConfig.getSessionTimeout() != null) {
-                context.setSessionTimeout(
-                        sessionConfig.getSessionTimeout().intValue());
-            }
-            SessionCookieConfig scc =
-                context.getServletContext().getSessionCookieConfig();
-            scc.setName(sessionConfig.getCookieName());
-            scc.setDomain(sessionConfig.getCookieDomain());
-            scc.setPath(sessionConfig.getCookiePath());
-            scc.setComment(sessionConfig.getCookieComment());
-            if (sessionConfig.getCookieHttpOnly() != null) {
-                scc.setHttpOnly(sessionConfig.getCookieHttpOnly().booleanValue());
-            }
-            if (sessionConfig.getCookieSecure() != null) {
-                scc.setSecure(sessionConfig.getCookieSecure().booleanValue());
-            }
-            if (sessionConfig.getCookieMaxAge() != null) {
-                scc.setMaxAge(sessionConfig.getCookieMaxAge().intValue());
-            }
-            if (sessionConfig.getSessionTrackingModes().size() > 0) {
-                context.getServletContext().setSessionTrackingModes(
-                        sessionConfig.getSessionTrackingModes());
-            }
-        }
-        for (Entry<String, String> entry : taglibs.entrySet()) {
-            TaglibDescriptor descriptor = new ApplicationTaglibDescriptor(
-                    entry.getValue(), entry.getKey());
-            context.getJspConfigDescriptor().getTaglibs().add(descriptor);
-        }
-
-        // Context doesn't use version directly
-
-        for (String welcomeFile : welcomeFiles) {
-            /*
-             * The following will result in a welcome file of "" so don't add
-             * that to the context
-             * <welcome-file-list>
-             *   <welcome-file/>
-             * </welcome-file-list>
-             */
-            if (welcomeFile != null && welcomeFile.length() > 0) {
-                context.addWelcomeFile(welcomeFile);
-            }
-        }
-
-        // Do this last as it depends on servlets
-        for (JspPropertyGroup jspPropertyGroup : jspPropertyGroups) {
-            String jspServletName = context.findServletMapping("*.jsp");
-            if (jspServletName == null) {
-                jspServletName = "jsp";
-            }
-            if (context.findChild(jspServletName) != null) {
-                for (String urlPattern : jspPropertyGroup.getUrlPatterns()) {
-                    context.addServletMapping(urlPattern, jspServletName, true);
-                }
-            } else {
-                if(log.isDebugEnabled()) {
-                    for (String urlPattern : jspPropertyGroup.getUrlPatterns()) {
-                        log.debug("Skiping " + urlPattern + " , no servlet " +
-                                jspServletName);
-                    }
-                }
-            }
-        }
-
-        for (Entry<String, String> entry : postConstructMethods.entrySet()) {
-            context.addPostConstructMethod(entry.getKey(), entry.getValue());
-        }
-
-        for (Entry<String, String> entry : preDestroyMethods.entrySet()) {
-            context.addPreDestroyMethod(entry.getKey(), entry.getValue());
-        }
-    }
-
-    /**
      * Merge the supplied web fragments into this main web.xml.
      *
      * @param fragments     The fragments to merge in
@@ -1577,13 +1355,13 @@ public class WebXml {
         }
 
         for (WebXml fragment : fragments) {
-            if (!mergeMap(fragment.getLocalEncodingMappings(),
-                    localeEncodingMappings, temp.getLocalEncodingMappings(),
+            if (!mergeMap(fragment.getLocaleEncodingMappings(),
+                    localeEncodingMappings, temp.getLocaleEncodingMappings(),
                     fragment, "Locale Encoding Mapping")) {
                 return false;
             }
         }
-        localeEncodingMappings.putAll(temp.getLocalEncodingMappings());
+        localeEncodingMappings.putAll(temp.getLocaleEncodingMappings());
 
         if (getLoginConfig() == null) {
             LoginConfig tempLoginConfig = null;
