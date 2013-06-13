@@ -119,7 +119,7 @@ for use by web applications (by placing them in "lib"):
 * tomcat-spdy.jar (SPDY implementation)
 * tomcat-util.jar (Various utilities)
 * tomcat-websocket.jar (WebSocket 1.0 implementation)
-* webspcketapi.jar (WebSocket 1.0 API)
+* websocket-api.jar (WebSocket 1.0 API)
 
 You can make additional APIs available to all of your web applications by
 putting unpacked classes into a "classes" directory (not created by default),

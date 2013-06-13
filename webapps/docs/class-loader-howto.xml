@@ -162,7 +162,7 @@ loaders as it is initialized:</p>
     <li><em>tomcat-util.jar</em> &#8212; Common classes used by various components of
         Apache Tomcat.</li>
     <li><em>tomcat-websocket.jar</em> &#8212; WebSocket 1.0 implementation</li>
-    <li><em>websocketapi.jar</em> &#8212; WebSocket 1.0 API</li>
+    <li><em>websocket-api.jar</em> &#8212; WebSocket 1.0 API</li>
     </ul></li>
 <li><p><strong>WebappX</strong> &#8212; A class loader is created for each web
     application that is deployed in a single Tomcat instance.  All unpacked
