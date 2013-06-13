@@ -86,7 +86,9 @@
         to be <code>repo.maven.apache.org</code>. (kkolinko)
       </update>
       <update>
-        Update JUnit to version 4.9. (kkolinko)
+        Update JUnit to version 4.11. Configure separate download for Hamcrest
+        1.3 core library as its classes are no longer included in junit.jar.
+        (kkolinko)
       </update>
     </changelog>
   </subsection>
