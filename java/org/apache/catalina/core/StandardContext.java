@@ -4780,6 +4780,9 @@ public class StandardContext extends ContainerBase
         setApplicationEventListeners(eventListeners.toArray());
         for (Object lifecycleListener: getApplicationLifecycleListeners()) {
             lifecycleListeners.add(lifecycleListener);
+            if (lifecycleListener instanceof ServletContextListener) {
+                noPluggabilityListeners.add(lifecycleListener);
+            }
         }
         setApplicationLifecycleListeners(lifecycleListeners.toArray());
 
