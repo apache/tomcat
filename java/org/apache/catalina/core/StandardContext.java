@@ -228,7 +228,8 @@ public class StandardContext extends ContainerBase
 
     /**
      * The set of application listener class names configured for this
-     * application, in the order they were encountered in the web.xml file.
+     * application, in the order they were encountered in the resulting merged
+     * web.xml file.
      */
     private ApplicationListener applicationListeners[] =
             new ApplicationListener[0];
