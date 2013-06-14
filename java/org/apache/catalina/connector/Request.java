@@ -2296,6 +2296,12 @@ public class Request
             return false;
         }
 
+        // If the role is "*" then the return value must be false
+        // Servlet 31, section 13.3
+        if ("*".equals(role)) {
+            return false;
+        }
+
         Realm realm = context.getRealm();
         if (realm == null) {
             return false;
