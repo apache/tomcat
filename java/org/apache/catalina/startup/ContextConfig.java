@@ -1149,9 +1149,10 @@ public class ContextConfig implements LifecycleListener {
 
         // Ordering is important here
 
-        // Step 1. Identify all the JARs packaged with the application
-        // If the JARs have a web-fragment.xml it will be parsed at this
-        // point.
+        // Step 1. Identify all the JARs packaged with the application and those
+        // provided by the container. If any of the application JARs have a
+        // web-fragment.xml it will be parsed at this point. web-fragment.xml
+        // files are ignored for container provided JARs.
         Map<String,WebXml> fragments = processJarsForWebFragments();
 
         // Step 2. Order the fragments.
@@ -2734,8 +2735,12 @@ public class ContextConfig implements LifecycleListener {
             fragment.setWebappJar(isWebapp);
 
             try {
-                jar = JarFactory.newInstance(url);
-                is = jar.getInputStream(FRAGMENT_LOCATION);
+                // Only web application JARs are scanned for deployment
+                // annotations and web-fragment.xml files
+                if (isWebapp) {
+                    jar = JarFactory.newInstance(url);
+                    is = jar.getInputStream(FRAGMENT_LOCATION);
+                }
 
                 if (is == null) {
                     // If there is no web.xml, normal JAR no impact on
