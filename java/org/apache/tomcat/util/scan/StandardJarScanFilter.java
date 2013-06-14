@@ -49,6 +49,35 @@ public class StandardJarScanFilter implements JarScanFilter {
     private Set<String[]> pluggabilityScanSet = new HashSet<>();
     private boolean defaultPluggabilityScan = true;
 
+    /**
+     * This is the standard implementation of {@link JarScanFilter}. By default,
+     * the following filtering rules are used:
+     * <ul>
+     * <li>JARs that match neither the skip nor the scan list will be included
+     *     in scan results.</li>
+     * <li>JARs that match the skip list but not the scan list will be excluded
+     *     from scan results.</li>
+     * <li>JARs that match the scan list will be included from scan results.
+     *     </li>
+     * </ul>
+     * The default skip list and default scan list are obtained from the system
+     * properties {@link Constants#SKIP_JARS_PROPERTY} and
+     * {@link Constants#SCAN_JARS_PROPERTY} respectively. These default values
+     * may be over-ridden for the {@link JarScanType#TLD} and
+     * {@link JarScanType#PLUGGABILITY} scans. The filtering rules may also be
+     * modified for these scan types using {@link #setDefaultTldScan(boolean)}
+     * and {@link #setDefaultPluggabilityScan(boolean)}. If set to
+     * <code>false</code>, the following filtering rules are used for associated
+     * type:
+     * <ul>
+     * <li>JARs that match neither the skip nor the scan list will be excluded
+     *     from scan results.</li>
+     * <li>JARs that match the scan list but not the skip list will be included
+     *     in scan results.</li>
+     * <li>JARs that match the skip list will be excluded from scan results.
+     *     </li>
+     * </ul>
+     */
     public StandardJarScanFilter() {
         // Set the defaults from the system properties
         defaultSkip = System.getProperty(Constants.SKIP_JARS_PROPERTY);
