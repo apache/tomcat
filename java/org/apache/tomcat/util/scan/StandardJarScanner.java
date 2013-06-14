@@ -174,7 +174,7 @@ public class StandardJarScanner implements JarScanner {
                         } else {
                             url = (new File(realPath)).toURI().toURL();
                         }
-                        process(callback, url);
+                        process(callback, url, true);
                     } catch (IOException e) {
                         log.warn(sm.getString("jarScan.webinflibFail", url), e);
                     }
@@ -234,7 +234,7 @@ public class StandardJarScanner implements JarScanner {
                                 log.debug(sm.getString("jarScan.classloaderJarScan", urls[i]));
                             }
                             try {
-                                process(callback, urls[i]);
+                                process(callback, urls[i], false);
                             } catch (IOException ioe) {
                                 log.warn(sm.getString(
                                         "jarScan.classloaderFail",urls[i]), ioe);
@@ -255,7 +255,7 @@ public class StandardJarScanner implements JarScanner {
      * Scan a URL for JARs with the optional extensions to look at all files
      * and all directories.
      */
-    private void process(JarScannerCallback callback, URL url)
+    private void process(JarScannerCallback callback, URL url, boolean isWebapp)
             throws IOException {
 
         if (log.isTraceEnabled()) {
@@ -264,13 +264,14 @@ public class StandardJarScanner implements JarScanner {
 
         URLConnection conn = url.openConnection();
         if (conn instanceof JarURLConnection) {
-            callback.scan((JarURLConnection) conn);
+            callback.scan((JarURLConnection) conn, isWebapp);
         } else {
             String urlStr = url.toString();
             if (urlStr.startsWith("file:") || urlStr.startsWith("jndi:")) {
                 if (urlStr.endsWith(Constants.JAR_EXT)) {
                     URL jarURL = new URL("jar:" + urlStr + "!/");
-                    callback.scan((JarURLConnection) jarURL.openConnection());
+                    callback.scan((JarURLConnection) jarURL.openConnection(),
+                            isWebapp);
                 } else {
                     File f;
                     try {
@@ -278,12 +279,14 @@ public class StandardJarScanner implements JarScanner {
                         if (f.isFile() && scanAllFiles) {
                             // Treat this file as a JAR
                             URL jarURL = new URL("jar:" + urlStr + "!/");
-                            callback.scan((JarURLConnection) jarURL.openConnection());
+                            callback.scan(
+                                    (JarURLConnection) jarURL.openConnection(),
+                                    isWebapp);
                         } else if (f.isDirectory() && scanAllDirectories) {
                             File metainf = new File(f.getAbsoluteFile() +
                                     File.separator + "META-INF");
                             if (metainf.isDirectory()) {
-                                callback.scan(f);
+                                callback.scan(f, isWebapp);
                             }
                         }
                     } catch (URISyntaxException e) {

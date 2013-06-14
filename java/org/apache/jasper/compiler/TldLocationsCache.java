@@ -255,12 +255,13 @@ public class TldLocationsCache {
     private class TldJarScannerCallback implements JarScannerCallback {
 
         @Override
-        public void scan(JarURLConnection urlConn) throws IOException {
+        public void scan(JarURLConnection urlConn, boolean isWebapp)
+                throws IOException {
             tldScanJar(urlConn);
         }
 
         @Override
-        public void scan(File file) throws IOException {
+        public void scan(File file, boolean isWebapp) throws IOException {
             File metaInf = new File(file, "META-INF");
             if (metaInf.isDirectory()) {
                 tldScanDir(metaInf);
