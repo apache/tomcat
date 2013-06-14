@@ -113,8 +113,8 @@
 
 
 <section name="Nested Components">
-  <p>No components may be nested inside a <strong>Jar Scanner</strong> element.
-  </p>
+  <p>Only a <a href="jar-scan-filter.html">Jar Scan Filter</a> may be nested
+  inside a <strong>Jar Scanner</strong> element.</p>
 </section>
 
 

@@ -58,6 +58,7 @@
     <menu name="Nested Components">
         <item name="Global Resources"      href="globalresources.html"/>
         <item name="JarScanner"            href="jar-scanner.html"/>
+        <item name="JarScanFilter"         href="jar-scan-filter.html"/>
         <item name="Listeners"             href="listeners.html"/>
         <item name="Loader"                href="loader.html"/>
         <item name="Manager"               href="manager.html"/>
