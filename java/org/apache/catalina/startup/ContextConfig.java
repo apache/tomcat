@@ -95,6 +95,7 @@ import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.Introspection;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -2042,8 +2043,8 @@ public class ContextConfig implements LifecycleListener {
         JarScanner jarScanner = context.getJarScanner();
         FragmentJarScannerCallback callback = new FragmentJarScannerCallback();
 
-        jarScanner.scan(context.getServletContext(), callback,
-                pluggabilityJarsToSkip);
+        jarScanner.scan(JarScanType.SERVLET3_PLUGGABILITY,
+                context.getServletContext(), callback, pluggabilityJarsToSkip);
 
         return callback.getFragments();
     }

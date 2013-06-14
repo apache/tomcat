@@ -37,6 +37,7 @@ import org.apache.jasper.xmlparser.ParserUtils;
 import org.apache.jasper.xmlparser.TreeNode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.scan.Jar;
@@ -242,7 +243,8 @@ public class TldLocationsCache {
 
             JarScanner jarScanner = JarScannerFactory.getJarScanner(ctxt);
             if (jarScanner != null) {
-                jarScanner.scan(ctxt, new TldJarScannerCallback(), noTldJars);
+                jarScanner.scan(JarScanType.TLD, ctxt,
+                        new TldJarScannerCallback(), noTldJars);
             }
 
             initialized = true;
