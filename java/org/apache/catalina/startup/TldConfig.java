@@ -287,12 +287,13 @@ public final class TldConfig  implements LifecycleListener {
     private class TldJarScannerCallback implements JarScannerCallback {
 
         @Override
-        public void scan(JarURLConnection urlConn) throws IOException {
+        public void scan(JarURLConnection urlConn, boolean isWebapp)
+                throws IOException {
             tldScanJar(urlConn);
         }
 
         @Override
-        public void scan(File file) {
+        public void scan(File file, boolean isWebapp) {
             File metaInf = new File(file, "META-INF");
             if (metaInf.isDirectory()) {
                 tldScanDir(metaInf);

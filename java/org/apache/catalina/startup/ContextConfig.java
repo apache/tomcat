@@ -2743,7 +2743,8 @@ public class ContextConfig implements LifecycleListener {
         private final Map<String,WebXml> fragments = new HashMap<>();
 
         @Override
-        public void scan(JarURLConnection jarConn) throws IOException {
+        public void scan(JarURLConnection jarConn, boolean isWebapp)
+                throws IOException {
 
             URL url = jarConn.getURL();
             URL resourceURL = jarConn.getJarFileURL();
@@ -2790,7 +2791,7 @@ public class ContextConfig implements LifecycleListener {
         }
 
         @Override
-        public void scan(File file) throws IOException {
+        public void scan(File file, boolean isWebapp) throws IOException {
 
             InputStream stream = null;
             WebXml fragment = new WebXml();

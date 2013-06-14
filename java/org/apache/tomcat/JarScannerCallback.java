@@ -31,17 +31,24 @@ public interface JarScannerCallback {
      * further processing via the provided URL connection.
      *
      * @param urlConn   The connection to the identified JAR
+     * @param isWebapp  Indicates if the JAR was found within a web application.
+     *                      If <code>false</code> the JAR should be treated as
+     *                      being provided by the container
      */
-    public void scan(JarURLConnection urlConn) throws IOException;
+    public void scan(JarURLConnection urlConn, boolean isWebapp)
+            throws IOException;
 
     /**
      * A JAR was found (probably in an unpacked WAR or possibly elsewhere on the
      * class path) and may be accessed for further processing via the provided
      * file.
      *
-     * @param file  The file for the identified JAR.
+     * @param file      The file for the identified JAR.
+     * @param isWebapp  Indicates if the JAR was found within a web application.
+     *                      If <code>false</code> the JAR should be treated as
+     *                      being provided by the container
      */
-    public void scan(File file) throws IOException;
+    public void scan(File file, boolean isWebapp) throws IOException;
 
     /**
      * A directory structure was found within the web application at
