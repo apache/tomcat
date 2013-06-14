@@ -111,9 +111,11 @@ public class StandardJarScanner implements JarScanner {
      * Controls the filtering of the results from the scan for JARs
      */
     private JarScanFilter jarScanFilter = new StandardJarScanFilter();
+    @Override
     public JarScanFilter getJarScanFilter() {
         return jarScanFilter;
     }
+    @Override
     public void setJarScanFilter(JarScanFilter jarScanFilter) {
         this.jarScanFilter = jarScanFilter;
     }

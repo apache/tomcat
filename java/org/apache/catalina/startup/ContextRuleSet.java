@@ -228,6 +228,14 @@ public class ContextRuleSet extends RuleSetBase {
                             "setJarScanner",
                             "org.apache.tomcat.JarScanner");
 
+        digester.addObjectCreate(prefix + "Context/JarScanner/JarScanFilter",
+                                 "org.apache.tomcat.util.scan.StandardJarScanFilter",
+                                 "className");
+        digester.addSetProperties(prefix + "Context/JarScanner/JarScanFilter");
+        digester.addSetNext(prefix + "Context/JarScanner/JarScanFilter",
+                            "setJarScanFilter",
+                            "org.apache.tomcat.JarScanFilter");
+
     }
 
 }

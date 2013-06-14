@@ -39,4 +39,7 @@ public interface JarScanner {
     public void scan(JarScanType scanType, ServletContext context,
             JarScannerCallback callback);
 
+    public JarScanFilter getJarScanFilter();
+
+    public void setJarScanFilter(JarScanFilter jarScanFilter);
 }
