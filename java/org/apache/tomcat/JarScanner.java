@@ -16,8 +16,6 @@
  */
 package org.apache.tomcat;
 
-import java.util.Set;
-
 import javax.servlet.ServletContext;
 
 /**
@@ -37,9 +35,8 @@ public interface JarScanner {
      * @param context       The ServletContext - used to locate and access
      *                      WEB-INF/lib
      * @param callback      The handler to process any JARs found
-     * @param jarsToSkip    List of JARs to ignore
      */
-    public void scan(JarScanType scanType, ServletContext context, JarScannerCallback callback,
-            Set<String> jarsToSkip);
+    public void scan(JarScanType scanType, ServletContext context,
+            JarScannerCallback callback);
 
 }

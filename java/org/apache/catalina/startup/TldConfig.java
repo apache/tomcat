@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.servlet.ServletContext;
 import javax.servlet.descriptor.TaglibDescriptor;
@@ -64,9 +63,6 @@ public final class TldConfig  implements LifecycleListener {
     private static final String WEB_INF_CLASSES = "/WEB-INF/classes/";
     private static final String WEB_INF_LIB = "/WEB-INF/lib/";
 
-
-    // Names of JARs that are known not to contain any TLDs
-    private static volatile Set<String> noTldJars = null;
 
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( TldConfig.class );
@@ -120,47 +116,6 @@ public final class TldConfig  implements LifecycleListener {
             digester = tldDigesters[3];
         }
         return digester;
-    }
-
-
-    static {
-        // Set the default list of JARs to skip for TLDs
-        StringBuilder jarList = new StringBuilder(System.getProperty(
-                Constants.DEFAULT_JARS_TO_SKIP, ""));
-
-        String tldJars = System.getProperty(Constants.TLD_JARS_TO_SKIP, "");
-        if (tldJars.length() > 0) {
-            if (jarList.length() > 0) {
-                jarList.append(',');
-            }
-            jarList.append(tldJars);
-        }
-
-        if (jarList.length() > 0) {
-            setNoTldJars(jarList.toString());
-        }
-    }
-
-    /**
-     * Sets the list of JARs that are known not to contain any TLDs.
-     *
-     * @param jarNames List of comma-separated names of JAR files that are
-     * known not to contain any TLDs.
-     */
-    public static synchronized void setNoTldJars(String jarNames) {
-        if (jarNames == null) {
-            noTldJars = null;
-        } else {
-            if (noTldJars == null) {
-                noTldJars = new HashSet<>();
-            } else {
-                noTldJars.clear();
-            }
-            StringTokenizer tokenizer = new StringTokenizer(jarNames, ",");
-            while (tokenizer.hasMoreElements()) {
-                noTldJars.add(tokenizer.nextToken());
-            }
-        }
     }
 
 
@@ -264,7 +219,7 @@ public final class TldConfig  implements LifecycleListener {
         // Stages 3b & 4
         JarScanner jarScanner = context.getJarScanner();
         jarScanner.scan(JarScanType.TLD, context.getServletContext(),
-                new TldJarScannerCallback(), noTldJars);
+                new TldJarScannerCallback());
 
         // Now add all the listeners we found to the listeners for this context
         String list[] = getTldListeners();

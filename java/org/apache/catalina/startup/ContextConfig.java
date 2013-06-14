@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.MultipartConfigElement;
@@ -149,13 +148,6 @@ public class ContextConfig implements LifecycleListener {
      */
     protected static final Properties authenticators;
 
-    /**
-     * The list of JARs that will be skipped when scanning a web application
-     * for JARs. This means the JAR will not be scanned for web fragments, SCIs,
-     * annotations or classes that match @HandlesTypes.
-     */
-    private static final Set<String> pluggabilityJarsToSkip = new HashSet<>();
-
     static {
         // Load our mapping properties for the standard authenticators
         InputStream is =
@@ -171,20 +163,6 @@ public class ContextConfig implements LifecycleListener {
             }
         }
         authenticators = props;
-
-        // Load the list of JARS to skip
-        addJarsToSkip(Constants.DEFAULT_JARS_TO_SKIP);
-        addJarsToSkip(Constants.PLUGGABILITY_JARS_TO_SKIP);
-    }
-
-    private static void addJarsToSkip(String systemPropertyName) {
-        String jarList = System.getProperty(systemPropertyName);
-        if (jarList != null) {
-            StringTokenizer tokenizer = new StringTokenizer(jarList, ",");
-            while (tokenizer.hasMoreElements()) {
-                pluggabilityJarsToSkip.add(tokenizer.nextToken());
-            }
-        }
 
     }
 
@@ -2043,8 +2021,8 @@ public class ContextConfig implements LifecycleListener {
         JarScanner jarScanner = context.getJarScanner();
         FragmentJarScannerCallback callback = new FragmentJarScannerCallback();
 
-        jarScanner.scan(JarScanType.SERVLET3_PLUGGABILITY,
-                context.getServletContext(), callback, pluggabilityJarsToSkip);
+        jarScanner.scan(JarScanType.PLUGGABILITY,
+                context.getServletContext(), callback);
 
         return callback.getFragments();
     }
