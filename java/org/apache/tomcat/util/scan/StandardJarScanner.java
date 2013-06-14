@@ -220,8 +220,15 @@ public class StandardJarScanner implements JarScanner {
             // already scanned WEB-INF/lib and WEB-INF/classes
             classLoader = classLoader.getParent();
 
+            // JARs are treated as application provided until the common class
+            // loader is reached.
+            boolean isWebapp = true;
+
             while (classLoader != null && classLoader != stopLoader) {
                 if (classLoader instanceof URLClassLoader) {
+                    if (isWebapp) {
+                        isWebapp = isWebappClassLoader(classLoader);
+                    }
                     URL[] urls = ((URLClassLoader) classLoader).getURLs();
                     for (int i=0; i<urls.length; i++) {
                         // Extract the jarName if there is one to be found
@@ -234,7 +241,7 @@ public class StandardJarScanner implements JarScanner {
                                 log.debug(sm.getString("jarScan.classloaderJarScan", urls[i]));
                             }
                             try {
-                                process(callback, urls[i], false);
+                                process(callback, urls[i], isWebapp);
                             } catch (IOException ioe) {
                                 log.warn(sm.getString(
                                         "jarScan.classloaderFail",urls[i]), ioe);
@@ -250,6 +257,34 @@ public class StandardJarScanner implements JarScanner {
             }
         }
     }
+
+
+    /*
+     * Since class loader hierarchies can get complicated, this method attempts
+     * to apply the following rule: A class loader is a web application class
+     * loader unless it loaded this class (StandardJarScanner) or is a parent
+     * of the class loader that loaded this class.
+     *
+     * This should mean:
+     *   the webapp class loader is an application class loader
+     *   the shared class loader is an application class loader
+     *   the server class loader is not an application class loader
+     *   the common class loader is not an application class loader
+     *   the system class loader is not an application class loader
+     *   the bootstrap class loader is not an application class loader
+     */
+    private boolean isWebappClassLoader(ClassLoader classLoader) {
+        ClassLoader nonWebappLoader = StandardJarScanner.class.getClassLoader();
+
+        while (nonWebappLoader != null) {
+            if (nonWebappLoader == classLoader) {
+                return false;
+            }
+            nonWebappLoader = nonWebappLoader.getParent();
+        }
+        return true;
+    }
+
 
     /*
      * Scan a URL for JARs with the optional extensions to look at all files
