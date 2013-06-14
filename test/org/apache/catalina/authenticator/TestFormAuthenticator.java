@@ -47,13 +47,13 @@ import org.apache.tomcat.websocket.server.WsListener;
  *    achievable with servlets, jsps, jstl (all of which which can ask for an
  *    encoded url to be inserted into the dynamic web page). It cannot work
  *    with static html.
- *    note: this test class uses the tomcat somaple jsps, which conform.
+ *    note: this test class uses the Tomcat sample jsps, which conform.
  *
  * 3. Therefore, any webapp that MIGHT need to authenticate a client that
  *    does not accept cookies MUST generate EVERY protected resource url
  *    dynamically (so that it will include the current session ID).
  *
- * 4. Any webapp that cannot satify case 3 MUST turn off
+ * 4. Any webapp that cannot satisfy case 3 MUST turn off
  *    changeSessionIdOnAuthentication for its Context and thus degrade the
  *    session fixation protection for ALL of its clients.
  *    note from MarkT: Not sure I agree with this. If the URLs aren't
