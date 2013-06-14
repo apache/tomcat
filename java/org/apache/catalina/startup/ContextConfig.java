@@ -2731,6 +2731,8 @@ public class ContextConfig implements LifecycleListener {
             InputStream is = null;
             WebXml fragment = new WebXml();
 
+            fragment.setWebappJar(isWebapp);
+
             try {
                 jar = JarFactory.newInstance(url);
                 is = jar.getInputStream(FRAGMENT_LOCATION);

@@ -597,6 +597,16 @@ public class WebXml {
     public void setJarName(String jarName) { this.jarName = jarName; }
     public String getJarName() { return jarName; }
 
+    // Is this JAR part of the application or is it a container JAR? Assume it
+    // is.
+    private boolean webappJar = true;
+    public void setWebappJar(boolean webappJar) {
+        this.webappJar = webappJar;
+    }
+    public boolean getWebappJar() {
+        return webappJar;
+    }
+
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(32);
