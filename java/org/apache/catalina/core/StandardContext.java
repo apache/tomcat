@@ -6775,13 +6775,13 @@ public class StandardContext extends ContainerBase
         @Override
         public int getEffectiveMajorVersion() {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public int getEffectiveMinorVersion() {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
@@ -6871,7 +6871,7 @@ public class StandardContext extends ContainerBase
         @Override
         public boolean setInitParameter(String name, String value) {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
@@ -6902,147 +6902,147 @@ public class StandardContext extends ContainerBase
         @Override
         public Dynamic addServlet(String servletName, String className) {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public Dynamic addServlet(String servletName, Servlet servlet) {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public Dynamic addServlet(String servletName,
                 Class<? extends Servlet> servletClass) {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public <T extends Servlet> T createServlet(Class<T> c)
                 throws ServletException {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public ServletRegistration getServletRegistration(String servletName) {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public Map<String,? extends ServletRegistration> getServletRegistrations() {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public javax.servlet.FilterRegistration.Dynamic addFilter(
                 String filterName, String className) {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public javax.servlet.FilterRegistration.Dynamic addFilter(
                 String filterName, Filter filter) {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public javax.servlet.FilterRegistration.Dynamic addFilter(
                 String filterName, Class<? extends Filter> filterClass) {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public <T extends Filter> T createFilter(Class<T> c)
                 throws ServletException {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public FilterRegistration getFilterRegistration(String filterName) {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public Map<String,? extends FilterRegistration> getFilterRegistrations() {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public SessionCookieConfig getSessionCookieConfig() {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public void setSessionTrackingModes(
                 Set<SessionTrackingMode> sessionTrackingModes) {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public void addListener(String className) {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public <T extends EventListener> void addListener(T t) {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public void addListener(Class<? extends EventListener> listenerClass) {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public <T extends EventListener> T createListener(Class<T> c)
                 throws ServletException {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public JspConfigDescriptor getJspConfigDescriptor() {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public ClassLoader getClassLoader() {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
         public void declareRoles(String... roleNames) {
             throw new UnsupportedOperationException(
-                    sm.getString("tldListenerServletContext.notAllowed"));
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
     }
 }
