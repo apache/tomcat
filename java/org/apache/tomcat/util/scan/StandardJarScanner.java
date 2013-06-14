@@ -127,16 +127,14 @@ public class StandardJarScanner implements JarScanner {
      *
      * @param context       The ServletContext - used to locate and access
      *                      WEB-INF/lib
-     * @param classloader   The classloader - used to access JARs not in
-     *                      WEB-INF/lib
      * @param callback      The handler to process any JARs found
      * @param jarsToSkip    List of JARs to ignore. If this list is null, a
      *                      default list will be read from the system property
      *                      defined by {@link Constants#SKIP_JARS_PROPERTY}
      */
     @Override
-    public void scan(ServletContext context, ClassLoader classloader,
-            JarScannerCallback callback, Set<String> jarsToSkip) {
+    public void scan(ServletContext context, JarScannerCallback callback,
+            Set<String> jarsToSkip) {
 
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("jarScan.webinflibStart"));
@@ -205,7 +203,7 @@ public class StandardJarScanner implements JarScanner {
         }
 
         // Scan the classpath
-        if (scanClassPath && classloader != null) {
+        if (scanClassPath) {
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("jarScan.classloaderStart"));
             }
@@ -216,13 +214,15 @@ public class StandardJarScanner implements JarScanner {
                 stopLoader = ClassLoader.getSystemClassLoader().getParent();
             }
 
+
+            ClassLoader classLoader = context.getClassLoader();
             // No need to scan the web application class loader - we have
             // already scanned WEB-INF/lib and WEB-INF/classes
-            ClassLoader loader = classloader.getParent();
+            classLoader = classLoader.getParent();
 
-            while (loader != null && loader != stopLoader) {
-                if (loader instanceof URLClassLoader) {
-                    URL[] urls = ((URLClassLoader) loader).getURLs();
+            while (classLoader != null && classLoader != stopLoader) {
+                if (classLoader instanceof URLClassLoader) {
+                    URL[] urls = ((URLClassLoader) classLoader).getURLs();
                     for (int i=0; i<urls.length; i++) {
                         // Extract the jarName if there is one to be found
                         String jarName = getJarName(urls[i]);
@@ -249,7 +249,7 @@ public class StandardJarScanner implements JarScanner {
                         }
                     }
                 }
-                loader = loader.getParent();
+                classLoader = classLoader.getParent();
             }
         }
     }
