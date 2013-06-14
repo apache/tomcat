@@ -600,12 +600,13 @@ public class WebXml {
     // Is this JAR part of the application or is it a container JAR? Assume it
     // is.
     private boolean webappJar = true;
-    public void setWebappJar(boolean webappJar) {
-        this.webappJar = webappJar;
-    }
-    public boolean getWebappJar() {
-        return webappJar;
-    }
+    public void setWebappJar(boolean webappJar) { this.webappJar = webappJar; }
+    public boolean getWebappJar() { return webappJar; }
+
+    // Does this web application delegate first for class loading?
+    private boolean delegate = false;
+    public boolean getDelegate() { return delegate; }
+    public void setDelegate(boolean delegate) { this.delegate = delegate; }
 
     @Override
     public String toString() {
@@ -2109,9 +2110,21 @@ public class WebXml {
             orderFragments(orderedFragments, afterSet);
         }
 
+        // Container fragments are always included
+        Set<WebXml> containerFragments = new LinkedHashSet<>();
+        // Find all the container fragments and remove any present from the
+        // ordered list
+        for (WebXml fragment : fragments.values()) {
+            if (!fragment.getWebappJar()) {
+                containerFragments.add(fragment);
+                orderedFragments.remove(fragment);
+            }
+        }
+
         // Avoid NPE when unit testing
         if (servletContext != null) {
-            // Publish the ordered fragments
+            // Publish the ordered fragments. The app does not need to know
+            // about container fragments
             List<String> orderedJarFileNames = null;
             if (orderingPresent) {
                 orderedJarFileNames = new ArrayList<>();
@@ -2123,7 +2136,21 @@ public class WebXml {
                     orderedJarFileNames);
         }
 
-        return orderedFragments;
+        // The remainder of the processing needs to know about container
+        // fragments
+        if (containerFragments.size() > 0) {
+            Set<WebXml> result = new LinkedHashSet<>();
+            if (containerFragments.iterator().next().getDelegate()) {
+                result.addAll(containerFragments);
+                result.addAll(orderedFragments);
+            } else {
+                result.addAll(orderedFragments);
+                result.addAll(containerFragments);
+            }
+            return result;
+        } else {
+            return orderedFragments;
+        }
     }
 
     private static void decoupleOtherGroups(Set<WebXml> group) {
