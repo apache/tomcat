@@ -1329,6 +1329,8 @@ public class ApplicationContext
         if (t instanceof HttpSessionListener
                 || (t instanceof ServletContextListener &&
                         newServletContextListenerAllowed)) {
+            // Add listener directly to the list of instances rather than to
+            // the list of class names.
             context.addApplicationLifecycleListener(t);
             match = true;
         }
