@@ -227,12 +227,9 @@ public class StandardJarScanner implements JarScanner {
                         // Extract the jarName if there is one to be found
                         String jarName = getJarName(urls[i]);
 
-                        // Skip JARs known not to be interesting and JARs
-                        // in WEB-INF/lib we have already scanned
-                        if (jarName != null &&
-                            !(Matcher.matchPath(ignoredJarsTokens, jarName) ||
-                                urls[i].toString().contains(
-                                        Constants.WEB_INF_LIB + jarName))) {
+                        // Skip JARs known not to be interesting
+                        if (jarName != null && !Matcher.matchPath(
+                                ignoredJarsTokens, jarName)) {
                             if (log.isDebugEnabled()) {
                                 log.debug(sm.getString("jarScan.classloaderJarScan", urls[i]));
                             }
