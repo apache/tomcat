@@ -257,11 +257,15 @@ public class TldLocationsCache {
         @Override
         public void scan(JarURLConnection urlConn, boolean isWebapp)
                 throws IOException {
+            // Note: TLDs are processed the same way for application and
+            //       container provided JARs.
             tldScanJar(urlConn);
         }
 
         @Override
         public void scan(File file, boolean isWebapp) throws IOException {
+            // Note: TLDs are processed the same way for application and
+            //       container provided JARs.
             File metaInf = new File(file, "META-INF");
             if (metaInf.isDirectory()) {
                 tldScanDir(metaInf);
