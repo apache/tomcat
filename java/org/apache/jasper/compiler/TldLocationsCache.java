@@ -242,9 +242,7 @@ public class TldLocationsCache {
 
             JarScanner jarScanner = JarScannerFactory.getJarScanner(ctxt);
             if (jarScanner != null) {
-                jarScanner.scan(ctxt,
-                        Thread.currentThread().getContextClassLoader(),
-                        new TldJarScannerCallback(), noTldJars);
+                jarScanner.scan(ctxt, new TldJarScannerCallback(), noTldJars);
             }
 
             initialized = true;

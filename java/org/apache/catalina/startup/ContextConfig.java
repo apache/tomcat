@@ -2042,8 +2042,7 @@ public class ContextConfig implements LifecycleListener {
         JarScanner jarScanner = context.getJarScanner();
         FragmentJarScannerCallback callback = new FragmentJarScannerCallback();
 
-        jarScanner.scan(context.getServletContext(),
-                context.getLoader().getClassLoader(), callback,
+        jarScanner.scan(context.getServletContext(), callback,
                 pluggabilityJarsToSkip);
 
         return callback.getFragments();

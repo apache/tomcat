@@ -263,7 +263,6 @@ public final class TldConfig  implements LifecycleListener {
         // Stages 3b & 4
         JarScanner jarScanner = context.getJarScanner();
         jarScanner.scan(context.getServletContext(),
-                context.getLoader().getClassLoader(),
                 new TldJarScannerCallback(), noTldJars);
 
         // Now add all the listeners we found to the listeners for this context
