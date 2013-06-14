@@ -2735,8 +2735,8 @@ public class ContextConfig implements LifecycleListener {
             fragment.setWebappJar(isWebapp);
 
             try {
-                // Only web application JARs are scanned for deployment
-                // annotations and web-fragment.xml files
+                // Only web application JARs are checked for web-fragment.xml
+                // files
                 if (isWebapp) {
                     jar = JarFactory.newInstance(url);
                     is = jar.getInputStream(FRAGMENT_LOCATION);
