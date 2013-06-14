@@ -2737,6 +2737,9 @@ public class ContextConfig implements LifecycleListener {
             WebXml fragment = new WebXml();
 
             fragment.setWebappJar(isWebapp);
+            if (context instanceof StandardContext) {
+                fragment.setDelegate(((StandardContext) context).getDelegate());
+            }
 
             try {
                 // Only web application JARs are checked for web-fragment.xml
