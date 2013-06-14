@@ -227,8 +227,8 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * The set of application listeners configured for this application, in the
-     * order they were encountered in the web.xml file.
+     * The set of application listener class names configured for this
+     * application, in the order they were encountered in the web.xml file.
      */
     private ApplicationListener applicationListeners[] =
             new ApplicationListener[0];
@@ -237,14 +237,18 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * The set of instantiated application event listener objects</code>.
+     * The set of instantiated application event listener objects. Note that
+     * SCIs and other code may use the pluggability APIs to add listener
+     * instances directly to this list before the application starts.
      */
     private Object applicationEventListenersObjects[] =
         new Object[0];
 
 
     /**
-     * The set of instantiated application lifecycle listener objects</code>.
+     * The set of instantiated application lifecycle listener objects. Note that
+     * SCIs and other code may use the pluggability APIs to add listener
+     * instances directly to this list before the application starts.
      */
     private Object applicationLifecycleListenersObjects[] =
         new Object[0];
@@ -4721,7 +4725,7 @@ public class StandardContext extends ContainerBase
         ApplicationListener listeners[] = findApplicationListeners();
         Object results[] = new Object[listeners.length];
         boolean ok = true;
-        Set<Object> tldListeners = new HashSet<>();
+        Set<Object> noPluggabilityListeners = new HashSet<>();
         for (int i = 0; i < results.length; i++) {
             if (getLogger().isDebugEnabled())
                 getLogger().debug(" Configuring event listener class '" +
@@ -4731,7 +4735,7 @@ public class StandardContext extends ContainerBase
                 results[i] = instanceManager.newInstance(
                         listener.getClassName());
                 if (listener.isPluggabilityBlocked()) {
-                    tldListeners.add(results[i]);
+                    noPluggabilityListeners.add(results[i]);
                 }
             } catch (Throwable t) {
                 t = ExceptionUtils.unwrapInvocationTargetException(t);
@@ -4764,7 +4768,11 @@ public class StandardContext extends ContainerBase
             }
         }
 
-        //Listeners may have been added by ServletContextInitializers.  Put them after the ones we know about.
+        // Listener instances may have been added directly to this Context by
+        // ServletContextInitializers and other code via the pluggability APIs.
+        // Put them these listeners after the ones defined in web.xml and/or
+        // annotations then overwrite the list of instances with the new, full
+        // list.
         for (Object eventListener: getApplicationEventListeners()) {
             eventListeners.add(eventListener);
         }
@@ -4791,7 +4799,7 @@ public class StandardContext extends ContainerBase
         ServletContextEvent event =
                 new ServletContextEvent(getServletContext());
         ServletContextEvent tldEvent = null;
-        if (tldListeners.size() > 0) {
+        if (noPluggabilityListeners.size() > 0) {
             tldEvent = new ServletContextEvent(new NoPluggabilityServletContext(
                     getServletContext()));
         }
@@ -4804,7 +4812,7 @@ public class StandardContext extends ContainerBase
                 (ServletContextListener) instances[i];
             try {
                 fireContainerEvent("beforeContextInitialized", listener);
-                if (tldListeners.contains(listener)) {
+                if (noPluggabilityListeners.contains(listener)) {
                     listener.contextInitialized(tldEvent);
                 } else {
                     listener.contextInitialized(event);
