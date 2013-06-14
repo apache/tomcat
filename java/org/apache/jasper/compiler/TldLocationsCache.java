@@ -22,15 +22,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.servlet.ServletContext;
 
-import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.util.ExceptionUtils;
 import org.apache.jasper.xmlparser.ParserUtils;
@@ -96,54 +93,9 @@ public class TldLocationsCache {
     private static final String JAR_EXT = ".jar";
     private static final String TLD_EXT = ".tld";
 
-    // Names of JARs that are known not to contain any TLDs
-    private static Set<String> noTldJars = null;
-
     // Flag that indicates that an INFO level message has been provided that
     // there are JARs that could be skipped
     private static volatile boolean showTldScanWarning = true;
-
-    static {
-        // Set the default list of JARs to skip for TLDs
-        // Set the default list of JARs to skip for TLDs
-        StringBuilder jarList = new StringBuilder(System.getProperty(
-                Constants.DEFAULT_JAR_SKIP_PROP, ""));
-
-        String tldJars = System.getProperty(Constants.TLD_JAR_SKIP_PROP, "");
-        if (tldJars.length() > 0) {
-            if (jarList.length() > 0) {
-                jarList.append(',');
-            }
-            jarList.append(tldJars);
-        }
-
-        if (jarList.length() > 0) {
-            setNoTldJars(jarList.toString());
-        }
-    }
-
-    /**
-     * Sets the list of JARs that are known not to contain any TLDs.
-     *
-     * @param jarNames List of comma-separated names of JAR files that are
-     * known not to contain any TLDs
-     */
-    public static synchronized void setNoTldJars(String jarNames) {
-        if (jarNames == null) {
-            noTldJars = null;
-        } else {
-            if (noTldJars == null) {
-                noTldJars = new HashSet<>();
-            } else {
-                noTldJars.clear();
-            }
-            StringTokenizer tokenizer = new StringTokenizer(jarNames, ",");
-            while (tokenizer.hasMoreElements()) {
-                noTldJars.add(tokenizer.nextToken());
-            }
-        }
-    }
-
 
     /**
      * The mapping of the 'global' tag library URI to the location (resource
@@ -244,7 +196,7 @@ public class TldLocationsCache {
             JarScanner jarScanner = JarScannerFactory.getJarScanner(ctxt);
             if (jarScanner != null) {
                 jarScanner.scan(JarScanType.TLD, ctxt,
-                        new TldJarScannerCallback(), noTldJars);
+                        new TldJarScannerCallback());
             }
 
             initialized = true;

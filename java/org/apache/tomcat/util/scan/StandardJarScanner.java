@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.scan;
 
 import java.io.File;
@@ -25,19 +24,17 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.servlet.ServletContext;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.JarScanFilter;
 import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
-import org.apache.tomcat.util.file.Matcher;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -58,23 +55,11 @@ public class StandardJarScanner implements JarScanner {
 
     private static final Log log = LogFactory.getLog(StandardJarScanner.class);
 
-    private static final Set<String> defaultJarsToSkip = new HashSet<>();
-
     /**
      * The string resources for this package.
      */
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
-
-    static {
-        String jarList = System.getProperty(Constants.SKIP_JARS_PROPERTY);
-        if (jarList != null) {
-            StringTokenizer tokenizer = new StringTokenizer(jarList, ",");
-            while (tokenizer.hasMoreElements()) {
-                defaultJarsToSkip.add(tokenizer.nextToken());
-            }
-        }
-    }
 
     /**
      * Controls the classpath scanning extension.
@@ -123,6 +108,17 @@ public class StandardJarScanner implements JarScanner {
     }
 
     /**
+     * Controls the filtering of the results from the scan for JARs
+     */
+    private JarScanFilter jarScanFilter = new StandardJarScanFilter();
+    public JarScanFilter getJarScanFilter() {
+        return jarScanFilter;
+    }
+    public void setJarScanFilter(JarScanFilter jarScanFilter) {
+        this.jarScanFilter = jarScanFilter;
+    }
+
+    /**
      * Scan the provided ServletContext and class loader for JAR files. Each JAR
      * file found will be passed to the callback handler to be processed.
      *
@@ -132,27 +128,13 @@ public class StandardJarScanner implements JarScanner {
      * @param context       The ServletContext - used to locate and access
      *                      WEB-INF/lib
      * @param callback      The handler to process any JARs found
-     * @param jarsToSkip    List of JARs to ignore. If this list is null, a
-     *                      default list will be read from the system property
-     *                      defined by {@link Constants#SKIP_JARS_PROPERTY}
      */
     @Override
     public void scan(JarScanType scanType, ServletContext context,
-            JarScannerCallback callback, Set<String> jarsToSkip) {
+            JarScannerCallback callback) {
 
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("jarScan.webinflibStart"));
-        }
-
-        Set<String> ignoredJars;
-        if (jarsToSkip == null) {
-            ignoredJars = defaultJarsToSkip;
-        } else {
-            ignoredJars = jarsToSkip;
-        }
-        Set<String[]> ignoredJarsTokens = new HashSet<>();
-        for (String pattern: ignoredJars) {
-            ignoredJarsTokens.add(Matcher.tokenizePathAsArray(pattern));
         }
 
         // Scan WEB-INF/lib
@@ -162,8 +144,8 @@ public class StandardJarScanner implements JarScanner {
             while (it.hasNext()) {
                 String path = it.next();
                 if (path.endsWith(Constants.JAR_EXT) &&
-                    !Matcher.matchPath(ignoredJarsTokens,
-                        path.substring(path.lastIndexOf('/')+1))) {
+                        jarScanFilter.check(scanType,
+                                path.substring(path.lastIndexOf('/')+1))) {
                     // Need to scan this JAR
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("jarScan.webinflibJarScan", path));
@@ -239,8 +221,8 @@ public class StandardJarScanner implements JarScanner {
                         String jarName = getJarName(urls[i]);
 
                         // Skip JARs known not to be interesting
-                        if (jarName != null && !Matcher.matchPath(
-                                ignoredJarsTokens, jarName)) {
+                        if (jarName != null &&
+                                jarScanFilter.check(scanType, jarName)) {
                             if (log.isDebugEnabled()) {
                                 log.debug(sm.getString("jarScan.classloaderJarScan", urls[i]));
                             }
