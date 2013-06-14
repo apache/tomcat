@@ -34,6 +34,7 @@ import javax.servlet.ServletContext;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.file.Matcher;
@@ -122,9 +123,12 @@ public class StandardJarScanner implements JarScanner {
     }
 
     /**
-     * Scan the provided ServletContext and classloader for JAR files. Each JAR
+     * Scan the provided ServletContext and class loader for JAR files. Each JAR
      * file found will be passed to the callback handler to be processed.
      *
+     * @param scanType      The type of JAR scan to perform. This is passed to
+     *                          the filter which uses it to determine how to
+     *                          filter the results
      * @param context       The ServletContext - used to locate and access
      *                      WEB-INF/lib
      * @param callback      The handler to process any JARs found
@@ -133,8 +137,8 @@ public class StandardJarScanner implements JarScanner {
      *                      defined by {@link Constants#SKIP_JARS_PROPERTY}
      */
     @Override
-    public void scan(ServletContext context, JarScannerCallback callback,
-            Set<String> jarsToSkip) {
+    public void scan(JarScanType scanType, ServletContext context,
+            JarScannerCallback callback, Set<String> jarsToSkip) {
 
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("jarScan.webinflibStart"));

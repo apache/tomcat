@@ -37,6 +37,7 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.ApplicationListener;
+import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -262,7 +263,7 @@ public final class TldConfig  implements LifecycleListener {
 
         // Stages 3b & 4
         JarScanner jarScanner = context.getJarScanner();
-        jarScanner.scan(context.getServletContext(),
+        jarScanner.scan(JarScanType.TLD, context.getServletContext(),
                 new TldJarScannerCallback(), noTldJars);
 
         // Now add all the listeners we found to the listeners for this context
