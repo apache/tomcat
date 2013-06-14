@@ -2031,16 +2031,20 @@ public class ContextConfig implements LifecycleListener {
     protected void processAnnotations(Set<WebXml> fragments,
             boolean handlesTypesOnly) {
         for(WebXml fragment : fragments) {
-            WebXml annotations = new WebXml();
-            // no impact on distributable
-            annotations.setDistributable(true);
-            URL url = fragment.getURL();
-            processAnnotationsUrl(url, annotations,
-                    (handlesTypesOnly || fragment.isMetadataComplete()));
-            Set<WebXml> set = new HashSet<>();
-            set.add(annotations);
-            // Merge annotations into fragment - fragment takes priority
-            fragment.merge(set);
+            if (fragment.getWebappJar()) {
+                // Only web application JARs should be scanned for deployment
+                // annotations
+                WebXml annotations = new WebXml();
+                // no impact on distributable
+                annotations.setDistributable(true);
+                URL url = fragment.getURL();
+                processAnnotationsUrl(url, annotations,
+                        (handlesTypesOnly || fragment.isMetadataComplete()));
+                Set<WebXml> set = new HashSet<>();
+                set.add(annotations);
+                // Merge annotations into fragment - fragment takes priority
+                fragment.merge(set);
+            }
         }
     }
 
