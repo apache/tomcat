@@ -119,6 +119,24 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     protected int bufferedWriteSize = 64*1024; //64k default write buffer
 
 
+    protected AbstractOutputBuffer(Response response, int headerBufferSize) {
+
+        this.response = response;
+
+        headerBuffer = new byte[headerBufferSize];
+
+        filterLibrary = new OutputFilter[0];
+        activeFilters = new OutputFilter[0];
+        lastActiveFilter = -1;
+
+        committed = false;
+        finished = false;
+
+        // Cause loading of HttpMessages
+        HttpMessages.getMessage(200);
+    }
+
+
     // -------------------------------------------------------------- Variables
 
     /**

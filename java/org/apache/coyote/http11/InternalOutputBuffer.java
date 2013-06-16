@@ -42,22 +42,12 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
      */
     public InternalOutputBuffer(Response response, int headerBufferSize) {
 
-        this.response = response;
-
-        headerBuffer = new byte[headerBufferSize];
+        super(response, headerBufferSize);
 
         outputStreamOutputBuffer = new OutputStreamOutputBuffer();
 
-        filterLibrary = new OutputFilter[0];
-        activeFilters = new OutputFilter[0];
-        lastActiveFilter = -1;
-
         socketBuffer = new ByteChunk();
         socketBuffer.setByteOutputChannel(this);
-
-        committed = false;
-        finished = false;
-
     }
 
     /**

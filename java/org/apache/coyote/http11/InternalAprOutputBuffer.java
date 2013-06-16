@@ -28,7 +28,6 @@ import org.apache.coyote.Response;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketWrapper;
@@ -47,9 +46,8 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
      */
     public InternalAprOutputBuffer(Response response, int headerBufferSize) {
 
-        this.response = response;
+        super(response, headerBufferSize);
 
-        headerBuffer = new byte[headerBufferSize];
         if (headerBufferSize < (8 * 1024)) {
             bbuf = ByteBuffer.allocateDirect(6 * 1500);
         } else {
@@ -57,17 +55,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         }
 
         outputStreamOutputBuffer = new SocketOutputBuffer();
-
-        filterLibrary = new OutputFilter[0];
-        activeFilters = new OutputFilter[0];
-        lastActiveFilter = -1;
-
-        committed = false;
-        finished = false;
-
-        // Cause loading of HttpMessages
-        HttpMessages.getMessage(200);
-
     }
 
 
@@ -362,7 +349,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
             int len = chunk.getLength();
             int start = chunk.getStart();
             byte[] b = chunk.getBuffer();
-            addToBB(b, start,len);
+            addToBB(b, start, len);
             byteCount += chunk.getLength();
             return chunk.getLength();
         }
