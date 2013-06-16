@@ -126,7 +126,7 @@ public class TestApplicationSessionCookieConfig {
     }
 
     private static class CustomContext extends StandardContext {
-        private LifecycleState state;
+        private volatile LifecycleState state;
 
         @Override
         public LifecycleState getState() {

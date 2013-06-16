@@ -466,6 +466,11 @@
 
   <!-- Test code -->
   <Match>
+    <Class name="org.apache.catalina.core.TestApplicationSessionCookieConfig$CustomContext" />
+    <Method name="getState"/>
+    <Bug code="UG" />
+  </Match>
+  <Match>
     <Or>
       <Class name="org.apache.catalina.startup.TestListener$SCL" />
       <Class name="org.apache.catalina.startup.TestListener$SCL3" />
@@ -585,5 +590,14 @@
       <Method name="testRenegotiateWorks" />
     </Or>
     <Bug code="RR" />
+  </Match>
+  <Match>
+    <!-- Code is deliberately unused -->
+    <Class name="org.apache.tomcat.websocket.server.TestUriTemplate" />
+    <Or>
+      <Method name="testBasicPrefix" />
+      <Method name="testQuote2" />
+    </Or>
+    <Bug code="DLS" />
   </Match>
 </FindBugsFilter>
