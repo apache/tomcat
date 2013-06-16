@@ -821,8 +821,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             try {
                 isReady.set(getOutputBuffer().isReady());
             } catch (IOException e) {
-                // TODO
-                throw new IllegalStateException();
+                getLog().debug("isReady() failed", e);
+                error = true;
             }
         } else if (actionCode == ActionCode.NB_READ_INTEREST) {
             registerForEvent(true, false);
