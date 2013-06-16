@@ -45,8 +45,7 @@ public abstract class PojoMessageHandlerWholeBase<T>
     @Override
     public final void onMessage(T message) {
 
-        if (params != null && params.length == 1 &&
-                params[0] instanceof DecodeException) {
+        if (params.length == 1 && params[0] instanceof DecodeException) {
             ((WsSession) session).getLocal().onError(session,
                     (DecodeException) params[0]);
             return;
