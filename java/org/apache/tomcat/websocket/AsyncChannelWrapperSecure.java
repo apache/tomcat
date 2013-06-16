@@ -472,7 +472,10 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         public T get(long timeout, TimeUnit unit)
                 throws InterruptedException, ExecutionException,
                 TimeoutException {
-            completionLatch.await(timeout, unit);
+            boolean latchResult = completionLatch.await(timeout, unit);
+            if (latchResult == false) {
+                throw new TimeoutException();
+            }
             if (throwable != null) {
                 throw new ExecutionException(throwable);
             }
