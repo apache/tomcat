@@ -195,7 +195,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
 
     @Override
-    protected void registerWriteInterest() throws IOException {
+    protected void registerWriteInterest() {
         // NO-OP for non-blocking connector
     }
 
