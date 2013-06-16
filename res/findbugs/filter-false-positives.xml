@@ -202,6 +202,20 @@
     <!-- of lock upgrade that is used. -->
     <Class name="org.apache.coyote.http11.upgrade.AprServletOutputStream" />
     <Method name="doWrite"/>
+    <Bug code="UL"  />
+  </Match>
+  <Match>
+    <!-- Locks are always released. Non-standard pattern is required because -->
+    <!-- of lock upgrade that is used. -->
+    <Class name="org.apache.coyote.http11.InternalAprInputBuffer" />
+    <Method name="doReadSocket"/>
+    <Bug code="UL" />
+  </Match>
+  <Match>
+    <!-- Locks are always released. Non-standard pattern is required because -->
+    <!-- of lock upgrade that is used. -->
+    <Class name="org.apache.coyote.http11.InternalAprOutputBuffer" />
+    <Method name="writeToSocket"/>
     <Bug code="UL" />
   </Match>
   <Match>
