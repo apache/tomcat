@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
@@ -49,22 +48,9 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      */
     public InternalNioOutputBuffer(Response response, int headerBufferSize) {
 
-        this.response = response;
-
-        headerBuffer = new byte[headerBufferSize];
+        super(response, headerBufferSize);
 
         outputStreamOutputBuffer = new SocketOutputBuffer();
-
-        filterLibrary = new OutputFilter[0];
-        activeFilters = new OutputFilter[0];
-        lastActiveFilter = -1;
-
-        committed = false;
-        finished = false;
-
-        // Cause loading of HttpMessages
-        HttpMessages.getMessage(200);
-
     }
 
 
