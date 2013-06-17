@@ -1244,7 +1244,15 @@ public class Response
     @Override
     public void sendRedirect(String location)
         throws IOException {
+        sendRedirect(location, SC_FOUND);
+    }
 
+    /**
+     * Internal method that allows a redirect to be sent with a status other
+     * than {@link HttpServletResponse#SC_FOUND} (302). No attempt is made to
+     * validate the status code.
+     */
+    public void sendRedirect(String location, int status) throws IOException {
         if (isCommitted()) {
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.sendRedirect.ise"));
@@ -1261,7 +1269,7 @@ public class Response
         // Generate a temporary redirect to the specified location
         try {
             String absolute = toAbsolute(location);
-            setStatus(SC_FOUND);
+            setStatus(status);
             setHeader("Location", absolute);
             if (getContext().getSendRedirectBody()) {
                 PrintWriter writer = getWriter();

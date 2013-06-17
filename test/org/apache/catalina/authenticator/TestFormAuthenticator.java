@@ -75,6 +75,9 @@ public class TestFormAuthenticator extends TomcatBaseTest {
     protected static final boolean CLIENT_USE_COOKIES = true;
     protected static final boolean CLIENT_NO_COOKIES = !CLIENT_USE_COOKIES;
 
+    protected static final boolean CLIENT_USE_HTTP_11 = true;
+    protected static final boolean CLIENT_USE_HTTP_10 = !CLIENT_USE_HTTP_11;
+
     protected static final boolean SERVER_USE_COOKIES = true;
     protected static final boolean SERVER_NO_COOKIES = !SERVER_USE_COOKIES;
 
@@ -236,6 +239,14 @@ public class TestFormAuthenticator extends TomcatBaseTest {
                 FormAuthClient.LOGIN_REQUIRED, 1);
     }
 
+    // HTTP 1.0 test
+    @Test
+    public void testGetWithCookiesHttp10() throws Exception {
+        doTest("GET", "GET", NO_100_CONTINUE,
+                CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID,
+                CLIENT_USE_HTTP_10);
+    }
+
     /*
      * Choreograph the steps of the test dialogue with the server
      *  1. while not authenticated, try to access a protected resource
@@ -255,9 +266,20 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             boolean useContinue, boolean clientShouldUseCookies,
             boolean serverWillUseCookies, boolean serverWillChangeSessid)
             throws Exception {
+        return doTest(resourceMethod, redirectMethod, useContinue,
+                clientShouldUseCookies, serverWillUseCookies,
+                serverWillChangeSessid, true);
+    }
+
+        private String doTest(String resourceMethod, String redirectMethod,
+                boolean useContinue, boolean clientShouldUseCookies,
+                boolean serverWillUseCookies, boolean serverWillChangeSessid,
+                boolean clientShouldUseHttp11)
+                throws Exception {
 
         client = new FormAuthClient(clientShouldUseCookies,
-                serverWillUseCookies, serverWillChangeSessid);
+                clientShouldUseHttp11, serverWillUseCookies,
+                serverWillChangeSessid);
 
         // First request for protected resource gets the login page
         client.setUseContinue(useContinue);
@@ -279,8 +301,13 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         // Second request replies to the login challenge
         client.setUseContinue(useContinue);
         client.doLoginRequest(loginUri);
-        assertTrue("login failed " + client.getResponseLine(),
-                client.isResponse302());
+        if (clientShouldUseHttp11) {
+            assertTrue("login failed " + client.getResponseLine(),
+                    client.isResponse303());
+        } else {
+            assertTrue("login failed " + client.getResponseLine(),
+                    client.isResponse302());
+        }
         assertTrue(client.isResponseBodyOK());
         String redirectUri = client.getRedirectUri();
         client.reset();
@@ -323,7 +350,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
      *     persistence of the authenticated session
      *
      * @param resourceMethod HTTP method for accessing the protected resource
-     * @param protectedUri to access (with or withour sessionid)
+     * @param protectedUri to access (with or without sessionid)
      * @param useContinue whether the HTTP client should expect a 100 Continue
      * @param clientShouldUseCookies whether the client should send cookies
      * @param serverWillUseCookies whether the server should send cookies
@@ -372,9 +399,14 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         protected final String SESSION_PARAMETER_START =
             SESSION_PARAMETER_NAME + "=";
 
+        private boolean clientShouldUseHttp11;
+
         private FormAuthClient(boolean clientShouldUseCookies,
+                boolean clientShouldUseHttp11,
                 boolean serverShouldUseCookies,
                 boolean serverShouldChangeSessid) throws Exception {
+
+            this.clientShouldUseHttp11 = clientShouldUseHttp11;
 
             Tomcat tomcat = getTomcatInstance();
             File appDir = new File(getBuildDirectory(), "webapps/examples");
@@ -447,7 +479,11 @@ public class TestFormAuthenticator extends TomcatBaseTest {
                     requestHead.append("?role=bar");
                 }
             }
-            requestHead.append(" HTTP/1.1").append(CRLF);
+            if (clientShouldUseHttp11) {
+                requestHead.append(" HTTP/1.1").append(CRLF);
+            } else {
+                requestHead.append(" HTTP/1.0").append(CRLF);
+            }
 
             // next, add the constant http headers
             requestHead.append("Host: localhost").append(CRLF);
