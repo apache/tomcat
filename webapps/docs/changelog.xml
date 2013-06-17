@@ -64,6 +64,11 @@
         available to <code>ServletContextListener</code>s defined in one of the
         specified ways. (markt)
       </fix>
+      <fix>
+        Better handle FORM authentication when requesting a resource as an
+        unauthenticated user that is only protected for a sub-set of HTTP
+        methods that does not include GET. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
