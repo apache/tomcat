@@ -201,10 +201,12 @@ public class SecurityConstraint implements Serializable {
 
         if (authRole == null)
             return;
+
         if ("*".equals(authRole)) {
             allRoles = true;
             return;
         }
+
         String results[] = new String[authRoles.length + 1];
         for (int i = 0; i < authRoles.length; i++)
             results[i] = authRoles[i];
@@ -338,6 +340,12 @@ public class SecurityConstraint implements Serializable {
 
         if (authRole == null)
             return;
+
+        if ("*".equals(authRole)) {
+            allRoles = false;
+            return;
+        }
+
         int n = -1;
         for (int i = 0; i < authRoles.length; i++) {
             if (authRoles[i].equals(authRole)) {
