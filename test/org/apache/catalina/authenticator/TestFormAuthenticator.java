@@ -17,9 +17,16 @@
 package org.apache.catalina.authenticator;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -28,8 +35,12 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.Valve;
 import org.apache.catalina.deploy.ApplicationListener;
+import org.apache.catalina.deploy.LoginConfig;
+import org.apache.catalina.deploy.SecurityCollection;
+import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
+import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.server.WsListener;
@@ -247,6 +258,43 @@ public class TestFormAuthenticator extends TomcatBaseTest {
                 CLIENT_USE_HTTP_10);
     }
 
+
+    @Test
+    public void doTestSelectedMethods() throws Exception {
+
+        FormAuthClientSelectedMethods client =
+                new FormAuthClientSelectedMethods(true, true, true, true);
+
+        // First request for protected resource gets the login page
+        client.doResourceRequest("PUT", true, "/test?" +
+                SelectedMethodsServlet.PARAM + "=" +
+                SelectedMethodsServlet.VALUE, null);
+        assertTrue(client.getResponseLine(), client.isResponse200());
+        assertTrue(client.isResponseBodyOK());
+        String originalSessionId = client.getSessionId();
+        client.reset();
+
+        // Second request replies to the login challenge
+        client.doResourceRequest("POST", true, "/test/j_security_check",
+                FormAuthClientBase.LOGIN_REPLY);
+        assertTrue("login failed " + client.getResponseLine(),
+                client.isResponse303());
+        assertTrue(client.isResponseBodyOK());
+        String redirectUri = client.getRedirectUri();
+        client.reset();
+
+        // Third request - the login was successful so
+        // follow the redirect to the protected resource
+        client.doResourceRequest("GET", true, redirectUri, null);
+        assertTrue(client.isResponse200());
+        assertTrue(client.isResponseBodyOK());
+        String newSessionId = client.getSessionId();
+
+        assertTrue(!originalSessionId.equals(newSessionId));
+        client.reset();
+    }
+
+
     /*
      * Choreograph the steps of the test dialogue with the server
      *  1. while not authenticated, try to access a protected resource
@@ -271,11 +319,10 @@ public class TestFormAuthenticator extends TomcatBaseTest {
                 serverWillChangeSessid, true);
     }
 
-        private String doTest(String resourceMethod, String redirectMethod,
-                boolean useContinue, boolean clientShouldUseCookies,
-                boolean serverWillUseCookies, boolean serverWillChangeSessid,
-                boolean clientShouldUseHttp11)
-                throws Exception {
+    private String doTest(String resourceMethod, String redirectMethod,
+            boolean useContinue, boolean clientShouldUseCookies,
+            boolean serverWillUseCookies, boolean serverWillChangeSessid,
+            boolean clientShouldUseHttp11) throws Exception {
 
         client = new FormAuthClient(clientShouldUseCookies,
                 clientShouldUseHttp11, serverWillUseCookies,
@@ -374,7 +421,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
      * Encapsulate the logic needed to run a suitably-configured tomcat
      * instance, send it an HTTP request and process the server response
      */
-    private final class FormAuthClient extends SimpleHttpClient {
+    private class FormAuthClientBase extends SimpleHttpClient {
 
         protected static final String LOGIN_PARAM_TAG = "action=";
         protected static final String LOGIN_RESOURCE = "j_security_check";
@@ -399,50 +446,9 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         protected final String SESSION_PARAMETER_START =
             SESSION_PARAMETER_NAME + "=";
 
-        private boolean clientShouldUseHttp11;
+        protected boolean clientShouldUseHttp11;
 
-        private FormAuthClient(boolean clientShouldUseCookies,
-                boolean clientShouldUseHttp11,
-                boolean serverShouldUseCookies,
-                boolean serverShouldChangeSessid) throws Exception {
-
-            this.clientShouldUseHttp11 = clientShouldUseHttp11;
-
-            Tomcat tomcat = getTomcatInstance();
-            File appDir = new File(getBuildDirectory(), "webapps/examples");
-            Context ctx = tomcat.addWebapp(null, "/examples",
-                    appDir.getAbsolutePath());
-            setUseCookies(clientShouldUseCookies);
-            ctx.setCookies(serverShouldUseCookies);
-            ctx.addApplicationListener(new ApplicationListener(
-                    WsListener.class.getName(), false));
-
-            MapRealm realm = new MapRealm();
-            realm.addUser("tomcat", "tomcat");
-            realm.addUserRole("tomcat", "tomcat");
-            ctx.setRealm(realm);
-
-            tomcat.start();
-
-            // perhaps this does not work until tomcat has started?
-            ctx.setSessionTimeout(TIMEOUT_MINS);
-
-            // Valve pipeline is only established after tomcat starts
-            Valve[] valves = ctx.getPipeline().getValves();
-            for (Valve valve : valves) {
-                if (valve instanceof AuthenticatorBase) {
-                    ((AuthenticatorBase)valve)
-                            .setChangeSessionIdOnAuthentication(
-                                                serverShouldChangeSessid);
-                    break;
-                }
-            }
-
-            // Port only known after Tomcat starts
-            setPort(getPort());
-        }
-
-        private void doLoginRequest(String loginUri) throws Exception {
+        protected void doLoginRequest(String loginUri) throws Exception {
 
             doResourceRequest("POST", true,
                     PROTECTED_RELATIVE_PATH + loginUri, LOGIN_REPLY);
@@ -457,7 +463,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
          * Cookies are sent if available and supported by the test. Otherwise, the
          * caller is expected to have provided a session id as a path parameter.
          */
-        private void doResourceRequest(String method, boolean isFullQualUri,
+        protected void doResourceRequest(String method, boolean isFullQualUri,
                 String resourceUri, String requestTail) throws Exception {
 
             // build the HTTP request while assembling the uri
@@ -571,7 +577,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
          * Scan the server response body and extract the given
          * url, including any path elements.
          */
-        private String extractBodyUri(String paramTag, String resource) {
+        protected String extractBodyUri(String paramTag, String resource) {
             extractUriElements();
             List<String> elements = getResponseBodyUriElements();
             String fullPath = null;
@@ -599,7 +605,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         /*
          * extract the session id path element (if it exists in the given url)
          */
-        private String extractPathSessionId(String url) {
+        protected String extractPathSessionId(String url) {
             String sessionId = null;
             int iStart = url.indexOf(SESSION_PARAMETER_START);
             if (iStart > -1) {
@@ -624,6 +630,173 @@ public class TestFormAuthenticator extends TomcatBaseTest {
                         + "Expected to contain substring: [" + expected
                         + "]\nActual: [" + body + "]");
             }
+        }
+    }
+
+
+    private class FormAuthClient extends FormAuthClientBase {
+        private FormAuthClient(boolean clientShouldUseCookies,
+                boolean clientShouldUseHttp11,
+                boolean serverShouldUseCookies,
+                boolean serverShouldChangeSessid) throws Exception {
+
+            this.clientShouldUseHttp11 = clientShouldUseHttp11;
+
+            Tomcat tomcat = getTomcatInstance();
+            File appDir = new File(getBuildDirectory(), "webapps/examples");
+            Context ctx = tomcat.addWebapp(null, "/examples",
+                    appDir.getAbsolutePath());
+            setUseCookies(clientShouldUseCookies);
+            ctx.setCookies(serverShouldUseCookies);
+            ctx.addApplicationListener(new ApplicationListener(
+                    WsListener.class.getName(), false));
+
+            MapRealm realm = new MapRealm();
+            realm.addUser("tomcat", "tomcat");
+            realm.addUserRole("tomcat", "tomcat");
+            ctx.setRealm(realm);
+
+            tomcat.start();
+
+            // perhaps this does not work until tomcat has started?
+            ctx.setSessionTimeout(TIMEOUT_MINS);
+
+            // Valve pipeline is only established after tomcat starts
+            Valve[] valves = ctx.getPipeline().getValves();
+            for (Valve valve : valves) {
+                if (valve instanceof AuthenticatorBase) {
+                    ((AuthenticatorBase)valve)
+                            .setChangeSessionIdOnAuthentication(
+                                                serverShouldChangeSessid);
+                    break;
+                }
+            }
+
+            // Port only known after Tomcat starts
+            setPort(getPort());
+        }
+    }
+
+
+    /**
+     * Encapsulate the logic needed to run a suitably-configured Tomcat
+     * instance, send it an HTTP request and process the server response when
+     * the protected resource is only protected for some HTTP methods. The use
+     * case of particular interest is when GET and POST are not protected since
+     * those are the methods used by the login form and the redirect and if
+     * those methods are not protected the authenticator may not process the
+     * associated requests.
+     */
+    private class FormAuthClientSelectedMethods extends FormAuthClientBase {
+
+        private FormAuthClientSelectedMethods(boolean clientShouldUseCookies,
+                boolean clientShouldUseHttp11,
+                boolean serverShouldUseCookies,
+                boolean serverShouldChangeSessid) throws Exception {
+
+            this.clientShouldUseHttp11 = clientShouldUseHttp11;
+
+            Tomcat tomcat = getTomcatInstance();
+
+            Context ctx = tomcat.addContext(
+                    "", System.getProperty("java.io.tmpdir"));
+            Tomcat.addServlet(ctx, "SelectedMethods",
+                    new SelectedMethodsServlet());
+            ctx.addServletMapping("/test", "SelectedMethods");
+            // Login servlet just needs to respond "OK". Client will handle
+            // creating a valid response. No need for a form.
+            Tomcat.addServlet(ctx, "Login",
+                    new TesterServlet());
+            ctx.addServletMapping("/login", "Login");
+
+            // Configure the security constraints
+            SecurityConstraint constraint = new SecurityConstraint();
+            SecurityCollection collection = new SecurityCollection();
+            collection.setName("Protect PUT");
+            collection.addMethod("PUT");
+            collection.addPattern("/test");
+            constraint.addCollection(collection);
+            constraint.addAuthRole("tomcat");
+            ctx.addConstraint(constraint);
+
+            // Configure authentication
+            LoginConfig lc = new LoginConfig();
+            lc.setAuthMethod("FORM");
+            lc.setLoginPage("/login");
+            ctx.setLoginConfig(lc);
+            ctx.getPipeline().addValve(new FormAuthenticator());
+
+            setUseCookies(clientShouldUseCookies);
+            ctx.setCookies(serverShouldUseCookies);
+
+            MapRealm realm = new MapRealm();
+            realm.addUser("tomcat", "tomcat");
+            realm.addUserRole("tomcat", "tomcat");
+            ctx.setRealm(realm);
+
+            tomcat.start();
+
+            // perhaps this does not work until tomcat has started?
+            ctx.setSessionTimeout(TIMEOUT_MINS);
+
+            // Valve pipeline is only established after tomcat starts
+            Valve[] valves = ctx.getPipeline().getValves();
+            for (Valve valve : valves) {
+                if (valve instanceof AuthenticatorBase) {
+                    ((AuthenticatorBase)valve)
+                            .setChangeSessionIdOnAuthentication(
+                                                serverShouldChangeSessid);
+                    break;
+                }
+            }
+
+            // Port only known after Tomcat starts
+            setPort(getPort());
+        }
+
+        @Override
+        public boolean isResponseBodyOK() {
+            if (isResponse303()) {
+                return true;
+            }
+            assertTrue(getResponseBody(), getResponseBody().contains("OK"));
+            assertFalse(getResponseBody().contains("FAIL"));
+            return true;
+        }
+    }
+
+
+    private static final class SelectedMethodsServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+        public static final String PARAM = "TestParam";
+        public static final String VALUE = "TestValue";
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain;charset=UTF-8");
+
+            if (VALUE.equals(req.getParameter(PARAM)) &&
+                    req.isUserInRole("tomcat")) {
+                resp.getWriter().print("OK");
+            } else {
+                resp.getWriter().print("FAIL");
+            }
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            // Same as GET for this test case
+            doGet(req, resp);
+        }
+
+        @Override
+        protected void doPut(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            // Same as GET for this test case
+            doGet(req, resp);
         }
     }
 }
