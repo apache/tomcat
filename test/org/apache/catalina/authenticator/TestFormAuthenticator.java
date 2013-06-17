@@ -556,26 +556,26 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             return fullPath;
         }
 
-    /*
-     * extract the session id path element (if it exists in the given url)
-     */
-    private String extractPathSessionId(String url) {
-        String sessionId = null;
-        int iStart = url.indexOf(SESSION_PARAMETER_START);
-        if (iStart > -1) {
-            iStart += SESSION_PARAMETER_START.length();
-            String remainder = url.substring(iStart);
-            StringTokenizer parser =
-                    new StringTokenizer(remainder, SESSION_PATH_PARAMETER_TAILS);
-            if (parser.hasMoreElements()) {
-                sessionId = parser.nextToken();
+        /*
+         * extract the session id path element (if it exists in the given url)
+         */
+        private String extractPathSessionId(String url) {
+            String sessionId = null;
+            int iStart = url.indexOf(SESSION_PARAMETER_START);
+            if (iStart > -1) {
+                iStart += SESSION_PARAMETER_START.length();
+                String remainder = url.substring(iStart);
+                StringTokenizer parser = new StringTokenizer(remainder,
+                        SESSION_PATH_PARAMETER_TAILS);
+                if (parser.hasMoreElements()) {
+                    sessionId = parser.nextToken();
+                }
+                else {
+                    sessionId = url.substring(iStart);
+                }
             }
-            else {
-                sessionId = url.substring(iStart);
-            }
+            return sessionId;
         }
-        return sessionId;
-    }
 
         private void assertContains(String body, String expected) {
             if (!body.contains(expected)) {
