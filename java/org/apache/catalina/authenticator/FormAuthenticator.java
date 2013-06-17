@@ -32,6 +32,7 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
@@ -335,7 +336,17 @@ public class FormAuthenticator
                 response.sendRedirect(response.encodeRedirectURL(uri));
             }
         } else {
-            response.sendRedirect(response.encodeRedirectURL(requestURI));
+            // Until the Servlet API allows specifying the type of redirect to
+            // use.
+            Response internalResponse = request.getResponse();
+            String location = response.encodeRedirectURL(requestURI);
+            if ("HTTP/1.1".equals(request.getProtocol())) {
+                internalResponse.sendRedirect(location,
+                        HttpServletResponse.SC_SEE_OTHER);
+            } else {
+                internalResponse.sendRedirect(location,
+                        HttpServletResponse.SC_FOUND);
+            }
         }
         return false;
 
