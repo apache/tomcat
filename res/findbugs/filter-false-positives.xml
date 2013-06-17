@@ -79,6 +79,16 @@
     <Bug code="SWL" />
   </Match>
   <Match>
+    <!-- The code is adding HTTP request headers, not parameters and the
+         header parsing on input will have removed any CR or LF characters. -->
+    <Class name="org.apache.catalina.filters.CorsFilter" />
+    <Or>
+      <Method name="handlePreflightCORS" />
+      <Method name="handleSimpleCORS" />
+    </Or>
+    <Bug pattern="HRS_REQUEST_PARAMETER_TO_HTTP_HEADER" />
+  </Match>
+  <Match>
     <!-- shost will not be null in normal usage -->
     <Class name="org.apache.catalina.ha.backend.CollectedInfo" />
     <Method name="init" />
