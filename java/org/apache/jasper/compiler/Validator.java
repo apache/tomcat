@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,7 +46,7 @@ import org.xml.sax.Attributes;
  * mandatory presence, entry value validity, and consistency. As a side effect,
  * some page global value (such as those from page directives) are stored, for
  * later use.
- * 
+ *
  * @author Kin-man Chung
  * @author Jan Luehe
  * @author Shawn Bayern
@@ -321,10 +321,10 @@ class Validator {
         /*
          * Compares page encodings specified in various places, and throws
          * exception in case of page encoding mismatch.
-         * 
+         *
          * @param pageDirEnc The value of the pageEncoding attribute of the page
          * directive @param pageDir The page directive node
-         * 
+         *
          * @throws JasperException in case of page encoding mismatch
          */
         private String comparePageEncodings(String thePageDirEnc,
@@ -372,17 +372,17 @@ class Validator {
                     return pageEnc;
                 }
             }
-            
+
             return pageDirEnc;
         }
-        
+
         /*
          * Compares page encodings specified in various places, and throws
          * exception in case of page encoding mismatch.
-         * 
+         *
          * @param thePageDirEnc The value of the pageEncoding attribute of the page
          * directive @param pageDir The page directive node
-         * 
+         *
          * @throws JasperException in case of page encoding mismatch
          */
         private void compareTagEncodings(String thePageDirEnc,
@@ -785,7 +785,7 @@ class Validator {
             if (value == null) {
                 return false;
             }
-            
+
             int i = 0;
             int len = value.length();
             boolean prevCharIsEscape = false;
@@ -1048,19 +1048,19 @@ class Validator {
         /*
          * Make sure the given custom action does not have any invalid
          * attributes.
-         * 
+         *
          * A custom action and its declared attributes always belong to the same
          * namespace, which is identified by the prefix name of the custom tag
          * invocation. For example, in this invocation:
-         * 
+         *
          * <my:test a="1" b="2" c="3"/>, the action
-         * 
+         *
          * "test" and its attributes "a", "b", and "c" all belong to the
          * namespace identified by the prefix "my". The above invocation would
          * be equivalent to:
-         * 
+         *
          * <my:test my:a="1" my:b="2" my:c="3"/>
-         * 
+         *
          * An action attribute may have a prefix different from that of the
          * action invocation only if the underlying tag handler supports dynamic
          * attributes, in which case the attribute with the different prefix is
@@ -1079,7 +1079,7 @@ class Validator {
 
             for (int i = 0; attrs != null && i < attrs.getLength(); i++) {
                 boolean found = false;
-                
+
                 boolean runtimeExpression = ((n.getRoot().isXmlSyntax() && attrs.getValue(i).startsWith("%="))
                         || (!n.getRoot().isXmlSyntax() && attrs.getValue(i).startsWith("<%=")));
                 boolean elExpression = false;
@@ -1127,7 +1127,7 @@ class Validator {
                         TagAttributeInfo tldAttr = tldAttrs[j];
                         if (tldAttr.canBeRequestTime()
                                 || tldAttr.isDeferredMethod() || tldAttr.isDeferredValue()) { // JSP 2.1
-                            
+
                             if (!expression) {
 
                                 String expectedType = null;
@@ -1207,12 +1207,12 @@ class Validator {
                                     err.jspError(n, "jsp.error.attribute.custom.non_rt_with_expr",
                                             tldAttr.getName());
                                 }
-                                
+
                                 if (elExpression) {
                                     // El expression
                                     validateFunctions(el, n);
                                     jspAttrs[i] = new Node.JspAttribute(tldAttr,
-                                            attrs.getQName(i), attrs.getURI(i), 
+                                            attrs.getQName(i), attrs.getURI(i),
                                             attrs.getLocalName(i),
                                             attrs.getValue(i), false, el, false);
                                     ELContextImpl ctx = new ELContextImpl();
@@ -1221,7 +1221,7 @@ class Validator {
                                         jspAttrs[i].validateEL(this.pageInfo.getExpressionFactory(), ctx);
                                     } catch (ELException e) {
                                         this.err.jspError(n.getStart(),
-                                                "jsp.error.invalid.expression", 
+                                                "jsp.error.invalid.expression",
                                                 attrs.getValue(i), e.toString());
                                     }
                                 } else {
@@ -1232,7 +1232,7 @@ class Validator {
                                             .getValue(i), n, false);
                                 }
                             }
-                            
+
                         } else {
                             // Attribute does not accept any expressions.
                             // Make sure its value does not contain any.
@@ -1274,7 +1274,7 @@ class Validator {
          * attributes
          */
         private void checkNamedAttributes(Node.CustomTag n,
-                Node.JspAttribute[] jspAttrs, int start, 
+                Node.JspAttribute[] jspAttrs, int start,
                 Hashtable<String, Object> tagDataAttrs)
                 throws JasperException {
 
@@ -1426,7 +1426,7 @@ class Validator {
          * expression.
          */
         private boolean isExpression(Node n, String value, boolean checkDeferred) {
-            
+
             boolean runtimeExpression = ((n.getRoot().isXmlSyntax() && value.startsWith("%="))
                     || (!n.getRoot().isXmlSyntax() && value.startsWith("<%=")));
             boolean elExpression = false;
@@ -1439,9 +1439,12 @@ class Validator {
                     if (node instanceof ELNode.Root) {
                         if (((ELNode.Root) node).getType() == '$') {
                             elExpression = true;
-                        } else if (checkDeferred && !pageInfo.isDeferredSyntaxAllowedAsLiteral() 
-                                && ((ELNode.Root) node).getType() == '#') {
+                            break;
+                        } else if (checkDeferred &&
+                                !pageInfo.isDeferredSyntaxAllowedAsLiteral() &&
+                                ((ELNode.Root) node).getType() == '#') {
                             elExpression = true;
+                            break;
                         }
                     }
                 }
@@ -1604,7 +1607,7 @@ class Validator {
 
         /**
          * Get the parameters types from the function signature.
-         * 
+         *
          * @return An array of parameter class names
          */
         private String[] getParameters(ELNode.Function func)

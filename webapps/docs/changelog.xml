@@ -70,8 +70,9 @@
         methods that does not include GET. (markt)
       </fix>
       <fix>
-        <bug>55108</bug>, <bug>55109</bug> &amp; <bug>55110</bug>: Small
-        performance improvements. Patches provided by Adrian Nistor. (markt)
+        <bug>55073</bug>, <bug>55108</bug>, <bug>55109</bug> &amp;
+        <bug>55110</bug>: Small performance improvements. Patches provided by
+        Adrian Nistor. (markt)
       </fix>
     </changelog>
   </subsection>
