@@ -16,7 +16,7 @@
  */
 package org.apache.catalina.connector;
 
-public class TesterMockRequest extends Request {
+public class TesterRequest extends Request {
     @Override
     public String getScheme() {
         return "http";
