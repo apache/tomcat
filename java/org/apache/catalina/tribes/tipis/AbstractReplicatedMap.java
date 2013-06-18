@@ -746,7 +746,7 @@ public abstract class AbstractReplicatedMap<K,V>
         ArrayList<Member> result = new ArrayList<>();
         for (int i=0; i<set.length; i++ ) {
             boolean include = true;
-            for (int j=0; j<mbrs.length; j++ )
+            for (int j=0; j<mbrs.length && include; j++ )
                 if ( mbrs[j].equals(set[i]) ) include = false;
             if ( include ) result.add(set[i]);
         }
