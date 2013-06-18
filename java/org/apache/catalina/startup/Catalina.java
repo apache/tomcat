@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -468,6 +469,12 @@ public class Catalina {
                     stream.write(shutdown.charAt(i));
                 }
                 stream.flush();
+            } catch (ConnectException ce) {
+                log.error(sm.getString("catalina.stopServer.connectException",
+                                       s.getAddress(),
+                                       String.valueOf(s.getPort())));
+                log.error("Catalina.stop: ", ce);
+                System.exit(1);
             } catch (IOException e) {
                 log.error("Catalina.stop: ", e);
                 System.exit(1);
