@@ -16,15 +16,18 @@
  */
 package org.apache.catalina.realm;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.connector.TesterResponse;
+import org.apache.catalina.core.TesterContext;
 import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.startup.TesterMapRealm;
@@ -36,14 +39,92 @@ public class TestRealmBase {
     private static final String ROLE1 = "role1";
 
     @Test
-    public void testSingleRole() throws Exception {
+    public void testUserWithSingleRole() throws IOException {
+        List<String> userRoles = new ArrayList<>();
+        List<String> constraintRoles = new ArrayList<>();
+        List<String> applicationRoles = new ArrayList<>();
+
+        // Configure this test
+        userRoles.add(ROLE1);
+        constraintRoles.add(ROLE1);
+        applicationRoles.add(ROLE1);
+
+        doRoleTest(userRoles, constraintRoles, applicationRoles, true);
+    }
+
+
+    @Test
+    public void testUserWithNoRoles() throws IOException {
+        List<String> userRoles = new ArrayList<>();
+        List<String> constraintRoles = new ArrayList<>();
+        List<String> applicationRoles = new ArrayList<>();
+
+        // Configure this test
+        constraintRoles.add(ROLE1);
+        applicationRoles.add(ROLE1);
+
+        doRoleTest(userRoles, constraintRoles, applicationRoles, false);
+    }
+
+
+    @Test
+    public void testUserWithSingleRoleAndAllRoles() throws IOException {
+        List<String> userRoles = new ArrayList<>();
+        List<String> constraintRoles = new ArrayList<>();
+        List<String> applicationRoles = new ArrayList<>();
+
+        // Configure this test
+        userRoles.add(ROLE1);
+        applicationRoles.add(ROLE1);
+        constraintRoles.add(SecurityConstraint.ROLE_ALL_ROLES);
+
+        doRoleTest(userRoles, constraintRoles, applicationRoles, true);
+    }
+
+
+    @Test
+    public void testUserWithoutNoRolesAndAllRoles() throws IOException {
+        List<String> userRoles = new ArrayList<>();
+        List<String> constraintRoles = new ArrayList<>();
+        List<String> applicationRoles = new ArrayList<>();
+
+        // Configure this test
+        constraintRoles.add(SecurityConstraint.ROLE_ALL_ROLES);
+        applicationRoles.add(ROLE1);
+
+        doRoleTest(userRoles, constraintRoles, applicationRoles, false);
+    }
+
+
+    @Test
+    public void testAllRolesWithNoAppRole() throws IOException {
+        List<String> userRoles = new ArrayList<>();
+        List<String> constraintRoles = new ArrayList<>();
+        List<String> applicationRoles = new ArrayList<>();
+
+        // Configure this test
+        userRoles.add(ROLE1);
+        constraintRoles.add(SecurityConstraint.ROLE_ALL_ROLES);
+
+        doRoleTest(userRoles, constraintRoles, applicationRoles, false);
+    }
+
+
+    private void doRoleTest(List<String> userRoles,
+            List<String> constraintRoles, List<String> applicationRoles,
+            boolean expected) throws IOException {
+
         // Configure the users in the Realm
         TesterMapRealm mapRealm = new TesterMapRealm();
-        mapRealm.addUser("user", ROLE1);
+        for (String userRole : userRoles) {
+            mapRealm.addUser(USER1, userRole);
+        }
 
-        // Configure the security constraints for the resourc
+        // Configure the security constraints for the resource
         SecurityConstraint constraint = new SecurityConstraint();
-        constraint.addAuthRole(ROLE1);
+        for (String constraintRole : constraintRoles) {
+            constraint.addAuthRole(constraintRole);
+        }
         SecurityCollection collection = new SecurityCollection();
         collection.addPattern("/*");
         SecurityConstraint[] constraints =
@@ -52,16 +133,20 @@ public class TestRealmBase {
         // Set up the mock request and response
         Request request = new Request();
         Response response = new TesterResponse();
+        Context context = new TesterContext();
+        for (String applicationRole : applicationRoles) {
+            context.addSecurityRole(applicationRole);
+        }
+        request.setContext(context);
 
         // Set up an authenticated user
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add(ROLE1);
         GenericPrincipal gp = new GenericPrincipal(USER1, PWD1, userRoles);
         request.setUserPrincipal(gp);
 
+        // Check if user meets constaints
         boolean result = mapRealm.hasResourcePermission(
                 request, response, constraints, null);
 
-        Assert.assertTrue(result);
+        Assert.assertEquals(Boolean.valueOf(expected), Boolean.valueOf(result));
     }
 }
