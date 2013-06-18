@@ -655,6 +655,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             for (Session session : setA) {
                 if (session.isOpen()) {
                     isOpen = true;
+                    break;
                 }
             }
         }
