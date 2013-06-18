@@ -19,6 +19,8 @@ package org.apache.catalina.core;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -64,6 +66,23 @@ import org.apache.tomcat.JarScanner;
  * Minimal implementation for use in unit tests.
  */
 public class TesterContext implements Context {
+
+    private List<String> securityRoles = new ArrayList<>();
+    @Override
+    public void addSecurityRole(String role) {
+        securityRoles.add(role);
+    }
+
+    @Override
+    public boolean findSecurityRole(String role) {
+        return securityRoles.contains(role);
+    }
+
+    @Override
+    public String[] findSecurityRoles() {
+        return securityRoles.toArray(new String[securityRoles.size()]);
+    }
+
 
     @Override
     public Log getLogger() {
@@ -699,11 +718,6 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public void addSecurityRole(String role) {
-        // NO-OP
-    }
-
-    @Override
     public void addServletMapping(String pattern, String name) {
         // NO-OP
     }
@@ -811,16 +825,6 @@ public class TesterContext implements Context {
 
     @Override
     public String findRoleMapping(String role) {
-        return null;
-    }
-
-    @Override
-    public boolean findSecurityRole(String role) {
-        return false;
-    }
-
-    @Override
-    public String[] findSecurityRoles() {
         return null;
     }
 
