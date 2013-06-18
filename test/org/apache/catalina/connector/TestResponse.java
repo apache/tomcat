@@ -165,7 +165,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53062a() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -178,7 +178,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53062b() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -190,7 +190,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53062c() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -202,7 +202,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53062d() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -214,7 +214,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void testBug53062e() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -224,7 +224,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53062f() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -237,7 +237,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53062g() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -250,7 +250,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53062h() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -264,7 +264,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53062i() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -277,7 +277,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53062j() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -289,7 +289,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53062k() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -303,7 +303,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53062l() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -316,7 +316,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53062m() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -329,7 +329,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53062n() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -342,7 +342,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53062o() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -354,7 +354,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53062p() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -366,7 +366,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53469a() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -378,7 +378,7 @@ public class TestResponse extends TomcatBaseTest {
 
     @Test
     public void testBug53469b() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
