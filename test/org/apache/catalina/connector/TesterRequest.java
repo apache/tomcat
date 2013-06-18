@@ -36,4 +36,13 @@ public class TesterRequest extends Request {
     public String getDecodedRequestURI() {
         return "/level1/level2/foo.html";
     }
+
+    private String method;
+    public void setMethod(String method) {
+        this.method = method;
+    }
+    @Override
+    public String getMethod() {
+        return method;
+    }
 }
