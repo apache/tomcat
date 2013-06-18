@@ -22,6 +22,8 @@ import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.membership.Membership;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * <p>Title: Member domain filter interceptor </p>
@@ -33,7 +35,7 @@ import org.apache.catalina.tribes.membership.Membership;
  * @version 1.0
  */
 public class DomainFilterInterceptor extends ChannelInterceptorBase {
-
+    private static final Log log = LogFactory.getLog(DomainFilterInterceptor.class);
     protected Membership membership = null;
 
     protected byte[] domain = new byte[0];
@@ -53,7 +55,11 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
             notify = Arrays.equals(domain,member.getDomain());
             if ( notify ) notify = membership.memberAlive(member);
         }
-        if ( notify ) super.memberAdded(member);
+        if ( notify ) {
+            super.memberAdded(member);
+        } else {
+            if(log.isInfoEnabled()) log.info("Member was refused to join cluster["+member+"]");
+        }
     }
 
     @Override
