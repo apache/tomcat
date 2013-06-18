@@ -1441,8 +1441,10 @@ public class WebdavServlet
             boolean tokenMatch = false;
             while (tokenList.hasMoreElements()) {
                 String token = tokenList.nextElement();
-                if (ifHeader.indexOf(token) != -1)
+                if (ifHeader.indexOf(token) != -1) {
                     tokenMatch = true;
+                    break;
+                }
             }
             if (!tokenMatch)
                 return true;
@@ -1462,8 +1464,10 @@ public class WebdavServlet
                 boolean tokenMatch = false;
                 while (tokenList.hasMoreElements()) {
                     String token = tokenList.nextElement();
-                    if (ifHeader.indexOf(token) != -1)
+                    if (ifHeader.indexOf(token) != -1) {
                         tokenMatch = true;
+                        break;
+                    }
                 }
                 if (!tokenMatch)
                     return true;
