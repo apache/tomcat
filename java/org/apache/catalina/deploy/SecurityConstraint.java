@@ -50,8 +50,8 @@ public class SecurityConstraint implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public static String ROLE_ALL_ROLES = "*";
-    public static String ROLE_ALL_AUTHENTICATED_USERS = "**";
+    public static final String ROLE_ALL_ROLES = "*";
+    public static final String ROLE_ALL_AUTHENTICATED_USERS = "**";
 
     // ----------------------------------------------------------- Constructors
 
