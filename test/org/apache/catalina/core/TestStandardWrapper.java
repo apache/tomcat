@@ -53,7 +53,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.deploy.LoginConfig;
-import org.apache.catalina.startup.TestTomcat.MapRealm;
+import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -237,7 +237,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         ctx.addServletMapping("/", "servlet");
 
         if (useRole) {
-            MapRealm realm = new MapRealm();
+            TesterMapRealm realm = new TesterMapRealm();
             realm.addUser("testUser", "testPwd");
             realm.addUserRole("testUser", "testRole");
             ctx.setRealm(realm);

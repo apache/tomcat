@@ -36,7 +36,7 @@ import org.apache.catalina.core.TesterContext;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
-import org.apache.catalina.startup.TestTomcat.MapRealm;
+import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -283,7 +283,7 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
         ctxt.addConstraint(sc);
 
         // Configure the Realm
-        MapRealm realm = new MapRealm();
+        TesterMapRealm realm = new TesterMapRealm();
         realm.addUser(USER, PWD);
         realm.addUserRole(USER, ROLE);
         ctxt.setRealm(realm);

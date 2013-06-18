@@ -49,7 +49,7 @@ import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.filters.FailedRequestFilter;
 import org.apache.catalina.startup.SimpleHttpClient;
-import org.apache.catalina.startup.TestTomcat.MapRealm;
+import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -320,7 +320,7 @@ public class TestRequest extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "servlet", new LoginLogoutServlet());
         ctx.addServletMapping("/", "servlet");
 
-        MapRealm realm = new MapRealm();
+        TesterMapRealm realm = new TesterMapRealm();
         realm.addUser(LoginLogoutServlet.USER, LoginLogoutServlet.PWD);
         ctx.setRealm(realm);
 

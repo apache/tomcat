@@ -23,11 +23,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.naming.Context;
@@ -48,8 +43,6 @@ import org.junit.Test;
 import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.deploy.ContextResourceLink;
-import org.apache.catalina.realm.GenericPrincipal;
-import org.apache.catalina.realm.RealmBase;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.websocket.server.WsListener;
 
@@ -189,45 +182,6 @@ public class TestTomcat extends TomcatBaseTest {
         }
     }
 
-
-    /**
-     * Simple Realm that uses a configurable {@link Map} to link user names and
-     * passwords.
-     */
-    public static final class MapRealm extends RealmBase {
-        private Map<String,String> users = new HashMap<>();
-        private Map<String,List<String>> roles = new HashMap<>();
-
-        public void addUser(String username, String password) {
-            users.put(username, password);
-        }
-
-        public void addUserRole(String username, String role) {
-            List<String> userRoles = roles.get(username);
-            if (userRoles == null) {
-                userRoles = new ArrayList<>();
-                roles.put(username, userRoles);
-            }
-            userRoles.add(role);
-        }
-
-        @Override
-        protected String getName() {
-            return "MapRealm";
-        }
-
-        @Override
-        protected String getPassword(String username) {
-            return users.get(username);
-        }
-
-        @Override
-        protected Principal getPrincipal(String username) {
-            return new GenericPrincipal(username, getPassword(username),
-                    roles.get(username));
-        }
-
-    }
 
     /**
      * Start tomcat with a single context and one
