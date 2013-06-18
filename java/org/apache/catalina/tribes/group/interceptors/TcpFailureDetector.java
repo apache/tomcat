@@ -67,8 +67,6 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         55, 21, -66, -121, 69, 126, 76, -88, -65, 10, 77, 19, 83, 56, 21, 50,
         85, -10, -108, -73, 58, -6, 64, 120, -111, 4, 125, -41, 114, -124, -64, -43};
 
-    protected boolean performConnectTest = true;
-
     protected long connectTimeout = 1000;//1 second default
 
     protected boolean performSendTest = true;
@@ -352,10 +350,6 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         return false;
     }
 
-    public boolean getPerformConnectTest() {
-        return performConnectTest;
-    }
-
     public long getReadTestTimeout() {
         return readTestTimeout;
     }
@@ -374,10 +368,6 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
 
     public int getRemoveSuspectsTimeout() {
         return removeSuspectsTimeout;
-    }
-
-    public void setPerformConnectTest(boolean performConnectTest) {
-        this.performConnectTest = performConnectTest;
     }
 
     public void setPerformReadTest(boolean performReadTest) {
