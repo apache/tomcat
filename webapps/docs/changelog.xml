@@ -82,6 +82,9 @@
         <code>keepAliveCount</code>/<code>keepAliveTime</code> is set to a value
         greater than 0. (kfujino)
       </fix>
+      <add>
+        Add logging of when a member is unable to join the cluster. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
