@@ -39,7 +39,7 @@ import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.startup.SimpleHttpClient;
-import org.apache.catalina.startup.TestTomcat.MapRealm;
+import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -651,7 +651,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             ctx.addApplicationListener(new ApplicationListener(
                     WsListener.class.getName(), false));
 
-            MapRealm realm = new MapRealm();
+            TesterMapRealm realm = new TesterMapRealm();
             realm.addUser("tomcat", "tomcat");
             realm.addUserRole("tomcat", "tomcat");
             ctx.setRealm(realm);
@@ -729,7 +729,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             setUseCookies(clientShouldUseCookies);
             ctx.setCookies(serverShouldUseCookies);
 
-            MapRealm realm = new MapRealm();
+            TesterMapRealm realm = new TesterMapRealm();
             realm.addUser("tomcat", "tomcat");
             realm.addUserRole("tomcat", "tomcat");
             ctx.setRealm(realm);

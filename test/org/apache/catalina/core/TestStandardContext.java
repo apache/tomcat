@@ -62,7 +62,7 @@ import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.startup.SimpleHttpClient;
-import org.apache.catalina.startup.TestTomcat.MapRealm;
+import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -418,7 +418,7 @@ public class TestStandardContext extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
 
         // Setup realm
-        MapRealm realm = new MapRealm();
+        TesterMapRealm realm = new TesterMapRealm();
         realm.addUser("tomcat", "tomcat");
         realm.addUserRole("tomcat", "tomcat");
         ctx.setRealm(realm);

@@ -48,7 +48,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
-import org.apache.catalina.startup.TestTomcat.MapRealm;
+import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 
 public final class TesterSupport {
@@ -194,7 +194,7 @@ public final class TesterSupport {
         ctx.addConstraint(sc);
 
         // Configure the Realm
-        MapRealm realm = new MapRealm();
+        TesterMapRealm realm = new TesterMapRealm();
         realm.addUser("CN=user1, C=US", "not used");
         realm.addUserRole("CN=user1, C=US", "testrole");
         ctx.setRealm(realm);

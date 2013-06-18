@@ -31,7 +31,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.filters.TesterHttpServletResponse;
-import org.apache.catalina.startup.TestTomcat.MapRealm;
+import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.util.ConcurrentMessageDigest;
 import org.apache.catalina.util.MD5Encoder;
 
@@ -108,7 +108,7 @@ public class TesterDigestAuthenticatorPerformance {
         ConcurrentMessageDigest.init("MD5");
 
         // Configure the Realm
-        MapRealm realm = new MapRealm();
+        TesterMapRealm realm = new TesterMapRealm();
         realm.addUser(USER, PWD);
         realm.addUserRole(USER, ROLE);
 
