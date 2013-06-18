@@ -69,6 +69,10 @@
         unauthenticated user that is only protected for a sub-set of HTTP
         methods that does not include GET. (markt)
       </fix>
+      <fix>
+        <bug>55110</bug>: Small performance improvements. Patch provided by
+        Adrian Nistor. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

@@ -461,6 +461,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
                 for (String authHeader : authHeaders) {
                     if (authHeader.indexOf(NICE_METHOD) > -1) {
                         methodFound = true;
+                        break;
                     }
                 }
                 assertTrue(methodFound);
