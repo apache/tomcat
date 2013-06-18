@@ -548,10 +548,12 @@ public abstract class AuthenticatorBase extends ValveBase
             for(i=0; i < constraints.length && authRequired; i++) {
                 if(!constraints[i].getAuthConstraint()) {
                     authRequired = false;
+                    break;
                 } else if(!constraints[i].getAllRoles()) {
                     String [] roles = constraints[i].findAuthRoles();
                     if(roles == null || roles.length == 0) {
                         authRequired = false;
+                        break;
                     }
                 }
             }
