@@ -154,24 +154,44 @@ public class TestRealmBase {
     }
 
 
+    @Test
+    public void testNoAuthConstraint() throws IOException {
+        // No auth constraint == allow access
+        List<String> userRoles = new ArrayList<>();
+        List<String> applicationRoles = new ArrayList<>();
+
+        doRoleTest(userRoles, null, applicationRoles, true);
+    }
+
+
+    /**
+     *
+     * @param userRoles         <code>null</code> tests unauthenticated access
+     *                          otherwise access is tested with an authenticated
+     *                          user with the listed roles
+     * @param constraintRoles   <code>null</code> is equivalent to no auth
+     *                          constraint whereas an empty list is equivalent
+     *                          to an auth constraint that defines no roles.
+     * @param applicationRoles
+     * @param expected
+     * @throws IOException
+     */
     private void doRoleTest(List<String> userRoles,
             List<String> constraintRoles, List<String> applicationRoles,
             boolean expected) throws IOException {
 
-        // Configure the users in the Realm
         TesterMapRealm mapRealm = new TesterMapRealm();
-        for (String userRole : userRoles) {
-            mapRealm.addUser(USER1, userRole);
-        }
 
         // Configure the security constraints for the resource
         SecurityConstraint constraint = new SecurityConstraint();
-        constraint.setAuthConstraint(true);
-        for (String constraintRole : constraintRoles) {
-            constraint.addAuthRole(constraintRole);
-            if (applicationRoles.contains(
-                    SecurityConstraint.ROLE_ALL_AUTHENTICATED_USERS)) {
-                constraint.treatAllAuthenticatedUsersAsApplicationRole();
+        if (constraintRoles != null) {
+            constraint.setAuthConstraint(true);
+            for (String constraintRole : constraintRoles) {
+                constraint.addAuthRole(constraintRole);
+                if (applicationRoles.contains(
+                        SecurityConstraint.ROLE_ALL_AUTHENTICATED_USERS)) {
+                    constraint.treatAllAuthenticatedUsersAsApplicationRole();
+                }
             }
         }
         SecurityCollection collection = new SecurityCollection();
@@ -189,8 +209,15 @@ public class TestRealmBase {
         request.setContext(context);
 
         // Set up an authenticated user
-        GenericPrincipal gp = new GenericPrincipal(USER1, PWD1, userRoles);
-        request.setUserPrincipal(gp);
+        // Configure the users in the Realm
+        if (userRoles != null) {
+            for (String userRole : userRoles) {
+                mapRealm.addUser(USER1, userRole);
+            }
+
+            GenericPrincipal gp = new GenericPrincipal(USER1, PWD1, userRoles);
+            request.setUserPrincipal(gp);
+        }
 
         // Check if user meets constraints
         boolean result = mapRealm.hasResourcePermission(
