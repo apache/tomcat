@@ -83,6 +83,28 @@ public class TesterContext implements Context {
         return securityRoles.toArray(new String[securityRoles.size()]);
     }
 
+    @Override
+    public void removeSecurityRole(String role) {
+        securityRoles.remove(role);
+    }
+
+    private List<SecurityConstraint> securityConstraints = new ArrayList<>();
+    @Override
+    public void addConstraint(SecurityConstraint constraint) {
+        securityConstraints.add(constraint);
+    }
+
+    @Override
+    public SecurityConstraint[] findConstraints() {
+        return securityConstraints.toArray(
+                new SecurityConstraint[securityConstraints.size()]);
+    }
+
+    @Override
+    public void removeConstraint(SecurityConstraint constraint) {
+        securityConstraints.remove(constraint);
+    }
+
 
     @Override
     public Log getLogger() {
@@ -668,11 +690,6 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public void addConstraint(SecurityConstraint constraint) {
-        // NO-OP
-    }
-
-    @Override
     public void addErrorPage(ErrorPage errorPage) {
         // NO-OP
     }
@@ -760,11 +777,6 @@ public class TesterContext implements Context {
 
     @Override
     public ApplicationParameter[] findApplicationParameters() {
-        return null;
-    }
-
-    @Override
-    public SecurityConstraint[] findConstraints() {
         return null;
     }
 
@@ -899,11 +911,6 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public void removeConstraint(SecurityConstraint constraint) {
-        // NO-OP
-    }
-
-    @Override
     public void removeErrorPage(ErrorPage errorPage) {
         // NO-OP
     }
@@ -935,11 +942,6 @@ public class TesterContext implements Context {
 
     @Override
     public void removeRoleMapping(String role) {
-        // NO-OP
-    }
-
-    @Override
-    public void removeSecurityRole(String role) {
         // NO-OP
     }
 
