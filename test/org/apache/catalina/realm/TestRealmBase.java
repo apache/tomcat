@@ -110,6 +110,50 @@ public class TestRealmBase {
     }
 
 
+    @Test
+    public void testAllAuthenticatedUsers() throws IOException {
+        List<String> userRoles = new ArrayList<>();
+        List<String> constraintRoles = new ArrayList<>();
+        List<String> applicationRoles = new ArrayList<>();
+
+        // Configure this test
+        constraintRoles.add(SecurityConstraint.ROLE_ALL_AUTHENTICATED_USERS);
+
+        doRoleTest(userRoles, constraintRoles, applicationRoles, true);
+    }
+
+
+    @Test
+    public void testAllAuthenticatedUsersAsAppRoleNoUser() throws IOException {
+        List<String> userRoles = new ArrayList<>();
+        List<String> constraintRoles = new ArrayList<>();
+        List<String> applicationRoles = new ArrayList<>();
+
+        // Configure this test
+        userRoles.add(ROLE1);
+        constraintRoles.add(SecurityConstraint.ROLE_ALL_AUTHENTICATED_USERS);
+        applicationRoles.add(SecurityConstraint.ROLE_ALL_AUTHENTICATED_USERS);
+
+        doRoleTest(userRoles, constraintRoles, applicationRoles, false);
+    }
+
+
+    @Test
+    public void testAllAuthenticatedUsersAsAppRoleWithUser()
+            throws IOException {
+        List<String> userRoles = new ArrayList<>();
+        List<String> constraintRoles = new ArrayList<>();
+        List<String> applicationRoles = new ArrayList<>();
+
+        // Configure this test
+        userRoles.add(SecurityConstraint.ROLE_ALL_AUTHENTICATED_USERS);
+        constraintRoles.add(SecurityConstraint.ROLE_ALL_AUTHENTICATED_USERS);
+        applicationRoles.add(SecurityConstraint.ROLE_ALL_AUTHENTICATED_USERS);
+
+        doRoleTest(userRoles, constraintRoles, applicationRoles, true);
+    }
+
+
     private void doRoleTest(List<String> userRoles,
             List<String> constraintRoles, List<String> applicationRoles,
             boolean expected) throws IOException {
@@ -122,8 +166,13 @@ public class TestRealmBase {
 
         // Configure the security constraints for the resource
         SecurityConstraint constraint = new SecurityConstraint();
+        constraint.setAuthConstraint(true);
         for (String constraintRole : constraintRoles) {
             constraint.addAuthRole(constraintRole);
+            if (applicationRoles.contains(
+                    SecurityConstraint.ROLE_ALL_AUTHENTICATED_USERS)) {
+                constraint.treatAllAuthenticatedUsersAsApplicationRole();
+            }
         }
         SecurityCollection collection = new SecurityCollection();
         collection.addPattern("/*");
@@ -143,7 +192,7 @@ public class TestRealmBase {
         GenericPrincipal gp = new GenericPrincipal(USER1, PWD1, userRoles);
         request.setUserPrincipal(gp);
 
-        // Check if user meets constaints
+        // Check if user meets constraints
         boolean result = mapRealm.hasResourcePermission(
                 request, response, constraints, null);
 

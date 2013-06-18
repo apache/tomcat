@@ -1342,7 +1342,13 @@ public class ContextConfig implements LifecycleListener {
         for (ContextResource resource : webxml.getResourceRefs().values()) {
             context.getNamingResources().addResource(resource);
         }
+        boolean allAuthenticatedUsersIsAppRole =
+                webxml.getSecurityRoles().contains(
+                        SecurityConstraint.ROLE_ALL_AUTHENTICATED_USERS);
         for (SecurityConstraint constraint : webxml.getSecurityConstraints()) {
+            if (allAuthenticatedUsersIsAppRole) {
+                constraint.treatAllAuthenticatedUsersAsApplicationRole();
+            }
             context.addConstraint(constraint);
         }
         for (String role : webxml.getSecurityRoles()) {

@@ -814,7 +814,13 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             if (log.isDebugEnabled())
                 log.debug("  Checking roles " + principal);
 
-            if (roles.length == 0 && !constraint.getAllRoles()) {
+            if (constraint.getAuthenticatedUsers() && principal != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Passing all authenticated users");
+                }
+                status = true;
+            } else if (roles.length == 0 && !constraint.getAllRoles() &&
+                    !constraint.getAuthenticatedUsers()) {
                 if(constraint.getAuthConstraint()) {
                     if( log.isDebugEnabled() )
                         log.debug("No roles");
