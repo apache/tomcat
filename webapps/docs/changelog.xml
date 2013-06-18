@@ -92,6 +92,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Complete the document for <code>MessageDispatch15Interceptor</code>.
+        (kfujino)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>

@@ -118,6 +118,15 @@
        The dispatcher will trigger on this value only, as it is predefined by Tribes.
        The other attributes are inherited from its base class <code>org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor</code>.
      </attribute>
+          <attribute name="maxThreads" required="false">
+       The maximum number of threads in this pool, default is 10.
+     </attribute>
+     <attribute name="maxSpareThreads" required="false">
+       The number of threads to keep in the pool, default is 2.
+     </attribute>
+     <attribute name="keepAliveTime" required="false">
+       Maximum number of milliseconds of until Idle thread terminates. Default value is 5000(5 seconds).
+     </attribute>
    </attributes>
   </subsection>
   <subsection name="org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor Attributes">
