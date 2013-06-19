@@ -90,6 +90,11 @@
       <add>
         Add logging of when a member is unable to join the cluster. (kfujino)
       </add>
+      <fix>
+        Replace Tribes&apos;s <code>TaskQueue</code> as executor&apos;s
+        workQueue in order to ensure that executor&apos;s <code>maxThread</code>
+        works correctly. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
