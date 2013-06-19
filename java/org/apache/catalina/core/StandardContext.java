@@ -5271,6 +5271,13 @@ public class StandardContext extends ContainerBase
                 }
             }
 
+            // Check constraints for uncovered HTTP methods
+            // Needs to be after SCIs and listeners as they may programatically
+            // change constraints
+            if (ok) {
+                checkConstraintsForUncoveredMethods();
+            }
+
             try {
                 // Start manager
                 Manager manager = getManager();
@@ -5333,6 +5340,107 @@ public class StandardContext extends ContainerBase
             setState(LifecycleState.STARTING);
         }
     }
+
+
+    private void checkConstraintsForUncoveredMethods() {
+        // TODO - Add an option to lower the log level of any uncovered method
+        //        warnings to debug
+        // TODO - Implement adding constraints to deny uncovered methods
+        Set<String> coveredPatterns = new HashSet<>();
+        Map<String,Set<String>> urlMethodMap = new HashMap<>();
+        Map<String,Set<String>> urlOmittedMethodMap = new HashMap<>();
+
+        // First build the lists of covered patterns and those patterns that
+        // might be uncovered
+        for (SecurityConstraint constraint : constraints) {
+            SecurityCollection[] collections = constraint.findCollections();
+            for (SecurityCollection collection : collections) {
+                String[] patterns = collection.findPatterns();
+                String[] methods = collection.findMethods();
+                String[] omittedMethods = collection.findOmittedMethods();
+                // Simple case: no methods
+                if (methods.length == 0 && omittedMethods.length == 0) {
+                    for (String pattern : patterns) {
+                        coveredPatterns.add(pattern);
+                    }
+                    continue;
+                }
+
+                // Pre-calculate so we don't do this for every iteration of the
+                // following loop
+                List<String> omNew = null;
+                if (omittedMethods.length == 0) {
+                    omNew = Arrays.asList(omittedMethods);
+                }
+
+                // Only need to process uncovered patterns
+                for (String pattern : patterns) {
+                    if (!coveredPatterns.contains(pattern)) {
+                        if (methods.length == 0) {
+                            // Build the interset of omitted methods for this
+                            // pattern
+                            Set<String> om = urlOmittedMethodMap.get(pattern);
+                            if (om == null) {
+                                om = new HashSet<>();
+                                urlMethodMap.put(pattern, om);
+                            }
+                            om.retainAll(omNew);
+                        } else {
+                            // Build the union of methods for this pattern
+                            Set<String> m = urlMethodMap.get(pattern);
+                            if (m == null) {
+                                m = new HashSet<>();
+                                urlMethodMap.put(pattern, m);
+                            }
+                            for (String method : methods) {
+                                m.add(method);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Now check the potentially uncovered patterns
+        for (Map.Entry<String, Set<String>> entry : urlMethodMap.entrySet()) {
+            String pattern = entry.getKey();
+            if (coveredPatterns.contains(pattern)) {
+                // Fully covered. Ignore any partial coverage
+                urlOmittedMethodMap.remove(pattern);
+                continue;
+            }
+
+            Set<String> omittedMethods = urlOmittedMethodMap.get(pattern);
+            Set<String> methods = entry.getValue();
+
+            if (omittedMethods == null) {
+                StringBuilder msg = new StringBuilder();
+                for (String method : methods) {
+                    msg.append(method);
+                    msg.append(' ');
+                }
+                log.error(sm.getString("standardContext.uncoveredHttpMethod",
+                        pattern, msg.toString().trim()));
+                continue;
+            }
+
+            // As long as every omitted method as a corresponding method the
+            // pattern is fully covered.
+            omittedMethods.removeAll(methods);
+
+            if (omittedMethods.size() > 0) {
+                StringBuilder msg = new StringBuilder();
+                for (String method : omittedMethods) {
+                    msg.append(method);
+                    msg.append(' ');
+                }
+                log.error(sm.getString(
+                        "standardContext.uncoveredHttpOmittedMethod",
+                        pattern, msg.toString().trim()));
+            }
+        }
+    }
+
 
     private void setClassLoaderProperty(String name, boolean value) {
         ClassLoader cl = getLoader().getClassLoader();
