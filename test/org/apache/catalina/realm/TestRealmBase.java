@@ -32,6 +32,7 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.connector.TesterRequest;
 import org.apache.catalina.connector.TesterResponse;
 import org.apache.catalina.core.TesterContext;
+import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.startup.TesterMapRealm;
 
@@ -599,6 +600,14 @@ public class TestRealmBase {
                 SecurityConstraint.createConstraints(
                         servletSecurityElement, "/*");
 
+        // Create a separate constraint that covers DELETE
+        SecurityConstraint deleteConstraint = new SecurityConstraint();
+        deleteConstraint.addAuthRole(ROLE1);
+        SecurityCollection deleteCollection = new SecurityCollection();
+        deleteCollection.addMethod("DELETE");
+        deleteCollection.addPattern("/*");
+        deleteConstraint.addCollection(deleteCollection);
+
         TesterMapRealm mapRealm = new TesterMapRealm();
 
         // Set up the mock request and response
@@ -625,6 +634,7 @@ public class TestRealmBase {
         for (SecurityConstraint constraint : constraints) {
             context.addConstraint(constraint);
         }
+        context.addConstraint(deleteConstraint);
 
         // All users should be able to perform a GET
         request.setMethod("GET");
@@ -704,5 +714,24 @@ public class TestRealmBase {
         Assert.assertTrue(mapRealm.hasResourcePermission(
                 request, response, constraintsTrace, null));
 
+        // Only user1 should be able to perform a DELETE as only that user has
+        // role1.
+        request.setMethod("DELETE");
+
+        SecurityConstraint[] constraintsDelete =
+                mapRealm.findSecurityConstraints(request, context);
+
+        request.setUserPrincipal(null);
+        Assert.assertFalse(mapRealm.hasResourcePermission(
+                request, response, constraintsDelete, null));
+        request.setUserPrincipal(gp1);
+        Assert.assertTrue(mapRealm.hasResourcePermission(
+                request, response, constraintsDelete, null));
+        request.setUserPrincipal(gp2);
+        Assert.assertFalse(mapRealm.hasResourcePermission(
+                request, response, constraintsDelete, null));
+        request.setUserPrincipal(gp99);
+        Assert.assertFalse(mapRealm.hasResourcePermission(
+                request, response, constraintsDelete, null));
     }
 }
