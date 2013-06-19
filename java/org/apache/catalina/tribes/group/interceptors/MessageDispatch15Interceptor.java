@@ -16,8 +16,7 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -25,6 +24,7 @@ import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.transport.bio.util.LinkObject;
+import org.apache.catalina.tribes.util.ExecutorFactory;
 import org.apache.catalina.tribes.util.TcclThreadFactory;
 
 /**
@@ -40,12 +40,10 @@ import org.apache.catalina.tribes.util.TcclThreadFactory;
 public class MessageDispatch15Interceptor extends MessageDispatchInterceptor {
 
     protected final AtomicLong currentSize = new AtomicLong(0);
-    protected ThreadPoolExecutor executor = null;
+    protected ExecutorService executor = null;
     protected int maxThreads = 10;
     protected int maxSpareThreads = 2;
     protected long keepAliveTime = 5000;
-    protected final LinkedBlockingQueue<Runnable> runnablequeue =
-            new LinkedBlockingQueue<>();
 
     @Override
     public long getCurrentSize() {
@@ -84,9 +82,8 @@ public class MessageDispatch15Interceptor extends MessageDispatchInterceptor {
     @Override
     public void startQueue() {
         if ( run ) return;
-        executor = new ThreadPoolExecutor(maxSpareThreads, maxThreads,
-                keepAliveTime, TimeUnit.MILLISECONDS, runnablequeue,
-                new TcclThreadFactory());
+        executor = ExecutorFactory.newThreadPool(maxSpareThreads, maxThreads,
+                keepAliveTime, TimeUnit.MILLISECONDS, new TcclThreadFactory());
         run = true;
     }
 
@@ -95,7 +92,6 @@ public class MessageDispatch15Interceptor extends MessageDispatchInterceptor {
         run = false;
         executor.shutdownNow();
         setAndGetCurrentSize(0);
-        runnablequeue.clear();
     }
 
     public long getKeepAliveTime() {
