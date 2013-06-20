@@ -1279,6 +1279,8 @@ public class ContextConfig implements LifecycleListener {
         for (Entry<String, String> entry : webxml.getContextParams().entrySet()) {
             context.addParameter(entry.getKey(), entry.getValue());
         }
+        context.setDenyUncoveredHttpMethods(
+                webxml.getDenyUncoveredHttpMethods());
         context.setDisplayName(webxml.getDisplayName());
         context.setDistributable(webxml.isDistributable());
         for (ContextLocalEjb ejbLocalRef : webxml.getEjbLocalRefs().values()) {

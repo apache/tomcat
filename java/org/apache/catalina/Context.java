@@ -329,6 +329,20 @@ public interface Context extends Container {
 
 
     /**
+     * Return the deny-uncovered-http-methods flag for this web application.
+     */
+    public boolean getDenyUncoveredHttpMethods();
+
+
+    /**
+     * Set the deny-uncovered-http-methods flag for this web application.
+     *
+     * @param denyUncoveredHttpMethods The new deny-uncovered-http-methods flag
+     */
+    public void setDenyUncoveredHttpMethods(boolean denyUncoveredHttpMethods);
+
+
+    /**
      * Return the display name of this web application.
      */
     public String getDisplayName();

@@ -261,6 +261,15 @@ public class WebXml {
         this.distributable = distributable;
     }
 
+    // deny-uncovered-http-methods
+    private boolean denyUncoveredHttpMethods = false;
+    public boolean getDenyUncoveredHttpMethods() {
+        return denyUncoveredHttpMethods;
+    }
+    public void setDenyUncoveredHttpMethods(boolean denyUncoveredHttpMethods) {
+        this.denyUncoveredHttpMethods = denyUncoveredHttpMethods;
+    }
+
     // context-param
     // TODO: description (multiple with language) is ignored
     private final Map<String,String> contextParams = new HashMap<>();
@@ -1265,6 +1274,17 @@ public class WebXml {
                 }
             }
             displayName = temp.getDisplayName();
+        }
+
+        // Note: Not permitted in fragments but we also use fragments for
+        //       per-Host and global defaults so it may appear there
+        if (!denyUncoveredHttpMethods) {
+            for (WebXml fragment : fragments) {
+                if (fragment.getDenyUncoveredHttpMethods()) {
+                    denyUncoveredHttpMethods = true;
+                    break;
+                }
+            }
         }
 
         if (distributable) {

@@ -203,6 +203,8 @@ public class WebRuleSet extends RuleSetBase {
                                    "addAbsoluteOrdering", 0);
             digester.addCallMethod(fullPrefix + "/absolute-ordering/others",
                                    "addAbsoluteOrderingOthers");
+            digester.addRule(fullPrefix + "/deny-uncovered-http-methods",
+                    new SetDenyUncoveredHttpMethodsRule());
         }
 
         digester.addCallMethod(fullPrefix + "/context-param",
@@ -803,9 +805,8 @@ final class SetAuthConstraintRule extends Rule {
 
 /**
  * Class that calls <code>setDistributable(true)</code> for the top object
- * on the stack, which must be a <code>org.apache.catalina.Context</code>.
+ * on the stack, which must be a {@link WebXml} instance.
  */
-
 final class SetDistributableRule extends Rule {
 
     public SetDistributableRule() {
@@ -822,7 +823,29 @@ final class SetDistributableRule extends Rule {
                (webXml.getClass().getName() + ".setDistributable(true)");
         }
     }
+}
 
+
+/**
+ * Class that calls <code>setDenyUncoveredHttpMethods(true)</code> for the top
+ * object on the stack, which must be a {@link WebXml} instance.
+ */
+final class SetDenyUncoveredHttpMethodsRule extends Rule {
+
+    public SetDenyUncoveredHttpMethodsRule() {
+        // NO-OP
+    }
+
+    @Override
+    public void begin(String namespace, String name, Attributes attributes)
+        throws Exception {
+        WebXml webXml = (WebXml) digester.peek();
+        webXml.setDenyUncoveredHttpMethods(true);
+        if (digester.getLogger().isDebugEnabled()) {
+            digester.getLogger().debug(webXml.getClass().getName() +
+                    ".setDenyUncoveredHttpMethods(true)");
+        }
+    }
 }
 
 
