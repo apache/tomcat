@@ -557,7 +557,6 @@ public class JDBCRealm
                             containerLog.warn(sm.getString("jdbcRealm.abnormalCloseResultSet"));
                         }
                     }
-                    dbConnection.commit();
                 }
 
             } catch (SQLException e) {
