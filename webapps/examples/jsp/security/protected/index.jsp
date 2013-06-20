@@ -64,17 +64,18 @@ in session <b><%= session.getId() %></b><br><br>
   }
 %>
 
-To check whether your username has been granted a particular role,
+To check whether your user name has been granted a particular role,
 enter it here:
 <form method="GET" action='<%= response.encodeURL("index.jsp") %>'>
 <input type="text" name="role" value="<%= util.HTMLFilter.filter(role) %>">
+<input type="submit" >
 </form>
 <br><br>
 
-If you have configured this app for form-based authentication, you can log
-off by clicking
+If you have configured this application for form-based authentication, you can
+log off by clicking
 <a href='<%= response.encodeURL("index.jsp?logoff=true") %>'>here</a>.
-This should cause you to be returned to the logon page after the redirect
+This should cause you to be returned to the login page after the redirect
 that is performed.
 
 </body>
