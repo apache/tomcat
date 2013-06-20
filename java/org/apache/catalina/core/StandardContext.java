@@ -5473,7 +5473,44 @@ public class StandardContext extends ContainerBase
                             "standardContext.uncoveredHttpOmittedMethodFix",
                             pattern, msg.toString().trim()));
                     SecurityCollection collection = new SecurityCollection();
-                    for (String method : methods) {
+                    for (String method : omittedMethods) {
+                        collection.addMethod(method);
+                    }
+                    collection.addPattern(pattern);
+                    collection.setName("deny-uncovered-http-methods");
+                    SecurityConstraint constraint = new SecurityConstraint();
+                    constraint.setAuthConstraint(true);
+                    constraint.addCollection(collection);
+                    addConstraint(constraint);
+                } else {
+                    log.error(sm.getString(
+                            "standardContext.uncoveredHttpOmittedMethod",
+                            pattern, msg.toString().trim()));
+                }
+            }
+        }
+        for (Map.Entry<String, Set<String>> entry :
+                urlOmittedMethodMap.entrySet()) {
+            String pattern = entry.getKey();
+            if (coveredPatterns.contains(pattern)) {
+                // Fully covered. Ignore any partial coverage
+                continue;
+            }
+
+            Set<String> omittedMethods = entry.getValue();
+
+            if (omittedMethods.size() > 0) {
+                StringBuilder msg = new StringBuilder();
+                for (String method : omittedMethods) {
+                    msg.append(method);
+                    msg.append(' ');
+                }
+                if (getDenyUncoveredHttpMethods()) {
+                    log.info(sm.getString(
+                            "standardContext.uncoveredHttpOmittedMethodFix",
+                            pattern, msg.toString().trim()));
+                    SecurityCollection collection = new SecurityCollection();
+                    for (String method : omittedMethods) {
                         collection.addMethod(method);
                     }
                     collection.addPattern(pattern);
