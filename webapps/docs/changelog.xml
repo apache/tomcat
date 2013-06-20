@@ -51,6 +51,10 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        Implement JSR 340 - Servlet 3.1. The JSR 340 implementation includes
+        contributions from Nick Williams. (markt) 
+      </add>
+      <add>
         Implement JSR 356 - WebSockets. The JSR 356 implementation includes
         contributions from Nick Williams and Rossen Stoyanchev. (markt)
       </add>
@@ -115,12 +119,6 @@
       <add>
         Port storeconfig functionality, which can persist to server.xml and
         context.xml runtime container configuration changes. (remm)
-      </add>
-      <add>
-        <bug>54552</bug>: Servlet 3.1. Implement
-        <code>HttpSessionIdListener</code> and
-        <code>HttpServletRequest#changeSessionId()</code>. Patch provided by
-        Nick Williams. (markt)
       </add>
       <fix>
         <bug>54708</bug>: Change the name of the working directory for the ROOT
