@@ -125,6 +125,10 @@
         application (located under $CATALINA_BASE/work by default) from _ to
         ROOT. (markt)
       </fix>
+      <add>
+        Change default configuration so that a change to the global web.xml file
+        will trigger a reload of all web applications. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
