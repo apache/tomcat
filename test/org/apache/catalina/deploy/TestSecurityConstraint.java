@@ -363,4 +363,96 @@ public class TestSecurityConstraint {
         Assert.assertEquals(1, sc.findMethods().length);
         Assert.assertEquals("POST", sc.findMethods()[0]);
     }
+
+
+    @Test
+    public void testFindUncoveredHttpMethods09() {
+        SecurityConstraint[] result =
+                SecurityConstraint.findUncoveredHttpMethods(
+                        new SecurityConstraint[] {GET_ONLY, GET_OMIT}, true,
+                        DUMMY_LOG);
+        Assert.assertEquals(0, result.length);
+    }
+
+
+    @Test
+    public void testFindUncoveredHttpMethods10() {
+        SecurityConstraint[] result =
+                SecurityConstraint.findUncoveredHttpMethods(
+                        new SecurityConstraint[] {POST_ONLY, POST_OMIT}, true,
+                        DUMMY_LOG);
+        Assert.assertEquals(0, result.length);
+    }
+
+
+    @Test
+    public void testFindUncoveredHttpMethods11() {
+        SecurityConstraint[] result =
+                SecurityConstraint.findUncoveredHttpMethods(
+                        new SecurityConstraint[] {GET_ONLY, POST_ONLY}, true,
+                        DUMMY_LOG);
+        Assert.assertEquals(1, result.length);
+        // Should be a deny constraint
+        Assert.assertTrue(result[0].getAuthConstraint());
+        // Should have a single collection
+        Assert.assertEquals(1, result[0].findCollections().length);
+        SecurityCollection sc = result[0].findCollections()[0];
+        // Should list GET and POST as omitted methods
+        Assert.assertEquals(0, sc.findMethods().length);
+        Assert.assertEquals(2, sc.findOmittedMethods().length);
+        HashSet<String> omittedMethods = new HashSet<>();
+        for (String omittedMethod : sc.findOmittedMethods()) {
+            omittedMethods.add(omittedMethod);
+        }
+        Assert.assertTrue(omittedMethods.remove("GET"));
+        Assert.assertTrue(omittedMethods.remove("POST"));
+    }
+
+
+    @Test
+    public void testFindUncoveredHttpMethods12() {
+        SecurityConstraint[] result =
+                SecurityConstraint.findUncoveredHttpMethods(
+                        new SecurityConstraint[] {GET_OMIT, POST_OMIT}, true,
+                        DUMMY_LOG);
+        Assert.assertEquals(0, result.length);
+    }
+
+
+    @Test
+    public void testFindUncoveredHttpMethods13() {
+        SecurityConstraint[] result =
+                SecurityConstraint.findUncoveredHttpMethods(
+                        new SecurityConstraint[] {GET_ONLY, POST_OMIT}, true,
+                        DUMMY_LOG);
+        Assert.assertEquals(1, result.length);
+        // Should be a deny constraint
+        Assert.assertTrue(result[0].getAuthConstraint());
+        // Should have a single collection
+        Assert.assertEquals(1, result[0].findCollections().length);
+        SecurityCollection sc = result[0].findCollections()[0];
+        // Should list POST as a method
+        Assert.assertEquals(1, sc.findMethods().length);
+        Assert.assertEquals(0, sc.findOmittedMethods().length);
+        Assert.assertEquals("POST", sc.findMethods()[0]);
+    }
+
+
+    @Test
+    public void testFindUncoveredHttpMethods14() {
+        SecurityConstraint[] result =
+                SecurityConstraint.findUncoveredHttpMethods(
+                        new SecurityConstraint[] {GET_OMIT, POST_ONLY}, true,
+                        DUMMY_LOG);
+        Assert.assertEquals(1, result.length);
+        // Should be a deny constraint
+        Assert.assertTrue(result[0].getAuthConstraint());
+        // Should have a single collection
+        Assert.assertEquals(1, result[0].findCollections().length);
+        SecurityCollection sc = result[0].findCollections()[0];
+        // Should list GET as a method
+        Assert.assertEquals(1, sc.findMethods().length);
+        Assert.assertEquals(0, sc.findOmittedMethods().length);
+        Assert.assertEquals("GET", sc.findMethods()[0]);
+    }
 }
