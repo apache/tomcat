@@ -290,7 +290,8 @@ public class StandardJarScanner implements JarScanner {
             callback.scan((JarURLConnection) conn, isWebapp);
         } else {
             String urlStr = url.toString();
-            if (urlStr.startsWith("file:") || urlStr.startsWith("jndi:")) {
+            if (urlStr.startsWith("file:") || urlStr.startsWith("jndi:") ||
+                urlStr.startsWith("http:") || urlStr.startsWith("https:")) {
                 if (urlStr.endsWith(Constants.JAR_EXT)) {
                     URL jarURL = new URL("jar:" + urlStr + "!/");
                     callback.scan((JarURLConnection) jarURL.openConnection(),
