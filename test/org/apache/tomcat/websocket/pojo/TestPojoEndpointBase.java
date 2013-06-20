@@ -75,6 +75,7 @@ public class TestPojoEndpointBase extends TomcatBaseTest {
         Assert.assertTrue("Server failed to close connection", closed);
     }
 
+
     @Test
     public void testOnOpenPojoMethod() throws Exception {
         // Set up utility classes
@@ -105,7 +106,6 @@ public class TestPojoEndpointBase extends TomcatBaseTest {
         client.waitForClose(5);
         Assert.assertTrue(session.isOpen());
     }
-
 
 
     @ServerEndpoint("/")
