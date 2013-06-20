@@ -348,6 +348,9 @@ public class StandardContext extends ContainerBase
     private boolean delegate = false;
 
 
+    private boolean denyUncoveredHttpMethods;
+
+
     /**
      * The display name of this web application.
      */
@@ -1683,6 +1686,19 @@ public class StandardContext extends ContainerBase
     public void setTldScanTime(long tldScanTime) {
         this.tldScanTime = tldScanTime;
     }
+
+
+    @Override
+    public boolean getDenyUncoveredHttpMethods() {
+        return denyUncoveredHttpMethods;
+    }
+
+
+    @Override
+    public void setDenyUncoveredHttpMethods(boolean denyUncoveredHttpMethods) {
+        this.denyUncoveredHttpMethods = denyUncoveredHttpMethods;
+    }
+
 
     /**
      * Return the display name of this web application.
@@ -5345,7 +5361,6 @@ public class StandardContext extends ContainerBase
     private void checkConstraintsForUncoveredMethods() {
         // TODO - Add an option to lower the log level of any uncovered method
         //        warnings to debug
-        // TODO - Implement adding constraints to deny uncovered methods
         Set<String> coveredPatterns = new HashSet<>();
         Map<String,Set<String>> urlMethodMap = new HashMap<>();
         Map<String,Set<String>> urlOmittedMethodMap = new HashMap<>();
@@ -5419,8 +5434,25 @@ public class StandardContext extends ContainerBase
                     msg.append(method);
                     msg.append(' ');
                 }
-                log.error(sm.getString("standardContext.uncoveredHttpMethod",
-                        pattern, msg.toString().trim()));
+                if (getDenyUncoveredHttpMethods()) {
+                    log.info(sm.getString(
+                            "standardContext.uncoveredHttpMethodFix",
+                            pattern, msg.toString().trim()));
+                    SecurityCollection collection = new SecurityCollection();
+                    for (String method : methods) {
+                        collection.addOmittedMethod(method);
+                    }
+                    collection.addPattern(pattern);
+                    collection.setName("deny-uncovered-http-methods");
+                    SecurityConstraint constraint = new SecurityConstraint();
+                    constraint.setAuthConstraint(true);
+                    constraint.addCollection(collection);
+                    addConstraint(constraint);
+                } else {
+                    log.error(sm.getString(
+                            "standardContext.uncoveredHttpMethod",
+                            pattern, msg.toString().trim()));
+                }
                 continue;
             }
 
@@ -5434,9 +5466,25 @@ public class StandardContext extends ContainerBase
                     msg.append(method);
                     msg.append(' ');
                 }
-                log.error(sm.getString(
-                        "standardContext.uncoveredHttpOmittedMethod",
-                        pattern, msg.toString().trim()));
+                if (getDenyUncoveredHttpMethods()) {
+                    log.info(sm.getString(
+                            "standardContext.uncoveredHttpOmittedMethodFix",
+                            pattern, msg.toString().trim()));
+                    SecurityCollection collection = new SecurityCollection();
+                    for (String method : methods) {
+                        collection.addMethod(method);
+                    }
+                    collection.addPattern(pattern);
+                    collection.setName("deny-uncovered-http-methods");
+                    SecurityConstraint constraint = new SecurityConstraint();
+                    constraint.setAuthConstraint(true);
+                    constraint.addCollection(collection);
+                    addConstraint(constraint);
+                } else {
+                    log.error(sm.getString(
+                            "standardContext.uncoveredHttpOmittedMethod",
+                            pattern, msg.toString().trim()));
+                }
             }
         }
     }

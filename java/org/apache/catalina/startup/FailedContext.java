@@ -368,6 +368,13 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void setAltDDName(String altDDName) { /* NO-OP */ }
 
     @Override
+    public boolean getDenyUncoveredHttpMethods() { return false; }
+    @Override
+    public void setDenyUncoveredHttpMethods(boolean denyUncoveredHttpMethods) {
+        // NO-OP
+    }
+
+    @Override
     public String getDisplayName() { return null; }
     @Override
     public void setDisplayName(String displayName) { /* NO-OP */ }

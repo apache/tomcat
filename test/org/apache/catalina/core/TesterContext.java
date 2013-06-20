@@ -455,6 +455,16 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public boolean getDenyUncoveredHttpMethods() {
+        return false;
+    }
+
+    @Override
+    public void setDenyUncoveredHttpMethods(boolean denyUncoveredHttpMethods) {
+        // NO-OP
+    }
+
+    @Override
     public String getDisplayName() {
         return null;
     }
