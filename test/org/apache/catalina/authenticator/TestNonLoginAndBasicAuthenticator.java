@@ -216,38 +216,28 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
     /*
      * This is the same as testAcceptProtectedBasic (above), except
-     * using white space around the username credential.
-     *
-     * The request is rejected with 401 SC_UNAUTHORIZED status.
-     *
-     * TODO: RFC2617 does not define the separation syntax between the
-     *       auth-scheme and basic-credentials tokens. Tomcat should tolerate
-     *       any reasonable amount of white space and return SC_OK.
+     * using white space around the username credential. The request
+     * is accepted.
      */
     @Test
     public void testUserExtraSpace() throws Exception {
         doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
                 NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
         doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, SPACED_USERNAME,
-                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+                NO_COOKIES, HttpServletResponse.SC_OK);
     }
 
     /*
      * This is the same as testAcceptProtectedBasic (above), except
-     * using white space around the password credential.
-     *
-     * The request is rejected with 401 SC_UNAUTHORIZED status.
-     *
-     * TODO: RFC2617 does not define the separation syntax between the
-     *       auth-scheme and basic-credentials tokens. Tomcat should tolerate
-     *       any reasonable amount of white space and return SC_OK.
+     * using white space around the password credential. The request
+     * is accepted.
      */
     @Test
     public void testPasswordExtraSpace() throws Exception {
         doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
                 NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
         doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, SPACED_PASSWORD,
-                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
+                NO_COOKIES, HttpServletResponse.SC_OK);
     }
 
     /*
