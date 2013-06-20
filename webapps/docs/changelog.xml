@@ -70,6 +70,10 @@
         methods that does not include GET. (markt)
       </fix>
       <fix>
+        <bug>54745</bug>: Fix JAR file scanning when Tomcat is deployed via Java
+        Web Start. Patch provided by Nick Williams. (markt)
+      </fix>
+      <fix>
         <bug>55073</bug>, <bug>55108</bug>, <bug>55109</bug> &amp;
         <bug>55110</bug>: Small performance improvements. Patches provided by
         Adrian Nistor. (markt)
