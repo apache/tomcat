@@ -527,47 +527,42 @@ public class JDBCRealm
         // connection may try to be opened again. On normal conditions (including
         // invalid login - the above is only used once.
         int numberOfTries = 2;
-        while (numberOfTries>0) {
+        while (numberOfTries > 0) {
             try {
-
                 // Ensure that we have an open database connection
                 open();
 
-                try {
-                    stmt = credentials(dbConnection, username);
-                    rs = stmt.executeQuery();
+                stmt = credentials(dbConnection, username);
+                rs = stmt.executeQuery();
+                dbConnection.commit();
 
-                    if (rs.next()) {
-                        dbCredentials = rs.getString(1);
-                    }
-                    rs.close();
-                    rs = null;
-                    if (dbCredentials == null) {
-                        return (null);
-                    }
-
-                    dbCredentials = dbCredentials.trim();
-                    return dbCredentials;
-
-                } finally {
-                    if (rs!=null) {
-                        try {
-                            rs.close();
-                        } catch(SQLException e) {
-                            containerLog.warn(sm.getString("jdbcRealm.abnormalCloseResultSet"));
-                        }
-                    }
+                if (rs.next()) {
+                    dbCredentials = rs.getString(1);
                 }
 
-            } catch (SQLException e) {
+                if (dbCredentials != null) {
+                    dbCredentials = dbCredentials.trim();
+                }
 
+                return dbCredentials;
+
+            } catch (SQLException e) {
                 // Log the problem for posterity
                 containerLog.error(sm.getString("jdbcRealm.exception"), e);
+            } finally {
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch(SQLException e) {
+                        containerLog.warn(sm.getString(
+                                "jdbcRealm.abnormalCloseResultSet"));
+                    }
+                }
+            }
 
-                // Close the connection so that it gets reopened next time
-                if (dbConnection != null)
-                    close(dbConnection);
-
+            // Close the connection so that it gets reopened next time
+            if (dbConnection != null) {
+                close(dbConnection);
             }
 
             numberOfTries--;
