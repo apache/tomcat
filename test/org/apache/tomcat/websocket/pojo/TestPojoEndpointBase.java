@@ -22,8 +22,11 @@ import java.util.concurrent.TimeUnit;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.ContainerProvider;
+import javax.websocket.EndpointConfig;
 import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnOpen;
+import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import javax.websocket.server.ServerEndpoint;
 
@@ -70,6 +73,56 @@ public class TestPojoEndpointBase extends TomcatBaseTest {
         // Server should close the connection after the exception on open.
         boolean closed = client.waitForClose(5);
         Assert.assertTrue("Server failed to close connection", closed);
+    }
+
+    @Test
+    public void testOnOpenPojoMethod() throws Exception {
+        // Set up utility classes
+        OnOpenServerEndpoint server = new OnOpenServerEndpoint();
+        SingletonConfigurator.setInstance(server);
+        ServerConfigListener.setPojoClazz(OnOpenServerEndpoint.class);
+
+        Tomcat tomcat = getTomcatInstance();
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(new ApplicationListener(
+                ServerConfigListener.class.getName(), false));
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
+
+        WebSocketContainer wsContainer =
+                ContainerProvider.getWebSocketContainer();
+
+
+        tomcat.start();
+
+        Client client = new Client();
+        URI uri = new URI("ws://localhost:" + getPort() + "/");
+
+        Session session = wsContainer.connectToServer(client, uri);
+
+        client.waitForClose(5);
+        Assert.assertTrue(session.isOpen());
+    }
+
+
+
+    @ServerEndpoint("/")
+    public static class OnOpenServerEndpoint {
+
+        @OnOpen
+        public void onOpen(@SuppressWarnings("unused") Session session,
+                EndpointConfig config) {
+            if (config == null) {
+                throw new RuntimeException();
+            }
+        }
+
+        @OnError
+        public void onError(@SuppressWarnings("unused") Throwable t){
+            throw new RuntimeException();
+        }
     }
 
 
