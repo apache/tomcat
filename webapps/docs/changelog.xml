@@ -103,6 +103,11 @@
         Complete the document for <code>MessageDispatch15Interceptor</code>.
         (kfujino)
       </add>
+      <add>
+        <bug>53655</bug>: Document the circumstances under which Tomcat will add
+        a <code>javax.mail.Authenticator</code> to mail sessions created via a
+        JNDI resource. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">

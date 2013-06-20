@@ -509,8 +509,13 @@ Transport.send(message);
     <code>javax.mail.Session.getInstance(java.util.Properties)</code> as part of
     the <code>java.util.Properties</code> collection. In addition to the
     properties defined in Annex A of the JavaMail specification, individual
-    providers may also support additional properties like <code>password</code>.
+    providers may also support additional properties.
     </p>
+    
+    <p>If the resource is configured with a <code>password</code> attribute and
+    either a <code>mail.smtp.user</code> or <code>mail.user</code> attribute
+    then Tomcat&apos;s resource factory will configure and add a
+    <code>javax.mail.Authenticator</code> to the mail session.</p>
 
     <h3>4.  Install the JavaMail libraries</h3>
 
