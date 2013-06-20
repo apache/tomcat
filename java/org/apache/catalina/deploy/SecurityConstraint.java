@@ -19,9 +19,14 @@
 package org.apache.catalina.deploy;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.HttpConstraintElement;
@@ -29,6 +34,9 @@ import javax.servlet.HttpMethodConstraintElement;
 import javax.servlet.ServletSecurityElement;
 import javax.servlet.annotation.ServletSecurity;
 import javax.servlet.annotation.ServletSecurity.EmptyRoleSemantic;
+
+import org.apache.juli.logging.Log;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -53,16 +61,17 @@ public class SecurityConstraint implements Serializable {
     public static final String ROLE_ALL_ROLES = "*";
     public static final String ROLE_ALL_AUTHENTICATED_USERS = "**";
 
-    // ----------------------------------------------------------- Constructors
+    private static final StringManager sm =
+            StringManager.getManager(Constants.Package);
 
+
+    // ----------------------------------------------------------- Constructors
 
     /**
      * Construct a new security constraint instance with default values.
      */
     public SecurityConstraint() {
-
         super();
-
     }
 
 
@@ -599,5 +608,182 @@ public class SecurityConstraint implements Serializable {
         }
 
         return null;
+    }
+
+
+    public static SecurityConstraint[] findUncoveredHttpMethods(
+            SecurityConstraint[] constraints,
+            boolean denyUncoveredHttpMethods, Log log) {
+
+        Set<String> coveredPatterns = new HashSet<>();
+        Map<String,Set<String>> urlMethodMap = new HashMap<>();
+        Map<String,Set<String>> urlOmittedMethodMap = new HashMap<>();
+
+        List<SecurityConstraint> newConstraints = new ArrayList<>();
+
+        // First build the lists of covered patterns and those patterns that
+        // might be uncovered
+        for (SecurityConstraint constraint : constraints) {
+            SecurityCollection[] collections = constraint.findCollections();
+            for (SecurityCollection collection : collections) {
+                String[] patterns = collection.findPatterns();
+                String[] methods = collection.findMethods();
+                String[] omittedMethods = collection.findOmittedMethods();
+                // Simple case: no methods
+                if (methods.length == 0 && omittedMethods.length == 0) {
+                    for (String pattern : patterns) {
+                        coveredPatterns.add(pattern);
+                    }
+                    continue;
+                }
+
+                // Pre-calculate so we don't do this for every iteration of the
+                // following loop
+                List<String> omNew = null;
+                if (omittedMethods.length != 0) {
+                    omNew = Arrays.asList(omittedMethods);
+                }
+
+                // Only need to process uncovered patterns
+                for (String pattern : patterns) {
+                    if (!coveredPatterns.contains(pattern)) {
+                        if (methods.length == 0) {
+                            // Build the interset of omitted methods for this
+                            // pattern
+                            Set<String> om = urlOmittedMethodMap.get(pattern);
+                            if (om == null) {
+                                om = new HashSet<>();
+                                urlOmittedMethodMap.put(pattern, om);
+                                om.addAll(omNew);
+                            } else {
+                                om.retainAll(omNew);
+                            }
+                        } else {
+                            // Build the union of methods for this pattern
+                            Set<String> m = urlMethodMap.get(pattern);
+                            if (m == null) {
+                                m = new HashSet<>();
+                                urlMethodMap.put(pattern, m);
+                            }
+                            for (String method : methods) {
+                                m.add(method);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Now check the potentially uncovered patterns
+        for (Map.Entry<String, Set<String>> entry : urlMethodMap.entrySet()) {
+            String pattern = entry.getKey();
+            if (coveredPatterns.contains(pattern)) {
+                // Fully covered. Ignore any partial coverage
+                urlOmittedMethodMap.remove(pattern);
+                continue;
+            }
+
+            Set<String> omittedMethods = urlOmittedMethodMap.get(pattern);
+            Set<String> methods = entry.getValue();
+
+            if (omittedMethods == null) {
+                StringBuilder msg = new StringBuilder();
+                for (String method : methods) {
+                    msg.append(method);
+                    msg.append(' ');
+                }
+                if (denyUncoveredHttpMethods) {
+                    log.info(sm.getString(
+                            "securityConstraint.uncoveredHttpMethodFix",
+                            pattern, msg.toString().trim()));
+                    SecurityCollection collection = new SecurityCollection();
+                    for (String method : methods) {
+                        collection.addOmittedMethod(method);
+                    }
+                    collection.addPattern(pattern);
+                    collection.setName("deny-uncovered-http-methods");
+                    SecurityConstraint constraint = new SecurityConstraint();
+                    constraint.setAuthConstraint(true);
+                    constraint.addCollection(collection);
+                    newConstraints.add(constraint);
+                } else {
+                    log.error(sm.getString(
+                            "securityConstraint.uncoveredHttpMethod",
+                            pattern, msg.toString().trim()));
+                }
+                continue;
+            }
+
+            // As long as every omitted method as a corresponding method the
+            // pattern is fully covered.
+            omittedMethods.removeAll(methods);
+
+            if (omittedMethods.size() > 0) {
+                StringBuilder msg = new StringBuilder();
+                for (String method : omittedMethods) {
+                    msg.append(method);
+                    msg.append(' ');
+                }
+                if (denyUncoveredHttpMethods) {
+                    log.info(sm.getString(
+                            "securityConstraint.uncoveredHttpOmittedMethodFix",
+                            pattern, msg.toString().trim()));
+                    SecurityCollection collection = new SecurityCollection();
+                    for (String method : omittedMethods) {
+                        collection.addMethod(method);
+                    }
+                    collection.addPattern(pattern);
+                    collection.setName("deny-uncovered-http-methods");
+                    SecurityConstraint constraint = new SecurityConstraint();
+                    constraint.setAuthConstraint(true);
+                    constraint.addCollection(collection);
+                    newConstraints.add(constraint);
+                } else {
+                    log.error(sm.getString(
+                            "securityConstraint.uncoveredHttpOmittedMethod",
+                            pattern, msg.toString().trim()));
+                }
+            }
+        }
+        for (Map.Entry<String, Set<String>> entry :
+                urlOmittedMethodMap.entrySet()) {
+            String pattern = entry.getKey();
+            if (coveredPatterns.contains(pattern)) {
+                // Fully covered. Ignore any partial coverage
+                continue;
+            }
+
+            Set<String> omittedMethods = entry.getValue();
+
+            if (omittedMethods.size() > 0) {
+                StringBuilder msg = new StringBuilder();
+                for (String method : omittedMethods) {
+                    msg.append(method);
+                    msg.append(' ');
+                }
+                if (denyUncoveredHttpMethods) {
+                    log.info(sm.getString(
+                            "securityConstraint.uncoveredHttpOmittedMethodFix",
+                            pattern, msg.toString().trim()));
+                    SecurityCollection collection = new SecurityCollection();
+                    for (String method : omittedMethods) {
+                        collection.addMethod(method);
+                    }
+                    collection.addPattern(pattern);
+                    collection.setName("deny-uncovered-http-methods");
+                    SecurityConstraint constraint = new SecurityConstraint();
+                    constraint.setAuthConstraint(true);
+                    constraint.addCollection(collection);
+                    newConstraints.add(constraint);
+                } else {
+                    log.error(sm.getString(
+                            "securityConstraint.uncoveredHttpOmittedMethod",
+                            pattern, msg.toString().trim()));
+                }
+            }
+        }
+
+        return newConstraints.toArray(
+                new SecurityConstraint[newConstraints.size()]);
     }
 }
