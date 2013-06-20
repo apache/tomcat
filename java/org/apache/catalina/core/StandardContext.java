@@ -5384,7 +5384,7 @@ public class StandardContext extends ContainerBase
                 // Pre-calculate so we don't do this for every iteration of the
                 // following loop
                 List<String> omNew = null;
-                if (omittedMethods.length == 0) {
+                if (omittedMethods.length != 0) {
                     omNew = Arrays.asList(omittedMethods);
                 }
 
@@ -5397,9 +5397,11 @@ public class StandardContext extends ContainerBase
                             Set<String> om = urlOmittedMethodMap.get(pattern);
                             if (om == null) {
                                 om = new HashSet<>();
-                                urlMethodMap.put(pattern, om);
+                                urlOmittedMethodMap.put(pattern, om);
+                                om.addAll(omNew);
+                            } else {
+                                om.retainAll(omNew);
                             }
-                            om.retainAll(omNew);
                         } else {
                             // Build the union of methods for this pattern
                             Set<String> m = urlMethodMap.get(pattern);
