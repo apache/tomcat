@@ -129,6 +129,10 @@
         Change default configuration so that a change to the global web.xml file
         will trigger a reload of all web applications. (markt)
       </add>
+      <fix>
+        <bug>55101</bug>: Make BASIC authentication more tolerant of whitespace.
+        Patch provided by Brian Burch. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
