@@ -683,7 +683,7 @@ public class SecurityConstraint implements Serializable {
                 continue;
             }
 
-            Set<String> omittedMethods = urlOmittedMethodMap.get(pattern);
+            Set<String> omittedMethods = urlOmittedMethodMap.remove(pattern);
             Set<String> methods = entry.getValue();
 
             if (omittedMethods == null) {
