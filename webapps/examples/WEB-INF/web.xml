@@ -235,12 +235,13 @@
     </jsp-config>
 
    <security-constraint>
-      <display-name>Example Security Constraint</display-name>
+      <display-name>Example Security Constraint - part 1</display-name>
       <web-resource-collection>
-         <web-resource-name>Protected Area</web-resource-name>
+         <web-resource-name>Protected Area - Allow methods</web-resource-name>
          <!-- Define the context-relative URL(s) to be protected -->
          <url-pattern>/jsp/security/protected/*</url-pattern>
-         <!-- If you list http methods, only those methods are protected -->
+         <!-- If you list http methods, only those methods are protected so -->
+         <!-- the constraint below ensures all other methods are denied     -->
          <http-method>DELETE</http-method>
          <http-method>GET</http-method>
          <http-method>POST</http-method>
@@ -251,6 +252,20 @@
          <role-name>tomcat</role-name>
          <role-name>role1</role-name>
       </auth-constraint>
+    </security-constraint>
+   <security-constraint>
+      <display-name>Example Security Constraint - part 2</display-name>
+      <web-resource-collection>
+         <web-resource-name>Protected Area - Deny methods</web-resource-name>
+         <!-- Define the context-relative URL(s) to be protected -->
+         <url-pattern>/jsp/security/protected/*</url-pattern>
+         <http-method-omission>DELETE</http-method-omission>
+         <http-method-omission>GET</http-method-omission>
+         <http-method-omission>POST</http-method-omission>
+         <http-method-omission>PUT</http-method-omission>
+      </web-resource-collection>
+      <!-- An empty auth constraint denies access -->
+      <auth-constraint />
     </security-constraint>
 
     <!-- Default login configuration uses form-based authentication -->
