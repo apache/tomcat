@@ -74,6 +74,10 @@
         Web Start. Patch provided by Nick Williams. (markt)
       </fix>
       <fix>
+        <bug>55071</bug>: Ensure original exception is reported if JDBC Realm
+        fails to read a user&apos;s credentials. (markt)
+      </fix>
+      <fix>
         <bug>55073</bug>, <bug>55108</bug>, <bug>55109</bug> &amp;
         <bug>55110</bug>: Small performance improvements. Patches provided by
         Adrian Nistor. (markt)
