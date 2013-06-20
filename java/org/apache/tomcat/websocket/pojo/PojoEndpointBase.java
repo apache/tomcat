@@ -56,7 +56,8 @@ public abstract class PojoEndpointBase extends Endpoint {
         if (methodMapping.getOnOpen() != null) {
             try {
                 methodMapping.getOnOpen().invoke(pojo,
-                        methodMapping.getOnOpenArgs(pathParameters, session));
+                        methodMapping.getOnOpenArgs(
+                                pathParameters, session, config));
 
             } catch (IllegalAccessException e) {
                 // Reflection related problems

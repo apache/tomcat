@@ -112,8 +112,9 @@ public class PojoMethodMapping {
 
 
     public Object[] getOnOpenArgs(Map<String,String> pathParameters,
-            Session session) throws DecodeException {
-        return buildArgs(onOpenParams, pathParameters, session, null, null);
+            Session session, EndpointConfig config) throws DecodeException {
+        return buildArgs(onOpenParams, pathParameters, session, config, null,
+                null);
     }
 
 
@@ -124,8 +125,8 @@ public class PojoMethodMapping {
 
     public Object[] getOnCloseArgs(Map<String,String> pathParameters,
             Session session, CloseReason closeReason) throws DecodeException {
-        return buildArgs(
-                onCloseParams, pathParameters, session, null, closeReason);
+        return buildArgs(onCloseParams, pathParameters, session, null, null,
+                closeReason);
     }
 
 
@@ -136,8 +137,8 @@ public class PojoMethodMapping {
 
     public Object[] getOnErrorArgs(Map<String,String> pathParameters,
             Session session, Throwable throwable) throws DecodeException {
-        return buildArgs(
-                onErrorParams, pathParameters, session, throwable, null);
+        return buildArgs(onErrorParams, pathParameters, session, null,
+                throwable, null);
     }
 
 
@@ -189,6 +190,9 @@ public class PojoMethodMapping {
             Class<?> type = types[i];
             if (type.equals(Session.class)) {
                 result[i] = new PojoPathParam(type, null);
+            } else if (methodType == MethodType.ON_OPEN &&
+                    type.equals(EndpointConfig.class)) {
+                result[i] = new PojoPathParam(type, null);
             } else if (methodType == MethodType.ON_ERROR
                     && type.equals(Throwable.class)) {
                 foundThrowable = true;
@@ -223,13 +227,15 @@ public class PojoMethodMapping {
 
     private static Object[] buildArgs(PojoPathParam[] pathParams,
             Map<String,String> pathParameters, Session session,
-            Throwable throwable, CloseReason closeReason)
+            EndpointConfig config, Throwable throwable, CloseReason closeReason)
             throws DecodeException {
         Object[] result = new Object[pathParams.length];
         for (int i = 0; i < pathParams.length; i++) {
             Class<?> type = pathParams[i].getType();
             if (type.equals(Session.class)) {
                 result[i] = session;
+            } else if (type.equals(EndpointConfig.class)) {
+                result[i] = config;
             } else if (type.equals(Throwable.class)) {
                 result[i] = throwable;
             } else if (type.equals(CloseReason.class)) {
