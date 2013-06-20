@@ -95,9 +95,9 @@ public class PojoMethodMapping {
         this.onOpen = open;
         this.onClose = close;
         this.onError = error;
-        onOpenParams = getPathParams(onOpen, false, false);
-        onCloseParams = getPathParams(onClose, false, true);
-        onErrorParams = getPathParams(onError, true, false);
+        onOpenParams = getPathParams(onOpen, MethodType.ON_OPEN);
+        onCloseParams = getPathParams(onClose, MethodType.ON_CLOSE);
+        onErrorParams = getPathParams(onError, MethodType.ON_ERROR);
     }
 
 
@@ -176,8 +176,8 @@ public class PojoMethodMapping {
     }
 
 
-    private static PojoPathParam[] getPathParams(Method m, boolean isOnError,
-            boolean isClose) {
+    private static PojoPathParam[] getPathParams(Method m,
+            MethodType methodType) {
         if (m == null) {
             return new PojoPathParam[0];
         }
@@ -189,10 +189,12 @@ public class PojoMethodMapping {
             Class<?> type = types[i];
             if (type.equals(Session.class)) {
                 result[i] = new PojoPathParam(type, null);
-            } else if (isOnError && type.equals(Throwable.class)) {
+            } else if (methodType == MethodType.ON_ERROR
+                    && type.equals(Throwable.class)) {
                 foundThrowable = true;
                 result[i] = new PojoPathParam(type, null);
-            } else if (isClose && type.equals(CloseReason.class)) {
+            } else if (methodType == MethodType.ON_CLOSE &&
+                    type.equals(CloseReason.class)) {
                 result[i] = new PojoPathParam(type, null);
             } else {
                 Annotation[] paramAnnotations = paramsAnnotations[i];
@@ -210,7 +212,7 @@ public class PojoMethodMapping {
                 }
             }
         }
-        if (isOnError && !foundThrowable) {
+        if (methodType == MethodType.ON_ERROR && !foundThrowable) {
             throw new IllegalArgumentException(sm.getString(
                     "pojoMethodMapping.onErrorNoThrowable",
                     m.getName(), m.getDeclaringClass().getName()));
@@ -564,5 +566,12 @@ public class PojoMethodMapping {
         public Decoder getDecoder() {
             return decoder;
         }
+    }
+
+
+    private static enum MethodType {
+        ON_OPEN,
+        ON_CLOSE,
+        ON_ERROR
     }
 }
