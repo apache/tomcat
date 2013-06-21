@@ -257,7 +257,7 @@ public class WsSession implements Session {
 
     @Override
     public boolean isOpen() {
-        return state == State.OPEN || state == State.PRE_CLOSING;
+        return state == State.OPEN;
     }
 
 
@@ -342,15 +342,11 @@ public class WsSession implements Session {
                 return;
             }
 
-            // This state exists to protect against recursive calls to close()
-            // from Endpoint.onClose()
-            state = State.PRE_CLOSING;
-
-            fireEndpointOnClose(closeReason);
-
             state = State.CLOSING;
 
             sendCloseMessage(closeReason);
+
+            fireEndpointOnClose(closeReason);
         }
     }
 
@@ -371,18 +367,15 @@ public class WsSession implements Session {
                 return;
             }
 
-            // This state exists to protect against recursive calls to close()
-            // from Endpoint.onClose()
-            state = State.PRE_CLOSING;
+            state = State.CLOSING;
+
+            sendCloseMessage(closeReason);
 
             CloseReason localCloseReason =
                     new CloseReason(CloseCodes.CLOSED_ABNORMALLY,
                             closeReason.getReasonPhrase());
+
             fireEndpointOnClose(localCloseReason);
-
-            state = State.CLOSING;
-
-            sendCloseMessage(closeReason);
         }
     }
 
@@ -394,19 +387,13 @@ public class WsSession implements Session {
      */
     public void onClose(CloseReason closeReason) {
 
-        boolean sendCloseMessage = false;
-
         synchronized (stateLock) {
             if (state == State.OPEN) {
-                sendCloseMessage = true;
+                sendCloseMessage(closeReason);
                 fireEndpointOnClose(closeReason);
             }
 
             state = State.CLOSED;
-
-            if (sendCloseMessage) {
-                sendCloseMessage(closeReason);
-            }
 
             // Close the socket
             wsRemoteEndpoint.close();
@@ -547,7 +534,6 @@ public class WsSession implements Session {
 
     private static enum State {
         OPEN,
-        PRE_CLOSING,
         CLOSING,
         CLOSED
     }
