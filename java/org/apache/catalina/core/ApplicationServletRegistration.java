@@ -55,7 +55,7 @@ public class ApplicationServletRegistration
     @Override
     public String getClassName() {
         return wrapper.getServletClass();
-   }
+    }
 
     @Override
     public String getInitParameter(String name) {
