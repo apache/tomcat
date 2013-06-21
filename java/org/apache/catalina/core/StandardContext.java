@@ -5291,7 +5291,7 @@ public class StandardContext extends ContainerBase
             // Needs to be after SCIs and listeners as they may programatically
             // change constraints
             if (ok) {
-                checkConstraintsForUncoveredMethods();
+                checkConstraintsForUncoveredMethods(findConstraints());
             }
 
             try {
@@ -5358,9 +5358,10 @@ public class StandardContext extends ContainerBase
     }
 
 
-    private void checkConstraintsForUncoveredMethods() {
+    private void checkConstraintsForUncoveredMethods(
+            SecurityConstraint[] constraints) {
         SecurityConstraint[] newConstraints =
-                SecurityConstraint.findUncoveredHttpMethods(findConstraints(),
+                SecurityConstraint.findUncoveredHttpMethods(constraints,
                         getDenyUncoveredHttpMethods(), getLogger());
         for (SecurityConstraint constraint : newConstraints) {
             addConstraint(constraint);
@@ -5838,6 +5839,8 @@ public class StandardContext extends ContainerBase
                         newSecurityConstraints) {
                     addConstraint(securityConstraint);
                 }
+
+                checkConstraintsForUncoveredMethods(newSecurityConstraints);
             }
         }
 
