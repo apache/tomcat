@@ -367,6 +367,8 @@ public class PojoMethodMapping {
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
                 } else {
+                    boolean foundBinaryDecoderMatch = false;
+                    boolean foundTextDecoderMatch = false;
                     for (DecoderEntry decoderEntry : decoderEntries) {
                         if (decoderEntry.getClazz().isAssignableFrom(
                                 types[i])) {
@@ -374,21 +376,26 @@ public class PojoMethodMapping {
                                         decoderEntry.getDecoder().getClass()) ||
                                     BinaryStream.class.isAssignableFrom(
                                             decoderEntry.getDecoder().getClass())) {
-                                if (indexByteBuffer == -1) {
-                                    indexByteBuffer = i;
-                                } else {
-                                    throw new IllegalArgumentException(sm.getString(
-                                            "pojoMethodMapping.duplicateMessageParam",
-                                            m.getName(), m.getDeclaringClass().getName()));
+                                if (!foundBinaryDecoderMatch) {
+                                    if (indexByteBuffer == -1) {
+                                        indexByteBuffer = i;
+                                        foundBinaryDecoderMatch = true;
+                                    } else {
+                                        throw new IllegalArgumentException(sm.getString(
+                                                "pojoMethodMapping.duplicateMessageParam",
+                                                m.getName(), m.getDeclaringClass().getName()));
+                                    }
                                 }
-                                break;
                             } else {
-                                if (indexString == -1) {
-                                    indexString = i;
-                                } else {
-                                    throw new IllegalArgumentException(sm.getString(
-                                            "pojoMethodMapping.duplicateMessageParam",
-                                            m.getName(), m.getDeclaringClass().getName()));
+                                if (!foundTextDecoderMatch) {
+                                    if (indexString == -1) {
+                                        indexString = i;
+                                        foundTextDecoderMatch = true;
+                                    } else {
+                                        throw new IllegalArgumentException(sm.getString(
+                                                "pojoMethodMapping.duplicateMessageParam",
+                                                m.getName(), m.getDeclaringClass().getName()));
+                                    }
                                 }
                             }
                         }
