@@ -356,6 +356,38 @@ public class WsSession implements Session {
 
 
     /**
+     * WebSocket 1.0. Section 2.1.5.
+     * Need internal close method as spec requires that the local endpoint
+     * receives a 1006 on timeout.
+     */
+    private void closeTimeout(CloseReason closeReason) {
+        // Double-checked locking. OK because state is volatile
+        if (state != State.OPEN) {
+            return;
+        }
+
+        synchronized (stateLock) {
+            if (state != State.OPEN) {
+                return;
+            }
+
+            // This state exists to protect against recursive calls to close()
+            // from Endpoint.onClose()
+            state = State.PRE_CLOSING;
+
+            CloseReason localCloseReason =
+                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY,
+                            closeReason.getReasonPhrase());
+            fireEndpointOnClose(localCloseReason);
+
+            state = State.CLOSING;
+
+            sendCloseMessage(closeReason);
+        }
+    }
+
+
+    /**
      * Called when a close message is received. Should only ever happen once.
      * Also called after a protocol error when the ProtocolHandler needs to
      * force the closing of the connection.
@@ -501,12 +533,8 @@ public class WsSession implements Session {
         }
 
         if (System.currentTimeMillis() - lastActive > timeout) {
-            try {
-                close(new CloseReason(CloseCodes.GOING_AWAY,
-                        sm.getString("wsSession.timeout")));
-            } catch (IOException e) {
-                log.warn(sm.getString("wsSession.expireFailed"), e);
-            }
+            closeTimeout(new CloseReason(CloseCodes.GOING_AWAY,
+                    sm.getString("wsSession.timeout")));
         }
     }
 
