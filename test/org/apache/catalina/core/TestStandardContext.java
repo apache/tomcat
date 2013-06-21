@@ -517,7 +517,8 @@ public class TestStandardContext extends TomcatBaseTest {
 
         // Check for a 401
         if (enableDeny) {
-            Assert.assertEquals("OK", bc.toString());
+            // Should be default error page
+            Assert.assertTrue(bc.toString().contains("403"));
             Assert.assertEquals(403, rc);
         } else {
             Assert.assertEquals("OK", bc.toString());
