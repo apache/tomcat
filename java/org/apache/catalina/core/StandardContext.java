@@ -5796,29 +5796,39 @@ public class StandardContext extends ContainerBase
                             // Skip this pattern
                             foundConflict = true;
                             conflicts.add(urlPattern);
+                            break;
                         } else {
                             // Need to overwrite constraint for this pattern
-                            // so remove every pattern found
-
-                            // TODO spec 13.4.2 appears to say only the
-                            // conflicting pattern is overwritten, not the
-                            // entire security constraint.
-                            removeConstraint(securityConstraint);
+                            collection.removePattern(urlPattern);
+                            // If the collection is now empty, remove it
+                            if (collection.findPatterns().length == 0) {
+                                securityConstraint.removeCollection(collection);
+                            }
                         }
                     }
-                    if (foundConflict) {
-                        break;
-                    }
                 }
+
+                // If the constraint now has no collections - remove it
+                if (securityConstraint.findCollections().length == 0) {
+                    removeConstraint(securityConstraint);
+                }
+
+                // No need to check other constraints for the current pattern
+                // once a conflict has been found
                 if (foundConflict) {
                     break;
                 }
             }
-            // TODO spec 13.4.2 appears to say that non-conflicting patterns are
-            // still used.
-            // TODO you can't calculate the eventual security constraint now,
-            // you have to wait until the context is started, since application
-            // code can add url patterns after calling setSecurity.
+
+            // Note: For progammatically added Servlets this may not be the
+            //       complete set of security constraints since additional
+            //       URL patterns can be added after the application has called
+            //       setSecurity. For all programmatically added servilets, the
+            //       #dynamicServletAdded() method sets a flag that ensures that
+            //       the constraints are re-evaluated before the servlet is
+            //       first used
+
+            // If the pattern did not conflict, add the new constraint(s).
             if (!foundConflict) {
                 SecurityConstraint[] newSecurityConstraints =
                         SecurityConstraint.createConstraints(
@@ -5832,7 +5842,6 @@ public class StandardContext extends ContainerBase
         }
 
         return conflicts;
-
     }
 
 
