@@ -20,12 +20,14 @@ package org.apache.catalina.core;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.HttpConstraintElement;
+import javax.servlet.HttpMethodConstraintElement;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContainerInitializer;
@@ -63,6 +65,7 @@ import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterMapRealm;
+import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -453,7 +456,7 @@ public class TestStandardContext extends TomcatBaseTest {
         public void onStartup(Set<Class<?>> c, ServletContext ctx)
                 throws ServletException {
             // Register and map servlet
-            Servlet s = new Bug50015Servlet();
+            Servlet s = new TesterServlet();
             ServletRegistration.Dynamic sr = ctx.addServlet("bug50015", s);
             sr.addMapping("/bug50015");
 
@@ -465,17 +468,84 @@ public class TestStandardContext extends TomcatBaseTest {
         }
     }
 
-    public static final class Bug50015Servlet extends HttpServlet {
+    @Test
+    public void testDenyUncoveredHttpMethodsSCITrue() throws Exception {
+        doTestDenyUncoveredHttpMethodsSCI(true);
+    }
 
-        private static final long serialVersionUID = 1L;
+    @Test
+    public void testDenyUncoveredHttpMethodsSCIFalse() throws Exception {
+        doTestDenyUncoveredHttpMethodsSCI(false);
+    }
+
+    private void doTestDenyUncoveredHttpMethodsSCI(boolean enableDeny)
+            throws Exception {
+        // Test that denying uncovered HTTP methods when adding servlet security
+        // constraints programmatically does work.
+
+        // Set up a container
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+        ctx.setDenyUncoveredHttpMethods(enableDeny);
+
+        // Setup realm
+        TesterMapRealm realm = new TesterMapRealm();
+        realm.addUser("tomcat", "tomcat");
+        realm.addUserRole("tomcat", "tomcat");
+        ctx.setRealm(realm);
+
+        // Configure app for BASIC auth
+        LoginConfig lc = new LoginConfig();
+        lc.setAuthMethod("BASIC");
+        ctx.setLoginConfig(lc);
+        ctx.getPipeline().addValve(new BasicAuthenticator());
+
+        // Add ServletContainerInitializer
+        ServletContainerInitializer sci = new DenyUncoveredHttpMethodsSCI();
+        ctx.addServletContainerInitializer(sci, null);
+
+        // Start the context
+        tomcat.start();
+
+        // Request the first servlet
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/test",
+                bc, null);
+
+        // Check for a 401
+        if (enableDeny) {
+            Assert.assertEquals("OK", bc.toString());
+            Assert.assertEquals(403, rc);
+        } else {
+            Assert.assertEquals("OK", bc.toString());
+            Assert.assertEquals(200, rc);
+        }
+    }
+
+    public static final class DenyUncoveredHttpMethodsSCI
+            implements ServletContainerInitializer {
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-            resp.setContentType("text/plain");
-            resp.getWriter().write("OK");
-        }
+        public void onStartup(Set<Class<?>> c, ServletContext ctx)
+                throws ServletException {
+            // Register and map servlet
+            Servlet s = new TesterServlet();
+            ServletRegistration.Dynamic sr = ctx.addServlet("test", s);
+            sr.addMapping("/test");
 
+            // Add a constraint with uncovered methods
+            HttpConstraintElement hce = new HttpConstraintElement(
+                    TransportGuarantee.NONE, "tomcat");
+            HttpMethodConstraintElement hmce =
+                    new HttpMethodConstraintElement("POST", hce);
+            Set<HttpMethodConstraintElement> hmces = new HashSet<>();
+            hmces.add(hmce);
+            ServletSecurityElement sse = new ServletSecurityElement(hmces);
+            sr.setServletSecurity(sse);
+        }
     }
 
     @Test
