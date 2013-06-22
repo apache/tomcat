@@ -50,7 +50,7 @@ public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
     }
 
     @Override
-    protected void close() {
+    protected void doClose() {
         channel.close();
     }
 }

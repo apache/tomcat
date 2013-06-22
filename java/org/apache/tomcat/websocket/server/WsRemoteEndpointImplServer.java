@@ -124,7 +124,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
 
     @Override
-    protected void close() {
+    protected void doClose() {
         try {
             sos.close();
         } catch (IOException e) {
