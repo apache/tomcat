@@ -332,22 +332,7 @@ public class WsSession implements Session {
 
     @Override
     public void close(CloseReason closeReason) throws IOException {
-        // Double-checked locking. OK because state is volatile
-        if (state != State.OPEN) {
-            return;
-        }
-
-        synchronized (stateLock) {
-            if (state != State.OPEN) {
-                return;
-            }
-
-            state = State.CLOSING;
-
-            sendCloseMessage(closeReason);
-
-            fireEndpointOnClose(closeReason);
-        }
+        doClose(closeReason, closeReason);
     }
 
 
@@ -356,7 +341,8 @@ public class WsSession implements Session {
      * Need internal close method as spec requires that the local endpoint
      * receives a 1006 on timeout.
      */
-    private void closeTimeout(CloseReason closeReason) {
+    private void doClose(CloseReason closeReasonMessage,
+            CloseReason closeReasonLocal) {
         // Double-checked locking. OK because state is volatile
         if (state != State.OPEN) {
             return;
@@ -369,13 +355,10 @@ public class WsSession implements Session {
 
             state = State.CLOSING;
 
-            sendCloseMessage(closeReason);
+            sendCloseMessage(closeReasonMessage);
+            fireEndpointOnClose(closeReasonLocal);
 
-            CloseReason localCloseReason =
-                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY,
-                            closeReason.getReasonPhrase());
-
-            fireEndpointOnClose(localCloseReason);
+            state = State.CLOSED;
         }
     }
 
@@ -391,9 +374,8 @@ public class WsSession implements Session {
             if (state == State.OPEN) {
                 sendCloseMessage(closeReason);
                 fireEndpointOnClose(closeReason);
+                state = State.CLOSED;
             }
-
-            state = State.CLOSED;
 
             // Close the socket
             wsRemoteEndpoint.close();
@@ -520,14 +502,15 @@ public class WsSession implements Session {
         }
 
         if (System.currentTimeMillis() - lastActive > timeout) {
-            closeTimeout(new CloseReason(CloseCodes.GOING_AWAY,
-                    sm.getString("wsSession.timeout")));
+            String msg = sm.getString("wsSession.timeout");
+            doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
+                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
         }
     }
 
 
     private void checkState() {
-        if (!isOpen()) {
+        if (state == State.CLOSED) {
             throw new IllegalStateException(sm.getString("wsSession.closed"));
         }
     }
