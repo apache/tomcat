@@ -33,8 +33,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
-import javax.websocket.Encoder;
 import javax.websocket.Endpoint;
+import javax.websocket.EndpointConfig;
 import javax.websocket.Extension;
 import javax.websocket.MessageHandler;
 import javax.websocket.PongMessage;
@@ -100,8 +100,7 @@ public class WsSession implements Session {
             URI requestUri, Map<String,List<String>> requestParameterMap,
             String queryString, Principal userPrincipal, String subProtocol,
             Map<String,String> pathParameters,
-            boolean secure, List<Class<? extends Encoder>> encoders,
-            Map<String,Object> userProperties)
+            boolean secure, EndpointConfig endpointConfig)
                     throws DeploymentException {
         this.localEndpoint = localEndpoint;
         this.wsRemoteEndpoint = wsRemoteEndpoint;
@@ -133,9 +132,9 @@ public class WsSession implements Session {
         }
         this.pathParameters = pathParameters;
         this.secure = secure;
-        this.wsRemoteEndpoint.setEncoders(encoders);
+        this.wsRemoteEndpoint.setEncoders(endpointConfig);
 
-        this.userProperties.putAll(userProperties);
+        this.userProperties.putAll(endpointConfig.getUserProperties());
         this.id = Long.toHexString(ids.getAndIncrement());
     }
 

@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.websocket.DeploymentException;
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
+import javax.websocket.EndpointConfig;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
@@ -460,13 +461,15 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    protected void setEncoders(List<Class<? extends Encoder>> encoders)
+    protected void setEncoders(EndpointConfig endpointConfig)
             throws DeploymentException {
         encoderEntries.clear();
-        for (Class<? extends Encoder> encoderClazz : encoders) {
+        for (Class<? extends Encoder> encoderClazz :
+                endpointConfig.getEncoders()) {
             Encoder instance;
             try {
                 instance = encoderClazz.newInstance();
+                instance.init(endpointConfig);
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new DeploymentException(
                         sm.getString("wsRemoteEndpoint.invalidEncoder",
@@ -489,10 +492,17 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    protected final void close() {
+        for (EncoderEntry entry : encoderEntries) {
+            entry.getEncoder().destroy();
+        }
+        doClose();
+    }
+
+
     protected abstract void doWrite(SendHandler handler, ByteBuffer... data);
     protected abstract boolean isMasked();
-    protected abstract void close();
-
+    protected abstract void doClose();
 
     private static void writeHeader(ByteBuffer headerBuffer, byte opCode,
             ByteBuffer payload, boolean first, boolean last, boolean masked,

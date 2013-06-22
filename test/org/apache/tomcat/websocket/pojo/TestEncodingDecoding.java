@@ -18,6 +18,7 @@ package org.apache.tomcat.websocket.pojo;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -97,6 +98,17 @@ public class TestEncodingDecoding extends TomcatBaseTest {
                 ((MsgString) server.received.peek()).getData());
         Assert.assertEquals(MESSAGE_ONE,
                 ((MsgString) client.received.peek()).getData());
+        session.close();
+        Thread.sleep(100);
+        Assert.assertTrue(Server.isLifeCycleEventCalled(MsgStringEncoder.class.getName()+":init"));
+        Assert.assertTrue(Server.isLifeCycleEventCalled(MsgStringDecoder.class.getName()+":init"));
+        Assert.assertTrue(Server.isLifeCycleEventCalled(MsgByteEncoder.class.getName()+":init"));
+        Assert.assertTrue(Server.isLifeCycleEventCalled(MsgByteDecoder.class.getName()+":init"));
+        Assert.assertTrue(Server.isLifeCycleEventCalled(MsgStringEncoder.class.getName()+":destroy"));
+        Assert.assertTrue(Server.isLifeCycleEventCalled(MsgStringDecoder.class.getName()+":destroy"));
+        Assert.assertTrue(Server.isLifeCycleEventCalled(MsgByteEncoder.class.getName()+":destroy"));
+        Assert.assertTrue(Server.isLifeCycleEventCalled(MsgByteDecoder.class.getName()+":destroy"));
+
     }
 
     @ClientEndpoint(decoders={MsgStringDecoder.class, MsgByteDecoder.class},
@@ -122,6 +134,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             configurator=SingletonConfigurator.class)
     public static class Server {
         private Queue<Object> received = new ConcurrentLinkedQueue<>();
+        static HashMap<String, Boolean> lifeCyclesCalled = new HashMap<>(8);
 
         @OnMessage
         public MsgString rx(MsgString in) {
@@ -135,6 +148,15 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             received.add(in);
             // Echo the message back
             return in;
+        }
+
+        public static void addLifeCycleEvent(String event){
+            lifeCyclesCalled.put(event, Boolean.TRUE);
+        }
+
+        public static boolean isLifeCycleEventCalled(String event){
+            Boolean called = lifeCyclesCalled.get(event);
+            return called == null ? false : called.booleanValue();
         }
     }
 
@@ -151,12 +173,12 @@ public class TestEncodingDecoding extends TomcatBaseTest {
 
         @Override
         public void init(EndpointConfig endpointConfig) {
-            // NO-OP
+            Server.addLifeCycleEvent(getClass().getName() + ":init");
         }
 
         @Override
         public void destroy() {
-            // NO-OP
+            Server.addLifeCycleEvent(getClass().getName() + ":destroy");
         }
 
         @Override
@@ -170,12 +192,12 @@ public class TestEncodingDecoding extends TomcatBaseTest {
 
         @Override
         public void init(EndpointConfig endpointConfig) {
-            // NO-OP
+            Server.addLifeCycleEvent(getClass().getName() + ":init");
         }
 
         @Override
         public void destroy() {
-            // NO-OP
+            Server.addLifeCycleEvent(getClass().getName() + ":destroy");
         }
 
         @Override
@@ -204,12 +226,12 @@ public class TestEncodingDecoding extends TomcatBaseTest {
 
         @Override
         public void init(EndpointConfig endpointConfig) {
-            // NO-OP
+            Server.addLifeCycleEvent(getClass().getName() + ":init");
         }
 
         @Override
         public void destroy() {
-            // NO-OP
+            Server.addLifeCycleEvent(getClass().getName() + ":destroy");
         }
 
         @Override
@@ -228,12 +250,12 @@ public class TestEncodingDecoding extends TomcatBaseTest {
 
         @Override
         public void init(EndpointConfig endpointConfig) {
-            // NO-OP
+             Server.addLifeCycleEvent(getClass().getName() + ":init");
         }
 
         @Override
         public void destroy() {
-            // NO-OP
+            Server.addLifeCycleEvent(getClass().getName() + ":destroy");
         }
 
         @Override

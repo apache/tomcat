@@ -113,8 +113,7 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
                     handshakeRequest.getParameterMap(),
                     handshakeRequest.getQueryString(),
                     handshakeRequest.getUserPrincipal(), subProtocol,
-                    pathParameters, secure, endpointConfig.getEncoders(),
-                    endpointConfig.getUserProperties());
+                    pathParameters, secure, endpointConfig);
             WsFrameServer wsFrame = new WsFrameServer(
                     sis,
                     wsSession);
