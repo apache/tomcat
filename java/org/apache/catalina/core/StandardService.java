@@ -522,7 +522,11 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             }
         }
 
-        mapperListener.stop();
+        // If the Server failed to start, the mapperListener won't have been
+        // started
+        if (mapperListener.getState() != LifecycleState.INITIALIZED) {
+            mapperListener.stop();
+        }
 
         synchronized (executors) {
             for (Executor executor: executors) {
