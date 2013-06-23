@@ -1744,6 +1744,24 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     }
 
     /**
+     * write time until first byte is written (commit time) in millis - %F
+     */
+    protected static class FirstByteTimeElement implements AccessLogElement {
+        @Override
+        public void addElement(StringBuilder buf, Date date, Request request,
+                Response response, long time) {
+            long commitTime = response.getCoyoteResponse().getCommitTime();
+            if (commitTime == -1) {
+                buf.append('-');
+            } else {
+                long delta =
+                        commitTime - request.getCoyoteRequest().getStartTime();
+                buf.append(Long.toString(delta));
+            }
+        }
+    }
+
+    /**
      * write Query string (prepended with a '?' if it exists) - %q
      */
     protected static class QueryElement implements AccessLogElement {
@@ -2055,6 +2073,8 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             return new ByteSentElement(false);
         case 'D':
             return new ElapsedTimeElement(true);
+        case 'F':
+            return new FirstByteTimeElement();
         case 'h':
             return new HostElement();
         case 'H':
