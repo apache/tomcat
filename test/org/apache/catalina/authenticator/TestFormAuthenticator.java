@@ -302,6 +302,9 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             boolean serverWillUseCookies, boolean serverWillChangeSessid)
             throws Exception {
 
+        client = new FormAuthClient(clientShouldUseCookies,
+                serverWillUseCookies, serverWillChangeSessid);
+        
         // First request for protected resource gets the login page
         client.setUseContinue(useContinue);
         client.doResourceRequest(resourceMethod, false, null, null);
