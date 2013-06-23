@@ -107,6 +107,7 @@ public final class Response {
 
     // General informations
     private long contentWritten = 0;
+    private long commitTime = -1;
 
     /**
      * Holds request error exception.
@@ -219,9 +220,20 @@ public final class Response {
 
 
     public void setCommitted(boolean v) {
+        if (v && !this.commited) {
+            this.commitTime = System.currentTimeMillis();
+        }
         this.commited = v;
     }
 
+    /**
+     * Return the time the response was committed (based on System.currentTimeMillis).
+     *
+     * @return the time the response was committed
+     */
+    public long getCommitTime() {
+        return commitTime;
+    }
 
     // -----------------Error State --------------------
 
@@ -354,7 +366,7 @@ public final class Response {
      */
     public void sendHeaders() {
         action(ActionCode.COMMIT, this);
-        commited = true;
+        setCommitted(true);
     }
 
 
@@ -522,6 +534,7 @@ public final class Response {
         status = 200;
         message = null;
         commited = false;
+        commitTime = -1;
         errorException = null;
         headers.clear();
         listener = null;
