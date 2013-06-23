@@ -129,6 +129,11 @@
         1.3 core library as its classes are no longer included in junit.jar.
         (kkolinko)
       </update>
+      <fix>
+        <bug>55119</bug>: Ensure that the build process produces Javadoc that is
+        not vulnerable to CVE-2013-1571. Based on a patch by Uwe Schindler.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
