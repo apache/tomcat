@@ -82,6 +82,10 @@
         <bug>55110</bug>: Small performance improvements. Patches provided by
         Adrian Nistor. (markt)
       </fix>
+      <add>
+        <bug>55102</bug>: Add support for time to first byte in the
+        AccessLogValve. Patch provided by Jeremy Boynes. (markt)
+      </add>
       <fix>
         <bug>55125</bug>: If the Server container fails to start, don't allow
         the Catalina wrapper to start (used when running from the command line

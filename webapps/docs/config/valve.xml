@@ -273,6 +273,7 @@
     <li><b>%v</b> - Local server name</li>
     <li><b>%D</b> - Time taken to process the request, in millis</li>
     <li><b>%T</b> - Time taken to process the request, in seconds</li>
+    <li><b>%F</b> - Time taken to commit the response, in millis</li>
     <li><b>%I</b> - Current request thread name (can compare later with stacktraces)</li>
     </ul>
 
