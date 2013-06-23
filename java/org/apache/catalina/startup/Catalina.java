@@ -690,7 +690,13 @@ public class Catalina {
         try {
             getServer().start();
         } catch (LifecycleException e) {
-            log.error("Catalina.start: ", e);
+            log.fatal(sm.getString("catalina.serverStartFail"), e);
+            try {
+                getServer().destroy();
+            } catch (LifecycleException e1) {
+                log.debug("destroy() failed for failed Server ", e1);
+            }
+            return;
         }
 
         long t2 = System.nanoTime();

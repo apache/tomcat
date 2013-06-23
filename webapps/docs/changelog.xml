@@ -82,6 +82,12 @@
         <bug>55110</bug>: Small performance improvements. Patches provided by
         Adrian Nistor. (markt)
       </fix>
+      <fix>
+        <bug>55125</bug>: If the Server container fails to start, don't allow
+        the Catalina wrapper to start (used when running from the command line
+        and when running as a service) since Tomcat will not be able to do any
+        useful work. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
