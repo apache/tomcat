@@ -1610,8 +1610,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <path location="${ant.core.lib}"/>
       </classpath>
     </javadoc>
-  	<patch-javadoc dir="${tomcat.dist}/webapps/docs/servletapi"
-  	  docencoding="ISO-8859-1"/>
+    <patch-javadoc dir="${tomcat.dist}/webapps/docs/servletapi"
+      docencoding="ISO-8859-1"/>
     <javadoc packagenames="javax.servlet.jsp.*"
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/jspapi"
@@ -1704,7 +1704,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
           <!-- TODO: add encoding="@{docencoding}" to contains check, when we
                are on ANT 1.9.0: -->
           <not>
-          	<contains text="function validURL(url) {" casesensitive="true" />
+            <contains text="function validURL(url) {" casesensitive="true" />
           </not>
         </restrict>
         <replacetoken><![CDATA[function loadFrames() {]]></replacetoken>
