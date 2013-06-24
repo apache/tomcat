@@ -177,12 +177,10 @@
       <attribute name="appContextProtection" required="false">
         <p>Enables protection so that calls to
         <code>sun.awt.AppContext.getAppContext()</code> triggered by a web
-        application do not result in a memory leak. Note that a call to this
-        method will be triggered as part of the web application stop process
-        when running on Java 6 and earlier. It is therefore strongly recommended
-        that this protection is enabled when running on Java 6 and earlier. The
-        default is <code>true</code> for Java 6 and earlier versions. The
-        default is <code>false</code> for Java 7 and later versions.</p>
+        application do not result in a memory leak. Note that enabling this
+        protection will trigger a requirement for a graphical environment unless
+        Java is started in head-less mode. The default is <code>false</code>.
+        </p>
       </attribute>
 
       <attribute name="AWTThreadProtection" required="false">

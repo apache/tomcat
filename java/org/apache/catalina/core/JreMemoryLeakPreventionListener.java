@@ -59,30 +59,15 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    private static final boolean IS_JAVA_7_OR_LATER;
-
-    static {
-        boolean isJava7OrLater;
-        try {
-            Class.forName("java.util.Objects");
-            isJava7OrLater = true;
-        } catch (ClassNotFoundException e) {
-            isJava7OrLater = false;
-        }
-        IS_JAVA_7_OR_LATER = isJava7OrLater;
-    }
-
     /**
      * Protect against the memory leak caused when the first call to
      * <code>sun.awt.AppContext.getAppContext()</code> is triggered by a web
-     * application. Defaults to <code>true</code> for Java 6 and earlier (since
-     * it is used by {@link java.beans.Introspector#flushCaches()}) but defaults
-     * to <code>false</code> for Java 7 and later since
+     * application. Defaults to <code>false</code> since
      * {@link java.beans.Introspector#flushCaches()} no longer uses AppContext
      * from 1.7.0_02 onwards. Also, from 1.7.0_25 onwards, calling this method
      * requires a graphical environment and starts an AWT thread.
      */
-    private boolean appContextProtection = !IS_JAVA_7_OR_LATER;
+    private boolean appContextProtection = false;
     public boolean isAppContextProtection() { return appContextProtection; }
     public void setAppContextProtection(boolean appContextProtection) {
         this.appContextProtection = appContextProtection;
@@ -268,7 +253,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                  * due to eventual calls to getAppContext() are:
                  * - Google Web Toolkit via its use of javax.imageio
                  * - Tomcat via its use of java.beans.Introspector.flushCaches()
-                 *   in 1.6.0_15 to 1.7.0_01. From 1.7.0_02 onwards use of
+                 *   in 1.7.0 to 1.7.0_01. From 1.7.0_02 onwards use of
                  *   AppContext by Introspector.flushCaches() was replaced with
                  *   ThreadGroupContext
                  * - others TBD
