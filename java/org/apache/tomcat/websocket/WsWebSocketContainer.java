@@ -250,7 +250,8 @@ public class WsWebSocketContainer
         }
         int port = path.getPort();
         Map<String,List<String>> reqHeaders = createRequestHeaders(host, port,
-                clientEndpointConfiguration.getPreferredSubprotocols());
+                clientEndpointConfiguration.getPreferredSubprotocols(),
+                clientEndpointConfiguration.getExtensions());
         clientEndpointConfiguration.getConfigurator().
                 beforeRequest(reqHeaders);
 
@@ -408,7 +409,7 @@ public class WsWebSocketContainer
     }
 
     private Map<String,List<String>> createRequestHeaders(String host,
-            int port, List<String> subProtocols) {
+            int port, List<String> subProtocols, List<Extension> extensions) {
 
         Map<String,List<String>> headers = new HashMap<>();
 
@@ -446,7 +447,33 @@ public class WsWebSocketContainer
         if (subProtocols != null && subProtocols.size() > 0) {
             headers.put(Constants.WS_PROTOCOL_HEADER_NAME, subProtocols);
         }
+
+        // WebSocket extensions
+        if (extensions != null && extensions.size() > 0) {
+            headers.put(Constants.WS_EXTENSIONS_HEADER_NAME,
+                    generateExtensionHeaders(extensions));
+        }
+
         return headers;
+    }
+
+
+    private List<String> generateExtensionHeaders(List<Extension> extensions) {
+        List<String> result = new ArrayList<>(extensions.size());
+        for (Extension extension : extensions) {
+            StringBuilder header = new StringBuilder();
+            header.append(extension.getName());
+            for (Extension.Parameter param : extension.getParameters()) {
+                header.append(';');
+                header.append(param.getName());
+                String value = param.getValue();
+                if (value != null && value.length() > 0) {
+                    header.append('=');
+                    header.append(value);
+                }
+            }
+        }
+        return result;
     }
 
 
