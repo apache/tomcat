@@ -36,11 +36,20 @@ import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
 import javax.net.ssl.SSLException;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Wraps the {@link AsynchronousSocketChannel} with SSL/TLS. This needs a lot
  * more testing before it can be considered robust.
  */
 public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
+
+    private static final Log log =
+            LogFactory.getLog(AsyncChannelWrapperSecure.class);
+    private static final StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
 
     private static final ByteBuffer DUMMY = ByteBuffer.allocate(8192);
     private final AsynchronousSocketChannel socketChannel;
@@ -67,8 +76,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         WrapperFuture<Integer,Void> future = new WrapperFuture<>();
 
         if (!reading.compareAndSet(false, true)) {
-            // TODO
-            throw new IllegalStateException();
+            throw new IllegalStateException(sm.getString(
+                    "asyncChannelWrapperSecure.concurrentRead"));
         }
 
         ReadTask readTask = new ReadTask(dst, future);
@@ -86,8 +95,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                 new WrapperFuture<>(handler, attachment);
 
         if (!reading.compareAndSet(false, true)) {
-            // TODO
-            throw new IllegalStateException();
+            throw new IllegalStateException(sm.getString(
+                    "asyncChannelWrapperSecure.concurrentRead"));
         }
 
         ReadTask readTask = new ReadTask(dst, future);
@@ -101,8 +110,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         WrapperFuture<Long,Void> inner = new WrapperFuture<>();
 
         if (!writing.compareAndSet(false, true)) {
-            // TODO
-            throw new IllegalStateException();
+            throw new IllegalStateException(sm.getString(
+                    "asyncChannelWrapperSecure.concurrentWrite"));
         }
 
         WriteTask writeTask =
@@ -123,8 +132,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                 new WrapperFuture<>(handler, attachment);
 
         if (!writing.compareAndSet(false, true)) {
-            // TODO
-            throw new IllegalStateException();
+            throw new IllegalStateException(sm.getString(
+                    "asyncChannelWrapperSecure.concurrentWrite"));
         }
 
         WriteTask writeTask = new WriteTask(srcs, offset, length, future);
@@ -137,7 +146,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         try {
             socketChannel.close();
         } catch (IOException e) {
-            // TODO
+            log.info(sm.getString("asyncChannelWrapperSecure.closeFail"));
         }
     }
 
@@ -189,8 +198,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                         } else {
                             // Status.BUFFER_UNDERFLOW - only happens on unwrap
                             // Status.CLOSED - unexpected
-                            // TODO
-                            throw new IllegalStateException();
+                            throw new IllegalStateException(sm.getString(
+                                    "asyncChannelWrapperSecure.statusWrap"));
                         }
 
                         // Check for tasks
@@ -208,7 +217,10 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                         Future<Integer> f = socketChannel.write(socketWriteBuffer);
                         Integer socketWrite = f.get();
                         if (socketWrite.intValue() != r.bytesProduced()) {
-                            throw new IOException();
+                            throw new IOException(sm.getString(
+                                    "asyncChannelWrapperSecure.writeFail",
+                                    Integer.valueOf(socketWrite.intValue()),
+                                    Integer.valueOf(r.bytesProduced())));
                         }
                     }
                 }
@@ -217,8 +229,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                 if (writing.compareAndSet(true, false)) {
                     future.complete(Long.valueOf(written));
                 } else {
-                    // TODO
-                    future.fail(new IllegalStateException());
+                    future.fail(new IllegalStateException(sm.getString(
+                            "asyncChannelWrapperSecure.wrongStateWrite")));
                 }
             } catch (Exception e) {
                 future.fail(e);
@@ -252,8 +264,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                                 socketChannel.read(socketReadBuffer);
                         Integer socketRead = f.get();
                         if (socketRead.intValue() == -1) {
-                            // TODO
-                            throw new EOFException();
+                            throw new EOFException(sm.getString(
+                                    "asyncChannelWrapperSecure.eof"));
                         }
                     }
 
@@ -282,8 +294,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             // partial data on the next read
                         } else {
                             // Status.CLOSED - unexpected
-                            // TODO
-                            throw new IllegalStateException();
+                            throw new IllegalStateException(sm.getString(
+                                    "asyncChannelWrapperSecure.statusUnwrap"));
                         }
 
                         // Check for tasks
@@ -303,8 +315,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                 if (reading.compareAndSet(true, false)) {
                     future.complete(Integer.valueOf(read));
                 } else {
-                    // TODO
-                    future.fail(new IllegalStateException());
+                    future.fail(new IllegalStateException(sm.getString(
+                            "asyncChannelWrapperSecure.wrongStateRead")));
                 }
             } catch (Exception e) {
                 future.fail(e);
@@ -510,8 +522,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         public Integer get() throws InterruptedException, ExecutionException {
             Long result = wrapped.get();
             if (result.longValue() > Integer.MAX_VALUE) {
-                // TODO
-                throw new ExecutionException("Result too big", null);
+                throw new ExecutionException(sm.getString(
+                        "asyncChannelWrapperSecure.tooBig", result), null);
             }
             return new Integer(result.intValue());
         }
@@ -522,8 +534,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                 TimeoutException {
             Long result = wrapped.get(timeout, unit);
             if (result.longValue() > Integer.MAX_VALUE) {
-                // TODO
-                throw new ExecutionException("Result too big", null);
+                throw new ExecutionException(sm.getString(
+                        "asyncChannelWrapperSecure.tooBig", result), null);
             }
             return new Integer(result.intValue());
         }
