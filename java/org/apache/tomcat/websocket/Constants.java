@@ -50,6 +50,8 @@ public class Constants {
     public static final String WS_KEY_HEADER_NAME = "Sec-WebSocket-Key";
     public static final String WS_PROTOCOL_HEADER_NAME =
             "Sec-WebSocket-Protocol";
+    public static final String WS_EXTENSIONS_HEADER_NAME =
+            "Sec-WebSocket-Extensions";
 
 
     private Constants() {
