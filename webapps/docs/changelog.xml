@@ -92,6 +92,12 @@
         and when running as a service) since Tomcat will not be able to do any
         useful work. (markt)
       </fix>
+      <fix>
+        Update the <code>JreMemoryLeakPreventionListener</code> to take account
+        of changes in the behaviour of
+        <code>java.beans.Introspector.flushCaches()</code> and
+        <code>sun.awt.AppContext.getAppContext()</code> in Java 7. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
