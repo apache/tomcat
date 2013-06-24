@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.deploy.ApplicationListener;
+import org.apache.catalina.filters.TesterServletContext;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -71,5 +72,44 @@ public class TestWsServerContainer extends TomcatBaseTest {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+
+    @Test
+    public void testSpecExample3() throws Exception {
+        WsServerContainer sc = WsServerContainer.getServerContainer();
+        sc.setServletContext(new TesterServletContext());
+
+        ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
+                Object.class, "/a/{var}/c").build();
+        ServerEndpointConfig configB = ServerEndpointConfig.Builder.create(
+                Object.class, "/a/b/c").build();
+        ServerEndpointConfig configC = ServerEndpointConfig.Builder.create(
+                Object.class, "/a/{var1}/{var2}").build();
+
+        sc.addEndpoint(configA);
+        sc.addEndpoint(configB);
+        sc.addEndpoint(configC);
+
+        Assert.assertEquals(configB, sc.findMapping("/a/b/c").getConfig());
+        Assert.assertEquals(configA, sc.findMapping("/a/d/c").getConfig());
+        Assert.assertEquals(configC, sc.findMapping("/a/x/y").getConfig());
+    }
+
+
+    @Test
+    public void testSpecExample4() throws Exception {
+        WsServerContainer sc = WsServerContainer.getServerContainer();
+        sc.setServletContext(new TesterServletContext());
+
+        ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
+                Object.class, "/{var1}/d").build();
+        ServerEndpointConfig configB = ServerEndpointConfig.Builder.create(
+                Object.class, "/b/{var2}").build();
+
+        sc.addEndpoint(configA);
+        sc.addEndpoint(configB);
+
+        Assert.assertEquals(configB, sc.findMapping("/b/d").getConfig());
     }
 }
