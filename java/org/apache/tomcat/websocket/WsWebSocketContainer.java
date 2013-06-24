@@ -55,7 +55,6 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.TrustManagerFactory;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.ClientEndpointConfig;
-import javax.websocket.ClientEndpointConfig.Builder;
 import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.Extension;
@@ -181,23 +180,9 @@ public class WsWebSocketContainer
     }
 
 
-    @SuppressWarnings("unchecked")
     @Override
     public Session connectToServer(Class<?> annotatedEndpointClass, URI path)
             throws DeploymentException {
-
-        // TODO: Remove this before release
-        /*
-         * This is a temporary hack to allow the WebSocket EA TCK to work. This
-         * has been confirmed as non-compliant with the EG lead so the TCK will
-         * have to change. For now, we need the TCK to work.
-         */
-        if (Endpoint.class.isAssignableFrom(annotatedEndpointClass)) {
-            return connectToServer(
-                    (Class<? extends Endpoint>) annotatedEndpointClass,
-                    Builder.create().build(), path);
-        }
-        // End of TCK hack
 
         Object pojo;
         try {
