@@ -86,4 +86,69 @@ public class TestUriTemplate {
 
         Assert.assertEquals(0, result.size());
     }
+
+
+    @Test
+    public void testSpecExample1_01() throws Exception {
+        UriTemplate t = new UriTemplate("/a/b");
+        Map<String,String> result = t.match(new UriTemplate("/a/b"));
+
+        Assert.assertEquals(0, result.size());
+    }
+
+
+    @Test
+    public void testSpecExample1_02() throws Exception {
+        UriTemplate t = new UriTemplate("/a/b");
+        Map<String,String> result = t.match(new UriTemplate("/a"));
+
+        Assert.assertNull(result);
+    }
+
+
+    @Test
+    public void testSpecExample1_03() throws Exception {
+        UriTemplate t = new UriTemplate("/a/b");
+        Map<String,String> result = t.match(new UriTemplate("/a/bb"));
+
+        Assert.assertNull(result);
+    }
+
+
+    @Test
+    public void testSpecExample2_01() throws Exception {
+        UriTemplate t = new UriTemplate("/a/{var}");
+        Map<String,String> result = t.match(new UriTemplate("/a/b"));
+
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("b", result.get("var"));
+    }
+
+
+    @Test
+    public void testSpecExample2_02() throws Exception {
+        UriTemplate t = new UriTemplate("/a/{var}");
+        Map<String,String> result = t.match(new UriTemplate("/a/apple"));
+
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("apple", result.get("var"));
+    }
+
+
+    @Test
+    public void testSpecExample2_03() throws Exception {
+        UriTemplate t = new UriTemplate("/a/{var}");
+        Map<String,String> result = t.match(new UriTemplate("/a"));
+
+        Assert.assertNull(result);
+   }
+
+
+    @Test
+    public void testSpecExample2_04() throws Exception {
+        UriTemplate t = new UriTemplate("/a/{var}");
+        Map<String,String> result = t.match(new UriTemplate("/a/b/c"));
+
+        Assert.assertNull(result);
+   }
 }
