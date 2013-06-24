@@ -33,7 +33,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.TesterEchoServer;
 
 
-public class TestWebSocketServerContainer extends TomcatBaseTest {
+public class TestWsServerContainer extends TomcatBaseTest {
 
     @Test
     public void testBug54807() throws Exception {
