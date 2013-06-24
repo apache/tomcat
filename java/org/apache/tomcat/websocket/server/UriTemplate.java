@@ -22,11 +22,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Extracts path parameters from URIs used to create web socket connections
  * using the URI template defined for the associated Endpoint.
  */
 public class UriTemplate {
+
+    private static final StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final String normalized;
     private final List<Segment> segments = new ArrayList<>();
@@ -55,8 +60,8 @@ public class UriTemplate {
                 normalized.append('}');
             } else {
                 if (segment.contains("{") || segment.contains("}")) {
-                    // TODO i18n
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException(sm.getString(
+                            "uriTemplate.invalidSegment", segment, path));
                 }
                 normalized.append(segment);
             }
