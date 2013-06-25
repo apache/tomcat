@@ -1618,7 +1618,9 @@ public class MBeanUtils {
         // The database itself
         ObjectName db = new ObjectName(
                 "Users:type=UserDatabase,database=" + userDatabase);
-        mserver.unregisterMBean(db);
+        if(mserver.isRegistered(db)) {
+            mserver.unregisterMBean(db);
+        }
     }
 
 
