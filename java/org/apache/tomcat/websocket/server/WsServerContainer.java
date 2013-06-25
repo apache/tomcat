@@ -148,10 +148,19 @@ public class WsServerContainer extends WsWebSocketContainer
                         TemplatePathMatchComparator.getInstance());
                 configTemplateMatchMap.put(key, templateMatches);
             }
-            templateMatches.add(new TemplatePathMatch(sec, uriTemplate));
+            if (!templateMatches.add(new TemplatePathMatch(sec, uriTemplate))) {
+                // Duplicate uriTemplate;
+                throw new DeploymentException(
+                        sm.getString("serverContainer.duplicatePaths", path));
+            }
         } else {
             // Exact match
-            configExactMatchMap.put(path, sec);
+            ServerEndpointConfig old = configExactMatchMap.put(path, sec);
+            if (old != null) {
+                // Duplicate path mappings
+                throw new DeploymentException(
+                        sm.getString("serverContainer.duplicatePaths", path));
+            }
         }
     }
 
