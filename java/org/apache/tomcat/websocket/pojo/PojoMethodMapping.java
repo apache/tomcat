@@ -165,7 +165,7 @@ public class PojoMethodMapping {
                 instance = decoderClazz.newInstance();
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new DeploymentException(
-                        sm.getString("wsRemoteEndpoint.invalidEncoder",
+                        sm.getString("pojoMethodMapping.invalidDecoder",
                                 decoderClazz.getName()), e);
             }
             DecoderEntry entry = new DecoderEntry(
