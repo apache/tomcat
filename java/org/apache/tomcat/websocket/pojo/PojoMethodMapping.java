@@ -161,7 +161,7 @@ public class PojoMethodMapping {
         List<DecoderEntry> result = new ArrayList<>();
         for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
             // Need to instantiate decoder to ensure it is valid and that
-            // deployment can be failed i=f it is not
+            // deployment can be failed if it is not
             @SuppressWarnings("unused")
             Decoder instance;
             try {
