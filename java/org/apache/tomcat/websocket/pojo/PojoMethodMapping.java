@@ -79,21 +79,37 @@ public class PojoMethodMapping {
         Method close = null;
         Method error = null;
         for (Method method : clazzPojo.getMethods()) {
-            if (open == null &&
-                    method.getAnnotation(OnOpen.class) != null) {
-                open = method;
-            } else if (close == null &&
-                    method.getAnnotation(OnClose.class) != null) {
-                close = method;
-            } else if (error == null &&
-                    method.getAnnotation(OnError.class) != null) {
-                error = method;
+            if (method.getAnnotation(OnOpen.class) != null) {
+                if (open == null) {
+                    open = method;
+                } else {
+                    // Duplicate annotation
+                    throw new DeploymentException(sm.getString(
+                            "pojoMethodMapping.duplicateAnnotation",
+                            OnOpen.class, clazzPojo));
+                }
+            } else if (method.getAnnotation(OnClose.class) != null) {
+                if (close == null) {
+                    close = method;
+                } else {
+                    // Duplicate annotation
+                    throw new DeploymentException(sm.getString(
+                            "pojoMethodMapping.duplicateAnnotation",
+                            OnClose.class, clazzPojo));
+                }
+            } else if (method.getAnnotation(OnError.class) != null) {
+                if (error == null) {
+                    error = method;
+                } else {
+                    // Duplicate annotation
+                    throw new DeploymentException(sm.getString(
+                            "pojoMethodMapping.duplicateAnnotation",
+                            OnError.class, clazzPojo));
+                }
             } else if (method.getAnnotation(OnMessage.class) != null) {
                 onMessage.add(new MessageMethod(method, decoders));
             } else {
-                // Duplicate annotation
-                throw new DeploymentException(sm.getString(
-                        "pojoMethodMapping.duplicateAnnotation", clazzPojo));
+                // Method not annotated
             }
         }
         this.onOpen = open;
