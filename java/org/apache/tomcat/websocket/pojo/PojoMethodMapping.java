@@ -90,6 +90,10 @@ public class PojoMethodMapping {
                 error = method;
             } else if (method.getAnnotation(OnMessage.class) != null) {
                 onMessage.add(new MessageMethod(method, decoders));
+            } else {
+                // Duplicate annotation
+                throw new DeploymentException(sm.getString(
+                        "pojoMethodMapping.duplicateAnnotation", clazzPojo));
             }
         }
         this.onOpen = open;
