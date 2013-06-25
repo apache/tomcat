@@ -300,6 +300,7 @@ public class PojoMethodMapping {
 
             Class<?>[] types = m.getParameterTypes();
             Annotation[][] paramsAnnotations = m.getParameterAnnotations();
+            boolean decoderParameterFound = false;
 
             for (int i = 0; i < types.length; i++) {
                 boolean paramFound = false;
@@ -403,6 +404,7 @@ public class PojoMethodMapping {
                                     if (indexByteBuffer == -1) {
                                         indexByteBuffer = i;
                                         foundBinaryDecoderMatch = true;
+                                        decoderParameterFound = true;
                                     } else {
                                         throw new IllegalArgumentException(sm.getString(
                                                 "pojoMethodMapping.duplicateMessageParam",
@@ -414,6 +416,7 @@ public class PojoMethodMapping {
                                     if (indexString == -1) {
                                         indexString = i;
                                         foundTextDecoderMatch = true;
+                                        decoderParameterFound = true;
                                     } else {
                                         throw new IllegalArgumentException(sm.getString(
                                                 "pojoMethodMapping.duplicateMessageParam",
@@ -508,6 +511,11 @@ public class PojoMethodMapping {
             if(indexInputStream != -1 && indexBoolean != -1) {
                 throw new IllegalArgumentException(sm.getString(
                         "pojoMethodMapping.partialInputStream",
+                        m.getName(), m.getDeclaringClass().getName()));
+            }
+            if (decoderParameterFound && indexBoolean != -1) {
+                throw new IllegalArgumentException(sm.getString(
+                        "pojoMethodMapping.partialObject",
                         m.getName(), m.getDeclaringClass().getName()));
             }
         }
