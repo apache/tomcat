@@ -77,6 +77,13 @@ public class WsServerContainer extends WsWebSocketContainer
         return result;
     }
 
+    // For unit testing
+    protected static void recycle() {
+        synchronized (classLoaderContainerMapLock) {
+            classLoaderContainerMap.clear();
+        }
+    }
+
     private final WsWriteTimeout wsWriteTimeout = new WsWriteTimeout();
 
     private volatile ServletContext servletContext = null;

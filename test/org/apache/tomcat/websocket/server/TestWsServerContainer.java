@@ -77,6 +77,7 @@ public class TestWsServerContainer extends TomcatBaseTest {
 
     @Test
     public void testSpecExample3() throws Exception {
+        WsServerContainer.recycle();
         WsServerContainer sc = WsServerContainer.getServerContainer();
         sc.setServletContext(new TesterServletContext());
 
@@ -99,6 +100,7 @@ public class TestWsServerContainer extends TomcatBaseTest {
 
     @Test
     public void testSpecExample4() throws Exception {
+        WsServerContainer.recycle();
         WsServerContainer sc = WsServerContainer.getServerContainer();
         sc.setServletContext(new TesterServletContext());
 
@@ -116,6 +118,7 @@ public class TestWsServerContainer extends TomcatBaseTest {
 
     @Test(expected = javax.websocket.DeploymentException.class)
     public void testDuplicatePaths_01() throws Exception {
+        WsServerContainer.recycle();
         WsServerContainer sc = WsServerContainer.getServerContainer();
         sc.setServletContext(new TesterServletContext());
 
@@ -131,6 +134,7 @@ public class TestWsServerContainer extends TomcatBaseTest {
 
     @Test(expected = javax.websocket.DeploymentException.class)
     public void testDuplicatePaths_02() throws Exception {
+        WsServerContainer.recycle();
         WsServerContainer sc = WsServerContainer.getServerContainer();
         sc.setServletContext(new TesterServletContext());
 
@@ -146,6 +150,7 @@ public class TestWsServerContainer extends TomcatBaseTest {
 
     @Test(expected = javax.websocket.DeploymentException.class)
     public void testDuplicatePaths_03() throws Exception {
+        WsServerContainer.recycle();
         WsServerContainer sc = WsServerContainer.getServerContainer();
         sc.setServletContext(new TesterServletContext());
 
@@ -161,6 +166,7 @@ public class TestWsServerContainer extends TomcatBaseTest {
 
     @Test
     public void testDuplicatePaths_04() throws Exception {
+        WsServerContainer.recycle();
         WsServerContainer sc = WsServerContainer.getServerContainer();
         sc.setServletContext(new TesterServletContext());
 
