@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.websocket.DeploymentException;
+
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -38,7 +40,13 @@ public class UriTemplate {
     private final boolean hasParameters;
 
 
-    public UriTemplate(String path) {
+    public UriTemplate(String path) throws DeploymentException {
+
+        if (path == null || path.length() ==0 || !path.startsWith("/")) {
+            throw new DeploymentException(
+                    sm.getString("uriTemplate.invalidPath", path));
+        }
+
         StringBuilder normalized = new StringBuilder(path.length());
 
         String[] segments = path.split("/");

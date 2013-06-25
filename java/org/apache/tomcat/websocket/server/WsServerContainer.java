@@ -190,7 +190,7 @@ public class WsServerContainer extends WsWebSocketContainer
             try {
                 configurator = annotation.configurator().newInstance();
             } catch (InstantiationException | IllegalAccessException e) {
-                throw new IllegalStateException(sm.getString(
+                throw new DeploymentException(sm.getString(
                         "serverContainer.configuratorFail",
                         annotation.configurator().getName(),
                         pojo.getClass().getName()), e);
@@ -232,7 +232,13 @@ public class WsServerContainer extends WsWebSocketContainer
         }
 
         // No exact match. Need to look for template matches.
-        UriTemplate pathUriTemplate = new UriTemplate(path);
+        UriTemplate pathUriTemplate = null;
+        try {
+            pathUriTemplate = new UriTemplate(path);
+        } catch (DeploymentException e) {
+            // Path is not valid so can't be matched to a WebSocketEndpoint
+            return null;
+        }
 
         // Number of segments has to match
         Integer key = Integer.valueOf(pathUriTemplate.getSegmentCount());
