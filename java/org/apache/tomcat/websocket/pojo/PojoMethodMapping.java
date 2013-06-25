@@ -160,6 +160,9 @@ public class PojoMethodMapping {
 
         List<DecoderEntry> result = new ArrayList<>();
         for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
+            // Need to instantiate decoder to ensure it is valid and that
+            // deployment can be failed i=f it is not
+            @SuppressWarnings("unused")
             Decoder instance;
             try {
                 instance = decoderClazz.newInstance();
@@ -169,7 +172,7 @@ public class PojoMethodMapping {
                                 decoderClazz.getName()), e);
             }
             DecoderEntry entry = new DecoderEntry(
-                    Util.getDecoderType(decoderClazz), instance);
+                    Util.getDecoderType(decoderClazz), decoderClazz);
             result.add(entry);
         }
 
@@ -373,9 +376,9 @@ public class PojoMethodMapping {
                         if (decoderEntry.getClazz().isAssignableFrom(
                                 types[i])) {
                             if (Binary.class.isAssignableFrom(
-                                        decoderEntry.getDecoder().getClass()) ||
+                                        decoderEntry.getDecoderClazz()) ||
                                     BinaryStream.class.isAssignableFrom(
-                                            decoderEntry.getDecoder().getClass())) {
+                                            decoderEntry.getDecoderClazz())) {
                                 if (!foundBinaryDecoderMatch) {
                                     if (indexByteBuffer == -1) {
                                         indexByteBuffer = i;
@@ -565,19 +568,20 @@ public class PojoMethodMapping {
     private static class DecoderEntry {
 
         private final Class<?> clazz;
-        private final Decoder decoder;
+        private final Class<? extends Decoder> decoderClazz;
 
-        public DecoderEntry(Class<?> clazz, Decoder decoder) {
+        public DecoderEntry(Class<?> clazz,
+                Class<? extends Decoder> decoderClazz) {
             this.clazz = clazz;
-            this.decoder = decoder;
+            this.decoderClazz = decoderClazz;
         }
 
         public Class<?> getClazz() {
             return clazz;
         }
 
-        public Decoder getDecoder() {
-            return decoder;
+        public Class<? extends Decoder> getDecoderClazz() {
+            return decoderClazz;
         }
     }
 
