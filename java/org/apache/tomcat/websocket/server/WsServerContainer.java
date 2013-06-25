@@ -30,6 +30,7 @@ import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.websocket.DeploymentException;
+import javax.websocket.Encoder;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
@@ -186,6 +187,9 @@ public class WsServerContainer extends WsWebSocketContainer
         // Uri Template
         UriTemplate uriTemplate = new UriTemplate(path);
 
+        // Validate encoders
+        validateEncoders(annotation.encoders());
+
         // Method mapping
         PojoMethodMapping methodMapping = new PojoMethodMapping(pojo,
                 annotation.decoders(), path);
@@ -313,6 +317,23 @@ public class WsServerContainer extends WsWebSocketContainer
         super.unregisterSession(endpoint, wsSession);
     }
 
+
+    private static void validateEncoders(Class<? extends Encoder>[] encoders)
+            throws DeploymentException {
+
+        for (Class<? extends Encoder> encoder : encoders) {
+            // Need to instantiate decoder to ensure it is valid and that
+            // deployment can be failed if it is not
+            @SuppressWarnings("unused")
+            Encoder instance;
+            try {
+                encoder.newInstance();
+            } catch(InstantiationException | IllegalAccessException e) {
+                throw new DeploymentException(sm.getString(
+                        "serverContainer.encoderFail", encoder.getName()), e);
+            }
+        }
+    }
 
     private static class TemplatePathMatch {
         private final ServerEndpointConfig config;
