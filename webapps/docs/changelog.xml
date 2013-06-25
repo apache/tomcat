@@ -99,8 +99,9 @@
         <code>sun.awt.AppContext.getAppContext()</code> in Java 7. (markt)
       </fix>
       <fix>
-        Avoid WARNING log message of <code>Users:type=UserDatabase,database=UserDatabase</code>
-        at tomcat shutdown. (pero)
+        Avoid WARNING log message of
+        <code>Users:type=UserDatabase,database=UserDatabase</code> at Tomcat
+        shutdown. (pero)
       </fix>
     </changelog>
   </subsection>
