@@ -17,7 +17,6 @@
 package org.apache.tomcat.websocket;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -152,35 +151,58 @@ public class WsSession implements Session {
 
         checkState();
 
-        Type t = Util.getMessageType(listener);
+        // Message handlers that require decoders may map to text messages,
+        // binary messages, both or neither.
 
-        if (String.class.isAssignableFrom((Class<?>) t)) {
-            if (textMessageHandler != null) {
-                throw new IllegalStateException(
-                        sm.getString("wsSession.duplicateHandlerText"));
+        // The frame processing code expects binary message handlers to
+        // accept ByteBuffer
+
+        // Use the POJO message handler wrappers as they are designed to wrap
+        // arbitrary objects with MessageHandlers and can wrap MessageHandlers
+        // just as easily.
+
+        Set<MessageHandlerResult> mhResults = Util.getMessageHandlers(listener);
+
+        for (MessageHandlerResult mhResult : mhResults) {
+            switch (mhResult.getType()) {
+                case TEXT: {
+                    if (textMessageHandler != null) {
+                        throw new IllegalStateException(
+                                sm.getString("wsSession.duplicateHandlerText"));
+                    }
+                    textMessageHandler = mhResult.getHandler();
+                    break;
+                }
+                case BINARY: {
+                    if (binaryMessageHandler != null) {
+                        throw new IllegalStateException(
+                                sm.getString("wsSession.duplicateHandlerBinary"));
+                    }
+                    binaryMessageHandler = mhResult.getHandler();
+                    break;
+                }
+                case PONG: {
+                    if (pongMessageHandler != null) {
+                        throw new IllegalStateException(
+                                sm.getString("wsSession.duplicateHandlerPong"));
+                    }
+                    MessageHandler handler = mhResult.getHandler();
+                    if (handler instanceof MessageHandler.Whole<?>) {
+                        pongMessageHandler =
+                                (MessageHandler.Whole<PongMessage>) handler;
+                    } else {
+                        throw new IllegalStateException(
+                                sm.getString("wsSession.invalidHandlerTypePong"));
+                    }
+
+                    break;
+                }
+                default: {
+                    throw new IllegalArgumentException(sm.getString(
+                            "wsSession.unknownHandlerType", listener,
+                            mhResult.getType()));
+                }
             }
-            textMessageHandler = listener;
-        } else if (ByteBuffer.class.isAssignableFrom((Class<?>) t)) {
-            if (binaryMessageHandler != null) {
-                throw new IllegalStateException(
-                        sm.getString("wsSession.duplicateHandlerBinary"));
-            }
-            binaryMessageHandler = listener;
-        } else if (PongMessage.class.isAssignableFrom((Class<?>) t)) {
-            if (pongMessageHandler != null) {
-                throw new IllegalStateException(
-                        sm.getString("wsSession.duplicateHandlerPong"));
-            }
-            if (listener instanceof MessageHandler.Whole<?>) {
-                pongMessageHandler =
-                        (MessageHandler.Whole<PongMessage>) listener;
-            } else {
-                throw new IllegalStateException(
-                        sm.getString("wsSession.invalidHandlerTypePong"));
-            }
-        } else {
-            throw new IllegalArgumentException(
-                    sm.getString("wsSession.unknownHandler", listener, t));
         }
     }
 
@@ -208,6 +230,9 @@ public class WsSession implements Session {
         if (listener == null) {
             return;
         }
+
+        // TODO Handle wrapped listeners
+
         if (listener.equals(textMessageHandler)) {
             textMessageHandler = null;
             return;
