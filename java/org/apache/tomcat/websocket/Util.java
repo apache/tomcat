@@ -360,7 +360,15 @@ public class Util {
                             getOnMessageMethod(listener), null,
                             endpointConfig, null, new Object[1], 0, true, -1,
                             -1),
-                    MessageHandlerResultType.BINARY);
+                    MessageHandlerResultType.TEXT);
+            results.add(result);
+        } else if (Util.isPrimitive(target)) {
+            MessageHandlerResult result = new MessageHandlerResult(
+                    new PojoMessageHandlerWholeText(listener,
+                            getOnMessageMethod(listener), null,
+                            endpointConfig, null, new Object[1], 0, true, -1,
+                            -1),
+                    MessageHandlerResultType.TEXT);
             results.add(result);
         } else {
         // More complex case - listener that requires a decoder
