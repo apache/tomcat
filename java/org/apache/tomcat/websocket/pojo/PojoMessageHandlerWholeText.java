@@ -62,7 +62,8 @@ public class PojoMessageHandlerWholeText
             primitiveType = null;
         }
 
-        try {if (decoderClazzes != null) {
+        try {
+            if (decoderClazzes != null) {
                 for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
                     if (Text.class.isAssignableFrom(decoderClazz)) {
                         Text<?> decoder = (Text<?>) decoderClazz.newInstance();
@@ -78,7 +79,7 @@ public class PojoMessageHandlerWholeText
                         // Binary decoder - ignore it
                     }
                 }
-        }
+            }
         } catch (IllegalAccessException | InstantiationException e) {
             throw new IllegalArgumentException(e);
         }
