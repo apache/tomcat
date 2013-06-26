@@ -21,7 +21,6 @@ import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +45,7 @@ import javax.websocket.server.PathParam;
 
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.Util;
+import org.apache.tomcat.websocket.Util.DecoderEntry;
 
 /**
  * For a POJO class annotated with
@@ -74,7 +74,7 @@ public class PojoMethodMapping {
 
         this.wsPath = wsPath;
 
-        List<DecoderEntry> decoders = getDecoders(decoderClazzes);
+        List<DecoderEntry> decoders = Util.getDecoders(decoderClazzes);
         Method open = null;
         Method close = null;
         Method error = null;
@@ -170,32 +170,6 @@ public class PojoMethodMapping {
             result.add(messageMethod.getMessageHandler(pojo, pathParameters,
                     session, config));
         }
-        return result;
-    }
-
-
-    private static List<DecoderEntry> getDecoders(
-            Class<? extends Decoder>[] decoderClazzes)
-                    throws DeploymentException{
-
-        List<DecoderEntry> result = new ArrayList<>();
-        for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
-            // Need to instantiate decoder to ensure it is valid and that
-            // deployment can be failed if it is not
-            @SuppressWarnings("unused")
-            Decoder instance;
-            try {
-                instance = decoderClazz.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new DeploymentException(
-                        sm.getString("pojoMethodMapping.invalidDecoder",
-                                decoderClazz.getName()), e);
-            }
-            DecoderEntry entry = new DecoderEntry(
-                    Util.getDecoderType(decoderClazz), decoderClazz);
-            result.add(entry);
-        }
-
         return result;
     }
 
@@ -589,27 +563,6 @@ public class PojoMethodMapping {
                 }
             }
             return mh;
-        }
-    }
-
-
-    private static class DecoderEntry {
-
-        private final Class<?> clazz;
-        private final Class<? extends Decoder> decoderClazz;
-
-        public DecoderEntry(Class<?> clazz,
-                Class<? extends Decoder> decoderClazz) {
-            this.clazz = clazz;
-            this.decoderClazz = decoderClazz;
-        }
-
-        public Class<?> getClazz() {
-            return clazz;
-        }
-
-        public Class<? extends Decoder> getDecoderClazz() {
-            return decoderClazz;
         }
     }
 

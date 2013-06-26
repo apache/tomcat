@@ -27,6 +27,7 @@ import javax.websocket.Decoder;
 import javax.websocket.Decoder.Text;
 import javax.websocket.Decoder.TextStream;
 import javax.websocket.EndpointConfig;
+import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
 import org.apache.tomcat.util.res.StringManager;
@@ -78,6 +79,25 @@ public class PojoMessageHandlerWholeText
         } catch (IllegalAccessException | InstantiationException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+
+    public PojoMessageHandlerWholeText(MessageHandler listener,
+            Method method, EndpointConfig config,
+            List<Class<? extends Decoder>> textDecoders) {
+        super(listener, method, null, new Object[1], -1, false, -1);
+
+        try {
+            for (Class<? extends Decoder> decoderClazz : textDecoders) {
+                Text<?> decoder = (Text<?>) decoderClazz.newInstance();
+                decoder.init(config);
+                decoders.add(decoder);
+            }
+        } catch (IllegalAccessException | InstantiationException e) {
+            throw new IllegalArgumentException(e);
+        }
+
+        primitiveType = null;
     }
 
 

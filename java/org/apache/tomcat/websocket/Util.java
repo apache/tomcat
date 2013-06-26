@@ -16,13 +16,16 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -30,11 +33,19 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Decoder;
+import javax.websocket.Decoder.Binary;
+import javax.websocket.Decoder.BinaryStream;
+import javax.websocket.Decoder.Text;
+import javax.websocket.Decoder.TextStream;
+import javax.websocket.DeploymentException;
 import javax.websocket.Encoder;
+import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.PongMessage;
 
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.pojo.PojoMessageHandlerWholeBinary;
+import org.apache.tomcat.websocket.pojo.PojoMessageHandlerWholeText;
 
 /**
  * Utility class for internal use only within the
@@ -271,40 +282,179 @@ public class Util {
     }
 
 
-    public static Set<MessageHandlerResult> getMessageHandlers(
-            MessageHandler listener) {
+    public static List<DecoderEntry> getDecoders(
+            Class<? extends Decoder>[] decoderClazzes)
+                    throws DeploymentException{
 
-        Type t = Util.getMessageType(listener);
+        List<DecoderEntry> result = new ArrayList<>();
+        for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
+            // Need to instantiate decoder to ensure it is valid and that
+            // deployment can be failed if it is not
+            @SuppressWarnings("unused")
+            Decoder instance;
+            try {
+                instance = decoderClazz.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new DeploymentException(
+                        sm.getString("pojoMethodMapping.invalidDecoder",
+                                decoderClazz.getName()), e);
+            }
+            DecoderEntry entry = new DecoderEntry(
+                    Util.getDecoderType(decoderClazz), decoderClazz);
+            result.add(entry);
+        }
+
+        return result;
+    }
+
+
+
+    public static Set<MessageHandlerResult> getMessageHandlers(
+            MessageHandler listener, EndpointConfig endpointConfig) {
+
+        Class<?> target = Util.getMessageType(listener);
 
         // Will never be more than 2 types
         Set<MessageHandlerResult> results = new HashSet<>(2);
 
         // Simple cases - handlers already accepts one of the types expected by
         // the frame handling code
-        if (String.class.isAssignableFrom((Class<?>) t)) {
+        if (String.class.isAssignableFrom(target)) {
             MessageHandlerResult result =
                     new MessageHandlerResult(listener,
                             MessageHandlerResultType.TEXT);
             results.add(result);
-        } else if (ByteBuffer.class.isAssignableFrom((Class<?>) t)) {
+        } else if (ByteBuffer.class.isAssignableFrom(target)) {
             MessageHandlerResult result =
                     new MessageHandlerResult(listener,
                             MessageHandlerResultType.BINARY);
             results.add(result);
-        } else if (PongMessage.class.isAssignableFrom((Class<?>) t)) {
+        } else if (PongMessage.class.isAssignableFrom(target)) {
             MessageHandlerResult result =
                     new MessageHandlerResult(listener,
                             MessageHandlerResultType.PONG);
             results.add(result);
+            // TODO byte[], Reader, InputStream
         } else {
-            // TODO Decoder handling
+            // More complex case - listener that requires a decoder
+            DecoderMatch decoderMatch;
+            try {
+                decoderMatch = new DecoderMatch(target,
+                        endpointConfig.getDecoders());
+            } catch (DeploymentException e) {
+                throw new IllegalArgumentException(e);
+            }
+            Method m = getOnMessageMethod(listener);
+            if (decoderMatch.getBinaryDecoders().size() > 0) {
+                MessageHandlerResult result = new MessageHandlerResult(
+                        new PojoMessageHandlerWholeBinary(listener, m,
+                                endpointConfig,
+                                decoderMatch.getBinaryDecoders()),
+                        MessageHandlerResultType.BINARY);
+                results.add(result);
+            }
+            if (decoderMatch.getTextDecoders().size() > 0) {
+                MessageHandlerResult result = new MessageHandlerResult(
+                        new PojoMessageHandlerWholeText(listener, m,
+                                endpointConfig, decoderMatch.getTextDecoders()),
+                        MessageHandlerResultType.TEXT);
+                results.add(result);
+            }
         }
 
         if (results.size() == 0) {
             throw new IllegalArgumentException(
-                    sm.getString("wsSession.unknownHandler", listener, t));
+                    sm.getString("wsSession.unknownHandler", listener, target));
         }
 
         return results;
+    }
+
+
+    private static Method getOnMessageMethod(MessageHandler listener) {
+        try {
+            return listener.getClass().getMethod("onMessage", Object.class);
+        } catch (NoSuchMethodException | SecurityException e) {
+            throw new IllegalArgumentException(
+                    sm.getString("util.invalidMessageHandler"), e);
+        }
+    }
+
+    public static class DecoderEntry {
+
+        private final Class<?> clazz;
+        private final Class<? extends Decoder> decoderClazz;
+
+        public DecoderEntry(Class<?> clazz,
+                Class<? extends Decoder> decoderClazz) {
+            this.clazz = clazz;
+            this.decoderClazz = decoderClazz;
+        }
+
+        public Class<?> getClazz() {
+            return clazz;
+        }
+
+        public Class<? extends Decoder> getDecoderClazz() {
+            return decoderClazz;
+        }
+    }
+
+
+    private static class DecoderMatch {
+
+        private final List<Class<? extends Decoder>> textDecoders =
+                new ArrayList<>();
+        private final List<Class<? extends Decoder>> binaryDecoders =
+                new ArrayList<>();
+
+
+        public DecoderMatch(Class<?> target, List<Class<? extends Decoder>> decoders)
+                throws DeploymentException {
+            List<DecoderEntry> decoderEntries = getDecoders(
+                    decoders.toArray(new Class[decoders.size()]));
+            for (DecoderEntry decoderEntry : decoderEntries) {
+                if (decoderEntry.getClazz().isAssignableFrom(target)) {
+                    if (Binary.class.isAssignableFrom(
+                            decoderEntry.getDecoderClazz())) {
+                        binaryDecoders.add(decoderEntry.getDecoderClazz());
+                        // willDecode() method means this decoder may or may not
+                        // decode a message so need to carry on checking for
+                        // other matches
+                    } else if (BinaryStream.class.isAssignableFrom(
+                            decoderEntry.getDecoderClazz())) {
+                        binaryDecoders.add(decoderEntry.getDecoderClazz());
+                        // Stream decoders have to process the message so no
+                        // more decoders can be matched
+                        break;
+                    } else if (Text.class.isAssignableFrom(
+                            decoderEntry.getDecoderClazz())) {
+                        textDecoders.add(decoderEntry.getDecoderClazz());
+                        // willDecode() method means this decoder may or may not
+                        // decode a message so need to carry on checking for
+                        // other matches
+                    } else if (TextStream.class.isAssignableFrom(
+                            decoderEntry.getDecoderClazz())) {
+                        textDecoders.add(decoderEntry.getDecoderClazz());
+                        // Stream decoders have to process the message so no
+                        // more decoders can be matched
+                        break;
+                    } else {
+                        throw new IllegalArgumentException(
+                                sm.getString("util.unknownDecoderType"));
+                    }
+                }
+            }
+        }
+
+
+        public List<Class<? extends Decoder>> getTextDecoders() {
+            return textDecoders;
+        }
+
+
+        public List<Class<? extends Decoder>> getBinaryDecoders() {
+            return binaryDecoders;
+        }
     }
 }
