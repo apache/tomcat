@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
 import javax.websocket.EncodeException;
+import javax.websocket.MessageHandler;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 
@@ -71,6 +72,20 @@ public abstract class PojoMessageHandlerBase<T> {
             }
         } catch (IOException | EncodeException ioe) {
             throw new IllegalStateException(ioe);
+        }
+    }
+
+
+    /**
+     * Expose the POJO if it is a message handler so the Session is able to
+     * match requests to remove handlers if the original handler has been
+     * wrapped.
+     */
+    public MessageHandler getWrappedHandler() {
+        if (pojo instanceof MessageHandler) {
+            return (MessageHandler) pojo;
+        } else {
+            return null;
         }
     }
 }

@@ -44,6 +44,7 @@ import javax.websocket.WebSocketContainer;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.pojo.PojoMessageHandlerBase;
 
 public class WsSession implements Session {
 
@@ -236,23 +237,42 @@ public class WsSession implements Session {
             return;
         }
 
-        // TODO Handle wrapped listeners
+        MessageHandler wrapped = null;
 
-        if (listener.equals(textMessageHandler)) {
-            textMessageHandler = null;
-            return;
-        } else if (listener.equals(binaryMessageHandler)) {
-            binaryMessageHandler = null;
-            return;
-        } else if (listener.equals(pongMessageHandler)) {
-            pongMessageHandler = null;
-            return;
+        if (listener instanceof PojoMessageHandlerBase) {
+            wrapped =
+                    ((PojoMessageHandlerBase<?>) listener).getWrappedHandler();
         }
 
-        // ISE for now. Could swallow this silently / log this if the ISE
-        // becomes a problem
-        throw new IllegalStateException(
-                sm.getString("wsSession.removeHandlerFailed", listener));
+        if (wrapped == null) {
+            wrapped = listener;
+        }
+
+        boolean removed = false;
+        if (wrapped.equals(textMessageHandler) ||
+                listener.equals(textMessageHandler)) {
+            textMessageHandler = null;
+            removed = true;
+        }
+
+        if (listener.equals(binaryMessageHandler) ||
+                listener.equals(binaryMessageHandler)) {
+            binaryMessageHandler = null;
+            removed = true;
+        }
+
+        if (listener.equals(pongMessageHandler) ||
+                listener.equals(pongMessageHandler)) {
+            pongMessageHandler = null;
+            removed = true;
+        }
+
+        if (!removed) {
+            // ISE for now. Could swallow this silently / log this if the ISE
+            // becomes a problem
+            throw new IllegalStateException(
+                    sm.getString("wsSession.removeHandlerFailed", listener));
+        }
     }
 
 
