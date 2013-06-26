@@ -49,9 +49,9 @@ public class PojoMessageHandlerWholeBinary
             Session session, EndpointConfig config,
             List<Class<? extends Decoder>> decoderClazzes, Object[] params,
             int indexPayload, boolean convert, int indexSession,
-            boolean isForInputStream) {
+            boolean isForInputStream, long maxMessageSize) {
         super(pojo, method, session, params, indexPayload, convert,
-                indexSession);
+                indexSession, maxMessageSize);
         try {
             if (decoderClazzes != null) {
                 for (Class<? extends Decoder> decoderClazz : decoderClazzes) {

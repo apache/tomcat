@@ -39,9 +39,10 @@ public abstract class PojoMessageHandlerPartialBase<T>
 
     public PojoMessageHandlerPartialBase(Object pojo, Method method,
             Session session, Object[] params, int indexPayload,
-            boolean convert, int indexBoolean, int indexSession) {
+            boolean convert, int indexBoolean, int indexSession,
+            long maxMessageSize) {
         super(pojo, method, session, params, indexPayload, convert,
-                indexSession);
+                indexSession, maxMessageSize);
         this.indexBoolean = indexBoolean;
     }
 

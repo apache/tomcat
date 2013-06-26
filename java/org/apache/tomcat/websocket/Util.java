@@ -343,7 +343,7 @@ public class Util {
                     new PojoMessageHandlerWholeBinary(listener,
                             getOnMessageMethod(listener), null,
                             endpointConfig, null, new Object[1], 0, true, -1,
-                            false),
+                            false, -1),
                     MessageHandlerResultType.BINARY);
             results.add(result);
         } else if (InputStream.class.isAssignableFrom(target)) {
@@ -351,14 +351,15 @@ public class Util {
                     new PojoMessageHandlerWholeBinary(listener,
                             getOnMessageMethod(listener), null,
                             endpointConfig, null, new Object[1], 0, true, -1,
-                            true),
+                            true, -1),
                     MessageHandlerResultType.BINARY);
             results.add(result);
         } else if (Reader.class.isAssignableFrom(target)) {
             MessageHandlerResult result = new MessageHandlerResult(
                     new PojoMessageHandlerWholeText(listener,
                             getOnMessageMethod(listener), null,
-                            endpointConfig, null, new Object[1], 0, true, -1),
+                            endpointConfig, null, new Object[1], 0, true, -1,
+                            -1),
                     MessageHandlerResultType.BINARY);
             results.add(result);
         } else {
@@ -376,7 +377,7 @@ public class Util {
                         new PojoMessageHandlerWholeBinary(listener, m, null,
                                 endpointConfig,
                                 decoderMatch.getBinaryDecoders(), new Object[1],
-                                0, false, -1, false),
+                                0, false, -1, false, -1),
                         MessageHandlerResultType.BINARY);
                 results.add(result);
             }
@@ -385,7 +386,7 @@ public class Util {
                         new PojoMessageHandlerWholeText(listener, m, null,
                                 endpointConfig,
                                 decoderMatch.getTextDecoders(), new Object[1],
-                                0, false, -1),
+                                0, false, -1, -1),
                         MessageHandlerResultType.TEXT);
                 results.add(result);
             }
