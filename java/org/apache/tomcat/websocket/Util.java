@@ -19,9 +19,12 @@ package org.apache.tomcat.websocket;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.HashSet;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.websocket.CloseReason.CloseCode;
@@ -29,6 +32,7 @@ import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Decoder;
 import javax.websocket.Encoder;
 import javax.websocket.MessageHandler;
+import javax.websocket.PongMessage;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -264,5 +268,43 @@ public class Util {
             throw new IllegalArgumentException(sm.getString(
                     "util.invalidType", value, type.getName()));
         }
+    }
+
+
+    public static Set<MessageHandlerResult> getMessageHandlers(
+            MessageHandler listener) {
+
+        Type t = Util.getMessageType(listener);
+
+        // Will never be more than 2 types
+        Set<MessageHandlerResult> results = new HashSet<>(2);
+
+        // Simple cases - handlers already accepts one of the types expected by
+        // the frame handling code
+        if (String.class.isAssignableFrom((Class<?>) t)) {
+            MessageHandlerResult result =
+                    new MessageHandlerResult(listener,
+                            MessageHandlerResultType.TEXT);
+            results.add(result);
+        } else if (ByteBuffer.class.isAssignableFrom((Class<?>) t)) {
+            MessageHandlerResult result =
+                    new MessageHandlerResult(listener,
+                            MessageHandlerResultType.BINARY);
+            results.add(result);
+        } else if (PongMessage.class.isAssignableFrom((Class<?>) t)) {
+            MessageHandlerResult result =
+                    new MessageHandlerResult(listener,
+                            MessageHandlerResultType.PONG);
+            results.add(result);
+        } else {
+            // TODO Decoder handling
+        }
+
+        if (results.size() == 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("wsSession.unknownHandler", listener, t));
+        }
+
+        return results;
     }
 }
