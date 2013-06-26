@@ -175,7 +175,7 @@ public class PojoMethodMapping {
 
 
     private static PojoPathParam[] getPathParams(Method m,
-            MethodType methodType) {
+            MethodType methodType) throws DeploymentException {
         if (m == null) {
             return new PojoPathParam[0];
         }
@@ -202,6 +202,15 @@ public class PojoMethodMapping {
                 for (Annotation paramAnnotation : paramAnnotations) {
                     if (paramAnnotation.annotationType().equals(
                             PathParam.class)) {
+                        // Check that the type is valid. "0" coerces to every
+                        // valid type
+                        try {
+                            Util.coerceToType(type, "0");
+                        } catch (IllegalArgumentException iae) {
+                            throw new DeploymentException(sm.getString(
+                                    "pojoMethodMapping.invalidPathParamType"),
+                                    iae);
+                        }
                         result[i] = new PojoPathParam(type,
                                 ((PathParam) paramAnnotation).value());
                         break;
@@ -209,12 +218,14 @@ public class PojoMethodMapping {
                 }
                 // Parameters without annotations are not permitted
                 if (result[i] == null) {
-                    throw new IllegalArgumentException();
+                    throw new DeploymentException(sm.getString(
+                            "pojoMethodMapping.paramWithoutAnnotation",
+                            type, m.getName(), m.getClass().getName()));
                 }
             }
         }
         if (methodType == MethodType.ON_ERROR && !foundThrowable) {
-            throw new IllegalArgumentException(sm.getString(
+            throw new DeploymentException(sm.getString(
                     "pojoMethodMapping.onErrorNoThrowable",
                     m.getName(), m.getDeclaringClass().getName()));
         }
