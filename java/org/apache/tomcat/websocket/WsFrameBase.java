@@ -329,9 +329,21 @@ public abstract class WsFrameBase {
 
 
     @SuppressWarnings("unchecked")
-    private void sendMessageText(boolean last) {
+    private void sendMessageText(boolean last) throws WsIOException {
         MessageHandler mh = wsSession.getTextMessageHandler();
         if (mh != null) {
+            if (mh instanceof WrappedMessageHandler) {
+                long maxMessageSize =
+                        ((WrappedMessageHandler) mh).getMaxMessageSize();
+                if (maxMessageSize > -1 &&
+                        messageBufferText.remaining() > maxMessageSize) {
+                    throw new WsIOException(new CloseReason(CloseCodes.TOO_BIG,
+                            sm.getString("wsFrame.messageTooBig",
+                                    Long.valueOf(messageBufferText.remaining()),
+                                    Long.valueOf(maxMessageSize))));
+                }
+            }
+
             if (mh instanceof MessageHandler.Partial<?>) {
                 ((MessageHandler.Partial<String>) mh).onMessage(
                         messageBufferText.toString(), last);
@@ -494,9 +506,20 @@ public abstract class WsFrameBase {
 
 
     @SuppressWarnings("unchecked")
-    private void sendMessageBinary(ByteBuffer msg, boolean last) {
+    private void sendMessageBinary(ByteBuffer msg, boolean last)
+            throws WsIOException {
         MessageHandler mh = wsSession.getBinaryMessageHandler();
         if (mh != null) {
+            if (mh instanceof WrappedMessageHandler) {
+                long maxMessageSize =
+                        ((WrappedMessageHandler) mh).getMaxMessageSize();
+                if (maxMessageSize > -1 && msg.remaining() > maxMessageSize) {
+                    throw new WsIOException(new CloseReason(CloseCodes.TOO_BIG,
+                            sm.getString("wsFrame.messageTooBig",
+                                    Long.valueOf(msg.remaining()),
+                                    Long.valueOf(maxMessageSize))));
+                }
+            }
             if (mh instanceof MessageHandler.Partial<?>) {
                 ((MessageHandler.Partial<ByteBuffer>) mh).onMessage(msg, last);
             } else {

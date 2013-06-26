@@ -44,7 +44,6 @@ import javax.websocket.WebSocketContainer;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.websocket.pojo.PojoMessageHandlerBase;
 
 public class WsSession implements Session {
 
@@ -239,9 +238,8 @@ public class WsSession implements Session {
 
         MessageHandler wrapped = null;
 
-        if (listener instanceof PojoMessageHandlerBase) {
-            wrapped =
-                    ((PojoMessageHandlerBase<?>) listener).getWrappedHandler();
+        if (listener instanceof WrappedMessageHandler) {
+            wrapped = ((WrappedMessageHandler) listener).getWrappedHandler();
         }
 
         if (wrapped == null) {

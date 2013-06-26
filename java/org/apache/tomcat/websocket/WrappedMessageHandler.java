@@ -14,35 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.websocket.pojo;
+package org.apache.tomcat.websocket;
 
-import java.lang.reflect.Method;
+import javax.websocket.MessageHandler;
 
-import javax.websocket.PongMessage;
-import javax.websocket.Session;
+public interface WrappedMessageHandler {
+    long getMaxMessageSize();
 
-/**
- * PongMessage specific concrete implementation for handling whole messages.
- */
-public class PojoMessageHandlerWholePong
-        extends PojoMessageHandlerWholeBase<PongMessage> {
-
-    public PojoMessageHandlerWholePong(Object pojo, Method method,
-            Session session, Object[] params, int indexPayload, boolean convert,
-            int indexSession) {
-        super(pojo, method, session, params, indexPayload, convert,
-                indexSession, -1);
-    }
-
-    @Override
-    protected Object decode(PongMessage message) {
-        // Never decoded
-        return null;
-    }
-
-
-    @Override
-    protected void onClose() {
-        // NO-OP
-    }
+    MessageHandler getWrappedHandler();
 }

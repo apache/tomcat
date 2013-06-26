@@ -25,12 +25,15 @@ import javax.websocket.MessageHandler;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 
+import org.apache.tomcat.websocket.WrappedMessageHandler;
+
 /**
  * Common implementation code for the POJO message handlers.
  *
  * @param <T>   The type of message to handle
  */
-public abstract class PojoMessageHandlerBase<T> {
+public abstract class PojoMessageHandlerBase<T>
+        implements WrappedMessageHandler {
 
     protected final Object pojo;
     protected final Method method;
@@ -39,11 +42,11 @@ public abstract class PojoMessageHandlerBase<T> {
     protected final int indexPayload;
     protected final boolean convert;
     protected final int indexSession;
-
+    protected final long maxMessageSize;
 
     public PojoMessageHandlerBase(Object pojo, Method method,
             Session session, Object[] params, int indexPayload, boolean convert,
-            int indexSession) {
+            int indexSession, long maxMessageSize) {
         this.pojo = pojo;
         this.method = method;
         this.session = session;
@@ -51,6 +54,7 @@ public abstract class PojoMessageHandlerBase<T> {
         this.indexPayload = indexPayload;
         this.convert = convert;
         this.indexSession = indexSession;
+        this.maxMessageSize = maxMessageSize;
     }
 
 
@@ -81,11 +85,18 @@ public abstract class PojoMessageHandlerBase<T> {
      * match requests to remove handlers if the original handler has been
      * wrapped.
      */
-    public MessageHandler getWrappedHandler() {
+    @Override
+    public final MessageHandler getWrappedHandler() {
         if (pojo instanceof MessageHandler) {
             return (MessageHandler) pojo;
         } else {
             return null;
         }
+    }
+
+
+    @Override
+    public final long getMaxMessageSize() {
+        return maxMessageSize;
     }
 }

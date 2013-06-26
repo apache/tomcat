@@ -36,9 +36,9 @@ public abstract class PojoMessageHandlerWholeBase<T>
 
     public PojoMessageHandlerWholeBase(Object pojo, Method method,
             Session session, Object[] params, int indexPayload,
-            boolean convert, int indexSession) {
+            boolean convert, int indexSession, long maxMessageSize) {
         super(pojo, method, session, params, indexPayload, convert,
-                indexSession);
+                indexSession, maxMessageSize);
     }
 
 

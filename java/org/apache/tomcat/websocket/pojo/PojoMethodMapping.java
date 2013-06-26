@@ -268,6 +268,7 @@ public class PojoMethodMapping {
         private Map<Integer,PojoPathParam> indexPathParams = new HashMap<>();
         private int indexPayload = -1;
         private boolean useDecoder = false;
+        private long maxMessageSize = -1;
 
         public MessageMethod(Method m, List<DecoderEntry> decoderEntries) {
             this.m = m;
@@ -491,6 +492,8 @@ public class PojoMethodMapping {
                         "pojoMethodMapping.partialObject",
                         m.getName(), m.getDeclaringClass().getName()));
             }
+
+            maxMessageSize = m.getAnnotation(OnMessage.class).maxMessageSize();
         }
 
 
@@ -526,27 +529,27 @@ public class PojoMethodMapping {
                 if (indexString != -1) {
                     mh = new PojoMessageHandlerWholeText(pojo, m,  session,
                             config, decoders, params, indexString, false,
-                            indexSession);
+                            indexSession, maxMessageSize);
                 } else if (indexPrimitive != -1) {
                     mh = new PojoMessageHandlerWholeText(pojo, m, session,
                             config, decoders, params, indexPrimitive, false,
-                            indexSession);
+                            indexSession, maxMessageSize);
                 } else if (indexByteArray != -1) {
                     mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
                             config, decoders, params, indexByteArray, true,
-                            indexSession, false);
+                            indexSession, false, maxMessageSize);
                 } else if (indexByteBuffer != -1) {
                     mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
                             config, decoders, params, indexByteBuffer, false,
-                            indexSession, false);
+                            indexSession, false, maxMessageSize);
                 } else if (indexInputStream != -1) {
                     mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
                             config, decoders, params, indexInputStream, true,
-                            indexSession, true);
+                            indexSession, true, maxMessageSize);
                 } else if (indexReader != -1) {
                     mh = new PojoMessageHandlerWholeText(pojo, m, session,
                             config, decoders, params, indexReader, true,
-                            indexSession);
+                            indexSession, maxMessageSize);
                 } else {
                     mh = new PojoMessageHandlerWholePong(pojo, m, session,
                             params, indexPong, false, indexSession);
@@ -556,15 +559,15 @@ public class PojoMethodMapping {
                 if (indexString != -1) {
                     mh = new PojoMessageHandlerPartialText(pojo, m, session,
                             params, indexString, false, indexBoolean,
-                            indexSession);
+                            indexSession, maxMessageSize);
                 } else if (indexByteArray != -1) {
                     mh = new PojoMessageHandlerPartialBinary(pojo, m, session,
                             params, indexByteArray, true, indexBoolean,
-                            indexSession);
+                            indexSession, maxMessageSize);
                 } else {
                     mh = new PojoMessageHandlerPartialBinary(pojo, m, session,
                             params, indexByteBuffer, false, indexBoolean,
-                            indexSession);
+                            indexSession, maxMessageSize);
                 }
             }
             return mh;

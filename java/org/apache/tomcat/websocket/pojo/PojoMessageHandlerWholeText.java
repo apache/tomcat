@@ -48,9 +48,10 @@ public class PojoMessageHandlerWholeText
     public PojoMessageHandlerWholeText(Object pojo, Method method,
             Session session, EndpointConfig config,
             List<Class<? extends Decoder>> decoderClazzes, Object[] params,
-            int indexPayload, boolean convert, int indexSession) {
+            int indexPayload, boolean convert, int indexSession,
+            long maxMessageSize) {
         super(pojo, method, session, params, indexPayload, convert,
-                indexSession);
+                indexSession, maxMessageSize);
 
         // Check for primitives
         Class<?> type = method.getParameterTypes()[indexPayload];
@@ -61,21 +62,23 @@ public class PojoMessageHandlerWholeText
             primitiveType = null;
         }
 
-        try {
-            for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
-                if (Text.class.isAssignableFrom(decoderClazz)) {
-                    Text<?> decoder = (Text<?>) decoderClazz.newInstance();
-                    decoder.init(config);
-                    decoders.add(decoder);
-                } else if (TextStream.class.isAssignableFrom(decoderClazz)) {
-                    TextStream<?> decoder =
-                            (TextStream<?>) decoderClazz.newInstance();
-                    decoder.init(config);
-                    decoders.add(decoder);
-                } else {
-                    // Binary decoder - ignore it
+        try {if (decoderClazzes != null) {
+                for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
+                    if (Text.class.isAssignableFrom(decoderClazz)) {
+                        Text<?> decoder = (Text<?>) decoderClazz.newInstance();
+                        decoder.init(config);
+                        decoders.add(decoder);
+                    } else if (TextStream.class.isAssignableFrom(
+                            decoderClazz)) {
+                        TextStream<?> decoder =
+                                (TextStream<?>) decoderClazz.newInstance();
+                        decoder.init(config);
+                        decoders.add(decoder);
+                    } else {
+                        // Binary decoder - ignore it
+                    }
                 }
-            }
+        }
         } catch (IllegalAccessException | InstantiationException e) {
             throw new IllegalArgumentException(e);
         }
