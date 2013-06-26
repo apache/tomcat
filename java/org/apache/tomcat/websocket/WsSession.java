@@ -64,6 +64,7 @@ public class WsSession implements Session {
     private final Map<String,List<String>> requestParameterMap;
     private final String queryString;
     private final Principal userPrincipal;
+    private final EndpointConfig endpointConfig;
 
     private final String subProtocol;
     private final Map<String,String> pathParameters;
@@ -132,6 +133,7 @@ public class WsSession implements Session {
         this.pathParameters = pathParameters;
         this.secure = secure;
         this.wsRemoteEndpoint.setEncoders(endpointConfig);
+        this.endpointConfig = endpointConfig;
 
         this.userProperties.putAll(endpointConfig.getUserProperties());
         this.id = Long.toHexString(ids.getAndIncrement());
@@ -161,7 +163,8 @@ public class WsSession implements Session {
         // arbitrary objects with MessageHandlers and can wrap MessageHandlers
         // just as easily.
 
-        Set<MessageHandlerResult> mhResults = Util.getMessageHandlers(listener);
+        Set<MessageHandlerResult> mhResults =
+                Util.getMessageHandlers(listener, endpointConfig);
 
         for (MessageHandlerResult mhResult : mhResults) {
             switch (mhResult.getType()) {
