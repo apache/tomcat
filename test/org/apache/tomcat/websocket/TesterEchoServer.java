@@ -35,6 +35,7 @@ public class TesterEchoServer {
 
         public static final String PATH_ASYNC = "/echoAsync";
         public static final String PATH_BASIC = "/echoBasic";
+        public static final String PATH_BASIC_LIMIT = "/echoBasicLimit";
 
         @Override
         public void contextInitialized(ServletContextEvent sce) {
@@ -45,6 +46,7 @@ public class TesterEchoServer {
             try {
                 sc.addEndpoint(Async.class);
                 sc.addEndpoint(Basic.class);
+                sc.addEndpoint(BasicLimit.class);
             } catch (DeploymentException e) {
                 throw new IllegalStateException(e);
             }
@@ -101,6 +103,40 @@ public class TesterEchoServer {
 
 
         @OnMessage
+        public void echoBinaryMessage(Session session, ByteBuffer msg) {
+            try {
+                session.getBasicRemote().sendBinary(msg);
+            } catch (IOException e) {
+                try {
+                    session.close();
+                } catch (IOException e1) {
+                    // Ignore
+                }
+            }
+        }
+    }
+
+
+    @ServerEndpoint("/echoBasicLimit")
+    public static class BasicLimit {
+
+        public static final long MAX_SIZE = 10;
+
+        @OnMessage(maxMessageSize = MAX_SIZE)
+        public void echoTextMessage(Session session, String msg) {
+            try {
+                session.getBasicRemote().sendText(msg);
+            } catch (IOException e) {
+                try {
+                    session.close();
+                } catch (IOException e1) {
+                    // Ignore
+                }
+            }
+        }
+
+
+        @OnMessage(maxMessageSize = MAX_SIZE)
         public void echoBinaryMessage(Session session, ByteBuffer msg) {
             try {
                 session.getBasicRemote().sendBinary(msg);

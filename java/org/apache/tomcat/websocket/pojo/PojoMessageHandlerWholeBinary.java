@@ -28,7 +28,6 @@ import javax.websocket.Decoder;
 import javax.websocket.Decoder.Binary;
 import javax.websocket.Decoder.BinaryStream;
 import javax.websocket.EndpointConfig;
-import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
 import org.apache.tomcat.util.res.StringManager;
@@ -47,49 +46,35 @@ public class PojoMessageHandlerWholeBinary
     private final boolean isForInputStream;
 
     public PojoMessageHandlerWholeBinary(Object pojo, Method method,
-            Session session, EndpointConfig config, Object[] params,
+            Session session, EndpointConfig config,
+            List<Class<? extends Decoder>> decoderClazzes, Object[] params,
             int indexPayload, boolean convert, int indexSession,
             boolean isForInputStream) {
         super(pojo, method, session, params, indexPayload, convert,
                 indexSession);
         try {
-            for (Class<? extends Decoder> decoderClazz : config.getDecoders()) {
-                if (Binary.class.isAssignableFrom(decoderClazz)) {
-                    Binary<?> decoder = (Binary<?>) decoderClazz.newInstance();
-                    decoder.init(config);
-                    decoders.add(decoder);
-                } else if (BinaryStream.class.isAssignableFrom(decoderClazz)) {
-                    BinaryStream<?> decoder =
-                            (BinaryStream<?>) decoderClazz.newInstance();
-                    decoder.init(config);
-                    decoders.add(decoder);
-                } else {
-                    // Text decoder - ignore it
+            if (decoderClazzes != null) {
+                for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
+                    if (Binary.class.isAssignableFrom(decoderClazz)) {
+                        Binary<?> decoder =
+                                (Binary<?>) decoderClazz.newInstance();
+                        decoder.init(config);
+                        decoders.add(decoder);
+                    } else if (BinaryStream.class.isAssignableFrom(
+                            decoderClazz)) {
+                        BinaryStream<?> decoder =
+                                (BinaryStream<?>) decoderClazz.newInstance();
+                        decoder.init(config);
+                        decoders.add(decoder);
+                    } else {
+                        // Text decoder - ignore it
+                    }
                 }
             }
         } catch (IllegalAccessException | InstantiationException e) {
             throw new IllegalArgumentException(e);
         }
         this.isForInputStream = isForInputStream;
-    }
-
-
-    public PojoMessageHandlerWholeBinary(MessageHandler listener,
-            Method method, EndpointConfig config,
-            List<Class<? extends Decoder>> binaryDecoders) {
-        super(listener, method, null, new Object[1], -1, false, -1);
-
-        try {
-            for (Class<? extends Decoder> decoderClazz : binaryDecoders) {
-                Binary<?> decoder = (Binary<?>) decoderClazz.newInstance();
-                decoder.init(config);
-                decoders.add(decoder);
-            }
-        } catch (IllegalAccessException | InstantiationException e) {
-            throw new IllegalArgumentException(e);
-        }
-
-        this.isForInputStream = false;
     }
 
 

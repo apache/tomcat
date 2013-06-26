@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.InputStream;
+import java.io.Reader;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -334,9 +336,33 @@ public class Util {
                     new MessageHandlerResult(listener,
                             MessageHandlerResultType.PONG);
             results.add(result);
-            // TODO byte[], Reader, InputStream
+        // Relatively simple cases - handler needs wrapping but no decoder to
+        // convert it to one of the types expected by the frame handling code
+        } else if (byte[].class.isAssignableFrom(target)) {
+            MessageHandlerResult result = new MessageHandlerResult(
+                    new PojoMessageHandlerWholeBinary(listener,
+                            getOnMessageMethod(listener), null,
+                            endpointConfig, null, new Object[1], 0, true, -1,
+                            false),
+                    MessageHandlerResultType.BINARY);
+            results.add(result);
+        } else if (InputStream.class.isAssignableFrom(target)) {
+            MessageHandlerResult result = new MessageHandlerResult(
+                    new PojoMessageHandlerWholeBinary(listener,
+                            getOnMessageMethod(listener), null,
+                            endpointConfig, null, new Object[1], 0, true, -1,
+                            true),
+                    MessageHandlerResultType.BINARY);
+            results.add(result);
+        } else if (Reader.class.isAssignableFrom(target)) {
+            MessageHandlerResult result = new MessageHandlerResult(
+                    new PojoMessageHandlerWholeText(listener,
+                            getOnMessageMethod(listener), null,
+                            endpointConfig, null, new Object[1], 0, true, -1),
+                    MessageHandlerResultType.BINARY);
+            results.add(result);
         } else {
-            // More complex case - listener that requires a decoder
+        // More complex case - listener that requires a decoder
             DecoderMatch decoderMatch;
             try {
                 decoderMatch = new DecoderMatch(target,
@@ -347,16 +373,19 @@ public class Util {
             Method m = getOnMessageMethod(listener);
             if (decoderMatch.getBinaryDecoders().size() > 0) {
                 MessageHandlerResult result = new MessageHandlerResult(
-                        new PojoMessageHandlerWholeBinary(listener, m,
+                        new PojoMessageHandlerWholeBinary(listener, m, null,
                                 endpointConfig,
-                                decoderMatch.getBinaryDecoders()),
+                                decoderMatch.getBinaryDecoders(), new Object[1],
+                                0, false, -1, false),
                         MessageHandlerResultType.BINARY);
                 results.add(result);
             }
             if (decoderMatch.getTextDecoders().size() > 0) {
                 MessageHandlerResult result = new MessageHandlerResult(
-                        new PojoMessageHandlerWholeText(listener, m,
-                                endpointConfig, decoderMatch.getTextDecoders()),
+                        new PojoMessageHandlerWholeText(listener, m, null,
+                                endpointConfig,
+                                decoderMatch.getTextDecoders(), new Object[1],
+                                0, false, -1),
                         MessageHandlerResultType.TEXT);
                 results.add(result);
             }

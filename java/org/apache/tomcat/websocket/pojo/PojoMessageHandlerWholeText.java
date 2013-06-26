@@ -27,7 +27,6 @@ import javax.websocket.Decoder;
 import javax.websocket.Decoder.Text;
 import javax.websocket.Decoder.TextStream;
 import javax.websocket.EndpointConfig;
-import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
 import org.apache.tomcat.util.res.StringManager;
@@ -47,7 +46,8 @@ public class PojoMessageHandlerWholeText
     private final Class<?> primitiveType;
 
     public PojoMessageHandlerWholeText(Object pojo, Method method,
-            Session session, EndpointConfig config, Object[] params,
+            Session session, EndpointConfig config,
+            List<Class<? extends Decoder>> decoderClazzes, Object[] params,
             int indexPayload, boolean convert, int indexSession) {
         super(pojo, method, session, params, indexPayload, convert,
                 indexSession);
@@ -62,7 +62,7 @@ public class PojoMessageHandlerWholeText
         }
 
         try {
-            for (Class<? extends Decoder> decoderClazz : config.getDecoders()) {
+            for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
                 if (Text.class.isAssignableFrom(decoderClazz)) {
                     Text<?> decoder = (Text<?>) decoderClazz.newInstance();
                     decoder.init(config);
@@ -79,25 +79,6 @@ public class PojoMessageHandlerWholeText
         } catch (IllegalAccessException | InstantiationException e) {
             throw new IllegalArgumentException(e);
         }
-    }
-
-
-    public PojoMessageHandlerWholeText(MessageHandler listener,
-            Method method, EndpointConfig config,
-            List<Class<? extends Decoder>> textDecoders) {
-        super(listener, method, null, new Object[1], -1, false, -1);
-
-        try {
-            for (Class<? extends Decoder> decoderClazz : textDecoders) {
-                Text<?> decoder = (Text<?>) decoderClazz.newInstance();
-                decoder.init(config);
-                decoders.add(decoder);
-            }
-        } catch (IllegalAccessException | InstantiationException e) {
-            throw new IllegalArgumentException(e);
-        }
-
-        primitiveType = null;
     }
 
 
