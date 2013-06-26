@@ -71,7 +71,9 @@ public class WsSession implements Session {
     private final boolean secure;
     private final String id;
 
+    // Expected to handle message types of <String> only
     private MessageHandler textMessageHandler = null;
+    // Expected to handle message types of <ByteBuffer> only
     private MessageHandler binaryMessageHandler = null;
     private MessageHandler.Whole<PongMessage> pongMessageHandler = null;
     private volatile State state = State.OPEN;
