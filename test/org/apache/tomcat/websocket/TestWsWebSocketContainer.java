@@ -798,4 +798,54 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Assert.assertEquals(1, messages.size());
         Assert.assertEquals(MESSAGE_STRING_1, messages.get(0));
     }
+
+
+    @Test
+    public void testMaxMessageSize01() throws Exception {
+        doMaxMessageSize(TesterEchoServer.BasicLimit.MAX_SIZE - 1, true);
+    }
+
+
+    @Test
+    public void testMaxMessageSize02() throws Exception {
+        doMaxMessageSize(TesterEchoServer.BasicLimit.MAX_SIZE, true);
+    }
+
+
+    @Test
+    public void testMaxMessageSize03() throws Exception {
+        doMaxMessageSize(TesterEchoServer.BasicLimit.MAX_SIZE + 1, false);
+    }
+
+
+    private void doMaxMessageSize(long size, boolean expectOpen)
+            throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(new ApplicationListener(
+                TesterEchoServer.Config.class.getName(), false));
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
+
+        tomcat.start();
+
+        WebSocketContainer wsContainer =
+                ContainerProvider.getWebSocketContainer();
+
+        Session s = connectToEchoServerBasic(wsContainer, EndpointA.class);
+
+        // 9 bytes
+        StringBuilder msg = new StringBuilder();
+        for (long i = 0; i < size; i++) {
+            msg.append('x');
+        }
+
+        s.getBasicRemote().sendText(msg.toString());
+
+        Assert.assertEquals(Boolean.valueOf(expectOpen),
+                Boolean.valueOf(s.isOpen()));
+    }
 }
