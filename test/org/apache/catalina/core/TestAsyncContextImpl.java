@@ -1800,7 +1800,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                     resp.getWriter().print("OK");
                 }
             } else {
-                resp.getWriter().print("ForbiddenDispatchingServletGet-");
+                resp.getWriter().print("DispatchingGenericServletGet-");
             }
         }
     }
@@ -1913,7 +1913,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         expected = new StringBuilder();
         expected.append("OK");
-        expected.append("ForbiddenDispatchingServletGet-");
+        expected.append("DispatchingGenericServletGet-");
         assertEquals(expected.toString(), res.toString());
     }
 
