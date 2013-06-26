@@ -37,9 +37,9 @@ import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.websocket.pojo.Util.ServerConfigListener;
-import org.apache.tomcat.websocket.pojo.Util.SimpleClient;
-import org.apache.tomcat.websocket.pojo.Util.SingletonConfigurator;
+import org.apache.tomcat.websocket.pojo.TesterUtil.ServerConfigListener;
+import org.apache.tomcat.websocket.pojo.TesterUtil.SimpleClient;
+import org.apache.tomcat.websocket.pojo.TesterUtil.SingletonConfigurator;
 
 public class TestPojoMethodMapping extends TomcatBaseTest {
 
