@@ -269,7 +269,6 @@ public class PojoMethodMapping {
         private int indexPayload = -1;
         private boolean useDecoder = false;
 
-
         public MessageMethod(Method m, List<DecoderEntry> decoderEntries) {
             this.m = m;
 
@@ -519,31 +518,35 @@ public class PojoMethodMapping {
 
             MessageHandler mh = null;
             if (indexBoolean == -1) {
+                List<Class<? extends Decoder>> decoders = null;
+                if (useDecoder) {
+                    decoders = config.getDecoders();
+                }
                 // Basic
                 if (indexString != -1) {
                     mh = new PojoMessageHandlerWholeText(pojo, m,  session,
-                            config, config.getDecoders(), params, indexString,
-                            false, indexSession);
+                            config, decoders, params, indexString, false,
+                            indexSession);
                 } else if (indexPrimitive != -1) {
                     mh = new PojoMessageHandlerWholeText(pojo, m, session,
-                            config, config.getDecoders(), params,
-                            indexPrimitive, false, indexSession);
+                            config, decoders, params, indexPrimitive, false,
+                            indexSession);
                 } else if (indexByteArray != -1) {
                     mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
-                            config, config.getDecoders(), params,
-                            indexByteArray, true, indexSession, false);
+                            config, decoders, params, indexByteArray, true,
+                            indexSession, false);
                 } else if (indexByteBuffer != -1) {
                     mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
-                            config, config.getDecoders(), params,
-                            indexByteBuffer, false, indexSession, false);
+                            config, decoders, params, indexByteBuffer, false,
+                            indexSession, false);
                 } else if (indexInputStream != -1) {
                     mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
-                            config, config.getDecoders(), params,
-                            indexInputStream, true, indexSession, true);
+                            config, decoders, params, indexInputStream, true,
+                            indexSession, true);
                 } else if (indexReader != -1) {
                     mh = new PojoMessageHandlerWholeText(pojo, m, session,
-                            config, config.getDecoders(), params, indexReader,
-                            true, indexSession);
+                            config, decoders, params, indexReader, true,
+                            indexSession);
                 } else {
                     mh = new PojoMessageHandlerWholePong(pojo, m, session,
                             params, indexPong, false, indexSession);
