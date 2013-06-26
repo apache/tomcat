@@ -267,6 +267,7 @@ public class PojoMethodMapping {
         private int indexPrimitive = -1;
         private Map<Integer,PojoPathParam> indexPathParams = new HashMap<>();
         private int indexPayload = -1;
+        private boolean useDecoder = false;
 
 
         public MessageMethod(Method m, List<DecoderEntry> decoderEntries) {
@@ -274,7 +275,6 @@ public class PojoMethodMapping {
 
             Class<?>[] types = m.getParameterTypes();
             Annotation[][] paramsAnnotations = m.getParameterAnnotations();
-            boolean decoderParameterFound = false;
 
             for (int i = 0; i < types.length; i++) {
                 boolean paramFound = false;
@@ -378,7 +378,7 @@ public class PojoMethodMapping {
                                     if (indexByteBuffer == -1) {
                                         indexByteBuffer = i;
                                         foundBinaryDecoderMatch = true;
-                                        decoderParameterFound = true;
+                                        useDecoder = true;
                                     } else {
                                         throw new IllegalArgumentException(sm.getString(
                                                 "pojoMethodMapping.duplicateMessageParam",
@@ -390,7 +390,7 @@ public class PojoMethodMapping {
                                     if (indexString == -1) {
                                         indexString = i;
                                         foundTextDecoderMatch = true;
-                                        decoderParameterFound = true;
+                                        useDecoder = true;
                                     } else {
                                         throw new IllegalArgumentException(sm.getString(
                                                 "pojoMethodMapping.duplicateMessageParam",
@@ -487,7 +487,7 @@ public class PojoMethodMapping {
                         "pojoMethodMapping.partialInputStream",
                         m.getName(), m.getDeclaringClass().getName()));
             }
-            if (decoderParameterFound && indexBoolean != -1) {
+            if (useDecoder && indexBoolean != -1) {
                 throw new IllegalArgumentException(sm.getString(
                         "pojoMethodMapping.partialObject",
                         m.getName(), m.getDeclaringClass().getName()));
