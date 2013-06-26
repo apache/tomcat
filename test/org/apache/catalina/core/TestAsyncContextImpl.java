@@ -30,11 +30,15 @@ import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 import javax.servlet.DispatcherType;
+import javax.servlet.GenericServlet;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
+import javax.servlet.ServletRequestWrapper;
 import javax.servlet.ServletResponse;
+import javax.servlet.ServletResponseWrapper;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -1741,9 +1745,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Wrapper wrapper = Tomcat.addServlet(ctx, "nonAsyncServlet",
                 nonAsyncServlet);
         wrapper.setAsyncSupported(true);
-        ctx.addServletMapping("/nonAsyncServlet", "nonAsyncServlet");
+        ctx.addServletMapping("/target", "nonAsyncServlet");
 
-        ForbiddenDispatchingServlet forbiddenDispatchingServlet = new ForbiddenDispatchingServlet();
+        DispatchingGenericServlet forbiddenDispatchingServlet = new DispatchingGenericServlet();
         Wrapper wrapper1 = Tomcat.addServlet(ctx,
                 "forbiddenDispatchingServlet", forbiddenDispatchingServlet);
         wrapper1.setAsyncSupported(true);
@@ -1767,20 +1771,92 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertTrue(body.toString().contains("NonAsyncServletGet"));
     }
 
-    private static class ForbiddenDispatchingServlet extends HttpServlet {
+    private static class DispatchingGenericServlet extends GenericServlet {
+
+        private static final long serialVersionUID = 1L;
+        private static final String CUSTOM_REQ_RESP = "crr";
+        private static final String EMPTY_DISPATCH = "empty";
+
+        @Override
+        public void service(ServletRequest req, ServletResponse resp)
+                throws ServletException, IOException {
+            if (DispatcherType.ASYNC != req.getDispatcherType()) {
+                AsyncContext asyncContext;
+                if ("y".equals(req.getParameter(CUSTOM_REQ_RESP))) {
+                    asyncContext = req.startAsync(
+                            new ServletRequestWrapper(req),
+                            new ServletResponseWrapper(resp));
+                } else {
+                    asyncContext = req.startAsync();
+                }
+                if ("y".equals(req.getParameter(EMPTY_DISPATCH))) {
+                    asyncContext.dispatch();
+                } else {
+                    asyncContext.dispatch("/target");
+                }
+                try {
+                    asyncContext.dispatch("/nonExistingServlet");
+                    resp.getWriter().print("FAIL");
+                } catch (IllegalStateException e) {
+                    resp.getWriter().print("OK");
+                }
+            } else {
+                resp.getWriter().print("DispatchingGenericServletGet-");
+            }
+        }
+
+    }
+
+    @Test
+    public void testDispatchWithCustomRequestResponse() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        DispatchingGenericServlet dispatch = new DispatchingGenericServlet();
+        Wrapper wrapper = Tomcat.addServlet(ctx, "dispatch", dispatch);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/dispatch", "dispatch");
+
+        CustomGenericServlet customGeneric = new CustomGenericServlet();
+        Wrapper wrapper2 = Tomcat.addServlet(ctx, "customGeneric",
+                customGeneric);
+        wrapper2.setAsyncSupported(true);
+        ctx.addServletMapping("/target", "customGeneric");
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort()
+                + "/dispatch?crr=y");
+
+        StringBuilder expected = new StringBuilder();
+        expected.append("OK");
+        expected.append("CustomGenericServletGet-");
+        assertEquals(expected.toString(), res.toString());
+
+        res = getUrl("http://localhost:" + getPort()
+                + "/dispatch?crr=y&empty=y");
+
+        expected = new StringBuilder();
+        expected.append("OK");
+        expected.append("DispatchingGenericServletGet-");
+        assertEquals(expected.toString(), res.toString());
+    }
+
+    private static class CustomGenericServlet extends GenericServlet {
 
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+        public void service(ServletRequest req, ServletResponse res)
                 throws ServletException, IOException {
-            AsyncContext asyncContext = req.startAsync();
-            asyncContext.dispatch("/nonAsyncServlet");
-            try {
-                asyncContext.dispatch("/nonExistingServlet");
-                resp.getWriter().println("FAIL");
-            } catch (IllegalStateException e) {
-                resp.getWriter().println("OK");
+            if (req instanceof ServletRequestWrapper
+                    && res instanceof ServletResponseWrapper) {
+                res.getWriter().print("CustomGenericServletGet-");
             }
         }
 

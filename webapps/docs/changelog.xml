@@ -103,6 +103,13 @@
         <code>Users:type=UserDatabase,database=UserDatabase</code> at Tomcat
         shutdown. (pero)
       </fix>
+      <fix>
+        Avoid <code>ClassCastException</code> when an asynchronous dispatch is
+        invoked in an asynchronous cycle which is started by a call to
+        <code>ServletRequest.startAsync(ServletRequest,ServletResponse)</code>
+        where ServletRequest/ServletResponse are custom implementations.
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
