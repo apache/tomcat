@@ -64,7 +64,7 @@ public class PojoMethodMapping {
     private final PojoPathParam[] onOpenParams;
     private final PojoPathParam[] onCloseParams;
     private final PojoPathParam[] onErrorParams;
-    private final Set<MessageMethod> onMessage = new HashSet<>();
+    private final Set<MessageHandlerInfo> onMessage = new HashSet<>();
     private final String wsPath;
 
 
@@ -107,7 +107,7 @@ public class PojoMethodMapping {
                             OnError.class, clazzPojo));
                 }
             } else if (method.getAnnotation(OnMessage.class) != null) {
-                onMessage.add(new MessageMethod(method, decoders));
+                onMessage.add(new MessageHandlerInfo(method, decoders));
             } else {
                 // Method not annotated
             }
@@ -166,7 +166,7 @@ public class PojoMethodMapping {
             Map<String,String> pathParameters, Session session,
             EndpointConfig config) {
         Set<MessageHandler> result = new HashSet<>();
-        for (MessageMethod messageMethod : onMessage) {
+        for (MessageHandlerInfo messageMethod : onMessage) {
             result.add(messageMethod.getMessageHandler(pojo, pathParameters,
                     session, config));
         }
@@ -264,7 +264,7 @@ public class PojoMethodMapping {
     }
 
 
-    private static class MessageMethod {
+    private static class MessageHandlerInfo {
 
         private final Method m;
         private int indexString = -1;
@@ -281,7 +281,7 @@ public class PojoMethodMapping {
         private boolean useDecoder = false;
         private long maxMessageSize = -1;
 
-        public MessageMethod(Method m, List<DecoderEntry> decoderEntries) {
+        public MessageHandlerInfo(Method m, List<DecoderEntry> decoderEntries) {
             this.m = m;
 
             Class<?>[] types = m.getParameterTypes();
