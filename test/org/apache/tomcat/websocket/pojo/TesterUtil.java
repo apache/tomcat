@@ -25,7 +25,7 @@ import javax.websocket.server.ServerEndpointConfig.Configurator;
 import org.apache.tomcat.websocket.server.Constants;
 import org.apache.tomcat.websocket.server.WsListener;
 
-public class Util {
+public class TesterUtil {
 
     public static class ServerConfigListener extends WsListener {
 
