@@ -30,8 +30,6 @@ import java.util.Set;
 import javax.websocket.CloseReason;
 import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
-import javax.websocket.Decoder.Binary;
-import javax.websocket.Decoder.BinaryStream;
 import javax.websocket.DeploymentException;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
@@ -46,6 +44,7 @@ import javax.websocket.server.PathParam;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.DecoderEntry;
 import org.apache.tomcat.websocket.Util;
+import org.apache.tomcat.websocket.Util.DecoderMatch;
 
 /**
  * For a POJO class annotated with
@@ -167,7 +166,7 @@ public class PojoMethodMapping {
             EndpointConfig config) {
         Set<MessageHandler> result = new HashSet<>();
         for (MessageHandlerInfo messageMethod : onMessage) {
-            result.add(messageMethod.getMessageHandler(pojo, pathParameters,
+            result.addAll(messageMethod.getMessageHandlers(pojo, pathParameters,
                     session, config));
         }
         return result;
@@ -278,7 +277,7 @@ public class PojoMethodMapping {
         private int indexPrimitive = -1;
         private Map<Integer,PojoPathParam> indexPathParams = new HashMap<>();
         private int indexPayload = -1;
-        private boolean useDecoder = false;
+        private DecoderMatch decoderMatch = null;
         private long maxMessageSize = -1;
 
         public MessageHandlerInfo(Method m, List<DecoderEntry> decoderEntries) {
@@ -376,46 +375,28 @@ public class PojoMethodMapping {
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
                 } else {
-                    boolean foundBinaryDecoderMatch = false;
-                    boolean foundTextDecoderMatch = false;
-                    for (DecoderEntry decoderEntry : decoderEntries) {
-                        if (decoderEntry.getClazz().isAssignableFrom(
-                                types[i])) {
-                            if (Binary.class.isAssignableFrom(
-                                        decoderEntry.getDecoderClazz()) ||
-                                    BinaryStream.class.isAssignableFrom(
-                                            decoderEntry.getDecoderClazz())) {
-                                if (!foundBinaryDecoderMatch) {
-                                    if (indexByteBuffer == -1) {
-                                        indexByteBuffer = i;
-                                        foundBinaryDecoderMatch = true;
-                                        useDecoder = true;
-                                    } else {
-                                        throw new IllegalArgumentException(sm.getString(
-                                                "pojoMethodMapping.duplicateMessageParam",
-                                                m.getName(), m.getDeclaringClass().getName()));
-                                    }
-                                }
-                            } else {
-                                if (!foundTextDecoderMatch) {
-                                    if (indexString == -1) {
-                                        indexString = i;
-                                        foundTextDecoderMatch = true;
-                                        useDecoder = true;
-                                    } else {
-                                        throw new IllegalArgumentException(sm.getString(
-                                                "pojoMethodMapping.duplicateMessageParam",
-                                                m.getName(), m.getDeclaringClass().getName()));
-                                    }
-                                }
-                            }
-                        }
+                    if (decoderMatch != null || decoderMatch.hasMatches()) {
+                        throw new IllegalArgumentException(sm.getString(
+                                "pojoMethodMapping.duplicateMessageParam",
+                                m.getName(), m.getDeclaringClass().getName()));
+                    }
+                    decoderMatch = new DecoderMatch(types[i], decoderEntries);
+
+                    if (decoderMatch.hasMatches()) {
+                        indexPayload = i;
                     }
                 }
             }
+
             // Additional checks required
             if (indexString != -1) {
-                indexPayload = indexString;
+                if (indexPayload != -1) {
+                    throw new IllegalArgumentException(sm.getString(
+                            "pojoMethodMapping.duplicateMessageParam",
+                            m.getName(), m.getDeclaringClass().getName()));
+                } else {
+                    indexPayload = indexString;
+                }
             }
             if (indexReader != -1) {
                 if (indexPayload != -1) {
@@ -498,7 +479,8 @@ public class PojoMethodMapping {
                         "pojoMethodMapping.partialInputStream",
                         m.getName(), m.getDeclaringClass().getName()));
             }
-            if (useDecoder && indexBoolean != -1) {
+            if (decoderMatch != null && decoderMatch.hasMatches() &&
+                    indexBoolean != -1) {
                 throw new IllegalArgumentException(sm.getString(
                         "pojoMethodMapping.partialObject",
                         m.getName(), m.getDeclaringClass().getName()));
@@ -508,7 +490,7 @@ public class PojoMethodMapping {
         }
 
 
-        public MessageHandler getMessageHandler(Object pojo,
+        public Set<MessageHandler> getMessageHandlers(Object pojo,
                 Map<String,String> pathParameters, Session session,
                 EndpointConfig config) {
             Object[] params = new Object[m.getParameterTypes().length];
@@ -530,58 +512,80 @@ public class PojoMethodMapping {
                 params[entry.getKey().intValue()] = value;
             }
 
-            MessageHandler mh = null;
+            Set<MessageHandler> results = new HashSet<>(2);
             if (indexBoolean == -1) {
-                List<Class<? extends Decoder>> decoders = null;
-                if (useDecoder) {
-                    decoders = config.getDecoders();
-                }
                 // Basic
                 if (indexString != -1) {
-                    mh = new PojoMessageHandlerWholeText(pojo, m,  session,
-                            config, decoders, params, indexString, false,
+                    MessageHandler mh = new PojoMessageHandlerWholeText(pojo, m,
+                            session, config, null, params, indexString, false,
                             indexSession, maxMessageSize);
+                    results.add(mh);
                 } else if (indexPrimitive != -1) {
-                    mh = new PojoMessageHandlerWholeText(pojo, m, session,
-                            config, decoders, params, indexPrimitive, false,
-                            indexSession, maxMessageSize);
+                    MessageHandler mh = new PojoMessageHandlerWholeText(pojo, m,
+                            session, config, null, params, indexPrimitive,
+                            false, indexSession, maxMessageSize);
+                    results.add(mh);
                 } else if (indexByteArray != -1) {
-                    mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
-                            config, decoders, params, indexByteArray, true,
-                            indexSession, false, maxMessageSize);
+                    MessageHandler mh = new PojoMessageHandlerWholeBinary(pojo,
+                            m, session, config, null, params, indexByteArray,
+                            true, indexSession, false, maxMessageSize);
+                    results.add(mh);
                 } else if (indexByteBuffer != -1) {
-                    mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
-                            config, decoders, params, indexByteBuffer, false,
-                            indexSession, false, maxMessageSize);
+                    MessageHandler mh = new PojoMessageHandlerWholeBinary(pojo,
+                            m, session, config, null, params, indexByteBuffer,
+                            false, indexSession, false, maxMessageSize);
+                    results.add(mh);
                 } else if (indexInputStream != -1) {
-                    mh = new PojoMessageHandlerWholeBinary(pojo, m, session,
-                            config, decoders, params, indexInputStream, true,
-                            indexSession, true, maxMessageSize);
+                    MessageHandler mh = new PojoMessageHandlerWholeBinary(pojo,
+                            m, session, config, null, params, indexInputStream,
+                            true, indexSession, true, maxMessageSize);
+                    results.add(mh);
                 } else if (indexReader != -1) {
-                    mh = new PojoMessageHandlerWholeText(pojo, m, session,
-                            config, decoders, params, indexReader, true,
+                    MessageHandler mh = new PojoMessageHandlerWholeText(pojo, m,
+                            session, config, null, params, indexReader, true,
                             indexSession, maxMessageSize);
+                    results.add(mh);
+                } else if (decoderMatch.hasMatches()) {
+                    if (decoderMatch.getBinaryDecoders().size() > 0) {
+                        MessageHandler mh = new PojoMessageHandlerWholeBinary(
+                                pojo, m, session, config,
+                                decoderMatch.getBinaryDecoders(), params,
+                                indexPayload, true, indexSession, true,
+                                maxMessageSize);
+                        results.add(mh);
+                    }
+                    if (decoderMatch.getTextDecoders().size() > 0) {
+                        MessageHandler mh = new PojoMessageHandlerWholeText(
+                                pojo, m, session, config,
+                                decoderMatch.getTextDecoders(), params,
+                                indexPayload, true, indexSession, maxMessageSize);
+                        results.add(mh);
+                    }
                 } else {
-                    mh = new PojoMessageHandlerWholePong(pojo, m, session,
-                            params, indexPong, false, indexSession);
+                    MessageHandler mh = new PojoMessageHandlerWholePong(pojo, m,
+                            session, params, indexPong, false, indexSession);
+                    results.add(mh);
                 }
             } else {
                 // ASync
                 if (indexString != -1) {
-                    mh = new PojoMessageHandlerPartialText(pojo, m, session,
-                            params, indexString, false, indexBoolean,
-                            indexSession, maxMessageSize);
+                    MessageHandler mh = new PojoMessageHandlerPartialText(pojo,
+                            m, session, params, indexString, false,
+                            indexBoolean, indexSession, maxMessageSize);
+                    results.add(mh);
                 } else if (indexByteArray != -1) {
-                    mh = new PojoMessageHandlerPartialBinary(pojo, m, session,
-                            params, indexByteArray, true, indexBoolean,
-                            indexSession, maxMessageSize);
+                    MessageHandler mh = new PojoMessageHandlerPartialBinary(
+                            pojo, m, session, params, indexByteArray, true,
+                            indexBoolean, indexSession, maxMessageSize);
+                    results.add(mh);
                 } else {
-                    mh = new PojoMessageHandlerPartialBinary(pojo, m, session,
-                            params, indexByteBuffer, false, indexBoolean,
-                            indexSession, maxMessageSize);
+                    MessageHandler mh = new PojoMessageHandlerPartialBinary(
+                            pojo, m, session, params, indexByteBuffer, false,
+                            indexBoolean, indexSession, maxMessageSize);
+                    results.add(mh);
                 }
             }
-            return mh;
+            return results;
         }
     }
 
