@@ -153,7 +153,8 @@ public class WsServerContainer extends WsWebSocketContainer
             if (templateMatches == null) {
                 templateMatches = new TreeSet<>(
                         TemplatePathMatchComparator.getInstance());
-                configTemplateMatchMap.put(key, templateMatches);
+                configTemplateMatchMap.putIfAbsent(key, templateMatches);
+                templateMatches = configTemplateMatchMap.get(key);
             }
             if (!templateMatches.add(new TemplatePathMatch(sec, uriTemplate))) {
                 // Duplicate uriTemplate;
@@ -246,7 +247,6 @@ public class WsServerContainer extends WsWebSocketContainer
 
 
     public WsMappingResult findMapping(String path) {
-
 
         // Check an exact match. Simple case as there are no templates.
         ServerEndpointConfig sec = configExactMatchMap.get(path);
