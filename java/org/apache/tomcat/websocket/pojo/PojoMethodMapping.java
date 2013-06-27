@@ -515,15 +515,15 @@ public class PojoMethodMapping {
             Set<MessageHandler> results = new HashSet<>(2);
             if (indexBoolean == -1) {
                 // Basic
-                if (indexString != -1) {
+                if (indexString != -1 || indexPrimitive != -1) {
                     MessageHandler mh = new PojoMessageHandlerWholeText(pojo, m,
-                            session, config, null, params, indexString, false,
+                            session, config, null, params, indexPayload, false,
                             indexSession, maxMessageSize);
                     results.add(mh);
-                } else if (indexPrimitive != -1) {
+                } else if (indexReader != -1) {
                     MessageHandler mh = new PojoMessageHandlerWholeText(pojo, m,
-                            session, config, null, params, indexPrimitive,
-                            false, indexSession, maxMessageSize);
+                            session, config, null, params, indexReader, true,
+                            indexSession, maxMessageSize);
                     results.add(mh);
                 } else if (indexByteArray != -1) {
                     MessageHandler mh = new PojoMessageHandlerWholeBinary(pojo,
@@ -539,11 +539,6 @@ public class PojoMethodMapping {
                     MessageHandler mh = new PojoMessageHandlerWholeBinary(pojo,
                             m, session, config, null, params, indexInputStream,
                             true, indexSession, true, maxMessageSize);
-                    results.add(mh);
-                } else if (indexReader != -1) {
-                    MessageHandler mh = new PojoMessageHandlerWholeText(pojo, m,
-                            session, config, null, params, indexReader, true,
-                            indexSession, maxMessageSize);
                     results.add(mh);
                 } else if (decoderMatch.hasMatches()) {
                     if (decoderMatch.getBinaryDecoders().size() > 0) {
