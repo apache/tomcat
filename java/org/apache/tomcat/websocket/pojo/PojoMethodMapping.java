@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -79,6 +80,7 @@ public class PojoMethodMapping {
         Method error = null;
         for (Method method : clazzPojo.getDeclaredMethods()) {
             if (method.getAnnotation(OnOpen.class) != null) {
+                checkPublic(method);
                 if (open == null) {
                     open = method;
                 } else {
@@ -88,6 +90,7 @@ public class PojoMethodMapping {
                             OnOpen.class, clazzPojo));
                 }
             } else if (method.getAnnotation(OnClose.class) != null) {
+                checkPublic(method);
                 if (close == null) {
                     close = method;
                 } else {
@@ -97,6 +100,7 @@ public class PojoMethodMapping {
                             OnClose.class, clazzPojo));
                 }
             } else if (method.getAnnotation(OnError.class) != null) {
+                checkPublic(method);
                 if (error == null) {
                     error = method;
                 } else {
@@ -106,6 +110,7 @@ public class PojoMethodMapping {
                             OnError.class, clazzPojo));
                 }
             } else if (method.getAnnotation(OnMessage.class) != null) {
+                checkPublic(method);
                 onMessage.add(new MessageHandlerInfo(method, decoders));
             } else {
                 // Method not annotated
@@ -117,6 +122,14 @@ public class PojoMethodMapping {
         onOpenParams = getPathParams(onOpen, MethodType.ON_OPEN);
         onCloseParams = getPathParams(onClose, MethodType.ON_CLOSE);
         onErrorParams = getPathParams(onError, MethodType.ON_ERROR);
+    }
+
+
+    private void checkPublic(Method m) throws DeploymentException {
+        if (!Modifier.isPublic(m.getModifiers())) {
+            throw new DeploymentException(sm.getString(
+                    "pojoMethodMapping.methodNotPublic", m.getName()));
+        }
     }
 
 
