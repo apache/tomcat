@@ -20,11 +20,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
@@ -88,10 +88,9 @@ public class WsServerContainer extends WsWebSocketContainer
 
     private volatile ServletContext servletContext = null;
     private final Map<String,ServerEndpointConfig> configExactMatchMap =
-            new HashMap<>();
-    private final Map<Integer,SortedSet<TemplatePathMatch>>
-            configTemplateMatchMap = new HashMap<>();
-
+            new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer,SortedSet<TemplatePathMatch>>
+            configTemplateMatchMap = new ConcurrentHashMap<>();
 
     private WsServerContainer() {
         // Hide default constructor
@@ -231,9 +230,12 @@ public class WsServerContainer extends WsWebSocketContainer
             SortedSet<TemplatePathMatch> templateMatches =
                     configTemplateMatchMap.get(key);
             if (templateMatches == null) {
+                // Ensure that if concurrent threads execute this block they
+                // both end up using the same TreeSet instance
                 templateMatches = new TreeSet<>(
                         TemplatePathMatchComparator.getInstance());
-                configTemplateMatchMap.put(key, templateMatches);
+                configTemplateMatchMap.putIfAbsent(key, templateMatches);
+                templateMatches = configTemplateMatchMap.get(key);
             }
             templateMatches.add(new TemplatePathMatch(sec, uriTemplate));
         } else {
@@ -244,6 +246,7 @@ public class WsServerContainer extends WsWebSocketContainer
 
 
     public WsMappingResult findMapping(String path) {
+
 
         // Check an exact match. Simple case as there are no templates.
         ServerEndpointConfig sec = configExactMatchMap.get(path);
