@@ -1553,9 +1553,9 @@ public class JNDIRealm extends RealmBase {
                     password = password.substring(5);
                     md.reset();
                     md.update(credentials.getBytes(B2CConverter.ISO_8859_1));
-                    byte[] decoded = Base64.decodeBase64(md.digest());
+                    byte[] encoded = Base64.encodeBase64(md.digest());
                     String digestedPassword =
-                            new String(decoded, B2CConverter.ISO_8859_1);
+                            new String(encoded, B2CConverter.ISO_8859_1);
                     validated = password.equals(digestedPassword);
                 }
             } else if (password.startsWith("{SSHA}")) {
