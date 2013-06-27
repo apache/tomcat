@@ -375,7 +375,7 @@ public class PojoMethodMapping {
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
                 } else {
-                    if (decoderMatch != null || decoderMatch.hasMatches()) {
+                    if (decoderMatch != null && decoderMatch.hasMatches()) {
                         throw new IllegalArgumentException(sm.getString(
                                 "pojoMethodMapping.duplicateMessageParam",
                                 m.getName(), m.getDeclaringClass().getName()));
