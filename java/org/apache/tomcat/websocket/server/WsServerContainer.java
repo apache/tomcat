@@ -91,6 +91,7 @@ public class WsServerContainer extends WsWebSocketContainer
             new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer,SortedSet<TemplatePathMatch>>
             configTemplateMatchMap = new ConcurrentHashMap<>();
+    private volatile boolean addAllowed = true;
 
     private WsServerContainer() {
         // Hide default constructor
@@ -139,6 +140,12 @@ public class WsServerContainer extends WsWebSocketContainer
     @Override
     public void addEndpoint(ServerEndpointConfig sec)
             throws DeploymentException {
+
+        if (!addAllowed) {
+            throw new DeploymentException(
+                    sm.getString("serverContainer.addNotAllowed"));
+        }
+
         if (servletContext == null) {
             throw new DeploymentException(
                     sm.getString("serverContainer.servletContextMissing"));
@@ -229,6 +236,12 @@ public class WsServerContainer extends WsWebSocketContainer
 
 
     public WsMappingResult findMapping(String path) {
+
+        // Prevent registering additional endpoints once the first attempt has
+        // been made to use one
+        if (addAllowed) {
+            addAllowed = false;
+        }
 
         // Check an exact match. Simple case as there are no templates.
         ServerEndpointConfig sec = configExactMatchMap.get(path);
