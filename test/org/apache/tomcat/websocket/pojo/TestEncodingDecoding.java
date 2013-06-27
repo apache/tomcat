@@ -108,7 +108,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         Assert.assertEquals(MESSAGE_ONE,
                 ((MsgString) MsgStringMessageHandler.received.peek()).getData());
         Assert.assertEquals(MESSAGE_ONE,
-                ((MsgString) client.received.peek()).getData());
+                new String(((MsgByte) client.received.peek()).getData()));
         session.close();
     }
 
@@ -272,8 +272,8 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         public void onMessage(MsgString in) {
             received.add(in);
             try {
-                MsgString msg = new MsgString();
-                msg.setData(MESSAGE_ONE);
+                MsgByte msg = new MsgByte();
+                msg.setData(MESSAGE_ONE.getBytes());
                 session.getBasicRemote().sendObject(msg);
             } catch (IOException | EncodeException e) {
                 e.printStackTrace();
@@ -368,6 +368,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             reply.put((byte) 0x12);
             reply.put((byte) 0x34);
             reply.put(data);
+            reply.flip();
             return reply;
         }
     }
@@ -388,7 +389,6 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         @Override
         public MsgByte decode(ByteBuffer bb) throws DecodeException {
             MsgByte result = new MsgByte();
-            bb.position(bb.position() + 2);
             byte[] data = new byte[bb.limit() - bb.position()];
             bb.get(data);
             result.setData(data);
