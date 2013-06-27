@@ -151,6 +151,8 @@ public class WsServerContainer extends WsWebSocketContainer
             SortedSet<TemplatePathMatch> templateMatches =
                     configTemplateMatchMap.get(key);
             if (templateMatches == null) {
+                // Ensure that if concurrent threads execute this block they
+                // both end up using the same TreeSet instance
                 templateMatches = new TreeSet<>(
                         TemplatePathMatchComparator.getInstance());
                 configTemplateMatchMap.putIfAbsent(key, templateMatches);
@@ -191,9 +193,6 @@ public class WsServerContainer extends WsWebSocketContainer
         }
         String path = annotation.value();
 
-        // Uri Template
-        UriTemplate uriTemplate = new UriTemplate(path);
-
         // Validate encoders
         validateEncoders(annotation.encoders());
 
@@ -225,33 +224,7 @@ public class WsServerContainer extends WsWebSocketContainer
                 PojoEndpointServer.POJO_METHOD_MAPPING_KEY,
                 methodMapping);
 
-
-        if (uriTemplate.hasParameters()) {
-            Integer key = Integer.valueOf(uriTemplate.getSegmentCount());
-            SortedSet<TemplatePathMatch> templateMatches =
-                    configTemplateMatchMap.get(key);
-            if (templateMatches == null) {
-                // Ensure that if concurrent threads execute this block they
-                // both end up using the same TreeSet instance
-                templateMatches = new TreeSet<>(
-                        TemplatePathMatchComparator.getInstance());
-                configTemplateMatchMap.putIfAbsent(key, templateMatches);
-                templateMatches = configTemplateMatchMap.get(key);
-            }
-            if (!templateMatches.add(new TemplatePathMatch(sec, uriTemplate))) {
-                // Duplicate uriTemplate;
-                throw new DeploymentException(
-                        sm.getString("serverContainer.duplicatePaths", path));
-            }
-        } else {
-            // Exact match
-            ServerEndpointConfig old = configExactMatchMap.put(path, sec);
-            if (old != null) {
-                // Duplicate path mappings
-                throw new DeploymentException(
-                        sm.getString("serverContainer.duplicatePaths", path));
-            }
-        }
+        addEndpoint(sec);
     }
 
 
