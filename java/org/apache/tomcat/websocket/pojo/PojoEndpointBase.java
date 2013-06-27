@@ -123,7 +123,10 @@ public abstract class PojoEndpointBase extends Endpoint {
     @Override
     public final void onError(Session session, Throwable throwable) {
 
-        if (methodMapping.getOnError() != null) {
+        if (methodMapping.getOnError() == null) {
+            log.error(sm.getString("pojoEndpointBase.onError",
+                    pojo.getClass().getName()), throwable);
+        } else {
             try {
                 methodMapping.getOnError().invoke(
                         pojo,
