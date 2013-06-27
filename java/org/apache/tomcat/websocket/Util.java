@@ -366,8 +366,11 @@ public class Util {
         // More complex case - listener that requires a decoder
             DecoderMatch decoderMatch;
             try {
-                decoderMatch = new DecoderMatch(target,
-                        endpointConfig.getDecoders());
+                List<Class<? extends Decoder>> decoders =
+                        endpointConfig.getDecoders();
+                List<DecoderEntry> decoderEntries = getDecoders(
+                        decoders.toArray(new Class[decoders.size()]));
+                decoderMatch = new DecoderMatch(target, decoderEntries);
             } catch (DeploymentException e) {
                 throw new IllegalArgumentException(e);
             }
@@ -410,7 +413,7 @@ public class Util {
         }
     }
 
-    private static class DecoderMatch {
+    public static class DecoderMatch {
 
         private final List<Class<? extends Decoder>> textDecoders =
                 new ArrayList<>();
@@ -418,10 +421,7 @@ public class Util {
                 new ArrayList<>();
 
 
-        public DecoderMatch(Class<?> target, List<Class<? extends Decoder>> decoders)
-                throws DeploymentException {
-            List<DecoderEntry> decoderEntries = getDecoders(
-                    decoders.toArray(new Class[decoders.size()]));
+        public DecoderMatch(Class<?> target, List<DecoderEntry> decoderEntries) {
             for (DecoderEntry decoderEntry : decoderEntries) {
                 if (decoderEntry.getClazz().isAssignableFrom(target)) {
                     if (Binary.class.isAssignableFrom(
@@ -464,6 +464,11 @@ public class Util {
 
         public List<Class<? extends Decoder>> getBinaryDecoders() {
             return binaryDecoders;
+        }
+
+
+        public boolean hasMatches() {
+            return (textDecoders.size() > 0) || (binaryDecoders.size() > 0);
         }
     }
 }
