@@ -77,7 +77,7 @@ public class PojoMethodMapping {
         Method open = null;
         Method close = null;
         Method error = null;
-        for (Method method : clazzPojo.getMethods()) {
+        for (Method method : clazzPojo.getDeclaredMethods()) {
             if (method.getAnnotation(OnOpen.class) != null) {
                 if (open == null) {
                     open = method;
