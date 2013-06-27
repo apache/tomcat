@@ -1879,42 +1879,18 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
     @Test
     public void testDispatchWithCustomRequestResponse() throws Exception {
-        // Setup Tomcat instance
-        Tomcat tomcat = getTomcatInstance();
-
-        // Must have a real docBase - just use temp
-        File docBase = new File(System.getProperty("java.io.tmpdir"));
-
-        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
-
-        DispatchingGenericServlet dispatch = new DispatchingGenericServlet();
-        Wrapper wrapper = Tomcat.addServlet(ctx, "dispatch", dispatch);
-        wrapper.setAsyncSupported(true);
-        ctx.addServletMapping("/dispatch", "dispatch");
-
-        CustomGenericServlet customGeneric = new CustomGenericServlet();
-        Wrapper wrapper2 = Tomcat.addServlet(ctx, "customGeneric",
-                customGeneric);
-        wrapper2.setAsyncSupported(true);
-        ctx.addServletMapping("/target", "customGeneric");
-
-        tomcat.start();
-
-        ByteChunk res = getUrl("http://localhost:" + getPort()
-                + "/dispatch?crr=y");
+        prepareApplicationWithGenericServlet("");
 
         StringBuilder expected = new StringBuilder();
         expected.append("OK");
         expected.append("CustomGenericServletGet-");
-        assertEquals(expected.toString(), res.toString());
-
-        res = getUrl("http://localhost:" + getPort()
-                + "/dispatch?crr=y&empty=y");
+        requestApplicationWithGenericServlet("/dispatch?crr=y", expected);
 
         expected = new StringBuilder();
         expected.append("OK");
         expected.append("DispatchingGenericServletGet-");
-        assertEquals(expected.toString(), res.toString());
+        requestApplicationWithGenericServlet("/dispatch?crr=y&empty=y",
+                expected);
     }
 
     private static class CustomGenericServlet extends GenericServlet {
@@ -1930,5 +1906,76 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             }
         }
 
+    }
+
+    @Test
+    public void testEmptyDispatch() throws Exception {
+        prepareApplicationWithGenericServlet("/fo o");
+        StringBuilder expected = new StringBuilder();
+        expected.append("OK");
+        expected.append("DispatchingGenericServletGet-");
+        requestApplicationWithGenericServlet("/fo%20o/dispatch?empty=y",
+                expected);
+        requestApplicationWithGenericServlet("//fo%20o/dispatch?empty=y",
+                expected);
+        requestApplicationWithGenericServlet("/./fo%20o/dispatch?empty=y",
+                expected);
+        requestApplicationWithGenericServlet("/fo%20o//dispatch?empty=y",
+                expected);
+        requestApplicationWithGenericServlet("/fo%20o/./dispatch?empty=y",
+                expected);
+        requestApplicationWithGenericServlet("/fo%20o/c/../dispatch?empty=y",
+                expected);
+    }
+
+    @Test
+    public void testEmptyDispatchWithCustomRequestResponse() throws Exception {
+        prepareApplicationWithGenericServlet("/fo o");
+        StringBuilder expected = new StringBuilder();
+        expected.append("OK");
+        expected.append("DispatchingGenericServletGet-");
+        requestApplicationWithGenericServlet("/fo%20o/dispatch?crr=y&empty=y",
+                expected);
+        requestApplicationWithGenericServlet("//fo%20o/dispatch?crr=y&empty=y",
+                expected);
+        requestApplicationWithGenericServlet(
+                "/./fo%20o/dispatch?crr=y&empty=y", expected);
+        requestApplicationWithGenericServlet("/fo%20o//dispatch?crr=y&empty=y",
+                expected);
+        requestApplicationWithGenericServlet(
+                "/fo%20o/./dispatch?crr=y&empty=y", expected);
+        requestApplicationWithGenericServlet(
+                "/fo%20o/c/../dispatch?crr=y&empty=y", expected);
+    }
+
+    private void prepareApplicationWithGenericServlet(String contextPath)
+            throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+
+        Context ctx = tomcat.addContext(contextPath, docBase.getAbsolutePath());
+
+        DispatchingGenericServlet dispatch = new DispatchingGenericServlet();
+        Wrapper wrapper = Tomcat.addServlet(ctx, "dispatch", dispatch);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/dispatch", "dispatch");
+
+        CustomGenericServlet customGeneric = new CustomGenericServlet();
+        Wrapper wrapper2 = Tomcat.addServlet(ctx, "customGeneric",
+                customGeneric);
+        wrapper2.setAsyncSupported(true);
+        ctx.addServletMapping("/target", "customGeneric");
+
+        tomcat.start();
+    }
+
+    private void requestApplicationWithGenericServlet(String path,
+            StringBuilder expectedContent) throws Exception {
+        ByteChunk res = getUrl("http://localhost:" + getPort() + path);
+
+        assertEquals(expectedContent.toString(), res.toString());
     }
 }
