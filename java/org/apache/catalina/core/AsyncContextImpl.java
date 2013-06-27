@@ -169,17 +169,19 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     public void dispatch() {
         check();
         String path;
-        String cpath;
+        String pathInfo;
         ServletRequest servletRequest = getRequest();
         if (servletRequest instanceof HttpServletRequest) {
             HttpServletRequest sr = (HttpServletRequest) servletRequest;
-            path = sr.getRequestURI();
-            cpath = sr.getContextPath();
+            path = sr.getServletPath();
+            pathInfo = sr.getPathInfo();
         } else {
-            path = request.getRequestURI();
-            cpath = request.getContextPath();
+            path = request.getServletPath();
+            pathInfo = request.getPathInfo();
         }
-        if (cpath.length()>1) path = path.substring(cpath.length());
+        if (pathInfo != null) {
+            path += pathInfo;
+        }
         dispatch(path);
     }
 
