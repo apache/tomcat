@@ -110,6 +110,12 @@
         where ServletRequest/ServletResponse are custom implementations.
         (violetagg)
       </fix>
+      <fix>
+        Correct a regression introduced in 7.0.39 (refactoring of base 64
+        encoding and decoding) that broke the JNDI Realm when
+        <code>userPassword</code> was set and passwords were hashed with MD5 or
+        SHA1. (markt/kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
