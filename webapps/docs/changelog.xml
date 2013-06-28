@@ -116,6 +116,10 @@
         <code>userPassword</code> was set and passwords were hashed with MD5 or
         SHA1. (markt/kkolinko)
       </fix>
+      <fix>
+        Correct the mechanism for the path calculation in
+        <code>AsyncContext.dispatch()</code>. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
