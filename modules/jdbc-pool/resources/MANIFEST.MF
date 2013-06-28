@@ -1,12 +1,13 @@
 Manifest-Version: 1.0
-Export-Package: 
-  org.apache.tomcat.jdbc.pool;version="@VERSION@";
-  uses:="javax.management,javax.naming,javax.naming.spi,javax.sql,
-  org.apache.tomcat.jdbc.pool.jmx",
-  org.apache.tomcat.jdbc.pool.interceptor;version="@VERSION@";
-  uses:="javax.management.openmbean,org.apache.tomcat.jdbc.pool",
-  org.apache.tomcat.jdbc.pool.jmx;version="@VERSION@";
-  uses:="javax.management,org.apache.tomcat.jdbc.pool"
+Export-Package: org.apache.tomcat.jdbc.naming;uses:="javax.naming,org.ap
+ ache.juli.logging,javax.naming.spi";version="@VERSION@",org.apache.tomc
+ at.jdbc.pool;uses:="org.apache.juli.logging,javax.sql,org.apache.tomcat
+ .jdbc.pool.jmx,javax.management,javax.naming,javax.naming.spi,org.apach
+ e.tomcat.jdbc.pool.interceptor";version="@VERSION@",org.apache.tomcat.j
+ dbc.pool.interceptor;uses:="org.apache.tomcat.jdbc.pool,org.apache.juli
+ .logging,javax.management.openmbean,javax.management";version="@VERSION@
+ ",org.apache.tomcat.jdbc.pool.jmx;uses:="org.apache.tomcat.jdbc.pool,or
+ g.apache.juli.logging,javax.management";version="@VERSION@"
 Ant-Version: Apache Ant 1.7.0
 Bundle-Vendor: Apache Software Foundation
 Bundle-Version: @VERSION@
@@ -20,4 +21,4 @@ Import-Package:
   javax.naming;version="0",
   javax.naming.spi;version="0",
   javax.sql;version="0",
-  org.apache.juli.logging;version="[6.0.18, 7.1.0)"
+  org.apache.juli.logging;version="0"
