@@ -51,6 +51,8 @@ public class JasperELResolver extends CompositeELResolver {
         for (ELResolver appResolver : appResolvers) {
             add(appResolver);
         }
+        // TODO ExpressionFactory.getStreamELResolver()
+        // TODO javax.el.StaticFieldResolver
         add(new MapELResolver());
         add(new ResourceBundleELResolver());
         add(new ListELResolver());
@@ -80,6 +82,7 @@ public class JasperELResolver extends CompositeELResolver {
         throws NullPointerException, PropertyNotFoundException, ELException {
         context.setPropertyResolved(false);
 
+        // TODO Review this once the additional resolvers have been implemented
         int start;
         Object result = null;
 

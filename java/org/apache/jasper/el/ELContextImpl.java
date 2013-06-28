@@ -128,6 +128,8 @@ public final class ELContextImpl extends ELContext {
     public static ELResolver getDefaultResolver() {
         if (Constants.IS_SECURITY_ENABLED) {
             CompositeELResolver defaultResolver = new CompositeELResolver();
+            // TODO ExpressionFactory.getStreamELResolver()
+            // TODO javax.el.StaticFieldResolver
             defaultResolver.add(new MapELResolver());
             defaultResolver.add(new ResourceBundleELResolver());
             defaultResolver.add(new ListELResolver());
