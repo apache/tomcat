@@ -77,9 +77,13 @@ public class WsFilter implements Filter {
                 !(response instanceof HttpServletResponse) ||
                 !headerContainsToken((HttpServletRequest) request,
                         Constants.UPGRADE_HEADER_NAME,
-                        Constants.UPGRADE_HEADER_VALUE)) {
+                        Constants.UPGRADE_HEADER_VALUE) ||
+                !"GET".equals(((HttpServletRequest) request).getMethod())) {
             // Not an HTTP request that includes a valid upgrade request to
             // web socket
+            // Note: RFC 2616 does not limit HTTP upgrade to GET requests but
+            //       the the Java WebSocket spec 1.0, section 8.2 implies such a
+            //       limitation
             chain.doFilter(request, response);
             return;
         }
