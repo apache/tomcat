@@ -280,6 +280,19 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
     public void service (HttpServletRequest request,
                              HttpServletResponse response)
                 throws ServletException, IOException {
+
+        String method = request.getMethod();
+
+        if (!"GET".equals(method) && !"POST".equals(method) &&
+                !"HEAD".equals(method)) {
+            // Specification states behaviour is undefined
+            // Jasper opts to reject any other verbs, partly as they are
+            // unlikely to make sense in a JSP context and partly to protect
+            // against verb tampering
+            response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED,
+                    Localizer.getMessage("jsp.error.servlet.invalid.method"));
+        }
+
         //jspFile may be configured as an init-param for this servlet instance
         String jspUri = jspFile;
 
