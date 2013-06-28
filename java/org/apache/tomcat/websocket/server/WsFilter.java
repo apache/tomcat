@@ -83,7 +83,8 @@ public class WsFilter implements Filter {
             // web socket
             // Note: RFC 2616 does not limit HTTP upgrade to GET requests but
             //       the the Java WebSocket spec 1.0, section 8.2 implies such a
-            //       limitation
+            //       limitation and RFC 6455 section 4.1 requires that a
+            //       WebSocket Upgrade uses GET.
             chain.doFilter(request, response);
             return;
         }
