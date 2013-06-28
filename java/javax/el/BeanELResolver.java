@@ -211,7 +211,7 @@ public class BeanELResolver extends ELResolver {
         return null;
     }
 
-    protected static final class BeanProperties {
+    static final class BeanProperties {
         private final Map<String, BeanProperty> properties;
 
         private final Class<?> type;
@@ -250,7 +250,7 @@ public class BeanELResolver extends ELResolver {
         }
     }
 
-    protected static final class BeanProperty {
+    static final class BeanProperty {
         private final Class<?> type;
 
         private final Class<?> owner;
