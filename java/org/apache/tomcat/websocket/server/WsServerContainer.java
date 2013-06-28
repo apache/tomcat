@@ -304,22 +304,24 @@ public class WsServerContainer extends WsWebSocketContainer
     /**
      * {@inheritDoc}
      *
-     * Overridden to make them visible to other classes in this package.
+     * Overridden to make it visible to other classes in this package.
      */
     @Override
-    protected void registerSession(Class<?> endpoint, WsSession wsSession) {
-        super.registerSession(endpoint, wsSession);
+    protected void registerSession(Object endpointInstance,
+            WsSession wsSession) {
+        super.registerSession(endpointInstance, wsSession);
     }
 
 
     /**
      * {@inheritDoc}
      *
-     * Overridden to make them visible to other classes in this package.
+     * Overridden to make it visible to other classes in this package.
      */
     @Override
-    protected void unregisterSession(Class<?> endpoint, WsSession wsSession) {
-        super.unregisterSession(endpoint, wsSession);
+    protected void unregisterSession(Object endpointInstance,
+            WsSession wsSession) {
+        super.unregisterSession(endpointInstance, wsSession);
     }
 
 
