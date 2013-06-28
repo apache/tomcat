@@ -156,6 +156,17 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>55031</bug>: Fixed <code>Export-Package</code> header and
+        <code>uses</code> directives in MANIFEST.MF. Change the version for
+        package <code>org.apache.juli.logging</code> to "0" in
+        <code>Import-Package</code> header. Thus any version of that package
+        can be used. Patch provided by Martin Lichtin. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
