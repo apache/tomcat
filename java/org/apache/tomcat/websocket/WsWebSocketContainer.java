@@ -345,10 +345,9 @@ public class WsWebSocketContainer
     }
 
 
-    protected void registerSession(Object endpointInstance,
-            WsSession wsSession) {
+    protected void registerSession(Endpoint endpoint, WsSession wsSession) {
 
-        Class<?> endpointClazz = endpointInstance.getClass();
+        Class<?> endpointClazz = endpoint.getClass();
 
         if (!wsSession.isOpen()) {
             // The session was closed during onOpen. No need to register it.
@@ -369,10 +368,9 @@ public class WsWebSocketContainer
     }
 
 
-    protected void unregisterSession(Object endpointInstance,
-            WsSession wsSession) {
+    protected void unregisterSession(Endpoint endpoint, WsSession wsSession) {
 
-        Class<?> endpointClazz = endpointInstance.getClass();
+        Class<?> endpointClazz = endpoint.getClass();
 
         synchronized (endPointSessionMapLock) {
             Set<WsSession> wsSessions = endpointSessionMap.get(endpointClazz);

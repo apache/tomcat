@@ -126,11 +126,14 @@ public class WsSci implements ServletContainerInitializer {
 
 
     static WsServerContainer init(ServletContext servletContext) {
+
         WsServerContainer sc = WsServerContainer.getServerContainer();
         sc.setServletContext(servletContext);
 
         servletContext.setAttribute(
                 Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE, sc);
+
+        servletContext.addListener(new WsSessionListener(sc));
 
         return sc;
     }

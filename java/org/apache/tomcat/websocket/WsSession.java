@@ -523,7 +523,7 @@ public class WsSession implements Session {
     }
 
 
-    protected String getHttpSessionId() {
+    public String getHttpSessionId() {
         return httpSessionId;
     }
 

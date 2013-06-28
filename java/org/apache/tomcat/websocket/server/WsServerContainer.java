@@ -16,11 +16,13 @@
  */
 package org.apache.tomcat.websocket.server;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
@@ -29,8 +31,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
+import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
 import javax.websocket.Encoder;
+import javax.websocket.Endpoint;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
@@ -62,7 +67,10 @@ public class WsServerContainer extends WsWebSocketContainer
     private static final Object classLoaderContainerMapLock = new Object();
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
-
+    private static final CloseReason AUTHENTICATED_HTTP_SESSION_CLOSED =
+            new CloseReason(CloseCodes.VIOLATED_POLICY,
+                    "This connection was established under an authenticated " +
+                    "HTTP session that has ended.");
 
     public static WsServerContainer getServerContainer() {
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
@@ -92,6 +100,8 @@ public class WsServerContainer extends WsWebSocketContainer
     private final ConcurrentHashMap<Integer,SortedSet<TemplatePathMatch>>
             configTemplateMatchMap = new ConcurrentHashMap<>();
     private volatile boolean addAllowed = true;
+    private final ConcurrentHashMap<String,Set<WsSession>> authenticatedSessions =
+            new ConcurrentHashMap<>();
 
     private WsServerContainer() {
         // Hide default constructor
@@ -307,9 +317,13 @@ public class WsServerContainer extends WsWebSocketContainer
      * Overridden to make it visible to other classes in this package.
      */
     @Override
-    protected void registerSession(Object endpointInstance,
-            WsSession wsSession) {
-        super.registerSession(endpointInstance, wsSession);
+    protected void registerSession(Endpoint endpoint, WsSession wsSession) {
+        super.registerSession(endpoint, wsSession);
+        if (wsSession.getUserPrincipal() != null &&
+                wsSession.getHttpSessionId() != null) {
+            registerAuthenticatedSession(wsSession,
+                    wsSession.getHttpSessionId());
+        }
     }
 
 
@@ -319,11 +333,48 @@ public class WsServerContainer extends WsWebSocketContainer
      * Overridden to make it visible to other classes in this package.
      */
     @Override
-    protected void unregisterSession(Object endpointInstance,
-            WsSession wsSession) {
-        super.unregisterSession(endpointInstance, wsSession);
+    protected void unregisterSession(Endpoint endpoint, WsSession wsSession) {
+        if (wsSession.getUserPrincipal() != null &&
+                wsSession.getHttpSessionId() != null) {
+            unregisterAuthenticatedSession(wsSession,
+                    wsSession.getHttpSessionId());
+        }
+        super.unregisterSession(endpoint, wsSession);
     }
 
+
+    private void registerAuthenticatedSession(WsSession wsSession,
+            String httpSessionId) {
+        Set<WsSession> wsSessions = authenticatedSessions.get(httpSessionId);
+        if (wsSession == null) {
+            wsSessions = Collections.newSetFromMap(
+                     new ConcurrentHashMap<WsSession,Boolean>());
+             authenticatedSessions.putIfAbsent(httpSessionId, wsSessions);
+             wsSessions = authenticatedSessions.get(httpSessionId);
+        }
+        wsSessions.add(wsSession);
+    }
+
+
+    private void unregisterAuthenticatedSession(WsSession wsSession,
+            String httpSessionId) {
+        Set<WsSession> wsSessions = authenticatedSessions.get(httpSessionId);
+        wsSessions.remove(wsSession);
+    }
+
+
+    public void closeAuthenticatedSession(String httpSessionId) {
+        Set<WsSession> wsSessions = authenticatedSessions.remove(httpSessionId);
+
+        for (WsSession wsSession : wsSessions) {
+            try {
+                wsSession.close(AUTHENTICATED_HTTP_SESSION_CLOSED);
+            } catch (IOException e) {
+                // Any IOExceptions during close will have been caught and the
+                // onError method called.
+            }
+        }
+    }
 
     private static void validateEncoders(Class<? extends Encoder>[] encoders)
             throws DeploymentException {
