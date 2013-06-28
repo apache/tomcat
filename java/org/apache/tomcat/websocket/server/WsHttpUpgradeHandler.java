@@ -24,6 +24,7 @@ import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 import javax.websocket.CloseReason;
@@ -99,6 +100,12 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
             throw new IllegalStateException(e);
         }
 
+        String httpSessionId = null;
+        Object session = handshakeRequest.getHttpSession();
+        if (session != null ) {
+            httpSessionId = ((HttpSession) session).getId();
+        }
+
         // Need to call onOpen using the web application's class loader
         // Create the frame using the application's class loader so it can pick
         // up application specific config from the ServerContainerImpl
@@ -112,8 +119,8 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
                     webSocketContainer, handshakeRequest.getRequestURI(),
                     handshakeRequest.getParameterMap(),
                     handshakeRequest.getQueryString(),
-                    handshakeRequest.getUserPrincipal(), subProtocol,
-                    pathParameters, secure, endpointConfig);
+                    handshakeRequest.getUserPrincipal(), httpSessionId,
+                    subProtocol, pathParameters, secure, endpointConfig);
             WsFrameServer wsFrame = new WsFrameServer(
                     sis,
                     wsSession);

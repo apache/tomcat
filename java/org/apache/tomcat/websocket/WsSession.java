@@ -69,6 +69,7 @@ public class WsSession implements Session {
     private final String subProtocol;
     private final Map<String,String> pathParameters;
     private final boolean secure;
+    private final String httpSessionId;
     private final String id;
 
     // Expected to handle message types of <String> only
@@ -100,8 +101,8 @@ public class WsSession implements Session {
             WsRemoteEndpointImplBase wsRemoteEndpoint,
             WsWebSocketContainer wsWebSocketContainer,
             URI requestUri, Map<String,List<String>> requestParameterMap,
-            String queryString, Principal userPrincipal, String subProtocol,
-            Map<String,String> pathParameters,
+            String queryString, Principal userPrincipal, String httpSessionId,
+            String subProtocol, Map<String,String> pathParameters,
             boolean secure, EndpointConfig endpointConfig)
                     throws DeploymentException {
         this.localEndpoint = localEndpoint;
@@ -127,6 +128,7 @@ public class WsSession implements Session {
         }
         this.queryString = queryString;
         this.userPrincipal = userPrincipal;
+        this.httpSessionId = httpSessionId;
         if (subProtocol == null) {
             this.subProtocol = "";
         } else {
@@ -519,6 +521,11 @@ public class WsSession implements Session {
 
     public Endpoint getLocal() {
         return localEndpoint;
+    }
+
+
+    protected String getHttpSessionId() {
+        return httpSessionId;
     }
 
 
