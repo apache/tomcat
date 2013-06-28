@@ -35,6 +35,23 @@ public class ArrayELResolver extends ELResolver {
     }
 
     @Override
+    public Class<?> getType(ELContext context, Object base, Object property)
+            throws NullPointerException, PropertyNotFoundException, ELException {
+        if (context == null) {
+            throw new NullPointerException();
+        }
+
+        if (base != null && base.getClass().isArray()) {
+            context.setPropertyResolved(true);
+            int idx = coerce(property);
+            checkBounds(base, idx);
+            return base.getClass().getComponentType();
+        }
+
+        return null;
+    }
+
+    @Override
     public Object getValue(ELContext context, Object base, Object property)
             throws NullPointerException, PropertyNotFoundException, ELException {
         if (context == null) {
@@ -48,23 +65,6 @@ public class ArrayELResolver extends ELResolver {
                 return null;
             }
             return Array.get(base, idx);
-        }
-
-        return null;
-    }
-
-    @Override
-    public Class<?> getType(ELContext context, Object base, Object property)
-            throws NullPointerException, PropertyNotFoundException, ELException {
-        if (context == null) {
-            throw new NullPointerException();
-        }
-
-        if (base != null && base.getClass().isArray()) {
-            context.setPropertyResolved(true);
-            int idx = coerce(property);
-            checkBounds(base, idx);
-            return base.getClass().getComponentType();
         }
 
         return null;
