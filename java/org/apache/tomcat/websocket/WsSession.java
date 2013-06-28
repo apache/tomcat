@@ -464,8 +464,7 @@ public class WsSession implements Session {
             wsRemoteEndpoint.close();
             localEndpoint.onError(this, ioe);
         } finally {
-            webSocketContainer.unregisterSession(
-                    localEndpoint.getClass(), this);
+            webSocketContainer.unregisterSession(localEndpoint, this);
         }
 
     }

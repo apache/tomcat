@@ -334,7 +334,7 @@ public class WsWebSocketContainer
                 Collections.EMPTY_MAP, false,
                 clientEndpointConfiguration);
         endpoint.onOpen(wsSession, clientEndpointConfiguration);
-        registerSession(endpoint.getClass(), wsSession);
+        registerSession(endpoint, wsSession);
 
         // Object creation will trigger input processing
         @SuppressWarnings("unused")
@@ -345,7 +345,11 @@ public class WsWebSocketContainer
     }
 
 
-    protected void registerSession(Class<?> endpoint, WsSession wsSession) {
+    protected void registerSession(Object endpointInstance,
+            WsSession wsSession) {
+
+        Class<?> endpointClazz = endpointInstance.getClass();
+
         if (!wsSession.isOpen()) {
             // The session was closed during onOpen. No need to register it.
             return;
@@ -354,10 +358,10 @@ public class WsWebSocketContainer
             if (endpointSessionMap.size() == 0) {
                 BackgroundProcessManager.getInstance().register(this);
             }
-            Set<WsSession> wsSessions = endpointSessionMap.get(endpoint);
+            Set<WsSession> wsSessions = endpointSessionMap.get(endpointClazz);
             if (wsSessions == null) {
                 wsSessions = new HashSet<>();
-                endpointSessionMap.put(endpoint, wsSessions);
+                endpointSessionMap.put(endpointClazz, wsSessions);
             }
             wsSessions.add(wsSession);
         }
@@ -365,13 +369,17 @@ public class WsWebSocketContainer
     }
 
 
-    protected void unregisterSession(Class<?> endpoint, WsSession wsSession) {
+    protected void unregisterSession(Object endpointInstance,
+            WsSession wsSession) {
+
+        Class<?> endpointClazz = endpointInstance.getClass();
+
         synchronized (endPointSessionMapLock) {
-            Set<WsSession> wsSessions = endpointSessionMap.get(endpoint);
+            Set<WsSession> wsSessions = endpointSessionMap.get(endpointClazz);
             if (wsSessions != null) {
                 wsSessions.remove(wsSession);
                 if (wsSessions.size() == 0) {
-                    endpointSessionMap.remove(endpoint);
+                    endpointSessionMap.remove(endpointClazz);
                 }
             }
             if (endpointSessionMap.size() == 0) {

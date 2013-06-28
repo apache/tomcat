@@ -128,7 +128,7 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
             sos.setWriteListener(
                     new WsWriteListener(this, wsRemoteEndpointServer));
             ep.onOpen(wsSession, endpointConfig);
-            webSocketContainer.registerSession(ep.getClass(), wsSession);
+            webSocketContainer.registerSession(ep, wsSession);
         } catch (DeploymentException e) {
             throw new IllegalArgumentException(e);
         } finally {
