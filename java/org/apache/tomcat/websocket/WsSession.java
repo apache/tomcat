@@ -445,6 +445,7 @@ public class WsSession implements Session {
         }
     }
 
+
     private void sendCloseMessage(CloseReason closeReason) {
         // 125 is maximum size for the payload of a control message
         ByteBuffer msg = ByteBuffer.allocate(125);
@@ -466,7 +467,6 @@ public class WsSession implements Session {
         } finally {
             webSocketContainer.unregisterSession(localEndpoint, this);
         }
-
     }
 
 
