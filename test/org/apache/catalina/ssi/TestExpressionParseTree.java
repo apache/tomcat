@@ -114,6 +114,28 @@ public class TestExpressionParseTree {
     }
 
 
+    @Test
+    public void testBug55176a() throws Exception {
+        SSIExternalResolver r = new TesterSSIExternalResolver();
+        r.setVariableValue("QUERY_STRING", "a=");
+        SSIMediator mediator = new SSIMediator(r, LAST_MODIFIED);
+        ExpressionParseTree ept =
+                new ExpressionParseTree("$QUERY_STRING = /a=/", mediator);
+        Assert.assertTrue(ept.evaluateTree());
+    }
+
+
+    @Test
+    public void testBug55176b() throws Exception {
+        SSIExternalResolver r = new TesterSSIExternalResolver();
+        r.setVariableValue("QUERY_STRING", "a");
+        SSIMediator mediator = new SSIMediator(r, LAST_MODIFIED);
+        ExpressionParseTree ept =
+                new ExpressionParseTree("$QUERY_STRING = /a=/", mediator);
+        Assert.assertFalse(ept.evaluateTree());
+    }
+
+
     /**
      * Minimal implementation that provides the bare essentials require for the
      * unit tests.
