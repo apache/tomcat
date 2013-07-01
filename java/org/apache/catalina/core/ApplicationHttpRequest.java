@@ -910,9 +910,10 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         public AttributeNamesEnumerator() {
             int last = -1;
             parentEnumeration = getRequest().getAttributeNames();
-            for (int i = 0; i < specialAttributes.length; i++) {
+            for (int i = specialAttributes.length - 1; i >= 0; i--) {
                 if (getAttribute(specials[i]) != null) {
                     last = i;
+                    break;
                 }
             }
             this.last = last;
