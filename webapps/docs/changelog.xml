@@ -129,6 +129,10 @@
         <bug>55155</bug>: Avoid constant focus grabbing when running the Tomcat
         unit tests under Java 6 on OSX. Patch provided by Casey Lucas. (markt)
       </fix>
+      <fix>
+        <bug>55160</bug>: Don't ignore connectionUploadTimeout setting when
+        using HTTP NIO connector. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
