@@ -130,11 +130,6 @@
         Change default configuration so that a change to the global web.xml file
         will trigger a reload of all web applications. (markt)
       </add>
-      <add>
-        <bug>55017</bug>: Add the ability to configure the RMI bind address when
-        using the JMX remote lifecycle listener. Patch provided by Alexey
-        Noskov. (markt)
-      </add>
       <fix>
         <bug>55101</bug>: Make BASIC authentication more tolerant of whitespace.
         Patch provided by Brian Burch. (markt)
