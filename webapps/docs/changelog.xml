@@ -70,6 +70,12 @@
         methods that does not include GET. (markt)
       </fix>
       <fix>
+        <bug>53777</bug>: Add support for a JAAS Realm instance to use a
+        dedicated configuration rather than the JVM global JAAS configuration.
+        This is most likely to be useful for per web application JAAS Realms.
+        Based on a patch by eolivelli. (markt)
+      </fix>
+      <fix>
         <bug>54745</bug>: Fix JAR file scanning when Tomcat is deployed via Java
         Web Start. Patch provided by Nick Williams. (markt)
       </fix>

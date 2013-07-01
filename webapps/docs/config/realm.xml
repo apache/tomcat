@@ -850,6 +850,14 @@
         for your user <code>Principals</code>.</p>
       </attribute>
 
+      <attribute name="configFile" required="false">
+        <p>The name of a JAAS configuration file to use with this Realm. It will
+        be searched for using <code>ClassLoader#getResource(String)</code> so it
+        is possible for the configuration to be bundled within a web
+        application. If not specified, the default JVM global JAAS configuration
+        willbe used.</p>
+      </attribute>
+
       <attribute name="roleClassNames" required="false">
         <p>A comma-separated list of the names of the classes that you have made
         for your role <code>Principals</code>.</p>

@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.realm;
 
-
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,6 +29,7 @@ import java.util.List;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.AccountExpiredException;
+import javax.security.auth.login.Configuration;
 import javax.security.auth.login.CredentialExpiredException;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginContext;
@@ -38,7 +41,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-
 
 /**
  * <p>Implementation of <b>Realm</b> that authenticates users via the <em>Java
@@ -125,9 +127,8 @@ org.foobar.auth.DatabaseLoginModule REQUIRED
  * @version $Id$
  */
 
-public class JAASRealm
-    extends RealmBase
- {
+public class JAASRealm extends RealmBase {
+
     private static final Log log = LogFactory.getLog(JAASRealm.class);
 
     // ----------------------------------------------------- Instance Variables
@@ -170,12 +171,35 @@ public class JAASRealm
      * True means use context ClassLoader, and True is the default
      * value.
      */
-     protected boolean useContextClassLoader = true;
+    protected boolean useContextClassLoader = true;
+
+
+    /**
+     * Path to find a JAAS configuration file, if not set global JVM JAAS
+     * configuration will be used.
+     */
+    protected String configFile;
+
+    protected Configuration jaasConfiguration;
+    protected volatile boolean jaasConfigurationLoaded = false;
 
 
     // ------------------------------------------------------------- Properties
 
-    
+    /**
+     * Getter for the <code>configfile</code> member variable.
+     */
+    public String getConfigFile() {
+        return configFile;
+    }
+
+    /**
+     * Setter for the <code>configfile</code> member variable.
+     */
+    public void setConfigFile(String configFile) {
+        this.configFile = configFile;
+    }
+
     /**
      * setter for the <code>appName</code> member variable
      */
@@ -389,7 +413,9 @@ public class JAASRealm
         }
 
         try {
-            loginContext = new LoginContext(appName, callbackHandler);
+            Configuration config = getConfig();
+            loginContext = new LoginContext(
+                    appName, null, callbackHandler, config);
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
             log.error(sm.getString("jaasRealm.unexpectedError"), e);
@@ -605,4 +631,50 @@ public class JAASRealm
 
         super.startInternal();
      }
+
+
+    /**
+     * Load custom JAAS Configuration
+     */
+    protected Configuration getConfig() {
+        try {
+            if (jaasConfigurationLoaded) {
+                return jaasConfiguration;
+            }
+            synchronized (this) {
+                if (configFile == null) {
+                    jaasConfigurationLoaded = true;
+                    return null;
+                }
+                URL resource = Thread.currentThread().getContextClassLoader().
+                        getResource(configFile);
+                URI uri = resource.toURI();
+                Class<Configuration> sunConfigFile = (Class<Configuration>)
+                        Class.forName("com.sun.security.auth.login.ConfigFile");
+                Constructor<Configuration> constructor =
+                        sunConfigFile.getConstructor(URI.class);
+                Configuration config = constructor.newInstance(uri);
+                this.jaasConfiguration = config;
+                this.jaasConfigurationLoaded = true;
+                return this.jaasConfiguration;
+            }
+        } catch (URISyntaxException ex) {
+            throw new RuntimeException(ex);
+        } catch (NoSuchMethodException ex) {
+            throw new RuntimeException(ex);
+        } catch (SecurityException ex) {
+            throw new RuntimeException(ex);
+        } catch (InstantiationException ex) {
+            throw new RuntimeException(ex);
+        } catch (IllegalAccessException ex) {
+            throw new RuntimeException(ex);
+        } catch (IllegalArgumentException ex) {
+            throw new RuntimeException(ex);
+        } catch (InvocationTargetException ex) {
+            throw new RuntimeException(ex.getCause());
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }
+
+    }
 }
