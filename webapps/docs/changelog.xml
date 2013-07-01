@@ -196,6 +196,11 @@
         (kkolinko)
       </update>
       <fix>
+        <bug>54013</bug>: When using a forced stop, allow a short period of time
+        (5s) for the process to die before returning. Patch provided by
+        mukarram.baig. (markt)
+      </fix>
+      <fix>
         <bug>55119</bug>: Ensure that the build process produces Javadoc that is
         not vulnerable to CVE-2013-1571. Based on a patch by Uwe Schindler.
         (markt)
