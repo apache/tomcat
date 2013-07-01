@@ -83,9 +83,9 @@
         fails to read a user&apos;s credentials. (markt)
       </fix>
       <fix>
-        <bug>55073</bug>, <bug>55108</bug>, <bug>55109</bug> &amp;
-        <bug>55110</bug>: Small performance improvements. Patches provided by
-        Adrian Nistor. (markt)
+        <bug>55073</bug>, <bug>55108</bug>, <bug>55109</bug>, <bug>55110</bug>
+        &amp; <bug>55159</bug>: Small performance improvements. Patches
+        provided by Adrian Nistor. (markt/violetagg)
       </fix>
       <add>
         <bug>55102</bug>: Add support for time to first byte in the
