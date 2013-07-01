@@ -146,6 +146,10 @@
         workQueue in order to ensure that executor&apos;s <code>maxThread</code>
         works correctly. (kfujino)
       </fix>
+      <fix>
+        <bug>54086</bug>: Fix an additional code path that could lead to
+        multiple threads attempting to modify the same selector key set. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
