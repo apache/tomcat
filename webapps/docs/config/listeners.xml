@@ -434,6 +434,13 @@
         <p>The port to be used by the Platform JMX/RMI server.</p>
       </attribute>
 
+      <attribute name="rmiBindAddress" required="false">
+        <p>The address of the interface to be used by JMX/RMI server. Setting
+        this option to <code>true</code> is incompatible with setting the system
+        property <code>com.sun.management.jmxremote.ssl</code> to
+        <code>true</code>.</p>
+      </attribute>
+
       <attribute name="useLocalPorts" required="false">
         <p>Should any clients using these ports be forced to use local ports to
         connect to the the JMX/RMI server. This is useful when tunnelling
