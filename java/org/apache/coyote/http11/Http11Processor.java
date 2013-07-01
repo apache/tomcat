@@ -175,7 +175,11 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             }
             // Once the first byte has been read, the standard timeout should be
             // used so restore it here.
-            socket.getSocket().setSoTimeout(endpoint.getSoTimeout());
+            if (endpoint.getSoTimeout()> 0) {
+                setSocketTimeout(endpoint.getSoTimeout());
+            } else {
+                setSocketTimeout(0);
+            }
         }
     }
 
