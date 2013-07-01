@@ -97,7 +97,7 @@ import org.apache.juli.logging.LogFactory;
  * <td>proxiesHeader</td>
  * <td>Name of the http header created by this valve to hold the list of proxies that have been processed in the incoming
  * <code>remoteIpHeader</code></td>
- * <td>RemoteIPProxiesHeader</td>
+ * <td>proxiesHeader</td>
  * <td>Compliant http header name</td>
  * <td>x-forwarded-by</td>
  * </tr>
@@ -165,7 +165,7 @@ import org.apache.juli.logging.LogFactory;
  *   className="org.apache.catalina.valves.RemoteIpValve"
  *   internalProxies="192\.168\.0\.10|192\.168\.0\.11"
  *   remoteIpHeader="x-forwarded-for"
- *   remoteIpProxiesHeader="x-forwarded-by"
+ *   proxiesHeader="x-forwarded-by"
  *   protocolHeader="x-forwarded-proto"
  *   /&gt;</pre></code>
  * <p>
@@ -227,7 +227,7 @@ import org.apache.juli.logging.LogFactory;
  *   className="org.apache.catalina.valves.RemoteIpValve"
  *   internalProxies="192\.168\.0\.10|192\.168\.0\.11"
  *   remoteIpHeader="x-forwarded-for"
- *   remoteIpProxiesHeader="x-forwarded-by"
+ *   proxiesHeader="x-forwarded-by"
  *   trustedProxies="proxy1|proxy2"
  *   /&gt;</pre></code>
  * <p>
@@ -269,7 +269,7 @@ import org.apache.juli.logging.LogFactory;
  *   className="org.apache.catalina.valves.RemoteIpValve"
  *   internalProxies="192\.168\.0\.10|192\.168\.0\.11"
  *   remoteIpHeader="x-forwarded-for"
- *   remoteIpProxiesHeader="x-forwarded-by"
+ *   proxiesHeader="x-forwarded-by"
  *   trustedProxies="proxy1|proxy2"
  *   /&gt;</pre></code>
  * <p>
@@ -312,7 +312,7 @@ import org.apache.juli.logging.LogFactory;
  *   className="org.apache.catalina.valves.RemoteIpValve"
  *   internalProxies="192\.168\.0\.10|192\.168\.0\.11"
  *   remoteIpHeader="x-forwarded-for"
- *   remoteIpProxiesHeader="x-forwarded-by"
+ *   proxiesHeader="x-forwarded-by"
  *   trustedProxies="proxy1|proxy2"
  *   /&gt;</pre></code>
  * <p>
