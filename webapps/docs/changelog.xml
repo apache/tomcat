@@ -125,6 +125,10 @@
         Correct the mechanism for the path calculation in
         <code>AsyncContext.dispatch()</code>. (violetagg)
       </fix>
+      <fix>
+        <bug>55155</bug>: Avoid constant focus grabbing when running the Tomcat
+        unit tests under Java 6 on OSX. Patch provided by Casey Lucas. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
