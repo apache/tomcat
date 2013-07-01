@@ -187,6 +187,11 @@
         a <code>javax.mail.Authenticator</code> to mail sessions created via a
         JNDI resource. (markt)
       </add>
+      <fix>
+        <bug>55179</bug>: Correct the Javadoc for the remote IP valve so the
+        correct name is used to refer to the <code>proxiesHeader</code>
+        property. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
