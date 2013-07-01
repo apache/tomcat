@@ -141,6 +141,12 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <bug>55177</bug>: Correctly handle infinite soTimeout for BIO HTTP
+      connector. Based on a patch by Nick Bunn. (markt)
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
