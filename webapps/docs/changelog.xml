@@ -73,6 +73,11 @@
         <bug>54745</bug>: Fix JAR file scanning when Tomcat is deployed via Java
         Web Start. Patch provided by Nick Williams. (markt)
       </fix>
+      <add>
+        <bug>55017</bug>: Add the ability to configure the RMI bind address when
+        using the JMX remote lifecycle listener. Patch provided by Alexey
+        Noskov. (markt)
+      </add>
       <fix>
         <bug>55071</bug>: Ensure original exception is reported if JDBC Realm
         fails to read a user&apos;s credentials. (markt)
