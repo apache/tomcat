@@ -139,6 +139,10 @@
         <bug>55160</bug>: Don't ignore connectionUploadTimeout setting when
         using HTTP NIO connector. (markt) 
       </fix>
+      <fix>
+        <bug>55176</bug>: Correctly handle regular expressions within SSI
+        expressions that contain an equals character. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
