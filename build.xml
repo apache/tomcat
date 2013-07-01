@@ -1204,7 +1204,7 @@
         <jvmarg value="${test.jvmarg.egd}"/>
         <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
         <jvmarg value="${test.formatter}"/>
-      	<jvmarg value="-Dapple.awt.UIElement=true"/>
+        <jvmarg value="-Dapple.awt.UIElement=true"/>
 
         <classpath refid="tomcat.test.classpath" />
 
