@@ -55,6 +55,8 @@ public class NioReceiver extends ReceiverBase implements Runnable {
     protected static final StringManager sm =
             StringManager.getManager(Constants.Package);
 
+    private volatile boolean running = false;
+
     private AtomicReference<Selector> selector = new AtomicReference<>();
     private ServerSocketChannel serverChannel = null;
     private DatagramChannel datagramChannel = null;
@@ -351,7 +353,17 @@ public class NioReceiver extends ReceiverBase implements Runnable {
         Selector selector = this.selector.get();
         if (selector != null) {
             try {
+                // Unlock the thread if is is blocked waiting for input
                 selector.wakeup();
+                // Wait for the receiver thread to finish
+                int count = 0;
+                while (running && count < 50) {
+                    Thread.sleep(100);
+                    count ++;
+                }
+                if (running) {
+                    log.warn(sm.getString("NioReceiver.stop.threadRunning"));
+                }
                 closeSelector();
             } catch (Exception x) {
                 log.error(sm.getString("NioReceiver.stop.fail"), x);
@@ -403,10 +415,13 @@ public class NioReceiver extends ReceiverBase implements Runnable {
      */
     @Override
     public void run() {
+        running = true;
         try {
             listen();
         } catch (Exception x) {
             log.error(sm.getString("NioReceiver.run.fail"), x);
+        } finally {
+            running = false;
         }
     }
 
