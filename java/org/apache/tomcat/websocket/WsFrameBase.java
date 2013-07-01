@@ -28,6 +28,7 @@ import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.MessageHandler;
 import javax.websocket.PongMessage;
 
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.Utf8Decoder;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -312,7 +313,14 @@ public abstract class WsFrameBase {
             MessageHandler.Whole<PongMessage> mhPong =
                     wsSession.getPongMessageHandler();
             if (mhPong != null) {
-                mhPong.onMessage(new WsPongMessage(controlBufferBinary));
+                try {
+                    mhPong.onMessage(new WsPongMessage(controlBufferBinary));
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    wsSession.getLocal().onError(wsSession, t);
+                } finally {
+                    controlBufferBinary.clear();
+                }
             }
         } else {
             // Should have caught this earlier but just in case...
@@ -344,15 +352,21 @@ public abstract class WsFrameBase {
                 }
             }
 
-            if (mh instanceof MessageHandler.Partial<?>) {
-                ((MessageHandler.Partial<String>) mh).onMessage(
-                        messageBufferText.toString(), last);
-            } else {
-                // Caller ensures last == true if this branch is used
-                ((MessageHandler.Whole<String>) mh).onMessage(
-                        messageBufferText.toString());
+            try {
+                if (mh instanceof MessageHandler.Partial<?>) {
+                    ((MessageHandler.Partial<String>) mh).onMessage(
+                            messageBufferText.toString(), last);
+                } else {
+                    // Caller ensures last == true if this branch is used
+                    ((MessageHandler.Whole<String>) mh).onMessage(
+                            messageBufferText.toString());
+                }
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                wsSession.getLocal().onError(wsSession, t);
+            } finally {
+                messageBufferText.clear();
             }
-            messageBufferText.clear();
         }
     }
 
@@ -520,11 +534,16 @@ public abstract class WsFrameBase {
                                     Long.valueOf(maxMessageSize))));
                 }
             }
-            if (mh instanceof MessageHandler.Partial<?>) {
-                ((MessageHandler.Partial<ByteBuffer>) mh).onMessage(msg, last);
-            } else {
-                // Caller ensures last == true if this branch is used
-                ((MessageHandler.Whole<ByteBuffer>) mh).onMessage(msg);
+            try {
+                if (mh instanceof MessageHandler.Partial<?>) {
+                    ((MessageHandler.Partial<ByteBuffer>) mh).onMessage(msg, last);
+                } else {
+                    // Caller ensures last == true if this branch is used
+                    ((MessageHandler.Whole<ByteBuffer>) mh).onMessage(msg);
+                }
+            } catch(Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                wsSession.getLocal().onError(wsSession, t);
             }
         }
     }
