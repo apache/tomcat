@@ -52,7 +52,7 @@
     <changelog>
       <add>
         Implement JSR 340 - Servlet 3.1. The JSR 340 implementation includes
-        contributions from Nick Williams. (markt)
+        contributions from Nick Williams and Jeremy Boynes. (markt)
       </add>
       <add>
         Implement JSR 356 - WebSockets. The JSR 356 implementation includes
