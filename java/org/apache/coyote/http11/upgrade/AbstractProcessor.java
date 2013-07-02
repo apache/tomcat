@@ -48,7 +48,6 @@ public abstract class AbstractProcessor<S>
         this.httpUpgradeHandler = httpUpgradeHandler;
         this.upgradeServletInputStream = upgradeServletInputStream;
         this.upgradeServletOutputStream = upgradeServletOutputStream;
-        this.httpUpgradeHandler.init(this);
     }
 
 

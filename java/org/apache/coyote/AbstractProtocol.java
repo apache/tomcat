@@ -30,6 +30,7 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.http.WebConnection;
 
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -636,10 +637,20 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                                 processor.getHttpUpgradeHandler();
                         // Release the Http11 processor to be re-used
                         release(wrapper, processor, false, false);
-                        // Create the light-weight upgrade processor
+                        // Create the upgrade processor
                         processor = createUpgradeProcessor(
                                 wrapper, httpUpgradeHandler);
+                        // Mark the connection as upgraded
                         wrapper.setUpgraded(true);
+                        // Associate with the processor with the connection
+                        connections.put(socket, processor);
+                        // Initialise the upgrade handler (which may trigger
+                        // some IO using the new protocol which is why the lines
+                        // above are necessary)
+                        // This cast should be safe. If it fails the error
+                        // handling for the surrounding try/catch will deal with
+                        // it.
+                        httpUpgradeHandler.init((WebConnection) processor);
                     }
                     if (getLog().isDebugEnabled()) {
                         getLog().debug("Socket: [" + wrapper +
@@ -667,8 +678,6 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     connections.remove(socket);
                     release(wrapper, processor, false, false);
                 } else if (state == SocketState.UPGRADED) {
-                    // Need to keep the connection associated with the processor
-                    connections.put(socket, processor);
                     // Don't add sockets back to the poller if this was a
                     // non-blocking write otherwise the poller may trigger
                     // multiple read events which may lead to thread starvation
