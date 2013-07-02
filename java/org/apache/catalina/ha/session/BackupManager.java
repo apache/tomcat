@@ -70,6 +70,11 @@ public class BackupManager extends ClusterManagerBase
     private long rpcTimeout = DEFAULT_REPL_TIMEOUT;
 
     /**
+     * Flag for whether to terminate this map that failed to start.
+     */
+    private boolean terminateOnStartFailure = false;
+
+    /**
      * Constructor, just calls super()
      *
      */
@@ -163,7 +168,7 @@ public class BackupManager extends ClusterManagerBase
             cluster.registerManager(this);
             LazyReplicatedMap<String,Session> map = new LazyReplicatedMap<>(
                     this, cluster.getChannel(), rpcTimeout, getMapName(),
-                    getClassLoaders());
+                    getClassLoaders(), terminateOnStartFailure);
             map.setChannelSendOptions(mapSendOptions);
             this.sessions = map;
         }  catch ( Exception x ) {
@@ -234,6 +239,14 @@ public class BackupManager extends ClusterManagerBase
         return rpcTimeout;
     }
 
+    public void setTerminateOnStartFailure(boolean terminateOnStartFailure) {
+        this.terminateOnStartFailure = terminateOnStartFailure;
+    }
+
+    public boolean isTerminateOnStartFailure() {
+        return terminateOnStartFailure;
+    }
+
     @Override
     public String[] getInvalidatedSessions() {
         return new String[0];
@@ -246,6 +259,7 @@ public class BackupManager extends ClusterManagerBase
         result.mExpireSessionsOnShutdown = mExpireSessionsOnShutdown;
         result.mapSendOptions = mapSendOptions;
         result.rpcTimeout = rpcTimeout;
+        result.terminateOnStartFailure = terminateOnStartFailure;
         return result;
     }
 
