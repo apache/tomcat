@@ -108,7 +108,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
         } else {
             // Non-blocking IO
             // If the non-blocking read does not complete, doWrite() will add
-            // the socket back into the poller. The poller way trigger a new
+            // the socket back into the poller. The poller may trigger a new
             // write event before this method has finished updating buffer. The
             // writeLock sync makes sure that buffer is updated before the next
             // write executes.
