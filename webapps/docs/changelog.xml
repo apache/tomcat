@@ -154,7 +154,7 @@
       <fix>
         <bug>55180</bug>: Correctly handle infinite soTimeout when
         <code>disableUploadTimeout</code> is set to false. Patch provided by
-        Roger Wang. (violetagg)
+        Nick Bunn. (violetagg)
       </fix>
     </changelog>
   </subsection>
