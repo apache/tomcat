@@ -237,6 +237,7 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
         @Override
         public void onError(Throwable throwable) {
             wsProtocolHandler.onError(throwable);
+            wsRemoteEndpointServer.close();
         }
     }
 }

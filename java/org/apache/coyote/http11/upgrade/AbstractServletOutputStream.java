@@ -21,6 +21,7 @@ import java.io.IOException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractServletOutputStream extends ServletOutputStream {
@@ -127,7 +128,17 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
 
     protected final void onWritePossible() throws IOException {
         synchronized (writeLock) {
-            writeInternal(buffer, 0, buffer.length);
+            try {
+                writeInternal(buffer, 0, buffer.length);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                listener.onError(t);
+                if (t instanceof IOException) {
+                    throw t;
+                } else {
+                    throw new IOException(t);
+                }
+            }
 
            // Make sure isReady() and onWritePossible() have a consistent view of
             // buffer and fireListener when determining if the listener should fire
