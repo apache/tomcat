@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket.server;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
@@ -121,6 +122,9 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
     @Override
     protected void doClose() {
+        if (handler != null) {
+            clearHandler(new EOFException());
+        }
         try {
             sos.close();
         } catch (IOException e) {
@@ -138,8 +142,8 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
 
     protected void onTimeout() {
-        close();
         clearHandler(new SocketTimeoutException());
+        close();
     }
 
 

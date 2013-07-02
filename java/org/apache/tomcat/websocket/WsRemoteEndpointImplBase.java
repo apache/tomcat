@@ -492,7 +492,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    protected final void close() {
+    public final void close() {
         for (EncoderEntry entry : encoderEntries) {
             entry.getEncoder().destroy();
         }
