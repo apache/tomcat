@@ -553,7 +553,7 @@ public class PojoMethodMapping {
                             m, session, config, null, params, indexInputStream,
                             true, indexSession, true, maxMessageSize);
                     results.add(mh);
-                } else if (decoderMatch.hasMatches()) {
+                } else if (decoderMatch != null && decoderMatch.hasMatches()) {
                     if (decoderMatch.getBinaryDecoders().size() > 0) {
                         MessageHandler mh = new PojoMessageHandlerWholeBinary(
                                 pojo, m, session, config,
