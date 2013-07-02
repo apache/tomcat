@@ -171,9 +171,10 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                                  int initialCapacity,
                                  float loadFactor,
                                  int channelSendOptions,
-                                 ClassLoader[] cls) {
+                                 ClassLoader[] cls,
+                                 boolean terminate) {
         super(initialCapacity, loadFactor, 15);
-        init(owner, channel, mapContextName, timeout, channelSendOptions, cls);
+        init(owner, channel, mapContextName, timeout, channelSendOptions, cls, terminate);
 
     }
 
@@ -197,7 +198,8 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
      * @param channelSendOptions int
      * @param cls ClassLoader[]
      */
-    protected void init(MapOwner owner, Channel channel, String mapContextName, long timeout, int channelSendOptions,ClassLoader[] cls) {
+    protected void init(MapOwner owner, Channel channel, String mapContextName,
+            long timeout, int channelSendOptions,ClassLoader[] cls, boolean terminate) {
         log.info("Initializing AbstractReplicatedMap with context name:"+mapContextName);
         this.mapOwner = owner;
         this.externalLoaders = cls;
@@ -227,11 +229,10 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             broadcast(MapMessage.MSG_START, true);
         } catch (ChannelException x) {
             log.warn("Unable to send map start message.");
-            // remove listener from channel
-            this.rpcChannel.breakdown();
-            this.channel.removeChannelListener(this);
-            this.channel.removeMembershipListener(this);
-            throw new RuntimeException("Unable to start replicated map.",x);
+            if (terminate) {
+                breakdown();
+                throw new RuntimeException("Unable to start replicated map.",x);
+            }
         }
     }
 

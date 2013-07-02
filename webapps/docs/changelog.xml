@@ -55,6 +55,20 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.43 (markt)">
+  <subsection name="Cluster">
+    <changelog>
+      <add>
+        Add new attribute terminateOnStartFailure. Set to true if you wish to
+        terminate replication map when replication map fails to start.
+        If replication map is terminated, associated context will fail to start.
+        If you set this attribute to false, replication map does not end.
+        It will try to join the map membership in the heartbeat. Default value
+        is false. (kfujino)
+      </add>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.42 (markt)">
   <subsection name="Catalina">
     <changelog>
