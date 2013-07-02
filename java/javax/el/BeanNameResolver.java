@@ -19,6 +19,8 @@ package javax.el;
 /**
  * Base implementation that provides a minimal default implementation that is
  * intended to be extended by application developers.
+ *
+ * @since EL 3.0
  */
 public abstract class BeanNameResolver {
 
