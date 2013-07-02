@@ -1082,7 +1082,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             }
 
             if (!disableUploadTimeout) {
-                setSocketTimeout(endpoint.getSoTimeout());
+                if(endpoint.getSoTimeout() > 0) {
+                    setSocketTimeout(endpoint.getSoTimeout());
+                } else {
+                    setSocketTimeout(0);
+                }
             }
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
