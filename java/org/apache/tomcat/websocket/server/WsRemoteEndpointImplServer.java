@@ -106,9 +106,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
         } catch (IOException ioe) {
             wsWriteTimeout.unregister(this);
             close();
-            SendHandler sh = handler;
-            handler = null;
-            sh.onResult(new SendResult(ioe));
+            clearHandler(ioe);
         }
         if (!complete) {
             // Async write is in progress
@@ -143,7 +141,13 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
     protected void onTimeout() {
         close();
-        handler.onResult(new SendResult(new SocketTimeoutException()));
+        clearHandler(new SocketTimeoutException());
+    }
+
+
+    private void clearHandler(Throwable t) {
+        SendHandler sh = handler;
         handler = null;
+        sh.onResult(new SendResult(t));
     }
 }
