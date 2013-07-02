@@ -308,8 +308,9 @@ public class WsWebSocketContainer
                     afterResponse(handshakeResponse);
 
             // Sub-protocol
+            // Header names are always stored in lower case
             List<String> values = handshakeResponse.getHeaders().get(
-                    Constants.WS_PROTOCOL_HEADER_NAME);
+                    Constants.WS_PROTOCOL_HEADER_NAME_LOWER);
             if (values == null || values.size() == 0) {
                 subProtocol = null;
             } else if (values.size() == 1) {
@@ -591,6 +592,7 @@ public class WsWebSocketContainer
             log.warn(sm.getString("wsWebSocketContainer.invalidHeader", line));
             return;
         }
+        // Header names are case insensitive so always use lower case
         String headerName = line.substring(0, index).trim().toLowerCase();
         // TODO handle known multi-value headers
         String headerValue = line.substring(index + 1).trim();

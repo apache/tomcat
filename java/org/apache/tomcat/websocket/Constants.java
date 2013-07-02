@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.util.Locale;
+
 /**
  * Internal implementation constants.
  */
@@ -50,6 +52,8 @@ public class Constants {
     public static final String WS_KEY_HEADER_NAME = "Sec-WebSocket-Key";
     public static final String WS_PROTOCOL_HEADER_NAME =
             "Sec-WebSocket-Protocol";
+    public static final String WS_PROTOCOL_HEADER_NAME_LOWER =
+            WS_PROTOCOL_HEADER_NAME.toLowerCase(Locale.ENGLISH);
     public static final String WS_EXTENSIONS_HEADER_NAME =
             "Sec-WebSocket-Extensions";
 
