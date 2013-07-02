@@ -235,6 +235,7 @@ public class WsServerContainer extends WsWebSocketContainer
         sec = ServerEndpointConfig.Builder.create(pojo, path).
                 decoders(Arrays.asList(annotation.decoders())).
                 encoders(Arrays.asList(annotation.encoders())).
+                subprotocols(Arrays.asList(annotation.subprotocols())).
                 configurator(configurator).
                 build();
         sec.getUserProperties().put(
