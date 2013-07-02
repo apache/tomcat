@@ -146,6 +146,13 @@
         another map.
         Default value is <code>15000</code> milliseconds.
       </attribute>
+      <attribute name="terminateOnStartFailure" required="false">
+        Set to true if you wish to terminate replication map when replication
+        map fails to start. If replication map is terminated, associated context
+        will fail to start. If you set this attribute to false, replication map
+        does not end. It will try to join the map membership in the heartbeat.
+        Default value is <code>false</code> .
+      </attribute>
     </attributes>
   </subsection>
 </section>
