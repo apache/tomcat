@@ -235,7 +235,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         tomcat.start();
 
-        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
+        Session wsSession = wsContainer.connectToServer(
+                TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
                         new URI("ws://localhost:" + getPort() +
                                 TesterEchoServer.Config.PATH_BASIC));
@@ -323,7 +324,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         tomcat.start();
 
-        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
+        Session wsSession = wsContainer.connectToServer(
+                TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
                 new URI("ws://localhost:" + getPort() + BlockingConfig.PATH));
 
@@ -406,7 +408,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         tomcat.start();
 
-        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
+        Session wsSession = wsContainer.connectToServer(
+                TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
                 new URI("ws://localhost:" + getPort() +
                         ConstantTxConfig.PATH));
