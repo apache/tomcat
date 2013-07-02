@@ -96,9 +96,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     // could update the value of the handler. Therefore, keep a
                     // local copy before signalling the end of the (partial)
                     // message.
-                    SendHandler sh = handler;
-                    handler = null;
-                    sh.onResult(new SendResult());
+                    clearHandler(null);
                     break;
                 }
             }
@@ -148,6 +146,10 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private void clearHandler(Throwable t) {
         SendHandler sh = handler;
         handler = null;
-        sh.onResult(new SendResult(t));
+        if (t == null) {
+            sh.onResult(new SendResult());
+        } else {
+            sh.onResult(new SendResult(t));
+        }
     }
 }
