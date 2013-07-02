@@ -231,10 +231,7 @@ public abstract class AbstractReplicatedMap<K,V>
         } catch (ChannelException x) {
             log.warn("Unable to send map start message.");
             if (terminate) {
-                // remove listener from channel
-                this.rpcChannel.breakdown();
-                this.channel.removeChannelListener(this);
-                this.channel.removeMembershipListener(this);
+                breakdown();
                 throw new RuntimeException("Unable to start replicated map.",x);
             }
         }
