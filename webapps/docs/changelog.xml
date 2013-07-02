@@ -147,8 +147,15 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
-      <bug>55177</bug>: Correctly handle infinite soTimeout for BIO HTTP
-      connector. Based on a patch by Nick Bunn. (markt)
+      <fix>
+        <bug>55177</bug>: Correctly handle infinite soTimeout for BIO HTTP
+        connector. Based on a patch by Nick Bunn. (markt)
+      </fix>
+      <fix>
+        <bug>55180</bug>: Correctly handle infinite soTimeout when
+        <code>disableUploadTimeout</code> is set to false. Patch provided by
+        Roger Wang. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
