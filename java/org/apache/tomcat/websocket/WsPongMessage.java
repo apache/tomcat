@@ -26,7 +26,9 @@ public class WsPongMessage implements PongMessage {
 
 
     public WsPongMessage(ByteBuffer applicationData) {
-        this.applicationData = applicationData;
+        byte[] dst = new byte[applicationData.limit()];
+        applicationData.get(dst);
+        this.applicationData = ByteBuffer.wrap(dst);
     }
 
 
