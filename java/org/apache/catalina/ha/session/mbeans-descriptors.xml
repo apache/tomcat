@@ -515,6 +515,11 @@
       description="Timeout for RPC messages, how long we will wait for a reply"
       type="long"/>
     <attribute
+      name="terminateOnStartFailure"
+      description="Flag for whether to terminate this map that failed to start."
+      is="true"
+      type="boolean"/>
+    <attribute
       name="secureRandomAlgorithm"
       description="The secure random number generator algorithm name"
       type="java.lang.String"/>
