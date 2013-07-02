@@ -19,6 +19,9 @@ package javax.el;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
+/**
+ * @since EL 3.0
+ */
 public class BeanNameELResolver extends ELResolver {
 
     private final BeanNameResolver beanNameResolver;
