@@ -84,8 +84,7 @@ public class ArrayELResolver extends ELResolver {
 
             if (this.readOnly) {
                 throw new PropertyNotWritableException(message(context,
-                        "resolverNotWriteable", new Object[] { base.getClass()
-                                .getName() }));
+                        "resolverNotWriteable", base.getClass().getName()));
             }
 
             int idx = coerce(property);
@@ -94,9 +93,8 @@ public class ArrayELResolver extends ELResolver {
                     !base.getClass().getComponentType().isAssignableFrom(
                             value.getClass())) {
                 throw new ClassCastException(message(context,
-                        "objectNotAssignable",
-                        new Object[] {value.getClass().getName(),
-                        base.getClass().getComponentType().getName()}));
+                        "objectNotAssignable", value.getClass().getName(),
+                        base.getClass().getComponentType().getName()));
             }
             Array.set(base, idx, value);
         }

@@ -96,8 +96,7 @@ public class ListELResolver extends ELResolver {
 
             if (this.readOnly) {
                 throw new PropertyNotWritableException(message(context,
-                        "resolverNotWriteable", new Object[] { base.getClass()
-                                .getName() }));
+                        "resolverNotWriteable", base.getClass().getName()));
             }
 
             int idx = coerce(property);
