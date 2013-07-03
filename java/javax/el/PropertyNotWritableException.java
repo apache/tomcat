@@ -14,42 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package javax.el;
 
-/**
- *
- */
 public class PropertyNotWritableException extends ELException {
 
     private static final long serialVersionUID = 827987155471214717L;
 
-    /**
-     *
-     */
     public PropertyNotWritableException() {
         super();
     }
 
-    /**
-     * @param message
-     */
     public PropertyNotWritableException(String message) {
         super(message);
     }
 
-    /**
-     * @param message
-     * @param cause
-     */
-    public PropertyNotWritableException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * @param cause
-     */
     public PropertyNotWritableException(Throwable cause) {
         super(cause);
+    }
+
+    public PropertyNotWritableException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
