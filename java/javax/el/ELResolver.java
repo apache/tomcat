@@ -28,7 +28,18 @@ public abstract class ELResolver {
 
     public static final String RESOLVABLE_AT_DESIGN_TIME = "resolvableAtDesignTime";
 
-    public abstract Object getValue(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
+    /**
+     * @throws NullPointerException
+     *              If the supplied context is <code>null</code>
+     * @throws PropertyNotFoundException
+     *              If the base/property combination provided to the resolver is
+     *              one that the resolver can handle but no match was found or a
+     *              match was found but was not readable
+     * @throws ELException
+     *              Wraps any exception throw whilst resolving the property
+     */
+    public abstract Object getValue(ELContext context, Object base,
+            Object property);
 
     /**
      * @since EL 2.2
@@ -41,15 +52,51 @@ public abstract class ELResolver {
         return null;
     }
 
-    public abstract Class<?> getType(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
+    /**
+     * @throws NullPointerException
+     *              If the supplied context is <code>null</code>
+     * @throws PropertyNotFoundException
+     *              If the base/property combination provided to the resolver is
+     *              one that the resolver can handle but no match was found or a
+     *              match was found but was not readable
+     * @throws ELException
+     *              Wraps any exception throw whilst resolving the property
+     */
+    public abstract Class<?> getType(ELContext context, Object base,
+            Object property);
 
-    public abstract void setValue(ELContext context, Object base, Object property, Object value) throws NullPointerException, PropertyNotFoundException, PropertyNotWritableException, ELException;
+    /**
+     * @throws NullPointerException
+     *              If the supplied context is <code>null</code>
+     * @throws PropertyNotFoundException
+     *              If the base/property combination provided to the resolver is
+     *              one that the resolver can handle but no match was found
+     * @throws PropertyNotWritableException
+     *              If the base/property combination provided to the resolver is
+     *              one that the resolver can handle but the property was not
+     *              writable
+     * @throws ELException
+     *              Wraps any exception throw whilst resolving the property
+     */
+    public abstract void setValue(ELContext context, Object base,
+            Object property, Object value);
 
-    public abstract boolean isReadOnly(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
+    /**
+     * @throws NullPointerException
+     *              If the supplied context is <code>null</code>
+     * @throws PropertyNotFoundException
+     *              If the base/property combination provided to the resolver is
+     *              one that the resolver can handle but no match was found
+     * @throws ELException
+     *              Wraps any exception throw whilst resolving the property
+     */
+    public abstract boolean isReadOnly(ELContext context, Object base,
+            Object property);
 
     public abstract Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base);
 
-    public abstract Class<?> getCommonPropertyType(ELContext context, Object base);
+    public abstract Class<?> getCommonPropertyType(ELContext context,
+            Object base);
 
     /**
      * Converts the given object to the given type. This default implementation
