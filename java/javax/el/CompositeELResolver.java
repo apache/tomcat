@@ -72,6 +72,52 @@ public class CompositeELResolver extends ELResolver {
         return null;
     }
 
+    /**
+     * @since EL 2.2
+     */
+    @Override
+    public Object invoke(ELContext context, Object base, Object method,
+            Class<?>[] paramTypes, Object[] params) {
+        context.setPropertyResolved(false);
+        int sz = this.size;
+        Object obj;
+        for (int i = 0; i < sz; i++) {
+            obj = this.resolvers[i].invoke(context, base, method, paramTypes,
+                    params);
+            if (context.isPropertyResolved()) {
+                return obj;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Class<?> getType(ELContext context, Object base, Object property)
+            throws NullPointerException, PropertyNotFoundException, ELException {
+        context.setPropertyResolved(false);
+        int sz = this.size;
+        Class<?> type;
+        for (int i = 0; i < sz; i++) {
+            type = this.resolvers[i].getType(context, base, property);
+            if (context.isPropertyResolved()) {
+                if (SCOPED_ATTRIBUTE_EL_RESOLVER != null &&
+                        SCOPED_ATTRIBUTE_EL_RESOLVER.isAssignableFrom(
+                                resolvers[i].getClass())) {
+                    // Special case since
+                    // javax.servlet.jsp.el.ScopedAttributeELResolver will
+                    // always return Object.class for type
+                    Object value =
+                        resolvers[i].getValue(context, base, property);
+                    if (value != null) {
+                        return value.getClass();
+                    }
+                }
+                return type;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void setValue(ELContext context, Object base, Object property,
             Object value) throws NullPointerException,
@@ -119,52 +165,6 @@ public class CompositeELResolver extends ELResolver {
             }
         }
         return commonType;
-    }
-
-    @Override
-    public Class<?> getType(ELContext context, Object base, Object property)
-            throws NullPointerException, PropertyNotFoundException, ELException {
-        context.setPropertyResolved(false);
-        int sz = this.size;
-        Class<?> type;
-        for (int i = 0; i < sz; i++) {
-            type = this.resolvers[i].getType(context, base, property);
-            if (context.isPropertyResolved()) {
-                if (SCOPED_ATTRIBUTE_EL_RESOLVER != null &&
-                        SCOPED_ATTRIBUTE_EL_RESOLVER.isAssignableFrom(
-                                resolvers[i].getClass())) {
-                    // Special case since
-                    // javax.servlet.jsp.el.ScopedAttributeELResolver will
-                    // always return Object.class for type
-                    Object value =
-                        resolvers[i].getValue(context, base, property);
-                    if (value != null) {
-                        return value.getClass();
-                    }
-                }
-                return type;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @since EL 2.2
-     */
-    @Override
-    public Object invoke(ELContext context, Object base, Object method,
-            Class<?>[] paramTypes, Object[] params) {
-        context.setPropertyResolved(false);
-        int sz = this.size;
-        Object obj;
-        for (int i = 0; i < sz; i++) {
-            obj = this.resolvers[i].invoke(context, base, method, paramTypes,
-                    params);
-            if (context.isPropertyResolved()) {
-                return obj;
-            }
-        }
-        return null;
     }
 
     private static final class FeatureIterator implements Iterator<FeatureDescriptor> {
