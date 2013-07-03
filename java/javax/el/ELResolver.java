@@ -51,21 +51,11 @@ public abstract class ELResolver {
         }
     }
 
-    public static final String RESOLVABLE_AT_DESIGN_TIME = "resolvableAtDesignTime";
-
     public static final String TYPE = "type";
 
+    public static final String RESOLVABLE_AT_DESIGN_TIME = "resolvableAtDesignTime";
+
     public abstract Object getValue(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
-
-    public abstract Class<?> getType(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
-
-    public abstract void setValue(ELContext context, Object base, Object property, Object value) throws NullPointerException, PropertyNotFoundException, PropertyNotWritableException, ELException;
-
-    public abstract boolean isReadOnly(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
-
-    public abstract Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base);
-
-    public abstract Class<?> getCommonPropertyType(ELContext context, Object base);
 
     /**
      * @since EL 2.2
@@ -77,4 +67,14 @@ public abstract class ELResolver {
             @SuppressWarnings("unused") Object[] params) {
         return null;
     }
+
+    public abstract Class<?> getType(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
+
+    public abstract void setValue(ELContext context, Object base, Object property, Object value) throws NullPointerException, PropertyNotFoundException, PropertyNotWritableException, ELException;
+
+    public abstract boolean isReadOnly(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
+
+    public abstract Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base);
+
+    public abstract Class<?> getCommonPropertyType(ELContext context, Object base);
 }
