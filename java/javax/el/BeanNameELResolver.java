@@ -98,7 +98,6 @@ public class BeanNameELResolver extends ELResolver {
     public boolean isReadOnly(ELContext context, Object base, Object property)
             throws NullPointerException, PropertyNotFoundException, ELException {
 
-
         if (context == null) {
             throw new NullPointerException();
         }

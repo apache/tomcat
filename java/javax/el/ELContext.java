@@ -14,16 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package javax.el;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- *
- */
 public abstract class ELContext {
 
     private Locale locale;
@@ -32,19 +28,16 @@ public abstract class ELContext {
 
     private boolean resolved;
 
-    /**
-     *
-     */
     public ELContext() {
         this.resolved = false;
     }
 
-    // Can't use Class<?> because API needs to match specification
-    public Object getContext(@SuppressWarnings("rawtypes") Class key) {
-        if (this.map == null) {
-            return null;
-        }
-        return this.map.get(key);
+    public void setPropertyResolved(boolean resolved) {
+        this.resolved = resolved;
+    }
+
+    public boolean isPropertyResolved() {
+        return this.resolved;
     }
 
     // Can't use Class<?> because API needs to match specification
@@ -61,19 +54,17 @@ public abstract class ELContext {
         this.map.put(key, contextObject);
     }
 
-    public void setPropertyResolved(boolean resolved) {
-        this.resolved = resolved;
-    }
-
-    public boolean isPropertyResolved() {
-        return this.resolved;
+    // Can't use Class<?> because API needs to match specification
+    public Object getContext(@SuppressWarnings("rawtypes") Class key) {
+        if (this.map == null) {
+            return null;
+        }
+        return this.map.get(key);
     }
 
     public abstract ELResolver getELResolver();
 
     public abstract FunctionMapper getFunctionMapper();
-
-    public abstract VariableMapper getVariableMapper();
 
     public Locale getLocale() {
         return this.locale;
@@ -82,4 +73,6 @@ public abstract class ELContext {
     public void setLocale(Locale locale) {
         this.locale = locale;
     }
+
+    public abstract VariableMapper getVariableMapper();
 }
