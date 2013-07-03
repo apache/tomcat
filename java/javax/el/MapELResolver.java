@@ -41,20 +41,6 @@ public class MapELResolver extends ELResolver {
     }
 
     @Override
-    public Object getValue(ELContext context, Object base, Object property) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
-
-        if (base instanceof Map<?,?>) {
-            context.setPropertyResolved(true);
-            return ((Map<?,?>) base).get(property);
-        }
-
-        return null;
-    }
-
-    @Override
     public Class<?> getType(ELContext context, Object base, Object property) {
         if (context == null) {
             throw new NullPointerException();
@@ -63,6 +49,20 @@ public class MapELResolver extends ELResolver {
         if (base instanceof Map<?,?>) {
             context.setPropertyResolved(true);
             return Object.class;
+        }
+
+        return null;
+    }
+
+    @Override
+    public Object getValue(ELContext context, Object base, Object property) {
+        if (context == null) {
+            throw new NullPointerException();
+        }
+
+        if (base instanceof Map<?,?>) {
+            context.setPropertyResolved(true);
+            return ((Map<?,?>) base).get(property);
         }
 
         return null;
