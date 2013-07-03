@@ -155,4 +155,23 @@ public abstract class ELContext {
             }
         }
     }
+
+    /**
+     * @since EL 3.0
+     */
+    public Object convertToType(Object obj, Class<?> type) {
+
+        boolean originalResolved = isPropertyResolved();
+        try {
+            ELResolver resolver = getELResolver();
+            Object result = resolver.convertToType(this, obj, type);
+            if (isPropertyResolved()) {
+                return result;
+            }
+        } finally {
+            setPropertyResolved(originalResolved);
+        }
+
+        return Util.getExpressionFactory().coerceToType(type, type);
+    }
 }
