@@ -45,6 +45,16 @@ public class ELException extends RuntimeException {
     }
 
     /**
+     * Creates an ELException with the given cause
+     *
+     * @param cause
+     *            the originating cause of this exception
+     */
+    public ELException(Throwable cause) {
+        super(cause);
+    }
+
+    /**
      * Creates an ELException with the given detail message and root cause.
      *
      * @param message
@@ -54,15 +64,5 @@ public class ELException extends RuntimeException {
      */
     public ELException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    /**
-     * Creates an ELException with the given cause
-     *
-     * @param cause
-     *            the originating cause of this exception
-     */
-    public ELException(Throwable cause) {
-        super(cause);
     }
 }
