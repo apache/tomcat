@@ -83,7 +83,7 @@ public class MapELResolver extends ELResolver {
             context.setPropertyResolved(true);
 
             if (this.readOnly) {
-                throw new PropertyNotWritableException(message(context,
+                throw new PropertyNotWritableException(Util.message(context,
                         "resolverNotWriteable", base.getClass().getName()));
             }
 

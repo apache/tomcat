@@ -43,7 +43,7 @@ public class ImportHandler {
         int lastPeriod = name.lastIndexOf('.');
 
         if (lastPeriod < 0) {
-            throw new ELException(ELResolver.message(
+            throw new ELException(Util.message(
                     null, "importHandler.invalidStaticName", name));
         }
 
@@ -53,7 +53,7 @@ public class ImportHandler {
         Class<?> clazz = findClass(className);
 
         if (clazz == null) {
-            throw new ELException(ELResolver.message(
+            throw new ELException(Util.message(
                     null, "importHandler.invalidClassNameForStatic",
                     className, name));
         }
@@ -77,14 +77,14 @@ public class ImportHandler {
         }
 
         if (!found) {
-            throw new ELException(ELResolver.message(null,
+            throw new ELException(Util.message(null,
                     "importHandler.staticNotFound", fieldOrMethodName,
                     className, name));
         }
 
         Class<?> conflict = statics.get(fieldOrMethodName);
         if (conflict != null) {
-            throw new ELException(ELResolver.message(null,
+            throw new ELException(Util.message(null,
                     "importHandler.ambiguousStaticImport", name,
                     conflict.getName() + '.' +  fieldOrMethodName));
         }
@@ -95,14 +95,14 @@ public class ImportHandler {
 
     public void importClass(String name) throws javax.el.ELException {
         if (!name.contains(".")) {
-            throw new ELException(ELResolver.message(
+            throw new ELException(Util.message(
                     null, "importHandler.invalidClassName", name));
         }
 
         Class<?> clazz = findClass(name);
 
         if (clazz == null) {
-            throw new ELException(ELResolver.message(
+            throw new ELException(Util.message(
                     null, "importHandler.classNotFound", name));
         }
     }
@@ -112,7 +112,7 @@ public class ImportHandler {
         // Import ambiguity is handled at resolution, not at import
         Package p = Package.getPackage(name);
         if (p == null) {
-            throw new IllegalArgumentException(ELResolver.message(
+            throw new IllegalArgumentException(Util.message(
                     null, "importHandler.invalidPackage", name));
         }
         packages.add(name);
@@ -154,7 +154,7 @@ public class ImportHandler {
         int modifiers = clazz.getModifiers();
         if (!Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers) ||
                 Modifier.isInterface(modifiers)) {
-            throw new ELException(ELResolver.message(
+            throw new ELException(Util.message(
                     null, "importHandler.invalidClass", name));
         }
 
@@ -162,7 +162,7 @@ public class ImportHandler {
         Class<?> conflict = clazzes.get(simpleName);
 
         if (conflict != null) {
-            throw new ELException(ELResolver.message(null,
+            throw new ELException(Util.message(null,
                     "importHandler.ambiguousImport", name, conflict.getName()));
         }
 
