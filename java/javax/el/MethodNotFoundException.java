@@ -14,42 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package javax.el;
 
-/**
- *
- */
 public class MethodNotFoundException extends ELException {
 
     private static final long serialVersionUID = -3631968116081480328L;
 
-    /**
-     *
-     */
     public MethodNotFoundException() {
         super();
     }
 
-    /**
-     * @param message
-     */
     public MethodNotFoundException(String message) {
         super(message);
     }
 
-    /**
-     * @param message
-     * @param cause
-     */
-    public MethodNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * @param cause
-     */
     public MethodNotFoundException(Throwable cause) {
         super(cause);
+    }
+
+    public MethodNotFoundException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
