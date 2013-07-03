@@ -14,12 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package javax.el;
 
-/**
- *
- */
 public abstract class MethodExpression extends Expression {
 
     private static final long serialVersionUID = 8163925562047324656L;
@@ -29,12 +25,23 @@ public abstract class MethodExpression extends Expression {
     public abstract Object invoke(ELContext context, Object[] params) throws NullPointerException, PropertyNotFoundException, MethodNotFoundException, ELException;
 
     /**
+     * @since EL 3.0
+     */
+    public boolean isParametersProvided() {
+        // Expected to be over-ridden by implementation
+        return false;
+    }
+
+    /**
      * @since EL 2.2
      *
      * Note: The spelling mistake is deliberate.
      * isParmetersProvided()  - Specification definition
      * isParametersProvided() - Corrected spelling
+     *
+     * @deprecated  Use {@link #isParametersProvided()}
      */
+    @Deprecated
     public boolean isParmetersProvided() {
         // Expected to be over-ridden by implementation
         return false;
