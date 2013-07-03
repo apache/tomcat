@@ -77,4 +77,16 @@ public abstract class ELResolver {
     public abstract Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base);
 
     public abstract Class<?> getCommonPropertyType(ELContext context, Object base);
+
+    /**
+     * Converts the given object to the given type. This default implementation
+     * always returns <code>null</code>.
+     *
+     * @since EL 3.0
+     */
+    public Object convertToType(@SuppressWarnings("unused") ELContext context,
+            @SuppressWarnings("unused") Object obj,
+            @SuppressWarnings("unused") Class<?> type) {
+        return null;
+    }
 }
