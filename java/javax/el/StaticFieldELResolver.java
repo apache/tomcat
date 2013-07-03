@@ -27,8 +27,9 @@ import java.util.Iterator;
 /**
  * @since EL 3.0
  */
-public class StaticFieldELResolver {
+public class StaticFieldELResolver extends ELResolver {
 
+    @Override
     public Object getValue(ELContext context, Object base, Object property) {
 
         if (context == null) {
@@ -64,13 +65,7 @@ public class StaticFieldELResolver {
     }
 
 
-    /**
-     *
-     * @param context
-     * @param base
-     * @param property
-     * @param value
-     */
+    @Override
     public void setValue(ELContext context, Object base, Object property,
             Object value) {
 
@@ -89,6 +84,7 @@ public class StaticFieldELResolver {
     }
 
 
+    @Override
     public Object invoke(ELContext context, Object base, Object method,
             Class<?>[] paramTypes, Object[] params) {
 
@@ -160,6 +156,7 @@ public class StaticFieldELResolver {
         return null;
     }
 
+    @Override
     public Class<?> getType(ELContext context, Object base, Object property) {
         if (context == null) {
             throw new NullPointerException();
@@ -194,6 +191,7 @@ public class StaticFieldELResolver {
     }
 
 
+    @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         if (context == null) {
             throw new NullPointerException();
@@ -210,10 +208,8 @@ public class StaticFieldELResolver {
 
     /**
      * Always returns <code>null</code>.
-     *
-     * @param context
-     * @param base
      */
+    @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
             Object base) {
         return null;
@@ -221,10 +217,8 @@ public class StaticFieldELResolver {
 
     /**
      * Always returns <code>String.class</code>.
-     *
-     * @param context
-     * @param base
      */
+    @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
         return String.class;
     }
