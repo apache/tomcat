@@ -367,12 +367,14 @@ public class WsServerContainer extends WsWebSocketContainer
     public void closeAuthenticatedSession(String httpSessionId) {
         Set<WsSession> wsSessions = authenticatedSessions.remove(httpSessionId);
 
-        for (WsSession wsSession : wsSessions) {
-            try {
-                wsSession.close(AUTHENTICATED_HTTP_SESSION_CLOSED);
-            } catch (IOException e) {
-                // Any IOExceptions during close will have been caught and the
-                // onError method called.
+        if (wsSessions != null && !wsSessions.isEmpty()) {
+            for (WsSession wsSession : wsSessions) {
+                try {
+                    wsSession.close(AUTHENTICATED_HTTP_SESSION_CLOSED);
+                } catch (IOException e) {
+                    // Any IOExceptions during close will have been caught and the
+                    // onError method called.
+                }
             }
         }
     }
