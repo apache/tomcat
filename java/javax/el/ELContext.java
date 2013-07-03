@@ -59,8 +59,12 @@ public abstract class ELContext {
     }
 
     // Can't use Class<?> because API needs to match specification
+    /**
+     * @throws NullPointerException
+     *              If the supplied context is <code>null</code>
+     */
     public void putContext(@SuppressWarnings("rawtypes") Class key,
-            Object contextObject) throws NullPointerException {
+            Object contextObject) {
         if (key == null || contextObject == null) {
             throw new NullPointerException();
         }
