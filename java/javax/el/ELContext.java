@@ -17,7 +17,9 @@
 package javax.el;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -33,6 +35,8 @@ public abstract class ELContext {
     private ImportHandler importHandler = null;
 
     private List<EvaluationListener> listeners = new ArrayList<>();
+
+    private Deque<Map<String,Object>> lambdaArguments = new LinkedList<>();
 
     public ELContext() {
         this.resolved = false;
@@ -154,6 +158,45 @@ public abstract class ELContext {
                 // Ignore - no option to log
             }
         }
+    }
+
+    /**
+     * @since EL 3.0
+     */
+    public boolean isLambdaArgument(String name) {
+        for (Map<String,Object> arguments : lambdaArguments) {
+            if (arguments.containsKey(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @since EL 3.0
+     */
+    public Object getLambdaArgument(String name) {
+        for (Map<String,Object> arguments : lambdaArguments) {
+            Object result = arguments.get(name);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @since EL 3.0
+     */
+    public void enterLambdaScope(Map<String,Object> arguments) {
+        lambdaArguments.push(arguments);
+    }
+
+    /**
+     * @since EL 3.0
+     */
+    public void exitLambdaScope() {
+        lambdaArguments.pop();
     }
 
     /**
