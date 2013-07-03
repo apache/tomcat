@@ -109,7 +109,7 @@ public class BeanELResolver extends ELResolver {
             if (cause instanceof VirtualMachineError) {
                 throw (VirtualMachineError) cause;
             }
-            throw new ELException(message(context, "propertyReadError",
+            throw new ELException(Util.message(context, "propertyReadError",
                     base.getClass().getName(), property.toString()), cause);
         } catch (Exception e) {
             throw new ELException(e);
@@ -131,7 +131,7 @@ public class BeanELResolver extends ELResolver {
         context.setPropertyResolved(true);
 
         if (this.readOnly) {
-            throw new PropertyNotWritableException(message(context,
+            throw new PropertyNotWritableException(Util.message(context,
                     "resolverNotWriteable", base.getClass().getName()));
         }
 
@@ -148,7 +148,7 @@ public class BeanELResolver extends ELResolver {
             if (cause instanceof VirtualMachineError) {
                 throw (VirtualMachineError) cause;
             }
-            throw new ELException(message(context, "propertyWriteError",
+            throw new ELException(Util.message(context, "propertyWriteError",
                     base.getClass().getName(), property.toString()), cause);
         } catch (Exception e) {
             throw new ELException(e);
@@ -338,7 +338,7 @@ public class BeanELResolver extends ELResolver {
         private BeanProperty get(ELContext ctx, String name) {
             BeanProperty property = this.properties.get(name);
             if (property == null) {
-                throw new PropertyNotFoundException(message(ctx,
+                throw new PropertyNotFoundException(Util.message(ctx,
                         "propertyNotFound", type.getName(), name));
             }
             return property;
@@ -393,7 +393,7 @@ public class BeanELResolver extends ELResolver {
             if (this.write == null) {
                 this.write = getMethod(this.owner, descriptor.getWriteMethod());
                 if (this.write == null) {
-                    throw new PropertyNotFoundException(message(ctx,
+                    throw new PropertyNotFoundException(Util.message(ctx,
                             "propertyNotWritable", new Object[] {
                                     owner.getName(), descriptor.getName() }));
                 }
@@ -405,7 +405,7 @@ public class BeanELResolver extends ELResolver {
             if (this.read == null) {
                 this.read = getMethod(this.owner, descriptor.getReadMethod());
                 if (this.read == null) {
-                    throw new PropertyNotFoundException(message(ctx,
+                    throw new PropertyNotFoundException(Util.message(ctx,
                             "propertyNotReadable", new Object[] {
                                     owner.getName(), descriptor.getName() }));
                 }

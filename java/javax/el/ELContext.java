@@ -16,7 +16,9 @@
  */
 package javax.el;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -28,12 +30,24 @@ public abstract class ELContext {
 
     private boolean resolved;
 
+    private ImportHandler importHandler = null;
+
+    private List<EvaluationListener> listeners = new ArrayList<>();
+
     public ELContext() {
         this.resolved = false;
     }
 
     public void setPropertyResolved(boolean resolved) {
         this.resolved = resolved;
+    }
+
+    /**
+     * @since EL 3.0
+     */
+    public void setPropertyResolved(Object base, Object property) {
+        setPropertyResolved(true);
+        notifyPropertyResolved(base, property);
     }
 
     public boolean isPropertyResolved() {
@@ -64,6 +78,16 @@ public abstract class ELContext {
 
     public abstract ELResolver getELResolver();
 
+    /**
+     * @since EL 3.0
+     */
+    public ImportHandler getImportHandler() {
+        if (importHandler == null) {
+            importHandler = new ImportHandler();
+        }
+        return importHandler;
+    }
+
     public abstract FunctionMapper getFunctionMapper();
 
     public Locale getLocale() {
@@ -75,4 +99,60 @@ public abstract class ELContext {
     }
 
     public abstract VariableMapper getVariableMapper();
+
+    /**
+     * @since EL 3.0
+     */
+    public void addEvaluationListener(EvaluationListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * @since EL 3.0
+     */
+    public List<EvaluationListener> getEvaluationListeners() {
+        return listeners;
+    }
+
+    /**
+     * @since EL 3.0
+     */
+    public void notifyBeforeEvaluation(String expression) {
+        for (EvaluationListener listener : listeners) {
+            try {
+                listener.beforeEvaluation(this, expression);
+            } catch (Throwable t) {
+                Util.handleThrowable(t);
+                // Ignore - no option to log
+            }
+        }
+    }
+
+    /**
+     * @since EL 3.0
+     */
+    public void notifyAfterEvaluation(String expression) {
+        for (EvaluationListener listener : listeners) {
+            try {
+                listener.afterEvaluation(this, expression);
+            } catch (Throwable t) {
+                Util.handleThrowable(t);
+                // Ignore - no option to log
+            }
+        }
+    }
+
+    /**
+     * @since EL 3.0
+     */
+    public void notifyPropertyResolved(Object base, Object property) {
+        for (EvaluationListener listener : listeners) {
+            try {
+                listener.propertyResolved(this, base, property);
+            } catch (Throwable t) {
+                Util.handleThrowable(t);
+                // Ignore - no option to log
+            }
+        }
+    }
 }
