@@ -14,23 +14,62 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package javax.el;
 
-/**
- *
- */
 public abstract class ValueExpression extends Expression {
 
     private static final long serialVersionUID = 8577809572381654673L;
 
-    public abstract Object getValue(ELContext context) throws NullPointerException, PropertyNotFoundException, ELException;
+    /**
+     * @throws NullPointerException
+     *              If the supplied context is <code>null</code>
+     * @throws PropertyNotFoundException
+     *              If a property/variable resolution failed because no match
+     *              was found or a match was found but was not readable
+     * @throws ELException
+     *              Wraps any exception throw whilst resolving a property or
+     *              variable
+     */
+    public abstract Object getValue(ELContext context);
 
-    public abstract void setValue(ELContext context, Object value) throws NullPointerException, PropertyNotFoundException, PropertyNotWritableException, ELException;
+    /**
+     * @throws NullPointerException
+     *              If the supplied context is <code>null</code>
+     * @throws PropertyNotFoundException
+     *              If a property/variable resolution failed because no match
+     *              was found
+     * @throws PropertyNotWritableException
+     *              If a property/variable resolution failed because a match was
+     *              found but was not writable
+     * @throws ELException
+     *              Wraps any exception throw whilst resolving a property or
+     *              variable
+     */
+    public abstract void setValue(ELContext context, Object value);
 
-    public abstract boolean isReadOnly(ELContext context) throws NullPointerException, PropertyNotFoundException, ELException;
+    /**
+     * @throws NullPointerException
+     *              If the supplied context is <code>null</code>
+     * @throws PropertyNotFoundException
+     *              If a property/variable resolution failed because no match
+     *              was found or a match was found but was not readable
+     * @throws ELException
+     *              Wraps any exception throw whilst resolving a property or
+     *              variable
+     */
+    public abstract boolean isReadOnly(ELContext context);
 
-    public abstract Class<?> getType(ELContext context) throws NullPointerException, PropertyNotFoundException, ELException;
+    /**
+     * @throws NullPointerException
+     *              If the supplied context is <code>null</code>
+     * @throws PropertyNotFoundException
+     *              If a property/variable resolution failed because no match
+     *              was found or a match was found but was not readable
+     * @throws ELException
+     *              Wraps any exception throw whilst resolving a property or
+     *              variable
+     */
+    public abstract Class<?> getType(ELContext context);
 
     public abstract Class<?> getExpectedType();
 

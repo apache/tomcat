@@ -40,25 +40,6 @@ public class ListELResolver extends ELResolver {
     }
 
     @Override
-    public Object getValue(ELContext context, Object base, Object property) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
-
-        if (base instanceof List<?>) {
-            context.setPropertyResolved(true);
-            List<?> list = (List<?>) base;
-            int idx = coerce(property);
-            if (idx < 0 || idx >= list.size()) {
-                return null;
-            }
-            return list.get(idx);
-        }
-
-        return null;
-    }
-
-    @Override
     public Class<?> getType(ELContext context, Object base, Object property) {
         if (context == null) {
             throw new NullPointerException();
@@ -73,6 +54,25 @@ public class ListELResolver extends ELResolver {
                         new ArrayIndexOutOfBoundsException(idx).getMessage());
             }
             return Object.class;
+        }
+
+        return null;
+    }
+
+    @Override
+    public Object getValue(ELContext context, Object base, Object property) {
+        if (context == null) {
+            throw new NullPointerException();
+        }
+
+        if (base instanceof List<?>) {
+            context.setPropertyResolved(true);
+            List<?> list = (List<?>) base;
+            int idx = coerce(property);
+            if (idx < 0 || idx >= list.size()) {
+                return null;
+            }
+            return list.get(idx);
         }
 
         return null;

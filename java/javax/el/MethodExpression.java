@@ -20,9 +20,32 @@ public abstract class MethodExpression extends Expression {
 
     private static final long serialVersionUID = 8163925562047324656L;
 
-    public abstract MethodInfo getMethodInfo(ELContext context) throws NullPointerException, PropertyNotFoundException, MethodNotFoundException, ELException;
+    /**
+     * @throws NullPointerException
+     *              If the supplied context is <code>null</code>
+     * @throws PropertyNotFoundException
+     *              If a property/variable resolution failed because no match
+     *              was found or a match was found but was not readable
+     * @throws MethodNotFoundException
+     *              If no matching method can be found
+     * @throws ELException
+     *              Wraps any exception throw whilst resolving the property
+     */
+    public abstract MethodInfo getMethodInfo(ELContext context);
 
-    public abstract Object invoke(ELContext context, Object[] params) throws NullPointerException, PropertyNotFoundException, MethodNotFoundException, ELException;
+    /**
+     * @throws NullPointerException
+     *              If the supplied context is <code>null</code>
+     * @throws PropertyNotFoundException
+     *              If a property/variable resolution failed because no match
+     *              was found or a match was found but was not readable
+     * @throws MethodNotFoundException
+     *              If no matching method can be found
+     * @throws ELException
+     *              Wraps any exception throw whilst resolving the property or
+     *              coercion of the result to the expected return type fails
+     */
+    public abstract Object invoke(ELContext context, Object[] params);
 
     /**
      * @since EL 3.0
