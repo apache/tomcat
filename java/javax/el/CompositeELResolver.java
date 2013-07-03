@@ -167,6 +167,20 @@ public class CompositeELResolver extends ELResolver {
         return commonType;
     }
 
+    @Override
+    public Object convertToType(ELContext context, Object obj, Class<?> type) {
+        context.setPropertyResolved(false);
+        int sz = this.size;
+        Object result = null;
+        for (int i = 0; i < sz; i++) {
+            result = this.resolvers[i].convertToType(context, obj, type);
+            if (context.isPropertyResolved()) {
+                return result;
+            }
+        }
+        return null;
+    }
+
     private static final class FeatureIterator implements Iterator<FeatureDescriptor> {
 
         private final ELContext context;
