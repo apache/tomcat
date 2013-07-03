@@ -63,11 +63,15 @@ public final class ELContextImpl extends ELContext {
         @Override
         public ValueExpression setVariable(String variable,
                 ValueExpression expression) {
-            if (vars == null)
+            if (vars == null) {
                 vars = new HashMap<>();
-            return vars.put(variable, expression);
+            }
+            if (expression == null) {
+                return vars.remove(variable);
+            } else {
+                return vars.put(variable, expression);
+            }
         }
-
     }
 
     private static final ELResolver DefaultResolver;

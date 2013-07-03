@@ -60,7 +60,11 @@ public class TestBeanELResolverVarargsInvocation {
                 @Override
                 public ValueExpression setVariable(String arg0,
                         ValueExpression arg1) {
-                    return vars.put(arg0, arg1);
+                    if (arg1 == null) {
+                        return vars.remove(arg0);
+                    } else {
+                        return vars.put(arg0, arg1);
+                    }
                 }
 
                 @Override
