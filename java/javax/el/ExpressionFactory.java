@@ -28,8 +28,10 @@ import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -85,21 +87,6 @@ public abstract class ExpressionFactory {
                     SEP + "el.properties";
         }
     }
-
-    public abstract Object coerceToType(Object obj, Class<?> expectedType)
-            throws ELException;
-
-    public abstract ValueExpression createValueExpression(ELContext context,
-            String expression, Class<?> expectedType)
-            throws NullPointerException, ELException;
-
-    public abstract ValueExpression createValueExpression(Object instance,
-            Class<?> expectedType);
-
-    public abstract MethodExpression createMethodExpression(ELContext context,
-            String expression, Class<?> expectedReturnType,
-            Class<?>[] expectedParamTypes) throws ELException,
-            NullPointerException;
 
     /**
      * Create a new {@link ExpressionFactory}. The class to use is determined by
@@ -227,6 +214,35 @@ public abstract class ExpressionFactory {
         }
 
         return result;
+    }
+
+    public abstract ValueExpression createValueExpression(ELContext context,
+            String expression, Class<?> expectedType)
+            throws NullPointerException, ELException;
+
+    public abstract ValueExpression createValueExpression(Object instance,
+            Class<?> expectedType);
+
+    public abstract MethodExpression createMethodExpression(ELContext context,
+            String expression, Class<?> expectedReturnType,
+            Class<?>[] expectedParamTypes) throws ELException,
+            NullPointerException;
+
+    public abstract Object coerceToType(Object obj, Class<?> expectedType)
+            throws ELException;
+
+    /**
+     * @since EL 3.0
+     */
+    public ELResolver getStreamELResolver() {
+        return null;
+    }
+
+    /**
+     * @since EL 3.0
+     */
+    public Map<String,Method> getInitFunctionMap() {
+        return null;
     }
 
     /**
