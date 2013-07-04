@@ -32,7 +32,7 @@ public class TestBeanNameELResolver {
      * resolver with the same configuration.
      */
     private BeanNameELResolver createBeanNameELResolver() {
-        return createBeanNameELResolver(false);
+        return createBeanNameELResolver(true);
     }
 
     private BeanNameELResolver createBeanNameELResolver(boolean allowCreate) {
