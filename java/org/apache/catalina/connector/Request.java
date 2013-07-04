@@ -1878,13 +1878,13 @@ public class Request
      */
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(
-            Class<T> httpUpgradeHandlerClass) throws java.io.IOException {
+            Class<T> httpUpgradeHandlerClass) throws java.io.IOException, ServletException {
 
         T handler;
         try {
             handler = (T) context.getInstanceManager().newInstance(httpUpgradeHandlerClass);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NamingException e) {
-            throw new IOException(e);
+            throw new ServletException(e);
         }
 
         coyoteRequest.action(ActionCode.UPGRADE, handler);

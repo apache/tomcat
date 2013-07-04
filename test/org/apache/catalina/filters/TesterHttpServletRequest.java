@@ -461,7 +461,7 @@ public class TesterHttpServletRequest implements HttpServletRequest {
 
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(
-            Class<T> httpUpgradeHandlerClass) throws IOException {
+            Class<T> httpUpgradeHandlerClass) throws IOException, ServletException {
         throw new RuntimeException("Not implemented");
     }
 
