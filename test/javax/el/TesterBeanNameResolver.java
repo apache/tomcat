@@ -25,10 +25,10 @@ public class TesterBeanNameResolver extends BeanNameResolver {
     public static final String THROWABLE_TRIGGER_NAME = "exception";
 
     private Map<String,Object> beans = new HashMap<>();
-    private final boolean allowCreate;
+    private boolean allowCreate = true;
 
-    public TesterBeanNameResolver(boolean allowCreate) {
-        this.allowCreate = allowCreate;
+
+    public TesterBeanNameResolver() {
         beans.put(EXCEPTION_TRIGGER_NAME, new Object());
     }
 
@@ -59,5 +59,10 @@ public class TesterBeanNameResolver extends BeanNameResolver {
     @Override
     public boolean canCreateBean(String beanName) {
         return allowCreate;
+    }
+
+
+    public void setAllowCreate(boolean allowCreate) {
+        this.allowCreate = allowCreate;
     }
 }
