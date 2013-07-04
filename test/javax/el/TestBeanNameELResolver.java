@@ -140,7 +140,8 @@ public class TestBeanNameELResolver {
      */
     @Test
     public void testGetValue06() {
-        doGetValueThrowableTest(TesterBeanNameResolver.EXCEPTION_TRIGGER_NAME);
+        doThrowableTest(TesterBeanNameResolver.EXCEPTION_TRIGGER_NAME,
+                MethodUnderTest.GET_VALUE);
     }
 
 
@@ -149,28 +150,8 @@ public class TestBeanNameELResolver {
      */
     @Test
     public void testGetValue07() {
-        doGetValueThrowableTest(TesterBeanNameResolver.THROWABLE_TRIGGER_NAME);
-    }
-
-
-    private void doGetValueThrowableTest(String trigger) {
-        BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
-
-        ELException elException = null;
-        try {
-            resolver.getValue(context, null,trigger);
-        } catch (ELException e) {
-            elException = e;
-        }
-
-        Assert.assertFalse(context.isPropertyResolved());
-        Assert.assertNotNull(elException);
-
-        @SuppressWarnings("null") // Can't be null due to assertion above
-        Throwable cause = elException.getCause();
-        Assert.assertNotNull(cause);
+        doThrowableTest(TesterBeanNameResolver.THROWABLE_TRIGGER_NAME,
+                MethodUnderTest.GET_VALUE);
     }
 
 
@@ -241,6 +222,61 @@ public class TestBeanNameELResolver {
 
 
     /**
+     * Exception during resolution should be wrapped and re-thrown.
+     */
+    @Test
+    public void testGetValue08() {
+        doThrowableTest(TesterBeanNameResolver.EXCEPTION_TRIGGER_NAME,
+                MethodUnderTest.SET_VALUE);
+    }
+
+
+    /**
+     * Throwable during resolution should be wrapped and re-thrown.
+     */
+    @Test
+    public void testGetValue09() {
+        doThrowableTest(TesterBeanNameResolver.THROWABLE_TRIGGER_NAME,
+                MethodUnderTest.SET_VALUE);
+    }
+
+
+    private void doThrowableTest(String trigger, MethodUnderTest method) {
+        BeanNameELResolver resolver = createBeanNameELResolver();
+        ELContext context =
+                new StandardELContext(ELManager.getExpressionFactory());
+
+        ELException elException = null;
+        try {
+            switch (method) {
+                case GET_VALUE: {
+                    resolver.getValue(context, null, trigger);
+                    break;
+                }
+                case SET_VALUE: {
+                    resolver.setValue(context, null, trigger, new Object());
+                    break;
+                }
+                default: {
+                    // Should never happen
+                    Assert.fail("Missing case for method");
+                }
+            }
+
+        } catch (ELException e) {
+            elException = e;
+        }
+
+        Assert.assertFalse(context.isPropertyResolved());
+        Assert.assertNotNull(elException);
+
+        @SuppressWarnings("null") // Can't be null due to assertion above
+        Throwable cause = elException.getCause();
+        Assert.assertNotNull(cause);
+    }
+
+
+    /**
      * Tests adding/replacing beans beans
      */
     private void doSetValueCreateReplaceTest(boolean canCreate,
@@ -279,5 +315,11 @@ public class TestBeanNameELResolver {
             Assert.assertTrue(context.isPropertyResolved());
             Assert.assertEquals(BEAN01, bean);
         }
+    }
+
+
+    private static enum MethodUnderTest {
+        GET_VALUE,
+        SET_VALUE
     }
 }
