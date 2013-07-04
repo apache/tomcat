@@ -212,11 +212,31 @@ public class TestBeanNameELResolver {
 
 
     /**
-     * Test ceate with create disabled.
+     * Test create with create disabled.
      */
     @Test
     public void testSetValue05() {
         doSetValueCreateReplaceTest(false, BEAN99_NAME);
+    }
+
+
+    /**
+     * Test replacing a read-only bean with create enabled.
+     */
+    @Test(expected=PropertyNotWritableException.class)
+    public void testSetValue06() {
+        doSetValueCreateReplaceTest(true,
+                TesterBeanNameResolver.READ_ONLY_NAME);
+    }
+
+
+    /**
+     * Test replacing a read-only bean with create disable.
+     */
+    @Test(expected=PropertyNotWritableException.class)
+    public void testSetValue07() {
+        doSetValueCreateReplaceTest(false,
+                TesterBeanNameResolver.READ_ONLY_NAME);
     }
 
 
