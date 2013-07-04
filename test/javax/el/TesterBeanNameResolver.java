@@ -22,7 +22,7 @@ import java.util.Map;
 public class TesterBeanNameResolver extends BeanNameResolver {
 
     public static final String EXCEPTION_TRIGGER_NAME = "exception";
-    public static final String THROWABLE_TRIGGER_NAME = "exception";
+    public static final String THROWABLE_TRIGGER_NAME = "throwable";
 
     private Map<String,Object> beans = new HashMap<>();
     private boolean allowCreate = true;
@@ -30,6 +30,7 @@ public class TesterBeanNameResolver extends BeanNameResolver {
 
     public TesterBeanNameResolver() {
         beans.put(EXCEPTION_TRIGGER_NAME, new Object());
+        beans.put(THROWABLE_TRIGGER_NAME, new Object());
     }
 
     @Override
