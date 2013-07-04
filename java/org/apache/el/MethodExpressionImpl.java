@@ -313,6 +313,15 @@ public final class MethodExpressionImpl extends MethodExpression implements
         return false;
     }
 
+
+    /**
+     * @since EL 3.0
+     */
+    @Override
+    public boolean isParametersProvided() {
+        return this.getNode().isParametersProvided();
+    }
+
     /**
      * @since EL 2.2
      * Note: The spelling mistake is deliberate.
