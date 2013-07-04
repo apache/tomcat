@@ -38,6 +38,7 @@ public class TesterBeanNameResolver extends BeanNameResolver {
     @Override
     public void setBeanValue(String beanName, Object value)
             throws PropertyNotWritableException {
+        checkTriggers(beanName);
         if (allowCreate || beans.containsKey(beanName)) {
             beans.put(beanName, value);
         }
@@ -50,12 +51,7 @@ public class TesterBeanNameResolver extends BeanNameResolver {
 
     @Override
     public Object getBean(String beanName) {
-        if (EXCEPTION_TRIGGER_NAME.equals(beanName)) {
-            throw new RuntimeException();
-        }
-        if (THROWABLE_TRIGGER_NAME.equals(beanName)) {
-            throw new Error();
-        }
+        checkTriggers(beanName);
         return beans.get(beanName);
     }
 
@@ -72,5 +68,14 @@ public class TesterBeanNameResolver extends BeanNameResolver {
     @Override
     public boolean isReadOnly(String beanName) {
         return READ_ONLY_NAME.equals(beanName);
+    }
+
+    private void checkTriggers(String beanName) {
+        if (EXCEPTION_TRIGGER_NAME.equals(beanName)) {
+            throw new RuntimeException();
+        }
+        if (THROWABLE_TRIGGER_NAME.equals(beanName)) {
+            throw new Error();
+        }
     }
 }
