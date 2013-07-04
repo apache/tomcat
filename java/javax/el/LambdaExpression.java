@@ -45,7 +45,7 @@ public class LambdaExpression {
         return null;
     }
 
-    public java.lang.Object invoke(Object... args) throws ELException {
+    public java.lang.Object invoke(Object... args) {
         return invoke (context, args);
     }
 }
