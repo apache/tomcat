@@ -23,6 +23,7 @@ public class TesterBeanNameResolver extends BeanNameResolver {
 
     public static final String EXCEPTION_TRIGGER_NAME = "exception";
     public static final String THROWABLE_TRIGGER_NAME = "throwable";
+    public static final String READ_ONLY_NAME = "readonly";
 
     private Map<String,Object> beans = new HashMap<>();
     private boolean allowCreate = true;
@@ -31,6 +32,7 @@ public class TesterBeanNameResolver extends BeanNameResolver {
     public TesterBeanNameResolver() {
         beans.put(EXCEPTION_TRIGGER_NAME, new Object());
         beans.put(THROWABLE_TRIGGER_NAME, new Object());
+        beans.put(READ_ONLY_NAME, new Object());
     }
 
     @Override
@@ -65,5 +67,10 @@ public class TesterBeanNameResolver extends BeanNameResolver {
 
     public void setAllowCreate(boolean allowCreate) {
         this.allowCreate = allowCreate;
+    }
+
+    @Override
+    public boolean isReadOnly(String beanName) {
+        return READ_ONLY_NAME.equals(beanName);
     }
 }

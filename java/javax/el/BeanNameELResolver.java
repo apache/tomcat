@@ -69,6 +69,11 @@ public class BeanNameELResolver extends ELResolver {
 
         String beanName = (String) property;
 
+        if (isReadOnly(context, base, property)) {
+            throw new PropertyNotWritableException(Util.message(context,
+                    "beanNameELResolver.beanReadOnly", beanName));
+        }
+
         if (beanNameResolver.isNameResolved(beanName) ||
                 beanNameResolver.canCreateBean(beanName)) {
             context.setPropertyResolved(true);
