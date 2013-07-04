@@ -98,8 +98,8 @@ public class TestMethodExpressionImpl {
                 context, "${beanB.sayHello('JUnit')}", String.class,
                 new Class<?>[] { String.class });
 
-        assertFalse(me1.isParmetersProvided());
-        assertTrue(me2.isParmetersProvided());
+        assertFalse(me1.isParametersProvided());
+        assertTrue(me2.isParametersProvided());
     }
 
     @Test
