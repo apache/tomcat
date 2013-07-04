@@ -225,7 +225,7 @@ public class TestBeanNameELResolver {
      * Exception during resolution should be wrapped and re-thrown.
      */
     @Test
-    public void testGetValue08() {
+    public void testSetValue08() {
         doThrowableTest(TesterBeanNameResolver.EXCEPTION_TRIGGER_NAME,
                 MethodUnderTest.SET_VALUE);
     }
@@ -235,9 +235,115 @@ public class TestBeanNameELResolver {
      * Throwable during resolution should be wrapped and re-thrown.
      */
     @Test
-    public void testGetValue09() {
+    public void testSetValue09() {
         doThrowableTest(TesterBeanNameResolver.THROWABLE_TRIGGER_NAME,
                 MethodUnderTest.SET_VALUE);
+    }
+
+
+    /**
+     * Tests that a null context results in an NPE as per EL Javadoc.
+     */
+    @Test(expected=NullPointerException.class)
+    public void testGetType01() {
+        BeanNameELResolver resolver = createBeanNameELResolver();
+        resolver.getType(null, new Object(), new Object());
+    }
+
+
+    /**
+     * Tests that a valid bean is resolved.
+     */
+    @Test
+    public void testGetType02() {
+
+        BeanNameELResolver resolver = createBeanNameELResolver();
+        ELContext context =
+                new StandardELContext(ELManager.getExpressionFactory());
+
+        Class<?> result = resolver.getType(context, null, BEAN01_NAME);
+
+        Assert.assertEquals(BEAN01.getClass(), result);
+        Assert.assertTrue(context.isPropertyResolved());
+    }
+
+
+    /**
+     * Tests that a valid bean is not resolved if base is non-null.
+     */
+    @Test
+    public void testGetType03() {
+
+        BeanNameELResolver resolver = createBeanNameELResolver();
+        ELContext context =
+                new StandardELContext(ELManager.getExpressionFactory());
+
+        Class<?> result = resolver.getType(context, new Object(), BEAN01_NAME);
+
+        Assert.assertNull(result);
+        Assert.assertFalse(context.isPropertyResolved());
+    }
+
+
+    /**
+     * Tests that a valid bean is not resolved if property is not a String even
+     * if it can be coerced to a valid bean name.
+     */
+    @Test
+    public void testGetType04() {
+
+        BeanNameELResolver resolver = createBeanNameELResolver();
+        ELContext context =
+                new StandardELContext(ELManager.getExpressionFactory());
+
+        Object property = new Object() {
+            @Override
+            public String toString() {
+                return BEAN01_NAME;
+            }
+        };
+
+        Class<?> result = resolver.getType(context, null, property);
+
+        Assert.assertNull(result);
+        Assert.assertFalse(context.isPropertyResolved());
+    }
+
+
+    /**
+     * Beans that don't exist shouldn't return anything
+     */
+    @Test
+    public void testGetType05() {
+
+        BeanNameELResolver resolver = createBeanNameELResolver();
+        ELContext context =
+                new StandardELContext(ELManager.getExpressionFactory());
+
+        Class<?> result = resolver.getType(context, null, BEAN99_NAME);
+
+        Assert.assertNull(result);
+        Assert.assertFalse(context.isPropertyResolved());
+    }
+
+
+    /**
+     * Exception during resolution should be wrapped and re-thrown.
+     */
+    @Test
+    public void testGetType06() {
+        doThrowableTest(TesterBeanNameResolver.EXCEPTION_TRIGGER_NAME,
+                MethodUnderTest.GET_TYPE);
+    }
+
+
+    /**
+     * Throwable during resolution should be wrapped and re-thrown.
+     */
+    @Test
+    public void testGetType07() {
+        doThrowableTest(TesterBeanNameResolver.THROWABLE_TRIGGER_NAME,
+                MethodUnderTest.GET_TYPE);
     }
 
 
@@ -255,6 +361,10 @@ public class TestBeanNameELResolver {
                 }
                 case SET_VALUE: {
                     resolver.setValue(context, null, trigger, new Object());
+                    break;
+                }
+                case GET_TYPE: {
+                    resolver.getType(context, null, trigger);
                     break;
                 }
                 default: {
@@ -320,6 +430,7 @@ public class TestBeanNameELResolver {
 
     private static enum MethodUnderTest {
         GET_VALUE,
-        SET_VALUE
+        SET_VALUE,
+        GET_TYPE
     }
 }

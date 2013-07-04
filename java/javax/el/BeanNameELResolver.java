@@ -100,9 +100,15 @@ public class BeanNameELResolver extends ELResolver {
 
         String beanName = (String) property;
 
-        if (beanNameResolver.isNameResolved(beanName)) {
-            context.setPropertyResolved(true);
-            beanNameResolver.getBean(beanName).getClass();
+        try {
+            if (beanNameResolver.isNameResolved(beanName)) {
+                Class<?> result = beanNameResolver.getBean(beanName).getClass();
+                context.setPropertyResolved(true);
+                return result;
+            }
+        } catch (Throwable t) {
+            Util.handleThrowable(t);
+            throw new ELException(t);
         }
 
         return null;
