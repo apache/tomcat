@@ -26,6 +26,7 @@ public class TestBeanNameELResolver {
     private static final String BEAN02_NAME = "bean02";
     private static final TesterBean BEAN02 = new TesterBean(BEAN02_NAME);
     private static final String BEAN99_NAME = "bean99";
+    private static final TesterBean BEAN99 = new TesterBean(BEAN99_NAME);
 
     /**
      * Creates the resolver that is used for the test. All the tests use a
@@ -37,10 +38,10 @@ public class TestBeanNameELResolver {
 
     private BeanNameELResolver createBeanNameELResolver(boolean allowCreate) {
 
-        BeanNameResolver beanNameResolver =
-                new TesterBeanNameResolver(allowCreate);
+        TesterBeanNameResolver beanNameResolver = new TesterBeanNameResolver();
         beanNameResolver.setBeanValue(BEAN01_NAME, BEAN01);
         beanNameResolver.setBeanValue(BEAN02_NAME, BEAN02);
+        beanNameResolver.setAllowCreate(allowCreate);
 
         BeanNameELResolver beanNameELResolver =
                 new BeanNameELResolver(beanNameResolver);
@@ -180,5 +181,83 @@ public class TestBeanNameELResolver {
     public void testSetValue01() {
         BeanNameELResolver resolver = createBeanNameELResolver();
         resolver.setValue(null, new Object(), new Object(), new Object());
+    }
+
+
+    /**
+     * Test replace with create enabled.
+     */
+    @Test
+    public void testSetValue02() {
+        doSetValueCreateReplaceTest(true, BEAN01_NAME);
+    }
+
+
+    /**
+     * Test replace with create disabled.
+     */
+    @Test
+    public void testSetValue03() {
+        doSetValueCreateReplaceTest(false, BEAN01_NAME);
+    }
+
+
+    /**
+     * Test create with create enabled.
+     */
+    @Test
+    public void testSetValue04() {
+        doSetValueCreateReplaceTest(true, BEAN99_NAME);
+    }
+
+
+    /**
+     * Test ceate with create disabled.
+     */
+    @Test
+    public void testSetValue05() {
+        doSetValueCreateReplaceTest(false, BEAN99_NAME);
+    }
+
+
+    /**
+     * Tests adding/replacing beans beans
+     */
+    private void doSetValueCreateReplaceTest(boolean canCreate,
+            String beanName) {
+        BeanNameELResolver resolver = createBeanNameELResolver(canCreate);
+        ELContext context =
+                new StandardELContext(ELManager.getExpressionFactory());
+
+        // Get bean one to be sure it has been replaced when testing replace
+        Object bean = resolver.getValue(context, null, BEAN01_NAME);
+
+        Assert.assertTrue(context.isPropertyResolved());
+        Assert.assertEquals(BEAN01, bean);
+
+        // Reset context
+        context.setPropertyResolved(false);
+
+        // Replace BEAN01
+        resolver.setValue(context, null, beanName, BEAN99);
+        if (canCreate || BEAN01_NAME.equals(beanName)) {
+            Assert.assertTrue(context.isPropertyResolved());
+
+            // Obtain BEAN01 again
+            context.setPropertyResolved(false);
+            bean = resolver.getValue(context, null, beanName);
+
+            Assert.assertTrue(context.isPropertyResolved());
+            Assert.assertEquals(BEAN99, bean);
+        } else {
+            Assert.assertFalse(context.isPropertyResolved());
+
+            // Obtain BEAN01 again
+            context.setPropertyResolved(false);
+            bean = resolver.getValue(context, null, BEAN01_NAME);
+
+            Assert.assertTrue(context.isPropertyResolved());
+            Assert.assertEquals(BEAN01, bean);
+        }
     }
 }
