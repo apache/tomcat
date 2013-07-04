@@ -216,20 +216,33 @@ public abstract class ExpressionFactory {
         return result;
     }
 
+    /**
+     * @throws NullPointerException
+     *              If the expected type is <code>null</code>
+     * @throws ELException
+     *              If there are syntax errors in the provided expression
+     */
     public abstract ValueExpression createValueExpression(ELContext context,
-            String expression, Class<?> expectedType)
-            throws NullPointerException, ELException;
+            String expression, Class<?> expectedType);
 
     public abstract ValueExpression createValueExpression(Object instance,
             Class<?> expectedType);
 
+    /**
+     * @throws NullPointerException
+     *              If the expected parameters types are <code>null</code>
+     * @throws ELException
+     *              If there are syntax errors in the provided expression
+     */
     public abstract MethodExpression createMethodExpression(ELContext context,
             String expression, Class<?> expectedReturnType,
-            Class<?>[] expectedParamTypes) throws ELException,
-            NullPointerException;
+            Class<?>[] expectedParamTypes);
 
-    public abstract Object coerceToType(Object obj, Class<?> expectedType)
-            throws ELException;
+    /**
+     * @throws ELException
+     *              If the conversion fails
+     */
+    public abstract Object coerceToType(Object obj, Class<?> expectedType);
 
     /**
      * @since EL 3.0
