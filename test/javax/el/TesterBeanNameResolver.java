@@ -21,12 +21,18 @@ import java.util.Map;
 
 public class TesterBeanNameResolver extends BeanNameResolver {
 
+    public static final String EXCEPTION_TRIGGER_NAME = "exception";
+    public static final String THROWABLE_TRIGGER_NAME = "exception";
+
     private Map<String,Object> beans = new HashMap<>();
+
+    public TesterBeanNameResolver() {
+        beans.put(EXCEPTION_TRIGGER_NAME, new Object());
+    }
 
     @Override
     public void setBeanValue(String beanName, Object value)
             throws PropertyNotWritableException {
-
         beans.put(beanName, value);
     }
 
@@ -37,6 +43,12 @@ public class TesterBeanNameResolver extends BeanNameResolver {
 
     @Override
     public Object getBean(String beanName) {
+        if (EXCEPTION_TRIGGER_NAME.equals(beanName)) {
+            throw new RuntimeException();
+        }
+        if (THROWABLE_TRIGGER_NAME.equals(beanName)) {
+            throw new Error();
+        }
         return beans.get(beanName);
     }
 }
