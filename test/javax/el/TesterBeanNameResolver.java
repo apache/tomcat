@@ -25,15 +25,19 @@ public class TesterBeanNameResolver extends BeanNameResolver {
     public static final String THROWABLE_TRIGGER_NAME = "exception";
 
     private Map<String,Object> beans = new HashMap<>();
+    private final boolean allowCreate;
 
-    public TesterBeanNameResolver() {
+    public TesterBeanNameResolver(boolean allowCreate) {
+        this.allowCreate = allowCreate;
         beans.put(EXCEPTION_TRIGGER_NAME, new Object());
     }
 
     @Override
     public void setBeanValue(String beanName, Object value)
             throws PropertyNotWritableException {
-        beans.put(beanName, value);
+        if (allowCreate || beans.containsKey(beanName)) {
+            beans.put(beanName, value);
+        }
     }
 
     @Override
@@ -50,5 +54,10 @@ public class TesterBeanNameResolver extends BeanNameResolver {
             throw new Error();
         }
         return beans.get(beanName);
+    }
+
+    @Override
+    public boolean canCreateBean(String beanName) {
+        return allowCreate;
     }
 }

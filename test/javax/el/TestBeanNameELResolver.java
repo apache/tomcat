@@ -32,8 +32,13 @@ public class TestBeanNameELResolver {
      * resolver with the same configuration.
      */
     private BeanNameELResolver createBeanNameELResolver() {
+        return createBeanNameELResolver(false);
+    }
 
-        BeanNameResolver beanNameResolver = new TesterBeanNameResolver();
+    private BeanNameELResolver createBeanNameELResolver(boolean allowCreate) {
+
+        BeanNameResolver beanNameResolver =
+                new TesterBeanNameResolver(allowCreate);
         beanNameResolver.setBeanValue(BEAN01_NAME, BEAN01);
         beanNameResolver.setBeanValue(BEAN02_NAME, BEAN02);
 
@@ -165,5 +170,15 @@ public class TestBeanNameELResolver {
         @SuppressWarnings("null") // Can't be null due to assertion above
         Throwable cause = elException.getCause();
         Assert.assertNotNull(cause);
+    }
+
+
+    /**
+     * Tests that a null context results in an NPE as per EL Javadoc.
+     */
+    @Test(expected=NullPointerException.class)
+    public void testSetValue01() {
+        BeanNameELResolver resolver = createBeanNameELResolver();
+        resolver.setValue(null, new Object(), new Object(), new Object());
     }
 }
