@@ -1113,7 +1113,7 @@ public class RequestFacade implements HttpServletRequest {
      */
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(
-            Class<T> httpUpgradeHandlerClass) throws java.io.IOException {
+            Class<T> httpUpgradeHandlerClass) throws java.io.IOException, ServletException {
         return request.upgrade(httpUpgradeHandlerClass);
     }
 }

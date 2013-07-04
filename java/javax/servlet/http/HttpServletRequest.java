@@ -510,8 +510,12 @@ public interface HttpServletRequest extends ServletRequest {
      * Protocol specific headers must have already been set before this method
      * is called.
      *
+     * @throws IOException
+     *             if an I/O error occurred during the upgrade
+     * @throws ServletException
+     *             if the given httpUpgradeHandlerClass fails to be instantiated
      * @since Servlet 3.1
      */
     public <T extends HttpUpgradeHandler> T upgrade(
-            Class<T> httpUpgradeHandlerClass) throws java.io.IOException;
+            Class<T> httpUpgradeHandlerClass) throws java.io.IOException, ServletException;
 }

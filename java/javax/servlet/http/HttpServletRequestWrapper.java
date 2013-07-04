@@ -370,7 +370,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
      */
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(
-            Class<T> httpUpgradeHandlerClass) throws IOException {
+            Class<T> httpUpgradeHandlerClass) throws IOException, ServletException {
         return this._getHttpServletRequest().upgrade(httpUpgradeHandlerClass);
     }
 }
