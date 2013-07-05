@@ -468,6 +468,60 @@ public class TestBeanNameELResolver {
     }
 
 
+    /**
+     * Confirm it returns null for 'valid' input.
+     */
+    public void testGetFeatureDescriptors01() {
+        BeanNameELResolver resolver = createBeanNameELResolver();
+        ELContext context =
+                new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.getFeatureDescriptors(context, null);
+
+        Assert.assertNull(result);
+        Assert.assertFalse(context.isPropertyResolved());
+    }
+
+
+    /**
+     * Confirm it returns null for invalid input.
+     */
+    public void testGetFeatureDescriptors02() {
+        BeanNameELResolver resolver = createBeanNameELResolver();
+
+        Object result = resolver.getFeatureDescriptors(null, new Object());
+
+        Assert.assertNull(result);
+    }
+
+
+    /**
+     * Confirm it returns String.class for 'valid' input.
+     */
+    public void testGetCommonPropertyType01() {
+        BeanNameELResolver resolver = createBeanNameELResolver();
+        ELContext context =
+                new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.getCommonPropertyType(context, null);
+
+        Assert.assertNull(result);
+        Assert.assertFalse(context.isPropertyResolved());
+    }
+
+
+    /**
+     * Confirm it returns String.class for invalid input.
+     */
+    public void testGetCommonPropertyType02() {
+        BeanNameELResolver resolver = createBeanNameELResolver();
+
+        Object result = resolver.getCommonPropertyType(null, new Object());
+
+        Assert.assertNull(result);
+    }
+
+
     private void doThrowableTest(String trigger, MethodUnderTest method) {
         BeanNameELResolver resolver = createBeanNameELResolver();
         ELContext context =
