@@ -516,6 +516,7 @@ public final class Request {
         headers.recycle();
         serverNameMB.recycle();
         serverPort=-1;
+        localNameMB.recycle();
         localPort = -1;
         remotePort = -1;
         available = 0;
