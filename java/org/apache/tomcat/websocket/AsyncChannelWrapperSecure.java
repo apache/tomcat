@@ -214,13 +214,12 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                         socketWriteBuffer.flip();
 
                         // Do the write
-                        Future<Integer> f = socketChannel.write(socketWriteBuffer);
-                        Integer socketWrite = f.get();
-                        if (socketWrite.intValue() != r.bytesProduced()) {
-                            throw new IOException(sm.getString(
-                                    "asyncChannelWrapperSecure.writeFail",
-                                    Integer.valueOf(socketWrite.intValue()),
-                                    Integer.valueOf(r.bytesProduced())));
+                        int toWrite = r.bytesProduced();
+                        while (toWrite > 0) {
+                            Future<Integer> f =
+                                    socketChannel.write(socketWriteBuffer);
+                            Integer socketWrite = f.get();
+                            toWrite -= socketWrite.intValue();
                         }
                     }
                 }
