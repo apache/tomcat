@@ -277,9 +277,9 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                         read += r.bytesProduced();
                         Status s = r.getStatus();
 
-                        if (s == Status.OK || s == Status.BUFFER_OVERFLOW) {
+                        if (s == Status.OK) {
                             // Bytes available for reading and there may be
-                            // sufficientNeed data in the socketReadBuffer to
+                            // sufficient data in the socketReadBuffer to
                             // support further reads without reading from the
                             // socket
                         } else if (s == Status.BUFFER_UNDERFLOW) {
@@ -291,6 +291,13 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             }
                             // else return the data we have and deal with the
                             // partial data on the next read
+                        } else if (s == Status.BUFFER_OVERFLOW) {
+                            // Not enough space in the destination buffer to
+                            // store all of the data
+                            throw new IOException(sm.getString(
+                                    "asyncChannelWrapperSecure.readOverflow",
+                                    Integer.valueOf(dest.limit()),
+                                    Integer.valueOf(dest.position())));
                         } else {
                             // Status.CLOSED - unexpected
                             throw new IllegalStateException(sm.getString(
