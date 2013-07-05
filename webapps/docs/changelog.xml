@@ -70,6 +70,11 @@
         <bug>55198</bug>: Ensure attribute values in tagx files that include EL
         and quoted XML characters are correctly quoted in the output. (markt)
       </fix>
+      <fix>
+        Ensure that <code>javax.el.ELContext.getContext(Class)</code> will
+        throw <code>NullPointerException</code> when the provided class is
+        null. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

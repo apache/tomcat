@@ -40,7 +40,14 @@ public abstract class ELContext {
     }
     
     // Can't use Class<?> because API needs to match specification
+    /**
+     * @throws NullPointerException
+     *              If the provided key is <code>null</code>
+     */
     public Object getContext(@SuppressWarnings("rawtypes") Class key) {
+        if (key == null) {
+            throw new NullPointerException();
+        }
         if (this.map == null) {
             return null;
         }
