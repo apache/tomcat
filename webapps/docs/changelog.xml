@@ -56,6 +56,14 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.43 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>55186</bug>: Ensure local name is recycled between requests so IP
+        virtual hosting works correctly. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <add>
