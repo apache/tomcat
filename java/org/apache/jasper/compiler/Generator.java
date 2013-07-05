@@ -821,7 +821,7 @@ class Generator {
          *            attributes that aren't EL expressions)
          */
         private String attributeValue(Node.JspAttribute attr, boolean encode,
-                Class<?> expectedType) {
+                Class<?> expectedType, boolean isXml) {
             String v = attr.getValue();
             if (!attr.isNamedAttribute() && (v == null))
                 return "";
@@ -834,7 +834,7 @@ class Generator {
                 return v;
             } else if (attr.isELInterpreterInput()) {
                 v = elInterpreter.interpreterCall(ctxt, this.isTagFile, v,
-                        expectedType, attr.getEL().getMapName(), false);
+                        expectedType, attr.getEL().getMapName(), isXml);
                 if (encode) {
                     return "org.apache.jasper.runtime.JspRuntimeLibrary.URLEncode("
                             + v + ", request.getCharacterEncoding())";
@@ -879,7 +879,8 @@ class Generator {
                             + "URLEncode(" + quote(n.getTextAttribute("name"))
                             + ", request.getCharacterEncoding())");
                     out.print("+ \"=\" + ");
-                    out.print(attributeValue(n.getValue(), true, String.class));
+                    out.print(attributeValue(n.getValue(), true, String.class,
+                            n.getRoot().isXmlSyntax()));
 
                     // The separator is '&' after the second use
                     separator = "\"&\"";
@@ -950,7 +951,8 @@ class Generator {
                 pageParam = generateNamedAttributeValue(page
                         .getNamedAttributeNode());
             } else {
-                pageParam = attributeValue(page, false, String.class);
+                pageParam = attributeValue(page, false, String.class,
+                        n.getRoot().isXmlSyntax());
             }
 
             // If any of the params have their values specified by
@@ -1036,7 +1038,8 @@ class Generator {
                 pageParam = generateNamedAttributeValue(page
                         .getNamedAttributeNode());
             } else {
-                pageParam = attributeValue(page, false, String.class);
+                pageParam = attributeValue(page, false, String.class,
+                        n.getRoot().isXmlSyntax());
             }
 
             // If any of the params have their values specified by
@@ -1143,7 +1146,8 @@ class Generator {
                         + "_jspx_page_context.findAttribute(\""
                         + name
                         + "\"), \"" + property + "\",");
-                out.print(attributeValue(value, false, null));
+                out.print(attributeValue(value, false, null,
+                        n.getRoot().isXmlSyntax()));
                 out.println(");");
             } else if (value.isELInterpreterInput()) {
                 // We've got to resolve the very call to the interpreter
@@ -1188,7 +1192,8 @@ class Generator {
                         + "_jspx_page_context.findAttribute(\""
                         + name
                         + "\"), \"" + property + "\", ");
-                out.print(attributeValue(value, false, null));
+                out.print(attributeValue(value, false, null,
+                        n.getRoot().isXmlSyntax()));
                 out.println(", null, null, false);");
             }
 
@@ -1320,7 +1325,7 @@ class Generator {
                                     .getNamedAttributeNode());
                         } else {
                             binaryName = attributeValue(beanName, false,
-                                    String.class);
+                                    String.class, n.getRoot().isXmlSyntax());
                         }
                     } else {
                         // Implies klass is not null
@@ -1429,20 +1434,24 @@ class Generator {
                         // We want something of the form
                         // out.println( "<param name=\"blah\"
                         // value=\"" + ... + "\">" );
-                        out.printil("out.write( \"<param name=\\\""
-                                + escape(name)
-                                + "\\\" value=\\\"\" + "
-                                + attributeValue(n.getValue(), false,
-                                        String.class) + " + \"\\\">\" );");
+                        out.printil("out.write( \"<param name=\\\"" +
+                                escape(name) +
+                                "\\\" value=\\\"\" + " +
+                                attributeValue(n.getValue(), false,
+                                        String.class,
+                                        n.getRoot().isXmlSyntax()) +
+                                " + \"\\\">\" );");
                         out.printil("out.write(\"\\n\");");
                     } else {
                         // We want something of the form
                         // out.print( " blah=\"" + ... + "\"" );
-                        out.printil("out.write( \" "
-                                + escape(name)
-                                + "=\\\"\" + "
-                                + attributeValue(n.getValue(), false,
-                                        String.class) + " + \"\\\"\" );");
+                        out.printil("out.write( \" " +
+                                escape(name) +
+                                "=\\\"\" + " +
+                                attributeValue(n.getValue(), false,
+                                        String.class,
+                                        n.getRoot().isXmlSyntax()) +
+                                " + \"\\\"\" );");
                     }
 
                     n.setEndJavaLine(out.getJavaLine());
@@ -1469,7 +1478,8 @@ class Generator {
                     widthStr = generateNamedAttributeValue(width
                             .getNamedAttributeNode());
                 } else {
-                    widthStr = attributeValue(width, false, String.class);
+                    widthStr = attributeValue(width, false, String.class,
+                            n.getRoot().isXmlSyntax());
                 }
             }
 
@@ -1479,7 +1489,8 @@ class Generator {
                     heightStr = generateNamedAttributeValue(height
                             .getNamedAttributeNode());
                 } else {
-                    heightStr = attributeValue(height, false, String.class);
+                    heightStr = attributeValue(height, false, String.class,
+                            n.getRoot().isXmlSyntax());
                 }
             }
 
@@ -1834,8 +1845,9 @@ class Generator {
                     out.print("=");
                     if (jspAttrs[i].isELInterpreterInput()) {
                         out.print("\\\"\" + ");
-                        out.print(attributeValue(jspAttrs[i], false,
-                                String.class));
+                        String debug = attributeValue(jspAttrs[i], false,
+                                String.class, n.getRoot().isXmlSyntax());
+                        out.print(debug);
                         out.print(" + \"\\\"");
                     } else {
                         out.print(DOUBLE_QUOTE);
@@ -1883,7 +1895,8 @@ class Generator {
                     if (omitAttr == null) {
                         omit = "false";
                     } else {
-                        omit = attributeValue(omitAttr, false, boolean.class);
+                        omit = attributeValue(omitAttr, false, boolean.class,
+                                n.getRoot().isXmlSyntax());
                         if ("true".equals(omit)) {
                             continue;
                         }
@@ -1899,7 +1912,8 @@ class Generator {
                                 " + \"\\\"\")";
                     }
                 } else {
-                    value = attributeValue(attrs[i], false, Object.class);
+                    value = attributeValue(attrs[i], false, Object.class,
+                            n.getRoot().isXmlSyntax());
                     nvp = " + \" " + attrs[i].getName() + "=\\\"\" + " +
                             value + " + \"\\\"\"";
                 }
@@ -1909,7 +1923,7 @@ class Generator {
             // Write begin tag, using XML-style 'name' attribute as the
             // element name
             String elemName = attributeValue(n.getNameAttribute(), false,
-                    String.class);
+                    String.class, n.getRoot().isXmlSyntax());
             out.printin("out.write(\"<\"");
             out.print(" + " + elemName);
 
