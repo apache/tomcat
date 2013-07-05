@@ -57,6 +57,7 @@ public class TesterBeanNameResolver extends BeanNameResolver {
 
     @Override
     public boolean canCreateBean(String beanName) {
+        checkTriggers(beanName);
         return allowCreate;
     }
 
@@ -67,6 +68,7 @@ public class TesterBeanNameResolver extends BeanNameResolver {
 
     @Override
     public boolean isReadOnly(String beanName) {
+        checkTriggers(beanName);
         return READ_ONLY_NAME.equals(beanName);
     }
 
