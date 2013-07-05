@@ -70,11 +70,21 @@ public class BeanNameELResolver extends ELResolver {
         String beanName = (String) property;
 
         boolean isResolved = context.isPropertyResolved();
-        if (isReadOnly(context, base, property)) {
+
+        boolean isReadOnly;
+        try {
+            isReadOnly = isReadOnly(context, base, property);
+        } catch (Throwable t) {
+            Util.handleThrowable(t);
+            throw new ELException(t);
+        } finally {
+            context.setPropertyResolved(isResolved);
+        }
+
+        if (isReadOnly) {
             throw new PropertyNotWritableException(Util.message(context,
                     "beanNameELResolver.beanReadOnly", beanName));
         }
-        context.setPropertyResolved(isResolved);
 
         if (beanNameResolver.isNameResolved(beanName) ||
                 beanNameResolver.canCreateBean(beanName)) {
@@ -128,8 +138,15 @@ public class BeanNameELResolver extends ELResolver {
         String beanName = (String) property;
 
         if (beanNameResolver.isNameResolved(beanName)) {
+            boolean result;
+            try {
+                result = beanNameResolver.isReadOnly(beanName);
+            } catch (Throwable t) {
+                Util.handleThrowable(t);
+                throw new ELException(t);
+            }
             context.setPropertyResolved(true);
-            return beanNameResolver.isReadOnly(beanName);
+            return result;
         }
 
         // Return value undefined

@@ -347,6 +347,127 @@ public class TestBeanNameELResolver {
     }
 
 
+    /**
+     * Tests that a null context results in an NPE as per EL Javadoc.
+     */
+    @Test(expected=NullPointerException.class)
+    public void testIsReadOnly01() {
+        BeanNameELResolver resolver = createBeanNameELResolver();
+        resolver.isReadOnly(null, new Object(), new Object());
+    }
+
+
+    /**
+     * Tests that a writable bean is reported as writable.
+     */
+    @Test
+    public void testIsReadOnly02() {
+
+        BeanNameELResolver resolver = createBeanNameELResolver();
+        ELContext context =
+                new StandardELContext(ELManager.getExpressionFactory());
+
+        boolean result = resolver.isReadOnly(context, null, BEAN01_NAME);
+
+        Assert.assertFalse(result);
+        Assert.assertTrue(context.isPropertyResolved());
+    }
+
+
+    /**
+     * Tests that a read-only bean is reported as not writable.
+     */
+    @Test
+    public void testIsReadOnly03() {
+
+        BeanNameELResolver resolver = createBeanNameELResolver();
+        ELContext context =
+                new StandardELContext(ELManager.getExpressionFactory());
+
+        boolean result = resolver.isReadOnly(context, null,
+                TesterBeanNameResolver.READ_ONLY_NAME);
+
+        Assert.assertTrue(result);
+        Assert.assertTrue(context.isPropertyResolved());
+    }
+
+
+    /**
+     * Tests that a valid bean is not resolved if base is non-null.
+     */
+    @Test
+    public void testIsReadOnly04() {
+
+        BeanNameELResolver resolver = createBeanNameELResolver();
+        ELContext context =
+                new StandardELContext(ELManager.getExpressionFactory());
+
+        resolver.isReadOnly(context, new Object(), BEAN01_NAME);
+
+        Assert.assertFalse(context.isPropertyResolved());
+    }
+
+
+    /**
+     * Tests that a valid bean is not resolved if property is not a String even
+     * if it can be coerced to a valid bean name.
+     */
+    @Test
+    public void testIsReadOnly05() {
+
+        BeanNameELResolver resolver = createBeanNameELResolver();
+        ELContext context =
+                new StandardELContext(ELManager.getExpressionFactory());
+
+        Object property = new Object() {
+            @Override
+            public String toString() {
+                return BEAN01_NAME;
+            }
+        };
+
+        resolver.isReadOnly(context, null, property);
+
+        Assert.assertFalse(context.isPropertyResolved());
+    }
+
+
+    /**
+     * Beans that don't exist should not resolve
+     */
+    @Test
+    public void testIsReadOnly06() {
+
+        BeanNameELResolver resolver = createBeanNameELResolver();
+        ELContext context =
+                new StandardELContext(ELManager.getExpressionFactory());
+
+        resolver.isReadOnly(context, null, BEAN99_NAME);
+
+        Assert.assertFalse(context.isPropertyResolved());
+    }
+
+
+    /**
+     * Exception during resolution should be wrapped and re-thrown.
+     */
+    @Test
+    public void testIsReadOnly07() {
+        doThrowableTest(TesterBeanNameResolver.EXCEPTION_TRIGGER_NAME,
+                MethodUnderTest.IS_READ_ONLY);
+    }
+
+
+    /**
+     * Throwable during resolution should be wrapped and re-thrown.
+     */
+    @Test
+    public void testIsReadOnly08() {
+        doThrowableTest(TesterBeanNameResolver.THROWABLE_TRIGGER_NAME,
+                MethodUnderTest.IS_READ_ONLY);
+    }
+
+
     private void doThrowableTest(String trigger, MethodUnderTest method) {
         BeanNameELResolver resolver = createBeanNameELResolver();
         ELContext context =
@@ -365,6 +486,10 @@ public class TestBeanNameELResolver {
                 }
                 case GET_TYPE: {
                     resolver.getType(context, null, trigger);
+                    break;
+                }
+                case IS_READ_ONLY: {
+                    resolver.isReadOnly(context, null, trigger);
                     break;
                 }
                 default: {
@@ -431,6 +556,7 @@ public class TestBeanNameELResolver {
     private static enum MethodUnderTest {
         GET_VALUE,
         SET_VALUE,
-        GET_TYPE
+        GET_TYPE,
+        IS_READ_ONLY
     }
 }
