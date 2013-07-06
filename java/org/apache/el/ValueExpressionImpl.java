@@ -31,7 +31,6 @@ import javax.el.ValueExpression;
 import javax.el.ValueReference;
 import javax.el.VariableMapper;
 
-import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 import org.apache.el.lang.ExpressionBuilder;
 import org.apache.el.parser.AstLiteralExpression;
@@ -184,7 +183,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
                 this.varMapper);
         Object value = this.getNode().getValue(ctx);
         if (this.expectedType != null) {
-            return ELSupport.coerceToType(value, this.expectedType);
+            return context.convertToType(value, this.expectedType);
         }
         return value;
     }

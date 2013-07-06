@@ -16,30 +16,14 @@
  */
 package javax.el;
 
-public class TesterELContext extends ELContext {
-
-    private final ELResolver resolver;
-
-    public TesterELContext() {
-        this(null);
-    }
-
-    public TesterELContext(ELResolver resolver) {
-        this.resolver = resolver;
-    }
+public class TesterELResolverTwo extends TesterELResolverBase {
 
     @Override
-    public ELResolver getELResolver() {
-        return resolver;
-    }
-
-    @Override
-    public FunctionMapper getFunctionMapper() {
-        return null;
-    }
-
-    @Override
-    public VariableMapper getVariableMapper() {
+    public Object convertToType(ELContext context, Object obj, Class<?> type) {
+        if ("2".equals(obj) && type == String.class) {
+            context.setPropertyResolved(true);
+            return "TWO";
+        }
         return null;
     }
 }
