@@ -27,7 +27,6 @@ import javax.el.ELException;
 import javax.el.MethodExpression;
 import javax.el.MethodInfo;
 
-import org.apache.el.lang.ELSupport;
 import org.apache.el.util.ReflectionUtil;
 
 
@@ -58,7 +57,7 @@ public class MethodExpressionLiteral extends MethodExpression implements Externa
     @Override
     public Object invoke(ELContext context, Object[] params) throws ELException {
         if (this.expectedType != null) {
-            return ELSupport.coerceToType(this.expr, this.expectedType);
+            return context.convertToType(this.expr, this.expectedType);
         } else {
             return this.expr;
         }

@@ -16,30 +16,45 @@
  */
 package javax.el;
 
-public class TesterELContext extends ELContext {
+import java.beans.FeatureDescriptor;
+import java.util.Iterator;
 
-    private final ELResolver resolver;
+public abstract class TesterELResolverBase extends ELResolver {
 
-    public TesterELContext() {
-        this(null);
-    }
-
-    public TesterELContext(ELResolver resolver) {
-        this.resolver = resolver;
-    }
 
     @Override
-    public ELResolver getELResolver() {
-        return resolver;
-    }
+    public abstract Object convertToType(ELContext context, Object obj,
+            Class<?> type);
 
     @Override
-    public FunctionMapper getFunctionMapper() {
+    public Object getValue(ELContext context, Object base, Object property) {
         return null;
     }
 
     @Override
-    public VariableMapper getVariableMapper() {
+    public Class<?> getType(ELContext context, Object base, Object property) {
+        return null;
+    }
+
+    @Override
+    public void setValue(ELContext context, Object base, Object property,
+            Object value) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean isReadOnly(ELContext context, Object base, Object property) {
+        return false;
+    }
+
+    @Override
+    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
+            Object base) {
+        return null;
+    }
+
+    @Override
+    public Class<?> getCommonPropertyType(ELContext context, Object base) {
         return null;
     }
 }

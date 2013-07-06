@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.el;
 
 import java.io.Externalizable;
@@ -26,7 +25,6 @@ import javax.el.ELContext;
 import javax.el.PropertyNotWritableException;
 import javax.el.ValueExpression;
 
-import org.apache.el.lang.ELSupport;
 import org.apache.el.util.MessageFactory;
 import org.apache.el.util.ReflectionUtil;
 
@@ -52,7 +50,7 @@ public final class ValueExpressionLiteral extends ValueExpression implements
     @Override
     public Object getValue(ELContext context) {
         if (this.expectedType != null) {
-            return ELSupport.coerceToType(this.value, this.expectedType);
+            return context.convertToType(this.value, this.expectedType);
         }
         return this.value;
     }
