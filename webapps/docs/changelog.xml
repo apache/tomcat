@@ -89,7 +89,7 @@
       </add>
     </changelog>
   </subsection>
-  <subsection>
+  <subsection name="Other">
     <changelog>
       <fix>
         <bug>55204</bug>: Correct namespace used in Servlet 2.4 test web 
