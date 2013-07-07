@@ -43,9 +43,9 @@
   </filter-mapping>
   <filter-mapping>
     <filter-name>Bug49922</filter-name>
+    <servlet-name>Bug49922Target</servlet-name>
     <dispatcher>FORWARD</dispatcher>
     <dispatcher>INCLUDE</dispatcher>
-    <servlet-name>Bug49922Target</servlet-name>
   </filter-mapping>
   <servlet>
     <servlet-name>Bug49922Forward</servlet-name>
@@ -98,9 +98,9 @@
 
   <jsp-config>
     <jsp-property-group>
-      <default-content-type>text/plain</default-content-type>
       <url-pattern>/bug49nnn/bug49726a.jsp</url-pattern>
       <url-pattern>/bug49nnn/bug49726b.jsp</url-pattern>
+      <default-content-type>text/plain</default-content-type>
     </jsp-property-group>
   </jsp-config>
 
@@ -129,8 +129,8 @@
   <env-entry>
     <description>Resource for testing bug 53465</description>
     <env-entry-name>bug53465</env-entry-name>
-    <env-entry-value>10</env-entry-value>
     <env-entry-type>java.lang.Integer</env-entry-type>
+    <env-entry-value>10</env-entry-value>
     <mapped-name>Bug53465MappedName</mapped-name>
   </env-entry>
 
