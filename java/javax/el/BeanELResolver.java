@@ -168,7 +168,7 @@ public class BeanELResolver extends ELResolver {
 
         // Find the matching method
         Method matchingMethod =
-                Util.findMethod(base, methodName, paramTypes, params);
+                Util.findMethod(base.getClass(), methodName, paramTypes, params);
 
         Object[] parameters = Util.buildParameters(
                 matchingMethod.getParameterTypes(), matchingMethod.isVarArgs(),
