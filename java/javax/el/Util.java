@@ -185,12 +185,11 @@ class Util {
     }
 
 
-    static Method findMethod(Object base, String methodName,
+    static Method findMethod(Class<?> clazz, String methodName,
             Class<?>[] paramTypes, Object[] params) {
 
         Method matchingMethod = null;
 
-        Class<?> clazz = base.getClass();
         if (paramTypes != null) {
             try {
                 matchingMethod =
@@ -261,12 +260,11 @@ class Util {
     }
 
 
-    static Constructor<?> findConstructor(Object base, Class<?>[] paramTypes,
+    static Constructor<?> findConstructor(Class<?> clazz, Class<?>[] paramTypes,
             Object[] params) {
 
         Constructor<?> match = null;
 
-        Class<?> clazz = base.getClass();
         if (paramTypes != null) {
             try {
                 match = getConstructor(clazz, clazz.getConstructor(paramTypes));

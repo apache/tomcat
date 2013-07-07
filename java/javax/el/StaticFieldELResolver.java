@@ -100,14 +100,7 @@ public class StaticFieldELResolver extends ELResolver {
 
             if ("<init>".equals(methodName)) {
                 Constructor<?> match =
-                        Util.findConstructor(base, paramTypes, params);
-
-                int modifiers = match.getModifiers();
-                if (!Modifier.isStatic(modifiers)) {
-                    throw new MethodNotFoundException(Util.message(context,
-                            "staticFieldELResolver.methodNotFound", methodName,
-                            clazz.getName()));
-                }
+                        Util.findConstructor(clazz, paramTypes, params);
 
                 Object[] parameters = Util.buildParameters(
                         match.getParameterTypes(), match.isVarArgs(), params);
@@ -128,7 +121,7 @@ public class StaticFieldELResolver extends ELResolver {
 
             } else {
                 Method match =
-                        Util.findMethod(base, methodName, paramTypes, params);
+                        Util.findMethod(clazz, methodName, paramTypes, params);
 
                 int modifiers = match.getModifiers();
                 if (!Modifier.isStatic(modifiers)) {
@@ -142,7 +135,7 @@ public class StaticFieldELResolver extends ELResolver {
 
                 Object result = null;
                 try {
-                    result = match.invoke(base, parameters);
+                    result = match.invoke(null, parameters);
                 } catch (IllegalArgumentException | IllegalAccessException e) {
                     throw new ELException(e);
                 } catch (InvocationTargetException e) {
@@ -199,10 +192,8 @@ public class StaticFieldELResolver extends ELResolver {
 
         if (base instanceof ELClass && property instanceof String) {
             context.setPropertyResolved(true);
-
-            return true;
         }
-        return false;
+        return true;
     }
 
 
