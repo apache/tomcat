@@ -670,9 +670,7 @@
     <jarIt jarfile="${jsp-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.jsp-api"
-      manifest="${tomcat.manifests}/jsp-api.jar.manifest"
-      notice="${tomcat.manifests}/jsp-api.jar.notice"
-      license="${tomcat.manifests}/jsp-api.jar.license" />
+      manifest="${tomcat.manifests}/jsp-api.jar.manifest" />
 
     <!-- EL 3.0 Implementation JAR File -->
     <jarIt jarfile="${el-api.jar}"
