@@ -54,7 +54,7 @@ import org.apache.catalina.deploy.ContextResourceEnvRef;
 import org.apache.catalina.deploy.ContextResourceLink;
 import org.apache.catalina.deploy.ContextService;
 import org.apache.catalina.deploy.ContextTransaction;
-import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.ContextAccessController;
@@ -112,7 +112,7 @@ public class NamingContextListener
     /**
      * Associated naming resources.
      */
-    protected NamingResources namingResources = null;
+    protected NamingResourcesImpl namingResources = null;
 
 
     /**
@@ -634,7 +634,7 @@ public class NamingContextListener
             log.debug("Creating JNDI naming context");
 
         if (namingResources == null) {
-            namingResources = new NamingResources();
+            namingResources = new NamingResourcesImpl();
             namingResources.setContainer(container);
         }
 

@@ -27,7 +27,7 @@ import javax.management.RuntimeOperationsException;
 import javax.management.modelmbean.InvalidTargetObjectTypeException;
 
 import org.apache.catalina.deploy.ContextResourceLink;
-import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 
 
@@ -174,7 +174,7 @@ public class ContextResourceLinkMBean extends BaseModelMBean {
 
         // cannot use side-effects.  It's removed and added back each time
         // there is a modification in a resource.
-        NamingResources nr = crl.getNamingResources();
+        NamingResourcesImpl nr = crl.getNamingResources();
         nr.removeResourceLink(crl.getName());
         nr.addResourceLink(crl);
     }

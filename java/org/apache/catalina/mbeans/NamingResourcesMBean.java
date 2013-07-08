@@ -27,7 +27,7 @@ import javax.management.RuntimeOperationsException;
 import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.deploy.ContextResource;
 import org.apache.catalina.deploy.ContextResourceLink;
-import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
@@ -86,7 +86,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
      */
     public String[] getEnvironments() {
         ContextEnvironment[] envs =
-                            ((NamingResources)this.resource).findEnvironments();
+                            ((NamingResourcesImpl)this.resource).findEnvironments();
         ArrayList<String> results = new ArrayList<>();
         for (int i = 0; i < envs.length; i++) {
             try {
@@ -112,7 +112,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
     public String[] getResources() {
 
         ContextResource[] resources =
-                            ((NamingResources)this.resource).findResources();
+                            ((NamingResourcesImpl)this.resource).findResources();
         ArrayList<String> results = new ArrayList<>();
         for (int i = 0; i < resources.length; i++) {
             try {
@@ -138,7 +138,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
     public String[] getResourceLinks() {
 
         ContextResourceLink[] resourceLinks =
-                            ((NamingResources)this.resource).findResourceLinks();
+                            ((NamingResourcesImpl)this.resource).findResourceLinks();
         ArrayList<String> results = new ArrayList<>();
         for (int i = 0; i < resourceLinks.length; i++) {
             try {
@@ -169,7 +169,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
     public String addEnvironment(String envName, String type, String value)
         throws MalformedObjectNameException {
 
-        NamingResources nresources = (NamingResources) this.resource;
+        NamingResourcesImpl nresources = (NamingResourcesImpl) this.resource;
         if (nresources == null) {
             return null;
         }
@@ -202,7 +202,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
     public String addResource(String resourceName, String type)
         throws MalformedObjectNameException {
 
-        NamingResources nresources = (NamingResources) this.resource;
+        NamingResourcesImpl nresources = (NamingResourcesImpl) this.resource;
         if (nresources == null) {
             return null;
         }
@@ -233,7 +233,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
     public String addResourceLink(String resourceLinkName, String type)
         throws MalformedObjectNameException {
 
-        NamingResources nresources = (NamingResources) this.resource;
+        NamingResourcesImpl nresources = (NamingResourcesImpl) this.resource;
         if (nresources == null) {
             return null;
         }
@@ -264,7 +264,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
      */
     public void removeEnvironment(String envName) {
 
-        NamingResources nresources = (NamingResources) this.resource;
+        NamingResourcesImpl nresources = (NamingResourcesImpl) this.resource;
         if (nresources == null) {
             return;
         }
@@ -286,7 +286,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
     public void removeResource(String resourceName) {
 
         resourceName = ObjectName.unquote(resourceName);
-        NamingResources nresources = (NamingResources) this.resource;
+        NamingResourcesImpl nresources = (NamingResourcesImpl) this.resource;
         if (nresources == null) {
             return;
         }
@@ -308,7 +308,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
     public void removeResourceLink(String resourceLinkName) {
 
         resourceLinkName = ObjectName.unquote(resourceLinkName);
-        NamingResources nresources = (NamingResources) this.resource;
+        NamingResourcesImpl nresources = (NamingResourcesImpl) this.resource;
         if (nresources == null) {
             return;
         }

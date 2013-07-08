@@ -34,7 +34,7 @@ import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
-import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
@@ -424,7 +424,7 @@ public interface Context extends Container {
     /**
      * Return the naming resources associated with this web application.
      */
-    public NamingResources getNamingResources();
+    public NamingResourcesImpl getNamingResources();
 
 
     /**
@@ -432,7 +432,7 @@ public interface Context extends Container {
      *
      * @param namingResources The new naming resources
      */
-    public void setNamingResources(NamingResources namingResources);
+    public void setNamingResources(NamingResourcesImpl namingResources);
 
 
     /**

@@ -106,7 +106,7 @@ import org.apache.catalina.deploy.InjectionTarget;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.MessageDestination;
 import org.apache.catalina.deploy.MessageDestinationRef;
-import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.loader.WebappLoader;
@@ -455,7 +455,7 @@ public class StandardContext extends ContainerBase
     /**
      * The naming resources for this web application.
      */
-    private NamingResources namingResources = null;
+    private NamingResourcesImpl namingResources = null;
 
     /**
      * The message destinations for this web application.
@@ -2019,10 +2019,10 @@ public class StandardContext extends ContainerBase
      * Return the naming resources associated with this web application.
      */
     @Override
-    public NamingResources getNamingResources() {
+    public NamingResourcesImpl getNamingResources() {
 
         if (namingResources == null) {
-            setNamingResources(new NamingResources());
+            setNamingResources(new NamingResourcesImpl());
         }
         return (namingResources);
 
@@ -2035,10 +2035,10 @@ public class StandardContext extends ContainerBase
      * @param namingResources The new naming resources
      */
     @Override
-    public void setNamingResources(NamingResources namingResources) {
+    public void setNamingResources(NamingResourcesImpl namingResources) {
 
         // Process the property setting change
-        NamingResources oldNamingResources = this.namingResources;
+        NamingResourcesImpl oldNamingResources = this.namingResources;
         this.namingResources = namingResources;
         if (namingResources != null) {
             namingResources.setContainer(this);
@@ -5248,7 +5248,7 @@ public class StandardContext extends ContainerBase
                     context = getNamingContextListener().getEnvContext();
                 }
                 Map<String, Map<String, String>> injectionMap = buildInjectionMap(
-                        getIgnoreAnnotations() ? new NamingResources(): getNamingResources());
+                        getIgnoreAnnotations() ? new NamingResourcesImpl(): getNamingResources());
                 setInstanceManager(new DefaultInstanceManager(context,
                         injectionMap, this, this.getClass().getClassLoader()));
                 getServletContext().setAttribute(
@@ -5379,7 +5379,7 @@ public class StandardContext extends ContainerBase
         }
     }
 
-    private Map<String, Map<String, String>> buildInjectionMap(NamingResources namingResources) {
+    private Map<String, Map<String, String>> buildInjectionMap(NamingResourcesImpl namingResources) {
         Map<String, Map<String, String>> injectionMap = new HashMap<>();
         for (Injectable resource: namingResources.findLocalEjbs()) {
             addInjectionTarget(resource, injectionMap);

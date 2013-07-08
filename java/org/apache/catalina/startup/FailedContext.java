@@ -54,7 +54,7 @@ import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
-import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.LifecycleMBeanBase;
@@ -398,9 +398,9 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void setLoginConfig(LoginConfig config) { /* NO-OP */ }
 
     @Override
-    public NamingResources getNamingResources() { return null; }
+    public NamingResourcesImpl getNamingResources() { return null; }
     @Override
-    public void setNamingResources(NamingResources namingResources) { /* NO-OP */ }
+    public void setNamingResources(NamingResourcesImpl namingResources) { /* NO-OP */ }
 
     @Override
     public String getPublicId() { return null; }

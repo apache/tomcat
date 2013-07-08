@@ -19,7 +19,7 @@
 package org.apache.catalina.startup;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.Rule;
 
@@ -93,11 +93,11 @@ public class SetNextNamingRule extends Rule {
         Object child = digester.peek(0);
         Object parent = digester.peek(1);
 
-        NamingResources namingResources = null;
+        NamingResourcesImpl namingResources = null;
         if (parent instanceof Context) {
             namingResources = ((Context) parent).getNamingResources();
         } else {
-            namingResources = (NamingResources) parent;
+            namingResources = (NamingResourcesImpl) parent;
         }
 
         // Call the specified method

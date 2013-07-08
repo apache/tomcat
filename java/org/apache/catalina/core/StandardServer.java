@@ -37,7 +37,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
-import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.mbeans.MBeanFactory;
 import org.apache.catalina.startup.Catalina;
 import org.apache.catalina.util.ExtensionValidator;
@@ -72,7 +72,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
         super();
 
-        globalNamingResources = new NamingResources();
+        globalNamingResources = new NamingResourcesImpl();
         globalNamingResources.setContainer(this);
 
         if (isUseNaming()) {
@@ -97,7 +97,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * Global naming resources.
      */
-    private NamingResources globalNamingResources = null;
+    private NamingResourcesImpl globalNamingResources = null;
 
 
     /**
@@ -200,7 +200,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      * Return the global naming resources.
      */
     @Override
-    public NamingResources getGlobalNamingResources() {
+    public NamingResourcesImpl getGlobalNamingResources() {
 
         return (this.globalNamingResources);
 
@@ -214,9 +214,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     @Override
     public void setGlobalNamingResources
-        (NamingResources globalNamingResources) {
+        (NamingResourcesImpl globalNamingResources) {
 
-        NamingResources oldGlobalNamingResources =
+        NamingResourcesImpl oldGlobalNamingResources =
             this.globalNamingResources;
         this.globalNamingResources = globalNamingResources;
         this.globalNamingResources.setContainer(this);
