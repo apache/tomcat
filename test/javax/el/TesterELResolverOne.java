@@ -16,7 +16,7 @@
  */
 package javax.el;
 
-public class TesterELResolverOne extends TesterELResolverBase {
+public class TesterELResolverOne extends TypeConverter {
 
     @Override
     public Object convertToType(ELContext context, Object obj, Class<?> type) {
