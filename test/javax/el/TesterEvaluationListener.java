@@ -16,14 +16,40 @@
  */
 package javax.el;
 
-public class TesterELResolverOne extends TypeConverter {
+import java.util.ArrayList;
+import java.util.List;
+
+public class TesterEvaluationListener extends EvaluationListener {
+
+    private final List<Pair> resolvedProperties = new ArrayList<>();
+
 
     @Override
-    public Object convertToType(ELContext context, Object obj, Class<?> type) {
-        if ("1".equals(obj) && type == String.class) {
-            context.setPropertyResolved(obj, type);
-            return "ONE";
+    public void propertyResolved(ELContext context, Object base,
+            Object property) {
+        resolvedProperties.add(new Pair(base, property));
+    }
+
+
+    public List<Pair> getResolvedProperties() {
+        return resolvedProperties;
+    }
+
+    public static class Pair {
+        private final Object base;
+        private final Object property;
+
+        public Pair(Object base, Object property) {
+            this.base = base;
+            this.property = property;
         }
-        return null;
+
+        public Object getBase() {
+            return base;
+        }
+
+        public Object getProperty() {
+            return property;
+        }
     }
 }

@@ -47,7 +47,7 @@ public class MapELResolver extends ELResolver {
         }
 
         if (base instanceof Map<?,?>) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             return Object.class;
         }
 
@@ -61,7 +61,7 @@ public class MapELResolver extends ELResolver {
         }
 
         if (base instanceof Map<?,?>) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             return ((Map<?,?>) base).get(property);
         }
 
@@ -76,7 +76,7 @@ public class MapELResolver extends ELResolver {
         }
 
         if (base instanceof Map<?, ?>) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
 
             if (this.readOnly) {
                 throw new PropertyNotWritableException(Util.message(context,
@@ -100,7 +100,7 @@ public class MapELResolver extends ELResolver {
         }
 
         if (base instanceof Map<?, ?>) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             return this.readOnly || UNMODIFIABLE.equals(base.getClass());
         }
 

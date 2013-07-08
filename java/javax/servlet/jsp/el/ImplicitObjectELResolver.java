@@ -87,7 +87,7 @@ public class ImplicitObjectELResolver extends ELResolver {
             if (idx >= 0) {
                 PageContext page = (PageContext) context
                         .getContext(JspContext.class);
-                context.setPropertyResolved(true);
+                context.setPropertyResolved(base, property);
                 switch (idx) {
                 case APPLICATIONSCOPE:
                     return ScopeManager.get(page).getApplicationScope();
@@ -127,7 +127,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         if (base == null && property != null) {
             int idx = Arrays.binarySearch(SCOPE_NAMES, property.toString());
             if (idx >= 0) {
-                context.setPropertyResolved(true);
+                context.setPropertyResolved(base, property);
             }
         }
         return null;
@@ -143,7 +143,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         if (base == null && property != null) {
             int idx = Arrays.binarySearch(SCOPE_NAMES, property.toString());
             if (idx >= 0) {
-                context.setPropertyResolved(true);
+                context.setPropertyResolved(base, property);
                 throw new PropertyNotWritableException();
             }
         }
@@ -158,7 +158,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         if (base == null && property != null) {
             int idx = Arrays.binarySearch(SCOPE_NAMES, property.toString());
             if (idx >= 0) {
-                context.setPropertyResolved(true);
+                context.setPropertyResolved(base, property);
                 return true;
             }
         }

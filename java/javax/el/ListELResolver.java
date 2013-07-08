@@ -46,7 +46,7 @@ public class ListELResolver extends ELResolver {
         }
 
         if (base instanceof List<?>) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             List<?> list = (List<?>) base;
             int idx = coerce(property);
             if (idx < 0 || idx >= list.size()) {
@@ -66,7 +66,7 @@ public class ListELResolver extends ELResolver {
         }
 
         if (base instanceof List<?>) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             List<?> list = (List<?>) base;
             int idx = coerce(property);
             if (idx < 0 || idx >= list.size()) {
@@ -86,7 +86,7 @@ public class ListELResolver extends ELResolver {
         }
 
         if (base instanceof List<?>) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             @SuppressWarnings("unchecked") // Must be OK to cast to Object
             List<Object> list = (List<Object>) base;
 
@@ -113,7 +113,7 @@ public class ListELResolver extends ELResolver {
         }
 
         if (base instanceof List<?>) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             List<?> list = (List<?>) base;
             int idx = coerce(property);
             if (idx < 0 || idx >= list.size()) {

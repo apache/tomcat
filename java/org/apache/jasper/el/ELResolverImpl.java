@@ -43,7 +43,7 @@ public final class ELResolverImpl extends ELResolver {
         }
 
         if (base == null) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             if (property != null) {
                 try {
                     return this.variableResolver.resolveVariable(property
@@ -67,7 +67,7 @@ public final class ELResolverImpl extends ELResolver {
         }
 
         if (base == null) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             if (property != null) {
                 try {
                     Object obj = this.variableResolver.resolveVariable(property
@@ -93,7 +93,7 @@ public final class ELResolverImpl extends ELResolver {
         }
 
         if (base == null) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             throw new PropertyNotWritableException(
                     "Legacy VariableResolver wrapped, not writable");
         }
@@ -110,7 +110,7 @@ public final class ELResolverImpl extends ELResolver {
         }
 
         if (base == null) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             return true;
         }
 

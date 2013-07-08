@@ -44,7 +44,7 @@ public class ScopedAttributeELResolver extends ELResolver {
         }
 
         if (base == null) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             if (property != null) {
                 String key = property.toString();
                 PageContext page = (PageContext) context
@@ -64,7 +64,7 @@ public class ScopedAttributeELResolver extends ELResolver {
         }
 
         if (base == null) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             return Object.class;
         }
 
@@ -79,7 +79,7 @@ public class ScopedAttributeELResolver extends ELResolver {
         }
 
         if (base == null) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             if (property != null) {
                 String key = property.toString();
                 PageContext page = (PageContext) context
@@ -101,7 +101,7 @@ public class ScopedAttributeELResolver extends ELResolver {
         }
 
         if (base == null) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
         }
 
         return false;
