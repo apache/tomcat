@@ -102,12 +102,65 @@ public class TestImportHandler {
 
 
     /**
-     * Import an invalid [ackage.
+     * Import an invalid package.
      */
     @Test(expected=ELException.class)
     public void testImportPackage01() {
         ImportHandler handler = new ImportHandler();
 
         handler.importPackage("org.apache.tomcat.foo");
+    }
+
+
+    /**
+     * Import a valid static field.
+     */
+    @Test
+    public void testImportStatic01() {
+        ImportHandler handler = new ImportHandler();
+
+        handler.importStatic("org.apache.tomcat.util.buf.Constants.Package");
+
+        Class<?> result = handler.resolveStatic("Package");
+
+        Assert.assertEquals(org.apache.tomcat.util.buf.Constants.class, result);
+    }
+
+
+    /**
+     * Import an invalid static field - does not exist.
+     */
+    @Test(expected=ELException.class)
+    public void testImportStatic02() {
+        ImportHandler handler = new ImportHandler();
+
+        handler.importStatic("org.apache.tomcat.util.buf.Constants.PackageXX");
+    }
+
+
+    /**
+     * Import an invalid static field - non-public.
+     */
+    @Test
+    public void testImportStatic03() {
+        ImportHandler handler = new ImportHandler();
+
+        handler.importStatic("org.apache.tomcat.util.buf.Ascii.toLower");
+
+        Class<?> result = handler.resolveStatic("toLower");
+
+        Assert.assertEquals(org.apache.tomcat.util.buf.Ascii.class, result);
+    }
+
+
+    /**
+     * Import an invalid static field - conflict.
+     */
+    @Test
+    public void testImportStatic04() {
+        ImportHandler handler = new ImportHandler();
+
+        handler.importStatic("org.apache.tomcat.util.buf.Constants.Package");
+        handler.importStatic("org.apache.tomcat.util.scan.Constants.Package");
     }
 }
