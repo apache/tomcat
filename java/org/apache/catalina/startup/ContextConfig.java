@@ -1638,7 +1638,7 @@ public class ContextConfig implements LifecycleListener {
             URL url = fragment.getURL();
             Jar jar = null;
             InputStream is = null;
-            ServletContainerInitializer sci = null;
+            List<ServletContainerInitializer> detectedScis = null;
             try {
                 if ("jar".equals(url.getProtocol())) {
                     jar = JarFactory.newInstance(url);
@@ -1651,7 +1651,7 @@ public class ContextConfig implements LifecycleListener {
                     }
                 }
                 if (is != null) {
-                    sci = getServletContainerInitializer(is);
+                    detectedScis = getServletContainerInitializers(is);
                 }
             } catch (IOException ioe) {
                 log.error(sm.getString(
@@ -1672,66 +1672,77 @@ public class ContextConfig implements LifecycleListener {
                 }
             }
 
-            if (sci == null) {
+            if (detectedScis == null) {
                 continue;
             }
 
-            initializerClassMap.put(sci, new HashSet<Class<?>>());
+            for (ServletContainerInitializer sci : detectedScis) {
+                initializerClassMap.put(sci, new HashSet<Class<?>>());
 
-            HandlesTypes ht = null;
-            try {
-                ht = sci.getClass().getAnnotation(HandlesTypes.class);
-            } catch (Exception e) {
-                if (log.isDebugEnabled()) {
-                    log.info(sm.getString("contextConfig.sci.debug", url), e);
-                } else {
-                    log.info(sm.getString("contextConfig.sci.info", url));
+                HandlesTypes ht = null;
+                try {
+                    ht = sci.getClass().getAnnotation(HandlesTypes.class);
+                } catch (Exception e) {
+                    if (log.isDebugEnabled()) {
+                        log.info(sm.getString("contextConfig.sci.debug", url),
+                                e);
+                    } else {
+                        log.info(sm.getString("contextConfig.sci.info", url));
+                    }
                 }
-            }
-            if (ht != null) {
-                Class<?>[] types = ht.value();
-                if (types != null) {
-                    for (Class<?> type : types) {
-                        if (type.isAnnotation()) {
-                            handlesTypesAnnotations = true;
-                        } else {
-                            handlesTypesNonAnnotations = true;
+                if (ht != null) {
+                    Class<?>[] types = ht.value();
+                    if (types != null) {
+                        for (Class<?> type : types) {
+                            if (type.isAnnotation()) {
+                                handlesTypesAnnotations = true;
+                            } else {
+                                handlesTypesNonAnnotations = true;
+                            }
+                            Set<ServletContainerInitializer> scis = typeInitializerMap
+                                    .get(type);
+                            if (scis == null) {
+                                scis = new HashSet<>();
+                                typeInitializerMap.put(type, scis);
+                            }
+                            scis.add(sci);
                         }
-                        Set<ServletContainerInitializer> scis =
-                            typeInitializerMap.get(type);
-                        if (scis == null) {
-                            scis = new HashSet<>();
-                            typeInitializerMap.put(type, scis);
-                        }
-                        scis.add(sci);
                     }
                 }
             }
-
         }
     }
 
 
     /**
      * Extract the name of the ServletContainerInitializer.
-     *
+     * 
      * @param is    The resource where the name is defined
      * @return      The class name
      * @throws IOException
      */
-    protected ServletContainerInitializer getServletContainerInitializer(
+    protected List<ServletContainerInitializer> getServletContainerInitializers(
             InputStream is) throws IOException {
 
-        String className = null;
+        List<ServletContainerInitializer> initializers = new ArrayList<>();
 
         if (is != null) {
             String line = null;
             try {
-                BufferedReader br =
-                    new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                line = br.readLine();
-                if (line != null && line.trim().length() > 0) {
-                    className = line.trim();
+                BufferedReader br = new BufferedReader(new InputStreamReader(
+                        is, "UTF-8"));
+                while ((line = br.readLine()) != null) {
+                    line = line.trim();
+                    if (line.length() > 0) {
+                        int i = line.indexOf('#');
+                        if (i > -1) {
+                            if (i == 0) {
+                                continue;
+                            }
+                            line = line.substring(0, i).trim();
+                        }
+                        initializers.add(getServletContainerInitializer(line));
+                    }
                 }
             } catch (UnsupportedEncodingException e) {
                 // Should never happen with UTF-8
@@ -1739,11 +1750,16 @@ public class ContextConfig implements LifecycleListener {
             }
         }
 
+        return initializers;
+    }
+
+    protected ServletContainerInitializer getServletContainerInitializer(
+            String className) throws IOException {
         ServletContainerInitializer sci = null;
         try {
-            Class<?> clazz = Class.forName(className,true,
-                    context.getLoader().getClassLoader());
-             sci = (ServletContainerInitializer) clazz.newInstance();
+            Class<?> clazz = Class.forName(className, true, context.getLoader()
+                    .getClassLoader());
+            sci = (ServletContainerInitializer) clazz.newInstance();
         } catch (ClassNotFoundException e) {
             log.error(sm.getString("contextConfig.invalidSci", className), e);
             throw new IOException(e);
