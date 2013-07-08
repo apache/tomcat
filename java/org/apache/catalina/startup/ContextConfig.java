@@ -1716,7 +1716,7 @@ public class ContextConfig implements LifecycleListener {
 
     /**
      * Extract the name of the ServletContainerInitializer.
-     * 
+     *
      * @param is    The resource where the name is defined
      * @return      The class name
      * @throws IOException
