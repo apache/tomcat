@@ -115,7 +115,6 @@ import org.apache.catalina.startup.TldConfig;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.ExtensionValidator;
-import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.webresources.StandardRoot;
 import org.apache.juli.logging.Log;
@@ -125,6 +124,7 @@ import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 
 /**
@@ -3172,7 +3172,7 @@ public class StandardContext extends ContainerBase
         if (findChild(name) == null)
             throw new IllegalArgumentException
                 (sm.getString("standardContext.servletMap.name", name));
-        String decodedPattern = adjustURLPattern(RequestUtil.URLDecode(pattern));
+        String decodedPattern = adjustURLPattern(UDecoder.URLDecode(pattern));
         if (!validateURLPattern(decodedPattern))
             throw new IllegalArgumentException
                 (sm.getString("standardContext.servletMap.pattern", decodedPattern));

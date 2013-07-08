@@ -46,6 +46,7 @@ import org.apache.catalina.util.DOMWriter;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.catalina.util.XMLWriter;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.w3c.dom.Document;
@@ -1501,8 +1502,7 @@ public class WebdavServlet
         }
 
         // Remove url encoding from destination
-        destinationPath = org.apache.catalina.util.RequestUtil.URLDecode(
-                destinationPath, "UTF8");
+        destinationPath = UDecoder.URLDecode(destinationPath, "UTF8");
 
         int protocolIndex = destinationPath.indexOf("://");
         if (protocolIndex >= 0) {
