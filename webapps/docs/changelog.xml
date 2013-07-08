@@ -223,6 +223,12 @@
         <bug>54899</bug>: Provide an initial implementation of NetBeans support.
         Patch provided by Brian Burch. (markt)
       </add>
+      <fix>
+        <bug>55166</bug>: Move the JSP descriptor and tag library descriptor
+        schema defintion files from jsp-api.jar to servlet-api.jar so relative
+        includes between the J2EE, Servlet and JSP schemas are correctly
+        resolved. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

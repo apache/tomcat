@@ -89,22 +89,22 @@ public final class Constants {
     public static final String JspSchemaPublicId_20 =
         "jsp_2_0.xsd";
     public static final String JspSchemaResourcePath_20 =
-        "/javax/servlet/jsp/resources/jsp_2_0.xsd";
+        "/javax/servlet/resources/jsp_2_0.xsd";
 
     public static final String JspSchemaPublicId_21 =
         "jsp_2_1.xsd";
     public static final String JspSchemaResourcePath_21 =
-        "/javax/servlet/jsp/resources/jsp_2_1.xsd";
+        "/javax/servlet/resources/jsp_2_1.xsd";
 
     public static final String JspSchemaPublicId_22 =
         "jsp_2_2.xsd";
     public static final String JspSchemaResourcePath_22 =
-        "/javax/servlet/jsp/resources/jsp_2_2.xsd";
+        "/javax/servlet/resources/jsp_2_2.xsd";
 
     public static final String JspSchemaPublicId_23 =
         "jsp_2_3.xsd";
     public static final String JspSchemaResourcePath_23 =
-        "/javax/servlet/jsp/resources/jsp_2_3.xsd";
+        "/javax/servlet/resources/jsp_2_3.xsd";
 
 
     // TLD
