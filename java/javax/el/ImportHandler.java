@@ -19,6 +19,7 @@ package javax.el;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -112,8 +113,15 @@ public class ImportHandler {
         // Import ambiguity is handled at resolution, not at import
         Package p = Package.getPackage(name);
         if (p == null) {
-            throw new IllegalArgumentException(Util.message(
-                    null, "importHandler.invalidPackage", name));
+            // Either the package does not exist or no class has been loaded
+            // from that package. Check if the package exists.
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            String path = name.replace('.', '/');
+            URL url = cl.getResource(path);
+            if (url == null) {
+                throw new ELException(Util.message(
+                        null, "importHandler.invalidPackage", name));
+            }
         }
         packages.add(name);
     }
@@ -123,13 +131,11 @@ public class ImportHandler {
         Class<?> result = clazzes.get(name);
 
         if (result == null) {
-            // Search the package imports
+            // Search the package imports - note there may be multiple matches
+            // (which correctly triggers an error)
             for (String p : packages) {
                 String className = p + '.' + name;
                 result = findClass(className);
-                if (result != null) {
-                    break;
-                }
             }
         }
 
