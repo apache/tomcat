@@ -38,7 +38,7 @@ import javax.servlet.descriptor.JspConfigDescriptor;
 
 import org.apache.catalina.core.ApplicationFilterRegistration;
 import org.apache.catalina.core.TesterContext;
-import org.apache.catalina.deploy.FilterDef;
+import org.apache.tomcat.util.descriptor.web.FilterDef;
 
 public class TesterServletContext implements ServletContext {
 

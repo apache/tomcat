@@ -27,10 +27,10 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import org.apache.catalina.LifecycleState;
-import org.apache.catalina.deploy.ApplicationListener;
-import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.descriptor.web.ApplicationListener;
+import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 
 public class TestNamingContextListener extends TomcatBaseTest {
 

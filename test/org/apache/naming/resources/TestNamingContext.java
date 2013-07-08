@@ -38,11 +38,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.deploy.ContextEnvironment;
-import org.apache.catalina.deploy.ContextResource;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
+import org.apache.tomcat.util.descriptor.web.ContextResource;
 
 public class TestNamingContext extends TomcatBaseTest {
 

@@ -23,8 +23,8 @@ import java.beans.PropertyDescriptor;
 import java.io.PrintWriter;
 import java.util.Iterator;
 
-import org.apache.catalina.deploy.ResourceBase;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.descriptor.web.ResourceBase;
 
 /**
  * StoreAppends generate really the xml tag elements

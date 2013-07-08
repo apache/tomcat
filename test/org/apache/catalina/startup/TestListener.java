@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.deploy.ApplicationListener;
+import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 
 public class TestListener extends TomcatBaseTest {
 

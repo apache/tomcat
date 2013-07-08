@@ -29,11 +29,11 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.filters.TesterHttpServletResponse;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.util.ConcurrentMessageDigest;
 import org.apache.catalina.util.MD5Encoder;
+import org.apache.tomcat.util.descriptor.web.LoginConfig;
 
 public class TesterDigestAuthenticatorPerformance {
 
