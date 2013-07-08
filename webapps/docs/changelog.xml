@@ -62,6 +62,13 @@
         <bug>55186</bug>: Ensure local name is recycled between requests so IP
         virtual hosting works correctly. (markt)
       </fix>
+      <fix>
+        <bug>55210</bug>: Correct the processing of the provider-configuration
+        file for <code>javax.servlet.ServletContainerInitializer</code> in the
+        resource directory <code>META-INF/services</code> when this file
+        contains comments and multiple SCIs. Patch provided by Nick Williams.
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
