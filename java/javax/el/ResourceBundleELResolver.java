@@ -39,7 +39,7 @@ public class ResourceBundleELResolver extends ELResolver {
         }
 
         if (base instanceof ResourceBundle) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
 
             if (property != null) {
                 try {
@@ -61,7 +61,7 @@ public class ResourceBundleELResolver extends ELResolver {
         }
 
         if (base instanceof ResourceBundle) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
         }
 
         return null;
@@ -75,7 +75,7 @@ public class ResourceBundleELResolver extends ELResolver {
         }
 
         if (base instanceof ResourceBundle) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             throw new PropertyNotWritableException(Util.message(context,
                     "resolverNotWriteable", base.getClass().getName()));
         }
@@ -88,7 +88,7 @@ public class ResourceBundleELResolver extends ELResolver {
         }
 
         if (base instanceof ResourceBundle) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
         }
 
         return true;

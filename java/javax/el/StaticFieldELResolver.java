@@ -37,7 +37,7 @@ public class StaticFieldELResolver extends ELResolver {
         }
 
         if (base instanceof ELClass && property instanceof String) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
 
             Class<?> clazz = ((ELClass) base).getKlass();
             String name = (String) property;
@@ -93,7 +93,7 @@ public class StaticFieldELResolver extends ELResolver {
         }
 
         if (base instanceof ELClass && method instanceof String) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, method);
 
             Class<?> clazz = ((ELClass) base).getKlass();
             String methodName = (String) method;
@@ -156,7 +156,7 @@ public class StaticFieldELResolver extends ELResolver {
         }
 
         if (base instanceof ELClass && property instanceof String) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
 
             Class<?> clazz = ((ELClass) base).getKlass();
             String name = (String) property;
@@ -191,7 +191,7 @@ public class StaticFieldELResolver extends ELResolver {
         }
 
         if (base instanceof ELClass && property instanceof String) {
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
         }
         return true;
     }

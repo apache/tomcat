@@ -45,7 +45,7 @@ public class BeanNameELResolver extends ELResolver {
         if (beanNameResolver.isNameResolved(beanName)) {
             try {
                 Object result = beanNameResolver.getBean((String) property);
-                context.setPropertyResolved(true);
+                context.setPropertyResolved(base, property);
                 return result;
             } catch (Throwable t) {
                 Util.handleThrowable(t);
@@ -90,7 +90,7 @@ public class BeanNameELResolver extends ELResolver {
                 beanNameResolver.canCreateBean(beanName)) {
             try {
                 beanNameResolver.setBeanValue(beanName, value);
-                context.setPropertyResolved(true);
+                context.setPropertyResolved(base, property);
             } catch (Throwable t) {
                 Util.handleThrowable(t);
                 throw new ELException(t);
@@ -113,7 +113,7 @@ public class BeanNameELResolver extends ELResolver {
         try {
             if (beanNameResolver.isNameResolved(beanName)) {
                 Class<?> result = beanNameResolver.getBean(beanName).getClass();
-                context.setPropertyResolved(true);
+                context.setPropertyResolved(base, property);
                 return result;
             }
         } catch (Throwable t) {
@@ -145,7 +145,7 @@ public class BeanNameELResolver extends ELResolver {
                 Util.handleThrowable(t);
                 throw new ELException(t);
             }
-            context.setPropertyResolved(true);
+            context.setPropertyResolved(base, property);
             return result;
         }
 

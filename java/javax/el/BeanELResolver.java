@@ -78,7 +78,7 @@ public class BeanELResolver extends ELResolver {
             return null;
         }
 
-        context.setPropertyResolved(true);
+        context.setPropertyResolved(base, property);
         return this.property(context, base, property).getPropertyType();
     }
 
@@ -91,7 +91,7 @@ public class BeanELResolver extends ELResolver {
             return null;
         }
 
-        context.setPropertyResolved(true);
+        context.setPropertyResolved(base, property);
         Method m = this.property(context, base, property).read(context);
         try {
             return m.invoke(base, (Object[]) null);
@@ -122,7 +122,7 @@ public class BeanELResolver extends ELResolver {
             return;
         }
 
-        context.setPropertyResolved(true);
+        context.setPropertyResolved(base, property);
 
         if (this.readOnly) {
             throw new PropertyNotWritableException(Util.message(context,
@@ -185,7 +185,7 @@ public class BeanELResolver extends ELResolver {
             throw new ELException(cause);
         }
 
-        context.setPropertyResolved(true);
+        context.setPropertyResolved(base, method);
         return result;
     }
 
@@ -198,7 +198,7 @@ public class BeanELResolver extends ELResolver {
             return false;
         }
 
-        context.setPropertyResolved(true);
+        context.setPropertyResolved(base, property);
         return this.readOnly
                 || this.property(context, base, property).isReadOnly();
     }
