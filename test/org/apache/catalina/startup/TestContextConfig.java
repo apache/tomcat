@@ -146,6 +146,19 @@ public class TestContextConfig extends TomcatBaseTest {
                 "envEntry1: 1 envEntry2: 2 envEntry3: 33 envEntry4: 4");
     }
 
+    @Test
+    public void testBug55210() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0-fragments");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        assertPageContains("/test/TesterServlet1", "OK");
+        assertPageContains("/test/TesterServlet2", "OK");
+    }
+
     private static class CustomDefaultServletSCI
             implements ServletContainerInitializer {
 
