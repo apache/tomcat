@@ -156,7 +156,7 @@ public class TestImportHandler {
     /**
      * Import an invalid static field - conflict.
      */
-    @Test
+    @Test(expected=ELException.class)
     public void testImportStatic04() {
         ImportHandler handler = new ImportHandler();
 
