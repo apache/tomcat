@@ -16,9 +16,6 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
-import org.apache.catalina.deploy.ContextEnvironment;
-import org.apache.catalina.deploy.ContextResource;
-import org.apache.catalina.deploy.ContextResourceLink;
 
 
 /**

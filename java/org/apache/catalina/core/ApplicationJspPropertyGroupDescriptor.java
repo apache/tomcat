@@ -20,7 +20,7 @@ import java.util.Collection;
 
 import javax.servlet.descriptor.JspPropertyGroupDescriptor;
 
-import org.apache.catalina.deploy.JspPropertyGroup;
+import org.apache.tomcat.util.descriptor.web.JspPropertyGroup;
 
 
 public class ApplicationJspPropertyGroupDescriptor

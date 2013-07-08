@@ -42,7 +42,18 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.ContextBindings;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.descriptor.web.ContextEjb;
+import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
+import org.apache.tomcat.util.descriptor.web.ContextLocalEjb;
+import org.apache.tomcat.util.descriptor.web.ContextResource;
+import org.apache.tomcat.util.descriptor.web.ContextResourceEnvRef;
+import org.apache.tomcat.util.descriptor.web.ContextResourceLink;
+import org.apache.tomcat.util.descriptor.web.ContextService;
+import org.apache.tomcat.util.descriptor.web.ContextTransaction;
+import org.apache.tomcat.util.descriptor.web.InjectionTarget;
+import org.apache.tomcat.util.descriptor.web.MessageDestinationRef;
 import org.apache.tomcat.util.descriptor.web.NamingResources;
+import org.apache.tomcat.util.descriptor.web.ResourceBase;
 import org.apache.tomcat.util.res.StringManager;
 
 

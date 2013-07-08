@@ -24,7 +24,7 @@ import javax.management.ReflectionException;
 import javax.management.RuntimeOperationsException;
 import javax.management.modelmbean.InvalidTargetObjectTypeException;
 
-import org.apache.catalina.deploy.ContextEnvironment;
+import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.descriptor.web.NamingResources;
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 

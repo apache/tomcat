@@ -20,7 +20,7 @@ import javax.servlet.annotation.HttpConstraint;
 import javax.servlet.annotation.HttpMethodConstraint;
 import javax.servlet.annotation.ServletSecurity;
 
-import org.apache.catalina.deploy.SecurityConstraint;
+import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
 @ServletSecurity(value=@HttpConstraint,
         httpMethodConstraints={

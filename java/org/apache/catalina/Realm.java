@@ -25,7 +25,7 @@ import java.security.cert.X509Certificate;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.deploy.SecurityConstraint;
+import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.ietf.jgss.GSSContext;
 /**
  * A <b>Realm</b> is a read-only facade for an underlying security realm

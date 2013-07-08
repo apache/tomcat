@@ -37,10 +37,10 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
 
 /**
  * Store server.xml Context element with all children

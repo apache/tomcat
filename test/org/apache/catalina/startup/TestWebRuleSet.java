@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import org.apache.catalina.deploy.WebXml;
+import org.apache.tomcat.util.descriptor.web.WebXml;
 import org.apache.tomcat.util.digester.Digester;
 
 public class TestWebRuleSet {
