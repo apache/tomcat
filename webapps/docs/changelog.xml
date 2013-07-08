@@ -96,7 +96,7 @@
         application. Patch provided by Jeremy Boynes. (markt)
       </fix>
       <fix>
-        <bug>55205</bug>: Reorder elements so web.xml compies with schema for
+        <bug>55205</bug>: Reorder elements so web.xml complies with schema for
         Servlet 3.0 test web application. Patch provided by Jeremy Boynes.
         (markt)
       </fix>
