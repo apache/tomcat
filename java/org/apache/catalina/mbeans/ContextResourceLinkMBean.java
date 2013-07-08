@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.mbeans;
-
 
 import javax.management.Attribute;
 import javax.management.AttributeNotFoundException;
@@ -27,7 +25,7 @@ import javax.management.RuntimeOperationsException;
 import javax.management.modelmbean.InvalidTargetObjectTypeException;
 
 import org.apache.catalina.deploy.ContextResourceLink;
-import org.apache.catalina.deploy.NamingResourcesImpl;
+import org.apache.tomcat.util.descriptor.web.NamingResources;
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 
 
@@ -174,7 +172,7 @@ public class ContextResourceLinkMBean extends BaseModelMBean {
 
         // cannot use side-effects.  It's removed and added back each time
         // there is a modification in a resource.
-        NamingResourcesImpl nr = crl.getNamingResources();
+        NamingResources nr = crl.getNamingResources();
         nr.removeResourceLink(crl.getName());
         nr.addResourceLink(crl);
     }

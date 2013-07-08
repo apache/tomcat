@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.tomcat.util.descriptor.web.NamingResources;
+
 
 /**
  * Representation of an Context element
@@ -199,13 +201,13 @@ public class ResourceBase implements Serializable, Injectable {
     /**
      * The NamingResources with which we are associated (if any).
      */
-    protected NamingResourcesImpl resources = null;
+    protected NamingResources resources = null;
 
-    public NamingResourcesImpl getNamingResources() {
+    public NamingResources getNamingResources() {
         return (this.resources);
     }
 
-    void setNamingResources(NamingResourcesImpl resources) {
+    void setNamingResources(NamingResources resources) {
         this.resources = resources;
     }
 }

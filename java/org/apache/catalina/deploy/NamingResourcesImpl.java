@@ -42,6 +42,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.ContextBindings;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.descriptor.web.NamingResources;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -53,7 +54,8 @@ import org.apache.tomcat.util.res.StringManager;
  * @version $Id$
  */
 
-public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializable {
+public class NamingResourcesImpl extends LifecycleMBeanBase
+        implements Serializable, NamingResources {
 
     private static final long serialVersionUID = 1L;
 
@@ -164,6 +166,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     /**
      * Get the container with which the naming resources are associated.
      */
+    @Override
     public Object getContainer() {
         return container;
     }
@@ -220,6 +223,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      *
      * @param environment New environment entry
      */
+    @Override
     public void addEnvironment(ContextEnvironment environment) {
 
         if (entries.contains(environment.getName())) {
@@ -353,6 +357,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      *
      * @param resource New resource reference
      */
+    @Override
     public void addResource(ContextResource resource) {
 
         if (entries.contains(resource.getName())) {
@@ -416,6 +421,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      *
      * @param resourceLink New resource link
      */
+    @Override
     public void addResourceLink(ContextResourceLink resourceLink) {
 
         if (entries.contains(resourceLink.getName())) {
@@ -726,6 +732,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      *
      * @param name Name of the environment entry to remove
      */
+    @Override
     public void removeEnvironment(String name) {
 
         entries.remove(name);
@@ -810,6 +817,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      *
      * @param name Name of the resource reference to remove
      */
+    @Override
     public void removeResource(String name) {
 
         entries.remove(name);
@@ -861,6 +869,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      *
      * @param name Name of the resource link to remove
      */
+    @Override
     public void removeResourceLink(String name) {
 
         entries.remove(name);
