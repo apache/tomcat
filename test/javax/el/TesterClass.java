@@ -20,12 +20,15 @@ public class TesterClass {
 
     public static String publicStaticString = "publicStaticString";
     public String publicString = "publicString";
+    @SuppressWarnings("unused") // Used in TestStaticFieldELREsolver
     private static String privateStaticString = "privateStaticString";
+    @SuppressWarnings("unused") // Used in TestStaticFieldELREsolver
     private String privateString = "privateString";
 
     public TesterClass() {
     }
 
+    @SuppressWarnings("unused") // Used in TestStaticFieldELREsolver
     private TesterClass(String privateString) {
         this.privateString = privateString;
     }
