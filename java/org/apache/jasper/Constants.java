@@ -127,11 +127,11 @@ public class Constants {
     private static final String TAGLIB_DTD_PUBLIC_ID_11 =
         "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN";
     private static final String TAGLIB_DTD_RESOURCE_PATH_11 =
-        "/javax/servlet/jsp/resources/web-jsptaglibrary_1_1.dtd";
+        "/javax/servlet/resources/web-jsptaglibrary_1_1.dtd";
     private static final String TAGLIB_DTD_PUBLIC_ID_12 =
         "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN";
     private static final String TAGLIB_DTD_RESOURCE_PATH_12 =
-        "/javax/servlet/jsp/resources/web-jsptaglibrary_1_2.dtd";
+        "/javax/servlet/resources/web-jsptaglibrary_1_2.dtd";
 
     /**
      * Public Id and the Resource path (of the cached copy)

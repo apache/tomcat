@@ -111,22 +111,22 @@ public final class Constants {
     public static final String TldDtdPublicId_11 =
         "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN";
     public static final String TldDtdResourcePath_11 =
-        "/javax/servlet/jsp/resources/web-jsptaglibrary_1_1.dtd";
+        "/javax/servlet/resources/web-jsptaglibrary_1_1.dtd";
 
     public static final String TldDtdPublicId_12 =
         "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN";
     public static final String TldDtdResourcePath_12 =
-        "/javax/servlet/jsp/resources/web-jsptaglibrary_1_2.dtd";
+        "/javax/servlet/resources/web-jsptaglibrary_1_2.dtd";
 
     public static final String TldSchemaPublicId_20 =
         "web-jsptaglibrary_2_0.xsd";
     public static final String TldSchemaResourcePath_20 =
-        "/javax/servlet/jsp/resources/web-jsptaglibrary_2_0.xsd";
+        "/javax/servlet/resources/web-jsptaglibrary_2_0.xsd";
 
     public static final String TldSchemaPublicId_21 =
         "web-jsptaglibrary_2_1.xsd";
     public static final String TldSchemaResourcePath_21 =
-        "/javax/servlet/jsp/resources/web-jsptaglibrary_2_1.xsd";
+        "/javax/servlet/resources/web-jsptaglibrary_2_1.xsd";
 
 
     // web.xml
