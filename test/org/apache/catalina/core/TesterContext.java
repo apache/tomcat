@@ -56,7 +56,7 @@ import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
-import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.InstanceManager;
@@ -520,12 +520,12 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public NamingResources getNamingResources() {
+    public NamingResourcesImpl getNamingResources() {
         return null;
     }
 
     @Override
-    public void setNamingResources(NamingResources namingResources) {
+    public void setNamingResources(NamingResourcesImpl namingResources) {
         // NO-OP
     }
 

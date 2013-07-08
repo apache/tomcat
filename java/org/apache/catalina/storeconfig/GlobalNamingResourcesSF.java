@@ -18,7 +18,7 @@ package org.apache.catalina.storeconfig;
 
 import java.io.PrintWriter;
 
-import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -38,19 +38,19 @@ public class GlobalNamingResourcesSF extends StoreFactoryBase {
     public void store(PrintWriter aWriter, int indent, Object aElement)
             throws Exception {
 
-        if (aElement instanceof NamingResources) {
+        if (aElement instanceof NamingResourcesImpl) {
 
             StoreDescription elementDesc = getRegistry().findDescription(
-                    NamingResources.class.getName()
+                    NamingResourcesImpl.class.getName()
                             + ".[GlobalNamingResources]");
 
             if (elementDesc != null) {
                 getStoreAppender().printIndent(aWriter, indent + 2);
                 getStoreAppender().printOpenTag(aWriter, indent + 2, aElement,
                         elementDesc);
-                NamingResources resources = (NamingResources) aElement;
+                NamingResourcesImpl resources = (NamingResourcesImpl) aElement;
                 StoreDescription resourcesdesc = getRegistry().findDescription(
-                        NamingResources.class.getName());
+                        NamingResourcesImpl.class.getName());
                 if (resourcesdesc != null) {
                     resourcesdesc.getStoreFactory().store(aWriter, indent + 2,
                             resources);

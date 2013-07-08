@@ -27,7 +27,7 @@ import javax.management.RuntimeOperationsException;
 import javax.management.modelmbean.InvalidTargetObjectTypeException;
 
 import org.apache.catalina.deploy.ContextEnvironment;
-import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 
 
@@ -99,7 +99,7 @@ public class ContextEnvironmentMBean extends BaseModelMBean {
 
         // cannot use side-effects.  It's removed and added back each time
         // there is a modification in a resource.
-        NamingResources nr = ce.getNamingResources();
+        NamingResourcesImpl nr = ce.getNamingResources();
         nr.removeEnvironment(ce.getName());
         nr.addEnvironment(ce);
     }

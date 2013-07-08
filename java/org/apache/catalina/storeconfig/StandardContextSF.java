@@ -38,7 +38,7 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.ApplicationParameter;
-import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -295,7 +295,7 @@ public class StandardContextSF extends StoreFactoryBase {
             storeElementArray(aWriter, indent, appParams);
 
             // Store nested naming resources elements (EJB,Resource,...)
-            NamingResources nresources = context.getNamingResources();
+            NamingResourcesImpl nresources = context.getNamingResources();
             storeElement(aWriter, indent, nresources);
 
             // Store nested watched resources <WatchedResource>

@@ -23,7 +23,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Service;
 import org.apache.catalina.core.StandardServer;
-import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.deploy.NamingResourcesImpl;
 
 /**
  * Store server.xml Server element and children (
@@ -86,10 +86,10 @@ public class StandardServerSF extends StoreFactoryBase {
                 }
             }*/
             // Store nested <GlobalNamingResources> element
-            NamingResources globalNamingResources = server
+            NamingResourcesImpl globalNamingResources = server
                     .getGlobalNamingResources();
             StoreDescription elementDesc = getRegistry().findDescription(
-                    NamingResources.class.getName()
+                    NamingResourcesImpl.class.getName()
                             + ".[GlobalNamingResources]");
             if (elementDesc != null) {
                 elementDesc.getStoreFactory().store(aWriter, indent,

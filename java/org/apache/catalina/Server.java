@@ -20,7 +20,7 @@ package org.apache.catalina;
 
 import java.io.File;
 
-import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.startup.Catalina;
 
 /**
@@ -55,7 +55,7 @@ public interface Server extends Lifecycle {
     /**
      * Return the global naming resources.
      */
-    public NamingResources getGlobalNamingResources();
+    public NamingResourcesImpl getGlobalNamingResources();
 
 
     /**
@@ -64,7 +64,7 @@ public interface Server extends Lifecycle {
      * @param globalNamingResources The new global naming resources
      */
     public void setGlobalNamingResources
-        (NamingResources globalNamingResources);
+        (NamingResourcesImpl globalNamingResources);
 
 
     /**

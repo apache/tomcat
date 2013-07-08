@@ -53,11 +53,11 @@ import org.apache.tomcat.util.res.StringManager;
  * @version $Id$
  */
 
-public class NamingResources extends LifecycleMBeanBase implements Serializable {
+public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Log log = LogFactory.getLog(NamingResources.class);
+    private static final Log log = LogFactory.getLog(NamingResourcesImpl.class);
 
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
@@ -70,7 +70,7 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
     /**
      * Create a new NamingResources instance.
      */
-    public NamingResources() {
+    public NamingResourcesImpl() {
         // NOOP
     }
 
@@ -233,7 +233,7 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
                 }
             } else if (rl != null) {
                 // Link. Need to look at the global resources
-                NamingResources global = getServer().getGlobalNamingResources();
+                NamingResourcesImpl global = getServer().getGlobalNamingResources();
                 if (global.findEnvironment(rl.getGlobal()) != null) {
                     if (global.findEnvironment(rl.getGlobal()).getOverride()) {
                         removeResourceLink(environment.getName());

@@ -199,13 +199,13 @@ public class ResourceBase implements Serializable, Injectable {
     /**
      * The NamingResources with which we are associated (if any).
      */
-    protected NamingResources resources = null;
+    protected NamingResourcesImpl resources = null;
 
-    public NamingResources getNamingResources() {
+    public NamingResourcesImpl getNamingResources() {
         return (this.resources);
     }
 
-    void setNamingResources(NamingResources resources) {
+    void setNamingResources(NamingResourcesImpl resources) {
         this.resources = resources;
     }
 }

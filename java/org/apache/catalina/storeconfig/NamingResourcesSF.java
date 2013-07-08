@@ -24,7 +24,7 @@ import org.apache.catalina.deploy.ContextLocalEjb;
 import org.apache.catalina.deploy.ContextResource;
 import org.apache.catalina.deploy.ContextResourceEnvRef;
 import org.apache.catalina.deploy.ContextResourceLink;
-import org.apache.catalina.deploy.NamingResources;
+import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -78,8 +78,8 @@ public class NamingResourcesSF extends StoreFactoryBase {
     public void storeChildren(PrintWriter aWriter, int indent, Object aElement,
             StoreDescription elementDesc) throws Exception {
 
-        if (aElement instanceof NamingResources) {
-            NamingResources resources = (NamingResources) aElement;
+        if (aElement instanceof NamingResourcesImpl) {
+            NamingResourcesImpl resources = (NamingResourcesImpl) aElement;
             // Store nested <Ejb> elements
             ContextEjb[] ejbs = resources.findEjbs();
             storeElementArray(aWriter, indent, ejbs);
