@@ -100,6 +100,12 @@
         Servlet 3.0 test web application. Patch provided by Jeremy Boynes.
         (markt)
       </fix>
+      <fix>
+        <bug>55211</bug>: Correct namespace in TLD files used in test web
+        applications. Rename elements <code>tagclass</code> to
+        <code>tag-class</code> so TLD files complies with DTD/schema. Patch
+        provided by Jeremy Boynes. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>
