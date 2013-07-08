@@ -21,7 +21,7 @@ package org.apache.catalina.deploy;
 
 import java.io.Serializable;
 
-import org.apache.catalina.util.RequestUtil;
+import org.apache.tomcat.util.buf.UDecoder;
 
 
 /**
@@ -142,7 +142,7 @@ public class ErrorPage implements Serializable {
         //        if ((location == null) || !location.startsWith("/"))
         //            throw new IllegalArgumentException
         //                ("Error Page Location must start with a '/'");
-        this.location = RequestUtil.URLDecode(location);
+        this.location = UDecoder.URLDecode(location);
 
     }
 

@@ -21,7 +21,7 @@ package org.apache.catalina.deploy;
 
 import java.io.Serializable;
 
-import org.apache.catalina.util.RequestUtil;
+import org.apache.tomcat.util.buf.UDecoder;
 
 
 /**
@@ -214,7 +214,7 @@ public class SecurityCollection implements Serializable {
         if (pattern == null)
             return;
 
-        String decodedPattern = RequestUtil.URLDecode(pattern);
+        String decodedPattern = UDecoder.URLDecode(pattern);
         String results[] = new String[patterns.length + 1];
         for (int i = 0; i < patterns.length; i++) {
             results[i] = patterns[i];

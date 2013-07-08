@@ -25,7 +25,7 @@ import java.util.Locale;
 
 import javax.servlet.DispatcherType;
 
-import org.apache.catalina.util.RequestUtil;
+import org.apache.tomcat.util.buf.UDecoder;
 
 
 /**
@@ -138,7 +138,7 @@ public class FilterMap implements Serializable {
         } else {
             String[] results = new String[urlPatterns.length + 1];
             System.arraycopy(urlPatterns, 0, results, 0, urlPatterns.length);
-            results[urlPatterns.length] = RequestUtil.URLDecode(urlPattern);
+            results[urlPatterns.length] = UDecoder.URLDecode(urlPattern);
             urlPatterns = results;
         }
     }
