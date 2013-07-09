@@ -1288,7 +1288,7 @@ public class JspC extends Task implements Options {
                     Localizer.getMessage("jsp.error.jspc.uriroot_not_dir"));
             }
 
-            if(context == null) {
+            if (context == null) {
                 initServletContext();
             }
 
@@ -1407,15 +1407,16 @@ public class JspC extends Task implements Options {
                 }
                 mapout.close();
             } catch (IOException ioe) {
-                // noting to do if it fails since we are done with it
+                // nothing to do if it fails since we are done with it
             }
         }
     }
 
-    protected void initServletContext() throws IOException {
-     // TODO: should we use the Ant Project's log?
+    protected void initServletContext() throws IOException, JasperException {
+        // TODO: should we use the Ant Project's log?
         PrintWriter log = new PrintWriter(System.out);
         URL resourceBase = new File(uriRoot).getCanonicalFile().toURI().toURL();
+
         context = new JspCServletContext(log, resourceBase);
         rctxt = new JspRuntimeContext(context, this);
         jspConfig = new JspConfig(context);

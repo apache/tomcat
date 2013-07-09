@@ -14,22 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.core;
+package org.apache.tomcat.util.descriptor.web;
 
 import java.util.Collection;
 
 import javax.servlet.descriptor.JspPropertyGroupDescriptor;
 
-import org.apache.tomcat.util.descriptor.web.JspPropertyGroup;
 
 
-public class ApplicationJspPropertyGroupDescriptor
+public class JspPropertyGroupDescriptorImpl
         implements JspPropertyGroupDescriptor{
 
     private final JspPropertyGroup jspPropertyGroup;
 
 
-    public ApplicationJspPropertyGroupDescriptor(
+    public JspPropertyGroupDescriptorImpl(
             JspPropertyGroup jspPropertyGroup) {
         this.jspPropertyGroup = jspPropertyGroup;
     }

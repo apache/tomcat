@@ -100,6 +100,7 @@
     <allow pkg="org.apache.jasper"/>
     <allow pkg="org.apache.juli"/>
     <allow pkg="org.apache.tomcat" exact-match="true"/>
+    <allow pkg="org.apache.tomcat.util.descriptor"/>
     <allow pkg="org.apache.tomcat.util.scan"/>
     <allow pkg="org.apache.tools.ant"/>
     <allow pkg="org.eclipse.jdt"/>

@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.servlet;
-
 
 import java.io.File;
 import java.io.InputStream;
@@ -29,6 +27,7 @@ import java.util.EventListener;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
 
@@ -43,8 +42,19 @@ import javax.servlet.ServletRegistration;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
+import javax.servlet.descriptor.JspPropertyGroupDescriptor;
+import javax.servlet.descriptor.TaglibDescriptor;
 
+import org.apache.jasper.JasperException;
+import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.util.ExceptionUtils;
+import org.apache.tomcat.util.descriptor.web.JspConfigDescriptorImpl;
+import org.apache.tomcat.util.descriptor.web.JspPropertyGroup;
+import org.apache.tomcat.util.descriptor.web.JspPropertyGroupDescriptorImpl;
+import org.apache.tomcat.util.descriptor.web.TaglibDescriptorImpl;
+import org.apache.tomcat.util.descriptor.web.WebXml;
+import org.apache.tomcat.util.descriptor.web.WebXmlParser;
+import org.xml.sax.InputSource;
 
 
 /**
@@ -79,6 +89,14 @@ public class JspCServletContext implements ServletContext {
 
 
     /**
+     * Merged web.xml for the application.
+     */
+    private final WebXml webXml;
+
+
+    private final JspConfigDescriptorImpl jspConfigDescriptor;
+
+    /**
      * Web application class loader.
      */
     private ClassLoader loader;
@@ -91,18 +109,71 @@ public class JspCServletContext implements ServletContext {
      *
      * @param aLogWriter PrintWriter which is used for <code>log()</code> calls
      * @param aResourceBaseURL Resource base URL
+     * @throws JasperException
      */
-    public JspCServletContext(PrintWriter aLogWriter, URL aResourceBaseURL) {
+    public JspCServletContext(PrintWriter aLogWriter, URL aResourceBaseURL)
+            throws JasperException {
 
         myAttributes = new Hashtable<>();
         myLogWriter = aLogWriter;
         myResourceBaseURL = aResourceBaseURL;
 
+        // Build the merged web.xml
+        // TODO - Process fragments
+        // TODO - Check to see if annotations can impact anything JspC
+        //        cares about and if yes, process fragments too.
+        this.webXml = new WebXml();
+
+        WebXmlParser webXmlParser = new WebXmlParser(false, false);
+
+        InputStream webXmlStream = getResourceAsStream(
+                org.apache.tomcat.util.descriptor.web.Constants.
+                WEB_XML_LOCATION);
+
+        if (webXmlStream != null) {
+            URL webXmlUrl;
+            try {
+                webXmlUrl = getResource(
+                        org.apache.tomcat.util.descriptor.web.Constants.
+                        WEB_XML_LOCATION);
+            } catch (MalformedURLException e) {
+                // Should never happen. Just in case...
+                throw new JasperException(e);
+            }
+
+            InputSource source = new InputSource(webXmlUrl.toExternalForm());
+            source.setByteStream(webXmlStream);
+            if (!webXmlParser.parseWebXml(source, webXml, false)) {
+                throw new JasperException(Localizer.getMessage(""));
+            }
+        }
+
+
+
+        Set<JspPropertyGroup> jspPropertyGroups = webXml.getJspPropertyGroups();
+        Map<String,String> tagLibs = webXml.getTaglibs();
+
+        if (jspPropertyGroups.isEmpty() && tagLibs.isEmpty()) {
+            jspConfigDescriptor = null;
+        } else {
+            jspConfigDescriptor = new JspConfigDescriptorImpl();
+            for (JspPropertyGroup jspPropertyGroup : jspPropertyGroups) {
+                JspPropertyGroupDescriptor descriptor =
+                        new JspPropertyGroupDescriptorImpl(jspPropertyGroup);
+                jspConfigDescriptor.getJspPropertyGroups().add(descriptor);
+
+            }
+            for (Entry<String, String> entry : webXml.getTaglibs().entrySet()) {
+                TaglibDescriptor descriptor = new TaglibDescriptorImpl(
+                        entry.getValue(), entry.getKey());
+                jspConfigDescriptor.getTaglibs().add(descriptor);
+            }
+        }
+
     }
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Return the specified context attribute, if any.
@@ -111,9 +182,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public Object getAttribute(String name) {
-
-        return (myAttributes.get(name));
-
+        return myAttributes.get(name);
     }
 
 
@@ -122,9 +191,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public Enumeration<String> getAttributeNames() {
-
-        return (myAttributes.keys());
-
+        return myAttributes.keys();
     }
 
 
@@ -135,9 +202,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public ServletContext getContext(String uripath) {
-
-        return (null);
-
+        return null;
     }
 
 
@@ -146,9 +211,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getContextPath() {
-
-        return (null);
-
+        return null;
     }
 
 
@@ -159,9 +222,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getInitParameter(String name) {
-
-        return (null);
-
+        return null;
     }
 
 
@@ -171,9 +232,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public Enumeration<String> getInitParameterNames() {
-
-        return (new Vector<String>().elements());
-
+        return new Vector<String>().elements();
     }
 
 
@@ -182,9 +241,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public int getMajorVersion() {
-
-        return (3);
-
+        return 3;
     }
 
 
@@ -195,9 +252,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getMimeType(String file) {
-
-        return (null);
-
+        return null;
     }
 
 
@@ -206,9 +261,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public int getMinorVersion() {
-
-        return (1);
-
+        return 1;
     }
 
 
@@ -219,9 +272,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public RequestDispatcher getNamedDispatcher(String name) {
-
-        return (null);
-
+        return null;
     }
 
 
@@ -256,9 +307,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public RequestDispatcher getRequestDispatcher(String path) {
-
-        return (null);
-
+        return null;
     }
 
 
@@ -353,9 +402,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getServerInfo() {
-
-        return ("JspCServletContext/1.0");
-
+        return ("JspC/ApacheTomcat8");
     }
 
 
@@ -369,9 +416,7 @@ public class JspCServletContext implements ServletContext {
     @Override
     @Deprecated
     public Servlet getServlet(String name) throws ServletException {
-
-        return (null);
-
+        return null;
     }
 
 
@@ -380,9 +425,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getServletContextName() {
-
         return (getServerInfo());
-
     }
 
 
@@ -394,9 +437,7 @@ public class JspCServletContext implements ServletContext {
     @Override
     @Deprecated
     public Enumeration<String> getServletNames() {
-
         return (new Vector<String>().elements());
-
     }
 
 
@@ -408,9 +449,7 @@ public class JspCServletContext implements ServletContext {
     @Override
     @Deprecated
     public Enumeration<Servlet> getServlets() {
-
         return (new Vector<Servlet>().elements());
-
     }
 
 
@@ -421,9 +460,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public void log(String message) {
-
         myLogWriter.println(message);
-
     }
 
 
@@ -438,9 +475,7 @@ public class JspCServletContext implements ServletContext {
     @Override
     @Deprecated
     public void log(Exception exception, String message) {
-
         log(message, exception);
-
     }
 
 
@@ -452,10 +487,8 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public void log(String message, Throwable exception) {
-
         myLogWriter.println(message);
         exception.printStackTrace(myLogWriter);
-
     }
 
 
@@ -466,9 +499,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public void removeAttribute(String name) {
-
         myAttributes.remove(name);
-
     }
 
 
@@ -480,9 +511,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public void setAttribute(String name, Object value) {
-
         myAttributes.put(name, value);
-
     }
 
 
@@ -628,13 +657,13 @@ public class JspCServletContext implements ServletContext {
 
     @Override
     public int getEffectiveMajorVersion() {
-        return 3;
+        return webXml.getMajorVersion();
     }
 
 
     @Override
     public int getEffectiveMinorVersion() {
-        return 0;
+        return webXml.getMinorVersion();
     }
 
 
@@ -646,7 +675,7 @@ public class JspCServletContext implements ServletContext {
 
     @Override
     public JspConfigDescriptor getJspConfigDescriptor() {
-        return null;
+        return jspConfigDescriptor;
     }
 
 

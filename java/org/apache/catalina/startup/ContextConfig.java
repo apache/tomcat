@@ -67,8 +67,6 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.core.ApplicationJspPropertyGroupDescriptor;
-import org.apache.catalina.core.ApplicationTaglibDescriptor;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
@@ -99,6 +97,7 @@ import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.JspPropertyGroup;
+import org.apache.tomcat.util.descriptor.web.JspPropertyGroupDescriptorImpl;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.MessageDestinationRef;
 import org.apache.tomcat.util.descriptor.web.MultipartDef;
@@ -106,6 +105,7 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.descriptor.web.SecurityRoleRef;
 import org.apache.tomcat.util.descriptor.web.ServletDef;
 import org.apache.tomcat.util.descriptor.web.SessionConfig;
+import org.apache.tomcat.util.descriptor.web.TaglibDescriptorImpl;
 import org.apache.tomcat.util.descriptor.web.WebXml;
 import org.apache.tomcat.util.descriptor.web.WebXmlParser;
 import org.apache.tomcat.util.digester.Digester;
@@ -1279,7 +1279,7 @@ public class ContextConfig implements LifecycleListener {
         for (JspPropertyGroup jspPropertyGroup :
                 webxml.getJspPropertyGroups()) {
             JspPropertyGroupDescriptor descriptor =
-                new ApplicationJspPropertyGroupDescriptor(jspPropertyGroup);
+                new JspPropertyGroupDescriptorImpl(jspPropertyGroup);
             context.getJspConfigDescriptor().getJspPropertyGroups().add(
                     descriptor);
         }
@@ -1411,7 +1411,7 @@ public class ContextConfig implements LifecycleListener {
             }
         }
         for (Entry<String, String> entry : webxml.getTaglibs().entrySet()) {
-            TaglibDescriptor descriptor = new ApplicationTaglibDescriptor(
+            TaglibDescriptor descriptor = new TaglibDescriptorImpl(
                     entry.getValue(), entry.getKey());
             context.getJspConfigDescriptor().getTaglibs().add(descriptor);
         }

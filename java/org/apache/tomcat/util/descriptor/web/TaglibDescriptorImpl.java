@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.catalina.core;
+package org.apache.tomcat.util.descriptor.web;
 
 import javax.servlet.descriptor.TaglibDescriptor;
 
-public class ApplicationTaglibDescriptor implements TaglibDescriptor {
+public class TaglibDescriptorImpl implements TaglibDescriptor {
 
     private final String location;
     private final String uri;
 
-    public ApplicationTaglibDescriptor(String location, String uri) {
+    public TaglibDescriptorImpl(String location, String uri) {
         this.location = location;
         this.uri = uri;
     }
@@ -54,10 +54,10 @@ public class ApplicationTaglibDescriptor implements TaglibDescriptor {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof ApplicationTaglibDescriptor)) {
+        if (!(obj instanceof TaglibDescriptorImpl)) {
             return false;
         }
-        ApplicationTaglibDescriptor other = (ApplicationTaglibDescriptor) obj;
+        TaglibDescriptorImpl other = (TaglibDescriptorImpl) obj;
         if (location == null) {
             if (other.location != null) {
                 return false;
