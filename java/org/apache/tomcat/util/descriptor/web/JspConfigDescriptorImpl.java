@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.catalina.core;
+package org.apache.tomcat.util.descriptor.web;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,7 +25,7 @@ import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.descriptor.JspPropertyGroupDescriptor;
 import javax.servlet.descriptor.TaglibDescriptor;
 
-public class ApplicationJspConfigDescriptor implements JspConfigDescriptor {
+public class JspConfigDescriptorImpl implements JspConfigDescriptor {
 
     private final Collection<JspPropertyGroupDescriptor> jspPropertyGroups =
         new LinkedHashSet<>();

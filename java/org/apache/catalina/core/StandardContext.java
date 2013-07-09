@@ -121,6 +121,7 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.Injectable;
 import org.apache.tomcat.util.descriptor.web.InjectionTarget;
+import org.apache.tomcat.util.descriptor.web.JspConfigDescriptorImpl;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.MessageDestination;
 import org.apache.tomcat.util.descriptor.web.MessageDestinationRef;
@@ -821,7 +822,7 @@ public class StandardContext extends ContainerBase
     private int effectiveMinorVersion = 0;
 
     private JspConfigDescriptor jspConfigDescriptor =
-        new ApplicationJspConfigDescriptor();
+        new JspConfigDescriptorImpl();
 
     private Set<String> resourceOnlyServlets = new HashSet<>();
 
@@ -5696,7 +5697,7 @@ public class StandardContext extends ContainerBase
         applicationListeners = new ApplicationListener[0];
         applicationEventListenersObjects = new Object[0];
         applicationLifecycleListenersObjects = new Object[0];
-        jspConfigDescriptor = new ApplicationJspConfigDescriptor();
+        jspConfigDescriptor = new JspConfigDescriptorImpl();
 
         initializers.clear();
 
