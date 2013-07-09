@@ -276,8 +276,7 @@ class ParserController implements TagConstants {
      * @return The value of the <page-encoding> attribute of the
      * jsp-property-group with matching URL pattern
      */
-    private String getJspConfigPageEncoding(String absFileName)
-    throws JasperException {
+    private String getJspConfigPageEncoding(String absFileName) {
 
         JspConfig jspConfig = ctxt.getOptions().getJspConfig();
         JspConfig.JspProperty jspProperty

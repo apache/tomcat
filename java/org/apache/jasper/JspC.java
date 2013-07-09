@@ -1220,7 +1220,7 @@ public class JspC extends Task implements Options {
      * Locate all jsp files in the webapp. Used if no explicit
      * jsps are specified.
      */
-    public void scanFiles( File base ) throws JasperException {
+    public void scanFiles( File base ) {
         Stack<String> dirs = new Stack<>();
         dirs.push(base.toString());
 
