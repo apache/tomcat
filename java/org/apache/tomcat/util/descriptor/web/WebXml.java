@@ -32,6 +32,7 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.SessionTrackingMode;
 
+import org.apache.tomcat.util.descriptor.XmlIdentifiers;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -127,44 +128,31 @@ public class WebXml {
      * @param version   Values of <code>null</code> will be ignored
      */
     public void setVersion(String version) {
-        if (version == null) return;
-
-        // Update major and minor version
-        // Expected format is n.n - allow for any number of digits just in case
-        String major = null;
-        String minor = null;
-        int split = version.indexOf('.');
-        if (split < 0) {
-            // Major only
-            major = version;
-        } else {
-            major = version.substring(0, split);
-            minor = version.substring(split + 1);
+        if (version == null) {
+            return;
         }
-        if (major == null || major.length() == 0) {
-            majorVersion = 0;
-        } else {
-            try {
-                majorVersion = Integer.parseInt(major);
-            } catch (NumberFormatException nfe) {
-                log.warn(sm.getString("webXml.version.nfe", major, version),
-                        nfe);
-                majorVersion = 0;
-            }
-        }
-
-        if (minor == null || minor.length() == 0) {
-            minorVersion = 0;
-        } else {
-            try {
-                minorVersion = Integer.parseInt(minor);
-            } catch (NumberFormatException nfe) {
-                log.warn(sm.getString("webXml.version.nfe", minor, version),
-                        nfe);
+        switch (version) {
+            case "2.4":
+                majorVersion = 2;
+                minorVersion = 4;
+                break;
+            case "2.5":
+                majorVersion = 2;
+                minorVersion = 5;
+                break;
+            case "3.0":
+                majorVersion = 3;
                 minorVersion = 0;
-            }
+                break;
+            case "3.1":
+                majorVersion = 3;
+                minorVersion = 1;
+                break;
+            default:
+                log.warn(sm.getString("webXml.version.unknown", version));
         }
     }
+
 
 
     // Optional publicId attribute
@@ -173,47 +161,22 @@ public class WebXml {
     public void setPublicId(String publicId) {
         // Update major and minor version
         if (publicId == null) {
-            // skip
-        } else if (org.apache.catalina.startup.Constants.WebSchemaPublicId_31.
-                equalsIgnoreCase(publicId) ||
-                org.apache.catalina.startup.Constants.WebFragmentSchemaPublicId_31.
-                equalsIgnoreCase(publicId)) {
-            majorVersion = 3;
-            minorVersion = 1;
-            this.publicId = publicId;
-        } else if (org.apache.catalina.startup.Constants.WebSchemaPublicId_30.
-                equalsIgnoreCase(publicId) ||
-                org.apache.catalina.startup.Constants.WebFragmentSchemaPublicId_30.
-                equalsIgnoreCase(publicId)) {
-            majorVersion = 3;
-            minorVersion = 0;
-            this.publicId = publicId;
-        } else if (org.apache.catalina.startup.Constants.WebSchemaPublicId_25.
-                equalsIgnoreCase(publicId)) {
-            majorVersion = 2;
-            minorVersion = 5;
-            this.publicId = publicId;
-        } else if (org.apache.catalina.startup.Constants.WebSchemaPublicId_24.
-                equalsIgnoreCase(publicId)) {
-            majorVersion = 2;
-            minorVersion = 4;
-            this.publicId = publicId;
-        } else if (org.apache.catalina.startup.Constants.WebDtdPublicId_23.
-                equalsIgnoreCase(publicId)) {
-            majorVersion = 2;
-            minorVersion = 3;
-            this.publicId = publicId;
-        } else if (org.apache.catalina.startup.Constants.WebDtdPublicId_22.
-                equalsIgnoreCase(publicId)) {
-            majorVersion = 2;
-            minorVersion = 2;
-            this.publicId = publicId;
-        } else if ("datatypes".equals(publicId)) {
-            // Will occur when validation is enabled and dependencies are
-            // traced back. Ignore it.
-        } else {
-            // Unrecognised publicId
-            log.warn(sm.getString("webXml.unrecognisedPublicId", publicId));
+            return;
+        }
+        switch (publicId) {
+            case XmlIdentifiers.WEB_22_PUBLIC:
+                majorVersion = 2;
+                minorVersion = 2;
+                this.publicId = publicId;
+                break;
+            case XmlIdentifiers.WEB_23_PUBLIC:
+                majorVersion = 2;
+                minorVersion = 3;
+                this.publicId = publicId;
+                break;
+            default:
+                log.warn(sm.getString("webXml.unrecognisedPublicId", publicId));
+                break;
         }
     }
 
