@@ -39,6 +39,7 @@ import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.res.StringManager;

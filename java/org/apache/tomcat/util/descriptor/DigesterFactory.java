@@ -14,15 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.startup;
+package org.apache.tomcat.util.descriptor;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.Servlet;
 
-import org.apache.tomcat.util.descriptor.LocalResolver;
-import org.apache.tomcat.util.descriptor.XmlIdentifiers;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
 

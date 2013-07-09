@@ -25,7 +25,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 import org.apache.catalina.startup.Constants;
-import org.apache.catalina.startup.DigesterFactory;
+import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tools.ant.BuildException;
 import org.xml.sax.InputSource;
