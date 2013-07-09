@@ -199,9 +199,9 @@ public class WebXml {
     }
 
     // Derived major and minor version attributes
-    // Default to 3.0 until we know otherwise
+    // Default to 3.1 until we know otherwise
     private int majorVersion = 3;
-    private int minorVersion = 0;
+    private int minorVersion = 1;
     public int getMajorVersion() { return majorVersion; }
     public int getMinorVersion() { return minorVersion; }
 
