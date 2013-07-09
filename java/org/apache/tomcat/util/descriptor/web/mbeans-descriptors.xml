@@ -22,7 +22,7 @@
          description="Representation of an application environment entry"
          domain="Catalina"
          group="Resources"
-         type="org.apache.catalina.deploy.ContextEnvironment">
+         type="org.apache.tomcat.util.descriptor.web.ContextEnvironment">
 
     <attribute name="className"
                description="Fully qualified class name of the managed object"
@@ -57,7 +57,7 @@
          description="Representation of a resource reference for a web application"
          domain="Catalina"
          group="Resources"
-         type="org.apache.catalina.deploy.ContextResource">
+         type="org.apache.tomcat.util.descriptor.web.ContextResource">
 
     <attribute   name="auth"
                description="The authorization requirement for this resource"
@@ -86,7 +86,7 @@
           description="Representation of a resource link for a web application"
           domain="Catalina"
           group="Resources"
-          type="org.apache.catalina.deploy.ContextResourceLink">
+          type="org.apache.tomcat.util.descriptor.web.ContextResourceLink">
 
     <attribute   name="global"
                description="The global name of this resource"

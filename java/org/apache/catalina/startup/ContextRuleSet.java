@@ -155,11 +155,11 @@ public class ContextRuleSet extends RuleSetBase {
                             "org.apache.catalina.Store");
 
         digester.addObjectCreate(prefix + "Context/Parameter",
-                                 "org.apache.catalina.deploy.ApplicationParameter");
+                                 "org.apache.tomcat.util.descriptor.web.ApplicationParameter");
         digester.addSetProperties(prefix + "Context/Parameter");
         digester.addSetNext(prefix + "Context/Parameter",
                             "addApplicationParameter",
-                            "org.apache.catalina.deploy.ApplicationParameter");
+                            "org.apache.tomcat.util.descriptor.web.ApplicationParameter");
 
         digester.addRuleSet(new RealmRuleSet(prefix + "Context/"));
 
@@ -197,11 +197,11 @@ public class ContextRuleSet extends RuleSetBase {
 
 
         digester.addObjectCreate(prefix + "Context/ResourceLink",
-                "org.apache.catalina.deploy.ContextResourceLink");
+                "org.apache.tomcat.util.descriptor.web.ContextResourceLink");
         digester.addSetProperties(prefix + "Context/ResourceLink");
         digester.addRule(prefix + "Context/ResourceLink",
                 new SetNextNamingRule("addResourceLink",
-                        "org.apache.catalina.deploy.ContextResourceLink"));
+                        "org.apache.tomcat.util.descriptor.web.ContextResourceLink"));
 
         digester.addObjectCreate(prefix + "Context/Valve",
                                  null, // MUST be specified in the element
