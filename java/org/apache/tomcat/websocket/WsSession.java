@@ -48,6 +48,12 @@ import org.apache.tomcat.util.res.StringManager;
 public class WsSession implements Session {
 
     private static final Charset UTF8 = Charset.forName("UTF8");
+    // An ellipsis is a single character that looks like three periods in a row
+    // and is used to indicate a continuation.
+    private static final byte[] ELLIPSIS_BYTES = "\u2026".getBytes(UTF8);
+    // An ellipsis is three bytes in UTF-8
+    private static final int ELLIPSIS_BYTES_LEN = ELLIPSIS_BYTES.length;
+
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
     private static AtomicLong ids = new AtomicLong(0);
@@ -450,9 +456,10 @@ public class WsSession implements Session {
         // 125 is maximum size for the payload of a control message
         ByteBuffer msg = ByteBuffer.allocate(125);
         msg.putShort((short) closeReason.getCloseCode().getCode());
+
         String reason = closeReason.getReasonPhrase();
         if (reason != null && reason.length() > 0) {
-            msg.put(reason.getBytes(UTF8));
+            appendCloseReasonWithTruncation(msg, reason);
         }
         msg.flip();
         try {
@@ -469,6 +476,35 @@ public class WsSession implements Session {
         }
     }
 
+
+    /**
+     * Use protected so unit tests can access this method directly.
+     */
+    protected static void appendCloseReasonWithTruncation(ByteBuffer msg,
+            String reason) {
+        // Once the close code has been added there are a maximum of 123 bytes
+        // left for the reason phrase. If it is truncated then care needs to be
+        // taken to ensure the bytes are not truncated in the middle of a
+        // multi-byte UTF-8 character.
+        byte[] reasonBytes = reason.getBytes(UTF8);
+
+        if (reasonBytes.length  <= 123) {
+            // No need to truncate
+            msg.put(reasonBytes);
+        } else {
+            // Need to truncate
+            int remaining = 123 - ELLIPSIS_BYTES_LEN;
+            int pos = 0;
+            byte[] bytesNext = reason.substring(pos, pos + 1).getBytes(UTF8);
+            while (remaining >= bytesNext.length) {
+                msg.put(bytesNext);
+                remaining -= bytesNext.length;
+                pos++;
+                bytesNext = reason.substring(pos, pos + 1).getBytes(UTF8);
+            }
+            msg.put(ELLIPSIS_BYTES);
+        }
+    }
 
     @Override
     public URI getRequestURI() {
