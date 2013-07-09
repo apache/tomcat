@@ -213,7 +213,7 @@ public class WebXml {
             // traced back. Ignore it.
         } else {
             // Unrecognised publicId
-            log.warn(sm.getString("webxml.unrecognisedPublicId", publicId));
+            log.warn(sm.getString("webXml.unrecognisedPublicId", publicId));
         }
     }
 
