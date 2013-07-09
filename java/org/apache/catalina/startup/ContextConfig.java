@@ -87,7 +87,7 @@ import org.apache.tomcat.util.bcel.classfile.ClassParser;
 import org.apache.tomcat.util.bcel.classfile.ElementValue;
 import org.apache.tomcat.util.bcel.classfile.ElementValuePair;
 import org.apache.tomcat.util.bcel.classfile.JavaClass;
-import org.apache.tomcat.util.descriptor.DigesterFactory;
+import org.apache.tomcat.util.descriptor.XmlErrorHandler;
 import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.util.descriptor.web.ContextEjb;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
@@ -106,8 +106,8 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.descriptor.web.SecurityRoleRef;
 import org.apache.tomcat.util.descriptor.web.ServletDef;
 import org.apache.tomcat.util.descriptor.web.SessionConfig;
-import org.apache.tomcat.util.descriptor.web.WebRuleSet;
 import org.apache.tomcat.util.descriptor.web.WebXml;
+import org.apache.tomcat.util.descriptor.web.WebXmlParser;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
 import org.apache.tomcat.util.res.StringManager;
@@ -252,20 +252,7 @@ public class ContextConfig implements LifecycleListener {
      */
     protected boolean handlesTypesNonAnnotations = false;
 
-    /**
-     * The <code>Digester</code> we will use to process web application
-     * deployment descriptor files.
-     */
-    protected Digester webDigester = null;
-    protected WebRuleSet webRuleSet = null;
-
-    /**
-     * The <code>Digester</code> we will use to process web fragment
-     * deployment descriptor files.
-     */
-    protected Digester webFragmentDigester = null;
-    protected WebRuleSet webFragmentRuleSet = null;
-
+    private WebXmlParser webXmlParser;
 
     // ------------------------------------------------------------- Properties
     /**
@@ -453,25 +440,6 @@ public class ContextConfig implements LifecycleListener {
                 }
             }
         }
-    }
-
-
-    /**
-     * Create and return a Digester configured to process the
-     * web application deployment descriptor (web.xml).
-     */
-    public void createWebXmlDigester(boolean namespaceAware,
-            boolean validation) {
-
-        webRuleSet = new WebRuleSet(false);
-        webDigester = DigesterFactory.newDigester(validation,
-                namespaceAware, webRuleSet);
-        webDigester.getParser();
-
-        webFragmentRuleSet = new WebRuleSet(true);
-        webFragmentDigester = DigesterFactory.newDigester(validation,
-                namespaceAware, webFragmentRuleSet);
-        webFragmentDigester.getParser();
     }
 
 
@@ -771,7 +739,7 @@ public class ContextConfig implements LifecycleListener {
 
         contextConfig(contextDigester);
 
-        createWebXmlDigester(context.getXmlNamespaceAware(),
+        webXmlParser = new WebXmlParser(context.getXmlNamespaceAware(),
                 context.getXmlValidation());
     }
 
@@ -1145,7 +1113,9 @@ public class ContextConfig implements LifecycleListener {
 
         // Parse context level web.xml
         InputSource contextWebXml = getContextWebXmlSource();
-        parseWebXml(contextWebXml, webXml, false);
+        if (!webXmlParser.parseWebXml(contextWebXml, webXml, false)) {
+            ok = false;
+        }
 
         ServletContext sContext = context.getServletContext();
 
@@ -1559,14 +1529,20 @@ public class ContextConfig implements LifecycleListener {
                 // This is unusual enough to log
                 log.info(sm.getString("contextConfig.defaultMissing"));
             } else {
-                parseWebXml(globalWebXml, webXmlDefaultFragment, false);
+                if (!webXmlParser.parseWebXml(
+                        globalWebXml, webXmlDefaultFragment, false)) {
+                    ok = false;
+                }
             }
 
             // Parse host level web.xml if present
             // Additive apart from welcome pages
             webXmlDefaultFragment.setReplaceWelcomeFiles(true);
 
-            parseWebXml(hostWebXml, webXmlDefaultFragment, false);
+            if (!webXmlParser.parseWebXml(
+                    hostWebXml, webXmlDefaultFragment, false)) {
+                ok = false;
+            }
 
             // Don't update the cache if an error occurs
             if (globalTimeStamp != -1 && hostTimeStamp != -1) {
@@ -1958,79 +1934,6 @@ public class ContextConfig implements LifecycleListener {
         }
 
         return source;
-    }
-
-
-    /**
-     * Parses the given source and stores the parsed data in the given web.xml
-     * representation. The byte stream will be closed at the end of the parse
-     * operation.
-     *
-     * @param source Input source containing the XML data to be parsed
-     * @param dest The object representation of common elements of web.xml and
-     *             web-fragment.xml
-     * @param fragment Specifies whether the source is web-fragment.xml or
-     *                 web.xml
-     */
-    protected void parseWebXml(InputSource source, WebXml dest,
-            boolean fragment) {
-
-        if (source == null) {
-            return;
-        }
-
-        XmlErrorHandler handler = new XmlErrorHandler();
-
-        Digester digester;
-        WebRuleSet ruleSet;
-        if (fragment) {
-            digester = webFragmentDigester;
-            ruleSet = webFragmentRuleSet;
-        } else {
-            digester = webDigester;
-            ruleSet = webRuleSet;
-        }
-
-        digester.push(dest);
-        digester.setErrorHandler(handler);
-
-        if(log.isDebugEnabled()) {
-            log.debug(sm.getString("contextConfig.applicationStart",
-                    source.getSystemId()));
-        }
-
-        try {
-            digester.parse(source);
-
-            if (handler.getWarnings().size() > 0 ||
-                    handler.getErrors().size() > 0) {
-                ok = false;
-                handler.logFindings(log, source.getSystemId());
-            }
-        } catch (SAXParseException e) {
-            log.error(sm.getString("contextConfig.applicationParse",
-                    source.getSystemId()), e);
-            log.error(sm.getString("contextConfig.applicationPosition",
-                             "" + e.getLineNumber(),
-                             "" + e.getColumnNumber()));
-            ok = false;
-        } catch (Exception e) {
-            log.error(sm.getString("contextConfig.applicationParse",
-                    source.getSystemId()), e);
-            ok = false;
-        } finally {
-            digester.reset();
-            ruleSet.recycle();
-
-            InputStream is = source.getByteStream();
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                }
-            }
-        }
     }
 
 
@@ -2783,7 +2686,9 @@ public class ContextConfig implements LifecycleListener {
                     InputSource source = new InputSource(
                             resourceURL.toString() + "!/" + FRAGMENT_LOCATION);
                     source.setByteStream(is);
-                    parseWebXml(source, fragment, true);
+                    if (!webXmlParser.parseWebXml(source, fragment, true)) {
+                        ok = false;
+                    }
                 }
             } finally {
                 if (jar != null) {
@@ -2822,7 +2727,9 @@ public class ContextConfig implements LifecycleListener {
                     InputSource source =
                         new InputSource(fragmentFile.toURI().toURL().toString());
                     source.setByteStream(stream);
-                    parseWebXml(source, fragment, true);
+                    if (!webXmlParser.parseWebXml(source, fragment, true)) {
+                        ok = false;
+                    }
                 } else {
                     // If there is no web.xml, normal folder no impact on
                     // distributable

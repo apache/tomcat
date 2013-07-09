@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.startup;
+package org.apache.tomcat.util.descriptor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,7 +28,7 @@ import org.xml.sax.SAXParseException;
 public class XmlErrorHandler implements ErrorHandler {
 
     private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+        StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final Set<SAXParseException> errors = new HashSet<>();
 
