@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper;
 
 import java.io.BufferedReader;
@@ -30,7 +29,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -1414,15 +1412,11 @@ public class JspC extends Task implements Options {
         }
     }
 
-    protected void initServletContext() {
-        try {
-            context =new JspCServletContext
-                (new PrintWriter(System.out),
-                 new URL("file:" + uriRoot.replace('\\','/') + '/'));
-            tldLocationsCache = TldLocationsCache.getInstance(context);
-        } catch (MalformedURLException me) {
-            System.out.println("**" + me);
-        }
+    protected void initServletContext() throws IOException {
+     // TODO: should we use the Ant Project's log?
+        PrintWriter log = new PrintWriter(System.out);
+        URL resourceBase = new File(uriRoot).getCanonicalFile().toURI().toURL();
+        context = new JspCServletContext(log, resourceBase);
         rctxt = new JspRuntimeContext(context, this);
         jspConfig = new JspConfig(context);
         tagPluginManager = new TagPluginManager(context);
