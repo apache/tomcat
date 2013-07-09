@@ -296,6 +296,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             // store all of the data
                             throw new IOException(sm.getString(
                                     "asyncChannelWrapperSecure.readOverflow",
+                                    Integer.valueOf(
+                                            socketReadBuffer.remaining()),
                                     Integer.valueOf(dest.limit()),
                                     Integer.valueOf(dest.position())));
                         } else {
