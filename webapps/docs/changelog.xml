@@ -134,6 +134,16 @@
         <bug>55101</bug>: Make BASIC authentication more tolerant of whitespace.
         Patch provided by Brian Burch. (markt)
       </fix>
+      <fix>
+        <bug>55166</bug>: Move JSP descriptor and tag library descriptor schemas
+        to servlet-api.jar to enable relative references between the schemas to
+        be correctly resolved. (markt)
+      </fix>
+      <scode>
+        Refactor the descriptor parsing code into a separate module that can be
+        used by both Catalina and Jasper. Includes patches provided by Jeremy
+        Boynes. (violetagg/markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
