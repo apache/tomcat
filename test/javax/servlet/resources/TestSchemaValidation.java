@@ -21,9 +21,9 @@ import java.io.File;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.catalina.startup.WebRuleSet;
 import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
+import org.apache.tomcat.util.descriptor.web.WebRuleSet;
 import org.apache.tomcat.util.descriptor.web.WebXml;
 import org.apache.tomcat.util.digester.Digester;
 
