@@ -14,21 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-package org.apache.catalina.startup;
-
+package org.apache.tomcat.util.descriptor.web;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import org.apache.tomcat.util.IntrospectionUtils;
-import org.apache.tomcat.util.descriptor.web.ContextHandler;
-import org.apache.tomcat.util.descriptor.web.ContextService;
-import org.apache.tomcat.util.descriptor.web.ResourceBase;
-import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
-import org.apache.tomcat.util.descriptor.web.ServletDef;
-import org.apache.tomcat.util.descriptor.web.WebXml;
 import org.apache.tomcat.util.digester.CallMethodRule;
 import org.apache.tomcat.util.digester.CallParamRule;
 import org.apache.tomcat.util.digester.Digester;
@@ -53,7 +44,7 @@ public class WebRuleSet extends RuleSetBase {
      * The string resources for this package.
      */
     protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+        StringManager.getManager(Constants.PACKAGE_NAME);
 
     // ----------------------------------------------------- Instance Variables
 
