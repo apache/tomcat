@@ -287,11 +287,11 @@ public class Catalina {
                             "org.apache.catalina.Server");
 
         digester.addObjectCreate("Server/GlobalNamingResources",
-                                 "org.apache.catalina.deploy.NamingResources");
+                                 "org.apache.catalina.deploy.NamingResourcesImpl");
         digester.addSetProperties("Server/GlobalNamingResources");
         digester.addSetNext("Server/GlobalNamingResources",
                             "setGlobalNamingResources",
-                            "org.apache.catalina.deploy.NamingResources");
+                            "org.apache.catalina.deploy.NamingResourcesImpl");
 
         digester.addObjectCreate("Server/Listener",
                                  null, // MUST be specified in the element

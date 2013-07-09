@@ -34,7 +34,7 @@ import org.apache.tomcat.util.modeler.Registry;
 
 /**
  * <p>A <strong>ModelMBean</strong> implementation for the
- * <code>org.apache.catalina.deploy.NamingResources</code> component.</p>
+ * <code>org.apache.catalina.deploy.NamingResourcesImpl</code> component.</p>
  *
  * @author Amy Roh
  * @version $Id$
