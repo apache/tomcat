@@ -34,41 +34,34 @@
 
 <section name="Overview">
 <p>Tomcat provides support for WebSocket as defined by
-   <a href="http://tools.ietf.org/html/rfc6455">RFC 6455</a>. This feature is
-   not yet finalised and you are encouraged to provide feedback in the form
-   of bug reports (via
-   <a href="https://issues.apache.org/bugzilla">Bugzilla</a>), suggested API
-   changes (via the
-   <a href="http://tomcat.apache.org/lists.html#tomcat-dev">dev list</a>) or
-   other comments (again via the
-   <a href="http://tomcat.apache.org/lists.html#tomcat-dev">dev list</a>).</p>
+   <a href="http://tools.ietf.org/html/rfc6455">RFC 6455</a>.</p>
 </section>
 
 <section name="Application development">
-<p>The API used for application development has not yet been finalised. Rather
-   than document something here that will quickly be out of date, please see the
-   Javadoc for the
-   <a href="api/index.html?org/apache/catalina/websocket/package-summary.html">
-   <code>org.apache.catalina.websocket</code></a> package. The Javadoc
-   pages are not included with Tomcat binary distributions. To view them
-   locally you would have to download and install "Full documentation"
-   distribution, or build it from sources. You can
-   also read this on the Apache Tomcat web site. Start with the
-   <a href="api/index.html?org/apache/catalina/websocket/WebSocketServlet.html">
-   <code>WebSocketServlet</code></a> class.</p>
-
-<p>There are also several example applications that demonstrate how the
-   WebSocket API can be used. You will need to look at both the client side <a
+<p>Tomcat implements the Java WebSocket 1.0 API defined by <a
+   href="http://www.jcp.org/en/jsr/detail?id=356">JSR-356</a>.</p>
+   
+<p>There are several example applications that demonstrate how the WebSocket API
+   can be used. You will need to look at both the client side <a
    href="http://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/websocket/">
    html</a> and the server side <a
    href="http://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/WEB-INF/classes/websocket/">
    code</a>.</p>
-
-<p>Do keep in mind that the API is fluid and is likely to change, possibly
-   significantly, between point releases. The documentation will be updated once
-   the API is considered stable (unlikely to be until JSR 356 is complete).</p>
 </section>
 
+<section name="Tomcat WebSocket specific configuration">
+<p>Tomcat provides a number of Tomcat specific configuration options for
+   WebSocket. It is anticipated that these will be absorbed into the WebSocket
+   specification over time.</p>
+
+<p>The write timeout used when sending WebSocket messages in blocking mode
+   defaults to 5000 milliseconds (5 seconds). This may be changed by setting
+   the property <code>org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT</code>
+   in the user properties collection attached to the WebSocket session. The
+   value assigned to this property should be a <code>Long</code> and represents
+   the timeout to use in milliseconds. For an infinite timeout, use
+   <code>-1</code>.</p>
+</section>
 
 </body>
 </document>

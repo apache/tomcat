@@ -52,6 +52,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
 
+    // Milliseconds so this is 5 seconds
+    private static final long DEFAULT_BLOCKING_SEND_TIMEOUT = 5 * 1000;
+
+    public static final String BLOCKING_SEND_TIMEOUT_PROPERTY =
+            "org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT";
+
     private final Log log = LogFactory.getLog(WsRemoteEndpointImplBase.class);
 
     private boolean messagePartInProgress = false;
@@ -75,7 +81,6 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     private volatile long sendTimeout = -1;
     private WsSession wsSession;
     private List<EncoderEntry> encoderEntries = new ArrayList<>();
-
 
     public long getSendTimeout() {
         return sendTimeout;
@@ -187,8 +192,14 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             TextMessageSendHandler tmsh = new TextMessageSendHandler(f2sh, part,
                     last, encoder, encoderBuffer, this);
             tmsh.write();
-            f2sh.get();
-        } catch (InterruptedException | ExecutionException e) {
+            long timeout = getBlockingSendTimeout();
+            if (timeout == -1) {
+                f2sh.get();
+            } else {
+                f2sh.get(timeout, TimeUnit.MILLISECONDS);
+            }
+        } catch (InterruptedException | ExecutionException |
+                TimeoutException e) {
             throw new IOException(e);
         }
     }
@@ -199,8 +210,14 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         FutureToSendHandler f2sh = new FutureToSendHandler();
         startMessage(opCode, payload, last, f2sh);
         try {
-            f2sh.get();
-        } catch (InterruptedException | ExecutionException e) {
+            long timeout = getBlockingSendTimeout();
+            if (timeout == -1) {
+                f2sh.get();
+            } else {
+                f2sh.get(timeout, TimeUnit.MILLISECONDS);
+            }
+        } catch (InterruptedException | ExecutionException |
+                TimeoutException e) {
             throw new IOException(e);
         }
     }
@@ -336,6 +353,21 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             doWrite(mp.getHandler(), headerBuffer, mp.getPayload());
         }
 
+    }
+
+
+    private long getBlockingSendTimeout() {
+        Object obj = wsSession.getUserProperties().get(
+                BLOCKING_SEND_TIMEOUT_PROPERTY);
+        Long userTimeout = null;
+        if (obj instanceof Long) {
+            userTimeout = (Long) obj;
+        }
+        if (userTimeout == null) {
+            return DEFAULT_BLOCKING_SEND_TIMEOUT;
+        } else {
+            return userTimeout.longValue();
+        }
     }
 
 
