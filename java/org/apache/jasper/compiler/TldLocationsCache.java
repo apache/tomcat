@@ -22,11 +22,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
+import javax.servlet.descriptor.JspConfigDescriptor;
+import javax.servlet.descriptor.TaglibDescriptor;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.util.ExceptionUtils;
@@ -235,60 +238,34 @@ public class TldLocationsCache {
     /*
      * Populates taglib map described in web.xml.
      *
-     * This is not kept in sync with o.a.c.startup.TldConfig as the Jasper only
-     * needs the URI to TLD mappings from scan web.xml whereas TldConfig needs
-     * to scan the actual TLD files.
+     * This is not kept in sync with o.a.c.startup.TldConfig as a) Jasper only
+     * needs the URI to TLD mappings and b) Jasper can obtain the information
+     * from the ServletContext.
      */
     private void tldScanWebXml() throws Exception {
 
-        WebXml webXml = null;
-        try {
-            webXml = new WebXml(ctxt);
-            if (webXml.getInputSource() == null) {
-                return;
-            }
+        JspConfigDescriptor jspConfig = ctxt.getJspConfigDescriptor();
 
-            // Parse the web application deployment descriptor
-            TreeNode webtld = null;
-            webtld = new ParserUtils().parseXMLDocument(webXml.getSystemId(),
-                    webXml.getInputSource());
+        Collection<TaglibDescriptor> taglibs = jspConfig.getTaglibs();
 
-            // Allow taglib to be an element of the root or jsp-config (JSP2.0)
-            TreeNode jspConfig = webtld.findChild("jsp-config");
-            if (jspConfig != null) {
-                webtld = jspConfig;
-            }
-            Iterator<TreeNode> taglibs = webtld.findChildren("taglib");
-            while (taglibs.hasNext()) {
+        for (TaglibDescriptor taglib : taglibs) {
 
-                // Parse the next <taglib> element
-                TreeNode taglib = taglibs.next();
-                String tagUri = null;
-                String tagLoc = null;
-                TreeNode child = taglib.findChild("taglib-uri");
-                if (child != null)
-                    tagUri = child.getBody();
-                child = taglib.findChild("taglib-location");
-                if (child != null)
-                    tagLoc = child.getBody();
+            String tagUri = taglib.getTaglibURI();
+            String tagLoc = taglib.getTaglibLocation();
 
-                // Save this location if appropriate
-                if (tagLoc == null)
-                    continue;
-                if (uriType(tagLoc) == NOROOT_REL_URI)
-                    tagLoc = "/WEB-INF/" + tagLoc;
-                TldLocation location;
-                if (tagLoc.endsWith(JAR_EXT)) {
-                    location = new TldLocation("META-INF/taglib.tld", ctxt.getResource(tagLoc).toString());
-                } else {
-                    location = new TldLocation(tagLoc);
-                }
-                mappings.put(tagUri, location);
+            // Save this location if appropriate
+            if (tagLoc == null)
+                continue;
+            if (uriType(tagLoc) == NOROOT_REL_URI)
+                tagLoc = "/WEB-INF/" + tagLoc;
+            TldLocation location;
+            if (tagLoc.endsWith(JAR_EXT)) {
+                location = new TldLocation("META-INF/taglib.tld",
+                        ctxt.getResource(tagLoc).toString());
+            } else {
+                location = new TldLocation(tagLoc);
             }
-        } finally {
-            if (webXml != null) {
-                webXml.close();
-            }
+            mappings.put(tagUri, location);
         }
     }
 
