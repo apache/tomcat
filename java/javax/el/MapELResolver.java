@@ -124,11 +124,12 @@ public class MapELResolver extends ELResolver {
                 key = itr.next();
                 desc = new FeatureDescriptor();
                 desc.setDisplayName(key.toString());
+                desc.setShortDescription("");
                 desc.setExpert(false);
                 desc.setHidden(false);
                 desc.setName(key.toString());
                 desc.setPreferred(true);
-                desc.setValue(RESOLVABLE_AT_DESIGN_TIME, Boolean.FALSE);
+                desc.setValue(RESOLVABLE_AT_DESIGN_TIME, Boolean.TRUE);
                 desc.setValue(TYPE, key.getClass());
                 feats.add(desc);
             }

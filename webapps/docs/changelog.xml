@@ -82,6 +82,13 @@
         throw <code>NullPointerException</code> when the provided class is
         null. (violetagg)
       </fix>
+      <fix>
+        Ensure that <code>FeatureDescriptor</code> objects returned by
+        <code>javax.el.MapELResolver.getFeatureDescriptors(ELContext,Object)</code>
+        will be created with a correct <code>shortDescription</code> - an empty string and
+        a named attribute <code>ELResolver.RESOLVABLE_AT_DESIGN_TIME</code> -
+        true. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
