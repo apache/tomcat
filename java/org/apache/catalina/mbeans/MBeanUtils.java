@@ -564,6 +564,7 @@ public class MBeanUtils {
             registry.loadDescriptors("org.apache.catalina.connector", cl);
             registry.loadDescriptors("org.apache.catalina.valves",  cl);
             registry.loadDescriptors("org.apache.catalina.storeconfig",  cl);
+            registry.loadDescriptors("org.apache.tomcat.util.descriptor.web",  cl);
         }
         return (registry);
 

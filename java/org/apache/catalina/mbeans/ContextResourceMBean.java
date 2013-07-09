@@ -31,7 +31,7 @@ import org.apache.tomcat.util.modeler.BaseModelMBean;
 
 /**
  * <p>A <strong>ModelMBean</strong> implementation for the
- * <code>org.apache.catalina.deploy.ContextResource</code> component.</p>
+ * <code>org.apache.tomcat.util.descriptor.web.ContextResource</code> component.</p>
  *
  * @author Amy Roh
  * @version $Id$
