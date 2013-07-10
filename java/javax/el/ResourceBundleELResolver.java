@@ -96,9 +96,10 @@ public class ResourceBundleELResolver extends ELResolver {
         
         if (base instanceof ResourceBundle) {
             context.setPropertyResolved(true);
+            return true;
         }
         
-        return true;
+        return false;
     }
 
     @Override
@@ -116,6 +117,7 @@ public class ResourceBundleELResolver extends ELResolver {
                 key = e.nextElement();
                 feat = new FeatureDescriptor();
                 feat.setDisplayName(key);
+                feat.setShortDescription("");
                 feat.setExpert(false);
                 feat.setHidden(false);
                 feat.setName(key);

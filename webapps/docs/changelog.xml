@@ -93,6 +93,15 @@
         a named attribute <code>ELResolver.RESOLVABLE_AT_DESIGN_TIME</code> -
         true. (violetagg)
       </fix>
+      <fix>
+        Ensure that <code>FeatureDescriptor</code> objects returned by
+        <code>javax.el.ResourceBundleELResolver.getFeatureDescriptors(ELContext,Object)</code>
+        will be created with a correct <code>shortDescription</code> - an empty
+        string.
+        <code>javax.el.ResourceBundleELResolver.isReadOnly(ELContext,Object,Object)</code>
+        returns true if the base object is an instance of ResourceBundle.
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
