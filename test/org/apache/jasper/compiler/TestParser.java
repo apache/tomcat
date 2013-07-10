@@ -328,7 +328,6 @@ public class TestParser extends TomcatBaseTest {
 
         String result = res.toString();
 
-        System.out.println(result);
         Assert.assertTrue(result.contains("&quot;bar&quot;") ||
                 result.contains("&#034;bar&#034;"));
         Assert.assertTrue(result.contains("&quot;foo&quot;") ||
