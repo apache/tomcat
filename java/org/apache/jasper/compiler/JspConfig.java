@@ -79,6 +79,10 @@ public class JspConfig {
 
         JspConfigDescriptor jspConfig = ctxt.getJspConfigDescriptor();
 
+        if (jspConfig == null) {
+            return;
+        }
+
         Collection<JspPropertyGroupDescriptor> jspPropertyGroups =
                 jspConfig.getJspPropertyGroups();
 
