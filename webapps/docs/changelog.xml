@@ -89,6 +89,10 @@
         a named attribute <code>ELResolver.RESOLVABLE_AT_DESIGN_TIME</code> -
         true. (violetagg)
       </fix>
+      <fix>
+        <bug>55230</bug>: Use the correct resource path when obtaining an
+        InputStream for resources served by a ProxyDirContext. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
