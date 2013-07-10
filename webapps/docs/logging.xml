@@ -424,52 +424,52 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
         following content and save it into <code>$CATALINA_BASE/lib</code></li>
     </ol>
     <source>
-log4j.rootLogger=INFO, CATALINA
+log4j.rootLogger = INFO, CATALINA
 
 # Define all the appenders
-log4j.appender.CATALINA=org.apache.log4j.DailyRollingFileAppender
-log4j.appender.CATALINA.File=${catalina.base}/logs/catalina.
-log4j.appender.CATALINA.Append=true
-log4j.appender.CATALINA.Encoding=UTF-8
+log4j.appender.CATALINA = org.apache.log4j.DailyRollingFileAppender
+log4j.appender.CATALINA.File = ${catalina.base}/logs/catalina
+log4j.appender.CATALINA.Append = true
+log4j.appender.CATALINA.Encoding = UTF-8
 # Roll-over the log once per day
-log4j.appender.CATALINA.DatePattern='.'yyyy-MM-dd'.log'
+log4j.appender.CATALINA.DatePattern = '.'yyyy-MM-dd'.log'
 log4j.appender.CATALINA.layout = org.apache.log4j.PatternLayout
 log4j.appender.CATALINA.layout.ConversionPattern = %d [%t] %-5p %c- %m%n
 
-log4j.appender.LOCALHOST=org.apache.log4j.DailyRollingFileAppender
-log4j.appender.LOCALHOST.File=${catalina.base}/logs/localhost.
-log4j.appender.LOCALHOST.Append=true
-log4j.appender.LOCALHOST.Encoding=UTF-8
-log4j.appender.LOCALHOST.DatePattern='.'yyyy-MM-dd'.log'
+log4j.appender.LOCALHOST = org.apache.log4j.DailyRollingFileAppender
+log4j.appender.LOCALHOST.File = ${catalina.base}/logs/localhost
+log4j.appender.LOCALHOST.Append = true
+log4j.appender.LOCALHOST.Encoding = UTF-8
+log4j.appender.LOCALHOST.DatePattern = '.'yyyy-MM-dd'.log'
 log4j.appender.LOCALHOST.layout = org.apache.log4j.PatternLayout
 log4j.appender.LOCALHOST.layout.ConversionPattern = %d [%t] %-5p %c- %m%n
 
-log4j.appender.MANAGER=org.apache.log4j.DailyRollingFileAppender
-log4j.appender.MANAGER.File=${catalina.base}/logs/manager.
-log4j.appender.MANAGER.Append=true
-log4j.appender.MANAGER.Encoding=UTF-8
-log4j.appender.MANAGER.DatePattern='.'yyyy-MM-dd'.log'
+log4j.appender.MANAGER = org.apache.log4j.DailyRollingFileAppender
+log4j.appender.MANAGER.File = ${catalina.base}/logs/manager
+log4j.appender.MANAGER.Append = true
+log4j.appender.MANAGER.Encoding = UTF-8
+log4j.appender.MANAGER.DatePattern = '.'yyyy-MM-dd'.log'
 log4j.appender.MANAGER.layout = org.apache.log4j.PatternLayout
 log4j.appender.MANAGER.layout.ConversionPattern = %d [%t] %-5p %c- %m%n
 
-log4j.appender.HOST-MANAGER=org.apache.log4j.DailyRollingFileAppender
-log4j.appender.HOST-MANAGER.File=${catalina.base}/logs/host-manager.
-log4j.appender.HOST-MANAGER.Append=true
-log4j.appender.HOST-MANAGER.Encoding=UTF-8
-log4j.appender.HOST-MANAGER.DatePattern='.'yyyy-MM-dd'.log'
+log4j.appender.HOST-MANAGER = org.apache.log4j.DailyRollingFileAppender
+log4j.appender.HOST-MANAGER.File = ${catalina.base}/logs/host-manager
+log4j.appender.HOST-MANAGER.Append = true
+log4j.appender.HOST-MANAGER.Encoding = UTF-8
+log4j.appender.HOST-MANAGER.DatePattern = '.'yyyy-MM-dd'.log'
 log4j.appender.HOST-MANAGER.layout = org.apache.log4j.PatternLayout
 log4j.appender.HOST-MANAGER.layout.ConversionPattern = %d [%t] %-5p %c- %m%n
 
-log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
-log4j.appender.CONSOLE.Encoding=UTF-8
+log4j.appender.CONSOLE = org.apache.log4j.ConsoleAppender
+log4j.appender.CONSOLE.Encoding = UTF-8
 log4j.appender.CONSOLE.layout = org.apache.log4j.PatternLayout
 log4j.appender.CONSOLE.layout.ConversionPattern = %d [%t] %-5p %c- %m%n
 
 # Configure which loggers log to which appenders
-log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=INFO, LOCALHOST
-log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager]=\
+log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost] = INFO, LOCALHOST
+log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager] =\
   INFO, MANAGER
-log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/host-manager]=\
+log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/host-manager] =\
   INFO, HOST-MANAGER
 </source>
     <ol start="2">
