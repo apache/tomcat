@@ -245,6 +245,9 @@ public class TldLocationsCache {
     private void tldScanWebXml() throws Exception {
 
         JspConfigDescriptor jspConfig = ctxt.getJspConfigDescriptor();
+        if (jspConfig == null) {
+            return;
+        }
 
         Collection<TaglibDescriptor> taglibs = jspConfig.getTaglibs();
 
