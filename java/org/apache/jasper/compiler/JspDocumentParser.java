@@ -270,11 +270,8 @@ class JspDocumentParser
             return;
         }
 
-        String currentPrefix = getPrefix(current.getQName());
-
         // jsp:text must not have any subelements
-        if (JSP_URI.equals(uri) && TEXT_ACTION.equals(current.getLocalName())
-                && "jsp".equals(currentPrefix)) {
+        if (current instanceof Node.JspText) {
             throw new SAXParseException(
                 Localizer.getMessage("jsp.error.text.has_subelement"),
                 locator);
