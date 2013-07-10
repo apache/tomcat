@@ -102,6 +102,11 @@
         returns true if the base object is an instance of ResourceBundle.
         (violetagg)
       </fix>
+      <fix>
+        <bug>55207</bug>: Enfore the restriction that a &lt;jsp:text&gt; element
+        may not contain any sub-elements from any namespace. Patch provided by
+        Jeremy Boynes. (mark))
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
