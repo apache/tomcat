@@ -73,6 +73,10 @@
         <bug>55230</bug>: Use the correct resource path when obtaining an
         InputStream for resources served by a ProxyDirContext. (markt)
       </fix>
+      <fix>
+        Ensure that the JAR scanning process scans the Apache Log4j version 2
+        JARs. Patch provided by Nick Williams. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
