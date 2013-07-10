@@ -19,7 +19,6 @@ package javax.el;
 
 import java.beans.FeatureDescriptor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -121,10 +120,15 @@ public class ListELResolver extends ELResolver {
         if (base instanceof List<?>) {
             context.setPropertyResolved(true);
             List<?> list = (List<?>) base;
-            int idx = coerce(property);
-            if (idx < 0 || idx >= list.size()) {
-                throw new PropertyNotFoundException(
-                        new ArrayIndexOutOfBoundsException(idx).getMessage());
+            try {
+                int idx = coerce(property);
+                if (idx < 0 || idx >= list.size()) {
+                    throw new PropertyNotFoundException(
+                            new ArrayIndexOutOfBoundsException(idx)
+                                    .getMessage());
+                }
+            } catch (IllegalArgumentException e) {
+                // ignore
             }
             return this.readOnly || UNMODIFIABLE.equals(list.getClass());
         }
@@ -134,20 +138,6 @@ public class ListELResolver extends ELResolver {
 
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        if (base instanceof List<?>) {
-            FeatureDescriptor[] descs = new FeatureDescriptor[((List<?>) base).size()];
-            for (int i = 0; i < descs.length; i++) {
-                descs[i] = new FeatureDescriptor();
-                descs[i].setDisplayName("["+i+"]");
-                descs[i].setExpert(false);
-                descs[i].setHidden(false);
-                descs[i].setName(""+i);
-                descs[i].setPreferred(true);
-                descs[i].setValue(RESOLVABLE_AT_DESIGN_TIME, Boolean.FALSE);
-                descs[i].setValue(TYPE, Integer.class);
-            }
-            return Arrays.asList(descs).iterator();
-        }
         return null;
     }
 

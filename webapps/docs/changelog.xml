@@ -107,9 +107,17 @@
         (violetagg)
       </fix>
       <fix>
-        <bug>55207</bug>: Enfore the restriction that a &lt;jsp:text&gt; element
+        <bug>55207</bug>: Enforce the restriction that a &lt;jsp:text&gt; element
         may not contain any sub-elements from any namespace. Patch provided by
         Jeremy Boynes. (mark))
+      </fix>
+      <fix>
+        Ensure that
+        <code>javax.el.ListELResolver.getFeatureDescriptors(ELContext,Object)</code>
+        will always return null.
+        <code>javax.el.ListELResolver.isReadOnly(ELContext,Object,Object)</code>
+        will return a result when the property cannot be coerced into an
+        integer. (violetagg)
       </fix>
     </changelog>
   </subsection>
