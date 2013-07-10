@@ -17,9 +17,7 @@
 -->
 <jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
 <jsp:directive.tag body-content="scriptless" />
-<jsp:text>
-  <a href="#" onclick="window.alert(&quot;${'foo'}&quot;)">foo</a>
-  <a href="#" onclick="window.alert(&quot;bar&quot;)">bar</a>
-</jsp:text>
+<a href="#" onclick="window.alert(&quot;${'foo'}&quot;)">foo</a>
+<a href="#" onclick="window.alert(&quot;bar&quot;)">bar</a>
 <jsp:doBody />
 </jsp:root>
