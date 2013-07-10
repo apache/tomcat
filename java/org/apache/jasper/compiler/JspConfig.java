@@ -83,6 +83,7 @@ public class JspConfig {
             return;
         }
 
+        jspProperties = new Vector<>();
         Collection<JspPropertyGroupDescriptor> jspPropertyGroups =
                 jspConfig.getJspPropertyGroups();
 
