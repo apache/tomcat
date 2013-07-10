@@ -69,6 +69,10 @@
         contains comments and multiple SCIs. Patch provided by Nick Williams.
         (violetagg)
       </fix>
+      <fix>
+        <bug>55230</bug>: Use the correct resource path when obtaining an
+        InputStream for resources served by a ProxyDirContext. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -88,10 +92,6 @@
         will be created with a correct <code>shortDescription</code> - an empty string and
         a named attribute <code>ELResolver.RESOLVABLE_AT_DESIGN_TIME</code> -
         true. (violetagg)
-      </fix>
-      <fix>
-        <bug>55230</bug>: Use the correct resource path when obtaining an
-        InputStream for resources served by a ProxyDirContext. (markt)
       </fix>
     </changelog>
   </subsection>
