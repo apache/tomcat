@@ -62,16 +62,16 @@ public class JspConfig {
     private void processWebDotXml() {
 
         // Very, very unlikely but just in case...
-        if (ctxt.getMajorVersion() < 2) {
+        if (ctxt.getEffectiveMajorVersion() < 2) {
             defaultIsELIgnored = "true";
             defaultDeferedSyntaxAllowedAsLiteral = "true";
             return;
         }
-        if (ctxt.getMajorVersion() == 2) {
-            if (ctxt.getMinorVersion() < 5) {
+        if (ctxt.getEffectiveMajorVersion() == 2) {
+            if (ctxt.getEffectiveMinorVersion() < 5) {
                 defaultDeferedSyntaxAllowedAsLiteral = "true";
             }
-            if (ctxt.getMinorVersion() < 4) {
+            if (ctxt.getEffectiveMinorVersion() < 4) {
                 defaultIsELIgnored = "true";
                 return;
             }
