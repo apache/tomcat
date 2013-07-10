@@ -19,7 +19,6 @@ package javax.el;
 
 import java.beans.FeatureDescriptor;
 import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.Iterator;
 
 public class ArrayELResolver extends ELResolver {
@@ -62,8 +61,12 @@ public class ArrayELResolver extends ELResolver {
 
         if (base != null && base.getClass().isArray()) {
             context.setPropertyResolved(true);
-            int idx = coerce(property);
-            checkBounds(base, idx);
+            try {
+                int idx = coerce(property);
+                checkBounds(base, idx);
+            } catch (IllegalArgumentException e) {
+                // ignore
+            }
             return base.getClass().getComponentType();
         }
 
@@ -111,8 +114,12 @@ public class ArrayELResolver extends ELResolver {
 
         if (base != null && base.getClass().isArray()) {
             context.setPropertyResolved(true);
-            int idx = coerce(property);
-            checkBounds(base, idx);
+            try {
+                int idx = coerce(property);
+                checkBounds(base, idx);
+            } catch (IllegalArgumentException e) {
+                // ignore
+            }
         }
 
         return this.readOnly;
@@ -120,20 +127,6 @@ public class ArrayELResolver extends ELResolver {
 
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        if (base != null && base.getClass().isArray()) {
-            FeatureDescriptor[] descs = new FeatureDescriptor[Array.getLength(base)];
-            for (int i = 0; i < descs.length; i++) {
-                descs[i] = new FeatureDescriptor();
-                descs[i].setDisplayName("["+i+"]");
-                descs[i].setExpert(false);
-                descs[i].setHidden(false);
-                descs[i].setName(""+i);
-                descs[i].setPreferred(true);
-                descs[i].setValue(RESOLVABLE_AT_DESIGN_TIME, Boolean.FALSE);
-                descs[i].setValue(TYPE, Integer.class);
-            }
-            return Arrays.asList(descs).iterator();
-        }
         return null;
     }
 
