@@ -107,9 +107,9 @@
         (violetagg)
       </fix>
       <fix>
-        <bug>55207</bug>: Enforce the restriction that a &lt;jsp:text&gt; element
-        may not contain any sub-elements from any namespace. Patch provided by
-        Jeremy Boynes. (mark))
+        <bug>55207</bug>: Enforce the restriction that a &lt;jsp:text&gt;
+        element may not contain any sub-elements from any namespace. Patch
+        provided by Jeremy Boynes. (markt)
       </fix>
       <fix>
         Ensure that
