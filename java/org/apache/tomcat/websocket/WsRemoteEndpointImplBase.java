@@ -52,8 +52,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
 
-    // Milliseconds so this is 5 seconds
-    private static final long DEFAULT_BLOCKING_SEND_TIMEOUT = 5 * 1000;
+    // Milliseconds so this is 20 seconds
+    private static final long DEFAULT_BLOCKING_SEND_TIMEOUT = 20 * 1000;
 
     public static final String BLOCKING_SEND_TIMEOUT_PROPERTY =
             "org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT";
