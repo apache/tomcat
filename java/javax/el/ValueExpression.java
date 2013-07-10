@@ -76,8 +76,10 @@ public abstract class ValueExpression extends Expression {
     /**
      * @since EL 2.2
      */
-    public ValueReference getValueReference(@SuppressWarnings("unused") ELContext context) {
-     // Expected to be over-ridden by implementation
+    public ValueReference getValueReference(ELContext context) {
+        // Expected to be over-ridden by implementation
+        context.notifyBeforeEvaluation(getExpressionString());
+        context.notifyAfterEvaluation(getExpressionString());
         return null;
     }
 }
