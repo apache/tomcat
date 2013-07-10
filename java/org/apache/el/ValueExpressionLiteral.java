@@ -49,26 +49,37 @@ public final class ValueExpressionLiteral extends ValueExpression implements
 
     @Override
     public Object getValue(ELContext context) {
+        context.notifyBeforeEvaluation(getExpressionString());
+        Object result;
         if (this.expectedType != null) {
-            return context.convertToType(this.value, this.expectedType);
+            result = context.convertToType(this.value, this.expectedType);
+        } else {
+            result = this.value;
         }
-        return this.value;
+        context.notifyAfterEvaluation(getExpressionString());
+        return result;
     }
 
     @Override
     public void setValue(ELContext context, Object value) {
+        context.notifyBeforeEvaluation(getExpressionString());
         throw new PropertyNotWritableException(MessageFactory.get(
                 "error.value.literal.write", this.value));
     }
 
     @Override
     public boolean isReadOnly(ELContext context) {
+        context.notifyBeforeEvaluation(getExpressionString());
+        context.notifyAfterEvaluation(getExpressionString());
         return true;
     }
 
     @Override
     public Class<?> getType(ELContext context) {
-        return (this.value != null) ? this.value.getClass() : null;
+        context.notifyBeforeEvaluation(getExpressionString());
+        Class<?> result = (this.value != null) ? this.value.getClass() : null;
+        context.notifyAfterEvaluation(getExpressionString());
+        return result;
     }
 
     @Override

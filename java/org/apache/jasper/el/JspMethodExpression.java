@@ -48,8 +48,11 @@ public final class JspMethodExpression extends MethodExpression implements
     public MethodInfo getMethodInfo(ELContext context)
             throws NullPointerException, PropertyNotFoundException,
             MethodNotFoundException, ELException {
+        context.notifyBeforeEvaluation(getExpressionString());
         try {
-            return this.target.getMethodInfo(context);
+            MethodInfo result = this.target.getMethodInfo(context);
+            context.notifyAfterEvaluation(getExpressionString());
+            return result;
         } catch (MethodNotFoundException e) {
             if (e instanceof JspMethodNotFoundException) throw e;
             throw new JspMethodNotFoundException(this.mark, e);
@@ -66,8 +69,11 @@ public final class JspMethodExpression extends MethodExpression implements
     public Object invoke(ELContext context, Object[] params)
             throws NullPointerException, PropertyNotFoundException,
             MethodNotFoundException, ELException {
+        context.notifyBeforeEvaluation(getExpressionString());
         try {
-            return this.target.invoke(context, params);
+            Object result = this.target.invoke(context, params);
+            context.notifyAfterEvaluation(getExpressionString());
+            return result;
         } catch (MethodNotFoundException e) {
             if (e instanceof JspMethodNotFoundException) throw e;
             throw new JspMethodNotFoundException(this.mark, e);

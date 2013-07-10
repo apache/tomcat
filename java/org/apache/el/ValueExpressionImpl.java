@@ -168,7 +168,10 @@ public final class ValueExpressionImpl extends ValueExpression implements
             ELException {
         EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
                 this.varMapper);
-        return this.getNode().getType(ctx);
+        context.notifyBeforeEvaluation(getExpressionString());
+        Class<?> result = this.getNode().getType(ctx);
+        context.notifyAfterEvaluation(getExpressionString());
+        return result;
     }
 
     /*
@@ -181,10 +184,12 @@ public final class ValueExpressionImpl extends ValueExpression implements
             ELException {
         EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
                 this.varMapper);
+        context.notifyBeforeEvaluation(getExpressionString());
         Object value = this.getNode().getValue(ctx);
         if (this.expectedType != null) {
-            return context.convertToType(value, this.expectedType);
+            value = context.convertToType(value, this.expectedType);
         }
+        context.notifyAfterEvaluation(getExpressionString());
         return value;
     }
 
@@ -222,7 +227,10 @@ public final class ValueExpressionImpl extends ValueExpression implements
             throws PropertyNotFoundException, ELException {
         EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
                 this.varMapper);
-        return this.getNode().isReadOnly(ctx);
+        context.notifyBeforeEvaluation(getExpressionString());
+        boolean result = this.getNode().isReadOnly(ctx);
+        context.notifyAfterEvaluation(getExpressionString());
+        return result;
     }
 
     @Override
@@ -249,7 +257,9 @@ public final class ValueExpressionImpl extends ValueExpression implements
             ELException {
         EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
                 this.varMapper);
+        context.notifyBeforeEvaluation(getExpressionString());
         this.getNode().setValue(ctx, value);
+        context.notifyAfterEvaluation(getExpressionString());
     }
 
     @Override
@@ -273,7 +283,9 @@ public final class ValueExpressionImpl extends ValueExpression implements
     public ValueReference getValueReference(ELContext context) {
         EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
                 this.varMapper);
-        return this.getNode().getValueReference(ctx);
+        context.notifyBeforeEvaluation(getExpressionString());
+        ValueReference result = this.getNode().getValueReference(ctx);
+        context.notifyAfterEvaluation(getExpressionString());
+        return result;
     }
-
 }

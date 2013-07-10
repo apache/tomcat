@@ -51,16 +51,24 @@ public class MethodExpressionLiteral extends MethodExpression implements Externa
 
     @Override
     public MethodInfo getMethodInfo(ELContext context) throws ELException {
-        return new MethodInfo(this.expr, this.expectedType, this.paramTypes);
+        context.notifyBeforeEvaluation(getExpressionString());
+        MethodInfo result =
+                new MethodInfo(this.expr, this.expectedType, this.paramTypes);
+        context.notifyAfterEvaluation(getExpressionString());
+        return result;
     }
 
     @Override
     public Object invoke(ELContext context, Object[] params) throws ELException {
+        context.notifyBeforeEvaluation(getExpressionString());
+        Object result;
         if (this.expectedType != null) {
-            return context.convertToType(this.expr, this.expectedType);
+            result = context.convertToType(this.expr, this.expectedType);
         } else {
-            return this.expr;
+            result = this.expr;
         }
+        context.notifyAfterEvaluation(getExpressionString());
+        return result;
     }
 
     @Override

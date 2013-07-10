@@ -56,8 +56,11 @@ public final class JspValueExpression extends ValueExpression implements
     @Override
     public Class<?> getType(ELContext context) throws NullPointerException,
             PropertyNotFoundException, ELException {
+        context.notifyBeforeEvaluation(getExpressionString());
         try {
-            return this.target.getType(context);
+            Class<?> result = this.target.getType(context);
+            context.notifyAfterEvaluation(getExpressionString());
+            return result;
         } catch (PropertyNotFoundException e) {
             if (e instanceof JspPropertyNotFoundException) throw e;
             throw new JspPropertyNotFoundException(this.mark, e);
@@ -70,8 +73,11 @@ public final class JspValueExpression extends ValueExpression implements
     @Override
     public boolean isReadOnly(ELContext context) throws NullPointerException,
             PropertyNotFoundException, ELException {
+        context.notifyBeforeEvaluation(getExpressionString());
         try {
-            return this.target.isReadOnly(context);
+            boolean result = this.target.isReadOnly(context);
+            context.notifyAfterEvaluation(getExpressionString());
+            return result;
         } catch (PropertyNotFoundException e) {
             if (e instanceof JspPropertyNotFoundException) throw e;
             throw new JspPropertyNotFoundException(this.mark, e);
@@ -85,8 +91,10 @@ public final class JspValueExpression extends ValueExpression implements
     public void setValue(ELContext context, Object value)
             throws NullPointerException, PropertyNotFoundException,
             PropertyNotWritableException, ELException {
+        context.notifyBeforeEvaluation(getExpressionString());
         try {
             this.target.setValue(context, value);
+            context.notifyAfterEvaluation(getExpressionString());
         } catch (PropertyNotWritableException e) {
             if (e instanceof JspPropertyNotWritableException) throw e;
             throw new JspPropertyNotWritableException(this.mark, e);
@@ -102,8 +110,11 @@ public final class JspValueExpression extends ValueExpression implements
     @Override
     public Object getValue(ELContext context) throws NullPointerException,
             PropertyNotFoundException, ELException {
+        context.notifyBeforeEvaluation(getExpressionString());
         try {
-            return this.target.getValue(context);
+            Object result = this.target.getValue(context);
+            context.notifyAfterEvaluation(getExpressionString());
+            return result;
         } catch (PropertyNotFoundException e) {
             if (e instanceof JspPropertyNotFoundException) throw e;
             throw new JspPropertyNotFoundException(this.mark, e);

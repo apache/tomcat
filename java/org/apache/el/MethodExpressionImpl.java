@@ -203,7 +203,10 @@ public final class MethodExpressionImpl extends MethodExpression implements
         Node n = this.getNode();
         EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
                 this.varMapper);
-        return n.getMethodInfo(ctx, this.paramTypes);
+        ctx.notifyBeforeEvaluation(getExpressionString());
+        MethodInfo result = n.getMethodInfo(ctx, this.paramTypes);
+        ctx.notifyAfterEvaluation(getExpressionString());
+        return result;
     }
 
     private Node getNode() throws ELException {
@@ -271,7 +274,10 @@ public final class MethodExpressionImpl extends MethodExpression implements
             ELException {
         EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
                 this.varMapper);
-        return this.getNode().invoke(ctx, this.paramTypes, params);
+        ctx.notifyBeforeEvaluation(getExpressionString());
+        Object result = this.getNode().invoke(ctx, this.paramTypes, params);
+        ctx.notifyAfterEvaluation(getExpressionString());
+        return result;
     }
 
     /*
