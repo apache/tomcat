@@ -55,7 +55,7 @@
    specification over time.</p>
 
 <p>The write timeout used when sending WebSocket messages in blocking mode
-   defaults to 5000 milliseconds (5 seconds). This may be changed by setting
+   defaults to 20000 milliseconds (20 seconds). This may be changed by setting
    the property <code>org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT</code>
    in the user properties collection attached to the WebSocket session. The
    value assigned to this property should be a <code>Long</code> and represents
