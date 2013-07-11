@@ -675,10 +675,14 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
             // Write the payload
             while (payload.hasRemaining() && outputBuffer.hasRemaining()) {
-                outputBuffer.put(
-                        (byte) (payload.get() ^ (mask[maskIndex++] & 0xFF)));
-                if (maskIndex > 3) {
-                    maskIndex = 0;
+                if (mask == null) {
+                    outputBuffer.put(payload.get());
+                } else {
+                    outputBuffer.put(
+                            (byte) (payload.get() ^ (mask[maskIndex++] & 0xFF)));
+                    if (maskIndex > 3) {
+                        maskIndex = 0;
+                    }
                 }
             }
             if (payload.hasRemaining()) {
