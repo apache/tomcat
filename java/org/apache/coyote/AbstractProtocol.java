@@ -270,6 +270,11 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         endpoint.setMaxHeaderCount(maxHeaderCount);
     }
 
+    public long getConnectionCount() {
+        return endpoint.getConnectionCount();
+    }
+
+
     // ---------------------------------------------------------- Public methods
 
     public synchronized int getNameIndex() {
