@@ -142,7 +142,9 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
 
     protected void onTimeout() {
-        clearHandler(new SocketTimeoutException());
+        if (handler != null) {
+            clearHandler(new SocketTimeoutException());
+        }
         close();
     }
 
@@ -150,10 +152,12 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private void clearHandler(Throwable t) {
         SendHandler sh = handler;
         handler = null;
-        if (t == null) {
-            sh.onResult(new SendResult());
-        } else {
-            sh.onResult(new SendResult(t));
+        if (sh != null) {
+            if (t == null) {
+                sh.onResult(new SendResult());
+            } else {
+                sh.onResult(new SendResult(t));
+            }
         }
     }
 }
