@@ -17,7 +17,7 @@
 package javax.el;
 
 /**
- * @since 3.0
+ * @since EL 3.0
  */
 public class ELClass {
 
