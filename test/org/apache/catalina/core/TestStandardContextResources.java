@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.naming.directory.DirContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -34,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -45,6 +47,7 @@ import org.apache.catalina.startup.Constants;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.naming.resources.ProxyDirContext;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestStandardContextResources extends TomcatBaseTest {
@@ -224,6 +227,36 @@ public class TestStandardContextResources extends TomcatBaseTest {
         assertPageContains("/test/getresource?path=/folder/resourceE.jsp",
                 "<p>resourceE.jsp in the web application</p>");
     }
+
+
+    @Test
+    public void testResourceCaching() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0-fragments");
+        // app dir is relative to server home
+        StandardContext ctx = (StandardContext) tomcat.addWebapp(
+                null, "/test", appDir.getAbsolutePath());
+        ctx.setCachingAllowed(false);
+
+        tomcat.start();
+
+        DirContext resources = ctx.getResources();
+
+        Assert.assertTrue(resources instanceof ProxyDirContext);
+
+        ProxyDirContext proxyResources = (ProxyDirContext) resources;
+
+        // Caching should be disabled
+        Assert.assertNull(proxyResources.getCache());
+
+        ctx.stop();
+        ctx.start();
+
+        // Caching should still be disabled
+        Assert.assertNull(proxyResources.getCache());
+    }
+
 
     /**
      * A servlet that prints the requested resource. The path to the requested
