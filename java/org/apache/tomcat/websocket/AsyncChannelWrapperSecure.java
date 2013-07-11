@@ -293,13 +293,17 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             // partial data on the next read
                         } else if (s == Status.BUFFER_OVERFLOW) {
                             // Not enough space in the destination buffer to
-                            // store all of the data
-                            throw new IOException(sm.getString(
-                                    "asyncChannelWrapperSecure.readOverflow",
-                                    Integer.valueOf( sslEngine.getSession().
-                                            getApplicationBufferSize()),
-                                    Integer.valueOf(dest.limit()),
-                                    Integer.valueOf(dest.position())));
+                            // store all of the data. We could use a bytes read
+                            // value of -bufferSizeRequired to signal the new
+                            // buffer size required but an explicit exception is
+                            // clearer.
+                            if (reading.compareAndSet(true, false)) {
+                                throw new ReadBufferOverflowException(sslEngine.
+                                        getSession().getApplicationBufferSize());
+                            } else {
+                                future.fail(new IllegalStateException(sm.getString(
+                                        "asyncChannelWrapperSecure.wrongStateRead")));
+                            }
                         } else {
                             // Status.CLOSED - unexpected
                             throw new IllegalStateException(sm.getString(
