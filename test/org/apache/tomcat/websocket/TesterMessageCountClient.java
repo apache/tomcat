@@ -31,7 +31,7 @@ import javax.websocket.OnError;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 
-public class TesterSingleMessageClient {
+public class TesterMessageCountClient {
 
     public interface TesterEndpoint {
         void setLatch(CountDownLatch latch);
@@ -143,14 +143,28 @@ public class TesterSingleMessageClient {
 
     public static class BasicText extends BasicHandler<String> {
 
+        private final String expected;
 
         public BasicText(CountDownLatch latch) {
+            this(latch, null);
+        }
+
+        public BasicText(CountDownLatch latch, String expected) {
             super(latch);
+            this.expected = expected;
         }
 
         @Override
         public void onMessage(String message) {
-            getMessages().add(message);
+            if (expected == null) {
+                getMessages().add(message);
+            } else {
+                if (!expected.equals(message)) {
+                    throw new IllegalStateException(
+                            "Expected: [" + expected + "]\r\n" +
+                            "Was:      [" + message + "]");
+                }
+            }
             if (getLatch() != null) {
                 getLatch().countDown();
             }

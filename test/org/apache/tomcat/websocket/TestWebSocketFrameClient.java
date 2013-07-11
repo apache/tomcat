@@ -17,13 +17,12 @@
 package org.apache.tomcat.websocket;
 
 import java.net.URI;
-import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
-import javax.websocket.PongMessage;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
@@ -35,66 +34,55 @@ import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.descriptor.web.ApplicationListener;
-import org.apache.tomcat.websocket.TesterMessageCountClient.TesterEndpoint;
+import org.apache.tomcat.util.net.TesterSupport;
+import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
-
-public class TestWsPingPongMessages extends TomcatBaseTest {
-
-    ByteBuffer applicationData = ByteBuffer.wrap(new String("mydata")
-            .getBytes());
+public class TestWebSocketFrameClient extends TomcatBaseTest {
 
     @Test
-    public void testPingPongMessages() throws Exception {
+    public void testConnectToServerEndpointSSL() throws Exception {
+
         Tomcat tomcat = getTomcatInstance();
         // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.addApplicationListener(new ApplicationListener(
-                TesterEchoServer.Config.class.getName(), false));
-
+                TesterFirehoseServer.Config.class.getName(), false));
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 
-        tomcat.start();
-
-        WebSocketContainer wsContainer = ContainerProvider
-                .getWebSocketContainer();
+        TesterSupport.initSsl(tomcat);
 
         tomcat.start();
 
+        WebSocketContainer wsContainer =
+                ContainerProvider.getWebSocketContainer();
+        ClientEndpointConfig clientEndpointConfig =
+                ClientEndpointConfig.Builder.create().build();
+        clientEndpointConfig.getUserProperties().put(
+                WsWebSocketContainer.SSL_TRUSTSTORE_PROPERTY,
+                "test/org/apache/tomcat/util/net/ca.jks");
         Session wsSession = wsContainer.connectToServer(
-                TesterProgrammaticEndpoint.class, ClientEndpointConfig.Builder
-                        .create().build(), new URI("ws://localhost:"
-                        + getPort() + TesterEchoServer.Config.PATH_ASYNC));
-
-        CountDownLatch latch = new CountDownLatch(1);
-        TesterEndpoint tep = (TesterEndpoint) wsSession.getUserProperties()
-                .get("endpoint");
-        tep.setLatch(latch);
-
-        PongMessageHandler handler = new PongMessageHandler(latch);
+                TesterProgrammaticEndpoint.class,
+                clientEndpointConfig,
+                new URI("wss://localhost:" + getPort() +
+                        TesterFirehoseServer.Config.PATH));
+        CountDownLatch latch =
+                new CountDownLatch(TesterFirehoseServer.MESSAGE_COUNT);
+        BasicText handler = new BasicText(latch);
         wsSession.addMessageHandler(handler);
-        wsSession.getBasicRemote().sendPing(applicationData);
+        wsSession.getBasicRemote().sendText("Hello");
 
-        boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
-        Assert.assertTrue(latchResult);
-        Assert.assertArrayEquals(applicationData.array(),
-                (handler.getMessages().get(0)).getApplicationData().array());
-    }
+        // Ignore the latch result as the message count test below will tell us
+        // if the right number of messages arrived
+        handler.getLatch().await(10, TimeUnit.SECONDS);
 
-    public static class PongMessageHandler extends
-            TesterMessageCountClient.BasicHandler<PongMessage> {
-        public PongMessageHandler(CountDownLatch latch) {
-            super(latch);
-        }
-
-        @Override
-        public void onMessage(PongMessage message) {
-            getMessages().add(message);
-            if (getLatch() != null) {
-                getLatch().countDown();
-            }
+        List<String> messages = handler.getMessages();
+        Assert.assertEquals(
+                TesterFirehoseServer.MESSAGE_COUNT, messages.size());
+        for (String message : messages) {
+            Assert.assertEquals(TesterFirehoseServer.MESSAGE, message);
         }
     }
 }

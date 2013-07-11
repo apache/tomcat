@@ -36,11 +36,11 @@ import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.descriptor.web.ApplicationListener;
-import org.apache.tomcat.websocket.TesterSingleMessageClient.AsyncHandler;
-import org.apache.tomcat.websocket.TesterSingleMessageClient.AsyncText;
-import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterAnnotatedEndpoint;
-import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterEndpoint;
-import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterProgrammaticEndpoint;
+import org.apache.tomcat.websocket.TesterMessageCountClient.AsyncHandler;
+import org.apache.tomcat.websocket.TesterMessageCountClient.AsyncText;
+import org.apache.tomcat.websocket.TesterMessageCountClient.TesterAnnotatedEndpoint;
+import org.apache.tomcat.websocket.TesterMessageCountClient.TesterEndpoint;
+import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
 public class TestWsRemoteEndpoint extends TomcatBaseTest {
 

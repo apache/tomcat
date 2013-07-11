@@ -50,11 +50,11 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.coyote.http11.Http11Protocol;
 import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.util.net.TesterSupport;
-import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicBinary;
-import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicHandler;
-import org.apache.tomcat.websocket.TesterSingleMessageClient.BasicText;
-import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterEndpoint;
-import org.apache.tomcat.websocket.TesterSingleMessageClient.TesterProgrammaticEndpoint;
+import org.apache.tomcat.websocket.TesterMessageCountClient.BasicBinary;
+import org.apache.tomcat.websocket.TesterMessageCountClient.BasicHandler;
+import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
+import org.apache.tomcat.websocket.TesterMessageCountClient.TesterEndpoint;
+import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 import org.apache.tomcat.websocket.server.Constants;
 import org.apache.tomcat.websocket.server.WsListener;
 
