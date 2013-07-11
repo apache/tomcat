@@ -26,6 +26,7 @@ import javax.servlet.http.WebConnection;
 
 import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
+import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -37,6 +38,7 @@ public abstract class AbstractProcessor<S>
 
     protected static final StringManager sm =
             StringManager.getManager(Constants.Package);
+    protected abstract Log getLog();
 
     private final HttpUpgradeHandler httpUpgradeHandler;
     private final AbstractServletInputStream upgradeServletInputStream;
@@ -93,6 +95,20 @@ public abstract class AbstractProcessor<S>
             upgradeServletInputStream.onDataAvailable();
         } else if (status == SocketStatus.OPEN_WRITE) {
             upgradeServletOutputStream.onWritePossible();
+        } else if (status == SocketStatus.STOP) {
+            try {
+                upgradeServletInputStream.close();
+            } catch (IOException ioe) {
+                getLog().debug(sm.getString(
+                        "abstractProcessor.isCloseFail", ioe));
+            }
+            try {
+                upgradeServletOutputStream.close();
+            } catch (IOException ioe) {
+                getLog().debug(sm.getString(
+                        "abstractProcessor.osCloseFail", ioe));
+            }
+            return SocketState.CLOSED;
         } else {
             // Unexpected state
             return SocketState.CLOSED;

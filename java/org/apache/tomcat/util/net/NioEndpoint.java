@@ -1552,7 +1552,10 @@ public class NioEndpoint extends AbstractEndpoint {
 
                 try {
                     if (key != null) {
-                        if (socket.isHandshakeComplete()) {
+                        // For STOP there is no point trying to handshake as the
+                        // Poller has been stopped.
+                        if (socket.isHandshakeComplete() ||
+                                status == SocketStatus.STOP) {
                             handshake = 0;
                         } else {
                             handshake = socket.handshake(
@@ -1576,8 +1579,6 @@ public class NioEndpoint extends AbstractEndpoint {
                 if ( handshake == 0 ) {
                     SocketState state = SocketState.OPEN;
                     // Process the request from this socket
-                    // Suppress null warnings for key in this block since
-                    // key can't be null in this block
                     if (status == null) {
                         state = handler.process(ka, SocketStatus.OPEN_READ);
                     } else {

@@ -21,9 +21,15 @@ import java.net.Socket;
 
 import javax.servlet.http.HttpUpgradeHandler;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 public class BioProcessor extends AbstractProcessor<Socket> {
+
+    private static final Log log = LogFactory.getLog(BioProcessor.class);
+    @Override
+    protected Log getLog() {return log;}
 
     private static final int INFINITE_TIMEOUT = 0;
 
