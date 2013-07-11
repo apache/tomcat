@@ -85,6 +85,10 @@
         <bug>55228</bug>: Allow web applications to set a HTTP Date header.
         (markt)
       </fix>
+      <add>
+        Expose the current connection count for each protocol handler via JMX.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
