@@ -495,9 +495,10 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/hos
         </ul>
         </li>
 
-        <li><p>If you are running Tomcat with separate $CATALINA_HOME and
-        $CATALINA_BASE and want to configure to use log4j in a single
-        $CATALINA_BASE only:</p>
+        <li><p>If you are running Tomcat with separate
+        <code>$CATALINA_HOME</code> and <code>$CATALINA_BASE</code> and want to
+        configure to use log4j in a single <code>$CATALINA_BASE</code> only:</p>
+
         <ul>
           <li>Create <code>$CATALINA_BASE/bin</code> and
           <code>$CATALINA_BASE/lib</code> directories if they do not exist.
@@ -513,6 +514,14 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/hos
           <code>$CATALINA_BASE/conf/catalina.policy</code> file to adjust
           it to using a different copy of tomcat-juli.jar.</li>
         </ul>
+
+        <p>Note: This works because libraries, if they exist in
+        <code>$CATALINA_BASE</code>, are loaded in preference to the same
+        library in <code>$CATALINA_HOME</code>.</p>
+
+        <p>Note: tomcat-juli.jar is loaded from <code>$CATALINA_BASE</code>/bin
+        not <code>$CATALINA_BASE</code>/lib as it is loaded as part of the
+        bootstrap process and all the bootstrap classes are loaded from bin.</p>
         </li>
 
         <li><p>Delete <code>$CATALINA_BASE/conf/logging.properties</code> to
