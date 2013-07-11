@@ -25,9 +25,10 @@ import javax.websocket.CloseReason.CloseCodes;
 
 public class WsFrameClient extends WsFrameBase {
 
-    private final ByteBuffer response;
     private final AsyncChannelWrapper channel;
     private final CompletionHandler<Integer,Void> handler;
+    // Not final as it may need to be re-sized
+    private ByteBuffer response;
 
     public WsFrameClient(ByteBuffer response, AsyncChannelWrapper channel,
             WsSession wsSession) {
@@ -107,7 +108,19 @@ public class WsFrameClient extends WsFrameBase {
 
         @Override
         public void failed(Throwable exc, Void attachment) {
-            close(exc);
+            if (exc instanceof ReadBufferOverflowException) {
+                // response will be empty if this exception is thrown
+                response = ByteBuffer.allocate(
+                        ((ReadBufferOverflowException) exc).getMinBufferSize());
+                response.flip();
+                try {
+                    processSocketRead();
+                } catch (IOException e) {
+                    close(e);
+                }
+            } else {
+                close(exc);
+            }
         }
     }
 }
