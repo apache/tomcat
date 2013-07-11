@@ -18,11 +18,17 @@ package org.apache.coyote.http11.upgrade;
 
 import javax.servlet.http.HttpUpgradeHandler;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 public class AprProcessor extends AbstractProcessor<Long> {
+
+    private static final Log log = LogFactory.getLog(AprProcessor.class);
+    @Override
+    protected Log getLog() {return log;}
 
     private static final int INFINITE_TIMEOUT = -1;
 
