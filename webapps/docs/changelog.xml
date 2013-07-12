@@ -177,6 +177,10 @@
         Simplify API of <code>ErrorDispatcher</code> class by using varargs.
         (kkolinko)
       </scode>
+      <scode>
+        Update Jasper to use the new common web.xml parsing code. Includes
+        patches by Jeremy Boynes. (markt/violetagg)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Cluster">
