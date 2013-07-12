@@ -41,14 +41,14 @@ public class ELProcessor {
 
     public Object getValue(String expression, Class<?> expectedType) {
         ValueExpression ve = factory.createValueExpression(
-                context, expression, expectedType);
+                context, bracket(expression), expectedType);
         return ve.getValue(context);
     }
 
 
     public void setValue(String expression, Object value) {
         ValueExpression ve = factory.createValueExpression(
-                context, expression, Object.class);
+                context, bracket(expression), Object.class);
         ve.setValue(context, value);
     }
 
@@ -58,7 +58,7 @@ public class ELProcessor {
             manager.setVariable(variable, null);
         } else {
             ValueExpression ve = factory.createValueExpression(
-                    context, expression, Object.class);
+                    context, bracket(expression), Object.class);
             manager.setVariable(variable, ve);
         }
     }
@@ -149,6 +149,10 @@ public class ELProcessor {
         manager.defineBean(name, bean);
     }
 
+
+    private static String bracket(String expression) {
+        return "${" + expression + "}";
+    }
 
     private static class MethodSignature {
 
