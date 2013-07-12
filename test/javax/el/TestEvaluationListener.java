@@ -77,4 +77,58 @@ public class TestEvaluationListener {
         Assert.assertEquals(bean, p.getBase());
         Assert.assertEquals("foo", p.getProperty());
     }
+
+
+    @Test
+    public void testEvaluation01() {
+        ExpressionFactory factory = ELManager.getExpressionFactory();
+        ELContext context = new TesterELContext();
+        String expression = "${1 + 1}";
+        ValueExpression ve =
+                factory.createValueExpression(context, expression, int.class);
+
+        TesterEvaluationListener listener = new TesterEvaluationListener();
+        context.addEvaluationListener(listener);
+
+        Object result = ve.getValue(context);
+
+        // Check the result
+        Assert.assertEquals(Integer.valueOf(2), result);
+
+        List<String> before = listener.getBeforeEvaluationExpressions();
+        Assert.assertEquals(1, before.size());
+        Assert.assertEquals(expression, before.get(0));
+
+        List<String> after = listener.getAfterEvaluationExpressions();
+        Assert.assertEquals(1, after.size());
+        Assert.assertEquals(expression, after.get(0));
+    }
+
+
+    @Test
+    public void testEvaluation02() {
+        ExpressionFactory factory = ELManager.getExpressionFactory();
+        ELContext context = new TesterELContext(new CompositeELResolver());
+        String expression = "${foo.bar + 1}";
+        ValueExpression ve =
+                factory.createValueExpression(context, expression, int.class);
+
+        TesterEvaluationListener listener = new TesterEvaluationListener();
+        context.addEvaluationListener(listener);
+
+        Exception e = null;
+        try {
+            ve.getValue(context);
+        } catch (PropertyNotFoundException pnfe) {
+            e = pnfe;
+        }
+        Assert.assertNotNull(e);
+
+        List<String> before = listener.getBeforeEvaluationExpressions();
+        Assert.assertEquals(1, before.size());
+        Assert.assertEquals(expression, before.get(0));
+
+        List<String> after = listener.getAfterEvaluationExpressions();
+        Assert.assertEquals(0, after.size());
+    }
 }
