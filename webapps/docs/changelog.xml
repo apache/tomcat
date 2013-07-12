@@ -181,6 +181,9 @@
         Update Jasper to use the new common web.xml parsing code. Includes
         patches by Jeremy Boynes. (markt/violetagg)
       </scode>
+      <add>
+        Create test cases for JspC. Patch by Jeremy Boynes. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
