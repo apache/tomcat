@@ -27,4 +27,37 @@ public class TestELProcessor {
         elp.defineBean("bean01", new TesterBean("name01"));
         Assert.assertEquals("name01", elp.eval("bean01.name"));
     }
+
+
+    @Test(expected=ELException.class)
+    public void testEval01() {
+        ELProcessor elp = new ELProcessor();
+        elp.eval("${1+1}");
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testEval02() {
+        ELProcessor elp = new ELProcessor();
+        elp.eval("#{1+1}");
+    }
+
+
+    @Test
+    public void testDefineFunctionMethod01() throws Exception {
+        ELProcessor elp = new ELProcessor();
+        elp.defineFunction("fn", "toInt",
+                Integer.class.getMethod("valueOf", String.class));
+        Assert.assertEquals(Integer.valueOf(1), elp.eval("fn:toInt(1)"));
+    }
+
+
+    @Test
+    public void testDefineFunctionName01() throws Exception {
+        ELProcessor elp = new ELProcessor();
+        // java.lang should be automatically imported so no need for full class
+        // name
+        elp.defineFunction("fn", "toInt", "Integer", "valueOf");
+        Assert.assertEquals(Integer.valueOf(1), elp.eval("fn:toInt(1)"));
+    }
 }
