@@ -1219,7 +1219,7 @@
            source="${compile.source}"
            optimize="${compile.optimize}"
            encoding="ISO-8859-1"
-           includeantruntime="false">
+           includeantruntime="true">
       <classpath refid="tomcat.test.classpath" />
       <include name="org/apache/**" />
       <include name="javax/**" />
