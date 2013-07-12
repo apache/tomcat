@@ -74,7 +74,12 @@ public class ELProcessor {
                     context, "elProcessor.defineFunctionNullParams"));
         }
 
-        Class<?> clazz = Class.forName(className);
+        // Check the imports
+        Class<?> clazz = context.getImportHandler().resolveClass(className);
+
+        if (clazz == null) {
+            clazz = Class.forName(className);
+        }
 
         if (!Modifier.isPublic(clazz.getModifiers())) {
             throw new ClassNotFoundException(Util.message(context,
