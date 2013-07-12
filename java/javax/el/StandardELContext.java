@@ -200,7 +200,11 @@ public class StandardELContext extends ELContext {
         public void mapFunction(String prefix, String localName,
                 Method method) {
             String key = prefix + ':' + localName;
-            methods.put(key, method);
+            if (method == null) {
+                methods.remove(key);
+            } else {
+                methods.put(key, method);
+            }
         }
     }
 }

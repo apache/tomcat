@@ -48,10 +48,20 @@ public class FunctionMapperFactory extends FunctionMapper {
         }
         Method m = this.target.resolveFunction(prefix, localName);
         if (m != null) {
-            this.memento.addFunction(prefix, localName, m);
+            this.memento.mapFunction(prefix, localName, m);
         }
         return m;
     }
+
+
+    @Override
+    public void mapFunction(String prefix, String localName, Method method) {
+        if (this.memento == null) {
+            this.memento = new FunctionMapperImpl();
+        }
+        memento.mapFunction(prefix, localName, method);
+    }
+
 
     public FunctionMapper create() {
         return this.memento;
