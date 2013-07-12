@@ -39,10 +39,9 @@ PARSER_BEGIN( ELParser )
 package org.apache.el.parser;
 import java.io.StringReader;
 import javax.el.ELException;
-public class ELParser
-{
-    public static Node parse(String ref) throws ELException
-    {
+public class ELParser {
+
+    public static Node parse(String ref) throws ELException {
         try {
             return (new ELParser(new StringReader(ref))).CompositeExpression();
         } catch (ParseException pe) {
@@ -59,7 +58,9 @@ PARSER_END( ELParser )
  */
 AstCompositeExpression CompositeExpression() #CompositeExpression : {}
 {
-    (DeferredExpression() | DynamicExpression() | LiteralExpression())* <EOF> { return jjtThis; }
+    (DeferredExpression() |
+     DynamicExpression() |
+     LiteralExpression())* <EOF> { return jjtThis; }
 }
 
 /*
@@ -73,7 +74,7 @@ void LiteralExpression() #LiteralExpression : { Token t = null; }
 
 /*
  * DeferredExpression
- * #{..} Expressions
+ * #{...} Expressions
  */
 void DeferredExpression() #DeferredExpression : {}
 {
@@ -358,7 +359,7 @@ void Null() #Null : {}
 }
 
 
-/* ==================================================================================== */
+/* ========================================================================== */
 <DEFAULT> TOKEN :
 {
   /*
@@ -384,17 +385,17 @@ void Null() #Null : {}
 
 <IN_EXPRESSION> TOKEN :
 {
-    < INTEGER_LITERAL: ["0"-"9"] (["0"-"9"])* >
+     < INTEGER_LITERAL: ["0"-"9"] (["0"-"9"])* >
 |    < FLOATING_POINT_LITERAL: (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)?
         | "." (["0"-"9"])+ (<EXPONENT>)?
         | (["0"-"9"])+ <EXPONENT>
-    >
+     >
 |    < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
 |    < STRING_LITERAL: ("\"" ((~["\"","\\"])
         | ("\\" ( ["\\","\"","\'"] )))* "\"")
         | ("\'" ((~["\'","\\"])
         | ("\\" ( ["\\","\"","\'"] )))* "\'")
-    >
+     >
 |    < TRUE : "true" >
 |    < FALSE : "false" >
 |    < NULL : "null" >
