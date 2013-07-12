@@ -1418,6 +1418,7 @@ public class JspC extends Task implements Options {
         URL resourceBase = new File(uriRoot).getCanonicalFile().toURI().toURL();
 
         context = new JspCServletContext(log, resourceBase);
+        tldLocationsCache = TldLocationsCache.getInstance(context);
         rctxt = new JspRuntimeContext(context, this);
         jspConfig = new JspConfig(context);
         tagPluginManager = new TagPluginManager(context);
