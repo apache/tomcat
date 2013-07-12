@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.el.lang;
 
 import java.io.Externalizable;
@@ -22,8 +21,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.el.FunctionMapper;
 
@@ -32,14 +31,13 @@ import org.apache.el.util.ReflectionUtil;
 
 /**
  * @author Jacob Hookom [jacob@hookom.net]
- * @version $Id$
  */
 public class FunctionMapperImpl extends FunctionMapper implements
         Externalizable {
 
     private static final long serialVersionUID = 1L;
 
-    protected Map<String, Function> functions = null;
+    protected Map<String, Function> functions = new ConcurrentHashMap<>();
 
     /*
      * (non-Javadoc)
@@ -49,20 +47,21 @@ public class FunctionMapperImpl extends FunctionMapper implements
      */
     @Override
     public Method resolveFunction(String prefix, String localName) {
-        if (this.functions != null) {
-            Function f = this.functions.get(prefix + ":" + localName);
-            return f.getMethod();
+        Function f = this.functions.get(prefix + ":" + localName);
+        if (f == null) {
+            return null;
         }
-        return null;
+        return f.getMethod();
     }
 
-    public void addFunction(String prefix, String localName, Method m) {
-        if (this.functions == null) {
-            this.functions = new HashMap<>();
-        }
-        Function f = new Function(prefix, localName, m);
-        synchronized (this) {
-            this.functions.put(prefix+":"+localName, f);
+    @Override
+    public void mapFunction(String prefix, String localName, Method m) {
+        String key = prefix + ":" + localName;
+        if (m == null) {
+            functions.remove(key);
+        } else {
+            Function f = new Function(prefix, localName, m);
+            functions.put(key, f);
         }
     }
 

@@ -1645,8 +1645,10 @@ class Validator {
 
                 private HashMap<String, Method> fnmap = new HashMap<>();
 
-                public void mapFunction(String fnQName, Method method) {
-                    fnmap.put(fnQName, method);
+                @Override
+                public void mapFunction(String prefix, String localName,
+                        Method method) {
+                    fnmap.put(prefix + ":" + localName, method);
                 }
 
                 @Override
@@ -1694,7 +1696,7 @@ class Validator {
                         err.jspError("jsp.error.noFunctionMethod", n
                                 .getMethodName(), n.getName(), c.getName());
                     }
-                    fmapper.mapFunction(n.getPrefix() + ':' + n.getName(),
+                    fmapper.mapFunction(n.getPrefix(), n.getName(),
                             method);
                 }
             }
