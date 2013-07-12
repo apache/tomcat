@@ -135,13 +135,14 @@ public class TestELContext {
     }
 
     /**
-     * Tests that if there is no ELResolver a standard coercions will be
+     * Tests that if there is no ELResolver the standard coercions will be
      * invoked.
      */
     @Test
     public void testConvertToType02() {
         ELContext elContext = new TesterELContext();
-        boolean originalPropertyResolved = elContext.isPropertyResolved();
+        boolean originalPropertyResolved = false;
+        elContext.setPropertyResolved(originalPropertyResolved);
 
         Object result = elContext.convertToType("test", String.class);
         Assert.assertEquals("test", result);
@@ -158,13 +159,14 @@ public class TestELContext {
     public void testConvertToType03() {
         ELContext elContext = new TesterELContext(new TesterELResolverOne());
 
-        boolean originalPropertyResolved = elContext.isPropertyResolved();
+        boolean originalPropertyResolved = false;
+        elContext.setPropertyResolved(originalPropertyResolved);
+
         Object result = elContext.convertToType("1", String.class);
         Assert.assertEquals("ONE", result);
         Assert.assertTrue(originalPropertyResolved == elContext
                 .isPropertyResolved());
 
-        originalPropertyResolved = elContext.isPropertyResolved();
         result = elContext.convertToType("test", String.class);
         Assert.assertEquals("test", result);
         Assert.assertTrue(originalPropertyResolved == elContext
