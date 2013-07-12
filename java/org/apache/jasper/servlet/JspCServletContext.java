@@ -125,6 +125,8 @@ public class JspCServletContext implements ServletContext {
         this.webXml = new WebXml();
 
         WebXmlParser webXmlParser = new WebXmlParser(false, false);
+        // Use this class's classloader as Ant will have set the TCCL to its own
+        webXmlParser.setClassLoader(getClass().getClassLoader());
 
         InputStream webXmlStream = getResourceAsStream(
                 org.apache.tomcat.util.descriptor.web.Constants.

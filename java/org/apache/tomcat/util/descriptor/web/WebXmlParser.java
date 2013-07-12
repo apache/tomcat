@@ -130,4 +130,14 @@ public class WebXmlParser {
 
         return ok;
     }
+
+
+    /**
+     * Sets the ClassLoader to be used for creating descriptor objects.
+     * @param classLoader the ClassLoader to be used for creating descriptor objects
+     */
+    public void setClassLoader(ClassLoader classLoader) {
+        webDigester.setClassLoader(classLoader);
+        webFragmentDigester.setClassLoader(classLoader);
+    }
 }
