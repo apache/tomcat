@@ -78,7 +78,7 @@ void LiteralExpression() #LiteralExpression : { Token t = null; }
  */
 void DeferredExpression() #DeferredExpression : {}
 {
-    <START_DEFERRED_EXPRESSION> Expression() <RCURL>
+    <START_DEFERRED_EXPRESSION> Expression() <RBRACE>
 }
 
 /*
@@ -87,12 +87,12 @@ void DeferredExpression() #DeferredExpression : {}
  */
 void DynamicExpression() #DynamicExpression : {}
 {
-    <START_DYNAMIC_EXPRESSION> Expression() <RCURL>
+    <START_DYNAMIC_EXPRESSION> Expression() <RBRACE>
 }
 
 /*
  * Expression
- * EL Expression Language Root, goes to Choice
+ * EL Expression Language Root
  */
 void Expression() : {}
 {
@@ -112,7 +112,36 @@ void Semicolon() : {}
  */
 void Assignment() : {}
 {
+    LOOKAHEAD(3) LambdaExpression() |
     Choice() ( LOOKAHEAD(2) <ASSIGN> Assignment() #Assign(2) )*
+}
+
+/*
+ * Lambda expression
+ */
+void LambdaExpression() #LambdaExpression : {}
+{
+    LambdaParameters() <ARROW> ( LOOKAHEAD(3) LambdaExpression() | Choice() )
+}
+
+/*
+ * Lambda parameters
+ */
+void LambdaParameters() #LambdaParameters : {}
+{
+    Identifier() | <LPAREN> ( Identifier() ( <COMMA> Identifier() )* )? <RPAREN>
+}
+
+/*
+ * Possible invocation of lambda expression. Invocations must be bracketed but
+ * being bracketed does not mean it is an invocation.
+ */
+void LambdaExpressionOrInvocation() #LambdaExpressionOrInvocation : {}
+{
+    <LPAREN>
+        LambdaParameters() <ARROW> ( LOOKAHEAD(3) LambdaExpression() | Choice() )
+    <RPAREN>
+    ( MethodParameters() )*
 }
 
 /*
@@ -279,7 +308,8 @@ void MethodParameters() #MethodParameters : {}
  */
 void NonLiteral() : {}
 {
-    <LPAREN> Expression() <RPAREN>
+    LOOKAHEAD(3) LambdaExpressionOrInvocation()
+    | <LPAREN> Expression() <RPAREN>
     | LOOKAHEAD((<IDENTIFIER> <COLON>)? <IDENTIFIER> <LPAREN>) Function()
     | Identifier()
     | LOOKAHEAD(3)SetData()
@@ -291,7 +321,7 @@ void SetData() #SetData: {}
 {
     <START_SET_OR_MAP>
         ( Expression() ( <COMMA> Expression() )* )?
-    <RCURL>
+    <RBRACE>
 }
 
 void ListData() #ListData: {}
@@ -305,7 +335,7 @@ void MapData() #MapData: {}
 {
     <START_SET_OR_MAP>
         ( MapEntry() ( <COMMA> MapEntry() )* )?
-    <RCURL>
+    <RBRACE>
 }
 
 void MapEntry() #MapEntry: {}
@@ -435,7 +465,7 @@ java.util.Deque<Integer> deque = new java.util.ArrayDeque<Integer>();
 <IN_EXPRESSION, IN_SET_OR_MAP> TOKEN :
 {
      < START_SET_OR_MAP : "{" > {deque.push(curLexState);}: IN_SET_OR_MAP
-|    < RCURL: "}" > {SwitchTo(deque.pop());}
+|    < RBRACE: "}" > {SwitchTo(deque.pop());}
 |    < INTEGER_LITERAL: ["0"-"9"] (["0"-"9"])* >
 |    < FLOATING_POINT_LITERAL: (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)?
         | "." (["0"-"9"])+ (<EXPONENT>)?
@@ -487,6 +517,7 @@ java.util.Deque<Integer> deque = new java.util.ArrayDeque<Integer>();
 |    < MOD0 : "%" >
 |    < MOD1 : "mod" >
 |    < ASSIGN : "=" >
+|    < ARROW : "->" >
 |    < IDENTIFIER : (<LETTER>|<IMPL_OBJ_START>) (<LETTER>|<DIGIT>)* >
 |    < FUNCTIONSUFFIX : (<IDENTIFIER>) >
 |    < #IMPL_OBJ_START: "#" >
