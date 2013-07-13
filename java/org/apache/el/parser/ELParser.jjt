@@ -78,7 +78,7 @@ void LiteralExpression() #LiteralExpression : { Token t = null; }
  */
 void DeferredExpression() #DeferredExpression : {}
 {
-    <START_DEFERRED_EXPRESSION> Expression() <END_EXPRESSION>
+    <START_DEFERRED_EXPRESSION> Expression() <RCURL>
 }
 
 /*
@@ -87,7 +87,7 @@ void DeferredExpression() #DeferredExpression : {}
  */
 void DynamicExpression() #DynamicExpression : {}
 {
-    <START_DYNAMIC_EXPRESSION> Expression() <END_EXPRESSION>
+    <START_DYNAMIC_EXPRESSION> Expression() <RCURL>
 }
 
 /*
@@ -266,6 +266,35 @@ void NonLiteral() : {}
     <LPAREN> Expression() <RPAREN>
     | LOOKAHEAD((<IDENTIFIER> <COLON>)? <IDENTIFIER> <LPAREN>) Function()
     | Identifier()
+    | LOOKAHEAD(3)SetData()
+    | ListData()
+    | MapData()
+}
+
+void SetData() #SetData: {}
+{
+    <START_SET_OR_MAP>
+        ( Expression() ( <COMMA> Expression() )* )?
+    <RCURL>
+}
+
+void ListData() #ListData: {}
+{
+    <LBRACK>
+        ( Expression() ( <COMMA> Expression() )* )?
+    <RBRACK>
+}
+
+void MapData() #MapData: {}
+{
+    <START_SET_OR_MAP>
+        ( MapEntry() ( <COMMA> MapEntry() )* )?
+    <RCURL>
+}
+
+void MapEntry() #MapEntry: {}
+{
+    Expression() <COLON> Expression()
 }
 
 /*
@@ -360,6 +389,10 @@ void Null() #Null : {}
 
 
 /* ========================================================================== */
+TOKEN_MGR_DECLS:
+{
+java.util.Deque<Integer> deque = new java.util.ArrayDeque<Integer>();
+}
 <DEFAULT> TOKEN :
 {
   /*
@@ -376,16 +409,18 @@ void Null() #Null : {}
     | "#"
   >
 |
-  < START_DYNAMIC_EXPRESSION: "${" > : IN_EXPRESSION
+  < START_DYNAMIC_EXPRESSION: "${" > {deque.push(DEFAULT);}: IN_EXPRESSION
 |
-  < START_DEFERRED_EXPRESSION: "#{" > : IN_EXPRESSION
+  < START_DEFERRED_EXPRESSION: "#{" > {deque.push(DEFAULT);}: IN_EXPRESSION
 }
 
 <IN_EXPRESSION> SKIP : { " " | "\t" | "\n" | "\r" }
 
-<IN_EXPRESSION> TOKEN :
+<IN_EXPRESSION, IN_SET_OR_MAP> TOKEN :
 {
-     < INTEGER_LITERAL: ["0"-"9"] (["0"-"9"])* >
+     < START_SET_OR_MAP : "{" > {deque.push(curLexState);}: IN_SET_OR_MAP
+|    < RCURL: "}" > {SwitchTo(deque.pop());}
+|    < INTEGER_LITERAL: ["0"-"9"] (["0"-"9"])* >
 |    < FLOATING_POINT_LITERAL: (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)?
         | "." (["0"-"9"])+ (<EXPONENT>)?
         | (["0"-"9"])+ <EXPONENT>
@@ -399,7 +434,6 @@ void Null() #Null : {}
 |    < TRUE : "true" >
 |    < FALSE : "false" >
 |    < NULL : "null" >
-|    < END_EXPRESSION : "}" > : DEFAULT
 |    < DOT : "." >
 |    < LPAREN : "(" >
 |    < RPAREN : ")" >
