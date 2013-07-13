@@ -83,7 +83,7 @@ void DeferredExpression() #DeferredExpression : {}
 
 /*
  * DynamicExpression
- * ${..} Expressions
+ * ${...} Expressions
  */
 void DynamicExpression() #DynamicExpression : {}
 {
@@ -96,7 +96,23 @@ void DynamicExpression() #DynamicExpression : {}
  */
 void Expression() : {}
 {
-    Choice()
+    Semicolon()
+}
+
+/*
+ * Semicolon
+ */
+void Semicolon() : {}
+{
+    Assignment() ( <SEMICOLON> Assignment() #Semicolon(2) )*
+}
+
+/*
+ * Assignment
+ */
+void Assignment() : {}
+{
+    Choice() ( LOOKAHEAD(2) <ASSIGN> Assignment() #Assign(2) )*
 }
 
 /*
@@ -440,6 +456,7 @@ java.util.Deque<Integer> deque = new java.util.ArrayDeque<Integer>();
 |    < LBRACK : "[" >
 |    < RBRACK : "]" >
 |    < COLON : ":" >
+|    < SEMICOLON : ";" >
 |    < COMMA : "," >
 |    < GT0 : ">" >
 |    < GT1 : "gt" >
@@ -469,6 +486,7 @@ java.util.Deque<Integer> deque = new java.util.ArrayDeque<Integer>();
 |    < DIV1 : "div" >
 |    < MOD0 : "%" >
 |    < MOD1 : "mod" >
+|    < ASSIGN : "=" >
 |    < IDENTIFIER : (<LETTER>|<IMPL_OBJ_START>) (<LETTER>|<DIGIT>)* >
 |    < FUNCTIONSUFFIX : (<IDENTIFIER>) >
 |    < #IMPL_OBJ_START: "#" >
