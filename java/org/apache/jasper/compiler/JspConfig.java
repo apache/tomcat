@@ -95,6 +95,24 @@ public class JspConfig {
                 continue;
             }
 
+            Vector<String> includePreludes = new Vector<>();
+            includePreludes.addAll(jspPropertyGroup.getIncludePreludes());
+
+            Vector<String> includeCodas = new Vector<>();
+            includeCodas.addAll(jspPropertyGroup.getIncludeCodas());
+
+            JspProperty property = new JspProperty(jspPropertyGroup.getIsXml(),
+                    jspPropertyGroup.getElIgnored(),
+                    jspPropertyGroup.getScriptingInvalid(),
+                    jspPropertyGroup.getPageEncoding(),
+                    includePreludes,
+                    includeCodas,
+                    jspPropertyGroup.getDeferredSyntaxAllowedAsLiteral(),
+                    jspPropertyGroup.getTrimDirectiveWhitespaces(),
+                    jspPropertyGroup.getDefaultContentType(),
+                    jspPropertyGroup.getBuffer(),
+                    jspPropertyGroup.getErrorOnUndeclaredNamespace());
+
             // Add one JspPropertyGroup for each URL Pattern.  This makes
             // the matching logic easier.
             for (String urlPattern : urlPatterns) {
@@ -137,23 +155,6 @@ public class JspConfig {
                     }
                 }
 
-                Vector<String> includePreludes = new Vector<>();
-                includePreludes.addAll(jspPropertyGroup.getIncludePreludes());
-
-                Vector<String> includeCodas = new Vector<>();
-                includeCodas.addAll(jspPropertyGroup.getIncludeCodas());
-
-                JspProperty property = new JspProperty(jspPropertyGroup.getIsXml(),
-                        jspPropertyGroup.getElIgnored(),
-                        jspPropertyGroup.getScriptingInvalid(),
-                        jspPropertyGroup.getPageEncoding(),
-                        includePreludes,
-                        includeCodas,
-                        jspPropertyGroup.getDeferredSyntaxAllowedAsLiteral(),
-                        jspPropertyGroup.getTrimDirectiveWhitespaces(),
-                        jspPropertyGroup.getDefaultContentType(),
-                        jspPropertyGroup.getBuffer(),
-                        jspPropertyGroup.getErrorOnUndeclaredNamespace());
                 JspPropertyGroup propertyGroup =
                     new JspPropertyGroup(path, extension, property);
 
