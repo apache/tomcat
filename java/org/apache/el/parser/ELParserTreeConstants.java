@@ -8,39 +8,41 @@ public interface ELParserTreeConstants
   public int JJTDEFERREDEXPRESSION = 2;
   public int JJTDYNAMICEXPRESSION = 3;
   public int JJTVOID = 4;
-  public int JJTCHOICE = 5;
-  public int JJTOR = 6;
-  public int JJTAND = 7;
-  public int JJTEQUAL = 8;
-  public int JJTNOTEQUAL = 9;
-  public int JJTLESSTHAN = 10;
-  public int JJTGREATERTHAN = 11;
-  public int JJTLESSTHANEQUAL = 12;
-  public int JJTGREATERTHANEQUAL = 13;
-  public int JJTPLUS = 14;
-  public int JJTMINUS = 15;
-  public int JJTMULT = 16;
-  public int JJTDIV = 17;
-  public int JJTMOD = 18;
-  public int JJTNEGATIVE = 19;
-  public int JJTNOT = 20;
-  public int JJTEMPTY = 21;
-  public int JJTVALUE = 22;
-  public int JJTDOTSUFFIX = 23;
-  public int JJTBRACKETSUFFIX = 24;
-  public int JJTMETHODPARAMETERS = 25;
-  public int JJTSETDATA = 26;
-  public int JJTLISTDATA = 27;
-  public int JJTMAPDATA = 28;
-  public int JJTMAPENTRY = 29;
-  public int JJTIDENTIFIER = 30;
-  public int JJTFUNCTION = 31;
-  public int JJTTRUE = 32;
-  public int JJTFALSE = 33;
-  public int JJTFLOATINGPOINT = 34;
-  public int JJTINTEGER = 35;
-  public int JJTSTRING = 36;
-  public int JJTNULL = 37;
+  public int JJTSEMICOLON = 5;
+  public int JJTASSIGN = 6;
+  public int JJTCHOICE = 7;
+  public int JJTOR = 8;
+  public int JJTAND = 9;
+  public int JJTEQUAL = 10;
+  public int JJTNOTEQUAL = 11;
+  public int JJTLESSTHAN = 12;
+  public int JJTGREATERTHAN = 13;
+  public int JJTLESSTHANEQUAL = 14;
+  public int JJTGREATERTHANEQUAL = 15;
+  public int JJTPLUS = 16;
+  public int JJTMINUS = 17;
+  public int JJTMULT = 18;
+  public int JJTDIV = 19;
+  public int JJTMOD = 20;
+  public int JJTNEGATIVE = 21;
+  public int JJTNOT = 22;
+  public int JJTEMPTY = 23;
+  public int JJTVALUE = 24;
+  public int JJTDOTSUFFIX = 25;
+  public int JJTBRACKETSUFFIX = 26;
+  public int JJTMETHODPARAMETERS = 27;
+  public int JJTSETDATA = 28;
+  public int JJTLISTDATA = 29;
+  public int JJTMAPDATA = 30;
+  public int JJTMAPENTRY = 31;
+  public int JJTIDENTIFIER = 32;
+  public int JJTFUNCTION = 33;
+  public int JJTTRUE = 34;
+  public int JJTFALSE = 35;
+  public int JJTFLOATINGPOINT = 36;
+  public int JJTINTEGER = 37;
+  public int JJTSTRING = 38;
+  public int JJTNULL = 39;
 
 
   public String[] jjtNodeName = {
@@ -49,6 +51,8 @@ public interface ELParserTreeConstants
     "DeferredExpression",
     "DynamicExpression",
     "void",
+    "Semicolon",
+    "Assign",
     "Choice",
     "Or",
     "And",
@@ -84,4 +88,4 @@ public interface ELParserTreeConstants
     "Null",
   };
 }
-/* JavaCC - OriginalChecksum=c22b9fc4e2a56a586ebf50a9db81e05b (do not edit this line) */
+/* JavaCC - OriginalChecksum=4f8c233589ca690e7904c52202800594 (do not edit this line) */
