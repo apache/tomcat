@@ -31,19 +31,17 @@ public class AstLambdaExpressionOrInvocation extends SimpleNode {
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
 
+        AstLambdaExpression lambdaExpression =
+                (AstLambdaExpression) children[0];
+
+        Object[] args;
         if (children.length == 2) {
-            AstLambdaExpression lambdaExpression =
-                    (AstLambdaExpression) children[0];
-
-
-            Object[] args =
-                    ((AstMethodParameters) children[1]).getParameters(ctx);
-
-            return lambdaExpression.invoke(ctx, null, args);
+            args = ((AstMethodParameters) children[1]).getParameters(ctx);
+        } else {
+            // No parameters - just the expression
+            args = null;
         }
-
-        // TODO Auto-generated method stub
-        return super.getValue(ctx);
+        return lambdaExpression.invoke(ctx, null, args);
     }
 }
 /* JavaCC - OriginalChecksum=6b3dd15b31540457a41bd55974037ed9 (do not edit this line) */
