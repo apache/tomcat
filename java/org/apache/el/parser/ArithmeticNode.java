@@ -26,7 +26,7 @@ import org.apache.el.lang.EvaluationContext;
  * @author Jacob Hookom [jacob@hookom.net]
  * @version $Id$
  */
-public class ArithmeticNode extends SimpleNode {
+public abstract class ArithmeticNode extends SimpleNode {
 
     /**
      * @param i
