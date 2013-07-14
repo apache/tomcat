@@ -40,7 +40,10 @@ public class AstLambdaExpression extends SimpleNode {
         AstLambdaParameters formalParameters =
                 (AstLambdaParameters) children[0];
 
-        int paramCount = formalParameters.children.length;
+        int paramCount = 0;
+        if (formalParameters.children != null) {
+            paramCount = formalParameters.children.length;
+        }
         int argCount = 0;
         if (paramValues != null) {
             argCount = paramValues.length;
@@ -52,7 +55,7 @@ public class AstLambdaExpression extends SimpleNode {
 
         // Build the argument map
         Map<String,Object> lambdaArgumnents = new HashMap<>();
-        for (int i = 0; i < formalParameters.children.length; i++) {
+        for (int i = 0; i < paramCount; i++) {
             lambdaArgumnents.put(formalParameters.children[i].getImage(),
                     paramValues[i]);
         }

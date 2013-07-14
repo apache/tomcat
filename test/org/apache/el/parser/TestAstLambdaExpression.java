@@ -29,4 +29,20 @@ public class TestAstLambdaExpression {
         Object result = processor.getValue("(x->x+1)(1)", Integer.class);
         Assert.assertEquals(Integer.valueOf(2), result);
     }
+
+
+    @Test
+    public void testSpec02() {
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue("((x,y)->x+y)(1,2)", Integer.class);
+        Assert.assertEquals(Integer.valueOf(3), result);
+    }
+
+
+    @Test
+    public void testSpec03() {
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue("(()->64)", Integer.class);
+        Assert.assertEquals(Integer.valueOf(64), result);
+    }
 }
