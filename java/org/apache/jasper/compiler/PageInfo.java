@@ -92,8 +92,8 @@ class PageInfo {
     private final HashSet<String> prefixes;
 
     private boolean hasJspRoot = false;
-    private Vector<String> includePrelude;
-    private Vector<String> includeCoda;
+    private Collection<String> includePrelude;
+    private Collection<String> includeCoda;
     private final Vector<String> pluginDcls;  // Id's for tagplugin declarations
 
     // JSP 2.2
@@ -182,19 +182,19 @@ class PageInfo {
         return scriptingInvalid;
     }
 
-    public List<String> getIncludePrelude() {
+    public Collection<String> getIncludePrelude() {
         return includePrelude;
     }
 
-    public void setIncludePrelude(Vector<String> prelude) {
+    public void setIncludePrelude(Collection<String> prelude) {
         includePrelude = prelude;
     }
 
-    public List<String> getIncludeCoda() {
+    public Collection<String> getIncludeCoda() {
         return includeCoda;
     }
 
-    public void setIncludeCoda(Vector<String> coda) {
+    public void setIncludeCoda(Collection<String> coda) {
         includeCoda = coda;
     }
 

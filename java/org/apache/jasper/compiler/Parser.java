@@ -18,8 +18,8 @@ package org.apache.jasper.compiler;
 
 import java.io.CharArrayWriter;
 import java.io.FileNotFoundException;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.servlet.jsp.tagext.TagAttributeInfo;
 import javax.servlet.jsp.tagext.TagFileInfo;
@@ -361,7 +361,7 @@ class Parser implements TagConstants {
      * Add a list of files. This is used for implementing include-prelude and
      * include-coda of jsp-config element in web.xml
      */
-    private void addInclude(Node parent, List<String> files) throws JasperException {
+    private void addInclude(Node parent, Collection<String> files) throws JasperException {
         if (files != null) {
             Iterator<String> iter = files.iterator();
             while (iter.hasNext()) {

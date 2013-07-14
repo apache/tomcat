@@ -20,8 +20,8 @@ import java.io.CharArrayWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.jar.JarFile;
 
 import javax.servlet.jsp.tagext.TagFileInfo;
@@ -219,7 +219,7 @@ class JspDocumentParser
      * This is used to implement the include-prelude and include-coda
      * subelements of the jsp-config element in web.xml
      */
-    private void addInclude(Node parent, List<String> files) throws SAXException {
+    private void addInclude(Node parent, Collection<String> files) throws SAXException {
         if (files != null) {
             Iterator<String> iter = files.iterator();
             while (iter.hasNext()) {
