@@ -61,6 +61,12 @@ public final class AstIdentifier extends SimpleNode {
 
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
+        // Lambda parameters
+        if (ctx.isLambdaArgument(this.image)) {
+            return ctx.getLambdaArgument(this.image);
+        }
+
+        // Variable mapper
         VariableMapper varMapper = ctx.getVariableMapper();
         if (varMapper != null) {
             ValueExpression expr = varMapper.resolveVariable(this.image);
@@ -68,6 +74,8 @@ public final class AstIdentifier extends SimpleNode {
                 return expr.getValue(ctx.getELContext());
             }
         }
+
+        // EL Resolvers
         ctx.setPropertyResolved(false);
         Object result = ctx.getELResolver().getValue(ctx, null, this.image);
         if (!ctx.isPropertyResolved()) {
