@@ -21,6 +21,9 @@ import java.beans.PropertyEditor;
 import java.beans.PropertyEditorManager;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 import javax.el.ELException;
 
@@ -417,6 +420,14 @@ public class ELSupport {
                 return editor.getValue();
             }
         }
+
+        // Handle special case because the syntax for the empty set is the same
+        // for an empty map. The parser will always parse {} as an empty set.
+        if (obj instanceof Set && type == Map.class &&
+                ((Set<?>) obj).isEmpty()) {
+            return Collections.EMPTY_MAP;
+        }
+
         throw new ELException(MessageFactory.get("error.convert",
                 obj, obj.getClass(), type));
     }
