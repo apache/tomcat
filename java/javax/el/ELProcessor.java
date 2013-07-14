@@ -78,7 +78,8 @@ public class ELProcessor {
         Class<?> clazz = context.getImportHandler().resolveClass(className);
 
         if (clazz == null) {
-            clazz = Class.forName(className);
+            clazz = Class.forName(className, true,
+                    Thread.currentThread().getContextClassLoader());
         }
 
         if (!Modifier.isPublic(clazz.getModifiers())) {
