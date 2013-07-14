@@ -184,21 +184,34 @@ void Equality() : {}
 
 /*
  * Compare
- * For a bunch of them, then Math
+ * For a bunch of them, then +=
  */
 void Compare() : {}
 {
-    Math()
+    Concatenation()
     (
-        ((<LT0>|<LT1>) Math() #LessThan(2))
+        ((<LT0>|<LT1>) Concatenation() #LessThan(2))
     |
-        ((<GT0>|<GT1>) Math() #GreaterThan(2))
+        ((<GT0>|<GT1>) Concatenation() #GreaterThan(2))
     |
-        ((<LE0>|<LE1>) Math() #LessThanEqual(2))
+        ((<LE0>|<LE1>) Concatenation() #LessThanEqual(2))
     |
-        ((<GE0>|<GE1>) Math() #GreaterThanEqual(2))
+        ((<GE0>|<GE1>) Concatenation() #GreaterThanEqual(2))
     )*
 }
+
+/*
+ * Concatenation
+ * For +=, then Math
+ * 
+ */
+ void Concatenation() : {}
+ {
+     Math()
+     (
+         <CONCAT> Math() #Concatenation(2)
+     )*
+ }
 
 /*
  * Math
@@ -513,6 +526,7 @@ java.util.Deque<Integer> deque = new java.util.ArrayDeque<Integer>();
 |    < DIV1 : "div" >
 |    < MOD0 : "%" >
 |    < MOD1 : "mod" >
+|    < CONCAT : "+=" >
 |    < ASSIGN : "=" >
 |    < ARROW : "->" >
 |    < IDENTIFIER : (<LETTER>|<IMPL_OBJ_START>) (<LETTER>|<DIGIT>)* >
