@@ -17,6 +17,7 @@
 
 package org.apache.jasper.compiler;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
@@ -95,18 +96,12 @@ public class JspConfig {
                 continue;
             }
 
-            Vector<String> includePreludes = new Vector<>();
-            includePreludes.addAll(jspPropertyGroup.getIncludePreludes());
-
-            Vector<String> includeCodas = new Vector<>();
-            includeCodas.addAll(jspPropertyGroup.getIncludeCodas());
-
             JspProperty property = new JspProperty(jspPropertyGroup.getIsXml(),
                     jspPropertyGroup.getElIgnored(),
                     jspPropertyGroup.getScriptingInvalid(),
                     jspPropertyGroup.getPageEncoding(),
-                    includePreludes,
-                    includeCodas,
+                    jspPropertyGroup.getIncludePreludes(),
+                    jspPropertyGroup.getIncludeCodas(),
                     jspPropertyGroup.getDeferredSyntaxAllowedAsLiteral(),
                     jspPropertyGroup.getTrimDirectiveWhitespaces(),
                     jspPropertyGroup.getDefaultContentType(),
@@ -247,8 +242,8 @@ public class JspConfig {
             uriExtension = uri.substring(index+1);
         }
 
-        Vector<String> includePreludes = new Vector<>();
-        Vector<String> includeCodas = new Vector<>();
+        Collection<String> includePreludes = new ArrayList<>();
+        Collection<String> includeCodas = new ArrayList<>();
 
         JspPropertyGroup isXmlMatch = null;
         JspPropertyGroup elIgnoredMatch = null;
@@ -462,8 +457,8 @@ public class JspConfig {
         private final String elIgnored;
         private final String scriptingInvalid;
         private final String pageEncoding;
-        private final Vector<String> includePrelude;
-        private final Vector<String> includeCoda;
+        private final Collection<String> includePrelude;
+        private final Collection<String> includeCoda;
         private final String deferedSyntaxAllowedAsLiteral;
         private final String trimDirectiveWhitespaces;
         private final String defaultContentType;
@@ -472,7 +467,7 @@ public class JspConfig {
 
         public JspProperty(String isXml, String elIgnored,
                 String scriptingInvalid, String pageEncoding,
-                Vector<String> includePrelude, Vector<String> includeCoda,
+                Collection<String> includePrelude, Collection<String> includeCoda,
                 String deferedSyntaxAllowedAsLiteral,
                 String trimDirectiveWhitespaces,
                 String defaultContentType,
@@ -508,11 +503,11 @@ public class JspConfig {
             return pageEncoding;
         }
 
-        public Vector<String> getIncludePrelude() {
+        public Collection<String> getIncludePrelude() {
             return includePrelude;
         }
 
-        public Vector<String> getIncludeCoda() {
+        public Collection<String> getIncludeCoda() {
             return includeCoda;
         }
 
