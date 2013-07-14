@@ -327,6 +327,11 @@ void NonLiteral() : {}
     | MapData()
 }
 
+/*
+ * Note that both an empty Set and an empty Map are represented by {}. The
+ * parser will always parse {} as an empty Set and special handling is required
+ * to convert it to an empty Map when appropriate.
+ */
 void SetData() #SetData: {}
 {
     <START_SET_OR_MAP>
@@ -341,6 +346,11 @@ void ListData() #ListData: {}
     <RBRACK>
 }
 
+/*
+ * Note that both an empty Set and an empty Map are represented by {}. The
+ * parser will always parse {} as an empty Set and special handling is required
+ * to convert it to an empty Map when appropriate.
+ */
 void MapData() #MapData: {}
 {
     <START_SET_OR_MAP>
