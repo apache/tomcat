@@ -138,10 +138,7 @@ void LambdaParameters() #LambdaParameters : {}
  */
 void LambdaExpressionOrInvocation() #LambdaExpressionOrInvocation : {}
 {
-    <LPAREN>
-        LambdaParameters() <ARROW> ( LOOKAHEAD(3) LambdaExpression() | Choice() )
-    <RPAREN>
-    ( MethodParameters() )*
+    <LPAREN> LambdaExpression() <RPAREN> ( MethodParameters() )*
 }
 
 /*
