@@ -211,4 +211,27 @@ public class TestCollectionOperations {
 
         Assert.assertEquals(expected, result);
     }
+
+
+    @Test
+    public void testForEach01() {
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("beans", beans);
+        processor.getValue(
+                "beans.stream().forEach(b->b.setValLong(b.valLong + 1))",
+                Object.class);
+
+        Assert.assertEquals(2, bean01.getValLong());
+        Assert.assertEquals(3, bean02.getValLong());
+        Assert.assertEquals(4, bean03.getValLong());
+
+        // Restore the beans to their default state
+        processor.getValue(
+                "beans.stream().forEach(b->b.setValLong(b.valLong - 1))",
+                Object.class);
+
+        Assert.assertEquals(1, bean01.getValLong());
+        Assert.assertEquals(2, bean02.getValLong());
+        Assert.assertEquals(3, bean03.getValLong());
+    }
 }

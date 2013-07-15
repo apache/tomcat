@@ -180,6 +180,14 @@ public class Stream {
     }
 
 
+    public Object forEach(final LambdaExpression le) {
+        while (iterator.hasNext()) {
+            le.invoke(iterator.next());
+        }
+        return null;
+    }
+
+
     public Iterator<?> iterator() {
         return iterator;
     }
