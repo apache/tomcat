@@ -49,7 +49,7 @@ public class AstLambdaExpression extends SimpleNode {
             argCount = paramValues.length;
         }
         if (paramCount > argCount) {
-            throw new ELException(MessageFactory.get("error.lamdba.args.tooFew",
+            throw new ELException(MessageFactory.get("error.lambda.args.tooFew",
                     Integer.valueOf(argCount), Integer.valueOf(paramCount)));
         }
 
