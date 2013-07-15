@@ -16,7 +16,9 @@
  */
 package javax.el;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LambdaExpression {
 
@@ -34,15 +36,44 @@ public class LambdaExpression {
         this.context = context;
     }
 
-    public Object invoke(ELContext context , Object... args)
+    @SuppressWarnings("null") // args[i] can't be null due to earlier checks
+    public Object invoke(ELContext context, Object... args)
             throws ELException {
 
         if (context == null) {
             throw new NullPointerException();
         }
 
-        // TODO
-        return null;
+        int formalParamCount = 0;
+        if (formalParameters != null) {
+            formalParamCount = formalParameters.size();
+        }
+
+        int argCount = 0;
+        if (args != null) {
+            argCount = args.length;
+        }
+
+        if (formalParamCount > argCount) {
+            throw new ELException(Util.message(context,
+                    "error.lambda.args.tooFew",
+                    Integer.valueOf(argCount),
+                    Integer.valueOf(formalParamCount)));
+        }
+
+        // Build the argument map
+        Map<String,Object> lambdaArguments = new HashMap<>();
+        for (int i = 0; i < formalParamCount; i++) {
+            lambdaArguments.put(formalParameters.get(i), args[i]);
+        }
+
+        context.enterLambdaScope(lambdaArguments);
+
+        try {
+            return expression.getValue(context);
+        } finally {
+            context.exitLambdaScope();
+        }
     }
 
     public java.lang.Object invoke(Object... args) {
