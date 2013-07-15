@@ -188,6 +188,22 @@ public class Stream {
     }
 
 
+    public Stream peek(final LambdaExpression le) {
+        Iterator<Object> downStream = new OpIterator() {
+            @Override
+            protected void findNext() {
+                if (iterator.hasNext()) {
+                    Object obj = iterator.next();
+                    le.invoke(obj);
+                    next = obj;
+                    foundNext = true;
+                }
+            }
+        };
+        return new Stream(downStream);
+    }
+
+
     public Iterator<?> iterator() {
         return iterator;
     }
