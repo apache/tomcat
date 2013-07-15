@@ -18,16 +18,13 @@
 package org.apache.el.parser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.el.ELException;
 import javax.el.LambdaExpression;
 
 import org.apache.el.ValueExpressionImpl;
 import org.apache.el.lang.EvaluationContext;
-import org.apache.el.util.MessageFactory;
 
 public class AstLambdaExpression extends SimpleNode {
 
@@ -63,42 +60,17 @@ public class AstLambdaExpression extends SimpleNode {
         }
     }
 
-    @SuppressWarnings("null") // paramValues[i] can't be null due to checks
     @Override
     public Object invoke(EvaluationContext ctx, Class<?>[] paramTypes,
             Object[] paramValues) throws ELException {
 
-        // Two children - the formal parameters and the expression
-        AstLambdaParameters formalParameters =
-                (AstLambdaParameters) children[0];
+        Object result = getValue(ctx);
 
-        int paramCount = 0;
-        if (formalParameters.children != null) {
-            paramCount = formalParameters.children.length;
-        }
-        int argCount = 0;
-        if (paramValues != null) {
-            argCount = paramValues.length;
-        }
-        if (paramCount > argCount) {
-            throw new ELException(MessageFactory.get("error.lambda.args.tooFew",
-                    Integer.valueOf(argCount), Integer.valueOf(paramCount)));
+        if (result instanceof LambdaExpression) {
+            result = ((LambdaExpression) result).invoke(paramValues);
         }
 
-        // Build the argument map
-        Map<String,Object> lambdaArguments = new HashMap<>();
-        for (int i = 0; i < paramCount; i++) {
-            lambdaArguments.put(formalParameters.children[i].getImage(),
-                    paramValues[i]);
-        }
-
-        ctx.enterLambdaScope(lambdaArguments);
-
-        try {
-            return children[1].getValue(ctx);
-        } finally {
-            ctx.exitLambdaScope();
-        }
+        return result;
     }
 }
 /* JavaCC - OriginalChecksum=071159eff10c8e15ec612c765ae4480a (do not edit this line) */
