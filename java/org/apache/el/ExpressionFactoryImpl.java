@@ -18,6 +18,7 @@
 package org.apache.el;
 
 import javax.el.ELContext;
+import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
@@ -75,5 +76,11 @@ public class ExpressionFactoryImpl extends ExpressionFactory {
                     .get("error.value.expectedType"));
         }
         return new ValueExpressionLiteral(instance, expectedType);
+    }
+
+    @Override
+    public ELResolver getStreamELResolver() {
+        // TODO Implement a streamELResolver
+        return null;
     }
 }
