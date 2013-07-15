@@ -19,6 +19,11 @@ package org.apache.el.stream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
+
+import javax.el.LambdaExpression;
+
+import org.apache.el.lang.ELSupport;
 
 public class Stream {
 
@@ -28,6 +33,55 @@ public class Stream {
         this.iterator = iterator;
     }
 
+    public Stream filter(final LambdaExpression le) {
+        Iterator<Object> filterIterator = new Iterator<Object>() {
+
+            private boolean foundNext = false;
+            private Object next;
+
+            @Override
+            public boolean hasNext() {
+                if (foundNext) {
+                    return true;
+                }
+                findNext();
+                return foundNext;
+            }
+
+            @Override
+            public Object next() {
+                if (foundNext) {
+                    foundNext = false;
+                    return next;
+                }
+                findNext();
+                if (foundNext) {
+                    foundNext = false;
+                    return next;
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            private void findNext() {
+                while (iterator.hasNext()) {
+                    Object obj = iterator.next();
+                    if (ELSupport.coerceToBoolean(
+                            le.invoke(obj)).booleanValue()) {
+                        next = obj;
+                        foundNext = true;
+                        break;
+                    }
+                }
+            }
+        };
+        return new Stream(filterIterator);
+    }
 
     public List<Object> toList() {
         List<Object> result = new ArrayList<>();

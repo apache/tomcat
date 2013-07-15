@@ -55,6 +55,7 @@ public class AstLambdaExpression extends SimpleNode {
             ValueExpressionImpl ve = new ValueExpressionImpl("", children[1],
                     ctx.getFunctionMapper(), ctx.getVariableMapper(), null);
             LambdaExpression le = new LambdaExpression(formalParameters, ve);
+            le.setELContext(ctx);
 
             return le;
         }
