@@ -69,7 +69,6 @@ public class StandardELContext extends ELContext {
         standardResolver.add(new BeanNameELResolver(
                 new StandardBeanNameResolver(localBeans)));
         standardResolver.add(customResolvers);
-        // No stream resolver - TODO
         // Use resolvers from context from this point on
         standardResolver.add(context.getELResolver());
     }
