@@ -234,4 +234,25 @@ public class TestCollectionOperations {
         Assert.assertEquals(2, bean02.getValLong());
         Assert.assertEquals(3, bean03.getValLong());
     }
+
+
+    @Test
+    public void testPeek01() {
+        ELProcessor processor = new ELProcessor();
+        List<TesterBeanA> debug = new ArrayList<>();
+        processor.defineBean("beans", beans);
+        processor.defineBean("debug", debug);
+
+        Object result = processor.getValue(
+                "beans.stream().peek(b->debug.add(b)).toList()",
+                Object.class);
+
+        List<TesterBeanA> expected = new ArrayList<>(3);
+        expected.add(bean01);
+        expected.add(bean02);
+        expected.add(bean03);
+
+        Assert.assertEquals(expected, result);
+        Assert.assertEquals(expected, debug);
+    }
 }
