@@ -132,4 +132,36 @@ public class TestCollectionOperations {
         Assert.assertEquals("bean03", list.get(1).get(0));
         Assert.assertEquals(Long.valueOf(3), list.get(1).get(1));
     }
+
+
+    @Test
+    public void testFlatMap01() {
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("beans", beans);
+        Object result = processor.getValue(
+                "beans.stream().flatMap(b->b.name.toCharArray().stream()).toList()",
+                List.class);
+
+        List<Character> expected = new ArrayList<>(18);
+        expected.add(Character.valueOf('b'));
+        expected.add(Character.valueOf('e'));
+        expected.add(Character.valueOf('a'));
+        expected.add(Character.valueOf('n'));
+        expected.add(Character.valueOf('0'));
+        expected.add(Character.valueOf('1'));
+        expected.add(Character.valueOf('b'));
+        expected.add(Character.valueOf('e'));
+        expected.add(Character.valueOf('a'));
+        expected.add(Character.valueOf('n'));
+        expected.add(Character.valueOf('0'));
+        expected.add(Character.valueOf('2'));
+        expected.add(Character.valueOf('b'));
+        expected.add(Character.valueOf('e'));
+        expected.add(Character.valueOf('a'));
+        expected.add(Character.valueOf('n'));
+        expected.add(Character.valueOf('0'));
+        expected.add(Character.valueOf('3'));
+
+        Assert.assertEquals(expected, result);
+    }
 }

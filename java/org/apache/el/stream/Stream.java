@@ -69,6 +69,36 @@ public class Stream {
     }
 
 
+    public Stream flatMap(final LambdaExpression le) {
+        Iterator<Object> downStream = new OpIterator() {
+
+            private Iterator<?> inner;
+
+            @Override
+            protected void findNext() {
+                while (iterator.hasNext() ||
+                        (inner != null && inner.hasNext())) {
+                    if (inner == null || !inner.hasNext()) {
+                        inner = ((Stream) le.invoke(iterator.next())).iterator;
+                    }
+
+                    if (inner.hasNext()) {
+                        next = inner.next();
+                        foundNext = true;
+                        break;
+                    }
+                }
+            }
+        };
+        return new Stream(downStream);
+    }
+
+
+    public Iterator<?> iterator() {
+        return iterator;
+    }
+
+
     public List<Object> toList() {
         List<Object> result = new ArrayList<>();
         while (iterator.hasNext()) {
