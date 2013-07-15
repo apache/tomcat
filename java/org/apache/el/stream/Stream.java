@@ -210,15 +210,29 @@ public class Stream {
 
 
     public Stream limit(final Number count) {
+        return substream(Integer.valueOf(0), count);
+    }
+
+
+    public Stream substream(final Number start) {
+        return substream(start, Integer.valueOf(Integer.MAX_VALUE));
+    }
+
+        public Stream substream(final Number start, final Number end) {
 
         Iterator<Object> downStream = new OpIterator() {
 
-            private final int limit = count.intValue();
+            private final int startPos = start.intValue();
+            private final int endPos = end.intValue();
             private int itemCount = 0;
 
             @Override
             protected void findNext() {
-                if (iterator.hasNext() && itemCount < limit) {
+                while (itemCount < startPos && iterator.hasNext()) {
+                    iterator.next();
+                    itemCount++;
+                }
+                if (iterator.hasNext() && itemCount < endPos) {
                     itemCount ++;
                     next = iterator.next();
                     foundNext = true;
@@ -235,6 +249,15 @@ public class Stream {
             result.add(iterator.next());
         }
         return result;
+    }
+
+
+    public Object[] toArray() {
+        List<Object> result = new ArrayList<>();
+        while (iterator.hasNext()) {
+            result.add(iterator.next());
+        }
+        return result.toArray(new Object[result.size()]);
     }
 
 
