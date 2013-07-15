@@ -111,4 +111,25 @@ public class TestCollectionOperations {
 
         Assert.assertEquals(expected, result);
     }
+
+
+    @Test
+    public void testMap02() {
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("beans", beans);
+        Object result = processor.getValue(
+                "beans.stream().filter(b->b.valLong > 1).map(b->[b.name, b.valLong]).toList()",
+                List.class);
+
+        Assert.assertTrue(result instanceof List);
+
+        @SuppressWarnings("unchecked")
+        List<List<Object>> list = (List<List<Object>>) result;
+
+        Assert.assertEquals(2, list.size());
+        Assert.assertEquals("bean02", list.get(0).get(0));
+        Assert.assertEquals(Long.valueOf(2), list.get(0).get(1));
+        Assert.assertEquals("bean03", list.get(1).get(0));
+        Assert.assertEquals(Long.valueOf(3), list.get(1).get(1));
+    }
 }
