@@ -218,7 +218,7 @@ public class Stream {
         return substream(start, Integer.valueOf(Integer.MAX_VALUE));
     }
 
-        public Stream substream(final Number start, final Number end) {
+    public Stream substream(final Number start, final Number end) {
 
         Iterator<Object> downStream = new OpIterator() {
 
@@ -232,8 +232,8 @@ public class Stream {
                     iterator.next();
                     itemCount++;
                 }
-                if (iterator.hasNext() && itemCount < endPos) {
-                    itemCount ++;
+                if (itemCount < endPos && iterator.hasNext()) {
+                    itemCount++;
                     next = iterator.next();
                     foundNext = true;
                 }
