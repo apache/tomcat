@@ -17,9 +17,11 @@
 package org.apache.el.stream;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import javax.el.LambdaExpression;
 
@@ -84,6 +86,27 @@ public class Stream {
 
                     if (inner.hasNext()) {
                         next = inner.next();
+                        foundNext = true;
+                        break;
+                    }
+                }
+            }
+        };
+        return new Stream(downStream);
+    }
+
+
+    public Stream distinct() {
+        Iterator<Object> downStream = new OpIterator() {
+
+            private Set<Object> values = new HashSet<>();
+
+            @Override
+            protected void findNext() {
+                while (iterator.hasNext()) {
+                    Object obj = iterator.next();
+                    if (values.add(obj)) {
+                        next = obj;
                         foundNext = true;
                         break;
                     }

@@ -164,4 +164,20 @@ public class TestCollectionOperations {
 
         Assert.assertEquals(expected, result);
     }
+
+
+    @Test
+    public void testDistinct01() {
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue(
+                "['a', 'b', 'b', 'c'].stream().distinct().toList()",
+                List.class);
+        List<String> expected = new ArrayList<>(3);
+        expected.add("a");
+        expected.add("b");
+        expected.add("c");
+
+        Assert.assertEquals(expected, result);
+    }
+
 }
