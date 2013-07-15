@@ -68,7 +68,9 @@ public class StreamELResolverImpl extends ELResolver {
                 return new Stream(new ArrayIterator(base));
             } else if (base instanceof Collection) {
                 context.setPropertyResolved(true);
-                return new Stream(((Collection<?>) base).iterator());
+                @SuppressWarnings("unchecked")
+                Collection<Object> collection = (Collection<Object>) base;
+                return new Stream(collection.iterator());
             }
         }
 
