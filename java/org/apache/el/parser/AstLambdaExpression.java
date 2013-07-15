@@ -40,23 +40,24 @@ public class AstLambdaExpression extends SimpleNode {
                 (AstLambdaParameters) children[0];
         Node[] formalParamNodes = formalParametersNode.children;
 
-        if (formalParamNodes == null || formalParamNodes.length == 0) {
-            // No formal parameters - should be able to simply invoke this
-            return invoke(ctx, null, null);
-        } else {
-            // Has parameters but they aren't provided so build a
-            // LambdaExpression
-            List<String> formalParameters =
-                    new ArrayList<>(formalParamNodes.length);
+        // Build a LambdaExpression
+        List<String> formalParameters = new ArrayList<>();
+        if (formalParamNodes != null) {
             for (Node formalParamNode : formalParamNodes) {
                 formalParameters.add(formalParamNode.getImage());
             }
+        }
 
-            ValueExpressionImpl ve = new ValueExpressionImpl("", children[1],
-                    ctx.getFunctionMapper(), ctx.getVariableMapper(), null);
-            LambdaExpression le = new LambdaExpression(formalParameters, ve);
-            le.setELContext(ctx);
+        ValueExpressionImpl ve = new ValueExpressionImpl("", children[1],
+                ctx.getFunctionMapper(), ctx.getVariableMapper(), null);
+        LambdaExpression le = new LambdaExpression(formalParameters, ve);
+        le.setELContext(ctx);
 
+        if (formalParameters.size() == 0) {
+            // No formal parameters - should be able to simply invoke this
+            return le.invoke(ctx, (Object[]) null);
+        } else {
+            // Has parameters but they aren't provided so return the
             return le;
         }
     }
