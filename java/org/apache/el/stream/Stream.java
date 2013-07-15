@@ -29,9 +29,11 @@ public class Stream {
 
     private final Iterator<?> iterator;
 
+
     public Stream(Iterator<?> iterator) {
         this.iterator = iterator;
     }
+
 
     public Stream filter(final LambdaExpression le) {
         Iterator<Object> filterIterator = new Iterator<Object>() {
@@ -82,6 +84,55 @@ public class Stream {
         };
         return new Stream(filterIterator);
     }
+
+
+    public Stream map(final LambdaExpression le) {
+        Iterator<Object> filterIterator = new Iterator<Object>() {
+
+            private boolean foundNext = false;
+            private Object next;
+
+            @Override
+            public boolean hasNext() {
+                if (foundNext) {
+                    return true;
+                }
+                findNext();
+                return foundNext;
+            }
+
+            @Override
+            public Object next() {
+                if (foundNext) {
+                    foundNext = false;
+                    return next;
+                }
+                findNext();
+                if (foundNext) {
+                    foundNext = false;
+                    return next;
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            private void findNext() {
+                while (iterator.hasNext()) {
+                    Object obj = iterator.next();
+                    next = le.invoke(obj);
+                    foundNext = true;
+                    break;
+                }
+            }
+        };
+        return new Stream(filterIterator);
+    }
+
 
     public List<Object> toList() {
         List<Object> result = new ArrayList<>();

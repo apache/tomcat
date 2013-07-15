@@ -38,12 +38,15 @@ public class TestCollectionOperations {
         List<TesterBeanA> list = new ArrayList<>();
 
         bean01.setValLong(1);
+        bean01.setName("bean01");
         list.add(bean01);
 
         bean02.setValLong(2);
+        bean02.setName("bean02");
         list.add(bean02);
 
         bean03.setValLong(3);
+        bean03.setName("bean03");
         list.add(bean03);
 
         beans = Collections.unmodifiableList(list);
@@ -89,6 +92,22 @@ public class TestCollectionOperations {
                 List.class);
         List<TesterBeanA> expected = new ArrayList<>(1);
         expected.add(bean03);
+
+        Assert.assertEquals(expected, result);
+    }
+
+
+    @Test
+    public void testMap01() {
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("beans", beans);
+        Object result = processor.getValue(
+                "beans.stream().map(b->b.name).toList()",
+                List.class);
+        List<String> expected = new ArrayList<>(3);
+        expected.add("bean01");
+        expected.add("bean02");
+        expected.add("bean03");
 
         Assert.assertEquals(expected, result);
     }
