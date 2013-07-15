@@ -272,4 +272,56 @@ public class TestCollectionOperations {
 
         Assert.assertEquals(expected, result);
     }
+
+
+    @Test
+    public void testSubstreamStart01() {
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("beans", beans);
+
+        Object result = processor.getValue(
+                "beans.stream().substream(1).toList()",
+                Object.class);
+
+        List<TesterBeanA> expected = new ArrayList<>(2);
+        expected.add(bean02);
+        expected.add(bean03);
+
+        Assert.assertEquals(expected, result);
+    }
+
+
+    @Test
+    public void testSubstreamStartEnd01() {
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("beans", beans);
+
+        Object result = processor.getValue(
+                "beans.stream().substream(1,2).toList()",
+                Object.class);
+
+        List<TesterBeanA> expected = new ArrayList<>(2);
+        expected.add(bean02);
+
+        Assert.assertEquals(expected, result);
+    }
+
+
+    @Test
+    public void testToArray01() {
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("beans", beans);
+
+        Object result = processor.getValue(
+                "beans.stream().toArray()",
+                Object.class);
+
+        Object[] expected = new Object[3];
+        expected[0] = bean01;
+        expected[1] = bean02;
+        expected[2] = bean03;
+
+        Assert.assertArrayEquals(expected, (Object[]) result);
+    }
+
 }
