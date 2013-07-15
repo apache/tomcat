@@ -17,6 +17,7 @@
 package org.apache.el.stream;
 
 import java.beans.FeatureDescriptor;
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -63,7 +64,8 @@ public class StreamELResolverImpl extends ELResolver {
 
         if ("stream".equals(method) && params.length == 0) {
             if (base.getClass().isArray()) {
-                // TODO handle array source
+                context.setPropertyResolved(true);
+                return new Stream(new ArrayIterator(base));
             } else if (base instanceof Collection) {
                 context.setPropertyResolved(true);
                 return new Stream(((Collection<?>) base).iterator());
@@ -72,5 +74,33 @@ public class StreamELResolverImpl extends ELResolver {
 
         // Not for handling by this resolver
         return null;
+    }
+
+
+    private static class ArrayIterator implements Iterator<Object> {
+
+        private final Object base;
+        private final int size;
+        private int index = 0;
+
+        public ArrayIterator(Object base) {
+            this.base = base;
+            size = Array.getLength(base);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return size > index;
+        }
+
+        @Override
+        public Object next() {
+            return Array.get(base, index++);
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
 }
