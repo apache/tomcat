@@ -53,11 +53,12 @@ public class AstLambdaExpression extends SimpleNode {
         LambdaExpression le = new LambdaExpression(formalParameters, ve);
         le.setELContext(ctx);
 
-        if (formalParameters.size() == 0) {
+        if (formalParameters.isEmpty()) {
             // No formal parameters - should be able to simply invoke this
             return le.invoke(ctx, (Object[]) null);
         } else {
             // Has parameters but they aren't provided so return the
+            // LambdaExpression
             return le;
         }
     }
