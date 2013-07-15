@@ -255,4 +255,21 @@ public class TestCollectionOperations {
         Assert.assertEquals(expected, result);
         Assert.assertEquals(expected, debug);
     }
+
+
+    @Test
+    public void testLimit01() {
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("beans", beans);
+
+        Object result = processor.getValue(
+                "beans.stream().limit(2).toList()",
+                Object.class);
+
+        List<TesterBeanA> expected = new ArrayList<>(2);
+        expected.add(bean01);
+        expected.add(bean02);
+
+        Assert.assertEquals(expected, result);
+    }
 }

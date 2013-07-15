@@ -209,6 +209,26 @@ public class Stream {
     }
 
 
+    public Stream limit(final Number count) {
+
+        Iterator<Object> downStream = new OpIterator() {
+
+            private final int limit = count.intValue();
+            private int itemCount = 0;
+
+            @Override
+            protected void findNext() {
+                if (iterator.hasNext() && itemCount < limit) {
+                    itemCount ++;
+                    next = iterator.next();
+                    foundNext = true;
+                }
+            }
+        };
+        return new Stream(downStream);
+    }
+
+
     public List<Object> toList() {
         List<Object> result = new ArrayList<>();
         while (iterator.hasNext()) {
