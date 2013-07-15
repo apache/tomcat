@@ -27,7 +27,6 @@ public class AstLambdaExpressionOrInvocation extends SimpleNode {
         super(id);
     }
 
-
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
 
@@ -38,8 +37,9 @@ public class AstLambdaExpressionOrInvocation extends SimpleNode {
         if (children.length == 2) {
             args = ((AstMethodParameters) children[1]).getParameters(ctx);
         } else {
-            // No parameters - just the expression
-            args = null;
+            // No parameters. AstLambdaExpression contains the logic to handle
+            // this in getValue()
+            return lambdaExpression.getValue(ctx);
         }
         return lambdaExpression.invoke(ctx, null, args);
     }

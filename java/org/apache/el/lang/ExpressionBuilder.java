@@ -80,9 +80,6 @@ public final class ExpressionBuilder implements NodeVisitor {
 
     private final String expression;
 
-    /**
-     *
-     */
     public ExpressionBuilder(String expression, ELContext ctx)
             throws ELException {
         this.expression = expression;
@@ -189,15 +186,31 @@ public final class ExpressionBuilder implements NodeVisitor {
 
             AstFunction funcNode = (AstFunction) node;
 
+            Method m = null;
+
+            if (this.fnMapper != null) {
+                m = fnMapper.resolveFunction(funcNode.getPrefix(), funcNode
+                        .getLocalName());
+            }
+
+            // References to variables that refer to lambda expressions will be
+            // parsed as functions. This is handled at runtime but at this point
+            // need to treat it as a variable rather than a function.
+            if (m == null && this.varMapper != null &&
+                    funcNode.getPrefix().length() == 0) {
+                this.varMapper.resolveVariable(funcNode.getLocalName());
+                return;
+            }
+
             if (this.fnMapper == null) {
                 throw new ELException(MessageFactory.get("error.fnMapper.null"));
             }
-            Method m = fnMapper.resolveFunction(funcNode.getPrefix(), funcNode
-                    .getLocalName());
+
             if (m == null) {
                 throw new ELException(MessageFactory.get(
                         "error.fnMapper.method", funcNode.getOutputName()));
             }
+
             int pcnt = m.getParameterTypes().length;
             if (node.jjtGetNumChildren() != pcnt) {
                 throw new ELException(MessageFactory.get(
