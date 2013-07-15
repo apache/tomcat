@@ -17,6 +17,8 @@
 package org.apache.el.stream;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -29,10 +31,10 @@ import org.apache.el.lang.ELSupport;
 
 public class Stream {
 
-    private final Iterator<?> iterator;
+    private final Iterator<Object> iterator;
 
 
-    public Stream(Iterator<?> iterator) {
+    public Stream(Iterator<Object > iterator) {
         this.iterator = iterator;
     }
 
@@ -117,6 +119,67 @@ public class Stream {
     }
 
 
+    public Stream sorted() {
+        Iterator<Object> downStream = new OpIterator() {
+
+            private Iterator<Object> sorted = null;
+
+            @Override
+            protected void findNext() {
+                if (sorted == null) {
+                    sort();
+                }
+                if (sorted.hasNext()) {
+                    next = sorted.next();
+                    foundNext = true;
+                }
+            }
+
+            @SuppressWarnings({ "rawtypes", "unchecked" })
+            private final void sort() {
+                List list = new ArrayList<>();
+                while (iterator.hasNext()) {
+                    list.add(iterator.next());
+                }
+                Collections.sort(list);
+                sorted = list.iterator();
+            }
+        };
+        return new Stream(downStream);
+    }
+
+
+    public Stream sorted(final LambdaExpression le) {
+        Iterator<Object> downStream = new OpIterator() {
+
+            private Iterator<Object> sorted = null;
+
+            @Override
+            protected void findNext() {
+                if (sorted == null) {
+                    sort(le);
+                }
+                if (sorted.hasNext()) {
+                    next = sorted.next();
+                    foundNext = true;
+                }
+            }
+
+            @SuppressWarnings({ "rawtypes", "unchecked" })
+            private final void sort(LambdaExpression le) {
+                List list = new ArrayList<>();
+                Comparator<Object> c = new LambdaExpressionComparator(le);
+                while (iterator.hasNext()) {
+                    list.add(iterator.next());
+                }
+                Collections.sort(list, c);
+                sorted = list.iterator();
+            }
+        };
+        return new Stream(downStream);
+    }
+
+
     public Iterator<?> iterator() {
         return iterator;
     }
@@ -128,6 +191,23 @@ public class Stream {
             result.add(iterator.next());
         }
         return result;
+    }
+
+
+    private static class LambdaExpressionComparator
+            implements Comparator<Object>{
+
+        private final LambdaExpression le;
+
+        public LambdaExpressionComparator(LambdaExpression le) {
+            this.le = le;
+        }
+
+        @Override
+        public int compare(Object o1, Object o2) {
+            return ELSupport.coerceToNumber(
+                    le.invoke(o1, o2), Integer.class).intValue();
+        }
     }
 
 

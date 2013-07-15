@@ -180,4 +180,35 @@ public class TestCollectionOperations {
         Assert.assertEquals(expected, result);
     }
 
+
+    @Test
+    public void testSorted01() {
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue(
+                "['c', 'd', 'b', 'a'].stream().sorted().toList()",
+                List.class);
+        List<String> expected = new ArrayList<>(4);
+        expected.add("a");
+        expected.add("b");
+        expected.add("c");
+        expected.add("d");
+
+        Assert.assertEquals(expected, result);
+    }
+
+
+    @Test
+    public void testSortedLambdaExpression01() {
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue(
+                "['c', 'd', 'b', 'a'].stream().sorted((x,y)->x.compareTo(y)*-1).toList()",
+                List.class);
+        List<String> expected = new ArrayList<>(4);
+        expected.add("d");
+        expected.add("c");
+        expected.add("b");
+        expected.add("a");
+
+        Assert.assertEquals(expected, result);
+    }
 }
