@@ -67,7 +67,7 @@ public class AstLambdaExpression extends SimpleNode {
         Object result = getValue(ctx);
 
         if (result instanceof LambdaExpression) {
-            result = ((LambdaExpression) result).invoke(paramValues);
+            result = ((LambdaExpression) result).invoke(ctx, paramValues);
         }
 
         return result;
