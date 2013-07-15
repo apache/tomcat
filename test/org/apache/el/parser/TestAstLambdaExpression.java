@@ -56,4 +56,12 @@ public class TestAstLambdaExpression {
     }
 
 
+    @Test
+    public void testSpec05() {
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("fact = n -> n==0? 1: n*fact(n-1); fact(5)",
+                        Integer.class);
+        Assert.assertEquals(Integer.valueOf(120), result);
+    }
 }
