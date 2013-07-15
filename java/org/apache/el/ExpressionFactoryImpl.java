@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.el;
 
 import javax.el.ELContext;
@@ -25,6 +24,7 @@ import javax.el.ValueExpression;
 
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.ExpressionBuilder;
+import org.apache.el.stream.StreamELResolverImpl;
 import org.apache.el.util.MessageFactory;
 
 
@@ -80,7 +80,6 @@ public class ExpressionFactoryImpl extends ExpressionFactory {
 
     @Override
     public ELResolver getStreamELResolver() {
-        // TODO Implement a streamELResolver
-        return null;
+        return new StreamELResolverImpl();
     }
 }
