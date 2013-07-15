@@ -49,18 +49,18 @@ public class AstLambdaExpression extends SimpleNode {
             argCount = paramValues.length;
         }
         if (paramCount > argCount) {
-            throw new ELException(MessageFactory.get("error.args.tooFew",
+            throw new ELException(MessageFactory.get("error.lamdba.args.tooFew",
                     Integer.valueOf(argCount), Integer.valueOf(paramCount)));
         }
 
         // Build the argument map
-        Map<String,Object> lambdaArgumnents = new HashMap<>();
+        Map<String,Object> lambdaArguments = new HashMap<>();
         for (int i = 0; i < paramCount; i++) {
-            lambdaArgumnents.put(formalParameters.children[i].getImage(),
+            lambdaArguments.put(formalParameters.children[i].getImage(),
                     paramValues[i]);
         }
 
-        ctx.enterLambdaScope(lambdaArgumnents);
+        ctx.enterLambdaScope(lambdaArguments);
 
         try {
             return children[1].getValue(ctx);
