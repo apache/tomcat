@@ -38,4 +38,21 @@ public class TestCollectionOperations {
 
         Assert.assertEquals(expected, result);
     }
+
+
+    @Test
+    public void testToList02() {
+        ELProcessor processor = new ELProcessor();
+        String[] src = new String[] { "a", "b", "c" };
+        processor.defineBean("src", src);
+        Object result = processor.getValue("src.stream().toList()",
+                List.class);
+        List<String> expected = new ArrayList<>(3);
+        expected.add("a");
+        expected.add("b");
+        expected.add("c");
+
+        Assert.assertEquals(expected, result);
+    }
+
 }
