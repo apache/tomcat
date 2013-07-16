@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.el.ELException;
 import javax.el.ELProcessor;
 
 import org.junit.Assert;
@@ -324,4 +325,39 @@ public class TestCollectionOperations {
         Assert.assertArrayEquals(expected, (Object[]) result);
     }
 
+
+    @Test
+    public void testReduceLambda01() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1,2,3,4,5].stream().reduce((x,y)->x+y)",
+                Object.class);
+
+        Assert.assertEquals(Long.valueOf(15), ((Optional) result).get());
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testReduceLambda02() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[].stream().reduce((x,y)->x+y)",
+                Object.class);
+
+        ((Optional) result).get();
+    }
+
+
+    @Test
+    public void testReduceLambdaSeed01() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1,2,3,4,5].stream().reduce(10, (x,y)->x+y)",
+                Object.class);
+
+        Assert.assertEquals(Long.valueOf(25), result);
+    }
 }
