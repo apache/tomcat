@@ -77,6 +77,11 @@
         Ensure that the JAR scanning process scans the Apache Log4j version 2
         JARs. Patch provided by Nick Williams. (markt)
       </fix>
+      <fix>
+        <bug>55268</bug>: Added optional --service-start-wait-time
+        command-line option to change service s tart wait time from default
+        of 10 seconds.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
