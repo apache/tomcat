@@ -573,4 +573,161 @@ public class TestCollectionOperations {
         Assert.assertTrue("Result: " + result.toString(),
                 ELSupport.equals(Long.valueOf(0), result));
     }
+
+
+    @Test
+    public void testAnyMatch01() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[1,2,3,4,5].stream().anyMatch(x->x==7)",
+                Object.class);
+
+        Assert.assertEquals(Boolean.FALSE, result.get());
+    }
+
+
+    @Test
+    public void testAnyMatch02() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[1,2,3,4,5].stream().anyMatch(x->x==3)",
+                Object.class);
+
+        Assert.assertEquals(Boolean.TRUE, result.get());
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testAnyMatch03() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[].stream().anyMatch(x->x==7)",
+                Object.class);
+
+        result.get();
+    }
+
+
+    @Test
+    public void testAllMatch01() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[1,2,3,4,5].stream().allMatch(x->x>3)",
+                Object.class);
+
+        Assert.assertEquals(Boolean.FALSE, result.get());
+    }
+
+
+    @Test
+    public void testAllMatch02() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[1,2,3,4,5].stream().allMatch(x->x>0)",
+                Object.class);
+
+        Assert.assertEquals(Boolean.TRUE, result.get());
+    }
+
+
+    @Test
+    public void testAllMatch03() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[1,2,3,4,5].stream().allMatch(x->x>10)",
+                Object.class);
+
+        Assert.assertEquals(Boolean.FALSE, result.get());
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testAllMatch04() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[].stream().allMatch(x->x==7)",
+                Object.class);
+
+        result.get();
+    }
+
+
+    @Test
+    public void testNoneMatch01() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[1,2,3,4,5].stream().allMatch(x->x>3)",
+                Object.class);
+
+        Assert.assertEquals(Boolean.FALSE, result.get());
+    }
+
+
+    @Test
+    public void testNoneMatch02() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[1,2,3,4,5].stream().noneMatch(x->x>0)",
+                Object.class);
+
+        Assert.assertEquals(Boolean.FALSE, result.get());
+    }
+
+
+    @Test
+    public void testNoneMatch03() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[1,2,3,4,5].stream().noneMatch(x->x>10)",
+                Object.class);
+
+        Assert.assertEquals(Boolean.TRUE, result.get());
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testNoneMatch04() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[].stream().noneMatch(x->x==7)",
+                Object.class);
+
+        result.get();
+    }
+
+
+    @Test
+    public void testFindFirst01() {
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("beans", beans);
+
+        Optional result = (Optional) processor.getValue(
+                "beans.stream().findFirst()",
+                Object.class);
+
+        Assert.assertEquals(bean01, result.get());
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testFindFirst02() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[].stream().findFirst()",
+                Object.class);
+
+        result.get();
+    }
 }
