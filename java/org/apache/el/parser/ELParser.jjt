@@ -138,7 +138,7 @@ void LambdaParameters() #LambdaParameters : {}
  */
 void LambdaExpressionOrInvocation() #LambdaExpressionOrInvocation : {}
 {
-    <LPAREN> LambdaExpression() <RPAREN> ( MethodParameters() )?
+    <LPAREN> LambdaExpression() <RPAREN> ( MethodParameters() )*
 }
 
 /*
