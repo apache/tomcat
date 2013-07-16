@@ -47,8 +47,8 @@ public class Stream {
             protected void findNext() {
                 while (iterator.hasNext()) {
                     Object obj = iterator.next();
-                    if (ELSupport.coerceToBoolean(
-                            le.invoke(obj)).booleanValue()) {
+                    Boolean filter = ELSupport.coerceToBoolean(le.invoke(obj));
+                    if (filter != null && filter.booleanValue()) {
                         next = obj;
                         foundNext = true;
                         break;
