@@ -35,10 +35,14 @@ public class AstLambdaExpression extends SimpleNode {
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
 
-        // Two children - the formal parameters and the expression
+        // First child is always parameters even if there aren't any
         AstLambdaParameters formalParametersNode =
                 (AstLambdaParameters) children[0];
         Node[] formalParamNodes = formalParametersNode.children;
+
+        // Second child is a value expression
+        ValueExpressionImpl ve = new ValueExpressionImpl("", children[1],
+                ctx.getFunctionMapper(), ctx.getVariableMapper(), null);
 
         // Build a LambdaExpression
         List<String> formalParameters = new ArrayList<>();
@@ -47,30 +51,29 @@ public class AstLambdaExpression extends SimpleNode {
                 formalParameters.add(formalParamNode.getImage());
             }
         }
-
-        ValueExpressionImpl ve = new ValueExpressionImpl("", children[1],
-                ctx.getFunctionMapper(), ctx.getVariableMapper(), null);
         LambdaExpression le = new LambdaExpression(formalParameters, ve);
         le.setELContext(ctx);
 
         if (formalParameters.isEmpty()) {
-            // No formal parameters - should be able to simply invoke this
+            // No formal parameters - invoke the expression
             return le.invoke(ctx, (Object[]) null);
-        } else {
-            // Has parameters but they aren't provided so return the
-            // LambdaExpression
-            return le;
         }
-    }
 
-    @Override
-    public Object invoke(EvaluationContext ctx, Class<?>[] paramTypes,
-            Object[] paramValues) throws ELException {
+        // If there are method parameters, need to invoke the expression with
+        // those parameters. If there are multiple method parameters there
+        // should be that many nested expressions.
+        // If there are more nested expressions that parameters this will return
+        // a LambdaExpression
+        Object result = le;
+        int i = 2;
+        while (result instanceof LambdaExpression && i < jjtGetNumChildren()) {
+            result = ((LambdaExpression) result).invoke(
+                    ((AstMethodParameters) children[i]).getParameters(ctx));
+            i++;
+        }
 
-        Object result = getValue(ctx);
-
-        if (result instanceof LambdaExpression) {
-            result = ((LambdaExpression) result).invoke(ctx, paramValues);
+        if (i < jjtGetNumChildren()) {
+            throw new ELException();
         }
 
         return result;

@@ -64,4 +64,14 @@ public class TestAstLambdaExpression {
                         Integer.class);
         Assert.assertEquals(Integer.valueOf(120), result);
     }
+
+
+    @Test
+    public void testSpec06() {
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("(x->y->x-y)(2)(1)",
+                        Integer.class);
+        Assert.assertEquals(Integer.valueOf(1), result);
+    }
 }

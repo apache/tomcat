@@ -136,9 +136,14 @@ void LambdaParameters() #LambdaParameters : {}
  * Possible invocation of lambda expression. Invocations must be bracketed but
  * being bracketed does not mean it is an invocation.
  */
-void LambdaExpressionOrInvocation() #LambdaExpressionOrInvocation : {}
+void LambdaExpressionOrInvocation() #LambdaExpression : {}
 {
-    <LPAREN> LambdaExpression() <RPAREN> ( MethodParameters() )*
+    <LPAREN> 
+        LambdaParameters()
+        <ARROW>
+        ( LOOKAHEAD(3) LambdaExpression() | Choice() )
+    <RPAREN>
+    ( MethodParameters() )*
 }
 
 /*
