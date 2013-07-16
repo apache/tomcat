@@ -27,6 +27,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.el.TesterBeanA;
+import org.apache.el.lang.ELSupport;
 
 public class TestCollectionOperations {
 
@@ -479,5 +480,97 @@ public class TestCollectionOperations {
                 Object.class);
 
         Assert.assertEquals(bean01, ((Optional) result).get());
+    }
+
+
+    @Test
+    public void testAverage01() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1,2,3,4,5].stream().average()",
+                Object.class);
+
+        Number average = (Number) ((Optional) result).get();
+        Assert.assertTrue("Result: " + average.toString(),
+                ELSupport.equals(Long.valueOf(3), average));
+    }
+
+
+    @Test
+    public void testAverage02() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1,2,3,4,5,6].stream().average()",
+                Object.class);
+
+        Number average = (Number) ((Optional) result).get();
+        Assert.assertTrue("Result: " + average.toString(),
+                ELSupport.equals(Double.valueOf(3.5), average));
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testAverage03() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[].stream().average()",
+                Object.class);
+
+        ((Optional) result).get();
+    }
+
+
+    @Test
+    public void testSum01() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1,2,3,4,5].stream().sum()",
+                Object.class);
+
+        Assert.assertTrue("Result: " + result.toString(),
+                ELSupport.equals(Long.valueOf(15), result));
+    }
+
+
+    @Test
+    public void testSum02() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[].stream().sum()",
+                Object.class);
+
+        Assert.assertTrue("Result: " + result.toString(),
+                ELSupport.equals(Long.valueOf(0), result));
+    }
+
+
+    @Test
+    public void testCount01() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1,2,3,4,5].stream().count()",
+                Object.class);
+
+        Assert.assertTrue("Result: " + result.toString(),
+                ELSupport.equals(Long.valueOf(5), result));
+    }
+
+
+    @Test
+    public void testCount02() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[].stream().count()",
+                Object.class);
+
+        Assert.assertTrue("Result: " + result.toString(),
+                ELSupport.equals(Long.valueOf(0), result));
     }
 }
