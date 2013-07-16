@@ -138,7 +138,7 @@ void LambdaParameters() #LambdaParameters : {}
  */
 void LambdaExpressionOrInvocation() #LambdaExpression : {}
 {
-    <LPAREN> 
+    <LPAREN>
         LambdaParameters()
         <ARROW>
         ( LOOKAHEAD(3) LambdaExpression() | Choice() )
@@ -208,7 +208,7 @@ void Compare() : {}
 /*
  * Concatenation
  * For +=, then Math
- * 
+ *
  */
  void Concatenation() : {}
  {
