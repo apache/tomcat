@@ -21,6 +21,8 @@ import java.beans.PropertyEditor;
 import java.beans.PropertyEditorManager;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +41,32 @@ import org.apache.el.util.MessageFactory;
 public class ELSupport {
 
     private static final Long ZERO = Long.valueOf(0L);
+
+    private static final boolean IS_SECURITY_ENABLED =
+            (System.getSecurityManager() != null);
+
+    protected static final boolean COERCE_TO_ZERO;
+
+    static {
+        if (IS_SECURITY_ENABLED) {
+            COERCE_TO_ZERO = AccessController.doPrivileged(
+                    new PrivilegedAction<Boolean>(){
+                        @Override
+                        public Boolean run() {
+                            return Boolean.valueOf(System.getProperty(
+                                    "org.apache.el.parser.COERCE_TO_ZERO",
+                                    "false"));
+                        }
+
+                    }
+            ).booleanValue();
+        } else {
+            COERCE_TO_ZERO = Boolean.valueOf(System.getProperty(
+                    "org.apache.el.parser.COERCE_TO_ZERO",
+                    "false")).booleanValue();
+        }
+    }
+
 
     /**
      * Compare two objects, after coercing to the same type if appropriate.
@@ -147,7 +175,7 @@ public class ELSupport {
             Long l1 = (Long) coerceToNumber(obj1, Long.class);
             return l0.equals(l1);
         } else if (obj0 instanceof Boolean || obj1 instanceof Boolean) {
-            return coerceToBoolean(obj0).equals(coerceToBoolean(obj1));
+            return coerceToBoolean(obj0, false).equals(coerceToBoolean(obj1, false));
         } else if (obj0.getClass().isEnum()) {
             return obj0.equals(coerceToEnum(obj1, obj0.getClass()));
         } else if (obj1.getClass().isEnum()) {
@@ -195,8 +223,15 @@ public class ELSupport {
      * @return the Boolean value of the object
      * @throws ELException if object is not Boolean or String
      */
-    public static final Boolean coerceToBoolean(final Object obj)
-            throws ELException {
+    public static final Boolean coerceToBoolean(final Object obj,
+            boolean primitive) throws ELException {
+
+        if (!COERCE_TO_ZERO && !primitive) {
+            if (obj == null) {
+                return null;
+            }
+        }
+
         if (obj == null || "".equals(obj)) {
             return Boolean.FALSE;
         }
@@ -211,7 +246,7 @@ public class ELSupport {
                 obj, obj.getClass(), Boolean.class));
     }
 
-    public static final Character coerceToCharacter(final Object obj)
+    private static final Character coerceToCharacter(final Object obj)
             throws ELException {
         if (obj == null || "".equals(obj)) {
             return Character.valueOf((char) 0);
@@ -279,6 +314,13 @@ public class ELSupport {
 
     public static final Number coerceToNumber(final Object obj,
             final Class<?> type) throws ELException {
+
+        if (!COERCE_TO_ZERO) {
+            if (obj == null && !type.isPrimitive()) {
+                return null;
+            }
+        }
+
         if (obj == null || "".equals(obj)) {
             return coerceToNumber(ZERO, type);
         }
@@ -388,10 +430,19 @@ public class ELSupport {
 
     public static final Object coerceToType(final Object obj,
             final Class<?> type) throws ELException {
+
         if (type == null || Object.class.equals(type) ||
                 (obj != null && type.isAssignableFrom(obj.getClass()))) {
             return obj;
         }
+
+        if (!COERCE_TO_ZERO) {
+            if (obj == null && !type.isPrimitive() &&
+                    !String.class.isAssignableFrom(type)) {
+                return null;
+            }
+        }
+
         if (String.class.equals(type)) {
             return coerceToString(obj);
         }
@@ -402,7 +453,7 @@ public class ELSupport {
             return coerceToCharacter(obj);
         }
         if (Boolean.class.equals(type) || Boolean.TYPE == type) {
-            return coerceToBoolean(obj);
+            return coerceToBoolean(obj, Boolean.TYPE == type);
         }
         if (type.isEnum()) {
             return coerceToEnum(obj, type);
