@@ -162,7 +162,7 @@ public class BeanELResolver extends ELResolver {
             return null;
         }
 
-        ExpressionFactory factory = Util.getExpressionFactory();
+        ExpressionFactory factory = ELManager.getExpressionFactory();
 
         String methodName = (String) factory.coerceToType(method, String.class);
 

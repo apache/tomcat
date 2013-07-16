@@ -229,6 +229,6 @@ public abstract class ELContext {
             setPropertyResolved(originalResolved);
         }
 
-        return Util.getExpressionFactory().coerceToType(obj, type);
+        return ELManager.getExpressionFactory().coerceToType(obj, type);
     }
 }
