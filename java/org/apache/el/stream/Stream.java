@@ -349,6 +349,60 @@ public class Stream {
     }
 
 
+    public Optional anyMatch(LambdaExpression le) {
+        if (!iterator.hasNext()) {
+            return Optional.EMPTY;
+        }
+
+        Boolean match = Boolean.FALSE;
+
+        while (!match.booleanValue() && iterator.hasNext()) {
+            match = (Boolean) le.invoke(iterator.next());
+        }
+
+        return new Optional(match);
+    }
+
+
+    public Optional allMatch(LambdaExpression le) {
+        if (!iterator.hasNext()) {
+            return Optional.EMPTY;
+        }
+
+        Boolean match = Boolean.TRUE;
+
+        while (match.booleanValue() && iterator.hasNext()) {
+            match = (Boolean) le.invoke(iterator.next());
+        }
+
+        return new Optional(match);
+    }
+
+
+    public Optional noneMatch(LambdaExpression le) {
+        if (!iterator.hasNext()) {
+            return Optional.EMPTY;
+        }
+
+        Boolean match = Boolean.FALSE;
+
+        while (!match.booleanValue() && iterator.hasNext()) {
+            match = (Boolean) le.invoke(iterator.next());
+        }
+
+        return new Optional(new Boolean(!match.booleanValue()));
+    }
+
+
+    public Optional findFirst() {
+        if (iterator.hasNext()) {
+            return new Optional(iterator.next());
+        } else {
+            return Optional.EMPTY;
+        }
+    }
+
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private Optional compare(boolean isMax) {
         Comparable result = null;
