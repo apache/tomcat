@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.el.ELException;
 import javax.el.LambdaExpression;
 
+import org.apache.el.lang.ELArithmetic;
 import org.apache.el.lang.ELSupport;
 
 public class Stream {
@@ -305,6 +306,46 @@ public class Stream {
 
     public Optional min(LambdaExpression le) {
         return compare(false, le);
+    }
+
+
+    public Optional average() {
+        long count = 0;
+        Number sum = Long.valueOf(0);
+
+        while (iterator.hasNext()) {
+            count++;
+            sum = ELArithmetic.add(sum, iterator.next());
+        }
+
+        if (count == 0) {
+            return Optional.EMPTY;
+        } else {
+            return new Optional(ELArithmetic.divide(sum, Long.valueOf(count)));
+        }
+    }
+
+
+    public Number sum() {
+        Number sum = Long.valueOf(0);
+
+        while (iterator.hasNext()) {
+            sum = ELArithmetic.add(sum, iterator.next());
+        }
+
+        return sum;
+    }
+
+
+    public Long count() {
+        long count = 0;
+
+        while (iterator.hasNext()) {
+            iterator.next();
+            count ++;
+        }
+
+        return Long.valueOf(count);
     }
 
 
