@@ -36,12 +36,12 @@ public final class AstAnd extends BooleanNode {
     public Object getValue(EvaluationContext ctx)
             throws ELException {
         Object obj = children[0].getValue(ctx);
-        Boolean b = coerceToBoolean(obj);
+        Boolean b = coerceToBoolean(obj, true);
         if (!b.booleanValue()) {
             return b;
         }
         obj = children[1].getValue(ctx);
-        b = coerceToBoolean(obj);
+        b = coerceToBoolean(obj, true);
         return b;
     }
 }

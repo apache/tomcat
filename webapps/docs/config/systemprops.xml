@@ -79,10 +79,14 @@
     </property>
 
     <property name="org.apache.el.parser. COERCE_TO_ZERO">
-      <p>If <code>true</code>, when coercing expressions to numbers
-      <code>""</code> and <code>null</code> will be coerced to zero as required
-      by the specification.</p>
-      <p>If not specified, the default value of <code>true</code> will be used.</p>
+      <p>If <code>true</code>, when coercing <code>null</code>s to objects of
+      type Number, Character or Boolean the result will be <code>0</code> for
+      Number and Character types and <code>false</code> for Boolean as required
+      by the EL 2.2 and earlier specifications. If this property is
+      <code>false</code> the result of the coercion will be <code>null</code> as
+      required by the EL 3.0 specification.</p> 
+      <p>If not specified, the default value of <code>false</code> will be
+      used.</p>
     </property>
 
     <property name="org.apache.el.parser. SKIP_IDENTIFIER_CHECK">

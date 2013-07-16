@@ -21,8 +21,6 @@ package org.apache.el.parser;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 import javax.el.ELException;
 import javax.el.ELResolver;
@@ -41,31 +39,6 @@ import org.apache.el.util.ReflectionUtil;
  * @version $Id$
  */
 public final class AstValue extends SimpleNode {
-
-    private static final boolean IS_SECURITY_ENABLED =
-        (System.getSecurityManager() != null);
-
-    protected static final boolean COERCE_TO_ZERO;
-
-    static {
-        if (IS_SECURITY_ENABLED) {
-            COERCE_TO_ZERO = AccessController.doPrivileged(
-                    new PrivilegedAction<Boolean>(){
-                        @Override
-                        public Boolean run() {
-                            return Boolean.valueOf(System.getProperty(
-                                    "org.apache.el.parser.COERCE_TO_ZERO",
-                                    "true"));
-                        }
-
-                    }
-            ).booleanValue();
-        } else {
-            COERCE_TO_ZERO = Boolean.valueOf(System.getProperty(
-                    "org.apache.el.parser.COERCE_TO_ZERO",
-                    "true")).booleanValue();
-        }
-    }
 
     protected static class Target {
         protected Object base;
@@ -213,8 +186,7 @@ public final class AstValue extends SimpleNode {
 
         // coerce to the expected type
         Class<?> targetClass = resolver.getType(ctx, t.base, t.property);
-        if (COERCE_TO_ZERO == true
-                || !isAssignable(value, targetClass)) {
+        if (!isAssignable(value, targetClass)) {
             resolver.setValue(ctx, t.base, t.property,
                     ELSupport.coerceToType(value, targetClass));
         } else {
