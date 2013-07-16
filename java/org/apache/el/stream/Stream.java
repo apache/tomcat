@@ -261,6 +261,32 @@ public class Stream {
     }
 
 
+    public Optional reduce(LambdaExpression le) {
+        Object seed = null;
+
+        if (iterator.hasNext()) {
+            seed = iterator.next();
+        }
+
+        if (seed == null) {
+            return Optional.EMPTY;
+        } else {
+            return new Optional(reduce(seed, le));
+        }
+    }
+
+
+    public Object reduce(Object seed, LambdaExpression le) {
+        Object result = seed;
+
+        while (iterator.hasNext()) {
+            result = le.invoke(result, iterator.next());
+        }
+
+        return result;
+    }
+
+
     private static class LambdaExpressionComparator
             implements Comparator<Object>{
 
