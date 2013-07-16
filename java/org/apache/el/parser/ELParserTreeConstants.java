@@ -12,41 +12,40 @@ public interface ELParserTreeConstants
   public int JJTASSIGN = 6;
   public int JJTLAMBDAEXPRESSION = 7;
   public int JJTLAMBDAPARAMETERS = 8;
-  public int JJTLAMBDAEXPRESSIONORINVOCATION = 9;
-  public int JJTCHOICE = 10;
-  public int JJTOR = 11;
-  public int JJTAND = 12;
-  public int JJTEQUAL = 13;
-  public int JJTNOTEQUAL = 14;
-  public int JJTLESSTHAN = 15;
-  public int JJTGREATERTHAN = 16;
-  public int JJTLESSTHANEQUAL = 17;
-  public int JJTGREATERTHANEQUAL = 18;
-  public int JJTCONCATENATION = 19;
-  public int JJTPLUS = 20;
-  public int JJTMINUS = 21;
-  public int JJTMULT = 22;
-  public int JJTDIV = 23;
-  public int JJTMOD = 24;
-  public int JJTNEGATIVE = 25;
-  public int JJTNOT = 26;
-  public int JJTEMPTY = 27;
-  public int JJTVALUE = 28;
-  public int JJTDOTSUFFIX = 29;
-  public int JJTBRACKETSUFFIX = 30;
-  public int JJTMETHODPARAMETERS = 31;
-  public int JJTSETDATA = 32;
-  public int JJTLISTDATA = 33;
-  public int JJTMAPDATA = 34;
-  public int JJTMAPENTRY = 35;
-  public int JJTIDENTIFIER = 36;
-  public int JJTFUNCTION = 37;
-  public int JJTTRUE = 38;
-  public int JJTFALSE = 39;
-  public int JJTFLOATINGPOINT = 40;
-  public int JJTINTEGER = 41;
-  public int JJTSTRING = 42;
-  public int JJTNULL = 43;
+  public int JJTCHOICE = 9;
+  public int JJTOR = 10;
+  public int JJTAND = 11;
+  public int JJTEQUAL = 12;
+  public int JJTNOTEQUAL = 13;
+  public int JJTLESSTHAN = 14;
+  public int JJTGREATERTHAN = 15;
+  public int JJTLESSTHANEQUAL = 16;
+  public int JJTGREATERTHANEQUAL = 17;
+  public int JJTCONCATENATION = 18;
+  public int JJTPLUS = 19;
+  public int JJTMINUS = 20;
+  public int JJTMULT = 21;
+  public int JJTDIV = 22;
+  public int JJTMOD = 23;
+  public int JJTNEGATIVE = 24;
+  public int JJTNOT = 25;
+  public int JJTEMPTY = 26;
+  public int JJTVALUE = 27;
+  public int JJTDOTSUFFIX = 28;
+  public int JJTBRACKETSUFFIX = 29;
+  public int JJTMETHODPARAMETERS = 30;
+  public int JJTSETDATA = 31;
+  public int JJTLISTDATA = 32;
+  public int JJTMAPDATA = 33;
+  public int JJTMAPENTRY = 34;
+  public int JJTIDENTIFIER = 35;
+  public int JJTFUNCTION = 36;
+  public int JJTTRUE = 37;
+  public int JJTFALSE = 38;
+  public int JJTFLOATINGPOINT = 39;
+  public int JJTINTEGER = 40;
+  public int JJTSTRING = 41;
+  public int JJTNULL = 42;
 
 
   public String[] jjtNodeName = {
@@ -59,7 +58,6 @@ public interface ELParserTreeConstants
     "Assign",
     "LambdaExpression",
     "LambdaParameters",
-    "LambdaExpressionOrInvocation",
     "Choice",
     "Or",
     "And",
@@ -96,4 +94,4 @@ public interface ELParserTreeConstants
     "Null",
   };
 }
-/* JavaCC - OriginalChecksum=23b494fccd3ecfb960d2779462d5457d (do not edit this line) */
+/* JavaCC - OriginalChecksum=96680d397165a1214a1ad1f24011d5c1 (do not edit this line) */
