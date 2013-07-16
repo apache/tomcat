@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import javax.el.ELException;
 import javax.el.LambdaExpression;
 
 import org.apache.el.lang.ELSupport;
@@ -284,6 +285,87 @@ public class Stream {
         }
 
         return result;
+    }
+
+
+    public Optional max() {
+        return compare(true);
+    }
+
+
+    public Optional max(LambdaExpression le) {
+        return compare(true, le);
+    }
+
+
+    public Optional min() {
+        return compare(false);
+    }
+
+
+    public Optional min(LambdaExpression le) {
+        return compare(false, le);
+    }
+
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private Optional compare(boolean isMax) {
+        Comparable result = null;
+
+        if (iterator.hasNext()) {
+            Object obj = iterator.next();
+            if ((obj instanceof Comparable)) {
+                result = (Comparable) obj;
+            } else {
+                throw new ELException();
+            }
+        }
+
+        while (iterator.hasNext()) {
+            Object obj = iterator.next();
+            if ((obj instanceof Comparable)) {
+                if (isMax && ((Comparable) obj).compareTo(result) > 0) {
+                    result = (Comparable) obj;
+                } else if (!isMax && ((Comparable) obj).compareTo(result) < 0) {
+                    result = (Comparable) obj;
+                }
+            } else {
+                throw new ELException();
+            }
+        }
+
+        if (result == null) {
+            return Optional.EMPTY;
+        } else {
+            return new Optional(result);
+        }
+    }
+
+
+    private Optional compare(boolean isMax, LambdaExpression le) {
+        Object result = null;
+
+        if (iterator.hasNext()) {
+            Object obj = iterator.next();
+            result = obj;
+        }
+
+        while (iterator.hasNext()) {
+            Object obj = iterator.next();
+            if (isMax && ELSupport.coerceToNumber(le.invoke(obj, result),
+                    Integer.class).intValue() > 0) {
+                result = obj;
+            } else if (!isMax && ELSupport.coerceToNumber(le.invoke(obj, result),
+                    Integer.class).intValue() < 0) {
+                result = obj;
+            }
+        }
+
+        if (result == null) {
+            return Optional.EMPTY;
+        } else {
+            return new Optional(result);
+        }
     }
 
 
