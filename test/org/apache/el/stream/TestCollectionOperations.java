@@ -360,4 +360,124 @@ public class TestCollectionOperations {
 
         Assert.assertEquals(Long.valueOf(25), result);
     }
+
+
+    @Test
+    public void testMax01() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1,2,3,4,5].stream().max()",
+                Object.class);
+
+        Assert.assertEquals(Long.valueOf(5), ((Optional) result).get());
+    }
+
+
+    @Test
+    public void testMax02() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[5,4,3,2,1].stream().max()",
+                Object.class);
+
+        Assert.assertEquals(Long.valueOf(5), ((Optional) result).get());
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testMax03() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[].stream().max()",
+                Object.class);
+
+        ((Optional) result).get();
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testMax04() {
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("beans", beans);
+
+        processor.getValue(
+                "beans.stream().max()",
+                Object.class);
+    }
+
+
+    @Test
+    public void testMaxLambda01() {
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("beans", beans);
+
+        Object result = processor.getValue(
+                "beans.stream().max((x,y)->x.name.compareTo(y.name))",
+                Object.class);
+
+        Assert.assertEquals(bean03, ((Optional) result).get());
+    }
+
+
+    @Test
+    public void testMin01() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1,2,3,4,5].stream().min()",
+                Object.class);
+
+        Assert.assertEquals(Long.valueOf(1), ((Optional) result).get());
+    }
+
+
+    @Test
+    public void testMin02() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[5,4,3,2,1].stream().min()",
+                Object.class);
+
+        Assert.assertEquals(Long.valueOf(1), ((Optional) result).get());
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testMin03() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[].stream().min()",
+                Object.class);
+
+        ((Optional) result).get();
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testMin04() {
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("beans", beans);
+
+        processor.getValue(
+                "beans.stream().min()",
+                Object.class);
+    }
+
+
+    @Test
+    public void testMinLambda01() {
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("beans", beans);
+
+        Object result = processor.getValue(
+                "beans.stream().min((x,y)->x.name.compareTo(y.name))",
+                Object.class);
+
+        Assert.assertEquals(bean01, ((Optional) result).get());
+    }
 }
