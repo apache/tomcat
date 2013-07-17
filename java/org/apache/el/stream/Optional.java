@@ -19,6 +19,8 @@ package org.apache.el.stream;
 import javax.el.ELException;
 import javax.el.LambdaExpression;
 
+import org.apache.el.util.MessageFactory;
+
 public class Optional {
 
     private final Object obj;
@@ -32,7 +34,7 @@ public class Optional {
 
     public Object get() throws ELException {
         if (obj == null) {
-            throw new ELException();
+            throw new ELException(MessageFactory.get("stream.optional.empty"));
         } else {
             return obj;
         }

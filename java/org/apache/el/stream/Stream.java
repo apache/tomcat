@@ -30,6 +30,7 @@ import javax.el.LambdaExpression;
 
 import org.apache.el.lang.ELArithmetic;
 import org.apache.el.lang.ELSupport;
+import org.apache.el.util.MessageFactory;
 
 public class Stream {
 
@@ -412,7 +413,8 @@ public class Stream {
             if ((obj instanceof Comparable)) {
                 result = (Comparable) obj;
             } else {
-                throw new ELException();
+                throw new ELException(
+                        MessageFactory.get("stream.compare.notComparable"));
             }
         }
 
@@ -425,7 +427,8 @@ public class Stream {
                     result = (Comparable) obj;
                 }
             } else {
-                throw new ELException();
+                throw new ELException(
+                        MessageFactory.get("stream.compare.notComparable"));
             }
         }
 
