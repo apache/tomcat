@@ -18,6 +18,7 @@
 
 package org.apache.el.parser;
 
+import javax.el.ELClass;
 import javax.el.ELException;
 import javax.el.MethodExpression;
 import javax.el.MethodInfo;
@@ -78,11 +79,27 @@ public final class AstIdentifier extends SimpleNode {
         // EL Resolvers
         ctx.setPropertyResolved(false);
         Object result = ctx.getELResolver().getValue(ctx, null, this.image);
-        if (!ctx.isPropertyResolved()) {
-            throw new PropertyNotFoundException(MessageFactory.get(
-                    "error.resolver.unhandled.null", this.image));
+        if (ctx.isPropertyResolved()) {
+            return result;
         }
-        return result;
+
+        // Import
+        result = ctx.getImportHandler().resolveClass(this.image);
+        if (result != null) {
+            return new ELClass((Class<?>) result);
+        }
+        result = ctx.getImportHandler().resolveStatic(this.image);
+        if (result != null) {
+            try {
+                return ((Class<?>) result).getField(this.image).get(null);
+            } catch (IllegalArgumentException | IllegalAccessException
+                    | NoSuchFieldException | SecurityException e) {
+                throw new ELException(e);
+            }
+        }
+
+        throw new PropertyNotFoundException(MessageFactory.get(
+                "error.resolver.unhandled.null", this.image));
     }
 
     @Override
