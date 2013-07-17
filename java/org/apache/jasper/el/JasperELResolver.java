@@ -29,6 +29,7 @@ import javax.el.ListELResolver;
 import javax.el.MapELResolver;
 import javax.el.PropertyNotFoundException;
 import javax.el.ResourceBundleELResolver;
+import javax.el.StaticFieldELResolver;
 import javax.servlet.jsp.el.ImplicitObjectELResolver;
 import javax.servlet.jsp.el.ScopedAttributeELResolver;
 
@@ -38,21 +39,24 @@ import javax.servlet.jsp.el.ScopedAttributeELResolver;
  */
 public class JasperELResolver extends CompositeELResolver {
 
+    private static final int STANDARD_RESOLVERS_COUNT = 9;
+
     private int size;
     private ELResolver[] resolvers;
     private final int appResolversSize;
 
-    public JasperELResolver(List<ELResolver> appResolvers) {
+    public JasperELResolver(List<ELResolver> appResolvers,
+            ELResolver streamResolver) {
         appResolversSize = appResolvers.size();
-        resolvers = new ELResolver[appResolversSize + 7];
+        resolvers = new ELResolver[appResolversSize + STANDARD_RESOLVERS_COUNT];
         size = 0;
 
         add(new ImplicitObjectELResolver());
         for (ELResolver appResolver : appResolvers) {
             add(appResolver);
         }
-        // TODO ExpressionFactory.getStreamELResolver()
-        // TODO javax.el.StaticFieldResolver
+        add(streamResolver);
+        add(new StaticFieldELResolver());
         add(new MapELResolver());
         add(new ResourceBundleELResolver());
         add(new ListELResolver());
@@ -82,7 +86,6 @@ public class JasperELResolver extends CompositeELResolver {
         throws NullPointerException, PropertyNotFoundException, ELException {
         context.setPropertyResolved(false);
 
-        // TODO Review this once the additional resolvers have been implemented
         int start;
         Object result = null;
 
@@ -95,9 +98,9 @@ public class JasperELResolver extends CompositeELResolver {
                     return result;
                 }
             }
-            // skip collection-based resolvers (map, resource, list, array, and
-            // bean)
-            start = index + 5;
+            // skip stream, static and collection-based resolvers (map,
+            // resource, list, array) and bean
+            start = index + 7;
         } else {
             // skip implicit resolver only
             start = 1;
@@ -125,8 +128,10 @@ public class JasperELResolver extends CompositeELResolver {
 
         Object result = null;
 
-        // skip implicit and call app resolvers
-        int index = 1 /* implicit */ + appResolversSize;
+        // skip implicit and call app resolvers, stream resolver and static
+        // resolver
+        int index = 1 /* implicit */ + appResolversSize +
+                2 /* stream + static */;
         for (int i = 1; i < index; i++) {
             result = resolvers[i].invoke(
                     context, base, targetMethod, paramTypes, params);
@@ -135,7 +140,7 @@ public class JasperELResolver extends CompositeELResolver {
             }
         }
 
-        // skip map, resource, list, and array resolvers
+        // skip collection (map, resource, list, and array) resolvers
         index += 4;
         // call bean and the rest of resolvers
         for (int i = index; i < size; i++) {

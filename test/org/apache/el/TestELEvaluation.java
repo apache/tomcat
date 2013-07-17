@@ -199,9 +199,9 @@ public class TestELEvaluation {
     // ************************************************************************
 
     private String evaluateExpression(String expression) {
-        ELContextImpl ctx = new ELContextImpl();
-        ctx.setFunctionMapper(new FMapper());
         ExpressionFactoryImpl exprFactory = new ExpressionFactoryImpl();
+        ELContextImpl ctx = new ELContextImpl(exprFactory);
+        ctx.setFunctionMapper(new FMapper());
         ValueExpression ve = exprFactory.createValueExpression(ctx, expression,
                 String.class);
         return (String) ve.getValue(ctx);

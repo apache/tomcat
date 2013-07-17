@@ -63,7 +63,7 @@ public class TestELParser {
     @Test
     public void testJavaKeyWordSuffix() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl();
+        ELContext context = new ELContextImpl(factory);
 
         TesterBeanA beanA = new TesterBeanA();
         beanA.setInt("five");
@@ -85,7 +85,7 @@ public class TestELParser {
     @Test
     public void testJavaKeyWordIdentifier() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl();
+        ELContext context = new ELContextImpl(factory);
 
         TesterBeanA beanA = new TesterBeanA();
         beanA.setInt("five");
@@ -106,7 +106,7 @@ public class TestELParser {
 
     private void testExpression(String expression, String expected) {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl();
+        ELContext context = new ELContextImpl(factory);
 
         ValueExpression ve = factory.createValueExpression(
                 context, expression, String.class);

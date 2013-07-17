@@ -39,12 +39,12 @@ public final class ExpressionEvaluatorImpl extends ExpressionEvaluator {
             FunctionMapper fMapper) throws ELException {
         try {
             ELContextImpl ctx =
-                new ELContextImpl(ELContextImpl.getDefaultResolver());
+                new ELContextImpl(ELContextImpl.getDefaultResolver(factory));
             if (fMapper != null) {
                 ctx.setFunctionMapper(new FunctionMapperImpl(fMapper));
             }
             ValueExpression ve = this.factory.createValueExpression(ctx, expression, expectedType);
-            return new ExpressionImpl(ve);
+            return new ExpressionImpl(ve, factory);
         } catch (javax.el.ELException e) {
             throw new ELParseException(e.getMessage());
         }

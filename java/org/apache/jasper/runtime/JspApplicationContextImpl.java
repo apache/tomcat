@@ -112,7 +112,8 @@ public class JspApplicationContextImpl implements JspApplicationContext {
     private ELResolver createELResolver() {
         this.instantiated = true;
         if (this.resolver == null) {
-            CompositeELResolver r = new JasperELResolver(this.resolvers);
+            CompositeELResolver r = new JasperELResolver(this.resolvers,
+                    expressionFactory.getStreamELResolver());
             this.resolver = r;
         }
         return this.resolver;
