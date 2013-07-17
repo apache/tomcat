@@ -95,9 +95,24 @@ public class AstLambdaExpression extends SimpleNode {
             result = ((LambdaExpression) result).invoke(
                     ((AstMethodParameters) children[i]).getParameters(ctx));
             i++;
+            while (i < jjtGetNumChildren() && children[i].jjtGetNumChildren() == 0) {
+                i++;
+            }
         }
 
         return result;
+    }
+
+
+    @Override
+    public String toString() {
+        // Purely for debug purposes. May not be complete or correct. Certainly
+        // is not efficient. Be sure not to call this from 'real' code.
+        StringBuilder result = new StringBuilder();
+        for (Node n : children) {
+            result.append(n.toString());
+        }
+        return result.toString();
     }
 }
 /* JavaCC - OriginalChecksum=071159eff10c8e15ec612c765ae4480a (do not edit this line) */
