@@ -134,4 +134,14 @@ public class TestAstLambdaExpression {
                         Integer.class);
         Assert.assertEquals(Integer.valueOf(1), result);
     }
+
+
+    @Test
+    public void testNested06() {
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("(()->y->()->()->x->x-y)()(1)()(3)(2)",
+                        Integer.class);
+        Assert.assertEquals(Integer.valueOf(1), result);
+    }
 }
