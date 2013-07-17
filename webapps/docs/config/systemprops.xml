@@ -84,7 +84,7 @@
       Number and Character types and <code>false</code> for Boolean as required
       by the EL 2.2 and earlier specifications. If this property is
       <code>false</code> the result of the coercion will be <code>null</code> as
-      required by the EL 3.0 specification.</p> 
+      required by the EL 3.0 specification.</p>
       <p>If not specified, the default value of <code>false</code> will be
       used.</p>
     </property>
