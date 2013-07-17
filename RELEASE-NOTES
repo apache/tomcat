@@ -28,11 +28,8 @@ CONTENTS:
 
 * Dependency Changes
 * API Stability
-* JNI Based Applications
 * Bundled APIs
 * Web application reloading and static fields in shared libraries
-* Tomcat on Linux
-* Enabling SSI and CGI Support
 * Security manager URLs
 * Symlinking static resources
 * Viewing the Tomcat Change Log
@@ -43,20 +40,16 @@ CONTENTS:
 ===================
 Dependency Changes:
 ===================
-Tomcat @VERSION_MAJOR_MINOR@ is designed to run on Java SE 6 and later.
-
-In addition, Tomcat @VERSION_MAJOR_MINOR@ uses the Eclipse JDT Java compiler for
-compiling JSP pages.  This means you no longer need to have the complete
-Java Development Kit (JDK) to run Tomcat, but a Java Runtime Environment
-(JRE) is sufficient.  The Eclipse JDT Java compiler is bundled with the
-binary Tomcat distributions.  Tomcat can also be configured to use the
-compiler from the JDK to compile JSPs, or any other Java compiler supported
-by Apache Ant.
+Tomcat @VERSION_MAJOR_MINOR@ is designed to run on Java SE 7 and later.
 
 
 ==============
 API Stability:
 ==============
+
+*** This is an alpha release. Currently no guarantees are made regarding API ***
+*** stability.                                                               ***
+
 The public interfaces for the following classes are fixed and will not be
 changed at all during the remaining lifetime of the @VERSION_MAJOR@.x series:
 - None
@@ -71,27 +64,6 @@ Note: As Tomcat @VERSION_MAJOR@ matures, the above list will be added to. The li
 
 The remaining classes are considered part of the Tomcat internals and may change
 without notice between point releases.
-
-
-=======================
-JNI Based Applications:
-=======================
-Applications that require native libraries must ensure that the libraries have
-been loaded prior to use.  Typically, this is done with a call like:
-
-  static {
-    System.loadLibrary("path-to-library-file");
-  }
-
-in some class.  However, the application must also ensure that the library is
-not loaded more than once.  If the above code were placed in a class inside
-the web application (i.e. under /WEB-INF/classes or /WEB-INF/lib), and the
-application were reloaded, the loadLibrary() call would be attempted a second
-time.
-
-To avoid this problem, place classes that load native libraries outside of the
-web application, and ensure that the loadLibrary() call is executed only once
-during the lifetime of a particular JVM.
 
 
 =============
