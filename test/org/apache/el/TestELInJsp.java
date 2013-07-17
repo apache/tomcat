@@ -370,6 +370,7 @@ public class TestELInJsp extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/el-misc.jsp");
         String result = res.toString();
+
         assertEcho(result, "00-\\\\\\\"${'hello world'}");
         assertEcho(result, "01-\\\\\\\"\\${'hello world'}");
         assertEcho(result, "02-\\\"${'hello world'}");
@@ -390,8 +391,6 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "17-foo\\bar\\baz");
         assertEcho(result, "18-3");
         assertEcho(result, "19-4");
-        // TODO Figure out why this doesn't work.
-        // assertEcho(result, "20-" + Integer.MAX_VALUE);
     }
 
     @Test
