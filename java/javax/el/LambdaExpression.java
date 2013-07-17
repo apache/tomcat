@@ -58,7 +58,7 @@ public class LambdaExpression {
 
         if (formalParamCount > argCount) {
             throw new ELException(Util.message(context,
-                    "error.lambda.args.tooFew",
+                    "lambdaExpression.tooFewArgs",
                     Integer.valueOf(argCount),
                     Integer.valueOf(formalParamCount)));
         }
