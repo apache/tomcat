@@ -26,6 +26,8 @@ import javax.servlet.jsp.el.ImplicitObjectELResolver;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.el.stream.StreamELResolverImpl;
+
 public class TestJasperELResolver {
 
     @Test
@@ -50,14 +52,15 @@ public class TestJasperELResolver {
             list.add(new ImplicitObjectELResolver());
         }
 
-        JasperELResolver resolver = new JasperELResolver(list);
+        JasperELResolver resolver =
+                new JasperELResolver(list, new StreamELResolverImpl());
 
 
         Assert.assertEquals(Integer.valueOf(count),
                 getField("appResolversSize", resolver));
-        Assert.assertEquals(7 + count,
+        Assert.assertEquals(8 + count,
                 ((ELResolver[])getField("resolvers", resolver)).length);
-        Assert.assertEquals(Integer.valueOf(7 + count),
+        Assert.assertEquals(Integer.valueOf(8 + count),
                 getField("size", resolver));
 
     }

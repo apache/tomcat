@@ -22,6 +22,7 @@ import java.util.Iterator;
 import javax.el.ELContext;
 import javax.el.ELException;
 import javax.el.ELResolver;
+import javax.el.ExpressionFactory;
 import javax.el.PropertyNotWritableException;
 import javax.servlet.jsp.el.VariableResolver;
 
@@ -31,9 +32,10 @@ public final class ELResolverImpl extends ELResolver {
     private final VariableResolver variableResolver;
     private final ELResolver elResolver;
 
-    public ELResolverImpl(VariableResolver variableResolver) {
+    public ELResolverImpl(VariableResolver variableResolver,
+            ExpressionFactory factory) {
         this.variableResolver = variableResolver;
-        this.elResolver = ELContextImpl.getDefaultResolver();
+        this.elResolver = ELContextImpl.getDefaultResolver(factory);
     }
 
     @Override

@@ -27,7 +27,7 @@ public class TestBeanELResolver {
     @Test
     public void testBug53421() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl();
+        ELContext context = new ELContextImpl(factory);
 
         Bean bean = new Bean();
 

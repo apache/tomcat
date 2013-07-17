@@ -25,10 +25,12 @@ import javax.el.BeanELResolver;
 import javax.el.CompositeELResolver;
 import javax.el.ELContext;
 import javax.el.ELResolver;
+import javax.el.ExpressionFactory;
 import javax.el.FunctionMapper;
 import javax.el.ListELResolver;
 import javax.el.MapELResolver;
 import javax.el.ResourceBundleELResolver;
+import javax.el.StaticFieldELResolver;
 import javax.el.ValueExpression;
 import javax.el.VariableMapper;
 
@@ -95,8 +97,8 @@ public final class ELContextImpl extends ELContext {
 
     private VariableMapper variableMapper;
 
-    public ELContextImpl() {
-        this(getDefaultResolver());
+    public ELContextImpl(ExpressionFactory factory) {
+        this(getDefaultResolver(factory));
     }
 
     public ELContextImpl(ELResolver resolver) {
@@ -129,11 +131,11 @@ public final class ELContextImpl extends ELContext {
         this.variableMapper = variableMapper;
     }
 
-    public static ELResolver getDefaultResolver() {
+    public static ELResolver getDefaultResolver(ExpressionFactory factory) {
         if (Constants.IS_SECURITY_ENABLED) {
             CompositeELResolver defaultResolver = new CompositeELResolver();
-            // TODO ExpressionFactory.getStreamELResolver()
-            // TODO javax.el.StaticFieldResolver
+            defaultResolver.add(factory.getStreamELResolver());
+            defaultResolver.add(new StaticFieldELResolver());
             defaultResolver.add(new MapELResolver());
             defaultResolver.add(new ResourceBundleELResolver());
             defaultResolver.add(new ListELResolver());
