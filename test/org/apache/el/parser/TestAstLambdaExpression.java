@@ -116,11 +116,21 @@ public class TestAstLambdaExpression {
     }
 
 
-    @Test(expected=ELException.class)
+    @Test
     public void testNested04() {
         ELProcessor processor = new ELProcessor();
         Object result =
                 processor.getValue("(()->y->()->x->x-y)()(1)()(2)",
+                        Integer.class);
+        Assert.assertEquals(Integer.valueOf(1), result);
+    }
+
+
+    @Test
+    public void testNested05() {
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("(()->y->()->()->x->x-y)()(1)()()(2)",
                         Integer.class);
         Assert.assertEquals(Integer.valueOf(1), result);
     }
