@@ -388,6 +388,10 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "15-foo\\bar\\baz");
         assertEcho(result, "16-foo\\bar\\baz");
         assertEcho(result, "17-foo\\bar\\baz");
+        assertEcho(result, "18-3");
+        assertEcho(result, "19-4");
+        // TODO Figure out why this doesn't work.
+        // assertEcho(result, "20-" + Integer.MAX_VALUE);
     }
 
     @Test

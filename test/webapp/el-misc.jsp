@@ -36,5 +36,8 @@
     <tags:echo echo='15-${\'foo\'}\\${"bar"}\\${\'baz\'}' />
     <tags:echo echo='16-${"foo"}\\${\'bar\'}\\${"baz"}' />
     <tags:echo echo='17-${"foo"}\\${&apos;bar&apos;}\\${&quot;baz&quot;}' />
+    <tags:echo echo='18-${((x,y)->x+y)(1,2)}' />
+    <tags:echo echo='19-${{1,2,3,4}.stream().max().orElse(-1)}' />
+    <tags:echo echo='20-${Integer.MAX_VAUE}' />
   </body>
 </html>
