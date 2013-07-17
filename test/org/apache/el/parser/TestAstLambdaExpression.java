@@ -16,6 +16,7 @@
  */
 package org.apache.el.parser;
 
+import javax.el.ELException;
 import javax.el.ELProcessor;
 
 import org.junit.Assert;
@@ -71,6 +72,55 @@ public class TestAstLambdaExpression {
         ELProcessor processor = new ELProcessor();
         Object result =
                 processor.getValue("(x->y->x-y)(2)(1)",
+                        Integer.class);
+        Assert.assertEquals(Integer.valueOf(1), result);
+    }
+
+
+    @Test
+    public void testInvocation01() {
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("(()->2)()",
+                        Integer.class);
+        Assert.assertEquals(Integer.valueOf(2), result);
+    }
+
+
+    @Test
+    public void testNested01() {
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("(()->y->2-y)()(1)",
+                        Integer.class);
+        Assert.assertEquals(Integer.valueOf(1), result);
+    }
+
+
+    @Test
+    public void testNested02() {
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("(()->y->()->2-y)()(1)()",
+                        Integer.class);
+        Assert.assertEquals(Integer.valueOf(1), result);
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testNested03() {
+        ELProcessor processor = new ELProcessor();
+        // More method parameters than there are nested lambda expressions
+        processor.getValue("(()->y->()->2-y)()(1)()()",
+                    Integer.class);
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testNested04() {
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("(()->y->()->x->x-y)()(1)()(2)",
                         Integer.class);
         Assert.assertEquals(Integer.valueOf(1), result);
     }
