@@ -229,6 +229,12 @@
     <Bug code="UL" />
   </Match>
   <Match>
+    <!-- Returning null is required by the EL specification -->
+    <Class name="org.apache.el.lang.ELSupport" />
+    <Method name="coerceToBoolean"/>
+    <Bug pattern="NP_BOOLEAN_RETURN_NULL"/>
+  </Match>
+  <Match>
     <!-- JspC will not be used under a security manager -->
     <Class name="org.apache.jasper.JspC"/>
     <Method name="initClassLoader"/>
@@ -490,6 +496,12 @@
 
   <!-- Test code -->
   <Match>
+    <!-- Code is intentionally unused -->
+    <Class name="org.apache.catalina.authenticator.TestBasicAuthParser"/>
+    <Method name="testAuthMethodBadMethod"/>
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.core.TestApplicationSessionCookieConfig$CustomContext" />
     <Method name="getState"/>
     <Bug code="UG" />
@@ -606,6 +618,12 @@
     <!-- Better to use it consistently rather than only where necessary -->
     <Class name="org.apache.tomcat.jdbc.pool.interceptor.TestInterceptor" />
     <Bug code="ST" />
+  </Match>
+  <Match>
+    <!-- Return value of latch is intentionally ignored -->
+    <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClient"/>
+    <Method name="testConnectToServerEndpointSSL"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
   </Match>
   <Match>
     <Class name="org.apache.tomcat.util.net.TestSsl" />
