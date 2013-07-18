@@ -144,4 +144,14 @@ public class TestAstLambdaExpression {
                         Integer.class);
         Assert.assertEquals(Integer.valueOf(1), result);
     }
+
+
+    @Test
+    public void testLambdaAsFunction() {
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("v = (x->y->x-y); v(2)(1)",
+                        Integer.class);
+        Assert.assertEquals(Integer.valueOf(1), result);
+    }
 }
