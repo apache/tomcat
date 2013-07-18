@@ -97,10 +97,11 @@ public final class AstFunction extends SimpleNode {
             if (obj instanceof LambdaExpression) {
                 LambdaExpression le = (LambdaExpression) obj;
                 // Build arguments
-                int numArgs = this.jjtGetNumChildren();
+                // TODO handle multiple sets of arguments
+                int numArgs = this.jjtGetChild(0).jjtGetNumChildren();
                 Object[] args = new Object[numArgs];
                 for (int i = 0; i < numArgs; i++) {
-                    args[i] = children[i].getValue(ctx);
+                    args[i] = jjtGetChild(0).jjtGetChild(i).getValue(ctx);
                 }
                 return le.invoke(ctx, args);
             }
@@ -111,15 +112,24 @@ public final class AstFunction extends SimpleNode {
                     this.getOutputName()));
         }
 
+        // Not a lambda expression so must be a function. Check there is just a
+        // single set of method parameters
+        if (this.jjtGetNumChildren() != 1) {
+            throw new ELException(MessageFactory.get(
+                    "error.funciton.tooManyMethodParameterSets",
+                    getOutputName()));
+        }
+
+        Node parameters = jjtGetChild(0);
         Class<?>[] paramTypes = m.getParameterTypes();
         Object[] params = null;
         Object result = null;
-        int numParams = this.jjtGetNumChildren();
+        int numParams = parameters.jjtGetNumChildren();
         if (numParams > 0) {
             params = new Object[numParams];
             try {
                 for (int i = 0; i < numParams; i++) {
-                    params[i] = this.children[i].getValue(ctx);
+                    params[i] = parameters.jjtGetChild(i).getValue(ctx);
                     params[i] = coerceToType(params[i], paramTypes[i]);
                 }
             } catch (ELException ele) {

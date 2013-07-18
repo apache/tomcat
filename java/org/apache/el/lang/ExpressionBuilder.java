@@ -212,7 +212,8 @@ public final class ExpressionBuilder implements NodeVisitor {
             }
 
             int pcnt = m.getParameterTypes().length;
-            if (node.jjtGetNumChildren() != pcnt) {
+            // AstFunction->MethodParameters->Parameters()
+            if (node.jjtGetChild(0).jjtGetNumChildren() != pcnt) {
                 throw new ELException(MessageFactory.get(
                         "error.fnMapper.paramcount", funcNode.getOutputName(),
                         "" + pcnt, "" + node.jjtGetNumChildren()));
