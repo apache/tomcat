@@ -29,8 +29,6 @@ import org.apache.el.util.MessageFactory;
 
 public class AstLambdaExpression extends SimpleNode {
 
-    private int methodParameterIndex = 0;
-
     public AstLambdaExpression(int id) {
         super(id);
     }
@@ -76,23 +74,21 @@ public class AstLambdaExpression extends SimpleNode {
         le.setELContext(ctx);
 
         if (jjtGetNumChildren() == 2) {
-            if (formalParameters.isEmpty() && !(parent instanceof AstLambdaExpression)) {
-                // No formal parameters or method parameters so invoke the
-                // expression. If this is a nested expression inform the outer
-                // expression that an invocation has occurred so the correct set
-                // of method parameters are used for the next invocation.
-                incMethodParameterIndex();
+            if (formalParameters.isEmpty() &&
+                    !(parent instanceof AstLambdaExpression)) {
+                // No formal parameters or method parameters and not a nested
+                // expression so invoke the expression.
                 return le.invoke(ctx, (Object[]) null);
             } else {
-                // Has formal parameters but no method parameters so return the
-                // expression for later evaluation
+                // Has formal parameters but no method parameters or is a nested
+                // expression so return the expression for later evaluation
                 return le;
             }
         }
 
 
         // Always have to invoke the outer-most expression
-        methodParameterIndex = 2;
+        int methodParameterIndex = 2;
         Object result = le.invoke(((AstMethodParameters)
                 children[methodParameterIndex]).getParameters(ctx));
         methodParameterIndex++;
@@ -111,11 +107,6 @@ public class AstLambdaExpression extends SimpleNode {
          * If the inner most expression(s) do not require parameters then a
          * value will be returned once the outermost expression that does
          * require a parameter has been evaluated.
-         *
-         * When invoking an expression if it has nested expressions that do not
-         * have formal parameters then they will be evaluated as as part of that
-         * invocation. In this case the method parameters associated with those
-         * nested expressions need to be skipped.
          */
         while (result instanceof LambdaExpression &&
                 methodParameterIndex < jjtGetNumChildren()) {
@@ -127,17 +118,6 @@ public class AstLambdaExpression extends SimpleNode {
         return result;
     }
 
-
-    public void incMethodParameterIndex() {
-        Node parent = jjtGetParent();
-        if (parent instanceof LambdaExpression) {
-            // Method parameter index is maintained by outermost lambda
-            // expressions as that is where the parameters are
-            ((AstLambdaExpression) parent).incMethodParameterIndex();
-        } else {
-            methodParameterIndex++;
-        }
-    }
 
     @Override
     public String toString() {

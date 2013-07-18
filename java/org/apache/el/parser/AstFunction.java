@@ -97,14 +97,11 @@ public final class AstFunction extends SimpleNode {
             if (obj instanceof LambdaExpression) {
                 // Build arguments
                 int i = 0;
-                while (obj instanceof LambdaExpression && i < this.jjtGetNumChildren()) {
-                    Node parameters = jjtGetChild(i);
-                    int numArgs = parameters.jjtGetNumChildren();
-                    Object[] args = new Object[numArgs];
-                    for (int j = 0; j < numArgs; j++) {
-                        args[j] = parameters.jjtGetChild(j).getValue(ctx);
-                    }
-                    obj = ((LambdaExpression) obj).invoke(args);
+                while (obj instanceof LambdaExpression &&
+                        i < this.jjtGetNumChildren()) {
+                    Node args = jjtGetChild(i);
+                    obj = ((LambdaExpression) obj).invoke(
+                            ((AstMethodParameters) args).getParameters(ctx));
                     i++;
                 }
                 return obj;
