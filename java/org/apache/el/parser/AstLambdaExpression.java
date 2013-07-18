@@ -76,7 +76,7 @@ public class AstLambdaExpression extends SimpleNode {
         le.setELContext(ctx);
 
         if (jjtGetNumChildren() == 2) {
-            if (formalParameters.isEmpty()) {
+            if (formalParameters.isEmpty() && !(parent instanceof AstLambdaExpression)) {
                 // No formal parameters or method parameters so invoke the
                 // expression. If this is a nested expression inform the outer
                 // expression that an invocation has occurred so the correct set
@@ -130,7 +130,7 @@ public class AstLambdaExpression extends SimpleNode {
 
     public void incMethodParameterIndex() {
         Node parent = jjtGetParent();
-        if (parent instanceof AstLambdaExpression) {
+        if (parent instanceof LambdaExpression) {
             // Method parameter index is maintained by outermost lambda
             // expressions as that is where the parameters are
             ((AstLambdaExpression) parent).incMethodParameterIndex();
