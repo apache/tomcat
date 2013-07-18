@@ -98,11 +98,17 @@ public final class AstFunction extends SimpleNode {
                 // Build arguments
                 int i = 0;
                 while (obj instanceof LambdaExpression &&
-                        i < this.jjtGetNumChildren()) {
+                        i < jjtGetNumChildren()) {
                     Node args = jjtGetChild(i);
                     obj = ((LambdaExpression) obj).invoke(
                             ((AstMethodParameters) args).getParameters(ctx));
                     i++;
+                }
+                if (i < jjtGetNumChildren()) {
+                    // Haven't consumed all the sets of parameters therefore
+                    // there were too many sets of parameters
+                    throw new ELException(MessageFactory.get(
+                            "error.lambda.tooManyMethodParameterSets"));
                 }
                 return obj;
             }

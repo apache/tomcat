@@ -147,10 +147,79 @@ public class TestAstLambdaExpression {
 
 
     @Test
-    public void testLambdaAsFunction() {
+    public void testNested07() {
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("()->()->()->42",
+                        Integer.class);
+        Assert.assertEquals(Integer.valueOf(42), result);
+    }
+
+
+    @Test
+    public void testLambdaAsFunction01() {
         ELProcessor processor = new ELProcessor();
         Object result =
                 processor.getValue("v = (x->y->x-y); v(2)(1)",
+                        Integer.class);
+        Assert.assertEquals(Integer.valueOf(1), result);
+    }
+
+
+    @Test
+    public void testLambdaAsFunction02() {
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("v = (()->y->2-y); v()(1)",
+                        Integer.class);
+        Assert.assertEquals(Integer.valueOf(1), result);
+    }
+
+
+    @Test
+    public void testLambdaAsFunction03() {
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("v = (()->y->()->2-y); v()(1)()",
+                        Integer.class);
+        Assert.assertEquals(Integer.valueOf(1), result);
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testLambdaAsFunction04() {
+        ELProcessor processor = new ELProcessor();
+        // More method parameters than there are nested lambda expressions
+        processor.getValue("v = (()->y->()->2-y); v()(1)()()",
+                    Integer.class);
+    }
+
+
+    @Test
+    public void testLambdaAsFunction05() {
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("v = (()->y->()->x->x-y); v()(1)()(2)",
+                        Integer.class);
+        Assert.assertEquals(Integer.valueOf(1), result);
+    }
+
+
+    @Test
+    public void testLambdaAsFunction06() {
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("v = (()->y->()->()->x->x-y); v()(1)()()(2)",
+                        Integer.class);
+        Assert.assertEquals(Integer.valueOf(1), result);
+    }
+
+
+    @Test
+    public void testLambdaAsFunction07() {
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("v = (()->y->()->()->x->x-y); v()(1)()(3)(2)",
                         Integer.class);
         Assert.assertEquals(Integer.valueOf(1), result);
     }

@@ -36,22 +36,39 @@ public class AstLambdaExpression extends SimpleNode {
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
 
-        // Check that there are not more sets of method parameters than there
-        // are nested lambda expressions
+        // Check;
+        // - that there are not more sets of method parameters than there are
+        //   nested lambda expressions
+        // - if any of the nested expressions declare formal parameters
         int methodParameterSetCount = jjtGetNumChildren() - 2;
-        if (methodParameterSetCount > 0) {
-            // We know this node is an expression
-            methodParameterSetCount--;
-            Node n = this.jjtGetChild(1);
-            while (methodParameterSetCount > 0) {
-                if (n.jjtGetNumChildren() <2 ||
-                        !(n.jjtGetChild(0) instanceof AstLambdaParameters)) {
-                    throw new ELException(MessageFactory.get(
-                            "error.lambda.tooManyMethodParameterSets"));
+        boolean declaresParameters = false;
+        // We know this node is an expression
+        int lambdaExpressionCount = 1;
+        // child at index 1 is the expression
+        Node n = jjtGetChild(1);
+        while (n instanceof AstLambdaExpression) {
+            lambdaExpressionCount++;
+            if (n.jjtGetChild(0) instanceof AstLambdaParameters) {
+                if (!declaresParameters &&
+                        n.jjtGetChild(0).jjtGetNumChildren() > 0) {
+                    declaresParameters = true;
                 }
                 n = n.jjtGetChild(1);
-                methodParameterSetCount--;
+            } else {
+                n = null;
             }
+        }
+        if (methodParameterSetCount > lambdaExpressionCount) {
+            throw new ELException(MessageFactory.get(
+                    "error.lambda.tooManyMethodParameterSets"));
+        }
+        // Also need to check parents for declaration of formal parameters
+        n = parent;
+        while (!declaresParameters && n instanceof AstLambdaExpression) {
+            if (n.jjtGetChild(0).jjtGetNumChildren() > 0) {
+                declaresParameters = true;
+            }
+            n = n.jjtGetParent();
         }
 
         // First child is always parameters even if there aren't any
@@ -74,10 +91,9 @@ public class AstLambdaExpression extends SimpleNode {
         le.setELContext(ctx);
 
         if (jjtGetNumChildren() == 2) {
-            if (formalParameters.isEmpty() &&
-                    !(parent instanceof AstLambdaExpression)) {
-                // No formal parameters or method parameters and not a nested
-                // expression so invoke the expression.
+            if (formalParameters.isEmpty() && !declaresParameters) {
+                // No formal parameters or method parameters and not nested
+                // inside another lambda expression so invoke the expression.
                 return le.invoke(ctx, (Object[]) null);
             } else {
                 // Has formal parameters but no method parameters or is a nested
