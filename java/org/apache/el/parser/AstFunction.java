@@ -24,6 +24,8 @@ import java.lang.reflect.Method;
 import javax.el.ELException;
 import javax.el.FunctionMapper;
 import javax.el.LambdaExpression;
+import javax.el.ValueExpression;
+import javax.el.VariableMapper;
 
 import org.apache.el.lang.EvaluationContext;
 import org.apache.el.util.MessageFactory;
@@ -90,10 +92,26 @@ public final class AstFunction extends SimpleNode {
         Method m = fnMapper.resolveFunction(this.prefix, this.localName);
 
         if (m == null && this.prefix.length() == 0) {
-            // Handle case of lambda expression being set to an EL variable for
-            // later use
-            Object obj =
-                    ctx.getELResolver().getValue(ctx, null, this.localName);
+            // TODO: Do we need to think about precedence of the various ways
+            //       a lambda expression may be obtained from something that
+            //       the parser thinks is a function?
+            Object obj = null;
+            if (ctx.isLambdaArgument(this.localName)) {
+                obj = ctx.getLambdaArgument(this.localName);
+            }
+            if (obj == null) {
+                VariableMapper varMapper = ctx.getVariableMapper();
+                if (varMapper != null) {
+                    obj = varMapper.resolveVariable(this.localName);
+                    if (obj instanceof ValueExpression) {
+                        // See if this returns a LambdaEXpression
+                        obj = ((ValueExpression) obj).getValue(ctx);
+                    }
+                }
+            }
+            if (obj == null) {
+                obj = ctx.getELResolver().getValue(ctx, null, this.localName);
+            }
             if (obj instanceof LambdaExpression) {
                 // Build arguments
                 int i = 0;
