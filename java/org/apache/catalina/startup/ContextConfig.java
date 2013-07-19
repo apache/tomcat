@@ -1954,13 +1954,13 @@ public class ContextConfig implements LifecycleListener {
         }
         FragmentJarScannerCallback callback =
                 new FragmentJarScannerCallback(webXmlParser, delegate);
-        if (!callback.isOk()) {
-            ok = false;
-        }
 
         jarScanner.scan(JarScanType.PLUGGABILITY,
                 context.getServletContext(), callback);
 
+        if (!callback.isOk()) {
+            ok = false;
+        }
         return callback.getFragments();
     }
 
