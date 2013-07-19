@@ -424,6 +424,18 @@ public class TestCollectionOperations {
 
 
     @Test
+    public void testMaxLambda02() {
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("beans", beans);
+        processor.setVariable("comparison", "v->(x,y)->v(x).compareTo(v(y))");
+
+        Object result = processor.getValue(
+                "beans.stream().max(comparison(x->x.name))",
+                Object.class);
+
+        Assert.assertEquals(bean03, ((Optional) result).get());
+    }
+    @Test
     public void testMin01() {
         ELProcessor processor = new ELProcessor();
 
