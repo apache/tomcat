@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -75,7 +74,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScanner;
-import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.bcel.classfile.AnnotationElementValue;
 import org.apache.tomcat.util.bcel.classfile.AnnotationEntry;
@@ -96,6 +94,7 @@ import org.apache.tomcat.util.descriptor.web.ContextService;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
+import org.apache.tomcat.util.descriptor.web.FragmentJarScannerCallback;
 import org.apache.tomcat.util.descriptor.web.JspPropertyGroup;
 import org.apache.tomcat.util.descriptor.web.JspPropertyGroupDescriptorImpl;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
@@ -1949,7 +1948,15 @@ public class ContextConfig implements LifecycleListener {
     protected Map<String,WebXml> processJarsForWebFragments() {
 
         JarScanner jarScanner = context.getJarScanner();
-        FragmentJarScannerCallback callback = new FragmentJarScannerCallback();
+        boolean delegate = false;
+        if (context instanceof StandardContext) {
+            delegate = ((StandardContext) context).getDelegate();
+        }
+        FragmentJarScannerCallback callback =
+                new FragmentJarScannerCallback(webXmlParser, delegate);
+        if (!callback.isOk()) {
+            ok = false;
+        }
 
         jarScanner.scan(JarScanType.PLUGGABILITY,
                 context.getServletContext(), callback);
@@ -2647,115 +2654,6 @@ public class ContextConfig implements LifecycleListener {
             }
         }
         return result;
-    }
-
-    private class FragmentJarScannerCallback implements JarScannerCallback {
-
-        private static final String FRAGMENT_LOCATION =
-            "META-INF/web-fragment.xml";
-        private final Map<String,WebXml> fragments = new HashMap<>();
-
-        @Override
-        public void scan(JarURLConnection jarConn, boolean isWebapp)
-                throws IOException {
-
-            URL url = jarConn.getURL();
-            URL resourceURL = jarConn.getJarFileURL();
-            Jar jar = null;
-            InputStream is = null;
-            WebXml fragment = new WebXml();
-
-            fragment.setWebappJar(isWebapp);
-            if (context instanceof StandardContext) {
-                fragment.setDelegate(((StandardContext) context).getDelegate());
-            }
-
-            try {
-                // Only web application JARs are checked for web-fragment.xml
-                // files
-                if (isWebapp) {
-                    jar = JarFactory.newInstance(url);
-                    is = jar.getInputStream(FRAGMENT_LOCATION);
-                }
-
-                if (is == null) {
-                    // If there is no web.xml, normal JAR no impact on
-                    // distributable
-                    fragment.setDistributable(true);
-                } else {
-                    InputSource source = new InputSource(
-                            resourceURL.toString() + "!/" + FRAGMENT_LOCATION);
-                    source.setByteStream(is);
-                    if (!webXmlParser.parseWebXml(source, fragment, true)) {
-                        ok = false;
-                    }
-                }
-            } finally {
-                if (jar != null) {
-                    jar.close();
-                }
-                fragment.setURL(url);
-                if (fragment.getName() == null) {
-                    fragment.setName(fragment.getURL().toString());
-                }
-                fragment.setJarName(extractJarFileName(url));
-                fragments.put(fragment.getName(), fragment);
-            }
-        }
-
-        private String extractJarFileName(URL input) {
-            String url = input.toString();
-            if (url.endsWith("!/")) {
-                // Remove it
-                url = url.substring(0, url.length() - 2);
-            }
-
-            // File name will now be whatever is after the final /
-            return url.substring(url.lastIndexOf('/') + 1);
-        }
-
-        @Override
-        public void scan(File file, boolean isWebapp) throws IOException {
-
-            InputStream stream = null;
-            WebXml fragment = new WebXml();
-
-            try {
-                File fragmentFile = new File(file, FRAGMENT_LOCATION);
-                if (fragmentFile.isFile()) {
-                    stream = new FileInputStream(fragmentFile);
-                    InputSource source =
-                        new InputSource(fragmentFile.toURI().toURL().toString());
-                    source.setByteStream(stream);
-                    if (!webXmlParser.parseWebXml(source, fragment, true)) {
-                        ok = false;
-                    }
-                } else {
-                    // If there is no web.xml, normal folder no impact on
-                    // distributable
-                    fragment.setDistributable(true);
-                }
-            } finally {
-                fragment.setURL(file.toURI().toURL());
-                if (fragment.getName() == null) {
-                    fragment.setName(fragment.getURL().toString());
-                }
-                fragment.setJarName(file.getName());
-                fragments.put(fragment.getName(), fragment);
-            }
-        }
-
-
-        @Override
-        public void scanWebInfClasses() {
-            // NO-OP. Fragments unpacked in WEB-INF classes are not handled,
-            // mainly because if there are multiple fragments there is no way to
-            // handle multiple web-fragment.xml files.
-        }
-
-        public Map<String,WebXml> getFragments() {
-            return fragments;
-        }
     }
 
     private static class DefaultWebXmlCacheEntry {
