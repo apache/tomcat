@@ -31,6 +31,9 @@ import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.SessionTrackingMode;
+import javax.servlet.descriptor.JspConfigDescriptor;
+import javax.servlet.descriptor.JspPropertyGroupDescriptor;
+import javax.servlet.descriptor.TaglibDescriptor;
 
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
 import org.apache.tomcat.util.res.StringManager;
@@ -555,6 +558,25 @@ public class WebXml {
     }
     public Map<String, String> getPreDestroyMethods() {
         return preDestroyMethods;
+    }
+
+    public JspConfigDescriptor getJspConfigDescriptor() {
+        if (jspPropertyGroups.isEmpty() && taglibs.isEmpty()) {
+            return null;
+        }
+        JspConfigDescriptorImpl jspConfigDescriptor = new JspConfigDescriptorImpl();
+        for (JspPropertyGroup jspPropertyGroup : jspPropertyGroups) {
+            JspPropertyGroupDescriptor descriptor =
+                    new JspPropertyGroupDescriptorImpl(jspPropertyGroup);
+            jspConfigDescriptor.getJspPropertyGroups().add(descriptor);
+
+        }
+        for (Entry<String, String> entry : taglibs.entrySet()) {
+            TaglibDescriptor descriptor = new TaglibDescriptorImpl(
+                    entry.getValue(), entry.getKey());
+            jspConfigDescriptor.getTaglibs().add(descriptor);
+        }
+        return jspConfigDescriptor;
     }
 
     // Attributes not defined in web.xml or web-fragment.xml
