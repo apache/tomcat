@@ -102,6 +102,14 @@
       <url-pattern>/bug49nnn/bug49726b.jsp</url-pattern>
       <default-content-type>text/plain</default-content-type>
     </jsp-property-group>
+    <jsp-property-group>
+      <url-pattern>/bug5nnnn/bug55262.jsp</url-pattern>
+      <include-prelude>/bug5nnnn/bug55262-prelude.jspf</include-prelude>
+      <include-prelude>/bug5nnnn/bug55262-prelude.jspf</include-prelude>
+      <include-coda>/bug5nnnn/bug55262-coda.jspf</include-coda>
+      <include-coda>/bug5nnnn/bug55262-coda.jspf</include-coda>
+      <default-content-type>text/plain</default-content-type>
+    </jsp-property-group>
   </jsp-config>
 
   <servlet>
