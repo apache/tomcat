@@ -17,6 +17,7 @@
 package org.apache.jasper.servlet;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
@@ -48,13 +49,13 @@ import javax.servlet.descriptor.TaglibDescriptor;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.util.ExceptionUtils;
+import org.apache.tomcat.util.descriptor.web.Constants;
 import org.apache.tomcat.util.descriptor.web.JspConfigDescriptorImpl;
 import org.apache.tomcat.util.descriptor.web.JspPropertyGroup;
 import org.apache.tomcat.util.descriptor.web.JspPropertyGroupDescriptorImpl;
 import org.apache.tomcat.util.descriptor.web.TaglibDescriptorImpl;
 import org.apache.tomcat.util.descriptor.web.WebXml;
 import org.apache.tomcat.util.descriptor.web.WebXmlParser;
-import org.xml.sax.InputSource;
 
 
 /**
@@ -128,29 +129,15 @@ public class JspCServletContext implements ServletContext {
         // Use this class's classloader as Ant will have set the TCCL to its own
         webXmlParser.setClassLoader(getClass().getClassLoader());
 
-        InputStream webXmlStream = getResourceAsStream(
-                org.apache.tomcat.util.descriptor.web.Constants.
-                WEB_XML_LOCATION);
-
-        if (webXmlStream != null) {
-            URL webXmlUrl;
-            try {
-                webXmlUrl = getResource(
-                        org.apache.tomcat.util.descriptor.web.Constants.
-                        WEB_XML_LOCATION);
-            } catch (MalformedURLException e) {
-                // Should never happen. Just in case...
-                throw new JasperException(e);
-            }
-
-            InputSource source = new InputSource(webXmlUrl.toExternalForm());
-            source.setByteStream(webXmlStream);
-            if (!webXmlParser.parseWebXml(source, webXml, false)) {
+        try {
+            URL url = getResource(Constants.WEB_XML_LOCATION);
+            if (!webXmlParser.parseWebXml(url, webXml, false)) {
+                // TODO - message
                 throw new JasperException(Localizer.getMessage(""));
             }
+        } catch (IOException e) {
+            throw new JasperException(e);
         }
-
-
 
         Set<JspPropertyGroup> jspPropertyGroups = webXml.getJspPropertyGroups();
         Map<String,String> tagLibs = webXml.getTaglibs();
