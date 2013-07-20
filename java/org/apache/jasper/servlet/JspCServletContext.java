@@ -22,11 +22,12 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.EventListener;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -45,9 +46,13 @@ import javax.servlet.descriptor.JspConfigDescriptor;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.util.ExceptionUtils;
+import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.util.descriptor.web.Constants;
+import org.apache.tomcat.util.descriptor.web.FragmentJarScannerCallback;
 import org.apache.tomcat.util.descriptor.web.WebXml;
 import org.apache.tomcat.util.descriptor.web.WebXmlParser;
+import org.apache.tomcat.util.scan.StandardJarScanFilter;
+import org.apache.tomcat.util.scan.StandardJarScanner;
 
 
 /**
@@ -66,7 +71,7 @@ public class JspCServletContext implements ServletContext {
     /**
      * Servlet context attributes.
      */
-    private final Hashtable<String,Object> myAttributes;
+    private final Map<String,Object> myAttributes;
 
 
     /**
@@ -107,15 +112,16 @@ public class JspCServletContext implements ServletContext {
     public JspCServletContext(PrintWriter aLogWriter, URL aResourceBaseURL)
             throws JasperException {
 
-        myAttributes = new Hashtable<>();
+        myAttributes = new HashMap<>();
         myLogWriter = aLogWriter;
         myResourceBaseURL = aResourceBaseURL;
 
-        // Build the merged web.xml
-        // TODO - Process fragments
-        // TODO - Check to see if annotations can impact anything JspC
-        //        cares about and if yes, process fragments too.
-        this.webXml = new WebXml();
+        this.webXml = buildMergedWebXml();
+        jspConfigDescriptor = webXml.getJspConfigDescriptor();
+    }
+
+    private WebXml buildMergedWebXml() throws JasperException {
+        WebXml webXml = new WebXml();
 
         WebXmlParser webXmlParser = new WebXmlParser(false, false);
         // Use this class's classloader as Ant will have set the TCCL to its own
@@ -131,7 +137,33 @@ public class JspCServletContext implements ServletContext {
             throw new JasperException(e);
         }
 
-        jspConfigDescriptor = webXml.getJspConfigDescriptor();
+        // if the application is metadata-complete then we can skip fragment processing
+        if (webXml.isMetadataComplete()) {
+            return webXml;
+        }
+
+        Map<String, WebXml> fragments = scanForFragments(webXmlParser);
+        Set<WebXml> orderedFragments = WebXml.orderWebFragments(webXml, fragments, this);
+
+        // JspC is not affected by annotations so skip that processing, proceed to merge
+        webXml.merge(orderedFragments);
+        return webXml;
+    }
+
+    private Map<String, WebXml> scanForFragments(WebXmlParser webXmlParser) throws JasperException {
+        StandardJarScanner scanner = new StandardJarScanner();
+        // TODO - enabling this means initializing the classloader first in JspC
+        scanner.setScanClassPath(false);
+        // TODO - configure filter rules from Ant rather then system properties
+        scanner.setJarScanFilter(new StandardJarScanFilter());
+
+        FragmentJarScannerCallback callback = new FragmentJarScannerCallback(webXmlParser, false);
+        scanner.scan(JarScanType.PLUGGABILITY, this, callback);
+        if (!callback.isOk()) {
+            // TODO - message
+            throw new JasperException(Localizer.getMessage(""));
+        }
+        return callback.getFragments();
     }
 
 
@@ -153,7 +185,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public Enumeration<String> getAttributeNames() {
-        return myAttributes.keys();
+        return Collections.enumeration(myAttributes.keySet());
     }
 
 
