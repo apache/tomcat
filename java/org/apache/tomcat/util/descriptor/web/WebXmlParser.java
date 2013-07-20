@@ -16,7 +16,9 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -63,6 +65,24 @@ public class WebXmlParser {
         webFragmentDigester = DigesterFactory.newDigester(validation,
                 namespaceAware, webFragmentRuleSet);
         webFragmentDigester.getParser();
+    }
+
+    /**
+     * Parse a web descriptor at a location.
+     *
+     * @param url the location; if null no load will be attempted
+     * @param dest the instance to be populated by the parse operation
+     * @param fragment indicate if the descriptor is a web-app or web-fragment
+     * @return true if the descriptor was successfully parsed
+     * @throws IOException if there was a problem reading from the URL
+     */
+    public boolean parseWebXml(URL url, WebXml dest, boolean fragment) throws IOException {
+        if (url == null) {
+            return true;
+        }
+        InputSource source = new InputSource(url.toExternalForm());
+        source.setByteStream(url.openStream());
+        return parseWebXml(source, dest, fragment);
     }
 
 
