@@ -28,10 +28,8 @@ import java.util.EventListener;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterRegistration;
 import javax.servlet.FilterRegistration.Dynamic;
@@ -43,17 +41,11 @@ import javax.servlet.ServletRegistration;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
-import javax.servlet.descriptor.JspPropertyGroupDescriptor;
-import javax.servlet.descriptor.TaglibDescriptor;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.util.ExceptionUtils;
 import org.apache.tomcat.util.descriptor.web.Constants;
-import org.apache.tomcat.util.descriptor.web.JspConfigDescriptorImpl;
-import org.apache.tomcat.util.descriptor.web.JspPropertyGroup;
-import org.apache.tomcat.util.descriptor.web.JspPropertyGroupDescriptorImpl;
-import org.apache.tomcat.util.descriptor.web.TaglibDescriptorImpl;
 import org.apache.tomcat.util.descriptor.web.WebXml;
 import org.apache.tomcat.util.descriptor.web.WebXmlParser;
 
@@ -95,7 +87,7 @@ public class JspCServletContext implements ServletContext {
     private final WebXml webXml;
 
 
-    private final JspConfigDescriptorImpl jspConfigDescriptor;
+    private final JspConfigDescriptor jspConfigDescriptor;
 
     /**
      * Web application class loader.
@@ -139,26 +131,7 @@ public class JspCServletContext implements ServletContext {
             throw new JasperException(e);
         }
 
-        Set<JspPropertyGroup> jspPropertyGroups = webXml.getJspPropertyGroups();
-        Map<String,String> tagLibs = webXml.getTaglibs();
-
-        if (jspPropertyGroups.isEmpty() && tagLibs.isEmpty()) {
-            jspConfigDescriptor = null;
-        } else {
-            jspConfigDescriptor = new JspConfigDescriptorImpl();
-            for (JspPropertyGroup jspPropertyGroup : jspPropertyGroups) {
-                JspPropertyGroupDescriptor descriptor =
-                        new JspPropertyGroupDescriptorImpl(jspPropertyGroup);
-                jspConfigDescriptor.getJspPropertyGroups().add(descriptor);
-
-            }
-            for (Entry<String, String> entry : webXml.getTaglibs().entrySet()) {
-                TaglibDescriptor descriptor = new TaglibDescriptorImpl(
-                        entry.getValue(), entry.getKey());
-                jspConfigDescriptor.getTaglibs().add(descriptor);
-            }
-        }
-
+        jspConfigDescriptor = webXml.getJspConfigDescriptor();
     }
 
 
