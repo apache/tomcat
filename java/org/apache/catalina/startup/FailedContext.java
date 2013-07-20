@@ -640,6 +640,9 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public JspConfigDescriptor getJspConfigDescriptor() { return null; }
 
     @Override
+    public void setJspConfigDescriptor(JspConfigDescriptor descriptor) { /* NO-OP */ }
+
+    @Override
     public void addServletContainerInitializer(ServletContainerInitializer sci,
             Set<Class<?>> classes) { /* NO-OP */ }
 

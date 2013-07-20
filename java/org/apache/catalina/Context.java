@@ -1277,9 +1277,15 @@ public interface Context extends Container {
 
     /**
      * Obtain the JSP configuration for this context.
+     * Will be null if there is no JSP configuration.
      */
     public JspConfigDescriptor getJspConfigDescriptor();
 
+    /**
+     * Set the JspConfigDescriptor for this context.
+     * A null value indicates there is not JSP configuration.
+     */
+    public void setJspConfigDescriptor(JspConfigDescriptor descriptor);
 
     /**
      * Add a ServletContainerInitializer instance to this web application.

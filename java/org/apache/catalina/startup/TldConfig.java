@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
+import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.descriptor.TaglibDescriptor;
 
 import org.apache.catalina.Context;
@@ -284,9 +285,12 @@ public final class TldConfig  implements LifecycleListener {
             log.trace(sm.getString("tldConfig.webxmlStart"));
         }
 
-        Collection<TaglibDescriptor> descriptors =
-            context.getJspConfigDescriptor().getTaglibs();
+        JspConfigDescriptor jspConfigDescriptor = context.getJspConfigDescriptor();
+        if (jspConfigDescriptor == null) {
+            return;
+        }
 
+        Collection<TaglibDescriptor> descriptors = jspConfigDescriptor.getTaglibs();
         for (TaglibDescriptor descriptor : descriptors) {
             String resourcePath = descriptor.getTaglibLocation();
             // Note: Whilst the Servlet 2.4 DTD implies that the location must
