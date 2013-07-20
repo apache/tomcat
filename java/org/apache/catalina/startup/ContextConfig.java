@@ -1275,13 +1275,7 @@ public class ContextConfig implements LifecycleListener {
         for (FilterMap filterMap : webxml.getFilterMappings()) {
             context.addFilterMap(filterMap);
         }
-        for (JspPropertyGroup jspPropertyGroup :
-                webxml.getJspPropertyGroups()) {
-            JspPropertyGroupDescriptor descriptor =
-                new JspPropertyGroupDescriptorImpl(jspPropertyGroup);
-            context.getJspConfigDescriptor().getJspPropertyGroups().add(
-                    descriptor);
-        }
+        context.setJspConfigDescriptor(webxml.getJspConfigDescriptor());
         for (String listener : webxml.getListeners()) {
             context.addApplicationListener(
                     new ApplicationListener(listener, false));
@@ -1408,11 +1402,6 @@ public class ContextConfig implements LifecycleListener {
                 context.getServletContext().setSessionTrackingModes(
                         sessionConfig.getSessionTrackingModes());
             }
-        }
-        for (Entry<String, String> entry : webxml.getTaglibs().entrySet()) {
-            TaglibDescriptor descriptor = new TaglibDescriptorImpl(
-                    entry.getValue(), entry.getKey());
-            context.getJspConfigDescriptor().getTaglibs().add(descriptor);
         }
 
         // Context doesn't use version directly

@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.servlet.descriptor.JspPropertyGroupDescriptor;
@@ -97,13 +98,13 @@ public class JspPropertyGroupDescriptorImpl
 
     @Override
     public Collection<String> getIncludeCodas() {
-        return jspPropertyGroup.getIncludeCodas();
+        return new ArrayList<>(jspPropertyGroup.getIncludeCodas());
     }
 
 
     @Override
     public Collection<String> getIncludePreludes() {
-        return jspPropertyGroup.getIncludePreludes();
+        return new ArrayList<>(jspPropertyGroup.getIncludePreludes());
     }
 
 
@@ -157,6 +158,6 @@ public class JspPropertyGroupDescriptorImpl
 
     @Override
     public Collection<String> getUrlPatterns() {
-        return jspPropertyGroup.getUrlPatterns();
+        return new ArrayList<>(jspPropertyGroup.getUrlPatterns());
     }
 }

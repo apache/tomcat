@@ -1011,6 +1011,11 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public void setJspConfigDescriptor(JspConfigDescriptor descriptor) {
+        // NO-OP
+    }
+
+    @Override
     public void addServletContainerInitializer(ServletContainerInitializer sci,
             Set<Class<?>> classes) {
         // NO-OP

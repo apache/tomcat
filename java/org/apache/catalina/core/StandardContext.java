@@ -821,8 +821,7 @@ public class StandardContext extends ContainerBase
 
     private int effectiveMinorVersion = 0;
 
-    private JspConfigDescriptor jspConfigDescriptor =
-        new JspConfigDescriptorImpl();
+    private JspConfigDescriptor jspConfigDescriptor = null;
 
     private Set<String> resourceOnlyServlets = new HashSet<>();
 
@@ -2514,6 +2513,10 @@ public class StandardContext extends ContainerBase
         return jspConfigDescriptor;
     }
 
+    @Override
+    public void setJspConfigDescriptor(JspConfigDescriptor descriptor) {
+        this.jspConfigDescriptor = descriptor;
+    }
 
     // ------------------------------------------------------ Public Properties
 
@@ -5697,7 +5700,7 @@ public class StandardContext extends ContainerBase
         applicationListeners = new ApplicationListener[0];
         applicationEventListenersObjects = new Object[0];
         applicationLifecycleListenersObjects = new Object[0];
-        jspConfigDescriptor = new JspConfigDescriptorImpl();
+        jspConfigDescriptor = null;
 
         initializers.clear();
 

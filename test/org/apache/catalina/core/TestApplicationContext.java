@@ -121,7 +121,6 @@ public class TestApplicationContext extends TomcatBaseTest {
     }
 
     @Test
-    @Ignore("Bug 55285")
     public void testJspPropertyGroupsAreIsolated() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 

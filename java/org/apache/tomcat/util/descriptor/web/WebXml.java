@@ -18,6 +18,7 @@ package org.apache.tomcat.util.descriptor.web;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -564,19 +565,23 @@ public class WebXml {
         if (jspPropertyGroups.isEmpty() && taglibs.isEmpty()) {
             return null;
         }
-        JspConfigDescriptorImpl jspConfigDescriptor = new JspConfigDescriptorImpl();
+
+        Collection<JspPropertyGroupDescriptor> descriptors =
+                new ArrayList<>(jspPropertyGroups.size());
         for (JspPropertyGroup jspPropertyGroup : jspPropertyGroups) {
             JspPropertyGroupDescriptor descriptor =
                     new JspPropertyGroupDescriptorImpl(jspPropertyGroup);
-            jspConfigDescriptor.getJspPropertyGroups().add(descriptor);
+            descriptors.add(descriptor);
 
         }
+
+        Collection<TaglibDescriptor> tlds = new HashSet<>(taglibs.size());
         for (Entry<String, String> entry : taglibs.entrySet()) {
             TaglibDescriptor descriptor = new TaglibDescriptorImpl(
                     entry.getValue(), entry.getKey());
-            jspConfigDescriptor.getTaglibs().add(descriptor);
+            tlds.add(descriptor);
         }
-        return jspConfigDescriptor;
+        return new JspConfigDescriptorImpl(descriptors, tlds);
     }
 
     // Attributes not defined in web.xml or web-fragment.xml
