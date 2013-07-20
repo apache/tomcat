@@ -40,9 +40,12 @@ public class TestJspCServletContext {
         Assert.assertTrue(jspConfigDescriptor.getTaglibs().isEmpty());
         Collection<JspPropertyGroupDescriptor> propertyGroups =
                 jspConfigDescriptor.getJspPropertyGroups();
-        Assert.assertEquals(1, propertyGroups.size());
-        JspPropertyGroupDescriptor groupDescriptor =
-                propertyGroups.iterator().next();
+        Assert.assertEquals(2, propertyGroups.size());
+        Iterator<JspPropertyGroupDescriptor> groupIterator =
+                propertyGroups.iterator();
+        JspPropertyGroupDescriptor groupDescriptor;
+
+        groupDescriptor = groupIterator.next();
         Assert.assertEquals("text/plain",
                 groupDescriptor.getDefaultContentType());
         Collection<String> urlPatterns =groupDescriptor.getUrlPatterns();
@@ -50,6 +53,10 @@ public class TestJspCServletContext {
         Iterator<String> iterator = urlPatterns.iterator();
         Assert.assertEquals("/bug49nnn/bug49726a.jsp", iterator.next());
         Assert.assertEquals("/bug49nnn/bug49726b.jsp", iterator.next());
+
+        groupDescriptor = groupIterator.next();
+        Assert.assertEquals(2, groupDescriptor.getIncludePreludes().size());
+        Assert.assertEquals(2, groupDescriptor.getIncludeCodas().size());
     }
 
     @Test

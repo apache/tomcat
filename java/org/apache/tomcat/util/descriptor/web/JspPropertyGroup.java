@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -35,17 +37,17 @@ public class JspPropertyGroup {
     }
     public Boolean getElIgnored() { return elIgnored; }
 
-    private final Set<String> includeCodas = new LinkedHashSet<>();
+    private final Collection<String> includeCodas = new ArrayList<>();
     public void addIncludeCoda(String includeCoda) {
         includeCodas.add(includeCoda);
     }
-    public Set<String> getIncludeCodas() { return includeCodas; }
+    public Collection<String> getIncludeCodas() { return includeCodas; }
 
-    private final Set<String> includePreludes = new LinkedHashSet<>();
+    private final Collection<String> includePreludes = new ArrayList<>();
     public void addIncludePrelude(String includePrelude) {
         includePreludes.add(includePrelude);
     }
-    public Set<String> getIncludePreludes() { return includePreludes; }
+    public Collection<String> getIncludePreludes() { return includePreludes; }
 
     private Boolean isXml = null;
     public void setIsXml(String isXml) {

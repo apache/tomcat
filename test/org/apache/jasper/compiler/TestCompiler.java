@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -218,6 +219,27 @@ public class TestCompiler extends TomcatBaseTest {
         // No further tests required. The bug triggers an infinite loop on
         // context start so the test will crash before it reaches this point if
         // it fails
+    }
+
+    @Test
+    public void testBug55262() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/bug5nnnn/bug55262.jsp");
+        String result = res.toString();
+        Pattern prelude = Pattern.compile(
+                "(.*This is a prelude\\.){2}.*",
+                Pattern.MULTILINE | Pattern.DOTALL);
+        Pattern coda = Pattern.compile(
+                "(.*This is a coda\\.){2}.*",
+                Pattern.MULTILINE|Pattern.DOTALL);
+        assertTrue(prelude.matcher(result).matches());
+        assertTrue(coda.matcher(result).matches());
     }
 
     /** Assertion for text printed by tags:echo */
