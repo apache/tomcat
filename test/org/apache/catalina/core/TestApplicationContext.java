@@ -17,13 +17,17 @@
 package org.apache.catalina.core;
 
 import java.io.File;
+import java.util.Collection;
 
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
+import javax.servlet.descriptor.JspConfigDescriptor;
+import javax.servlet.descriptor.JspPropertyGroupDescriptor;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
@@ -114,6 +118,34 @@ public class TestApplicationContext extends TomcatBaseTest {
         tomcat.start();
 
         Assert.assertNotNull(servletContext.getJspConfigDescriptor());
+    }
+
+    @Test
+    @Ignore("Bug 55285")
+    public void testJspPropertyGroupsAreIsolated() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        // app dir is relative to server home
+        StandardContext standardContext = (StandardContext) tomcat.addWebapp(
+                null, "/test", appDir.getAbsolutePath());
+
+        ServletContext servletContext = standardContext.getServletContext();
+
+        Assert.assertNull(servletContext.getJspConfigDescriptor());
+
+        tomcat.start();
+
+        JspConfigDescriptor jspConfigDescriptor =
+                servletContext.getJspConfigDescriptor();
+        Collection<JspPropertyGroupDescriptor> propertyGroups =
+                jspConfigDescriptor.getJspPropertyGroups();
+        Assert.assertFalse(propertyGroups.isEmpty());
+        propertyGroups.clear();
+
+        jspConfigDescriptor = servletContext.getJspConfigDescriptor();
+        propertyGroups = jspConfigDescriptor.getJspPropertyGroups();
+        Assert.assertFalse(propertyGroups.isEmpty());
     }
 
 
