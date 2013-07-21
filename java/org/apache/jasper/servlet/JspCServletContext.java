@@ -130,8 +130,7 @@ public class JspCServletContext implements ServletContext {
         try {
             URL url = getResource(Constants.WEB_XML_LOCATION);
             if (!webXmlParser.parseWebXml(url, webXml, false)) {
-                // TODO - message
-                throw new JasperException(Localizer.getMessage(""));
+                throw new JasperException(Localizer.getMessage("jspc.error.invalidWebXml"));
             }
         } catch (IOException e) {
             throw new JasperException(e);
@@ -160,8 +159,7 @@ public class JspCServletContext implements ServletContext {
         FragmentJarScannerCallback callback = new FragmentJarScannerCallback(webXmlParser, false);
         scanner.scan(JarScanType.PLUGGABILITY, this, callback);
         if (!callback.isOk()) {
-            // TODO - message
-            throw new JasperException(Localizer.getMessage(""));
+            throw new JasperException(Localizer.getMessage("jspc.error.invalidFragment"));
         }
         return callback.getFragments();
     }
