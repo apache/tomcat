@@ -387,13 +387,13 @@ void Function() #Function :
     Token t1 = null;
 }
 {
-    (LOOKAHEAD(2) t0=<IDENTIFIER> <COLON>)? t1=<IDENTIFIER>
+    t0=<IDENTIFIER>  ( <COLON> t1=<IDENTIFIER> )?
     {
-        if (t0 != null) {
+        if (t1 != null) {
             jjtThis.setPrefix(t0.image);
             jjtThis.setLocalName(t1.image);
         } else {
-            jjtThis.setLocalName(t1.image);
+            jjtThis.setLocalName(t0.image);
         }
     }
     ( MethodParameters() )+
