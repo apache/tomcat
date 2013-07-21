@@ -754,7 +754,8 @@
     <!-- Jasper Implementation JAR File -->
     <jarIt jarfile="${jasper.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.jasper" />
+      filesId="files.jasper"
+      meta-inf="${tomcat.manifests}/jasper.jar"/>
 
     <!-- Jasper EL Implementation JAR File -->
     <jarIt jarfile="${jasper-el.jar}"
