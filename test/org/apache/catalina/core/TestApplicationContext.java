@@ -27,7 +27,6 @@ import javax.servlet.descriptor.JspPropertyGroupDescriptor;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
