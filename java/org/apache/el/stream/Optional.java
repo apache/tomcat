@@ -57,9 +57,18 @@ public class Optional {
     }
 
 
-    public Object orElseGet(LambdaExpression le) {
+    public Object orElseGet(Object le) {
         if (obj == null) {
-            return le.invoke((Object[]) null);
+            // EL 3.0 specification says parameter is LambdaExpression but it
+            // may already have been evaluated. If that is the case, the
+            // original parameter will have been checked to ensure it was a
+            // LambdaExpression before it was evaluated.
+
+            if (le instanceof LambdaExpression) {
+                return ((LambdaExpression) le).invoke((Object[]) null);
+            } else {
+                return le;
+            }
         } else {
             return obj;
         }
