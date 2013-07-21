@@ -121,7 +121,6 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.Injectable;
 import org.apache.tomcat.util.descriptor.web.InjectionTarget;
-import org.apache.tomcat.util.descriptor.web.JspConfigDescriptorImpl;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.MessageDestination;
 import org.apache.tomcat.util.descriptor.web.MessageDestinationRef;

@@ -536,6 +536,30 @@ public class TestCollectionOperations {
 
 
     @Test
+    public void testAverage04() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[].stream().average().orElseGet(()->10)",
+                Object.class);
+
+        ((Optional) result).get();
+    }
+
+
+    @Test
+    public void testAverage05() {
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[].stream().average().orElseGet(()->()->10)",
+                Object.class);
+
+        ((Optional) result).get();
+    }
+
+
+    @Test
     public void testSum01() {
         ELProcessor processor = new ELProcessor();
 
