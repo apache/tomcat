@@ -543,7 +543,7 @@ public class TestCollectionOperations {
                 "[].stream().average().orElseGet(()->10)",
                 Object.class);
 
-        ((Optional) result).get();
+        Assert.assertEquals(Long.valueOf(10), result);
     }
 
 
@@ -555,7 +555,7 @@ public class TestCollectionOperations {
                 "[].stream().average().orElseGet(()->()->10)",
                 Object.class);
 
-        ((Optional) result).get();
+        Assert.assertEquals(Long.valueOf(10), result);
     }
 
 
