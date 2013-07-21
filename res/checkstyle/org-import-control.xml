@@ -137,7 +137,11 @@
       <allow pkg="org.apache.juli"/>
       <allow pkg="org.apache.tomcat.jni"/>
       <allow pkg="org.apache.tomcat.util"/>
-      <disallow pkg="org.apache.util.scan"/>
+      <disallow pkg="org.apache.tomcat.util.scan"/>
+      <subpackage name="descriptor">
+        <allow pkg="org.apache.tomcat.util.scan"/>
+        <allow pkg="org.apache.tomcat" exact-match="true"/>
+      </subpackage>
       <subpackage name="scan">
         <allow pkg="org.apache.tomcat" exact-match="true"/>
       </subpackage>
