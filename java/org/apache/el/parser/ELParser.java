@@ -1945,7 +1945,7 @@ public class ELParser/*@bgen(jjtree)*/implements ELParserTreeConstants, ELParser
   }
 
 /*
- * FloatinPoint
+ * FloatingPoint
  * For Decimal and Floating Point Literals
  */
   final public void FloatingPoint() throws ParseException {

@@ -423,7 +423,7 @@ void Boolean() : {}
 }
 
 /*
- * FloatinPoint
+ * FloatingPoint
  * For Decimal and Floating Point Literals
  */
 void FloatingPoint() #FloatingPoint : { Token t = null; }
@@ -485,7 +485,7 @@ java.util.Deque<Integer> deque = new java.util.ArrayDeque<Integer>();
   < START_DEFERRED_EXPRESSION: "#{" > {deque.push(DEFAULT);}: IN_EXPRESSION
 }
 
-<IN_EXPRESSION> SKIP : { " " | "\t" | "\n" | "\r" }
+<IN_EXPRESSION, IN_SET_OR_MAP> SKIP : { " " | "\t" | "\n" | "\r" }
 
 <IN_EXPRESSION, IN_SET_OR_MAP> TOKEN :
 {
