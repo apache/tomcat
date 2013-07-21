@@ -24,12 +24,14 @@ import java.lang.reflect.Method;
 
 import javax.el.ELException;
 import javax.el.ELResolver;
+import javax.el.LambdaExpression;
 import javax.el.MethodInfo;
 import javax.el.PropertyNotFoundException;
 import javax.el.ValueReference;
 
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
+import org.apache.el.stream.Optional;
 import org.apache.el.util.MessageFactory;
 import org.apache.el.util.ReflectionUtil;
 
@@ -142,6 +144,15 @@ public final class AstValue extends SimpleNode {
                     (this.children[i+1] instanceof AstMethodParameters)) {
                 AstMethodParameters mps =
                     (AstMethodParameters) this.children[i+1];
+                if (base instanceof Optional && "orElseGet".equals(suffix) &&
+                        mps.jjtGetNumChildren() == 1) {
+                    Node paramFoOptional = mps.jjtGetChild(0);
+                    if (!(paramFoOptional instanceof AstLambdaExpression ||
+                            paramFoOptional instanceof LambdaExpression)) {
+                        throw new ELException(MessageFactory.get(
+                                "stream.optional.paramNotLambda", suffix));
+                    }
+                }
                 // This is a method
                 base = resolver.invoke(ctx, base, suffix, null,
                         mps.getParameters(ctx));

@@ -559,6 +559,16 @@ public class TestCollectionOperations {
     }
 
 
+    @Test(expected=ELException.class)
+    public void testAverage06() {
+        ELProcessor processor = new ELProcessor();
+
+        processor.getValue(
+                "[].stream().average().orElseGet(10)",
+                Object.class);
+    }
+
+
     @Test
     public void testSum01() {
         ELProcessor processor = new ELProcessor();
