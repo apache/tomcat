@@ -347,7 +347,7 @@ public class WsServerContainer extends WsWebSocketContainer
     private void registerAuthenticatedSession(WsSession wsSession,
             String httpSessionId) {
         Set<WsSession> wsSessions = authenticatedSessions.get(httpSessionId);
-        if (wsSession == null) {
+        if (wsSessions == null) {
             wsSessions = Collections.newSetFromMap(
                      new ConcurrentHashMap<WsSession,Boolean>());
              authenticatedSessions.putIfAbsent(httpSessionId, wsSessions);
