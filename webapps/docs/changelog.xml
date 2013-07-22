@@ -158,6 +158,10 @@
         It will try to join the map membership in the heartbeat. Default value
         is false. (kfujino)
       </add>
+      <fix>
+        Avoid ConcurrentModificationException when sending a heartbeat.
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
