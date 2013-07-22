@@ -108,7 +108,7 @@ test ".$CATALINA_BASE" = . && CATALINA_BASE="$CATALINA_HOME"
 test ".$CATALINA_MAIN" = . && CATALINA_MAIN=org.apache.catalina.startup.Bootstrap
 test ".$JSVC" = . && JSVC="$CATALINA_BASE/bin/jsvc"
 # Set the default service-start wait time if necessary
-test -z "$SERVICE_START_WAIT_TIME" && SERVICE_START_WAIT_TIME=10
+test ".$SERVICE_START_WAIT_TIME" = . && SERVICE_START_WAIT_TIME=10
 
 # Ensure that any user defined CLASSPATH variables are not used on startup,
 # but allow them to be specified in setenv.sh, in rare case when it is needed.
