@@ -162,6 +162,9 @@
         Avoid ConcurrentModificationException when sending a heartbeat.
         (kfujino)
       </fix>
+      <fix>
+        Avoid NPE when the channel fails to start. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

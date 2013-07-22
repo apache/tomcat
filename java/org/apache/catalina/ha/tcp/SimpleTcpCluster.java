@@ -1032,6 +1032,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     }
 
     private void unregisterMember(Member member) {
+        if (member == null) return;
         ObjectName oname = memberOnameMap.remove(member);
         if (oname != null) {
             unregister(oname);
