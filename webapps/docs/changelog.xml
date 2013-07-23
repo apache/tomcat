@@ -94,6 +94,12 @@
         Expose the current connection count for each protocol handler via JMX.
         (markt)
       </add>
+      <fix>
+        <bug>55267</bug>: If an application configures a timeout for a Comet
+        connection ensure it is only used for read and not write operations.
+        This prevents a long timeout delaying the closing of the socket
+        associated with a Comet connection after an error occurs. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

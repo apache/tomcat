@@ -1499,6 +1499,7 @@ public class NioEndpoint extends AbstractEndpoint {
             lastAccess = System.currentTimeMillis();
             comet = false;
             timeout = soTimeout;
+            setWriteTimeout(soTimeout);
             error = false;
             lastRegistered = 0;
             sendfileData = null;
@@ -1593,13 +1594,18 @@ public class NioEndpoint extends AbstractEndpoint {
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf;}
         public SendfileData getSendfileData() { return this.sendfileData;}
 
+        public void setWriteTimeout(long writeTimeout) {
+            this.writeTimeout = writeTimeout;
+        }
+        public long getWriteTimeout() {return this.writeTimeout;}
+
         protected boolean comet = false;
         protected int cometOps = SelectionKey.OP_READ;
         protected boolean cometNotify = false;
         protected CountDownLatch readLatch = null;
         protected CountDownLatch writeLatch = null;
         protected SendfileData sendfileData = null;
-
+        private long writeTimeout = -1;
     }
 
     // ------------------------------------------------ Application Buffer Handler

@@ -284,7 +284,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         
         NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
         if ( att == null ) throw new IOException("Key must be cancelled");
-        long writeTimeout = att.getTimeout();
+        long writeTimeout = att.getWriteTimeout();
         Selector selector = null;
         try {
             selector = pool.get();
