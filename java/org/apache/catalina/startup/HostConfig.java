@@ -1301,6 +1301,10 @@ public class HostConfig
                             context.setDocBase(resource.getAbsolutePath());
                         }
                         reload(app);
+                        // Update times
+                        app.redeployResources.put(resources[i],
+                                Long.valueOf(resource.lastModified()));
+                        app.timestamp = System.currentTimeMillis();
                         return;
                     } else {
                         // Everything else triggers a redeploy
