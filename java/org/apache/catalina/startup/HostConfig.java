@@ -1082,6 +1082,7 @@ public class HostConfig
 
 
         DeployedApplication deployedApp;
+        boolean copyThisXml = copyXML;
 
         try {
             if (deployXML && xml.exists()) {
@@ -1100,7 +1101,6 @@ public class HostConfig
                     }
                 }
 
-                boolean copyThisXml = copyXML;
                 if (copyThisXml == false && context instanceof StandardContext) {
                     // Host is using default value. Context may override it.
                     copyThisXml = ((StandardContext) context).getCopyXML();
@@ -1159,7 +1159,7 @@ public class HostConfig
             deployedApp.redeployResources.put(dir.getAbsolutePath(),
                     Long.valueOf(dir.lastModified()));
             if (deployXML && xml.exists()) {
-                if (copyXML) {
+                if (copyThisXml) {
                     deployedApp.redeployResources.put(
                             xmlCopy.getAbsolutePath(),
                             Long.valueOf(xmlCopy.lastModified()));
