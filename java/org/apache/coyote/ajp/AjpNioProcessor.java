@@ -283,7 +283,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
         writeBuffer.flip();
 
-        long writeTimeout = att.getTimeout();
+        long writeTimeout = att.getWriteTimeout();
         Selector selector = null;
         try {
             selector = pool.get();
