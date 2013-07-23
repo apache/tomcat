@@ -1380,7 +1380,7 @@ public class NioEndpoint extends AbstractEndpoint {
             this.poller = poller;
             lastAccess = System.currentTimeMillis();
             setComet(false);
-            timeout = soTimeout;
+            setTimeout(soTimeout);
             error = false;
             sendfileData = null;
             if (readLatch != null) {

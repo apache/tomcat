@@ -25,7 +25,7 @@ public class SocketWrapper<E> {
     protected volatile E socket;
 
     protected volatile long lastAccess = -1;
-    protected long timeout = -1;
+    private long timeout = -1;
     protected boolean error = false;
     protected volatile int keepAliveLeft = 100;
     private boolean comet = false;
