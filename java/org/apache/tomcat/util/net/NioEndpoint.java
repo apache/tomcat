@@ -1381,6 +1381,7 @@ public class NioEndpoint extends AbstractEndpoint {
             lastAccess = System.currentTimeMillis();
             setComet(false);
             setTimeout(soTimeout);
+            setWriteTimeout(soTimeout);
             error = false;
             sendfileData = null;
             if (readLatch != null) {
@@ -1450,12 +1451,18 @@ public class NioEndpoint extends AbstractEndpoint {
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf;}
         public SendfileData getSendfileData() { return this.sendfileData;}
 
+        public void setWriteTimeout(long writeTimeout) {
+            this.writeTimeout = writeTimeout;
+        }
+        public long getWriteTimeout() {return this.writeTimeout;}
+
         private Poller poller = null;
         private int interestOps = 0;
         private boolean cometNotify = false;
         private CountDownLatch readLatch = null;
         private CountDownLatch writeLatch = null;
         private SendfileData sendfileData = null;
+        private long writeTimeout = -1;
 
     }
 
