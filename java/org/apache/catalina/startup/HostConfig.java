@@ -1150,7 +1150,7 @@ public class HostConfig
                     dir.getAbsolutePath()), t);
         } finally {
             deployedApp = new DeployedApplication(cn.getName(),
-                    xml.exists() && deployXML && copyXML);
+                    xml.exists() && deployXML && copyThisXml);
 
             // Fake re-deploy resource to detect if a WAR is added at a later
             // point
