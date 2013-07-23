@@ -1306,7 +1306,7 @@ public class HostConfig
                         app.redeployResources.put(resources[i],
                                 Long.valueOf(resource.lastModified()));
                         app.timestamp = System.currentTimeMillis();
-                        if (unpackWARs) { 
+                        if (unpackWARs) {
                             addWatchedResources(app, context.getDocBase(), context);
                         } else {
                             addWatchedResources(app, null, context);
