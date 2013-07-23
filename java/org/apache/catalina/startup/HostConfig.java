@@ -1100,12 +1100,13 @@ public class HostConfig
                     }
                 }
 
-                if (copyXML == false && context instanceof StandardContext) {
+                boolean copyThisXml = copyXML;
+                if (copyThisXml == false && context instanceof StandardContext) {
                     // Host is using default value. Context may override it.
-                    copyXML = ((StandardContext) context).getCopyXML();
+                    copyThisXml = ((StandardContext) context).getCopyXML();
                 }
 
-                if (copyXML) {
+                if (copyThisXml) {
                     InputStream is = null;
                     OutputStream os = null;
                     try {
