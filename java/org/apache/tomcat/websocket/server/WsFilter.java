@@ -60,6 +60,12 @@ public class WsFilter implements Filter {
             "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(ISO_8859_1);
     private final Queue<MessageDigest> sha1Helpers =
             new ConcurrentLinkedQueue<>();
+    private final WsServerContainer sc;
+
+
+    WsFilter(WsServerContainer sc) {
+        this.sc = sc;
+    }
 
 
     @Override
@@ -94,7 +100,6 @@ public class WsFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
 
         // Check to see if this WebSocket implementation has a matching mapping
-        WsServerContainer sc = WsServerContainer.getServerContainer();
         String path;
         String pathInfo = req.getPathInfo();
         if (pathInfo == null) {

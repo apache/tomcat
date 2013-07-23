@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.DispatcherType;
@@ -60,11 +59,6 @@ import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
 public class WsServerContainer extends WsWebSocketContainer
         implements ServerContainer {
 
-    // Needs to be a WeakHashMap to prevent memory leaks when a context is
-    // stopped
-    private static final Map<ClassLoader,WsServerContainer>
-            classLoaderContainerMap = new WeakHashMap<>();
-    private static final Object classLoaderContainerMapLock = new Object();
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
     private static final CloseReason AUTHENTICATED_HTTP_SESSION_CLOSED =
@@ -72,29 +66,9 @@ public class WsServerContainer extends WsWebSocketContainer
                     "This connection was established under an authenticated " +
                     "HTTP session that has ended.");
 
-    public static WsServerContainer getServerContainer() {
-        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        WsServerContainer result = null;
-        synchronized (classLoaderContainerMapLock) {
-            result = classLoaderContainerMap.get(tccl);
-            if (result == null) {
-                result = new WsServerContainer();
-                classLoaderContainerMap.put(tccl, result);
-            }
-        }
-        return result;
-    }
-
-    // For unit testing
-    protected static void recycle() {
-        synchronized (classLoaderContainerMapLock) {
-            classLoaderContainerMap.clear();
-        }
-    }
-
     private final WsWriteTimeout wsWriteTimeout = new WsWriteTimeout();
 
-    private volatile ServletContext servletContext = null;
+    private final ServletContext servletContext;
     private final Map<String,ServerEndpointConfig> configExactMatchMap =
             new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer,SortedSet<TemplatePathMatch>>
@@ -103,16 +77,7 @@ public class WsServerContainer extends WsWebSocketContainer
     private final ConcurrentHashMap<String,Set<WsSession>> authenticatedSessions =
             new ConcurrentHashMap<>();
 
-    private WsServerContainer() {
-        // Hide default constructor
-    }
-
-
-    public void setServletContext(ServletContext servletContext) {
-
-        if (this.servletContext == servletContext) {
-            return;
-        }
+    WsServerContainer(ServletContext servletContext) {
 
         this.servletContext = servletContext;
 
@@ -130,7 +95,7 @@ public class WsServerContainer extends WsWebSocketContainer
         }
 
         FilterRegistration fr = servletContext.addFilter(
-                WsFilter.class.getName(), WsFilter.class);
+                WsFilter.class.getName(), new WsFilter(this));
 
         EnumSet<DispatcherType> types = EnumSet.of(DispatcherType.REQUEST,
                 DispatcherType.FORWARD);

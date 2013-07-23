@@ -233,7 +233,8 @@ public class TesterServletContext implements ServletContext {
     @Override
     public javax.servlet.FilterRegistration.Dynamic addFilter(
             String filterName, Filter filter) {
-        throw new RuntimeException("Not implemented");
+        return new ApplicationFilterRegistration(
+                new FilterDef(), new TesterContext());
     }
 
     @Override
