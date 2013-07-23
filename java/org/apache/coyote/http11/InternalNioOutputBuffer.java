@@ -96,13 +96,11 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      */
     @Override
     public void sendAck() throws IOException {
-
         if (!committed) {
-            //Socket.send(socket, Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length) < 0
-            socket.getBufHandler() .getWriteBuffer().put(Constants.ACK_BYTES,0,Constants.ACK_BYTES.length);
-            writeToSocket(socket.getBufHandler() .getWriteBuffer(),true,true);
+            socket.getBufHandler().getWriteBuffer().put(
+                    Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
+            writeToSocket(socket.getBufHandler().getWriteBuffer(), true, true);
         }
-
     }
 
     /**
