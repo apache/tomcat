@@ -960,7 +960,7 @@ public class HostConfig
         }
 
         DeployedApplication deployedApp = new DeployedApplication(cn.getName(),
-                xml.exists() && deployXML && copyXML);
+                xml.exists() && deployXML && copyThisXml);
 
         // Deploy the application in this WAR file
         if(log.isInfoEnabled())
@@ -972,10 +972,10 @@ public class HostConfig
             deployedApp.redeployResources.put
                 (war.getAbsolutePath(), Long.valueOf(war.lastModified()));
 
-            if (deployXML && xml.exists() && copyXML) {
+            if (deployXML && xml.exists() && copyThisXml) {
                 deployedApp.redeployResources.put(xml.getAbsolutePath(),
                         Long.valueOf(xml.lastModified()));
-            } else if (!copyXML ) {
+            } else if (!copyThisXml ) {
                 // In case an XML file is added to the config base later
                 deployedApp.redeployResources.put(
                         (new File(host.getConfigBaseFile(),
@@ -1006,7 +1006,7 @@ public class HostConfig
                         Long.valueOf(docBase.lastModified()));
                 addWatchedResources(deployedApp, docBase.getAbsolutePath(),
                         context);
-                if (deployXML && !copyXML && (xmlInWar || xml.exists())) {
+                if (deployXML && !copyThisXml && (xmlInWar || xml.exists())) {
                     deployedApp.redeployResources.put(xml.getAbsolutePath(),
                             Long.valueOf(xml.lastModified()));
                 }
