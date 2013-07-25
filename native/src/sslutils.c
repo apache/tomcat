@@ -1231,9 +1231,10 @@ static int ssl_ocsp_request(X509 *cert, X509 *issuer)
            approach is to iterate for all the possible ocsp urls */
         resp = get_ocsp_response(cert, issuer, ocsp_urls[0]);
 
-        apr_pool_destroy(p);
-        if (resp != NULL)
+        if (resp != NULL) {
+            apr_pool_destroy(p);
             return process_ocsp_response(resp);
+        }
     }
     apr_pool_destroy(p);
     return OCSP_STATUS_UNKNOWN;

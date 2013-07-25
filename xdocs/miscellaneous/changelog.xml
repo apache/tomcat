@@ -47,6 +47,10 @@
       of APR improves performance. (rjung)
     </update>
     <fix>
+      <bug>29422</bug> Fixed double-free in ssl_ocsp_request</code>.
+      Patch provided by Aristotelis. (schultz)
+    </fix>
+    <fix>
       <bug>51655</bug> Added a decent description of what tcnative actually is.
       (schultz)
     </fix>
