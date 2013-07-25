@@ -186,7 +186,7 @@ public final class Streams {
     public static String checkFileName(String pFileName) {
         if (pFileName != null  &&  pFileName.indexOf('\u0000') != -1) {
             // pFileName.replace("\u0000", "\\0")
-            final StringBuffer sb = new StringBuffer();
+            final StringBuilder sb = new StringBuilder();
             for (int i = 0;  i < pFileName.length();  i++) {
                 char c = pFileName.charAt(i);
                 switch (c) {
