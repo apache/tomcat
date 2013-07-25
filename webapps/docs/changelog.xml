@@ -171,6 +171,10 @@
       <fix>
         Avoid NPE when the channel fails to start. (kfujino)
       </fix>
+      <fix>
+        <bug>55301</bug>: Fix <code>IllegalArgumentException</code> thrown by
+        simple test for McastService. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
