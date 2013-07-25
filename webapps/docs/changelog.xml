@@ -194,6 +194,10 @@
         <code>tag-class</code> so TLD files complies with DTD/schema. Patch
         provided by Jeremy Boynes. (violetagg)
       </fix>
+      <update>
+        Update package renamed version of Commons BCEL to the latest code from
+        Commons BCEL trunk. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
