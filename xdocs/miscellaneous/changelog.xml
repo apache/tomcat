@@ -48,6 +48,7 @@
     </update>
     <fix>
       <bug>51655</bug> Added a decent description of what tcnative actually is.
+      (schultz)
     </fix>
   </changelog>
 </section>
