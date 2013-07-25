@@ -202,6 +202,11 @@
         Update package renamed version of Commons FileUpload to the latest code
         from Commons FileUpload trunk. (markt)
       </update>
+      <fix>
+        <bug>55297</bug>: When looking for the jsvc executable, if an explicit
+        path is not set and it is not found in $CATALINA_BASE, look in
+        $CATALINA_HOME as well. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
