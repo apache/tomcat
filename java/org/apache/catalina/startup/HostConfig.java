@@ -634,7 +634,7 @@ public class HostConfig
                                 Long.valueOf(warDocBase.lastModified()));
                     } else {
                         // Trigger a reload if a WAR is added
-                        deployedApp.reloadResources.put(
+                        deployedApp.redeployResources.put(
                                 warDocBase.getAbsolutePath(),
                                 Long.valueOf(0));
                     }
