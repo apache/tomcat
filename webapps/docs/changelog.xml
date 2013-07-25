@@ -198,6 +198,10 @@
         Update package renamed version of Commons BCEL to the latest code from
         Commons BCEL trunk. (markt)
       </update>
+      <update>
+        Update package renamed version of Commons FileUpload to the latest code
+        from Commons FileUpload trunk. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
