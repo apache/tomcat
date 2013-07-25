@@ -578,6 +578,8 @@ public class McastService implements MembershipService,MembershipListener,Messag
         p.setProperty("mcastFrequency","500");
         p.setProperty("tcpListenPort","4000");
         p.setProperty("tcpListenHost","127.0.0.1");
+        p.setProperty("tcpSecurePort","4100");
+        p.setProperty("udpListenPort","4200");
         service.setProperties(p);
         service.start();
         Thread.sleep(60*1000*60);
