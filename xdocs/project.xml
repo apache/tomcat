@@ -18,10 +18,10 @@
 <project name="Apache Tomcat Native Documentation"
         href="http://tomcat.apache.org/">
 
-    <title>The Apache Tomcat Native</title>
+    <title>Apache Tomcat Native Library</title>
 
     <logo href="/images/tomcat.gif">
-      The Apache Tomcat Native
+      Apache Tomcat Native Library
     </logo>
 <body>
 

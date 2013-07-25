@@ -31,8 +31,28 @@
 
 <section name="Introduction">
 
-<p>This is the top-level entry point of the documentation bundle for the
-<strong>Apache Tomcat Native</strong>
+  <p>
+    The Apache Tomcat Native Library is an optional component for use with
+    Apache Tomcat that allows Tomcat to use certain native resources
+    for performance, compatibility, etc.
+  </p>
+
+  <p>
+    Specifically, the Apache Tomcat Native Library gives Tomcat access to
+    the Apache Portable Runtime (APR) library's network connection (socket)
+    implementation and random-number generator.
+    See the Apache Tomcat documentation for more information on how to
+    configure Tomcat to use the APR connector.
+  </p>
+
+  <p>
+    Features of the APR connector:
+  </p>
+  <ul>
+    <li>Non-blocking I/O for Keep-Alive requests (between requests)</li>
+    <li>Uses OpenSSL for TLS/SSL capabilities (if supported by linked APR library)</li>
+    <li>FIPS 140-2 support for TLS/SSL (if supported by linked OpenSSL library)</li>
+  </ul>
 
 </p>
 <p>Select one of the links from the navigation menu (to the left) to drill
@@ -148,6 +168,20 @@ manual is described in more detail below.</p>
 </section>
 
 <section name="Install and tests">
+  <subsection name="Configuring Tomcat">
+    <p>
+      Apache Tomcat comes with the <code>AprLifecycleListener</code> enabled
+      by default. Still, you should check your <code>conf/server.xml</code>
+      to ensure that something like the following is present, and uncommented:
+    </p>
+
+    <pre>
+      &lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" /&gt;
+    </pre>
+
+    Please see the Apache Tomcat documentation for configuration specifics.
+  </subsection>
+
 <subsection name="UNIX">
   <p>
    Edit $CATALINA_HOME/bin/setenv.sh (creating the file if necessary) and add
@@ -175,10 +209,14 @@ manual is described in more detail below.</p>
   <p>
     Edit $CATALINA_BASE\bin\setenv.bat (creating the file if necessary) and add
     the path to the tc-native libraries, apr and OpenSSL to PATH. For example:
-  <pre>
+  <p>
+
+  <pre style="white-space:pre-wrap; word-wrap:break-word;">
     set PATH=%PATH;C:\cygwin\home\support\tomcat-native-current-win32-src\jni\native\Debug;C:\cygwin\home\support\tomcat-native-current-win32-src\jni\apr\Debug;C:\OpenSSL\lib\VC
   </pre>
+  <p>
     Start tomcat and check for the messages like this ones:
+  </p>
   <pre>
     Feb 8, 2008 2:48:17 PM org.apache.catalina.core.AprLifecycleListener init
     INFO: Loaded APR based Apache Tomcat Native library 1.x.y.

@@ -46,6 +46,9 @@
       Minimum supported APR version is now again 1.2.1. Version 1.3.0
       of APR improves performance. (rjung)
     </update>
+    <fix>
+      <bug>51655</bug> Added a decent description of what tcnative actually is.
+    </fix>
   </changelog>
 </section>
 <section name="Changes between 1.1.26 and 1.1.27">
