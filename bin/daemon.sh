@@ -106,7 +106,13 @@ fi
 test ".$CATALINA_HOME" = . && CATALINA_HOME=`cd "$DIRNAME/.." >/dev/null; pwd`
 test ".$CATALINA_BASE" = . && CATALINA_BASE="$CATALINA_HOME"
 test ".$CATALINA_MAIN" = . && CATALINA_MAIN=org.apache.catalina.startup.Bootstrap
-test ".$JSVC" = . && JSVC="$CATALINA_BASE/bin/jsvc"
+# If not explicitly set, look for jsvc in CATALINA_BASE first then CATALINA_HOME
+if [ -z $JSVC ]; then
+    JSVC="$CATALINA_BASE/bin/jsvc"
+    if [ ! -x $JSVC ]; then
+        JSVC="$CATALINA_HOME/bin/jsvc"
+    fi
+fi
 # Set the default service-start wait time if necessary
 test ".$SERVICE_START_WAIT_TIME" = . && SERVICE_START_WAIT_TIME=10
 
