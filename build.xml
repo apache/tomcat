@@ -1225,6 +1225,9 @@
       <include name="org/apache/**" />
       <include name="javax/**" />
     </javac>
+    <copy todir="${test.classes}">
+        <fileset dir="test" includes="META-INF/**"/>
+    </copy>
   </target>
 
   <!-- Default JUnit log output formatter -->
