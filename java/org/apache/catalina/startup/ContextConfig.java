@@ -16,19 +16,17 @@
  */
 package org.apache.catalina.startup;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1129,7 +1127,7 @@ public class ContextConfig implements LifecycleListener {
 
         // Step 3. Look for ServletContainerInitializer implementations
         if (ok) {
-            processServletContainerInitializers(orderedFragments);
+            processServletContainerInitializers(context.getServletContext());
         }
 
         if  (!webXml.isMetadataComplete() || typeInitializerMap.size() > 0) {
@@ -1591,151 +1589,64 @@ public class ContextConfig implements LifecycleListener {
 
     /**
      * Scan JARs for ServletContainerInitializer implementations.
-     * Implementations will be added in web-fragment.xml priority order.
      */
-    protected void processServletContainerInitializers(
-            Set<WebXml> fragments) {
+    protected void processServletContainerInitializers(ServletContext servletContext) {
 
-        for (WebXml fragment : fragments) {
-            URL url = fragment.getURL();
-            Jar jar = null;
-            InputStream is = null;
-            List<ServletContainerInitializer> detectedScis = null;
+        Collection<ServletContainerInitializer> detectedScis;
+        try {
+            WebappServiceLoader<ServletContainerInitializer> loader =
+                    new WebappServiceLoader<>(servletContext);
+            detectedScis = loader.load(ServletContainerInitializer.class);
+        } catch (IOException e) {
+            log.error(sm.getString(
+                    "contextConfig.servletContainerInitializerFail",
+                    context.getName()),
+                e);
+            ok = false;
+            return;
+        }
+
+        for (ServletContainerInitializer sci : detectedScis) {
+            initializerClassMap.put(sci, new HashSet<Class<?>>());
+
+            HandlesTypes ht;
             try {
-                if ("jar".equals(url.getProtocol())) {
-                    jar = JarFactory.newInstance(url);
-                    is = jar.getInputStream(SCI_LOCATION);
-                } else if ("file".equals(url.getProtocol())) {
-                    String path = url.getPath();
-                    File file = new File(path, SCI_LOCATION);
-                    if (file.exists()) {
-                        is = new FileInputStream(file);
-                    }
+                ht = sci.getClass().getAnnotation(HandlesTypes.class);
+            } catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    log.info(sm.getString("contextConfig.sci.debug",
+                            sci.getClass().getName()),
+                            e);
+                } else {
+                    log.info(sm.getString("contextConfig.sci.info",
+                            sci.getClass().getName()));
                 }
-                if (is != null) {
-                    detectedScis = getServletContainerInitializers(is);
-                }
-            } catch (IOException ioe) {
-                log.error(sm.getString(
-                        "contextConfig.servletContainerInitializerFail", url,
-                        context.getName()));
-                ok = false;
-                return;
-            } finally {
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
-                if (jar != null) {
-                    jar.close();
-                }
+                continue;
             }
-
-            if (detectedScis == null) {
+            if (ht == null) {
+                continue;
+            }
+            Class<?>[] types = ht.value();
+            if (types == null) {
                 continue;
             }
 
-            for (ServletContainerInitializer sci : detectedScis) {
-                initializerClassMap.put(sci, new HashSet<Class<?>>());
-
-                HandlesTypes ht = null;
-                try {
-                    ht = sci.getClass().getAnnotation(HandlesTypes.class);
-                } catch (Exception e) {
-                    if (log.isDebugEnabled()) {
-                        log.info(sm.getString("contextConfig.sci.debug", url),
-                                e);
-                    } else {
-                        log.info(sm.getString("contextConfig.sci.info", url));
-                    }
+            for (Class<?> type : types) {
+                if (type.isAnnotation()) {
+                    handlesTypesAnnotations = true;
+                } else {
+                    handlesTypesNonAnnotations = true;
                 }
-                if (ht != null) {
-                    Class<?>[] types = ht.value();
-                    if (types != null) {
-                        for (Class<?> type : types) {
-                            if (type.isAnnotation()) {
-                                handlesTypesAnnotations = true;
-                            } else {
-                                handlesTypesNonAnnotations = true;
-                            }
-                            Set<ServletContainerInitializer> scis = typeInitializerMap
-                                    .get(type);
-                            if (scis == null) {
-                                scis = new HashSet<>();
-                                typeInitializerMap.put(type, scis);
-                            }
-                            scis.add(sci);
-                        }
-                    }
+                Set<ServletContainerInitializer> scis =
+                        typeInitializerMap.get(type);
+                if (scis == null) {
+                    scis = new HashSet<>();
+                    typeInitializerMap.put(type, scis);
                 }
+                scis.add(sci);
             }
         }
     }
-
-
-    /**
-     * Extract the name of the ServletContainerInitializer.
-     *
-     * @param is    The resource where the name is defined
-     * @return      The class name
-     * @throws IOException
-     */
-    protected List<ServletContainerInitializer> getServletContainerInitializers(
-            InputStream is) throws IOException {
-
-        List<ServletContainerInitializer> initializers = new ArrayList<>();
-
-        if (is != null) {
-            String line = null;
-            try {
-                BufferedReader br = new BufferedReader(new InputStreamReader(
-                        is, "UTF-8"));
-                while ((line = br.readLine()) != null) {
-                    line = line.trim();
-                    if (line.length() > 0) {
-                        int i = line.indexOf('#');
-                        if (i > -1) {
-                            if (i == 0) {
-                                continue;
-                            }
-                            line = line.substring(0, i).trim();
-                        }
-                        initializers.add(getServletContainerInitializer(line));
-                    }
-                }
-            } catch (UnsupportedEncodingException e) {
-                // Should never happen with UTF-8
-                // If it does - ignore & return null
-            }
-        }
-
-        return initializers;
-    }
-
-    protected ServletContainerInitializer getServletContainerInitializer(
-            String className) throws IOException {
-        ServletContainerInitializer sci = null;
-        try {
-            Class<?> clazz = Class.forName(className, true, context.getLoader()
-                    .getClassLoader());
-            sci = (ServletContainerInitializer) clazz.newInstance();
-        } catch (ClassNotFoundException e) {
-            log.error(sm.getString("contextConfig.invalidSci", className), e);
-            throw new IOException(e);
-        } catch (InstantiationException e) {
-            log.error(sm.getString("contextConfig.invalidSci", className), e);
-            throw new IOException(e);
-        } catch (IllegalAccessException e) {
-            log.error(sm.getString("contextConfig.invalidSci", className), e);
-            throw new IOException(e);
-        }
-
-        return sci;
-    }
-
 
     /**
      * Scan JARs that contain web-fragment.xml files that will be used to
