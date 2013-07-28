@@ -1,0 +1,2 @@
+# SCIs that should be added when running tests
+org.apache.jasper.servlet.JasperInitializer
