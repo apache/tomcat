@@ -108,6 +108,8 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
 
         InputStream stream = null;
         WebXml fragment = new WebXml();
+        fragment.setWebappJar(isWebapp);
+        fragment.setDelegate(delegate);
 
         try {
             File fragmentFile = new File(file, FRAGMENT_LOCATION);
