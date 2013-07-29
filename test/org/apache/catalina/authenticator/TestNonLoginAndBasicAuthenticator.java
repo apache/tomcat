@@ -49,6 +49,15 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
  * both have quite simple behaviour. By testing them together, we
  * can make sure they operate independently and confirm that no
  * SSO logic has been accidentally triggered.
+ *
+ * <p>
+ * r1495169 refactored BasicAuthenticator by creating an inner class
+ * called BasicCredentials. All edge cases associated with strangely
+ * encoded Base64 credentials are tested thoroughly by TestBasicAuthParser.
+ * Therefore, TestNonLoginAndBasicAuthenticator only needs to examine
+ * a sufficient set of test cases to verify the interface between
+ * BasicAuthenticator and BasicCredentials, which it does by running
+ * each test under a separate tomcat instance.
  */
 public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
@@ -90,12 +99,6 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
                 new BasicCredentials(NICE_METHOD, USER, "wrong");
     private static final BasicCredentials BAD_METHOD =
                 new BasicCredentials("BadMethod", USER, PWD);
-    private static final BasicCredentials SPACED_BASE64 =
-                new BasicCredentials(NICE_METHOD + " ", USER, PWD);
-    private static final BasicCredentials SPACED_USERNAME =
-                new BasicCredentials(NICE_METHOD, " " + USER + " ", PWD);
-    private static final BasicCredentials SPACED_PASSWORD =
-                new BasicCredentials(NICE_METHOD, USER, " " + PWD + " ");
 
     private Tomcat tomcat;
     private Context basicContext;
@@ -192,52 +195,6 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
                 NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
         doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, BAD_METHOD,
                 NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-    }
-
-    /*
-     * This is the same as testAcceptProtectedBasic (above), except
-     * using excess white space after the authentication method.
-     *
-     * The access will be challenged with 401 SC_UNAUTHORIZED, and then be
-     * permitted once authenticated.
-     *
-     * RFC2617 does not define the separation syntax between the auth-scheme and
-     * basic-credentials tokens. Tomcat tolerates any amount of white space
-     * (within the limits of HTTP header sizes) and returns SC_OK.
-     */
-    @Test
-    public void testAuthMethodExtraSpace() throws Exception {
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
-                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, SPACED_BASE64,
-                NO_COOKIES, HttpServletResponse.SC_OK);
-
-    }
-
-    /*
-     * This is the same as testAcceptProtectedBasic (above), except
-     * using white space around the username credential. The request
-     * is accepted.
-     */
-    @Test
-    public void testUserExtraSpace() throws Exception {
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
-                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, SPACED_USERNAME,
-                NO_COOKIES, HttpServletResponse.SC_OK);
-    }
-
-    /*
-     * This is the same as testAcceptProtectedBasic (above), except
-     * using white space around the password credential. The request
-     * is accepted.
-     */
-    @Test
-    public void testPasswordExtraSpace() throws Exception {
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
-                NO_COOKIES, HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, SPACED_PASSWORD,
-                NO_COOKIES, HttpServletResponse.SC_OK);
     }
 
     /*
