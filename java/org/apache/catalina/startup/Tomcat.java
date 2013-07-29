@@ -179,22 +179,32 @@ public class Tomcat {
     }
 
     /**
-     * Add a webapp using normal WEB-INF/web.xml if found.
+     * This is equivalent to adding a web application to Tomcat&apos;s webapps
+     * directory. The equivalent of the default web.xml will be applied  to the
+     * web application and any WEB-INF/web.xml packaged with the application
+     * will be processed normally. Normal web fragment and
+     * {@link javax.servlet.ServletContainerInitializer} processing will be
+     * applied.
      *
-     * @param contextPath
-     * @param baseDir
-     * @return new Context
      * @throws ServletException
      */
-    public Context addWebapp(String contextPath,
-                                     String baseDir) throws ServletException {
+    public Context addWebapp(String contextPath, String baseDir)
+            throws ServletException {
 
         return addWebapp(getHost(), contextPath, baseDir);
     }
 
 
     /**
-     * Add a context - programmatic mode, no web.xml used.
+     * Add a context - programmatic mode, no default web.xml used. This means
+     * that there is no JSP support (no JSP servlet), no default servlet and
+     * no web socket support unless explicitly enabled via the programmatic
+     * interface. There is also no
+     * {@link javax.servlet.ServletContainerInitializer} processing and no
+     * annotation processing. If a
+     * {@link javax.servlet.ServletContainerInitializer} is added
+     * programmatically, there will still be no scanning for
+     * {@link javax.servlet.annotation.HandlesTypes} matches.
      *
      * API calls equivalent with web.xml:
      *
@@ -470,10 +480,16 @@ public class Tomcat {
         return server;
     }
 
+    /**
+     * @see {@link #addContext(String, String)}
+     */
     public Context addContext(Host host, String contextPath, String dir) {
         return addContext(host, contextPath, contextPath, dir);
     }
 
+    /**
+     * @see {@link #addContext(String, String)}
+     */
     public Context addContext(Host host, String contextPath, String contextName,
             String dir) {
         silence(host, contextPath);
@@ -491,10 +507,16 @@ public class Tomcat {
         return ctx;
     }
 
+    /**
+     * @see {@link #addWebapp(String, String)}.
+     */
     public Context addWebapp(Host host, String url, String path) {
         return addWebapp(host, url, url, path);
     }
 
+    /**
+     * @see {@link #addWebapp(String, String)}.
+     */
     public Context addWebapp(Host host, String url, String name, String path) {
         silence(host, url);
 
