@@ -45,7 +45,6 @@ public class TagPluginManager {
     private boolean initialized = false;
     private HashMap<String, TagPlugin> tagPlugins = null;
     private final ServletContext ctxt;
-    private PageInfo pageInfo;
 
     public TagPluginManager(ServletContext ctxt) {
         this.ctxt = ctxt;
@@ -59,17 +58,7 @@ public class TagPluginManager {
             return;
         }
 
-        this.pageInfo = pageInfo;
-
-        page.visit(new Node.Visitor() {
-            @Override
-            public void visit(Node.CustomTag n)
-                    throws JasperException {
-                invokePlugin(n);
-                visitBody(n);
-            }
-        });
-
+        page.visit(new NodeVisitor(this, pageInfo));
     }
 
     private void init(ErrorDispatcher err) throws JasperException {
@@ -162,7 +151,7 @@ public class TagPluginManager {
      *
      * The given custom tag node will be manipulated by the plugin.
      */
-    private void invokePlugin(Node.CustomTag n) {
+    private void invokePlugin(Node.CustomTag n, PageInfo pageInfo) {
         TagPlugin tagPlugin = tagPlugins.get(n.getTagHandlerClass().getName());
         if (tagPlugin == null) {
             return;
@@ -171,6 +160,22 @@ public class TagPluginManager {
         TagPluginContext tagPluginContext = new TagPluginContextImpl(n, pageInfo);
         n.setTagPluginContext(tagPluginContext);
         tagPlugin.doTag(tagPluginContext);
+    }
+
+    private static class NodeVisitor extends Node.Visitor {
+        private TagPluginManager manager;
+        private PageInfo pageInfo;
+
+        public NodeVisitor(TagPluginManager manager, PageInfo pageInfo) {
+            this.manager = manager;
+            this.pageInfo = pageInfo;
+        }
+
+        @Override
+        public void visit(Node.CustomTag n) throws JasperException {
+            manager.invokePlugin(n, pageInfo);
+            visitBody(n);
+        }
     }
 
     private static class TagPluginContextImpl implements TagPluginContext {
