@@ -121,9 +121,6 @@ public class ContextConfig implements LifecycleListener {
 
     private static final Log log = LogFactory.getLog( ContextConfig.class );
 
-    private static final String SCI_LOCATION =
-        "META-INF/services/javax.servlet.ServletContainerInitializer";
-
 
     /**
      * The string resources for this package.
