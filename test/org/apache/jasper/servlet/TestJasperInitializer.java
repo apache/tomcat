@@ -16,23 +16,34 @@
  */
 package org.apache.jasper.servlet;
 
-import java.util.ServiceLoader;
+import java.io.File;
+import java.util.Collection;
 
 import javax.servlet.ServletContainerInitializer;
+import javax.servlet.ServletContext;
 
+import org.junit.Assert;
 import org.junit.Test;
 
-/**
- *
- */
-public class TestJasperInitializer {
+import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.WebappServiceLoader;
+
+public class TestJasperInitializer extends TomcatBaseTest {
 
     @Test
-    public void testServiceLoader() {
-        ServiceLoader<ServletContainerInitializer> initializers =
-                ServiceLoader.load(ServletContainerInitializer.class);
-        for (ServletContainerInitializer initializer : initializers) {
-            System.out.println(initializer.getClass().getName());
-        }
+    public void testServiceLoader() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        File appDir = new File("test/webapp");
+        // app dir is relative to server home
+        StandardContext standardContext = (StandardContext) tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        tomcat.start();
+
+        ServletContext context = standardContext.getServletContext();
+        WebappServiceLoader<ServletContainerInitializer> loader = new WebappServiceLoader<>(context);
+        Collection<ServletContainerInitializer> initializers = loader.load(ServletContainerInitializer.class);
+        Assert.assertEquals(1, initializers.size());
+        Assert.assertTrue(initializers.iterator().next() instanceof JasperInitializer);
     }
 }
