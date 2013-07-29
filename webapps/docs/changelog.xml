@@ -152,6 +152,10 @@
         will return a result when the property cannot be coerced into an
         integer. (violetagg)
       </fix>
+      <fix>
+        <bug>55309</bug>: Fix concurrency issue with JSP compilation and the
+        tag plug-in manager. Patch provided by Sheldon Shao. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
