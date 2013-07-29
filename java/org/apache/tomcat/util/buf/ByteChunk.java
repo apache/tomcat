@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /*
  * In a server it is very important to be able to operate on
@@ -99,7 +100,7 @@ public final class ByteChunk implements Cloneable, Serializable {
         as most standards seem to converge, but the servlet API requires
         8859_1, and this object is used mostly for servlets.
     */
-    public static final Charset DEFAULT_CHARSET = B2CConverter.ISO_8859_1;
+    public static final Charset DEFAULT_CHARSET = StandardCharsets.ISO_8859_1;
 
     private int hashCode=0;
     // did we compute the hashcode ?

@@ -16,7 +16,7 @@
  */
 package org.apache.catalina.tribes.util;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -32,8 +32,6 @@ import org.apache.catalina.tribes.membership.Membership;
  * @version 1.0
  */
 public class Arrays {
-    private static final Charset CHARSET_ISO_8859_1 =
-        Charset.forName("ISO-8859-1");
 
     public static boolean contains(byte[] source, int srcoffset, byte[] key, int keyoffset, int length) {
         if ( srcoffset < 0 || srcoffset >= source.length) throw new ArrayIndexOutOfBoundsException("srcoffset is out of bounds.");
@@ -215,6 +213,6 @@ public class Arrays {
 
 
     public static byte[] convert(String s) {
-        return s.getBytes(CHARSET_ISO_8859_1);
+        return s.getBytes(StandardCharsets.ISO_8859_1);
     }
 }

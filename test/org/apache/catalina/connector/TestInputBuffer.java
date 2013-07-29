@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.MalformedInputException;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -32,7 +33,6 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.TestUtf8;
 import org.apache.tomcat.util.buf.TestUtf8.Utf8TestCase;
@@ -77,7 +77,7 @@ public class TestInputBuffer extends TomcatBaseTest {
         } else if (expected.length() == 0) {
             Assert.assertNull(description, bc.toString());
         } else {
-            bc.setCharset(B2CConverter.UTF_8);
+            bc.setCharset(StandardCharsets.UTF_8);
             Assert.assertEquals(description, expected, bc.toString());
         }
     }

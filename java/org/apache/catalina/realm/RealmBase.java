@@ -22,6 +22,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -242,7 +243,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     protected Charset getDigestCharset() throws UnsupportedEncodingException {
         if (digestEncoding == null) {
-            return B2CConverter.ISO_8859_1;
+            return StandardCharsets.ISO_8859_1;
         } else {
             return B2CConverter.getCharset(getDigestEncoding());
         }

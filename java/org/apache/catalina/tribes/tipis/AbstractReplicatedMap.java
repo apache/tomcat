@@ -19,7 +19,7 @@ package org.apache.catalina.tribes.tipis;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -68,11 +68,6 @@ public abstract class AbstractReplicatedMap<K,V>
      **/
     public static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
-    /**
-     * Used to identify the map
-     */
-    private static final Charset CHARSET_ISO_8859_1 =
-        Charset.forName("ISO-8859-1");
 
 //------------------------------------------------------------------------------
 //              INSTANCE VARIABLES
@@ -210,7 +205,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
         this.mapname = mapContextName;
         //unique context is more efficient if it is stored as bytes
-        this.mapContextName = mapContextName.getBytes(CHARSET_ISO_8859_1);
+        this.mapContextName = mapContextName.getBytes(StandardCharsets.ISO_8859_1);
         if ( log.isTraceEnabled() ) log.trace("Created Lazy Map with name:"+mapContextName+", bytes:"+Arrays.toString(this.mapContextName));
 
         //create an rpc channel and add the map as a listener
@@ -945,7 +940,7 @@ public abstract class AbstractReplicatedMap<K,V>
         try {
             System.out.println("\nDEBUG MAP:"+header);
             System.out.println("Map[" +
-                    new String(mapContextName, CHARSET_ISO_8859_1) +
+                    new String(mapContextName, StandardCharsets.ISO_8859_1) +
                     ", Map Size:" + innerMap.size());
             Member[] mbrs = getMapMembers();
             for ( int i=0; i<mbrs.length;i++ ) {

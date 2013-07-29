@@ -18,6 +18,7 @@ package org.apache.tomcat.util.buf;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 /**
@@ -209,7 +210,7 @@ public final class MessageBytes implements Cloneable, Serializable {
         }
         toString();
         type=T_BYTES;
-        byte bb[] = strValue.getBytes(B2CConverter.ISO_8859_1);
+        byte bb[] = strValue.getBytes(StandardCharsets.ISO_8859_1);
         byteC.setBytes(bb, 0, bb.length);
     }
 

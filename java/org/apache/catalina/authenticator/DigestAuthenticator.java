@@ -18,6 +18,7 @@ package org.apache.catalina.authenticator;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -34,7 +35,6 @@ import org.apache.catalina.util.ConcurrentMessageDigest;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.http.parser.HttpParser;
 
 
@@ -345,7 +345,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             request.getRemoteAddr() + ":" + currentTime + ":" + getKey();
 
         byte[] buffer = ConcurrentMessageDigest.digestMD5(
-                ipTimeKey.getBytes(B2CConverter.ISO_8859_1));
+                ipTimeKey.getBytes(StandardCharsets.ISO_8859_1));
         String nonce = currentTime + ":" + MD5Encoder.encode(buffer);
 
         NonceInfo info = new NonceInfo(currentTime, getNonceCountWindowSize());
@@ -587,7 +587,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             String serverIpTimeKey =
                 request.getRemoteAddr() + ":" + nonceTime + ":" + key;
             byte[] buffer = ConcurrentMessageDigest.digestMD5(
-                    serverIpTimeKey.getBytes(B2CConverter.ISO_8859_1));
+                    serverIpTimeKey.getBytes(StandardCharsets.ISO_8859_1));
             String md5ServerIpTimeKey = MD5Encoder.encode(buffer);
             if (!md5ServerIpTimeKey.equals(md5clientIpTimeKey)) {
                 return false;
@@ -646,7 +646,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             String a2 = method + ":" + uri;
 
             byte[] buffer = ConcurrentMessageDigest.digestMD5(
-                    a2.getBytes(B2CConverter.ISO_8859_1));
+                    a2.getBytes(StandardCharsets.ISO_8859_1));
             String md5a2 = MD5Encoder.encode(buffer);
 
             return realm.authenticate(userName, response, nonce, nc, cnonce,

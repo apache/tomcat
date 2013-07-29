@@ -26,8 +26,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -202,7 +202,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
             // Set up an authorization header with our credentials
             String input = username + ":" + password;
             String output = Base64.encodeBase64String(
-                    input.getBytes(B2CConverter.ISO_8859_1));
+                    input.getBytes(StandardCharsets.ISO_8859_1));
             hconn.setRequestProperty("Authorization",
                                      "Basic " + output);
 

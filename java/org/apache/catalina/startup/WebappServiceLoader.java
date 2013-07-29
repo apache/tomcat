@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -54,7 +54,6 @@ import javax.servlet.ServletContext;
 public class WebappServiceLoader<T> {
     private static final String LIB = "/WEB-INF/lib/";
     private static final String SERVICES = "META-INF/services/";
-    private static final Charset UTF8 = Charset.forName("UTF-8");
 
     private final ServletContext context;
 
@@ -129,7 +128,8 @@ public class WebappServiceLoader<T> {
 
     private void parseConfigFile(Set<String> servicesFound, URL url) throws IOException {
         try (InputStream is = url.openStream()) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is, UTF8));
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(is, StandardCharsets.UTF_8));
             String line;
             while ((line = reader.readLine()) != null) {
                 int i = line.indexOf('#');

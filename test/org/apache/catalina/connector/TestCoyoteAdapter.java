@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -35,7 +36,6 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestCoyoteAdapter extends TomcatBaseTest {
@@ -331,7 +331,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
                 public void run() {
                     while (true) {
                         try {
-                            os.write("TEST".getBytes(B2CConverter.UTF_8));
+                            os.write("TEST".getBytes(StandardCharsets.UTF_8));
                             os.flush();
                             Thread.sleep(1000);
                         } catch (Exception e) {

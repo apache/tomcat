@@ -22,7 +22,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -34,7 +34,6 @@ public class MultiCastSender
     implements Sender {
 
     private static final Log log = LogFactory.getLog(HeartbeatListener.class);
-    private static final Charset US_ASCII = Charset.forName("US-ASCII");
 
     HeartbeatListener config = null;
 
@@ -69,7 +68,7 @@ public class MultiCastSender
         }
 
         byte[] buf;
-        buf = mess.getBytes(US_ASCII);
+        buf = mess.getBytes(StandardCharsets.US_ASCII);
         DatagramPacket data = new DatagramPacket(buf, buf.length, group, config.getMultiport());
         try {
             s.send(data);

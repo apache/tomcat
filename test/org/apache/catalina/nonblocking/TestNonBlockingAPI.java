@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,6 @@ import org.apache.catalina.startup.BytesStreamer;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.ByteChunk.ByteOutputChannel;
 
@@ -110,7 +110,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         os.write(("GET / HTTP/1.1\r\n" +
                 "Host: localhost:" + getPort() + "\r\n" +
                 "Connection: close\r\n" +
-                "\r\n").getBytes(B2CConverter.ISO_8859_1));
+                "\r\n").getBytes(StandardCharsets.ISO_8859_1));
         os.flush();
 
         InputStream is = s.getInputStream();

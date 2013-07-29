@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1189,7 +1190,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             }
         }
         if (charset == null) {
-            charset = B2CConverter.ISO_8859_1;
+            charset = StandardCharsets.ISO_8859_1;
         }
 
         try {

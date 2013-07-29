@@ -19,6 +19,7 @@ package org.apache.tomcat.util.buf;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -327,7 +328,7 @@ public final class UDecoder {
         byte[] bytes = null;
         try {
             if (enc == null) {
-                bytes = str.getBytes(B2CConverter.ISO_8859_1);
+                bytes = str.getBytes(StandardCharsets.ISO_8859_1);
             } else {
                 bytes = str.getBytes(B2CConverter.getCharset(enc));
             }

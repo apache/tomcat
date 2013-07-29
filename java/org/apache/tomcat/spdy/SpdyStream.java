@@ -19,7 +19,7 @@ package org.apache.tomcat.spdy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -39,8 +39,6 @@ import java.util.concurrent.TimeUnit;
  * call is done the frame will be reused.
  */
 public class SpdyStream implements Runnable {
-    public static final Charset UTF8 = Charset.forName("UTF-8");
-
     private final SpdyConnection spdy;
 
     public SpdyFrame reqFrame;
@@ -177,10 +175,10 @@ public class SpdyStream implements Runnable {
         int nvCount = f.nvCount;
         for (int i = 0; i < nvCount; i++) {
             int len = f.read16();
-            String n = new String(f.data, f.off, len, UTF8);
+            String n = new String(f.data, f.off, len, StandardCharsets.UTF_8);
             f.advance(len);
             len = f.read16();
-            String v = new String(f.data, f.off, len, UTF8);
+            String v = new String(f.data, f.off, len, StandardCharsets.UTF_8);
             f.advance(len);
             resHeaders.put(n, v);
         }

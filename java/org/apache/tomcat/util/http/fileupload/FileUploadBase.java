@@ -18,7 +18,7 @@ package org.apache.tomcat.util.http.fileupload;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,9 +52,6 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
 public abstract class FileUploadBase {
 
     // ---------------------------------------------------------- Class methods
-
-    private static final Charset CHARSET_ISO_8859_1 =
-        Charset.forName("ISO-8859-1");
 
     /**
      * <p>Utility method that determines whether the request contains multipart
@@ -379,7 +376,7 @@ public abstract class FileUploadBase {
             return null;
         }
         byte[] boundary;
-        boundary = boundaryStr.getBytes(CHARSET_ISO_8859_1);
+        boundary = boundaryStr.getBytes(StandardCharsets.ISO_8859_1);
         return boundary;
     }
 

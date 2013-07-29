@@ -19,6 +19,7 @@ package org.apache.tomcat.util.http;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -213,7 +214,7 @@ public final class Parameters {
     private final ByteChunk origValue=new ByteChunk();
     public static final String DEFAULT_ENCODING = "ISO-8859-1";
     private static final Charset DEFAULT_CHARSET =
-        Charset.forName(DEFAULT_ENCODING);
+            StandardCharsets.ISO_8859_1;
 
 
     public void processParameters( byte bytes[], int start, int len ) {
