@@ -19,7 +19,7 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.HashSet;
@@ -47,10 +47,10 @@ import org.apache.tomcat.util.res.StringManager;
 
 public class WsSession implements Session {
 
-    private static final Charset UTF8 = Charset.forName("UTF8");
     // An ellipsis is a single character that looks like three periods in a row
     // and is used to indicate a continuation.
-    private static final byte[] ELLIPSIS_BYTES = "\u2026".getBytes(UTF8);
+    private static final byte[] ELLIPSIS_BYTES =
+            "\u2026".getBytes(StandardCharsets.UTF_8);
     // An ellipsis is three bytes in UTF-8
     private static final int ELLIPSIS_BYTES_LEN = ELLIPSIS_BYTES.length;
 
@@ -486,7 +486,7 @@ public class WsSession implements Session {
         // left for the reason phrase. If it is truncated then care needs to be
         // taken to ensure the bytes are not truncated in the middle of a
         // multi-byte UTF-8 character.
-        byte[] reasonBytes = reason.getBytes(UTF8);
+        byte[] reasonBytes = reason.getBytes(StandardCharsets.UTF_8);
 
         if (reasonBytes.length  <= 123) {
             // No need to truncate
@@ -495,12 +495,14 @@ public class WsSession implements Session {
             // Need to truncate
             int remaining = 123 - ELLIPSIS_BYTES_LEN;
             int pos = 0;
-            byte[] bytesNext = reason.substring(pos, pos + 1).getBytes(UTF8);
+            byte[] bytesNext = reason.substring(pos, pos + 1).getBytes(
+                    StandardCharsets.UTF_8);
             while (remaining >= bytesNext.length) {
                 msg.put(bytesNext);
                 remaining -= bytesNext.length;
                 pos++;
-                bytesNext = reason.substring(pos, pos + 1).getBytes(UTF8);
+                bytesNext = reason.substring(pos, pos + 1).getBytes(
+                        StandardCharsets.UTF_8);
             }
             msg.put(ELLIPSIS_BYTES);
         }

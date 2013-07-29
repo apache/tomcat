@@ -20,7 +20,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
@@ -519,7 +519,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("iib.invalidheader", new String(buf, start,
-                    lastRealByte - start + 1, Charset.forName("ISO-8859-1"))));
+                    lastRealByte - start + 1, StandardCharsets.ISO_8859_1)));
         }
     }
 

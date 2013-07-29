@@ -20,6 +20,7 @@ package org.apache.catalina.authenticator;
 
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.connector.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -250,15 +250,15 @@ public class BasicAuthenticator extends AuthenticatorBase {
             }
 
             if (colon < 0) {
-                username = new String(decoded, B2CConverter.ISO_8859_1);
+                username = new String(decoded, StandardCharsets.ISO_8859_1);
                 // password will remain null!
             }
             else {
                 username = new String(
-                            decoded, 0, colon, B2CConverter.ISO_8859_1);
+                            decoded, 0, colon, StandardCharsets.ISO_8859_1);
                 password = new String(
                             decoded, colon + 1, decoded.length - colon - 1,
-                            B2CConverter.ISO_8859_1);
+                            StandardCharsets.ISO_8859_1);
                 // tolerate surplus white space around credentials
                 if (password.length() > 1) {
                     password = password.trim();

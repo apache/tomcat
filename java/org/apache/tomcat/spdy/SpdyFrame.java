@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.spdy;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class SpdyFrame {
@@ -263,10 +264,10 @@ public class SpdyFrame {
     public void getHeaders(Map<String, String> resHeaders) {
         for (int i = 0; i < nvCount; i++) {
             int len = read16();
-            String n = new String(data, off, len, SpdyStream.UTF8);
+            String n = new String(data, off, len, StandardCharsets.UTF_8);
             advance(len);
             len = read16();
-            String v = new String(data, off, len, SpdyStream.UTF8);
+            String v = new String(data, off, len, StandardCharsets.UTF_8);
             advance(len);
             resHeaders.put(n, v);
         }

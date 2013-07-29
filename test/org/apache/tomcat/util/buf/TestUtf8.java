@@ -18,10 +18,10 @@ package org.apache.tomcat.util.buf;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -362,7 +362,7 @@ public class TestUtf8 {
 
     @Test
     public void testJvmDecoder() {
-        CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
+        CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
         for (Utf8TestCase testCase : TEST_CASES) {
             doTest(decoder, testCase, testCase.flagsJvm);
         }

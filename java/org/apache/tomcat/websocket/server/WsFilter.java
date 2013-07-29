@@ -17,7 +17,7 @@
 package org.apache.tomcat.websocket.server;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -52,12 +52,9 @@ import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
  */
 public class WsFilter implements Filter {
 
-    private static final Charset ISO_8859_1;
-    static {
-        ISO_8859_1 = Charset.forName("ISO-8859-1");
-    }
     private static final byte[] WS_ACCEPT =
-            "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(ISO_8859_1);
+            "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(
+                    StandardCharsets.ISO_8859_1);
     private final Queue<MessageDigest> sha1Helpers =
             new ConcurrentLinkedQueue<>();
     private final WsServerContainer sc;
@@ -268,7 +265,7 @@ public class WsFilter implements Filter {
             }
         }
         sha1Helper.reset();
-        sha1Helper.update(key.getBytes(ISO_8859_1));
+        sha1Helper.update(key.getBytes(StandardCharsets.ISO_8859_1));
         String result = Base64.encodeBase64String(sha1Helper.digest(WS_ACCEPT));
         sha1Helpers.add(sha1Helper);
         return result;

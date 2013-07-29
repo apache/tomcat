@@ -19,7 +19,7 @@ package org.apache.coyote.http11;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.channels.Selector;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
@@ -42,9 +42,6 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(InternalNioInputBuffer.class);
-
-    private static final Charset DEFAULT_CHARSET =
-        Charset.forName("ISO-8859-1");
 
     // -------------------------------------------------------------- Constants
 
@@ -269,7 +266,8 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             parsingRequestLinePhase = 2;
             if (log.isDebugEnabled()) {
                 log.debug("Received ["
-                        + new String(buf, pos, lastValid - pos, DEFAULT_CHARSET)
+                        + new String(buf, pos, lastValid - pos,
+                                StandardCharsets.ISO_8859_1)
                         + "]");
             }
         }
@@ -733,7 +731,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             log.debug(sm.getString("iib.invalidheader", new String(buf,
                     headerData.start,
                     headerData.lastSignificantChar - headerData.start + 1,
-                    DEFAULT_CHARSET)));
+                    StandardCharsets.ISO_8859_1)));
         }
 
         headerParsePos = HeaderParsePosition.HEADER_START;

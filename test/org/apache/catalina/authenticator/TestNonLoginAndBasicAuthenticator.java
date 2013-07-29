@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.authenticator;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,6 @@ import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
@@ -559,7 +559,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
             password = aPassword;
             String userCredentials = username + ":" + password;
             byte[] credentialsBytes =
-                    userCredentials.getBytes(B2CConverter.ISO_8859_1);
+                    userCredentials.getBytes(StandardCharsets.ISO_8859_1);
             String base64auth = Base64.encodeBase64String(credentialsBytes);
             credentials= method + " " + base64auth;
         }

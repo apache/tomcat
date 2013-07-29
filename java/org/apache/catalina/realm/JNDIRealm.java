@@ -19,6 +19,7 @@ package org.apache.catalina.realm;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -52,7 +53,6 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
 import org.apache.catalina.LifecycleException;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.ietf.jgss.GSSCredential;
 
@@ -1552,10 +1552,10 @@ public class JNDIRealm extends RealmBase {
                 synchronized (this) {
                     password = password.substring(5);
                     md.reset();
-                    md.update(credentials.getBytes(B2CConverter.ISO_8859_1));
+                    md.update(credentials.getBytes(StandardCharsets.ISO_8859_1));
                     byte[] encoded = Base64.encodeBase64(md.digest());
                     String digestedPassword =
-                            new String(encoded, B2CConverter.ISO_8859_1);
+                            new String(encoded, StandardCharsets.ISO_8859_1);
                     validated = password.equals(digestedPassword);
                 }
             } else if (password.startsWith("{SSHA}")) {
@@ -1565,7 +1565,7 @@ public class JNDIRealm extends RealmBase {
                     password = password.substring(6);
 
                     md.reset();
-                    md.update(credentials.getBytes(B2CConverter.ISO_8859_1));
+                    md.update(credentials.getBytes(StandardCharsets.ISO_8859_1));
 
                     // Decode stored password.
                     byte[] decoded = Base64.decodeBase64(password);

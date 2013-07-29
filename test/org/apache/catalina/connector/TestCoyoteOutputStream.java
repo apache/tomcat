@@ -17,6 +17,7 @@
 package org.apache.catalina.connector;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.AsyncContext;
@@ -34,7 +35,6 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestCoyoteOutputStream extends TomcatBaseTest {
@@ -137,7 +137,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
                 if (next < asyncWriteTarget) {
                     sos.write(
                             ("OK - " + next + System.lineSeparator()).getBytes(
-                                    B2CConverter.UTF_8));
+                                    StandardCharsets.UTF_8));
                     sos.flush();
                 } else {
                     asyncCtxt.dispatch("/write");
@@ -212,7 +212,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
 
             for (int i = start; i < start + len; i++) {
                 sos.write(("OK - " + i + System.lineSeparator()).getBytes(
-                        B2CConverter.UTF_8));
+                        StandardCharsets.UTF_8));
             }
         }
     }

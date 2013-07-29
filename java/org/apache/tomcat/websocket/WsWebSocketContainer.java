@@ -27,7 +27,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,7 +88,6 @@ public class WsWebSocketContainer
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
     private static final Random random = new Random();
-    private static final Charset iso88591 = Charset.forName("ISO-8859-1");
     private static final byte[] crlf = new byte[] {13, 10};
     private static final AsynchronousChannelGroup asynchronousChannelGroup;
 
@@ -481,14 +480,14 @@ public class WsWebSocketContainer
         ByteBuffer result = ByteBuffer.allocate(4 * 1024);
 
         // Request line
-        result.put("GET ".getBytes(iso88591));
-        result.put(uri.getRawPath().getBytes(iso88591));
+        result.put("GET ".getBytes(StandardCharsets.ISO_8859_1));
+        result.put(uri.getRawPath().getBytes(StandardCharsets.ISO_8859_1));
         String query = uri.getRawQuery();
         if (query != null) {
             result.put((byte) '?');
-            result.put(query.getBytes(iso88591));
+            result.put(query.getBytes(StandardCharsets.ISO_8859_1));
         }
-        result.put(" HTTP/1.1\r\n".getBytes(iso88591));
+        result.put(" HTTP/1.1\r\n".getBytes(StandardCharsets.ISO_8859_1));
 
         // Headers
         Iterator<Entry<String,List<String>>> iter =
@@ -520,9 +519,9 @@ public class WsWebSocketContainer
             sb.append(iter.next());
         }
 
-        result.put(key.getBytes(iso88591));
-        result.put(": ".getBytes(iso88591));
-        result.put(sb.toString().getBytes(iso88591));
+        result.put(key.getBytes(StandardCharsets.ISO_8859_1));
+        result.put(": ".getBytes(StandardCharsets.ISO_8859_1));
+        result.put(sb.toString().getBytes(StandardCharsets.ISO_8859_1));
         result.put(crlf);
     }
 

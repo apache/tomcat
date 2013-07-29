@@ -19,7 +19,7 @@ package org.apache.jasper.compiler;
 import java.io.ByteArrayInputStream;
 import java.io.CharArrayWriter;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ListIterator;
 
 import javax.servlet.jsp.tagext.PageData;
@@ -53,7 +53,6 @@ class PageDataImpl extends PageData implements TagConstants {
     private static final String JSP_VERSION = "2.0";
     private static final String CDATA_START_SECTION = "<![CDATA[\n";
     private static final String CDATA_END_SECTION = "]]>\n";
-    private static final Charset CHARSET_UTF8 = Charset.forName("UTF-8");
 
     // string buffer used to build XML view
     private final StringBuilder buf;
@@ -86,7 +85,8 @@ class PageDataImpl extends PageData implements TagConstants {
      */
     @Override
     public InputStream getInputStream() {
-        return new ByteArrayInputStream(buf.toString().getBytes(CHARSET_UTF8));
+        return new ByteArrayInputStream(
+                buf.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     /*

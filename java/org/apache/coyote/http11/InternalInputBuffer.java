@@ -20,7 +20,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
@@ -499,7 +499,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("iib.invalidheader", new String(buf, start,
-                    lastRealByte - start + 1, Charset.forName("ISO-8859-1"))));
+                    lastRealByte - start + 1, StandardCharsets.ISO_8859_1)));
         }
     }
 

@@ -17,11 +17,11 @@
 package org.apache.catalina.authenticator;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.codec.binary.Base64;
 
@@ -467,7 +467,7 @@ public class TestBasicAuthParser {
 
         private  final String HTTP_AUTH = "authorization: ";
         private  final byte[] HEADER =
-                HTTP_AUTH.getBytes(B2CConverter.ISO_8859_1);
+                HTTP_AUTH.getBytes(StandardCharsets.ISO_8859_1);
         private ByteChunk authHeader;
         private int initialOffset = 0;
 
@@ -491,15 +491,15 @@ public class TestBasicAuthParser {
                     ? username
                     : username + ":" + password;
             byte[] credentialsBytes =
-                    userCredentials.getBytes(B2CConverter.ISO_8859_1);
+                    userCredentials.getBytes(StandardCharsets.ISO_8859_1);
             String base64auth = Base64.encodeBase64String(credentialsBytes);
             byte[] base64Bytes =
-                    base64auth.getBytes(B2CConverter.ISO_8859_1);
+                    base64auth.getBytes(StandardCharsets.ISO_8859_1);
 
             byte[] extraBytes =
                     ((extraBlob == null) || (extraBlob.length() < 1))
                     ? null :
-                    extraBlob.getBytes(B2CConverter.ISO_8859_1);
+                    extraBlob.getBytes(StandardCharsets.ISO_8859_1);
 
             try {
                 authHeader.append(base64Bytes, 0, base64Bytes.length);
@@ -522,7 +522,7 @@ public class TestBasicAuthParser {
         private BasicAuthHeader(String method, String fakeBase64) {
             prefix(method);
 
-            byte[] fakeBytes = fakeBase64.getBytes(B2CConverter.ISO_8859_1);
+            byte[] fakeBytes = fakeBase64.getBytes(StandardCharsets.ISO_8859_1);
 
             try {
                 authHeader.append(fakeBytes, 0, fakeBytes.length);
@@ -544,7 +544,7 @@ public class TestBasicAuthParser {
             initialOffset = HEADER.length;
 
             String methodX = method + " ";
-            byte[] methodBytes = methodX.getBytes(B2CConverter.ISO_8859_1);
+            byte[] methodBytes = methodX.getBytes(StandardCharsets.ISO_8859_1);
 
             try {
                 authHeader.append(methodBytes, 0, methodBytes.length);

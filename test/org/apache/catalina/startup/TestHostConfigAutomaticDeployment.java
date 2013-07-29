@@ -19,6 +19,7 @@ package org.apache.catalina.startup;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
@@ -36,7 +37,6 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
-import org.apache.tomcat.util.buf.B2CConverter;
 
 /**
  * The purpose of this class is to test the automatic deployment features of the
@@ -1671,7 +1671,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 context.append("\" antiResourceLocking=\"true");
             }
             context.append("\" />");
-            fos.write(context.toString().getBytes(B2CConverter.ISO_8859_1));
+            fos.write(context.toString().getBytes(StandardCharsets.ISO_8859_1));
         }
         return xml;
     }
