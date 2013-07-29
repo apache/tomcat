@@ -82,7 +82,6 @@ public class WebappServiceLoader<T> {
 
         // if the ServletContext has ORDERED_LIBS, then use that to specify the
         // set of JARs from WEB-INF/lib that should be used for loading services
-        @SuppressWarnings("unchecked")
         List<String> orderedLibs = (List<String>) context.getAttribute(ServletContext.ORDERED_LIBS);
         if (orderedLibs != null) {
             // handle ordered libs directly, ...
