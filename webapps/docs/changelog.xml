@@ -78,6 +78,11 @@
         JARs. Patch provided by Nick Williams. (markt)
       </fix>
       <fix>
+        <bug>55261</bug>: Fix failing unit test for file upload checks when
+        running on platform / JVM combinations that have large network buffers.
+        (markt)
+      </fix>
+      <fix>
         <bug>55268</bug>: Added optional --service-start-wait-time
         command-line option to change service s tart wait time from default
         of 10 seconds.
