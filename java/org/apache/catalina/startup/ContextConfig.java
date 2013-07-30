@@ -1128,7 +1128,8 @@ public class ContextConfig implements LifecycleListener {
         }
 
         if  (!webXml.isMetadataComplete() || typeInitializerMap.size() > 0) {
-            // Step 4. Process /WEB-INF/classes for annotations
+            // Step 4. Process /WEB-INF/classes for annotations and
+            // @HandlesTypes matches
             if (ok) {
                 WebResource[] webResources =
                         context.getResources().listResources("/WEB-INF/classes");
@@ -1139,8 +1140,10 @@ public class ContextConfig implements LifecycleListener {
                 }
             }
 
-            // Step 5. Process JARs for annotations - only need to process
-            // those fragments we are going to use
+            // Step 5. Process JARs for annotations for annotations and
+            // @HandlesTypes matches - only need to process those fragments we
+            // are going to use (remember orderedFragments includes any
+            // container fragments)
             if (ok) {
                 processAnnotations(
                         orderedFragments, webXml.isMetadataComplete());
@@ -1860,20 +1863,24 @@ public class ContextConfig implements LifecycleListener {
     protected void processAnnotations(Set<WebXml> fragments,
             boolean handlesTypesOnly) {
         for(WebXml fragment : fragments) {
-            if (fragment.getWebappJar()) {
-                // Only web application JARs should be scanned for deployment
-                // annotations
-                WebXml annotations = new WebXml();
-                // no impact on distributable
-                annotations.setDistributable(true);
-                URL url = fragment.getURL();
-                processAnnotationsUrl(url, annotations,
-                        (handlesTypesOnly || fragment.isMetadataComplete()));
-                Set<WebXml> set = new HashSet<>();
-                set.add(annotations);
-                // Merge annotations into fragment - fragment takes priority
-                fragment.merge(set);
-            }
+            // Only need to scan for @HandlesTypes matches if any of the
+            // following are true:
+            // - it has already been determined only @HandlesTypes is required
+            //   (e.g. main web.xml has metadata-complete="true"
+            // - this fragment is for a container JAR (Servlet 3.1 section 8.1)
+            // - this fragment has metadata-complete="true"
+            boolean htOnly = handlesTypesOnly || !fragment.getWebappJar() ||
+                    fragment.isMetadataComplete();
+
+            WebXml annotations = new WebXml();
+            // no impact on distributable
+            annotations.setDistributable(true);
+            URL url = fragment.getURL();
+            processAnnotationsUrl(url, annotations, htOnly);
+            Set<WebXml> set = new HashSet<>();
+            set.add(annotations);
+            // Merge annotations into fragment - fragment takes priority
+            fragment.merge(set);
         }
     }
 
