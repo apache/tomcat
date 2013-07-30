@@ -82,12 +82,6 @@ public class HostConfig
 
 
     /**
-     * The Java class name of the Context configuration class we should use.
-     */
-    protected String configClass = "org.apache.catalina.startup.ContextConfig";
-
-
-    /**
      * The Java class name of the Context implementation we should use.
      */
     protected String contextClass = "org.apache.catalina.core.StandardContext";
@@ -160,28 +154,6 @@ public class HostConfig
     protected final Set<String> invalidWars = new HashSet<>();
 
     // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return the Context configuration class name.
-     */
-    public String getConfigClass() {
-
-        return (this.configClass);
-
-    }
-
-
-    /**
-     * Set the Context configuration class name.
-     *
-     * @param configClass The new Context configuration class name.
-     */
-    public void setConfigClass(String configClass) {
-
-        this.configClass = configClass;
-
-    }
 
 
     /**
