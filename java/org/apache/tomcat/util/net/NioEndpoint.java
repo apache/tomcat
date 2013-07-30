@@ -1749,6 +1749,8 @@ public class NioEndpoint extends AbstractEndpoint {
                             ExceptionUtils.handleThrowable(letsHopeWeDontGetHere);
                         }
                     }
+                } catch (VirtualMachineError vme) {
+                    ExceptionUtils.handleThrowable(vme);
                 }catch ( Throwable t ) {
                     log.error("",t);
                     socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);

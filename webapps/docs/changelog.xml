@@ -105,6 +105,10 @@
         This prevents a long timeout delaying the closing of the socket
         associated with a Comet connection after an error occurs. (markt)
       </fix>
+      <fix>
+        Ensure that <code>java.lang.VirtualMachineError</code>s are not
+        swallowed when using the HTTP or AJP NIO connectors. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
