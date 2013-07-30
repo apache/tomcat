@@ -1626,8 +1626,8 @@ public class NioEndpoint extends AbstractEndpoint {
                 } else {
                     ka.getPoller().add(socket,handshake);
                 }
-            }catch(CancelledKeyException cx) {
-                socket.getPoller().cancelledKey(key,null);
+            } catch(CancelledKeyException cx) {
+                socket.getPoller().cancelledKey(key, null);
             } catch (OutOfMemoryError oom) {
                 try {
                     oomParachuteData = null;
@@ -1636,18 +1636,18 @@ public class NioEndpoint extends AbstractEndpoint {
                         socket.getPoller().cancelledKey(key,SocketStatus.ERROR);
                     }
                     releaseCaches();
-                }catch ( Throwable oomt ) {
+                } catch (Throwable oomt) {
                     try {
                         System.err.println(oomParachuteMsg);
                         oomt.printStackTrace();
-                    }catch (Throwable letsHopeWeDontGetHere){
+                    } catch (Throwable letsHopeWeDontGetHere){
                         ExceptionUtils.handleThrowable(letsHopeWeDontGetHere);
                     }
                 }
             } catch (VirtualMachineError vme) {
                 ExceptionUtils.handleThrowable(vme);
-            }catch ( Throwable t ) {
-                log.error("",t);
+            } catch (Throwable t) {
+                log.error("", t);
                 if (socket != null) {
                     socket.getPoller().cancelledKey(key,SocketStatus.ERROR);
                 }
