@@ -1577,13 +1577,13 @@ public class NioEndpoint extends AbstractEndpoint {
                             status = SocketStatus.OPEN_READ;
                         }
                     }
-                }catch ( IOException x ) {
+                } catch (IOException x) {
                     handshake = -1;
-                    if ( log.isDebugEnabled() ) log.debug("Error during SSL handshake",x);
-                }catch ( CancelledKeyException ckx ) {
+                    if (log.isDebugEnabled()) log.debug("Error during SSL handshake",x);
+                } catch (CancelledKeyException ckx) {
                     handshake = -1;
                 }
-                if ( handshake == 0 ) {
+                if (handshake == 0) {
                     SocketState state = SocketState.OPEN;
                     // Process the request from this socket
                     if (status == null) {
@@ -1604,7 +1604,7 @@ public class NioEndpoint extends AbstractEndpoint {
                                 keyCache.push(ka);
                             }
                             ka = null;
-                        }catch ( Exception x ) {
+                        } catch (Exception x) {
                             log.error("",x);
                         }
                     } else if (state == SocketState.LONG && ka != null && ka.isAsync() && ka.interestOps() > 0) {
@@ -1626,7 +1626,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 } else {
                     ka.getPoller().add(socket,handshake);
                 }
-            } catch(CancelledKeyException cx) {
+            } catch (CancelledKeyException cx) {
                 socket.getPoller().cancelledKey(key, null);
             } catch (OutOfMemoryError oom) {
                 try {
