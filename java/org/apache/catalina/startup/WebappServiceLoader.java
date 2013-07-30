@@ -34,11 +34,12 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 
 /**
- * A variation of Java's JAR ServiceLoader that respects exclusion rules for web applications.
+ * A variation of Java's JAR ServiceLoader that respects exclusion rules for
+ * web applications.
  * <p/>
- * Primarily intended for use loading ServletContainerInitializers as defined by Servlet 8.2.4.
- * This implementation does not attempt lazy loading as the container is required to
- * introspect all implementations discovered.
+ * Primarily intended for use loading ServletContainerInitializers as defined
+ * by Servlet 8.2.4. This implementation does not attempt lazy loading as the
+ * container is required to introspect all implementations discovered.
  * <p/>
  * If the ServletContext defines ORDERED_LIBS, then only JARs in WEB-INF/lib
  * that are named in that set will be included in the search for
@@ -81,7 +82,8 @@ public class WebappServiceLoader<T> {
 
         // if the ServletContext has ORDERED_LIBS, then use that to specify the
         // set of JARs from WEB-INF/lib that should be used for loading services
-        List<String> orderedLibs = (List<String>) context.getAttribute(ServletContext.ORDERED_LIBS);
+        List<String> orderedLibs =
+                (List<String>) context.getAttribute(ServletContext.ORDERED_LIBS);
         if (orderedLibs != null) {
             // handle ordered libs directly, ...
             for (String lib : orderedLibs) {
@@ -126,10 +128,12 @@ public class WebappServiceLoader<T> {
         return loadServices(serviceType, servicesFound);
     }
 
-    private void parseConfigFile(Set<String> servicesFound, URL url) throws IOException {
+    private void parseConfigFile(Set<String> servicesFound, URL url)
+            throws IOException {
         try (InputStream is = url.openStream()) {
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(is, StandardCharsets.UTF_8));
+            InputStreamReader in =
+                    new InputStreamReader(is, StandardCharsets.UTF_8);
+            BufferedReader reader = new BufferedReader(in);
             String line;
             while ((line = reader.readLine()) != null) {
                 int i = line.indexOf('#');
@@ -148,14 +152,17 @@ public class WebappServiceLoader<T> {
         }
     }
 
-    private Collection<T> loadServices(Class<T> serviceType, Set<String> servicesFound) throws IOException {
+    private Collection<T> loadServices(Class<T> serviceType,
+                                       Set<String> servicesFound)
+            throws IOException {
         ClassLoader loader = context.getClassLoader();
         List<T> services = new ArrayList<>(servicesFound.size());
         for (String serviceClass : servicesFound) {
             try {
                 Class<?> clazz = Class.forName(serviceClass, true, loader);
                 services.add(serviceType.cast(clazz.newInstance()));
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+            } catch (ClassNotFoundException | InstantiationException |
+                    IllegalAccessException | ClassCastException e) {
                 throw new IOException(e);
             }
         }
