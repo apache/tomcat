@@ -84,8 +84,8 @@
       </fix>
       <fix>
         <bug>55268</bug>: Added optional --service-start-wait-time
-        command-line option to change service s tart wait time from default
-        of 10 seconds.
+        command-line option to change service start wait time from default of 10
+        seconds.
       </fix>
     </changelog>
   </subsection>
