@@ -97,7 +97,9 @@ public class HostConfig
 
     /**
      * The Java class name of the Context configuration class we should use.
+     * @deprecated Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     protected String configClass = "org.apache.catalina.startup.ContextConfig";
 
 
@@ -178,7 +180,9 @@ public class HostConfig
 
     /**
      * Return the Context configuration class name.
+     * @deprecated Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     public String getConfigClass() {
 
         return (this.configClass);
@@ -190,7 +194,9 @@ public class HostConfig
      * Set the Context configuration class name.
      *
      * @param configClass The new Context configuration class name.
+     * @deprecated Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     public void setConfigClass(String configClass) {
 
         this.configClass = configClass;
