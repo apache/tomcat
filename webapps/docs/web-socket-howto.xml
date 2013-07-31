@@ -61,6 +61,17 @@
    value assigned to this property should be a <code>Long</code> and represents
    the timeout to use in milliseconds. For an infinite timeout, use
    <code>-1</code>.</p>
+
+<p>The default buffer size for binary messages is 8192 bytes. This may be
+   changed for a web application by setting the servlet context initialization
+   parameter <code>org.apache.tomcat.websocket.binaryBufferSize</code> to the
+   desired value in bytes.</p>
+   
+<p>The default buffer size for text messages is 8192 bytes. This may be
+   changed for a web application by setting the servlet context initialization
+   parameter <code>org.apache.tomcat.websocket.textBufferSize</code> to the
+   desired value in bytes.</p>
+   
 </section>
 
 </body>
