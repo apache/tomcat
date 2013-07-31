@@ -68,10 +68,6 @@
                type="java.lang.String"
                writeable="false" />
 
-    <attribute name="configClass"
-               description="The Java class name of the Context configuration class we should use"
-               type="java.lang.String"/>
-
     <attribute name="contextClass"
                description="The Java class name of the Context implementation we should use"
                type="java.lang.String"/>
