@@ -206,7 +206,7 @@ public interface HttpSession {
      * <code>HttpSessionBindingListener.valueUnbound</code> method is called.
      * <p>
      * If the value passed in is null, this has the same effect as calling
-     * <code>removeAttribute()<code>.
+     * <code>removeAttribute()</code>.
      *
      * @param name
      *            the name to which the object is bound; cannot be null
