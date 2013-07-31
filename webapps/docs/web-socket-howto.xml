@@ -72,6 +72,15 @@
    parameter <code>org.apache.tomcat.websocket.textBufferSize</code> to the
    desired value in bytes.</p>
    
+<p>The Java WebSocket specification 1.0 does not permit programmatic deployment
+   after the first endpoint has started a WebSocket handshake. By default,
+   Tomcat continues to permit additional programmatic deployment. This
+   behavior is controlled by the
+   <code>org.apache.tomcat.websocket.noAddAfterHandshake</code> servlet context
+   initialization parameter. The default may be changed by setting the
+   <code>org.apache.tomcat.websocket.STRICT_SPEC_COMPLIANCE</code> system
+   property to <code>true</code> but any explict setting on the servlet context
+   will always take priority.</p>
 </section>
 
 </body>

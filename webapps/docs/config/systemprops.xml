@@ -272,7 +272,7 @@
 </section>
 
 
-<section name="Specification">
+<section name="Specifications">
 
   <properties>
 
@@ -341,6 +341,16 @@
       else the default value will be <code>false</code>.</p>
     </property>
 
+    <property name="org.apache.tomcat.websocket. STRICT_SPEC_COMPLIANCE">
+      <p>The default value of this system property is <code>false</code>.</p>
+      <p>If this is <code>true</code> the default values will be changed for:
+      <ul>
+        <li><code>org.apache.tomcat.websocket.server#isEnforceNoAddAfterHandshake</code>
+        (default changes from <code>false</code> to <code>true</code>)</li>
+      </ul>
+      </p>
+    </property>
+    
     <property
     name="org.apache.tomcat.util.http. ServerCookie.ALLOW_EQUALS_IN_VALUE">
       <p>If this is <code>true</code> Tomcat will allow '<code>=</code>'

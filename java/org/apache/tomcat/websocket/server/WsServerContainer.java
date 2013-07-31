@@ -73,6 +73,8 @@ public class WsServerContainer extends WsWebSocketContainer
             new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer,SortedSet<TemplatePathMatch>>
             configTemplateMatchMap = new ConcurrentHashMap<>();
+    private volatile boolean enforceNoAddAfterHandshake =
+            org.apache.tomcat.websocket.Constants.STRICT_SPEC_COMPLIANCE;
     private volatile boolean addAllowed = true;
     private final ConcurrentHashMap<String,Set<WsSession>> authenticatedSessions =
             new ConcurrentHashMap<>();
@@ -92,6 +94,12 @@ public class WsServerContainer extends WsWebSocketContainer
                 Constants.TEXT_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM);
         if (value != null) {
             setDefaultMaxTextMessageBufferSize(Integer.parseInt(value));
+        }
+
+        value = servletContext.getInitParameter(
+                Constants.ENFORCE_NO_ADD_AFTER_HANDSHAKE_CONTEXT_INIT_PARAM);
+        if (value != null) {
+            setEnforceNoAddAfterHandshake(Boolean.parseBoolean(value));
         }
 
         FilterRegistration fr = servletContext.addFilter(
@@ -116,7 +124,7 @@ public class WsServerContainer extends WsWebSocketContainer
     public void addEndpoint(ServerEndpointConfig sec)
             throws DeploymentException {
 
-        if (!addAllowed) {
+        if (enforceNoAddAfterHandshake && !addAllowed) {
             throw new DeploymentException(
                     sm.getString("serverContainer.addNotAllowed"));
         }
@@ -269,6 +277,18 @@ public class WsServerContainer extends WsWebSocketContainer
         }
 
         return new WsMappingResult(sec, pathParams);
+    }
+
+
+
+    public boolean isEnforceNoAddAfterHandshake() {
+        return enforceNoAddAfterHandshake;
+    }
+
+
+    public void setEnforceNoAddAfterHandshake(
+            boolean enforceNoAddAfterHandshake) {
+        this.enforceNoAddAfterHandshake = enforceNoAddAfterHandshake;
     }
 
 
