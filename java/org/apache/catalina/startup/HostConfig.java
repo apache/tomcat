@@ -310,6 +310,7 @@ public class HostConfig
                 setCopyXML(((StandardHost) host).isCopyXML());
                 setDeployXML(((StandardHost) host).isDeployXML());
                 setUnpackWARs(((StandardHost) host).isUnpackWARs());
+                setContextClass(((StandardHost) host).getContextClass());
             }
         } catch (ClassCastException e) {
             log.error(sm.getString("hostConfig.cce", event.getLifecycle()), e);
