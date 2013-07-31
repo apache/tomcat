@@ -468,7 +468,9 @@ public class WsSession implements Session {
         } catch (IOException ioe) {
             // Failed to send close message. Close the socket and let the caller
             // deal with the Exception
-            log.error(sm.getString("wsSession.sendCloseFail"), ioe);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("wsSession.sendCloseFail"), ioe);
+            }
             wsRemoteEndpoint.close();
             localEndpoint.onError(this, ioe);
         } finally {
