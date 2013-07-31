@@ -66,12 +66,12 @@
    changed for a web application by setting the servlet context initialization
    parameter <code>org.apache.tomcat.websocket.binaryBufferSize</code> to the
    desired value in bytes.</p>
-   
+
 <p>The default buffer size for text messages is 8192 bytes. This may be
    changed for a web application by setting the servlet context initialization
    parameter <code>org.apache.tomcat.websocket.textBufferSize</code> to the
    desired value in bytes.</p>
-   
+
 <p>The Java WebSocket specification 1.0 does not permit programmatic deployment
    after the first endpoint has started a WebSocket handshake. By default,
    Tomcat continues to permit additional programmatic deployment. This

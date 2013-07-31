@@ -350,7 +350,7 @@
       </ul>
       </p>
     </property>
-    
+
     <property
     name="org.apache.tomcat.util.http. ServerCookie.ALLOW_EQUALS_IN_VALUE">
       <p>If this is <code>true</code> Tomcat will allow '<code>=</code>'
