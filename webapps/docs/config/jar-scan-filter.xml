@@ -78,17 +78,17 @@
     <attributes>
 
       <attribute name="tldSkip" required="false">
-       <p>The comma separated list of JAR file name patterns to skip when
-       scanning for TLDs. If not specified, the default is obtained from the
-       <code>tomcat.util.scan.StandardJarScanFilter.jarsToSkip</code> system
-       property.</p>
+       <p>The comma separated list of JAR file and / or directory name patterns
+       to skip when scanning for TLDs. If not specified, the default is obtained
+       from the <code>tomcat.util.scan.StandardJarScanFilter.jarsToSkip</code>
+       system property.</p>
       </attribute>
 
       <attribute name="tldScan" required="false">
-       <p>The comma separated list of JAR file name patterns to scan when
-       scanning for TLDs. If not specified, the default is obtained from the
-       <code>tomcat.util.scan.StandardJarScanFilter.jarsToScan</code> system
-       property.</p>
+       <p>The comma separated list of JAR file and / or directory name patterns
+       to scan when scanning for TLDs. If not specified, the default is obtained
+       from the <code>tomcat.util.scan.StandardJarScanFilter.jarsToScan</code>
+       system property.</p>
       </attribute>
 
       <attribute name="defaultTldScan" required="false">
@@ -101,17 +101,17 @@
       </attribute>
 
       <attribute name="pluggableSkip" required="false">
-       <p>The comma separated list of JAR file name patterns to skip when
-       scanning for pluggable features. If not specified, the default is
-       obtained from the
+       <p>The comma separated list of JAR file and / or directory name patterns
+       to skip when scanning for pluggable features. If not specified, the
+       default is obtained from the
        <code>tomcat.util.scan.StandardJarScanFilter.jarsToSkip</code> system
        property.</p>
       </attribute>
 
       <attribute name="pluggableScan" required="false">
-       <p>The comma separated list of JAR file name patterns to scan when
-       scanning for pluggable features. If not specified, the default is
-       obtained from the
+       <p>The comma separated list of JAR file and / or directory name patterns
+       to scan when scanning for pluggable features. If not specified, the
+       default is obtained from the
        <code>tomcat.util.scan.StandardJarScanFilter.jarsToScan</code> system
        property.</p>
       </attribute>

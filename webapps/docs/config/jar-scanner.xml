@@ -35,10 +35,10 @@
 <section name="Introduction">
 
   <p>The <strong>Jar Scanner</strong> element represents the component that is
-  used to scan the web application for JAR files. It is typically used during
-  web application start to identify configuration files such as TLDs or
-  web-fragment.xml files that must be processed as part of the web application
-  initialisation.</p>
+  used to scan the web application for JAR files and directories of class files.
+  It is typically used during web application start to identify configuration
+  files such as TLDs or web-fragment.xml files that must be processed as part of
+  the web application initialisation.</p>
 
   <p>A Jar Scanner element MAY be nested inside a
   <a href="context.html">Context</a> component.  If it is not included,
@@ -79,10 +79,13 @@
 
       <attribute name="scanAllDirectories" required="false">
        <p>If true, any directories found on the classpath will be checked to see
-       if are expanded Jar files. The default is <code>false</code>. Tomcat
+       if are expanded JAR files. The default is <code>false</code>. Tomcat
        determines if directory is an expanded JAR file by looking for a META-INF
        sub-directory. Only if the META-INF sub-directory exists, is the
-       directory to be an expanded JAR file.</p>
+       directory assumed to be an expanded JAR file. Note that for scans for
+       matches to <code>@HandlesTypes</code> annotations, all directories will
+       be scanned irrespective of the presence or not of a META-INF
+       sub-directory.</p>
       </attribute>
 
       <attribute name="scanAllFiles" required="false">
