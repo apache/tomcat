@@ -57,6 +57,9 @@ public class Constants {
     public static final String WS_EXTENSIONS_HEADER_NAME =
             "Sec-WebSocket-Extensions";
 
+    public static final boolean STRICT_SPEC_COMPLIANCE =
+            Boolean.getBoolean(
+                    "org.apache.tomcat.websocket.STRICT_SPEC_COMPLIANCE");
 
     private Constants() {
         // Hide default constructor
