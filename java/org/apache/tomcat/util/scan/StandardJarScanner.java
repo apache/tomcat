@@ -162,7 +162,7 @@ public class StandardJarScanner implements JarScanner {
                         } else {
                             url = (new File(realPath)).toURI().toURL();
                         }
-                        process(callback, url, true);
+                        process(scanType, callback, url, true);
                     } catch (IOException e) {
                         log.warn(sm.getString("jarScan.webinflibFail", url), e);
                     }
@@ -219,24 +219,34 @@ public class StandardJarScanner implements JarScanner {
                     }
                     URL[] urls = ((URLClassLoader) classLoader).getURLs();
                     for (int i=0; i<urls.length; i++) {
-                        // Extract the jarName if there is one to be found
-                        String jarName = getJarName(urls[i]);
+                        ClassPathEntry cpe = new ClassPathEntry(urls[i]);
 
-                        // Skip JARs known not to be interesting
-                        if (jarName != null &&
-                                jarScanFilter.check(scanType, jarName)) {
+                        // JARs are scanned unless the filter says not to.
+                        // Directories are scanned for pluggability scans or
+                        // if scanAllDirectories is enabled unless the
+                        // filter says not to.
+                        if ((cpe.isJar() ||
+                                scanType == JarScanType.PLUGGABILITY ||
+                                isScanAllDirectories()) &&
+                                        jarScanFilter.check(scanType,
+                                                cpe.getName())) {
                             if (log.isDebugEnabled()) {
-                                log.debug(sm.getString("jarScan.classloaderJarScan", urls[i]));
+                                log.debug(sm.getString(
+                                        "jarScan.classloaderJarScan", urls[i]));
                             }
                             try {
-                                process(callback, urls[i], isWebapp);
+                                process(scanType, callback, urls[i], isWebapp);
                             } catch (IOException ioe) {
                                 log.warn(sm.getString(
-                                        "jarScan.classloaderFail",urls[i]), ioe);
+                                        "jarScan.classloaderFail", urls[i]),
+                                                ioe);
                             }
                         } else {
+                            // JAR / directory has been skipped
                             if (log.isTraceEnabled()) {
-                                log.trace(sm.getString("jarScan.classloaderJarNoScan", urls[i]));
+                                log.trace(sm.getString(
+                                        "jarScan.classloaderJarNoScan",
+                                        urls[i]));
                             }
                         }
                     }
@@ -278,8 +288,8 @@ public class StandardJarScanner implements JarScanner {
      * Scan a URL for JARs with the optional extensions to look at all files
      * and all directories.
      */
-    private void process(JarScannerCallback callback, URL url, boolean isWebapp)
-            throws IOException {
+    private void process(JarScanType scanType, JarScannerCallback callback,
+            URL url, boolean isWebapp) throws IOException {
 
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("jarScan.jarUrlStart", url));
@@ -306,11 +316,15 @@ public class StandardJarScanner implements JarScanner {
                             callback.scan(
                                     (JarURLConnection) jarURL.openConnection(),
                                     isWebapp);
-                        } else if (f.isDirectory() && scanAllDirectories) {
-                            File metainf = new File(f.getAbsoluteFile() +
-                                    File.separator + "META-INF");
-                            if (metainf.isDirectory()) {
+                        } else if (f.isDirectory()) {
+                            if (scanType == JarScanType.PLUGGABILITY) {
                                 callback.scan(f, isWebapp);
+                            } else {
+                                File metainf = new File(f.getAbsoluteFile() +
+                                        File.separator + "META-INF");
+                                if (metainf.isDirectory()) {
+                                    callback.scan(f, isWebapp);
+                                }
                             }
                         }
                     } catch (URISyntaxException e) {
@@ -325,24 +339,36 @@ public class StandardJarScanner implements JarScanner {
 
     }
 
-    /*
-     * Extract the JAR name, if present, from a URL
-     */
-    private String getJarName(URL url) {
 
-        String name = null;
+    private static class ClassPathEntry {
 
-        String path = url.getPath();
-        int end = path.indexOf(Constants.JAR_EXT);
-        if (end != -1) {
-            int start = path.lastIndexOf('/', end);
-            name = path.substring(start + 1, end + 4);
-        } else if (isScanAllDirectories()){
-            int start = path.lastIndexOf('/');
-            name = path.substring(start + 1);
+        private final boolean jar;
+        private final String name;
+
+        public ClassPathEntry(URL url) {
+            String path = url.getPath();
+            int end = path.indexOf(Constants.JAR_EXT);
+            if (end != -1) {
+                jar = true;
+                int start = path.lastIndexOf('/', end);
+                name = path.substring(start + 1, end + 4);
+            } else {
+                jar = false;
+                if (path.endsWith("/")) {
+                    path = path.substring(0, path.length() - 1);
+                }
+                int start = path.lastIndexOf('/');
+                name = path.substring(start + 1);
+            }
+
         }
 
-        return name;
-    }
+        public boolean isJar() {
+            return jar;
+        }
 
+        public String getName() {
+            return name;
+        }
+    }
 }
