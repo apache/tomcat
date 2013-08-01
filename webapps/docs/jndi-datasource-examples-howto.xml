@@ -126,7 +126,7 @@ only the classes needed for connection pooling have been included, and the
 packages have been renamed to avoid interfering with applications.
 </p>
 
-<p>DBCP 1.4 provides support for JDBC 4.0.</p>
+<p>DBCP 2.0 provides support for JDBC 4.1.</p>
 
 <subsection name="Installation">
 
