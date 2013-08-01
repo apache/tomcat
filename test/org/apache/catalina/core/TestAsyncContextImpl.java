@@ -46,8 +46,6 @@ import javax.servlet.http.HttpServletResponse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -398,15 +396,28 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     }
 
     @Test
-    public void testTimeoutListenerCompleteDispatch() throws Exception {
+    public void testTimeoutListenerCompleteNonAsyncDispatch() throws Exception {
         // Should trigger an error - can't do both
         doTestTimeout(Boolean.TRUE, Boolean.FALSE);
     }
 
     @Test
-    public void testTimeoutListenerNoCompleteDispatch() throws Exception {
+    public void testTimeoutListenerNoCompleteNonAsyncDispatch()
+            throws Exception {
         // Should work
         doTestTimeout(Boolean.FALSE, Boolean.FALSE);
+    }
+
+    @Test
+    public void testTimeoutListenerCompleteAsyncDispatch() throws Exception {
+        // Should trigger an error - can't do both
+        doTestTimeout(Boolean.TRUE, Boolean.TRUE);
+    }
+
+    @Test
+    public void testTimeoutListenerNoCompleteAsyncDispatch() throws Exception {
+        // Should work
+        doTestTimeout(Boolean.FALSE, Boolean.TRUE);
     }
 
     @Test
@@ -433,13 +444,6 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         File docBase = new File(System.getProperty("java.io.tmpdir"));
 
-        // Create the folder that will trigger the redirect
-        File foo = new File(docBase, "async");
-        addDeleteOnTearDown(foo);
-        if (!foo.mkdirs() && !foo.isDirectory()) {
-            fail("Unable to create async directory in docBase");
-        }
-
         Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
 
         TimeoutServlet timeout =
@@ -451,8 +455,11 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         if (asyncDispatch != null) {
             if (asyncDispatch.booleanValue()) {
-                AsyncStartRunnable asyncStartRunnable = new AsyncStartRunnable();
-                Tomcat.addServlet(ctx, "async", asyncStartRunnable);
+                AsyncStartRunnable asyncStartRunnable =
+                        new AsyncStartRunnable();
+                Wrapper async =
+                        Tomcat.addServlet(ctx, "async", asyncStartRunnable);
+                async.setAsyncSupported(true);
                 ctx.addServletMapping(dispatchUrl, "async");
             } else {
                 NonAsyncServlet nonAsync = new NonAsyncServlet();
@@ -488,7 +495,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             expected.append("onTimeout-");
             if (asyncDispatch != null) {
                 if (asyncDispatch.booleanValue()) {
-                    // TODO
+                    expected.append("onStartAsync-Runnable-");
                 } else {
                     expected.append("NonAsyncServletGet-");
                 }
@@ -507,12 +514,16 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                     TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
                     REQUEST_TIME);
         } else {
-            alvGlobal.validateAccessLog(1, 200, TimeoutServlet.ASYNC_TIMEOUT,
-                    TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
-                    REQUEST_TIME);
-            alv.validateAccessLog(1, 200, TimeoutServlet.ASYNC_TIMEOUT,
-                    TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
-                    REQUEST_TIME);
+            long timeoutDelay = TimeoutServlet.ASYNC_TIMEOUT;
+            if (asyncDispatch != null && asyncDispatch.booleanValue() &&
+                    !completeOnTimeout.booleanValue()) {
+                // Extra timeout in this case
+                timeoutDelay += TimeoutServlet.ASYNC_TIMEOUT;
+            }
+            alvGlobal.validateAccessLog(1, 200, timeoutDelay,
+                    timeoutDelay + TIMEOUT_MARGIN + REQUEST_TIME);
+            alv.validateAccessLog(1, 200, timeoutDelay,
+                    timeoutDelay + TIMEOUT_MARGIN + REQUEST_TIME);
         }
     }
 
