@@ -193,6 +193,10 @@
         <bug>55301</bug>: Fix <code>IllegalArgumentException</code> thrown by
         simple test for McastService. (kfujino)
       </fix>
+      <fix>
+        <bug>55332</bug>: Fix NPE in <code>FileMessageFactory.main</code> when
+        specify empty file as arguments. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
