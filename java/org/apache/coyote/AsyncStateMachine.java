@@ -216,6 +216,10 @@ public class AsyncStateMachine<S> {
         } else if (state == AsyncState.DISPATCHING) {
             state = AsyncState.DISPATCHED;
             return SocketState.ASYNC_END;
+        } else if (state == AsyncState.STARTED) {
+            // This can occur if an async listener does a dispatch to an async
+            // servlet during onTimeout
+            return SocketState.LONG;
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
