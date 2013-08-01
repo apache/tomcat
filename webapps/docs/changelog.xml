@@ -92,6 +92,11 @@
         refers to the value of the <code>contextClass</code> attribute of Host.
         (kfujino)
       </fix>
+      <fix>
+        <bug>55331</bug>: Dispatching to an asychronous servlet from
+        <code>AsyncListener.onTimeout()</code> should not trigger an
+        <code>IllegalStateException</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

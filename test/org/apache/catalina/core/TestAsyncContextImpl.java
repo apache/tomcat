@@ -46,8 +46,6 @@ import javax.servlet.http.HttpServletResponse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -398,15 +396,28 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     }
 
     @Test
-    public void testTimeoutListenerCompleteDispatch() throws Exception {
+    public void testTimeoutListenerCompleteNonAsyncDispatch() throws Exception {
         // Should trigger an error - can't do both
-        doTestTimeout(Boolean.TRUE, "/nonasync");
+        doTestTimeout(Boolean.TRUE, Boolean.FALSE);
     }
 
     @Test
-    public void testTimeoutListenerNoCompleteDispatch() throws Exception {
+    public void testTimeoutListenerNoCompleteNonAsyncDispatch()
+            throws Exception {
         // Should work
-        doTestTimeout(Boolean.FALSE, "/nonasync");
+        doTestTimeout(Boolean.FALSE, Boolean.FALSE);
+    }
+
+    @Test
+    public void testTimeoutListenerCompleteAsyncDispatch() throws Exception {
+        // Should trigger an error - can't do both
+        doTestTimeout(Boolean.TRUE, Boolean.TRUE);
+    }
+
+    @Test
+    public void testTimeoutListenerNoCompleteAsyncDispatch() throws Exception {
+        // Should work
+        doTestTimeout(Boolean.FALSE, Boolean.TRUE);
     }
 
     @Test
@@ -415,20 +426,23 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         doTestTimeout(null, null);
     }
 
-    private void doTestTimeout(Boolean completeOnTimeout, String dispatchUrl)
-    throws Exception {
+    private void doTestTimeout(Boolean completeOnTimeout, Boolean asyncDispatch)
+            throws Exception {
+
+        String dispatchUrl = null;
+        if (asyncDispatch != null) {
+            if (asyncDispatch.booleanValue()) {
+                dispatchUrl = "/async";
+            } else {
+                dispatchUrl = "/nonasync";
+            }
+        }
+
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
         // Must have a real docBase - just use temp
         File docBase = new File(System.getProperty("java.io.tmpdir"));
-
-        // Create the folder that will trigger the redirect
-        File foo = new File(docBase, "async");
-        addDeleteOnTearDown(foo);
-        if (!foo.mkdirs() && !foo.isDirectory()) {
-            fail("Unable to create async directory in docBase");
-        }
 
         Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
 
@@ -437,13 +451,22 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         Wrapper wrapper = Tomcat.addServlet(ctx, "time", timeout);
         wrapper.setAsyncSupported(true);
-        ctx.addServletMapping("/async", "time");
+        ctx.addServletMapping("/start", "time");
 
-        if (dispatchUrl != null) {
-            NonAsyncServlet nonAsync = new NonAsyncServlet();
-            Tomcat.addServlet(ctx, "nonasync", nonAsync);
-            ctx.addServletMapping(dispatchUrl, "nonasync");
-        }
+        if (asyncDispatch != null) {
+            if (asyncDispatch.booleanValue()) {
+                AsyncStartRunnable asyncStartRunnable =
+                        new AsyncStartRunnable();
+                Wrapper async =
+                        Tomcat.addServlet(ctx, "async", asyncStartRunnable);
+                async.setAsyncSupported(true);
+                ctx.addServletMapping(dispatchUrl, "async");
+            } else {
+                NonAsyncServlet nonAsync = new NonAsyncServlet();
+                Tomcat.addServlet(ctx, "nonasync", nonAsync);
+                ctx.addServletMapping(dispatchUrl, "nonasync");
+            }
+         }
 
         ctx.addApplicationListener(new ApplicationListener(
                 TrackingRequestListener.class.getName(), false));
@@ -456,7 +479,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         tomcat.start();
         ByteChunk res = new ByteChunk();
         try {
-            getUrl("http://localhost:" + getPort() + "/async", res, null);
+            getUrl("http://localhost:" + getPort() + "/start", res, null);
         } catch (IOException ioe) {
             // Ignore - expected for some error conditions
         }
@@ -470,8 +493,12 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             expected.append("requestDestroyed");
         } else {
             expected.append("onTimeout-");
-            if (dispatchUrl != null) {
-                expected.append("NonAsyncServletGet-");
+            if (asyncDispatch != null) {
+                if (asyncDispatch.booleanValue()) {
+                    expected.append("onStartAsync-Runnable-");
+                } else {
+                    expected.append("NonAsyncServletGet-");
+                }
             }
             expected.append("onComplete-");
             expected.append("requestDestroyed");
@@ -487,12 +514,16 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                     TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
                     REQUEST_TIME);
         } else {
-            alvGlobal.validateAccessLog(1, 200, TimeoutServlet.ASYNC_TIMEOUT,
-                    TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
-                    REQUEST_TIME);
-            alv.validateAccessLog(1, 200, TimeoutServlet.ASYNC_TIMEOUT,
-                    TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
-                    REQUEST_TIME);
+            long timeoutDelay = TimeoutServlet.ASYNC_TIMEOUT;
+            if (asyncDispatch != null && asyncDispatch.booleanValue() &&
+                    !completeOnTimeout.booleanValue()) {
+                // Extra timeout in this case
+                timeoutDelay += TimeoutServlet.ASYNC_TIMEOUT;
+            }
+            alvGlobal.validateAccessLog(1, 200, timeoutDelay,
+                    timeoutDelay + TIMEOUT_MARGIN + REQUEST_TIME);
+            alv.validateAccessLog(1, 200, timeoutDelay,
+                    timeoutDelay + TIMEOUT_MARGIN + REQUEST_TIME);
         }
     }
 
