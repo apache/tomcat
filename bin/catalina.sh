@@ -309,20 +309,20 @@ elif [ "$1" = "run" ]; then
       echo "Using Security Manager"
     fi
     shift
-    eval exec \"$_RUNJAVA\" \"$LOGGING_CONFIG\" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
-      -Djava.endorsed.dirs=\"$JAVA_ENDORSED_DIRS\" -classpath \"$CLASSPATH\" \
+    eval exec "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
+      -Djava.endorsed.dirs="\"$JAVA_ENDORSED_DIRS\"" -classpath "\"$CLASSPATH\"" \
       -Djava.security.manager \
-      -Djava.security.policy==\"$CATALINA_BASE/conf/catalina.policy\" \
-      -Dcatalina.base=\"$CATALINA_BASE\" \
-      -Dcatalina.home=\"$CATALINA_HOME\" \
-      -Djava.io.tmpdir=\"$CATALINA_TMPDIR\" \
+      -Djava.security.policy=="\"$CATALINA_BASE/conf/catalina.policy\"" \
+      -Dcatalina.base="\"$CATALINA_BASE\"" \
+      -Dcatalina.home="\"$CATALINA_HOME\"" \
+      -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
       org.apache.catalina.startup.Bootstrap "$@" start
   else
-    eval exec \"$_RUNJAVA\" \"$LOGGING_CONFIG\" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
-      -Djava.endorsed.dirs=\"$JAVA_ENDORSED_DIRS\" -classpath \"$CLASSPATH\" \
-      -Dcatalina.base=\"$CATALINA_BASE\" \
-      -Dcatalina.home=\"$CATALINA_HOME\" \
-      -Djava.io.tmpdir=\"$CATALINA_TMPDIR\" \
+    eval exec "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
+      -Djava.endorsed.dirs="\"$JAVA_ENDORSED_DIRS\"" -classpath "\"$CLASSPATH\"" \
+      -Dcatalina.base="\"$CATALINA_BASE\"" \
+      -Dcatalina.home="\"$CATALINA_HOME\"" \
+      -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
       org.apache.catalina.startup.Bootstrap "$@" start
   fi
 
@@ -373,22 +373,22 @@ elif [ "$1" = "start" ] ; then
       echo "Using Security Manager"
     fi
     shift
-    eval \"$_RUNJAVA\" \"$LOGGING_CONFIG\" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
-      -Djava.endorsed.dirs=\"$JAVA_ENDORSED_DIRS\" -classpath \"$CLASSPATH\" \
+    eval "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
+      -Djava.endorsed.dirs="\"$JAVA_ENDORSED_DIRS\"" -classpath "\"$CLASSPATH\"" \
       -Djava.security.manager \
-      -Djava.security.policy==\"$CATALINA_BASE/conf/catalina.policy\" \
-      -Dcatalina.base=\"$CATALINA_BASE\" \
-      -Dcatalina.home=\"$CATALINA_HOME\" \
-      -Djava.io.tmpdir=\"$CATALINA_TMPDIR\" \
+      -Djava.security.policy=="\"$CATALINA_BASE/conf/catalina.policy\"" \
+      -Dcatalina.base="\"$CATALINA_BASE\"" \
+      -Dcatalina.home="\"$CATALINA_HOME\"" \
+      -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
       org.apache.catalina.startup.Bootstrap "$@" start \
       >> "$CATALINA_OUT" 2>&1 "&"
 
   else
-    eval \"$_RUNJAVA\" \"$LOGGING_CONFIG\" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
-      -Djava.endorsed.dirs=\"$JAVA_ENDORSED_DIRS\" -classpath \"$CLASSPATH\" \
-      -Dcatalina.base=\"$CATALINA_BASE\" \
-      -Dcatalina.home=\"$CATALINA_HOME\" \
-      -Djava.io.tmpdir=\"$CATALINA_TMPDIR\" \
+    eval "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
+      -Djava.endorsed.dirs="\"$JAVA_ENDORSED_DIRS\"" -classpath "\"$CLASSPATH\"" \
+      -Dcatalina.base="\"$CATALINA_BASE\"" \
+      -Dcatalina.home="\"$CATALINA_HOME\"" \
+      -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
       org.apache.catalina.startup.Bootstrap "$@" start \
       >> "$CATALINA_OUT" 2>&1 "&"
 
@@ -434,11 +434,11 @@ elif [ "$1" = "stop" ] ; then
     fi
   fi
 
-  eval \"$_RUNJAVA\" $LOGGING_MANAGER $JAVA_OPTS \
-    -Djava.endorsed.dirs=\"$JAVA_ENDORSED_DIRS\" -classpath \"$CLASSPATH\" \
-    -Dcatalina.base=\"$CATALINA_BASE\" \
-    -Dcatalina.home=\"$CATALINA_HOME\" \
-    -Djava.io.tmpdir=\"$CATALINA_TMPDIR\" \
+  eval "\"$_RUNJAVA\"" $LOGGING_MANAGER $JAVA_OPTS \
+    -Djava.endorsed.dirs="\"$JAVA_ENDORSED_DIRS\"" -classpath "\"$CLASSPATH\"" \
+    -Dcatalina.base="\"$CATALINA_BASE\"" \
+    -Dcatalina.home="\"$CATALINA_HOME\"" \
+    -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
     org.apache.catalina.startup.Bootstrap "$@" stop
 
   if [ ! -z "$CATALINA_PID" ]; then
@@ -501,11 +501,11 @@ elif [ "$1" = "stop" ] ; then
 
 elif [ "$1" = "configtest" ] ; then
 
-    eval \"$_RUNJAVA\" $LOGGING_MANAGER $JAVA_OPTS \
-      -Djava.endorsed.dirs=\"$JAVA_ENDORSED_DIRS\" -classpath \"$CLASSPATH\" \
-      -Dcatalina.base=\"$CATALINA_BASE\" \
-      -Dcatalina.home=\"$CATALINA_HOME\" \
-      -Djava.io.tmpdir=\"$CATALINA_TMPDIR\" \
+    eval "\"$_RUNJAVA\"" $LOGGING_MANAGER $JAVA_OPTS \
+      -Djava.endorsed.dirs="\"$JAVA_ENDORSED_DIRS\"" -classpath "\"$CLASSPATH\"" \
+      -Dcatalina.base="\"$CATALINA_BASE\"" \
+      -Dcatalina.home="\"$CATALINA_HOME\"" \
+      -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
       org.apache.catalina.startup.Bootstrap configtest
     result=$?
     if [ $result -ne 0 ]; then
