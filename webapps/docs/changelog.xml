@@ -238,6 +238,11 @@
         path is not set and it is not found in $CATALINA_BASE, look in
         $CATALINA_HOME as well. (markt)
       </fix>
+      <fix>
+        <bug>55336</bug>: Correctly escape parameters passed to eval in the
+        catalina.sh script to ensure that Tomcat starts when installed on a path
+        that contains multiple consecutive spaces. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
