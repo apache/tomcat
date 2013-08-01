@@ -598,7 +598,7 @@
     </copy>
   </target>
 
-  <target name="compile" depends="build-prepare,compile-prepare,validate">
+  <target name="compile" depends="download-compile,validate">
     <!-- Compile internal server components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
@@ -653,7 +653,7 @@
 
   </target>
 
-  <target name="package" depends="compile,download-compile,build-manifests" >
+  <target name="package" depends="compile,build-tomcat-dbcp" >
     <!-- Common Annotations 1.0 JAR File -->
     <jarIt jarfile="${annotations-api.jar}"
       filesDir="${tomcat.classes}"
@@ -2443,7 +2443,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   </target>
 
-  <target name="download-compile" depends="compile"
+  <target name="download-compile"
           description="Download (and build) components necessary to compile" >
 
     <antcall target="downloadfile-2">
@@ -2489,7 +2489,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <uptodate srcfile="${commons-dbcp.home}" targetfile="${tomcat-dbcp-src.jar}" />
       </and>
     </condition>
-    <antcall target="build-tomcat-dbcp" />
 
     <!-- Download JDT (Eclipse compiler) -->
     <antcall target="downloadfile-2">
