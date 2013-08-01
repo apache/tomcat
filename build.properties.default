@@ -152,7 +152,7 @@ tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-nativ
 #commons-dbcp.home=${base.path}/commons-dbcp-${commons-dbcp.version}-src
 #commons-dbcp-src.loc.1=${base-commons.loc.1}/dbcp/source/commons-dbcp-${commons-dbcp.version}-src.tar.gz
 #commons-dbcp-src.loc.2=${base-commons.loc.2}/dbcp/source/commons-dbcp-${commons-dbcp.version}-src.tar.gz
-commons-dbcp.version=2.0-20130801.161025-126
+commons-dbcp.version=2.0-20130801.192813-128
 commons-dbcp.home=${base.path}/commons-dbcp2-2.0-SNAPSHOT-src
 commons-dbcp-src.loc.1=https://repository.apache.org/content/repositories/snapshots/org/apache/commons/commons-dbcp2/2.0-SNAPSHOT/commons-dbcp2-${commons-dbcp.version}-src.tar.gz
 commons-dbcp-src.loc.2=https://repository.apache.org/content/repositories/snapshots/org/apache/commons/commons-dbcp2/2.0-SNAPSHOT/commons-dbcp2-${commons-dbcp.version}-src.tar.gz
@@ -163,7 +163,7 @@ commons-dbcp-src.loc.2=https://repository.apache.org/content/repositories/snapsh
 #commons-pool-src.loc.1=${base-commons.loc.1}/pool/source/commons-pool-${commons-pool.version}-src.tar.gz
 #commons-pool-src.loc.2=${base-commons.loc.2}/pool/source/commons-pool-${commons-pool.version}-src.tar.gz
 #Temporary use of snapshots until Commons Pool 2 has its first release
-commons-pool.version=2.0-20130801.160158-233
+commons-pool.version=2.0-20130801.192625-235
 commons-pool.home=${base.path}/commons-pool2-2.0-SNAPSHOT-src
 commons-pool-src.loc.1=https://repository.apache.org/content/repositories/snapshots/org/apache/commons/commons-pool2/2.0-SNAPSHOT/commons-pool2-${commons-pool.version}-src.tar.gz
 commons-pool-src.loc.2=https://repository.apache.org/content/repositories/snapshots/org/apache/commons/commons-pool2/2.0-SNAPSHOT/commons-pool2-${commons-pool.version}-src.tar.gz
