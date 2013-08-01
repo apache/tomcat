@@ -2410,7 +2410,10 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="clean-depend"
           description="Deletes the dependencies that are built from source">
-     <delete dir="${tomcat-dbcp.home}"/>
+    <delete dir="${tomcat-dbcp.home}"/>
+    <!-- Only required while working with snapshots -->
+    <delete dir="${commons-pool.home}"/>
+    <delete dir="${commons-dbcp.home}"/>
   </target>
 
   <target name="clean"
