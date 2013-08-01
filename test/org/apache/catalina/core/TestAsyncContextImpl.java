@@ -400,13 +400,13 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     @Test
     public void testTimeoutListenerCompleteDispatch() throws Exception {
         // Should trigger an error - can't do both
-        doTestTimeout(Boolean.TRUE, "/nonasync");
+        doTestTimeout(Boolean.TRUE, Boolean.FALSE);
     }
 
     @Test
     public void testTimeoutListenerNoCompleteDispatch() throws Exception {
         // Should work
-        doTestTimeout(Boolean.FALSE, "/nonasync");
+        doTestTimeout(Boolean.FALSE, Boolean.FALSE);
     }
 
     @Test
@@ -415,8 +415,18 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         doTestTimeout(null, null);
     }
 
-    private void doTestTimeout(Boolean completeOnTimeout, String dispatchUrl)
-    throws Exception {
+    private void doTestTimeout(Boolean completeOnTimeout, Boolean asyncDispatch)
+            throws Exception {
+
+        String dispatchUrl = null;
+        if (asyncDispatch != null) {
+            if (asyncDispatch.booleanValue()) {
+                dispatchUrl = "/async";
+            } else {
+                dispatchUrl = "/nonasync";
+            }
+        }
+
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
@@ -437,13 +447,19 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         Wrapper wrapper = Tomcat.addServlet(ctx, "time", timeout);
         wrapper.setAsyncSupported(true);
-        ctx.addServletMapping("/async", "time");
+        ctx.addServletMapping("/start", "time");
 
-        if (dispatchUrl != null) {
-            NonAsyncServlet nonAsync = new NonAsyncServlet();
-            Tomcat.addServlet(ctx, "nonasync", nonAsync);
-            ctx.addServletMapping(dispatchUrl, "nonasync");
-        }
+        if (asyncDispatch != null) {
+            if (asyncDispatch.booleanValue()) {
+                AsyncStartRunnable asyncStartRunnable = new AsyncStartRunnable();
+                Tomcat.addServlet(ctx, "async", asyncStartRunnable);
+                ctx.addServletMapping(dispatchUrl, "async");
+            } else {
+                NonAsyncServlet nonAsync = new NonAsyncServlet();
+                Tomcat.addServlet(ctx, "nonasync", nonAsync);
+                ctx.addServletMapping(dispatchUrl, "nonasync");
+            }
+         }
 
         ctx.addApplicationListener(new ApplicationListener(
                 TrackingRequestListener.class.getName(), false));
@@ -456,7 +472,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         tomcat.start();
         ByteChunk res = new ByteChunk();
         try {
-            getUrl("http://localhost:" + getPort() + "/async", res, null);
+            getUrl("http://localhost:" + getPort() + "/start", res, null);
         } catch (IOException ioe) {
             // Ignore - expected for some error conditions
         }
@@ -470,8 +486,12 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             expected.append("requestDestroyed");
         } else {
             expected.append("onTimeout-");
-            if (dispatchUrl != null) {
-                expected.append("NonAsyncServletGet-");
+            if (asyncDispatch != null) {
+                if (asyncDispatch.booleanValue()) {
+                    // TODO
+                } else {
+                    expected.append("NonAsyncServletGet-");
+                }
             }
             expected.append("onComplete-");
             expected.append("requestDestroyed");
