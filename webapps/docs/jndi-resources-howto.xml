@@ -684,7 +684,7 @@ conn.close();
 
     <p>The configuration properties for Tomcat's standard data source
     resource factory
-    (<code>org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory</code>) are
+    (<code>org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory</code>) are
     as follows:</p>
     <ul>
     <li><strong>driverClassName</strong> - Fully qualified Java class name

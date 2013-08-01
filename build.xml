@@ -598,7 +598,7 @@
     </copy>
   </target>
 
-  <target name="compile" depends="build-prepare,download-compile,compile-prepare,validate">
+  <target name="compile" depends="build-prepare,compile-prepare,validate">
     <!-- Compile internal server components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
@@ -653,7 +653,7 @@
 
   </target>
 
-  <target name="package" depends="compile,build-manifests" >
+  <target name="package" depends="compile,download-compile,build-manifests" >
     <!-- Common Annotations 1.0 JAR File -->
     <jarIt jarfile="${annotations-api.jar}"
       filesDir="${tomcat.classes}"
@@ -2440,7 +2440,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   </target>
 
-  <target name="download-compile"
+  <target name="download-compile" depends="compile"
           description="Download (and build) components necessary to compile" >
 
     <antcall target="downloadfile-2">
@@ -2554,11 +2554,14 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <!-- ================  be built rather than used directly ================ -->
 
   <target name="build-tomcat-dbcp" depends="build-manifests" unless="no.build.dbcp">
-    <copy todir="${tomcat-dbcp.home}">
-      <fileset dir="${commons-pool.home}">
+    <!-- Pool2 and DBCP2 currently have slightly different source structures -->
+    <copy todir="${tomcat-dbcp.home}/src">
+      <fileset dir="${commons-pool.home}/src/main">
         <include name="**/*.java" />
         <exclude name="**/test/**" />
       </fileset>
+    </copy>
+    <copy todir="${tomcat-dbcp.home}">
       <fileset dir="${commons-dbcp.home}">
         <include name="**/*.java" />
         <exclude name="**/test/**" />
@@ -2566,20 +2569,18 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       </fileset>
     </copy>
 
-    <patch patchfile="${basedir}/res/dbcp/dbcp-java-7.patch"
-           dir="${tomcat-dbcp.home}"
-           ignorewhitespace="true"
-           strip="0"/>
-
+    <!-- Package rename to avoid clashes with the same classes in webapps -->
     <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons"
         encoding="ISO-8859-1">
       <replacefilter token="org.apache.commons"
             value="org.apache.tomcat.dbcp" />
     </replace>
-    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons/pool/impl"
+
+   <!-- Depend on JULI rather than Commons-Logging -->
+    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons"
         encoding="ISO-8859-1">
-      <replacefilter token="enum"
-            value="enumeration" />
+      <replacefilter token="org.apache.tomcat.dbcp.logging"
+            value="org.apache.juli.logging" />
     </replace>
 
     <mkdir dir="${tomcat-dbcp.home}/src/java/org/apache/tomcat/dbcp" />
@@ -2598,6 +2599,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
            encoding="ISO-8859-1"
            includeantruntime="false">
       <include name="**" />
+      <classpath path="${tomcat.classes}" />
     </javac>
     <jarIt jarfile="${tomcat-dbcp.jar}"
       filesDir="${tomcat-dbcp.home}/classes"
