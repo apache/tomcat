@@ -374,6 +374,10 @@ public class FileMessageFactory {
         FileMessageFactory write = getInstance(new File(args[1]), true);
         FileMessage msg = new FileMessage(null, args[0], args[0]);
         msg = read.readMessage(msg);
+        if (msg == null) {
+            System.out.println("Empty input file : " + args[0]);
+            return;
+        }
         System.out.println("Expecting to write " + msg.getTotalNrOfMsgs()
                 + " messages.");
         int cnt = 0;
