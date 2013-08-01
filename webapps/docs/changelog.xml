@@ -97,6 +97,10 @@
         <code>AsyncListener.onTimeout()</code> should not trigger an
         <code>IllegalStateException</code>. (markt)
       </fix>
+      <fix>
+        <bug>55333</bug>: Correct a regression in the fix for <bug>55071</bug>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

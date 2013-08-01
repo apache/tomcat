@@ -553,11 +553,11 @@ public class JDBCRealm
 
                 stmt = credentials(dbConnection, username);
                 rs = stmt.executeQuery();
-                dbConnection.commit();
-
                 if (rs.next()) {
                     dbCredentials = rs.getString(1);
                 }
+
+                dbConnection.commit();
 
                 if (dbCredentials != null) {
                     dbCredentials = dbCredentials.trim();
