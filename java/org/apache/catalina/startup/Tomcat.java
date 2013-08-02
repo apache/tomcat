@@ -481,14 +481,14 @@ public class Tomcat {
     }
 
     /**
-     * @see {@link #addContext(String, String)}
+     * @see #addContext(String, String)
      */
     public Context addContext(Host host, String contextPath, String dir) {
         return addContext(host, contextPath, contextPath, dir);
     }
 
     /**
-     * @see {@link #addContext(String, String)}
+     * @see #addContext(String, String)
      */
     public Context addContext(Host host, String contextPath, String contextName,
             String dir) {
@@ -508,14 +508,14 @@ public class Tomcat {
     }
 
     /**
-     * @see {@link #addWebapp(String, String)}.
+     * @see #addWebapp(String, String)
      */
     public Context addWebapp(Host host, String url, String path) {
         return addWebapp(host, url, url, path);
     }
 
     /**
-     * @see {@link #addWebapp(String, String)}.
+     * @see #addWebapp(String, String)
      */
     public Context addWebapp(Host host, String url, String name, String path) {
         silence(host, url);
