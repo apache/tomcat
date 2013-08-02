@@ -16,9 +16,9 @@
  */
 package javax.websocket;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 final class DefaultClientEndpointConfig implements ClientEndpointConfig {
 
@@ -26,7 +26,7 @@ final class DefaultClientEndpointConfig implements ClientEndpointConfig {
     private final List<Extension> extensions;
     private final List<Class<? extends Encoder>> encoders;
     private final List<Class<? extends Decoder>> decoders;
-    private final Map<String,Object> userProperties = new HashMap<>();
+    private final Map<String,Object> userProperties = new ConcurrentHashMap<>();
     private final Configurator configurator;
 
 
