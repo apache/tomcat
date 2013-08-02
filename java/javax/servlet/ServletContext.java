@@ -419,8 +419,8 @@ public interface ServletContext {
      * @param name
      *            a <code>String</code> containing the name of the parameter
      *            whose value is requested
-     * @return a <code>String</code> containing at least the servlet container
-     *         name and version number
+     * @return a <code>String</code> containing the value of the initialization
+     *         parameter
      * @see ServletConfig#getInitParameter
      */
     public String getInitParameter(String name);
