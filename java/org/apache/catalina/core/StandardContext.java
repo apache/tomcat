@@ -4524,6 +4524,11 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String getRealPath(String path) {
+        // The WebResources API expects all paths to start with /. This is a
+        // special case for consistency with earlier Tomcat versions.
+        if ("".equals(path)) {
+            path = "/";
+        }
         if (resources != null) {
             return resources.getResource(path).getCanonicalPath();
         }
