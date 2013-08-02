@@ -16,9 +16,9 @@
  */
 package javax.websocket.server;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.Decoder;
 import javax.websocket.Encoder;
@@ -36,7 +36,7 @@ final class DefaultServerEndpointConfig implements ServerEndpointConfig {
     private final List<Class<? extends Encoder>> encoders;
     private final List<Class<? extends Decoder>> decoders;
     private final Configurator serverEndpointConfigurator;
-    private final Map<String,Object> userProperties = new HashMap<>();
+    private final Map<String,Object> userProperties = new ConcurrentHashMap<>();
 
     DefaultServerEndpointConfig(
             Class<?> endpointClass, String path,
