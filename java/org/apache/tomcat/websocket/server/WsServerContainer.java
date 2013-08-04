@@ -230,7 +230,8 @@ public class WsServerContainer extends WsWebSocketContainer
         // Check an exact match. Simple case as there are no templates.
         ServerEndpointConfig sec = configExactMatchMap.get(path);
         if (sec != null) {
-            return new WsMappingResult(sec, Collections.EMPTY_MAP);
+            return new WsMappingResult(sec,
+                    Collections.<String, String> emptyMap());
         }
 
         // No exact match. Need to look for template matches.

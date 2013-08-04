@@ -59,10 +59,12 @@ public interface ServerEndpointConfig extends EndpointConfig {
 
         private final Class<?> endpointClass;
         private final String path;
-        private List<Class<? extends Encoder>> encoders = Collections.EMPTY_LIST;
-        private List<Class<? extends Decoder>> decoders = Collections.EMPTY_LIST;
-        private List<String> subprotocols = Collections.EMPTY_LIST;
-        private List<Extension> extensions = Collections.EMPTY_LIST;
+        private List<Class<? extends Encoder>> encoders =
+                Collections.emptyList();
+        private List<Class<? extends Decoder>> decoders =
+                Collections.emptyList();
+        private List<String> subprotocols = Collections.emptyList();
+        private List<Extension> extensions = Collections.emptyList();
         private Configurator configurator =
                 Configurator.fetchContainerDefaultConfigurator();
 
@@ -82,7 +84,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
         public Builder encoders(
                 List<Class<? extends Encoder>> encoders) {
             if (encoders == null || encoders.size() == 0) {
-                this.encoders = Collections.EMPTY_LIST;
+                this.encoders = Collections.emptyList();
             } else {
                 this.encoders = Collections.unmodifiableList(encoders);
             }
@@ -93,7 +95,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
         public Builder decoders(
                 List<Class<? extends Decoder>> decoders) {
             if (decoders == null || decoders.size() == 0) {
-                this.decoders = Collections.EMPTY_LIST;
+                this.decoders = Collections.emptyList();
             } else {
                 this.decoders = Collections.unmodifiableList(decoders);
             }
@@ -104,7 +106,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
         public Builder subprotocols(
                 List<String> subprotocols) {
             if (subprotocols == null || subprotocols.size() == 0) {
-                this.subprotocols = Collections.EMPTY_LIST;
+                this.subprotocols = Collections.emptyList();
             } else {
                 this.subprotocols = Collections.unmodifiableList(subprotocols);
             }
@@ -115,7 +117,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
         public Builder extensions(
                 List<Extension> extensions) {
             if (extensions == null || extensions.size() == 0) {
-                this.extensions = Collections.EMPTY_LIST;
+                this.extensions = Collections.emptyList();
             } else {
                 this.extensions = Collections.unmodifiableList(extensions);
             }

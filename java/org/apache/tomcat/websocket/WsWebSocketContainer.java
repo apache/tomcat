@@ -331,7 +331,7 @@ public class WsWebSocketContainer
 
         WsSession wsSession = new WsSession(endpoint, wsRemoteEndpointClient,
                 this, null, null, null, null, null, subProtocol,
-                Collections.EMPTY_MAP, false,
+                Collections.<String, String> emptyMap(), false,
                 clientEndpointConfiguration);
         endpoint.onOpen(wsSession, clientEndpointConfiguration);
         registerSession(endpoint, wsSession);
@@ -715,7 +715,7 @@ public class WsWebSocketContainer
      */
     @Override
     public Set<Extension> getInstalledExtensions() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
 
