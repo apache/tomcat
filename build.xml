@@ -1230,7 +1230,10 @@
       <include name="javax/**" />
     </javac>
     <copy todir="${test.classes}">
-        <fileset dir="test" includes="META-INF/**"/>
+        <fileset dir="test">
+          <include name="META-INF/**"/>
+          <include name="**/service-config.txt"/>
+        </fileset>
     </copy>
   </target>
 
