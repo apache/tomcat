@@ -174,13 +174,16 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             lineStart = lineEnd + 1;
             lineEnd = resultString.indexOf('\n', lineStart);
             System.out.println("Start : "  + lineStart + ", End: " + lineEnd);
-            line = resultString.substring(lineStart, lineEnd + 1);
+            if (lineEnd > lineStart) {
+                line = resultString.substring(lineStart, lineEnd + 1);
+            } else {
+                line = resultString.substring(lineStart);
+            }
             if (line.length() > 40) {
                 System.out.println(line.substring(0, 32));
             } else {
                 System.out.println(line);
                 }
-            Assert.assertTrue(line.endsWith("\r\n"));
             if (chunkSize + 2 != line.length()) {
                 System.out.println("Chunk wrong length. Was " + line.length() +
                         " Expected " + (chunkSize + 2));
@@ -188,12 +191,19 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 int pos = 0;
                 String seq = "0123456789ABCDEF";
                 // Assume starts with 0
-                while (line.subSequence(pos, pos + seq.length()).equals(seq)) {
+                while (pos + seq.length() < line.length() &&
+                        line.subSequence(pos, pos + seq.length()).equals(seq)) {
                     pos += seq.length();
                 }
-                System.out.println("Failed at position " + pos + " " +
-                        line.substring(pos, pos + seq.length()));
+                if (pos + seq.length() < line.length()) {
+                    System.out.println("Failed at position " + pos + " " +
+                            line.substring(pos, pos + seq.length()));
+                } else {
+                    System.out.println("Failed at position " + pos + " " +
+                            line.substring(pos));
+                }
             }
+            Assert.assertTrue(line.endsWith("\r\n"));
             Assert.assertEquals(chunkSize + 2, line.length());
 
             totalBodyRead += chunkSize;
