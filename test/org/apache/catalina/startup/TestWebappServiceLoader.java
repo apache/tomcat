@@ -32,15 +32,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import static org.easymock.EasyMock.createMockBuilder;
-import static org.easymock.EasyMock.createStrictControl;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.EasyMock.same;
 
 public class TestWebappServiceLoader {
     private static final String CONFIG_FILE =
@@ -53,21 +46,23 @@ public class TestWebappServiceLoader {
 
     @Before
     public void init() {
-        control = createStrictControl();
+        control = EasyMock.createStrictControl();
         parent = control.createMock(ClassLoader.class);
-        cl = createMockBuilder(ClassLoader.class)
+        cl = EasyMock.createMockBuilder(ClassLoader.class)
                 .withConstructor(parent)
                 .addMockedMethod("loadClass", String.class)
                 .createMock(control);
         context = control.createMock(ServletContext.class);
-        expect(context.getClassLoader()).andStubReturn(cl);
+        EasyMock.expect(context.getClassLoader()).andStubReturn(cl);
     }
 
     @Test
     public void testNoInitializersFound() throws IOException {
         loader = new WebappServiceLoader<>(context);
-        expect(context.getAttribute(ServletContext.ORDERED_LIBS)).andReturn(null);
-        expect(cl.getResources(CONFIG_FILE)).andReturn(Collections.<URL>emptyEnumeration());
+        EasyMock.expect(context.getAttribute(ServletContext.ORDERED_LIBS))
+                .andReturn(null);
+        EasyMock.expect(cl.getResources(CONFIG_FILE))
+                .andReturn(Collections.<URL>emptyEnumeration());
         control.replay();
         Assert.assertTrue(loader.load(ServletContainerInitializer.class).isEmpty());
         control.verify();
@@ -77,13 +72,14 @@ public class TestWebappServiceLoader {
     @SuppressWarnings("unchecked")
     public void testInitializerFromClasspath() throws IOException {
         URL url = new URL("file://test");
-        loader = createMockBuilder(WebappServiceLoader.class)
+        loader = EasyMock.createMockBuilder(WebappServiceLoader.class)
                 .addMockedMethod("parseConfigFile", Set.class, URL.class)
                 .withConstructor(context).createMock(control);
-        expect(context.getAttribute(ServletContext.ORDERED_LIBS)).andReturn(null);
-        expect(cl.getResources(CONFIG_FILE))
+        EasyMock.expect(context.getAttribute(ServletContext.ORDERED_LIBS))
+                .andReturn(null);
+        EasyMock.expect(cl.getResources(CONFIG_FILE))
                 .andReturn(Collections.enumeration(Collections.singleton(url)));
-        loader.parseConfigFile(isA(Set.class), same(url));
+        loader.parseConfigFile(EasyMock.isA(Set.class), EasyMock.same(url));
         control.replay();
         Assert.assertTrue(loader.load(ServletContainerInitializer.class).isEmpty());
         control.verify();
@@ -96,16 +92,20 @@ public class TestWebappServiceLoader {
         URL sci1 = new URL("jar:file://jar1.jar!/" + CONFIG_FILE);
         URL url2 = new URL("file://dir/");
         URL sci2 = new URL("file://dir/" + CONFIG_FILE);
-        loader = createMockBuilder(WebappServiceLoader.class)
+        loader = EasyMock.createMockBuilder(WebappServiceLoader.class)
                 .addMockedMethod("parseConfigFile", Set.class, URL.class)
                 .withConstructor(context).createMock(control);
         List<String> jars = Arrays.asList("jar1.jar", "dir/");
-        expect(context.getAttribute(ServletContext.ORDERED_LIBS)).andReturn(jars);
-        expect(context.getResource("/WEB-INF/lib/jar1.jar")).andReturn(url1);
-        loader.parseConfigFile(isA(Set.class), eq(sci1));
-        expect(context.getResource("/WEB-INF/lib/dir/")).andReturn(url2);
-        loader.parseConfigFile(isA(Set.class), eq(sci2));
-        expect(parent.getResources(CONFIG_FILE)).andReturn(Collections.<URL>emptyEnumeration());
+        EasyMock.expect(context.getAttribute(ServletContext.ORDERED_LIBS))
+                .andReturn(jars);
+        EasyMock.expect(context.getResource("/WEB-INF/lib/jar1.jar"))
+                .andReturn(url1);
+        loader.parseConfigFile(EasyMock.isA(Set.class), EasyMock.eq(sci1));
+        EasyMock.expect(context.getResource("/WEB-INF/lib/dir/"))
+                .andReturn(url2);
+        loader.parseConfigFile(EasyMock.isA(Set.class), EasyMock.eq(sci2));
+        EasyMock.expect(parent.getResources(CONFIG_FILE))
+                .andReturn(Collections.<URL>emptyEnumeration());
 
         control.replay();
         Assert.assertTrue(loader.load(ServletContainerInitializer.class).isEmpty());
@@ -125,7 +125,8 @@ public class TestWebappServiceLoader {
         Class<?> sci = TesterServletContainerInitializer1.class;
         loader = new WebappServiceLoader<>(context);
         cl.loadClass(sci.getName());
-        expectLastCall().andReturn(sci);
+        EasyMock.expectLastCall()
+                .andReturn(sci);
         Set<String> names = Collections.singleton(sci.getName());
         control.replay();
         Collection<ServletContainerInitializer> initializers =
@@ -140,7 +141,8 @@ public class TestWebappServiceLoader {
         Class<?> sci = Object.class;
         loader = new WebappServiceLoader<>(context);
         cl.loadClass(sci.getName());
-        expectLastCall().andReturn(sci);
+        EasyMock.expectLastCall()
+                .andReturn(sci);
         Set<String> names = Collections.singleton(sci.getName());
         control.replay();
         try {
@@ -157,7 +159,8 @@ public class TestWebappServiceLoader {
         Class<?> sci = Integer.class;
         loader = new WebappServiceLoader<>(context);
         cl.loadClass(sci.getName());
-        expectLastCall().andReturn(sci);
+        EasyMock.expectLastCall()
+                .andReturn(sci);
         Set<String> names = Collections.singleton(sci.getName());
         control.replay();
         try {
