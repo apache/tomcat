@@ -144,9 +144,6 @@ public class WebappServiceLoader<T> {
                 if (line.length() == 0) {
                     continue;
                 }
-                if (servicesFound.contains(line)) {
-                    continue;
-                }
                 servicesFound.add(line);
             }
         }
