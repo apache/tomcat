@@ -44,12 +44,12 @@ public interface ClientEndpointConfig extends EndpointConfig {
         }
 
         private Configurator configurator = DEFAULT_CONFIGURATOR;
-        private List<String> preferredSubprotocols = Collections.EMPTY_LIST;
-        private List<Extension> extensions = Collections.EMPTY_LIST;
+        private List<String> preferredSubprotocols = Collections.emptyList();
+        private List<Extension> extensions = Collections.emptyList();
         private List<Class<? extends Encoder>> encoders =
-                Collections.EMPTY_LIST;
+                Collections.emptyList();
         private List<Class<? extends Decoder>> decoders =
-                Collections.EMPTY_LIST;
+                Collections.emptyList();
 
 
         public ClientEndpointConfig build() {
@@ -72,7 +72,7 @@ public interface ClientEndpointConfig extends EndpointConfig {
                 List<String> preferredSubprotocols) {
             if (preferredSubprotocols == null ||
                     preferredSubprotocols.size() == 0) {
-                this.preferredSubprotocols = Collections.EMPTY_LIST;
+                this.preferredSubprotocols = Collections.emptyList();
             } else {
                 this.preferredSubprotocols =
                         Collections.unmodifiableList(preferredSubprotocols);
@@ -84,7 +84,7 @@ public interface ClientEndpointConfig extends EndpointConfig {
         public Builder extensions(
                 List<Extension> extensions) {
             if (extensions == null || extensions.size() == 0) {
-                this.extensions = Collections.EMPTY_LIST;
+                this.extensions = Collections.emptyList();
             } else {
                 this.extensions = Collections.unmodifiableList(extensions);
             }
@@ -94,7 +94,7 @@ public interface ClientEndpointConfig extends EndpointConfig {
 
         public Builder encoders(List<Class<? extends Encoder>> encoders) {
             if (encoders == null || encoders.size() == 0) {
-                this.encoders = Collections.EMPTY_LIST;
+                this.encoders = Collections.emptyList();
             } else {
                 this.encoders = Collections.unmodifiableList(encoders);
             }
@@ -104,7 +104,7 @@ public interface ClientEndpointConfig extends EndpointConfig {
 
         public Builder decoders(List<Class<? extends Decoder>> decoders) {
             if (decoders == null || decoders.size() == 0) {
-                this.decoders = Collections.EMPTY_LIST;
+                this.decoders = Collections.emptyList();
             } else {
                 this.decoders = Collections.unmodifiableList(decoders);
             }

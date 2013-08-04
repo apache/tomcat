@@ -128,7 +128,7 @@ public class WsSession implements Session {
                 webSocketContainer.getDefaultMaxSessionIdleTimeout();
         this.requestUri = requestUri;
         if (requestParameterMap == null) {
-            this.requestParameterMap = Collections.EMPTY_MAP;
+            this.requestParameterMap = Collections.emptyMap();
         } else {
             this.requestParameterMap = requestParameterMap;
         }
@@ -299,7 +299,7 @@ public class WsSession implements Session {
     @Override
     public List<Extension> getNegotiatedExtensions() {
         checkState();
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
 
