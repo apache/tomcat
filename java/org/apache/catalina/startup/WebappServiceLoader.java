@@ -128,8 +128,7 @@ public class WebappServiceLoader<T> {
         return loadServices(serviceType, servicesFound);
     }
 
-    private void parseConfigFile(Set<String> servicesFound, URL url)
-            throws IOException {
+    void parseConfigFile(Set<String> servicesFound, URL url) throws IOException {
         try (InputStream is = url.openStream()) {
             InputStreamReader in =
                     new InputStreamReader(is, StandardCharsets.UTF_8);
@@ -149,8 +148,7 @@ public class WebappServiceLoader<T> {
         }
     }
 
-    private Collection<T> loadServices(Class<T> serviceType,
-                                       Set<String> servicesFound)
+    Collection<T> loadServices(Class<T> serviceType, Set<String> servicesFound)
             throws IOException {
         ClassLoader loader = context.getClassLoader();
         List<T> services = new ArrayList<>(servicesFound.size());
