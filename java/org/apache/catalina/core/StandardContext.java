@@ -4861,7 +4861,7 @@ public class StandardContext extends ContainerBase
                 ExceptionUtils.handleThrowable(t);
                 getLogger().error
                     (sm.getString("standardContext.applicationListener",
-                                  listeners[i]), t);
+                                  listeners[i].getClassName()), t);
                 ok = false;
             }
         }
