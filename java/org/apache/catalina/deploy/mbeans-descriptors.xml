@@ -17,14 +17,14 @@
 -->
 <mbeans-descriptors>
 
-  <mbean         name="NamingResources"
+  <mbean         name="NamingResourcesImpl"
             className="org.apache.catalina.mbeans.NamingResourcesMBean"
           description="Holds and manages the naming resources defined in the
                        J2EE Enterprise Naming Context and their associated
                        JNDI context"
                domain="Catalina"
                 group="Resources"
-                 type="org.apache.catalina.deploy.NamingResources">
+                 type="org.apache.catalina.deploy.NamingResourcesImpl">
 
     <attribute   name="container"
           description="The container with which the naming resources are associated."
