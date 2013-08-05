@@ -36,19 +36,6 @@
           description="The reloadable flag for this Loader"
                  type="boolean"/>
 
-    <attribute   name="searchExternalFirst"
-          description="The searchExternalFirst flag for this Loader"
-                 type="boolean"/>
-
-    <attribute   name="repositories"
-          description="Extra repositories managed by this loader"
-                 type="[Ljava.lang.String;"/>
-
-    <attribute   name="repositoriesString"
-          description="Extra repositories managed by this loader"
-             writeable="false"
-                 type="java.lang.String"/>
-
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
                  type="java.lang.String"
@@ -94,10 +81,6 @@
 
     <attribute   name="antiJARLocking"
           description="The antiJARLocking flag for this Loader"
-                 type="boolean"/>
-
-    <attribute   name="searchExternalFirst"
-          description="The searchExternalFirst flag for this Loader"
                  type="boolean"/>
 
     <attribute   name="stateName"
