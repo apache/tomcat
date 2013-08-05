@@ -208,6 +208,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <update>
+        Remove the experimental label from the AJP NIO connector documentation.
+        (markt)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
