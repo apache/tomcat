@@ -53,16 +53,25 @@ import org.apache.tomcat.util.buf.ByteChunk.ByteOutputChannel;
 
 public class TestNonBlockingAPI extends TomcatBaseTest {
 
-    private static final byte[] CHUNK = new byte[1024 * 1024];
-    private static final long WRITE_SIZE  = CHUNK.length * 5;
+    private static final int CHUNK_SIZE = 1024 * 1024;
+    private static final int WRITE_SIZE  = CHUNK_SIZE * 5;
+    private static final byte[] DATA = new byte[WRITE_SIZE];
+
 
     static {
-        byte[] seq = new byte[] {'0', '1', '2', '3', '4', '5', '6', '7',
-                '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-        int i = 0;
-        while (i < CHUNK.length) {
-            System.arraycopy(seq, 0, CHUNK, i, 16);
-            i += 16;
+        // Use this sequence for padding to make it easier to spot errors
+        byte[] padding = new byte[] {'z', 'y', 'x', 'w', 'v', 'u', 't', 's',
+                'r', 'q', 'p', 'o', 'n', 'm', 'l', 'k'};
+        int blockSize = padding.length;
+
+        for (int i = 0; i < WRITE_SIZE / blockSize; i++) {
+            String hex = String.format("%01X", Integer.valueOf(i));
+            int hexSize = hex.length();
+            int padSize = blockSize - hexSize;
+
+            System.arraycopy(padding, 0, DATA, i * blockSize, padSize);
+            System.arraycopy(
+                    hex.getBytes(), 0, DATA, i * blockSize + padSize, hexSize);
         }
     }
 
@@ -137,7 +146,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // Validate the result.
         // Response line
         String resultString = result.toString();
-        System.out.println("Read " + resultString.length() + " bytes");
+        System.out.println("Client read " + resultString.length() + " bytes");
         int lineStart = 0;
         int lineEnd = resultString.indexOf('\n', 0);
         String line = resultString.substring(lineStart, lineEnd + 1);
@@ -183,26 +192,46 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 System.out.println(line.substring(0, 32));
             } else {
                 System.out.println(line);
-                }
+            }
             if (chunkSize + 2 != line.length()) {
                 System.out.println("Chunk wrong length. Was " + line.length() +
                         " Expected " + (chunkSize + 2));
-                // look for failed position
-                int pos = 0;
-                String seq = "0123456789ABCDEF";
-                // Assume starts with 0
-                while (pos + seq.length() < line.length() &&
-                        line.subSequence(pos, pos + seq.length()).equals(seq)) {
-                    pos += seq.length();
+
+                byte[] resultBytes = resultString.getBytes();
+
+                // Find error
+                boolean found = false;
+                for (int i = totalBodyRead; i < (totalBodyRead + line.length()); i++) {
+                    if (DATA[i] != resultBytes[lineStart + i - totalBodyRead]) {
+                        int dataStart = i - 16;
+                        if (dataStart < 0) {
+                            dataStart = 0;
+                        }
+                        int dataEnd = i + 16;
+                        if (dataEnd > DATA.length) {
+                            dataEnd = DATA.length;
+                        }
+                        int resultStart = lineStart + i - totalBodyRead - 16;
+                        if (resultStart < 0) {
+                            resultStart = 0;
+                        }
+                        int resultEnd = lineStart + i - totalBodyRead + 16;
+                        if (resultEnd > resultString.length()) {
+                            resultEnd = resultString.length();
+                        }
+                        System.out.println("Mis-match tx: " + new String(
+                                DATA, dataStart, dataEnd - dataStart));
+                        System.out.println("Mis-match rx: " +
+                                resultString.substring(resultStart, resultEnd));
+                        found = true;
+                        break;
+                    }
                 }
-                if (pos + seq.length() < line.length()) {
-                    System.out.println("Failed at position " + pos + " " +
-                            line.substring(pos, pos + seq.length()));
-                } else {
-                    System.out.println("Failed at position " + pos + " " +
-                            line.substring(pos));
+                if (!found) {
+                    System.out.println("No mismatch. Data truncated");
                 }
             }
+
             Assert.assertTrue(line.endsWith("\r\n"));
             Assert.assertEquals(chunkSize + 2, line.length());
 
@@ -474,7 +503,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     private class TestWriteListener implements WriteListener {
         AsyncContext ctx;
-        long bytesToDownload = TestNonBlockingAPI.WRITE_SIZE;
+        int written = 0;
         public volatile boolean onErrorInvoked = false;
 
         public TestWriteListener(AsyncContext ctx) {
@@ -484,18 +513,20 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         @Override
         public void onWritePossible() {
             try {
-                long left = Math.max(bytesToDownload, 0);
                 long start = System.currentTimeMillis();
                 long end = System.currentTimeMillis();
-                long before = left;
-                while (left > 0 && ctx.getResponse().getOutputStream().isReady()) {
-                    ctx.getResponse().getOutputStream().write(CHUNK);
-                    bytesToDownload -= CHUNK.length;
-                    left = Math.max(bytesToDownload, 0);
+                int before = written;
+                while (written < WRITE_SIZE &&
+                        ctx.getResponse().getOutputStream().isReady()) {
+                    ctx.getResponse().getOutputStream().write(
+                            DATA, written, CHUNK_SIZE);
+                    written += CHUNK_SIZE;
                 }
-                System.out.println("Write took:" + (end - start) + " ms. Bytes before=" + before + " after=" + left);
+                System.out.println("Write took:" + (end - start) +
+                        " ms. Bytes before=" + before + " after=" + written);
                 // only call complete if we have emptied the buffer
-                if (left == 0 && ctx.getResponse().getOutputStream().isReady()) {
+                if (ctx.getResponse().getOutputStream().isReady() &&
+                        written == WRITE_SIZE) {
                     // it is illegal to call complete
                     // if there is a write in progress
                     ctx.complete();
