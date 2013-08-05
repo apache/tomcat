@@ -522,6 +522,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                             DATA, written, CHUNK_SIZE);
                     written += CHUNK_SIZE;
                 }
+                if (written == WRITE_SIZE) {
+                    // Clear the output buffer else data may be lost when
+                    // calling complete
+                    ctx.getResponse().flushBuffer();
+                }
                 System.out.println("Write took:" + (end - start) +
                         " ms. Bytes before=" + before + " after=" + written);
                 // only call complete if we have emptied the buffer
