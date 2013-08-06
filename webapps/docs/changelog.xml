@@ -246,6 +246,12 @@
         includes between the J2EE, Servlet and JSP schemas are correctly
         resolved. (markt)
       </fix>
+      <fix>
+        <bug>55372</bug>: When starting Tomcat with the <code>jpda</code> option
+        to enable remote debugging, by default only listen on localhost for
+        connections from a debugger. Prior to this change, Tomcat listened on
+        all known addresses. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
