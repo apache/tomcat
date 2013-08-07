@@ -24,6 +24,7 @@ import java.util.Locale;
 
 import javax.management.ObjectName;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
@@ -76,6 +77,11 @@ public class Connector extends LifecycleMBeanBase  {
                     "coyoteConnector.protocolHandlerInstantiationFailed"), e);
         } finally {
             this.protocolHandler = p;
+        }
+
+        if (!Globals.STRICT_SERVLET_COMPLIANCE) {
+            URIEncoding = "UTF-8";
+            URIEncodingLower = URIEncoding.toLowerCase(Locale.ENGLISH);
         }
     }
 

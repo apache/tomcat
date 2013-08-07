@@ -288,6 +288,9 @@
       <li><code>org.apache.tomcat.util.http.<br/>ServerCookie.ALWAYS_ADD_EXPIRES</code></li>
       <li><code>org.apache.tomcat.util.http.<br/>ServerCookie.FWD_SLASH_IS_SEPARATOR</code></li>
       <li><code>org.apache.tomcat.util.http.<br/>ServerCookie.STRICT_NAMING</code></li>
+      <li>The <code>URIEncoding</code> attribute of any
+          <a href="http.html">HTTP connector</a> or
+          <a href="ajp.html">AJP connector</a>element.</li>
       <li>The <code>resourceOnlyServlets</code> attribute of any
           <a href="context.html">Context</a> element.</li>
       <li>The <code>tldNamespaceAware</code> attribute of any
