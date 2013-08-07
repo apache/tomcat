@@ -36,7 +36,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
-import java.util.logging.SimpleFormatter;
 
 /**
  * Implementation of <b>Handler</b> that appends log messages to a file
@@ -330,10 +329,10 @@ public class FileHandler
                 setFormatter((Formatter) cl.loadClass(formatterName).newInstance());
             } catch (Exception e) {
                 // Ignore and fallback to defaults
-                setFormatter(new SimpleFormatter());
+                setFormatter(new OneLineFormatter());
             }
         } else {
-            setFormatter(new SimpleFormatter());
+            setFormatter(new OneLineFormatter());
         }
 
         // Set error manager
