@@ -14,6 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
+<%@page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="my" uri="http://tomcat.apache.org/jsp2-example-taglib"%>
 
