@@ -64,7 +64,7 @@ rem   JPDA_TRANSPORT  (Optional) JPDA transport used when the "jpda start"
 rem                   command is executed. The default is "dt_socket".
 rem
 rem   JPDA_ADDRESS    (Optional) Java runtime options used when the "jpda start"
-rem                   command is executed. The default is 8000.
+rem                   command is executed. The default is localhost:8000.
 rem
 rem   JPDA_SUSPEND    (Optional) Java runtime options used when the "jpda start"
 rem                   command is executed. Specifies whether JVM should suspend
@@ -212,7 +212,7 @@ if not "%JPDA_TRANSPORT%" == "" goto gotJpdaTransport
 set JPDA_TRANSPORT=dt_socket
 :gotJpdaTransport
 if not "%JPDA_ADDRESS%" == "" goto gotJpdaAddress
-set JPDA_ADDRESS=8000
+set JPDA_ADDRESS=localhost:8000
 :gotJpdaAddress
 if not "%JPDA_SUSPEND%" == "" goto gotJpdaSuspend
 set JPDA_SUSPEND=n
