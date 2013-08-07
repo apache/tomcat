@@ -80,6 +80,10 @@
         <code>catalina.base</code> system property falling back to the value for
         Catalina home. (markt)
       </scode>
+      <update>
+        <bug>52092</bug>: JULI now uses the <code>OneLineFormatter</code> and
+        <code>AsyncFileHandler</code> by default. (markt)
+      </update>
       <fix>
         <bug>52767</bug>: Remove reference to MySQL specific autoReconnect
         property in <code>JDBCAccessLogValve</code>. (markt)
