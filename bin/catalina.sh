@@ -461,7 +461,8 @@ elif [ "$1" = "stop" ] ; then
         fi
         if [ $SLEEP -eq 0 ]; then
           if [ $FORCE -eq 0 ]; then
-            echo "Tomcat did not stop in time. PID file was not removed."
+            echo "Tomcat did not stop in time. PID file was not removed. To aid diagnostics a thread dump has been written to standard out."
+            kill -3 `cat "$CATALINA_PID"`
           fi
         fi
         SLEEP=`expr $SLEEP - 1 `

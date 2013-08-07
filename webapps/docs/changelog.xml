@@ -224,6 +224,11 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <add>
+        <bug>45428</bug>: Trigger a thread dump written to standard out if
+        Tomcat fails to stop in a timely manner to aid diagnostics. This is only
+        available on platforms that use <code>catalina.sh</code>. (markt)
+      </add>
       <fix>
         <bug>55204</bug>: Correct namespace used in Servlet 2.4 test web 
         application. Patch provided by Jeremy Boynes. (markt)
