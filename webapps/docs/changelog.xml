@@ -209,6 +209,9 @@
         application to include details of the configured SSL ciphers suites for
         each connector. (markt)
       </add>
+      <update>
+        <bug>48550</bug>: Update exmaple web applications to use UTF-8. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Tribes">
