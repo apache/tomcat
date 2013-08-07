@@ -169,6 +169,10 @@
       <scode>
         Refactor char encoding/decoding using NIO APIs. (remm)
       </scode>
+      <update>
+        Change the default URIEncoding for all connectors from ISO-8859-1 to
+        UTF-8. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">

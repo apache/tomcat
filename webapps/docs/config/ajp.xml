@@ -226,8 +226,10 @@
 
     <attribute name="URIEncoding" required="false">
       <p>This specifies the character encoding used to decode the URI bytes,
-      after %xx decoding the URL. If not specified, ISO-8859-1 will be used.
-      </p>
+      after %xx decoding the URL. If not specified, UTF-8 will be used unless
+      the <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
+      <a href="systemprops.html">system property</a> is set to <code>true</code>
+      in which case ISO-8859-1 will be used.</p>
     </attribute>
 
     <attribute name="useBodyEncodingForURI" required="false">
