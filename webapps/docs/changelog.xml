@@ -101,6 +101,12 @@
         <bug>55333</bug>: Correct a regression in the fix for <bug>55071</bug>.
         (markt)
       </fix>
+      <fix>
+        When using a security manager, ensure that calls to the ServletContext
+        that are routed via an <code>AccessController.doPrivileged</code> block
+        do not result in a call to a different underlying method on the
+        ServletContext. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
