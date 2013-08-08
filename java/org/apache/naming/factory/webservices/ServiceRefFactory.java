@@ -176,6 +176,7 @@ public class ServiceRefFactory implements ObjectFactory {
                     Definition def = reader.readWSDL((new URL(wsdlRefAddr)).toExternalForm());
 
                     javax.wsdl.Service wsdlservice = def.getService(serviceQname);
+                    @SuppressWarnings("unchecked")
                     Map<String,?> ports = wsdlservice.getPorts();
                     Method m = serviceInterfaceClass.getMethod("setEndpointAddress",
                             new Class[] { java.lang.String.class,
@@ -327,6 +328,7 @@ public class ServiceRefFactory implements ObjectFactory {
      */
     private String getSOAPLocation(Port port) {
         String endpoint = null;
+        @SuppressWarnings("unchecked")
         List<ExtensibilityElement> extensions = port.getExtensibilityElements();
         for (Iterator<ExtensibilityElement> i = extensions.iterator();
                 i.hasNext();) {
@@ -343,6 +345,7 @@ public class ServiceRefFactory implements ObjectFactory {
     private void initHandlerChain(QName portName, HandlerRegistry handlerRegistry,
             HandlerInfo handlerInfo, ArrayList<String> soaprolesToAdd) {
         HandlerChain handlerChain = (HandlerChain) handlerRegistry.getHandlerChain(portName);
+        @SuppressWarnings("unchecked")
         Iterator<Handler> iter = handlerChain.iterator();
         while (iter.hasNext()) {
             Handler handler = iter.next();

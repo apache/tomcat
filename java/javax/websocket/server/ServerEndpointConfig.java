@@ -170,6 +170,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
             // Fall-back. Also used by unit tests
             if (result == null) {
                 try {
+                    @SuppressWarnings("unchecked")
                     Class<Configurator> clazz =
                             (Class<Configurator>) Class.forName(
                                     DEFAULT_IMPL_CLASSNAME);

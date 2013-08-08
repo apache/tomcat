@@ -1415,6 +1415,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             return new X509SubjectDnRetriever();
 
         try {
+            @SuppressWarnings("unchecked")
             Class<? extends X509UsernameRetriever> clazz = (Class<? extends X509UsernameRetriever>)Class.forName(className);
             return clazz.newInstance();
         } catch (ClassNotFoundException e) {

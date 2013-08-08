@@ -177,6 +177,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol {
     }
 
     protected NpnHandler<S> npnHandler;
+    @SuppressWarnings("unchecked")
     public void setNpnHandler(String impl) {
         try {
             Class<?> c = Class.forName(impl);

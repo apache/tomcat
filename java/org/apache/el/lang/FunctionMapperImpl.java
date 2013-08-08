@@ -80,6 +80,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
      *
      * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void readExternal(ObjectInput in) throws IOException,
             ClassNotFoundException {

@@ -128,6 +128,7 @@ public class StatementCache extends StatementDecoratorInterceptor {
 
     @Override
     public void disconnected(ConnectionPool parent, PooledConnection con, boolean finalizing) {
+        @SuppressWarnings("unchecked")
         ConcurrentHashMap<String,CachedStatement> statements =
             (ConcurrentHashMap<String,CachedStatement>)con.getAttributes().get(STATEMENT_CACHE_ATTR);
 
@@ -182,12 +183,14 @@ public class StatementCache extends StatementDecoratorInterceptor {
     }
 
     public CachedStatement isCached(String sql) {
+        @SuppressWarnings("unchecked")
         ConcurrentHashMap<String,CachedStatement> cache =
             (ConcurrentHashMap<String,CachedStatement>)pcon.getAttributes().get(STATEMENT_CACHE_ATTR);
         return cache.get(sql);
     }
 
     public boolean cacheStatement(CachedStatement proxy) {
+        @SuppressWarnings("unchecked")
         ConcurrentHashMap<String,CachedStatement> cache =
             (ConcurrentHashMap<String,CachedStatement>)pcon.getAttributes().get(STATEMENT_CACHE_ATTR);
         if (proxy.getSql()==null) {
@@ -207,6 +210,7 @@ public class StatementCache extends StatementDecoratorInterceptor {
     }
 
     public boolean removeStatement(CachedStatement proxy) {
+        @SuppressWarnings("unchecked")
         ConcurrentHashMap<String,CachedStatement> cache =
             (ConcurrentHashMap<String,CachedStatement>)pcon.getAttributes().get(STATEMENT_CACHE_ATTR);
         if (cache.remove(proxy.getSql()) != null) {

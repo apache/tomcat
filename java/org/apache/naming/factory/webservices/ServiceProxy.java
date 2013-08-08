@@ -103,7 +103,8 @@ public class ServiceProxy implements InvocationHandler {
         String nameString = name.getLocalPart();
         Class<?> serviceendpointClass = (Class<?>) args[1];
 
-        for (Iterator<QName> ports = service.getPorts(); ports.hasNext();) {
+        for (@SuppressWarnings("unchecked")
+        Iterator<QName> ports = service.getPorts(); ports.hasNext();) {
             QName portName = ports.next();
             String portnameString = portName.getLocalPart();
             if (portnameString.equals(nameString)) {

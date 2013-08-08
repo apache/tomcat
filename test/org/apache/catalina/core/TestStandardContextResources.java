@@ -88,6 +88,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
 
         // For BZ 54391. Relative ordering is specified in resources2.jar.
         // It is not absolute-ordering, so there may be other jars in the list
+        @SuppressWarnings("unchecked")
         List<String> orderedLibs = (List<String>) ctx.getServletContext()
                 .getAttribute(ServletContext.ORDERED_LIBS);
         if (orderedLibs.size() > 2) {

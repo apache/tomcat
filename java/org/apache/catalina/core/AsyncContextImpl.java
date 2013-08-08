@@ -282,6 +282,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         listeners.add(wrapper);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends AsyncListener> T createListener(Class<T> clazz)
             throws ServletException {

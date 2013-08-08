@@ -377,6 +377,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
     public Member[] getMapMembersExcl(Member[] exclude) {
         synchronized (mapMembers) {
+            @SuppressWarnings("unchecked")
             HashMap<Member, Long> list = (HashMap<Member, Long>)mapMembers.clone();
             for (int i=0; i<exclude.length;i++) list.remove(exclude[i]);
             return getMapMembers(list);
@@ -1007,6 +1008,7 @@ public abstract class AbstractReplicatedMap<K,V>
     public void putAll(Map<? extends K, ? extends V> m) {
         Iterator<?> i = m.entrySet().iterator();
         while ( i.hasNext() ) {
+            @SuppressWarnings("unchecked")
             Map.Entry<K,V> entry = (Map.Entry<K,V>) i.next();
             put(entry.getKey(),entry.getValue());
         }
@@ -1247,6 +1249,7 @@ public abstract class AbstractReplicatedMap<K,V>
          * @throws IOException
          * @throws ClassNotFoundException
          */
+        @SuppressWarnings("unchecked")
         public void apply(byte[] data, int offset, int length, boolean diff) throws IOException, ClassNotFoundException {
             if (isDiffable() && diff) {
                 ReplicatedMapEntry rentry = (ReplicatedMapEntry) value;

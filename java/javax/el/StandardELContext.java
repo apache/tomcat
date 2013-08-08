@@ -75,7 +75,8 @@ public class StandardELContext extends ELContext {
 
     // Can't use Class<?> because API needs to match specification
     @Override
-    public void putContext(Class key, Object contextObject) {
+    public void putContext(@SuppressWarnings("rawtypes") Class key,
+            Object contextObject) {
         if (wrappedContext == null) {
             super.putContext(key, contextObject);
         } else {
@@ -84,7 +85,7 @@ public class StandardELContext extends ELContext {
     }
 
     @Override
-    public Object getContext(Class key) {
+    public Object getContext(@SuppressWarnings("rawtypes") Class key) {
         if (wrappedContext == null) {
             return super.getContext(key);
         } else {

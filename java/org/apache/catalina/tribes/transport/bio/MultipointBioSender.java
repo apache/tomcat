@@ -139,6 +139,7 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
     @Override
     public boolean keepalive() {
         boolean result = false;
+        @SuppressWarnings("unchecked")
         Map.Entry<Member,BioSender>[] entries = bioSenders.entrySet().toArray(new Map.Entry[bioSenders.size()]);
         for ( int i=0; i<entries.length; i++ ) {
             BioSender sender = entries[i].getValue();
