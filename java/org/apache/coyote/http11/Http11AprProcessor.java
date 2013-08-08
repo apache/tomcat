@@ -81,12 +81,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
 
     /**
-     * Socket associated with the current connection.
-     */
-    protected SocketWrapper<Long> socket = null;
-
-
-    /**
      * When client certificate information is presented in a form other than
      * instances of {@link java.security.cert.X509Certificate} it needs to be
      * converted before it can be used and this property controls which JSSE
@@ -192,7 +186,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
     @Override
     protected void setSocketTimeout(int timeout) {
-        Socket.timeoutSet(socket.getSocket().longValue(), timeout * 1000);
+        Socket.timeoutSet(socketWrapper.getSocket().longValue(), timeout * 1000);
     }
 
 
@@ -234,7 +228,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     @Override
     protected void registerForEvent(boolean read, boolean write) {
         ((AprEndpoint) endpoint).getPoller().add(
-                socket.getSocket().longValue(), -1, read, write);
+                socketWrapper.getSocket().longValue(), -1, read, write);
     }
 
 
@@ -246,7 +240,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
     @Override
     public void recycleInternal() {
-        socket = null;
+        socketWrapper = null;
         sendfileData = null;
     }
 
@@ -268,22 +262,22 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     @Override
     public void actionInternal(ActionCode actionCode, Object param) {
 
-        long socketRef = socket.getSocket().longValue();
+        long socketRef = socketWrapper.getSocket().longValue();
 
         if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
 
             if (socketRef == 0) {
                 request.remoteAddr().recycle();
             } else {
-                if (socket.getRemoteAddr() == null) {
+                if (socketWrapper.getRemoteAddr() == null) {
                     try {
                         long sa = Address.get(Socket.APR_REMOTE, socketRef);
-                        socket.setRemoteAddr(Address.getip(sa));
+                        socketWrapper.setRemoteAddr(Address.getip(sa));
                     } catch (Exception e) {
                         log.warn(sm.getString("http11processor.socket.info"), e);
                     }
                 }
-                request.remoteAddr().setString(socket.getRemoteAddr());
+                request.remoteAddr().setString(socketWrapper.getRemoteAddr());
             }
 
         } else if (actionCode == ActionCode.REQ_LOCAL_NAME_ATTRIBUTE) {
@@ -291,15 +285,15 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             if (socketRef == 0) {
                 request.localName().recycle();
             } else {
-                if (socket.getLocalName() == null) {
+                if (socketWrapper.getLocalName() == null) {
                     try {
                         long sa = Address.get(Socket.APR_LOCAL, socketRef);
-                        socket.setLocalName(Address.getnameinfo(sa, 0));
+                        socketWrapper.setLocalName(Address.getnameinfo(sa, 0));
                     } catch (Exception e) {
                         log.warn(sm.getString("http11processor.socket.info"), e);
                     }
                 }
-                request.localName().setString(socket.getLocalName());
+                request.localName().setString(socketWrapper.getLocalName());
             }
 
         } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
@@ -307,23 +301,23 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             if (socketRef == 0) {
                 request.remoteHost().recycle();
             } else {
-                if (socket.getRemoteHost() == null) {
+                if (socketWrapper.getRemoteHost() == null) {
                     try {
                         long sa = Address.get(Socket.APR_REMOTE, socketRef);
-                        socket.setRemoteHost(Address.getnameinfo(sa, 0));
-                        if (socket.getRemoteHost() == null) {
-                            if (socket.getRemoteAddr() == null) {
-                                socket.setRemoteAddr(Address.getip(sa));
+                        socketWrapper.setRemoteHost(Address.getnameinfo(sa, 0));
+                        if (socketWrapper.getRemoteHost() == null) {
+                            if (socketWrapper.getRemoteAddr() == null) {
+                                socketWrapper.setRemoteAddr(Address.getip(sa));
                             }
-                            if (socket.getRemoteAddr() != null) {
-                                socket.setRemoteHost(socket.getRemoteAddr());
+                            if (socketWrapper.getRemoteAddr() != null) {
+                                socketWrapper.setRemoteHost(socketWrapper.getRemoteAddr());
                             }
                         }
                     } catch (Exception e) {
                         log.warn(sm.getString("http11processor.socket.info"), e);
                     }
                 } else {
-                    request.remoteHost().setString(socket.getRemoteHost());
+                    request.remoteHost().setString(socketWrapper.getRemoteHost());
                 }
             }
 
@@ -332,15 +326,15 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             if (socketRef == 0) {
                 request.localAddr().recycle();
             } else {
-                if (socket.getLocalAddr() == null) {
+                if (socketWrapper.getLocalAddr() == null) {
                     try {
                         long sa = Address.get(Socket.APR_LOCAL, socketRef);
-                        socket.setLocalAddr(Address.getip(sa));
+                        socketWrapper.setLocalAddr(Address.getip(sa));
                     } catch (Exception e) {
                         log.warn(sm.getString("http11processor.socket.info"), e);
                     }
                 }
-                request.localAddr().setString(socket.getLocalAddr());
+                request.localAddr().setString(socketWrapper.getLocalAddr());
             }
 
         } else if (actionCode == ActionCode.REQ_REMOTEPORT_ATTRIBUTE) {
@@ -348,16 +342,16 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             if (socketRef == 0) {
                 request.setRemotePort(0);
             } else {
-                if (socket.getRemotePort() == -1) {
+                if (socketWrapper.getRemotePort() == -1) {
                     try {
                         long sa = Address.get(Socket.APR_REMOTE, socketRef);
                         Sockaddr addr = Address.getInfo(sa);
-                        socket.setRemotePort(addr.port);
+                        socketWrapper.setRemotePort(addr.port);
                     } catch (Exception e) {
                         log.warn(sm.getString("http11processor.socket.info"), e);
                     }
                 }
-                request.setRemotePort(socket.getRemotePort());
+                request.setRemotePort(socketWrapper.getRemotePort());
             }
 
         } else if (actionCode == ActionCode.REQ_LOCALPORT_ATTRIBUTE) {
@@ -365,16 +359,16 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             if (socketRef == 0) {
                 request.setLocalPort(0);
             } else {
-                if (socket.getLocalPort() == -1) {
+                if (socketWrapper.getLocalPort() == -1) {
                     try {
                         long sa = Address.get(Socket.APR_LOCAL, socketRef);
                         Sockaddr addr = Address.getInfo(sa);
-                        socket.setLocalPort(addr.port);
+                        socketWrapper.setLocalPort(addr.port);
                     } catch (Exception e) {
                         log.warn(sm.getString("http11processor.socket.info"), e);
                     }
                 }
-                request.setLocalPort(socket.getLocalPort());
+                request.setLocalPort(socketWrapper.getLocalPort());
             }
 
         } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
@@ -469,13 +463,13 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         } else if (actionCode == ActionCode.COMET_END) {
             comet = false;
         } else if (actionCode == ActionCode.COMET_CLOSE) {
-            ((AprEndpoint)endpoint).processSocketAsync(this.socket,
+            ((AprEndpoint)endpoint).processSocketAsync(this.socketWrapper,
                     SocketStatus.OPEN_READ);
         } else if (actionCode == ActionCode.COMET_SETTIMEOUT) {
             //no op
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
             if (asyncStateMachine.asyncComplete()) {
-                ((AprEndpoint)endpoint).processSocketAsync(this.socket,
+                ((AprEndpoint)endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
@@ -483,10 +477,10 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 return;
             }
             long timeout = ((Long)param).longValue();
-            socket.setTimeout(timeout);
+            socketWrapper.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
-                ((AprEndpoint)endpoint).processSocketAsync(this.socket,
+                ((AprEndpoint)endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);
             }
         }
