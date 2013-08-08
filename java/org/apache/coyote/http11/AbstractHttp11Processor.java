@@ -1110,10 +1110,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Regsiter the socket for the specified events.
+     * Register the socket for the specified events.
      *
      * @param read  Register the socket for read events
-     * @param write Regsiter the socket for write events
+     * @param write Register the socket for write events
      */
     protected abstract void registerForEvent(boolean read, boolean write);
 
