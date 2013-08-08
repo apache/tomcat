@@ -16,10 +16,9 @@
  */
 package org.apache.tomcat.websocket.server;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.websocket.DeploymentException;
@@ -36,7 +35,7 @@ public class UriTemplate {
             StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final String normalized;
-    private final List<Segment> segments = new ArrayList<>();
+    private final Map<String,Segment> segments = new LinkedHashMap<>();
     private final boolean hasParameters;
 
 
@@ -73,7 +72,12 @@ public class UriTemplate {
                 }
                 normalized.append(segment);
             }
-            this.segments.add(new Segment(index, segment));
+            Segment old =
+                    this.segments.put(segment, new Segment(index, segment));
+            if (old != null) {
+                throw new IllegalArgumentException(
+                        sm.getString("uriTemplate.duplicateName", segment));
+            }
             segmentCount++;
         }
 
@@ -92,8 +96,8 @@ public class UriTemplate {
         }
 
         Iterator<Segment> candidateSegments =
-                candidate.getSegments().iterator();
-        Iterator<Segment> targetSegments = segments.iterator();
+                candidate.getSegments().values().iterator();
+        Iterator<Segment> targetSegments = segments.values().iterator();
 
         while (candidateSegments.hasNext()) {
             Segment candidateSegment = candidateSegments.next();
@@ -132,7 +136,7 @@ public class UriTemplate {
     }
 
 
-    private List<Segment> getSegments() {
+    private Map<String,Segment> getSegments() {
         return segments;
     }
 
