@@ -197,6 +197,7 @@ public class Util {
         }
 
         // Interface not found on this class. Look at the superclass.
+        @SuppressWarnings("unchecked")
         Class<? extends T> superClazz =
                 (Class<? extends T>) clazz.getSuperclass();
 
@@ -368,6 +369,7 @@ public class Util {
             try {
                 List<Class<? extends Decoder>> decoders =
                         endpointConfig.getDecoders();
+                @SuppressWarnings("unchecked")
                 List<DecoderEntry> decoderEntries = getDecoders(
                         decoders.toArray(new Class[decoders.size()]));
                 decoderMatch = new DecoderMatch(target, decoderEntries);

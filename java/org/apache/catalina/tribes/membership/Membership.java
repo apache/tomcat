@@ -69,6 +69,7 @@ public class Membership implements Cloneable {
     public Object clone() {
         synchronized (membersLock) {
             Membership clone = new Membership(local, memberComparator);
+            @SuppressWarnings("unchecked")
             final HashMap<Member, MbrEntry> tmpclone = (HashMap<Member, MbrEntry>) map.clone();
             clone.map = tmpclone;
             clone.members = new Member[members.length];

@@ -114,6 +114,7 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
 
         Assert.assertTrue(latchResult);
 
+        @SuppressWarnings("unchecked")
         List<String> messages = (List<String>) handler.getMessages();
 
         int offset = 0;

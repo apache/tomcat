@@ -1800,6 +1800,7 @@ public class WebappClassLoader
                 defineClass("org.apache.catalina.loader.JdbcLeakPrevention",
                     classBytes, 0, offset, this.getClass().getProtectionDomain());
             Object obj = lpClass.newInstance();
+            @SuppressWarnings("unchecked")
             List<String> driverNames = (List<String>) obj.getClass().getMethod(
                     "clearJdbcDriverRegistrations").invoke(obj);
             for (String name : driverNames) {
@@ -1828,6 +1829,7 @@ public class WebappClassLoader
 
     private final void clearReferencesStaticFinal() {
 
+        @SuppressWarnings("unchecked")
         Collection<ResourceEntry> values =
             ((HashMap<String,ResourceEntry>) resourceEntries.clone()).values();
         Iterator<ResourceEntry> loadedClasses = values.iterator();

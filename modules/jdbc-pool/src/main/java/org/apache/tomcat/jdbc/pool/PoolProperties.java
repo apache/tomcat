@@ -754,6 +754,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
 
         try {
+            @SuppressWarnings("unchecked")
             Class<Validator> validatorClass = (Class<Validator>)Class.forName(className);
             validator = validatorClass.newInstance();
         } catch (ClassNotFoundException e) {

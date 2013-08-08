@@ -67,7 +67,7 @@ Unnecessary code
 
 Generic types
  - All                                  - W
-   [x] Ignore unavoidable generic type problems
+   [ ] Ignore unavoidable generic type problems
 
 Annotations
  - All                                  - W

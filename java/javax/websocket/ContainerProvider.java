@@ -44,6 +44,7 @@ public abstract class ContainerProvider {
         // Fall-back. Also used by unit tests
         if (result == null) {
             try {
+                @SuppressWarnings("unchecked")
                 Class<WebSocketContainer> clazz =
                         (Class<WebSocketContainer>) Class.forName(
                                 DEFAULT_PROVIDER_CLASS_NAME);

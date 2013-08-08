@@ -1876,6 +1876,7 @@ public class Request
      *
      * @since Servlet 3.1
      */
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(
             Class<T> httpUpgradeHandlerClass) throws java.io.IOException, ServletException {

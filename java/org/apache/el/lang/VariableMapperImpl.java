@@ -52,6 +52,7 @@ public class VariableMapperImpl extends VariableMapper implements Externalizable
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void readExternal(ObjectInput in) throws IOException,
             ClassNotFoundException {
