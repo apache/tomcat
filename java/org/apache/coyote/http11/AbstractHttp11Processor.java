@@ -637,12 +637,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Allows the super class to set the socket wrapper being used.
-     */
-    protected abstract void setSocketWrapper(SocketWrapper<S> socketWrapper);
-
-
-    /**
      * Exposes input buffer to super class to allow better code re-use.
      * @return  The input buffer used by the processor.
      */

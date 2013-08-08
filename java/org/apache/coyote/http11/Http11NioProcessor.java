@@ -85,12 +85,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     protected NioEndpoint.SendfileData sendfileData = null;
 
 
-    /**
-     * Socket associated with the current connection.
-     */
-    protected SocketWrapper<NioChannel> socket = null;
-
-
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -106,7 +100,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         long soTimeout = endpoint.getSoTimeout();
 
         RequestInfo rp = request.getRequestProcessor();
-        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
+        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(false);
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             error = !getAdapter().event(request, response, status);
@@ -162,7 +156,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     @Override
     protected void registerForEvent(boolean read, boolean write) {
         final NioEndpoint.KeyAttachment attach =
-                (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(
+                (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(
                         false);
         if (attach == null) {
             return;
@@ -178,7 +172,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
     @Override
     protected void resetTimeouts() {
-        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
+        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(false);
         if (!error && attach != null &&
                 asyncStateMachine.isAsyncDispatching()) {
             long soTimeout = endpoint.getSoTimeout();
@@ -228,17 +222,17 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         // Check to see if we have read any of the request line yet
         if (((InternalNioInputBuffer)
                 inputBuffer).getParsingRequestLinePhase() < 2) {
-            if (socket.getLastAccess() > -1 || keptAlive) {
+            if (socketWrapper.getLastAccess() > -1 || keptAlive) {
                 // Haven't read the request line and have previously processed a
                 // request. Must be keep-alive. Make sure poller uses keepAlive.
-                socket.setTimeout(endpoint.getKeepAliveTimeout());
+                socketWrapper.setTimeout(endpoint.getKeepAliveTimeout());
             }
         } else {
             // Started to read request line. Need to keep processor
             // associated with socket
             readComplete = false;
             // Make sure poller uses soTimeout from here onwards
-            socket.setTimeout(endpoint.getSoTimeout());
+            socketWrapper.setTimeout(endpoint.getSoTimeout());
         }
         if (endpoint.isPaused()) {
             // 503 - Service unavailable
@@ -254,7 +248,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
     @Override
     protected void setSocketTimeout(int timeout) throws IOException {
-        socket.getSocket().getIOChannel().socket().setSoTimeout(timeout);
+        socketWrapper.getSocket().getIOChannel().socket().setSoTimeout(timeout);
     }
 
 
@@ -301,7 +295,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
     @Override
     public void recycleInternal() {
-        socket = null;
+        socketWrapper = null;
         sendfileData = null;
     }
 
@@ -320,87 +314,87 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
         if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
 
-            if (socket == null) {
+            if (socketWrapper == null) {
                 request.remoteAddr().recycle();
             } else {
-                if (socket.getRemoteAddr() == null) {
-                    InetAddress inetAddr = socket.getSocket().getIOChannel().socket().getInetAddress();
+                if (socketWrapper.getRemoteAddr() == null) {
+                    InetAddress inetAddr = socketWrapper.getSocket().getIOChannel().socket().getInetAddress();
                     if (inetAddr != null) {
-                        socket.setRemoteAddr(inetAddr.getHostAddress());
+                        socketWrapper.setRemoteAddr(inetAddr.getHostAddress());
                     }
                 }
-                request.remoteAddr().setString(socket.getRemoteAddr());
+                request.remoteAddr().setString(socketWrapper.getRemoteAddr());
             }
 
         } else if (actionCode == ActionCode.REQ_LOCAL_NAME_ATTRIBUTE) {
 
-            if (socket == null) {
+            if (socketWrapper == null) {
                 request.localName().recycle();
             } else {
-                if (socket.getLocalName() == null) {
-                    InetAddress inetAddr = socket.getSocket().getIOChannel().socket().getLocalAddress();
+                if (socketWrapper.getLocalName() == null) {
+                    InetAddress inetAddr = socketWrapper.getSocket().getIOChannel().socket().getLocalAddress();
                     if (inetAddr != null) {
-                        socket.setLocalName(inetAddr.getHostName());
+                        socketWrapper.setLocalName(inetAddr.getHostName());
                     }
                 }
-                request.localName().setString(socket.getLocalName());
+                request.localName().setString(socketWrapper.getLocalName());
             }
 
         } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
 
-            if (socket == null) {
+            if (socketWrapper == null) {
                 request.remoteHost().recycle();
             } else {
-                if (socket.getRemoteHost() == null) {
-                    InetAddress inetAddr = socket.getSocket().getIOChannel().socket().getInetAddress();
+                if (socketWrapper.getRemoteHost() == null) {
+                    InetAddress inetAddr = socketWrapper.getSocket().getIOChannel().socket().getInetAddress();
                     if (inetAddr != null) {
-                        socket.setRemoteHost(inetAddr.getHostName());
+                        socketWrapper.setRemoteHost(inetAddr.getHostName());
                     }
-                    if (socket.getRemoteHost() == null) {
-                        if (socket.getRemoteAddr() == null &&
+                    if (socketWrapper.getRemoteHost() == null) {
+                        if (socketWrapper.getRemoteAddr() == null &&
                                 inetAddr != null) {
-                            socket.setRemoteAddr(inetAddr.getHostAddress());
+                            socketWrapper.setRemoteAddr(inetAddr.getHostAddress());
                         }
-                        if (socket.getRemoteAddr() != null) {
-                            socket.setRemoteHost(socket.getRemoteAddr());
+                        if (socketWrapper.getRemoteAddr() != null) {
+                            socketWrapper.setRemoteHost(socketWrapper.getRemoteAddr());
                         }
                     }
                 }
-                request.remoteHost().setString(socket.getRemoteHost());
+                request.remoteHost().setString(socketWrapper.getRemoteHost());
             }
 
         } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
 
-            if (socket == null) {
+            if (socketWrapper == null) {
                 request.localAddr().recycle();
             } else {
-                if (socket.getLocalAddr() == null) {
-                    socket.setLocalAddr(
-                            socket.getSocket().getIOChannel().socket().getLocalAddress().getHostAddress());
+                if (socketWrapper.getLocalAddr() == null) {
+                    socketWrapper.setLocalAddr(
+                            socketWrapper.getSocket().getIOChannel().socket().getLocalAddress().getHostAddress());
                 }
-                request.localAddr().setString(socket.getLocalAddr());
+                request.localAddr().setString(socketWrapper.getLocalAddr());
             }
 
         } else if (actionCode == ActionCode.REQ_REMOTEPORT_ATTRIBUTE) {
 
-            if (socket == null) {
+            if (socketWrapper == null) {
                 request.setRemotePort(0);
             } else {
-                if (socket.getRemotePort() == -1) {
-                    socket.setRemotePort(socket.getSocket().getIOChannel().socket().getPort());
+                if (socketWrapper.getRemotePort() == -1) {
+                    socketWrapper.setRemotePort(socketWrapper.getSocket().getIOChannel().socket().getPort());
                 }
-                request.setRemotePort(socket.getRemotePort());
+                request.setRemotePort(socketWrapper.getRemotePort());
             }
 
         } else if (actionCode == ActionCode.REQ_LOCALPORT_ATTRIBUTE) {
 
-            if (socket == null) {
+            if (socketWrapper == null) {
                 request.setLocalPort(0);
             } else {
-                if (socket.getLocalPort() == -1) {
-                    socket.setLocalPort(socket.getSocket().getIOChannel().socket().getLocalPort());
+                if (socketWrapper.getLocalPort() == -1) {
+                    socketWrapper.setLocalPort(socketWrapper.getSocket().getIOChannel().socket().getLocalPort());
                 }
-                request.setLocalPort(socket.getLocalPort());
+                request.setLocalPort(socketWrapper.getLocalPort());
             }
 
         } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
@@ -445,7 +439,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     .setLimit(maxSavePostSize);
                 inputBuffer.addActiveFilter
                     (inputFilters[Constants.BUFFERED_FILTER]);
-                SecureNioChannel sslChannel = (SecureNioChannel) socket.getSocket();
+                SecureNioChannel sslChannel = (SecureNioChannel) socketWrapper.getSocket();
                 SSLEngine engine = sslChannel.getSslEngine();
                 if (!engine.getNeedClientAuth()) {
                     // Need to re-negotiate SSL connection
@@ -477,7 +471,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         } else if (actionCode == ActionCode.COMET_END) {
             comet = false;
         } else if (actionCode == ActionCode.COMET_CLOSE) {
-            if (socket==null || socket.getSocket().getAttachment(false)==null) {
+            if (socketWrapper==null || socketWrapper.getSocket().getAttachment(false)==null) {
                 return;
             }
             RequestInfo rp = request.getRequestProcessor();
@@ -485,16 +479,16 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 // Close event for this processor triggered by request
                 // processing in another processor, a non-Tomcat thread (i.e.
                 // an application controlled thread) or similar.
-                socket.getSocket().getPoller().add(socket.getSocket());
+                socketWrapper.getSocket().getPoller().add(socketWrapper.getSocket());
             }
         } else if (actionCode == ActionCode.COMET_SETTIMEOUT) {
             if (param==null) {
                 return;
             }
-            if (socket==null || socket.getSocket().getAttachment(false)==null) {
+            if (socketWrapper==null || socketWrapper.getSocket().getAttachment(false)==null) {
                 return;
             }
-            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
+            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(false);
             long timeout = ((Long)param).longValue();
             //if we are not piggy backing on a worker thread, set the timeout
             RequestInfo rp = request.getRequestProcessor();
@@ -503,22 +497,22 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             }
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
             if (asyncStateMachine.asyncComplete()) {
-                ((NioEndpoint)endpoint).dispatchForEvent(this.socket.getSocket(),SocketStatus.OPEN_READ, true);
+                ((NioEndpoint)endpoint).dispatchForEvent(this.socketWrapper.getSocket(),SocketStatus.OPEN_READ, true);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param==null) {
                 return;
             }
-            if (socket==null || socket.getSocket().getAttachment(false)==null) {
+            if (socketWrapper==null || socketWrapper.getSocket().getAttachment(false)==null) {
                 return;
             }
-            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
+            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(false);
             long timeout = ((Long)param).longValue();
             //if we are not piggy backing on a worker thread, set the timeout
             attach.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
-                ((NioEndpoint)endpoint).dispatchForEvent(this.socket.getSocket(),SocketStatus.OPEN_READ, true);
+                ((NioEndpoint)endpoint).dispatchForEvent(this.socketWrapper.getSocket(),SocketStatus.OPEN_READ, true);
             }
         }
     }
@@ -549,11 +543,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             return true;
         }
         return false;
-    }
-
-    @Override
-    protected void setSocketWrapper(SocketWrapper<NioChannel> socketWrapper) {
-        this.socket = socketWrapper;
     }
 
     @Override
