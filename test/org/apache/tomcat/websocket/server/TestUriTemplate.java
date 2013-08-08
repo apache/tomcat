@@ -151,4 +151,11 @@ public class TestUriTemplate {
 
         Assert.assertNull(result);
    }
+
+
+    @Test(expected=java.lang.IllegalArgumentException.class)
+    public void testDuplicate() throws Exception {
+        @SuppressWarnings("unused")
+        UriTemplate t = new UriTemplate("/{var}/{var}");
+   }
 }
