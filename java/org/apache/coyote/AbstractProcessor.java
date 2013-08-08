@@ -37,6 +37,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     protected final AbstractEndpoint endpoint;
     protected final Request request;
     protected final Response response;
+    protected SocketWrapper<S> socketWrapper = null;
 
 
     /**
@@ -96,6 +97,22 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
      */
     public Adapter getAdapter() {
         return adapter;
+    }
+
+
+    /**
+     * Set the socket wrapper being used.
+     */
+    protected final void setSocketWrapper(SocketWrapper<S> socketWrapper) {
+        this.socketWrapper = socketWrapper;
+    }
+
+
+    /**
+     * Get the socket wrapper being used.
+     */
+    protected final SocketWrapper<S> getSocketWrapper() {
+        return socketWrapper;
     }
 
 

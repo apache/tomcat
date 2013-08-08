@@ -523,11 +523,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     }
 
     @Override
-    protected void setSocketWrapper(SocketWrapper<Long> socketWrapper) {
-        this.socket = socketWrapper;
-    }
-
-    @Override
     protected AbstractInputBuffer<Long> getInputBuffer() {
         return inputBuffer;
     }

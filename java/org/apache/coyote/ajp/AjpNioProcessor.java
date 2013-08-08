@@ -66,13 +66,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
     // ----------------------------------------------------- Instance Variables
 
-
-    /**
-     * Socket associated with the current connection.
-     */
-    protected NioChannel socket;
-
-
     /**
      * Selector pool for the associated endpoint.
      */
@@ -95,7 +88,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
         // Setting up the socket
-        this.socket = socket.getSocket();
+        this.socketWrapper = socket;
 
         long soTimeout = endpoint.getSoTimeout();
         boolean cping = false;
@@ -252,18 +245,21 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
         if (actionCode == ActionCode.ASYNC_COMPLETE) {
             if (asyncStateMachine.asyncComplete()) {
-                ((NioEndpoint)endpoint).dispatchForEvent(socket, SocketStatus.OPEN_READ, false);
+                ((NioEndpoint)endpoint).dispatchForEvent(
+                        socketWrapper.getSocket(), SocketStatus.OPEN_READ, false);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param == null) return;
             long timeout = ((Long)param).longValue();
-            final KeyAttachment ka = (KeyAttachment)socket.getAttachment(false);
+            final KeyAttachment ka =
+                    (KeyAttachment)socketWrapper.getSocket().getAttachment(false);
             if (keepAliveTimeout > 0) {
                 ka.setTimeout(timeout);
             }
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
-                ((NioEndpoint)endpoint).dispatchForEvent(socket, SocketStatus.OPEN_READ, true);            }
+                ((NioEndpoint)endpoint).dispatchForEvent(
+                        socketWrapper.getSocket(), SocketStatus.OPEN_READ, true);            }
             }
         }
 
@@ -274,10 +270,12 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
     protected void output(byte[] src, int offset, int length)
             throws IOException {
 
-        NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+        NioEndpoint.KeyAttachment att =
+                (NioEndpoint.KeyAttachment) socketWrapper.getSocket().getAttachment(false);
         if ( att == null ) throw new IOException("Key must be cancelled");
 
-        ByteBuffer writeBuffer = socket.getBufHandler() .getWriteBuffer();
+        ByteBuffer writeBuffer =
+                socketWrapper.getSocket().getBufHandler().getWriteBuffer();
 
         writeBuffer.put(src, offset, length);
 
@@ -291,7 +289,8 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             //ignore
         }
         try {
-            pool.write(writeBuffer, socket, selector, writeTimeout, true);
+            pool.write(writeBuffer, socketWrapper.getSocket(), selector,
+                    writeTimeout, true);
         }finally {
             writeBuffer.clear();
             if ( selector != null ) pool.put(selector);
@@ -326,8 +325,10 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
     private int readSocket(byte[] buf, int pos, int n, boolean block)
             throws IOException {
         int nRead = 0;
-        socket.getBufHandler().getReadBuffer().clear();
-        socket.getBufHandler().getReadBuffer().limit(n);
+        ByteBuffer readBuffer =
+                socketWrapper.getSocket().getBufHandler().getReadBuffer();
+        readBuffer.clear();
+        readBuffer.limit(n);
         if ( block ) {
             Selector selector = null;
             try {
@@ -336,21 +337,23 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
                 // Ignore
             }
             try {
-                NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+                NioEndpoint.KeyAttachment att =
+                        (NioEndpoint.KeyAttachment) socketWrapper.getSocket().getAttachment(false);
                 if ( att == null ) throw new IOException("Key must be cancelled.");
-                nRead = pool.read(socket.getBufHandler().getReadBuffer(),socket,selector,att.getTimeout());
+                nRead = pool.read(readBuffer, socketWrapper.getSocket(),
+                        selector, att.getTimeout());
             } catch ( EOFException eof ) {
                 nRead = -1;
             } finally {
                 if ( selector != null ) pool.put(selector);
             }
         } else {
-            nRead = socket.read(socket.getBufHandler().getReadBuffer());
+            nRead = socketWrapper.getSocket().read(readBuffer);
         }
         if (nRead > 0) {
-            socket.getBufHandler().getReadBuffer().flip();
-            socket.getBufHandler().getReadBuffer().limit(nRead);
-            socket.getBufHandler().getReadBuffer().get(buf, pos, nRead);
+            readBuffer.flip();
+            readBuffer.limit(nRead);
+            readBuffer.get(buf, pos, nRead);
             return nRead;
         } else if (nRead == -1) {
             //return false;
