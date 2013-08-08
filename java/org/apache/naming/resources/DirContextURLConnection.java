@@ -362,7 +362,7 @@ public class DirContextURLConnection extends URLConnection {
      * Get object content.
      */
     @Override
-    public Object getContent(Class[] classes)
+    public Object getContent(@SuppressWarnings("rawtypes") Class[] classes)
         throws IOException {
 
         Object obj = getContent();

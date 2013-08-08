@@ -20,12 +20,13 @@ import org.apache.catalina.ha.ClusterMessageBase;
 
 /**
  * Session id change cluster message
- * 
+ *
  * @author Peter Rossbach
- * 
+ *
  * @version $Id$
  * @deprecated Will be removed in Tomcat 8.0.x
  */
+@Deprecated
 public class SessionIDMessage extends ClusterMessageBase {
 
     private static final long serialVersionUID = 1L;
@@ -66,7 +67,7 @@ public class SessionIDMessage extends ClusterMessageBase {
     public void setHost(String host) {
         this.host = host;
     }
-    
+
     /**
      * @return Returns the context name.
      */
@@ -94,7 +95,7 @@ public class SessionIDMessage extends ClusterMessageBase {
         this.messageNumber = messageNumber;
     }
 
-    
+
     /**
      * @return Returns the backupSessionID.
      */

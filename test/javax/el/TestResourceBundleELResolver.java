@@ -222,6 +222,7 @@ public class TestResourceBundleELResolver {
         ResourceBundleELResolver resolver = new ResourceBundleELResolver();
         ELContext context = new ELContextImpl();
 
+        @SuppressWarnings("unchecked")
         Iterator<FeatureDescriptor> result = resolver.getFeatureDescriptors(
                 context, new Object());
 
@@ -238,6 +239,7 @@ public class TestResourceBundleELResolver {
 
         ResourceBundle resourceBundle = new TesterResourceBundle(
                 new Object[][] { { "key", "value" } });
+        @SuppressWarnings("unchecked")
         Iterator<FeatureDescriptor> result = resolver.getFeatureDescriptors(
                 context, resourceBundle);
 

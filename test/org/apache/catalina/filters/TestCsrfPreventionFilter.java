@@ -83,6 +83,7 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         ByteArrayInputStream bais =
             new ByteArrayInputStream(baos.toByteArray());
         ObjectInputStream ois = new ObjectInputStream(bais);
+        @SuppressWarnings("unchecked")
         LruCache<String> cache2 = (LruCache<String>) ois.readObject();
 
         cache2.add("key7");

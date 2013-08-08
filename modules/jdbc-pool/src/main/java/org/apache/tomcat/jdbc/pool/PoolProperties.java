@@ -754,6 +754,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
 
         try {
+            @SuppressWarnings("unchecked")
             Class<Validator> validatorClass = (Class<Validator>)Class.forName(className);
             validator = validatorClass.newInstance();
         } catch (ClassNotFoundException e) {
@@ -936,6 +937,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             return properties;
         }
 
+        @SuppressWarnings("unchecked")
         public Class<? extends JdbcInterceptor> getInterceptorClass() throws ClassNotFoundException {
             if (clazz==null) {
                 if (getClassName().indexOf(".")<0) {

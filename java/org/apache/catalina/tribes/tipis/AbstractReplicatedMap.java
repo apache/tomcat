@@ -53,6 +53,7 @@ import org.apache.juli.logging.LogFactory;
  * @author Filip Hanik
  * @version 1.0
  */
+@SuppressWarnings("rawtypes")
 public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements RpcCallback, ChannelListener, MembershipListener, Heartbeat {
     private static final long serialVersionUID = 1L;
 
@@ -467,6 +468,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
      * @param complete boolean
      */
     public void replicate(boolean complete) {
+        @SuppressWarnings("unchecked")
         Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
         while (i.hasNext()) {
             Map.Entry<?,?> e = i.next();
@@ -541,6 +543,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         if (mapmsg.getMsgType() == MapMessage.MSG_STATE || mapmsg.getMsgType() == MapMessage.MSG_STATE_COPY) {
             synchronized (stateMutex) { //make sure we dont do two things at the same time
                 ArrayList<MapMessage> list = new ArrayList<MapMessage>();
+                @SuppressWarnings("unchecked")
                 Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
                 while (i.hasNext()) {
                     Map.Entry<?,?> e = i.next();
@@ -589,6 +592,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void messageReceived(Serializable msg, Member sender) {
         if (! (msg instanceof MapMessage)) return;
@@ -715,6 +719,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         }
         if ( memberAdded ) {
             synchronized (stateMutex) {
+                @SuppressWarnings("unchecked")
                 Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
                 while (i.hasNext()) {
                     Map.Entry<?,?> e = i.next();
@@ -769,6 +774,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             }
         }
 
+        @SuppressWarnings("unchecked")
         Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
         while (i.hasNext()) {
             Map.Entry<?,?> e = i.next();
@@ -949,6 +955,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             for ( int i=0; i<mbrs.length;i++ ) {
                 System.out.println("Mbr["+(i+1)+"="+mbrs[i].getName());
             }
+            @SuppressWarnings("unchecked")
             Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
             int cnt = 0;
 
@@ -979,6 +986,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             return put(key,value,true);
         }
 
+        @SuppressWarnings("unchecked")
         public Object put(Object key, Object value, boolean notify) {
             MapEntry entry = new MapEntry(key,value);
             entry.setBackup(false);
@@ -1008,6 +1016,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
          */
         @Override
         public void putAll(Map m) {
+            @SuppressWarnings("unchecked")
             Iterator<Map.Entry<?,?>> i = m.entrySet().iterator();
             while ( i.hasNext() ) {
                 Map.Entry<?,?> entry = i.next();
@@ -1036,6 +1045,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             if ( value == null ) {
                 return super.containsValue(value);
             } else {
+                @SuppressWarnings("unchecked")
                 Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
                 while (i.hasNext()) {
                     Map.Entry<?,?> e = i.next();
@@ -1072,6 +1082,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         @Override
         public Set<MapEntry> entrySet() {
             LinkedHashSet<MapEntry> set = new LinkedHashSet<MapEntry>(super.size());
+            @SuppressWarnings("unchecked")
             Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
             while ( i.hasNext() ) {
                 Map.Entry<?,?> e = i.next();
@@ -1089,6 +1100,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             //todo implement
             //should only return keys where this is active.
             LinkedHashSet<Object> set = new LinkedHashSet<Object>(super.size());
+            @SuppressWarnings("unchecked")
             Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
             while ( i.hasNext() ) {
                 Map.Entry<?,?> e = i.next();
@@ -1106,6 +1118,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             //todo, implement a counter variable instead
             //only count active members in this node
             int counter = 0;
+            @SuppressWarnings("unchecked")
             Iterator<Map.Entry<?,?>> it = super.entrySet().iterator();
             while (it!=null && it.hasNext() ) {
                 Map.Entry<?,?> e = it.next();
@@ -1125,6 +1138,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         @Override
         public Collection<Object> values() {
             ArrayList<Object> values = new ArrayList<Object>();
+            @SuppressWarnings("unchecked")
             Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
             while ( i.hasNext() ) {
                 Map.Entry<?,?> e = i.next();

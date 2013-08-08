@@ -819,6 +819,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             InputFilter savedBody = new SavedRequestInputFilter(body);
             savedBody.setRequest(request);
 
+            @SuppressWarnings("unchecked")
             AbstractInputBuffer<S> internalBuffer = (AbstractInputBuffer<S>)
                 request.getInputBuffer();
             internalBuffer.addActiveFilter(savedBody);

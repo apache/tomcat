@@ -111,11 +111,12 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
     public void setExpire(long expire) {
         this.expire = expire;
     }
-    
+
     @Override
     public void heartbeat() {
         try {
             long now = System.currentTimeMillis();
+            @SuppressWarnings("unchecked")
             Map.Entry<UniqueId,MapEntry>[] entries = messages.entrySet().toArray(new Map.Entry[messages.size()]);
             for (int i=0; i<entries.length; i++ ) {
                 MapEntry entry = entries[i].getValue();
@@ -131,12 +132,12 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
             super.heartbeat();
         }
     }
-    
+
     public static class MapEntry {
         public ChannelMessage msg;
         public UniqueId id;
         public long timestamp;
-        
+
         public MapEntry(ChannelMessage msg, UniqueId id, long timestamp) {
             this.msg = msg;
             this.id = id;

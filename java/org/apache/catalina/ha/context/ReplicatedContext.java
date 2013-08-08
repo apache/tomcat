@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,7 +45,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     private int mapSendOptions = Channel.SEND_OPTIONS_DEFAULT;
     private static final Log log = LogFactory.getLog( ReplicatedContext.class );
     protected static long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
-    
+
     /**
      * Start this component and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
@@ -53,6 +53,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    @SuppressWarnings("unchecked")
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
@@ -72,7 +73,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
             throw new LifecycleException("Failed to start ReplicatedContext",x);
         }
     }
-    
+
     /**
      * Stop this component and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
@@ -82,7 +83,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
      */
     @Override
     protected synchronized void stopInternal() throws LifecycleException {
-        
+
         super.stopInternal();
 
         AbstractMap<String,Object> map =
@@ -100,7 +101,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     public int getMapSendOptions() {
         return mapSendOptions;
     }
-    
+
     public ClassLoader[] getClassLoaders() {
         Loader loader = null;
         ClassLoader classLoader = null;
@@ -113,7 +114,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
             return new ClassLoader[] {classLoader,Thread.currentThread().getContextClassLoader()};
         }
     }
-    
+
     @Override
     public ServletContext getServletContext() {
         if (context == null) {
@@ -126,38 +127,38 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
 
     }
 
-    
+
     protected static class ReplApplContext extends ApplicationContext {
         protected ConcurrentHashMap<String, Object> tomcatAttributes =
             new ConcurrentHashMap<String, Object>();
-        
+
         public ReplApplContext(ReplicatedContext context) {
             super(context);
         }
-        
+
         protected ReplicatedContext getParent() {
             return (ReplicatedContext)getContext();
         }
-        
+
         @Override
         protected ServletContext getFacade() {
              return super.getFacade();
         }
-        
+
         public AbstractMap<String,Object> getAttributeMap() {
             return (AbstractMap<String,Object>)this.attributes;
         }
         public void setAttributeMap(AbstractMap<String,Object> map) {
             this.attributes = map;
         }
-        
+
         @Override
         public void removeAttribute(String name) {
             tomcatAttributes.remove(name);
             //do nothing
             super.removeAttribute(name);
         }
-        
+
         @Override
         public void setAttribute(String name, Object value) {
             if ( (!getParent().getState().isAvailable()) || "org.apache.jasper.runtime.JspApplicationContextImpl".equals(name) ){
@@ -165,7 +166,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
             } else
                 super.setAttribute(name,value);
         }
-        
+
         @Override
         public Object getAttribute(String name) {
             Object obj = tomcatAttributes.get(name);
@@ -175,7 +176,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
                 return obj;
             }
         }
-        
+
         @SuppressWarnings("unchecked")
         @Override
         public Enumeration<String> getAttributeNames() {
@@ -209,7 +210,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
 
         }
     }
-    
+
     @Override
     public void objectMadePrimay(Object key, Object value) {
         //noop
