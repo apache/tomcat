@@ -621,6 +621,7 @@ public interface Context extends Container {
      * parsing tlds files.
      * @param tldValidation true to enable xml instance validation
      */
+    @Deprecated
     public void setTldValidation(boolean tldValidation);
 
 
@@ -629,6 +630,7 @@ public interface Context extends Container {
      * @return true if validation is enabled.
      *
      */
+    @Deprecated
     public boolean getTldValidation();
 
 
@@ -636,6 +638,7 @@ public interface Context extends Container {
      * Get the server.xml &lt;host&gt; attribute's xmlNamespaceAware.
      * @return true if namespace awareness is enabled.
      */
+    @Deprecated
     public boolean getTldNamespaceAware();
 
 
@@ -644,6 +647,7 @@ public interface Context extends Container {
      * parsing xml instances.
      * @param tldNamespaceAware true to enable namespace awareness
      */
+    @Deprecated
     public void setTldNamespaceAware(boolean tldNamespaceAware);
 
     /**

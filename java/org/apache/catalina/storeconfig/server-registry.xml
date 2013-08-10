@@ -189,7 +189,6 @@
        <TransientChild>org.apache.catalina.startup.ContextConfig</TransientChild>
        <TransientChild>org.apache.catalina.startup.EngineConfig</TransientChild>
        <TransientChild>org.apache.catalina.startup.HostConfig</TransientChild>
-       <TransientChild>org.apache.catalina.startup.TldConfig</TransientChild>
        <TransientChild>org.apache.catalina.core.StandardHost$MemoryLeakTrackingListener</TransientChild>
        <TransientChild>org.apache.catalina.mapper.MapperListener</TransientChild>
        <TransientChild>org.apache.catalina.core.ThreadLocalLeakPreventionListener</TransientChild>

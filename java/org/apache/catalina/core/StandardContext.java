@@ -99,7 +99,6 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.session.StandardManager;
-import org.apache.catalina.startup.TldConfig;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.ExtensionValidator;
@@ -705,11 +704,6 @@ public class StandardContext extends ContainerBase
      * Attribute value used to turn on/off XML namespace validation
      */
     private boolean webXmlNamespaceAware = Globals.STRICT_SERVLET_COMPLIANCE;
-
-    /**
-     * Attribute value used to turn on/off TLD processing
-     */
-    private boolean processTlds = true;
 
     /**
      * Attribute value used to turn on/off XML validation
@@ -6338,10 +6332,6 @@ public class StandardContext extends ContainerBase
     protected void initInternal() throws LifecycleException {
         super.initInternal();
 
-        if (processTlds) {
-            this.addLifecycleListener(new TldConfig());
-        }
-
         // Register the naming resources
         if (namingResources != null) {
             namingResources.init();
@@ -6515,22 +6505,6 @@ public class StandardContext extends ContainerBase
     @Override
     public boolean getTldValidation(){
         return tldValidation;
-    }
-
-    /**
-     * Sets the process TLDs attribute.
-     *
-     * @param newProcessTlds The new value
-     */
-    public void setProcessTlds(boolean newProcessTlds) {
-        processTlds = newProcessTlds;
-    }
-
-    /**
-     * Returns the processTlds attribute value.
-     */
-    public boolean getProcessTlds() {
-        return processTlds;
     }
 
     /**

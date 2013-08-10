@@ -64,6 +64,7 @@ import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.jasper.servlet.JasperInitializer;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
@@ -865,6 +866,7 @@ public class TestStandardContext extends TomcatBaseTest {
 
         File docBase = new File("test/webapp-3.0");
         Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+        ctx.addServletContainerInitializer(new JasperInitializer(), null);
 
         // Start the context
         tomcat.start();
