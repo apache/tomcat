@@ -565,13 +565,6 @@
          <code>$CATALINA_BASE/conf/catalina.properties</code> file.</p>
     </property>
 
-    <property name="org.apache.catalina.startup. TldConfig.jarsToSkip">
-      <p>The comma-separated list of additional filenames of JARs that Tomcat
-         will not scan for TLDs.</p>
-      <p>The coded default is that no JARs are skipped however the system
-         property is set in a default Tomcat installation via the
-         <code>$CATALINA_BASE/conf/catalina.properties</code> file.</p>
-    </property>
   </properties>
 
 </section>
