@@ -16,6 +16,7 @@
  */
 package org.apache.jasper.servlet;
 
+import java.io.IOException;
 import java.util.Set;
 
 import javax.servlet.ServletContainerInitializer;
@@ -25,11 +26,17 @@ import javax.servlet.ServletException;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.xml.sax.SAXException;
 
 /**
  * Initializer for the Jasper JSP Engine.
  */
 public class JasperInitializer implements ServletContainerInitializer {
+    /**
+     * Name of ServletContext initParam that determines if descriptor XML
+     * should be validated.
+     */
+    public static final String VALIDATE = "org.apache.jasper.validateDescriptors";
     private static final String MSG = "org.apache.jasper.servlet.JasperInitializer";
     private static final Log LOG = LogFactory.getLog(JasperInitializer.class);
 
@@ -37,6 +44,21 @@ public class JasperInitializer implements ServletContainerInitializer {
     public void onStartup(Set<Class<?>> types, ServletContext context) throws ServletException {
         if (LOG.isDebugEnabled()) {
             LOG.debug(Localizer.getMessage(MSG + ".onStartup", context.getServletContextName()));
+        }
+
+        boolean validate = Boolean.valueOf(context.getInitParameter(VALIDATE));
+
+        // scan the application for TLDs
+        TldScanner scanner = new TldScanner(context, true, validate);
+        try {
+            scanner.scan();
+        } catch (IOException | SAXException e) {
+            throw new ServletException(e);
+        }
+
+        // add any listeners defined in TLDs
+        for (String listener : scanner.getListeners()) {
+            context.addListener(listener);
         }
     }
 }
