@@ -16,14 +16,15 @@
  */
 package org.apache.tomcat.util.descriptor.tld;
 
-import java.io.FileInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 public class TestTldParser {
     private static final String WEBAPP = "test/webapp-3.1/WEB-INF/";
@@ -36,54 +37,42 @@ public class TestTldParser {
 
     @Test
     public void testParseTld21() throws Exception {
-        try (FileInputStream is = new FileInputStream(WEBAPP + "tags21.tld")) {
-            InputSource source = new InputSource(is);
-            TaglibXml xml = parser.parse(source);
-            Assert.assertEquals("1.0", xml.getTlibVersion());
-            Assert.assertEquals("2.1", xml.getJspVersion());
-            Assert.assertEquals("Tags21", xml.getShortName());
-            Assert.assertEquals("http://tomcat.apache.org/tags21", xml.getUri());
-            verifyTags(xml.getTags());
-        }
+        TaglibXml xml = parse("test/webapp-3.1/WEB-INF/tags21.tld");
+        Assert.assertEquals("1.0", xml.getTlibVersion());
+        Assert.assertEquals("2.1", xml.getJspVersion());
+        Assert.assertEquals("Tags21", xml.getShortName());
+        Assert.assertEquals("http://tomcat.apache.org/tags21", xml.getUri());
+        verifyTags(xml.getTags());
     }
 
     @Test
     public void testParseTld20() throws Exception {
-        try (FileInputStream is = new FileInputStream(WEBAPP + "tags20.tld")) {
-            InputSource source = new InputSource(is);
-            TaglibXml xml = parser.parse(source);
-            Assert.assertEquals("1.0", xml.getTlibVersion());
-            Assert.assertEquals("2.0", xml.getJspVersion());
-            Assert.assertEquals("Tags20", xml.getShortName());
-            Assert.assertEquals("http://tomcat.apache.org/tags20", xml.getUri());
-            verifyTags(xml.getTags());
-        }
+        TaglibXml xml = parse("test/webapp-3.1/WEB-INF/tags20.tld");
+        Assert.assertEquals("1.0", xml.getTlibVersion());
+        Assert.assertEquals("2.0", xml.getJspVersion());
+        Assert.assertEquals("Tags20", xml.getShortName());
+        Assert.assertEquals("http://tomcat.apache.org/tags20", xml.getUri());
+        verifyTags(xml.getTags());
     }
 
     @Test
     public void testParseTld12() throws Exception {
-        try (FileInputStream is = new FileInputStream(WEBAPP + "tags12.tld")) {
-            InputSource source = new InputSource(is);
-            TaglibXml xml = parser.parse(source);
-            Assert.assertEquals("1.0", xml.getTlibVersion());
-            Assert.assertEquals("1.2", xml.getJspVersion());
-            Assert.assertEquals("Tags12", xml.getShortName());
-            Assert.assertEquals("http://tomcat.apache.org/tags12", xml.getUri());
-            verifyTags(xml.getTags());
-        }
+        TaglibXml xml = parse("test/webapp-3.1/WEB-INF/tags12.tld");
+        Assert.assertEquals("1.0", xml.getTlibVersion());
+        Assert.assertEquals("1.2", xml.getJspVersion());
+        Assert.assertEquals("Tags12", xml.getShortName());
+        Assert.assertEquals("http://tomcat.apache.org/tags12", xml.getUri());
+        verifyTags(xml.getTags());
     }
 
     @Test
     public void testParseTld11() throws Exception {
-        try (FileInputStream is = new FileInputStream(WEBAPP + "tags11.tld")) {
-            InputSource source = new InputSource(is);
-            TaglibXml xml = parser.parse(source);
-            Assert.assertEquals("1.0", xml.getTlibVersion());
-            Assert.assertEquals("1.1", xml.getJspVersion());
-            Assert.assertEquals("Tags11", xml.getShortName());
-            Assert.assertEquals("http://tomcat.apache.org/tags11", xml.getUri());
-            verifyTags(xml.getTags());
-        }
+        TaglibXml xml = parse("test/webapp-3.1/WEB-INF/tags11.tld");
+        Assert.assertEquals("1.0", xml.getTlibVersion());
+        Assert.assertEquals("1.1", xml.getJspVersion());
+        Assert.assertEquals("Tags11", xml.getShortName());
+        Assert.assertEquals("http://tomcat.apache.org/tags11", xml.getUri());
+        verifyTags(xml.getTags());
     }
 
     private void verifyTags(List<Tag> tags) {
@@ -97,14 +86,17 @@ public class TestTldParser {
 
     @Test
     public void testListener() throws Exception {
-        try (FileInputStream is = new FileInputStream("test/webapp-3.0/WEB-INF/listener.tld")) {
-            InputSource source = new InputSource(is);
-            TaglibXml xml = parser.parse(source);
-            Assert.assertEquals("1.0", xml.getTlibVersion());
-            List<String> listeners = xml.getListeners();
-            Assert.assertEquals(1, listeners.size());
-            Assert.assertEquals("org.apache.catalina.core.TesterTldListener", listeners.get(0));
-        }
+        TaglibXml xml = parse("test/webapp-3.0/WEB-INF/listener.tld");
+        Assert.assertEquals("1.0", xml.getTlibVersion());
+        List<String> listeners = xml.getListeners();
+        Assert.assertEquals(1, listeners.size());
+        Assert.assertEquals("org.apache.catalina.core.TesterTldListener", listeners.get(0));
+    }
+
+    private TaglibXml parse(String pathname) throws IOException, SAXException {
+        File file = new File(pathname);
+        TldResourcePath path = new TldResourcePath(file.toURI().toURL());
+        return parser.parse(path);
     }
 
 }

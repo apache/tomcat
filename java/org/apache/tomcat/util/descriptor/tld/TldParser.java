@@ -17,7 +17,7 @@
 package org.apache.tomcat.util.descriptor.tld;
 
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -32,7 +32,6 @@ import org.xml.sax.SAXException;
  */
 public class TldParser {
     private static final Log LOG = LogFactory.getLog(TldParser.class);
-
     private final Digester digester;
 
     public TldParser(boolean namespaceAware, boolean validation) {
@@ -40,19 +39,16 @@ public class TldParser {
         digester = DigesterFactory.newDigester(validation, namespaceAware, ruleSet);
     }
 
-    public TaglibXml parse(URL url) throws IOException, SAXException {
-        InputSource source = new InputSource(url.toExternalForm());
-        source.setByteStream(url.openStream());
-        return parse(source);
-    }
-
-    public TaglibXml parse(InputSource source) throws IOException, SAXException {
-        try {
+    public TaglibXml parse(TldResourcePath path) throws IOException, SAXException {
+        try (InputStream is = path.openStream()) {
             XmlErrorHandler handler = new XmlErrorHandler();
             digester.setErrorHandler(handler);
 
             TaglibXml taglibXml = new TaglibXml();
             digester.push(taglibXml);
+
+            InputSource source = new InputSource(path.toExternalForm());
+            source.setByteStream(is);
             digester.parse(source);
             if (!handler.getWarnings().isEmpty() || !handler.getErrors().isEmpty()) {
                 handler.logFindings(LOG, source.getSystemId());

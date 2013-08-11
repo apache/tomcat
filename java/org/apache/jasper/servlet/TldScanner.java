@@ -18,7 +18,6 @@ package org.apache.jasper.servlet;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
@@ -46,9 +45,9 @@ import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.descriptor.tld.TaglibXml;
 import org.apache.tomcat.util.descriptor.tld.TldParser;
+import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.scan.Jar;
 import org.apache.tomcat.util.scan.JarFactory;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -61,7 +60,8 @@ public class TldScanner {
     private static final String WEB_INF = "/WEB-INF/";
     private final ServletContext context;
     private final TldParser tldParser;
-    private final Map<String, TaglibXml> taglibMap = new HashMap<>();
+    private final Map<String, TldResourcePath> taglibMap = new HashMap<>();
+    private final Map<TldResourcePath, TaglibXml> tldCache = new HashMap<>();
     private final List<String> listeners = new ArrayList<>();
 
     /**
@@ -86,16 +86,14 @@ public class TldScanner {
      * <li>Additional entries from the container</li>
      * </ol>
      *
-     * @return the taglib map build by this scan
      * @throws IOException  if there was a problem scanning for or loading a TLD
      * @throws SAXException if there was a problem parsing a TLD
      */
-    public Map<String, TaglibXml> scan() throws IOException, SAXException {
+    public void scan() throws IOException, SAXException {
         scanPlatform();
         scanJspConfig();
         scanResourcePaths(WEB_INF);
         scanJars();
-        return taglibMap;
     }
 
     /**
@@ -103,7 +101,7 @@ public class TldScanner {
      *
      * @return the taglib map
      */
-    public Map<String, TaglibXml> getTaglibMap() {
+    public Map<String, TldResourcePath> getTaglibMap() {
         return taglibMap;
     }
 
@@ -156,16 +154,21 @@ public class TldScanner {
             }
 
             URL url = context.getResource(resourcePath);
+            TldResourcePath tldResourcePath;
             if (resourcePath.endsWith(".jar")) {
                 // if the path points to a jar file, the TLD is presumed to be
                 // inside at META-INF/taglib.tld
-                url = new URL ("jar:" +
-                        url.toExternalForm() +
-                        "!/META-INF/taglib.tld");
+                tldResourcePath = new TldResourcePath(url, "META-INF/taglib.tld");
+            } else {
+                tldResourcePath = new TldResourcePath(url);
             }
-
-            TaglibXml tld = tldParser.parse(url);
-            taglibMap.put(taglibURI, tld);
+            // parse TLD but store using the URI supplied in the descriptor
+            TaglibXml tld = tldParser.parse(tldResourcePath);
+            taglibMap.put(taglibURI, tldResourcePath);
+            tldCache.put(tldResourcePath, tld);
+            if (tld.getListeners() != null) {
+                listeners.addAll(tld.getListeners());
+            }
         }
     }
 
@@ -209,21 +212,20 @@ public class TldScanner {
     }
 
     private void parseTld(String resourcePath) throws IOException, SAXException {
-        parseTld(context.getResource(resourcePath));
+        TldResourcePath tldResourcePath =
+                new TldResourcePath(context.getResource(resourcePath));
+        parseTld(tldResourcePath);
     }
 
-    private void parseTld(URL url) throws IOException, SAXException {
-        TaglibXml tld = tldParser.parse(url);
-        registerTld(tld);
-    }
-
-    private void registerTld(TaglibXml tld) {
+    private void parseTld(TldResourcePath path) throws IOException, SAXException {
+        TaglibXml tld = tldParser.parse(path);
         String uri = tld.getUri();
         if (uri != null) {
             if (!taglibMap.containsKey(uri)) {
-                taglibMap.put(uri, tld);
+                taglibMap.put(uri, path);
             }
         }
+        tldCache.put(path, tld);
         if (tld.getListeners() != null) {
             listeners.addAll(tld.getListeners());
         }
@@ -236,9 +238,7 @@ public class TldScanner {
         public void scan(JarURLConnection urlConn, boolean isWebapp) throws IOException {
             boolean found = false;
             Jar jar = JarFactory.newInstance(urlConn.getURL());
-            StringBuilder base = new StringBuilder(256);
-            base.append("jar:").append(urlConn.getURL()).append("!/");
-            int baseLength = base.length();
+            URL jarURL = urlConn.getJarFileURL();
             try {
                 jar.nextEntry();
                 for (String entryName = jar.getEntryName();
@@ -249,13 +249,10 @@ public class TldScanner {
                         continue;
                     }
                     found = true;
-                    String location = base.append(entryName).toString();
-                    base.setLength(baseLength);
-                    try (InputStream is = jar.getEntryInputStream()) {
-                        InputSource source = new InputSource(is);
-                        source.setSystemId(location);
-                        TaglibXml tld = tldParser.parse(source);
-                        registerTld(tld);
+                    TldResourcePath tldResourcePath =
+                            new TldResourcePath(jarURL, entryName);
+                    try {
+                        parseTld(tldResourcePath);
                     } catch (SAXException e) {
                         throw new IOException(e);
                     }
@@ -268,7 +265,7 @@ public class TldScanner {
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug(Localizer.getMessage("jsp.tldCache.noTldInJar",
-                            urlConn.getJarFileURL().toString()));
+                            jarURL.toString()));
                 }
             }
         }
@@ -284,13 +281,17 @@ public class TldScanner {
                 public FileVisitResult visitFile(Path file,
                                                  BasicFileAttributes attrs)
                         throws IOException {
-                    if (file.endsWith(TLD_EXT)) {
-                        try {
-                            parseTld(file.toUri().toURL());
-                            tldFound = true;
-                        } catch (SAXException e) {
-                            throw new IOException(e);
-                        }
+                    if (!file.endsWith(TLD_EXT)) {
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    try {
+                        URL url = file.toUri().toURL();
+                        TldResourcePath path = new TldResourcePath(url);
+                        parseTld(path);
+                        tldFound = true;
+                    } catch (SAXException e) {
+                        throw new IOException(e);
                     }
                     return FileVisitResult.CONTINUE;
                 }
