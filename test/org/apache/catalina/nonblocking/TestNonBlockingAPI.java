@@ -487,7 +487,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 msg = "FAILED";
             }
             try {
-                ctx.getResponse().getWriter().print(msg);
+                ctx.getResponse().getOutputStream().print(msg);
             } catch (IOException ioe) {
                 // Ignore
             }
