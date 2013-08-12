@@ -49,7 +49,6 @@ import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.ByteChunk.ByteOutputChannel;
 
 public class TestNonBlockingAPI extends TomcatBaseTest {
 
@@ -264,40 +263,47 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         tomcat.getConnector().setProperty("socket.txBufSize", "1024");
         tomcat.start();
 
-        Map<String, List<String>> resHeaders = new HashMap<>();
-        ByteChunk slowReader = new ByteChunk();
-        slowReader.setLimit(1); // FIXME BUFFER IS BROKEN, 0 doesn't work
-        slowReader.setByteOutputChannel(new ByteOutputChannel() {
-            long counter = 0;
-            long delta = 0;
+        SocketFactory factory = SocketFactory.getDefault();
+        Socket s = factory.createSocket("localhost", getPort());
 
-            @Override
-            public void realWriteBytes(byte[] cbuf, int off, int len) throws IOException {
-                try {
-                    if (len == 0)
-                        return;
-                    counter += len;
-                    delta += len;
-                    if (counter > WRITE_SIZE) {
-                        System.out.println("ERROR Downloaded more than expected ERROR");
-                    } else if (counter == WRITE_SIZE) {
-                        System.out.println("Download complete(" + WRITE_SIZE + " bytes)");
-                        // } else if (counter > (1966086)) {
-                        // System.out.println("Download almost complete, missing bytes ("+counter+")");
-                    } else if (delta > (WRITE_SIZE / 16)) {
-                        System.out.println("Read " + counter + " bytes.");
-                        delta = 0;
-                        Thread.sleep(500);
-                    }
-                } catch (Exception x) {
-                    throw new IOException(x);
-                }
+        ByteChunk result = new ByteChunk();
+        OutputStream os = s.getOutputStream();
+        os.write(("GET / HTTP/1.1\r\n" +
+                "Host: localhost:" + getPort() + "\r\n" +
+                "Connection: close\r\n" +
+                "\r\n").getBytes(StandardCharsets.ISO_8859_1));
+        os.flush();
+
+        InputStream is = s.getInputStream();
+        byte[] buffer = new byte[8192];
+
+        int read = 0;
+        int readSinceLastPause = 0;
+        int readTotal = 0;
+        while (read != -1 && readTotal < WRITE_SIZE / 2) {
+            read = is.read(buffer);
+            if (read > 0) {
+                result.append(buffer, 0, read);
             }
-        });
-        int rc = postUrlWithDisconnect(true, new DataWriter(0), "http://localhost:" + getPort() + "/", resHeaders,
-                null);
-        slowReader.flushBuffer();
-        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+            readSinceLastPause += read;
+            readTotal += read;
+            if (readSinceLastPause > WRITE_SIZE / 16) {
+                readSinceLastPause = 0;
+                Thread.sleep(500);
+            }
+        }
+
+        os.close();
+        is.close();
+        s.close();
+
+        String resultString = result.toString();
+        System.out.println("Client read " + resultString.length() + " bytes");
+        int lineStart = 0;
+        int lineEnd = resultString.indexOf('\n', 0);
+        String line = resultString.substring(lineStart, lineEnd + 1);
+        Assert.assertEquals("HTTP/1.1 200 OK\r\n", line);
+
         try {
             //allow the listeners to finish up
             Thread.sleep(1000);
