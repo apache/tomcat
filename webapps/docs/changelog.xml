@@ -148,6 +148,11 @@
         used by both Catalina and Jasper. Includes patches provided by Jeremy
         Boynes. (violetagg/markt)
       </scode>
+      <scode>
+        <bug>55246</bug>: Move TLD scanning to a ServletContainerInitializer
+        provided by Jasper. Includes removal of TldConfig lifecycle listener and
+        associated Context properties. (jboynes)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -192,6 +197,12 @@
       <add>
         Create test cases for JspC. Patch by Jeremy Boynes. (markt)
       </add>
+      <scode>
+        <bug>55246</bug>: TLD scanning is now performed by JasperInitializer
+        (a ServletContainerInitializer) removing the need for support within the
+        Servlet container itself. The scan is now performed only once rather than
+        in two passes reducing startup time. (jboynes)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Cluster">
