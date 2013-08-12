@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 public class TestTldParser {
-    private static final String WEBAPP = "test/webapp-3.1/WEB-INF/";
     private TldParser parser;
 
     @Before
