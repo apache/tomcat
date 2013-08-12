@@ -17,6 +17,7 @@
 
 package org.apache.jasper.compiler;
 
+@Deprecated
 public class TldLocation {
 
     private final String entryName;
