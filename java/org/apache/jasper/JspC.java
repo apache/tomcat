@@ -156,6 +156,7 @@ public class JspC extends Task implements Options {
     protected ClassLoader loader = null;
     protected boolean trimSpaces = false;
     protected boolean genStringAsCharArray = false;
+    protected boolean validateXml;
     protected boolean xpoweredBy;
     protected boolean mappedFile = false;
     protected boolean poolingEnabled = true;
@@ -842,6 +843,7 @@ public class JspC extends Task implements Options {
     }
 
     public void setValidateXml( boolean b ) {
+        this.validateXml = b;
         org.apache.jasper.xmlparser.ParserUtils.validating=b;
     }
 
@@ -1421,7 +1423,7 @@ public class JspC extends Task implements Options {
         URL resourceBase = new File(uriRoot).getCanonicalFile().toURI().toURL();
 
         context = new JspCServletContext(log, resourceBase, classLoader);
-        TldScanner scanner = new TldScanner(context, true, false);
+        TldScanner scanner = new TldScanner(context, true, validateXml);
         try {
             scanner.scan();
         } catch (SAXException e) {
