@@ -206,7 +206,7 @@ public class TldScanner {
         JarScanner scanner = JarScannerFactory.getJarScanner(context);
         TldScannerCallback callback = new TldScannerCallback();
         scanner.scan(JarScanType.TLD, context, callback);
-        if (!callback.tldFound) {
+        if (callback.scanFoundNoTLDs()) {
             log.info(Localizer.getMessage("jsp.tldCache.noTldSummary"));
         }
     }
@@ -233,9 +233,13 @@ public class TldScanner {
 
     private class TldScannerCallback implements JarScannerCallback {
         private boolean tldFound = false;
+        private boolean jarFound = false;
 
         @Override
         public void scan(JarURLConnection urlConn, boolean isWebapp) throws IOException {
+            if (!jarFound) {
+                jarFound = true;
+            }
             boolean found = false;
             Jar jar = JarFactory.newInstance(urlConn.getURL());
             URL jarURL = urlConn.getJarFileURL();
@@ -272,6 +276,9 @@ public class TldScanner {
 
         @Override
         public void scan(File file, boolean isWebapp) throws IOException {
+            if (!jarFound) {
+                jarFound = true;
+            }
             File metaInf = new File(file, "META-INF");
             if (!metaInf.isDirectory()) {
                 return;
@@ -301,6 +308,11 @@ public class TldScanner {
         @Override
         public void scanWebInfClasses() throws IOException {
             // this is now handled when WEB-INF is scanned for resources
+        }
+
+
+        private boolean scanFoundNoTLDs() {
+            return jarFound && !tldFound;
         }
     }
 }
