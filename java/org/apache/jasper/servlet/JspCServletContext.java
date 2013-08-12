@@ -98,7 +98,7 @@ public class JspCServletContext implements ServletContext {
     /**
      * Web application class loader.
      */
-    private ClassLoader loader;
+    private final ClassLoader loader;
 
 
     // ----------------------------------------------------------- Constructors
@@ -110,12 +110,13 @@ public class JspCServletContext implements ServletContext {
      * @param aResourceBaseURL Resource base URL
      * @throws JasperException
      */
-    public JspCServletContext(PrintWriter aLogWriter, URL aResourceBaseURL)
-            throws JasperException {
+    public JspCServletContext(PrintWriter aLogWriter, URL aResourceBaseURL, ClassLoader classLoader)
+        throws JasperException {
 
         myAttributes = new HashMap<>();
         myLogWriter = aLogWriter;
         myResourceBaseURL = aResourceBaseURL;
+        this.loader = classLoader;
 
         this.webXml = buildMergedWebXml();
         jspConfigDescriptor = webXml.getJspConfigDescriptor();
@@ -640,11 +641,6 @@ public class JspCServletContext implements ServletContext {
     @Override
     public ClassLoader getClassLoader() {
         return loader;
-    }
-
-
-    public void setClassLoader(ClassLoader loader) {
-        this.loader = loader;
     }
 
 
