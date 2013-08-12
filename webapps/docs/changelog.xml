@@ -107,6 +107,10 @@
         do not result in a call to a different underlying method on the
         ServletContext. (markt)
       </fix>
+      <fix>
+        <bug>55404</bug>: Log warnings about using security roles in web.xml
+        without defining them as warnings. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
