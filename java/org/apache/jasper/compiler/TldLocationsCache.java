@@ -21,9 +21,6 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import org.apache.jasper.JasperException;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 
 
@@ -64,7 +61,6 @@ public class TldLocationsCache {
 
     public static final String KEY = TldLocationsCache.class.getName();
 
-    private static final Log log = LogFactory.getLog(TldLocationsCache.class);
     private final Hashtable<String, TldLocation> mappings;
 
     public TldLocationsCache(Map<String, TldResourcePath> taglibMap) {
@@ -105,7 +101,7 @@ public class TldLocationsCache {
      * @param uri The taglib uri
      * @return the TldLocation for this uri
      */
-    public TldLocation getLocation(String uri) throws JasperException {
+    public TldLocation getLocation(String uri) {
         return mappings.get(uri);
     }
 }
