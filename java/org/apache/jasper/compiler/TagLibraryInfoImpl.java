@@ -296,22 +296,22 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
     }
 
     /*
-     * @param uri The uri of the TLD @param ctxt The compilation context
+     * @param uri The uri of the TLD
+     * @param ctxt The compilation context
      *
-     * @return String array whose first element denotes the path to the TLD. If
-     * the path to the TLD points to a jar file, then the second element denotes
-     * the name of the TLD entry in the jar file, which is hardcoded to
-     * META-INF/taglib.tld.
+     * @return the location of the TLD identified by the uri
      */
     @SuppressWarnings("null") // url can't be null
     private TldLocation generateTLDLocation(String uri, JspCompilationContext ctxt)
             throws JasperException {
 
-        int uriType = TldLocationsCache.uriType(uri);
-        if (uriType == TldLocationsCache.ABS_URI) {
-            err.jspError("jsp.error.taglibDirective.absUriCannotBeResolved",
-                    uri);
-        } else if (uriType == TldLocationsCache.NOROOT_REL_URI) {
+        // TODO: this matches the current implementation but the URL logic looks fishy
+        // map URI to location per JSP 7.3.6.2
+        if (uri.indexOf(':') != -1) {
+            // abs_uri, this was not found in the taglibMap so raise an error
+            err.jspError("jsp.error.taglibDirective.absUriCannotBeResolved", uri);
+        } else if (uri.charAt(0) != '/') {
+            // noroot_rel_uri, resolve against the current JSP page
             uri = ctxt.resolveRelativeUri(uri);
         }
 

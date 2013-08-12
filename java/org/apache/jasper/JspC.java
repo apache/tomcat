@@ -51,12 +51,14 @@ import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.compiler.TagPluginManager;
 import org.apache.jasper.compiler.TldLocationsCache;
 import org.apache.jasper.servlet.JspCServletContext;
+import org.apache.jasper.servlet.TldScanner;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.util.FileUtils;
+import org.xml.sax.SAXException;
 
 /**
  * Shell for the jspc compiler.  Handles all options associated with the
@@ -1419,7 +1421,14 @@ public class JspC extends Task implements Options {
         URL resourceBase = new File(uriRoot).getCanonicalFile().toURI().toURL();
 
         context = new JspCServletContext(log, resourceBase, classLoader);
-        tldLocationsCache = TldLocationsCache.getInstance(context);
+        TldScanner scanner = new TldScanner(context, true, false);
+        try {
+            scanner.scan();
+        } catch (SAXException e) {
+            throw new JasperException(e);
+        }
+        tldLocationsCache = new TldLocationsCache(scanner.getTaglibMap());
+        context.setAttribute(TldLocationsCache.KEY, tldLocationsCache);
         rctxt = new JspRuntimeContext(context, this);
         jspConfig = new JspConfig(context);
         tagPluginManager = new TagPluginManager(context);
