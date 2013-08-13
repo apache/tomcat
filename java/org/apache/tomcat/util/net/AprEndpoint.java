@@ -795,7 +795,8 @@ public class AprEndpoint extends AbstractEndpoint {
             // During shutdown, executor may be null - avoid NPE
             if (running) {
                 if (log.isDebugEnabled()) {
-                    log.debug("processSocketWithOptions(long): " + socket);
+                    log.debug(sm.getString("endpoint.debug.socket",
+                            Long.valueOf(socket)));
                 }
                 AprSocketWrapper wrapper =
                         new AprSocketWrapper(Long.valueOf(socket));
@@ -912,7 +913,8 @@ public class AprEndpoint extends AbstractEndpoint {
 
     private void destroySocket(long socket, boolean doIt) {
         if (log.isDebugEnabled()) {
-            String msg = "destroySocket(long,boolean): " + socket + " " + doIt;
+            String msg = sm.getString("endpoint.debug.destroySocket",
+                    Long.valueOf(socket), Boolean.valueOf(doIt));
             if (log.isTraceEnabled()) {
                 log.trace(msg, new Exception());
             } else {
@@ -1430,8 +1432,9 @@ public class AprEndpoint extends AbstractEndpoint {
 
         private void add(long socket, int timeout, int flags) {
             if (log.isDebugEnabled()) {
-                String msg = "Poller.add(long,int,int) " + socket + " " +
-                        timeout + " " + flags;
+                String msg = sm.getString("endpoint.debug.pollerAdd",
+                        Long.valueOf(socket), Integer.valueOf(timeout),
+                        Integer.valueOf(flags));
                 if (log.isTraceEnabled()) {
                     log.trace(msg, new Exception());
                 } else {
@@ -1516,7 +1519,8 @@ public class AprEndpoint extends AbstractEndpoint {
             long socket = timeouts.check(date);
             while (socket != 0) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Poller maintain() timing out socket: " + socket);
+                    log.debug(sm.getString("endpoint.debug.socketTimeout",
+                            Long.valueOf(socket)));
                 }
                 removeFromPoller(socket);
                 boolean comet = connections.get(
@@ -1599,8 +1603,9 @@ public class AprEndpoint extends AbstractEndpoint {
                         SocketInfo info = localAddList.get();
                         while (info != null) {
                             if (log.isDebugEnabled()) {
-                                log.debug("Poller run() adding socket: " +
-                                        info.socket);
+                                log.debug(sm.getString(
+                                        "endpoint.debug.pollerAddDo",
+                                        Long.valueOf(info.socket)));
                             }
                             timeouts.remove(info.socket);
                             AprSocketWrapper wrapper = connections.get(
@@ -1657,6 +1662,12 @@ public class AprEndpoint extends AbstractEndpoint {
                                 timeouts.remove(desc[n*2+1]);
                                 AprSocketWrapper wrapper = connections.get(
                                         Long.valueOf(desc[n*2+1]));
+                                if (getLog().isDebugEnabled()) {
+                                    log.debug(sm.getString(
+                                            "endpoint.debug.pollerProcess",
+                                            Long.valueOf(desc[n*2+1]),
+                                            Long.valueOf(desc[n*2])));
+                                }
                                 wrapper.pollerFlags = wrapper.pollerFlags & ~((int) desc[n*2]);
                                 // Check for failed sockets and hand this socket off to a worker
                                 if (wrapper.isComet()) {
@@ -1700,19 +1711,22 @@ public class AprEndpoint extends AbstractEndpoint {
                                     if (wrapper.isAsync()) {
                                         // Must be using non-blocking IO for the socket to be in the
                                         // poller during async processing. Need to trigger error
-                                        // handling. Poller will return error codes plus the flags it
-                                        // was waiting for. We could return ASYNC_[WRITE|READ]_ERROR
-                                        // error here but if we do, there will be no exception
-                                        // associated with the error. By signalling read/write is
-                                        // possible, a read/write will be attempted, fail and that
-                                        // will trigger an exception
-                                        if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
+                                        // handling. Poller may return error codes plus the flags it
+                                        // was waiting for or it may just return an error code. We
+                                        // could return ASYNC_[WRITE|READ]_ERROR here but if we do,
+                                        // there will be no exception associated with the error in
+                                        // application code. By signalling read/write is possible, a
+                                        // read/write will be attempted, fail and that will trigger
+                                        // an exception the application will see.
+                                        if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN ||
+                                                (wrapper.pollerFlags & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
                                             // Must be doing a non-blocking read
                                             if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
                                                 // Close socket and clear pool
                                                 destroySocket(desc[n*2+1]);
                                             }
-                                        } else if ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
+                                        } else if ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT ||
+                                                (wrapper.pollerFlags & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
                                             // Must be doing an non-blocking write write
                                             if (!processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
                                                 // Close socket and clear pool
