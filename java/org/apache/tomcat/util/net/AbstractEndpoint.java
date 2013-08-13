@@ -405,8 +405,7 @@ public abstract class AbstractEndpoint {
      */
     public void setAttribute(String name, Object value) {
         if (getLog().isTraceEnabled()) {
-            getLog().trace(sm.getString("abstractProtocolHandler.setAttribute",
-                    name, value));
+            getLog().trace(sm.getString("endpoint.setAttribute", name, value));
         }
         attributes.put(name, value);
     }
@@ -416,8 +415,7 @@ public abstract class AbstractEndpoint {
     public Object getAttribute(String key) {
         Object value = attributes.get(key);
         if (getLog().isTraceEnabled()) {
-            getLog().trace(sm.getString("abstractProtocolHandler.getAttribute",
-                    key, value));
+            getLog().trace(sm.getString("endpoint.getAttribute", key, value));
         }
         return value;
     }
