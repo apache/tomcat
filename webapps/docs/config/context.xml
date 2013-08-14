@@ -493,29 +493,6 @@
         of the flag is <code>false</code>.</p>
       </attribute>
 
-      <attribute name="tldNamespaceAware" required="false">
-        <p>If the value of this flag is <code>true</code>, the TLD files
-        XML validation will be namespace-aware.  If you turn this flag on,
-        you should probably also turn <code>tldValidation</code> on. If the
-        <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
-        <a href="systemprops.html">system property</a> is set to
-        <code>true</code>, the default value of this attribute will be
-        <code>true</code>, else the default value will be <code>false</code>.
-        Setting this attribute to <code>true</code> will incur a performance
-        penalty.</p>
-      </attribute>
-
-      <attribute name="tldValidation" required="false">
-        <p>If the value of this flag is <code>true</code>, the TLD files
-        will be XML validated on context startup. If the
-        <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
-        <a href="systemprops.html">system property</a> is set to
-        <code>true</code>, the default value of this attribute will be
-        <code>true</code>, else the default value will be <code>false</code>.
-        Setting this attribute to <code>true</code> will incur a performance
-        penalty.</p>
-      </attribute>
-
       <attribute name="useHttpOnly" required="false">
        <p>Should the HttpOnly flag be set on session cookies to prevent client
           side script from accessing the session ID? Defaults to
