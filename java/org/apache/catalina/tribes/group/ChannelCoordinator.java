@@ -72,7 +72,8 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
      * @param payload TBA
      */
     @Override
-    public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
+    public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload)
+            throws ChannelException {
         if ( destination == null ) destination = membershipService.getMembers();
         if ((msg.getOptions()&Channel.SEND_OPTIONS_MULTICAST) == Channel.SEND_OPTIONS_MULTICAST) {
             membershipService.broadcast(msg);
@@ -80,7 +81,9 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             clusterSender.sendMessage(msg,destination);
         }
         if ( Logs.MESSAGES.isTraceEnabled() ) {
-            Logs.MESSAGES.trace("ChannelCoordinator - Sent msg:" + new UniqueId(msg.getUniqueId()) + " at " +new java.sql.Timestamp(System.currentTimeMillis())+ " to "+Arrays.toNameString(destination));
+            Logs.MESSAGES.trace("ChannelCoordinator - Sent msg:" + new UniqueId(msg.getUniqueId()) +
+                    " at " + new java.sql.Timestamp(System.currentTimeMillis()) + " to " +
+                    Arrays.toNameString(destination));
         }
     }
 
@@ -138,7 +141,9 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             if (startLevel == Channel.DEFAULT) return; //we have already started up all components
             if (svc == 0 ) return;//nothing to start
 
-            if (svc == (svc & startLevel)) throw new ChannelException("Channel already started for level:"+svc);
+            if (svc == (svc & startLevel)) {
+                throw new ChannelException("Channel already started for level:"+svc);
+            }
 
             //must start the receiver first so that we can coordinate the port it
             //listens to with the local membership settings
@@ -170,8 +175,9 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 valid = true;
             }
 
-            if ( !valid) {
-                throw new IllegalArgumentException("Invalid start level, valid levels are:SND_RX_SEQ,SND_TX_SEQ,MBR_TX_SEQ,MBR_RX_SEQ");
+            if (!valid) {
+                throw new IllegalArgumentException("Invalid start level, valid levels are:" +
+                        "SND_RX_SEQ,SND_TX_SEQ,MBR_TX_SEQ,MBR_RX_SEQ");
             }
             startLevel = (startLevel | svc);
         }catch ( ChannelException cx ) {
@@ -222,7 +228,8 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 membershipService.stop(MembershipService.MBR_TX);
             }
             if ( !valid) {
-                throw new IllegalArgumentException("Invalid start level, valid levels are:SND_RX_SEQ,SND_TX_SEQ,MBR_TX_SEQ,MBR_RX_SEQ");
+                throw new IllegalArgumentException("Invalid start level, valid levels are:" +
+                        "SND_RX_SEQ,SND_TX_SEQ,MBR_TX_SEQ,MBR_RX_SEQ");
             }
 
             startLevel = (startLevel & (~svc));
@@ -250,7 +257,10 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
     @Override
     public void messageReceived(ChannelMessage msg) {
         if ( Logs.MESSAGES.isTraceEnabled() ) {
-            Logs.MESSAGES.trace("ChannelCoordinator - Received msg:" + new UniqueId(msg.getUniqueId()) + " at " +new java.sql.Timestamp(System.currentTimeMillis())+ " from "+msg.getAddress().getName());
+            Logs.MESSAGES.trace("ChannelCoordinator - Received msg:" +
+                    new UniqueId(msg.getUniqueId()) + " at " +
+                    new java.sql.Timestamp(System.currentTimeMillis()) + " from " +
+                    msg.getAddress().getName());
         }
         super.messageReceived(msg);
     }

@@ -172,14 +172,16 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * Send a message to the destinations specified
      * @param destination Member[] - destination.length > 0
      * @param msg Serializable - the message to send
-     * @param options int - sender options, options can trigger guarantee levels and different interceptors to
-     * react to the message see class documentation for the <code>Channel</code> object.<br>
+     * @param options sender options, options can trigger guarantee levels and different
+     *                interceptors to react to the message see class documentation for the
+     *                <code>Channel</code> object.<br>
      * @return UniqueId - the unique Id that was assigned to this message
      * @throws ChannelException - if an error occurs processing the message
      * @see org.apache.catalina.tribes.Channel
      */
     @Override
-    public UniqueId send(Member[] destination, Serializable msg, int options) throws ChannelException {
+    public UniqueId send(Member[] destination, Serializable msg, int options)
+            throws ChannelException {
         return send(destination,msg,options,null);
     }
 
@@ -187,20 +189,25 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      *
      * @param destination Member[] - destination.length > 0
      * @param msg Serializable - the message to send
-     * @param options int - sender options, options can trigger guarantee levels and different interceptors to
-     * react to the message see class documentation for the <code>Channel</code> object.<br>
-     * @param handler - callback object for error handling and completion notification, used when a message is
-     * sent asynchronously using the <code>Channel.SEND_OPTIONS_ASYNCHRONOUS</code> flag enabled.
+     * @param options sender options, options can trigger guarantee levels and different
+     *                interceptors to react to the message see class documentation for the
+     *                <code>Channel</code> object.<br>
+     * @param handler - callback object for error handling and completion notification,
+     *                  used when a message is sent asynchronously using the
+     *                  <code>Channel.SEND_OPTIONS_ASYNCHRONOUS</code> flag enabled.
      * @return UniqueId - the unique Id that was assigned to this message
      * @throws ChannelException - if an error occurs processing the message
      * @see org.apache.catalina.tribes.Channel
      */
     @Override
-    public UniqueId send(Member[] destination, Serializable msg, int options, ErrorHandler handler) throws ChannelException {
+    public UniqueId send(Member[] destination, Serializable msg, int options, ErrorHandler handler)
+            throws ChannelException {
         if ( msg == null ) throw new ChannelException("Cant send a NULL message");
         XByteBuffer buffer = null;
         try {
-            if ( destination == null || destination.length == 0) throw new ChannelException("No destination given");
+            if (destination == null || destination.length == 0) {
+                throw new ChannelException("No destination given");
+            }
             ChannelData data = new ChannelData(true);//generates a unique Id
             data.setAddress(getLocalMember(false));
             data.setTimestamp(System.currentTimeMillis());
@@ -224,8 +231,11 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             }
             getFirstInterceptor().sendMessage(destination, data, payload);
             if ( Logs.MESSAGES.isTraceEnabled() ) {
-                Logs.MESSAGES.trace("GroupChannel - Sent msg:" + new UniqueId(data.getUniqueId()) + " at " +new java.sql.Timestamp(System.currentTimeMillis())+ " to "+Arrays.toNameString(destination));
-                Logs.MESSAGES.trace("GroupChannel - Send Message:" + new UniqueId(data.getUniqueId()) + " is " +msg);
+                Logs.MESSAGES.trace("GroupChannel - Sent msg:" + new UniqueId(data.getUniqueId()) +
+                        " at " + new java.sql.Timestamp(System.currentTimeMillis()) + " to " +
+                        Arrays.toNameString(destination));
+                Logs.MESSAGES.trace("GroupChannel - Send Message:" +
+                        new UniqueId(data.getUniqueId()) + " is " + msg);
             }
 
             return new UniqueId(data.getUniqueId());
@@ -240,10 +250,11 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
 
     /**
      * Callback from the interceptor stack. <br>
-     * When a message is received from a remote node, this method will be invoked by
-     * the previous interceptor.<br>
-     * This method can also be used to send a message to other components within the same application,
-     * but its an extreme case, and you're probably better off doing that logic between the applications itself.
+     * When a message is received from a remote node, this method will be
+     * invoked by the previous interceptor.<br>
+     * This method can also be used to send a message to other components
+     * within the same application, but its an extreme case, and you're probably
+     * better off doing that logic between the applications itself.
      * @param msg ChannelMessage
      */
     @Override
@@ -251,7 +262,10 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         if ( msg == null ) return;
         try {
             if ( Logs.MESSAGES.isTraceEnabled() ) {
-                Logs.MESSAGES.trace("GroupChannel - Received msg:" + new UniqueId(msg.getUniqueId()) + " at " +new java.sql.Timestamp(System.currentTimeMillis())+ " from "+msg.getAddress().getName());
+                Logs.MESSAGES.trace("GroupChannel - Received msg:" +
+                        new UniqueId(msg.getUniqueId()) + " at " +
+                        new java.sql.Timestamp(System.currentTimeMillis()) + " from " +
+                        msg.getAddress().getName());
             }
 
             Serializable fwd = null;
@@ -259,14 +273,16 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
                 fwd = new ByteMessage(msg.getMessage().getBytes());
             } else {
                 try {
-                    fwd = XByteBuffer.deserialize(msg.getMessage().getBytesDirect(), 0, msg.getMessage().getLength());
+                    fwd = XByteBuffer.deserialize(msg.getMessage().getBytesDirect(), 0,
+                            msg.getMessage().getLength());
                 }catch (Exception sx) {
                     log.error("Unable to deserialize message:"+msg,sx);
                     return;
                 }
             }
             if ( Logs.MESSAGES.isTraceEnabled() ) {
-                Logs.MESSAGES.trace("GroupChannel - Receive Message:" + new UniqueId(msg.getUniqueId()) + " is " +fwd);
+                Logs.MESSAGES.trace("GroupChannel - Receive Message:" +
+                        new UniqueId(msg.getUniqueId()) + " is " + fwd);
             }
 
             //get the actual member with the correct alive time
@@ -289,7 +305,8 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
                 sendNoRpcChannelReply((RpcMessage)fwd,source);
             }
             if ( Logs.MESSAGES.isTraceEnabled() ) {
-                Logs.MESSAGES.trace("GroupChannel delivered["+delivered+"] id:"+new UniqueId(msg.getUniqueId()));
+                Logs.MESSAGES.trace("GroupChannel delivered[" + delivered + "] id:" +
+                        new UniqueId(msg.getUniqueId()));
             }
 
         } catch ( Exception x ) {
@@ -311,7 +328,8 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         try {
             //avoid circular loop
             if ( msg instanceof RpcMessage.NoRpcChannelReply) return;
-            RpcMessage.NoRpcChannelReply reply = new RpcMessage.NoRpcChannelReply(msg.rpcId,msg.uuid);
+            RpcMessage.NoRpcChannelReply reply =
+                    new RpcMessage.NoRpcChannelReply(msg.rpcId, msg.uuid);
             send(new Member[]{destination},reply,Channel.SEND_OPTIONS_ASYNCHRONOUS);
         } catch ( Exception x ) {
             log.error("Unable to find rpc channel, failed to send NoRpcChannelReply.",x);
@@ -358,8 +376,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             ChannelInterceptor interceptor = null;
             Class<?> clazz = null;
             try {
-                clazz = Class.forName("org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor",
-                                      true,GroupChannel.class.getClassLoader());
+                clazz = Class.forName(
+                        "org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor",
+                        true, GroupChannel.class.getClassLoader());
                 clazz.newInstance();
             } catch ( Throwable x ) {
                 clazz = MessageDispatchInterceptor.class;
@@ -367,7 +386,8 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             try {
                 interceptor = (ChannelInterceptor) clazz.newInstance();
             } catch (Exception x) {
-                throw new ChannelException("Unable to add MessageDispatchInterceptor to interceptor chain.",x);
+                throw new ChannelException(
+                        "Unable to add MessageDispatchInterceptor to interceptor chain.", x);
             }
             this.addInterceptor(interceptor);
         }
