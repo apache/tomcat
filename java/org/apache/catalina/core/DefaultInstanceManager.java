@@ -82,7 +82,10 @@ public class DefaultInstanceManager implements InstanceManager {
     private final Map<String, String> postConstructMethods;
     private final Map<String, String> preDestroyMethods;
 
-    public DefaultInstanceManager(Context context, Map<String, Map<String, String>> injectionMap, org.apache.catalina.Context catalinaContext, ClassLoader containerClassLoader) {
+    public DefaultInstanceManager(Context context,
+            Map<String, Map<String, String>> injectionMap,
+            org.apache.catalina.Context catalinaContext,
+            ClassLoader containerClassLoader) {
         classLoader = catalinaContext.getLoader().getClassLoader();
         privileged = catalinaContext.getPrivileged();
         this.containerClassLoader = containerClassLoader;
@@ -95,10 +98,12 @@ public class DefaultInstanceManager implements InstanceManager {
             if (is != null) {
                 restrictedServlets.load(is);
             } else {
-                catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedServletsResource"));
+                catalinaContext.getLogger().error(sm.getString(
+                        "defaultInstanceManager.restrictedServletsResource"));
             }
         } catch (IOException e) {
-            catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedServletsResource"), e);
+            catalinaContext.getLogger().error(sm.getString(
+                    "defaultInstanceManager.restrictedServletsResource"), e);
         }
 
         try {
@@ -108,10 +113,12 @@ public class DefaultInstanceManager implements InstanceManager {
             if (is != null) {
                 restrictedListeners.load(is);
             } else {
-                catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedListenersResources"));
+                catalinaContext.getLogger().error(sm.getString(
+                        "defaultInstanceManager.restrictedListenersResources"));
             }
         } catch (IOException e) {
-            catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedListenersResources"), e);
+            catalinaContext.getLogger().error(sm.getString(
+                    "defaultInstanceManager.restrictedListenersResources"), e);
         }
         try {
             InputStream is =
@@ -120,10 +127,12 @@ public class DefaultInstanceManager implements InstanceManager {
             if (is != null) {
                 restrictedFilters.load(is);
             } else {
-                catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedFiltersResource"));
+                catalinaContext.getLogger().error(sm.getString(
+                        "defaultInstanceManager.restrictedFiltersResource"));
             }
         } catch (IOException e) {
-            catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedServletsResources"), e);
+            catalinaContext.getLogger().error(sm.getString(
+                    "defaultInstanceManager.restrictedServletsResources"), e);
         }
         this.context = context;
         this.injectionMap = injectionMap;
@@ -132,18 +141,24 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
     @Override
-    public Object newInstance(Class<?> clazz) throws IllegalAccessException, InvocationTargetException, NamingException, InstantiationException {
+    public Object newInstance(Class<?> clazz) throws IllegalAccessException,
+            InvocationTargetException, NamingException, InstantiationException {
         return newInstance(clazz.newInstance(), clazz);
     }
 
     @Override
-    public Object newInstance(String className) throws IllegalAccessException, InvocationTargetException, NamingException, InstantiationException, ClassNotFoundException {
+    public Object newInstance(String className) throws IllegalAccessException,
+            InvocationTargetException, NamingException, InstantiationException,
+            ClassNotFoundException {
         Class<?> clazz = loadClassMaybePrivileged(className, classLoader);
         return newInstance(clazz.newInstance(), clazz);
     }
 
     @Override
-    public Object newInstance(final String className, final ClassLoader classLoader) throws IllegalAccessException, NamingException, InvocationTargetException, InstantiationException, ClassNotFoundException {
+    public Object newInstance(final String className, final ClassLoader classLoader)
+            throws IllegalAccessException, NamingException,
+            InvocationTargetException, InstantiationException,
+            ClassNotFoundException {
         Class<?> clazz = classLoader.loadClass(className);
         return newInstance(clazz.newInstance(), clazz);
     }
@@ -154,7 +169,8 @@ public class DefaultInstanceManager implements InstanceManager {
         newInstance(o, o.getClass());
     }
 
-    private Object newInstance(Object instance, Class<?> clazz) throws IllegalAccessException, InvocationTargetException, NamingException {
+    private Object newInstance(Object instance, Class<?> clazz)
+            throws IllegalAccessException, InvocationTargetException, NamingException {
         if (!ignoreAnnotations) {
             Map<String, String> injections = assembleInjectionsFromClassHierarchy(clazz);
             populateAnnotationsCache(clazz, injections);
@@ -178,14 +194,16 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
     @Override
-    public void destroyInstance(Object instance) throws IllegalAccessException, InvocationTargetException {
+    public void destroyInstance(Object instance) throws IllegalAccessException,
+            InvocationTargetException {
         if (!ignoreAnnotations) {
             preDestroy(instance, instance.getClass());
         }
     }
 
     /**
-     * Call postConstruct method on the specified instance recursively from deepest superclass to actual class.
+     * Call postConstruct method on the specified instance recursively from
+     * deepest superclass to actual class.
      *
      * @param instance object to call postconstruct methods on
      * @param clazz    (super) class to examine for postConstruct annotation.
@@ -226,7 +244,8 @@ public class DefaultInstanceManager implements InstanceManager {
 
 
     /**
-     * Call preDestroy method on the specified instance recursively from deepest superclass to actual class.
+     * Call preDestroy method on the specified instance recursively from deepest
+     * superclass to actual class.
      *
      * @param instance object to call preDestroy methods on
      * @param clazz    (super) class to examine for preDestroy annotation.
@@ -491,7 +510,8 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
 
-    protected Class<?> loadClassMaybePrivileged(final String className, final ClassLoader classLoader) throws ClassNotFoundException {
+    protected Class<?> loadClassMaybePrivileged(final String className,
+            final ClassLoader classLoader) throws ClassNotFoundException {
         Class<?> clazz;
         if (SecurityUtil.isPackageProtectionEnabled()) {
             try {
@@ -516,7 +536,8 @@ public class DefaultInstanceManager implements InstanceManager {
         return clazz;
     }
 
-    protected Class<?> loadClass(String className, ClassLoader classLoader) throws ClassNotFoundException {
+    protected Class<?> loadClass(String className, ClassLoader classLoader)
+            throws ClassNotFoundException {
         if (className.startsWith("org.apache.catalina")) {
             return containerClassLoader.loadClass(className);
         }
