@@ -482,25 +482,20 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
 
         @Override
-        public void onDataAvailable() {
-            try {
-                ServletInputStream in = ctx.getRequest().getInputStream();
-                String s = "";
-                byte[] b = new byte[8192];
-                int read = 0;
-                do {
-                    read = in.read(b);
-                    if (read == -1) {
-                        break;
-                    }
-                    s += new String(b, 0, read);
-                } while (in.isReady());
-                log.info(s);
-                body.append(s);
-            } catch (Exception x) {
-                x.printStackTrace();
-                ctx.complete();
-            }
+        public void onDataAvailable() throws IOException {
+            ServletInputStream in = ctx.getRequest().getInputStream();
+            String s = "";
+            byte[] b = new byte[8192];
+            int read = 0;
+            do {
+                read = in.read(b);
+                if (read == -1) {
+                    break;
+                }
+                s += new String(b, 0, read);
+            } while (in.isReady());
+            log.info(s);
+            body.append(s);
         }
 
         @Override
@@ -537,35 +532,30 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
 
         @Override
-        public void onWritePossible() {
-            try {
-                long start = System.currentTimeMillis();
-                long end = System.currentTimeMillis();
-                int before = written;
-                while (written < WRITE_SIZE &&
-                        ctx.getResponse().getOutputStream().isReady()) {
-                    ctx.getResponse().getOutputStream().write(
-                            DATA, written, CHUNK_SIZE);
-                    written += CHUNK_SIZE;
-                }
-                if (written == WRITE_SIZE) {
-                    // Clear the output buffer else data may be lost when
-                    // calling complete
-                    ctx.getResponse().flushBuffer();
-                }
-                log.info("Write took:" + (end - start) +
-                        " ms. Bytes before=" + before + " after=" + written);
-                // only call complete if we have emptied the buffer
-                if (ctx.getResponse().getOutputStream().isReady() &&
-                        written == WRITE_SIZE) {
-                    // it is illegal to call complete
-                    // if there is a write in progress
-                    ctx.complete();
-                }
-            } catch (Exception x) {
-                x.printStackTrace();
+        public void onWritePossible() throws IOException {
+            long start = System.currentTimeMillis();
+            long end = System.currentTimeMillis();
+            int before = written;
+            while (written < WRITE_SIZE &&
+                    ctx.getResponse().getOutputStream().isReady()) {
+                ctx.getResponse().getOutputStream().write(
+                        DATA, written, CHUNK_SIZE);
+                written += CHUNK_SIZE;
             }
-
+            if (written == WRITE_SIZE) {
+                // Clear the output buffer else data may be lost when
+                // calling complete
+                ctx.getResponse().flushBuffer();
+            }
+            log.info("Write took:" + (end - start) +
+                    " ms. Bytes before=" + before + " after=" + written);
+            // only call complete if we have emptied the buffer
+            if (ctx.getResponse().getOutputStream().isReady() &&
+                    written == WRITE_SIZE) {
+                // it is illegal to call complete
+                // if there is a write in progress
+                ctx.complete();
+            }
         }
 
         @Override
