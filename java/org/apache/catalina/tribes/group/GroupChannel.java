@@ -38,7 +38,7 @@ import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.MembershipService;
 import org.apache.catalina.tribes.RemoteProcessException;
 import org.apache.catalina.tribes.UniqueId;
-import org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor;
+import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
 import org.apache.catalina.tribes.io.BufferPool;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
@@ -370,26 +370,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * @throws ChannelException
      */
     protected synchronized void setupDefaultStack() throws ChannelException {
-
-        if ( getFirstInterceptor() != null &&
-             ((getFirstInterceptor().getNext() instanceof ChannelCoordinator))) {
-            ChannelInterceptor interceptor = null;
-            Class<?> clazz = null;
-            try {
-                clazz = Class.forName(
-                        "org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor",
-                        true, GroupChannel.class.getClassLoader());
-                clazz.newInstance();
-            } catch ( Throwable x ) {
-                clazz = MessageDispatchInterceptor.class;
-            }//catch
-            try {
-                interceptor = (ChannelInterceptor) clazz.newInstance();
-            } catch (Exception x) {
-                throw new ChannelException(
-                        "Unable to add MessageDispatchInterceptor to interceptor chain.", x);
-            }
-            this.addInterceptor(interceptor);
+        if (getFirstInterceptor() != null &&
+                ((getFirstInterceptor().getNext() instanceof ChannelCoordinator))) {
+            addInterceptor(new MessageDispatch15Interceptor());
         }
     }
 
