@@ -705,17 +705,6 @@ public class StandardContext extends ContainerBase
      */
     private boolean webXmlNamespaceAware = Globals.STRICT_SERVLET_COMPLIANCE;
 
-    /**
-     * Attribute value used to turn on/off XML validation
-     */
-    private boolean tldValidation = Globals.STRICT_SERVLET_COMPLIANCE;
-
-
-    /**
-     * Attribute value used to turn on/off TLD XML namespace validation
-     */
-    private boolean tldNamespaceAware = Globals.STRICT_SERVLET_COMPLIANCE;
-
 
     /**
      * The name to use for session cookies. <code>null</code> indicates that
