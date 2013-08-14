@@ -1611,7 +1611,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             if (error) {
                 // 500 - Internal Server Error
                 response.setStatus(500);
-                getAdapter().log(request, response, 0);
+                long time = 0;
+                if (request.getStartTime() != -1) {
+                    time = System.currentTimeMillis() - request.getStartTime();
+                }
+                getAdapter().log(request, response, time);
             }
         }
 
