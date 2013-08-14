@@ -291,7 +291,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         int readSinceLastPause = 0;
         int readTotal = 0;
         while (read != -1 && readTotal < WRITE_SIZE / 2) {
+            long start = System.currentTimeMillis();
             read = is.read(buffer);
+            long end = System.currentTimeMillis();
+            log.info("Client read [" + read + "] bytes in [" + (end - start) +
+                    "] ms");
             if (read > 0) {
                 result.append(buffer, 0, read);
             }
