@@ -6486,49 +6486,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Set the validation feature of the XML parser used when
-     * parsing tlds files.
-     * @param tldValidation true to enable xml instance validation
-     */
-    @Override
-    public void setTldValidation(boolean tldValidation){
-
-        this.tldValidation = tldValidation;
-
-    }
-
-    /**
-     * Get the server.xml <context> attribute's webXmlValidation.
-     * @return true if validation is enabled.
-     *
-     */
-    @Override
-    public boolean getTldValidation(){
-        return tldValidation;
-    }
-
-    /**
-     * Get the server.xml &lt;host&gt; attribute's xmlNamespaceAware.
-     * @return true if namespace awarenes is enabled.
-     */
-    @Override
-    public boolean getTldNamespaceAware(){
-        return tldNamespaceAware;
-    }
-
-
-    /**
-     * Set the namespace aware feature of the XML parser used when
-     * parsing xml instances.
-     * @param tldNamespaceAware true to enable namespace awareness
-     */
-    @Override
-    public void setTldNamespaceAware(boolean tldNamespaceAware){
-        this.tldNamespaceAware= tldNamespaceAware;
-    }
-
-
-    /**
      * Support for "stateManageable" JSR77
      */
     public boolean isStateManageable() {

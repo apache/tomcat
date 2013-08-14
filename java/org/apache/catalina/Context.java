@@ -610,45 +610,6 @@ public interface Context extends Container {
      * @param xmlNamespaceAware true to enable namespace awareness
      */
     public void setXmlNamespaceAware(boolean xmlNamespaceAware);
-    /**
-     * Get the server.xml <context> attribute's xmlValidation.
-     * @return true if validation is enabled.
-     */
-
-
-    /**
-     * Set the validation feature of the XML parser used when
-     * parsing tlds files.
-     * @param tldValidation true to enable xml instance validation
-     */
-    @Deprecated
-    public void setTldValidation(boolean tldValidation);
-
-
-    /**
-     * Get the server.xml <context> attribute's webXmlValidation.
-     * @return true if validation is enabled.
-     *
-     */
-    @Deprecated
-    public boolean getTldValidation();
-
-
-    /**
-     * Get the server.xml &lt;host&gt; attribute's xmlNamespaceAware.
-     * @return true if namespace awareness is enabled.
-     */
-    @Deprecated
-    public boolean getTldNamespaceAware();
-
-
-    /**
-     * Set the namespace aware feature of the XML parser used when
-     * parsing xml instances.
-     * @param tldNamespaceAware true to enable namespace awareness
-     */
-    @Deprecated
-    public void setTldNamespaceAware(boolean tldNamespaceAware);
 
     /**
      * Get the Jar Scanner to be used to scan for JAR resources for this
