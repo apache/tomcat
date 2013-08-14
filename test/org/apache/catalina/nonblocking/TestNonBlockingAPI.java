@@ -49,9 +49,13 @@ import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestNonBlockingAPI extends TomcatBaseTest {
+
+    private static final Log log = LogFactory.getLog(TestNonBlockingAPI.class);
 
     private static final int CHUNK_SIZE = 1024 * 1024;
     private static final int WRITE_SIZE  = CHUNK_SIZE * 5;
@@ -147,7 +151,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // Validate the result.
         // Response line
         String resultString = result.toString();
-        System.out.println("Client read " + resultString.length() + " bytes");
+        log.info("Client read " + resultString.length() + " bytes");
         int lineStart = 0;
         int lineEnd = resultString.indexOf('\n', 0);
         String line = resultString.substring(lineStart, lineEnd + 1);
@@ -177,25 +181,25 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             line = resultString.substring(lineStart, lineEnd + 1);
             Assert.assertTrue(line.endsWith("\r\n"));
             line = line.substring(0, line.length() - 2);
-            System.out.println("[" + line + "]");
+            log.info("[" + line + "]");
             chunkSize = Integer.parseInt(line, 16);
 
             // Read the chunk
             lineStart = lineEnd + 1;
             lineEnd = resultString.indexOf('\n', lineStart);
-            System.out.println("Start : "  + lineStart + ", End: " + lineEnd);
+            log.info("Start : "  + lineStart + ", End: " + lineEnd);
             if (lineEnd > lineStart) {
                 line = resultString.substring(lineStart, lineEnd + 1);
             } else {
                 line = resultString.substring(lineStart);
             }
             if (line.length() > 40) {
-                System.out.println(line.substring(0, 32));
+                log.info(line.substring(0, 32));
             } else {
-                System.out.println(line);
+                log.info(line);
             }
             if (chunkSize + 2 != line.length()) {
-                System.out.println("Chunk wrong length. Was " + line.length() +
+                log.error("Chunk wrong length. Was " + line.length() +
                         " Expected " + (chunkSize + 2));
 
                 byte[] resultBytes = resultString.getBytes();
@@ -220,16 +224,16 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                         if (resultEnd > resultString.length()) {
                             resultEnd = resultString.length();
                         }
-                        System.out.println("Mis-match tx: " + new String(
+                        log.error("Mis-match tx: " + new String(
                                 DATA, dataStart, dataEnd - dataStart));
-                        System.out.println("Mis-match rx: " +
+                        log.error("Mis-match rx: " +
                                 resultString.substring(resultStart, resultEnd));
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    System.out.println("No mismatch. Data truncated");
+                    log.error("No mismatch. Data truncated");
                 }
             }
 
@@ -304,7 +308,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         s.close();
 
         String resultString = result.toString();
-        System.out.println("Client read " + resultString.length() + " bytes");
+        log.info("Client read " + resultString.length() + " bytes");
         int lineStart = 0;
         int lineEnd = resultString.indexOf('\n', 0);
         String line = resultString.substring(lineStart, lineEnd + 1);
@@ -381,25 +385,25 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
                 @Override
                 public void onTimeout(AsyncEvent event) throws IOException {
-                    System.out.println("onTimeout");
+                    log.info("onTimeout");
 
                 }
 
                 @Override
                 public void onStartAsync(AsyncEvent event) throws IOException {
-                    System.out.println("onStartAsync");
+                    log.info("onStartAsync");
 
                 }
 
                 @Override
                 public void onError(AsyncEvent event) throws IOException {
-                    System.out.println("AsyncListener.onError");
+                    log.info("AsyncListener.onError");
 
                 }
 
                 @Override
                 public void onComplete(AsyncEvent event) throws IOException {
-                    System.out.println("onComplete");
+                    log.info("onComplete");
 
                 }
             });
@@ -427,25 +431,25 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
                 @Override
                 public void onTimeout(AsyncEvent event) throws IOException {
-                    System.out.println("onTimeout");
+                    log.info("onTimeout");
 
                 }
 
                 @Override
                 public void onStartAsync(AsyncEvent event) throws IOException {
-                    System.out.println("onStartAsync");
+                    log.info("onStartAsync");
 
                 }
 
                 @Override
                 public void onError(AsyncEvent event) throws IOException {
-                    System.out.println("AsyncListener.onError");
+                    log.info("AsyncListener.onError");
 
                 }
 
                 @Override
                 public void onComplete(AsyncEvent event) throws IOException {
-                    System.out.println("onComplete");
+                    log.info("onComplete");
 
                 }
             });
@@ -484,7 +488,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                     }
                     s += new String(b, 0, read);
                 } while (in.isReady());
-                System.out.println(s);
+                log.info(s);
                 body.append(s);
             } catch (Exception x) {
                 x.printStackTrace();
@@ -494,7 +498,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         @Override
         public void onAllDataRead() {
-            System.out.println("onAllDataRead");
+            log.info("onAllDataRead");
             String msg;
             if (body.toString().endsWith("FINISHED")) {
                 msg = "OK";
@@ -511,7 +515,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         @Override
         public void onError(Throwable throwable) {
-            System.out.println("ReadListener.onError");
+            log.info("ReadListener.onError");
             throwable.printStackTrace();
         }
     }
@@ -542,7 +546,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                     // calling complete
                     ctx.getResponse().flushBuffer();
                 }
-                System.out.println("Write took:" + (end - start) +
+                log.info("Write took:" + (end - start) +
                         " ms. Bytes before=" + before + " after=" + written);
                 // only call complete if we have emptied the buffer
                 if (ctx.getResponse().getOutputStream().isReady() &&
@@ -559,7 +563,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         @Override
         public void onError(Throwable throwable) {
-            System.out.println("WriteListener.onError");
+            log.info("WriteListener.onError");
             throwable.printStackTrace();
             onErrorInvoked = true;
         }
