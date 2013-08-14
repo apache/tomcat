@@ -305,7 +305,10 @@ public class CoyoteAdapter implements Adapter {
                     asyncConImpl.setErrorState(null, false);
                 }
             } else if (status==SocketStatus.ASYNC_READ_ERROR) {
-                success = true;
+                // A async read error is an IO error which means the socket
+                // needs to be closed so set success to false to trigger a
+                // close
+                success = false;
                 Throwable t = (Throwable)req.getAttribute(
                         RequestDispatcher.ERROR_EXCEPTION);
                 req.getAttributes().remove(RequestDispatcher.ERROR_EXCEPTION);
@@ -325,7 +328,10 @@ public class CoyoteAdapter implements Adapter {
                     asyncConImpl.setErrorState(t, true);
                 }
             } else if (status==SocketStatus.ASYNC_WRITE_ERROR) {
-                success = true;
+                // A async write error is an IO error which means the socket
+                // needs to be closed so set success to false to trigger a
+                // close
+                success = false;
                 Throwable t = (Throwable)req.getAttribute(
                         RequestDispatcher.ERROR_EXCEPTION);
                 req.getAttributes().remove(RequestDispatcher.ERROR_EXCEPTION);
