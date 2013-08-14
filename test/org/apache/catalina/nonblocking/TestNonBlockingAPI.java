@@ -48,6 +48,7 @@ import org.apache.catalina.startup.BytesStreamer;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.valves.TesterAccessLogValve;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestNonBlockingAPI extends TomcatBaseTest {
@@ -55,6 +56,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     private static final int CHUNK_SIZE = 1024 * 1024;
     private static final int WRITE_SIZE  = CHUNK_SIZE * 5;
     private static final byte[] DATA = new byte[WRITE_SIZE];
+    private static final int WRITE_PAUSE_MS = 500;
 
 
     static {
@@ -254,7 +256,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
 
         // Must have a real docBase - just use temp
-        StandardContext ctx = (StandardContext) tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        StandardContext ctx = (StandardContext) tomcat.addContext(
+                "", System.getProperty("java.io.tmpdir"));
+
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        ctx.getPipeline().addValve(alv);
 
         NBWriteServlet servlet = new NBWriteServlet();
         String servletName = NBWriteServlet.class.getName();
@@ -289,7 +295,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             readTotal += read;
             if (readSinceLastPause > WRITE_SIZE / 16) {
                 readSinceLastPause = 0;
-                Thread.sleep(500);
+                Thread.sleep(WRITE_PAUSE_MS);
             }
         }
 
@@ -309,7 +315,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             Thread.sleep(1000);
         } catch (Exception e) {
         }
-        Assert.assertTrue("Error listener should have been invoked.", servlet.wlistener.onErrorInvoked);
+        Assert.assertTrue("Error listener should have been invoked.",
+                servlet.wlistener.onErrorInvoked);
+        alv.validateAccessLog(1, 500, WRITE_PAUSE_MS * 7,
+                WRITE_PAUSE_MS * 7 + 1000);
     }
 
 
