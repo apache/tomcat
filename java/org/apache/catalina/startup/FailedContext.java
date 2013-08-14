@@ -456,16 +456,6 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void setXmlValidation(boolean xmlValidation) { /* NO-OP */ }
 
     @Override
-    public void setTldValidation(boolean tldValidation) { /* NO-OP */ }
-    @Override
-    public boolean getTldValidation() { return false; }
-
-    @Override
-    public boolean getTldNamespaceAware() { return false; }
-    @Override
-    public void setTldNamespaceAware(boolean tldNamespaceAware) { /* NO-OP */ }
-
-    @Override
     public JarScanner getJarScanner() { return null; }
     @Override
     public void setJarScanner(JarScanner jarScanner) { /* NO-OP */ }

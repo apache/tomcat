@@ -412,17 +412,18 @@ public class MBeanFactory {
                                         String docBase)
         throws Exception {
 
-        return createStandardContext(parent, path, docBase, false, false,
-                false, false);
+        return createStandardContext(parent, path, docBase, false, false);
     }
 
 
-   /**
+    /**
      * Create a new StandardContext.
      *
      * @param parent MBean Name of the associated parent component
      * @param path The context path for this Context
      * @param docBase Document base directory (or WAR) for this Context
+     * @param xmlValidation if XML descriptors should be validated
+     * @param xmlNamespaceAware if the XML processor should namespace aware
      *
      * @exception Exception if an MBean cannot be created or registered
      */
@@ -430,9 +431,7 @@ public class MBeanFactory {
                                         String path,
                                         String docBase,
                                         boolean xmlValidation,
-                                        boolean xmlNamespaceAware,
-                                        boolean tldValidation,
-                                        boolean tldNamespaceAware)
+                                        boolean xmlNamespaceAware)
         throws Exception {
 
         // Create a new StandardContext instance
@@ -442,8 +441,6 @@ public class MBeanFactory {
         context.setDocBase(docBase);
         context.setXmlValidation(xmlValidation);
         context.setXmlNamespaceAware(xmlNamespaceAware);
-        context.setTldValidation(tldValidation);
-        context.setTldNamespaceAware(tldNamespaceAware);
 
         ContextConfig contextConfig = new ContextConfig();
         context.addLifecycleListener(contextConfig);
