@@ -102,8 +102,9 @@ public class WsServerContainer extends WsWebSocketContainer
             setEnforceNoAddAfterHandshake(Boolean.parseBoolean(value));
         }
 
-        FilterRegistration fr = servletContext.addFilter(
+        FilterRegistration.Dynamic fr = servletContext.addFilter(
                 WsFilter.class.getName(), new WsFilter(this));
+        fr.setAsyncSupported(true);
 
         EnumSet<DispatcherType> types = EnumSet.of(DispatcherType.REQUEST,
                 DispatcherType.FORWARD);
