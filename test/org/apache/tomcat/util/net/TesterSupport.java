@@ -77,7 +77,7 @@ public final class TesterSupport {
         RFC_5746_SUPPORTED = result;
     }
 
-    protected static void initSsl(Tomcat tomcat) {
+    public static void initSsl(Tomcat tomcat) {
         initSsl(tomcat, "localhost.jks", null, null);
     }
 
