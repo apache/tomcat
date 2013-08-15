@@ -133,7 +133,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
         finished = false;
 
         // Cause loading of HttpMessages
-        HttpMessages.getMessage(200);
+        HttpMessages.getInstance(response.getLocale()).getMessage(200);
     }
 
 
@@ -427,7 +427,8 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
             message = response.getMessage();
         }
         if (message == null) {
-            write(HttpMessages.getMessage(status));
+            write(HttpMessages.getInstance(
+                    response.getLocale()).getMessage(status));
         } else {
             write(message);
         }

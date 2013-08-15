@@ -440,7 +440,8 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
                 message = response.getMessage();
             }
             if (message == null) {
-                message = HttpMessages.getMessage(response.getStatus());
+                message = HttpMessages.getInstance(
+                        response.getLocale()).getMessage(response.getStatus());
             }
             if (message == null) {
                 // mod_jk + httpd 2.x fails with a null status message - bug
