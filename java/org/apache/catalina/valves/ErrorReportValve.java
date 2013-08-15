@@ -161,6 +161,7 @@ public class ErrorReportValve extends ValveBase {
         String report = null;
         StringManager smClient = StringManager.getManager(
                 Constants.Package, request.getLocales());
+        response.setLocale(smClient.getLocale());
         try {
             report = smClient.getString("http." + statusCode);
         } catch (Throwable t) {
