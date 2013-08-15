@@ -55,11 +55,7 @@ import org.xml.sax.SAXException;
  * @author Craig R. McClanahan
  * @author Jean-Francois Arcand
  * @author Costin Manolache
- *
- * @deprecated This will be removed in Tomcat 8.0.x onwards. TLD processing
- *             has been moved to Jasper.
  */
-@Deprecated
 public final class TldConfig  implements LifecycleListener {
 
     private static final String TLD_EXT = ".tld";

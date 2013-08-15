@@ -6630,7 +6630,6 @@ public class StandardContext extends ContainerBase
      * @param tldValidation true to enable xml instance validation
      */
     @Override
-    @Deprecated
     public void setTldValidation(boolean tldValidation){
         
         this.tldValidation = tldValidation;
@@ -6643,7 +6642,6 @@ public class StandardContext extends ContainerBase
      *
      */
     @Override
-    @Deprecated
     public boolean getTldValidation(){
         return tldValidation;
     }
@@ -6652,22 +6650,14 @@ public class StandardContext extends ContainerBase
      * Sets the process TLDs attribute.
      *
      * @param newProcessTlds The new value
-     *
-     * @deprecated This will be removed in Tomcat 8.0.x onwards. TLD processing
-     *             has been moved to Jasper.
      */
-    @Deprecated
     public void setProcessTlds(boolean newProcessTlds) {
         processTlds = newProcessTlds;
     }
 
     /**
      * Returns the processTlds attribute value.
-     *
-     * @deprecated This will be removed in Tomcat 8.0.x onwards. TLD processing
-     *             has been moved to Jasper.
      */
-    @Deprecated
     public boolean getProcessTlds() {
         return processTlds;
     }
@@ -6677,7 +6667,6 @@ public class StandardContext extends ContainerBase
      * @return true if namespace awarenes is enabled.
      */
     @Override
-    @Deprecated
     public boolean getTldNamespaceAware(){
         return tldNamespaceAware;
     }
@@ -6689,7 +6678,6 @@ public class StandardContext extends ContainerBase
      * @param tldNamespaceAware true to enable namespace awareness
      */
     @Override
-    @Deprecated
     public void setTldNamespaceAware(boolean tldNamespaceAware){
         this.tldNamespaceAware= tldNamespaceAware;
     }    

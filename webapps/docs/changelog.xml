@@ -111,11 +111,6 @@
         <bug>55404</bug>: Log warnings about using security roles in web.xml
         without defining them as warnings. (markt)
       </fix>
-      <scode>
-        <bug>55246</bug>: Deprecate TldConfig and TLD-related properties of Context
-        as they have been removed in Tomcat 8.0.x where TLD processing is handled
-        by Jasper. (jboynes)
-      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

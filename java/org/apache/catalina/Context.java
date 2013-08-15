@@ -655,11 +655,7 @@ public interface Context extends Container {
      * Set the validation feature of the XML parser used when
      * parsing tlds files.
      * @param tldValidation true to enable xml instance validation
-     *
-     * @deprecated This will be removed in Tomcat 8.0.x onwards. TLD processing
-     *             has been moved to Jasper.
      */
-    @Deprecated
     public void setTldValidation(boolean tldValidation);
 
 
@@ -667,21 +663,14 @@ public interface Context extends Container {
      * Get the server.xml <context> attribute's webXmlValidation.
      * @return true if validation is enabled.
      *
-     * @deprecated This will be removed in Tomcat 8.0.x onwards. TLD processing
-     *             has been moved to Jasper.
      */
-    @Deprecated
     public boolean getTldValidation();
 
 
     /**
      * Get the server.xml &lt;host&gt; attribute's xmlNamespaceAware.
      * @return true if namespace awareness is enabled.
-     *
-     * @deprecated This will be removed in Tomcat 8.0.x onwards. TLD processing
-     *             has been moved to Jasper.
      */
-    @Deprecated
     public boolean getTldNamespaceAware();
 
 
@@ -689,11 +678,7 @@ public interface Context extends Container {
      * Set the namespace aware feature of the XML parser used when
      * parsing xml instances.
      * @param tldNamespaceAware true to enable namespace awareness
-     *
-     * @deprecated This will be removed in Tomcat 8.0.x onwards. TLD processing
-     *             has been moved to Jasper.
      */
-    @Deprecated
     public void setTldNamespaceAware(boolean tldNamespaceAware);
 
     /**
