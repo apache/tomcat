@@ -2050,9 +2050,12 @@ public class JNDIRealm extends RealmBase {
 
         User user = null;
         List<String> roles = null;
+        Hashtable<?, ?> preservedEnvironment = null;
 
         try {
             if (gssCredential != null && isUseDelegatedCredential()) {
+                // Preserve the current context environment parameters
+                preservedEnvironment = context.getEnvironment();
                 // Set up context
                 context.addToEnvironment(
                         Context.SECURITY_AUTHENTICATION, "GSSAPI");
@@ -2068,24 +2071,12 @@ public class JNDIRealm extends RealmBase {
                 roles = getRoles(context, user);
             }
         } finally {
-            try {
-                context.removeFromEnvironment(
-                        Context.SECURITY_AUTHENTICATION);
-            } catch (NamingException e) {
-                // Ignore
-            }
-            try {
-                context.removeFromEnvironment(
-                        "javax.security.sasl.server.authentication");
-            } catch (NamingException e) {
-                // Ignore
-            }
-            try {
-                context.removeFromEnvironment(
-                        "javax.security.sasl.qop");
-            } catch (NamingException e) {
-                // Ignore
-            }
+            restoreEnvironmentParameter(context,
+                    Context.SECURITY_AUTHENTICATION, preservedEnvironment);
+            restoreEnvironmentParameter(context,
+                    "javax.security.sasl.server.authentication", preservedEnvironment);
+            restoreEnvironmentParameter(context, "javax.security.sasl.qop",
+                    preservedEnvironment);
         }
 
         if (user != null) {
@@ -2094,6 +2085,19 @@ public class JNDIRealm extends RealmBase {
         }
 
         return null;
+    }
+
+    private void restoreEnvironmentParameter(DirContext context,
+            String parameterName, Hashtable<?, ?> preservedEnvironment) {
+        try {
+            context.removeFromEnvironment(parameterName);
+            if (preservedEnvironment != null && preservedEnvironment.containsKey(parameterName)) {
+                context.addToEnvironment(parameterName,
+                        preservedEnvironment.get(parameterName));
+            }
+        } catch (NamingException e) {
+            // Ignore
+        }
     }
 
     /**
