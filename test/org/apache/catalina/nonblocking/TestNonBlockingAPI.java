@@ -251,14 +251,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     public void testNonBlockingWriteError() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Not applicable to BIO. This test does not start a new thread for the
-        // write so with BIO all the writes happen in the service() method just
-        // like blocking IO.
-        if (tomcat.getConnector().getProtocolHandlerClassName().equals(
-                "org.apache.coyote.http11.Http11Protocol")) {
-            return;
-        }
-
         // Must have a real docBase - just use temp
         StandardContext ctx = (StandardContext) tomcat.addContext(
                 "", System.getProperty("java.io.tmpdir"));
@@ -416,10 +408,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             });
             // step 2 - notify on read
             ServletInputStream in = req.getInputStream();
-            listener = new TestReadListener(actx);
+            listener = new TestReadListener(actx, false);
             in.setReadListener(listener);
-
-            listener.onDataAvailable();
         }
     }
 
@@ -462,13 +452,12 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             });
             // step 2 - notify on read
             ServletInputStream in = req.getInputStream();
-            rlistener = new TestReadListener(actx);
+            rlistener = new TestReadListener(actx, true);
             in.setReadListener(rlistener);
             ServletOutputStream out = resp.getOutputStream();
             resp.setBufferSize(200 * 1024);
             wlistener = new TestWriteListener(actx);
             out.setWriteListener(wlistener);
-            wlistener.onWritePossible();
         }
 
 
@@ -476,9 +465,12 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     private class TestReadListener implements ReadListener {
         private final AsyncContext ctx;
         private final StringBuilder body = new StringBuilder();
+        private final boolean usingNonBlockingWrite;
 
-        public TestReadListener(AsyncContext ctx) {
+        public TestReadListener(AsyncContext ctx,
+                boolean usingNonBlockingWrite) {
             this.ctx = ctx;
+            this.usingNonBlockingWrite = usingNonBlockingWrite;
         }
 
         @Override
@@ -501,18 +493,22 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         @Override
         public void onAllDataRead() {
             log.info("onAllDataRead");
-            String msg;
-            if (body.toString().endsWith("FINISHED")) {
-                msg = "OK";
-            } else {
-                msg = "FAILED";
+            // If non-blocking writes are being used, don't write here as it
+            // will inject unexpected data into the write output.
+            if (!usingNonBlockingWrite) {
+                String msg;
+                if (body.toString().endsWith("FINISHED")) {
+                    msg = "OK";
+                } else {
+                    msg = "FAILED";
+                }
+                try {
+                    ctx.getResponse().getOutputStream().print(msg);
+                } catch (IOException ioe) {
+                    // Ignore
+                }
+                ctx.complete();
             }
-            try {
-                ctx.getResponse().getOutputStream().print(msg);
-            } catch (IOException ioe) {
-                // Ignore
-            }
-            ctx.complete();
         }
 
         @Override

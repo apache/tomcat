@@ -1718,16 +1718,30 @@ public class AprEndpoint extends AbstractEndpoint {
                                         // application code. By signalling read/write is possible, a
                                         // read/write will be attempted, fail and that will trigger
                                         // an exception the application will see.
-                                        if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN ||
-                                                (wrapper.pollerFlags & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
-                                            // Must be doing a non-blocking read
+                                        // Check the return flags first, followed by what the socket
+                                        // was registered for
+                                        if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
+                                            // Error probably occurred during a non-blocking read
                                             if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
                                                 // Close socket and clear pool
                                                 destroySocket(desc[n*2+1]);
                                             }
-                                        } else if ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT ||
-                                                (wrapper.pollerFlags & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
-                                            // Must be doing an non-blocking write write
+                                        } else if ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
+                                            // Error probably occurred during a non-blocking write
+                                            if (!processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
+                                                // Close socket and clear pool
+                                                destroySocket(desc[n*2+1]);
+                                            }
+                                        } else if ((wrapper.pollerFlags & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
+                                            // Can't tell what was happening when the error occurred but the
+                                            // socket is registered for non-blocking read so use that
+                                            if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
+                                                // Close socket and clear pool
+                                                destroySocket(desc[n*2+1]);
+                                            }
+                                        } else if ((wrapper.pollerFlags & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
+                                            // Can't tell what was happening when the error occurred but the
+                                            // socket is registered for non-blocking write so use that
                                             if (!processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
                                                 // Close socket and clear pool
                                                 destroySocket(desc[n*2+1]);
