@@ -388,27 +388,6 @@ public class Diagnostics {
     }
 
     /**
-     * Retrieve the StringManager for a list of Locales.
-     * The first StringManager found will be returned.
-     *
-     * @param requestedLocales the list of locales
-     * @return the found StringManager or the default
-     *         StringManager
-     */
-    private static StringManager getStringManager(
-            Enumeration<Locale> requestedLocales) {
-        while (requestedLocales.hasMoreElements()) {
-            Locale locale = requestedLocales.nextElement();
-            StringManager result = StringManager.getManager(PACKAGE, locale);
-            if (result.getLocale().equals(locale)) {
-                return result;
-            }
-        }
-        // Return the default
-        return sm;
-    }
-
-    /**
      * Retrieves a formatted JVM thread dump.
      * The default StringManager will be used.
      *
@@ -427,7 +406,8 @@ public class Diagnostics {
      * @return the formatted JVM thread dump
      */
     public static String getThreadDump(Enumeration<Locale> requestedLocales) {
-        return getThreadDump(getStringManager(requestedLocales));
+        return getThreadDump(
+                StringManager.getManager(PACKAGE, requestedLocales));
     }
 
     /**
@@ -501,7 +481,7 @@ public class Diagnostics {
      * @return the formatted JVM information text
      */
     public static String getVMInfo(Enumeration<Locale> requestedLocales) {
-        return getVMInfo(getStringManager(requestedLocales));
+        return getVMInfo(StringManager.getManager(PACKAGE, requestedLocales));
     }
 
     /**

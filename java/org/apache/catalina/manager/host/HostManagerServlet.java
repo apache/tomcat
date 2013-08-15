@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.Enumeration;
-import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
@@ -196,7 +194,8 @@ public class HostManagerServlet
                       HttpServletResponse response)
         throws IOException, ServletException {
 
-        StringManager smClient = getStringManager(request);
+        StringManager smClient = StringManager.getManager(
+                Constants.Package, request.getLocales());
 
         // Identify the request parameters that we need
         String command = request.getPathInfo();
@@ -689,20 +688,5 @@ public class HostManagerServlet
             return null;
         }
         return configBase;
-    }
-
-
-    protected StringManager getStringManager(HttpServletRequest req) {
-        Enumeration<Locale> requestedLocales = req.getLocales();
-        while (requestedLocales.hasMoreElements()) {
-            Locale locale = requestedLocales.nextElement();
-            StringManager result = StringManager.getManager(Constants.Package,
-                    locale);
-            if (result.getLocale().equals(locale)) {
-                return result;
-            }
-        }
-        // Return the default
-        return sm;
     }
 }

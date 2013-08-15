@@ -306,7 +306,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                       HttpServletResponse response)
         throws IOException, ServletException {
 
-        StringManager smClient = getStringManager(request);
+        StringManager smClient = StringManager.getManager(
+                Constants.Package, request.getLocales());
 
         // Identify the request parameters that we need
         String command = request.getPathInfo();
@@ -399,7 +400,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                       HttpServletResponse response)
         throws IOException, ServletException {
 
-        StringManager smClient = getStringManager(request);
+        StringManager smClient = StringManager.getManager(
+                Constants.Package, request.getLocales());
 
         // Identify the request parameters that we need
         String command = request.getPathInfo();
@@ -1555,21 +1557,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             }
         }
 
-    }
-
-
-    protected StringManager getStringManager(HttpServletRequest req) {
-        Enumeration<Locale> requestedLocales = req.getLocales();
-        while (requestedLocales.hasMoreElements()) {
-            Locale locale = requestedLocales.nextElement();
-            StringManager result = StringManager.getManager(Constants.Package,
-                    locale);
-            if (result.getLocale().equals(locale)) {
-                return result;
-            }
-        }
-        // Return the default
-        return sm;
     }
 
 

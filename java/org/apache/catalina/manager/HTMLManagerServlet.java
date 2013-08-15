@@ -118,7 +118,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
                       HttpServletResponse response)
         throws IOException, ServletException {
 
-        StringManager smClient = getStringManager(request);
+        StringManager smClient = StringManager.getManager(
+                Constants.Package, request.getLocales());
 
         // Identify the request parameters that we need
         // By obtaining the command from the pathInfo, per-command security can
@@ -179,7 +180,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
                       HttpServletResponse response)
         throws IOException, ServletException {
 
-        StringManager smClient = getStringManager(request);
+        StringManager smClient = StringManager.getManager(
+                Constants.Package, request.getLocales());
 
         // Identify the request parameters that we need
         // By obtaining the command from the pathInfo, per-command security can
