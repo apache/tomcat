@@ -63,7 +63,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         finished = false;
 
         // Cause loading of HttpMessages
-        HttpMessages.getMessage(200);
+        HttpMessages.getInstance(response.getLocale()).getMessage(200);
 
     }
 

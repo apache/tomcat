@@ -18,6 +18,7 @@
 package org.apache.tomcat.util.res;
 
 import java.text.MessageFormat;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Map;
@@ -208,4 +209,27 @@ public class StringManager {
         }
         return mgr;
     }
+
+    /**
+     * Retrieve the StringManager for a list of Locales. The first StringManager
+     * found will be returned.
+     *
+     * @param requestedLocales the list of Locales
+     *
+     * @return the found StringManager or the default StringManager
+     */
+    public static StringManager getManager(String packageName,
+            Enumeration<Locale> requestedLocales) {
+        while (requestedLocales.hasMoreElements()) {
+            Locale locale = requestedLocales.nextElement();
+            StringManager result = getManager(packageName, locale);
+            if (result.getLocale().equals(locale)) {
+                return result;
+            }
+        }
+        // Return the default
+        return getManager(packageName);
+    }
+
+
 }

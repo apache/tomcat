@@ -137,6 +137,10 @@
         Ensure that <code>java.lang.VirtualMachineError</code>s are not
         swallowed when using the HTTP or AJP NIO connectors. (markt)
       </fix>
+      <fix>
+        <bug>55399</bug>: Use the response locale to select the language to use
+        for the status message in the HTTP response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

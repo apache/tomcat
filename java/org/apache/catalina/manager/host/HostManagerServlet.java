@@ -212,7 +212,8 @@ public class HostManagerServlet
                       HttpServletResponse response)
         throws IOException, ServletException {
 
-        StringManager smClient = getStringManager(request);
+        StringManager smClient = StringManager.getManager(
+                Constants.Package, request.getLocales());
 
         // Identify the request parameters that we need
         String command = request.getPathInfo();
@@ -709,6 +710,11 @@ public class HostManagerServlet
     }
 
 
+    /**
+     * @deprecated Use {@link StringManager#getManager(String, Enumeration)}.
+     *             This method will be removed in Tomcat 8.
+     */
+    @Deprecated
     protected StringManager getStringManager(HttpServletRequest req) {
         Enumeration<Locale> requestedLocales = req.getLocales();
         while (requestedLocales.hasMoreElements()) {

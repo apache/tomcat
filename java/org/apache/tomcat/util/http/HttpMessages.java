@@ -16,6 +16,10 @@
  */
 package org.apache.tomcat.util.http;
 
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -28,14 +32,24 @@ import org.apache.tomcat.util.res.StringManager;
  * @author costin@eng.sun.com
  */
 public class HttpMessages {
-    // XXX move message resources in this package
-    protected static final StringManager sm =
-        StringManager.getManager("org.apache.tomcat.util.http.res");
 
-    static String st_200=null;
-    static String st_302=null;
-    static String st_400=null;
-    static String st_404=null;
+    private static final Map<Locale,HttpMessages> instances =
+            new ConcurrentHashMap<Locale, HttpMessages>();
+
+    private static final HttpMessages DEFAULT = getInstance(Locale.getDefault());
+
+    // XXX move message resources in this package
+    private final StringManager sm;
+
+    private String st_200 = null;
+    private String st_302 = null;
+    private String st_400 = null;
+    private String st_404 = null;
+
+    private HttpMessages(StringManager sm) {
+        this.sm = sm;
+    }
+
 
     /** Get the status string associated with a status code.
      *  No I18N - return the messages defined in the HTTP spec.
@@ -45,35 +59,52 @@ public class HttpMessages {
      *  Common messages are cached.
      *
      */
-    public static String getMessage( int status ) {
+    public String getMessage(int status) {
         // method from Response.
 
         // Does HTTP requires/allow international messages or
         // are pre-defined? The user doesn't see them most of the time
         switch( status ) {
         case 200:
-            if( st_200==null ) {
-                st_200=sm.getString( "sc.200");
+            if(st_200 == null ) {
+                st_200 = sm.getString("sc.200");
             }
             return st_200;
         case 302:
-            if( st_302==null ) {
-                st_302=sm.getString( "sc.302");
+            if(st_302 == null ) {
+                st_302 = sm.getString("sc.302");
             }
             return st_302;
         case 400:
-            if( st_400==null ) {
-                st_400=sm.getString( "sc.400");
+            if(st_400 == null ) {
+                st_400 = sm.getString("sc.400");
             }
             return st_400;
         case 404:
-            if( st_404==null ) {
-                st_404=sm.getString( "sc.404");
+            if(st_404 == null ) {
+                st_404 = sm.getString("sc.404");
             }
             return st_404;
         }
         return sm.getString("sc."+ status);
     }
+
+
+    public static HttpMessages getInstance(Locale locale) {
+        HttpMessages result = instances.get(locale);
+        if (result == null) {
+            StringManager sm = StringManager.getManager(
+                    "org.apache.tomcat.util.http.res", locale);
+            if (Locale.getDefault().equals(sm.getLocale())) {
+                result = DEFAULT;
+            } else {
+                result = new HttpMessages(sm);
+            }
+            instances.put(locale, result);
+        }
+        return result;
+    }
+
 
     /**
      * Filter the specified message string for characters that are sensitive
