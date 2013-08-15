@@ -33,10 +33,6 @@
   <subpackage name="mail">
     <allow pkg="javax.mail"/>
   </subpackage>
-  <subpackage name="websocket">
-    <allow pkg="javax.websocket"/>
-    <allow pkg="javax.websocket.extensions"/>
-  </subpackage>
   <subpackage name="persistence">
     <allow pkg="javax.persistence"/>
   </subpackage>
@@ -47,6 +43,9 @@
       <allow pkg="javax.el"/>
       <allow pkg="javax.servlet.jsp"/>
     </subpackage>
+  </subpackage>
+  <subpackage name="websocket">
+    <allow pkg="javax.websocket"/>
   </subpackage>
   <subpackage name="xml.ws">
     <allow pkg="javax.xwl.ws"/>
