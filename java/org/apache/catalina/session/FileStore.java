@@ -266,6 +266,7 @@ public final class FileStore extends StoreBase {
         ObjectInputStream ois = null;
         Loader loader = null;
         ClassLoader classLoader = null;
+        ClassLoader oldThreadContextCL = Thread.currentThread().getContextClassLoader();
         try {
             fis = new FileInputStream(file.getAbsolutePath());
             bis = new BufferedInputStream(fis);
@@ -274,10 +275,18 @@ public final class FileStore extends StoreBase {
                 loader = container.getLoader();
             if (loader != null)
                 classLoader = loader.getClassLoader();
-            if (classLoader != null)
+            if (classLoader != null) {
+                Thread.currentThread().setContextClassLoader(classLoader);
                 ois = new CustomObjectInputStream(bis, classLoader);
-            else
+            } else {
                 ois = new ObjectInputStream(bis);
+            }
+
+            StandardSession session =
+                    (StandardSession) manager.createEmptySession();
+            session.readObjectData(ois);
+            session.setManager(manager);
+            return (session);
         } catch (FileNotFoundException e) {
             if (manager.getContainer().getLogger().isDebugEnabled())
                 manager.getContainer().getLogger().debug("No persisted data file found");
@@ -298,21 +307,16 @@ public final class FileStore extends StoreBase {
                 }
             }
             throw e;
-        }
-
-        try {
-            StandardSession session =
-                (StandardSession) manager.createEmptySession();
-            session.readObjectData(ois);
-            session.setManager(manager);
-            return (session);
         } finally {
-            // Close the input stream
-            try {
-                ois.close();
-            } catch (IOException f) {
-                // Ignore
+            if (ois != null) {
+                // Close the input stream
+                try {
+                    ois.close();
+                } catch (IOException f) {
+                    // Ignore
+                }
             }
+            Thread.currentThread().setContextClassLoader(oldThreadContextCL);
         }
     }
 

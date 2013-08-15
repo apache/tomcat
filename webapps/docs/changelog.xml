@@ -108,6 +108,10 @@
         ServletContext. (markt)
       </fix>
       <fix>
+        <bug>55357</bug>: Ensure the web application class loader is set as a
+        thread context class loader during session deserialization. (violetagg)
+      </fix>
+      <fix>
         <bug>55404</bug>: Log warnings about using security roles in web.xml
         without defining them as warnings. (markt)
       </fix>
