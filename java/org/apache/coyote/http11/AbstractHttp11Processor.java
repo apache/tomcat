@@ -1586,7 +1586,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 request.getReadListener() != null) {
             try {
                 try {
-                    if (inputBuffer.available() > 0 ||  inputBuffer.nbRead() > 0) {
+                    if (inputBuffer.available() > 0 || inputBuffer.nbRead() > 0) {
                         asyncStateMachine.asyncOperation();
                     }
                 } catch (IOException x) {
