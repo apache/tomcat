@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -59,6 +62,8 @@ public class SocketWrapper<E> {
      */
     private final Object writeThreadLock = new Object();
     public Object getWriteThreadLock() { return writeThreadLock; }
+
+    private Set<DispatchType> dispatches = new LinkedHashSet<>();
 
     public SocketWrapper(E socket) {
         this.socket = socket;
@@ -107,5 +112,20 @@ public class SocketWrapper<E> {
     public Lock getBlockingStatusReadLock() { return blockingStatusReadLock; }
     public WriteLock getBlockingStatusWriteLock() {
         return blockingStatusWriteLock;
+    }
+    public void addDispatch(DispatchType dispatchType) {
+        dispatches.add(dispatchType);
+    }
+    public boolean hasNextDispatch() {
+        return dispatches.size() > 0;
+    }
+    public DispatchType getNextDispatch() {
+        DispatchType result = null;
+        Iterator<DispatchType> iter = dispatches.iterator();
+        if (iter.hasNext()) {
+            result = iter.next();
+            iter.remove();
+        }
+        return result;
     }
 }

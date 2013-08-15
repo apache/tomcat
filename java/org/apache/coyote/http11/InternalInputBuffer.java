@@ -554,7 +554,10 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
     @Override
     protected int nbRead() throws IOException {
-        throw new IllegalStateException("This method is unused for BIO");
+        // If this gets called for BIO need to make caller think there is data
+        // to read as BIO always reads whether there is data or not (and blocks
+        // until there is data to read).
+        return 1;
     }
 
 

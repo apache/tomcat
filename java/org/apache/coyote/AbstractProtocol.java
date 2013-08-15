@@ -38,6 +38,7 @@ import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler;
+import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
@@ -616,7 +617,11 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
                 SocketState state = SocketState.CLOSED;
                 do {
-                    if (status == SocketStatus.DISCONNECT &&
+                    if (wrapper.hasNextDispatch()) {
+                        DispatchType nextDispatch = wrapper.getNextDispatch();
+                        state = processor.asyncDispatch(
+                                nextDispatch.getSocketStatus());
+                    } else if (status == SocketStatus.DISCONNECT &&
                             !processor.isComet()) {
                         // Do nothing here, just wait for it to get recycled
                         // Don't do this for Comet we need to generate an end
@@ -663,7 +668,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                                 "], State out: [" + state + "]");
                     }
                 } while (state == SocketState.ASYNC_END ||
-                        state == SocketState.UPGRADING);
+                        state == SocketState.UPGRADING ||
+                        wrapper.hasNextDispatch());
 
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the

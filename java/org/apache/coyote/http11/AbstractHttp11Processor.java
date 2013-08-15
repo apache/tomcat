@@ -51,6 +51,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
@@ -828,6 +829,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         } else if (actionCode == ActionCode.REQUEST_BODY_FULLY_READ) {
             AtomicBoolean result = (AtomicBoolean) param;
             result.set(getInputBuffer().isFinished());
+        } else if (actionCode == ActionCode.DISPATCH_READ) {
+            socketWrapper.addDispatch(DispatchType.NON_BLOCKING_READ);
+        } else if (actionCode == ActionCode.DISPATCH_WRITE) {
+            socketWrapper.addDispatch(DispatchType.NON_BLOCKING_WRITE);
         } else {
             actionInternal(actionCode, param);
         }

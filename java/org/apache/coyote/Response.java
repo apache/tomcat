@@ -593,6 +593,21 @@ public final class Response {
         }
 
         this.listener = listener;
+
+        // The container is responsible for the first call to
+        // listener.onWritePossible(). If isReady() returns true, the container
+        // needs to call listener.onWritePossible() from a new thread. If
+        // isReady() returns false, the socket will be registered for write and
+        // the container will call listener.onWritePossible() once data can be
+        // written.
+        if (isReady()) {
+            action(ActionCode.DISPATCH_WRITE, null);
+            // Need to set the fireListener flag otherwise when the container
+            // tries to trigger onWritePossible, nothing will happen
+            synchronized (nonBlockingStateLock) {
+                fireListener = true;
+            }
+        }
     }
 
     public boolean isReady() {
