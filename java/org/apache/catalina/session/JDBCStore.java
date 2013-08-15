@@ -607,6 +607,7 @@ public class JDBCStore extends StoreBase {
                     return (null);
                 }
 
+                ClassLoader oldThreadContextCL = Thread.currentThread().getContextClassLoader();
                 try {
                     if (preparedLoadSql == null) {
                         String loadSql = "SELECT " + sessionIdCol + ", "
@@ -629,6 +630,7 @@ public class JDBCStore extends StoreBase {
                             classLoader = loader.getClassLoader();
                         }
                         if (classLoader != null) {
+                            Thread.currentThread().setContextClassLoader(classLoader);
                             ois = new CustomObjectInputStream(bis,
                                     classLoader);
                         } else {
@@ -667,6 +669,7 @@ public class JDBCStore extends StoreBase {
                             // Ignore
                         }
                     }
+                    Thread.currentThread().setContextClassLoader(oldThreadContextCL);
                     release(_conn);
                 }
                 numberOfTries--;
