@@ -30,6 +30,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
@@ -103,7 +106,7 @@ public class WsServerContainer extends WsWebSocketContainer
         }
 
         FilterRegistration.Dynamic fr = servletContext.addFilter(
-                WsFilter.class.getName(), new WsFilter(this));
+                WsFilter.class.getName(), new WsFilter());
         fr.setAsyncSupported(true);
 
         EnumSet<DispatcherType> types = EnumSet.of(DispatcherType.REQUEST,
@@ -217,6 +220,14 @@ public class WsServerContainer extends WsWebSocketContainer
                 methodMapping);
 
         addEndpoint(sec);
+    }
+
+
+    public void doUpgrade(HttpServletRequest request,
+            HttpServletResponse response, ServerEndpointConfig sec,
+            Map<String,String> pathParams)
+            throws ServletException, IOException {
+        UpgradeUtil.doUpgrade(this, request, response, sec, pathParams);
     }
 
 
