@@ -30,6 +30,7 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>Implementation of a Valve that outputs HTML error pages.</p>
@@ -158,8 +159,10 @@ public class ErrorReportValve extends ValveBase {
         // Do nothing if there is no report for the specified status code and
         // no error message provided
         String report = null;
+        StringManager smClient = StringManager.getManager(
+                Constants.Package, request.getLocales());
         try {
-            report = sm.getString("http." + statusCode);
+            report = smClient.getString("http." + statusCode);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
         }
@@ -167,7 +170,7 @@ public class ErrorReportValve extends ValveBase {
             if (message.length() == 0) {
                 return;
             } else {
-                report = sm.getString("errorReportValve.noDescription");
+                report = smClient.getString("errorReportValve.noDescription");
             }
         }
 
@@ -175,29 +178,29 @@ public class ErrorReportValve extends ValveBase {
 
         sb.append("<html><head><title>");
         sb.append(ServerInfo.getServerInfo()).append(" - ");
-        sb.append(sm.getString("errorReportValve.errorReport"));
+        sb.append(smClient.getString("errorReportValve.errorReport"));
         sb.append("</title>");
         sb.append("<style><!--");
         sb.append(org.apache.catalina.util.TomcatCSS.TOMCAT_CSS);
         sb.append("--></style> ");
         sb.append("</head><body>");
         sb.append("<h1>");
-        sb.append(sm.getString("errorReportValve.statusHeader",
+        sb.append(smClient.getString("errorReportValve.statusHeader",
                                "" + statusCode, message)).append("</h1>");
         sb.append("<HR size=\"1\" noshade=\"noshade\">");
         sb.append("<p><b>type</b> ");
         if (throwable != null) {
-            sb.append(sm.getString("errorReportValve.exceptionReport"));
+            sb.append(smClient.getString("errorReportValve.exceptionReport"));
         } else {
-            sb.append(sm.getString("errorReportValve.statusReport"));
+            sb.append(smClient.getString("errorReportValve.statusReport"));
         }
         sb.append("</p>");
         sb.append("<p><b>");
-        sb.append(sm.getString("errorReportValve.message"));
+        sb.append(smClient.getString("errorReportValve.message"));
         sb.append("</b> <u>");
         sb.append(message).append("</u></p>");
         sb.append("<p><b>");
-        sb.append(sm.getString("errorReportValve.description"));
+        sb.append(smClient.getString("errorReportValve.description"));
         sb.append("</b> <u>");
         sb.append(report);
         sb.append("</u></p>");
@@ -206,7 +209,7 @@ public class ErrorReportValve extends ValveBase {
 
             String stackTrace = getPartialServletStackTrace(throwable);
             sb.append("<p><b>");
-            sb.append(sm.getString("errorReportValve.exception"));
+            sb.append(smClient.getString("errorReportValve.exception"));
             sb.append("</b> <pre>");
             sb.append(RequestUtil.filter(stackTrace));
             sb.append("</pre></p>");
@@ -216,7 +219,7 @@ public class ErrorReportValve extends ValveBase {
             while (rootCause != null && (loops < 10)) {
                 stackTrace = getPartialServletStackTrace(rootCause);
                 sb.append("<p><b>");
-                sb.append(sm.getString("errorReportValve.rootCause"));
+                sb.append(smClient.getString("errorReportValve.rootCause"));
                 sb.append("</b> <pre>");
                 sb.append(RequestUtil.filter(stackTrace));
                 sb.append("</pre></p>");
@@ -226,9 +229,9 @@ public class ErrorReportValve extends ValveBase {
             }
 
             sb.append("<p><b>");
-            sb.append(sm.getString("errorReportValve.note"));
+            sb.append(smClient.getString("errorReportValve.note"));
             sb.append("</b> <u>");
-            sb.append(sm.getString("errorReportValve.rootCauseInLogs",
+            sb.append(smClient.getString("errorReportValve.rootCauseInLogs",
                                    ServerInfo.getServerInfo()));
             sb.append("</u></p>");
 
