@@ -224,6 +224,12 @@
         Remove the experimental label from the AJP NIO connector documentation.
         (markt)
       </update>
+      <fix>
+        Correctly associated the default resource bundle with the English locale
+        so that requests that specify an Accept-Language of English ahead of
+        French, Spanish or Japanese get the English messages they asked for.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

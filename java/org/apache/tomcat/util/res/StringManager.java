@@ -88,7 +88,12 @@ public class StringManager {
         bundle = bnd;
         // Get the actual locale, which may be different from the requested one
         if (bundle != null) {
-            this.locale = bundle.getLocale();
+            Locale bundleLocale = bundle.getLocale();
+            if (bundleLocale.equals(Locale.ROOT)) {
+                this.locale = Locale.ENGLISH;
+            } else {
+                this.locale = bundle.getLocale();
+            }
         } else {
             this.locale = null;
         }
