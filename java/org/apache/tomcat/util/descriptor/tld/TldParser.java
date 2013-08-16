@@ -52,6 +52,10 @@ public class TldParser {
             digester.parse(source);
             if (!handler.getWarnings().isEmpty() || !handler.getErrors().isEmpty()) {
                 handler.logFindings(LOG, source.getSystemId());
+                if (!handler.getErrors().isEmpty()) {
+                    // throw the first to indicate there was a error during processing
+                    throw handler.getErrors().iterator().next();
+                }
             }
             return taglibXml;
         } finally {

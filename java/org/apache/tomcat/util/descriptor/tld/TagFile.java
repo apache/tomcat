@@ -17,7 +17,9 @@
 package org.apache.tomcat.util.descriptor.tld;
 
 /**
- *
+ * Bare-bone model of a tag file loaded from a TLD.
+ * This does not contain the tag-specific attributes that requiring parsing
+ * the actual tag file to derive.
  */
 public class TagFile {
     private String name;

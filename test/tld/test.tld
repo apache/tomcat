@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<taglib xmlns="http://java.sun.com/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+      http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
+      version="2.1">
+  <tlib-version>1.0</tlib-version>
+  <short-name>test</short-name>
+  <uri>http://tomcat.apache.org/TldTests</uri>
+
+  <validator>
+    <validator-class>com.example.Validator</validator-class>
+    <init-param>
+      <param-name>name</param-name>
+      <param-value>value</param-value>
+    </init-param>
+  </validator>
+
+  <tag>
+    <description>Echo Tag</description>
+    <display-name>Echo</display-name>
+    <icon>
+      <small-icon>small</small-icon>
+      <large-icon>large</large-icon>
+    </icon>
+    <name>Echo</name>
+    <tag-class>org.apache.jasper.compiler.TestValidator$Echo</tag-class>
+    <body-content>empty</body-content>
+    <variable>
+      <name-given>var</name-given>
+      <variable-class>java.lang.Object</variable-class>
+      <declare>yes</declare>
+      <scope>AT_END</scope>
+    </variable>
+    <attribute>
+      <name>echo</name>
+      <required>yes</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>fragment</name>
+      <fragment>yes</fragment>
+    </attribute>
+    <attribute>
+      <name>deferredValue</name>
+      <deferred-value>
+        <type>java.util.Date</type>
+      </deferred-value>
+    </attribute>
+    <attribute>
+      <name>deferredMethod</name>
+      <deferred-method>
+        <method-signature>java.util.Date getDate()</method-signature>
+      </deferred-method>
+    </attribute>
+    <dynamic-attributes>true</dynamic-attributes>
+  </tag>
+
+  <tag-file>
+    <description>Echo Tag</description>
+    <display-name>Echo</display-name>
+    <icon>
+      <small-icon>small</small-icon>
+      <large-icon>large</large-icon>
+    </icon>
+    <name>Echo2</name>
+    <path>/echo.tag</path>
+  </tag-file>
+
+  <function>
+    <name>trim</name>
+    <function-class>org.apache.el.TesterFunctions</function-class>
+    <function-signature>
+      java.lang.String trim(java.lang.String)
+    </function-signature>
+  </function>
+</taglib>

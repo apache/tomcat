@@ -16,23 +16,31 @@
  */
 package org.apache.tomcat.util.descriptor.tld;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.jsp.tagext.TagAttributeInfo;
+import javax.servlet.jsp.tagext.TagInfo;
+import javax.servlet.jsp.tagext.TagVariableInfo;
+
 /**
- *
+ * Model of a tag define in a tag library descriptor.
+ * This represents the information as parsed from the XML but differs from
+ * TagInfo in that is does not provide a link back to the tag library that
+ * defined it.
  */
 public class Tag {
     private String name;
     private String tagClass;
     private String teiClass;
-    private String bodyContent;
+    private String bodyContent = TagInfo.BODY_CONTENT_JSP;
     private String displayName;
     private String smallIcon;
     private String largeIcon;
     private String info;
     private boolean dynamicAttributes;
-    private List<Variable> variables;
-    private List<Attribute> attributes;
+    private List<TagAttributeInfo> attributes;
+    private List<TagVariableInfo> variables;
 
     public String getName() {
         return name;
@@ -106,144 +114,17 @@ public class Tag {
         this.dynamicAttributes = dynamicAttributes;
     }
 
-    public static class Variable {
-        private String nameGiven;
-        private String nameFromAttribute;
-        private String className;
-        private boolean declare;
-        private int scope;
-
-        public String getNameGiven() {
-            return nameGiven;
+    public List<TagAttributeInfo> getAttributes() {
+        if (attributes == null) {
+            attributes = new ArrayList<>();
         }
-
-        public void setNameGiven(String nameGiven) {
-            this.nameGiven = nameGiven;
-        }
-
-        public String getNameFromAttribute() {
-            return nameFromAttribute;
-        }
-
-        public void setNameFromAttribute(String nameFromAttribute) {
-            this.nameFromAttribute = nameFromAttribute;
-        }
-
-        public String getClassName() {
-            return className;
-        }
-
-        public void setClassName(String className) {
-            this.className = className;
-        }
-
-        public boolean isDeclare() {
-            return declare;
-        }
-
-        public void setDeclare(boolean declare) {
-            this.declare = declare;
-        }
-
-        public int getScope() {
-            return scope;
-        }
-
-        public void setScope(int scope) {
-            this.scope = scope;
-        }
+        return attributes;
     }
 
-    public static class Attribute {
-        private String name;
-        private boolean required;
-        private String type;
-        private boolean requestTime;
-        private boolean fragment;
-        private String description;
-        private boolean deferredValue;
-        private boolean deferredMethod;
-        private String expectedTypeName;
-        private String methodSignature;
-
-        public String getName() {
-            return name;
+    public List<TagVariableInfo> getVariables() {
+        if (variables == null) {
+            variables = new ArrayList<>();
         }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public boolean isRequired() {
-            return required;
-        }
-
-        public void setRequired(boolean required) {
-            this.required = required;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public boolean isRequestTime() {
-            return requestTime;
-        }
-
-        public void setRequestTime(boolean requestTime) {
-            this.requestTime = requestTime;
-        }
-
-        public boolean isFragment() {
-            return fragment;
-        }
-
-        public void setFragment(boolean fragment) {
-            this.fragment = fragment;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        public boolean isDeferredValue() {
-            return deferredValue;
-        }
-
-        public void setDeferredValue(boolean deferredValue) {
-            this.deferredValue = deferredValue;
-        }
-
-        public boolean isDeferredMethod() {
-            return deferredMethod;
-        }
-
-        public void setDeferredMethod(boolean deferredMethod) {
-            this.deferredMethod = deferredMethod;
-        }
-
-        public String getExpectedTypeName() {
-            return expectedTypeName;
-        }
-
-        public void setExpectedTypeName(String expectedTypeName) {
-            this.expectedTypeName = expectedTypeName;
-        }
-
-        public String getMethodSignature() {
-            return methodSignature;
-        }
-
-        public void setMethodSignature(String methodSignature) {
-            this.methodSignature = methodSignature;
-        }
+        return variables;
     }
 }
