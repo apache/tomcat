@@ -1357,7 +1357,7 @@ public class ApplicationContext
         try {
             @SuppressWarnings("unchecked")
             T listener =
-                (T) context.getInstanceManager().newInstance(c.getName());
+                (T) context.getInstanceManager().newInstance(c);
             if (listener instanceof ServletContextListener ||
                     listener instanceof ServletContextAttributeListener ||
                     listener instanceof ServletRequestListener ||
@@ -1378,9 +1378,8 @@ public class ApplicationContext
             throw new ServletException(e);
         } catch (InstantiationException e) {
             throw new ServletException(e);
-        } catch (ClassNotFoundException e) {
-            throw new ServletException(e);
-        }    }
+        }
+    }
 
 
     @Override

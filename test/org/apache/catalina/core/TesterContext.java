@@ -58,6 +58,7 @@ import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.juli.logging.Log;
+import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.http.mapper.Mapper;
 
@@ -1181,5 +1182,15 @@ public class TesterContext implements Context {
             ApplicationServletRegistration registration,
             ServletSecurityElement servletSecurityElement) {
         return null;
+    }
+
+    @Override
+    public InstanceManager getInstanceManager() {
+        return null;
+    }
+
+    @Override
+    public void setInstanceManager(InstanceManager instanceManager) {
+        // NO-OP
     }
 }

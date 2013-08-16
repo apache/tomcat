@@ -40,6 +40,7 @@ import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.util.CharsetMapper;
+import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.http.mapper.Mapper;
 
@@ -711,6 +712,16 @@ public interface Context extends Container {
      * Should the effective web.xml for this context be logged on context start?
      */
     public boolean getLogEffectiveWebXml();
+
+    /**
+     * Get the instance manager associated with this context.
+     */
+    public InstanceManager getInstanceManager();
+
+    /**
+     * Set the instance manager associated with this context.
+     */
+    public void setInstanceManager(InstanceManager instanceManager);
 
     // --------------------------------------------------------- Public Methods
 
