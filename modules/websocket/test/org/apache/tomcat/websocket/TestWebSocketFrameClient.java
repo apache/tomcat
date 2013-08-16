@@ -16,7 +16,9 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.File;
 import java.net.URI;
+import java.net.URL;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -52,6 +54,7 @@ public class TestWebSocketFrameClient extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 
+
         TesterSupport.initSsl(tomcat);
 
         tomcat.start();
@@ -60,9 +63,12 @@ public class TestWebSocketFrameClient extends TomcatBaseTest {
                 ContainerProvider.getWebSocketContainer();
         ClientEndpointConfig clientEndpointConfig =
                 ClientEndpointConfig.Builder.create().build();
+        URL truststoreUrl = this.getClass().getClassLoader().getResource(
+                "org/apache/tomcat/util/net/ca.jks");
+        File truststoreFile = new File(truststoreUrl.toURI());
         clientEndpointConfig.getUserProperties().put(
                 WsWebSocketContainer.SSL_TRUSTSTORE_PROPERTY,
-                "test/org/apache/tomcat/util/net/ca.jks");
+                truststoreFile.getAbsolutePath());
         Session wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class,
                 clientEndpointConfig,

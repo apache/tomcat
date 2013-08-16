@@ -16,8 +16,10 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.File;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Set;
@@ -790,9 +792,12 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                 ContainerProvider.getWebSocketContainer();
         ClientEndpointConfig clientEndpointConfig =
                 ClientEndpointConfig.Builder.create().build();
+        URL truststoreUrl = this.getClass().getClassLoader().getResource(
+                "org/apache/tomcat/util/net/ca.jks");
+        File truststoreFile = new File(truststoreUrl.toURI());
         clientEndpointConfig.getUserProperties().put(
                 WsWebSocketContainer.SSL_TRUSTSTORE_PROPERTY,
-                "test/org/apache/tomcat/util/net/ca.jks");
+                truststoreFile.getAbsolutePath());
         Session wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class,
                 clientEndpointConfig,
