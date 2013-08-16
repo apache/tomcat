@@ -79,6 +79,7 @@
     </subpackage>
   </subpackage>
   <subpackage name="coyote">
+    <allow pkg="javax.servlet"/>
     <allow pkg="org.apache.coyote"/>
     <allow pkg="org.apache.juli"/>
     <allow pkg="org.apache.tomcat.jni"/>
