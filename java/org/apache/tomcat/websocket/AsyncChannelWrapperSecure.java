@@ -88,10 +88,10 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
     }
 
     @Override
-    public <A> void read(ByteBuffer dst, A attachment,
-            CompletionHandler<Integer,? super A> handler) {
+    public <B,A extends B> void read(ByteBuffer dst, A attachment,
+            CompletionHandler<Integer,B> handler) {
 
-        WrapperFuture<Integer,? super A> future =
+        WrapperFuture<Integer,B> future =
                 new WrapperFuture<>(handler, attachment);
 
         if (!reading.compareAndSet(false, true)) {
@@ -124,11 +124,11 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
     }
 
     @Override
-    public <A> void write(ByteBuffer[] srcs, int offset, int length,
+    public <B,A extends B> void write(ByteBuffer[] srcs, int offset, int length,
             long timeout, TimeUnit unit, A attachment,
-            CompletionHandler<Long,? super A> handler) {
+            CompletionHandler<Long,B> handler) {
 
-        WrapperFuture<Long,? super A> future =
+        WrapperFuture<Long,B> future =
                 new WrapperFuture<>(handler, attachment);
 
         if (!writing.compareAndSet(false, true)) {

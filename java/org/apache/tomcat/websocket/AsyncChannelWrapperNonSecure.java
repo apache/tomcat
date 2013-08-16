@@ -47,8 +47,8 @@ public class AsyncChannelWrapperNonSecure implements AsyncChannelWrapper {
     }
 
     @Override
-    public <A> void read(ByteBuffer dst, A attachment,
-            CompletionHandler<Integer,? super A> handler) {
+    public <B,A extends B> void read(ByteBuffer dst, A attachment,
+            CompletionHandler<Integer,B> handler) {
         socketChannel.read(dst, attachment, handler);
     }
 
@@ -58,9 +58,9 @@ public class AsyncChannelWrapperNonSecure implements AsyncChannelWrapper {
     }
 
     @Override
-    public <A> void write(ByteBuffer[] srcs, int offset, int length,
+    public <B,A extends B> void write(ByteBuffer[] srcs, int offset, int length,
             long timeout, TimeUnit unit, A attachment,
-            CompletionHandler<Long,? super A> handler) {
+            CompletionHandler<Long,B> handler) {
         socketChannel.write(
                 srcs, offset, length, timeout, unit, attachment, handler);
     }
