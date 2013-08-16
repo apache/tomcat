@@ -37,6 +37,7 @@ import org.apache.coyote.http11.filters.SavedRequestInputFilter;
 import org.apache.coyote.http11.filters.VoidInputFilter;
 import org.apache.coyote.http11.filters.VoidOutputFilter;
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
+import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.Ascii;
@@ -258,11 +259,18 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     /**
      * Listener to which data available events are passed once the associated
-     * connection has completed the HTTP upgrade process.
+     * connection has completed the proprietary Tomcat HTTP upgrade process.
      */
     protected UpgradeInbound upgradeInbound = null;
 
 
+    /**
+     * Instance of the new protocol to use after the HTTP connection has been
+     * upgraded using the Servlet 3.1 based upgrade process.
+     */
+    protected HttpUpgradeHandler httpUpgradeHandler = null;
+    
+    
     public AbstractHttp11Processor(AbstractEndpoint endpoint) {
         super(endpoint);
         userDataHelper = new UserDataHelper(getLog());
@@ -848,6 +856,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             upgradeInbound = (UpgradeInbound) param;
             // Stop further HTTP output
             getOutputBuffer().finished = true;
+        } else if (actionCode == ActionCode.UPGRADE) {
+            httpUpgradeHandler = (HttpUpgradeHandler) param;
+            // Stop further HTTP output
+            getOutputBuffer().finished = true;
         } else {
             actionInternal(actionCode, param);
         }
@@ -923,7 +935,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
         while (!error && keepAlive && !comet && !isAsync() &&
-                upgradeInbound == null && !endpoint.isPaused()) {
+                upgradeInbound == null &&
+                httpUpgradeHandler == null && !endpoint.isPaused()) {
 
             // Parsing the request header
             try {
@@ -1630,13 +1643,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     @Override
-    public boolean isUpgrade() {
-        return upgradeInbound != null;
-    }
-
-
-
-    @Override
     public SocketState upgradeDispatch() throws IOException {
         // Should never reach this code but in case we do...
         // TODO
@@ -1651,6 +1657,26 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     }
 
 
+    @Override
+    public boolean isUpgrade() {
+        return httpUpgradeHandler != null;
+    }
+    
+    
+    @Override
+    public SocketState upgradeDispatch(SocketStatus status) throws IOException {
+        // Should never reach this code but in case we do...
+        throw new IOException(
+                sm.getString("ajpprocessor.httpupgrade.notsupported"));
+    }
+
+
+    @Override
+    public HttpUpgradeHandler getHttpUpgradeHandler() {
+        return httpUpgradeHandler;
+    }
+    
+    
     /**
      * Provides a mechanism for those connector implementations (currently only
      * NIO) that need to reset timeouts from Async timeouts to standard HTTP
@@ -1717,6 +1743,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             asyncStateMachine.recycle();
         }
         upgradeInbound = null;
+        httpUpgradeHandler = null;
         remoteAddr = null;
         remoteHost = null;
         localAddr = null;

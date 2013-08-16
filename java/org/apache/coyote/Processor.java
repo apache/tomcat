@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.concurrent.Executor;
 
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
+import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -43,6 +44,9 @@ public interface Processor<S> {
     UpgradeInbound getUpgradeInbound();
     SocketState upgradeDispatch() throws IOException;
 
+    HttpUpgradeHandler getHttpUpgradeHandler();
+    SocketState upgradeDispatch(SocketStatus status) throws IOException;
+    
     boolean isComet();
     boolean isAsync();
     boolean isUpgrade();

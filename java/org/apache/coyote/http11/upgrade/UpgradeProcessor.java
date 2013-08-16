@@ -21,6 +21,7 @@ import java.util.concurrent.Executor;
 
 import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
+import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -84,15 +85,29 @@ public abstract class UpgradeProcessor<S> implements Processor<S> {
     }
 
     @Override
-    public final boolean isUpgrade() {
-        return true;
-    }
-
-    @Override
     public final void recycle(boolean socketClosing) {
         // Currently a NO-OP as upgrade processors are not recycled.
     }
 
+    
+    // Servlet 3.1 based HTTP upgrade mechanism. NO-OPs for the proprietary
+    // Tomcat upgrade mechanism.
+    @Override
+    public HttpUpgradeHandler getHttpUpgradeHandler() {
+        return null;
+    }
+
+    @Override
+    public SocketState upgradeDispatch(SocketStatus status) throws IOException {
+        return null;
+    }
+
+    @Override
+    public boolean isUpgrade() {
+        return false;
+    }
+    
+    
     // NO-OP methods for upgrade
     @Override
     public final Executor getExecutor() {

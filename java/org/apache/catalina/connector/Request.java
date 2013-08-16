@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
@@ -40,6 +41,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.naming.NamingException;
 import javax.security.auth.Subject;
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
@@ -75,6 +77,7 @@ import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.StringParser;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
+import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -2819,7 +2822,7 @@ public class Request
     }
 
 
-    // --------------------------------------------------------- Upgrade Methods
+    // --------------------------------- Tomcat proprietary HTTP upgrade methods
 
     public void doUpgrade(UpgradeInbound inbound)
             throws IOException {
@@ -2830,6 +2833,35 @@ public class Request
         // already been set.
         response.setStatus(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
         response.flushBuffer();
+    }
+
+
+    // ---------------------------------- Servlet 3.1 based HTTP upgrade methods
+
+    @SuppressWarnings("unchecked")
+    public <T extends HttpUpgradeHandler> T upgrade(
+            Class<T> httpUpgradeHandlerClass) throws ServletException {
+            
+        T handler;
+        try {
+            handler = (T) context.getInstanceManager().newInstance(httpUpgradeHandlerClass);
+        } catch (InstantiationException e) {
+            throw new ServletException(e);
+        } catch (IllegalAccessException e) {
+            throw new ServletException(e);
+        } catch (InvocationTargetException e) {
+            throw new ServletException(e);
+        } catch (NamingException e) {
+            throw new ServletException(e);
+        }
+
+        coyoteRequest.action(ActionCode.UPGRADE, handler);
+
+        // Output required by RFC2616. Protocol specific headers should have
+        // already been set.
+        response.setStatus(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
+
+        return handler;
     }
 
 
