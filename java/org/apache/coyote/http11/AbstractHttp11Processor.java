@@ -1116,6 +1116,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             return SocketState.CLOSED;
         } else if (isAsync() || comet) {
             return SocketState.LONG;
+        } else if (isUpgrade()) {
+            return SocketState.UPGRADING;
         } else if (getUpgradeInbound() != null) {
             return SocketState.UPGRADING_TOMCAT;
         } else {

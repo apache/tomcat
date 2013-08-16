@@ -20,8 +20,10 @@ import java.io.IOException;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
+import org.apache.coyote.http11.upgrade.AprProcessor;
 import org.apache.coyote.http11.upgrade.UpgradeAprProcessor;
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
+import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -319,6 +321,15 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                 SocketWrapper<Long> socket, UpgradeInbound inbound)
                 throws IOException {
             return new UpgradeAprProcessor(socket, inbound);
+        }
+        
+        @Override
+        protected Processor<Long> createUpgradeProcessor(
+                SocketWrapper<Long> socket,
+                HttpUpgradeHandler httpUpgradeProcessor)
+                throws IOException {
+            return new AprProcessor(socket, httpUpgradeProcessor,
+                    (AprEndpoint) proto.endpoint);
         }
     }
 }

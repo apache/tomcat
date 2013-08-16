@@ -31,6 +31,8 @@ import javax.management.ObjectName;
 
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
+import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
+import org.apache.coyote.http11.upgrade.servlet31.WebConnection;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
@@ -602,7 +604,27 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                         state = processor.asyncPostProcess();
                     }
 
-                    if (state == SocketState.UPGRADING_TOMCAT) {
+                    if (state == SocketState.UPGRADING) {
+                        // Get the HTTP upgrade handler
+                        HttpUpgradeHandler httpUpgradeHandler =
+                                processor.getHttpUpgradeHandler();
+                        // Release the Http11 processor to be re-used
+                        release(wrapper, processor, false, false);
+                        // Create the upgrade processor
+                        processor = createUpgradeProcessor(
+                                wrapper, httpUpgradeHandler);
+                        // Mark the connection as upgraded
+                        wrapper.setUpgraded(true);
+                        // Associate with the processor with the connection
+                        connections.put(socket, processor);
+                        // Initialise the upgrade handler (which may trigger
+                        // some IO using the new protocol which is why the lines
+                        // above are necessary)
+                        // This cast should be safe. If it fails the error
+                        // handling for the surrounding try/catch will deal with
+                        // it.
+                        httpUpgradeHandler.init((WebConnection) processor);
+                    } else if (state == SocketState.UPGRADING_TOMCAT) {
                         // Get the UpgradeInbound handler
                         UpgradeInbound inbound = processor.getUpgradeInbound();
                         // Release the Http11 processor to be re-used
@@ -612,6 +634,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                         inbound.onUpgradeComplete();
                     }
                 } while (state == SocketState.ASYNC_END ||
+                        state == SocketState.UPGRADING ||
                         state == SocketState.UPGRADING_TOMCAT);
 
                 if (state == SocketState.LONG) {
@@ -676,7 +699,10 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         protected abstract Processor<S> createUpgradeProcessor(
                 SocketWrapper<S> socket,
                 UpgradeInbound inbound) throws IOException;
-
+        protected abstract Processor<S> createUpgradeProcessor(
+                SocketWrapper<S> socket,
+                HttpUpgradeHandler httpUpgradeProcessor) throws IOException;
+        
         protected void register(AbstractProcessor<S> processor) {
             if (getProtocol().getDomain() != null) {
                 synchronized (this) {
