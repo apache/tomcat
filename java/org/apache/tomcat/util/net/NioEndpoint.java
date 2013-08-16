@@ -1256,11 +1256,11 @@ public class NioEndpoint extends AbstractEndpoint {
                                 //read goes before write
                                 if (sk.isReadable()) {
                                     //read notification
-                                    if (!processSocket(channel, SocketStatus.OPEN, true))
+                                    if (!processSocket(channel, SocketStatus.OPEN_READ, true))
                                         processSocket(channel, SocketStatus.DISCONNECT, true);
                                 } else {
                                     //future placement of a WRITE notif
-                                    if (!processSocket(channel, SocketStatus.OPEN, true))
+                                    if (!processSocket(channel, SocketStatus.OPEN_READ, true))
                                         processSocket(channel, SocketStatus.DISCONNECT, true);
                                 }
                             } else {
@@ -1436,7 +1436,7 @@ public class NioEndpoint extends AbstractEndpoint {
                         ka.setCometNotify(false);
                         reg(key,ka,0);//avoid multiple calls, this gets reregistered after invocation
                         //if (!processSocket(ka.getChannel(), SocketStatus.OPEN_CALLBACK)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT);
-                        if (!processSocket(ka.getChannel(), SocketStatus.OPEN, true)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT, true);
+                        if (!processSocket(ka.getChannel(), SocketStatus.OPEN_READ, true)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT, true);
                     } else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ ||
                               (ka.interestOps()&SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
                         //only timeout sockets that we are waiting for a read from
@@ -1691,7 +1691,7 @@ public class NioEndpoint extends AbstractEndpoint {
                         if (status == null) {
                             state = handler.process(
                                     (KeyAttachment) key.attachment(),
-                                    SocketStatus.OPEN);
+                                    SocketStatus.OPEN_READ);
                         } else {
                             state = handler.process(
                                     (KeyAttachment) key.attachment(),
@@ -1757,7 +1757,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 } finally {
                     if (launch) {
                         try {
-                            getExecutor().execute(new SocketProcessor(socket, SocketStatus.OPEN));
+                            getExecutor().execute(new SocketProcessor(socket, SocketStatus.OPEN_READ));
                         } catch (NullPointerException npe) {
                             if (running) {
                                 log.error(sm.getString("endpoint.launch.fail"),

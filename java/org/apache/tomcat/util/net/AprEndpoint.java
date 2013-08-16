@@ -1369,7 +1369,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     // Check for failed sockets and hand this socket off to a worker
                     if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                             || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
-                            || (comet && (!processSocket(desc[n*2+1], SocketStatus.OPEN)))
+                            || (comet && (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)))
                             || (!comet && (!processSocket(desc[n*2+1])))) {
                         // Close socket and clear pool
                         if (comet) {
@@ -1808,7 +1808,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                     // Process the request from this socket
                     Handler.SocketState state = handler.process(socket,
-                            SocketStatus.OPEN);
+                            SocketStatus.OPEN_READ);
                     if (state == Handler.SocketState.CLOSED) {
                         // Close socket and pool
                         destroySocket(socket.getSocket().longValue());
@@ -1849,7 +1849,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 // Process the request from this socket
                 SocketState state = SocketState.OPEN;
                 if (status == null) {
-                    state = handler.process(socket,SocketStatus.OPEN);
+                    state = handler.process(socket,SocketStatus.OPEN_READ);
                 } else {
                     state = handler.process(socket, status);
                 }
@@ -1864,7 +1864,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                 } else if (state == Handler.SocketState.ASYNC_END) {
                     socket.access();
-                    SocketProcessor proc = new SocketProcessor(socket, SocketStatus.OPEN);
+                    SocketProcessor proc = new SocketProcessor(socket, SocketStatus.OPEN_READ);
                     getExecutor().execute(proc);
                 }
             }

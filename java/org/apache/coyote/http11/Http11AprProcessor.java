@@ -455,13 +455,13 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             comet = false;
         } else if (actionCode == ActionCode.COMET_CLOSE) {
             ((AprEndpoint)endpoint).processSocketAsync(this.socket,
-                    SocketStatus.OPEN);
+                    SocketStatus.OPEN_READ);
         } else if (actionCode == ActionCode.COMET_SETTIMEOUT) {
             //no op
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
             if (asyncStateMachine.asyncComplete()) {
                 ((AprEndpoint)endpoint).processSocketAsync(this.socket,
-                        SocketStatus.OPEN);
+                        SocketStatus.OPEN_READ);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param==null) {
@@ -472,7 +472,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
                 ((AprEndpoint)endpoint).processSocketAsync(this.socket,
-                        SocketStatus.OPEN);
+                        SocketStatus.OPEN_READ);
             }
         }
 

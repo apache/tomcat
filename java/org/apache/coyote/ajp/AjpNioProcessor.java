@@ -253,7 +253,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         if (actionCode == ActionCode.ASYNC_COMPLETE) {
             if (asyncStateMachine.asyncComplete()) {
                 ((NioEndpoint)endpoint).processSocket(this.socket,
-                        SocketStatus.OPEN, false);
+                        SocketStatus.OPEN_READ, false);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param == null) return;
@@ -265,7 +265,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
                 ((NioEndpoint)endpoint).processSocket(this.socket,
-                        SocketStatus.OPEN, true);
+                        SocketStatus.OPEN_READ, true);
             }
         }
     }
