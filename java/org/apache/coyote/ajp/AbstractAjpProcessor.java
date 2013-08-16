@@ -536,9 +536,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
     @Override
     public UpgradeInbound getUpgradeInbound() {
-        // Should never reach this code but in case we do...
-        throw new IllegalStateException(
-                sm.getString("ajpprocessor.httpupgrade.notsupported"));
+        // Can't throw exception as this is used to test if connection has been
+        // upgraded using Tomcat's proprietary HTTP upgrade mechanism.
+        return null;
     }
 
 
