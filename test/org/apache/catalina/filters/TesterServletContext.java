@@ -36,6 +36,10 @@ import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
+import org.apache.catalina.core.ApplicationFilterRegistration;
+import org.apache.catalina.core.TesterContext;
+import org.apache.catalina.deploy.FilterDef;
+
 public class TesterServletContext implements ServletContext {
 
     @Override
@@ -137,8 +141,7 @@ public class TesterServletContext implements ServletContext {
 
     @Override
     public String getInitParameter(String name) {
-
-        throw new RuntimeException("Not implemented");
+        return null;
     }
 
     @Override
@@ -230,7 +233,8 @@ public class TesterServletContext implements ServletContext {
     @Override
     public javax.servlet.FilterRegistration.Dynamic addFilter(
             String filterName, Filter filter) {
-        throw new RuntimeException("Not implemented");
+        return new ApplicationFilterRegistration(
+                new FilterDef(), new TesterContext());
     }
 
     @Override
