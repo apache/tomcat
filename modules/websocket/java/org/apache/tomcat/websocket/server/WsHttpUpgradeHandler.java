@@ -20,19 +20,19 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.servlet.ReadListener;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.WebConnection;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 
+import org.apache.coyote.http11.upgrade.AbstractServletInputStream;
+import org.apache.coyote.http11.upgrade.AbstractServletOutputStream;
+import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
+import org.apache.coyote.http11.upgrade.servlet31.ReadListener;
+import org.apache.coyote.http11.upgrade.servlet31.WebConnection;
+import org.apache.coyote.http11.upgrade.servlet31.WriteListener;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -91,8 +91,8 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
 
         this.connection = connection;
 
-        ServletInputStream sis;
-        ServletOutputStream sos;
+        AbstractServletInputStream sis;
+        AbstractServletOutputStream sos;
         try {
             sis = connection.getInputStream();
             sos = connection.getOutputStream();

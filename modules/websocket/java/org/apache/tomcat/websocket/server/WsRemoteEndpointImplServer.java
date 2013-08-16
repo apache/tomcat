@@ -25,6 +25,7 @@ import javax.servlet.ServletOutputStream;
 import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
 
+import org.apache.coyote.http11.upgrade.AbstractServletOutputStream;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -42,7 +43,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private static final Log log =
             LogFactory.getLog(WsHttpUpgradeHandler.class);
 
-    private final ServletOutputStream sos;
+    private final AbstractServletOutputStream sos;
     private final WsWriteTimeout wsWriteTimeout;
     private volatile SendHandler handler = null;
     private volatile ByteBuffer[] buffers = null;
@@ -51,7 +52,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private volatile boolean close;
 
 
-    public WsRemoteEndpointImplServer(ServletOutputStream sos,
+    public WsRemoteEndpointImplServer(AbstractServletOutputStream sos,
             WsServerContainer serverContainer) {
         this.sos = sos;
         this.wsWriteTimeout = serverContainer.getTimeout();

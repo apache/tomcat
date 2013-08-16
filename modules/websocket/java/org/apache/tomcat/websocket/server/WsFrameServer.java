@@ -19,18 +19,17 @@ package org.apache.tomcat.websocket.server;
 import java.io.EOFException;
 import java.io.IOException;
 
-import javax.servlet.ServletInputStream;
-
+import org.apache.coyote.http11.upgrade.AbstractServletInputStream;
 import org.apache.tomcat.websocket.WsFrameBase;
 import org.apache.tomcat.websocket.WsSession;
 
 public class WsFrameServer extends WsFrameBase {
 
-    private final ServletInputStream sis;
+    private final AbstractServletInputStream sis;
     private final Object connectionReadLock = new Object();
 
 
-    public WsFrameServer(ServletInputStream sis, WsSession wsSession) {
+    public WsFrameServer(AbstractServletInputStream sis, WsSession wsSession) {
         super(wsSession);
         this.sis = sis;
     }
