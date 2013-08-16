@@ -32,14 +32,14 @@ public interface AsyncChannelWrapper {
 
     Future<Integer> read(ByteBuffer dst);
 
-    <A> void read(ByteBuffer dst, A attachment,
-            CompletionHandler<Integer,? super A> handler);
+    <B,A extends B> void read(ByteBuffer dst, A attachment,
+            CompletionHandler<Integer,B> handler);
 
     Future<Integer> write(ByteBuffer src);
 
-    <A> void write(ByteBuffer[] srcs, int offset, int length, long timeout,
-            TimeUnit unit, A attachment,
-            CompletionHandler<Long,? super A> handler);
+    <B,A extends B> void write(ByteBuffer[] srcs, int offset, int length,
+            long timeout, TimeUnit unit, A attachment,
+            CompletionHandler<Long,B> handler);
 
     void close();
 
