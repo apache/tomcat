@@ -92,7 +92,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
             CompletionHandler<Integer,B> handler) {
 
         WrapperFuture<Integer,B> future =
-                new WrapperFuture<>(handler, attachment);
+                new WrapperFuture<Integer, B>(handler, attachment);
 
         if (!reading.compareAndSet(false, true)) {
             throw new IllegalStateException(sm.getString(
@@ -129,7 +129,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
             CompletionHandler<Long,B> handler) {
 
         WrapperFuture<Long,B> future =
-                new WrapperFuture<>(handler, attachment);
+                new WrapperFuture<Long, B>(handler, attachment);
 
         if (!writing.compareAndSet(false, true)) {
             throw new IllegalStateException(sm.getString(
