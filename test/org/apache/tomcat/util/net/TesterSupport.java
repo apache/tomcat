@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -84,18 +85,25 @@ public final class TesterSupport {
     protected static void initSsl(Tomcat tomcat, String keystore,
             String keystorePass, String keyPass) {
 
+        ClassLoader cl = TesterSupport.class.getClassLoader();
+
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
         if (protocol.indexOf("Apr") == -1) {
             Connector connector = tomcat.getConnector();
             connector.setProperty("sslProtocol", "tls");
-            File keystoreFile =
-                new File("test/org/apache/tomcat/util/net/" + keystore);
+            
+            java.net.URL keyStoreUrl =
+                    cl.getResource("org/apache/tomcat/util/net/" + keystore);
+            File keystoreFile = toFile(keyStoreUrl);
             connector.setAttribute("keystoreFile",
                     keystoreFile.getAbsolutePath());
-            File truststoreFile = new File(
-                    "test/org/apache/tomcat/util/net/ca.jks");
+            
+            java.net.URL truststoreUrl =
+                    cl.getResource("org/apache/tomcat/util/net/ca.jks");
+            File truststoreFile = toFile(truststoreUrl);
             connector.setAttribute("truststoreFile",
                     truststoreFile.getAbsolutePath());
+            
             if (keystorePass != null) {
                 connector.setAttribute("keystorePass", keystorePass);
             }
@@ -103,23 +111,34 @@ public final class TesterSupport {
                 connector.setAttribute("keyPass", keyPass);
             }
         } else {
-            File keystoreFile = new File(
-                    "test/org/apache/tomcat/util/net/localhost-cert.pem");
+            java.net.URL keyStoreUrl =
+                    cl.getResource("org/apache/tomcat/util/net/localhost-cert.pem");
+            File keystoreFile = toFile(keyStoreUrl);
             tomcat.getConnector().setAttribute("SSLCertificateFile",
                     keystoreFile.getAbsolutePath());
-            keystoreFile = new File(
-                    "test/org/apache/tomcat/util/net/localhost-key.pem");
+            
+            java.net.URL sslCertificateKeyUrl =
+                    cl.getResource("org/apache/tomcat/util/net/localhost-key.pem");
+            File sslCertificateKeyFile = toFile(sslCertificateKeyUrl);
             tomcat.getConnector().setAttribute("SSLCertificateKeyFile",
-                    keystoreFile.getAbsolutePath());
+                    sslCertificateKeyFile.getAbsolutePath());
         }
         tomcat.getConnector().setSecure(true);
         tomcat.getConnector().setProperty("SSLEnabled", "true");
     }
 
+    private static File toFile(java.net.URL url) {
+        try {
+            return new File(url.toURI());
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+    
     protected static KeyManager[] getUser1KeyManagers() throws Exception {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(
                 KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(getKeyStore("test/org/apache/tomcat/util/net/user1.jks"),
+        kmf.init(getKeyStore("org/apache/tomcat/util/net/user1.jks"),
                 "changeit".toCharArray());
         return kmf.getKeyManagers();
     }
@@ -127,7 +146,7 @@ public final class TesterSupport {
     protected static TrustManager[] getTrustManagers() throws Exception {
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(
                 TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(getKeyStore("test/org/apache/tomcat/util/net/ca.jks"));
+        tmf.init(getKeyStore("org/apache/tomcat/util/net/ca.jks"));
         return tmf.getTrustManagers();
     }
 
@@ -146,7 +165,9 @@ public final class TesterSupport {
     }
 
     private static KeyStore getKeyStore(String keystore) throws Exception {
-        File keystoreFile = new File(keystore);
+        ClassLoader cl = TesterSupport.class.getClassLoader();
+        java.net.URL keystoreUrl = cl.getResource(keystore);
+        File keystoreFile = toFile(keystoreUrl);
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream is = null;
         try {
