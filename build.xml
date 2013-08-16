@@ -1146,6 +1146,15 @@
       <include name="org/apache/**" />
       <include name="javax/**" />
     </javac>
+    <!-- Copy static resource files the tests need to load via the class     -->
+    <!-- loader.                                                             -->
+    <copy todir="${test.classes}" encoding="ISO-8859-1">
+      <filterset refid="version.filters"/>
+      <fileset dir="test">
+        <include name="**/*.jks"/>
+        <include name="**/*.pem"/>
+      </fileset>
+    </copy>
   </target>
 
   <!-- Default JUnit log output formatter -->
