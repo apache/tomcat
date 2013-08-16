@@ -40,7 +40,7 @@ import javax.websocket.Extension;
 import javax.websocket.HandshakeResponse;
 import javax.websocket.server.ServerEndpointConfig;
 
-import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.RequestFacade;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.websocket.Constants;
 import org.apache.tomcat.websocket.WsHandshakeResponse;
@@ -172,8 +172,9 @@ public class UpgradeUtil {
             }
         }
 
+        // TODO: Check if the request is wrapped and unwrap it if necessary.
         WsHttpUpgradeHandler wsHandler =
-                ((Request) req).upgrade(WsHttpUpgradeHandler.class);
+                ((RequestFacade) req).upgrade(WsHttpUpgradeHandler.class);
         wsHandler.preInit(ep, sec, sc, wsRequest, subProtocol,
                 pathParams, req.isSecure());
 
