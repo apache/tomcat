@@ -185,7 +185,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             encoders={MsgStringEncoder.class, MsgByteEncoder.class})
     public static class Client {
 
-        private Queue<Object> received = new ConcurrentLinkedQueue<>();
+        private Queue<Object> received = new ConcurrentLinkedQueue<Object>();
 
         @OnMessage
         public void rx(MsgString in) {
@@ -205,8 +205,8 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             configurator=SingletonConfigurator.class)
     public static class Server {
 
-        private Queue<Object> received = new ConcurrentLinkedQueue<>();
-        static HashMap<String, Boolean> lifeCyclesCalled = new HashMap<>(8);
+        private Queue<Object> received = new ConcurrentLinkedQueue<Object>();
+        static HashMap<String, Boolean> lifeCyclesCalled = new HashMap<String, Boolean>(8);
 
         @OnMessage
         public MsgString rx(MsgString in) {
@@ -236,7 +236,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     public static class MsgByteMessageHandler implements
             MessageHandler.Whole<MsgByte> {
 
-        public static Queue<Object> received = new ConcurrentLinkedQueue<>();
+        public static Queue<Object> received = new ConcurrentLinkedQueue<Object>();
         private final Session session;
 
         public MsgByteMessageHandler(Session session) {
@@ -251,7 +251,9 @@ public class TestEncodingDecoding extends TomcatBaseTest {
                 MsgByte msg = new MsgByte();
                 msg.setData("got it".getBytes());
                 session.getBasicRemote().sendObject(msg);
-            } catch (IOException | EncodeException e) {
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            } catch (EncodeException e) {
                 throw new IllegalStateException(e);
             }
         }
@@ -261,7 +263,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     public static class MsgStringMessageHandler
             implements MessageHandler.Whole<MsgString>{
 
-        public static Queue<Object> received = new ConcurrentLinkedQueue<>();
+        public static Queue<Object> received = new ConcurrentLinkedQueue<Object>();
         private final Session session;
 
         public MsgStringMessageHandler(Session session) {
@@ -275,7 +277,9 @@ public class TestEncodingDecoding extends TomcatBaseTest {
                 MsgByte msg = new MsgByte();
                 msg.setData(MESSAGE_ONE.getBytes());
                 session.getBasicRemote().sendObject(msg);
-            } catch (IOException | EncodeException e) {
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (EncodeException e) {
                 e.printStackTrace();
             }
         }
@@ -424,14 +428,14 @@ public class TestEncodingDecoding extends TomcatBaseTest {
                     }
                     @Override
                     public List<Class<? extends Encoder>> getEncoders() {
-                        List<Class<? extends Encoder>> encoders = new ArrayList<>(2);
+                        List<Class<? extends Encoder>> encoders = new ArrayList<Class<? extends Encoder>>(2);
                         encoders.add(MsgStringEncoder.class);
                         encoders.add(MsgByteEncoder.class);
                         return encoders;
                     }
                     @Override
                     public List<Class<? extends Decoder>> getDecoders() {
-                        List<Class<? extends Decoder>> decoders = new ArrayList<>(2);
+                        List<Class<? extends Decoder>> decoders = new ArrayList<Class<? extends Decoder>>(2);
                         decoders.add(MsgStringDecoder.class);
                         decoders.add(MsgByteDecoder.class);
                         return decoders;

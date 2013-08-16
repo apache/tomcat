@@ -533,7 +533,9 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                             ByteBuffer.wrap(MESSAGE_BINARY_4K));
                     f.get();
                 }
-            } catch (ExecutionException | InterruptedException e) {
+            } catch (ExecutionException e) {
+                exception = e;
+            } catch (InterruptedException e) {
                 exception = e;
             }
             timeout = System.currentTimeMillis() - lastSend;

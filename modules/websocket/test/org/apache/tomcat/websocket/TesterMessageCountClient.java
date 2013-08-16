@@ -111,7 +111,7 @@ public class TesterMessageCountClient {
 
         private final CountDownLatch latch;
 
-        private final List<T> messages = new CopyOnWriteArrayList<>();
+        private final List<T> messages = new CopyOnWriteArrayList<T>();
 
         public BasicHandler(CountDownLatch latch) {
             this.latch = latch;
@@ -176,7 +176,7 @@ public class TesterMessageCountClient {
 
         private final CountDownLatch latch;
 
-        private final List<T> messages = new CopyOnWriteArrayList<>();
+        private final List<T> messages = new CopyOnWriteArrayList<T>();
 
         public AsyncHandler(CountDownLatch latch) {
             this.latch = latch;
