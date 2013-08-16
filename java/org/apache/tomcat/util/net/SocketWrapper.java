@@ -61,7 +61,6 @@ public class SocketWrapper<E> {
      * writes.
      */
     private final Object writeThreadLock = new Object();
-    public Object getWriteThreadLock() { return writeThreadLock; }
 
     private Set<DispatchType> dispatches = new LinkedHashSet<>();
 
@@ -113,6 +112,7 @@ public class SocketWrapper<E> {
     public WriteLock getBlockingStatusWriteLock() {
         return blockingStatusWriteLock;
     }
+    public Object getWriteThreadLock() { return writeThreadLock; }
     public void addDispatch(DispatchType dispatchType) {
         dispatches.add(dispatchType);
     }
