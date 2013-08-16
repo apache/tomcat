@@ -588,7 +588,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                         state = processor.asyncDispatch(status);
                     } else if (processor.isComet()) {
                         state = processor.event(status);
-                    } else if (processor.isUpgrade()) {
+                    } else if (processor.getUpgradeInbound() != null) {
                         state = processor.upgradeDispatch();
                     } else {
                         state = processor.process(socket);
