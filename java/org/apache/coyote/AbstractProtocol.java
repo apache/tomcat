@@ -590,6 +590,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                         state = processor.event(status);
                     } else if (processor.getUpgradeInbound() != null) {
                         state = processor.upgradeDispatch();
+                    } else if (processor.isUpgrade()) {
+                        state = processor.upgradeDispatch(status);
                     } else {
                         state = processor.process(socket);
                     }
@@ -598,7 +600,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                         state = processor.asyncPostProcess();
                     }
 
-                    if (state == SocketState.UPGRADING) {
+                    if (state == SocketState.UPGRADING_TOMCAT) {
                         // Get the UpgradeInbound handler
                         UpgradeInbound inbound = processor.getUpgradeInbound();
                         // Release the Http11 processor to be re-used
@@ -608,7 +610,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                         inbound.onUpgradeComplete();
                     }
                 } while (state == SocketState.ASYNC_END ||
-                        state == SocketState.UPGRADING);
+                        state == SocketState.UPGRADING_TOMCAT);
 
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the

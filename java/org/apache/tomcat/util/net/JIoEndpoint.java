@@ -324,7 +324,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                             // Ignore
                         }
                     } else if (state == SocketState.OPEN ||
-                            state == SocketState.UPGRADING  ||
+                            state == SocketState.UPGRADING_TOMCAT  ||
                             state == SocketState.UPGRADED){
                         socket.setKeptAlive(true);
                         socket.access();
