@@ -42,6 +42,7 @@ import javax.servlet.http.Part;
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
+import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -1101,5 +1102,10 @@ public class RequestFacade implements HttpServletRequest {
     public void doUpgrade(UpgradeInbound inbound)
             throws IOException {
         request.doUpgrade(inbound);
+    }
+    
+    public <T extends HttpUpgradeHandler> T upgrade(
+            Class<T> httpUpgradeHandlerClass) throws ServletException {
+        return request.upgrade(httpUpgradeHandlerClass);
     }
 }
