@@ -85,7 +85,7 @@ public class WsSession implements Session {
     private MessageHandler.Whole<PongMessage> pongMessageHandler = null;
     private volatile State state = State.OPEN;
     private final Object stateLock = new Object();
-    private final Map<String,Object> userProperties = new ConcurrentHashMap<>();
+    private final Map<String,Object> userProperties = new ConcurrentHashMap<String, Object>();
     private volatile int maxBinaryMessageBufferSize =
             Constants.DEFAULT_BUFFER_SIZE;
     private volatile int maxTextMessageBufferSize =
@@ -223,7 +223,7 @@ public class WsSession implements Session {
     @Override
     public Set<MessageHandler> getMessageHandlers() {
         checkState();
-        Set<MessageHandler> result = new HashSet<>();
+        Set<MessageHandler> result = new HashSet<MessageHandler>();
         if (binaryMessageHandler != null) {
             result.add(binaryMessageHandler);
         }

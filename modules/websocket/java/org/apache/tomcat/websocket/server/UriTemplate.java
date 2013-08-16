@@ -35,7 +35,7 @@ public class UriTemplate {
             StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final String normalized;
-    private final Map<String,Segment> segments = new LinkedHashMap<>();
+    private final Map<String,Segment> segments = new LinkedHashMap<String, Segment>();
     private final boolean hasParameters;
 
 
@@ -88,7 +88,7 @@ public class UriTemplate {
 
     public Map<String,String> match(UriTemplate candidate) {
 
-        Map<String,String> result = new HashMap<>();
+        Map<String,String> result = new HashMap<String, String>();
 
         // Should not happen but for safety
         if (candidate.getSegmentCount() != getSegmentCount()) {

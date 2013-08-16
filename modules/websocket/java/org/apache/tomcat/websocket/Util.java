@@ -58,7 +58,7 @@ public class Util {
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
     private static final Queue<SecureRandom> randoms =
-            new ConcurrentLinkedQueue<>();
+            new ConcurrentLinkedQueue<SecureRandom>();
 
     private Util() {
         // Hide default constructor
@@ -289,7 +289,7 @@ public class Util {
             Class<? extends Decoder>[] decoderClazzes)
                     throws DeploymentException{
 
-        List<DecoderEntry> result = new ArrayList<>();
+        List<DecoderEntry> result = new ArrayList<DecoderEntry>();
         for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
             // Need to instantiate decoder to ensure it is valid and that
             // deployment can be failed if it is not
@@ -297,7 +297,11 @@ public class Util {
             Decoder instance;
             try {
                 instance = decoderClazz.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException e) {
+                throw new DeploymentException(
+                        sm.getString("pojoMethodMapping.invalidDecoder",
+                                decoderClazz.getName()), e);
+            } catch (IllegalAccessException e) {
                 throw new DeploymentException(
                         sm.getString("pojoMethodMapping.invalidDecoder",
                                 decoderClazz.getName()), e);
@@ -318,7 +322,7 @@ public class Util {
         Class<?> target = Util.getMessageType(listener);
 
         // Will never be more than 2 types
-        Set<MessageHandlerResult> results = new HashSet<>(2);
+        Set<MessageHandlerResult> results = new HashSet<MessageHandlerResult>(2);
 
         // Simple cases - handlers already accepts one of the types expected by
         // the frame handling code
@@ -409,7 +413,10 @@ public class Util {
     private static Method getOnMessageMethod(MessageHandler listener) {
         try {
             return listener.getClass().getMethod("onMessage", Object.class);
-        } catch (NoSuchMethodException | SecurityException e) {
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(
+                    sm.getString("util.invalidMessageHandler"), e);
+        } catch ( SecurityException e) {
             throw new IllegalArgumentException(
                     sm.getString("util.invalidMessageHandler"), e);
         }
@@ -418,9 +425,9 @@ public class Util {
     public static class DecoderMatch {
 
         private final List<Class<? extends Decoder>> textDecoders =
-                new ArrayList<>();
+                new ArrayList<Class<? extends Decoder>>();
         private final List<Class<? extends Decoder>> binaryDecoders =
-                new ArrayList<>();
+                new ArrayList<Class<? extends Decoder>>();
 
 
         public DecoderMatch(Class<?> target, List<DecoderEntry> decoderEntries) {

@@ -73,14 +73,14 @@ public class WsServerContainer extends WsWebSocketContainer
 
     private final ServletContext servletContext;
     private final Map<String,ServerEndpointConfig> configExactMatchMap =
-            new ConcurrentHashMap<>();
+            new ConcurrentHashMap<String, ServerEndpointConfig>();
     private final ConcurrentHashMap<Integer,SortedSet<TemplatePathMatch>>
-            configTemplateMatchMap = new ConcurrentHashMap<>();
+            configTemplateMatchMap = new ConcurrentHashMap<Integer, SortedSet<TemplatePathMatch>>();
     private volatile boolean enforceNoAddAfterHandshake =
             org.apache.tomcat.websocket.Constants.STRICT_SPEC_COMPLIANCE;
     private volatile boolean addAllowed = true;
     private final ConcurrentHashMap<String,Set<WsSession>> authenticatedSessions =
-            new ConcurrentHashMap<>();
+            new ConcurrentHashMap<String, Set<WsSession>>();
 
     WsServerContainer(ServletContext servletContext) {
 
@@ -147,7 +147,7 @@ public class WsServerContainer extends WsWebSocketContainer
             if (templateMatches == null) {
                 // Ensure that if concurrent threads execute this block they
                 // both end up using the same TreeSet instance
-                templateMatches = new TreeSet<>(
+                templateMatches = new TreeSet<TemplatePathMatch>(
                         TemplatePathMatchComparator.getInstance());
                 configTemplateMatchMap.putIfAbsent(key, templateMatches);
                 templateMatches = configTemplateMatchMap.get(key);
@@ -202,7 +202,12 @@ public class WsServerContainer extends WsWebSocketContainer
         if (!configuratorClazz.equals(Configurator.class)) {
             try {
                 configurator = annotation.configurator().newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException e) {
+                throw new DeploymentException(sm.getString(
+                        "serverContainer.configuratorFail",
+                        annotation.configurator().getName(),
+                        pojo.getClass().getName()), e);
+            } catch (IllegalAccessException e) {
                 throw new DeploymentException(sm.getString(
                         "serverContainer.configuratorFail",
                         annotation.configurator().getName(),
@@ -387,7 +392,10 @@ public class WsServerContainer extends WsWebSocketContainer
             Encoder instance;
             try {
                 encoder.newInstance();
-            } catch(InstantiationException | IllegalAccessException e) {
+            } catch(InstantiationException e) {
+                throw new DeploymentException(sm.getString(
+                        "serverContainer.encoderFail", encoder.getName()), e);
+            } catch (IllegalAccessException e) {
                 throw new DeploymentException(sm.getString(
                         "serverContainer.encoderFail", encoder.getName()), e);
             }

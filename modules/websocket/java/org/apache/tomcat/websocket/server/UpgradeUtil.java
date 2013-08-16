@@ -52,7 +52,7 @@ public class UpgradeUtil {
             "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(
                     StandardCharsets.ISO_8859_1);
     private static final Queue<MessageDigest> sha1Helpers =
-            new ConcurrentLinkedQueue<>();
+            new ConcurrentLinkedQueue<MessageDigest>();
 
     private UpgradeUtil() {
         // Utility class. Hide default constructor.
@@ -207,7 +207,7 @@ public class UpgradeUtil {
      */
     private static List<String> getTokensFromHeader(HttpServletRequest req,
             String headerName) {
-        List<String> result = new ArrayList<>();
+        List<String> result = new ArrayList<String>();
         Enumeration<String> headers = req.getHeaders(headerName);
         while (headers.hasMoreElements()) {
             String header = headers.nextElement();

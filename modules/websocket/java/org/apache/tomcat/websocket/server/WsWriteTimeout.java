@@ -34,7 +34,7 @@ import org.apache.tomcat.websocket.BackgroundProcessManager;
 public class WsWriteTimeout implements BackgroundProcess {
 
     private final Set<WsRemoteEndpointImplServer> endpoints =
-            new ConcurrentSkipListSet<>(new EndpointComparator());
+            new ConcurrentSkipListSet<WsRemoteEndpointImplServer>(new EndpointComparator());
     private final AtomicInteger count = new AtomicInteger(0);
     private int backgroundProcessCount = 0;
     private volatile int processPeriod = 1;

@@ -57,7 +57,7 @@ public class DefaultServerEndpointConfigurator
     public List<Extension> getNegotiatedExtensions(List<Extension> installed,
             List<Extension> requested) {
 
-        List<Extension> result = new ArrayList<>();
+        List<Extension> result = new ArrayList<Extension>();
         for (Extension request : requested) {
             if (installed.contains(request)) {
                 result.add(request);

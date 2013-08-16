@@ -175,8 +175,11 @@ public interface ServerEndpointConfig extends EndpointConfig {
                             (Class<Configurator>) Class.forName(
                                     DEFAULT_IMPL_CLASSNAME);
                     result = clazz.newInstance();
-                } catch (ClassNotFoundException | InstantiationException |
-                        IllegalAccessException e) {
+                } catch (ClassNotFoundException e) {
+                    // No options left. Just return null.
+                } catch (InstantiationException e) {
+                    // No options left. Just return null.
+                } catch (IllegalAccessException e) {
                     // No options left. Just return null.
                 }
             }

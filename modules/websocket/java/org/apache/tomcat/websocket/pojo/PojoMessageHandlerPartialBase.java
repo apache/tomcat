@@ -69,7 +69,9 @@ public abstract class PojoMessageHandlerPartialBase<T>
         Object result;
         try {
             result = method.invoke(pojo, parameters);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
+            throw new IllegalArgumentException(e);
+        } catch (InvocationTargetException e) {
             throw new IllegalArgumentException(e);
         }
         processResult(result);

@@ -51,9 +51,9 @@ public class WsSci implements ServletContainerInitializer {
         }
 
         // Group the discovered classes by type
-        Set<ServerApplicationConfig> serverApplicationConfigs = new HashSet<>();
-        Set<Class<? extends Endpoint>> scannedEndpointClazzes = new HashSet<>();
-        Set<Class<?>> scannedPojoEndpoints = new HashSet<>();
+        Set<ServerApplicationConfig> serverApplicationConfigs = new HashSet<ServerApplicationConfig>();
+        Set<Class<? extends Endpoint>> scannedEndpointClazzes = new HashSet<Class<? extends Endpoint>>();
+        Set<Class<?>> scannedPojoEndpoints = new HashSet<Class<?>>();
 
         try {
             // wsPackage is "javax.websocket."
@@ -84,13 +84,15 @@ public class WsSci implements ServletContainerInitializer {
                     scannedPojoEndpoints.add(clazz);
                 }
             }
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException e) {
+            throw new ServletException(e);
+        } catch (IllegalAccessException e) {
             throw new ServletException(e);
         }
 
         // Filter the results
-        Set<ServerEndpointConfig> filteredEndpointConfigs = new HashSet<>();
-        Set<Class<?>> filteredPojoEndpoints = new HashSet<>();
+        Set<ServerEndpointConfig> filteredEndpointConfigs = new HashSet<ServerEndpointConfig>();
+        Set<Class<?>> filteredPojoEndpoints = new HashSet<Class<?>>();
 
         if (serverApplicationConfigs.isEmpty()) {
             filteredPojoEndpoints.addAll(scannedPojoEndpoints);

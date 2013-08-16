@@ -47,7 +47,7 @@ public class BackgroundProcessManager {
         return instance;
     }
 
-    private final Set<BackgroundProcess> processes = new HashSet<>();
+    private final Set<BackgroundProcess> processes = new HashSet<BackgroundProcess>();
     private final Object processesLock = new Object();
     private WsBackgroundThread wsBackgroundThread = null;
 
@@ -82,7 +82,7 @@ public class BackgroundProcessManager {
 
 
     private void process() {
-        Set<BackgroundProcess> currentProcesses = new HashSet<>();
+        Set<BackgroundProcess> currentProcesses = new HashSet<BackgroundProcess>();
         synchronized (processesLock) {
             currentProcesses.addAll(processes);
         }

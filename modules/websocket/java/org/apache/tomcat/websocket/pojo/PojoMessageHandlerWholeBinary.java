@@ -41,7 +41,7 @@ public class PojoMessageHandlerWholeBinary
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
 
-    private final List<Decoder> decoders = new ArrayList<>();
+    private final List<Decoder> decoders = new ArrayList<Decoder>();
 
     private final boolean isForInputStream;
 
@@ -71,7 +71,9 @@ public class PojoMessageHandlerWholeBinary
                     }
                 }
             }
-        } catch (IllegalAccessException | InstantiationException e) {
+        } catch (IllegalAccessException e) {
+            throw new IllegalArgumentException(e);
+        } catch (InstantiationException e) {
             throw new IllegalArgumentException(e);
         }
         this.isForInputStream = isForInputStream;

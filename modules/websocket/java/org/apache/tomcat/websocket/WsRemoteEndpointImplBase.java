@@ -61,7 +61,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     private final Log log = LogFactory.getLog(WsRemoteEndpointImplBase.class);
 
     private boolean messagePartInProgress = false;
-    private final Queue<MessagePart> messagePartQueue = new ArrayDeque<>();
+    private final Queue<MessagePart> messagePartQueue = new ArrayDeque<MessagePart>();
     private final Object messagePartLock = new Object();
     private boolean dataMessageInProgress = false;
 
@@ -80,7 +80,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     private final AtomicBoolean batchingAllowed = new AtomicBoolean(false);
     private volatile long sendTimeout = -1;
     private WsSession wsSession;
-    private List<EncoderEntry> encoderEntries = new ArrayList<>();
+    private List<EncoderEntry> encoderEntries = new ArrayList<EncoderEntry>();
 
     public long getSendTimeout() {
         return sendTimeout;
@@ -198,8 +198,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             } else {
                 f2sh.get(timeout, TimeUnit.MILLISECONDS);
             }
-        } catch (InterruptedException | ExecutionException |
-                TimeoutException e) {
+        } catch (InterruptedException e) {
+            throw new IOException(e);
+        } catch (ExecutionException e) {
+            throw new IOException(e);
+        } catch (TimeoutException e) {
             throw new IOException(e);
         }
     }
@@ -216,8 +219,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             } else {
                 f2sh.get(timeout, TimeUnit.MILLISECONDS);
             }
-        } catch (InterruptedException | ExecutionException |
-                TimeoutException e) {
+        } catch (InterruptedException e) {
+            throw new IOException(e);
+        } catch (ExecutionException e) {
+            throw new IOException(e);
+        } catch (TimeoutException e) {
             throw new IOException(e);
         }
     }
@@ -437,7 +443,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         Future<Void> f = sendObjectByFuture(obj);
         try {
             f.get();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
+            throw new IOException(e);
+        } catch (ExecutionException e) {
             throw new IOException(e);
         }
     }
@@ -465,23 +473,46 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 String msg = ((Encoder.Text) encoder).encode(obj);
                 sendStringByCompletion(msg, completion);
             } else if (encoder instanceof Encoder.TextStream) {
-                try (Writer w = getSendWriter()) {
+                Writer w = null;
+                try {
+                    w = getSendWriter();
                     ((Encoder.TextStream) encoder).encode(obj, w);
+                } finally {
+                    if (w != null) {
+                        try {
+                            w.close();
+                        } catch (IOException ioe) {
+                            // Ignore
+                        }
+                    }
                 }
                 completion.onResult(new SendResult());
             } else if (encoder instanceof Encoder.Binary) {
                 ByteBuffer msg = ((Encoder.Binary) encoder).encode(obj);
                 sendBytesByCompletion(msg, completion);
             } else if (encoder instanceof Encoder.BinaryStream) {
-                try (OutputStream os = getSendStream()) {
+                OutputStream os = null;
+                try {
+                    os = getSendStream();
                     ((Encoder.BinaryStream) encoder).encode(obj, os);
+                } finally {
+                    if (os != null) {
+                        try {
+                            os.close();
+                        } catch (IOException ioe) {
+                            // Ignore
+                        }
+                    }
                 }
                 completion.onResult(new SendResult());
             } else {
                 throw new EncodeException(obj, sm.getString(
                         "wsRemoteEndpoint.noEncoder", obj.getClass()));
             }
-        } catch (EncodeException | IOException e) {
+        } catch (EncodeException e) {
+            SendResult sr = new SendResult(e);
+            completion.onResult(sr);
+        } catch (IOException e) {
             SendResult sr = new SendResult(e);
             completion.onResult(sr);
         }
@@ -502,7 +533,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             try {
                 instance = encoderClazz.newInstance();
                 instance.init(endpointConfig);
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException e) {
+                throw new DeploymentException(
+                        sm.getString("wsRemoteEndpoint.invalidEncoder",
+                                encoderClazz.getName()), e);
+            } catch (IllegalAccessException e) {
                 throw new DeploymentException(
                         sm.getString("wsRemoteEndpoint.invalidEncoder",
                                 encoderClazz.getName()), e);

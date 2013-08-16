@@ -26,7 +26,7 @@ final class DefaultClientEndpointConfig implements ClientEndpointConfig {
     private final List<Extension> extensions;
     private final List<Class<? extends Encoder>> encoders;
     private final List<Class<? extends Decoder>> decoders;
-    private final Map<String,Object> userProperties = new ConcurrentHashMap<>();
+    private final Map<String,Object> userProperties = new ConcurrentHashMap<String, Object>();
     private final Configurator configurator;
 
 
