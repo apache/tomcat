@@ -23,15 +23,15 @@ import java.util.Map;
  * Model of a Tag Library Validator from the XML descriptor.
  */
 public class Validator {
-    private String validationClass;
+    private String validatorClass;
     private Map<String, String> initParams;
 
-    public String getValidationClass() {
-        return validationClass;
+    public String getValidatorClass() {
+        return validatorClass;
     }
 
-    public void setValidationClass(String validationClass) {
-        this.validationClass = validationClass;
+    public void setValidatorClass(String validatorClass) {
+        this.validatorClass = validatorClass;
     }
 
     public void addInitParam(String name, String value) {

@@ -38,6 +38,7 @@ public class TaglibXml {
     private String info;
     private Validator validator;
     private List<Tag> tags;
+    private List<TagFile> tagFiles;
     private List<String> listeners;
     private List<FunctionInfo> functions;
 
@@ -100,6 +101,17 @@ public class TaglibXml {
         return tags;
     }
 
+    public void addTagFile(TagFile tag) {
+        if (tagFiles == null) {
+            tagFiles = new ArrayList<>();
+        }
+        tagFiles.add(tag);
+    }
+
+    public List<TagFile> getTagFiles() {
+        return tagFiles;
+    }
+
     public void addListener(String listener) {
         if (listeners == null) {
             listeners = new ArrayList<>();
@@ -111,11 +123,11 @@ public class TaglibXml {
         return listeners;
     }
 
-    public void addFunction(FunctionInfo functionInfo) {
+    public void addFunction(String name, String klass, String signature) {
         if (functions == null) {
             functions = new ArrayList<>();
         }
-        functions.add(functionInfo);
+        functions.add(new FunctionInfo(name, klass, signature));
     }
 
     public List<FunctionInfo> getFunctions() {
