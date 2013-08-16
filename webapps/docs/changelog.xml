@@ -108,6 +108,11 @@
         ServletContext. (markt)
       </fix>
       <fix>
+        <bug>55354</bug>: Ensure that the naming context environment parameters
+        are restored after associating the Principle with the user name. Based
+        on patch provided by Richard Begg. (violetagg)
+      </fix>
+      <fix>
         <bug>55357</bug>: Ensure the web application class loader is set as a
         thread context class loader during session deserialization. (violetagg)
       </fix>
