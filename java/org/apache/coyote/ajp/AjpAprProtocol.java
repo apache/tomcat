@@ -136,7 +136,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
                 ((AprEndpoint)proto.endpoint).getPoller().add(
                         socket.getSocket().longValue(),
                         proto.endpoint.getKeepAliveTimeout(),
-                        AprEndpoint.Poller.FLAGS_READ);
+                        true, false);
             }
         }
 

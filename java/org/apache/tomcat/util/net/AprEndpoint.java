@@ -1230,18 +1230,32 @@ public class AprEndpoint extends AbstractEndpoint {
             }
         }
 
+        
         /**
          * Add specified socket and associated pool to the poller. The socket
          * will be added to a temporary array, and polled first after a maximum
          * amount of time equal to pollTime (in most cases, latency will be much
-         * lower, however).
+         * lower, however). Note: If both read and write are false, the socket
+         * will only be checked for timeout; if the socket was already present
+         * in the poller, a callback event will be generated and the socket will
+         * be removed from the poller.
          *
-         * @param socket    to add to the poller
-         * @param timeout   read timeout (in milliseconds) to use with this
-         *                  socket. Use -1 for infinite timeout
-         * @param flags     flags that define the events that are to be polled
-         *                  for
+         * @param socket to add to the poller
+         * @param timeout to use for this connection
+         * @param read to do read polling
+         * @param write to do write polling
          */
+        public void add(long socket, int timeout, boolean read, boolean write) {
+            add(socket, timeout,
+                    (read ? Poll.APR_POLLIN : 0) |
+                    (write ? Poll.APR_POLLOUT : 0));
+        }
+
+        /**
+         * @deprecated  Use {@link #add(long, int, boolean, boolean)}. This
+         *              method will be made private in Tomcat 8
+         */
+        @Deprecated
         public void add(long socket, int timeout, int flags) {
             synchronized (this) {
                 // Add socket to the list. Newly added sockets will wait
