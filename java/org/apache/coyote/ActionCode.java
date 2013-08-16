@@ -197,7 +197,12 @@ public enum ActionCode {
     ASYNC_IS_ERROR,
 
     /**
-     * Callback to trigger the HTTP upgrade process.
+     * Callback to trigger Tomcat's proprietary HTTP upgrade process.
+     */
+    UPGRADE_TOMCAT,
+    
+    /**
+     * Callback to trigger the Servlet 3.1 based HTTP upgrade process.
      */
     UPGRADE
 }

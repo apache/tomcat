@@ -844,7 +844,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
         } else if (actionCode == ActionCode.ASYNC_IS_ERROR) {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
-        } else if (actionCode == ActionCode.UPGRADE) {
+        } else if (actionCode == ActionCode.UPGRADE_TOMCAT) {
             upgradeInbound = (UpgradeInbound) param;
             // Stop further HTTP output
             getOutputBuffer().finished = true;

@@ -2824,7 +2824,7 @@ public class Request
     public void doUpgrade(UpgradeInbound inbound)
             throws IOException {
 
-        coyoteRequest.action(ActionCode.UPGRADE, inbound);
+        coyoteRequest.action(ActionCode.UPGRADE_TOMCAT, inbound);
 
         // Output required by RFC2616. Protocol specific headers should have
         // already been set.
