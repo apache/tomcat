@@ -16,6 +16,10 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
 public class SocketWrapper<E> {
 
     protected volatile E socket;
@@ -28,8 +32,29 @@ public class SocketWrapper<E> {
     protected boolean async = false;
     protected boolean keptAlive = false;
 
+    /*
+     * Used if block/non-blocking is set at the socket level. The client is
+     * responsible for the thread-safe use of this field via the locks provided.
+     */
+    private volatile boolean blockingStatus = true;
+    private final Lock blockingStatusReadLock;
+    private final WriteLock blockingStatusWriteLock;
+
+    /*
+     * In normal servlet processing only one thread is allowed to access the
+     * socket at a time. That is controlled by a lock on the socket for both
+     * read and writes). When HTTP upgrade is used, one read thread and one
+     * write thread are allowed to access the socket concurrently. In this case
+     * the lock on the socket is used for reads and the lock below is used for
+     * writes.
+     */
+    private final Object writeThreadLock = new Object();
+
     public SocketWrapper(E socket) {
         this.socket = socket;
+        ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+        this.blockingStatusReadLock = lock.readLock();
+        this.blockingStatusWriteLock =lock.writeLock();
     }
 
     public E getSocket() {
@@ -49,4 +74,13 @@ public class SocketWrapper<E> {
     public int decrementKeepAlive() { return (--keepAliveLeft);}
     public boolean isKeptAlive() {return keptAlive;}
     public void setKeptAlive(boolean keptAlive) {this.keptAlive = keptAlive;}
+    public boolean getBlockingStatus() { return blockingStatus; }
+    public void setBlockingStatus(boolean blockingStatus) {
+        this.blockingStatus = blockingStatus;
+    }
+    public Lock getBlockingStatusReadLock() { return blockingStatusReadLock; }
+    public WriteLock getBlockingStatusWriteLock() {
+        return blockingStatusWriteLock;
+    }
+    public Object getWriteThreadLock() { return writeThreadLock; }
 }
