@@ -40,6 +40,7 @@ import javax.websocket.Extension;
 import javax.websocket.HandshakeResponse;
 import javax.websocket.server.ServerEndpointConfig;
 
+import org.apache.catalina.connector.Request;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.websocket.Constants;
 import org.apache.tomcat.websocket.WsHandshakeResponse;
@@ -172,7 +173,7 @@ public class UpgradeUtil {
         }
 
         WsHttpUpgradeHandler wsHandler =
-                req.upgrade(WsHttpUpgradeHandler.class);
+                ((Request) req).upgrade(WsHttpUpgradeHandler.class);
         wsHandler.preInit(ep, sec, sc, wsRequest, subProtocol,
                 pathParams, req.isSecure());
 
