@@ -639,8 +639,8 @@
     <Or>
       <Method name="testBasicPrefix" />
       <Method name="testQuote2" />
-      <Method name="testDuplicate" />
+      <Method name="testDuplicate01" />
     </Or>
-    <Bug  pattern="DLS_DEAD_LOCAL_STORE"/>
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
 </FindBugsFilter>
