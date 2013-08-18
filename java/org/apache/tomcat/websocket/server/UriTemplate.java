@@ -16,10 +16,13 @@
  */
 package org.apache.tomcat.websocket.server;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.websocket.DeploymentException;
 
@@ -35,7 +38,7 @@ public class UriTemplate {
             StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final String normalized;
-    private final Map<String,Segment> segments = new LinkedHashMap<>();
+    private final List<Segment> segments = new ArrayList<>();
     private final boolean hasParameters;
 
 
@@ -47,6 +50,7 @@ public class UriTemplate {
         }
 
         StringBuilder normalized = new StringBuilder(path.length());
+        Set<String> paramNames = new HashSet<>();
 
         String[] segments = path.split("/");
         int paramCount = 0;
@@ -65,6 +69,10 @@ public class UriTemplate {
                 normalized.append('{');
                 normalized.append(paramCount++);
                 normalized.append('}');
+                if (!paramNames.add(segment)) {
+                    throw new IllegalArgumentException(sm.getString(
+                            "uriTemplate.duplicateParameter", segment));
+                }
             } else {
                 if (segment.contains("{") || segment.contains("}")) {
                     throw new IllegalArgumentException(sm.getString(
@@ -72,12 +80,7 @@ public class UriTemplate {
                 }
                 normalized.append(segment);
             }
-            Segment old =
-                    this.segments.put(segment, new Segment(index, segment));
-            if (old != null) {
-                throw new IllegalArgumentException(
-                        sm.getString("uriTemplate.duplicateName", segment));
-            }
+            this.segments.add(new Segment(index, segment));
             segmentCount++;
         }
 
@@ -96,8 +99,8 @@ public class UriTemplate {
         }
 
         Iterator<Segment> candidateSegments =
-                candidate.getSegments().values().iterator();
-        Iterator<Segment> targetSegments = segments.values().iterator();
+                candidate.getSegments().iterator();
+        Iterator<Segment> targetSegments = segments.iterator();
 
         while (candidateSegments.hasNext()) {
             Segment candidateSegment = candidateSegments.next();
@@ -136,7 +139,7 @@ public class UriTemplate {
     }
 
 
-    private Map<String,Segment> getSegments() {
+    private List<Segment> getSegments() {
         return segments;
     }
 

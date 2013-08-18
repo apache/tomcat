@@ -141,7 +141,7 @@ public class TestUriTemplate {
         Map<String,String> result = t.match(new UriTemplate("/a"));
 
         Assert.assertNull(result);
-   }
+    }
 
 
     @Test
@@ -150,12 +150,23 @@ public class TestUriTemplate {
         Map<String,String> result = t.match(new UriTemplate("/a/b/c"));
 
         Assert.assertNull(result);
-   }
+    }
 
 
     @Test(expected=java.lang.IllegalArgumentException.class)
-    public void testDuplicate() throws Exception {
+    public void testDuplicate01() throws Exception {
         @SuppressWarnings("unused")
         UriTemplate t = new UriTemplate("/{var}/{var}");
-   }
+    }
+
+
+    @Test
+    public void testDuplicate02() throws Exception {
+        UriTemplate t = new UriTemplate("/{a}/{b}");
+        Map<String,String> result = t.match(new UriTemplate("/x/x"));
+
+        Assert.assertEquals(2, result.size());
+        Assert.assertEquals("x", result.get("a"));
+        Assert.assertEquals("x", result.get("b"));
+    }
 }
