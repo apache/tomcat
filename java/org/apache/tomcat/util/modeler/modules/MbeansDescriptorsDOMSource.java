@@ -36,7 +36,10 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-
+/**
+ * @deprecated Unused: Will be removed in Tomcat 8.0.x
+ */
+@Deprecated
 public class MbeansDescriptorsDOMSource extends ModelerSource
 {
     private static final Log log = LogFactory.getLog(MbeansDescriptorsDOMSource.class);
