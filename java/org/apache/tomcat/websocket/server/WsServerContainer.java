@@ -318,7 +318,8 @@ public class WsServerContainer extends WsWebSocketContainer
     @Override
     protected void registerSession(Endpoint endpoint, WsSession wsSession) {
         super.registerSession(endpoint, wsSession);
-        if (wsSession.getUserPrincipal() != null &&
+        if (wsSession.isOpen() &&
+                wsSession.getUserPrincipal() != null &&
                 wsSession.getHttpSessionId() != null) {
             registerAuthenticatedSession(wsSession,
                     wsSession.getHttpSessionId());
