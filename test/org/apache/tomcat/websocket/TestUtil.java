@@ -26,6 +26,11 @@ import org.junit.Test;
 
 public class TestUtil {
 
+    // Used to init SecureRandom prior to running tests
+    public static void generateMask() {
+        Util.generateMask();
+    }
+
     @Test
     public void testGetMessageTypeSimple() {
         Assert.assertEquals(
