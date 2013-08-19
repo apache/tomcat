@@ -38,6 +38,7 @@ import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.descriptor.web.ApplicationListener;
+import org.apache.tomcat.websocket.TestUtil;
 import org.apache.tomcat.websocket.pojo.TesterUtil.ServerConfigListener;
 import org.apache.tomcat.websocket.pojo.TesterUtil.SingletonConfigurator;
 
@@ -45,6 +46,7 @@ public class TestPojoEndpointBase extends TomcatBaseTest {
 
     @Test
     public void testBug54716() throws Exception {
+        TestUtil.generateMask();
         // Set up utility classes
         Bug54716 server = new Bug54716();
         SingletonConfigurator.setInstance(server);
