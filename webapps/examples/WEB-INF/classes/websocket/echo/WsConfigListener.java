@@ -23,8 +23,6 @@ import javax.websocket.DeploymentException;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
-import org.apache.tomcat.websocket.server.Constants;
-
 @WebListener
 public class WsConfigListener implements ServletContextListener {
 
@@ -32,7 +30,7 @@ public class WsConfigListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         ServerContainer sc =
                 (ServerContainer) sce.getServletContext().getAttribute(
-                        Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
+                        "javax.websocket.server.ServerContainer");
         try {
             sc.addEndpoint(ServerEndpointConfig.Builder.create(
                     EchoEndpoint.class, "/websocket/echoProgrammatic").build());
