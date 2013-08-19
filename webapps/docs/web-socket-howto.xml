@@ -44,7 +44,7 @@
 <p>There are several example applications that demonstrate how the WebSocket API
    can be used. You will need to look at both the client side <a
    href="http://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/websocket/">
-   html</a> and the server side <a
+   HTML</a> and the server side <a
    href="http://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/WEB-INF/classes/websocket/">
    code</a>.</p>
 </section>
@@ -79,7 +79,7 @@
    <code>org.apache.tomcat.websocket.noAddAfterHandshake</code> servlet context
    initialization parameter. The default may be changed by setting the
    <code>org.apache.tomcat.websocket.STRICT_SPEC_COMPLIANCE</code> system
-   property to <code>true</code> but any explict setting on the servlet context
+   property to <code>true</code> but any explicit setting on the servlet context
    will always take priority.</p>
 </section>
 
