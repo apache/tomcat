@@ -2461,9 +2461,7 @@ public class Request
      * of the request body has been read
      */
     public boolean isFinished() {
-        AtomicBoolean result = new AtomicBoolean(false);
-        coyoteRequest.action(ActionCode.REQUEST_BODY_FULLY_READ, result);
-        return result.get();
+        return coyoteRequest.isFinished();
     }
 
 
