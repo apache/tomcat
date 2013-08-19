@@ -128,15 +128,7 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
             sos.setWriteListener(
                     new WsWriteListener(this, wsRemoteEndpointServer));
             ep.onOpen(wsSession, endpointConfig);
-            // If onOpen event throws an exception, the session will be closed.
-            if (wsSession.isOpen()) {
-                webSocketContainer.registerSession(ep, wsSession);
-            } else {
-                // Have to throw a RuntimeException to signal that init() failed
-                // as API offers no other options.
-                throw new IllegalStateException(
-                        sm.getString("wsHttpUpgradeHandler.initFailed"));
-            }
+            webSocketContainer.registerSession(ep, wsSession);
         } catch (DeploymentException e) {
             throw new IllegalArgumentException(e);
         } finally {
