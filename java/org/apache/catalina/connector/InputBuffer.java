@@ -258,14 +258,14 @@ public class InputBuffer extends Reader
         // Must call isFinished() first as a call to isReady() if the request
         // has been finished will register the socket for read interest and that
         // is not required.
-        if (isFinished() || isReady()) {
+        if (!coyoteRequest.isFinished() && isReady()) {
             coyoteRequest.action(ActionCode.DISPATCH_READ, null);
         }
     }
 
 
     public boolean isFinished() {
-        return available() == 0;
+        return coyoteRequest.isFinished();
     }
 
 

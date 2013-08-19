@@ -425,8 +425,14 @@ public final class Request {
         this.available = available;
     }
 
-    // -------------------- Input Buffer --------------------
+    public boolean isFinished() {
+        AtomicBoolean result = new AtomicBoolean(false);
+        action(ActionCode.REQUEST_BODY_FULLY_READ, result);
+        return result.get();
+    }
 
+
+    // -------------------- Input Buffer --------------------
 
     public InputBuffer getInputBuffer() {
         return inputBuffer;

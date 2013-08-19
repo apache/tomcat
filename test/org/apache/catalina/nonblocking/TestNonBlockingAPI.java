@@ -316,12 +316,49 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         } catch (Exception e) {
         }
         Assert.assertTrue("Error listener should have been invoked.",
-                servlet.wlistener.onErrorInvoked);
+                servlet.wlistener.onErrorInvoked || servlet.rlistener.onErrorInvoked);
 
         // TODO Figure out why non-blocking writes with the NIO connector appear
         // to be slower on Linux
         alv.validateAccessLog(1, 500, WRITE_PAUSE_MS * 7,
                 WRITE_PAUSE_MS * 7 + 30 * 1000);
+    }
+
+
+    @Test
+    public void testBug55438NonBlockingReadWriteEmptyRead() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        StandardContext ctx = (StandardContext) tomcat.addContext("",
+                System.getProperty("java.io.tmpdir"));
+
+        NBReadWriteServlet servlet = new NBReadWriteServlet();
+        String servletName = NBReadWriteServlet.class.getName();
+        Tomcat.addServlet(ctx, servletName, servlet);
+        ctx.addServletMapping("/", servletName);
+
+        tomcat.start();
+
+        Map<String, List<String>> resHeaders = new HashMap<>();
+        int rc = postUrl(false, new BytesStreamer() {
+            @Override
+            public byte[] next() {
+                return new byte[] {};
+            }
+
+            @Override
+            public int getLength() {
+                return 0;
+            }
+
+            @Override
+            public int available() {
+                return 0;
+            }
+        }, "http://localhost:" +
+                getPort() + "/", new ByteChunk(), resHeaders, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }
 
 
@@ -462,10 +499,31 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
 
     }
+
+    @WebServlet(asyncSupported = true)
+    public class NBReadWriteServlet extends TesterServlet {
+        private static final long serialVersionUID = 1L;
+        public volatile TestReadWriteListener rwlistener;
+
+        @Override
+        protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            // step 1 - start async
+            AsyncContext actx = req.startAsync();
+            actx.setTimeout(Long.MAX_VALUE);
+
+            // step 2 - notify on read
+            ServletInputStream in = req.getInputStream();
+            rwlistener = new TestReadWriteListener(actx);
+            in.setReadListener(rwlistener);
+        }
+    }
+
     private class TestReadListener implements ReadListener {
         private final AsyncContext ctx;
         private final StringBuilder body = new StringBuilder();
         private final boolean usingNonBlockingWrite;
+        public volatile boolean onErrorInvoked = false;
+
 
         public TestReadListener(AsyncContext ctx,
                 boolean usingNonBlockingWrite) {
@@ -515,6 +573,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         public void onError(Throwable throwable) {
             log.info("ReadListener.onError");
             throwable.printStackTrace();
+            onErrorInvoked = true;
         }
     }
 
@@ -559,6 +618,62 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             log.info("WriteListener.onError");
             throwable.printStackTrace();
             onErrorInvoked = true;
+        }
+
+    }
+
+    private class TestReadWriteListener implements ReadListener {
+        AsyncContext ctx;
+        private final StringBuilder body = new StringBuilder();
+
+        public TestReadWriteListener(AsyncContext ctx) {
+            this.ctx = ctx;
+        }
+
+        @Override
+        public void onDataAvailable() throws IOException {
+            ServletInputStream in = ctx.getRequest().getInputStream();
+            String s = "";
+            byte[] b = new byte[8192];
+            int read = 0;
+            do {
+                read = in.read(b);
+                if (read == -1) {
+                    break;
+                }
+                s += new String(b, 0, read);
+            } while (in.isReady());
+            log.info("Read [" + s + "]");
+            body.append(s);
+        }
+
+        @Override
+        public void onAllDataRead() throws IOException {
+            log.info("onAllDataRead");
+            ServletOutputStream output = ctx.getResponse().getOutputStream();
+            output.setWriteListener(new WriteListener() {
+                @Override
+                public void onWritePossible() throws IOException {
+                    ServletOutputStream output = ctx.getResponse().getOutputStream();
+                    if (output.isReady()) {
+                        log.info("Writing [" + body.toString() + "]");
+                        output.write(body.toString().getBytes("utf-8"));
+                    }
+                    ctx.complete();
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    log.info("ReadWriteListener.onError");
+                    throwable.printStackTrace();
+                }
+            });
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            log.info("ReadListener.onError");
+            throwable.printStackTrace();
         }
 
     }
