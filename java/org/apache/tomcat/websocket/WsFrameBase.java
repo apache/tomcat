@@ -280,7 +280,7 @@ public abstract class WsFrameBase {
             int code = CloseCodes.NORMAL_CLOSURE.getCode();
             if (controlBufferBinary.remaining() == 1) {
                 controlBufferBinary.clear();
-                // Payload must be zero or greater than 2
+                // Payload must be zero or 2+ bytes long
                 throw new WsIOException(new CloseReason(
                         CloseCodes.PROTOCOL_ERROR,
                         sm.getString("wsFrame.oneByteCloseCode")));
