@@ -22,10 +22,10 @@ package org.apache.coyote.http11.upgrade.servlet31;
 public interface HttpUpgradeHandler {
 
     /**
-     * This method is called once the request/response pair where
-     * {@link HttpServletRequest#upgrade(Class)} is called has completed
-     * processing and is the point where control of the connection passes from
-     * the container to the {@link HttpUpgradeHandler}.
+     * This method is called once the request/response pair where the upgrade
+     * is initiated has completed processing and is the point where control of
+     * the connection passes from the container to the
+     * {@link HttpUpgradeHandler}.
      *
      * @param connection    The connection that has been upgraded
      */

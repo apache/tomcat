@@ -78,8 +78,6 @@ public class MBeanFactory {
      * Construct a <code>ModelMBean</code> with default
      * <code>ModelMBeanInfo</code> information.
      *
-     * @exception javax.management.MBeanException if the initializer of an
-     *  object throws an exception
      * @exception javax.management.RuntimeOperationsException if an
      *  IllegalArgumentException occurs
      */

@@ -148,16 +148,11 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         public void setLimit(int limit) {
             this.limit = limit;
         }
-        /**
-         * @return
-         */
+
         public int getInUsePoolSize() {
             return inuse.size();
         }
 
-        /**
-         * @return
-         */
         public int getInPoolSize() {
             return notinuse.size();
         }
