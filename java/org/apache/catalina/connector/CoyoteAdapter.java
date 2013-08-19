@@ -530,8 +530,7 @@ public class CoyoteAdapter implements Adapter {
             AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
             if (asyncConImpl != null) {
                 async = true;
-                ReadListener readListener =
-                        request.getCoyoteRequest().getReadListener();
+                ReadListener readListener = req.getReadListener();
                 if (readListener != null) {
                     // Possible the all data may have been read during service()
                     // method so this needs to be checked here
