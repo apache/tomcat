@@ -566,7 +566,7 @@ public class JspCompilationContext {
      * Returns null if the given uri is not associated with any tag library
      * 'exposed' in the web application.
      */
-    public TldLocation getTldLocation(String uri) throws JasperException {
+    public TldLocation getTldLocation(String uri) {
         TldLocation location =
                 getOptions().getTldLocationsCache().getLocation(uri);
         return location;
