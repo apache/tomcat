@@ -26,6 +26,10 @@ import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.net.SocketWrapper;
 
+/**
+ * @deprecated  Will be removed in Tomcat 8.0.x.
+ */
+@Deprecated
 public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
 
     private final NioChannel nioChannel;

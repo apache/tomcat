@@ -42,7 +42,10 @@ import org.apache.tomcat.util.res.StringManager;
  * Provides the base implementation of a Servlet for processing WebSocket
  * connections as per RFC6455. It is expected that applications will extend this
  * implementation and provide application specific functionality.
+ * 
+ * @deprecated  Will be removed in Tomcat 8.0.x.
  */
+@Deprecated
 public abstract class WebSocketServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;

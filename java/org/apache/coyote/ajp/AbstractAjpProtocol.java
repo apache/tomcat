@@ -18,7 +18,6 @@ package org.apache.coyote.ajp;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
@@ -91,9 +90,13 @@ public abstract class AbstractAjpProtocol extends AbstractProtocol {
             socket.setAsync(true);
         }
 
+        /**
+         * @deprecated  Will be removed in Tomcat 8.0.x.
+         */
+        @Deprecated
         @Override
         protected P createUpgradeProcessor(SocketWrapper<S> socket,
-                UpgradeInbound inbound) {
+                org.apache.coyote.http11.upgrade.UpgradeInbound inbound) {
             // TODO should fail - throw IOE
             return null;
         }

@@ -29,8 +29,6 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
-import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.servlet31.WebConnection;
 import org.apache.juli.logging.Log;
@@ -556,6 +554,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         }
         
 
+        @SuppressWarnings("deprecation") // Old HTTP upgrade method has been deprecated
         public SocketState process(SocketWrapper<S> wrapper,
                 SocketStatus status) {
             S socket = wrapper.getSocket();
@@ -626,7 +625,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                         httpUpgradeHandler.init((WebConnection) processor);
                     } else if (state == SocketState.UPGRADING_TOMCAT) {
                         // Get the UpgradeInbound handler
-                        UpgradeInbound inbound = processor.getUpgradeInbound();
+                        org.apache.coyote.http11.upgrade.UpgradeInbound inbound =
+                                processor.getUpgradeInbound();
                         // Release the Http11 processor to be re-used
                         release(wrapper, processor, false, false);
                         // Create the light-weight upgrade processor
@@ -656,7 +656,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     longPoll(wrapper, processor);
                 } else {
                     // Connection closed. OK to recycle the processor.
-                    if (!(processor instanceof UpgradeProcessor)) {
+                    if (!(processor instanceof org.apache.coyote.http11.upgrade.UpgradeProcessor)) {
                         release(wrapper, processor, true, false);
                     }
                 }
@@ -682,7 +682,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                         sm.getString("abstractConnectionHandler.error"), e);
             }
             // Don't try to add upgrade processors back into the pool
-            if (!(processor instanceof UpgradeProcessor)) {
+            if (!(processor instanceof org.apache.coyote.http11.upgrade.UpgradeProcessor)) {
                 release(wrapper, processor, true, false);
             }
             return SocketState.CLOSED;
@@ -696,9 +696,13 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         protected abstract void release(SocketWrapper<S> socket,
                 Processor<S> processor, boolean socketClosing,
                 boolean addToPoller);
+        /**
+         * @deprecated  Will be removed in Tomcat 8.0.x.
+         */
+        @Deprecated
         protected abstract Processor<S> createUpgradeProcessor(
                 SocketWrapper<S> socket,
-                UpgradeInbound inbound) throws IOException;
+                org.apache.coyote.http11.upgrade.UpgradeInbound inbound) throws IOException;
         protected abstract Processor<S> createUpgradeProcessor(
                 SocketWrapper<S> socket,
                 HttpUpgradeHandler httpUpgradeProcessor) throws IOException;

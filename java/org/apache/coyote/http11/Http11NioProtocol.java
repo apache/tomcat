@@ -23,8 +23,6 @@ import java.util.Iterator;
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
 import org.apache.coyote.http11.upgrade.NioProcessor;
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
-import org.apache.coyote.http11.upgrade.UpgradeNioProcessor;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -281,11 +279,17 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             return processor;
         }
 
+        /**
+         * @deprecated  Will be removed in Tomcat 8.0.x.
+         */
+        @Deprecated
         @Override
         protected Processor<NioChannel> createUpgradeProcessor(
-                SocketWrapper<NioChannel> socket, UpgradeInbound inbound)
+                SocketWrapper<NioChannel> socket,
+                org.apache.coyote.http11.upgrade.UpgradeInbound inbound)
                 throws IOException {
-            return new UpgradeNioProcessor(socket, inbound,
+            return new org.apache.coyote.http11.upgrade.UpgradeNioProcessor(
+                    socket, inbound,
                     ((Http11NioProtocol) getProtocol()).getEndpoint().getSelectorPool());
         }
         

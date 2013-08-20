@@ -33,7 +33,6 @@ import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -534,8 +533,12 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     }
 
 
+    /**
+     * @deprecated  Will be removed in Tomcat 8.0.x.
+     */
+    @Deprecated
     @Override
-    public UpgradeInbound getUpgradeInbound() {
+    public org.apache.coyote.http11.upgrade.UpgradeInbound getUpgradeInbound() {
         // Can't throw exception as this is used to test if connection has been
         // upgraded using Tomcat's proprietary HTTP upgrade mechanism.
         return null;

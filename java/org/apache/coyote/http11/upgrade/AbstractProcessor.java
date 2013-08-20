@@ -126,6 +126,7 @@ public abstract class AbstractProcessor<S>
     // ------------------ Processor methods for Inbound/Outbound based mechanism
     
     @Override
+    @Deprecated
     public UpgradeInbound getUpgradeInbound() {
         return null;
     }

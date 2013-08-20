@@ -36,7 +36,6 @@ import org.apache.coyote.http11.filters.IdentityOutputFilter;
 import org.apache.coyote.http11.filters.SavedRequestInputFilter;
 import org.apache.coyote.http11.filters.VoidInputFilter;
 import org.apache.coyote.http11.filters.VoidOutputFilter;
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -260,8 +259,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     /**
      * Listener to which data available events are passed once the associated
      * connection has completed the proprietary Tomcat HTTP upgrade process.
+     * 
+     * @deprecated  Will be removed in Tomcat 8.0.x.
      */
-    protected UpgradeInbound upgradeInbound = null;
+    @Deprecated
+    protected org.apache.coyote.http11.upgrade.UpgradeInbound upgradeInbound = null;
 
 
     /**
@@ -751,6 +753,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * @param param Action parameter
      */
     @Override
+    @SuppressWarnings("deprecation") // Inbound/Outbound based upgrade mechanism
     public final void action(ActionCode actionCode, Object param) {
 
         if (actionCode == ActionCode.CLOSE) {
@@ -853,7 +856,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         } else if (actionCode == ActionCode.ASYNC_IS_ERROR) {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
         } else if (actionCode == ActionCode.UPGRADE_TOMCAT) {
-            upgradeInbound = (UpgradeInbound) param;
+            upgradeInbound = (org.apache.coyote.http11.upgrade.UpgradeInbound) param;
             // Stop further HTTP output
             getOutputBuffer().finished = true;
         } else if (actionCode == ActionCode.UPGRADE) {
@@ -1653,8 +1656,12 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     }
 
 
+    /**
+     * @deprecated  Will be removed in Tomcat 8.0.x.
+     */
+    @Deprecated
     @Override
-    public UpgradeInbound getUpgradeInbound() {
+    public org.apache.coyote.http11.upgrade.UpgradeInbound getUpgradeInbound() {
         return upgradeInbound;
     }
 

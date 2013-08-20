@@ -21,8 +21,6 @@ import java.io.IOException;
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
 import org.apache.coyote.http11.upgrade.AprProcessor;
-import org.apache.coyote.http11.upgrade.UpgradeAprProcessor;
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -262,6 +260,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
             // NOOP for APR
         }
 
+        @SuppressWarnings("deprecation") // Inbound/Outbound based upgrade
         @Override
         protected void longPoll(SocketWrapper<Long> socket,
                 Processor<Long> processor) {
@@ -316,11 +315,17 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
             return processor;
         }
 
+        /**
+         * @deprecated  Will be removed in Tomcat 8.0.x.
+         */
+        @Deprecated
         @Override
         protected Processor<Long> createUpgradeProcessor(
-                SocketWrapper<Long> socket, UpgradeInbound inbound)
+                SocketWrapper<Long> socket,
+                org.apache.coyote.http11.upgrade.UpgradeInbound inbound)
                 throws IOException {
-            return new UpgradeAprProcessor(socket, inbound);
+            return new org.apache.coyote.http11.upgrade.UpgradeAprProcessor(
+                    socket, inbound);
         }
         
         @Override

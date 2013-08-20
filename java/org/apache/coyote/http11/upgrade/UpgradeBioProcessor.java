@@ -23,6 +23,10 @@ import java.net.Socket;
 
 import org.apache.tomcat.util.net.SocketWrapper;
 
+/**
+ * @deprecated  Will be removed in Tomcat 8.0.x.
+ */
+@Deprecated
 public class UpgradeBioProcessor extends UpgradeProcessor<Socket> {
 
     private final InputStream inputStream;

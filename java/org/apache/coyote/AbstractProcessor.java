@@ -19,7 +19,6 @@ package org.apache.coyote;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -150,6 +149,10 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     @Override
     public abstract SocketState upgradeDispatch() throws IOException;
 
+    /**
+     * @deprecated  Will be removed in Tomcat 8.0.x.
+     */
+    @Deprecated
     @Override
-    public abstract UpgradeInbound getUpgradeInbound();
+    public abstract org.apache.coyote.http11.upgrade.UpgradeInbound getUpgradeInbound();
 }

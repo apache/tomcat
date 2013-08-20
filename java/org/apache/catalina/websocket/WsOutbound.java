@@ -31,7 +31,10 @@ import org.apache.tomcat.util.res.StringManager;
  * that write to the client (or update a buffer that is later written to the
  * client) are synchronized to prevent multiple threads trying to write to the
  * client at the same time.
+ * 
+ * @deprecated  Will be removed in Tomcat 8.0.x.
  */
+@Deprecated
 public class WsOutbound {
 
     private static final StringManager sm =

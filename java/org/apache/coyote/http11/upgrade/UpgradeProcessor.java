@@ -28,6 +28,10 @@ import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * @deprecated  Will be removed in Tomcat 8.0.x.
+ */
+@Deprecated
 public abstract class UpgradeProcessor<S> implements Processor<S> {
 
     protected static final StringManager sm =

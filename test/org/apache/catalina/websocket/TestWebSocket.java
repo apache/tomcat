@@ -56,6 +56,10 @@ import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.websocket.TesterEchoServer;
 
+/**
+ * @deprecated  Will be removed in Tomcat 8.0.x.
+ */
+@Deprecated
 public class TestWebSocket extends TomcatBaseTest {
 
     private static final String CRLF = "\r\n";

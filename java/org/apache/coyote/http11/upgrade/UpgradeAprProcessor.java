@@ -22,6 +22,10 @@ import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.net.SocketWrapper;
 
+/**
+ * @deprecated  Will be removed in Tomcat 8.0.x.
+ */
+@Deprecated
 public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
 
     private final long socket;

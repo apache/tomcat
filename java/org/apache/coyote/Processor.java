@@ -20,7 +20,6 @@ package org.apache.coyote;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -41,7 +40,15 @@ public interface Processor<S> {
     SocketState asyncDispatch(SocketStatus status);
     SocketState asyncPostProcess();
 
-    UpgradeInbound getUpgradeInbound();
+    /**
+     * @deprecated  Will be removed in Tomcat 8.0.x.
+     */
+    @Deprecated
+    org.apache.coyote.http11.upgrade.UpgradeInbound getUpgradeInbound();
+    /**
+     * @deprecated  Will be removed in Tomcat 8.0.x.
+     */
+    @Deprecated
     SocketState upgradeDispatch() throws IOException;
 
     HttpUpgradeHandler getHttpUpgradeHandler();

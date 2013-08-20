@@ -22,8 +22,6 @@ import java.net.Socket;
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
 import org.apache.coyote.http11.upgrade.BioProcessor;
-import org.apache.coyote.http11.upgrade.UpgradeBioProcessor;
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -187,11 +185,17 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
             return processor;
         }
 
+        /**
+         * @deprecated  Will be removed in Tomcat 8.0.x.
+         */
+        @Deprecated
         @Override
         protected Processor<Socket> createUpgradeProcessor(
-                SocketWrapper<Socket> socket, UpgradeInbound inbound)
+                SocketWrapper<Socket> socket,
+                org.apache.coyote.http11.upgrade.UpgradeInbound inbound)
                 throws IOException {
-            return new UpgradeBioProcessor(socket, inbound);
+            return new org.apache.coyote.http11.upgrade.UpgradeBioProcessor(
+                    socket, inbound);
         }
         
         @Override

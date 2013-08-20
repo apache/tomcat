@@ -76,7 +76,6 @@ import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.StringParser;
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -2824,7 +2823,11 @@ public class Request
 
     // --------------------------------- Tomcat proprietary HTTP upgrade methods
 
-    public void doUpgrade(UpgradeInbound inbound)
+    /**
+     * @deprecated  Will be removed in Tomcat 8.0.x.
+     */
+    @Deprecated
+    public void doUpgrade(org.apache.coyote.http11.upgrade.UpgradeInbound inbound)
             throws IOException {
 
         coyoteRequest.action(ActionCode.UPGRADE_TOMCAT, inbound);

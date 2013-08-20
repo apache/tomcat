@@ -35,7 +35,10 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
  * on streams. Applications should extend this class to provide application
  * specific functionality. Applications that wish to operate on a message basis
  * rather than a stream basis should use {@link MessageInbound}.
+ * 
+ * @deprecated  Will be removed in Tomcat 8.0.x.
  */
+@Deprecated
 public abstract class StreamInbound implements UpgradeInbound {
 
     private final ClassLoader applicationClassLoader;
