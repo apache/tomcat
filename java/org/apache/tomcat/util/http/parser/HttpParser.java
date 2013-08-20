@@ -208,11 +208,13 @@ public class HttpParser {
         while (lookForSemiColon == SkipConstantResult.FOUND) {
             String attribute = readToken(input);
 
+            String value = "";
             if (skipConstant(input, "=") == SkipConstantResult.FOUND) {
-                String value = readTokenOrQuotedString(input, true);
+                value = readTokenOrQuotedString(input, true);
+            }
+
+            if (attribute != null) {
                 parameters.put(attribute.toLowerCase(Locale.ENGLISH), value);
-            } else {
-                parameters.put(attribute.toLowerCase(Locale.ENGLISH), "");
             }
 
             lookForSemiColon = skipConstant(input, ";");
