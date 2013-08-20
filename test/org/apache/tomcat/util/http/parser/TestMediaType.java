@@ -212,6 +212,25 @@ public class TestMediaType {
     }
 
 
+    @Test
+    public void testBug55454() throws IOException {
+        String input = "text/html;;charset=UTF-8";
+
+        StringReader sr = new StringReader(input);
+        MediaType m = HttpParser.parseMediaType(sr);
+
+        assertEquals("text", m.getType());
+        assertEquals("html", m.getSubtype());
+
+        assertTrue(m.getParameterCount() == 1);
+
+        assertEquals("UTF-8", m.getParameterValue("charset"));
+        assertEquals("UTF-8", m.getCharset());
+
+        assertEquals("text/html; charset=UTF-8", m.toString());
+    }
+
+
     private void doTest(Parameter... parameters) throws IOException {
         for (String lws : LWS_VALUES) {
             doTest(lws, parameters);
