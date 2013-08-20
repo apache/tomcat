@@ -121,6 +121,13 @@
         without defining them as warnings. (markt)
       </fix>
       <fix>
+        <bug>55439</bug>: Don&apos;t try a forced stop when <code>stop
+        -force</code> is used if Tomcat has already been stopped. This avoids
+        error messages when the PID file has been cleared. If a forced stop is
+        required, improve handling of the case when the PID file can be read
+        from or written to but not deleted. (markt)
+      </fix>
+      <fix>
         <bug>55454</bug>: Avoid NPE when parsing an incorrect content type.
         (violetagg)
       </fix>

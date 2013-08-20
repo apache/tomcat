@@ -450,6 +450,8 @@ elif [ "$1" = "stop" ] ; then
           if [ $? != 0 ]; then
             if [ -w "$CATALINA_PID" ]; then
               cat /dev/null > "$CATALINA_PID"
+              # If Tomcat has stopped don't try and force a stop with an empty PID file
+              FORCE=0
             else
               echo "Tomcat stopped but the PID file could not be removed or cleared."
             fi
@@ -484,7 +486,13 @@ elif [ "$1" = "stop" ] ; then
             if [ $? -gt 0 ]; then
                 rm -f "$CATALINA_PID" >/dev/null 2>&1
                 if [ $? != 0 ]; then
-                    echo "Tomcat was killed but the PID file could not be removed."
+                    if [ -w "$CATALINA_PID" ]; then
+                        cat /dev/null > "$CATALINA_PID"
+                    else
+                        echo "Tomcat was killed but the PID file could not be removed."
+                    fi
+                    # Set this to zero else a warning will be issued about the process still running
+                    KILL_SLEEP_INTERVAL=0
                 fi
                 break
             fi
