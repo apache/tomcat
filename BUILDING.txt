@@ -33,11 +33,11 @@ In order to build a binary distribution version of Apache Tomcat from a
 source distribution, do the following:
 
 
-(1) Download and Install a Java Development Kit
+(1) Download and Install a Java 6 and Java 7 Development Kit
 
- 1. If the JDK is already installed, skip to (2).
+ 1. If the JDKs are already installed, skip to (2).
 
- 2. Download a version 6 of Java Development Kit (JDK) release (use the
+ 2. Download a version 6 of the Java Development Kit (JDK) release (use the
     latest update available for your chosen version) from
 
         http://www.oracle.com/technetwork/java/javase/downloads/index.html
@@ -45,7 +45,7 @@ source distribution, do the following:
 
     Note regarding later versions of Java:
 
-      As documented elsewhere, one of components in Apache Tomcat includes
+      As documented elsewhere, one of the components in Apache Tomcat includes
       a private copy of the Apache Commons DBCP library. The source code
       for this library is downloaded, processed by the build script
       (renaming the packages) and compiled.
@@ -53,7 +53,8 @@ source distribution, do the following:
       Due to changes in JDBC interfaces implemented by the library between
       versions of Java SE specification, the library has to target specific
       version of Java and can be compiled only with the JDK version
-      implementing this version of specification.
+      implementing this version of specification. Therefore, the build Tomcat
+      build process must be executed with a Java 6 JDK.
 
       See Apache Commons DBCP project web site for more details on
       available versions of the library and its requirements,
@@ -64,10 +65,23 @@ source distribution, do the following:
       several workarounds are possible. One of them is to skip building
       the component (tomcat-dbcp.jar).
 
- 3. Install the JDK according to the instructions included with the release.
+ 3. Install the Java 6 JDK according to the instructions included with the
+    release.
 
  4. Set an environment variable JAVA_HOME to the pathname of the directory
     into which you installed the JDK release.
+
+ 5. Download a version 7 of the Java Development Kit (JDK) release (use the
+    latest update available for your chosen version) from
+
+        http://www.oracle.com/technetwork/java/javase/downloads/index.html
+        or from another JDK vendor.
+
+ 6. Install the Java 7 JDK according to the instructions included with the
+    release.
+
+* NOTE: The Java 7 JDK is only required if you wish to build Tomcat with
+  JSR-356 (Java WebSocket 1.0) support.
 
 
 (2) Install Apache Ant 1.8.x on your computer
@@ -157,6 +171,10 @@ ${tomcat.source}.
         proxy.password=password
 
   See Apache Ant documentation for the <setproxy> task for details.
+
+* NOTE: Users wishing to build Tomcat with JSR-356 (Java WebSocket 1.0) support
+  must also set the java.7.home build property to the location of the Java 7 JDK
+  installation.
 
  3. Go to the sources directory and run Ant:
 

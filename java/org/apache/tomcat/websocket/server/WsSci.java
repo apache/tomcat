@@ -31,6 +31,10 @@ import javax.websocket.server.ServerApplicationConfig;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Registers an interest in any class that is annotated with
  * {@link ServerEndpoint} so that Endpoint can be published via the WebSocket
@@ -40,9 +44,26 @@ import javax.websocket.server.ServerEndpointConfig;
         Endpoint.class})
 public class WsSci implements ServletContainerInitializer {
 
+    private static boolean logMessageWritten = false;
+
+    private static final Log log =
+            LogFactory.getLog(WsSci.class);
+    private static final StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
+
     @Override
     public void onStartup(Set<Class<?>> clazzes, ServletContext ctx)
             throws ServletException {
+
+        if (!isJava7OrLater()) {
+            // The WebSocket implementation requires Java 7 so don't initialise
+            // it if Java 7 is not available.
+            if (!logMessageWritten) {
+                logMessageWritten = true;
+                log.info(sm.getString("sci.noWebSocketSupport"));
+            }
+            return;
+        }
 
         WsServerContainer sc = init(ctx);
 
@@ -137,5 +158,15 @@ public class WsSci implements ServletContainerInitializer {
         servletContext.addListener(new WsSessionListener(sc));
 
         return sc;
+    }
+
+
+    private static boolean isJava7OrLater() {
+        try {
+            Class.forName("java.nio.channels.AsynchronousSocketChannel");
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+        return true;
     }
 }

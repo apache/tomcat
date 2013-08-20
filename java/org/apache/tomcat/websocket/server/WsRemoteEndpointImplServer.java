@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 
-import javax.servlet.ServletOutputStream;
 import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
 
@@ -34,7 +33,7 @@ import org.apache.tomcat.websocket.WsRemoteEndpointImplBase;
 /**
  * This is the server side {@link javax.websocket.RemoteEndpoint} implementation
  * - i.e. what the server uses to send data to the client. Communication is over
- * a {@link ServletOutputStream}.
+ * a {@link javax.servlet.ServletOutputStream}.
  */
 public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 

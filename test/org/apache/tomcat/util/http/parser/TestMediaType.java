@@ -291,4 +291,10 @@ public class TestMediaType {
         Assert.assertEquals("2", m.getParameterValue("B"));
         Assert.assertEquals("2", m.getParameterValue("b"));
     }
+
+    @Test
+    public void testBug55454() throws Exception {
+        StringReader sr = new StringReader("text/html;");
+        MediaType m = HttpParser.parseMediaType(sr);
+    }
 }

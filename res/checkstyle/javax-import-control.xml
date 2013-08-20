@@ -44,6 +44,9 @@
       <allow pkg="javax.servlet.jsp"/>
     </subpackage>
   </subpackage>
+  <subpackage name="websocket">
+    <allow pkg="javax.websocket"/>
+  </subpackage>
   <subpackage name="xml.ws">
     <allow pkg="javax.xwl.ws"/>
   </subpackage>

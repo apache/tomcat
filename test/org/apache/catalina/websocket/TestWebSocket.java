@@ -17,7 +17,6 @@
 package org.apache.catalina.websocket;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,7 +44,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.deploy.ContextEnvironment;
+import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.Base64;
@@ -53,6 +54,7 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharChunk;
+import org.apache.tomcat.websocket.TesterEchoServer;
 
 public class TestWebSocket extends TomcatBaseTest {
 
@@ -64,16 +66,21 @@ public class TestWebSocket extends TomcatBaseTest {
     @Test
     public void testSimple() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        File appDir = new File(getBuildDirectory(), "webapps/examples");
-        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        // Must have a real docBase - just use temp
+        Context ctx = tomcat.addContext("",
+                System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(new ApplicationListener(
+                TesterEchoServer.Config.class.getName(), false));
+
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
-        WebSocketClient client= new WebSocketClient(getPort());
-
+        WebSocketClient client = new WebSocketClient(getPort());
 
         // Send the WebSocket handshake
-        client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
+        client.writer.write("GET " + TesterEchoServer.Config.PATH_BASIC + " HTTP/1.1" + CRLF);
         client.writer.write("Host: foo" + CRLF);
         client.writer.write("Upgrade: websocket" + CRLF);
         client.writer.write("Connection: keep-alive, upgrade" + CRLF);
@@ -105,14 +112,21 @@ public class TestWebSocket extends TomcatBaseTest {
     @Test
     public void testDetectWrongVersion() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        File appDir = new File(getBuildDirectory(), "webapps/examples");
-        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        // Must have a real docBase - just use temp
+        Context ctx = tomcat.addContext("",
+                System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(new ApplicationListener(
+                TesterEchoServer.Config.class.getName(), false));
+
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
+
         WebSocketClient client= new WebSocketClient(getPort());
 
         // Send the WebSocket handshake
-        client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
+        client.writer.write("GET " + TesterEchoServer.Config.PATH_BASIC + " HTTP/1.1" + CRLF);
         client.writer.write("Host: foo" + CRLF);
         client.writer.write("Upgrade: websocket" + CRLF);
         client.writer.write("Connection: upgrade" + CRLF);
@@ -141,15 +155,21 @@ public class TestWebSocket extends TomcatBaseTest {
     @Test
     public void testNoConnection() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        File appDir = new File(getBuildDirectory(), "webapps/examples");
-        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        // Must have a real docBase - just use temp
+        Context ctx = tomcat.addContext("",
+                System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(new ApplicationListener(
+                TesterEchoServer.Config.class.getName(), false));
+
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
+
         WebSocketClient client= new WebSocketClient(getPort());
 
-
         // Send the WebSocket handshake
-        client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
+        client.writer.write("GET " + TesterEchoServer.Config.PATH_BASIC + " HTTP/1.1" + CRLF);
         client.writer.write("Host: foo" + CRLF);
         client.writer.write("Upgrade: websocket" + CRLF);
         client.writer.write("Sec-WebSocket-Version: 13" + CRLF);
@@ -157,7 +177,7 @@ public class TestWebSocket extends TomcatBaseTest {
         client.writer.write(CRLF);
         client.writer.flush();
 
-        // Make sure we got an upgrade response
+        // Make sure we got an error response
         String responseLine = client.reader.readLine();
         assertTrue(responseLine.startsWith("HTTP/1.1 400"));
 
@@ -169,14 +189,21 @@ public class TestWebSocket extends TomcatBaseTest {
     @Test
     public void testNoUpgrade() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        File appDir = new File(getBuildDirectory(), "webapps/examples");
-        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        // Must have a real docBase - just use temp
+        Context ctx = tomcat.addContext("",
+                System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(new ApplicationListener(
+                TesterEchoServer.Config.class.getName(), false));
+
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
+
         WebSocketClient client= new WebSocketClient(getPort());
 
         // Send the WebSocket handshake
-        client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
+        client.writer.write("GET " + TesterEchoServer.Config.PATH_BASIC + " HTTP/1.1" + CRLF);
         client.writer.write("Host: foo" + CRLF);
         client.writer.write("Connection: upgrade" + CRLF);
         client.writer.write("Sec-WebSocket-Version: 13" + CRLF);
@@ -184,9 +211,11 @@ public class TestWebSocket extends TomcatBaseTest {
         client.writer.write(CRLF);
         client.writer.flush();
 
-        // Make sure we got an upgrade response
+        // Make sure we got an error response
+        // No upgrade means it is not treated an as upgrade request so a 404 is
+        // generated when the request reaches the Default Servlet.s
         String responseLine = client.reader.readLine();
-        assertTrue(responseLine.startsWith("HTTP/1.1 400"));
+        assertTrue(responseLine.startsWith("HTTP/1.1 404"));
 
         // Finished with the socket
         client.close();
@@ -195,14 +224,21 @@ public class TestWebSocket extends TomcatBaseTest {
     @Test
     public void testKey() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        File appDir = new File(getBuildDirectory(), "webapps/examples");
-        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        // Must have a real docBase - just use temp
+        Context ctx = tomcat.addContext("",
+                System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(new ApplicationListener(
+                TesterEchoServer.Config.class.getName(), false));
+
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
+
         WebSocketClient client= new WebSocketClient(getPort());
 
         // Send the WebSocket handshake
-        client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
+        client.writer.write("GET " + TesterEchoServer.Config.PATH_BASIC + " HTTP/1.1" + CRLF);
         client.writer.write("Host: foo" + CRLF);
         client.writer.write("Upgrade: websocket" + CRLF);
         client.writer.write("Connection: upgrade" + CRLF);

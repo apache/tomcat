@@ -161,23 +161,30 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         Assert.assertEquals(MESSAGE_ONE,
                 ((MsgString) client.received.peek()).getData());
         session.close();
-        Thread.sleep(100);
-        Assert.assertTrue(Server.isLifeCycleEventCalled(
-                MsgStringEncoder.class.getName()+":init"));
-        Assert.assertTrue(Server.isLifeCycleEventCalled(
-                MsgStringDecoder.class.getName()+":init"));
-        Assert.assertTrue(Server.isLifeCycleEventCalled(
-                MsgByteEncoder.class.getName()+":init"));
-        Assert.assertTrue(Server.isLifeCycleEventCalled(
-                MsgByteDecoder.class.getName()+":init"));
-        Assert.assertTrue(Server.isLifeCycleEventCalled(
-                MsgStringEncoder.class.getName()+":destroy"));
-        Assert.assertTrue(Server.isLifeCycleEventCalled(
-                MsgStringDecoder.class.getName()+":destroy"));
-        Assert.assertTrue(Server.isLifeCycleEventCalled(
-                MsgByteEncoder.class.getName()+":destroy"));
-        Assert.assertTrue(Server.isLifeCycleEventCalled(
-                MsgByteDecoder.class.getName()+":destroy"));
+
+        // Should not take very long but some failures have been seen
+        i = testEvent(MsgStringEncoder.class.getName()+":init", 0);
+        i = testEvent(MsgStringDecoder.class.getName()+":init", i);
+        i = testEvent(MsgByteEncoder.class.getName()+":init", i);
+        i = testEvent(MsgByteDecoder.class.getName()+":init", i);
+        i = testEvent(MsgStringEncoder.class.getName()+":destroy", i);
+        i = testEvent(MsgStringDecoder.class.getName()+":destroy", i);
+        i = testEvent(MsgByteEncoder.class.getName()+":destroy", i);
+        i = testEvent(MsgByteDecoder.class.getName()+":destroy", i);
+    }
+
+    
+    private int testEvent(String name, int count) throws InterruptedException {
+        int i = count;
+        while (i < 50) {
+            if (Server.isLifeCycleEventCalled(name)) {
+                break;
+            }
+            i++;
+            Thread.sleep(100);
+        }
+        Assert.assertTrue(Server.isLifeCycleEventCalled(name));
+        return i;
     }
 
 

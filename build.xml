@@ -47,6 +47,7 @@
   <property name="servlet.revision" value="FR" />
   <property name="jsp.revision" value="FR" />
   <property name="el.revision" value="FR" />
+  <property name="websocket.revision" value="FR" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
@@ -148,8 +149,18 @@
   <!-- jdbc-pool JARs & source JARs -->
   <property name="tomcat-jdbc.jar" value="${tomcat.pool}/tomcat-jdbc.jar"/>
   <property name="tomcat-jdbc-src.jar" value="${tomcat.pool}/tomcat-jdbc-src.jar"/>
-  
-  
+
+  <!-- WebSocket 1.0 (JSR-356) API and implementation JARs & source JARS     -->
+  <!-- The API JAR is the same as the one that ships with Tomcat 8 except    -->
+  <!-- that it does not use Java 7 features (<> and multi-catch) and has     -->
+  <!-- been compiled for Java 6. The implementation JAR includes a number of -->
+  <!-- modifications to remove the dependencies on the Servlet 3.1 APIs.     -->
+  <!-- The implementation JAR will only work with Tomcat 7.                  -->
+  <property name="websocket-api.jar" value="${tomcat.build}/lib/websocket-api.jar"/>
+  <property name="tomcat7-websocket.jar" value="${tomcat.build}/lib/tomcat7-websocket.jar"/>
+  <property name="websocket-api-src.jar" value="${tomcat.src.jars}/websocket-api-src.jar"/>
+  <property name="tomcat7-websocket-src.jar" value="${tomcat.src.jars}/tomcat7-websocket-src.jar"/>
+
   <!-- Tests To Run -->
   <property name="test.name" value="**/Test*.java"/>
   <property name="test.formatter" value="-Dorg.apache.juli.formatter=java.util.logging.SimpleFormatter"/>
@@ -274,6 +285,14 @@
     <include name="javax/el/*" />
   </patternset>
 
+  <patternset id="files.websocket-api">
+    <include name="javax/websocket/**" />
+  </patternset>
+
+  <patternset id="files.tomcat7-websocket">
+    <include name="org/apache/tomcat/websocket/**" />
+  </patternset>
+
   <patternset id="files.bootstrap">
     <include name="org/apache/catalina/startup/Bootstrap.*" />
     <include name="org/apache/catalina/startup/catalina.properties" />
@@ -358,6 +377,8 @@
     <patternset refid="files.catalina" />
     <patternset refid="files.el-api" />
     <patternset refid="files.servlet-api" />
+    <patternset refid="files.websocket-api" />
+    <patternset refid="files.tomcat7-websocket" />
     <patternset refid="files.tomcat-api" />
     <!-- These pattern sets conflict so include files directly
       <patternset refid="files.tomcat-coyote" />
@@ -551,7 +572,8 @@
     </copy>
   </target>
 
-  <target name="compile" depends="build-prepare,download-compile,compile-prepare,validate">
+  <target name="compile"
+          depends="build-prepare,download-compile,compile-prepare,validate,compile-java7">
     <!-- Compile internal server components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
@@ -565,6 +587,8 @@
       <compilerarg value="-Xlint:unchecked"/>
       <classpath refid="compile.classpath" />
       <exclude name="org/apache/naming/factory/webservices/**" />
+      <!-- Exclude classes that require Java 7 to compile -->
+      <exclude name="org/apache/tomcat/websocket/**" />
     </javac>
     <!-- Copy static resource files -->
     <copy todir="${tomcat.classes}" encoding="ISO-8859-1">
@@ -579,7 +603,33 @@
     </copy>
 
   </target>
-  
+
+  <target name="compile-java7"
+          depends="build-prepare,download-compile,compile-prepare,validate"
+          if="java.7.home" >
+    <javac srcdir="java" destdir="${tomcat.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           target="${compile.target}"
+           optimize="${compile.optimize}"
+           excludes="**/.svn/**"
+           encoding="ISO-8859-1"
+           includeAntRuntime="true"
+           fork="true"
+           executable="${java.7.home}/bin/javac">
+      <compilerarg value="-Xlint:unchecked"/>
+      <classpath refid="compile.classpath" />
+      <!-- Only include classes that require Java 7 to compile -->
+      <include name="org/apache/tomcat/websocket/**" />
+      <!-- Not required but prevents a warning being displayed -->
+      <bootclasspath>
+        <fileset dir="${java.7.home}/jre/lib">
+          <include name="*.jar"/>
+        </fileset>
+      </bootclasspath>
+    </javac>
+  </target>
   
 
   <target name="build-manifests" unless="manifests.uptodate"
@@ -590,21 +640,18 @@
     <filter token="servlet.revision" value="${servlet.revision}"/>
     <filter token="jsp.revision" value="${jsp.revision}"/>
     <filter token="el.revision" value="${el.revision}"/>
+    <filter token="websocket.revision" value="${websocket.revision}"/>
 
     <mkdir dir="${tomcat.manifests}" />
     <copy todir="${tomcat.manifests}" overwrite="yes" filtering="yes"
       encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
-      <fileset dir="${tomcat.home}/res/META-INF" >
-        <include name="*.manifest" />
-        <include name="*.license" />
-        <include name="*.notice" />
-      </fileset>
+      <fileset dir="${tomcat.home}/res/META-INF" />
     </copy>
 
   </target>
 
-  <target name="package" depends="compile,build-manifests" >
+  <target name="package" depends="compile,build-manifests,package-java7" >
     <!-- Common Annotations 1.0 JAR File -->
     <jarIt jarfile="${annotations-api.jar}"
       filesDir="${tomcat.classes}"
@@ -721,6 +768,21 @@
         fullpath="META-INF/LICENSE" />
     </jar>
 
+  </target>
+
+  <target name="package-java7" depends="compile,build-manifests"
+          if="java.7.home">
+    <!-- WebSocket 1.0 API JAR File -->
+    <jarIt jarfile="${websocket-api.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.websocket-api"
+      manifest="${tomcat.manifests}/websocket-api.jar.manifest" />
+
+    <!-- WebSocket 1.0 implementation JAR File -->
+    <jarIt jarfile="${tomcat7-websocket.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.tomcat7-websocket"
+      meta-inf="${tomcat.manifests}/tomcat7-websocket.jar"/>
   </target>
 
   <target name="build-docs" depends="compile-prepare" description="Builds all documentation from XML sources">
@@ -1057,9 +1119,13 @@
       failonerror="false"/>
     <copy file="${jdt.jar}" todir="${tomcat.embed}" />
 
+    <!-- Note the meta-inf below will work as long as there is only one JAR
+         that needs to add entries. If there is more than one a more complex
+         solution will be required. -->
     <jarIt jarfile="${tomcat-embed-core.jar}"
            filesDir="${tomcat.classes}"
-           filesId="files.tomcat-embed-core"/>
+           filesId="files.tomcat-embed-core"
+           meta-inf="${tomcat.manifests}/tomcat7-websocket.jar"/>
     <jarIt jarfile="${tomcat-embed-jasper.jar}"
            filesDir="${tomcat.classes}"
            filesId="files.tomcat-embed-jasper"/>
@@ -1145,6 +1211,8 @@
       <classpath refid="tomcat.test.classpath" />
       <include name="org/apache/**" />
       <include name="javax/**" />
+      <exclude unless="java.7.home" name="org/apache/catalina/websocket/**" />
+      <exclude unless="java.7.home" name="org/apache/tomcat/websocket/**" />
     </javac>
     <!-- Copy static resource files the tests need to load via the class     -->
     <!-- loader.                                                             -->
@@ -1163,7 +1231,7 @@
   <property name="junit.formatter.extension" value=".txt" />
 
   <target name="test" description="Runs the JUnit test cases"
-          depends="test-bio,test-nio,test-apr" >
+          depends="test-init1,test-init2,test-bio,test-nio,test-apr" >
     <fail if="test.result.error" message='Some tests completed with an Error. See ${tomcat.build}/logs for details, search for "FAILED".' />
     <fail if="test.result.failure" message='Some tests completed with a Failure. See ${tomcat.build}/logs for details, search for "FAILED".' />
   </target>
@@ -1192,6 +1260,14 @@
     <available file="${test.apr.loc}" property="apr.exists" />
   </target>
 
+  <target name="test-init1" if="java.7.home">
+    <property name="java.bin.path" value="${java.7.home}/bin/"/>
+  </target>
+
+  <target name="test-init2" unless="java.7.home">
+    <property name="java.bin.path" value=""/>
+  </target>
+
   <macrodef name="runtests"
             description="Runs the unit tests using the specified connector.
               Does not stop on errors, but sets 'test.result.error' and 'test.result.failure' properties.">
@@ -1204,7 +1280,8 @@
       <junit printsummary="yes" fork="yes" dir="." showoutput="yes"
         errorproperty="test.result.error"
         failureproperty="test.result.failure"
-        haltonfailure="${test.haltonfailure}" >
+        haltonfailure="${test.haltonfailure}"
+        jvm="${java.bin.path}java" >
 
         <jvmarg value="${test.jvmarg.egd}"/>
         <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
@@ -1232,6 +1309,11 @@
             <exclude name="**/Tester*.java" />
             <!-- Exclude the tests known to fail -->
             <exclude name="org/apache/catalina/tribes/test/**" />
+            <!-- Exclude both sets of WebSocket tests unless Java 7 is       -->
+            <!-- present as the WebSocket exmaples (used by the tests) won't -->
+            <!-- build without it.                                           -->
+            <exclude unless="java.7.home" name="org/apache/catalina/websocket/**" />
+            <exclude unless="java.7.home" name="org/apache/tomcat/websocket/**" />
           </fileset>
         </batchtest>
       </junit>
@@ -1656,6 +1738,25 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </javadoc>
     <patch-javadoc dir="${tomcat.dist}/webapps/docs/elapi"
       docencoding="ISO-8859-1"/>
+    <javadoc packagenames="javax.websocket.*"
+      sourcepath="${tomcat.dist}/src/java"
+      destdir="${tomcat.dist}/webapps/docs/websocketapi"
+      version="true"
+      windowtitle="WebSocket 1.0 API Documentation - Apache Tomcat ${version}"
+      doctitle="WebSocket 1.0 API - Apache Tomcat ${version}"
+      header="&lt;b&gt;WebSocket 1.0 - Apache Tomcat ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      encoding="ISO-8859-1"
+      additionalparam="-breakiterator"
+      maxmemory="256m" >
+      <classpath>
+        <path refid="compile.classpath"/>
+        <path refid="tomcat.webservices.classpath"/>
+        <path location="${ant.core.lib}"/>
+      </classpath>
+    </javadoc>
+    <patch-javadoc dir="${tomcat.dist}/webapps/docs/websocketapi"
+      docencoding="ISO-8859-1"/>
     <javadoc packagenames="org.apache.*"
       destdir="${tomcat.dist}/webapps/docs/api"
       version="true"
@@ -1674,7 +1775,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <link href="../servletapi"/>
       <link href="../jspapi"/>
       <link href="../elapi"/>
-      <link href="http://docs.oracle.com/javase/6/docs/api/"/>
+      <link href="../websocketapi"/>
+      <link href="http://docs.oracle.com/javase/7/docs/api/"/>
       <link href="http://commons.apache.org/proper/commons-io/javadocs/api-release/"/>
       <link href="http://docs.oracle.com/javaee/6/api/"/>
       <sourcepath>
@@ -1767,6 +1869,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <include name="jasper.jar"/>
         <include name="jasper-el.jar"/>
         <include name="servlet-api.jar"/>
+        <include name="websocket-api.jar"/>
+        <include name="tomcat7-websocket.jar"/>
         <include name="tomcat-coyote.jar"/>
         <include name="tomcat-util.jar"/>
       </fileset>
@@ -1938,7 +2042,10 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   </target>
 
   <!-- Sets properties only required for releases -->
-  <target name="release-init" depends="gpg-init-1,gpg-init-2" />
+  <target name="release-init" depends="gpg-init-1,gpg-init-2" >
+    <fail unless="java.7.home"
+          message="The java.7.home property must be set for a release build"/>
+  </target>
 
   <target name="gpg-init-1">
     <available file="${gpg.exec}" property="gpg.exec.available"/>
@@ -2265,7 +2372,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- Packages the source code in JARs to match the binary JARs -->
   <target name="package-src-jar"
-          depends="build-manifests,build-tomcat-jdbc-src">
+          depends="build-manifests,build-tomcat-jdbc-src,package-src-jar-java7">
 
     <mkdir dir="${tomcat.src.jars}" />
 
@@ -2360,6 +2467,23 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <!-- jdbc-pool JAR File -->
     <copy file="${tomcat-jdbc-src.jar}" todir="${tomcat.src.jars}" />
   </target>
+
+  <target name="package-src-jar-java7"
+          depends="build-manifests,build-tomcat-jdbc-src"
+          if="java.7.home">
+
+    <!-- WebSocket 1.0 API JAR File -->
+    <jarIt jarfile="${websocket-api-src.jar}"
+      filesDir="java"
+      filesId="files.websocket-api"
+      manifest="${tomcat.manifests}/websocket-api.jar.manifest" />
+
+    <!-- WebSocket 1.0 implementation JAR File -->
+    <jarIt jarfile="${tomcat-websocket-src.jar}"
+      filesDir="java"
+      filesId="files.tomcat-websocket" />
+  </target>
+
 
   <!-- ========================= Cleaning Targets ========================== -->
 
@@ -2685,6 +2809,8 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
                default="${tomcat.manifests}/default.notice" />
     <attribute name="license" description="the NOTICE file to use"
                default="${tomcat.manifests}/default.license" />
+    <attribute name="meta-inf" description="additional contents for META-INF"
+               default="${tomcat.manifests}/default" />
     <sequential>
       <jar jarfile="@{jarfile}" manifest="@{manifest}">
         <fileset dir="@{filesDir}">
@@ -2693,6 +2819,8 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
           <exclude name="**/package.html" />
           <exclude name="**/LocalStrings_*" />
         </fileset>
+        <zipfileset dir="@{meta-inf}" prefix="META-INF/"
+                    excludes=".gitignore" />
         <zipfileset file="@{notice}" fullpath="META-INF/NOTICE" />
         <zipfileset file="@{license}" fullpath="META-INF/LICENSE" />
       </jar>

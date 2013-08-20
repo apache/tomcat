@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
+import javax.servlet.ServletRequestWrapper;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -172,12 +173,20 @@ public class UpgradeUtil {
             }
         }
 
-        // TODO: Check if the request is wrapped and unwrap it if necessary.
-        WsHttpUpgradeHandler wsHandler =
-                ((RequestFacade) req).upgrade(WsHttpUpgradeHandler.class);
-        wsHandler.preInit(ep, sec, sc, wsRequest, subProtocol,
-                pathParams, req.isSecure());
-
+        // Small hack until the Servlet API provides a way to do this.
+        ServletRequest inner = req;
+        // Unwrap the request
+        while (inner instanceof ServletRequestWrapper) {
+            inner = ((ServletRequestWrapper) inner).getRequest();
+        }
+        if (inner instanceof RequestFacade) {
+            WsHttpUpgradeHandler wsHandler =
+                    ((RequestFacade) req).upgrade(WsHttpUpgradeHandler.class);
+            wsHandler.preInit(ep, sec, sc, wsRequest, subProtocol,
+                    pathParams, req.isSecure());
+        } else {
+            throw new ServletException("Upgrade failed");
+        }
     }
 
 

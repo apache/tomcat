@@ -17,55 +17,53 @@
 package websocket.snake;
 
 import java.io.IOException;
-import java.nio.CharBuffer;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
 
-import org.apache.catalina.websocket.WsOutbound;
+import javax.websocket.Session;
 
 public class Snake {
 
     private static final int DEFAULT_LENGTH = 5;
 
     private final int id;
-    private final WsOutbound outbound;
+    private final Session session;
 
     private Direction direction;
     private int length = DEFAULT_LENGTH;
     private Location head;
-    private Deque<Location> tail = new ArrayDeque<Location>();
-    private String hexColor;
+    private final Deque<Location> tail = new ArrayDeque<Location>();
+    private final String hexColor;
 
-    public Snake(int id, WsOutbound outbound) {
+    public Snake(int id, Session session) {
         this.id = id;
-        this.outbound = outbound;
-        this.hexColor = SnakeWebSocketServlet.getRandomHexColor();
+        this.session = session;
+        this.hexColor = SnakeAnnotation.getRandomHexColor();
         resetState();
     }
 
     private void resetState() {
         this.direction = Direction.NONE;
-        this.head = SnakeWebSocketServlet.getRandomLocation();
+        this.head = SnakeAnnotation.getRandomLocation();
         this.tail.clear();
         this.length = DEFAULT_LENGTH;
     }
 
     private synchronized void kill() {
         resetState();
-        try {
-            CharBuffer response = CharBuffer.wrap("{'type': 'dead'}");
-            outbound.writeTextMessage(response);
-        } catch (IOException ioe) {
-            // Ignore
-        }
+        sendMessage("{'type': 'dead'}");
     }
 
     private synchronized void reward() {
         length++;
+        sendMessage("{'type': 'kill'}");
+    }
+
+
+    protected void sendMessage(String msg) {
         try {
-            CharBuffer response = CharBuffer.wrap("{'type': 'kill'}");
-            outbound.writeTextMessage(response);
+            session.getBasicRemote().sendText(msg);
         } catch (IOException ioe) {
             // Ignore
         }
@@ -73,17 +71,17 @@ public class Snake {
 
     public synchronized void update(Collection<Snake> snakes) {
         Location nextLocation = head.getAdjacentLocation(direction);
-        if (nextLocation.x >= SnakeWebSocketServlet.PLAYFIELD_WIDTH) {
+        if (nextLocation.x >= SnakeAnnotation.PLAYFIELD_WIDTH) {
             nextLocation.x = 0;
         }
-        if (nextLocation.y >= SnakeWebSocketServlet.PLAYFIELD_HEIGHT) {
+        if (nextLocation.y >= SnakeAnnotation.PLAYFIELD_HEIGHT) {
             nextLocation.y = 0;
         }
         if (nextLocation.x < 0) {
-            nextLocation.x = SnakeWebSocketServlet.PLAYFIELD_WIDTH;
+            nextLocation.x = SnakeAnnotation.PLAYFIELD_WIDTH;
         }
         if (nextLocation.y < 0) {
-            nextLocation.y = SnakeWebSocketServlet.PLAYFIELD_HEIGHT;
+            nextLocation.y = SnakeAnnotation.PLAYFIELD_HEIGHT;
         }
         if (direction != Direction.NONE) {
             tail.addFirst(head);

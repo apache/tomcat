@@ -130,13 +130,13 @@
 <div>
     <div id="connect-container">
         <div>
-            <span>Connect using:</span>
-            <!-- echo example using streams on the server side -->
-            <input id="radio1" type="radio" name="group1" value="/examples/websocket/echoStream"
-                   onclick="updateTarget(this.value);"> <label for="radio1">streams</label>
-            <!-- echo example using messages on the server side -->
-            <input id="radio2" type="radio" name="group1" value="/examples/websocket/echoMessage"
-                   onclick="updateTarget(this.value);"> <label for="radio2">messages</label>
+            <span>Connect to service implemented using:</span>
+            <!-- echo example using new programmatic API on the server side -->
+            <input id="radio1" type="radio" name="group1" value="/examples/websocket/echoProgrammatic"
+                   onclick="updateTarget(this.value);"> <label for="radio1">programmatic API</label>
+            <!-- echo example using new annotation API on the server side -->
+            <input id="radio2" type="radio" name="group1" value="/examples/websocket/echoAnnotation"
+                   onclick="updateTarget(this.value);"> <label for="radio2">annotation API</label>
         </div>
         <div>
             <input id="target" type="text" size="40" style="width: 350px"/>

@@ -128,5 +128,24 @@
         <allow pkg="org.apache.tomcat" exact-match="true"/>
       </subpackage>
     </subpackage>
+    <subpackage name="websocket">
+      <allow pkg="javax.websocket"/>
+      <!-- Require to access HTTP Upgrade API -->
+      <allow pkg="org.apache.catalina.connector"/>
+      <!-- The Servlet 3.1 API replacement classes are in this package -->
+      <allow pkg="org.apache.coyote.http11.upgrade"/>
+      <allow pkg="org.apache.juli"/>
+      <allow pkg="org.apache.tomcat.util"/>
+      <!-- Ideally want to remove this -->
+      <allow pkg="org.apache.tomcat.websocket.pojo"/>
+      <disallow pkg="javax.servlet"/>
+      <subpackage name="pojo">
+        <allow pkg="org.apache.tomcat.websocket"/>
+      </subpackage>
+      <subpackage name="server">
+        <allow pkg="javax.servlet"/>
+        <allow pkg="org.apache.tomcat.websocket"/>
+      </subpackage>
+    </subpackage>
   </subpackage>
 </import-control>
