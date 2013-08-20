@@ -2481,7 +2481,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <!-- WebSocket 1.0 implementation JAR File -->
     <jarIt jarfile="${tomcat-websocket-src.jar}"
       filesDir="java"
-      filesId="files.tomcat-websocket" />
+      filesId="files.tomcat7-websocket" />
   </target>
 
 
