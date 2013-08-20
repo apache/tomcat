@@ -120,6 +120,10 @@
         <bug>55404</bug>: Log warnings about using security roles in web.xml
         without defining them as warnings. (markt)
       </fix>
+      <fix>
+        <bug>55454</bug>: Avoid NPE when parsing an incorrect content type.
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
