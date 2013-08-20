@@ -21,6 +21,7 @@ package org.apache.el.parser;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import javax.el.ELClass;
 import javax.el.ELException;
 import javax.el.FunctionMapper;
 import javax.el.LambdaExpression;
@@ -129,6 +130,18 @@ public final class AstFunction extends SimpleNode {
                             "error.lambda.tooManyMethodParameterSets"));
                 }
                 return obj;
+            }
+
+            // Call to a constructor or a static method
+            obj = ctx.getImportHandler().resolveClass(this.localName);
+            if (obj != null) {
+                return ctx.getELResolver().invoke(ctx, new ELClass((Class<?>) obj), "<init>", null,
+                        ((AstMethodParameters) this.children[0]).getParameters(ctx));
+            }
+            obj = ctx.getImportHandler().resolveStatic(this.localName);
+            if (obj != null) {
+                return ctx.getELResolver().invoke(ctx, new ELClass((Class<?>) obj), this.localName,
+                        null, ((AstMethodParameters) this.children[0]).getParameters(ctx));
             }
         }
 
