@@ -353,7 +353,7 @@ public class TldRuleSet extends RuleSetBase {
         @Override
         public void body(String namespace, String name, String text) throws Exception {
             boolean value = "true".equalsIgnoreCase(text) || "yes".equalsIgnoreCase(text);
-            setter.invoke(digester.peek(), value);
+            setter.invoke(digester.peek(), Boolean.valueOf(value));
         }
     }
 }
