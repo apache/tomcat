@@ -161,7 +161,16 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         Assert.assertEquals(MESSAGE_ONE,
                 ((MsgString) client.received.peek()).getData());
         session.close();
-        Thread.sleep(100);
+
+        // Should not take very long but some failures have been seen
+        i = 0;
+        while (i < 20) {
+            if (Server.isLifeCycleEventCalled(
+                    MsgStringEncoder.class.getName()+":init")) {
+                break;
+            }
+            Thread.sleep(100);
+        }
         Assert.assertTrue(Server.isLifeCycleEventCalled(
                 MsgStringEncoder.class.getName()+":init"));
         Assert.assertTrue(Server.isLifeCycleEventCalled(
