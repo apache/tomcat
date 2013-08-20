@@ -180,6 +180,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             if (Server.isLifeCycleEventCalled(name)) {
                 break;
             }
+            i++;
             Thread.sleep(100);
         }
         Assert.assertTrue(Server.isLifeCycleEventCalled(name));
