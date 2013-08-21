@@ -80,8 +80,13 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        // Must have a real docBase. Don't use java.io.tmpdir as it may not be
+        // writable.
+        File docBase = new File(getTemporaryDirectory(), "testCoyoteAdapter");
+        addDeleteOnTearDown(docBase);
+        if (!docBase.mkdirs() && !docBase.isDirectory()) {
+            Assert.fail("Failed to create: [" + docBase.toString() + "]");
+        }
 
         // Create the folder that will trigger the redirect
         File foo = new File(docBase, "foo");
