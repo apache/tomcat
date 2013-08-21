@@ -76,7 +76,8 @@ public class TestWebSocketFrameClient extends TomcatBaseTest {
 
         // Ignore the latch result as the message count test below will tell us
         // if the right number of messages arrived
-        handler.getLatch().await(60, TimeUnit.SECONDS);
+        handler.getLatch().await(TesterFirehoseServer.WAIT_TIME_MILLIS,
+                TimeUnit.MILLISECONDS);
 
         List<String> messages = handler.getMessages();
         Assert.assertEquals(
