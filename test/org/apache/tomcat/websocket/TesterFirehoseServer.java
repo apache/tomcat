@@ -38,6 +38,7 @@ public class TesterFirehoseServer {
     public static final int MESSAGE_COUNT = 100000;
     public static final String MESSAGE;
     public static final int MESSAGE_SIZE = 1024;
+    public static final int WAIT_TIME_MILLIS = 60000;
 
     static {
         StringBuilder sb = new StringBuilder(MESSAGE_SIZE);
@@ -86,6 +87,10 @@ public class TesterFirehoseServer {
                     started = true;
                 }
             }
+
+            session.getUserProperties().put(
+                    "org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT",
+                    Long.valueOf(WAIT_TIME_MILLIS));
 
             Basic remote = session.getBasicRemote();
             remote.setBatchingAllowed(true);
