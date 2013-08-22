@@ -191,7 +191,9 @@ public class OneLineFormatter extends Formatter {
             }
             ThreadInfo threadInfo =
                     threadMxBean.getThreadInfo(logRecordThreadId);
-            result = threadInfo.getThreadName();
+            if (threadInfo == null) {
+                return Long.toString(logRecordThreadId);
+            }
         }
 
         cache.put(Integer.valueOf(logRecordThreadId), result);
