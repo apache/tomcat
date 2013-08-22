@@ -661,7 +661,14 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                 } else if (state == SocketState.UPGRADED) {
                     // Need to keep the connection associated with the processor
                     connections.put(socket, processor);
-                    longPoll(wrapper, processor);
+                    // Don't add sockets back to the poller if this was a
+                    // non-blocking write otherwise the poller may trigger
+                    // multiple read events which may lead to thread starvation
+                    // in the connector. The write() method will add this this
+                    // socket to the poller if necessary.
+                    if (status != SocketStatus.OPEN_WRITE) {
+                        longPoll(wrapper, processor);
+                    }
                 } else {
                     // Connection closed. OK to recycle the processor. Upgrade
                     // processors are not recycled.
