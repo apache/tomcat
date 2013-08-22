@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket.server;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -30,7 +31,12 @@ public class WsListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        WsSci.init(sce.getServletContext());
+        ServletContext sc = sce.getServletContext();
+        // Don't trigger WebSocket initialization if a WebSocket Server
+        // Container is already present
+        if (sc.getAttribute(Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE) == null) {
+            WsSci.init(sce.getServletContext());
+        }
     }
 
     @Override
