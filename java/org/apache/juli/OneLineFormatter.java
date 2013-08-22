@@ -194,6 +194,7 @@ public class OneLineFormatter extends Formatter {
             if (threadInfo == null) {
                 return Long.toString(logRecordThreadId);
             }
+            result = threadInfo.getThreadName();
         }
 
         cache.put(Integer.valueOf(logRecordThreadId), result);
