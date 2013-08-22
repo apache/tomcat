@@ -905,7 +905,7 @@ public class NioEndpoint extends AbstractEndpoint {
                         final KeyAttachment att = (KeyAttachment) key.attachment();
                         if ( att!=null ) {
                             //handle callback flag
-                            if (att.getComet() && (interestOps & OP_CALLBACK) == OP_CALLBACK ) {
+                            if (att.isComet() && (interestOps & OP_CALLBACK) == OP_CALLBACK ) {
                                 att.setCometNotify(true);
                             } else {
                                 att.setCometNotify(false);
@@ -1065,7 +1065,7 @@ public class NioEndpoint extends AbstractEndpoint {
             try {
                 if ( key == null ) return;//nothing to do
                 KeyAttachment ka = (KeyAttachment) key.attachment();
-                if (ka != null && ka.getComet() && status != null) {
+                if (ka != null && ka.isComet() && status != null) {
                     //the comet event takes care of clean up
                     //processSocket(ka.getChannel(), status, dispatch);
                     ka.setComet(false);//to avoid a loop
@@ -1247,7 +1247,7 @@ public class NioEndpoint extends AbstractEndpoint {
                     if (sk.isReadable() || sk.isWritable() ) {
                         if ( attachment.getSendfileData() != null ) {
                             processSendfile(sk,attachment, false);
-                        } else if ( attachment.getComet() ) {
+                        } else if ( attachment.isComet() ) {
                             //check if thread is available
                             if ( isWorkerAvailable() ) {
                                 //set interest ops to 0 so we don't get multiple
@@ -1449,7 +1449,7 @@ public class NioEndpoint extends AbstractEndpoint {
                         cancelledKey(key, SocketStatus.ERROR,false); //we don't support any keys without attachments
                     } else if ( ka.getError() ) {
                         cancelledKey(key, SocketStatus.ERROR,true);//TODO this is not yet being used
-                    } else if (ka.getComet() && ka.getCometNotify() ) {
+                    } else if (ka.isComet() && ka.getCometNotify() ) {
                         ka.setCometNotify(false);
                         reg(key,ka,0);//avoid multiple calls, this gets reregistered after invocation
                         //if (!processSocket(ka.getChannel(), SocketStatus.OPEN_CALLBACK)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT);
@@ -1469,7 +1469,7 @@ public class NioEndpoint extends AbstractEndpoint {
                             ka.interestOps(0); //avoid duplicate timeout calls
                             cancelledKey(key, SocketStatus.TIMEOUT,true);
                         }
-                    } else if (ka.isAsync() || ka.getComet()) {
+                    } else if (ka.isAsync() || ka.isComet()) {
                         if (close) {
                             key.interestOps(0);
                             ka.interestOps(0); //avoid duplicate stop calls
@@ -1514,7 +1514,7 @@ public class NioEndpoint extends AbstractEndpoint {
             this.socket = channel;
             this.poller = poller;
             lastAccess = System.currentTimeMillis();
-            comet = false;
+            setComet(false);
             timeout = soTimeout;
             setWriteTimeout(soTimeout);
             error = false;
@@ -1551,8 +1551,6 @@ public class NioEndpoint extends AbstractEndpoint {
 
         public Poller getPoller() { return poller;}
         public void setPoller(Poller poller){this.poller = poller;}
-        public void setComet(boolean comet) { this.comet = comet; }
-        public boolean getComet() { return comet; }
         public void setCometNotify(boolean notify) { this.cometNotify = notify; }
         public boolean getCometNotify() { return cometNotify; }
         /**

@@ -29,6 +29,7 @@ public class SocketWrapper<E> {
     protected boolean error = false;
     protected long lastRegistered = 0;
     protected volatile int keepAliveLeft = 100;
+    private boolean comet = false;
     protected boolean async = false;
     protected boolean keptAlive = false;
     private boolean upgraded = false;
@@ -62,6 +63,8 @@ public class SocketWrapper<E> {
         return socket;
     }
 
+    public boolean isComet() { return comet; }
+    public void setComet(boolean comet) { this.comet = comet; }
     public boolean isAsync() { return async; }
     public void setAsync(boolean async) { this.async = async; }
     public boolean isUpgraded() { return upgraded; }

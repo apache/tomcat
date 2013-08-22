@@ -778,13 +778,6 @@
         connections. This is a synonym for maxConnections.</p>
       </attribute>
 
-      <attribute name="pollerThreadCount" required="false">
-        <p>Number of threads used to poll kept alive connections. On Windows the
-        default is chosen so that the sockets managed by each thread is
-        less than 1024. For Linux the default is 1. Changing the default on
-        Windows is likely to have a negative performance impact.</p>
-      </attribute>
-
       <attribute name="pollTime" required="false">
         <p>Duration of a poll call in microseconds. Lowering this value will
         slightly decrease latency of connections being kept alive in some cases,
@@ -801,13 +794,6 @@
         the kernel), and the sendfile poller will not be used, so the amount of
         static files which can be sent concurrently is much larger than the
         specified amount. The default value is 1024.</p>
-      </attribute>
-
-      <attribute name="sendfileThreadCount" required="false">
-        <p>Number of threads used service sendfile sockets. On Windows the
-        default is chosen so that the sockets managed by each thread is
-        less than 1024. For Linux the default is 1. Changing the default on
-        Windows is likely to have a negative performance impact.</p>
       </attribute>
 
       <attribute name="threadPriority" required="false">

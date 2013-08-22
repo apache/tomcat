@@ -82,9 +82,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
     public void setPollerSize(int pollerSize) { endpoint.setMaxConnections(pollerSize); }
     public int getPollerSize() { return endpoint.getMaxConnections(); }
 
-    public void setPollerThreadCount(int pollerThreadCount) { ((AprEndpoint)endpoint).setPollerThreadCount(pollerThreadCount); }
-    public int getPollerThreadCount() { return ((AprEndpoint)endpoint).getPollerThreadCount(); }
-    
     public int getSendfileSize() { return ((AprEndpoint)endpoint).getSendfileSize(); }
     public void setSendfileSize(int sendfileSize) { ((AprEndpoint)endpoint).setSendfileSize(sendfileSize); }
     
@@ -249,8 +246,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
             if (addToPoller && proto.endpoint.isRunning()) {
                 ((AprEndpoint)proto.endpoint).getPoller().add(
                         socket.getSocket().longValue(),
-                        proto.endpoint.getKeepAliveTimeout(),
-                        true, false);
+                        proto.endpoint.getKeepAliveTimeout(), true, false);
             }
         }
 
@@ -271,18 +267,22 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
             } else if (processor.isComet()) {
                 // Comet
                 if (proto.endpoint.isRunning()) {
-                    ((AprEndpoint) proto.endpoint).getCometPoller().add(
+                    socket.setComet(true);
+                    ((AprEndpoint) proto.endpoint).getPoller().add(
                             socket.getSocket().longValue(),
-                            proto.endpoint.getSoTimeout(),
-                            true, false);
+                            proto.endpoint.getSoTimeout(), true, false);
                 } else {
                     // Process a STOP directly
                     ((AprEndpoint) proto.endpoint).processSocket(
                             socket.getSocket().longValue(),
                             SocketStatus.STOP);
                 }
-            } else {
+            } else if (processor.isUpgrade()) {
                 // Upgraded
+                ((AprEndpoint) proto.endpoint).getPoller().add(
+                        socket.getSocket().longValue(), -1, true, false);
+            } else {
+                // Tomcat 7 proprietary upgrade
                 ((AprEndpoint) proto.endpoint).getPoller().add(
                         socket.getSocket().longValue(),
                         processor.getUpgradeInbound().getReadTimeout(),
