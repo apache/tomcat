@@ -633,7 +633,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                         inbound.onUpgradeComplete();
                     }
                     if (getLog().isDebugEnabled()) {
-                        getLog().debug("Socket: [" + socket +
+                        getLog().debug("Socket: [" + wrapper +
                                 "], Status in: [" + status +
                                 "], State out: [" + state + "]");
                     }
@@ -650,13 +650,13 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                 } else if (state == SocketState.OPEN) {
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
-                    connections.remove(processor);
+                    connections.remove(socket);
                     release(wrapper, processor, false, true);
                 } else if (state == SocketState.SENDFILE) {
                     // Sendfile in progress. If it fails, the socket will be
                     // closed. If it works, the socket will be re-added to the
                     // poller
-                    connections.remove(processor);
+                    connections.remove(socket);
                     release(wrapper, processor, false, false);
                 } else if (state == SocketState.UPGRADED) {
                     // Need to keep the connection associated with the processor
@@ -665,7 +665,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                 } else {
                     // Connection closed. OK to recycle the processor. Upgrade
                     // processors are not recycled.
-                    connections.remove(processor);
+                    connections.remove(socket);
                     if (!(processor instanceof org.apache.coyote.http11.upgrade.UpgradeProcessor)
                             && !processor.isUpgrade()) {
                         release(wrapper, processor, true, false);
@@ -692,6 +692,9 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                 getLog().error(
                         sm.getString("abstractConnectionHandler.error"), e);
             }
+            // Make sure socket/processor is removed from the list of current
+            // connections
+            connections.remove(socket);
             // Don't try to add upgrade processors back into the pool
             if (!(processor instanceof org.apache.coyote.http11.upgrade.UpgradeProcessor)
                     && !processor.isUpgrade()) {
