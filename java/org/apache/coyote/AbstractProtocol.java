@@ -676,8 +676,11 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     // Connection closed. OK to recycle the processor. Upgrade
                     // processors are not recycled.
                     connections.remove(socket);
-                    if (!(processor instanceof org.apache.coyote.http11.upgrade.UpgradeProcessor)
-                            && !processor.isUpgrade()) {
+                    if (processor.isUpgrade()) {
+                        processor.getHttpUpgradeHandler().destroy();
+                    } else if (processor instanceof org.apache.coyote.http11.upgrade.UpgradeProcessor) {
+                        // NO-OP
+                    } else {
                         release(wrapper, processor, true, false);
                     }
                 }
