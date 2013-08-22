@@ -23,8 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -33,17 +32,14 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestMaxConnections extends TomcatBaseTest {
+    private static final int MAX_CONNECTIONS = 3;
     public static final int soTimeout = 5000;
     public static final int connectTimeout = 1000;
 
     @Test
     public void testConnector() throws Exception {
-        log.info("This test tries to create 10 connections to connector "
-                + "that has maxConnections='4'. Expect half of them to fail.");
         init();
         ConnectThread[] t = new ConnectThread[10];
-        int passcount = 0;
-        int connectfail = 0;
         for (int i=0; i<t.length; i++) {
             t[i] = new ConnectThread();
             t[i].setName("ConnectThread["+i+"]");
@@ -54,27 +50,19 @@ public class TestMaxConnections extends TomcatBaseTest {
         }
         for (int i=0; i<t.length; i++) {
             t[i].join();
-            if (t[i].passed) passcount++;
-            if (t[i].connectfailed) connectfail++;
         }
 
-        assertTrue("The number of successful requests should have been 4-5, actual "+passcount,4==passcount || 5==passcount);
-        log.info("There were [" + passcount + "] passed requests and ["
-                + connectfail + "] connection failures");
+        Assert.assertEquals(MAX_CONNECTIONS, SimpleServlet.getMaxConnections());
     }
 
     private class ConnectThread extends Thread {
-        public boolean passed = true;
-        public boolean connectfailed = false;
         @Override
         public void run() {
             try {
                 TestClient client = new TestClient();
                 client.doHttp10Request();
-            }catch (Exception x) {
-                passed = false;
-                log.info(Thread.currentThread().getName()+" Error:"+x.getMessage());
-                connectfailed = "connect timed out".equals(x.getMessage()) || "Connection refused: connect".equals(x.getMessage());
+            } catch (Exception x) {
+                // NO-OP. Some connections are expected to fail.
             }
         }
     }
@@ -89,7 +77,8 @@ public class TestMaxConnections extends TomcatBaseTest {
         tomcat.getConnector().setProperty("maxThreads", "10");
         tomcat.getConnector().setProperty("soTimeout", "20000");
         tomcat.getConnector().setProperty("keepAliveTimeout", "50000");
-        tomcat.getConnector().setProperty("maxConnections", "4");
+        tomcat.getConnector().setProperty(
+                "maxConnections", Integer.toString(MAX_CONNECTIONS));
         tomcat.getConnector().setProperty("acceptCount", "1");
         tomcat.start();
     }
@@ -116,14 +105,13 @@ public class TestMaxConnections extends TomcatBaseTest {
             // Close the connection
             disconnect();
             reset();
-            assertTrue(passed);
+            Assert.assertTrue(passed);
         }
 
         @Override
         public boolean isResponseBodyOK() {
             return true;
         }
-
     }
 
 
@@ -131,8 +119,15 @@ public class TestMaxConnections extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
+        private static int currentConnections = 0;
+        private static int maxConnections = 0;
+
         @Override
-        protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        protected void service(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            increment();
+
             try {
                 Thread.sleep(TestMaxConnections.soTimeout*4/5);
             }catch (InterruptedException x) {
@@ -140,8 +135,24 @@ public class TestMaxConnections extends TomcatBaseTest {
             }
             resp.setContentLength(0);
             resp.flushBuffer();
+
+            decrement();
         }
 
-    }
+        private static synchronized void increment() {
+            currentConnections++;
+            if (currentConnections > maxConnections) {
+                maxConnections = currentConnections;
+            }
+        }
 
+        private static synchronized void decrement() {
+            currentConnections--;
+        }
+
+
+        public static synchronized int getMaxConnections() {
+            return maxConnections;
+        }
+    }
 }
