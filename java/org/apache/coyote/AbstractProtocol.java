@@ -633,6 +633,11 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                         processor = createUpgradeProcessor(wrapper, inbound);
                         inbound.onUpgradeComplete();
                     }
+                    if (getLog().isDebugEnabled()) {
+                        getLog().debug("Socket: [" + socket +
+                                "], Status in: [" + status +
+                                "], State out: [" + state + "]");
+                    }
                 } while (state == SocketState.ASYNC_END ||
                         state == SocketState.UPGRADING ||
                         state == SocketState.UPGRADING_TOMCAT);
