@@ -558,11 +558,16 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         public SocketState process(SocketWrapper<S> wrapper,
                 SocketStatus status) {
             S socket = wrapper.getSocket();
-            Processor<S> processor = connections.get(socket);
 
+            if (socket == null) {
+                // Nothing to do. Socket has been closed.
+                return SocketState.CLOSED;
+            }
+
+            Processor<S> processor = connections.get(socket);
             if (status == SocketStatus.DISCONNECT && processor == null) {
-                //nothing more to be done endpoint requested a close
-                //and there are no object associated with this connection
+                // Nothing to do. Endpoint requested a close and there is no
+                // longer a processor associated with this socket.
                 return SocketState.CLOSED;
             }
 
