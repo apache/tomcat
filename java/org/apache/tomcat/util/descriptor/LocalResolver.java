@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.descriptor;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -119,8 +120,10 @@ public class LocalResolver implements EntityResolver2 {
             if (systemUri.isAbsolute()) {
                 return systemId;
             }
-            return new URI(baseURI).resolve(systemUri).toString();
+            return new URL(new URL(baseURI), systemId).toString();
         } catch (URISyntaxException e) {
+            return systemId;
+        } catch (MalformedURLException e) {
             return systemId;
         }
     }
