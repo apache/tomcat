@@ -28,6 +28,7 @@ import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
@@ -580,14 +581,18 @@ public class McastServiceImpl
     }//class SenderThread
 
     protected static class RecoveryThread extends Thread {
-        static volatile boolean running = false;
+
+        private static final AtomicBoolean running = new AtomicBoolean(false);
 
         public static synchronized void recover(McastServiceImpl parent) {
-            if (running) return;
-            if (!parent.isRecoveryEnabled())
-                return;
 
-            running = true;
+            if (!parent.isRecoveryEnabled()) {
+                return;
+            }
+
+            if (!running.compareAndSet(false, true)) {
+                return;
+            }
 
             Thread t = new RecoveryThread(parent);
 
@@ -644,7 +649,7 @@ public class McastServiceImpl
                     }
                 }
             }finally {
-                running = false;
+                running.set(false);
             }
         }
     }
