@@ -65,6 +65,10 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
         getNext().invoke(request, response);
     }
 
+    public int getEntryCount() {
+        return entries.size();
+    }
+
     public void validateAccessLog(int count, int status, long minTime,
             long maxTime) throws Exception {
 

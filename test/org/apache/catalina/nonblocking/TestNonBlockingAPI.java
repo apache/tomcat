@@ -310,11 +310,16 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         String line = resultString.substring(lineStart, lineEnd + 1);
         Assert.assertEquals("HTTP/1.1 200 OK\r\n", line);
 
-        try {
-            //allow the listeners to finish up
-            Thread.sleep(1000);
-        } catch (Exception e) {
+        // Listeners are invoked and access valve entries created on a different
+        // thread so give that thread a chance to complete its work.
+        int count = 0;
+        while (count < 50 ||
+                !(servlet.wlistener.onErrorInvoked || servlet.rlistener.onErrorInvoked) ||
+                alv.getEntryCount() < 1) {
+            Thread.sleep(100);
+            count ++;
         }
+
         Assert.assertTrue("Error listener should have been invoked.",
                 servlet.wlistener.onErrorInvoked || servlet.rlistener.onErrorInvoked);
 
