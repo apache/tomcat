@@ -188,11 +188,14 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     void sendPartialString(CharBuffer part, boolean last) throws IOException {
         try {
+            // Get the timeout before we send the message. The message may
+            // trigger a session close and depending on timing the client
+            // session may close before we can read the timeout.
+            long timeout = getBlockingSendTimeout();
             FutureToSendHandler f2sh = new FutureToSendHandler();
             TextMessageSendHandler tmsh = new TextMessageSendHandler(f2sh, part,
                     last, encoder, encoderBuffer, this);
             tmsh.write();
-            long timeout = getBlockingSendTimeout();
             if (timeout == -1) {
                 f2sh.get();
             } else {
@@ -207,10 +210,13 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     void startMessageBlock(byte opCode, ByteBuffer payload, boolean last)
             throws IOException {
+        // Get the timeout before we send the message. The message may
+        // trigger a session close and depending on timing the client
+        // session may close before we can read the timeout.
+        long timeout = getBlockingSendTimeout();
         FutureToSendHandler f2sh = new FutureToSendHandler();
         startMessage(opCode, payload, last, f2sh);
         try {
-            long timeout = getBlockingSendTimeout();
             if (timeout == -1) {
                 f2sh.get();
             } else {
