@@ -50,6 +50,9 @@
 </section>
 
 <section name="Tomcat WebSocket specific configuration">
+<p>The JSR-356 Java WebSocket 1.0 implementation is only available when Tomcat
+   is running on Java 7 or later.</p>
+
 <p>Tomcat provides a number of Tomcat specific configuration options for
    WebSocket. It is anticipated that these will be absorbed into the WebSocket
    specification over time.</p>
