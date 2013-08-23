@@ -254,6 +254,10 @@
         French, Spanish or Japanese get the English messages they asked for.
         (markt) 
       </fix>
+      <fix>
+        <bug>55469</bug>: Fixed tags that were not properly closed. Based on a
+        patch provided by Larry Shatzer, jr. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
