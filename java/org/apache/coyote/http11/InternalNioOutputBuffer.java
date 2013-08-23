@@ -68,7 +68,17 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      */
     protected volatile boolean flipped = false;
 
+
     // --------------------------------------------------------- Public Methods
+
+    @Override
+    public void init(SocketWrapper<NioChannel> socketWrapper,
+            AbstractEndpoint endpoint) throws IOException {
+
+        socket = socketWrapper.getSocket();
+        pool = ((NioEndpoint)endpoint).getSelectorPool();
+    }
+
 
     /**
      * Recycle the output buffer. This should be called when closing the
@@ -95,7 +105,10 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         if (!committed) {
             socket.getBufHandler().getWriteBuffer().put(
                     Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
-            writeToSocket(socket.getBufHandler().getWriteBuffer(), true, true);
+            int result = writeToSocket(socket.getBufHandler().getWriteBuffer(), true, true);
+            if (result < 0) {
+                throw new IOException(sm.getString("iob.failedwrite.ack"));
+            }
         }
     }
 
@@ -147,23 +160,13 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     // ------------------------------------------------------ Protected Methods
 
-    @Override
-    public void init(SocketWrapper<NioChannel> socketWrapper,
-            AbstractEndpoint endpoint) throws IOException {
-
-        socket = socketWrapper.getSocket();
-        pool = ((NioEndpoint)endpoint).getSelectorPool();
-    }
-
-
     /**
      * Commit the response.
      *
      * @throws IOException an underlying I/O error occurred
      */
     @Override
-    protected void commit()
-        throws IOException {
+    protected void commit() throws IOException {
 
         // The response is now committed
         committed = true;

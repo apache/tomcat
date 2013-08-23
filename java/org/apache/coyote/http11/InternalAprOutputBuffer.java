@@ -123,14 +123,11 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
      * Send an acknowledgment.
      */
     @Override
-    public void sendAck()
-        throws IOException {
-
+    public void sendAck() throws IOException {
         if (!committed) {
             if (Socket.send(socket, Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length) < 0)
-                throw new IOException(sm.getString("iib.failedwrite"));
+                throw new IOException(sm.getString("iob.failedwrite.ack"));
         }
-
     }
 
 
