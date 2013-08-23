@@ -22,7 +22,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
@@ -69,8 +68,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      */
     protected volatile boolean flipped = false;
 
-    private final AtomicLong bytesWritten = new AtomicLong(0);
-
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -85,7 +82,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             socket = null;
         }
         flipped = false;
-        bytesWritten.set(0);
     }
 
 
