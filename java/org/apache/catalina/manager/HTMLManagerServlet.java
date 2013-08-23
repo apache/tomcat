@@ -1307,6 +1307,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</tr>\n" +
         "</table>\n" +
         "</form>\n" +
+        "</td>\n" +
+        "</tr>\n" +
         "</table>\n" +
         "<br>\n" +
         "\n";
