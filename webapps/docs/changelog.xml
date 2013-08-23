@@ -131,6 +131,14 @@
         <bug>55454</bug>: Avoid NPE when parsing an incorrect content type.
         (violetagg)
       </fix>
+      <update>
+        Back-port the JSR-356 Java WebSocket 1.0 implementation from Tomcat 8.
+        Note that use of this functionality requires Java 7. (markt)
+      </update>
+      <update>
+        Deprecate the Tomcat proprietary WebSocket API in favour of the new
+        JSR-356 implementation. (markt) 
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -157,6 +165,12 @@
         <bug>55399</bug>: Use the response locale to select the language to use
         for the status message in the HTTP response. (markt)
       </fix>
+      <update>
+        Refactor the connectors to support the new JSR-356 Java WebSocket
+        1.0 implementation. The most noticeable change is that the AJP
+        APR/native and HTTP APR/native connectors no longer support multiple
+        poller threads. Both connectors now use a single poller thread. (markt)  
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -258,6 +272,10 @@
         <bug>55469</bug>: Fixed tags that were not properly closed. Based on a
         patch provided by Larry Shatzer, jr. (violetagg)
       </fix>
+      <update>
+        The WebSocket examples in the examples web application have been changed
+        to use the new JSR-356 Java WebSocket 1.0 implementation. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
