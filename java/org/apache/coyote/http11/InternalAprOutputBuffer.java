@@ -306,10 +306,10 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
     private void transfer(ByteBuffer from, ByteBuffer to) {
         int max = Math.min(from.remaining(), to.remaining());
-        ByteBuffer tmp = from.duplicate ();
-        tmp.limit (tmp.position() + max);
-        to.put (tmp);
-        from.position(from.position() + max);
+        int fromLimit = from.limit();
+        from.limit(from.position() + max);
+        to.put(from);
+        from.limit(fromLimit);
     }
 
 
