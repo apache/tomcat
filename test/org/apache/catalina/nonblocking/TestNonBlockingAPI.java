@@ -313,8 +313,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // Listeners are invoked and access valve entries created on a different
         // thread so give that thread a chance to complete its work.
         int count = 0;
-        while (count < 50 ||
-                !(servlet.wlistener.onErrorInvoked || servlet.rlistener.onErrorInvoked) ||
+        while (count < 50 &&
+                !(servlet.wlistener.onErrorInvoked || servlet.rlistener.onErrorInvoked) &&
                 alv.getEntryCount() < 1) {
             Thread.sleep(100);
             count ++;
