@@ -205,10 +205,6 @@ public class BeanELResolver extends ELResolver {
 
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
-
         if (base == null) {
             return null;
         }
@@ -230,10 +226,6 @@ public class BeanELResolver extends ELResolver {
 
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
-
         if (base != null) {
             return Object.class;
         }
@@ -319,7 +311,7 @@ public class BeanELResolver extends ELResolver {
             if (this.write == null) {
                 this.write = Util.getMethod(this.owner, descriptor.getWriteMethod());
                 if (this.write == null) {
-                    throw new PropertyNotFoundException(Util.message(ctx,
+                    throw new PropertyNotWritableException(Util.message(ctx,
                             "propertyNotWritable", new Object[] {
                                     owner.getName(), descriptor.getName() }));
                 }

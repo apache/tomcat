@@ -18,7 +18,7 @@ package javax.el;
 
 public class TesterBean {
 
-    private final String name;
+    private String name;
 
     public TesterBean(String name) {
         this.name = name;
@@ -28,8 +28,16 @@ public class TesterBean {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public String toString() {
         return getName();
+    }
+
+    public String getValueA() throws Exception {
+        throw new Exception();
     }
 }
