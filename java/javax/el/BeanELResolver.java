@@ -175,10 +175,6 @@ public class BeanELResolver extends ELResolver {
 
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
-
         if (base == null) {
             return null;
         }
@@ -200,10 +196,6 @@ public class BeanELResolver extends ELResolver {
 
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
-
         if (base != null) {
             return Object.class;
         }

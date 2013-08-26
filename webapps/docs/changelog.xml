@@ -227,6 +227,14 @@
         <bug>55309</bug>: Fix concurrency issue with JSP compilation and the
         tag plug-in manager. Patch provided by Sheldon Shao. (markt)
       </fix>
+      <fix>
+        Ensure that
+        <code>javax.el.BeanELResolver.getFeatureDescriptors(ELContext,Object)</code>
+        and
+        <code>javax.el.BeanELResolver.getCommonPropertyType(ELContext,Object)</code>
+        do not throw <code>NullPointerException</code> when the provided context
+        is null. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
