@@ -296,7 +296,7 @@ public final class Request {
     }
 
 
-    public void setContentLength(int len) {
+    public void setContentLength(long len) {
         this.contentLength = len;
     }
 
