@@ -35,11 +35,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import org.apache.catalina.core.StandardContext;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
@@ -408,5 +410,42 @@ public class TestTomcat extends TomcatBaseTest {
         assertEquals("OK", res.toString());
 
         assertEquals(1, initCount.getCallCount());
+    }
+
+    @Test
+    public void testGetWebappConfigFileFromDirectory() {
+        Tomcat tomcat = new Tomcat();
+        assertNotNull(tomcat.getWebappConfigFile("test/deployment/dirContext", ""));
+    }
+
+    @Test
+    public void testGetWebappConfigFileFromDirectoryNegative() {
+        Tomcat tomcat = new Tomcat();
+        assertNull(tomcat.getWebappConfigFile("test/deployment/dirNoContext", ""));
+    }
+
+    @Test
+    public void testGetWebappConfigFileFromJar() {
+        Tomcat tomcat = new Tomcat();
+        assertNotNull(tomcat.getWebappConfigFile("test/deployment/context.war", ""));
+    }
+
+    @Test
+    public void testGetWebappConfigFileFromJarNegative() {
+        Tomcat tomcat = new Tomcat();
+        assertNull(tomcat.getWebappConfigFile("test/deployment/noContext.war", ""));
+    }
+
+    @Test
+    public void testBug51526() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appFile = new File("test/deployment/context.war");
+        StandardContext context = (StandardContext) tomcat.addWebapp(null, "/test",
+                appFile.getAbsolutePath());
+
+        tomcat.start();
+
+        assertEquals("WAR_CONTEXT", context.getSessionCookieName());
     }
 }

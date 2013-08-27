@@ -18,12 +18,16 @@ package org.apache.catalina.startup;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -181,8 +185,8 @@ public class Tomcat {
     /**
      * This is equivalent to adding a web application to Tomcat&apos;s webapps
      * directory. The equivalent of the default web.xml will be applied  to the
-     * web application and any WEB-INF/web.xml packaged with the application
-     * will be processed normally. Normal web fragment and
+     * web application and any WEB-INF/web.xml and META-INF/context.xml packaged
+     * with the application will be processed normally. Normal web fragment and
      * {@link javax.servlet.ServletContainerInitializer} processing will be
      * applied.
      *
@@ -525,6 +529,7 @@ public class Tomcat {
         ctx.setPath(url);
         ctx.setDocBase(path);
         ctx.addLifecycleListener(new DefaultWebXmlListener());
+        ctx.setConfigFile(getWebappConfigFile(path, url));
 
         ContextConfig ctxCfg = new ContextConfig();
         ctx.addLifecycleListener(ctxCfg);
@@ -668,16 +673,20 @@ public class Tomcat {
     }
 
     private void silence(Host host, String ctx) {
-        String base = "org.apache.catalina.core.ContainerBase.[default].[";
+        Logger.getLogger(getLoggerName(host, ctx)).setLevel(Level.WARNING);
+    }
+
+    private String getLoggerName(Host host, String ctx) {
+        String loggerName = "org.apache.catalina.core.ContainerBase.[default].[";
         if (host == null) {
-            base += getHost().getName();
+            loggerName += getHost().getName();
         } else {
-            base += host.getName();
+            loggerName += host.getName();
         }
-        base += "].[";
-        base += ctx;
-        base += "]";
-        Logger.getLogger(base).setLevel(Level.WARNING);
+        loggerName += "].[";
+        loggerName += ctx;
+        loggerName += "]";
+        return loggerName;
     }
 
     /**
@@ -1059,4 +1068,52 @@ public class Tomcat {
         "z", "application/x-compress",
         "zip", "application/zip"
     };
+
+    protected URL getWebappConfigFile(String path, String url) {
+        File docBase = new File(path);
+        if (docBase.isDirectory()) {
+            return getWebappConfigFileFromDirectory(docBase, url);
+        } else {
+            return getWebappConfigFileFromJar(docBase, url);
+        }
+    }
+
+    private URL getWebappConfigFileFromDirectory(File docBase, String url) {
+        URL result = null;
+        File webAppContextXml = new File(docBase, Constants.ApplicationContextXml);
+        if (webAppContextXml.exists()) {
+            try {
+                result = webAppContextXml.toURI().toURL();
+            } catch (MalformedURLException e) {
+                Logger.getLogger(getLoggerName(getHost(), url)).log(Level.WARNING,
+                        "Unable to determine web application context.xml " + docBase, e);
+            }
+        }
+        return result;
+    }
+
+    private URL getWebappConfigFileFromJar(File docBase, String url) {
+        URL result = null;
+        JarFile jar = null;
+        try {
+            jar = new JarFile(docBase);
+            JarEntry entry = jar.getJarEntry(Constants.ApplicationContextXml);
+            if (entry != null) {
+                result = new URL("jar:" + docBase.toURI().toString() + "!/"
+                        + Constants.ApplicationContextXml);
+            }
+        } catch (IOException e) {
+            Logger.getLogger(getLoggerName(getHost(), url)).log(Level.WARNING,
+                    "Unable to determine web application context.xml " + docBase, e);
+        } finally {
+            if (jar != null) {
+                try {
+                    jar.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
+        }
+        return result;
+    }
 }
