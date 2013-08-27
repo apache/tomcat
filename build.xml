@@ -210,6 +210,7 @@
   <tstamp>
     <format property="year" pattern="yyyy" locale="en"/>
     <format property="today" pattern="MMM d yyyy" locale="en"/>
+    <format property="today-iso-8601" pattern="yyyy-MM-dd" locale="en"/>
     <format property="tstamp" pattern="hh:mm:ss"/>
   </tstamp>
   <filterset id="version.filters">
@@ -845,6 +846,7 @@
       <param name="relative-path" expression="."/>
       <param name="version" expression="${version}"/>
       <param name="build-date" expression="${today}"/>
+      <param name="build-date-iso-8601" expression="${today-iso-8601}"/>
       <param name="year" expression="${year}"/>
     </xslt>
     <xslt basedir="webapps/docs/appdev"
@@ -859,6 +861,7 @@
       <param name="relative-path" expression=".."/>
       <param name="version" expression="${version}"/>
       <param name="build-date" expression="${today}"/>
+      <param name="build-date-iso-8601" expression="${today-iso-8601}"/>
       <param name="year" expression="${year}"/>
     </xslt>
     <xslt basedir="webapps/docs/funcspecs"
@@ -873,6 +876,7 @@
       <param name="relative-path" expression=".."/>
       <param name="version" expression="${version}"/>
       <param name="build-date" expression="${today}"/>
+      <param name="build-date-iso-8601" expression="${today-iso-8601}"/>
       <param name="year" expression="${year}"/>
     </xslt>
     <xslt basedir="webapps/docs/config"
@@ -887,6 +891,7 @@
       <param name="relative-path" expression=".."/>
       <param name="version" expression="${version}"/>
       <param name="build-date" expression="${today}"/>
+      <param name="build-date-iso-8601" expression="${today-iso-8601}"/>
       <param name="year" expression="${year}"/>
     </xslt>
     <xslt basedir="webapps/docs/architecture"
@@ -901,6 +906,7 @@
       <param name="relative-path" expression=".."/>
       <param name="version" expression="${version}"/>
       <param name="build-date" expression="${today}"/>
+      <param name="build-date-iso-8601" expression="${today-iso-8601}"/>
       <param name="year" expression="${year}"/>
     </xslt>
 
@@ -916,6 +922,7 @@
       <param name="relative-path" expression=".."/>
       <param name="version" expression="${version}"/>
       <param name="build-date" expression="${today}"/>
+      <param name="build-date-iso-8601" expression="${today-iso-8601}"/>
       <param name="year" expression="${year}"/>
     </xslt>
   </target>
