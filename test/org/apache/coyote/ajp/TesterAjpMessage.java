@@ -16,6 +16,9 @@
  */
 package org.apache.coyote.ajp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Extends {@link AjpMessage} to provide additional methods for reading from the
  * message.
@@ -23,6 +26,9 @@ package org.apache.coyote.ajp;
  *       AjpMessage
  */
 public class TesterAjpMessage extends AjpMessage {
+
+    private final List<Header> headers = new ArrayList<>();
+
 
     public TesterAjpMessage(int packetSize) {
         super(packetSize);
@@ -68,8 +74,29 @@ public class TesterAjpMessage extends AjpMessage {
         }
     }
 
+
+    public void addHeader(int code, String value) {
+        headers.add(new Header(code, value));
+    }
+
+
+    public void addHeader(String name, String value) {
+        headers.add(new Header(name, value));
+    }
+
+
     @Override
     public void end() {
+        // Add the header count
+        appendInt(headers.size());
+
+        for (Header header : headers) {
+            header.append(this);
+        }
+
+        // Terminator
+        appendByte(0xFF);
+
         len = pos;
         int dLen = len - 4;
 
@@ -80,4 +107,39 @@ public class TesterAjpMessage extends AjpMessage {
     }
 
 
+    @Override
+    public void reset() {
+        super.reset();
+        headers.clear();
+    }
+
+
+
+
+    private static class Header {
+        private final int code;
+        private final String name;
+        private final String value;
+
+        public Header(int code, String value) {
+            this.code = code;
+            this.name = null;
+            this.value = value;
+        }
+
+        public Header(String name, String value) {
+            this.code = 0;
+            this.name = name;
+            this.value = value;
+        }
+
+        public void append(TesterAjpMessage message) {
+            if (code == 0) {
+                message.appendString(name);
+            } else {
+                message.appendInt(code);
+            }
+            message.appendString(value);
+        }
+    }
 }
