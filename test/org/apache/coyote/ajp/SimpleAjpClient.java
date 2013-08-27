@@ -67,6 +67,11 @@ public class SimpleAjpClient {
      * Create a message to request the given URL.
      */
     public TesterAjpMessage createForwardMessage(String url) {
+        return createForwardMessage(url, 2);
+    }
+
+    public TesterAjpMessage createForwardMessage(String url, int method) {
+
         TesterAjpMessage message = new TesterAjpMessage(AJP_PACKET_SIZE);
         message.reset();
 
@@ -78,7 +83,7 @@ public class SimpleAjpClient {
         message.appendByte(Constants.JK_AJP13_FORWARD_REQUEST);
 
         // HTTP method, GET = 2
-        message.appendByte(0x02);
+        message.appendByte(method);
 
         // Protocol
         message.appendString("http");
@@ -101,26 +106,44 @@ public class SimpleAjpClient {
         // Is ssl
         message.appendByte(0x00);
 
-        // No other headers or attributes
-        message.appendInt(0);
+        return message;
+    }
 
-        // Terminator
-        message.appendByte(0xFF);
 
-        // End the message and set the length
+    public TesterAjpMessage createBodyMessage(byte[] data) {
+
+        TesterAjpMessage message = new TesterAjpMessage(AJP_PACKET_SIZE);
+        message.reset();
+
+        // Set the header bytes
+        message.getBuffer()[0] = 0x12;
+        message.getBuffer()[1] = 0x34;
+
+        message.appendBytes(data, 0, data.length);
         message.end();
 
         return message;
     }
 
+
     /**
      * Sends an TesterAjpMessage to the server and returns the response message.
      */
-    public TesterAjpMessage sendMessage(TesterAjpMessage message)
+    public TesterAjpMessage sendMessage(TesterAjpMessage headers)
             throws IOException {
-        // Send the message
+        return sendMessage(headers, null);
+    }
+
+    public TesterAjpMessage sendMessage(TesterAjpMessage headers,
+            TesterAjpMessage body) throws IOException {
+        // Send the headers
         socket.getOutputStream().write(
-                message.getBuffer(), 0, message.getLen());
+                headers.getBuffer(), 0, headers.getLen());
+        if (body != null) {
+            // Send the body of present
+            socket.getOutputStream().write(
+                    body.getBuffer(), 0, body.getLen());
+        }
         // Read the response
         return readMessage();
     }
