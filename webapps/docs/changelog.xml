@@ -58,6 +58,11 @@
 <section name="Tomcat 7.0.43 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>51526</bug>: <code>o.a.catalina.startup.Tomcat#addWebapp</code>
+        methods now process the web application's <code>META-INF/context.xml</code>
+        when it is available in the provided path. (violetagg)
+      </add>
       <fix>
         <bug>55186</bug>: Ensure local name is recycled between requests so IP
         virtual hosting works correctly. (markt)
