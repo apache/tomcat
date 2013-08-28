@@ -1028,7 +1028,7 @@ public class JNDIRealm extends RealmBase {
                    with broken SSL
                 */
                 // log the exception so we know it's there.
-                containerLog.warn(sm.getString("jndiRealm.exception"), e);
+                containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
 
                 // close the connection so we know it will be reopened.
                 if (context != null)
@@ -1043,7 +1043,7 @@ public class JNDIRealm extends RealmBase {
             } catch (CommunicationException e) {
 
                 // log the exception so we know it's there.
-                containerLog.warn(sm.getString("jndiRealm.exception"), e);
+                containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
 
                 // close the connection so we know it will be reopened.
                 if (context != null)
@@ -1058,7 +1058,7 @@ public class JNDIRealm extends RealmBase {
             } catch (ServiceUnavailableException e) {
 
                 // log the exception so we know it's there.
-                containerLog.warn(sm.getString("jndiRealm.exception"), e);
+                containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
 
                 // close the connection so we know it will be reopened.
                 if (context != null)
@@ -1987,7 +1987,7 @@ public class JNDIRealm extends RealmBase {
             } catch (CommunicationException e) {
 
                 // log the exception so we know it's there.
-                containerLog.warn(sm.getString("jndiRealm.exception"), e);
+                containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
 
                 // close the connection so we know it will be reopened.
                 if (context != null)
@@ -2002,7 +2002,7 @@ public class JNDIRealm extends RealmBase {
             } catch (ServiceUnavailableException e) {
 
                 // log the exception so we know it's there.
-                containerLog.warn(sm.getString("jndiRealm.exception"), e);
+                containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
 
                 // close the connection so we know it will be reopened.
                 if (context != null)
@@ -2122,7 +2122,7 @@ public class JNDIRealm extends RealmBase {
             connectionAttempt = 1;
 
             // log the first exception.
-            containerLog.warn(sm.getString("jndiRealm.exception"), e);
+            containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
 
             // Try connecting to the alternate url.
             context = new InitialDirContext(getDirectoryContextEnvironment());
