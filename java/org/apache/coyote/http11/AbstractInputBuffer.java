@@ -343,6 +343,21 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
                 available = activeFilters[i].available();
             }
         }
+        if (available > 0) {
+            return available;
+        }
+
+        try {
+            available = nbRead();
+        } catch (IOException ioe) {
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("iib.available.readFail"), ioe);
+            }
+            // Not ideal. This will indicate that data is available which should
+            // trigger a read which in turn will trigger another IOException and
+            // that one can be thrown.
+            available = 1;
+        }
         return available;
     }
 
