@@ -598,6 +598,8 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                 bbuf.limit(nRead);
                 bbuf.get(buf, pos, nRead);
                 lastValid = pos + nRead;
+            } else if (-nRead == Status.EAGAIN) {
+                return false;
             } else if ((-nRead) == Status.ETIMEDOUT || (-nRead) == Status.TIMEUP) {
                 if (block) {
                     throw new SocketTimeoutException(
