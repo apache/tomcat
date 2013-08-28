@@ -627,32 +627,6 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
 
     @Override
-    protected int nbRead() throws IOException {
-        bbuf.clear();
-        int nRead = doReadSocket(false);
-
-        if (nRead > 0) {
-            bbuf.limit(nRead);
-            bbuf.get(buf, pos, nRead);
-            lastValid = pos + nRead;
-            return nRead;
-        } else if (-nRead == Status.EAGAIN) {
-            return 0;
-        } else if (-nRead == Status.TIMEUP) {
-            // Attempting to read from the socket when the poller has not
-            // signalled that there is data to read appears to behave like a
-            // blocking read with a short timeout on OSX rather than like a
-            // non-blocking read. If no data is read, treat the resulting
-            // timeout like a non-blocking read that returned no data.
-            return 0;
-        } else {
-            throw new IOException(sm.getString("iib.failedread.apr",
-                    Integer.valueOf(-nRead)));
-        }
-    }
-
-
-    @Override
     protected final Log getLog() {
         return log;
     }

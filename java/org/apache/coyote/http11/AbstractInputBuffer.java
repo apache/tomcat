@@ -244,12 +244,6 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
     protected abstract void init(SocketWrapper<S> socketWrapper,
             AbstractEndpoint endpoint) throws IOException;
 
-    /**
-     * Issues a non blocking read.
-     * @return int  Number of bytes read
-     */
-    protected abstract int nbRead() throws IOException;
-
     protected abstract Log getLog();
 
 
@@ -348,7 +342,8 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
         }
 
         try {
-            available = nbRead();
+            fill(false);
+            available = lastValid - pos;
         } catch (IOException ioe) {
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("iib.available.readFail"), ioe);
