@@ -1585,16 +1585,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         } else if (status == SocketStatus.OPEN_READ &&
                 request.getReadListener() != null) {
             try {
-                try {
-                    if (inputBuffer.available() > 0 || inputBuffer.nbRead() > 0) {
-                        asyncStateMachine.asyncOperation();
-                    }
-                } catch (IOException x) {
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug("Unable to read async data.",x);
-                    }
-                    status = SocketStatus.ASYNC_READ_ERROR;
-                    request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
+                if (inputBuffer.available() > 0) {
+                    asyncStateMachine.asyncOperation();
                 }
             } catch (IllegalStateException x) {
                 registerForEvent(true, false);
