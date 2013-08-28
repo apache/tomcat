@@ -22,9 +22,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
@@ -185,48 +188,311 @@ class Util {
     }
 
 
+    /*
+     * This class duplicates code in org.apache.el.util.ReflectionUtil. When
+     * making changes keep the code in sync.
+     */
+    @SuppressWarnings("null")
     static Method findMethod(Class<?> clazz, String methodName,
-            Class<?>[] paramTypes, Object[] params) {
+            Class<?>[] paramTypes, Object[] paramValues) {
 
-        Method matchingMethod = null;
+        if (clazz == null || methodName == null) {
+            throw new MethodNotFoundException(
+                    message(null, "util.method.notfound", clazz, methodName,
+                    paramString(paramTypes)));
+        }
 
-        if (paramTypes != null) {
-            try {
-                matchingMethod =
-                    getMethod(clazz, clazz.getMethod(methodName, paramTypes));
-            } catch (NoSuchMethodException e) {
-                throw new MethodNotFoundException(e);
-            }
+        int paramCount;
+        if (paramTypes == null) {
+            paramTypes = getTypesFromValues(paramValues);
+        }
+
+        if (paramTypes == null) {
+            paramCount = 0;
         } else {
-            int paramCount = 0;
-            if (params != null) {
-                paramCount = params.length;
+            paramCount = paramTypes.length;
+        }
+
+        Method[] methods = clazz.getMethods();
+        Map<Method,Integer> candidates = new HashMap<>();
+
+        for (Method m : methods) {
+            if (!m.getName().equals(methodName)) {
+                // Method name doesn't match
+                continue;
             }
-            Method[] methods = clazz.getMethods();
-            for (Method m : methods) {
-                if (methodName.equals(m.getName())) {
-                    if (m.getParameterTypes().length == paramCount) {
-                        // Same number of parameters - use the first match
-                        matchingMethod = getMethod(clazz, m);
-                        break;
+
+            Class<?>[] mParamTypes = m.getParameterTypes();
+            int mParamCount;
+            if (mParamTypes == null) {
+                mParamCount = 0;
+            } else {
+                mParamCount = mParamTypes.length;
+            }
+
+            // Check the number of parameters
+            if (!(paramCount == mParamCount ||
+                    (m.isVarArgs() && paramCount >= mParamCount))) {
+                // Method has wrong number of parameters
+                continue;
+            }
+
+            // Check the parameters match
+            int exactMatch = 0;
+            boolean noMatch = false;
+            for (int i = 0; i < mParamCount; i++) {
+                // Can't be null
+                if (mParamTypes[i].equals(paramTypes[i])) {
+                    exactMatch++;
+                } else if (i == (mParamCount - 1) && m.isVarArgs()) {
+                    Class<?> varType = mParamTypes[i].getComponentType();
+                    for (int j = i; j < paramCount; j++) {
+                        if (!isAssignableFrom(paramTypes[j], varType)) {
+                            if (paramValues == null) {
+                                noMatch = true;
+                                break;
+                            } else {
+                                if (!isCoercibleFrom(paramValues[j], varType)) {
+                                    noMatch = true;
+                                    break;
+                                }
+                            }
+                        }
+                        // Don't treat a varArgs match as an exact match, it can
+                        // lead to a varArgs method matching when the result
+                        // should be ambiguous
                     }
-                    if (m.isVarArgs()
-                            && paramCount > m.getParameterTypes().length - 2) {
-                        matchingMethod = getMethod(clazz, m);
+                } else if (!isAssignableFrom(paramTypes[i], mParamTypes[i])) {
+                    if (paramValues == null) {
+                        noMatch = true;
+                        break;
+                    } else {
+                        if (!isCoercibleFrom(paramValues[i], mParamTypes[i])) {
+                            noMatch = true;
+                            break;
+                        }
                     }
                 }
             }
-            if (matchingMethod == null) {
-                throw new MethodNotFoundException(
-                        "Unable to find method [" + methodName + "] with ["
-                        + paramCount + "] parameters");
+            if (noMatch) {
+                continue;
             }
+
+            // If a method is found where every parameter matches exactly,
+            // return it
+            if (exactMatch == paramCount) {
+                return getMethod(clazz, m);
+            }
+
+            candidates.put(m, Integer.valueOf(exactMatch));
         }
 
-        return matchingMethod;
+        // Look for the method that has the highest number of parameters where
+        // the type matches exactly
+        int bestMatch = 0;
+        Method match = null;
+        boolean multiple = false;
+        for (Map.Entry<Method, Integer> entry : candidates.entrySet()) {
+            if (entry.getValue().intValue() > bestMatch ||
+                    match == null) {
+                bestMatch = entry.getValue().intValue();
+                match = entry.getKey();
+                multiple = false;
+            } else if (entry.getValue().intValue() == bestMatch) {
+                multiple = true;
+            }
+        }
+        if (multiple) {
+            if (bestMatch == paramCount - 1) {
+                // Only one parameter is not an exact match - try using the
+                // super class
+                match = resolveAmbiguousMethod(candidates.keySet(), paramTypes);
+            } else {
+                match = null;
+            }
+
+            if (match == null) {
+                // If multiple methods have the same matching number of parameters
+                // the match is ambiguous so throw an exception
+                throw new MethodNotFoundException(message(
+                        null, "util.method.ambiguous", clazz, methodName,
+                        paramString(paramTypes)));
+                }
+        }
+
+        // Handle case where no match at all was found
+        if (match == null) {
+            throw new MethodNotFoundException(message(
+                        null, "util.method.notfound", clazz, methodName,
+                        paramString(paramTypes)));
+        }
+
+        return getMethod(clazz, match);
     }
 
 
+    private static final String paramString(Class<?>[] types) {
+        if (types != null) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < types.length; i++) {
+                if (types[i] == null) {
+                    sb.append("null, ");
+                } else {
+                    sb.append(types[i].getName()).append(", ");
+                }
+            }
+            if (sb.length() > 2) {
+                sb.setLength(sb.length() - 2);
+            }
+            return sb.toString();
+        }
+        return null;
+    }
+
+
+    /*
+     * This class duplicates code in org.apache.el.util.ReflectionUtil. When
+     * making changes keep the code in sync.
+     */
+    private static Method resolveAmbiguousMethod(Set<Method> candidates,
+            Class<?>[] paramTypes) {
+        // Identify which parameter isn't an exact match
+        Method m = candidates.iterator().next();
+
+        int nonMatchIndex = 0;
+        Class<?> nonMatchClass = null;
+
+        for (int i = 0; i < paramTypes.length; i++) {
+            if (m.getParameterTypes()[i] != paramTypes[i]) {
+                nonMatchIndex = i;
+                nonMatchClass = paramTypes[i];
+                break;
+            }
+        }
+
+        if (nonMatchClass == null) {
+            // Null will always be ambiguous
+            return null;
+        }
+
+        for (Method c : candidates) {
+           if (c.getParameterTypes()[nonMatchIndex] ==
+                   paramTypes[nonMatchIndex]) {
+               // Methods have different non-matching parameters
+               // Result is ambiguous
+               return null;
+           }
+        }
+
+        // Can't be null
+        Class<?> superClass = nonMatchClass.getSuperclass();
+        while (superClass != null) {
+            for (Method c : candidates) {
+                if (c.getParameterTypes()[nonMatchIndex].equals(superClass)) {
+                    // Found a match
+                    return c;
+                }
+            }
+            superClass = superClass.getSuperclass();
+        }
+
+        // Treat instances of Number as a special case
+        Method match = null;
+        if (Number.class.isAssignableFrom(nonMatchClass)) {
+            for (Method c : candidates) {
+                Class<?> candidateType = c.getParameterTypes()[nonMatchIndex];
+                if (Number.class.isAssignableFrom(candidateType) ||
+                        candidateType.isPrimitive()) {
+                    if (match == null) {
+                        match = c;
+                    } else {
+                        // Match still ambiguous
+                        match = null;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return match;
+    }
+
+
+    /*
+     * This class duplicates code in org.apache.el.util.ReflectionUtil. When
+     * making changes keep the code in sync.
+     */
+    private static boolean isAssignableFrom(Class<?> src, Class<?> target) {
+        // src will always be an object
+        // Short-cut. null is always assignable to an object and in EL null
+        // can always be coerced to a valid value for a primitive
+        if (src == null) {
+            return true;
+        }
+
+        Class<?> targetClass;
+        if (target.isPrimitive()) {
+            if (target == Boolean.TYPE) {
+                targetClass = Boolean.class;
+            } else if (target == Character.TYPE) {
+                targetClass = Character.class;
+            } else if (target == Byte.TYPE) {
+                targetClass = Byte.class;
+            } else if (target == Short.TYPE) {
+                targetClass = Short.class;
+            } else if (target == Integer.TYPE) {
+                targetClass = Integer.class;
+            } else if (target == Long.TYPE) {
+                targetClass = Long.class;
+            } else if (target == Float.TYPE) {
+                targetClass = Float.class;
+            } else {
+                targetClass = Double.class;
+            }
+        } else {
+            targetClass = target;
+        }
+        return targetClass.isAssignableFrom(src);
+    }
+
+
+    /*
+     * This class duplicates code in org.apache.el.util.ReflectionUtil. When
+     * making changes keep the code in sync.
+     */
+    private static boolean isCoercibleFrom(Object src, Class<?> target) {
+        // TODO: This isn't pretty but it works. Significant refactoring would
+        //       be required to avoid the exception.
+        try {
+            getExpressionFactory().coerceToType(src, target);
+        } catch (ELException e) {
+            return false;
+        }
+        return true;
+    }
+
+
+    private static Class<?>[] getTypesFromValues(Object[] values) {
+        if (values == null) {
+            return null;
+        }
+
+        Class<?> result[] = new Class<?>[values.length];
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] == null) {
+                result[i] = null;
+            } else {
+                result[i] = values[i].getClass();
+            }
+        }
+        return result;
+    }
+
+
+    /*
+     * This class duplicates code in org.apache.el.util.ReflectionUtil. When
+     * making changes keep the code in sync.
+     */
     static Method getMethod(Class<?> type, Method m) {
         if (m == null || Modifier.isPublic(type.getModifiers())) {
             return m;
