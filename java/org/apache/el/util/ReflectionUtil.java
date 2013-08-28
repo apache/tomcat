@@ -18,6 +18,7 @@ package org.apache.el.util;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -105,13 +106,17 @@ public class ReflectionUtil {
     }
 
     /**
-     * Returns a method based on the criteria
+     * Returns a method based on the criteria.
      * @param base the object that owns the method
      * @param property the name of the method
      * @param paramTypes the parameter types to use
      * @param paramValues the parameter values
      * @return the method specified
      * @throws MethodNotFoundException
+     */
+    /*
+     * This class duplicates code in javax.el.Util. When making changes keep
+     * the code in sync.
      */
     @SuppressWarnings("null")
     public static Method getMethod(Object base, Object property,
@@ -201,7 +206,7 @@ public class ReflectionUtil {
             // If a method is found where every parameter matches exactly,
             // return it
             if (exactMatch == paramCount) {
-                return m;
+                getMethod(base.getClass(), m);
             }
 
             candidates.put(m, Integer.valueOf(exactMatch));
@@ -247,9 +252,13 @@ public class ReflectionUtil {
                         paramString(paramTypes)));
         }
 
-        return match;
+        return getMethod(base.getClass(), match);
     }
 
+    /*
+     * This class duplicates code in javax.el.Util. When making changes keep
+     * the code in sync.
+     */
     private static Method resolveAmbiguousMethod(Set<Method> candidates,
             Class<?>[] paramTypes) {
         // Identify which parameter isn't an exact match
@@ -281,23 +290,45 @@ public class ReflectionUtil {
         }
 
         // Can't be null
-        nonMatchClass = nonMatchClass.getSuperclass();
-        while (nonMatchClass != null) {
+        Class<?> superClass = nonMatchClass.getSuperclass();
+        while (superClass != null) {
             for (Method c : candidates) {
-                if (c.getParameterTypes()[nonMatchIndex].equals(
-                        nonMatchClass)) {
+                if (c.getParameterTypes()[nonMatchIndex].equals(superClass)) {
                     // Found a match
                     return c;
                 }
             }
-            nonMatchClass = nonMatchClass.getSuperclass();
+            superClass = superClass.getSuperclass();
         }
 
-        return null;
+        // Treat instances of Number as a special case
+        Method match = null;
+        if (Number.class.isAssignableFrom(nonMatchClass)) {
+            for (Method c : candidates) {
+                Class<?> candidateType = c.getParameterTypes()[nonMatchIndex];
+                if (Number.class.isAssignableFrom(candidateType) ||
+                        candidateType.isPrimitive()) {
+                    if (match == null) {
+                        match = c;
+                    } else {
+                        // Match still ambiguous
+                        match = null;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return match;
     }
 
-    // src will always be an object
+
+    /*
+     * This class duplicates code in javax.el.Util. When making changes keep
+     * the code in sync.
+     */
     private static boolean isAssignableFrom(Class<?> src, Class<?> target) {
+        // src will always be an object
         // Short-cut. null is always assignable to an object and in EL null
         // can always be coerced to a valid value for a primitive
         if (src == null) {
@@ -329,6 +360,11 @@ public class ReflectionUtil {
         return targetClass.isAssignableFrom(src);
     }
 
+
+    /*
+     * This class duplicates code in javax.el.Util. When making changes keep
+     * the code in sync.
+     */
     private static boolean isCoercibleFrom(Object src, Class<?> target) {
         // TODO: This isn't pretty but it works. Significant refactoring would
         //       be required to avoid the exception.
@@ -340,7 +376,45 @@ public class ReflectionUtil {
         return true;
     }
 
-    protected static final String paramString(Class<?>[] types) {
+
+    /*
+     * This class duplicates code in javax.el.Util. When making changes keep
+     * the code in sync.
+     */
+    private static Method getMethod(Class<?> type, Method m) {
+        if (m == null || Modifier.isPublic(type.getModifiers())) {
+            return m;
+        }
+        Class<?>[] inf = type.getInterfaces();
+        Method mp = null;
+        for (int i = 0; i < inf.length; i++) {
+            try {
+                mp = inf[i].getMethod(m.getName(), m.getParameterTypes());
+                mp = getMethod(mp.getDeclaringClass(), mp);
+                if (mp != null) {
+                    return mp;
+                }
+            } catch (NoSuchMethodException e) {
+                // Ignore
+            }
+        }
+        Class<?> sup = type.getSuperclass();
+        if (sup != null) {
+            try {
+                mp = sup.getMethod(m.getName(), m.getParameterTypes());
+                mp = getMethod(mp.getDeclaringClass(), mp);
+                if (mp != null) {
+                    return mp;
+                }
+            } catch (NoSuchMethodException e) {
+                // Ignore
+            }
+        }
+        return null;
+    }
+
+
+    private static final String paramString(Class<?>[] types) {
         if (types != null) {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < types.length; i++) {
