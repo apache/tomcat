@@ -707,9 +707,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             if (hId == Constants.SC_REQ_CONTENT_LENGTH ||
                     (hId == -1 && tmpMB.equalsIgnoreCase("Content-Length"))) {
                 // just read the content-length header, so set it
-                long cl = vMB.getLong();
-                if(cl < Integer.MAX_VALUE)
-                    request.setContentLength( (int)cl );
+                request.setContentLength(vMB.getLong());
             } else if (hId == Constants.SC_REQ_CONTENT_TYPE ||
                     (hId == -1 && tmpMB.equalsIgnoreCase("Content-Type"))) {
                 // just read the content-type header, so set it

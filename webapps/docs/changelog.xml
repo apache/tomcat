@@ -176,6 +176,11 @@
         APR/native and HTTP APR/native connectors no longer support multiple
         poller threads. Both connectors now use a single poller thread. (markt)  
       </update>
+      <fix>
+        Internally, content length is managed as a <code>long</code>. Fix a few
+        places in the AJP connector where this was restricted to an
+        <code>int</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
