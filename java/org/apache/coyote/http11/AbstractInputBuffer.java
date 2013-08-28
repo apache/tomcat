@@ -334,13 +334,13 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      * correspond).
      */
     public int available() {
-        int result = (lastValid - pos);
-        if ((result == 0) && (lastActiveFilter >= 0)) {
-            for (int i = 0; (result == 0) && (i <= lastActiveFilter); i++) {
-                result = activeFilters[i].available();
+        int available = lastValid - pos;
+        if ((available == 0) && (lastActiveFilter >= 0)) {
+            for (int i = 0; (available == 0) && (i <= lastActiveFilter); i++) {
+                available = activeFilters[i].available();
             }
         }
-        return result;
+        return available;
     }
 
 
