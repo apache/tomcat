@@ -600,7 +600,18 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                 lastValid = pos + nRead;
             } else {
                 if ((-nRead) == Status.ETIMEDOUT || (-nRead) == Status.TIMEUP) {
-                    throw new SocketTimeoutException(sm.getString("iib.readtimeout"));
+                    if (block) {
+                        throw new SocketTimeoutException(
+                                sm.getString("iib.readtimeout"));
+                    } else {
+                        // Attempting to read from the socket when the poller
+                        // has not signalled that there is data to read appears
+                        // to behave like a blocking read with a short timeout
+                        // on OSX rather than like a non-blocking read. If no
+                        // data is read, treat the resulting timeout like a
+                        // non-blocking read that returned no data.
+                        return false;
+                    }
                 } else if (nRead == 0) {
                     // APR_STATUS_IS_EOF, since native 1.1.22
                     return false;
