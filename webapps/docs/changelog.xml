@@ -181,6 +181,11 @@
         places in the AJP connector where this was restricted to an
         <code>int</code>. (markt)
       </fix>
+      <fix>
+        <bug>55453</bug>: Ensure that the AJP connector does not permit response
+        bodies to be included for responses with status codes and/or request
+        methods that are not permitted to have a response body. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

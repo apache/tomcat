@@ -215,6 +215,12 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     /**
+     * Should any response body be swallowed and not sent to the client.
+     */
+    private boolean swallowResponse = false;
+
+
+    /**
      * Finished response.
      */
     protected boolean finished = false;
@@ -582,6 +588,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         request.recycle();
         response.recycle();
         certificates.recycle();
+        swallowResponse = false;
         bytesWritten = 0;
     }
 
@@ -959,8 +966,25 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         responseMessage.reset();
         responseMessage.appendByte(Constants.JK_AJP13_SEND_HEADERS);
 
+        // Responses with certain status codes are not permitted to include a
+        // response body.
+        int statusCode = response.getStatus();
+        if (statusCode < 200 || statusCode == 204 || statusCode == 205 ||
+                statusCode == 304) {
+            // No entity body
+            swallowResponse = true;
+        }
+
+        // Responses to HEAD requests are not permitted to incude a response
+        // body.
+        MessageBytes methodMB = request.method();
+        if (methodMB.equals("HEAD")) {
+            // No entity body
+            swallowResponse = true;
+        }
+
         // HTTP header contents
-        responseMessage.appendInt(response.getStatus());
+        responseMessage.appendInt(statusCode);
         String message = null;
         if (org.apache.coyote.Constants.USE_CUSTOM_STATUS_MSG_IN_HEADER &&
                 HttpMessages.isSafeInHttpHeader(response.getMessage())) {
@@ -1125,27 +1149,29 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 }
             }
 
-            int len = chunk.getLength();
-            // 4 - hardcoded, byte[] marshaling overhead
-            // Adjust allowed size if packetSize != default (Constants.MAX_PACKET_SIZE)
-            int chunkSize = Constants.MAX_SEND_SIZE + packetSize - Constants.MAX_PACKET_SIZE;
-            int off = 0;
-            while (len > 0) {
-                int thisTime = len;
-                if (thisTime > chunkSize) {
-                    thisTime = chunkSize;
+            if (!swallowResponse) {
+                int len = chunk.getLength();
+                // 4 - hardcoded, byte[] marshaling overhead
+                // Adjust allowed size if packetSize != default (Constants.MAX_PACKET_SIZE)
+                int chunkSize = Constants.MAX_SEND_SIZE + packetSize - Constants.MAX_PACKET_SIZE;
+                int off = 0;
+                while (len > 0) {
+                    int thisTime = len;
+                    if (thisTime > chunkSize) {
+                        thisTime = chunkSize;
+                    }
+                    len -= thisTime;
+                    responseMessage.reset();
+                    responseMessage.appendByte(Constants.JK_AJP13_SEND_BODY_CHUNK);
+                    responseMessage.appendBytes(chunk.getBytes(), chunk.getOffset() + off, thisTime);
+                    responseMessage.end();
+                    output(responseMessage.getBuffer(), 0, responseMessage.getLen());
+
+                    off += thisTime;
                 }
-                len -= thisTime;
-                responseMessage.reset();
-                responseMessage.appendByte(Constants.JK_AJP13_SEND_BODY_CHUNK);
-                responseMessage.appendBytes(chunk.getBytes(), chunk.getOffset() + off, thisTime);
-                responseMessage.end();
-                output(responseMessage.getBuffer(), 0, responseMessage.getLen());
 
-                off += thisTime;
+                bytesWritten += chunk.getLength();
             }
-
-            bytesWritten += chunk.getLength();
             return chunk.getLength();
         }
 

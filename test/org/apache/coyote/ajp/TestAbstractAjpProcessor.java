@@ -17,6 +17,12 @@
 package org.apache.coyote.ajp;
 
 import java.io.File;
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -93,7 +99,6 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     }
 
 
-
     @Test
     public void testSimplePost() throws Exception {
 
@@ -128,6 +133,44 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         // Skip the body
         TesterAjpMessage responseBody = ajpClient.readMessage();
         validateResponseBody(responseBody, "test - data");
+        validateResponseEnd(ajpClient.readMessage(), true);
+
+        // Double check the connection is still open
+        validateCpong(ajpClient.cping());
+
+        ajpClient.disconnect();
+    }
+
+
+    /*
+     * Bug 55453
+     */
+    @Test
+    public void test304WithBody() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        Tomcat.addServlet(ctx, "bug55453", new Tester304WithBodyServlet());
+        ctx.addServletMapping("/", "bug55453");
+
+        tomcat.start();
+
+        SimpleAjpClient ajpClient = new SimpleAjpClient();
+        ajpClient.setPort(getPort());
+        ajpClient.connect();
+
+        validateCpong(ajpClient.cping());
+
+        TesterAjpMessage forwardMessage = ajpClient.createForwardMessage("/");
+        forwardMessage.end();
+
+        TesterAjpMessage responseHeaders =
+                ajpClient.sendMessage(forwardMessage, null);
+
+        // Expect 2 messages: headers, end
+        validateResponseHeaders(responseHeaders, 304);
         validateResponseEnd(ajpClient.readMessage(), true);
 
         // Double check the connection is still open
@@ -226,5 +269,19 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Assert.assertEquals(1, message.getLen());
         // Data should be the value 9
         Assert.assertEquals(9, message.buf[4]);
+    }
+
+
+    private static class Tester304WithBodyServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            resp.setStatus(304);
+            resp.getWriter().print("Body not permitted for 304 response");
+        }
     }
 }
