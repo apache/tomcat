@@ -158,12 +158,6 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
     // --------------------------------------------------------- Public Methods
 
     @Override
-    public int nbRead() throws IOException {
-        return readSocket(true,false);
-    }
-
-
-    @Override
     protected final Log getLog() {
         return log;
     }

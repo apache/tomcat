@@ -553,15 +553,6 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
 
     @Override
-    protected int nbRead() throws IOException {
-        // If this gets called for BIO need to make caller think there is data
-        // to read as BIO always reads whether there is data or not (and blocks
-        // until there is data to read).
-        return 1;
-    }
-
-
-    @Override
     protected final Log getLog() {
         return log;
     }
