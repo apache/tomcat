@@ -22,7 +22,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -189,10 +191,9 @@ class Util {
 
 
     /*
-     * This class duplicates code in org.apache.el.util.ReflectionUtil. When
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
      * making changes keep the code in sync.
      */
-    @SuppressWarnings("null")
     static Method findMethod(Class<?> clazz, String methodName,
             Class<?>[] paramTypes, Object[] paramValues) {
 
@@ -202,27 +203,42 @@ class Util {
                     paramString(paramTypes)));
         }
 
-        int paramCount;
         if (paramTypes == null) {
             paramTypes = getTypesFromValues(paramValues);
         }
 
+        Method[] methods = clazz.getMethods();
+
+        List<Wrapper> wrappers = Wrapper.wrap(methods, methodName);
+
+        Wrapper result = findWrapper(
+                clazz, wrappers, methodName, paramTypes, paramValues);
+
+        if (result == null) {
+            return null;
+        }
+        return getMethod(clazz, (Method) result.unWrap());
+    }
+
+    /*
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
+     * making changes keep the code in sync.
+     */
+    @SuppressWarnings("null")
+    private static Wrapper findWrapper(Class<?> clazz, List<Wrapper> wrappers,
+            String name, Class<?>[] paramTypes, Object[] paramValues) {
+
+        Map<Wrapper,Integer> candidates = new HashMap<>();
+
+        int paramCount;
         if (paramTypes == null) {
             paramCount = 0;
         } else {
             paramCount = paramTypes.length;
         }
 
-        Method[] methods = clazz.getMethods();
-        Map<Method,Integer> candidates = new HashMap<>();
-
-        for (Method m : methods) {
-            if (!m.getName().equals(methodName)) {
-                // Method name doesn't match
-                continue;
-            }
-
-            Class<?>[] mParamTypes = m.getParameterTypes();
+        for (Wrapper w : wrappers) {
+            Class<?>[] mParamTypes = w.getParameterTypes();
             int mParamCount;
             if (mParamTypes == null) {
                 mParamCount = 0;
@@ -232,7 +248,7 @@ class Util {
 
             // Check the number of parameters
             if (!(paramCount == mParamCount ||
-                    (m.isVarArgs() && paramCount >= mParamCount))) {
+                    (w.isVarArgs() && paramCount >= mParamCount))) {
                 // Method has wrong number of parameters
                 continue;
             }
@@ -244,7 +260,7 @@ class Util {
                 // Can't be null
                 if (mParamTypes[i].equals(paramTypes[i])) {
                     exactMatch++;
-                } else if (i == (mParamCount - 1) && m.isVarArgs()) {
+                } else if (i == (mParamCount - 1) && w.isVarArgs()) {
                     Class<?> varType = mParamTypes[i].getComponentType();
                     for (int j = i; j < paramCount; j++) {
                         if (!isAssignableFrom(paramTypes[j], varType)) {
@@ -281,18 +297,18 @@ class Util {
             // If a method is found where every parameter matches exactly,
             // return it
             if (exactMatch == paramCount) {
-                return getMethod(clazz, m);
+                return w;
             }
 
-            candidates.put(m, Integer.valueOf(exactMatch));
+            candidates.put(w, Integer.valueOf(exactMatch));
         }
 
         // Look for the method that has the highest number of parameters where
         // the type matches exactly
         int bestMatch = 0;
-        Method match = null;
+        Wrapper match = null;
         boolean multiple = false;
-        for (Map.Entry<Method, Integer> entry : candidates.entrySet()) {
+        for (Map.Entry<Wrapper, Integer> entry : candidates.entrySet()) {
             if (entry.getValue().intValue() > bestMatch ||
                     match == null) {
                 bestMatch = entry.getValue().intValue();
@@ -306,7 +322,7 @@ class Util {
             if (bestMatch == paramCount - 1) {
                 // Only one parameter is not an exact match - try using the
                 // super class
-                match = resolveAmbiguousMethod(candidates.keySet(), paramTypes);
+                match = resolveAmbiguousWrapper(candidates.keySet(), paramTypes);
             } else {
                 match = null;
             }
@@ -315,7 +331,7 @@ class Util {
                 // If multiple methods have the same matching number of parameters
                 // the match is ambiguous so throw an exception
                 throw new MethodNotFoundException(message(
-                        null, "util.method.ambiguous", clazz, methodName,
+                        null, "util.method.ambiguous", clazz, name,
                         paramString(paramTypes)));
                 }
         }
@@ -323,11 +339,11 @@ class Util {
         // Handle case where no match at all was found
         if (match == null) {
             throw new MethodNotFoundException(message(
-                        null, "util.method.notfound", clazz, methodName,
+                        null, "util.method.notfound", clazz, name,
                         paramString(paramTypes)));
         }
 
-        return getMethod(clazz, match);
+        return match;
     }
 
 
@@ -351,19 +367,19 @@ class Util {
 
 
     /*
-     * This class duplicates code in org.apache.el.util.ReflectionUtil. When
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
      * making changes keep the code in sync.
      */
-    private static Method resolveAmbiguousMethod(Set<Method> candidates,
+    private static Wrapper resolveAmbiguousWrapper(Set<Wrapper> candidates,
             Class<?>[] paramTypes) {
         // Identify which parameter isn't an exact match
-        Method m = candidates.iterator().next();
+        Wrapper w = candidates.iterator().next();
 
         int nonMatchIndex = 0;
         Class<?> nonMatchClass = null;
 
         for (int i = 0; i < paramTypes.length; i++) {
-            if (m.getParameterTypes()[i] != paramTypes[i]) {
+            if (w.getParameterTypes()[i] != paramTypes[i]) {
                 nonMatchIndex = i;
                 nonMatchClass = paramTypes[i];
                 break;
@@ -375,7 +391,7 @@ class Util {
             return null;
         }
 
-        for (Method c : candidates) {
+        for (Wrapper c : candidates) {
            if (c.getParameterTypes()[nonMatchIndex] ==
                    paramTypes[nonMatchIndex]) {
                // Methods have different non-matching parameters
@@ -387,7 +403,7 @@ class Util {
         // Can't be null
         Class<?> superClass = nonMatchClass.getSuperclass();
         while (superClass != null) {
-            for (Method c : candidates) {
+            for (Wrapper c : candidates) {
                 if (c.getParameterTypes()[nonMatchIndex].equals(superClass)) {
                     // Found a match
                     return c;
@@ -397,9 +413,9 @@ class Util {
         }
 
         // Treat instances of Number as a special case
-        Method match = null;
+        Wrapper match = null;
         if (Number.class.isAssignableFrom(nonMatchClass)) {
-            for (Method c : candidates) {
+            for (Wrapper c : candidates) {
                 Class<?> candidateType = c.getParameterTypes()[nonMatchIndex];
                 if (Number.class.isAssignableFrom(candidateType) ||
                         candidateType.isPrimitive()) {
@@ -419,7 +435,7 @@ class Util {
 
 
     /*
-     * This class duplicates code in org.apache.el.util.ReflectionUtil. When
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
      * making changes keep the code in sync.
      */
     private static boolean isAssignableFrom(Class<?> src, Class<?> target) {
@@ -457,7 +473,7 @@ class Util {
 
 
     /*
-     * This class duplicates code in org.apache.el.util.ReflectionUtil. When
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
      * making changes keep the code in sync.
      */
     private static boolean isCoercibleFrom(Object src, Class<?> target) {
@@ -490,7 +506,7 @@ class Util {
 
 
     /*
-     * This class duplicates code in org.apache.el.util.ReflectionUtil. When
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
      * making changes keep the code in sync.
      */
     static Method getMethod(Class<?> type, Method m) {
@@ -527,41 +543,31 @@ class Util {
 
 
     static Constructor<?> findConstructor(Class<?> clazz, Class<?>[] paramTypes,
-            Object[] params) {
+            Object[] paramValues) {
 
-        Constructor<?> match = null;
+        String methodName = "<init>";
 
-        if (paramTypes != null) {
-            try {
-                match = getConstructor(clazz, clazz.getConstructor(paramTypes));
-            } catch (NoSuchMethodException e) {
-                throw new MethodNotFoundException(e);
-            }
-        } else {
-            int paramCount = 0;
-            if (params != null) {
-                paramCount = params.length;
-            }
-            Constructor<?>[] constructors = clazz.getConstructors();
-            for (Constructor<?> c : constructors) {
-                if (c.getParameterTypes().length == paramCount) {
-                    // Same number of parameters - use the first match
-                    match = getConstructor(clazz, c);
-                    break;
-                }
-                if (c.isVarArgs()
-                        && paramCount > c.getParameterTypes().length - 2) {
-                    match = getConstructor(clazz, c);
-                }
-            }
-            if (match == null) {
-                throw new MethodNotFoundException(
-                        "Unable to find constructor with [" + paramCount +
-                        "] parameters");
-            }
+        if (clazz == null) {
+            throw new MethodNotFoundException(
+                    message(null, "util.method.notfound", clazz, methodName,
+                    paramString(paramTypes)));
         }
 
-        return match;
+        if (paramTypes == null) {
+            paramTypes = getTypesFromValues(paramValues);
+        }
+
+        Constructor<?>[] constructors = clazz.getConstructors();
+
+        List<Wrapper> wrappers = Wrapper.wrap(constructors);
+
+        Wrapper result = findWrapper(
+                clazz, wrappers, methodName, paramTypes, paramValues);
+
+        if (result == null) {
+            return null;
+        }
+        return getConstructor(clazz, (Constructor<?>) result.unWrap());
     }
 
 
@@ -620,5 +626,78 @@ class Util {
             }
         }
         return parameters;
+    }
+
+
+    private abstract static class Wrapper {
+
+        public static List<Wrapper> wrap(Method[] methods, String name) {
+            List<Wrapper> result = new ArrayList<>();
+            for (Method method : methods) {
+                if (method.getName().equals(name)) {
+                    result.add(new MethodWrapper(method));
+                }
+            }
+            return result;
+        }
+
+        public static List<Wrapper> wrap(Constructor<?>[] constructors) {
+            List<Wrapper> result = new ArrayList<>();
+            for (Constructor<?> constructor : constructors) {
+                result.add(new ConstructorWrapper(constructor));
+            }
+            return result;
+        }
+
+        public abstract Object unWrap();
+        public abstract Class<?>[] getParameterTypes();
+        public abstract boolean isVarArgs();
+    }
+
+
+    private static class MethodWrapper extends Wrapper {
+        private final Method m;
+
+        public MethodWrapper(Method m) {
+            this.m = m;
+        }
+
+        @Override
+        public Object unWrap() {
+            return m;
+        }
+
+        @Override
+        public Class<?>[] getParameterTypes() {
+            return m.getParameterTypes();
+        }
+
+        @Override
+        public boolean isVarArgs() {
+            return m.isVarArgs();
+        }
+    }
+
+    private static class ConstructorWrapper extends Wrapper {
+        private final Constructor<?> c;
+
+        public ConstructorWrapper(Constructor<?> c) {
+            this.c = c;
+        }
+
+        @Override
+        public Object unWrap() {
+            return c;
+        }
+
+        @Override
+        public Class<?>[] getParameterTypes() {
+            return c.getParameterTypes();
+        }
+
+        @Override
+        public boolean isVarArgs() {
+            return c.isVarArgs();
+        }
     }
 }
