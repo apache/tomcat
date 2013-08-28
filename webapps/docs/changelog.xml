@@ -144,6 +144,12 @@
         Deprecate the Tomcat proprietary WebSocket API in favour of the new
         JSR-356 implementation. (markt) 
       </update>
+      <fix>
+        <bug>55494</bug>: Reduce severity of log message from warning to
+        information for JNDI Realm connection issues where the JNDI Realm
+        automatically re-tries the action that failed. Make clear in the log
+        message that the action is being re-tried. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
