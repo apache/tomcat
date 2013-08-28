@@ -374,7 +374,7 @@ public class TestStaticFieldELResolver {
      */
     @Test
     public void testInvoke06() {
-        doThrowableTest(METHOD01_NAME, MethodUnderTest.INVOKE, true);
+        doThrowableTest(METHOD01_NAME, MethodUnderTest.INVOKE, false);
     }
 
     /**

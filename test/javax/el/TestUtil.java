@@ -31,7 +31,7 @@ public class TestUtil {
     }
 
 
-    // Commented out as this is not yet fixed @Test
+    @Test
     public void test02() {
         ELProcessor processor = new ELProcessor();
         processor.getELManager().importClass("java.util.Date");
