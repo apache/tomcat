@@ -198,7 +198,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Body empty flag.
+     * Request body empty flag.
      */
     protected boolean empty = true;
 
