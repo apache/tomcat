@@ -163,7 +163,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             return available;
         }
 
-        available = Math.max(lastValid - pos, 0);
+        available = lastValid - pos;
         if (available>0) {
             return available;
         }
