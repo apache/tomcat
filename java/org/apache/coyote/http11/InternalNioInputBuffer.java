@@ -158,29 +158,6 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
     // --------------------------------------------------------- Public Methods
 
     @Override
-    public int available() {
-
-        int available = super.available();
-        if (available>0) {
-            return available;
-        }
-
-        try {
-            available = nbRead();
-        }catch (IOException ioe) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("iib.available.readFail"), ioe);
-            }
-            // Not ideal. This will indicate that data is available which should
-            // trigger a read which in turn will trigger another IOException and
-            // that one can be thrown.
-            available = 1;
-        }
-        return available;
-    }
-
-
-    @Override
     public int nbRead() throws IOException {
         return readSocket(true,false);
     }
