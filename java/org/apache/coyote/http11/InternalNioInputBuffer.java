@@ -23,6 +23,8 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -40,8 +42,8 @@ import org.apache.tomcat.util.net.SocketWrapper;
  */
 public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
-    private static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog(InternalNioInputBuffer.class);
+    private static final Log log =
+            LogFactory.getLog(InternalNioInputBuffer.class);
 
     // -------------------------------------------------------------- Constants
 
@@ -181,6 +183,12 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
     @Override
     public int nbRead() throws IOException {
         return readSocket(true,false);
+    }
+
+
+    @Override
+    protected final Log getLog() {
+        return log;
     }
 
 

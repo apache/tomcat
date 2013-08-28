@@ -561,6 +561,12 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
     }
 
 
+    @Override
+    protected final Log getLog() {
+        return log;
+    }
+
+
     // ------------------------------------- InputStreamInputBuffer Inner Class
 
     /**

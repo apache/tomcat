@@ -641,6 +641,12 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     }
 
 
+    @Override
+    protected final Log getLog() {
+        return log;
+    }
+
+
     private int doReadSocket(boolean block) {
 
         Lock readLock = wrapper.getBlockingStatusReadLock();

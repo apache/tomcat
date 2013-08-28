@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
+import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -248,6 +249,8 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      * @return int  Number of bytes read
      */
     protected abstract int nbRead() throws IOException;
+
+    protected abstract Log getLog();
 
 
     // --------------------------------------------------------- Public Methods
