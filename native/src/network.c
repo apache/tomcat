@@ -439,6 +439,10 @@ TCN_IMPLEMENT_CALL(jint, Socket, send)(TCN_STDARGS, jlong sock,
         return -(jint)APR_ENOTSOCK;
     }
     TCN_ASSERT(s->opaque != NULL);
+    if(!s->net) {
+        tcn_ThrowAPRException(e, APR_EINVALSOCK);
+        return -(jint)APR_EINVALSOCK;
+    }
 #ifdef TCN_DO_STATISTICS
     sp_max_send = TCN_MAX(sp_max_send, nbytes);
     sp_min_send = TCN_MIN(sp_min_send, nbytes);
@@ -515,6 +519,10 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
     }
     TCN_ASSERT(s->opaque != NULL);
     TCN_ASSERT(buf != NULL);
+    if(!s->net) {
+        tcn_ThrowAPRException(e, APR_EINVALSOCK);
+        return -(jint)APR_EINVALSOCK;
+    }
 #ifdef TCN_DO_STATISTICS
     sp_max_send = TCN_MAX(sp_max_send, nbytes);
     sp_min_send = TCN_MIN(sp_min_send, nbytes);
@@ -555,6 +563,10 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendib)(TCN_STDARGS, jlong sock,
     }
     TCN_ASSERT(s->opaque != NULL);
     TCN_ASSERT(buf != NULL);
+    if(!s->net) {
+        tcn_ThrowAPRException(e, APR_EINVALSOCK);
+        return -(jint)APR_EINVALSOCK;
+    }
 #ifdef TCN_DO_STATISTICS
     sp_max_send = TCN_MAX(sp_max_send, nbytes);
     sp_min_send = TCN_MIN(sp_min_send, nbytes);
@@ -589,6 +601,10 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendbb)(TCN_STDARGS, jlong sock,
     }
     TCN_ASSERT(s->opaque != NULL);
     TCN_ASSERT(s->jsbbuff != NULL);
+    if(!s->net) {
+        tcn_ThrowAPRException(e, APR_EINVALSOCK);
+        return -(jint)APR_EINVALSOCK;
+    }
 #ifdef TCN_DO_STATISTICS
     sp_max_send = TCN_MAX(sp_max_send, nbytes);
     sp_min_send = TCN_MIN(sp_min_send, nbytes);
@@ -625,6 +641,10 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendibb)(TCN_STDARGS, jlong sock,
     }
     TCN_ASSERT(s->opaque != NULL);
     TCN_ASSERT(s->jsbbuff != NULL);
+    if(!s->net) {
+        tcn_ThrowAPRException(e, APR_EINVALSOCK);
+        return -(jint)APR_EINVALSOCK;
+    }
 #ifdef TCN_DO_STATISTICS
     sp_max_send = TCN_MAX(sp_max_send, nbytes);
     sp_min_send = TCN_MIN(sp_min_send, nbytes);
@@ -656,6 +676,10 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendv)(TCN_STDARGS, jlong sock,
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(s->opaque != NULL);
+    if(!s->net) {
+        tcn_ThrowAPRException(e, APR_EINVALSOCK);
+        return -(jint)APR_EINVALSOCK;
+    }
 
     nvec = (*e)->GetArrayLength(e, bufs);
     if (nvec >= APR_MAX_IOVEC_SIZE)
@@ -726,6 +750,10 @@ TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(s->opaque != NULL);
+    if(!s->net) {
+        tcn_ThrowAPRException(e, APR_EINVALSOCK);
+        return -(jint)APR_EINVALSOCK;
+    }
 
     if (toread <= TCN_BUFFER_SZ) {
         char sb[TCN_BUFFER_SZ];
@@ -783,6 +811,10 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvt)(TCN_STDARGS, jlong sock,
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(s->opaque != NULL);
     TCN_ASSERT(buf != NULL);
+    if(!s->net) {
+        tcn_ThrowAPRException(e, APR_EINVALSOCK);
+        return -(jint)APR_EINVALSOCK;
+    }
 
     if ((ss = (*s->net->timeout_get)(s->opaque, &pt)) != APR_SUCCESS) {
         TCN_ERROR_WRAP(ss);
@@ -855,6 +887,10 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvb)(TCN_STDARGS, jlong sock,
     }
     TCN_ASSERT(s->opaque != NULL);
     TCN_ASSERT(buf != NULL);
+    if(!s->net) {
+        tcn_ThrowAPRException(e, APR_EINVALSOCK);
+        return -(jint)APR_EINVALSOCK;
+    }
 
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
     TCN_ASSERT(bytes != NULL);
@@ -903,6 +939,10 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbb)(TCN_STDARGS, jlong sock,
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(s->opaque != NULL);
     TCN_ASSERT(s->jrbbuff != NULL);
+    if(!s->net) {
+        tcn_ThrowAPRException(e, APR_EINVALSOCK);
+        return -(jint)APR_EINVALSOCK;
+    }
 
     ss = (*s->net->recv)(s->opaque, s->jrbbuff + offset, &nbytes);
 #ifdef TCN_DO_STATISTICS
@@ -954,6 +994,10 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
     }
     TCN_ASSERT(buf != NULL);
     TCN_ASSERT(s->opaque != NULL);
+    if(!s->net) {
+        tcn_ThrowAPRException(e, APR_EINVALSOCK);
+        return -(jint)APR_EINVALSOCK;
+    }
 
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
     TCN_ASSERT(bytes != NULL);
@@ -1023,7 +1067,10 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbbt)(TCN_STDARGS, jlong sock,
     }
     TCN_ASSERT(s->jrbbuff != NULL);
     TCN_ASSERT(s->opaque != NULL);
-
+    if(!s->net) {
+        tcn_ThrowAPRException(e, APR_EINVALSOCK);
+        return -(jint)APR_EINVALSOCK;
+    }
 
     if ((ss = (*s->net->timeout_get)(s->opaque, &pt)) != APR_SUCCESS) {
         TCN_ERROR_WRAP(ss);
