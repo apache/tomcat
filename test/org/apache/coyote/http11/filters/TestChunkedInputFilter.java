@@ -198,7 +198,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         client.connect();
         client.processRequest();
         // Expected to fail because the trailers are longer
-        // than the default limit of 8Kb
+        // than the set limit of 10 bytes
         assertTrue(client.isResponse500());
     }
 
