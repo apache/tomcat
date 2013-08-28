@@ -163,10 +163,6 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             return available;
         }
 
-        available = lastValid - pos;
-        if (available>0) {
-            return available;
-        }
         try {
             available = nbRead();
         }catch (IOException ioe) {
