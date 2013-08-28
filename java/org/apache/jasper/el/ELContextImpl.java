@@ -24,6 +24,7 @@ import javax.el.ArrayELResolver;
 import javax.el.BeanELResolver;
 import javax.el.CompositeELResolver;
 import javax.el.ELContext;
+import javax.el.ELManager;
 import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
 import javax.el.FunctionMapper;
@@ -83,6 +84,9 @@ public final class ELContextImpl extends ELContext {
             DefaultResolver = null;
         } else {
             DefaultResolver = new CompositeELResolver();
+            ((CompositeELResolver) DefaultResolver).add(
+                    ELManager.getExpressionFactory().getStreamELResolver());
+            ((CompositeELResolver) DefaultResolver).add(new StaticFieldELResolver());
             ((CompositeELResolver) DefaultResolver).add(new MapELResolver());
             ((CompositeELResolver) DefaultResolver).add(new ResourceBundleELResolver());
             ((CompositeELResolver) DefaultResolver).add(new ListELResolver());
