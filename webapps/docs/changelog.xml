@@ -236,7 +236,7 @@
       <update>
         <bug>55383</bug>: Improve the design and correct the HTML markup of
         the documentation web application. Patches provided by Konstantin
-        Preißer. (markt) 
+        Preißer. (markt)
       </update>
     </changelog>
   </subsection>
