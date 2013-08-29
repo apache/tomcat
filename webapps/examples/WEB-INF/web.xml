@@ -367,4 +367,15 @@
       <url-pattern>/async/stockticker</url-pattern>
     </servlet-mapping>
 
+    <!-- Non-blocking IO examples -->
+    <servlet>
+      <servlet-class>nonblocking.ByteCounter</servlet-class>
+      <servlet-name>bytecounter</servlet-name>
+      <async-supported>true</async-supported>
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>bytecounter</servlet-name>
+      <url-pattern>/servlets/nonblocking/bytecounter</url-pattern>
+    </servlet-mapping>
+
 </web-app>
