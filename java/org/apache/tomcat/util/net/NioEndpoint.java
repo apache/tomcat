@@ -1376,13 +1376,11 @@ public class NioEndpoint extends AbstractEndpoint {
         }
 
         public void reset(Poller poller, NioChannel channel, long soTimeout) {
-            this.socket = channel;
+            super.reset(channel, soTimeout);
+
+            cometNotify = false;
+            interestOps = 0;
             this.poller = poller;
-            lastAccess = System.currentTimeMillis();
-            setComet(false);
-            setTimeout(soTimeout);
-            setWriteTimeout(soTimeout);
-            error = false;
             sendfileData = null;
             if (readLatch != null) {
                 try {
@@ -1393,6 +1391,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 }
             }
             readLatch = null;
+            sendfileData = null;
             if (writeLatch != null) {
                 try {
                     for (int i = 0; i < (int) writeLatch.getCount(); i++) {
@@ -1402,10 +1401,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 }
             }
             writeLatch = null;
-            cometNotify = false;
-            sendfileData = null;
-            keepAliveLeft = 100;
-            async = false;
+            setWriteTimeout(soTimeout);
         }
 
         public void reset() {
@@ -1417,7 +1413,6 @@ public class NioEndpoint extends AbstractEndpoint {
         public void setCometNotify(boolean notify) { this.cometNotify = notify; }
         public boolean getCometNotify() { return cometNotify; }
         public NioChannel getChannel() { return getSocket();}
-        public void setChannel(NioChannel channel) { this.socket = channel;}
         public int interestOps() { return interestOps;}
         public int interestOps(int ops) { this.interestOps  = ops; return ops; }
         public CountDownLatch getReadLatch() { return readLatch; }

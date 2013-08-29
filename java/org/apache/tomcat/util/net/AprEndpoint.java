@@ -1050,7 +1050,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     waitingRequests.iterator();
                 while (sockets.hasNext()) {
                     SocketWrapper<Long> socket = sockets.next();
-                    if (socket.async) {
+                    if (socket.isAsync()) {
                         long access = socket.getLastAccess();
                         if (socket.getTimeout() > 0 &&
                                 (now-access)>socket.getTimeout()) {
@@ -2218,7 +2218,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         socket = null;
                     } else if (state == Handler.SocketState.LONG) {
                         socket.access();
-                        if (socket.async) {
+                        if (socket.isAsync()) {
                             waitingRequests.add(socket);
                         }
                     }
@@ -2277,10 +2277,10 @@ public class AprEndpoint extends AbstractEndpoint {
             if (state == Handler.SocketState.CLOSED) {
                 // Close socket and pool
                 destroySocket(socket.getSocket().longValue());
-                socket.socket = null;
+                socket.reset(null, 1);
             } else if (state == Handler.SocketState.LONG) {
                 socket.access();
-                if (socket.async) {
+                if (socket.isAsync()) {
                     waitingRequests.add(socket);
                 }
             } else if (state == Handler.SocketState.ASYNC_END) {
