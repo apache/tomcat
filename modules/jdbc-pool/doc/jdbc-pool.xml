@@ -41,7 +41,7 @@
 
   <p>So why do we need a new connection pool?</p>
 
-  <p>Here are a few of the reasons:
+  <p>Here are a few of the reasons:</p>
     <ol>
       <li>commons-dbcp is single threaded, in order to be thread safe commons-dbcp locks the entire pool, even during query validation.</li>
       <li>commons-dbcp is slow - as the number of logical CPUs grow, the performance suffers, the above point shows that there is not support for high concurrency
@@ -59,9 +59,8 @@
       <li>Starvation proof. If a pool is empty, and threads are waiting for a connection, when a connection is returned,
           the pool will awake the correct thread waiting. Most pools will simply starve.</li>
     </ol>
-  </p>
 
-  <p>Features added over other connection pool implementations
+  <p>Features added over other connection pool implementations</p>
     <ol>
       <li>Support for highly concurrent environments and multi core/cpu systems.</li>
       <li>Dynamic implementation of interface, will support <code>java.sql</code> and <code>javax.sql</code> interfaces for
@@ -96,7 +95,6 @@
           This is achieved using the <code>dataSource</code> and <code>dataSourceJNDI</code> attributes.</li>
       <li>XA connection support</li>
     </ol>
-  </p>
 
 
 </section>
@@ -173,7 +171,7 @@
     </attribute>
 
     <attribute name="defaultTransactionIsolation" required="false">
-      <p>(String) The default TransactionIsolation state of connections created by this pool. One of the following: (see javadoc )
+      <p>(String) The default TransactionIsolation state of connections created by this pool. One of the following: (see javadoc )</p>
          <ul>
            <li><code>NONE</code></li>
            <li><code>READ_COMMITTED</code></li>
@@ -181,8 +179,7 @@
            <li><code>REPEATABLE_READ</code></li>
            <li><code>SERIALIZABLE</code></li>
          </ul>
-         If not set, the method will not be called and it defaults to the JDBC driver.
-      </p>
+         <p>If not set, the method will not be called and it defaults to the JDBC driver.</p>
     </attribute>
 
     <attribute name="defaultCatalog" required="false">
@@ -673,8 +670,7 @@
   <p>Other examples of Tomcat configuration for JDBC usage can be found <a href="http://tomcat.apache.org/tomcat-6.0-doc/jndi-datasource-examples-howto.html">in the Tomcat documentation</a>. </p>
   <subsection name="Plain Ol' Java">
     <p>Here is a simple example of how to create and use a data source.</p>
-<source>
-  import java.sql.Connection;
+<source><![CDATA[  import java.sql.Connection;
   import java.sql.ResultSet;
   import java.sql.Statement;
 
@@ -705,8 +701,8 @@
           p.setLogAbandoned(true);
           p.setRemoveAbandoned(true);
           p.setJdbcInterceptors(
-            &quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;&quot;+
-            &quot;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;);
+            "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;"+
+            "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer");
           DataSource datasource = new DataSource();
           datasource.setPoolProperties(p);
 
@@ -727,53 +723,50 @@
           }
       }
 
-  }
-</source>
+  }]]></source>
   </subsection>
   <subsection name="As a Resource">
     <p>And here is an example on how to configure a resource for JNDI lookups</p>
-<source>
-&lt;Resource name=&quot;jdbc/TestDB&quot;
-          auth=&quot;Container&quot;
-          type=&quot;javax.sql.DataSource&quot;
-          factory=&quot;org.apache.tomcat.jdbc.pool.DataSourceFactory&quot;
-          testWhileIdle=&quot;true&quot;
-          testOnBorrow=&quot;true&quot;
-          testOnReturn=&quot;false&quot;
-          validationQuery=&quot;SELECT 1&quot;
-          validationInterval=&quot;30000&quot;
-          timeBetweenEvictionRunsMillis=&quot;30000&quot;
-          maxActive=&quot;100&quot;
-          minIdle=&quot;10&quot;
-          maxWait=&quot;10000&quot;
-          initialSize=&quot;10&quot;
-          removeAbandonedTimeout=&quot;60&quot;
-          removeAbandoned=&quot;true&quot;
-          logAbandoned=&quot;true&quot;
-          minEvictableIdleTimeMillis=&quot;30000&quot;
-          jmxEnabled=&quot;true&quot;
-          jdbcInterceptors=&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
-            org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;
-          username=&quot;root&quot;
-          password=&quot;password&quot;
-          driverClassName=&quot;com.mysql.jdbc.Driver&quot;
-          url=&quot;jdbc:mysql://localhost:3306/mysql&quot;/&gt;
-</source>
+<source><![CDATA[<Resource name="jdbc/TestDB"
+          auth="Container"
+          type="javax.sql.DataSource"
+          factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+          testWhileIdle="true"
+          testOnBorrow="true"
+          testOnReturn="false"
+          validationQuery="SELECT 1"
+          validationInterval="30000"
+          timeBetweenEvictionRunsMillis="30000"
+          maxActive="100"
+          minIdle="10"
+          maxWait="10000"
+          initialSize="10"
+          removeAbandonedTimeout="60"
+          removeAbandoned="true"
+          logAbandoned="true"
+          minEvictableIdleTimeMillis="30000"
+          jmxEnabled="true"
+          jdbcInterceptors="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
+            org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer"
+          username="root"
+          password="password"
+          driverClassName="com.mysql.jdbc.Driver"
+          url="jdbc:mysql://localhost:3306/mysql"/>]]></source>
 
   </subsection>
   <subsection name="Asynchronous Connection Retrieval">
     <p> The Tomcat JDBC connection pool supports asynchronous connection retrieval without adding additional threads to the
         pool library. It does this by adding a method to the data source called <code>Future&lt;Connection&gt; getConnectionAsync()</code>.
         In order to use the async retrieval, two conditions must be met:
+    </p>
         <ol>
           <li>You must configure the <code>fairQueue</code> property to be <code>true</code>.</li>
           <li>You will have to cast the data source to <code>org.apache.tomcat.jdbc.pool.DataSource</code></li>
         </ol>
         An example of using the async feature is show below.
-<source>
-  Connection con = null;
+<source><![CDATA[  Connection con = null;
   try {
-    Future&lt;Connection&gt; future = datasource.getConnectionAsync();
+    Future<Connection> future = datasource.getConnectionAsync();
     while (!future.isDone()) {
       System.out.println("Connection is not yet available. Do some background work");
       try {
@@ -784,9 +777,8 @@
     }
     con = future.get(); //should return instantly
     Statement st = con.createStatement();
-    ResultSet rs = st.executeQuery("select * from user");
-</source>
-    </p>
+    ResultSet rs = st.executeQuery("select * from user");]]></source>
+
   </subsection>
   <subsection name="Interceptors">
     <p>Interceptors are a powerful way to enable, disable or modify functionality on a specific connection or its sub components.
@@ -796,91 +788,86 @@
        the pool itself will not reset them.</p>
     <p>An interceptor has to extend the <code>org.apache.tomcat.jdbc.pool.JdbcInterceptor</code> class. This class is fairly simple,
        You will need to have a no arg constructor</p>
-<source>
-  public JdbcInterceptor() {
-  }
-</source>
+<source><![CDATA[  public JdbcInterceptor() {
+  }]]></source>
     <p>
        When a connection is borrowed from the pool, the interceptor can initialize or in some other way react to the event by implementing the
-<source>
-  public abstract void reset(ConnectionPool parent, PooledConnection con);
-</source>
+    </p>
+<source><![CDATA[  public abstract void reset(ConnectionPool parent, PooledConnection con);]]></source>
+    <p>
        method. This method gets called with two parameters, a reference to the connection pool itself <code>ConnectionPool parent</code>
        and a reference to the underlying connection <code>PooledConnection con</code>.
     </p>
     <p>
        When a method on the <code>java.sql.Connection</code> object is invoked, it will cause the
-<source>
-  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-</source>
+    </p>
+<source><![CDATA[  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable]]></source>
+    <p>
        method to get invoked. The <code>Method method</code> is the actual method invoked, and <code>Object[] args</code> are the arguments.
        To look at a very simple example, where we demonstrate how to make the invokation to <code>java.sql.Connection.close()</code> a noop
        if the connection has been closed
-<source>
-  if (CLOSE_VAL==method.getName()) {
+    </p>
+<source><![CDATA[  if (CLOSE_VAL==method.getName()) {
       if (isClosed()) return null; //noop for already closed.
   }
-  return super.invoke(proxy,method,args);
-</source>
+  return super.invoke(proxy,method,args);]]></source>
+    <p>
         There is an observation being made. It is the comparison of the method name. One way to do this would be to do
         <code>&quot;close&quot;.equals(method.getName())</code>.
         Above we see a direct reference comparison between the method name and <code>static final String</code> reference.
         According to the JVM spec, method names and static final String end up in a shared constant pool, so the reference comparison should work.
         One could of course do this as well:
-<source>
-  if (compare(CLOSE_VAL,method)) {
+    </p>
+<source><![CDATA[  if (compare(CLOSE_VAL,method)) {
       if (isClosed()) return null; //noop for already closed.
   }
-  return super.invoke(proxy,method,args);
-</source>
+  return super.invoke(proxy,method,args);]]></source>
+    <p>
         The <code>compare(String,Method)</code> will use the <code>useEquals</code> flag on an interceptor and do either reference comparison or
         a string value comparison when the <code>useEquals=true</code> flag is set.
     </p>
     <p>Pool start/stop<br/>
        When the connection pool is started or closed, you can be notifed. You will only be notified once per interceptor class
        even though it is an instance method. and you will be notified using an interceptor currently not attached to a pool.
-<source>
-  public void poolStarted(ConnectionPool pool) {
+    </p>
+<source><![CDATA[  public void poolStarted(ConnectionPool pool) {
   }
 
   public void poolClosed(ConnectionPool pool) {
-  }
-</source>
+  }]]></source>
+    <p>
        When overriding these methods, don't forget to call super if you are extending a class other than <code>JdbcInterceptor</code>
     </p>
     <p>Configuring interceptors<br/>
        Interceptors are configured using the <code>jdbcInterceptors</code> property or the <code>setJdbcInterceptors</code> method.
        An interceptor can have properties, and would be configured like this
-<source>
-  String jdbcInterceptors=
-    &quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState(useEquals=true,fast=yes)&quot;
-</source>
     </p>
+<source><![CDATA[  String jdbcInterceptors=
+    "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState(useEquals=true,fast=yes)"]]></source>
+
     <p>Interceptor properties<br/>
        Since interceptors can have properties, you need to be able to read the values of these properties within your
        interceptor. Taking an example like the one above, you can override the <code>setProperties</code> method.
-<source>
-  public void setProperties(Map&lt;String, InterceptorProperty&gt; properties) {
+    </p>
+<source><![CDATA[  public void setProperties(Map<String, InterceptorProperty> properties) {
      super.setProperties(properties);
-     final String myprop = &quot;myprop&quot;;
+     final String myprop = "myprop";
      InterceptorProperty p1 = properties.get(myprop);
      if (p1!=null) {
          setMyprop(Long.parseLong(p1.getValue()));
      }
-  }
-</source>
-    </p>
+  }]]></source>
+
   </subsection>
   <subsection name="Getting the actual JDBC connection">
     <p>Connection pools create wrappers around the actual connection in order to properly pool them.
        We also create interceptors in these wrappers to be able to perform certain functions.
        If there is a need to retrieve the actual connection, one can do so using the <code>javax.sql.PooledConnection</code>
        interface.
-<source>
-  Connection con = datasource.getConnection();
-  Connection actual = ((javax.sql.PooledConnection)con).getConnection();
-</source>
     </p>
+<source><![CDATA[  Connection con = datasource.getConnection();
+  Connection actual = ((javax.sql.PooledConnection)con).getConnection();]]></source>
+
   </subsection>
 
 </section>
@@ -890,25 +877,22 @@
   <p>Other examples of Tomcat configuration for JDBC usage can be found <a href="http://tomcat.apache.org/tomcat-6.0-doc/jndi-datasource-examples-howto.html">in the Tomcat documentation</a>. </p>
   <subsection name="Building from source">
     <p>Building is pretty simple. The pool has a dependency on <code>tomcat-juli.jar</code> and in case you want the <code>SlowQueryReportJmx</code></p>
-<source>
-  javac -classpath tomcat-juli.jar \
+<source><![CDATA[  javac -classpath tomcat-juli.jar \
         -d . \
         org/apache/tomcat/jdbc/pool/*.java \
         org/apache/tomcat/jdbc/pool/interceptor/*.java \
-        org/apache/tomcat/jdbc/pool/jmx/*.java
-</source>
+        org/apache/tomcat/jdbc/pool/jmx/*.java]]></source>
     <p>
        A build file can be found in the Tomcat <a href="http://svn.apache.org/viewvc/tomcat/trunk/modules/jdbc-pool/">source repository</a>.
     </p>
     <p>
       As a convenience, a build file is also included where a simple build command will generate all files needed.
-<source>
-  ant download  (downloads dependencies)
+    </p>
+<source>  ant download  (downloads dependencies)
   ant build     (compiles and generates .jar files)
   ant dist      (creates a release package)
-  ant test      (runs tests, expects a test database to be setup)
-</source>
-    </p>
+  ant test      (runs tests, expects a test database to be setup)</source>
+
     <p>
       The system is structured for a Maven build, but does generate release artifacts. Just the library itself.
     </p>

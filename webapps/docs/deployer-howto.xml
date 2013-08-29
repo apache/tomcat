@@ -41,7 +41,8 @@
         </p>
         <p>
             Web application deployment may be accomplished in a number of ways
-            within the Tomcat server.</p>
+            within the Tomcat server.
+        </p>
         <ul>
                 <li>Statically; the web application is setup before Tomcat is started</li>
                 <li>

@@ -108,18 +108,18 @@ elements in the <a href="config/context.html"><code>&lt;Context&gt;</code></a>
 element:</p>
 
 <ul>
-<li><a href="config/context.html#Environment Entries">&lt;Environment&gt;</a> -
+<li><a href="config/context.html#Environment_Entries">&lt;Environment&gt;</a> -
     Configure names and values for scalar environment entries that will be
     exposed to the web application through the JNDI
     <code>InitialContext</code> (equivalent to the inclusion of an
     <code>&lt;env-entry&gt;</code> element in the web application
     deployment descriptor).</li>
-<li><a href="config/context.html#Resource Definitions">&lt;Resource&gt;</a> -
+<li><a href="config/context.html#Resource_Definitions">&lt;Resource&gt;</a> -
     Configure the name and data type of a resource made available to the
     application (equivalent to the inclusion of a
     <code>&lt;resource-ref&gt;</code> element in the web application
     deployment descriptor).</li>
-<li><a href="config/context.html#Resource Links">&lt;ResourceLink&gt;</a> -
+<li><a href="config/context.html#Resource_Links">&lt;ResourceLink&gt;</a> -
     Add a link to a resource defined in the global JNDI context. Use resource
     links to give a web application access to a resource defined in
     the <a href="config/globalresources.html">&lt;GlobalNamingResources&gt;</a>
@@ -161,11 +161,11 @@ entire server.  These are configured in the
 <code><strong>&lt;GlobalNamingResources&gt;</strong></code></a> element of
 <code>$CATALINA_BASE/conf/server.xml</code>. You may expose these resources to
 web applications by using a
-<a href="config/context.html#Resource Links">&lt;ResourceLink&gt;</a> to
+<a href="config/context.html#Resource_Links">&lt;ResourceLink&gt;</a> to
 include it in the per-web-application context.</p>
 
 <p>If a resource has been defined using a
-<a href="config/context.html#Resource Links">&lt;ResourceLink&gt;</a>, it is not
+<a href="config/context.html#Resource_Links">&lt;ResourceLink&gt;</a>, it is not
 necessary for that resource to be defined in <code>/WEB-INF/web.xml</code>.
 However, it is recommended to keep the entry in <code>/WEB-INF/web.xml</code>
 to document the resource requirements for the web application.</p>
@@ -181,8 +181,7 @@ the <code>java:comp/env</code> portion of the JNDI namespace, so a typical
 access to a resource - in this case, to a JDBC <code>DataSource</code> -
 would look something like this:</p>
 
-<source>
-// Obtain our environment naming context
+<source><![CDATA[// Obtain our environment naming context
 Context initCtx = new InitialContext();
 Context envCtx = (Context) initCtx.lookup("java:comp/env");
 
@@ -193,8 +192,7 @@ DataSource ds = (DataSource)
 // Allocate and use a connection from the pool
 Connection conn = ds.getConnection();
 ... use this connection to access the database ...
-conn.close();
-</source>
+conn.close();]]></source>
 
 </section>
 
@@ -208,7 +206,7 @@ conn.close();
   subsection below details the configuration and usage of the standard resource
   factories.</p>
 
-  <p>See <a href="#Adding Custom Resource Factories">Adding Custom
+  <p>See <a href="#Adding_Custom_Resource_Factories">Adding Custom
   Resource Factories</a> for information about how to create, install,
   configure, and use your own custom resource factory classes with
   Tomcat.</p>
@@ -223,7 +221,7 @@ conn.close();
 
   <subsection name="Generic JavaBean Resources">
 
-    <h3>0.  Introduction</h3>
+    <h5>0.  Introduction</h5>
 
     <p>This resource factory can be used to create objects of <em>any</em>
     Java class that conforms to standard JavaBeans naming conventions (i.e.
@@ -234,15 +232,14 @@ conn.close();
 
     <p>The steps required to use this facility are described below.</p>
 
-    <h3>1.  Create Your JavaBean Class</h3>
+    <h5>1.  Create Your JavaBean Class</h5>
 
     <p>Create the JavaBean class which will be instantiated each time
     that the resource factory is looked up.  For this example, assume
     you create a class <code>com.mycompany.MyBean</code>, which looks
     like this:</p>
 
-<source>
-package com.mycompany;
+<source><![CDATA[package com.mycompany;
 
 public class MyBean {
 
@@ -267,29 +264,26 @@ public class MyBean {
   }
 
 
-}
-</source>
+}]]></source>
 
-  <h3>2.  Declare Your Resource Requirements</h3>
+  <h5>2.  Declare Your Resource Requirements</h5>
 
   <p>Next, modify your web application deployment descriptor
   (<code>/WEB-INF/web.xml</code>) to declare the JNDI name under which
   you will request new instances of this bean.  The simplest approach is
   to use a <code>&lt;resource-env-ref&gt;</code> element, like this:</p>
 
-<source>
-&lt;resource-env-ref&gt;
-  &lt;description&gt;
+<source><![CDATA[<resource-env-ref>
+  <description>
     Object factory for MyBean instances.
-  &lt;/description&gt;
-  &lt;resource-env-ref-name&gt;
+  </description>
+  <resource-env-ref-name>
     bean/MyBeanFactory
-  &lt;/resource-env-ref-name&gt;
-  &lt;resource-env-ref-type&gt;
+  </resource-env-ref-name>
+  <resource-env-ref-type>
     com.mycompany.MyBean
-  &lt;/resource-env-ref-type&gt;
-&lt;/resource-env-ref&gt;
-</source>
+  </resource-env-ref-type>
+</resource-env-ref>]]></source>
 
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
@@ -297,36 +291,32 @@ public class MyBean {
     <a href="http://wiki.apache.org/tomcat/Specifications">Servlet
     Specification</a> for details.</p>
 
-  <h3>3.  Code Your Application's Use Of This Resource</h3>
+  <h5>3.  Code Your Application's Use Of This Resource</h5>
 
   <p>A typical use of this resource environment reference might look
   like this:</p>
 
-<source>
-Context initCtx = new InitialContext();
+<source><![CDATA[Context initCtx = new InitialContext();
 Context envCtx = (Context) initCtx.lookup("java:comp/env");
 MyBean bean = (MyBean) envCtx.lookup("bean/MyBeanFactory");
 
 writer.println("foo = " + bean.getFoo() + ", bar = " +
-               bean.getBar());
-</source>
+               bean.getBar());]]></source>
 
-    <h3>4.  Configure Tomcat's Resource Factory</h3>
+    <h5>4.  Configure Tomcat's Resource Factory</h5>
 
     <p>To configure Tomcat's resource factory, add an element like this to the
     <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
     this web application.</p>
 
-<source>
-&lt;Context ...&gt;
+<source><![CDATA[<Context ...>
   ...
-  &lt;Resource name="bean/MyBeanFactory" auth="Container"
+  <Resource name="bean/MyBeanFactory" auth="Container"
             type="com.mycompany.MyBean"
             factory="org.apache.naming.factory.BeanFactory"
-            bar="23"/&gt;
+            bar="23"/>
   ...
-&lt;/Context&gt;
-</source>
+</Context>]]></source>
 
     <p>Note that the resource name (here, <code>bean/MyBeanFactory</code>
     must match the value specified in the web application deployment
@@ -341,7 +331,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
 
   <subsection name="UserDatabase Resources">
 
-    <h3>0.  Introduction</h3>
+    <h5>0.  Introduction</h5>
 
     <p>UserDatabase resources are typically configured as global resources for
     use by a UserDatabase realm. Tomcat includes a UserDatabaseFactoory that
@@ -351,7 +341,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
     <p>The steps required to set up a global UserDatabase resource are described
     below.</p>
 
-    <h3>1. Create/edit the XML file</h3>
+    <h5>1. Create/edit the XML file</h5>
 
     <p>The XMl file is typically located at
     <code>$CATALINA_BASE/conf/tomcat-users.xml</code> however, you are free to
@@ -359,32 +349,28 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
     files are placed in <code>$CATALINA_BASE/conf</code>. A typical XML would
     look like:</p>
 
-<source>
-&lt;?xml version='1.0' encoding='utf-8'?&gt;
-&lt;tomcat-users&gt;
-  &lt;role rolename="tomcat"/&gt;
-  &lt;role rolename="role1"/&gt;
-  &lt;user username="tomcat" password="tomcat" roles="tomcat"/&gt;
-  &lt;user username="both" password="tomcat" roles="tomcat,role1"/&gt;
-  &lt;user username="role1" password="tomcat" roles="role1"/&gt;
-&lt;/tomcat-users&gt;
-</source>
+<source><![CDATA[<?xml version='1.0' encoding='utf-8'?>
+<tomcat-users>
+  <role rolename="tomcat"/>
+  <role rolename="role1"/>
+  <user username="tomcat" password="tomcat" roles="tomcat"/>
+  <user username="both" password="tomcat" roles="tomcat,role1"/>
+  <user username="role1" password="tomcat" roles="role1"/>
+</tomcat-users>]]></source>
 
-    <h3>2.  Declare Your Resource</h3>
+    <h5>2.  Declare Your Resource</h5>
 
     <p>Next, modify <code>$CATALINA_BASE/conf/server.xml</code> to create the
     UserDatabase resource based on your XMl file. It should look something like
     this:</p>
 
-<source>
-&lt;Resource name="UserDatabase"
+<source><![CDATA[<Resource name="UserDatabase"
           auth="Container"
           type="org.apache.catalina.UserDatabase"
           description="User database that can be updated and saved"
           factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
           pathname="conf/tomcat-users.xml"
-          readonly="false" /&gt;
-</source>
+          readonly="false" />]]></source>
 
     <p>The <code>pathname</code> attribute can be absolute or relative. If
     relative, it is relative to <code>$CATALINA_BASE</code>.</p>
@@ -396,7 +382,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
     is running as. Ensure that these are appropriate to maintain the security
     of your installation.</p>
 
-    <h3>3.  Configure the Realm</h3>
+    <h5>3.  Configure the Realm</h5>
 
     <p>Configure a UserDatabase Realm to use this resource as described in the
     <a href="config/realm.html">Realm configuration documentation</a>.</p>
@@ -406,7 +392,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
 
   <subsection name="JavaMail Sessions">
 
-    <h3>0.  Introduction</h3>
+    <h5>0.  Introduction</h5>
 
     <p>In many web applications, sending electronic mail messages is a
     required part of the system's functionality.  The
@@ -424,7 +410,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
 
     <p>The steps required for this are outlined below.</p>
 
-    <h3>1.  Declare Your Resource Requirements</h3>
+    <h5>1.  Declare Your Resource Requirements</h5>
 
     <p>The first thing you should do is modify the web application deployment
     descriptor (<code>/WEB-INF/web.xml</code>) to declare the JNDI name under
@@ -433,25 +419,23 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
     standard <code>java:comp/env</code> naming context that is the root of
     all provided resource factories.  A typical <code>web.xml</code> entry
     might look like this:</p>
-<source>
-&lt;resource-ref&gt;
-  &lt;description&gt;
+<source><![CDATA[<resource-ref>
+  <description>
     Resource reference to a factory for javax.mail.Session
     instances that may be used for sending electronic mail
     messages, preconfigured to connect to the appropriate
     SMTP server.
-  &lt;/description&gt;
-  &lt;res-ref-name&gt;
+  </description>
+  <res-ref-name>
     mail/Session
-  &lt;/res-ref-name&gt;
-  &lt;res-type&gt;
+  </res-ref-name>
+  <res-type>
     javax.mail.Session
-  &lt;/res-type&gt;
-  &lt;res-auth&gt;
+  </res-type>
+  <res-auth>
     Container
-  &lt;/res-auth&gt;
-&lt;/resource-ref&gt;
-</source>
+  </res-auth>
+</resource-ref>]]></source>
 
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
@@ -459,11 +443,10 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
     <a href="http://wiki.apache.org/tomcat/Specifications">Servlet
     Specification</a> for details.</p>
 
-    <h3>2.  Code Your Application's Use Of This Resource</h3>
+    <h5>2.  Code Your Application's Use Of This Resource</h5>
 
     <p>A typical use of this resource reference might look like this:</p>
-<source>
-Context initCtx = new InitialContext();
+<source><![CDATA[Context initCtx = new InitialContext();
 Context envCtx = (Context) initCtx.lookup("java:comp/env");
 Session session = (Session) envCtx.lookup("mail/Session");
 
@@ -474,8 +457,7 @@ to[0] = new InternetAddress(request.getParameter("to"));
 message.setRecipients(Message.RecipientType.TO, to);
 message.setSubject(request.getParameter("subject"));
 message.setContent(request.getParameter("content"), "text/plain");
-Transport.send(message);
-</source>
+Transport.send(message);]]></source>
 
     <p>Note that the application uses the same resource reference name
     that was declared in the web application deployment descriptor.  This
@@ -483,21 +465,19 @@ Transport.send(message);
     <a href="config/context.html"><code>&lt;Context&gt;</code></a> element
     for the web application as described below.</p>
 
-    <h3>3.  Configure Tomcat's Resource Factory</h3>
+    <h5>3.  Configure Tomcat's Resource Factory</h5>
 
     <p>To configure Tomcat's resource factory, add an elements like this to the
     <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
     this web application.</p>
 
-<source>
-&lt;Context ...&gt;
+<source><![CDATA[<Context ...>
   ...
-  &lt;Resource name="mail/Session" auth="Container"
+  <Resource name="mail/Session" auth="Container"
             type="javax.mail.Session"
-            mail.smtp.host="localhost"/&gt;
+            mail.smtp.host="localhost"/>
   ...
-&lt;/Context&gt;
-</source>
+</Context>]]></source>
 
     <p>Note that the resource name (here, <code>mail/Session</code>) must
     match the value specified in the web application deployment descriptor.
@@ -517,9 +497,9 @@ Transport.send(message);
     then Tomcat&apos;s resource factory will configure and add a
     <code>javax.mail.Authenticator</code> to the mail session.</p>
 
-    <h3>4.  Install the JavaMail libraries</h3>
+    <h5>4.  Install the JavaMail libraries</h5>
 
-    <p><a href="http://www.oracle.com/technetwork/java/index-138643.html">
+    <p><a href="http://javamail.java.net/">
     Download the JavaMail API</a>.</p>
 
     <p>Unpackage the distribution and place mail.jar  into $CATALINA_HOME/lib so
@@ -529,13 +509,13 @@ Transport.send(message);
     it in the $CATALINA_HOME/lib location only.
     </p>
 
-    <h3>5.  Restart Tomcat</h3>
+    <h5>5.  Restart Tomcat</h5>
 
     <p>For the additional JAR to be visible to Tomcat, it is necessary for the
     Tomcat instance to be restarted.</p>
 
 
-    <h3>Example Application</h3>
+    <h5>Example Application</h5>
 
     <p>The <code>/examples</code> application included with Tomcat contains
     an example of utilizing this resource factory.  It is accessed via the
@@ -555,7 +535,7 @@ Transport.send(message);
 
   <subsection name="JDBC Data Sources">
 
-    <h3>0.  Introduction</h3>
+    <h5>0.  Introduction</h5>
 
     <p>Many web applications need to access a database via a JDBC driver,
     to support the functionality required by that application.  The Java EE
@@ -586,9 +566,9 @@ Transport.send(message);
     project.  However, it is possible to use any other connection pool
     that implements <code>javax.sql.DataSource</code>, by writing your
     own custom resource factory, as described
-    <a href="#Adding Custom Resource Factories">below</a>.</p>
+    <a href="#Adding_Custom_Resource_Factories">below</a>.</p>
 
-    <h3>1.  Install Your JDBC Driver</h3>
+    <h5>1.  Install Your JDBC Driver</h5>
 
     <p>Use of the <em>JDBC Data Sources</em> JNDI Resource Factory requires
     that you make an appropriate JDBC driver available to both Tomcat internal
@@ -597,7 +577,7 @@ Transport.send(message);
     <code>$CATALINA_HOME/lib</code> directory, which makes the driver
     available both to the resource factory and to your application.</p>
 
-    <h3>2.  Declare Your Resource Requirements</h3>
+    <h5>2.  Declare Your Resource Requirements</h5>
 
     <p>Next, modify the web application deployment descriptor
     (<code>/WEB-INF/web.xml</code>) to declare the JNDI name under
@@ -606,25 +586,23 @@ Transport.send(message);
     standard <code>java:comp/env</code> naming context that is the root of
     all provided resource factories.  A typical <code>web.xml</code> entry
     might look like this:</p>
-<source>
-&lt;resource-ref&gt;
-  &lt;description&gt;
+<source><![CDATA[<resource-ref>
+  <description>
     Resource reference to a factory for java.sql.Connection
     instances that may be used for talking to a particular
-    database that is configured in the &lt;Context&gt;
+    database that is configured in the <Context>
     configurartion for the web application.
-  &lt;/description&gt;
-  &lt;res-ref-name&gt;
+  </description>
+  <res-ref-name>
     jdbc/EmployeeDB
-  &lt;/res-ref-name&gt;
-  &lt;res-type&gt;
+  </res-ref-name>
+  <res-type>
     javax.sql.DataSource
-  &lt;/res-type&gt;
-  &lt;res-auth&gt;
+  </res-type>
+  <res-auth>
     Container
-  &lt;/res-auth&gt;
-&lt;/resource-ref&gt;
-</source>
+  </res-auth>
+</resource-ref>]]></source>
 
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
@@ -632,19 +610,17 @@ Transport.send(message);
     <a href="http://wiki.apache.org/tomcat/Specifications">Servlet
     Specification</a> for details.</p>
 
-    <h3>3.  Code Your Application's Use Of This Resource</h3>
+    <h5>3.  Code Your Application's Use Of This Resource</h5>
 
     <p>A typical use of this resource reference might look like this:</p>
-<source>
-Context initCtx = new InitialContext();
+<source><![CDATA[Context initCtx = new InitialContext();
 Context envCtx = (Context) initCtx.lookup("java:comp/env");
 DataSource ds = (DataSource)
   envCtx.lookup("jdbc/EmployeeDB");
 
 Connection conn = ds.getConnection();
 ... use this connection to access the database ...
-conn.close();
-</source>
+conn.close();]]></source>
 
     <p>Note that the application uses the same resource reference name that was
     declared in the web application deployment descriptor. This is matched up
@@ -652,16 +628,15 @@ conn.close();
     <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
     the web application as described below.</p>
 
-    <h3>4.  Configure Tomcat's Resource Factory</h3>
+    <h5>4.  Configure Tomcat's Resource Factory</h5>
 
     <p>To configure Tomcat's resource factory, add an element like this to the
     <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
     the web application.</p>
 
-<source>
-&lt;Context ...&gt;
+<source><![CDATA[<Context ...>
   ...
-  &lt;Resource name="jdbc/EmployeeDB"
+  <Resource name="jdbc/EmployeeDB"
             auth="Container"
             type="javax.sql.DataSource"
             username="dbusername"
@@ -669,10 +644,9 @@ conn.close();
             driverClassName="org.hsql.jdbcDriver"
             url="jdbc:HypersonicSQL:database"
             maxActive="8"
-            maxIdle="4"/&gt;
+            maxIdle="4"/>
   ...
-&lt;/Context&gt;
-</source>
+</Context>]]></source>
 
     <p>Note that the resource name (here, <code>jdbc/EmployeeDB</code>) must
     match the value specified in the web application deployment descriptor.</p>
@@ -807,10 +781,10 @@ conn.close();
   <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
   the web application. In the example below, we will create a factory that only
   knows how to create <code>com.mycompany.MyBean</code> beans from the
-  <a href="#Generic JavaBean Resources">Generic JavaBean Resources</a> example
+  <a href="#Generic_JavaBean_Resources">Generic JavaBean Resources</a> example
   above.</p>
 
-  <h3>1.  Write A Resource Factory Class</h3>
+  <h4>1.  Write A Resource Factory Class</h4>
 
   <p>You must write a class that implements the JNDI service provider
   <code>javax.naming.spi.ObjectFactory</code> inteface.  Every time your
@@ -839,8 +813,7 @@ conn.close();
   <p>To create a resource factory that knows how to produce <code>MyBean</code>
   instances, you might create a class like this:</p>
 
-<source>
-package com.mycompany;
+<source><![CDATA[package com.mycompany;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -883,8 +856,7 @@ public class MyBeanFactory implements ObjectFactory {
 
   }
 
-}
-</source>
+}]]></source>
 
   <p>In this example, we are unconditionally creating a new instance of
   the <code>com.mycompany.MyBean</code> class, and populating its properties
@@ -907,26 +879,24 @@ public class MyBeanFactory implements ObjectFactory {
   files are visible to both Catalina internal resources and your web
   application.</p>
 
-  <h3>2.  Declare Your Resource Requirements</h3>
+  <h4>2.  Declare Your Resource Requirements</h4>
 
   <p>Next, modify your web application deployment descriptor
   (<code>/WEB-INF/web.xml</code>) to declare the JNDI name under which
   you will request new instances of this bean.  The simplest approach is
   to use a <code>&lt;resource-env-ref&gt;</code> element, like this:</p>
 
-<source>
-&lt;resource-env-ref&gt;
-  &lt;description&gt;
+<source><![CDATA[<resource-env-ref>
+  <description>
     Object factory for MyBean instances.
-  &lt;/description&gt;
-  &lt;resource-env-ref-name&gt;
+  </description>
+  <resource-env-ref-name>
     bean/MyBeanFactory
-  &lt;/resource-env-ref-name&gt;
-  &lt;resource-env-ref-type&gt;
+  </resource-env-ref-name>
+  <resource-env-ref-type>
     com.mycompany.MyBean
-  &lt;/resource-env-ref-type&gt;
-&lt;resource-env-ref&gt;
-</source>
+  </resource-env-ref-type>
+<resource-env-ref>]]></source>
 
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
@@ -934,36 +904,32 @@ public class MyBeanFactory implements ObjectFactory {
     <a href="http://wiki.apache.org/tomcat/Specifications">Servlet
     Specification</a> for details.</p>
 
-  <h3>3.  Code Your Application's Use Of This Resource</h3>
+  <h4>3.  Code Your Application's Use Of This Resource</h4>
 
   <p>A typical use of this resource environment reference might look
   like this:</p>
 
-<source>
-Context initCtx = new InitialContext();
+<source><![CDATA[Context initCtx = new InitialContext();
 Context envCtx = (Context) initCtx.lookup("java:comp/env");
 MyBean bean = (MyBean) envCtx.lookup("bean/MyBeanFactory");
 
 writer.println("foo = " + bean.getFoo() + ", bar = " +
-               bean.getBar());
-</source>
+               bean.getBar());]]></source>
 
-    <h3>4.  Configure Tomcat's Resource Factory</h3>
+    <h4>4.  Configure Tomcat's Resource Factory</h4>
 
     <p>To configure Tomcat's resource factory, add an elements like this to the
     <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
     this web application.</p>
 
-<source>
-&lt;Context ...&gt;
+<source><![CDATA[<Context ...>
   ...
-  &lt;Resource name="bean/MyBeanFactory" auth="Container"
+  <Resource name="bean/MyBeanFactory" auth="Container"
             type="com.mycompany.MyBean"
             factory="com.mycompany.MyBeanFactory"
-            bar="23"/&gt;
+            bar="23"/>
   ...
-&lt;/Context&gt;
-</source>
+</Context>]]></source>
 
     <p>Note that the resource name (here, <code>bean/MyBeanFactory</code>
     must match the value specified in the web application deployment

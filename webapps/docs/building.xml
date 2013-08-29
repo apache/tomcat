@@ -107,10 +107,10 @@ available, which will be used to actually perform the build.
 
 <p>
 Use the following commands to build Tomcat:
-<br/>
-<code><br/>
+<br/><br/>
+<code>
     cd ${tomcat.source}<br/>
-    ant<br/>
+    ant
 </code>
 </p>
 
@@ -133,20 +133,18 @@ Use the following commands to build Tomcat:
 <p>
   The build can be controlled by creating a <code>${tomcat.source}/build.properties</code>
   file and adding the following content to it:
-<br/>
-<code><br/>
-    # ----- Proxy setup -----<br/>
-    # Uncomment if using a proxy server.<br/>
-    #proxy.host=proxy.domain<br/>
-    #proxy.port=8080<br/>
-    #proxy.use=on<br/>
-<br/>
-    # ----- Default Base Path for Dependent Packages -----<br/>
-    # Replace this path with the directory path where<br/>
-    # dependencies binaries should be downloaded.<br/>
-    base.path=/home/me/some-place-to-download-to<br/>
-</code>
 </p>
+<source># ----- Proxy setup -----
+# Uncomment if using a proxy server.
+#proxy.host=proxy.domain
+#proxy.port=8080
+#proxy.use=on
+
+# ----- Default Base Path for Dependent Packages -----
+# Replace this path with the directory path where
+# dependencies binaries should be downloaded.
+base.path=/home/me/some-place-to-download-to</source>
+
 
 <p>
 Once the build has completed successfully, a usable Tomcat installation will have been
@@ -204,13 +202,13 @@ Open the <em>Preferences</em> dialog and then select <em>Java-&gt;Build Path-&gt
 Variables</em> to add two new <em>Classpath Variables</em>:
 </p>
 
-<p>
-<table border="1">
+
+<table class="defaultTable">
  <tr><td>TOMCAT_LIBS_BASE</td><td>The same location as the <code>base.path</code>
   setting in <code>build.properties</code>, where the binary dependencies have been downloaded</td></tr>
  <tr><td>ANT_HOME</td><td>the base path of Ant 1.8.1 or later</td></tr>
 </table>
-</p>
+
 
 <p>
 Use <em>File-&gt;Import</em> and choose <em>Existing Projects into Workspace</em>.
@@ -232,8 +230,8 @@ then use <code>org.apache.catalina.startup.Bootstrap</code> as the main class,
 Tweaking a few formatting preferences will make it much easier to keep consistent with Tomcat
 coding conventions (and have your contributions accepted):
 </p>
-<p>
-<table border="1">
+
+<table class="defaultTable">
   <tr><td>Java -&gt; Code Style -> Formatter -&gt; Edit...</td>
   <td>Tab policy: Spaces only<br/>Tab and Indentation size: 4</td></tr>
   <tr><td>General -&gt; Editors -> Text Editors</td>
@@ -241,7 +239,7 @@ coding conventions (and have your contributions accepted):
   <tr><td>XML -&gt; XML Files -> Editor</td><td>Indent using spaces<br/>Indentation size: 2</td></tr>
   <tr><td>Ant -&gt; Editor -> Formatter</td><td>Tab size: 2<br/>Use tab character instead of spaces: unchecked</td></tr>
 </table>
-</p>
+
 
 </section>
 
