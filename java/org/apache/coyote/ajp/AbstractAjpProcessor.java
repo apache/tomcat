@@ -468,7 +468,8 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
         } else if (actionCode == ActionCode.UPGRADE) {
             // HTTP connections only. Unsupported for AJP.
-            // NOOP
+            throw new UnsupportedOperationException(
+                    sm.getString("ajpprocessor.httpupgrade.notsupported"));
         }  else {
             actionInternal(actionCode, param);
         }
