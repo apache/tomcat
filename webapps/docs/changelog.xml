@@ -55,7 +55,7 @@
         contributions from Nick Williams and Jeremy Boynes. (markt)
       </add>
       <add>
-        Implement JSP 2.3. (markt)
+        Implement JSR 245 MR2 - JSP 2.3. (markt)
       </add>
       <add>
         Implement JSR 341 - Unified Expression Language 3.0. (markt)
