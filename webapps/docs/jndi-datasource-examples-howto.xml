@@ -196,7 +196,7 @@ The default is <code>false</code>.
 
 <subsection name="MySQL DBCP Example">
 
-<h3>0. Introduction</h3>
+<h5>0. Introduction</h5>
 <p>Versions of <a href="http://www.mysql.com/products/mysql/index.html">MySQL</a> and JDBC
 drivers that have been reported to work:
 </p>
@@ -208,7 +208,7 @@ drivers that have been reported to work:
 
 <p>Before you proceed, don't forget to copy the JDBC Driver's jar into <code>$CATALINA_HOME/lib</code>.</p>
 
-<h3>1. MySQL configuration</h3>
+<h5>1. MySQL configuration</h5>
 <p>
 Ensure that you follow these instructions as variations can cause problems.
 </p>
@@ -217,16 +217,14 @@ Ensure that you follow these instructions as variations can cause problems.
 Your MySQL user <strong>must</strong> have a password assigned. The driver
 will fail if you try to connect with an empty password.
 </p>
-<source>
-mysql&gt; GRANT ALL PRIVILEGES ON *.* TO javauser@localhost
-    -&gt;   IDENTIFIED BY 'javadude' WITH GRANT OPTION;
-mysql&gt; create database javatest;
-mysql&gt; use javatest;
-mysql&gt; create table testdata (
-    -&gt;   id int not null auto_increment primary key,
-    -&gt;   foo varchar(25),
-    -&gt;   bar int);
-</source>
+<source><![CDATA[mysql> GRANT ALL PRIVILEGES ON *.* TO javauser@localhost
+    ->   IDENTIFIED BY 'javadude' WITH GRANT OPTION;
+mysql> create database javatest;
+mysql> use javatest;
+mysql> create table testdata (
+    ->   id int not null auto_increment primary key,
+    ->   foo varchar(25),
+    ->   bar int);]]></source>
 <blockquote>
 <strong>Note:</strong> the above user should be removed once testing is
 complete!
@@ -234,8 +232,7 @@ complete!
 
 <p>Next insert some test data into the testdata table.
 </p>
-<source>
-mysql&gt; insert into testdata values(null, 'hello', 12345);
+<source><![CDATA[mysql> insert into testdata values(null, 'hello', 12345);
 Query OK, 1 row affected (0.00 sec)
 
 mysql> select * from testdata;
@@ -246,95 +243,87 @@ mysql> select * from testdata;
 +----+-------+-------+
 1 row in set (0.00 sec)
 
-mysql&gt;
-</source>
+mysql>]]></source>
 
-<h3>2. Context configuration</h3>
+<h5>2. Context configuration</h5>
 <p>Configure the JNDI DataSource in Tomcat by adding a declaration for your
 resource to your <a href="config/context.html">Context</a>.</p>
 <p>For example:</p>
-<source>
-&lt;Context&gt;
+<source><![CDATA[<Context>
 
-    &lt;!-- maxActive: Maximum number of database connections in pool. Make sure you
+    <!-- maxActive: Maximum number of database connections in pool. Make sure you
          configure your mysqld max_connections large enough to handle
          all of your db connections. Set to -1 for no limit.
-         --&gt;
+         -->
 
-    &lt;!-- maxIdle: Maximum number of idle database connections to retain in pool.
+    <!-- maxIdle: Maximum number of idle database connections to retain in pool.
          Set to -1 for no limit.  See also the DBCP documentation on this
          and the minEvictableIdleTimeMillis configuration parameter.
-         --&gt;
+         -->
 
-    &lt;!-- maxWait: Maximum time to wait for a database connection to become available
+    <!-- maxWait: Maximum time to wait for a database connection to become available
          in ms, in this example 10 seconds. An Exception is thrown if
          this timeout is exceeded.  Set to -1 to wait indefinitely.
-         --&gt;
+         -->
 
-    &lt;!-- username and password: MySQL username and password for database connections  --&gt;
+    <!-- username and password: MySQL username and password for database connections  -->
 
-    &lt;!-- driverClassName: Class name for the old mm.mysql JDBC driver is
+    <!-- driverClassName: Class name for the old mm.mysql JDBC driver is
          org.gjt.mm.mysql.Driver - we recommend using Connector/J though.
          Class name for the official MySQL Connector/J driver is com.mysql.jdbc.Driver.
-         --&gt;
+         -->
 
-    &lt;!-- url: The JDBC connection url for connecting to your MySQL database.
-         --&gt;
+    <!-- url: The JDBC connection url for connecting to your MySQL database.
+         -->
 
-  &lt;Resource name="jdbc/TestDB" auth="Container" type="javax.sql.DataSource"
+  <Resource name="jdbc/TestDB" auth="Container" type="javax.sql.DataSource"
                maxActive="100" maxIdle="30" maxWait="10000"
                username="javauser" password="javadude" driverClassName="com.mysql.jdbc.Driver"
-               url="jdbc:mysql://localhost:3306/javatest"/&gt;
+               url="jdbc:mysql://localhost:3306/javatest"/>
 
-&lt;/Context&gt;
-</source>
+</Context>]]></source>
 
-<h3>3. web.xml configuration</h3>
+<h5>3. web.xml configuration</h5>
 
 <p>Now create a <code>WEB-INF/web.xml</code> for this test application.</p>
-<source>
-&lt;web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+<source><![CDATA[<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
 http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-    version="2.4"&gt;
-  &lt;description&gt;MySQL Test App&lt;/description&gt;
-  &lt;resource-ref&gt;
-      &lt;description&gt;DB Connection&lt;/description&gt;
-      &lt;res-ref-name&gt;jdbc/TestDB&lt;/res-ref-name&gt;
-      &lt;res-type&gt;javax.sql.DataSource&lt;/res-type&gt;
-      &lt;res-auth&gt;Container&lt;/res-auth&gt;
-  &lt;/resource-ref&gt;
-&lt;/web-app&gt;
-</source>
+    version="2.4">
+  <description>MySQL Test App</description>
+  <resource-ref>
+      <description>DB Connection</description>
+      <res-ref-name>jdbc/TestDB</res-ref-name>
+      <res-type>javax.sql.DataSource</res-type>
+      <res-auth>Container</res-auth>
+  </resource-ref>
+</web-app>]]></source>
 
-<h3>4. Test code</h3>
-<p>Now create a simple <code>test.jsp</code> page for use later.
-<source>
-&lt;%@ taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql" %&gt;
-&lt;%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %&gt;
+<h5>4. Test code</h5>
+<p>Now create a simple <code>test.jsp</code> page for use later.</p>
+<source><![CDATA[<%@ taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-&lt;sql:query var="rs" dataSource="jdbc/TestDB"&gt;
+<sql:query var="rs" dataSource="jdbc/TestDB">
 select id, foo, bar from testdata
-&lt;/sql:query&gt;
+</sql:query>
 
-&lt;html&gt;
-  &lt;head&gt;
-    &lt;title&gt;DB Test&lt;/title&gt;
-  &lt;/head&gt;
-  &lt;body&gt;
+<html>
+  <head>
+    <title>DB Test</title>
+  </head>
+  <body>
 
-  &lt;h2&gt;Results&lt;/h2&gt;
+  <h2>Results</h2>
 
-&lt;c:forEach var="row" items="${rs.rows}"&gt;
-    Foo ${row.foo}&lt;br/&gt;
-    Bar ${row.bar}&lt;br/&gt;
-&lt;/c:forEach&gt;
+<c:forEach var="row" items="${rs.rows}">
+    Foo ${row.foo}<br/>
+    Bar ${row.bar}<br/>
+</c:forEach>
 
-  &lt;/body&gt;
-&lt;/html&gt;
-</source>
-</p>
+  </body>
+</html>]]></source>
 
 <p>That JSP page makes use of <a href="http://java.sun.com/products/jsp/jstl">JSTL</a>'s
 SQL and Core taglibs. You can get it from
@@ -355,7 +344,7 @@ your hard work.</p>
 </subsection>
 
 <subsection name="Oracle 8i, 9i &amp; 10g">
-<h3>0.    Introduction</h3>
+<h5>0.    Introduction</h5>
 
 <p>Oracle requires minimal changes from the MySQL configuration except for the
 usual gotchas :-)</p>
@@ -372,7 +361,7 @@ that <code>oracle.jdbc.driver.OracleDriver</code> is deprecated and support
 for this driver class will be discontinued in the next major release.
 </p>
 
-<h3>1. Context configuration</h3>
+<h5>1. Context configuration</h5>
 <p>In a similar manner to the mysql config above, you will need to define your
 Datasource in your <a href="config/context.html">Context</a>. Here we define a
 Datasource called myoracle using the thin driver to connect as user scott,
@@ -382,57 +371,51 @@ user scott.</p>
 
 <p>Use of the OCI driver should simply involve a changing thin to oci in the URL string.
 </p>
-<source>
-&lt;Resource name="jdbc/myoracle" auth="Container"
+<source><![CDATA[<Resource name="jdbc/myoracle" auth="Container"
               type="javax.sql.DataSource" driverClassName="oracle.jdbc.OracleDriver"
               url="jdbc:oracle:thin:@127.0.0.1:1521:mysid"
               username="scott" password="tiger" maxActive="20" maxIdle="10"
-              maxWait="-1"/&gt;
-</source>
+              maxWait="-1"/>]]></source>
 
-<h3>2.    web.xml configuration</h3>
+<h5>2.    web.xml configuration</h5>
 <p>You should ensure that you respect the element ordering defined by the DTD when you
 create you applications web.xml file.</p>
-<source>
-&lt;resource-ref&gt;
- &lt;description&gt;Oracle Datasource example&lt;/description&gt;
- &lt;res-ref-name&gt;jdbc/myoracle&lt;/res-ref-name&gt;
- &lt;res-type&gt;javax.sql.DataSource&lt;/res-type&gt;
- &lt;res-auth&gt;Container&lt;/res-auth&gt;
-&lt;/resource-ref&gt;
-</source>
-<h3>3.   Code example</h3>
+<source><![CDATA[<resource-ref>
+ <description>Oracle Datasource example</description>
+ <res-ref-name>jdbc/myoracle</res-ref-name>
+ <res-type>javax.sql.DataSource</res-type>
+ <res-auth>Container</res-auth>
+</resource-ref>]]></source>
+<h5>3.   Code example</h5>
 <p>You can use the same example application as above (asuming you create the required DB
 instance, tables etc.) replacing the Datasource code with something like</p>
-<source>
-Context initContext = new InitialContext();
+<source><![CDATA[Context initContext = new InitialContext();
 Context envContext  = (Context)initContext.lookup("java:/comp/env");
 DataSource ds = (DataSource)envContext.lookup("jdbc/myoracle");
 Connection conn = ds.getConnection();
-//etc.
-</source>
+//etc.]]></source>
 </subsection>
 
 
 <subsection name="PostgreSQL">
-<h3>0.    Introduction</h3>
+<h5>0.    Introduction</h5>
 <p>PostgreSQL is configured in a similar manner to Oracle.</p>
 
-<h3>1. Required files </h3>
+<h5>1. Required files </h5>
 <p>
 Copy the Postgres JDBC jar to $CATALINA_HOME/lib. As with Oracle, the
 jars need to be in this directory in order for DBCP's Classloader to find
 them. This has to be done regardless of which configuration step you take next.
 </p>
 
-<h3>2. Resource configuration</h3>
+<h5>2. Resource configuration</h5>
 
 <p>
 You have two choices here: define a datasource that is shared across all Tomcat
 applications, or define a datasource specifically for one application.
 </p>
 
-<h4>2a. Shared resource configuration</h4>
+<h6>2a. Shared resource configuration</h6>
 <p>
 Use this option if you wish to define a datasource that is shared across
 multiple Tomcat applications, or if you just prefer defining your datasource
@@ -441,13 +424,11 @@ in this file.
 <p><i>This author has not had success here, although others have reported so.
 Clarification would be appreciated here.</i></p>
 
-<source>
-&lt;Resource name="jdbc/postgres" auth="Container"
+<source><![CDATA[<Resource name="jdbc/postgres" auth="Container"
           type="javax.sql.DataSource" driverClassName="org.postgresql.Driver"
           url="jdbc:postgresql://127.0.0.1:5432/mydb"
-          username="myuser" password="mypasswd" maxActive="20" maxIdle="10" maxWait="-1"/&gt;
-</source>
-<h4>2b. Application-specific resource configuration</h4>
+          username="myuser" password="mypasswd" maxActive="20" maxIdle="10" maxWait="-1"/>]]></source>
+<h6>2b. Application-specific resource configuration</h6>
 
 <p>
 Use this option if you wish to define a datasource specific to your application,
@@ -460,28 +441,24 @@ Create a resource definition for your <a href="config/context.html">Context</a>.
 The Context element should look something like the following.
 </p>
 
-<source>
-&lt;Context&gt;
+<source><![CDATA[<Context>
 
-&lt;Resource name="jdbc/postgres" auth="Container"
+<Resource name="jdbc/postgres" auth="Container"
           type="javax.sql.DataSource" driverClassName="org.postgresql.Driver"
           url="jdbc:postgresql://127.0.0.1:5432/mydb"
           username="myuser" password="mypasswd" maxActive="20" maxIdle="10"
-maxWait="-1"/&gt;
-&lt;/Context&gt;
-</source>
+maxWait="-1"/>
+</Context>]]></source>
 
-<h3>3. web.xml configuration</h3>
-<source>
-&lt;resource-ref&gt;
- &lt;description&gt;postgreSQL Datasource example&lt;/description&gt;
- &lt;res-ref-name&gt;jdbc/postgres&lt;/res-ref-name&gt;
- &lt;res-type&gt;javax.sql.DataSource&lt;/res-type&gt;
- &lt;res-auth&gt;Container&lt;/res-auth&gt;
-&lt;/resource-ref&gt;
-</source>
+<h5>3. web.xml configuration</h5>
+<source><![CDATA[<resource-ref>
+ <description>postgreSQL Datasource example</description>
+ <res-ref-name>jdbc/postgres</res-ref-name>
+ <res-type>javax.sql.DataSource</res-type>
+ <res-auth>Container</res-auth>
+</resource-ref>]]></source>
 
-<h4>4. Accessing the datasource</h4>
+<h5>4. Accessing the datasource</h5>
 <p>
 When accessing the datasource programmatically, remember to prepend
 <code>java:/comp/env</code> to your JNDI lookup, as in the following snippet of
@@ -489,8 +466,7 @@ code. Note also that "jdbc/postgres" can be replaced with any value you prefer, 
 you change it in the above resource definition file as well.
 </p>
 
-<source>
-InitialContext cxt = new InitialContext();
+<source><![CDATA[InitialContext cxt = new InitialContext();
 if ( cxt == null ) {
    throw new Exception("Uh oh -- no context!");
 }
@@ -499,8 +475,7 @@ DataSource ds = (DataSource) cxt.lookup( "java:/comp/env/jdbc/postgres" );
 
 if ( ds == null ) {
    throw new Exception("Data source not found!");
-}
-</source>
+}]]></source>
 
 </subsection>
 </section>
@@ -539,12 +514,10 @@ using <code>System.loadLibrary("ocijdbc8");</code>
 You should next create a simple test servlet or jsp that has these
 <strong>critical lines</strong>:
 </p>
-<source>
-DriverManager.registerDriver(new
+<source><![CDATA[DriverManager.registerDriver(new
 oracle.jdbc.driver.OracleDriver());
 conn =
-DriverManager.getConnection("jdbc:oracle:oci8:@database","username","password");
-</source>
+DriverManager.getConnection("jdbc:oracle:oci8:@database","username","password");]]></source>
 <p>
 where database is of the form <code>host:port:SID</code> Now if you try to access the URL of your
 test servlet/jsp and what you get is a
@@ -552,6 +525,7 @@ test servlet/jsp and what you get is a
 </p>
 <p>
 First, the <code>UnsatisfiedLinkError</code> indicates that you have
+</p>
 <ul>
 <li>a mismatch between your JDBC classes file and
 your Oracle client version. The giveaway here is the message stating that a needed library file cannot be
@@ -563,7 +537,6 @@ Oracle client. The classeXXXs.zip file and Oracle client software versions must 
 the classes12.zip file from the directory <code>$ORAHOME\jdbc\lib</code> will also work.
 </li>
 </ul>
-</p>
 <p>
 Next you may experience the error <code>ORA-06401 NETCMN: invalid driver designator</code>
 </p>
@@ -640,8 +613,7 @@ of events which could cause this error in Tomcat:
 Here is an example of properly written code to use a database connection
 obtained from a connection pool:
 </p>
-<pre>
-  Connection conn = null;
+<source><![CDATA[  Connection conn = null;
   Statement stmt = null;  // Or PreparedStatement if needed
   ResultSet rs = null;
   try {
@@ -672,8 +644,7 @@ obtained from a connection pool:
       try { conn.close(); } catch (SQLException e) { ; }
       conn = null;
     }
-  }
-</pre>
+  }]]></source>
 
 </subsection>
 

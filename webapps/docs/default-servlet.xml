@@ -34,59 +34,56 @@
 </section>
 
 <section anchor="what" name="What is the DefaultServlet">
+<p>
 The default servlet is the servlet which serves static resources as well
 as serves the directory listings (if directory listings are enabled).
-
+</p>
 </section>
 
 <section anchor="where" name="Where is it declared?">
+<p>
 It is declared globally in <i>$CATALINA_BASE/conf/web.xml</i>.
 By default here is it's declaration:
-<source>
-    &lt;servlet&gt;
-        &lt;servlet-name&gt;default&lt;/servlet-name&gt;
-        &lt;servlet-class&gt;
+</p>
+<source><![CDATA[    <servlet>
+        <servlet-name>default</servlet-name>
+        <servlet-class>
           org.apache.catalina.servlets.DefaultServlet
-        &lt;/servlet-class&gt;
-        &lt;init-param&gt;
-            &lt;param-name&gt;debug&lt;/param-name&gt;
-            &lt;param-value&gt;0&lt;/param-value&gt;
-        &lt;/init-param&gt;
-        &lt;init-param&gt;
-            &lt;param-name&gt;listings&lt;/param-name&gt;
-            &lt;param-value&gt;false&lt;/param-value&gt;
-        &lt;/init-param&gt;
-        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
-    &lt;/servlet&gt;
+        </servlet-class>
+        <init-param>
+            <param-name>debug</param-name>
+            <param-value>0</param-value>
+        </init-param>
+        <init-param>
+            <param-name>listings</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 
 ...
 
-    &lt;servlet-mapping&gt;
-        &lt;servlet-name&gt;default&lt;/servlet-name&gt;
-        &lt;url-pattern&gt;/&lt;/url-pattern&gt;
-    &lt;/servlet-mapping&gt;
-
-</source>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>]]></source>
 
 So by default, the default servlet is loaded at webapp startup and
 directory listings are disabled and debugging is turned off.
 </section>
 
 <section anchor="change" name="What can I change?">
-The DefaultServlet allows the following initParamters:
+<p>
+  The DefaultServlet allows the following initParamters:
+</p>
 
-<table border="1">
-  <tr>
-    <th valign='top'>debug</th>
-    <td valign='top'>
+<properties>
+  <property name="debug">
         Debugging level. It is not very useful unless you are a tomcat
         developer. As
         of this writing, useful values are 0, 1, 11, 1000. [0]
-    </td>
-  </tr>
-  <tr>
-    <th valign='top'>listings</th>
-    <td valign='top'>
+  </property>
+  <property name="listings">
         If no welcome file is present, can a directory listing be
         shown?
         value may be <b>true</b> or <b>false</b> [false]
@@ -96,30 +93,21 @@ The DefaultServlet allows the following initParamters:
         <b>WARNING:</b> Listings of directories containing many entries are
         expensive. Multiple requests for large directory listings can consume
         significant proportions of server resources.
-    </td>
-  </tr>
-  <tr>
-    <th valign='top'>readmeFile</th>
-    <td valign='top'>
+  </property>
+  <property name="readmeFile">
         If a directory listing is presented, a readme file may also
         be presented with the listing. This file is inserted as is
         so it may contain HTML.
-    </td>
-  </tr>
-  <tr>
-    <th valign='top'>globalXsltFile</th>
-    <td valign='top'>
+  </property>
+  <property name="globalXsltFile">
         If you wish to customize your directory listing, you
         can use an XSL transformation. This value is an absolute
         file name which be used for all directory listings.
         This can be overridden per context and/or per directory. See
         <strong>contextXsltFile</strong> and <strong>localXsltFile</strong>
         below. The format of the xml is shown below.
-    </td>
-  </tr>
-  <tr>
-    <th valign='top'>contextXsltFile</th>
-    <td valign='top'>
+  </property>
+  <property name="contextXsltFile">
         You may also customize your directory listing by context by
         configuring <code>contextXsltFile</code>. This should be a context
         relative path (e.g.: <code>/path/to/context.xslt</code>). This
@@ -127,11 +115,8 @@ The DefaultServlet allows the following initParamters:
         file does not exist, then <code>globalXsltFile</code> will be used. If
         <code>globalXsltFile</code> does not exist, then the default
         directory listing will be shown.
-    </td>
-  </tr>
-  <tr>
-    <th valign='top'>localXsltFile</th>
-    <td valign='top'>
+  </property>
+  <property name="localXsltFile">
         You may also customize your directory listing by directory by
         configuring <code>localXsltFile</code>. This should be a relative
         file name in the directory where the listing will take place.
@@ -142,53 +127,33 @@ The DefaultServlet allows the following initParamters:
         <code>globalXsltFile</code> will be used. If
         <code>globalXsltFile</code> does not exist, then the default
         directory listing will be shown.
-    </td>
-  </tr>
-  <tr>
-    <th valign='top'>input</th>
-    <td valign='top'>
+  </property>
+  <property name="input">
         Input buffer size (in bytes) when reading
         resources to be served.  [2048]
-    </td>
-  </tr>
-  <tr>
-    <th valign='top'>output</th>
-    <td valign='top'>
+  </property>
+  <property name="output">
         Output buffer size (in bytes) when writing
         resources to be served.  [2048]
-    </td>
-  </tr>
-  <tr>
-    <th valign='top'>readonly</th>
-    <td valign='top'>
+  </property>
+  <property name="readonly">
         Is this context "read only", so HTTP commands like PUT and
         DELETE are rejected?  [true]
-    </td>
-  </tr>
-  <tr>
-    <th valign='top'>fileEncoding</th>
-    <td valign='top'>
+  </property>
+  <property name="fileEncoding">
         File encoding to be used when reading static resources.
         [platform default]
-    </td>
-  </tr>
-  <tr>
-    <th valign='top'>sendfileSize</th>
-    <td valign='top'>
+  </property>
+  <property name="sendfileSize">
         If the connector used supports sendfile, this represents the minimal
         file size in KB for which sendfile will be used. Use a negative value
         to always disable sendfile. [48]
-    </td>
-  </tr>
-  <tr>
-    <th valign='top'>useAcceptRanges</th>
-    <td valign='top'>
+  </property>
+  <property name="useAcceptRanges">
         If true, the Accept-Ranges header will be set when appropriate for the
         response. [true]
-    </td>
-  </tr>
-
-</table>
+  </property>
+</properties>
 </section>
 
 <section anchor="dir" name="How do I customize directory listings?">
@@ -210,102 +175,101 @@ behaviors takes place.
 
 <p>
 Format:
-<source>
-    &lt;listing&gt;
-     &lt;entries&gt;
-      &lt;entry type='file|dir' urlPath='aPath' size='###' date='gmt date'&gt;
+</p>
+<source><![CDATA[    <listing>
+     <entries>
+      <entry type='file|dir' urlPath='aPath' size='###' date='gmt date'>
         fileName1
-      &lt;/entry&gt;
-      &lt;entry type='file|dir' urlPath='aPath' size='###' date='gmt date'&gt;
+      </entry>
+      <entry type='file|dir' urlPath='aPath' size='###' date='gmt date'>
         fileName2
-      &lt;/entry&gt;
+      </entry>
       ...
-     &lt;/entries&gt;
-     &lt;readme&gt;&lt;/readme&gt;
-    &lt;/listing&gt;
-</source>
+     </entries>
+     <readme></readme>
+    </listing>]]></source>
 <ul>
   <li>size will be missing if <code>type='dir'</code></li>
   <li>Readme is a CDATA entry</li>
 </ul>
+
+<p>
+  The following is a sample xsl file which mimics the default tomcat behavior:
 </p>
-The following is a sample xsl file which mimics the default tomcat behavior:
-<source>
-&lt;?xml version="1.0"?&gt;
+<source><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 
-&lt;xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  version="1.0"&gt;
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  version="3.0">
 
-  &lt;xsl:output method="xhtml" encoding="iso-8859-1" indent="no"/&gt;
+  <xsl:output method="html" html-version="5.0"
+    encoding="UTF-8" indent="no"
+    doctype-system="about:legacy-compat"/>
 
-  &lt;xsl:template match="listing"&gt;
-   &lt;html&gt;
-    &lt;head&gt;
-      &lt;title&gt;
+  <xsl:template match="listing">
+   <html>
+    <head>
+      <title>
         Sample Directory Listing For
-        &lt;xsl:value-of select="@directory"/&gt;
-      &lt;/title&gt;
-      &lt;style&gt;
-        h1{color : white;background-color : #0086b2;}
-        h3{color : white;background-color : #0086b2;}
-        body{font-family : sans-serif,Arial,Tahoma;
+        <xsl:value-of select="@directory"/>
+      </title>
+      <style>
+        h1 {color : white;background-color : #0086b2;}
+        h3 {color : white;background-color : #0086b2;}
+        body {font-family : sans-serif,Arial,Tahoma;
              color : black;background-color : white;}
-        b{color : white;background-color : #0086b2;}
-        a{color : black;} HR{color : #0086b2;}
-      &lt;/style&gt;
-    &lt;/head&gt;
-    &lt;body&gt;
-      &lt;h1&gt;Sample Directory Listing For
-            &lt;xsl:value-of select="@directory"/&gt;
-      &lt;/h1&gt;
-      &lt;hr size="1" /&gt;
-      &lt;table cellspacing="0"
-                  width="100%"
-            cellpadding="5"
-                  align="center"&gt;
-        &lt;tr&gt;
-          &lt;th align="left"&gt;Filename&lt;/th&gt;
-          &lt;th align="center"&gt;Size&lt;/th&gt;
-          &lt;th align="right"&gt;Last Modified&lt;/th&gt;
-        &lt;/tr&gt;
-        &lt;xsl:apply-templates select="entries"/&gt;
-        &lt;/table&gt;
-      &lt;xsl:apply-templates select="readme"/&gt;
-      &lt;hr size="1" /&gt;
-      &lt;h3&gt;Apache Tomcat/7.0&lt;/h3&gt;
-    &lt;/body&gt;
-   &lt;/html&gt;
-  &lt;/xsl:template&gt;
+        b {color : white;background-color : #0086b2;}
+        a {color : black;} HR{color : #0086b2;}
+        table td { padding: 5px; }
+      </style>
+    </head>
+    <body>
+      <h1>Sample Directory Listing For
+            <xsl:value-of select="@directory"/>
+      </h1>
+      <hr style="height: 1px;" />
+      <table style="width: 100%;">
+        <tr>
+          <th style="text-align: left;">Filename</th>
+          <th style="text-align: center;">Size</th>
+          <th style="text-align: right;">Last Modified</th>
+        </tr>
+        <xsl:apply-templates select="entries"/>
+        </table>
+      <xsl:apply-templates select="readme"/>
+      <hr style="height: 1px;" />
+      <h3>Apache Tomcat/8.0</h3>
+    </body>
+   </html>
+  </xsl:template>
 
 
-  &lt;xsl:template match="entries"&gt;
-    &lt;xsl:apply-templates select="entry"/&gt;
-  &lt;/xsl:template&gt;
+  <xsl:template match="entries">
+    <xsl:apply-templates select="entry"/>
+  </xsl:template>
 
-  &lt;xsl:template match="readme"&gt;
-    &lt;hr size="1" /&gt;
-    &lt;pre&gt;&lt;xsl:apply-templates/&gt;&lt;/pre&gt;
-  &lt;/xsl:template&gt;
+  <xsl:template match="readme">
+    <hr style="height: 1px;" />
+    <pre><xsl:apply-templates/></pre>
+  </xsl:template>
 
-  &lt;xsl:template match="entry"&gt;
-    &lt;tr&gt;
-      &lt;td align="left"&gt;
-        &lt;xsl:variable name="urlPath" select="@urlPath"/&gt;
-        &lt;a href="{$urlPath}"&gt;
-          &lt;tt&gt;&lt;xsl:apply-templates/&gt;&lt;/tt&gt;
-        &lt;/a&gt;
-      &lt;/td&gt;
-      &lt;td align="right"&gt;
-        &lt;tt&gt;&lt;xsl:value-of select="@size"/&gt;&lt;/tt&gt;
-      &lt;/td&gt;
-      &lt;td align="right"&gt;
-        &lt;tt&gt;&lt;xsl:value-of select="@date"/&gt;&lt;/tt&gt;
-      &lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/xsl:template&gt;
+  <xsl:template match="entry">
+    <tr>
+      <td style="text-align: left;">
+        <xsl:variable name="urlPath" select="@urlPath"/>
+        <a href="{$urlPath}">
+          <pre><xsl:apply-templates/></pre>
+        </a>
+      </td>
+      <td style="text-align: right;">
+        <pre><xsl:value-of select="@size"/></pre>
+      </td>
+      <td style="text-align: right;">
+        <pre><xsl:value-of select="@date"/></pre>
+      </td>
+    </tr>
+  </xsl:template>
 
-&lt;/xsl:stylesheet&gt;
-</source>
+</xsl:stylesheet>]]></source>
 
 </section>
 

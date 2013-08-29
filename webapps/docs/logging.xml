@@ -229,6 +229,7 @@
     JULI is enabled by default, and supports per classloader configuration, in
     addition to the regular global java.util.logging configuration. This means
     that logging can be configured at the following layers:
+  </p>
     <ul>
       <li>Globally. That is usually done in the
         <code>${catalina.base}/conf/logging.properties</code> file.
@@ -241,7 +242,6 @@
         <code>WEB-INF/classes/logging.properties</code>
       </li>
     </ul>
-  </p>
   <p>
     The default <code>logging.properties</code> in the JRE specifies a
     <code>ConsoleHandler</code> that routes logging to System.err.
@@ -260,9 +260,7 @@
     so FINEST or ALL should be set. Please refer to <code>java.util.logging</code>
     documentation in the JDK for the complete details:
   </p>
-  <p>
-    <source>org.apache.catalina.level=FINEST</source>
-  </p>
+  <source>org.apache.catalina.level=FINEST</source>
   <p>
     The configuration used by JULI is extremely similar to the one supported by
     plain <code>java.util.logging</code>, but uses a few
@@ -302,8 +300,8 @@
   </p>
   <p>
     Example logging.properties file to be placed in $CATALINA_BASE/conf:
-    <source>
-handlers = 1catalina.org.apache.juli.FileHandler, \
+  </p>
+  <source><![CDATA[handlers = 1catalina.org.apache.juli.FileHandler, \
            2localhost.org.apache.juli.FileHandler, \
            3manager.org.apache.juli.FileHandler, \
            java.util.logging.ConsoleHandler
@@ -347,15 +345,13 @@ org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager].handler
 
 # For example, set the org.apache.catalina.util.LifecycleBase logger to log
 # each component that extends LifecycleBase changing state:
-#org.apache.catalina.util.LifecycleBase.level = FINE
-</source>
-    </p>
+#org.apache.catalina.util.LifecycleBase.level = FINE]]></source>
 
     <p>
       Example logging.properties for the servlet-examples web application to be
       placed in WEB-INF/classes inside the web application:
-      <source>
-handlers = org.apache.juli.FileHandler, java.util.logging.ConsoleHandler
+    </p>
+    <source><![CDATA[handlers = org.apache.juli.FileHandler, java.util.logging.ConsoleHandler
 
 ############################################################
 # Handler specific properties.
@@ -367,9 +363,8 @@ org.apache.juli.FileHandler.directory = ${catalina.base}/logs
 org.apache.juli.FileHandler.prefix = servlet-examples.
 
 java.util.logging.ConsoleHandler.level = FINE
-java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
-</source>
-    </p>
+java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter]]></source>
+
 
     <subsection name="Documentation references">
       <p>See the following resources for additional information:</p>
@@ -430,7 +425,7 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
         <li>Create a file called <code>log4j.properties</code> with the
         following content and save it into <code>$CATALINA_BASE/lib</code></li>
     </ol>
-    <source>
+    <source><![CDATA[
 log4j.rootLogger = INFO, CATALINA
 
 # Define all the appenders
@@ -477,8 +472,7 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost] = INF
 log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager] =\
   INFO, MANAGER
 log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/host-manager] =\
-  INFO, HOST-MANAGER
-</source>
+  INFO, HOST-MANAGER]]></source>
     <ol start="2">
         <li><a href="http://logging.apache.org/log4j">Download Log4J</a>
         (v1.2 or later).</li>
@@ -553,11 +547,9 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/hos
       configuration files, so we recommend you use a properties file as
       described until a future version of log4j allows this convention.
     </p>
-      <source>
-log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=DEBUG<br/>
-log4j.logger.org.apache.catalina.core=DEBUG<br/>
-log4j.logger.org.apache.catalina.session=DEBUG<br/>
-      </source>
+      <source><![CDATA[log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=DEBUG
+log4j.logger.org.apache.catalina.core=DEBUG
+log4j.logger.org.apache.catalina.session=DEBUG]]></source>
 
     <p>
       Be warned: a level of DEBUG will produce megabytes of logging and slow

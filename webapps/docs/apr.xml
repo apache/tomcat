@@ -57,12 +57,12 @@
 
     <p>
       APR support requires three main native components to be installed:
-      <ul>
-        <li>APR library</li>
-        <li>JNI wrappers for APR used by Tomcat (libtcnative)</li>
-        <li>OpenSSL libraries</li>
-      </ul>
     </p>
+    <ul>
+      <li>APR library</li>
+      <li>JNI wrappers for APR used by Tomcat (libtcnative)</li>
+      <li>OpenSSL libraries</li>
+    </ul>
 
     <subsection name="Windows">
 
@@ -87,21 +87,21 @@
 
     <p>
       Requirements:
-      <ul>
-        <li>APR 1.2+ development headers (libapr1-dev package)</li>
-        <li>OpenSSL 0.9.7+ development headers (libssl-dev package)</li>
-        <li>JNI headers from Java compatible JDK 1.4+</li>
-        <li>GNU development environment (gcc, make)</li>
-      </ul>
     </p>
+    <ul>
+      <li>APR 1.2+ development headers (libapr1-dev package)</li>
+      <li>OpenSSL 0.9.7+ development headers (libssl-dev package)</li>
+      <li>JNI headers from Java compatible JDK 1.4+</li>
+      <li>GNU development environment (gcc, make)</li>
+    </ul>
 
     <p>
       The wrapper library sources are located in the Tomcat binary bundle, in the
       <code>bin/tomcat-native.tar.gz</code> archive.
       Once the build environment is installed and the source archive is extracted, the wrapper library
       can be compiled using (from the folder containing the configure script):
-      <source>./configure &amp;&amp; make &amp;&amp; make install</source>
     </p>
+    <source>./configure &amp;&amp; make &amp;&amp; make install</source>
 
     </subsection>
 
@@ -119,32 +119,33 @@
 
   <p>
     When APR is enabled, the following features are also enabled in Tomcat:
-    <ul>
-      <li>Secure session ID generation by default on all platforms (platforms other than Linux required
-          random number generation using a configured entropy)</li>
-      <li>OS level statistics on memory usage and CPU usage by the Tomcat process are displayed by
-          the status servlet</li>
-    </ul>
   </p>
+  <ul>
+    <li>Secure session ID generation by default on all platforms (platforms other than Linux required
+        random number generation using a configured entropy)</li>
+    <li>OS level statistics on memory usage and CPU usage by the Tomcat process are displayed by
+        the status servlet</li>
+  </ul>
 
   </section>
 
   <section name="APR Lifecycle Listener Configuration">
     <subsection name="AprLifecycleListener">
+    <attributes>
     <attribute name="SSLEngine" required="false">
     <p>
       Name of the SSLEngine to use. off: Do not use SSL, on: Use SSL but no specific ENGINE.
       The default value is <b>on</b>.
       This initializes the native SSL engine, then enable the use of this engine in the connector
       using the <code>SSLEnabled</code> attribute. Example:
-      <source>
-&lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" /&gt;
-      </source>
     </p>
+      <source><![CDATA[<Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />]]></source>
+
     <p>See the <a href="http://www.openssl.org">Official OpenSSL
        website</a> for more details on SSL hardware engines and manufacturers.
     </p>
     </attribute>
+    </attributes>
     </subsection>
   </section>
 
@@ -156,19 +157,18 @@
       connector configuration documentation.</p>
 
       <p>For HTTPS configuration, see the
-      <a href="config/http.html#SSL%20Support">HTTPS</a> connector configuration
+      <a href="config/http.html#SSL_Support">HTTPS</a> connector configuration
       documentation.</p>
 
-      <p>An example SSL Connector declaration is:
-      <source>
-      &lt;Connector port="443" maxHttpHeaderSize="8192"
+      <p>An example SSL Connector declaration is:</p>
+      <source><![CDATA[<Connector port="443" maxHttpHeaderSize="8192"
                  maxThreads="150"
                  enableLookups="false" disableUploadTimeout="true"
                  acceptCount="100" scheme="https" secure="true"
                  SSLEnabled="true"
                  SSLCertificateFile="${catalina.base}/conf/localhost.crt"
-                 SSLCertificateKeyFile="${catalina.base}/conf/localhost.key" /&gt;</source>
-      </p>
+                 SSLCertificateKeyFile="${catalina.base}/conf/localhost.key" />]]></source>
+
 
     </subsection>
 
