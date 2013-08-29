@@ -55,6 +55,12 @@
         contributions from Nick Williams and Jeremy Boynes. (markt)
       </add>
       <add>
+        Implement JSP 2.3. (markt)
+      </add>
+      <add>
+        Implement JSR 341 - Unified Expression Language 3.0. (markt)
+      </add>
+      <add>
         Implement JSR 356 - WebSockets. The JSR 356 implementation includes
         contributions from Nick Williams, Rossen Stoyanchev and Niki Dokovski.
         (markt)
