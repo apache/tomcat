@@ -46,6 +46,7 @@
     <filter>
         <filter-name>Set Character Encoding</filter-name>
         <filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
+        <async-supported>true</async-supported>
         <init-param>
             <param-name>encoding</param-name>
             <param-value>UTF-8</param-value>
