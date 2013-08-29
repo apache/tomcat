@@ -57,13 +57,19 @@
 
   <subsection name="Introduction">
 
-    <p>The <strong>Access Log Valve</strong> creates log files in the same
-    format as those created by standard web servers.  These logs can later
-    be analyzed by standard log analysis tools to track page hit counts,
-    user session activity, and so on.  The files produces by this <code>Valve</code>
-    are rolled over nightly at midnight.  This <code>Valve</code>
-    may be associated with any Catalina container (<code>Context</code>,
-    <code>Host</code>, or <code>Engine</code>), and
+    <p>The <strong>Access Log Valve</strong> creates log files in the
+    same format as those created by standard web servers.  These logs
+    can later be analyzed by standard log analysis tools to track page
+    hit counts, user session activity, and so on.  This <code>Valve</code>
+    uses self-contained logic to write its log files, which can be
+    automatically rolled over at midnight each day.  (The essential
+    requirement for access logging is to handle a large continuous
+    stream of data with low overhead. This <code>Valve</code> does not
+    use Apache Commons Logging, thus avoiding additional overhead and
+    potentially complex configuration).</p>
+
+    <p>This <code>Valve</code> may be associated with any Catalina container
+    (<code>Context</code>, <code>Host</code>, or <code>Engine</code>), and
     will record ALL requests processed by that container.</p>
 
     <p>Some requests may be handled by Tomcat before they are passed to a
@@ -339,12 +345,15 @@
 
   <subsection name="Introduction">
 
-    <p>The <strong>Extended Access Log Valve</strong> is a variant of
-    the Access Log Valve. It is not a real extension of the standard
-    Access Log valve, instead it supports the so-called
+    <p>The <strong>Extended Access Log Valve</strong> extends the
+    <a href="#Access_Log_Valve">Access Log Valve</a> class, and so
+    uses the same self-contained logging logic.  This means it
+    implements many of the same file handling attributes.  The main
+    difference to the standard <code>AccessLogValve</code> is that
+    <code>ExtendedAccessLogValve</code> creates log files which
+    conform to the the Working Draft for the
     <a href="http://www.w3.org/TR/WD-logfile.html">Extended Log File Format</a>
-    defined by the W3C. The main difference to the standard
-    <code>AccessLogValve</code> are the supported pattern values.</p>
+    defined by the W3C.</p>
 
   </subsection>
 

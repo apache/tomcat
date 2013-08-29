@@ -57,7 +57,7 @@
       logging, one has to replace the logging library with the one that is built
       with the full implementation. Such library is provided as an <a href="extras.html">extras</a>
       component. Instructions on how to configure Tomcat to use Log4j framework
-      for its internal logging may be found below.
+      for its internal logging may be found <a href="#Using_Log4j">below</a>.
     </p>
 
     <p>
@@ -193,9 +193,16 @@
     <subsection name="Access logging">
 
     <p>
-      A related, but different feature is access logging. It can be configured
-      as a valve at the Context, or Host, or Engine. See <a href="config/valve.html">Valves</a>
-      documentation for more details.
+      Access logging is a related but different feature, which is
+      implemented as a <code>Valve</code>. It uses self-contained
+      logic to write its log files. The essential requirement for
+      access logging is to handle a large continuous stream of data
+      with low overhead, so it only uses Apache Commons Logging for
+      its own debug messages. This implementation approach avoids
+      additional overhead and potentially complex configuration.
+      Please refer to the <a href="config/valve.html">Valves</a>
+      documentation for more details on its configuration, including
+      the various report formats.
     </p>
 
     </subsection>
@@ -547,10 +554,10 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/hos
       described until a future version of log4j allows this convention.
     </p>
       <source>
-log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=DEBUG<br />
-log4j.logger.org.apache.catalina.core=DEBUG<br />
-log4j.logger.org.apache.catalina.session=DEBUG<br />
-</source>
+log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=DEBUG<br/>
+log4j.logger.org.apache.catalina.core=DEBUG<br/>
+log4j.logger.org.apache.catalina.session=DEBUG<br/>
+      </source>
 
     <p>
       Be warned: a level of DEBUG will produce megabytes of logging and slow
@@ -580,15 +587,26 @@ log4j.logger.org.apache.catalina.session=DEBUG<br />
         library are likely to automatically choose log4j as the underlying
         logging implementation.</p></li>
 
-        <li><p>The <code>java.util.logging</code> API is still available, for
-        those web applications that use it directly. The
+        <li><p>The <code>java.util.logging</code> API is still available for
+        those web applications that use it directly.  The
         <code>${catalina.base}/conf/logging.properties</code> file is still
-        referenced by Tomcat startup scripts.</p>
+        referenced by Tomcat startup scripts.  For more information, see the
+        subsections of the <a href="#Introduction">Introduction</a> to
+        this page.</p>
         <p> Removal of <code>${catalina.base}/conf/logging.properties</code>
-        file, mentioned as one of the steps, just causes
-        <code>java.util.logging</code> to fallback to the default configuration
-        as configured in JRE, which is to use a ConsoleHandler and do not
-        create any files.</p></li>
+        file, mentioned as one of the steps above, causes
+        <code>java.util.logging</code> to fallback to the default
+        configuration for the JRE, which is to use a ConsoleHandler
+        and therefore not create any standard log files.  You should
+        confirm that all your log files are being created by log4j
+        <i>before</i> disabling the standard mechanism.</p></li>
+
+        <li><p>The <strong>Access Log Valve</strong> and
+        <strong>ExtendedAccessLogValve</strong> use their own self-contained
+        logging implementation, so they
+        <strong><i>cannot be configured to use log4j</i></strong>.
+        Refer to <a href="config/valve.html#Access_Log_Valve">Valves</a>
+        for specific configuration details.</p></li>
     </ul>
   </section>
 
