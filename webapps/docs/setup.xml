@@ -50,7 +50,7 @@
       based installers, with only a few items of interest.
     </p>
 
-    <p>
+
       <ul>
         <li><strong>Installation as a service</strong>: Tomcat will be
             installed as a Windows service no matter what setting is selected.
@@ -76,7 +76,7 @@
             for information on how to manage Tomcat as a Windows service.
             </li>
       </ul>
-    </p>
+
 
     <p>The installer will create shortcuts allowing starting and configuring
        Tomcat. It is important to note that the Tomcat administration web
@@ -106,31 +106,27 @@
     <p>Please note that you should use the GNU make (gmake) instead of
        the native BSD make on FreeBSD systems.</p>
 
-<source>
-    cd $CATALINA_HOME/bin
-    tar xvfz commons-daemon-native.tar.gz
-    cd commons-daemon-1.0.x-native-src/unix
-    ./configure
-    make
-    cp jsvc ../..
-    cd ../..
-</source>
+<source>cd $CATALINA_HOME/bin
+tar xvfz commons-daemon-native.tar.gz
+cd commons-daemon-1.0.x-native-src/unix
+./configure
+make
+cp jsvc ../..
+cd ../..</source>
 
     <p>Tomcat can then be run as a daemon using the following commands.</p>
 
-<source>
-    CATALINA_BASE=$CATALINA_HOME
-    cd $CATALINA_HOME
-    ./bin/jsvc \
-        -classpath $CATALINA_HOME/bin/bootstrap.jar:$CATALINA_HOME/bin/tomcat-juli.jar \
-        -outfile $CATALINA_BASE/logs/catalina.out \
-        -errfile $CATALINA_BASE/logs/catalina.err \
-        -Dcatalina.home=$CATALINA_HOME \
-        -Dcatalina.base=$CATALINA_BASE \
-        -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager \
-        -Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties \
-        org.apache.catalina.startup.Bootstrap
-</source>
+<source>CATALINA_BASE=$CATALINA_HOME
+cd $CATALINA_HOME
+./bin/jsvc \
+    -classpath $CATALINA_HOME/bin/bootstrap.jar:$CATALINA_HOME/bin/tomcat-juli.jar \
+    -outfile $CATALINA_BASE/logs/catalina.out \
+    -errfile $CATALINA_BASE/logs/catalina.err \
+    -Dcatalina.home=$CATALINA_HOME \
+    -Dcatalina.base=$CATALINA_BASE \
+    -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager \
+    -Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties \
+    org.apache.catalina.startup.Bootstrap</source>
 
     <p>You may also need to specify <code>-jvm server</code> if the JVM defaults
        to using a server VM rather than a client VM. This has been observed on

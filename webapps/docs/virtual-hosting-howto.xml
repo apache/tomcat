@@ -50,12 +50,10 @@
       At the simplest, edit the <a href="config/engine.html">Engine</a> portion
       of your <code>server.xml</code> file to look like this:
     </p>
-    <source>
-&lt;Engine name="Catalina" defaultHost="ren"&gt;
-    &lt;Host name="ren"    appBase="renapps"/&gt;
-    &lt;Host name="stimpy" appBase="stimpyapps"/&gt;
-&lt;/Engine&gt;
-    </source>
+    <source><![CDATA[<Engine name="Catalina" defaultHost="ren">
+    <Host name="ren"    appBase="renapps"/>
+    <Host name="stimpy" appBase="stimpyapps"/>
+</Engine>]]></source>
     <p>
       Note that the directory structures under the appBase for each host should
       not overlap each other.
@@ -71,10 +69,8 @@
     <p>
       Create directories for each of the virtual hosts:
     </p>
-    <source>
-mkdir $CATALINA_HOME/renapps
-mkdir $CATALINA_HOME/stimpyapps
-    </source>
+    <source>mkdir $CATALINA_HOME/renapps
+mkdir $CATALINA_HOME/stimpyapps</source>
   </section>
 
   <section name="Configuring Your Contexts">
@@ -106,10 +102,8 @@ mkdir $CATALINA_HOME/stimpyapps
         Create a structure under <code>$CATALINA_HOME/conf/Catalina</code>
         corresponding to your virtual hosts, e.g.:
       </p>
-      <source>
-mkdir $CATALINA_HOME/conf/Catalina/ren
-mkdir $CATALINA_HOME/conf/Catalina/stimpy
-      </source>
+      <source>mkdir $CATALINA_HOME/conf/Catalina/ren
+mkdir $CATALINA_HOME/conf/Catalina/stimpy</source>
       <p>
         Note that the ending directory name "Catalina" represents the
         <code>name</code> attribute of the
@@ -118,19 +112,15 @@ mkdir $CATALINA_HOME/conf/Catalina/stimpy
       <p>
         Now, for your default webapps, add:
       </p>
-      <source>
-$CATALINA_HOME/conf/Catalina/ren/ROOT.xml
-$CATALINA_HOME/conf/Catalina/stimpy/ROOT.xml
-      </source>
+      <source>$CATALINA_HOME/conf/Catalina/ren/ROOT.xml
+$CATALINA_HOME/conf/Catalina/stimpy/ROOT.xml</source>
       <p>
         If you want to use the Tomcat manager webapp for each host, you'll also
         need to add it here:
       </p>
-      <source>
-cd $CATALINA_HOME/conf/Catalina
+      <source>cd $CATALINA_HOME/conf/Catalina
 cp localhost/manager.xml ren/
-cp localhost/manager.xml stimpy/
-      </source>
+cp localhost/manager.xml stimpy/</source>
     </subsection>
     <subsection name="Further Information">
       <p>
