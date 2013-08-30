@@ -100,8 +100,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             // Parsing the request header
             try {
                 // Get first message of the request
-                int bytesRead = readMessage(requestHeaderMessage, false);
-                if (bytesRead == 0) {
+                if (!readMessage(requestHeaderMessage, false)) {
                     break;
                 }
                 // Set back timeout if keep alive timeout is enabled
@@ -396,10 +395,11 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
     /**
      * Read an AJP message.
      *
-     * @return The number of bytes read
+     * @return <code>true</code> if a message was read, otherwise false
+     *
      * @throws IOException any other failure, including incomplete reads
      */
-    protected int readMessage(AjpMessage message, boolean blockFirstRead)
+    protected boolean readMessage(AjpMessage message, boolean blockFirstRead)
         throws IOException {
 
         byte[] buf = message.getBuffer();
@@ -408,7 +408,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         int bytesRead = read(buf, 0, headerLength, blockFirstRead);
 
         if (bytesRead == 0) {
-            return 0;
+            return false;
         }
 
         int messageLength = message.processHeader(true);
@@ -419,7 +419,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         }
         else if (messageLength == 0) {
             // Zero length message.
-            return bytesRead;
+            return true;
         }
         else {
             if (messageLength > buf.length) {
@@ -431,7 +431,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
                         Integer.valueOf(buf.length)));
             }
             bytesRead += read(buf, headerLength, messageLength, true);
-            return bytesRead;
+            return true;
         }
     }
 
