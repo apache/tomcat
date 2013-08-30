@@ -96,16 +96,18 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         // Error flag
         error = false;
 
+        boolean keptAlive = false;
+
         while (!error && !endpoint.isPaused()) {
             // Parsing the request header
             try {
                 // Get first message of the request
-                if (!readMessage(requestHeaderMessage, false)) {
+                if (!readMessage(requestHeaderMessage, !keptAlive)) {
                     break;
                 }
                 // Set back timeout if keep alive timeout is enabled
                 if (keepAliveTimeout > 0) {
-                    socket.setTimeout(soTimeout);
+                    setTimeout(socketWrapper, soTimeout);
                 }
                 // Check message type, process right away and break if
                 // not regular request processing
@@ -133,6 +135,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
                     recycle(true);
                     break;
                 }
+                keptAlive = true;
                 request.setStartTime(System.currentTimeMillis());
             } catch (IOException e) {
                 error = true;
@@ -210,7 +213,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
             // Set keep alive timeout if enabled
             if (keepAliveTimeout > 0) {
-                socket.setTimeout(keepAliveTimeout);
+                setTimeout(socketWrapper, keepAliveTimeout);
             }
 
             recycle(false);
