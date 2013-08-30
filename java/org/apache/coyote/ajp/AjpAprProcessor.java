@@ -341,10 +341,23 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
     /**
      * Read at least the specified amount of bytes, and place them
-     * in the input buffer.
+     * in the input buffer. Note that if any data is available to read then this
+     * method will always block until at least the specified number of bytes
+     * have been read.
+     *
+     * @param n     The minimum number of bytes to read
+     * @param block If there is no data available to read when this method is
+     *              called, should this call block until data becomes available?
+     * @return
+     * @throws IOException
      */
-    protected boolean read(int n)
-        throws IOException {
+    protected boolean read(int n, boolean block) throws IOException {
+
+        boolean nextReadBlocks = block;
+
+        if (!block && inputBuffer.remaining() > 0) {
+            nextReadBlocks = true;
+        }
 
         if (inputBuffer.capacity() - inputBuffer.limit() <=
                 n - inputBuffer.remaining()) {
@@ -355,9 +368,14 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         int nRead;
         while (inputBuffer.remaining() < n) {
             nRead = readSocket(inputBuffer.limit(),
-                    inputBuffer.capacity() - inputBuffer.limit(), true);
-            if (nRead > 0) {
+                    inputBuffer.capacity() - inputBuffer.limit(),
+                    nextReadBlocks);
+            if (nRead == 0) {
+                // Must be a non-blocking read
+                return false;
+            } else if (nRead > 0) {
                 inputBuffer.limit(inputBuffer.limit() + nRead);
+                nextReadBlocks = true;
             } else {
                 throw new IOException(sm.getString("ajpprocessor.failedread"));
             }
@@ -499,7 +517,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                 return false;
             }
         } else {
-            read(headerLength);
+            read(headerLength, true);
         }
         inputBuffer.get(message.getBuffer(), 0, headerLength);
         int messageLength = message.processHeader(true);
@@ -521,7 +539,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                         Integer.valueOf(messageLength),
                         Integer.valueOf(message.getBuffer().length)));
             }
-            read(messageLength);
+            read(messageLength, true);
             inputBuffer.get(message.getBuffer(), headerLength, messageLength);
             return true;
         }
