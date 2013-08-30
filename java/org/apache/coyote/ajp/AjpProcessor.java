@@ -118,7 +118,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     socket.getSocket().setSoTimeout(keepAliveTimeout);
                 }
                 // Get first message of the request
-                if (!readMessage(requestHeaderMessage)) {
+                if (!readMessage(requestHeaderMessage, true)) {
                     // This means a connection timeout
                     break;
                 }
@@ -321,10 +321,9 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
 
         first = false;
         bodyMessage.reset();
-        if (!readMessage(bodyMessage)) {
-            // Invalid message
-            return false;
-        }
+
+        readMessage(bodyMessage, true);
+
         // No data received.
         if (bodyMessage.getLen() == 0) {
             // just the header
@@ -341,14 +340,17 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
         return true;
     }
 
+
     /**
      * Read an AJP message.
      *
+     * @param message   The message to populate
+     * @param ignored   Not used in BIO
      * @return true if the message has been read, false if the short read
      *         didn't return anything
      * @throws IOException any other failure, including incomplete reads
      */
-    protected boolean readMessage(AjpMessage message)
+    protected boolean readMessage(AjpMessage message, boolean ignored)
         throws IOException {
 
         byte[] buf = message.getBuffer();
@@ -359,8 +361,8 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
         int messageLength = message.processHeader(true);
         if (messageLength < 0) {
             // Invalid AJP header signature
-            // TODO: Throw some exception and close the connection to frontend.
-            return false;
+            throw new IOException(sm.getString("ajpmessage.invalidLength",
+                    Integer.valueOf(messageLength)));
         }
         else if (messageLength == 0) {
             // Zero length message.
