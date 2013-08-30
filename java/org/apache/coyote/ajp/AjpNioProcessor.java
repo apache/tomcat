@@ -90,7 +90,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         // Setting up the socket
         this.socketWrapper = socket;
 
-        long soTimeout = endpoint.getSoTimeout();
+        int soTimeout = endpoint.getSoTimeout();
         boolean cping = false;
 
         // Error flag
