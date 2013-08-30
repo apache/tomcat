@@ -90,7 +90,7 @@ public class ByteCounter extends HttpServlet {
             this.sos = sos;
 
             // In Tomcat, the order the listeners are set controls the order
-            // that the first calls are made. In this case, the write listener
+            // that the first calls are made. In this case, the read listener
             // will be called before the write listener.
             sis.setReadListener(this);
             sos.setWriteListener(this);
