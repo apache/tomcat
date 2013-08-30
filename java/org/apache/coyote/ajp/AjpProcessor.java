@@ -98,12 +98,11 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
 
         // Setting up the socket
         this.socketWrapper = socket;
+
         input = socket.getSocket().getInputStream();
         output = socket.getSocket().getOutputStream();
-        int soTimeout = -1;
-        if (keepAliveTimeout > 0) {
-            soTimeout = socket.getSocket().getSoTimeout();
-        }
+
+        int soTimeout = endpoint.getSoTimeout();
         boolean cping = false;
 
         // Error flag
