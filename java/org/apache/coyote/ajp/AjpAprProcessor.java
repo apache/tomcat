@@ -104,9 +104,12 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
         // Setting up the socket
         this.socketWrapper = socket;
+
         long socketRef = socket.getSocket().longValue();
         Socket.setrbb(socketRef, inputBuffer);
         Socket.setsbb(socketRef, outputBuffer);
+
+        int soTimeout = endpoint.getSoTimeout();
         boolean cping = false;
 
         // Error flag
@@ -123,6 +126,10 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                     // (long keepalive), so that the processor should be recycled
                     // and the method should return true
                     break;
+                }
+                // Set back timeout if keep alive timeout is enabled
+                if (keepAliveTimeout > 0) {
+                    setTimeout(socketWrapper, soTimeout);
                 }
                 // Check message type, process right away and break if
                 // not regular request processing
@@ -223,6 +230,11 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
             request.updateCounters();
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
+            // Set keep alive timeout if enabled
+            if (keepAliveTimeout > 0) {
+                setTimeout(socketWrapper, keepAliveTimeout);
+            }
+
             recycle(false);
         }
 
