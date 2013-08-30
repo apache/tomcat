@@ -272,6 +272,13 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
     // ------------------------------------------------------ Protected Methods
 
+    @Override
+    protected void setTimeout(SocketWrapper<Long> socketWrapper,
+            int timeout) throws IOException {
+        Socket.timeoutSet(
+                socketWrapper.getSocket().longValue(), timeout * 1000);
+    }
+
 
     @Override
     protected void output(byte[] src, int offset, int length)

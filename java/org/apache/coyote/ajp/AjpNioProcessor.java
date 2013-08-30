@@ -266,6 +266,13 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
     // ------------------------------------------------------ Protected Methods
 
     @Override
+    protected void setTimeout(SocketWrapper<NioChannel> socketWrapper,
+            int timeout) throws IOException {
+        socketWrapper.setTimeout(timeout);
+    }
+
+
+    @Override
     protected void output(byte[] src, int offset, int length)
             throws IOException {
 
