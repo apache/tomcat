@@ -41,12 +41,6 @@ public enum ActionCode {
     RESET,
 
     /**
-     * Hook called after request, but before recycling. Can be used for logging,
-     * to update counters, custom cleanup - the request is still visible
-     */
-    POST_REQUEST,
-
-    /**
      * Hook called if swallowing request input should be disabled.
      * Example: Cancel a large file upload.
      *

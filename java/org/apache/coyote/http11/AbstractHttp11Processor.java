@@ -810,6 +810,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
         } else if (actionCode == ActionCode.ASYNC_IS_ERROR) {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
+        } else if (actionCode == ActionCode.UPGRADE) {
+            httpUpgradeHandler = (HttpUpgradeHandler) param;
+            // Stop further HTTP output
+            getOutputBuffer().finished = true;
         } else if (actionCode == ActionCode.AVAILABLE) {
             request.setAvailable(inputBuffer.available());
         } else if (actionCode == ActionCode.NB_WRITE_INTEREST) {
@@ -822,10 +826,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             }
         } else if (actionCode == ActionCode.NB_READ_INTEREST) {
             registerForEvent(true, false);
-        } else if (actionCode == ActionCode.UPGRADE) {
-            httpUpgradeHandler = (HttpUpgradeHandler) param;
-            // Stop further HTTP output
-            getOutputBuffer().finished = true;
         } else if (actionCode == ActionCode.REQUEST_BODY_FULLY_READ) {
             AtomicBoolean result = (AtomicBoolean) param;
             result.set(getInputBuffer().isFinished());
