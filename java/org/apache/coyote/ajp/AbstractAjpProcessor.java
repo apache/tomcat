@@ -318,7 +318,18 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     @Override
     public final void action(ActionCode actionCode, Object param) {
 
-        if (actionCode == ActionCode.COMMIT) {
+        if (actionCode == ActionCode.CLOSE) {
+            // End the processing of the current request, and stop any further
+            // transactions with the client
+
+            try {
+                finish();
+            } catch (IOException e) {
+                // Set error flag
+                error = true;
+            }
+
+        } else if (actionCode == ActionCode.COMMIT) {
 
             if (response.isCommitted())
                 return;
@@ -337,6 +348,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 // Set error flag
                 error = true;
             }
+
+        } else if (actionCode == ActionCode.ACK) {
+            // NO_OP for AJP
 
         } else if (actionCode == ActionCode.CLIENT_FLUSH) {
 
@@ -363,17 +377,10 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             // make sure we are closing the connection
             error = true;
 
-        } else if (actionCode == ActionCode.CLOSE) {
-            // Close
-            // End the processing of the current request, and stop any further
-            // transactions with the client
-
-            try {
-                finish();
-            } catch (IOException e) {
-                // Set error flag
-                error = true;
-            }
+        } else if (actionCode == ActionCode.RESET) {
+            // NO-OP
+            // TODO Check if this is really a NO-OP for AJP or if something
+            // needs to be done here
 
         } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
 
@@ -416,6 +423,10 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 request.setAttribute(SSLSupport.CERTIFICATE_KEY, jsseCerts);
             }
 
+        } else if (actionCode == ActionCode.REQ_SSL_CERTIFICATE) {
+            // NO-OP. Can't force a new SSL handshake with the client when using
+            // AJP as the reverse proxy controls that connection.
+
         } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
 
             // Get remote host name using a DNS resolution
@@ -428,10 +439,30 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 }
             }
 
+        } else if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
+            // NO-OP
+            // TODO Check if this is really a NO-OP for AJP or if something
+            // needs to be done here
+
+        } else if (actionCode == ActionCode.REQ_LOCAL_NAME_ATTRIBUTE) {
+            // NO-OP
+            // TODO Check if this is really a NO-OP for AJP or if something
+            // needs to be done here
+
         } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
 
             // Copy from local name for now, which should simply be an address
             request.localAddr().setString(request.localName().toString());
+
+        } else if (actionCode == ActionCode.REQ_REMOTEPORT_ATTRIBUTE) {
+            // NO-OP
+            // TODO Check if this is really a NO-OP for AJP or if something
+            // needs to be done here
+
+        } else if (actionCode == ActionCode.REQ_LOCALPORT_ATTRIBUTE) {
+            // NO-OP
+            // TODO Check if this is really a NO-OP for AJP or if something
+            // needs to be done here
 
         } else if (actionCode == ActionCode.REQ_SET_BODY_REPLAY) {
 
@@ -470,6 +501,39 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             // HTTP connections only. Unsupported for AJP.
             throw new UnsupportedOperationException(
                     sm.getString("ajpprocessor.httpupgrade.notsupported"));
+
+        } else if (actionCode == ActionCode.COMET_BEGIN) {
+            // HTTP connections only. Unsupported for AJP.
+            throw new UnsupportedOperationException(
+                    sm.getString("ajpprocessor.comet.notsupported"));
+
+        } else if (actionCode == ActionCode.COMET_END) {
+            // HTTP connections only. Unsupported for AJP.
+            throw new UnsupportedOperationException(
+                    sm.getString("ajpprocessor.comet.notsupported"));
+
+        } else if (actionCode == ActionCode.COMET_CLOSE) {
+            // HTTP connections only. Unsupported for AJP.
+            throw new UnsupportedOperationException(
+                    sm.getString("ajpprocessor.comet.notsupported"));
+
+        } else if (actionCode == ActionCode.COMET_SETTIMEOUT) {
+            // HTTP connections only. Unsupported for AJP.
+            throw new UnsupportedOperationException(
+                    sm.getString("ajpprocessor.comet.notsupported"));
+
+        } else if (actionCode == ActionCode.AVAILABLE) {
+            // TODO
+        } else if (actionCode == ActionCode.NB_WRITE_INTEREST) {
+            // TODO
+        } else if (actionCode == ActionCode.NB_READ_INTEREST) {
+            // TODO
+        } else if (actionCode == ActionCode.REQUEST_BODY_FULLY_READ) {
+            // TODO
+        } else if (actionCode == ActionCode.DISPATCH_READ) {
+            // TODO
+        } else if (actionCode == ActionCode.DISPATCH_WRITE) {
+            // TODO
         }  else {
             actionInternal(actionCode, param);
         }

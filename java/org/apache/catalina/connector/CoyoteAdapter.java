@@ -425,7 +425,6 @@ public class CoyoteAdapter implements Adapter {
             if (!request.isAsync() && !comet) {
                 request.finishRequest();
                 response.finishResponse();
-                req.action(ActionCode.POST_REQUEST , null);
                 request.getMappingData().context.logAccess(
                         request, response,
                         System.currentTimeMillis() - req.getStartTime(),
@@ -561,7 +560,6 @@ public class CoyoteAdapter implements Adapter {
                             System.currentTimeMillis() - req.getStartTime(),
                             false);
                 }
-                req.action(ActionCode.POST_REQUEST , null);
             }
 
         } catch (IOException e) {
