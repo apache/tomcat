@@ -36,13 +36,11 @@
 
 <section name="Quick Start">
 
-   
     <p><em>The description below uses the variable name $CATALINA_BASE to refer the
     base directory against which most relative paths are resolved. If you have
     not configured Tomcat for multiple instances by setting a CATALINA_BASE
     directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
     the directory into which you have installed Tomcat.</em></p>
-    
 
 <p>To install and configure SSL support on Tomcat, you need to follow
 these simple steps.  For more information, read the rest of this HOW-TO.</p>
@@ -367,13 +365,11 @@ change this to any port number you wish (such as to the default port for
 (outside the scope of this document) is necessary to run Tomcat on port
 numbers lower than 1024 on many operating systems.</p>
 
-  
   <p><em>If you change the port number here, you should also change the
   value specified for the <code>redirectPort</code> attribute on the
   non-SSL connector.  This allows Tomcat to automatically redirect
   users who attempt to access a page with a security constraint specifying
   that SSL is required, as required by the Servlet Specification.</em></p>
-  
 
 <p>After completing these configuration changes, you must restart Tomcat as
 you normally do, and you should be in business.  You should be able to access
