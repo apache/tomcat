@@ -110,13 +110,8 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
         error = false;
 
         while (!error && !endpoint.isPaused()) {
-
             // Parsing the request header
             try {
-                // Set keep alive timeout if enabled
-                if (keepAliveTimeout > 0) {
-                    socket.getSocket().setSoTimeout(keepAliveTimeout);
-                }
                 // Get first message of the request
                 if (!readMessage(requestHeaderMessage, true)) {
                     // This means a connection timeout
@@ -225,6 +220,11 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             request.updateCounters();
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
+            // Set keep alive timeout if enabled
+            if (keepAliveTimeout > 0) {
+                socket.getSocket().setSoTimeout(keepAliveTimeout);
+            }
+
             recycle(false);
         }
 
