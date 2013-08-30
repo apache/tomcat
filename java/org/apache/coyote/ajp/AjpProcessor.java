@@ -118,7 +118,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                 }
                 // Set back timeout if keep alive timeout is enabled
                 if (keepAliveTimeout > 0) {
-                    socket.getSocket().setSoTimeout(soTimeout);
+                    setTimeout(socketWrapper, soTimeout);
                 }
                 // Check message type, process right away and break if
                 // not regular request processing
@@ -221,7 +221,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
             // Set keep alive timeout if enabled
             if (keepAliveTimeout > 0) {
-                socket.getSocket().setSoTimeout(keepAliveTimeout);
+                setTimeout(socketWrapper, keepAliveTimeout);
             }
 
             recycle(false);
