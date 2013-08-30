@@ -52,28 +52,26 @@ in order to avoid a "ManagedBean is not found" exception.</p>
 a mbeans-descriptor.xml file, located in the same package as the class files
 it describes.</p>
 
-<source>
-  &lt;mbean         name="LDAPRealm"
+<source><![CDATA[  <mbean         name="LDAPRealm"
             className="org.apache.catalina.mbeans.ClassNameMBean"
           description="Custom LDAPRealm"
                domain="Catalina"
                 group="Realm"
-                 type="com.myfirm.mypackage.LDAPRealm"&gt;
+                 type="com.myfirm.mypackage.LDAPRealm">
 
-    &lt;attribute   name="className"
+    <attribute   name="className"
           description="Fully qualified class name of the managed object"
                  type="java.lang.String"
-            writeable="false"/&gt;
+            writeable="false"/>
 
-    &lt;attribute   name="debug"
+    <attribute   name="debug"
           description="The debugging detail level for this component"
-                 type="int"/&gt;
+                 type="int"/>
     .
     .
     .
 
-  &lt;/mbean&gt;
-</source>
+  </mbean>]]></source>
 
 
 </section>

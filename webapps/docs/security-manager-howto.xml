@@ -48,9 +48,7 @@
 
   <p>Imagine if someone who is authorized to publish JSPs on your site
   inadvertently included the following in their JSP:</p>
-<source>
-&lt;% System.exit(1); %&gt;
-</source>
+<source><![CDATA[<% System.exit(1); %>]]></source>
 
   <p>Every time this JSP was executed by Tomcat, Tomcat would exit.
   Using the Java SecurityManager is just one more line of defense a
@@ -116,9 +114,7 @@
     used to do wild card matching for a JNDI named file resource when
     granting permission.  For example, you might include the following
     in your policy file:</p>
-<source>
-permission  org.apache.naming.JndiPermission  "jndi://localhost/examples/*";
-</source>
+<source>permission  org.apache.naming.JndiPermission  "jndi://localhost/examples/*";</source>
 
     <p>A Permission entry like this is generated dynamically for each web
     application that is deployed, to allow it to read its own static resources
@@ -159,13 +155,11 @@ permission java.io.FilePermission
 
   <p>Entries in the <code>catalina.policy</code> file use the standard
   <code>java.policy</code> file format, as follows:</p>
-<source>
-// Example policy file entry
+<source><![CDATA[// Example policy file entry
 
-grant [signedBy &lt;signer&gt;,] [codeBase &lt;code source&gt;] {
-  permission  &lt;class&gt;  [&lt;name&gt; [, &lt;action list&gt;]];
-};
-</source>
+grant [signedBy <signer>,] [codeBase <code source>] {
+  permission  <class>  [<name> [, <action list>]];
+};]]></source>
 
   <p>The <strong>signedBy</strong> and <strong>codeBase</strong> entries are
   optional when granting permissions.  Comment lines begin with "//" and
@@ -190,10 +184,8 @@ grant [signedBy &lt;signer&gt;,] [codeBase &lt;code source&gt;] {
   <p>Once you have configured the <code>catalina.policy</code> file for use
   with a SecurityManager, Tomcat can be started with a SecurityManager in
   place by using the "-security" option:</p>
-<source>
-$CATALINA_HOME/bin/catalina.sh start -security    (Unix)
-%CATALINA_HOME%\bin\catalina start -security      (Windows)
-</source>
+<source>$CATALINA_HOME/bin/catalina.sh start -security    (Unix)
+%CATALINA_HOME%\bin\catalina start -security      (Windows)</source>
 
 </section>
 <section name="Configuring Package Protection in Tomcat">
@@ -211,8 +203,7 @@ $CATALINA_HOME/bin/catalina.sh start -security    (Unix)
 
   <p>The default <code>$CATALINA_BASE/conf/catalina.properties</code> file
   looks like this:</p>
-<source>
-#
+<source><![CDATA[#
 # List of comma-separated packages that start with or equal this string
 # will cause a security exception to be thrown when
 # passed to checkPackageAccess unless the
@@ -231,8 +222,7 @@ org.apache.jasper.
 # the class loaders supplied with the JDK call checkPackageDefinition.
 #
 package.definition=sun.,java.,org.apache.catalina.,org.apache.coyote.,
-org.apache.tomcat.,org.apache.jasper.
-</source>
+org.apache.tomcat.,org.apache.jasper.]]></source>
   <p>Once you have configured the <code>catalina.properties</code> file for use
   with a SecurityManager, remember to re-start Tomcat.</p>
 </section>
@@ -248,10 +238,8 @@ org.apache.tomcat.,org.apache.jasper.
   is done by setting a system property before starting Tomcat.  The easiest
   way to do this is via the <code>CATALINA_OPTS</code> environment variable.
   Execute this command:</p>
-<source>
-export CATALINA_OPTS=-Djava.security.debug=all    (Unix)
-set CATALINA_OPTS=-Djava.security.debug=all       (Windows)
-</source>
+<source>export CATALINA_OPTS=-Djava.security.debug=all    (Unix)
+set CATALINA_OPTS=-Djava.security.debug=all       (Windows)</source>
 
   <p>before starting Tomcat.</p>
 

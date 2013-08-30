@@ -279,9 +279,7 @@
       can be changed by creating the file
       CATALINA_BASE/lib/org/apache/catalina/util/ServerInfo.properties with
       content as follows:</p>
-      <source>
-server.info=Apache Tomcat/7.0.x
-      </source>
+      <source>server.info=Apache Tomcat/7.0.x</source>
       <p>Modify the values as required. Note that this will also change the version
       number reported in some of the management tools and may make it harder to
       determine the real version installed. The CATALINA_HOME/bin/version.bat|sh

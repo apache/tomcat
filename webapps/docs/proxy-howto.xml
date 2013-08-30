@@ -71,54 +71,48 @@ forward requests for a particular web application to a Tomcat instance,
 without having to configure a web connector such as <code>mod_jk</code>.
 To accomplish this, you need to perform the following tasks:</p>
 <ol>
-<li>Configure your copy of Apache so that it includes the
+<li><p>Configure your copy of Apache so that it includes the
     <code>mod_proxy</code> module.  If you are building from source,
     the easiest way to do this is to include the
     <code>--enable-module=proxy</code> directive on the
-    <code>./configure</code> command line.</li>
-<li>If not already added for you, make sure that you are loading the
+    <code>./configure</code> command line.</p></li>
+<li><p>If not already added for you, make sure that you are loading the
     <code>mod_proxy</code> module at Apache startup time, by using the
-    following directives in your <code>httpd.conf</code> file:
-<source>
-LoadModule proxy_module  {path-to-modules}/mod_proxy.so
-AddModule  mod_proxy.c
-</source></li>
-<li>Include two directives in your <code>httpd.conf</code> file for
+    following directives in your <code>httpd.conf</code> file:</p>
+<source><![CDATA[LoadModule proxy_module  {path-to-modules}/mod_proxy.so
+AddModule  mod_proxy.c]]></source></li>
+<li><p>Include two directives in your <code>httpd.conf</code> file for
     each web application that you wish to forward to Tomcat.  For
-    example, to forward an application at context path <code>/myapp</code>:
-<source>
-ProxyPass         /myapp  http://localhost:8081/myapp
-ProxyPassReverse  /myapp  http://localhost:8081/myapp
-</source>
-    which tells Apache to forward URLs of the form
+    example, to forward an application at context path <code>/myapp</code>:</p>
+<source><![CDATA[ProxyPass         /myapp  http://localhost:8081/myapp
+ProxyPassReverse  /myapp  http://localhost:8081/myapp]]></source>
+    <p>which tells Apache to forward URLs of the form
     <code>http://localhost/myapp/*</code> to the Tomcat connector
-    listening on port 8081.</li>
-<li>Configure your copy of Tomcat to include a special
+    listening on port 8081.</p></li>
+<li><p>Configure your copy of Tomcat to include a special
     <code>&lt;Connector&gt;</code> element, with appropriate
-    proxy settings, for example:
-<source>
-&lt;Connector port="8081" ...
+    proxy settings, for example:</p>
+<source><![CDATA[<Connector port="8081" ...
               proxyName="www.mycompany.com"
-              proxyPort="80"/&gt;
-</source>
-    which will cause servlets inside this web application to think that
+              proxyPort="80"/>]]></source>
+    <p>which will cause servlets inside this web application to think that
     all proxied requests were directed to <code>www.mycompany.com</code>
-    on port 80.</li>
-<li>It is legal to omit the <code>proxyName</code> attribute from the
+    on port 80.</p></li>
+<li><p>It is legal to omit the <code>proxyName</code> attribute from the
     <code>&lt;Connector&gt;</code> element.  If you do so, the value
     returned by <code>request.getServerName()</code> will by the host
     name on which Tomcat is running.  In the example above, it would be
-    <code>localhost</code>.</li>
-<li>If you also have a <code>&lt;Connector&gt;</code> listening on port
+    <code>localhost</code>.</p></li>
+<li><p>If you also have a <code>&lt;Connector&gt;</code> listening on port
     8080 (nested within the same <a href="config/service.html">Service</a>
     element), the requests to either port will share the same set of
-    virtual hosts and web applications.</li>
-<li>You might wish to use the IP filtering features of your operating
+    virtual hosts and web applications.</p></li>
+<li><p>You might wish to use the IP filtering features of your operating
     system to restrict connections to port 8081 (in this example) to
     be allowed <strong>only</strong> from the server that is running
-    Apache.</li>
-<li>Alternatively, you can set up a series of web applications that are
-    only available via proxying, as follows:
+    Apache.</p></li>
+<li><p>Alternatively, you can set up a series of web applications that are
+    only available via proxying, as follows:</p>
     <ul>
     <li>Configure another <code>&lt;Service&gt;</code> that contains
         only a <code>&lt;Connector&gt;</code> for the proxy port.</li>
@@ -129,9 +123,9 @@ ProxyPassReverse  /myapp  http://localhost:8081/myapp
     <li>Optionally, protect port 8081 with IP filters as described
         earlier.</li>
     </ul></li>
-<li>When requests are proxied by Apache, the web server will be recording
+<li><p>When requests are proxied by Apache, the web server will be recording
     these requests in its access log.  Therefore, you will generally want to
-    disable any access logging performed by Tomcat itself.</li>
+    disable any access logging performed by Tomcat itself.</p></li>
 </ol>
 
 <p>When requests are proxied in this manner, <strong>all</strong> requests

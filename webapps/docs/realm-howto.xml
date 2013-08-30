@@ -53,7 +53,7 @@ Specification (Version 2.4)</a>, Section 12.</p>
 <p>For information about utilizing the <em>Single Sign On</em> feature of
 Tomcat (allowing a user to authenticate themselves once across the entire
 set of web applications associated with a virtual host), see
-<a href="config/host.html#Single Sign On">here</a>.</p>
+<a href="config/host.html#Single_Sign_On">here</a>.</p>
 
 </section>
 
@@ -104,14 +104,13 @@ sources of authentication information:</p>
 </ul>
 
 <p>It is also possible to write your own <code>Realm</code> implementation,
-and integrate it with Tomcat.  To do so, you need to:
+and integrate it with Tomcat.  To do so, you need to:</p>
 <ul>
   <li>Implement <code>org.apache.catalina.Realm</code>,</li>
   <li>Place your compiled realm in $CATALINA_HOME/lib,</li>
   <li>Declare your realm as described in the "Configuring a Realm" section below,</li>
   <li>Declare your realm to the <a href="mbeans-descriptor-howto.html">MBeans Descriptor</a>.</li>
 </ul>
-</p>
 
 </subsection>
 
@@ -123,10 +122,8 @@ important to understand, in general terms, how a Realm is configured.  In
 general, you will be adding an XML element to your <code>conf/server.xml</code>
 configuration file, that looks something like this:</p>
 
-<source>
-&lt;Realm className="... class name for this implementation"
-       ... other attributes for this implementation .../&gt;
-</source>
+<source><![CDATA[<Realm className="... class name for this implementation"
+       ... other attributes for this implementation .../>]]></source>
 
 <p>The <code>&lt;Realm&gt;</code> element can be nested inside any one of
 of the following <code>Container</code> elements.  The location of the
@@ -196,8 +193,7 @@ techniques are supported:</p>
     method will return the digested password.</li>
 <li>If you want to execute a command line utility to calculate the digested
     password, simply execute
-<source>CATALINA_HOME/bin/digest.[bat|sh] -a {algorithm} {cleartext-password}
-</source>
+<source>CATALINA_HOME/bin/digest.[bat|sh] -a {algorithm} {cleartext-password}</source>
     and the digested version of this cleartext password will be returned to
     standard output.</li>
 </ul>
@@ -213,10 +209,9 @@ techniques are supported:</p>
    not specified in web.xml, the default value of <code>Authentication
    required</code> is used.</p>
 
-<p>Non-ASCII usernames and/or passwords are supported using
-<source>CATALINA_HOME/bin/digest.[bat|sh] -a {algorithm} -e {encoding} {input}
-</source>
-but care is required to ensure that the non-ASCII input is
+<p>Non-ASCII usernames and/or passwords are supported using</p>
+<source>CATALINA_HOME/bin/digest.[bat|sh] -a {algorithm} -e {encoding} {input}</source>
+<p>but care is required to ensure that the non-ASCII input is
 correctly passed to the digester.
 The digester returns <code>{input}:{digest}</code>. If the input appears
 corrupted in the return, the digest will be invalid.</p>
@@ -271,7 +266,7 @@ users.</p>
 
 <subsection name="JDBCRealm">
 
-<h3>Introduction</h3>
+<h5>Introduction</h5>
 
 <p><strong>JDBCRealm</strong> is an implementation of the Tomcat
 <code>Realm</code> interface that looks up users in a relational database
@@ -303,7 +298,7 @@ database structure conforms to the following requirements:</p>
     </ul></li>
 </ul>
 
-<h3>Quick Start</h3>
+<h5>Quick Start</h5>
 
 <p>To set up Tomcat to use JDBCRealm, you will need to follow these steps:</p>
 <ol>
@@ -320,20 +315,19 @@ database structure conforms to the following requirements:</p>
 <li>Restart Tomcat if it is already running.</li>
 </ol>
 
-<h3>Realm Element Attributes</h3>
+<h5>Realm Element Attributes</h5>
 
 <p>To configure JDBCRealm, you will create a <code>&lt;Realm&gt;</code>
 element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code> file,
-as described <a href="#Configuring a Realm">above</a>. The attributes for the
+as described <a href="#Configuring_a_Realm">above</a>. The attributes for the
 JDBCRealm are defined in the <a href="config/realm.html">Realm</a> configuration
 documentation.</p>
 
-<h3>Example</h3>
+<h5>Example</h5>
 
 <p>An example SQL script to create the needed tables might look something
 like this (adapt the syntax as required for your particular database):</p>
-<source>
-create table users (
+<source>create table users (
   user_name         varchar(15) not null primary key,
   user_pass         varchar(15) not null
 );
@@ -342,22 +336,19 @@ create table user_roles (
   user_name         varchar(15) not null,
   role_name         varchar(15) not null,
   primary key (user_name, role_name)
-);
-</source>
+);</source>
 
 <p>Example <code>Realm</code> elements are included (commented out) in the
 default <code>$CATALINA_BASE/conf/server.xml</code> file.  Here's an example
 for using a MySQL database called "authority", configured with the tables
 described above, and accessed with username "dbuser" and password "dbpass":</p>
-<source>
-&lt;Realm className="org.apache.catalina.realm.JDBCRealm"
+<source><![CDATA[<Realm className="org.apache.catalina.realm.JDBCRealm"
       driverName="org.gjt.mm.mysql.Driver"
-   connectionURL="jdbc:mysql://localhost/authority?user=dbuser&amp;amp;password=dbpass"
+   connectionURL="jdbc:mysql://localhost/authority?user=dbuser&amp;password=dbpass"
        userTable="users" userNameCol="user_name" userCredCol="user_pass"
-   userRoleTable="user_roles" roleNameCol="role_name"/&gt;
-</source>
+   userRoleTable="user_roles" roleNameCol="role_name"/>]]></source>
 
-<h3>Additional Notes</h3>
+<h5>Additional Notes</h5>
 
 <p>JDBCRealm operates according to the following rules:</p>
 <ul>
@@ -384,7 +375,7 @@ described above, and accessed with username "dbuser" and password "dbpass":</p>
 
 <subsection name="DataSourceRealm">
 
-<h3>Introduction</h3>
+<h5>Introduction</h5>
 
 <p><strong>DataSourceRealm</strong> is an implementation of the Tomcat
 <code>Realm</code> interface that looks up users in a relational database
@@ -416,7 +407,7 @@ as your database structure conforms to the following requirements:</p>
     </ul></li>
 </ul>
 
-<h3>Quick Start</h3>
+<h5>Quick Start</h5>
 
 <p>To set up Tomcat to use DataSourceRealm, you will need to follow these steps:</p>
 <ol>
@@ -433,20 +424,19 @@ as your database structure conforms to the following requirements:</p>
 <li>Restart Tomcat if it is already running.</li>
 </ol>
 
-<h3>Realm Element Attributes</h3>
+<h5>Realm Element Attributes</h5>
 
 <p>To configure DataSourceRealm, you will create a <code>&lt;Realm&gt;</code>
 element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code> file,
-as described <a href="#Configuring a Realm">above</a>. The attributes for the
+as described <a href="#Configuring_a_Realm">above</a>. The attributes for the
 DataSourceRealm are defined in the <a href="config/realm.html">Realm</a>
 configuration documentation.</p>
 
-<h3>Example</h3>
+<h5>Example</h5>
 
 <p>An example SQL script to create the needed tables might look something
 like this (adapt the syntax as required for your particular database):</p>
-<source>
-create table users (
+<source>create table users (
   user_name         varchar(15) not null primary key,
   user_pass         varchar(15) not null
 );
@@ -455,20 +445,17 @@ create table user_roles (
   user_name         varchar(15) not null,
   role_name         varchar(15) not null,
   primary key (user_name, role_name)
-);
-</source>
+);</source>
 
 <p>Here is an example for using a MySQL database called "authority", configured
 with the tables described above, and accessed with the JNDI JDBC DataSource with
 name "java:/comp/env/jdbc/authority".</p>
-<source>
-&lt;Realm className="org.apache.catalina.realm.DataSourceRealm"
+<source><![CDATA[<Realm className="org.apache.catalina.realm.DataSourceRealm"
    dataSourceName="jdbc/authority"
    userTable="users" userNameCol="user_name" userCredCol="user_pass"
-   userRoleTable="user_roles" roleNameCol="role_name"/&gt;
-</source>
+   userRoleTable="user_roles" roleNameCol="role_name"/>]]></source>
 
-<h3>Additional Notes</h3>
+<h5>Additional Notes</h5>
 
 <p>DataSourceRealm operates according to the following rules:</p>
 <ul>
@@ -495,7 +482,7 @@ name "java:/comp/env/jdbc/authority".</p>
 
 <subsection name="JNDIRealm">
 
-<h3>Introduction</h3>
+<h5>Introduction</h5>
 
 <p><strong>JNDIRealm</strong> is an implementation of the Tomcat
 <code>Realm</code> interface that looks up users in an LDAP directory
@@ -504,7 +491,7 @@ provider that is available with the JNDI API classes). The realm
 supports a variety of approaches to using a directory for
 authentication.</p>
 
-<h4>Connecting to the directory</h4>
+<h6>Connecting to the directory</h6>
 
 <p>The realm's connection to the directory is defined by the
 <strong>connectionURL</strong> configuration attribute. This is a URL
@@ -528,7 +515,7 @@ many cases.
 </p>
 
 
-<h4>Selecting the user's directory entry</h4>
+<h6>Selecting the user's directory entry</h6>
 
 <p>Each user that can be authenticated must be represented in the
 directory by an individual entry that corresponds to an element in the
@@ -545,7 +532,7 @@ the username should be substituted.</p>
 
 <p>Otherwise the realm must search the directory to find a unique entry
 containing the username. The following attributes configure this
-search:
+search:</p>
 
      <ul>
      <li><strong>userBase</strong> - the entry that is the base of
@@ -562,10 +549,9 @@ search:
          search filter to use after substitution of the username.</li>
 
     </ul>
-</p>
 
 
-<h4>Authenticating the user</h4>
+<h6>Authenticating the user</h6>
 
 <ul>
 <li>
@@ -577,8 +563,8 @@ presented by the user. If this simple bind succeeds the user is considered to
 be authenticated.</p>
 
 <p>For security reasons a directory may store a digest of the user's
-password rather than the clear text version (see <a href="#Digested
-Passwords">Digested Passwords</a> for more information). In that case,
+password rather than the clear text version (see
+<a href="#Digested_Passwords">Digested Passwords</a> for more information). In that case,
 as part of the simple bind operation the directory automatically
 computes the correct digest of the plaintext password presented by the
 user before validating it against the stored value. In bind mode,
@@ -612,7 +598,7 @@ the repository for user information as discussed above).
 </li>
 </ul>
 
-<h4>Assigning roles to the user</h4>
+<h6>Assigning roles to the user</h6>
 
 <p>The directory realm supports two approaches to the representation
 of roles in the directory:</p>
@@ -672,7 +658,7 @@ the name of this attribute.</p>
 </ul>
 <p>A combination of both approaches to role representation may be used.</p>
 
-<h3>Quick Start</h3>
+<h5>Quick Start</h5>
 
 <p>To set up Tomcat to use JNDIRealm, you will need to follow these steps:</p>
 <ol>
@@ -686,15 +672,15 @@ the name of this attribute.</p>
 <li>Restart Tomcat if it is already running.</li>
 </ol>
 
-<h3>Realm Element Attributes</h3>
+<h5>Realm Element Attributes</h5>
 
 <p>To configure JNDIRealm, you will create a <code>&lt;Realm&gt;</code>
 element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code> file,
-as described <a href="#Configuring a Realm">above</a>. The attributes for the
+as described <a href="#Configuring_a_Realm">above</a>. The attributes for the
 JNDIRealm are defined in the <a href="config/realm.html">Realm</a> configuration
 documentation.</p>
 
-<h3>Example</h3>
+<h5>Example</h5>
 
 <p>Creation of the appropriate schema in your directory server is beyond the
 scope of this document, because it is unique to each directory server
@@ -704,12 +690,10 @@ can be downloaded from
 <a href="http://www.openldap.org">http://www.openldap.org</a>.  Assume that
 your <code>slapd.conf</code> file contains the following settings
 (among others):</p>
-<source>
-database ldbm
+<source>database ldbm
 suffix dc="mycompany",dc="com"
 rootdn "cn=Manager,dc=mycompany,dc=com"
-rootpw secret
-</source>
+rootpw secret</source>
 
 <p>We will assume for <code>connectionURL</code> that the directory
 server runs on the same machine as Tomcat.  See <a
@@ -720,9 +704,7 @@ provider.</p>
 <p>Next, assume that this directory server has been populated with elements
 as shown below (in LDIF format):</p>
 
-<source>
-
-# Define top-level entry
+<source># Define top-level entry
 dn: dc=mycompany,dc=com
 objectClass: dcObject
 dc:mycompany
@@ -768,8 +750,7 @@ uniqueMember: uid=fbloggs,ou=people,dc=mycompany,dc=com
 dn: cn=role1,ou=groups,dc=mycompany,dc=com
 objectClass: groupOfUniqueNames
 cn: role1
-uniqueMember: uid=fbloggs,ou=people,dc=mycompany,dc=com
-</source>
+uniqueMember: uid=fbloggs,ou=people,dc=mycompany,dc=com</source>
 
 <p>An example <code>Realm</code> element for the OpenLDAP directory
 server configured as described above might look like this, assuming
@@ -777,15 +758,13 @@ that users use their uid (e.g. jjones) to login to the
 application and that an anonymous connection is sufficient to search
 the directory and retrieve role information:</p>
 
-<source>
-&lt;Realm   className="org.apache.catalina.realm.JNDIRealm"
+<source><![CDATA[<Realm   className="org.apache.catalina.realm.JNDIRealm"
      connectionURL="ldap://localhost:389"
        userPattern="uid={0},ou=people,dc=mycompany,dc=com"
           roleBase="ou=groups,dc=mycompany,dc=com"
           roleName="cn"
         roleSearch="(uniqueMember={0})"
-/&gt;
-</source>
+/>]]></source>
 
 <p>With this configuration, the realm will determine the user's
 distinguished name by substituting the username into the
@@ -803,8 +782,7 @@ to different organizational units or company locations).</p>
 use an attribute of the user's entry to hold roles. Now the entry for
 Janet Jones might read as follows:</p>
 
-<source>
-dn: uid=jjones,ou=people,dc=mycompany,dc=com
+<source>dn: uid=jjones,ou=people,dc=mycompany,dc=com
 objectClass: inetOrgPerson
 uid: jjones
 sn: jones
@@ -812,13 +790,11 @@ cn: janet jones
 mail: j.jones@mycompany.com
 memberOf: role2
 memberOf: role3
-userPassword: janet
-</source>
+userPassword: janet</source>
 
 <p> This realm configuration would satisfy the new requirements:</p>
 
-<source>
-&lt;Realm   className="org.apache.catalina.realm.JNDIRealm"
+<source><![CDATA[<Realm   className="org.apache.catalina.realm.JNDIRealm"
      connectionURL="ldap://localhost:389"
           userBase="ou=people,dc=mycompany,dc=com"
         userSearch="(mail={0})"
@@ -826,8 +802,7 @@ userPassword: janet
           roleBase="ou=groups,dc=mycompany,dc=com"
           roleName="cn"
         roleSearch="(uniqueMember={0})"
-/&gt;
-</source>
+/>]]></source>
 
 <p>Now when Janet Jones logs in as "j.jones@mycompany.com", the realm
 searches the directory for a unique entry with that value as its mail
@@ -842,8 +817,7 @@ only group entry of which she is a member.</p>
 the password from the directory and making a local comparison in the
 realm, you might use a realm configuration like this:</p>
 
-<source>
-&lt;Realm   className="org.apache.catalina.realm.JNDIRealm"
+<source><![CDATA[<Realm   className="org.apache.catalina.realm.JNDIRealm"
     connectionName="cn=Manager,dc=mycompany,dc=com"
 connectionPassword="secret"
      connectionURL="ldap://localhost:389"
@@ -852,13 +826,12 @@ connectionPassword="secret"
           roleBase="ou=groups,dc=mycompany,dc=com"
           roleName="cn"
         roleSearch="(uniqueMember={0})"
-/&gt;
-</source>
+/>]]></source>
 
 <p>However, as discussed above, the default bind mode for
 authentication is usually to be preferred.</p>
 
-<h3>Additional Notes</h3>
+<h5>Additional Notes</h5>
 
 <p>JNDIRealm operates according to the following rules:</p>
 <ul>
@@ -885,7 +858,7 @@ authentication is usually to be preferred.</p>
 
 <subsection name="UserDatabaseRealm">
 
-<h3>Introduction</h3>
+<h5>Introduction</h5>
 
 <p><strong>UserDatabaseRealm</strong> is an implementation of the Tomcat
 <code>Realm</code> interface that uses a JNDI resource to store user
@@ -897,34 +870,32 @@ document (by default, this document is loaded from
 and their roles may all be editing dynamically, typically via JMX. Changes may
 be saved and will be reflected in the XML file.</p>
 
-<h3>Realm Element Attributes</h3>
+<h5>Realm Element Attributes</h5>
 
 <p>To configure UserDatabaseRealm, you will create a <code>&lt;Realm&gt;</code>
 element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code> file,
-as described <a href="#Configuring a Realm">above</a>. The attributes for the
+as described <a href="#Configuring_a_Realm">above</a>. The attributes for the
 UserDatabaseRealm are defined in the <a href="config/realm.html">Realm</a>
 configuration documentation.</p>
 
-<h3>User File Format</h3>
+<h5>User File Format</h5>
 
 <p>The users file uses the same format as the
 <a href="#MemoryRealm">MemoryRealm</a>.</p>
 
-<h3>Example</h3>
+<h5>Example</h5>
 
 <p>The default installation of Tomcat is configured with a UserDatabaseRealm
 nested inside the <code>&lt;Engine&gt;</code> element, so that it applies
 to all virtual hosts and web applications.  The default contents of the
 <code>conf/tomcat-users.xml</code> file is:</p>
-<source>
-&lt;tomcat-users&gt;
-  &lt;user name="tomcat" password="tomcat" roles="tomcat" /&gt;
-  &lt;user name="role1"  password="tomcat" roles="role1"  /&gt;
-  &lt;user name="both"   password="tomcat" roles="tomcat,role1" /&gt;
-&lt;/tomcat-users&gt;
-</source>
+<source><![CDATA[<tomcat-users>
+  <user name="tomcat" password="tomcat" roles="tomcat" />
+  <user name="role1"  password="tomcat" roles="role1"  />
+  <user name="both"   password="tomcat" roles="tomcat,role1" />
+</tomcat-users>]]></source>
 
-<h3>Additional Notes</h3>
+<h5>Additional Notes</h5>
 
 <p>UserDatabaseRealm operates according to the following rules:</p>
 <ul>
@@ -950,7 +921,7 @@ to all virtual hosts and web applications.  The default contents of the
 
 <subsection name="MemoryRealm">
 
-<h3>Introduction</h3>
+<h5>Introduction</h5>
 
 <p><strong>MemoryRealm</strong> is a simple demonstration implementation of the
 Tomcat <code>Realm</code> interface.  It is not designed for production use.
@@ -959,15 +930,15 @@ corresponding roles, from an XML document (by default, this document is loaded
 from <code>$CATALINA_BASE/conf/tomcat-users.xml</code>).  Changes to the data
 in this file are not recognized until Tomcat is restarted.</p>
 
-<h3>Realm Element Attributes</h3>
+<h5>Realm Element Attributes</h5>
 
 <p>To configure MemoryRealm, you will create a <code>&lt;Realm&gt;</code>
 element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code> file,
-as described <a href="#Configuring a Realm">above</a>. The attributes for the
+as described <a href="#Configuring_a_Realm">above</a>. The attributes for the
 MemoryRealm are defined in the <a href="config/realm.html">Realm</a>
 configuration documentation.</p>
 
-<h3>User File Format</h3>
+<h5>User File Format</h5>
 
 <p>The users file (by default, <code>conf/tomcat-users.xml</code> must be an
 XML document, with a root element <code>&lt;tomcat-users&gt;</code>.  Nested
@@ -978,12 +949,12 @@ valid user, consisting of the following attributes:</p>
 <li><strong>password</strong> - Password this user must log on with (in
     clear text if the <code>digest</code> attribute was not set on the
     <code>&lt;Realm&gt;</code> element, or digested appropriately as
-    described <a href="#Digested Passwords">here</a> otherwise).</li>
+    described <a href="#Digested_Passwords">here</a> otherwise).</li>
 <li><strong>roles</strong> - Comma-delimited list of the role names
     associated with this user.</li>
 </ul>
 
-<h3>Additional Notes</h3>
+<h5>Additional Notes</h5>
 
 <p>MemoryRealm operates according to the following rules:</p>
 <ul>
@@ -1011,7 +982,7 @@ valid user, consisting of the following attributes:</p>
 
 <subsection name="JAASRealm">
 
-<h3>Introduction</h3>
+<h5>Introduction</h5>
 
         <p><strong>JAASRealm</strong> is an implementation of the Tomcat
 6 <code>Realm</code> interface that authenticates users through the Java
@@ -1032,7 +1003,7 @@ security mechanism or wrap another third-party mechanism for
 integration with the CMA as implemented by Tomcat.
         </p>
 
-        <h3>Quick Start</h3>
+        <h5>Quick Start</h5>
         <p>To set up Tomcat to use JAASRealm with your own JAAS login module,
  you will need to follow these steps:</p>
         <ol>
@@ -1065,7 +1036,7 @@ the resources you want to protect</li>
           <li>Configure the JAASRealm module in your server.xml </li>
           <li>Restart Tomcat if it is already running.</li>
         </ol>
-        <h3>Realm Element Attributes</h3>
+        <h5>Realm Element Attributes</h5>
         <p>To configure JAASRealm as for step 6 above, you create
 a <code>&lt;Realm&gt;</code> element and nest it in your
 <code>$CATALINA_BASE/conf/server.xml</code>
@@ -1073,16 +1044,14 @@ file within your <code>&lt;Engine&gt;</code> node. The attributes for the
 JAASRealm are defined in the <a href="config/realm.html">Realm</a>
 configuration documentation.</p>
 
-<h3>Example</h3>
+<h5>Example</h5>
 
 <p>Here is an example of how your server.xml snippet should look.</p>
 
-<source>
-&lt;Realm className="org.apache.catalina.realm.JAASRealm"
+<source><![CDATA[<Realm className="org.apache.catalina.realm.JAASRealm"
                 appName="MyFooRealm"
     userClassNames="org.foobar.realm.FooUser"
-     roleClassNames="org.foobar.realm.FooRole"/&gt;
-</source>
+     roleClassNames="org.foobar.realm.FooRole"/>]]></source>
 
 <p>It is the responsibility of your login module to create and save User and
 Role objects representing Principals for the user
@@ -1100,7 +1069,7 @@ the scenes in your own login module.</li>
 and restarting the server, without any code changes to your application.</li>
         </ul>
 
-        <h3>Additional Notes</h3>
+        <h5>Additional Notes</h5>
         <ul>
           <li>When a user attempts to access a protected resource for
               the first time, Tomcat will call the <code>authenticate()</code>
@@ -1125,7 +1094,7 @@ and restarting the server, without any code changes to your application.</li>
 
 <subsection name="CombinedRealm">
 
-    <h3>Introduction</h3>
+    <h5>Introduction</h5>
 
     <p><strong>CombinedRealm</strong> is an implementation of the Tomcat
     <code>Realm</code> interface that authenticates users through one or more
@@ -1142,34 +1111,32 @@ and restarting the server, without any code changes to your application.</li>
     listed. Authentication against any Realm will be sufficient to authenticate
     the user.</p>
 
-    <h3>Realm Element Attributes</h3>
+    <h5>Realm Element Attributes</h5>
     <p>To configure a CombinedRealm, you create a <code>&lt;Realm&gt;</code>
     element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code>
     file within your <code>&lt;Engine&gt;</code> or <code>&lt;Host&gt;</code>.
     You can also nest inside a <code>&lt;Context&gt;</code> node in a
     <code>context.xml</code> file.</p>
 
-<h3>Example</h3>
+<h5>Example</h5>
 
 <p>Here is an example of how your server.xml snippet should look to use a
 UserDatabase Realm and a DataSource Realm.</p>
 
-<source>
-&lt;Realm className="org.apache.catalina.realm.CombinedRealm" &gt;
-   &lt;Realm className="org.apache.catalina.realm.UserDatabaseRealm"
-             resourceName="UserDatabase"/&gt;
-   &lt;Realm className="org.apache.catalina.realm.DataSourceRealm"
+<source><![CDATA[<Realm className="org.apache.catalina.realm.CombinedRealm" >
+   <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+             resourceName="UserDatabase"/>
+   <Realm className="org.apache.catalina.realm.DataSourceRealm"
              dataSourceName="jdbc/authority"
              userTable="users" userNameCol="user_name" userCredCol="user_pass"
-             userRoleTable="user_roles" roleNameCol="role_name"/&gt;
-&lt;/Realm&gt;
-</source>
+             userRoleTable="user_roles" roleNameCol="role_name"/>
+</Realm>]]></source>
 
 </subsection>
 
 <subsection name="LockOutRealm">
 
-    <h3>Introduction</h3>
+    <h5>Introduction</h5>
 
     <p><strong>LockOutRealm</strong> is an implementation of the Tomcat
     <code>Realm</code> interface that extends the CombinedRealm to provide lock
@@ -1192,7 +1159,7 @@ UserDatabase Realm and a DataSource Realm.</p>
     listed. Authentication against any Realm will be sufficient to authenticate
     the user.</p>
 
-    <h3>Realm Element Attributes</h3>
+    <h5>Realm Element Attributes</h5>
     <p>To configure a LockOutRealm, you create a <code>&lt;Realm&gt;</code>
     element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code>
     file within your <code>&lt;Engine&gt;</code> or <code>&lt;Host&gt;</code>.
@@ -1201,17 +1168,15 @@ UserDatabase Realm and a DataSource Realm.</p>
     LockOutRealm are defined in the <a href="config/realm.html">Realm</a>
     configuration documentation.</p>
 
-<h3>Example</h3>
+<h5>Example</h5>
 
 <p>Here is an example of how your server.xml snippet should look to add lock out
 functionality to a UserDatabase Realm.</p>
 
-<source>
-&lt;Realm className="org.apache.catalina.realm.LockOutRealm" &gt;
-   &lt;Realm className="org.apache.catalina.realm.UserDatabaseRealm"
-             resourceName="UserDatabase"/&gt;
-&lt;/Realm&gt;
-</source>
+<source><![CDATA[<Realm className="org.apache.catalina.realm.LockOutRealm" >
+   <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+             resourceName="UserDatabase"/>
+</Realm>]]></source>
 
 </subsection>
 

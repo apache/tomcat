@@ -39,14 +39,14 @@ the user being authenticated are part of the same domain. For the user to be
 authenticated automatically, the client machine used by the user must also be
 part of the domain.</p>
 <p>There are several options for implementing integrated Windows authentication
-with Apache Tomcat. They are:
+with Apache Tomcat. They are:</p>
 <ul>
 <li>Built-in Tomcat support.</li>
 <li>Use a third party library such as Waffle.</li>
 <li>Use a reverse proxy that supports Windows authentication to perform the
 authentication step such as IIS or httpd.</li>
 </ul>
-The configuration of each of these options is discussed in the following
+<p>The configuration of each of these options is discussed in the following
 sections.</p>
 </section>
 

@@ -108,76 +108,72 @@
           where <em>NAME_OF_VARIABLE</em> can be a string taken
           from the following list:
 
-          <table border="1">
-
-            <tr>
-              <th>HTTP headers:</th> <th>connection &amp; request:</th> <th></th>
-            </tr>
-
-            <tr>
-              <td>
-                 HTTP_USER_AGENT<br />
-                 HTTP_REFERER<br />
-                 HTTP_COOKIE<br />
-                 HTTP_FORWARDED<br />
-                 HTTP_HOST<br />
-                 HTTP_PROXY_CONNECTION<br />
-                 HTTP_ACCEPT<br />
-              </td>
-
-              <td>
-                 REMOTE_ADDR<br />
-                 REMOTE_HOST<br />
-                 REMOTE_PORT<br />
-                 REMOTE_USER<br />
-                 REMOTE_IDENT<br />
-                 REQUEST_METHOD<br />
-                 SCRIPT_FILENAME<br />
-                 REQUEST_PATH<br />
-                 CONTEXT_PATH<br />
-                 SERVLET_PATH<br />
-                 PATH_INFO<br />
-                 QUERY_STRING<br />
-                 AUTH_TYPE<br />
-              </td>
-
-              <td></td>
-            </tr>
-
-            <tr>
-              <th>server internals:</th> <th>date and time:</th> <th>specials:</th>
-            </tr>
-
-            <tr>
-              <td>
-                 DOCUMENT_ROOT<br />
-                 SERVER_NAME<br />
-                 SERVER_ADDR<br />
-                 SERVER_PORT<br />
-                 SERVER_PROTOCOL<br />
-                 SERVER_SOFTWARE<br />
-              </td>
-
-              <td>
-                 TIME_YEAR<br />
-                 TIME_MON<br />
-                 TIME_DAY<br />
-                 TIME_HOUR<br />
-                 TIME_MIN<br />
-                 TIME_SEC<br />
-                 TIME_WDAY<br />
-                 TIME<br />
-              </td>
-
-              <td>
-                 THE_REQUEST<br />
-                 REQUEST_URI<br />
-                 REQUEST_FILENAME<br />
-                 HTTPS<br />
-              </td>
-            </tr>
-          </table>
-
+          <ul>
+          <li>
+          <p><b>HTTP headers:</b></p>
+          <p>
+            HTTP_USER_AGENT<br />
+            HTTP_REFERER<br />
+            HTTP_COOKIE<br />
+            HTTP_FORWARDED<br />
+            HTTP_HOST<br />
+            HTTP_PROXY_CONNECTION<br />
+            HTTP_ACCEPT<br />
+          </p>
+          </li>
+          <li>
+          <p><b>connection &amp; request:</b></p>
+          <p>
+            REMOTE_ADDR<br />
+            REMOTE_HOST<br />
+            REMOTE_PORT<br />
+            REMOTE_USER<br />
+            REMOTE_IDENT<br />
+            REQUEST_METHOD<br />
+            SCRIPT_FILENAME<br />
+            REQUEST_PATH<br />
+            CONTEXT_PATH<br />
+            SERVLET_PATH<br />
+            PATH_INFO<br />
+            QUERY_STRING<br />
+            AUTH_TYPE<br />
+          </p>
+          </li>
+          <li>
+          <p><b>server internals:</b></p>
+          <p>
+            DOCUMENT_ROOT<br />
+            SERVER_NAME<br />
+            SERVER_ADDR<br />
+            SERVER_PORT<br />
+            SERVER_PROTOCOL<br />
+            SERVER_SOFTWARE<br />
+          </p>
+          </li>
+          <li>
+          <p><b>date and time:</b></p>
+          <p>
+            TIME_YEAR<br />
+            TIME_MON<br />
+            TIME_DAY<br />
+            TIME_HOUR<br />
+            TIME_MIN<br />
+            TIME_SEC<br />
+            TIME_WDAY<br />
+            TIME<br />
+          </p>
+          </li>
+          <li>
+          <p><b>specials:</b></p>
+          <p>
+            THE_REQUEST<br />
+            REQUEST_URI<br />
+            REQUEST_FILENAME<br />
+            HTTPS<br />
+          </p>
+          </li>
+          </ul>
+          
                 <p>These variables all
                 correspond to the similarly named HTTP
                 MIME-headers and Servlet API methods.
@@ -324,11 +320,11 @@
 
           </ul>
 
-<note><title>Note:</title>
+<strong>Note:</strong>
               All of these tests can
               also be prefixed by an exclamation mark ('!') to
               negate their meaning.
-</note>
+
         </li>
 
         <li>You can also set special flags for
@@ -354,12 +350,10 @@
           Use this to combine rule conditions with a local OR
           instead of the implicit AND. Typical example:
 
-<source>
-RewriteCond %{REMOTE_HOST}  ^host1.*  [OR]
+<source>RewriteCond %{REMOTE_HOST}  ^host1.*  [OR]
 RewriteCond %{REMOTE_HOST}  ^host2.*  [OR]
 RewriteCond %{REMOTE_HOST}  ^host3.*
-RewriteRule ...some special stuff for any of these hosts...
-</source>
+RewriteRule ...some special stuff for any of these hosts...</source>
 
           Without this flag you would have to write the condition/rule
           pair three times.
@@ -374,15 +368,13 @@ RewriteRule ...some special stuff for any of these hosts...
         ``<code>User-Agent:</code>'' header of the request, you can
         use the following: </p>
 
-<source>
-RewriteCond  %{HTTP_USER_AGENT}  ^Mozilla.*
+<source>RewriteCond  %{HTTP_USER_AGENT}  ^Mozilla.*
 RewriteRule  ^/$                 /homepage.max.html  [L]
 
 RewriteCond  %{HTTP_USER_AGENT}  ^Lynx.*
 RewriteRule  ^/$                 /homepage.min.html  [L]
 
-RewriteRule  ^/$                 /homepage.std.html  [L]
-</source>
+RewriteRule  ^/$                 /homepage.std.html  [L]</source>
 
         <p>Explanation: If you use a browser which identifies itself
         as 'Mozilla' (including Netscape Navigator, Mozilla etc), then you
@@ -404,14 +396,12 @@ RewriteRule  ^/$                 /homepage.std.html  [L]
     <p>The maps are implemented using an interface that users must implement. Its class
     name is <code>org.apache.catalina.valves.rewrite.RewriteMap</code>, and its code is:</p>
 
-<source>
-package org.apache.catalina.valves.rewrite;
+<source><![CDATA[package org.apache.catalina.valves.rewrite;
 
 public interface RewriteMap {
     public String setParameters(String params);
     public String lookup(String key);
-}
-</source>
+}]]></source>
 
   </subsection>
 
@@ -435,6 +425,7 @@ public interface RewriteMap {
       <p>Some hints on the syntax of regular
       expressions:</p>
 
+<!-- TODO: Why is the following pre-formatted non-wrappable text? -->
 <pre>
 <strong>Text:</strong>
   <strong><code>.</code></strong>           Any single character
@@ -473,7 +464,7 @@ public interface RewriteMap {
         <em>Mastering Regular Expressions, 2nd Edition</em><br />
          Jeffrey E.F. Friedl<br />
          O'Reilly &amp; Associates, Inc. 2002<br />
-         ISBN 0-596-00289-0<br />
+         ISBN 978-0-596-00289-3<br />
       </p>
 
       <p>In the rules, the NOT character
@@ -492,7 +483,7 @@ contents for the groups. Thus, if negated patterns are used, you
 cannot use <code>$N</code> in the substitution string!
 </p>
 
-      <p>The <a id="rhs" name="rhs"><em>substitution</em></a> of a
+      <p>The <em id="rhs" >substitution</em> of a
       rewrite rule is the string which is substituted for (or
       replaces) the original URL which <em>Pattern</em>
       matched. In addition to plain text, it can include</p>
@@ -538,8 +529,8 @@ cannot use <code>$N</code> in the substitution string!
       to apply more than one pattern before substitution occurs.</p>
 
 
-      <p>Additionally you can set special <a name="rewriteflags"
-      id="rewriteflags">flags</a> for <em>Substitution</em> by
+      <p>Additionally you can set special <span
+      id="rewriteflags">flags</span> for <em>Substitution</em> by
       appending <strong><code>[</code><em>flags</em><code>]</code></strong>
       as the third argument to the <code>RewriteRule</code>
       directive. <em>Flags</em> is a comma-separated list of any of the
@@ -639,9 +630,7 @@ cannot use <code>$N</code> in the substitution string!
           '%24', and '%3B', respectively); this flag prevents this
           from happening. This allows percent symbols to appear in
           the output, as in
-<example>
-    RewriteRule /foo/(.*) /bar?arg=P1\%3d$1 [R,NE]
-</example>
+          <source>RewriteRule /foo/(.*) /bar?arg=P1\%3d$1 [R,NE]</source>
           which would turn '<code>/foo/zed</code>' into a safe
           request for '<code>/bar?arg=P1=zed</code>'.
         </li>
@@ -678,8 +667,8 @@ cannot use <code>$N</code> in the substitution string!
         data to the query string via a rewrite rule.</li>
 
          <li>'<strong><code>redirect|R</code>
-          [=<em>code</em>]</strong>' (force <a id="redirect"
-          name="redirect"><strong>r</strong>edirect</a>)<br />
+          [=<em>code</em>]</strong>' (force <span id="redirect">
+          <strong>r</strong>edirect</span>)<br />
           Prefix <em>Substitution</em> with
           <code>http://thishost[:thisport]/</code> (which makes the
           new URL a URI) to force a external redirection. If no
@@ -716,15 +705,13 @@ cannot use <code>$N</code> in the substitution string!
         <li>
         '<strong><code>type|T</code></strong>=<em>MIME-type</em>'
         (force MIME <strong>t</strong>ype)<br />
-         Force the <glossary>MIME-type</glossary> of the target file to be
+         Force the MIME-type of the target file to be
         <em>MIME-type</em>. This can be used to
         set up the content-type based on some conditions.
         For example, the following snippet allows <code>.php</code> files to
         be <em>displayed</em> by <code>mod_php</code> if they are called with
         the <code>.phps</code> extension:
-        <example>
-            RewriteRule ^(.+\.php)s$ $1 [T=application/x-httpd-php-source]
-        </example>
+        <source>RewriteRule ^(.+\.php)s$ $1 [T=application/x-httpd-php-source]</source>
         </li>
       </ul>
 
