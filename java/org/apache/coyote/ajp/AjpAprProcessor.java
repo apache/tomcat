@@ -19,6 +19,8 @@ package org.apache.coyote.ajp;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.RequestInfo;
@@ -280,7 +282,8 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         long socketRef = socketWrapper.getSocket().longValue();
 
         if (outputBuffer.position() > 0) {
-            if ((socketRef != 0) && Socket.sendbb(socketRef, 0, outputBuffer.position()) < 0) {
+            if ((socketRef != 0) &&
+                    writeSocket(0, outputBuffer.position(), true) < 0) {
                 // There are no re-tries so clear the buffer to prevent a
                 // possible overflow if the buffer is used again. BZ53119.
                 outputBuffer.clear();
@@ -288,6 +291,51 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
             }
             outputBuffer.clear();
         }
+    }
+
+
+    private int writeSocket(int pos, int len, boolean block) {
+
+        Lock readLock = socketWrapper.getBlockingStatusReadLock();
+        WriteLock writeLock = socketWrapper.getBlockingStatusWriteLock();
+        long socket = socketWrapper.getSocket().longValue();
+
+        boolean writeDone = false;
+        int result = 0;
+        try {
+            readLock.lock();
+            if (socketWrapper.getBlockingStatus() == block) {
+                result = Socket.sendbb(socket, pos, len);
+                writeDone = true;
+            }
+        } finally {
+            readLock.unlock();
+        }
+
+        if (!writeDone) {
+            try {
+                writeLock.lock();
+                socketWrapper.setBlockingStatus(block);
+                // Set the current settings for this socket
+                Socket.optSet(socket, Socket.APR_SO_NONBLOCK, (block ? 0 : 1));
+                // Downgrade the lock
+                try {
+                    readLock.lock();
+                    writeLock.unlock();
+                    result = Socket.sendbb(socket, pos, len);
+                } finally {
+                    readLock.unlock();
+                }
+            } finally {
+                // Should have been released above but may not have been on some
+                // exception paths
+                if (writeLock.isHeldByCurrentThread()) {
+                    writeLock.unlock();
+                }
+            }
+        }
+
+        return result;
     }
 
 
@@ -306,9 +354,8 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         }
         int nRead;
         while (inputBuffer.remaining() < n) {
-            nRead = Socket.recvbb
-                (socketWrapper.getSocket().longValue(), inputBuffer.limit(),
-                        inputBuffer.capacity() - inputBuffer.limit());
+            nRead = readSocket(inputBuffer.limit(),
+                    inputBuffer.capacity() - inputBuffer.limit(), true);
             if (nRead > 0) {
                 inputBuffer.limit(inputBuffer.limit() + nRead);
             } else {
@@ -339,9 +386,8 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         }
         int nRead;
         while (inputBuffer.remaining() < n) {
-            nRead = Socket.recvbb
-                (socketWrapper.getSocket().longValue(), inputBuffer.limit(),
-                    inputBuffer.capacity() - inputBuffer.limit());
+            nRead = readSocket(inputBuffer.limit(),
+                    inputBuffer.capacity() - inputBuffer.limit(), true);
             if (nRead > 0) {
                 inputBuffer.limit(inputBuffer.limit() + nRead);
             } else {
@@ -355,6 +401,51 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
         return true;
 
+    }
+
+
+    private int readSocket(int pos, int len, boolean block) {
+
+        Lock readLock = socketWrapper.getBlockingStatusReadLock();
+        WriteLock writeLock = socketWrapper.getBlockingStatusWriteLock();
+        long socket = socketWrapper.getSocket().longValue();
+
+        boolean readDone = false;
+        int result = 0;
+        try {
+            readLock.lock();
+            if (socketWrapper.getBlockingStatus() == block) {
+                result = Socket.recvbb(socket, pos, len);
+                readDone = true;
+            }
+        } finally {
+            readLock.unlock();
+        }
+
+        if (!readDone) {
+            try {
+                writeLock.lock();
+                socketWrapper.setBlockingStatus(block);
+                // Set the current settings for this socket
+                Socket.optSet(socket, Socket.APR_SO_NONBLOCK, (block ? 0 : 1));
+                // Downgrade the lock
+                try {
+                    readLock.lock();
+                    writeLock.unlock();
+                    result = Socket.recvbb(socket, pos, len);
+                } finally {
+                    readLock.unlock();
+                }
+            } finally {
+                // Should have been released above but may not have been on some
+                // exception paths
+                if (writeLock.isHeldByCurrentThread()) {
+                    writeLock.unlock();
+                }
+            }
+        }
+
+        return result;
     }
 
 
