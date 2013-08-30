@@ -46,6 +46,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -647,6 +648,10 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     // Methods called by prepareResponse()
     protected abstract void output(byte[] src, int offset, int length)
             throws IOException;
+
+    // Methods used by process
+    protected abstract void setTimeout(SocketWrapper<S> socketWrapper,
+            int timeout) throws IOException;
 
     // Methods used by SocketInputBuffer
     /** Receive a chunk of data. Called to implement the
