@@ -184,15 +184,14 @@ main {
 
 code {
   background-color: rgb(224,255,255);
-  padding: 0 0.1em;
 }
 
-div.codeBox pre code, code.attributeName, code.propertyName {
+div.codeBox pre code, code.attributeName, code.propertyName, code.noHighlight {
   background-color: transparent;
 }
 div.codeBox {
   overflow: auto;
-  /* TODO: Maybe add margin-top and margin-bottom like with <p> */
+  margin: 1em 0;
 }
 div.codeBox pre {
   margin: 0;
@@ -214,6 +213,18 @@ div.codeBox pre.wrap {
 }
 
 
+table.defaultTable tr {
+    border: 1px solid #CCC;
+}
+
+table.defaultTable tr:nth-child(even) {
+    background-color: #FAFBFF;
+}
+
+table.defaultTable tr:nth-child(odd) {
+    background-color: #EEEFFF;
+}
+
 table.defaultTable th {
   background-color: #88b;
   color: #fff;
@@ -228,8 +239,7 @@ table.detail-table td {
 }
 
 table.defaultTable th, table.defaultTable td, table.detail-table th, table.detail-table td {
-  border: 1px solid #777;
-  padding: 5px;
+  padding: 5px 8px;
   text-align: left;
 }
 
