@@ -266,8 +266,8 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
     /**
      * The number of milliseconds Tomcat will wait for a subsequent request
-     * before closing the connection. The default is the same as for
-     * Apache HTTP Server (15 000 milliseconds).
+     * before closing the connection. The default is -1 which is an infinite
+     * timeout.
      */
     protected int keepAliveTimeout = -1;
     public int getKeepAliveTimeout() { return keepAliveTimeout; }
