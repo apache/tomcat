@@ -232,7 +232,7 @@
     <td>executable</td>
     <td>Can one of <b>jvm</b> <b>java</b> or <b>exe</b></td>
     </tr>
-	<tr>
+    <tr>
     <td>--StopImage</td>
     <td></td>
     <td>Executable that will be run on Stop service signal.</td>
