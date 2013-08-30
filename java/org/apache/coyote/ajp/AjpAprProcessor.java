@@ -27,7 +27,6 @@ import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Socket;
-import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.AprEndpoint;
@@ -119,7 +118,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
             // Parsing the request header
             try {
                 // Get first message of the request
-                if (!readMessage(requestHeaderMessage, true, keptAlive)) {
+                if (!readMessage(requestHeaderMessage, !keptAlive)) {
                     // This means that no data is available right now
                     // (long keepalive), so that the processor should be recycled
                     // and the method should return true
@@ -382,43 +381,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         }
 
         return true;
-
-    }
-
-
-    /**
-     * Read at least the specified amount of bytes, and place them
-     * in the input buffer.
-     */
-    protected boolean readt(int n, boolean useAvailableData)
-        throws IOException {
-
-        if (useAvailableData && inputBuffer.remaining() == 0) {
-            return false;
-        }
-        if (inputBuffer.capacity() - inputBuffer.limit() <=
-                n - inputBuffer.remaining()) {
-            inputBuffer.compact();
-            inputBuffer.limit(inputBuffer.position());
-            inputBuffer.position(0);
-        }
-        int nRead;
-        while (inputBuffer.remaining() < n) {
-            nRead = readSocket(inputBuffer.limit(),
-                    inputBuffer.capacity() - inputBuffer.limit(), true);
-            if (nRead > 0) {
-                inputBuffer.limit(inputBuffer.limit() + nRead);
-            } else {
-                if ((-nRead) == Status.ETIMEDOUT || (-nRead) == Status.TIMEUP) {
-                    return false;
-                } else {
-                    throw new IOException(sm.getString("ajpprocessor.failedread"));
-                }
-            }
-        }
-
-        return true;
-
     }
 
 
@@ -476,10 +438,9 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
         first = false;
         bodyMessage.reset();
-        if (!readMessage(bodyMessage, false, false)) {
-            // Invalid message
-            return false;
-        }
+
+        readMessage(bodyMessage, true);
+
         // No data received.
         if (bodyMessage.getLen() == 0) {
             // just the header
@@ -500,25 +461,22 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     /**
      * Read an AJP message.
      *
-     * @param first is true if the message is the first in the request, which
-     *        will cause a short duration blocking read
-     * @return true if the message has been read, false if the short read
-     *         didn't return anything
+     * @param block If there is no data available to read when this method is
+     *              called, should this call block until data becomes available?
+
+     * @return true if the message has been read, false if no data was read
+     *
      * @throws IOException any other failure, including incomplete reads
      */
-    protected boolean readMessage(AjpMessage message, boolean first,
-            boolean useAvailableData)
+    protected boolean readMessage(AjpMessage message, boolean block)
         throws IOException {
 
         int headerLength = message.getHeaderLength();
 
-        if (first) {
-            if (!readt(headerLength, useAvailableData)) {
-                return false;
-            }
-        } else {
-            read(headerLength, true);
+        if (!read(headerLength, block)) {
+            return false;
         }
+
         inputBuffer.get(message.getBuffer(), 0, headerLength);
         int messageLength = message.processHeader(true);
         if (messageLength < 0) {
