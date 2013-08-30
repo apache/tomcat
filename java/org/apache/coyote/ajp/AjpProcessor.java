@@ -312,35 +312,6 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
     }
 
 
-    /** Receive a chunk of data. Called to implement the
-     *  'special' packet in ajp13 and to receive the data
-     *  after we send a GET_BODY packet
-     */
-    @Override
-    public boolean receive() throws IOException {
-
-        first = false;
-        bodyMessage.reset();
-
-        readMessage(bodyMessage, true);
-
-        // No data received.
-        if (bodyMessage.getLen() == 0) {
-            // just the header
-            // Don't mark 'end of stream' for the first chunk.
-            return false;
-        }
-        int blen = bodyMessage.peekInt();
-        if (blen == 0) {
-            return false;
-        }
-
-        bodyMessage.getBodyBytes(bodyBytes);
-        empty = false;
-        return true;
-    }
-
-
     /**
      * Read an AJP message.
      *
@@ -350,6 +321,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
      *         didn't return anything
      * @throws IOException any other failure, including incomplete reads
      */
+    @Override
     protected boolean readMessage(AjpMessage message, boolean ignored)
         throws IOException {
 
