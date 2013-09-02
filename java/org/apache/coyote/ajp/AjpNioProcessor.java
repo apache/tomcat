@@ -31,23 +31,16 @@ import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
-
 /**
  * Processes AJP requests using NIO.
  */
 public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
-
-    /**
-     * Logger.
-     */
     private static final Log log = LogFactory.getLog(AjpNioProcessor.class);
     @Override
     protected Log getLog() {
         return log;
     }
-
-    // ----------------------------------------------------------- Constructors
 
 
     public AjpNioProcessor(int packetSize, NioEndpoint endpoint) {
@@ -60,15 +53,11 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
     }
 
 
-    // ----------------------------------------------------- Instance Variables
-
     /**
      * Selector pool for the associated endpoint.
      */
     protected final NioSelectorPool pool;
 
-
-    // ----------------------------------------------------- ActionHook Methods
 
     /**
      * Send an action to the connector.
@@ -95,12 +84,11 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
                 ((NioEndpoint)endpoint).dispatchForEvent(
-                        socketWrapper.getSocket(), SocketStatus.OPEN_READ, true);            }
+                        socketWrapper.getSocket(), SocketStatus.OPEN_READ, true);
             }
         }
+    }
 
-
-    // ------------------------------------------------------ Protected Methods
 
     @Override
     protected void setupSocket(SocketWrapper<NioChannel> socketWrapper)
@@ -135,15 +123,17 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         Selector selector = null;
         try {
             selector = pool.get();
-        } catch ( IOException x ) {
+        } catch (IOException x) {
             //ignore
         }
         try {
             pool.write(writeBuffer, socketWrapper.getSocket(), selector,
                     writeTimeout, true);
-        }finally {
+        } finally {
             writeBuffer.clear();
-            if ( selector != null ) pool.put(selector);
+            if (selector != null) {
+                pool.put(selector);
+            }
         }
     }
 
@@ -171,6 +161,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         }
         return read;
     }
+
 
     private int readSocket(byte[] buf, int pos, int n, boolean block)
             throws IOException {
@@ -257,6 +248,4 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             return true;
         }
     }
-
-
 }

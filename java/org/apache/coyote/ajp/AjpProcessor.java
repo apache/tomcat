@@ -28,7 +28,6 @@ import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
-
 /**
  * Processes AJP requests.
  *
@@ -42,17 +41,11 @@ import org.apache.tomcat.util.net.SocketWrapper;
  */
 public class AjpProcessor extends AbstractAjpProcessor<Socket> {
 
-
-    /**
-     * Logger.
-     */
     private static final Log log = LogFactory.getLog(AjpProcessor.class);
     @Override
     protected Log getLog() {
         return log;
     }
-
-    // ----------------------------------------------------------- Constructors
 
 
     public AjpProcessor(int packetSize, JIoEndpoint endpoint) {
@@ -63,21 +56,10 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
     }
 
 
-    // ----------------------------------------------------- Instance Variables
-
-    /**
-     * Input stream.
-     */
     protected InputStream input;
 
-
-    /**
-     * Output stream.
-     */
     protected OutputStream output;
 
-
-    // --------------------------------------------------------- Public Methods
 
     @Override
     public void recycle(boolean socketClosing) {
@@ -87,8 +69,6 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             output = null;
         }
     }
-
-    // ----------------------------------------------------- ActionHook Methods
 
 
     /**
@@ -118,8 +98,6 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
         }
     }
 
-
-    // ------------------------------------------------------ Protected Methods
 
     @Override
     protected void setupSocket(SocketWrapper<Socket> socketWrapper)
@@ -162,7 +140,6 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
         }
 
         return true;
-
     }
 
 
