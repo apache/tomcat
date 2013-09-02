@@ -108,11 +108,13 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
         // Error flag
         error = false;
 
+        boolean keptAlive = false;
+
         while (!error && !endpoint.isPaused()) {
             // Parsing the request header
             try {
                 // Get first message of the request
-                if (!readMessage(requestHeaderMessage, true)) {
+                if (!readMessage(requestHeaderMessage, !keptAlive)) {
                     // This means a connection timeout
                     break;
                 }
@@ -144,6 +146,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     error = true;
                     break;
                 }
+                keptAlive = true;
                 request.setStartTime(System.currentTimeMillis());
             } catch (IOException e) {
                 error = true;
