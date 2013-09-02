@@ -194,7 +194,8 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
      * @return
      * @throws IOException
      */
-    protected boolean read(int n, boolean block) throws IOException {
+    protected boolean read(byte[] buf, int pos, int n, boolean block)
+            throws IOException {
 
         boolean nextReadBlocks = block;
 
@@ -224,6 +225,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
             }
         }
 
+        inputBuffer.get(buf, pos, n);
         return true;
     }
 
@@ -280,11 +282,10 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         byte[] buf = message.getBuffer();
         int headerLength = message.getHeaderLength();
 
-        if (!read(headerLength, block)) {
+        if (!read(buf, 0, headerLength, block)) {
             return false;
         }
 
-        inputBuffer.get(buf, 0, headerLength);
         int messageLength = message.processHeader(true);
         if (messageLength < 0) {
             // Invalid AJP header signature
@@ -304,8 +305,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                         Integer.valueOf(messageLength),
                         Integer.valueOf(buf.length)));
             }
-            read(messageLength, true);
-            inputBuffer.get(buf, headerLength, messageLength);
+            read(buf, headerLength, messageLength, true);
             return true;
         }
     }
