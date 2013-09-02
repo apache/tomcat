@@ -44,6 +44,7 @@ import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
@@ -515,17 +516,34 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     sm.getString("ajpprocessor.comet.notsupported"));
 
         } else if (actionCode == ActionCode.AVAILABLE) {
-            // TODO
+            // Web Server only sends data when asked so unless end of stream has
+            // been reached, there should be data available.
+            // TODO Figure out if a 'true' non-blocking approach is possible
+            //      for AJP and what changes would be required to support it.
+            if (!endOfStream) {
+                request.setAvailable(1);
+            }
+
         } else if (actionCode == ActionCode.NB_WRITE_INTEREST) {
-            // TODO
+            // Assume it is always possible write data.
+            // TODO Investigate 'true' non-blocking IO for AJP.
+            AtomicBoolean isReady = (AtomicBoolean)param;
+            isReady.set(true);
+
         } else if (actionCode == ActionCode.NB_READ_INTEREST) {
             // TODO
+            System.out.println("AJP Non-blocking IO TODO: NB_READ_INTEREST");
+
         } else if (actionCode == ActionCode.REQUEST_BODY_FULLY_READ) {
-            // TODO
+            AtomicBoolean result = (AtomicBoolean) param;
+            result.set(endOfStream);
+
         } else if (actionCode == ActionCode.DISPATCH_READ) {
-            // TODO
+            socketWrapper.addDispatch(DispatchType.NON_BLOCKING_READ);
+
         } else if (actionCode == ActionCode.DISPATCH_WRITE) {
-            // TODO
+            socketWrapper.addDispatch(DispatchType.NON_BLOCKING_WRITE);
+
         }  else {
             actionInternal(actionCode, param);
         }
