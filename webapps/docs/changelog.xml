@@ -305,6 +305,10 @@
         The WebSocket examples in the examples web application have been changed
         to use the new JSR-356 Java WebSocket 1.0 implementation. (markt)
       </update>
+      <add>
+        Add document for
+        <code>org.apache.catalina.tribes.group.GroupChannel</code>. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
