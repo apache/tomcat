@@ -132,7 +132,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
                         log.debug("Unexpected message: " + type);
                     }
                     error = true;
-                    recycle(true);
                     break;
                 }
                 keptAlive = true;
