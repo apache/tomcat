@@ -496,6 +496,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 attach.setTimeout(timeout);
             }
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
+            socketWrapper.clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
                 ((NioEndpoint)endpoint).dispatchForEvent(this.socketWrapper.getSocket(),SocketStatus.OPEN_READ, true);
             }

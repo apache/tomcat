@@ -369,6 +369,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                 }
             }
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
+            socketWrapper.clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
                 ((JIoEndpoint) endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);

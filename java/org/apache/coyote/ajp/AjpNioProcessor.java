@@ -69,9 +69,10 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
     protected void actionInternal(ActionCode actionCode, Object param) {
 
         if (actionCode == ActionCode.ASYNC_COMPLETE) {
+            socketWrapper.clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
                 ((NioEndpoint)endpoint).dispatchForEvent(
-                        socketWrapper.getSocket(), SocketStatus.OPEN_READ, false);
+                        socketWrapper.getSocket(), SocketStatus.OPEN_READ, true);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param == null) return;

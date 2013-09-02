@@ -128,6 +128,9 @@ public class SocketWrapper<E> {
         }
         return result;
     }
+    public void clearDispatches() {
+        dispatches.clear();
+    }
 
     public void reset(E socket, long timeout) {
         async = false;
