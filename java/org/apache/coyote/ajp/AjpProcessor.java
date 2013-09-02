@@ -121,22 +121,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
     }
 
 
-    /**
-     * Read at least the specified amount of bytes, and place them
-     * in the input buffer.
-     *
-     * @param buf   Buffer to read data into
-     * @param pos   Start position
-     * @param n     Number of bytes to read
-     * @param blockFirstRead    Should the first read block?
-     *
-     * @return If blockFirstRead is false, the connector supports non-blocking
-     *         IO and the first read does not return any data, this method
-     *         reads no data into the buffer returns false. Otherwise, blocking
-     *         reads are used read the specified number of bytes into the
-     *         buffer.
-     * @throws IOException
-     */
+    @Override
     protected boolean read(byte[] buf, int pos, int n, boolean blockFirstRead)
         throws IOException {
 
@@ -152,41 +137,5 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
         }
 
         return true;
-    }
-
-
-    @Override
-    protected boolean readMessage(AjpMessage message, boolean block)
-        throws IOException {
-
-        byte[] buf = message.getBuffer();
-        int headerLength = message.getHeaderLength();
-
-        if (!read(buf, 0, headerLength, block)) {
-            return false;
-        }
-
-        int messageLength = message.processHeader(true);
-        if (messageLength < 0) {
-            // Invalid AJP header signature
-            throw new IOException(sm.getString("ajpmessage.invalidLength",
-                    Integer.valueOf(messageLength)));
-        }
-        else if (messageLength == 0) {
-            // Zero length message.
-            return true;
-        }
-        else {
-            if (messageLength > buf.length) {
-                // Message too long for the buffer
-                // Need to trigger a 400 response
-                throw new IllegalArgumentException(sm.getString(
-                        "ajpprocessor.header.tooLong",
-                        Integer.valueOf(messageLength),
-                        Integer.valueOf(buf.length)));
-            }
-            read(buf, headerLength, messageLength, true);
-            return true;
-        }
     }
 }

@@ -182,18 +182,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     }
 
 
-    /**
-     * Read at least the specified amount of bytes, and place them
-     * in the input buffer. Note that if any data is available to read then this
-     * method will always block until at least the specified number of bytes
-     * have been read.
-     *
-     * @param n     The minimum number of bytes to read
-     * @param block If there is no data available to read when this method is
-     *              called, should this call block until data becomes available?
-     * @return
-     * @throws IOException
-     */
+    @Override
     protected boolean read(byte[] buf, int pos, int n, boolean block)
             throws IOException {
 
@@ -272,42 +261,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         }
 
         return result;
-    }
-
-
-    @Override
-    protected boolean readMessage(AjpMessage message, boolean block)
-        throws IOException {
-
-        byte[] buf = message.getBuffer();
-        int headerLength = message.getHeaderLength();
-
-        if (!read(buf, 0, headerLength, block)) {
-            return false;
-        }
-
-        int messageLength = message.processHeader(true);
-        if (messageLength < 0) {
-            // Invalid AJP header signature
-            throw new IOException(sm.getString("ajpmessage.invalidLength",
-                    Integer.valueOf(messageLength)));
-        }
-        else if (messageLength == 0) {
-            // Zero length message.
-            return true;
-        }
-        else {
-            if (messageLength > message.getBuffer().length) {
-                // Message too long for the buffer
-                // Need to trigger a 400 response
-                throw new IllegalArgumentException(sm.getString(
-                        "ajpprocessor.header.tooLong",
-                        Integer.valueOf(messageLength),
-                        Integer.valueOf(buf.length)));
-            }
-            read(buf, headerLength, messageLength, true);
-            return true;
-        }
     }
 
 

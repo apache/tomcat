@@ -800,13 +800,31 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     protected abstract void setupSocket(SocketWrapper<S> socketWrapper)
             throws IOException;
 
+    protected abstract void setTimeout(SocketWrapper<S> socketWrapper,
+            int timeout) throws IOException;
+
     // Methods called by prepareResponse()
     protected abstract void output(byte[] src, int offset, int length)
             throws IOException;
 
-    // Methods used by process
-    protected abstract void setTimeout(SocketWrapper<S> socketWrapper,
-            int timeout) throws IOException;
+    // Methods used by readMessage
+    /**
+     * Read at least the specified amount of bytes, and place them
+     * in the input buffer. Note that if any data is available to read then this
+     * method will always block until at least the specified number of bytes
+     * have been read.
+     *
+     * @param buf   Buffer to read data into
+     * @param pos   Start position
+     * @param n     The minimum number of bytes to read
+     * @param block If there is no data available to read when this method is
+     *              called, should this call block until data becomes available?
+     * @return  <code>true</code> if the requested number of bytes were read
+     *          else <code>false</code>
+     * @throws IOException
+     */
+    protected abstract boolean read(byte[] buf, int pos, int n, boolean block)
+            throws IOException;
 
     // Methods used by SocketInputBuffer
     /** Receive a chunk of data. Called to implement the
@@ -848,8 +866,40 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      *
      * @throws IOException any other failure, including incomplete reads
      */
-    protected abstract boolean readMessage(AjpMessage message,
-            boolean blockOnFirstRead) throws IOException;
+    protected boolean readMessage(AjpMessage message, boolean block)
+        throws IOException {
+
+        byte[] buf = message.getBuffer();
+        int headerLength = message.getHeaderLength();
+
+        if (!read(buf, 0, headerLength, block)) {
+            return false;
+        }
+
+        int messageLength = message.processHeader(true);
+        if (messageLength < 0) {
+            // Invalid AJP header signature
+            throw new IOException(sm.getString("ajpmessage.invalidLength",
+                    Integer.valueOf(messageLength)));
+        }
+        else if (messageLength == 0) {
+            // Zero length message.
+            return true;
+        }
+        else {
+            if (messageLength > message.getBuffer().length) {
+                // Message too long for the buffer
+                // Need to trigger a 400 response
+                throw new IllegalArgumentException(sm.getString(
+                        "ajpprocessor.header.tooLong",
+                        Integer.valueOf(messageLength),
+                        Integer.valueOf(buf.length)));
+            }
+            read(buf, headerLength, messageLength, true);
+            return true;
+        }
+    }
+
 
     @Override
     public final boolean isComet() {
