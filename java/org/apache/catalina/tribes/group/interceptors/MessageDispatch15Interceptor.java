@@ -83,7 +83,8 @@ public class MessageDispatch15Interceptor extends MessageDispatchInterceptor {
     public void startQueue() {
         if ( run ) return;
         executor = ExecutorFactory.newThreadPool(maxSpareThreads, maxThreads,
-                keepAliveTime, TimeUnit.MILLISECONDS, new TcclThreadFactory());
+                keepAliveTime, TimeUnit.MILLISECONDS,
+                new TcclThreadFactory("MessageDispatch15Interceptor.MessageDispatchThread"));
         run = true;
     }
 
