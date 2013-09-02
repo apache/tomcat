@@ -1604,16 +1604,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             ExceptionUtils.handleThrowable(t);
             getLog().error(sm.getString("http11processor.request.process"), t);
             error = true;
-        } finally {
-            if (error) {
-                // 500 - Internal Server Error
-                response.setStatus(500);
-                long time = 0;
-                if (request.getStartTime() != -1) {
-                    time = System.currentTimeMillis() - request.getStartTime();
-                }
-                getAdapter().log(request, response, time);
-            }
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);

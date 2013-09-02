@@ -439,6 +439,14 @@ public class CoyoteAdapter implements Adapter {
             success = false;
             log.error(sm.getString("coyoteAdapter.asyncDispatch"), t);
         } finally {
+            if (!success) {
+                res.setStatus(500);
+                long time = 0;
+                if (req.getStartTime() != -1) {
+                    time = System.currentTimeMillis() - req.getStartTime();
+                }
+                log(req, res, time);
+            }
             req.getRequestProcessor().setWorkerThreadName(null);
             // Recycle the wrapper request and response
             if (!success || (!comet && !request.isAsync())) {
