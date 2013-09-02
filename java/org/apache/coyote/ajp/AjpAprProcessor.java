@@ -84,6 +84,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     protected void actionInternal(ActionCode actionCode, Object param) {
 
         if (actionCode == ActionCode.ASYNC_COMPLETE) {
+            socketWrapper.clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
                 ((AprEndpoint)endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);

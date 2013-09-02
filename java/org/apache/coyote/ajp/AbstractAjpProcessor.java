@@ -525,14 +525,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             }
 
         } else if (actionCode == ActionCode.NB_WRITE_INTEREST) {
-            // Assume it is always possible write data.
-            // TODO Investigate 'true' non-blocking IO for AJP.
+            // Until 'true' non-blocking IO is implemented, assume it is always
+            // possible write data.
             AtomicBoolean isReady = (AtomicBoolean)param;
             isReady.set(true);
 
         } else if (actionCode == ActionCode.NB_READ_INTEREST) {
-            // TODO
-            System.out.println("AJP Non-blocking IO TODO: NB_READ_INTEREST");
+            // NO-OP. Not required until 'true' non-blocking IO is implemented.
 
         } else if (actionCode == ActionCode.REQUEST_BODY_FULLY_READ) {
             AtomicBoolean result = (AtomicBoolean) param;

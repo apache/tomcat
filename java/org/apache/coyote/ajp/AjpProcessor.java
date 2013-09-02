@@ -81,6 +81,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
     protected void actionInternal(ActionCode actionCode, Object param) {
 
         if (actionCode == ActionCode.ASYNC_COMPLETE) {
+            socketWrapper.clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
                 ((JIoEndpoint)endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);
