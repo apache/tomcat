@@ -380,8 +380,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         } else if (actionCode == ActionCode.RESET) {
             // NO-OP
-            // TODO Check if this is really a NO-OP for AJP or if something
-            // needs to be done here
 
         } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
 
@@ -429,7 +427,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             // AJP as the reverse proxy controls that connection.
 
         } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
-
             // Get remote host name using a DNS resolution
             if (request.remoteHost().isNull()) {
                 try {
@@ -442,13 +439,11 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         } else if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
             // NO-OP
-            // TODO Check if this is really a NO-OP for AJP or if something
-            // needs to be done here
+            // Automatically populated during prepareRequest()
 
         } else if (actionCode == ActionCode.REQ_LOCAL_NAME_ATTRIBUTE) {
             // NO-OP
-            // TODO Check if this is really a NO-OP for AJP or if something
-            // needs to be done here
+            // Automatically populated during prepareRequest()
 
         } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
             // Copy from local name for now, which should simply be an address
@@ -456,13 +451,11 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         } else if (actionCode == ActionCode.REQ_REMOTEPORT_ATTRIBUTE) {
             // NO-OP
-            // TODO Check if this is really a NO-OP for AJP or if something
-            // needs to be done here
+            // This information is not available when using the AJP protocol
 
         } else if (actionCode == ActionCode.REQ_LOCALPORT_ATTRIBUTE) {
             // NO-OP
-            // TODO Check if this is really a NO-OP for AJP or if something
-            // needs to be done here
+            // Automatically populated during prepareRequest()
 
         } else if (actionCode == ActionCode.REQ_SET_BODY_REPLAY) {
             // Set the given bytes as the content
