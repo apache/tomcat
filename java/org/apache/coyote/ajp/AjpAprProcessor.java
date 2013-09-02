@@ -137,10 +137,12 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                         break;
                     }
                     cping = true;
-                    if (Socket.send(socketRef, pongMessageArray, 0,
-                            pongMessageArray.length) < 0) {
+                    try {
+                        output(pongMessageArray, 0, pongMessageArray.length);
+                    } catch (IOException e) {
                         error = true;
                     }
+                    recycle(false);
                     continue;
                 } else if(type != Constants.JK_AJP13_FORWARD_REQUEST) {
                     // Unexpected packet type. Unread body packets should have
