@@ -17,18 +17,14 @@
 package org.apache.coyote.ajp;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Socket;
-import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
@@ -87,172 +83,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     protected final ByteBuffer outputBuffer;
 
 
-    // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Process pipelined HTTP requests using the specified input and output
-     * streams.
-     *
-     * @throws IOException error during an I/O operation
-     */
-    @Override
-    public SocketState process(SocketWrapper<Long> socket)
-        throws IOException {
-        RequestInfo rp = request.getRequestProcessor();
-        rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
-
-        // Setting up the socket
-        this.socketWrapper = socket;
-
-        long socketRef = socket.getSocket().longValue();
-        Socket.setrbb(socketRef, inputBuffer);
-        Socket.setsbb(socketRef, outputBuffer);
-
-        int soTimeout = endpoint.getSoTimeout();
-        boolean cping = false;
-
-        // Error flag
-        error = false;
-
-        boolean keptAlive = false;
-
-        while (!error && !endpoint.isPaused()) {
-            // Parsing the request header
-            try {
-                // Get first message of the request
-                if (!readMessage(requestHeaderMessage, !keptAlive)) {
-                    break;
-                }
-                // Set back timeout if keep alive timeout is enabled
-                if (keepAliveTimeout > 0) {
-                    setTimeout(socketWrapper, soTimeout);
-                }
-                // Check message type, process right away and break if
-                // not regular request processing
-                int type = requestHeaderMessage.getByte();
-                if (type == Constants.JK_AJP13_CPING_REQUEST) {
-                    if (endpoint.isPaused()) {
-                        recycle(true);
-                        break;
-                    }
-                    cping = true;
-                    try {
-                        output(pongMessageArray, 0, pongMessageArray.length);
-                    } catch (IOException e) {
-                        error = true;
-                    }
-                    recycle(false);
-                    continue;
-                } else if(type != Constants.JK_AJP13_FORWARD_REQUEST) {
-                    // Unexpected packet type. Unread body packets should have
-                    // been swallowed in finish().
-                    if (log.isDebugEnabled()) {
-                        log.debug("Unexpected message: " + type);
-                    }
-                    error = true;
-                    break;
-                }
-                keptAlive = true;
-                request.setStartTime(System.currentTimeMillis());
-            } catch (IOException e) {
-                error = true;
-                break;
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                log.debug(sm.getString("ajpprocessor.header.error"), t);
-                // 400 - Bad Request
-                response.setStatus(400);
-                getAdapter().log(request, response, 0);
-                error = true;
-            }
-
-            if (!error) {
-                // Setting up filters, and parse some request headers
-                rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
-                try {
-                    prepareRequest();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    log.debug(sm.getString("ajpprocessor.request.prepare"), t);
-                    // 400 - Internal Server Error
-                    response.setStatus(400);
-                    getAdapter().log(request, response, 0);
-                    error = true;
-                }
-            }
-
-            if (!error && !cping && endpoint.isPaused()) {
-                // 503 - Service unavailable
-                response.setStatus(503);
-                getAdapter().log(request, response, 0);
-                error = true;
-            }
-            cping = false;
-
-            // Process the request in the adapter
-            if (!error) {
-                try {
-                    rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-                    getAdapter().service(request, response);
-                } catch (InterruptedIOException e) {
-                    error = true;
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    log.error(sm.getString("ajpprocessor.request.process"), t);
-                    // 500 - Internal Server Error
-                    response.setStatus(500);
-                    getAdapter().log(request, response, 0);
-                    error = true;
-                }
-            }
-
-            if (isAsync() && !error) {
-                break;
-            }
-
-            // Finish the response if not done yet
-            if (!finished) {
-                try {
-                    finish();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    error = true;
-                }
-            }
-
-            // If there was an error, make sure the request is counted as
-            // and error, and update the statistics counter
-            if (error) {
-                response.setStatus(500);
-            }
-            request.updateCounters();
-
-            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
-            // Set keep alive timeout if enabled
-            if (keepAliveTimeout > 0) {
-                setTimeout(socketWrapper, keepAliveTimeout);
-            }
-
-            recycle(false);
-        }
-
-        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-
-        if (!error && !endpoint.isPaused()) {
-            if (isAsync()) {
-                return SocketState.LONG;
-            } else {
-                return SocketState.OPEN;
-            }
-        } else {
-            return SocketState.CLOSED;
-        }
-    }
-
-
     // ----------------------------------------------------- ActionHook Methods
-
 
     /**
      * Send an action to the connector.
@@ -282,6 +113,14 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
 
     // ------------------------------------------------------ Protected Methods
+
+    @Override
+    protected void setupSocket(SocketWrapper<Long> socketWrapper) {
+        long socketRef = socketWrapper.getSocket().longValue();
+        Socket.setrbb(socketRef, inputBuffer);
+        Socket.setsbb(socketRef, outputBuffer);
+    }
+
 
     @Override
     protected void setTimeout(SocketWrapper<Long> socketWrapper,
