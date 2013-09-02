@@ -122,9 +122,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
             try {
                 // Get first message of the request
                 if (!readMessage(requestHeaderMessage, !keptAlive)) {
-                    // This means that no data is available right now
-                    // (long keepalive), so that the processor should be recycled
-                    // and the method should return true
                     break;
                 }
                 // Set back timeout if keep alive timeout is enabled
