@@ -29,7 +29,6 @@ import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
-
 /**
  * Processes AJP requests.
  *
@@ -43,17 +42,11 @@ import org.apache.tomcat.util.net.SocketWrapper;
  */
 public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
-
-    /**
-     * Logger.
-     */
     private static final Log log = LogFactory.getLog(AjpAprProcessor.class);
     @Override
     protected Log getLog() {
         return log;
     }
-
-    // ----------------------------------------------------------- Constructors
 
 
     public AjpAprProcessor(int packetSize, AprEndpoint endpoint) {
@@ -69,8 +62,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     }
 
 
-    // ----------------------------------------------------- Instance Variables
-
     /**
      * Direct buffer used for input.
      */
@@ -82,8 +73,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
      */
     protected final ByteBuffer outputBuffer;
 
-
-    // ----------------------------------------------------- ActionHook Methods
 
     /**
      * Send an action to the connector.
@@ -111,8 +100,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         }
     }
 
-
-    // ------------------------------------------------------ Protected Methods
 
     @Override
     protected void setupSocket(SocketWrapper<Long> socketWrapper) {
@@ -330,7 +317,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
             inputBuffer.get(message.getBuffer(), headerLength, messageLength);
             return true;
         }
-
     }
 
 
