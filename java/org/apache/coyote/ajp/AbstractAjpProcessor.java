@@ -451,7 +451,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             // needs to be done here
 
         } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
-
             // Copy from local name for now, which should simply be an address
             request.localAddr().setString(request.localName().toString());
 
@@ -466,7 +465,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             // needs to be done here
 
         } else if (actionCode == ActionCode.REQ_SET_BODY_REPLAY) {
-
             // Set the given bytes as the content
             ByteChunk bc = (ByteChunk) param;
             int length = bc.getLength();
