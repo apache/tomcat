@@ -618,6 +618,9 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                 SocketState state = SocketState.CLOSED;
                 do {
                     if (wrapper.hasNextDispatch()) {
+                        // Associate with the processor with the connection as
+                        // these calls may result in a nested call to process()
+                        connections.put(socket, processor);
                         DispatchType nextDispatch = wrapper.getNextDispatch();
                         state = processor.asyncDispatch(
                                 nextDispatch.getSocketStatus());
