@@ -39,9 +39,13 @@ public class TcclThreadFactory implements ThreadFactory {
     private final String namePrefix;
     
     public TcclThreadFactory() {
+        this("pool-" + poolNumber.getAndIncrement() + "-thread-");
+    }
+
+    public TcclThreadFactory(String namePrefix) {
         SecurityManager s = System.getSecurityManager();
         group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
-        namePrefix = "pool-" + poolNumber.getAndIncrement() + "-thread-";
+        this.namePrefix = namePrefix;
     }
 
     @Override
