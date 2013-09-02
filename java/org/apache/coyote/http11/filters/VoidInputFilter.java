@@ -123,7 +123,11 @@ public class VoidInputFilter implements InputFilter {
 
     @Override
     public int available() {
-        return 0;
+        if (read) {
+            return 0;
+        } else {
+            return 1;
+        }
     }
 
 
