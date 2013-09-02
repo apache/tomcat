@@ -273,32 +273,23 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     }
 
 
-    /**
-     * Read an AJP message.
-     *
-     * @param block If there is no data available to read when this method is
-     *              called, should this call block until data becomes available?
-
-     * @return true if the message has been read, false if no data was read
-     *
-     * @throws IOException any other failure, including incomplete reads
-     */
     @Override
     protected boolean readMessage(AjpMessage message, boolean block)
         throws IOException {
 
+        byte[] buf = message.getBuffer();
         int headerLength = message.getHeaderLength();
 
         if (!read(headerLength, block)) {
             return false;
         }
 
-        inputBuffer.get(message.getBuffer(), 0, headerLength);
+        inputBuffer.get(buf, 0, headerLength);
         int messageLength = message.processHeader(true);
         if (messageLength < 0) {
             // Invalid AJP header signature
-            // TODO: Throw some exception and close the connection to frontend.
-            return false;
+            throw new IOException(sm.getString("ajpmessage.invalidLength",
+                    Integer.valueOf(messageLength)));
         }
         else if (messageLength == 0) {
             // Zero length message.
@@ -311,10 +302,10 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                 throw new IllegalArgumentException(sm.getString(
                         "ajpprocessor.header.tooLong",
                         Integer.valueOf(messageLength),
-                        Integer.valueOf(message.getBuffer().length)));
+                        Integer.valueOf(buf.length)));
             }
             read(messageLength, true);
-            inputBuffer.get(message.getBuffer(), headerLength, messageLength);
+            inputBuffer.get(buf, headerLength, messageLength);
             return true;
         }
     }
