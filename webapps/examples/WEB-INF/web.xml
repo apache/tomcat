@@ -377,5 +377,14 @@
       <servlet-name>bytecounter</servlet-name>
       <url-pattern>/servlets/nonblocking/bytecounter</url-pattern>
     </servlet-mapping>
+    <servlet>
+      <servlet-class>nonblocking.NumberWriter</servlet-class>
+      <servlet-name>numberwriter</servlet-name>
+      <async-supported>true</async-supported>
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>numberwriter</servlet-name>
+      <url-pattern>/servlets/nonblocking/numberwriter</url-pattern>
+    </servlet-mapping>
 
 </web-app>
