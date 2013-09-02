@@ -138,9 +138,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
     }
 
 
-    /**
-     * Read the specified amount of bytes, and place them in the input buffer.
-     */
+    @Override
     protected boolean read(byte[] buf, int pos, int n, boolean blockFirstRead)
         throws IOException {
 
@@ -201,42 +199,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             throw new EOFException(sm.getString("iib.eof.error"));
         } else {
             return 0;
-        }
-    }
-
-
-    @Override
-    protected boolean readMessage(AjpMessage message, boolean blockFirstRead)
-        throws IOException {
-
-        byte[] buf = message.getBuffer();
-        int headerLength = message.getHeaderLength();
-
-        if (!read(buf, 0, headerLength, blockFirstRead)) {
-            return false;
-        }
-
-        int messageLength = message.processHeader(true);
-        if (messageLength < 0) {
-            // Invalid AJP header signature
-            throw new IOException(sm.getString("ajpmessage.invalidLength",
-                    Integer.valueOf(messageLength)));
-        }
-        else if (messageLength == 0) {
-            // Zero length message.
-            return true;
-        }
-        else {
-            if (messageLength > buf.length) {
-                // Message too long for the buffer
-                // Need to trigger a 400 response
-                throw new IllegalArgumentException(sm.getString(
-                        "ajpprocessor.header.tooLong",
-                        Integer.valueOf(messageLength),
-                        Integer.valueOf(buf.length)));
-            }
-            read(buf, headerLength, messageLength, true);
-            return true;
         }
     }
 }
