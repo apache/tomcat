@@ -124,8 +124,20 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
     /**
      * Read at least the specified amount of bytes, and place them
      * in the input buffer.
+     *
+     * @param buf   Buffer to read data into
+     * @param pos   Start position
+     * @param n     Number of bytes to read
+     * @param blockFirstRead    Should the first read block?
+     *
+     * @return If blockFirstRead is false, the connector supports non-blocking
+     *         IO and the first read does not return any data, this method
+     *         reads no data into the buffer returns false. Otherwise, blocking
+     *         reads are used read the specified number of bytes into the
+     *         buffer.
+     * @throws IOException
      */
-    protected boolean read(byte[] buf, int pos, int n)
+    protected boolean read(byte[] buf, int pos, int n, boolean blockFirstRead)
         throws IOException {
 
         int read = 0;
@@ -143,23 +155,16 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
     }
 
 
-    /**
-     * Read an AJP message.
-     *
-     * @param message   The message to populate
-     * @param ignored   Not used in BIO
-     * @return true if the message has been read, false if the short read
-     *         didn't return anything
-     * @throws IOException any other failure, including incomplete reads
-     */
     @Override
-    protected boolean readMessage(AjpMessage message, boolean ignored)
+    protected boolean readMessage(AjpMessage message, boolean block)
         throws IOException {
 
         byte[] buf = message.getBuffer();
         int headerLength = message.getHeaderLength();
 
-        read(buf, 0, headerLength);
+        if (!read(buf, 0, headerLength, block)) {
+            return false;
+        }
 
         int messageLength = message.processHeader(true);
         if (messageLength < 0) {
@@ -180,7 +185,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                         Integer.valueOf(messageLength),
                         Integer.valueOf(buf.length)));
             }
-            read(buf, headerLength, messageLength);
+            read(buf, headerLength, messageLength, true);
             return true;
         }
     }

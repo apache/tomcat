@@ -141,7 +141,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
     /**
      * Read the specified amount of bytes, and place them in the input buffer.
      */
-    protected int read(byte[] buf, int pos, int n, boolean blockFirstRead)
+    protected boolean read(byte[] buf, int pos, int n, boolean blockFirstRead)
         throws IOException {
 
         int read = 0;
@@ -153,13 +153,13 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             if (res > 0) {
                 read += res;
             } else if (res == 0 && !block) {
-                break;
+                return false;
             } else {
                 throw new IOException(sm.getString("ajpprocessor.failedread"));
             }
             block = true;
         }
-        return read;
+        return true;
     }
 
 
@@ -205,13 +205,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
     }
 
 
-    /**
-     * Read an AJP message.
-     *
-     * @return <code>true</code> if a message was read, otherwise false
-     *
-     * @throws IOException any other failure, including incomplete reads
-     */
     @Override
     protected boolean readMessage(AjpMessage message, boolean blockFirstRead)
         throws IOException {
@@ -219,9 +212,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         byte[] buf = message.getBuffer();
         int headerLength = message.getHeaderLength();
 
-        int bytesRead = read(buf, 0, headerLength, blockFirstRead);
-
-        if (bytesRead == 0) {
+        if (!read(buf, 0, headerLength, blockFirstRead)) {
             return false;
         }
 
