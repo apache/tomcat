@@ -282,6 +282,11 @@ public class InputBuffer extends Reader
     }
 
 
+    boolean isBlocking() {
+        return coyoteRequest.getReadListener() != null;
+    }
+
+
     // ------------------------------------------------- Bytes Handling Methods
 
     /**

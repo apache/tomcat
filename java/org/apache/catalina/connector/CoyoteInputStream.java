@@ -25,6 +25,7 @@ import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This class handles reading bytes.
@@ -32,25 +33,18 @@ import org.apache.catalina.security.SecurityUtil;
  * @author Remy Maucherat
  * @author Jean-Francois Arcand
  */
-public class CoyoteInputStream
-    extends ServletInputStream {
+public class CoyoteInputStream extends ServletInputStream {
 
-
-    // ----------------------------------------------------- Instance Variables
+    protected static final StringManager sm =
+            StringManager.getManager(Constants.Package);
 
 
     protected InputBuffer ib;
 
 
-    // ----------------------------------------------------------- Constructors
-
-
     protected CoyoteInputStream(InputBuffer ib) {
         this.ib = ib;
     }
-
-
-    // -------------------------------------------------------- Package Methods
 
 
     /**
@@ -61,25 +55,19 @@ public class CoyoteInputStream
     }
 
 
-    // --------------------------------------------------------- Public Methods
-
-
     /**
      * Prevent cloning the facade.
      */
     @Override
-    protected Object clone()
-        throws CloneNotSupportedException {
+    protected Object clone() throws CloneNotSupportedException {
         throw new CloneNotSupportedException();
     }
 
 
-    // --------------------------------------------- ServletInputStream Methods
-
-
     @Override
-    public int read()
-        throws IOException {
+    public int read() throws IOException {
+        checkNonBlockingRead();
+
         if (SecurityUtil.isPackageProtectionEnabled()){
 
             try{
@@ -140,6 +128,7 @@ public class CoyoteInputStream
 
     @Override
     public int read(final byte[] b) throws IOException {
+        checkNonBlockingRead();
 
         if (SecurityUtil.isPackageProtectionEnabled()){
             try{
@@ -173,6 +162,7 @@ public class CoyoteInputStream
     @Override
     public int read(final byte[] b, final int off, final int len)
         throws IOException {
+        checkNonBlockingRead();
 
         if (SecurityUtil.isPackageProtectionEnabled()){
             try{
@@ -257,5 +247,13 @@ public class CoyoteInputStream
     @Override
     public void setReadListener(ReadListener listener) {
         ib.setReadListener(listener);
+    }
+
+
+    private void checkNonBlockingRead() {
+        if (ib.isBlocking() && !ib.isReady()) {
+            throw new IllegalStateException(
+                    sm.getString("coyoteInputStream.nbNotready"));
+        }
     }
 }
