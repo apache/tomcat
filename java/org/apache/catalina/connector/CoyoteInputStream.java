@@ -40,6 +40,7 @@ public class CoyoteInputStream extends ServletInputStream {
 
 
     protected InputBuffer ib;
+    private volatile Boolean ready = null;
 
 
     protected CoyoteInputStream(InputBuffer ib) {
@@ -240,7 +241,8 @@ public class CoyoteInputStream extends ServletInputStream {
 
     @Override
     public boolean isReady() {
-        return ib.isReady();
+        ready = Boolean.valueOf(ib.isReady());
+        return ready.booleanValue();
     }
 
 
@@ -251,9 +253,10 @@ public class CoyoteInputStream extends ServletInputStream {
 
 
     private void checkNonBlockingRead() {
-        if (ib.isBlocking() && !ib.isReady()) {
+        if (ib.isBlocking() && (ready == null || !ready.booleanValue())) {
             throw new IllegalStateException(
                     sm.getString("coyoteInputStream.nbNotready"));
         }
+        ready = null;
     }
 }
