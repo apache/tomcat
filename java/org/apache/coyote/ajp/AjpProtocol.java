@@ -37,7 +37,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * @author Remy Maucherat
  * @author Costin Manolache
  */
-public class AjpProtocol extends AbstractAjpProtocol {
+public class AjpProtocol extends AbstractAjpProtocol<Socket> {
 
 
     private static final Log log = LogFactory.getLog(AjpProtocol.class);
@@ -96,7 +96,7 @@ public class AjpProtocol extends AbstractAjpProtocol {
         }
 
         @Override
-        protected AbstractProtocol getProtocol() {
+        protected AbstractProtocol<Socket> getProtocol() {
             return proto;
         }
 

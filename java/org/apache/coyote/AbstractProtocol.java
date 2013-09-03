@@ -43,7 +43,7 @@ import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractProtocol implements ProtocolHandler,
+public abstract class AbstractProtocol<S> implements ProtocolHandler,
         MBeanRegistration {
 
     /**
@@ -85,7 +85,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
      * ProtocolHandler implementation (ProtocolHandler using BIO, requires BIO
      * Endpoint etc.).
      */
-    protected AbstractEndpoint endpoint = null;
+    protected AbstractEndpoint<S> endpoint = null;
 
 
     // ----------------------------------------------- Generic property handling
@@ -573,7 +573,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                 new RecycledProcessors<>(this);
 
 
-        protected abstract AbstractProtocol getProtocol();
+        protected abstract AbstractProtocol<S> getProtocol();
 
 
         @Override

@@ -466,7 +466,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
     @Override
     protected void init(SocketWrapper<Socket> socketWrapper,
-            AbstractEndpoint endpoint) throws IOException {
+            AbstractEndpoint<Socket> endpoint) throws IOException {
         inputStream = socketWrapper.getSocket().getInputStream();
     }
 

@@ -87,7 +87,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
     @Override
     public void init(SocketWrapper<Socket> socketWrapper,
-            AbstractEndpoint endpoint) throws IOException {
+            AbstractEndpoint<Socket> endpoint) throws IOException {
 
         outputStream = socketWrapper.getSocket().getOutputStream();
     }

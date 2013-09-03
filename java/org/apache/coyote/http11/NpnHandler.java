@@ -46,7 +46,7 @@ public interface NpnHandler<S> {
      * @param sslContext
      * @param adapter
      */
-    public void init(final AbstractEndpoint ep, long sslContext, Adapter adapter);
+    public void init(final AbstractEndpoint<S> ep, long sslContext, Adapter adapter);
 
     /**
      * Called when a SSLSocket or SSLEngine are first used, to initialize

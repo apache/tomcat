@@ -120,7 +120,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
         }
 
         @Override
-        protected AbstractProtocol getProtocol() {
+        protected AbstractProtocol<Socket> getProtocol() {
             return proto;
         }
 

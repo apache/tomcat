@@ -23,7 +23,7 @@ import org.apache.coyote.Processor;
 import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractAjpProtocol extends AbstractProtocol {
+public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
 
     /**
      * The string manager for this package.

@@ -73,7 +73,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     @Override
     public void init(SocketWrapper<NioChannel> socketWrapper,
-            AbstractEndpoint endpoint) throws IOException {
+            AbstractEndpoint<NioChannel> endpoint) throws IOException {
 
         socket = socketWrapper.getSocket();
         pool = ((NioEndpoint)endpoint).getSelectorPool();

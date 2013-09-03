@@ -237,7 +237,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
     // ------------------------------------------------------------ Constructor
 
-    public AbstractAjpProcessor(int packetSize, AbstractEndpoint endpoint) {
+    public AbstractAjpProcessor(int packetSize, AbstractEndpoint<S> endpoint) {
 
         super(endpoint);
 
