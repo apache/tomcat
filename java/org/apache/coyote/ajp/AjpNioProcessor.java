@@ -21,13 +21,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Selector;
 
-import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
-import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
@@ -56,29 +54,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
      * Selector pool for the associated endpoint.
      */
     protected final NioSelectorPool pool;
-
-
-    /**
-     * Send an action to the connector.
-     *
-     * @param actionCode Type of the action
-     * @param param Action parameter
-     */
-    @Override
-    protected void actionInternal(ActionCode actionCode, Object param) {
-
-        if (actionCode == ActionCode.ASYNC_COMPLETE) {
-            socketWrapper.clearDispatches();
-            if (asyncStateMachine.asyncComplete()) {
-                endpoint.processSocketAsync(socketWrapper, SocketStatus.OPEN_READ);
-            }
-
-        } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
-            if (asyncStateMachine.asyncDispatch()) {
-                endpoint.processSocketAsync(socketWrapper, SocketStatus.OPEN_READ);
-            }
-        }
-    }
 
 
     @Override
