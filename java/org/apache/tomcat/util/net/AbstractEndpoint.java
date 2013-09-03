@@ -591,7 +591,7 @@ public abstract class AbstractEndpoint<S> {
 
     // ---------------------------------------------- Request processing methods
 
-    protected abstract void processSocketAsync(SocketWrapper<S> socketWrapper,
+    public abstract void processSocketAsync(SocketWrapper<S> socketWrapper,
             SocketStatus socketStatus);
 
 

@@ -602,7 +602,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
 
     @Override
-    protected void processSocketAsync(SocketWrapper<NioChannel> socketWrapper,
+    public void processSocketAsync(SocketWrapper<NioChannel> socketWrapper,
             SocketStatus socketStatus) {
         dispatchForEvent(socketWrapper.getSocket(), socketStatus, true);
     }
