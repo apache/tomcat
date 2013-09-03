@@ -26,7 +26,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
-import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
@@ -74,20 +73,34 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
                 ((NioEndpoint)endpoint).dispatchForEvent(
                         socketWrapper.getSocket(), SocketStatus.OPEN_READ, true);
             }
-        } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
-            if (param == null) return;
-            long timeout = ((Long)param).longValue();
-            final KeyAttachment ka =
-                    (KeyAttachment)socketWrapper.getSocket().getAttachment(false);
-            if (keepAliveTimeout > 0) {
-                ka.setTimeout(timeout);
-            }
+
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
                 ((NioEndpoint)endpoint).dispatchForEvent(
                         socketWrapper.getSocket(), SocketStatus.OPEN_READ, true);
             }
         }
+    }
+
+
+    @Override
+    protected void resetTimeouts() {
+        // The NIO connector uses the timeout configured on the wrapper in the
+        // poller. Therefore, it needs to be reset once asycn processing has
+        // finished.
+        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(false);
+        if (!error && attach != null &&
+                asyncStateMachine.isAsyncDispatching()) {
+            long soTimeout = endpoint.getSoTimeout();
+
+            //reset the timeout
+            if (keepAliveTimeout > 0) {
+                attach.setTimeout(keepAliveTimeout);
+            } else {
+                attach.setTimeout(soTimeout);
+            }
+        }
+
     }
 
 
