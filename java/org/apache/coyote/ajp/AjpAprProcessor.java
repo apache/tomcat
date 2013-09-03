@@ -89,16 +89,20 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                 ((AprEndpoint)endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);
             }
-        } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
-            if (param == null) return;
-            long timeout = ((Long)param).longValue();
-            socketWrapper.setTimeout(timeout);
+
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
                 ((AprEndpoint)endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);
             }
         }
+    }
+
+
+    @Override
+    protected void resetTimeouts() {
+        // NO-OP. The AJP APR/native connector only uses the timeout value on
+        //        time SocketWrapper for async timeouts.
     }
 
 

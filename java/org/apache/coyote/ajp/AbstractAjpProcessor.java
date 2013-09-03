@@ -473,6 +473,10 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             asyncStateMachine.asyncStart((AsyncContextCallback) param);
         } else if (actionCode == ActionCode.ASYNC_DISPATCHED) {
             asyncStateMachine.asyncDispatched();
+        } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
+            if (param == null) return;
+            long timeout = ((Long)param).longValue();
+            socketWrapper.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_TIMEOUT) {
             AtomicBoolean result = (AtomicBoolean) param;
             result.set(asyncStateMachine.asyncTimeout());
@@ -556,6 +560,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             error = !getAdapter().asyncDispatch(request, response, status);
+            resetTimeouts();
         } catch (InterruptedIOException e) {
             error = true;
         } catch (Throwable t) {
@@ -806,16 +811,24 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     // Methods called by action()
     protected abstract void actionInternal(ActionCode actionCode, Object param);
 
+    // Methods called by asyncDispatch
+    /**
+     * Provides a mechanism for those connector implementations (currently only
+     * NIO) that need to reset timeouts from Async timeouts to standard HTTP
+     * timeouts once async processing completes.
+     */
+    protected abstract void resetTimeouts();
+
+    // Methods called by prepareResponse()
+    protected abstract void output(byte[] src, int offset, int length)
+            throws IOException;
+
     // Methods called by process()
     protected abstract void setupSocket(SocketWrapper<S> socketWrapper)
             throws IOException;
 
     protected abstract void setTimeout(SocketWrapper<S> socketWrapper,
             int timeout) throws IOException;
-
-    // Methods called by prepareResponse()
-    protected abstract void output(byte[] src, int offset, int length)
-            throws IOException;
 
     // Methods used by readMessage
     /**

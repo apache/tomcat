@@ -86,17 +86,20 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                 ((JIoEndpoint)endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);
             }
-        } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
-            if (param == null) return;
-            long timeout = ((Long)param).longValue();
-            // if we are not piggy backing on a worker thread, set the timeout
-            socketWrapper.setTimeout(timeout);
+
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
                 ((JIoEndpoint)endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);
             }
         }
+    }
+
+
+    @Override
+    protected void resetTimeouts() {
+        // NO-OP. The AJP BIO connector only uses the timeout value on the
+        //        SocketWrapper for async timeouts.
     }
 
 
