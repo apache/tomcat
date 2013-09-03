@@ -150,6 +150,10 @@
         automatically re-tries the action that failed. Make clear in the log
         message that the action is being re-tried. (markt)
       </fix>
+      <fix>
+        Correct several incorrect formats of <code>JdkLoggerFormatter</code>.
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
