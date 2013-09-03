@@ -70,6 +70,11 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
 
 
     @Override
+    protected void registerForEvent(boolean read, boolean write) {
+        // NO-OP for BIO
+    }
+
+    @Override
     protected void resetTimeouts() {
         // NO-OP. The AJP BIO connector only uses the timeout value on the
         //        SocketWrapper for async timeouts.
