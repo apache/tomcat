@@ -35,12 +35,12 @@
 <p>
 This page describes how the Tomcat server starts up.  There are several
 different ways to start tomcat, including:
+</p>
 <ul>
   <li>From the command line.</li>
   <li>From a Java program as an embedded server.</li>
   <li>Automatically as a Windows service.</li>
 </ul>
-</p>
 
 <subsection name="description">
 <p>

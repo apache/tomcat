@@ -156,7 +156,7 @@ deployed).</p>
 in Chapter 13 of the Servlet API Specification, version 2.3.  Over time, it
 is expected that development tools will be provided that create and edit the
 deployment descriptor for you.  In the meantime, to provide a starting point,
-a <a href="web.xml.txt" target="_new">basic web.xml file</a>
+a <a href="web.xml.txt" target="_blank">basic web.xml file</a>
 is provided.  This file includes comments that describe the purpose of each
 included element.</p>
 
@@ -186,13 +186,11 @@ information on the Context element.</p>
 
 <section name="Deployment With Tomcat">
 
-    <blockquote><em>
-    <p>The description below uses the variable name $CATALINA_BASE to refer the
+    <p><em>The description below uses the variable name $CATALINA_BASE to refer the
     base directory against which most relative paths are resolved. If you have
     not configured Tomcat for multiple instances by setting a CATALINA_BASE
     directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
-    the directory into which you have installed Tomcat.</p>
-    </em></blockquote>
+    the directory into which you have installed Tomcat.</em></p>
 
 <p>In order to be executed, a web application must be deployed on
 a servlet container.  This is true even during development.

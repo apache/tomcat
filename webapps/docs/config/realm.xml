@@ -55,13 +55,11 @@
   <a href="../realm-howto.html">Container-Managed Security Guide</a>.
   </p>
 
-    <blockquote><em>
-    <p>The description below uses the variable name $CATALINA_BASE to refer the
+    <p><em>The description below uses the variable name $CATALINA_BASE to refer the
     base directory against which most relative paths are resolved. If you have
     not configured Tomcat for multiple instances by setting a CATALINA_BASE
     directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
-    the directory into which you have installed Tomcat.</p>
-    </em></blockquote>
+    the directory into which you have installed Tomcat.</em></p>
 
 </section>
 

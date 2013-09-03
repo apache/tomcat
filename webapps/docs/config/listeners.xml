@@ -451,47 +451,35 @@
 
     <h3>Using file-based Authentication and Authorisation</h3>
 
-    <p>If this listener was configured in server.xml as:
-  <source>
-  &lt;Listener className="org.apache.catalina.mbeans.JmxRemoteLifecycleListener"
-          rmiRegistryPortPlatform="10001" rmiServerPortPlatform="10002" /&gt;
-  </source>
-    with the following system properties set (e.g. in setenv.sh):
-  <source>
-  -Dcom.sun.management.jmxremote.password.file=$CATALINA_BASE/conf/jmxremote.password
+    <p>If this listener was configured in server.xml as:</p>
+  <source><![CDATA[  <Listener className="org.apache.catalina.mbeans.JmxRemoteLifecycleListener"
+          rmiRegistryPortPlatform="10001" rmiServerPortPlatform="10002" />]]></source>
+    <p>with the following system properties set (e.g. in setenv.sh):</p>
+  <source>  -Dcom.sun.management.jmxremote.password.file=$CATALINA_BASE/conf/jmxremote.password
   -Dcom.sun.management.jmxremote.access.file=$CATALINA_BASE/conf/jmxremote.access
-  -Dcom.sun.management.jmxremote.ssl=false
-  </source>
-    $CATALINA_BASE/conf/jmxremote.password containing:
-  <source>
-  admin letmein
-  </source>
-    $CATALINA_BASE/conf/jmxremote.access containing:
-  <source>
-  admin readwrite
-  </source>
-    then opening ports 10001 (RMI Registry) and 10002 (JMX/RMI Server) in your
+  -Dcom.sun.management.jmxremote.ssl=false</source>
+    <p>$CATALINA_BASE/conf/jmxremote.password containing:</p>
+  <source>admin letmein</source>
+    <p>$CATALINA_BASE/conf/jmxremote.access containing:</p>
+  <source>admin readwrite</source>
+    <p>then opening ports 10001 (RMI Registry) and 10002 (JMX/RMI Server) in your
     firewall would enable jconsole to connect to a Tomcat instance running
-    behind a firewall using a connection string of the form:
-  <source>
-  service:jmx:rmi://&lt;hostname&gt;:10002/jndi/rmi://&lt;hostname&gt;:10001/jmxrmi
-  </source>
+    behind a firewall using a connection string of the form:</p>
+  <source>service:jmx:rmi://&lt;hostname&gt;:10002/jndi/rmi://&lt;hostname&gt;:10001/jmxrmi</source>
+    <p>
     with a user name of <code>admin</code> and a password of
     <code>letmein</code>.
     </p>
 
     <h3>Using JAAS</h3>
 
-    <p>If we use the following system properties instead:
-  <source>
-  -Dcom.sun.management.jmxremote.login.config=Tomcat
+    <p>If we use the following system properties instead:</p>
+  <source>  -Dcom.sun.management.jmxremote.login.config=Tomcat
   -Djava.security.auth.login.config=$CATALINA_BASE/conf/login.config
   -Dcom.sun.management.jmxremote.access.file=$CATALINA_BASE/conf/jmxremote.access
-  -Dcom.sun.management.jmxremote.ssl=false
-  </source>
-    $CATALINA_BASE/conf/login.config containing your choice of JAAS LoginModule implementation, for example:
-  <source>
-  Tomcat { /* should match to the com.sun.management.jmxremote.login.config property */
+  -Dcom.sun.management.jmxremote.ssl=false</source>
+    <p>$CATALINA_BASE/conf/login.config containing your choice of JAAS LoginModule implementation, for example:</p>
+  <source>  Tomcat { /* should match to the com.sun.management.jmxremote.login.config property */
 
     /* for illustration purposes only */
     com.sun.security.auth.module.LdapLoginModule REQUIRED
@@ -499,12 +487,10 @@
       userFilter="(&amp;(uid={USERNAME})(objectClass=inetOrgPerson))"
       authzIdentity="admin"
       debug=true;
-  };
-  </source>
-    $CATALINA_BASE/conf/jmxremote.access containing:
-  <source>
-  admin readwrite
-  </source>
+  };</source>
+    <p>$CATALINA_BASE/conf/jmxremote.access containing:</p>
+  <source>admin readwrite</source>
+    <p>
     then we would need to provide LDAP credentials instead.
     </p>
 

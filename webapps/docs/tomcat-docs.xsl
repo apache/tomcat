@@ -307,6 +307,8 @@
 
     <div class="subsection">
       <!-- Subsection heading -->
+      <!-- TODO: When a <subsection> is nested in another <subsection>,
+           the output should be <h5>, not <h4>. Same with <h6>. -->
       <h4 id="{$name}">
         <xsl:value-of select="@name"/>
       </h4>

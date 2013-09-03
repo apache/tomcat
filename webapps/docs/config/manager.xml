@@ -195,14 +195,14 @@
     element - this is required for use of <code>PersistentManager</code>.</p>
 
     <p>This implementation of Manager supports the following attributes in
-    addition to the <a href="#Common Attributes">Common Attributes</a>
+    addition to the <a href="#Common_Attributes">Common Attributes</a>
     described earlier.</p>
 
     <attributes>
 
       <attribute name="className" required="true">
         <p>It has the same meaning as described in the
-        <a href="#Common Attributes">Common Attributes</a> above.
+        <a href="#Common_Attributes">Common Attributes</a> above.
         You <strong>must</strong> specify
         <code>org.apache.catalina.session.PersistentManager</code> to use
         this manager implementation.</p>
@@ -432,8 +432,7 @@
   Detailed SQL commands vary depending on the database you are using, but
   a script like this will generally be required:</p>
 
-<source>
-create table tomcat_sessions (
+<source>create table tomcat_sessions (
   session_id     varchar(100) not null primary key,
   valid_session  char(1) not null,
   max_inactive   int not null,
@@ -441,8 +440,7 @@ create table tomcat_sessions (
   app_name       varchar(255),
   session_data   mediumblob,
   KEY kapp_name(app_name)
-);
-</source>
+);</source>
 
   <p>In order for the JDBC Based Store to successfully connect to your
   database, the JDBC driver you configure must be visible to Tomcat's
@@ -481,7 +479,7 @@ create table tomcat_sessions (
     a <a href="context.html">Context</a> configuration file for your web
     application and add the following element there:</p>
 
-    <source>&lt;Manager pathname="" /&gt;</source>
+    <source><![CDATA[<Manager pathname="" />]]></source>
   </subsection>
 
 </section>

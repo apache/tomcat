@@ -49,7 +49,7 @@
   the <code>jvmRoute</code> attribute of the
   <a href="engine.html">Engine</a>.</p>
 
-  <p>The native connectors supported with this Tomcat release are:
+  <p>The native connectors supported with this Tomcat release are:</p>
     <ul>
       <li>JK 1.2.x with any of the supported servers. See
       <a href="http://tomcat.apache.org/connectors-doc/">the JK docs</a>
@@ -59,7 +59,6 @@
       <a href="http://httpd.apache.org/docs/2.2/mod/mod_proxy_ajp.html">the
       httpd docs</a> for details.</li>
     </ul>
-  </p>
 
   <p><b>Other native connectors supporting AJP may work, but are no longer
   supported.</b></p>
@@ -178,7 +177,7 @@
         <code>org.apache.coyote.ajp.AjpAprProtocol</code>
         - the APR/native connector.<br/>
         Custom implementations may also be used.<br/>
-        Take a look at our <a href="#Connector Comparison">Connector
+        Take a look at our <a href="#Connector_Comparison">Connector
         Comparison</a> chart.
       </p>
     </attribute>
@@ -187,7 +186,7 @@
       <p>If this <strong>Connector</strong> is being used in a proxy
       configuration, configure this attribute to specify the server name
       to be returned for calls to <code>request.getServerName()</code>.
-      See <a href="#Proxy Support">Proxy Support</a> for more
+      See <a href="#Proxy_Support">Proxy Support</a> for more
       information.</p>
     </attribute>
 
@@ -195,7 +194,7 @@
       <p>If this <strong>Connector</strong> is being used in a proxy
       configuration, configure this attribute to specify the server port
       to be returned for calls to <code>request.getServerPort()</code>.
-      See <a href="#Proxy Support">Proxy Support</a> for more
+      See <a href="#Proxy_Support">Proxy Support</a> for more
       information.</p>
     </attribute>
 
@@ -667,20 +666,69 @@
   <subsection name="Connector Comparison">
 
     <p>Below is a small chart that shows how the connectors differentiate.</p>
-    <source>
-                       Java Blocking Connector   Java Nio Blocking Connector   APR/native Connector
-                                 BIO                         NIO                       APR
-    Classname                AjpProtocol               AjpNioProtocol           AjpAprProtocol
-    Tomcat Version           3.x onwards                 7.x onwards              5.5.x onwards
-    Support Polling              NO                          YES                       YES
-    Polling Size                 N/A                   maxConnections             maxConnections
-    Read Request Headers      Blocking                  Sim Blocking                   Blocking
-    Read Request Body         Blocking                  Sim Blocking                   Blocking
-    Write Response            Blocking                  Sim Blocking                   Blocking
-    Wait for next Request     Blocking                  Non Blocking               Non Blocking
-    Max Connections        maxConnections              maxConnections             maxConnections
 
-    </source>
+    <table class="defaultTable" style="text-align: center;">
+      <tr>
+        <th />
+        <th>Java Blocking Connector<br />BIO</th>
+        <th>Java Nio Blocking Connector<br />NIO</th>
+        <th>APR/native Connector<br />APR</th>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Classname</th>
+        <td><code class="noHighlight">AjpProtocol</code></td>
+        <td><code class="noHighlight">AjpNioProtocol</code></td>
+        <td><code class="noHighlight">AjpAprProtocol</code></td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Tomcat Version</th>
+        <td>3.x onwards</td>
+        <td>7.x onwards</td>
+        <td>5.5.x onwards</td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Support Polling</th>
+        <td>NO</td>
+        <td>YES</td>
+        <td>YES</td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Polling Size</th>
+        <td>N/A</td>
+        <td><code class="noHighlight">maxConnections</code></td>
+        <td><code class="noHighlight">maxConnections</code></td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Read Request Headers</th>
+        <td>Blocking</td>
+        <td>Sim Blocking</td>
+        <td>Blocking</td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Read Request Body</th>
+        <td>Blocking</td>
+        <td>Sim Blocking</td>
+        <td>Blocking</td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Write Response</th>
+        <td>Blocking</td>
+        <td>Sim Blocking</td>
+        <td>Blocking</td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Wait for next Request</th>
+        <td>Blocking</td>
+        <td>Non Blocking</td>
+        <td>Non Blocking</td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Max Connections</th>
+        <td><code class="noHighlight">maxConnections</code></td>
+        <td><code class="noHighlight">maxConnections</code></td>
+        <td><code class="noHighlight">maxConnections</code></td>
+      </tr>
+    </table>
 
   </subsection>
 
