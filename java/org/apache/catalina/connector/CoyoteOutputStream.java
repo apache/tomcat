@@ -35,8 +35,12 @@ public class CoyoteOutputStream extends ServletOutputStream {
             StringManager.getManager(Constants.Package);
 
 
+    // ----------------------------------------------------- Instance Variables
+
     protected OutputBuffer ob;
-    private volatile Boolean ready = null;
+
+
+    // ----------------------------------------------------------- Constructors
 
 
     protected CoyoteOutputStream(OutputBuffer ob) {
@@ -44,13 +48,20 @@ public class CoyoteOutputStream extends ServletOutputStream {
     }
 
 
+    // --------------------------------------------------------- Public Methods
+
+
     /**
      * Prevent cloning the facade.
      */
     @Override
-    protected Object clone() throws CloneNotSupportedException {
+    protected Object clone()
+        throws CloneNotSupportedException {
         throw new CloneNotSupportedException();
     }
+
+
+    // -------------------------------------------------------- Package Methods
 
 
     /**
@@ -59,6 +70,9 @@ public class CoyoteOutputStream extends ServletOutputStream {
     void clear() {
         ob = null;
     }
+
+
+    // --------------------------------------------------- OutputStream Methods
 
 
     @Override
@@ -110,11 +124,10 @@ public class CoyoteOutputStream extends ServletOutputStream {
      */
     private boolean checkNonBlockingWrite() {
         boolean nonBlocking = !ob.isBlocking();
-        if (nonBlocking && (ready == null || !ready.booleanValue())) {
+        if (nonBlocking && !ob.isReady()) {
             throw new IllegalStateException(
                     sm.getString("coyoteOutputStream.nbNotready"));
         }
-        ready = null;
         return nonBlocking;
     }
 
@@ -140,8 +153,7 @@ public class CoyoteOutputStream extends ServletOutputStream {
 
     @Override
     public boolean isReady() {
-        ready = Boolean.valueOf(ob.isReady());
-        return ready.booleanValue();
+        return ob.isReady();
     }
 
 
