@@ -481,6 +481,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             error = !adapter.asyncDispatch(request, response, status);
+            resetTimeouts();
         } catch (InterruptedIOException e) {
             error = true;
         } catch (Throwable t) {
@@ -598,10 +599,21 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     // Methods called by action()
     protected abstract void actionInternal(ActionCode actionCode, Object param);
 
+    
+    // Methods called by asyncDispatch
+    /**
+     * Provides a mechanism for those connector implementations (currently only
+     * NIO) that need to reset timeouts from Async timeouts to standard HTTP
+     * timeouts once async processing completes.
+     */
+    protected abstract void resetTimeouts();
+
+    
     // Methods called by prepareResponse()
     protected abstract void output(byte[] src, int offset, int length)
             throws IOException;
 
+    
     // Methods used by SocketInputBuffer
     protected abstract boolean receive() throws IOException;
 

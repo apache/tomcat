@@ -192,6 +192,10 @@
         bodies to be included for responses with status codes and/or request
         methods that are not permitted to have a response body. (markt)
       </fix>
+      <fix>
+        <bug>55500</bug>: Don&apos;t ignore the value of an asynchronous context
+        timeout when using the AJP NIO connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

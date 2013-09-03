@@ -255,13 +255,13 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
                 ((NioEndpoint)endpoint).processSocket(this.socket,
                         SocketStatus.OPEN_READ, false);
             }
+
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param == null) return;
             long timeout = ((Long)param).longValue();
             final KeyAttachment ka = (KeyAttachment)socket.getAttachment(false);
-            if (keepAliveTimeout > 0) {
-                ka.setTimeout(timeout);
-            }
+            ka.setTimeout(timeout);
+
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
                 ((NioEndpoint)endpoint).processSocket(this.socket,
@@ -271,7 +271,26 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
     }
 
 
-    // ------------------------------------------------------ Protected Methods
+    @Override
+    protected void resetTimeouts() {
+        // The NIO connector uses the timeout configured on the wrapper in the
+        // poller. Therefore, it needs to be reset once asycn processing has
+        // finished.
+        final KeyAttachment attach = (KeyAttachment)socket.getAttachment(false);
+        if (!error && attach != null &&
+                asyncStateMachine.isAsyncDispatching()) {
+            long soTimeout = endpoint.getSoTimeout();
+
+            //reset the timeout
+            if (keepAliveTimeout > 0) {
+                attach.setTimeout(keepAliveTimeout);
+            } else {
+                attach.setTimeout(soTimeout);
+            }
+        }
+
+    }
+
 
     @Override
     protected void output(byte[] src, int offset, int length)
