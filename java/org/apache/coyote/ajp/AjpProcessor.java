@@ -21,11 +21,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.JIoEndpoint;
-import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
@@ -67,29 +65,6 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
         if (socketClosing) {
             input = null;
             output = null;
-        }
-    }
-
-
-    /**
-     * Send an action to the connector.
-     *
-     * @param actionCode Type of the action
-     * @param param Action parameter
-     */
-    @Override
-    protected void actionInternal(ActionCode actionCode, Object param) {
-
-        if (actionCode == ActionCode.ASYNC_COMPLETE) {
-            socketWrapper.clearDispatches();
-            if (asyncStateMachine.asyncComplete()) {
-                endpoint.processSocketAsync(socketWrapper, SocketStatus.OPEN_READ);
-            }
-
-        } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
-            if (asyncStateMachine.asyncDispatch()) {
-                endpoint.processSocketAsync(socketWrapper, SocketStatus.OPEN_READ);
-            }
         }
     }
 

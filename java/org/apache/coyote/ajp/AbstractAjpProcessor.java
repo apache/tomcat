@@ -471,29 +471,51 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         } else if (actionCode == ActionCode.ASYNC_START) {
             asyncStateMachine.asyncStart((AsyncContextCallback) param);
+
+        } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
+            socketWrapper.clearDispatches();
+            if (asyncStateMachine.asyncComplete()) {
+                endpoint.processSocketAsync(socketWrapper, SocketStatus.OPEN_READ);
+            }
+
+        } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
+            if (asyncStateMachine.asyncDispatch()) {
+                endpoint.processSocketAsync(socketWrapper, SocketStatus.OPEN_READ);
+            }
+
         } else if (actionCode == ActionCode.ASYNC_DISPATCHED) {
             asyncStateMachine.asyncDispatched();
+
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param == null) return;
             long timeout = ((Long)param).longValue();
             socketWrapper.setTimeout(timeout);
+
         } else if (actionCode == ActionCode.ASYNC_TIMEOUT) {
             AtomicBoolean result = (AtomicBoolean) param;
             result.set(asyncStateMachine.asyncTimeout());
+
         } else if (actionCode == ActionCode.ASYNC_RUN) {
             asyncStateMachine.asyncRun((Runnable) param);
+
         } else if (actionCode == ActionCode.ASYNC_ERROR) {
             asyncStateMachine.asyncError();
+
         } else if (actionCode == ActionCode.ASYNC_IS_STARTED) {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarted());
+
         } else if (actionCode == ActionCode.ASYNC_IS_DISPATCHING) {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncDispatching());
+
         } else if (actionCode == ActionCode.ASYNC_IS_ASYNC) {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsync());
+
         } else if (actionCode == ActionCode.ASYNC_IS_TIMINGOUT) {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
+
         } else if (actionCode == ActionCode.ASYNC_IS_ERROR) {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
+
         } else if (actionCode == ActionCode.UPGRADE) {
             // HTTP connections only. Unsupported for AJP.
             throw new UnsupportedOperationException(
@@ -546,9 +568,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         } else if (actionCode == ActionCode.DISPATCH_WRITE) {
             socketWrapper.addDispatch(DispatchType.NON_BLOCKING_WRITE);
-
-        }  else {
-            actionInternal(actionCode, param);
         }
     }
 
@@ -807,9 +826,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     // ------------------------------------------------------ Protected Methods
-
-    // Methods called by action()
-    protected abstract void actionInternal(ActionCode actionCode, Object param);
 
     // Methods called by asyncDispatch
     /**

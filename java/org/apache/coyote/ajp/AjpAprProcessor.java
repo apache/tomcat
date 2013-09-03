@@ -21,12 +21,10 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.util.net.AprEndpoint;
-import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
@@ -72,29 +70,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
      * Direct buffer used for output.
      */
     protected final ByteBuffer outputBuffer;
-
-
-    /**
-     * Send an action to the connector.
-     *
-     * @param actionCode Type of the action
-     * @param param Action parameter
-     */
-    @Override
-    protected void actionInternal(ActionCode actionCode, Object param) {
-
-        if (actionCode == ActionCode.ASYNC_COMPLETE) {
-            socketWrapper.clearDispatches();
-            if (asyncStateMachine.asyncComplete()) {
-                endpoint.processSocketAsync(socketWrapper, SocketStatus.OPEN_READ);
-            }
-
-        } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
-            if (asyncStateMachine.asyncDispatch()) {
-                endpoint.processSocketAsync(socketWrapper, SocketStatus.OPEN_READ);
-            }
-        }
-    }
 
 
     @Override
