@@ -49,7 +49,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * TODO: if spdy->spdy proxy, info about original spdy stream for pushes.
  *
  */
-public class SpdyProxyProtocol extends AbstractProtocol {
+public class SpdyProxyProtocol extends AbstractProtocol<Socket> {
     private static final Log log = LogFactory.getLog(SpdyProxyProtocol.class);
 
     private final JIoEndpoint.Handler cHandler = new TomcatJioHandler();
@@ -93,7 +93,7 @@ public class SpdyProxyProtocol extends AbstractProtocol {
         spdyContext.setHandler(new SpdyHandler() {
             @Override
             public void onStream(SpdyConnection con, SpdyStream ch) throws IOException {
-                SpdyProcessor sp = new SpdyProcessor(con, endpoint);
+                SpdyProcessor<Socket> sp = new SpdyProcessor<>(con, endpoint);
                 sp.setAdapter(getAdapter());
                 sp.onSynStream(ch);
             }

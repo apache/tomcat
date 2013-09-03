@@ -65,7 +65,7 @@ public class SpdyAprNpnHandler implements NpnHandler<Long> {
     private SpdyContext spdyContext;
 
     @Override
-    public void init(final AbstractEndpoint ep, long sslContext,
+    public void init(final AbstractEndpoint<Long> ep, long sslContext,
             final Adapter adapter) {
         spdyContext = new SpdyContext();
         if (sslContext == 0) {
@@ -82,7 +82,7 @@ public class SpdyAprNpnHandler implements NpnHandler<Long> {
             @Override
             public void onStream(SpdyConnection con, SpdyStream ch)
                     throws IOException {
-                SpdyProcessor sp = new SpdyProcessor(con, ep);
+                SpdyProcessor<Long> sp = new SpdyProcessor<>(con, ep);
                 sp.setAdapter(adapter);
                 sp.onSynStream(ch);
             }

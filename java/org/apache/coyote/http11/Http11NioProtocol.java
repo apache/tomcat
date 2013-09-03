@@ -157,7 +157,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         }
 
         @Override
-        protected AbstractProtocol getProtocol() {
+        protected AbstractProtocol<NioChannel> getProtocol() {
             return proto;
         }
 

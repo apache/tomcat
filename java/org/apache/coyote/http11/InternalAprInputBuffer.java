@@ -546,7 +546,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
     @Override
     protected void init(SocketWrapper<Long> socketWrapper,
-            AbstractEndpoint endpoint) throws IOException {
+            AbstractEndpoint<Long> endpoint) throws IOException {
 
         socket = socketWrapper.getSocket().longValue();
         wrapper = socketWrapper;

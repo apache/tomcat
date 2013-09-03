@@ -223,7 +223,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         }
 
         @Override
-        protected AbstractProtocol getProtocol() {
+        protected AbstractProtocol<Long> getProtocol() {
             return proto;
         }
 

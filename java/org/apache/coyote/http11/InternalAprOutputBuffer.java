@@ -83,14 +83,14 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     private volatile boolean flipped = false;
 
 
-    private AbstractEndpoint endpoint;
+    private AbstractEndpoint<Long> endpoint;
 
 
     // --------------------------------------------------------- Public Methods
 
     @Override
     public void init(SocketWrapper<Long> socketWrapper,
-            AbstractEndpoint endpoint) throws IOException {
+            AbstractEndpoint<Long> endpoint) throws IOException {
 
         wrapper = socketWrapper;
         socket = socketWrapper.getSocket().longValue();

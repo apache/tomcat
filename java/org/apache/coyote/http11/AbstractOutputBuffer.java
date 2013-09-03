@@ -386,7 +386,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
 
     public abstract void init(SocketWrapper<S> socketWrapper,
-            AbstractEndpoint endpoint) throws IOException;
+            AbstractEndpoint<S> endpoint) throws IOException;
 
     public abstract void sendAck() throws IOException;
 

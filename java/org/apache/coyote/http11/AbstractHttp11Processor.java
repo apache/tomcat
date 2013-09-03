@@ -239,7 +239,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     protected HttpUpgradeHandler httpUpgradeHandler = null;
 
 
-    public AbstractHttp11Processor(AbstractEndpoint endpoint) {
+    public AbstractHttp11Processor(AbstractEndpoint<S> endpoint) {
         super(endpoint);
         userDataHelper = new UserDataHelper(getLog());
     }
