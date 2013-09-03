@@ -73,6 +73,12 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
 
     @Override
+    protected void registerForEvent(boolean read, boolean write) {
+        ((AprEndpoint) endpoint).getPoller().add(
+                socketWrapper.getSocket().longValue(), -1, read, write);
+    }
+
+    @Override
     protected void resetTimeouts() {
         // NO-OP. The AJP APR/native connector only uses the timeout value on
         //        time SocketWrapper for async timeouts.

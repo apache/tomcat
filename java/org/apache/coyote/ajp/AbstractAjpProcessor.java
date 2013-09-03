@@ -212,6 +212,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     /**
+     * Indicates that a 'get body chunk' message has been sent but the body
+     * chunk has not yet been received.
+     */
+    private boolean waitingForBodyMessage = false;
+
+
+    /**
      * Replay read.
      */
     protected boolean replay = false;
@@ -542,22 +549,33 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     sm.getString("ajpprocessor.comet.notsupported"));
 
         } else if (actionCode == ActionCode.AVAILABLE) {
-            // Web Server only sends data when asked so unless end of stream has
-            // been reached, there should be data available.
-            // TODO Figure out if a 'true' non-blocking approach is possible
-            //      for AJP and what changes would be required to support it.
             if (!endOfStream) {
-                request.setAvailable(1);
+                if (empty) {
+                    try {
+                        refillReadBuffer(false);
+                    } catch (IOException e) {
+                        error = true;
+                        return;
+                    }
+                }
+                if (empty) {
+                    request.setAvailable(0);
+                } else {
+                    request.setAvailable(1);
+                }
+            }
+
+        } else if (actionCode == ActionCode.NB_READ_INTEREST) {
+            if (!endOfStream) {
+                registerForEvent(true, false);
             }
 
         } else if (actionCode == ActionCode.NB_WRITE_INTEREST) {
+            // TODO
             // Until 'true' non-blocking IO is implemented, assume it is always
             // possible write data.
             AtomicBoolean isReady = (AtomicBoolean)param;
             isReady.set(true);
-
-        } else if (actionCode == ActionCode.NB_READ_INTEREST) {
-            // NO-OP. Not required until 'true' non-blocking IO is implemented.
 
         } else if (actionCode == ActionCode.REQUEST_BODY_FULLY_READ) {
             AtomicBoolean result = (AtomicBoolean) param;
@@ -814,6 +832,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         // Recycle Request object
         first = true;
         endOfStream = false;
+        waitingForBodyMessage = false;
         empty = true;
         replay = false;
         finished = false;
@@ -866,16 +885,26 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             throws IOException;
 
     // Methods used by SocketInputBuffer
-    /** Receive a chunk of data. Called to implement the
-     *  'special' packet in ajp13 and to receive the data
-     *  after we send a GET_BODY packet
+    /**
+     * Read an AJP body message. Used to read both the 'special' packet in ajp13
+     * and to receive the data after we send a GET_BODY packet.
+     *
+     * @param block If there is no data available to read when this method is
+     *              called, should this call block until data becomes available?
+     *
+     * @return <code>true</code> if at least one body byte was read, otherwise
+     *         <code>false</code>
      */
-    protected boolean receive() throws IOException {
+    protected boolean receive(boolean block) throws IOException {
 
-        first = false;
         bodyMessage.reset();
 
-        readMessage(bodyMessage, true);
+        if (!readMessage(bodyMessage, block)) {
+            return false;
+        }
+
+        waitingForBodyMessage = false;
+        first = false;
 
         // No data received.
         if (bodyMessage.getLen() == 0) {
@@ -960,7 +989,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      *
      * @return true if there is more data, false if not.
      */
-    protected boolean refillReadBuffer() throws IOException {
+    protected boolean refillReadBuffer(boolean block) throws IOException {
         // If the server returns an empty packet, assume that that end of
         // the stream has been reached (yuck -- fix protocol??).
         // FORM support
@@ -972,10 +1001,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         }
 
         // Request more data immediately
-        output(getBodyMessageArray, 0, getBodyMessageArray.length);
+        if (!first && !waitingForBodyMessage) {
+            output(getBodyMessageArray, 0, getBodyMessageArray.length);
+            waitingForBodyMessage = true;
+        }
 
-        boolean moreData = receive();
-        if( !moreData ) {
+        boolean moreData = receive(block);
+        if (!first && !waitingForBodyMessage && !moreData) {
             endOfStream = true;
         }
         return moreData;
@@ -1402,8 +1434,8 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         finished = true;
 
         // Swallow the unread body packet if present
-        if (first && request.getContentLengthLong() > 0) {
-            receive();
+        if (first && request.getContentLengthLong() > 0 || waitingForBodyMessage) {
+            receive(true);
         }
 
         // Add the end message
@@ -1424,24 +1456,22 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      */
     protected class SocketInputBuffer implements InputBuffer {
 
-
         /**
          * Read bytes into the specified chunk.
          */
         @Override
-        public int doRead(ByteChunk chunk, Request req)
-        throws IOException {
+        public int doRead(ByteChunk chunk, Request req) throws IOException {
 
             if (endOfStream) {
                 return -1;
             }
             if (first && req.getContentLengthLong() > 0) {
                 // Handle special first-body-chunk
-                if (!receive()) {
+                if (!receive(true)) {
                     return 0;
                 }
             } else if (empty) {
-                if (!refillReadBuffer()) {
+                if (!refillReadBuffer(true)) {
                     return -1;
                 }
             }
@@ -1449,9 +1479,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             chunk.setBytes(bc.getBuffer(), bc.getStart(), bc.getLength());
             empty = true;
             return chunk.getLength();
-
         }
-
     }
 
 

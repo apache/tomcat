@@ -19,6 +19,7 @@ package org.apache.coyote.ajp;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 
 import org.apache.juli.logging.Log;
@@ -54,6 +55,23 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
      * Selector pool for the associated endpoint.
      */
     protected final NioSelectorPool pool;
+
+
+    @Override
+    protected void registerForEvent(boolean read, boolean write) {
+        final NioEndpoint.KeyAttachment attach =
+                (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(
+                        false);
+        if (attach == null) {
+            return;
+        }
+        if (read) {
+            attach.interestOps(attach.interestOps() | SelectionKey.OP_READ);
+        }
+        if (write) {
+            attach.interestOps(attach.interestOps() | SelectionKey.OP_WRITE);
+        }
+    }
 
 
     @Override
