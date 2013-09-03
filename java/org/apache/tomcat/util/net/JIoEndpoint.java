@@ -51,7 +51,7 @@ import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
  * @author Yoav Shapira
  * @author Remy Maucherat
  */
-public class JIoEndpoint extends AbstractEndpoint {
+public class JIoEndpoint extends AbstractEndpoint<Socket> {
 
 
     // -------------------------------------------------------------- Constants
@@ -557,12 +557,9 @@ public class JIoEndpoint extends AbstractEndpoint {
      * @param status    Only OPEN and TIMEOUT are used. The others are used for
      *                  Comet requests that are not supported by the BIO (JIO)
      *                  Connector.
-     * @return          <code>true</code> if the socket is passed to the
-     *                  executor, <code>false</code> if something went wrong.
-     *                  Returning <code>false</code> is an indication to close
-     *                  the socket immediately.
      */
-    public boolean processSocketAsync(SocketWrapper<Socket> socket,
+    @Override
+    public void processSocketAsync(SocketWrapper<Socket> socket,
             SocketStatus status) {
         try {
             synchronized (socket) {
@@ -581,7 +578,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                         }
                         // During shutdown, executor may be null - avoid NPE
                         if (!running) {
-                            return false;
+                            return;
                         }
                         getExecutor().execute(proc);
                         //TODO gotta catch RejectedExecutionException and properly handle it
@@ -600,9 +597,7 @@ public class JIoEndpoint extends AbstractEndpoint {
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
             log.error(sm.getString("endpoint.process.fail"), t);
-            return false;
         }
-        return true;
     }
 
     protected ConcurrentLinkedQueue<SocketWrapper<Socket>> waitingRequests =

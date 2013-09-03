@@ -63,7 +63,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
  * @author Mladen Turk
  * @author Remy Maucherat
  */
-public class AprEndpoint extends AbstractEndpoint {
+public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
     // -------------------------------------------------------------- Constants
@@ -850,7 +850,8 @@ public class AprEndpoint extends AbstractEndpoint {
     }
 
 
-    public boolean processSocketAsync(SocketWrapper<Long> socket,
+    @Override
+    public void processSocketAsync(SocketWrapper<Long> socket,
             SocketStatus status) {
         try {
             synchronized (socket) {
@@ -871,7 +872,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         if (executor == null) {
                             log.warn(sm.getString("endpoint.warn.noExector",
                                     socket, status));
-                            return false;
+                            return;
                         } else {
                             executor.execute(proc);
                         }
@@ -887,15 +888,12 @@ public class AprEndpoint extends AbstractEndpoint {
             }
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for: "+socket, x);
-            return false;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
             log.error(sm.getString("endpoint.process.fail"), t);
-            return false;
         }
-        return true;
     }
 
     private void destroySocket(long socket) {

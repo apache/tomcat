@@ -71,7 +71,7 @@ import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
  * @author Remy Maucherat
  * @author Filip Hanik
  */
-public class NioEndpoint extends AbstractEndpoint {
+public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
 
     // -------------------------------------------------------------- Constants
@@ -598,6 +598,13 @@ public class NioEndpoint extends AbstractEndpoint {
      */
     protected boolean isWorkerAvailable() {
         return true;
+    }
+
+
+    @Override
+    protected void processSocketAsync(SocketWrapper<NioChannel> socketWrapper,
+            SocketStatus socketStatus) {
+        dispatchForEvent(socketWrapper.getSocket(), socketStatus, true);
     }
 
     public boolean dispatchForEvent(NioChannel socket, SocketStatus status, boolean dispatch) {

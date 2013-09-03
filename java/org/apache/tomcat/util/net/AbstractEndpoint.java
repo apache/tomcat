@@ -43,7 +43,7 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
  * @author Mladen Turk
  * @author Remy Maucherat
  */
-public abstract class AbstractEndpoint {
+public abstract class AbstractEndpoint<S> {
 
     // -------------------------------------------------------------- Constants
     protected static final StringManager sm = StringManager.getManager("org.apache.tomcat.util.net.res");
@@ -587,6 +587,12 @@ public abstract class AbstractEndpoint {
             }
         }
     }
+
+
+    // ---------------------------------------------- Request processing methods
+
+    protected abstract void processSocketAsync(SocketWrapper<S> socketWrapper,
+            SocketStatus socketStatus);
 
 
     // ------------------------------------------------------- Lifecycle methods
