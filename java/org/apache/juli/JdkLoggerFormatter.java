@@ -41,6 +41,9 @@ import java.util.logging.LogRecord;
  * @author Costin Manolache
  */
 public class JdkLoggerFormatter extends Formatter {
+
+    private static final String LINE_SEP = System.getProperty("line.separator");
+
     // values from JDK Level
     public static final int LOG_LEVEL_TRACE  = 400;
     public static final int LOG_LEVEL_DEBUG  = 500;
@@ -65,7 +68,6 @@ public class JdkLoggerFormatter extends Formatter {
         StringBuilder buf = new StringBuilder();
 
         buf.append(time);
-        buf.append(" ");
 
         // pad to 8 to make it more readable
         for( int i=0; i<8-buf.length(); i++ ) { buf.append(" "); }
@@ -84,6 +86,7 @@ public class JdkLoggerFormatter extends Formatter {
 
         // Append the name of the log instance if so configured
         buf.append(name);
+        buf.append(" ");
 
         // pad to 20 chars
         for( int i=0; i<8-buf.length(); i++ ) { buf.append(" "); }
@@ -93,7 +96,7 @@ public class JdkLoggerFormatter extends Formatter {
 
         // Append stack trace if not null
         if(t != null) {
-            buf.append(" \n");
+            buf.append(LINE_SEP);
 
             java.io.StringWriter sw= new java.io.StringWriter(1024);
             java.io.PrintWriter pw= new java.io.PrintWriter(sw);
@@ -102,7 +105,7 @@ public class JdkLoggerFormatter extends Formatter {
             buf.append(sw.toString());
         }
 
-        buf.append("\n");
+        buf.append(LINE_SEP);
         // Print to the appropriate destination
         return buf.toString();
     }
