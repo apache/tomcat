@@ -174,7 +174,7 @@
         <code>org.apache.coyote.http11.Http11AprProtocol</code> -
               the APR/native connector.<br/>
         Custom implementations may also be used.<br/>
-        Take a look at our <a href="#Connector Comparison">Connector
+        Take a look at our <a href="#Connector_Comparison">Connector
         Comparison</a> chart. The configuration for both Java connectors is
         identical, for http and https.<br/>
         For more information on the APR connector and APR specific SSL settings
@@ -186,7 +186,7 @@
       <p>If this <strong>Connector</strong> is being used in a proxy
       configuration, configure this attribute to specify the server name
       to be returned for calls to <code>request.getServerName()</code>.
-      See <a href="#Proxy Support">Proxy Support</a> for more
+      See <a href="#Proxy_Support">Proxy Support</a> for more
       information.</p>
     </attribute>
 
@@ -194,7 +194,7 @@
       <p>If this <strong>Connector</strong> is being used in a proxy
       configuration, configure this attribute to specify the server port
       to be returned for calls to <code>request.getServerPort()</code>.
-      See <a href="#Proxy Support">Proxy Support</a> for more
+      See <a href="#Proxy_Support">Proxy Support</a> for more
       information.</p>
     </attribute>
 
@@ -489,7 +489,7 @@
       <code>scheme</code> and the <code>secure</code> attributes as well
       to pass the correct <code>request.getScheme()</code> and
       <code>request.isSecure()</code> values to the servlets
-      See <a href="#SSL Support">SSL Support</a> for more information.
+      See <a href="#SSL_Support">SSL Support</a> for more information.
       </p>
     </attribute>
 
@@ -565,19 +565,19 @@
       </attribute>
       <attribute name="socket.performanceConnectionTime" required="false">
         <p>(int)The first value for the performance settings. See
-        <a href="http://docs.oracle.com/javase/6/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
+        <a href="http://docs.oracle.com/javase/7/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute>
       <attribute name="socket.performanceLatency" required="false">
         <p>(int)The second value for the performance settings. See
-        <a href="http://docs.oracle.com/javase/6/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
+        <a href="http://docs.oracle.com/javase/7/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute>
       <attribute name="socket.performanceBandwidth" required="false">
         <p>(int)The third value for the performance settings. See
-        <a href="http://docs.oracle.com/javase/6/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
+        <a href="http://docs.oracle.com/javase/7/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute>
@@ -1029,8 +1029,6 @@
       the JVM default is used. The permitted values may be obtained from the
       JVM documentation for the allowed values for
       <code>SSLSocket.setEnabledProtocols()</code> e.g.
-      <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html#jssenames">
-      Oracle Java 6</a> and
       <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#jssenames">
       Oracle Java 7</a>. Note: There is overlap between this attribute and
       <code>sslProtocol</code>.</p>
@@ -1049,8 +1047,6 @@
       default is <code>TLS</code>. The permitted values may be obtained from the
       JVM documentation for the allowed values for algorithm when creating an
       <code>SSLContext</code> instance e.g.
-      <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html#SSLContext">
-      Oracle Java 6</a> and
       <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#SSLContext">
       Oracle Java 7</a>. Note: There is overlap between this attribute and
       <code>sslEnabledProtocols</code>.</p>
@@ -1249,23 +1245,81 @@
   <subsection name="Connector Comparison">
 
     <p>Below is a small chart that shows how the connectors differentiate.</p>
-    <source>
-                       Java Blocking Connector   Java Non Blocking Connector   APR/native Connector
-                                 BIO                         NIO                       APR
-    Classname              Http11Protocol             Http11NioProtocol         Http11AprProtocol
-    Tomcat Version           3.x onwards                 6.x onwards              5.5.x onwards
-    Support Polling              NO                          YES                       YES
-    Polling Size                 N/A                   maxConnections             maxConnections
-    Read HTTP Request         Blocking                  Non Blocking                 Blocking
-    Read HTTP Body            Blocking                  Sim Blocking                 Blocking
-    Write HTTP Response       Blocking                  Sim Blocking                 Blocking
-    Wait for next Request     Blocking                  Non Blocking               Non Blocking
-    SSL Support               Java SSL                    Java SSL                   OpenSSL
-    SSL Handshake             Blocking                  Non blocking                 Blocking
-    Max Connections        maxConnections              maxConnections             maxConnections
 
-
-    </source>
+    <table class="defaultTable" style="text-align: center;">
+      <tr>
+        <th />
+        <th>Java Blocking Connector<br />BIO</th>
+        <th>Java Nio Blocking Connector<br />NIO</th>
+        <th>APR/native Connector<br />APR</th>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Classname</th>
+        <td><code class="noHighlight">Http11Protocol</code></td>
+        <td><code class="noHighlight">Http11NioProtocol</code></td>
+        <td><code class="noHighlight">Http11AprProtocol</code></td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Tomcat Version</th>
+        <td>3.x onwards</td>
+        <td>6.x onwards</td>
+        <td>5.5.x onwards</td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Support Polling</th>
+        <td>NO</td>
+        <td>YES</td>
+        <td>YES</td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Polling Size</th>
+        <td>N/A</td>
+        <td><code class="noHighlight">maxConnections</code></td>
+        <td><code class="noHighlight">maxConnections</code></td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Read HTTP Request</th>
+        <td>Blocking</td>
+        <td>Non Blocking</td>
+        <td>Blocking</td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Read HTTP Body</th>
+        <td>Blocking</td>
+        <td>Sim Blocking</td>
+        <td>Blocking</td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Write HTTP Response</th>
+        <td>Blocking</td>
+        <td>Sim Blocking</td>
+        <td>Blocking</td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Wait for next Request</th>
+        <td>Blocking</td>
+        <td>Non Blocking</td>
+        <td>Non Blocking</td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">SSL Support</th>
+        <td>Java SSL</td>
+        <td>Java SSL</td>
+        <td>OpenSSL</td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">SSL Handshake</th>
+        <td>Blocking</td>
+        <td>Non blocking</td>
+        <td>Blocking</td>
+      </tr>
+      <tr>
+        <th style="text-align: left;">Max Connections</th>
+        <td><code class="noHighlight">maxConnections</code></td>
+        <td><code class="noHighlight">maxConnections</code></td>
+        <td><code class="noHighlight">maxConnections</code></td>
+      </tr>
+    </table>
 
   </subsection>
 </section>

@@ -38,6 +38,11 @@ img {
 
 table {
   border-collapse: collapse;
+  text-align: left;
+}
+table *:not(table) {
+  /* Prevent border-collapsing for table child elements like <div> */
+  border-collapse: separate;
 }
 
 main {
@@ -213,34 +218,25 @@ div.codeBox pre.wrap {
 }
 
 
-table.defaultTable tr {
+table.defaultTable tr, table.detail-table tr {
     border: 1px solid #CCC;
 }
 
-table.defaultTable tr:nth-child(even) {
+table.defaultTable tr:nth-child(even), table.detail-table tr:nth-child(even) {
     background-color: #FAFBFF;
 }
 
-table.defaultTable tr:nth-child(odd) {
+table.defaultTable tr:nth-child(odd), table.detail-table tr:nth-child(odd) {
     background-color: #EEEFFF;
 }
 
-table.defaultTable th {
+table.defaultTable th, table.detail-table th {
   background-color: #88b;
   color: #fff;
 }
 
-table.detail-table th {
-  background-color: #039acc;
-  color: #fff;
-}
-table.detail-table td {
-  background-color: #DAF2FA;
-}
-
 table.defaultTable th, table.defaultTable td, table.detail-table th, table.detail-table td {
   padding: 5px 8px;
-  text-align: left;
 }
 
 

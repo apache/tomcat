@@ -278,7 +278,7 @@
 
     <property name="org.apache.catalina. STRICT_SERVLET_COMPLIANCE">
       <p>The default value of this system property is <code>false</code>.</p>
-      <p>If this is <code>true</code> the default values will be changed for:
+      <p>If this is <code>true</code> the default values will be changed for:</p>
       <ul>
       <li><code>org.apache.catalina.core.<br/>ApplicationContext.GET_RESOURCE_REQUIRE_SLASH</code></li>
       <li><code>org.apache.catalina.core.<br/>ApplicationDispatcher.WRAP_SAME_OBJECT</code></li>
@@ -298,7 +298,7 @@
       <li>The <code>xmlValidation</code> attribute of any
           <a href="context.html">Context</a> element.</li>
       </ul>
-      </p>
+
       <p>Note that changing a number of the above defaults is likely to break
       the majority of systems as some browsers are unable to correctly handle
       the cookie headers that result from a strict adherence to the
@@ -342,12 +342,12 @@
 
     <property name="org.apache.tomcat.websocket. STRICT_SPEC_COMPLIANCE">
       <p>The default value of this system property is <code>false</code>.</p>
-      <p>If this is <code>true</code> the default values will be changed for:
+      <p>If this is <code>true</code> the default values will be changed for:</p>
       <ul>
         <li><code>org.apache.tomcat.websocket.server#isEnforceNoAddAfterHandshake</code>
         (default changes from <code>false</code> to <code>true</code>)</li>
       </ul>
-      </p>
+
     </property>
 
     <property
@@ -510,7 +510,7 @@
          <code>org.apache.juli.logging.UserDataHelper.SUPPRESSION_TIME</code>.
          </p>
       <p>The default value is <code>INFO_THEN_DEBUG</code>.</p>
-      <p>The errors currently logged using this system are:
+      <p>The errors currently logged using this system are:</p>
          <ul>
          <li>invalid cookies;</li>
          <li>invalid parameters;</li>
@@ -518,7 +518,7 @@
            <code>maxHeaderCount</code> or <code>maxParameterCount</code> limits
            of a <a href="http.html">connector</a>).</li>
          </ul>
-         Other errors triggered by invalid input data may be added to this
+         <p>Other errors triggered by invalid input data may be added to this
          system in later versions.</p>
     </property>
 

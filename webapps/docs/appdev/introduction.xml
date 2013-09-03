@@ -47,7 +47,7 @@ are included in the following subsections.</p>
 
 <p>The discussion in this manual is aimed at developers who will be using
 a text editor along with command line tools to develop and debug their
-applications.  As such, the recommendations are fairly generic -- but you
+applications.  As such, the recommendations are fairly generic &#x2013; but you
 should easily be able to apply them in either a Windows-based or Unix-based
 development environment.  If you are utilizing an Integrated Development
 Environment (IDE) tool, you will need to adapt the advice given here to
@@ -62,7 +62,7 @@ the details of your particular environment.</p>
 information, documentation, and software that is useful in developing
 web applications with Tomcat.</p>
 <ul>
-<li><a href="http://jcp.org/aboutJava/communityprocess/mrel/jsr245/index2.html">http://jcp.org/aboutJava/communityprocess/mrel/jsr245/index2.html</a> -
+<li><p><a href="http://jcp.org/aboutJava/communityprocess/mrel/jsr245/index2.html">http://jcp.org/aboutJava/communityprocess/mrel/jsr245/index2.html</a> -
     <i>JavaServer Pages (JSP) Specification, Version 2.3</i>.  Describes
     the programming environment provided by standard implementations
     of the JavaServer Pages (JSP) technology.  In conjunction with
@@ -71,8 +71,8 @@ web applications with Tomcat.</p>
     information on scripting (Chapter 9), tag extensions (Chapter 7),
     and packaging JSP pages (Appendix A) is useful.  The Javadoc
     API Documentation is included in the specification, and with the
-    Tomcat download.<br/><br/></li>
-<li><a href="http://jcp.org/aboutJava/communityprocess/final/jsr340/index.html">http://jcp.org/aboutJava/communityprocess/final/jsr340/index.html</a> -
+    Tomcat download.</p></li>
+<li><p><a href="http://jcp.org/aboutJava/communityprocess/final/jsr340/index.html">http://jcp.org/aboutJava/communityprocess/final/jsr340/index.html</a> -
     <i>Servlet API Specification, Version 3.1</i>.  Describes the
     programming environment that must be provided by all servlet
     containers conforming to this specification.  In particular, you
@@ -82,7 +82,7 @@ web applications with Tomcat.</p>
     security (Chapter 13), and the syntax of the <code>web.xml</code>
     Web Application Deployment Descriptor (Chapter 14).  The Javadoc
     API Documentation is included in the specification, and with the
-    Tomcat download.<br/><br/></li>
+    Tomcat download.</p></li>
 </ul>
 
 </section>

@@ -41,7 +41,6 @@
 </section>
 
 <section name="Available Interceptors">
- <p>
    <ul>
     <li><code>org.apache.catalina.tribes.group.interceptors.TcpFailureDetector</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor</code></li>
@@ -57,7 +56,6 @@
     <li><code>org.apache.catalina.tribes.group.interceptors.GzipInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.TcpPingInterceptor</code></li>
    </ul>
- </p>
 </section>
 
 <section name="Static Membership">
@@ -67,19 +65,15 @@
    underneath the <code>org.apache.catalina.tribes.group.interceptors.TcpFailureDetector</code> interceptor.
    Inside the <code>StaticMembershipInterceptor</code> you can add the static members you wish to have.
    The <code>TcpFailureDetector</code> will do a health check on the static members,and also monitor them for crashes
-   so they will have the same level of notification mechanism as the members that are automatically discovered.
-   <source>
-     &lt;Interceptor className=&quot;org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor&quot;&gt;
-       &lt;Member className=&quot;org.apache.catalina.tribes.membership.StaticMember&quot;
-                  port=&quot;5678&quot;
-                  securePort=&quot;-1&quot;
-                  host=&quot;tomcat01.mydomain.com&quot;
-                  domain=&quot;staging-cluster&quot;
-                  uniqueId=&quot;{0,1,2,3,4,5,6,7,8,9}&quot;/&gt;
-     &lt;/Interceptor&gt;
-
-   </source>
-  </p>
+   so they will have the same level of notification mechanism as the members that are automatically discovered.</p>
+   <source><![CDATA[     <Interceptor className="org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor">
+       <Member className="org.apache.catalina.tribes.membership.StaticMember"
+                  port="5678"
+                  securePort="-1"
+                  host="tomcat01.mydomain.com"
+                  domain="staging-cluster"
+                  uniqueId="{0,1,2,3,4,5,6,7,8,9}"/>
+     </Interceptor>]]></source>
 </section>
 
 <section name="Attributes">

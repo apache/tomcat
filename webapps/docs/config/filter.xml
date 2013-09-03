@@ -40,13 +40,11 @@
   web applications by configuring them in the application's
   <code>WEB-INF/web.xml</code>. Each filter is described below.</p>
 
-    <blockquote><em>
-    <p>This description uses the variable name $CATALINA_BASE to refer the
+    <p><em>This description uses the variable name $CATALINA_BASE to refer the
     base directory against which most relative paths are resolved. If you have
     not configured Tomcat for multiple instances by setting a CATALINA_BASE
     directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
-    the directory into which you have installed Tomcat.</p>
-    </em></blockquote>
+    the directory into which you have installed Tomcat.</em></p>
 
 </section>
 
@@ -110,16 +108,14 @@
     <a href="../images/cors-flowchart.png">flowchart</a> that
     demonstrates request processing by this filter is available.</p>
     <p>The minimal configuration required to use this filter is:</p>
-    <source>
-&lt;filter&gt;
-  &lt;filter-name&gt;CorsFilter&lt;/filter-name&gt;
-  &lt;filter-class&gt;org.apache.catalina.filters.CorsFilter&lt;/filter-class&gt;
-&lt;/filter&gt;
-&lt;filter-mapping&gt;
-  &lt;filter-name>CorsFilter&lt;/filter-name&gt;
-  &lt;url-pattern>/*&lt;/url-pattern&gt;
-&lt;/filter-mapping&gt;
-    </source>
+    <source><![CDATA[<filter>
+  <filter-name>CorsFilter</filter-name>
+  <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>CorsFilter</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>]]></source>
   </subsection>
   <subsection name="Filter Class Name">
     <p>The filter class name for the CORS Filter is
@@ -185,40 +181,38 @@
     </attributes>
     <p>Here's an example of a more advanced configuration, that overrides
     defaults:</p>
-    <source>
-&lt;filter&gt;
-  &lt;filter-name&gt;CorsFilter&lt;/filter-name&gt;
-  &lt;filter-class&gt;org.apache.catalina.filters.CorsFilter&lt;/filter-class&gt;
-  &lt;init-param&gt;
-    &lt;param-name&gt;cors.allowed.origins&lt;/param-name&gt;
-    &lt;param-value&gt;*&lt;/param-value&gt;
-  &lt;/init-param&gt;
-  &lt;init-param&gt;
-    &lt;param-name&gt;cors.allowed.methods&lt;/param-name&gt;
-    &lt;param-value&gt;GET,POST,HEAD,OPTIONS,PUT&lt;/param-value&gt;
-  &lt;/init-param&gt;
-  &lt;init-param&gt;
-    &lt;param-name&gt;cors.allowed.headers&lt;/param-name&gt;
-    &lt;param-value&gt;Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers&lt;/param-value&gt;
-  &lt;/init-param&gt;
-  &lt;init-param&gt;
-    &lt;param-name&gt;cors.exposed.headers&lt;/param-name&gt;
-    &lt;param-value&gt;Access-Control-Allow-Origin,Access-Control-Allow-Credentials&lt;/param-value&gt;
-  &lt;/init-param&gt;
-  &lt;init-param&gt;
-    &lt;param-name&gt;cors.support.credentials&lt;/param-name&gt;
-    &lt;param-value&gt;true&lt;/param-value&gt;
-  &lt;/init-param&gt;
-  &lt;init-param&gt;
-    &lt;param-name&gt;cors.preflight.maxage&lt;/param-name&gt;
-    &lt;param-value&gt;10&lt;/param-value&gt;
-  &lt;/init-param&gt;
-&lt;/filter&gt;
-&lt;filter-mapping&gt;
-  &lt;filter-name&gt;CorsFilter&lt;/filter-name&gt;
-  &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
-&lt;/filter-mapping&gt;
-    </source>
+    <source><![CDATA[<filter>
+  <filter-name>CorsFilter</filter-name>
+  <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+  <init-param>
+    <param-name>cors.allowed.origins</param-name>
+    <param-value>*</param-value>
+  </init-param>
+  <init-param>
+    <param-name>cors.allowed.methods</param-name>
+    <param-value>GET,POST,HEAD,OPTIONS,PUT</param-value>
+  </init-param>
+  <init-param>
+    <param-name>cors.allowed.headers</param-name>
+    <param-value>Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers</param-value>
+  </init-param>
+  <init-param>
+    <param-name>cors.exposed.headers</param-name>
+    <param-value>Access-Control-Allow-Origin,Access-Control-Allow-Credentials</param-value>
+  </init-param>
+  <init-param>
+    <param-name>cors.support.credentials</param-name>
+    <param-value>true</param-value>
+  </init-param>
+  <init-param>
+    <param-name>cors.preflight.maxage</param-name>
+    <param-value>10</param-value>
+  </init-param>
+</filter>
+<filter-mapping>
+  <filter-name>CorsFilter</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>]]></source>
   </subsection>
   <subsection name="CORS Filter and HttpServletRequest attributes">
     <p>CORS Filter adds information about the request, in HttpServletRequest
@@ -353,31 +347,28 @@
     headers to images, css and javascript.
     </p>
 
-    <source>
-&lt;filter&gt;
- &lt;filter-name&gt;ExpiresFilter&lt;/filter-name&gt;
- &lt;filter-class&gt;org.apache.catalina.filters.ExpiresFilter&lt;/filter-class&gt;
- &lt;init-param&gt;
-    &lt;param-name&gt;ExpiresByType image&lt;/param-name&gt;
-    &lt;param-value&gt;access plus 10 minutes&lt;/param-value&gt;
- &lt;/init-param&gt;
- &lt;init-param&gt;
-    &lt;param-name&gt;ExpiresByType text/css&lt;/param-name&gt;
-    &lt;param-value&gt;access plus 10 minutes&lt;/param-value&gt;
- &lt;/init-param&gt;
- &lt;init-param&gt;
-    &lt;param-name&gt;ExpiresByType application/javascript&lt;/param-name&gt;
-    &lt;param-value&gt;access plus 10 minutes&lt;/param-value&gt;
- &lt;/init-param&gt;
-&lt;/filter&gt;
+    <source><![CDATA[<filter>
+ <filter-name>ExpiresFilter</filter-name>
+ <filter-class>org.apache.catalina.filters.ExpiresFilter</filter-class>
+ <init-param>
+    <param-name>ExpiresByType image</param-name>
+    <param-value>access plus 10 minutes</param-value>
+ </init-param>
+ <init-param>
+    <param-name>ExpiresByType text/css</param-name>
+    <param-value>access plus 10 minutes</param-value>
+ </init-param>
+ <init-param>
+    <param-name>ExpiresByType application/javascript</param-name>
+    <param-value>access plus 10 minutes</param-value>
+ </init-param>
+</filter>
 ...
-&lt;filter-mapping&gt;
- &lt;filter-name&gt;ExpiresFilter&lt;/filter-name&gt;
- &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
- &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
-&lt;/filter-mapping&gt;
-
-    </source>
+<filter-mapping>
+ <filter-name>ExpiresFilter</filter-name>
+ <url-pattern>/*</url-pattern>
+ <dispatcher>REQUEST</dispatcher>
+</filter-mapping>]]></source>
 
   </subsection>
 
@@ -387,34 +378,34 @@
     defined in a more readable syntax of the form:
     </p>
 
-    <source>
-&lt;init-param&gt;
- &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;
- &lt;param-value&gt;&lt;base&gt; [plus] {&lt;num&gt;   &lt;type&gt;}*&lt;/param-value&gt;
-&lt;/init-param&gt;
+    <source><![CDATA[<init-param>
+ <param-name>ExpiresDefault</param-name>
+ <param-value><base> [plus] {<num>   <type>}*</param-value>
+</init-param>
 
-&lt;init-param&gt;
- &lt;param-name&gt;ExpiresByType type&lt;/param-name&gt;
- &lt;param-value&gt;&lt;base&gt; [plus]   {&lt;num&gt; &lt;type&gt;}*&lt;/param-value&gt;
-&lt;/init-param&gt;
+<init-param>
+ <param-name>ExpiresByType type</param-name>
+ <param-value><base> [plus]   {<num> <type>}*</param-value>
+</init-param>
 
-&lt;init-param&gt;
- &lt;param-name&gt;ExpiresByType type;encoding&lt;/param-name&gt;
- &lt;param-value&gt;&lt;base&gt; [plus]   {&lt;num&gt; &lt;type&gt;}*&lt;/param-value&gt;
-&lt;/init-param&gt;
-    </source>
+<init-param>
+ <param-name>ExpiresByType type;encoding</param-name>
+ <param-value><base> [plus]   {<num> <type>}*</param-value>
+</init-param>]]></source>
     <p>
     where <code>&lt;base&gt;</code> is one of:
+    </p>
     <ul>
     <li><code>access</code></li>
     <li><code>now</code> (equivalent to &#x27;<code>access</code>&#x27;)</li>
     <li><code>modification</code></li>
     </ul>
-    </p>
+
     <p>
     The <code>plus</code> keyword is optional. <code>&lt;num&gt;</code> should be an
     integer value (acceptable to <code>Integer.parseInt()</code>), and
     <code>&lt;type&gt;</code> is one of:
+    </p>
     <ul>
     <li><code>years</code></li>
     <li><code>months</code></li>
@@ -424,42 +415,39 @@
     <li><code>minutes</code></li>
     <li><code>seconds</code></li>
     </ul>
+    <p>
     For example, any of the following directives can be used to make documents
     expire 1 month after being accessed, by default:
     </p>
 
-    <source>
-&lt;init-param&gt;
- &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;
- &lt;param-value&gt;access plus 1 month&lt;/param-value&gt;
-&lt;/init-param&gt;
+    <source><![CDATA[<init-param>
+ <param-name>ExpiresDefault</param-name>
+ <param-value>access plus 1 month</param-value>
+</init-param>
 
-&lt;init-param&gt;
- &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;
- &lt;param-value&gt;access plus 4 weeks&lt;/param-value&gt;
-&lt;/init-param&gt;
+<init-param>
+ <param-name>ExpiresDefault</param-name>
+ <param-value>access plus 4 weeks</param-value>
+</init-param>
 
-&lt;init-param&gt;
- &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;
- &lt;param-value&gt;access plus 30 days&lt;/param-value&gt;
-&lt;/init-param&gt;
-</source>
+<init-param>
+ <param-name>ExpiresDefault</param-name>
+ <param-value>access plus 30 days</param-value>
+</init-param>]]></source>
 <p>
 The expiry time can be fine-tuned by adding several &#x27;
 <code>&lt;num&gt; &lt;type&gt;</code>&#x27; clauses:
 </p>
 
-<source>
-&lt;init-param&gt;
- &lt;param-name&gt;ExpiresByType text/html&lt;/param-name&gt;
- &lt;param-value&gt;access plus 1 month 15   days 2 hours&lt;/param-value&gt;
-&lt;/init-param&gt;
+<source><![CDATA[<init-param>
+ <param-name>ExpiresByType text/html</param-name>
+ <param-value>access plus 1 month 15   days 2 hours</param-value>
+</init-param>
 
-&lt;init-param&gt;
- &lt;param-name&gt;ExpiresByType image/gif&lt;/param-name&gt;
- &lt;param-value&gt;modification plus 5 hours 3   minutes&lt;/param-value&gt;
-&lt;/init-param&gt;
-    </source>
+<init-param>
+ <param-name>ExpiresByType image/gif</param-name>
+ <param-value>modification plus 5 hours 3   minutes</param-value>
+</init-param>]]></source>
     <p>
     Note that if you use a modification date based setting, the <code>Expires</code>
     header will <strong>not</strong> be added to content that does not come from
@@ -471,6 +459,7 @@ The expiry time can be fine-tuned by adding several &#x27;
   <subsection name="Expiration headers generation eligibility">
     <p>
     A response is eligible to be enriched by <code>ExpiresFilter</code> if :
+    </p>
     <ol>
     <li>no expiration header is defined (<code>Expires</code> header or the
     <code>max-age</code> directive of the <code>Cache-Control</code> header),</li>
@@ -480,7 +469,7 @@ The expiry time can be fine-tuned by adding several &#x27;
     defined the in <code>ExpiresByType</code> directives or the
     <code>ExpiresDefault</code> directive is defined.</li>
     </ol>
-    </p>
+
     <p>
     Note : If <code>Cache-Control</code> header contains other directives than
     <code>max-age</code>, they are concatenated with the <code>max-age</code> directive
@@ -492,6 +481,7 @@ The expiry time can be fine-tuned by adding several &#x27;
   <subsection name="Expiration configuration selection">
     <p>
     The expiration configuration if elected according to the following algorithm:
+    </p>
     <ol>
     <li><code>ExpiresByType</code> matching the exact content-type returned by
     <code>HttpServletResponse.getContentType()</code> possibly including the charset
@@ -505,7 +495,7 @@ The expiry time can be fine-tuned by adding several &#x27;
     &#x27;),</li>
     <li><code>ExpiresDefault</code></li>
     </ol>
-    </p>
+
   </subsection>
 
   <subsection name="Filter Class Name">
@@ -600,29 +590,25 @@ The expiry time can be fine-tuned by adding several &#x27;
       </attribute>
     </attributes>
 
-    <p><i>Sample : exclude response status codes 302, 500 and 503</i></p>
+    <p><i>Sample: exclude response status codes 302, 500 and 503</i></p>
 
-<source>
-&lt;init-param&gt;
- &lt;param-name&gt;ExpiresExcludedResponseStatusCodes&lt;/param-name&gt;
- &lt;param-value&gt;302, 500, 503&lt;/param-value&gt;
-&lt;/init-param&gt;
-</source>
+<source><![CDATA[<init-param>
+ <param-name>ExpiresExcludedResponseStatusCodes</param-name>
+ <param-value>302, 500, 503</param-value>
+</init-param>]]></source>
 
     <p><i>Sample for ExpiresByType initialization parameter</i></p>
 
-         <source>
-&lt;init-param&gt;
-   &lt;param-name&gt;ExpiresByType text/html&lt;/param-name&gt;
-   &lt;param-value&gt;access plus 1 month 15   days 2 hours&lt;/param-value&gt;
-&lt;/init-param&gt;
+         <source><![CDATA[<init-param>
+   <param-name>ExpiresByType text/html</param-name>
+   <param-value>access plus 1 month 15   days 2 hours</param-value>
+</init-param>
 
-&lt;init-param&gt;
-   &lt;!-- 2592000 seconds = 30 days --&gt;
-   &lt;param-name&gt;ExpiresByType image/gif&lt;/param-name&gt;
-   &lt;param-value&gt;A2592000&lt;/param-value&gt;
-&lt;/init-param&gt;
-         </source>
+<init-param>
+   <!-- 2592000 seconds = 30 days -->
+   <param-name>ExpiresByType image/gif</param-name>
+   <param-value>A2592000</param-value>
+</init-param>]]></source>
 
   </subsection>
 
@@ -635,44 +621,36 @@ The expiry time can be fine-tuned by adding several &#x27;
     Extract of logging.properties
     </p>
 
-    <source>
-org.apache.catalina.filters.ExpiresFilter.level = FINE
-    </source>
+    <source>org.apache.catalina.filters.ExpiresFilter.level = FINE    </source>
     <p>
     Sample of initialization log message:
     </p>
 
-    <source>
-Mar 26, 2010 2:01:41 PM org.apache.catalina.filters.ExpiresFilter init
+    <source>Mar 26, 2010 2:01:41 PM org.apache.catalina.filters.ExpiresFilter init
 FINE: Filter initialized with configuration ExpiresFilter[
  excludedResponseStatusCode=[304],
  default=null,
  byType={
     image=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]],
     text/css=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]],
-    text/javascript=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]]}]
-    </source>
+    text/javascript=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]]}]</source>
     <p>
     Sample of per-request log message where <code>ExpiresFilter</code> adds an
     expiration date is below. The message is on one line and is wrapped here
     for better readability.
     </p>
 
-    <source>
-Mar 26, 2010 2:09:47 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteResponseBody
+    <source>Mar 26, 2010 2:09:47 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteResponseBody
 FINE: Request "/tomcat.gif" with response status "200"
- content-type "image/gif", set expiration date 3/26/10 2:19 PM
-    </source>
+ content-type "image/gif", set expiration date 3/26/10 2:19 PM</source>
     <p>
     Sample of per-request log message where <code>ExpiresFilter</code> does not add
     an expiration date:
     </p>
 
-    <source>
-Mar 26, 2010 2:10:27 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteResponseBody
+    <source>Mar 26, 2010 2:10:27 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteResponseBody
 FINE: Request "/docs/config/manager.html" with response status "200"
- content-type "text/html", no expiration configured
-    </source>
+ content-type "text/html", no expiration configured</source>
   </subsection>
 
 </section>
@@ -789,20 +767,18 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 
   <subsection name="Example">
     <p>To allow access only for the clients connecting from localhost:</p>
-<source>
-    &lt;filter>
-      &lt;filter-name>Remote Address Filter&lt;/filter-name>
-      &lt;filter-class>org.apache.catalina.filters.RemoteAddrFilter&lt;/filter-class>
-      &lt;init-param>
-        &lt;param-name>allow&lt;/param-name>
-        &lt;param-value>127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1&lt;/param-value>
-      &lt;/init-param>
-    &lt;/filter>
-    &lt;filter-mapping>
-      &lt;filter-name>Remote Address Filter&lt;/filter-name>
-      &lt;url-pattern>/*&lt;/url-pattern>
-    &lt;/filter-mapping>
-</source>
+<source><![CDATA[    <filter>
+      <filter-name>Remote Address Filter</filter-name>
+      <filter-class>org.apache.catalina.filters.RemoteAddrFilter</filter-class>
+      <init-param>
+        <param-name>allow</param-name>
+        <param-value>127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1</param-value>
+      </init-param>
+    </filter>
+    <filter-mapping>
+      <filter-name>Remote Address Filter</filter-name>
+      <url-pattern>/*</url-pattern>
+    </filter-mapping>]]></source>
   </subsection>
 
 </section>
@@ -930,18 +906,16 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     <p>
     The filter will process the <code>x-forwarded-for</code> http header.
     </p>
-    <source>
-      &lt;filter&gt;
-        &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
-        &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
-      &lt;/filter&gt;
+    <source><![CDATA[      <filter>
+        <filter-name>RemoteIpFilter</filter-name>
+        <filter-class>org.apache.catalina.filters.RemoteIpFilter</filter-class>
+      </filter>
 
-      &lt;filter-mapping&gt;
-        &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
-        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
-        &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
-      &lt;/filter-mapping&gt;
-    </source>
+      <filter-mapping>
+        <filter-name>RemoteIpFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+      </filter-mapping>]]></source>
   </subsection>
 
   <subsection name="Basic configuration to handle &#x27;x-forwarded-for&#x27; and &#x27;x-forwarded-proto&#x27;">
@@ -951,54 +925,50 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     <code>x-forwarded-proto</code> http headers. Expected value for the
     <code>x-forwarded-proto</code> header in case of SSL connections is
     <code>https</code> (case insensitive). </p>
-    <source>
-      &lt;filter&gt;
-        &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
-        &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
-        &lt;init-param&gt;
-          &lt;param-name&gt;protocolHeader&lt;/param-name&gt;
-          &lt;param-value&gt;x-forwarded-proto&lt;/param-value&gt;
-        &lt;/init-param&gt;
-      &lt;/filter&gt;
+    <source><![CDATA[      <filter>
+        <filter-name>RemoteIpFilter</filter-name>
+        <filter-class>org.apache.catalina.filters.RemoteIpFilter</filter-class>
+        <init-param>
+          <param-name>protocolHeader</param-name>
+          <param-value>x-forwarded-proto</param-value>
+        </init-param>
+      </filter>
 
-      &lt;filter-mapping&gt;
-        &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
-        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
-        &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
-      &lt;/filter-mapping&gt;
-    </source>
+      <filter-mapping>
+        <filter-name>RemoteIpFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+      </filter-mapping>]]></source>
   </subsection>
 
   <subsection name="Advanced configuration with internal proxies">
     <p>RemoteIpFilter configuration: </p>
-    <source>
-     &lt;filter&gt;
-       &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
-       &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;allowedInternalProxies&lt;/param-name&gt;
-         &lt;param-value&gt;192\.168\.0\.10|192\.168\.0\.11&lt;/param-value&gt;
-       &lt;/init-param&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;
-         &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
-       &lt;/init-param&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
-         &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
-       &lt;/init-param&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;protocolHeader&lt;/param-name&gt;
-         &lt;param-value&gt;x-forwarded-proto&lt;/param-value&gt;
-       &lt;/init-param&gt;
-     &lt;/filter&gt;
-    </source>
-    <p>Request values:
-    <table border="1" cellpadding="5">
+    <source><![CDATA[     <filter>
+       <filter-name>RemoteIpFilter</filter-name>
+       <filter-class>org.apache.catalina.filters.RemoteIpFilter</filter-class>
+       <init-param>
+         <param-name>allowedInternalProxies</param-name>
+         <param-value>192\.168\.0\.10|192\.168\.0\.11</param-value>
+       </init-param>
+       <init-param>
+         <param-name>remoteIpHeader</param-name>
+         <param-value>x-forwarded-for</param-value>
+       </init-param>
+       <init-param>
+         <param-name>remoteIpProxiesHeader</param-name>
+         <param-value>x-forwarded-by</param-value>
+       </init-param>
+       <init-param>
+         <param-name>protocolHeader</param-name>
+         <param-value>x-forwarded-proto</param-value>
+       </init-param>
+     </filter>]]></source>
+    <p>Request values:</p>
+    <table class="defaultTable">
       <tr>
-        <th bgcolor="#023264"><font color="#ffffff">Property</font></th>
-        <th bgcolor="#023264"><font color="#ffffff">Value Before RemoteIpFilter</font></th>
-        <th bgcolor="#023264"><font color="#ffffff">Value After RemoteIpFilter</font></th>
+        <th>Property</th>
+        <th>Value Before RemoteIpFilter</th>
+        <th>Value After RemoteIpFilter</th>
       </tr>
       <tr>
         <td> request.remoteAddr </td>
@@ -1036,7 +1006,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         <td> 443 </td>
       </tr>
     </table>
-    </p>
+
     <p>
     Note : <code>x-forwarded-by</code> header is <code>null</code> because only
     internal proxies has been traversed by the request.
@@ -1048,33 +1018,32 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 
   <subsection name="Advanced configuration with trusted proxies">
     <p>RemoteIpFilter configuration: </p>
-    <source>
-     &lt;filter&gt;
-       &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
-       &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;allowedInternalProxies&lt;/param-name&gt;
-         &lt;param-value&gt;192\.168\.0\.10|192\.168\.0\.11&lt;/param-value&gt;
-       &lt;/init-param&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;
-         &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
-       &lt;/init-param&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
-         &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
-       &lt;/init-param&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;trustedProxies&lt;/param-name&gt;
-         &lt;param-value&gt;proxy1|proxy2&lt;/param-value&gt;
-       &lt;/init-param&gt;
-     &lt;/filter&gt;
-    </source>
-    <p>Request values: <table border="1" cellpadding="5">
+    <source><![CDATA[     <filter>
+       <filter-name>RemoteIpFilter</filter-name>
+       <filter-class>org.apache.catalina.filters.RemoteIpFilter</filter-class>
+       <init-param>
+         <param-name>allowedInternalProxies</param-name>
+         <param-value>192\.168\.0\.10|192\.168\.0\.11</param-value>
+       </init-param>
+       <init-param>
+         <param-name>remoteIpHeader</param-name>
+         <param-value>x-forwarded-for</param-value>
+       </init-param>
+       <init-param>
+         <param-name>remoteIpProxiesHeader</param-name>
+         <param-value>x-forwarded-by</param-value>
+       </init-param>
+       <init-param>
+         <param-name>trustedProxies</param-name>
+         <param-value>proxy1|proxy2</param-value>
+       </init-param>
+     </filter>]]></source>
+    <p>Request values:</p>
+    <table class="defaultTable">
       <tr>
-        <th bgcolor="#023264"><font color="#ffffff">Property</font></th>
-        <th bgcolor="#023264"><font color="#ffffff">Value Before RemoteIpFilter</font></th>
-        <th bgcolor="#023264"><font color="#ffffff">Value After RemoteIpFilter</font></th>
+        <th>Property</th>
+        <th>Value Before RemoteIpFilter</th>
+        <th>Value After RemoteIpFilter</th>
       </tr>
       <tr>
         <td> request.remoteAddr </td>
@@ -1092,7 +1061,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         <td> proxy1, proxy2 </td>
       </tr>
     </table>
-    </p>
+
     <p>
     Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that
     come in <code>x-forwarded-for</code> header, they both are migrated in
@@ -1103,33 +1072,32 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 
   <subsection name="Advanced configuration with internal and trusted proxies">
     <p>RemoteIpFilter configuration: </p>
-    <source>
-     &lt;filter&gt;
-       &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
-       &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;allowedInternalProxies&lt;/param-name&gt;
-         &lt;param-value&gt;192\.168\.0\.10|192\.168\.0\.11&lt;/param-value&gt;
-       &lt;/init-param&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;
-         &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
-       &lt;/init-param&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
-         &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
-       &lt;/init-param&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;trustedProxies&lt;/param-name&gt;
-         &lt;param-value&gt;proxy1|proxy2&lt;/param-value&gt;
-       &lt;/init-param&gt;
-     &lt;/filter&gt;
-    </source>
-    <p>Request values: <table border="1" cellpadding="5">
+    <source><![CDATA[     <filter>
+       <filter-name>RemoteIpFilter</filter-name>
+       <filter-class>org.apache.catalina.filters.RemoteIpFilter</filter-class>
+       <init-param>
+         <param-name>allowedInternalProxies</param-name>
+         <param-value>192\.168\.0\.10|192\.168\.0\.11</param-value>
+       </init-param>
+       <init-param>
+         <param-name>remoteIpHeader</param-name>
+         <param-value>x-forwarded-for</param-value>
+       </init-param>
+       <init-param>
+         <param-name>remoteIpProxiesHeader</param-name>
+         <param-value>x-forwarded-by</param-value>
+       </init-param>
+       <init-param>
+         <param-name>trustedProxies</param-name>
+         <param-value>proxy1|proxy2</param-value>
+       </init-param>
+     </filter>]]></source>
+    <p>Request values:</p>
+    <table class="defaultTable">
       <tr>
-        <th bgcolor="#023264"><font color="#ffffff">Property</font></th>
-        <th bgcolor="#023264"><font color="#ffffff">Value Before RemoteIpFilter</font></th>
-        <th bgcolor="#023264"><font color="#ffffff">Value After RemoteIpFilter</font></th>
+        <th>Property</th>
+        <th>Value Before RemoteIpFilter</th>
+        <th>Value After RemoteIpFilter</th>
       </tr>
       <tr>
         <td> request.remoteAddr </td>
@@ -1147,7 +1115,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         <td> proxy1, proxy2 </td>
       </tr>
     </table>
-    </p>
+
     <p>
     Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that
     come in <code>x-forwarded-for</code> header, they both are migrated in
@@ -1161,33 +1129,32 @@ FINE: Request "/docs/config/manager.html" with response status "200"
   <subsection name="Advanced configuration with an untrusted proxy">
 
     <p>RemoteIpFilter configuration: </p>
-    <source>
-     &lt;filter&gt;
-       &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
-       &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;allowedInternalProxies&lt;/param-name&gt;
-         &lt;param-value&gt;192\.168\.0\.10|192\.168\.0\.11&lt;/param-value&gt;
-       &lt;/init-param&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;remoteIpHeader&lt;/param-name&gt;
-         &lt;param-value&gt;x-forwarded-for&lt;/param-value&gt;
-       &lt;/init-param&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;remoteIpProxiesHeader&lt;/param-name&gt;
-         &lt;param-value&gt;x-forwarded-by&lt;/param-value&gt;
-       &lt;/init-param&gt;
-       &lt;init-param&gt;
-         &lt;param-name&gt;trustedProxies&lt;/param-name&gt;
-         &lt;param-value&gt;proxy1|proxy2&lt;/param-value&gt;
-       &lt;/init-param&gt;
-     &lt;/filter&gt;
-    </source>
-    <p>Request values: <table border="1" cellpadding="5">
+    <source><![CDATA[     <filter>
+       <filter-name>RemoteIpFilter</filter-name>
+       <filter-class>org.apache.catalina.filters.RemoteIpFilter</filter-class>
+       <init-param>
+         <param-name>allowedInternalProxies</param-name>
+         <param-value>192\.168\.0\.10|192\.168\.0\.11</param-value>
+       </init-param>
+       <init-param>
+         <param-name>remoteIpHeader</param-name>
+         <param-value>x-forwarded-for</param-value>
+       </init-param>
+       <init-param>
+         <param-name>remoteIpProxiesHeader</param-name>
+         <param-value>x-forwarded-by</param-value>
+       </init-param>
+       <init-param>
+         <param-name>trustedProxies</param-name>
+         <param-value>proxy1|proxy2</param-value>
+       </init-param>
+     </filter>]]></source>
+    <p>Request values:</p>
+    <table class="defaultTable">
       <tr>
-        <th bgcolor="#023264"><font color="#ffffff">Property</font></th>
-        <th bgcolor="#023264"><font color="#ffffff">Value Before RemoteIpFilter</font></th>
-        <th bgcolor="#023264"><font color="#ffffff">Value After RemoteIpFilter</font></th>
+        <th>Property</th>
+        <th>Value Before RemoteIpFilter</th>
+        <th>Value After RemoteIpFilter</th>
       </tr>
       <tr>
         <td> request.remoteAddr </td>
@@ -1205,7 +1172,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         <td> proxy1 </td>
       </tr>
     </table>
-    </p>
+
     <p>
     Note : <code>x-forwarded-by</code> holds the trusted proxy <code>proxy1</code>.
     <code>x-forwarded-by</code> holds <code>140.211.11.130</code> because
@@ -1348,23 +1315,20 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     Request Dumper filter for all requests for that web application. If the
     entries were added to <code>CATALINA_BASE/conf/web.xml</code>, the Request
     Dumper Filter would be enabled for all web applications.</p>
-    <source>
-&lt;filter&gt;
-    &lt;filter-name&gt;requestdumper&lt;/filter-name&gt;
-    &lt;filter-class&gt;
+    <source><![CDATA[<filter>
+    <filter-name>requestdumper</filter-name>
+    <filter-class>
         org.apache.catalina.filters.RequestDumperFilter
-    &lt;/filter-class&gt;
-&lt;/filter&gt;
-&lt;filter-mapping&gt;
-    &lt;filter-name&gt;requestdumper&lt;/filter-name&gt;
-    &lt;url-pattern&gt;*&lt;/url-pattern&gt;
-&lt;/filter-mapping&gt;
-    </source>
+    </filter-class>
+</filter>
+<filter-mapping>
+    <filter-name>requestdumper</filter-name>
+    <url-pattern>*</url-pattern>
+</filter-mapping>]]></source>
 
     <p>The following entries in CATALINA_BASE/conf/logging.properties would
     create a separate log file for the Request Dumper Filter output.</p>
-    <source>
-# To this configuration below, 1request-dumper.org.apache.juli.FileHandler
+    <source># To this configuration below, 1request-dumper.org.apache.juli.FileHandler
 # also needs to be added to the handlers property near the top of the file
 1request-dumper.org.apache.juli.FileHandler.level = INFO
 1request-dumper.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
@@ -1372,8 +1336,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 1request-dumper.org.apache.juli.FileHandler.formatter = org.apache.juli.VerbatimFormatter
 org.apache.catalina.filters.RequestDumperFilter.level = INFO
 org.apache.catalina.filters.RequestDumperFilter.handlers = \
-  1request-dumper.org.apache.juli.FileHandler
-    </source>
+  1request-dumper.org.apache.juli.FileHandler</source>
   </subsection>
 </section>
 

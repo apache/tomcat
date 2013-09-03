@@ -98,7 +98,7 @@
       a give time. The default value is <code>3000</code> ms. This means, that if a heartbeat is not received from a
       member in that timeframe, the membership component will notify the cluster of this.<br/>
       On a high latency network you may wish to increase this value, to protect against false positives.<br/>
-      Apache Tribes also provides a <a href="cluster-interceptor.html#tcpfailuredetector"><code>TcpFailureDetector</code></a> that will
+      Apache Tribes also provides a <a href="cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.TcpFailureDetector_Attributes"><code>TcpFailureDetector</code></a> that will
       verify a timeout using a TCP connection when a heartbeat timeout has occurred. This protects against false positives.
       </p>
     </attribute>

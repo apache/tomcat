@@ -56,12 +56,12 @@ will need to figure out the corresponding commands for your system.</p>
 <em>Manager</em> web application, you need to perform the following tasks
 once (no matter how many web applications you plan to develop).</p>
 <ul>
-<li><em>Configure the Ant custom tasks</em>.  The implementation code for the
+<li><p><em>Configure the Ant custom tasks</em>.  The implementation code for the
     Ant custom tasks is in a JAR file named
     <code>$CATALINA_HOME/lib/catalina-ant.jar</code>, which must be
     copied in to the <code>lib</code> directory of your Ant installation.
-    <br/><br/></li>
-<li><em>Define one or more Tomcat users</em>.  The <em>Manager</em> web
+    </p></li>
+<li><p><em>Define one or more Tomcat users</em>.  The <em>Manager</em> web
     application runs under a security constraint that requires a user to be
     logged in, and have the security role <code>manager-script</code> assigned
     to him or her.  How such users are defined depends on which Realm you have
@@ -69,7 +69,7 @@ once (no matter how many web applications you plan to develop).</p>
     <a href="../realm-howto.html">Realm Configuration HOW-TO</a> for more
     information.  You may define any number of users (with any username
     and password that you like) with the <code>manager-script</code> role.
-    <br/><br/></li>
+    </p></li>
 </ul>
 
 </subsection>
@@ -87,38 +87,32 @@ previous section</a>, or you can use the
 repository.  This might be done by a series of commands like this, where
 <code>{project}</code> is the name under which your project should be
 stored in the CVS repository, and {username} is your login username:</p>
-<source>
-cd {my home directory}
-mkdir myapp &lt;-- Assumed "project source directory"
+<source><![CDATA[cd {my home directory}
+mkdir myapp <-- Assumed "project source directory"
 cd myapp
 mkdir docs
 mkdir src
 mkdir web
 mkdir web/WEB-INF
 cvs import -m "Initial Project Creation" {project} \
-    {username} start
-</source>
+    {username} start]]></source>
 
 <p>Now, to verify that it was created correctly in CVS, we will perform a
 checkout of the new project:</p>
-<source>
-cd ..
+<source><![CDATA[cd ..
 mv myapp myapp.bu
-cvs checkout {project}
-</source>
+cvs checkout {project}]]></source>
 
 <p>Next, you will need to create and check in an initial version of the
 <code>build.xml</code> script to be used for development.  For getting
 started quickly and easily, base your <code>build.xml</code> on the
 <a href="build.xml.txt">basic build.xml file</a>, included with this manual,
 or code it from scratch.</p>
-<source>
-cd {my home directory}
+<source><![CDATA[cd {my home directory}
 cd myapp
-emacs build.xml     &lt;-- if you want a real editor :-)
+emacs build.xml     <-- if you want a real editor :-)
 cvs add build.xml
-cvs commit
-</source>
+cvs commit]]></source>
 
 <p>Until you perform the CVS commit, your changes are local to your own
 development directory.  Committing makes those changes visible to other
@@ -132,8 +126,7 @@ the sample <code>build.xml</code> script.  At a minimum, you will generally
 need to define the <code>catalina.home</code> property defining where
 Tomcat is installed, and the manager application username and password.
 You might end up with something like this:</p>
-<source>
-# Context path to install this application on
+<source><![CDATA[# Context path to install this application on
 app.path=/hello
 
 # Tomcat 7 installation directory
@@ -141,8 +134,7 @@ catalina.home=/usr/local/apache-tomcat-7.0
 
 # Manager webapp username and password
 manager.username=myusername
-manager.password=mypassword
-</source>
+manager.password=mypassword]]></source>
 
 <p>In general, you will <strong>not</strong> want to check the
 <code>build.properties</code> file in to the CVS repository, because it
@@ -151,13 +143,11 @@ is unique to each developer's environment.</p>
 <p>Now, create the initial version of the web application deployment
 descriptor.  You can base <code>web.xml</code> on the
 <a href="web.xml.txt">basic web.xml file</a>, or code it from scratch.</p>
-<source>
-cd {my home directory}
+<source><![CDATA[cd {my home directory}
 cd myapp/web/WEB-INF
 emacs web.xml
 cvs add web.xml
-cvs commit
-</source>
+cvs commit]]></source>
 
 Note that this is only an example web.xml file.  The full definition
 of the deployment descriptor file is in the
@@ -176,24 +166,20 @@ project source directory.</p>
 
 <p>Whenever you wish to refresh your development directory to reflect the
 work performed by other developers, you will ask CVS to do it for you:</p>
-<source>
-cd {my home directory}
+<source><![CDATA[cd {my home directory}
 cd myapp
-cvs update -dP
-</source>
+cvs update -dP]]></source>
 
 <p>To create a new file, go to the appropriate directory, create the file,
 and register it with CVS.  When you are satisfied with it's contents (after
 building and testing is successful), commit the new file to the repository.
 For example, to create a new JSP page:</p>
-<source>
-cd {my home directory}
-cd myapp/web        &lt;-- Ultimate destination is document root
+<source><![CDATA[cd {my home directory}
+cd myapp/web        <-- Ultimate destination is document root
 emacs mypage.jsp
 cvs add mypage.jsp
 ... build and test the application ...
-cvs commit
-</source>
+cvs commit]]></source>
 
 <p>Java source code that is defined in packages must be organized in a
 directory hierarchy (under the <strong>src/</strong> subdirectory) that
@@ -216,11 +202,9 @@ are going to be modifying, this is generally not used.</p>
 <p>When you are ready to compile the application, issue the following
 commands (generally, you will want a shell window open that is set to
 the project source directory, so that only the last command is needed):</p>
-<source>
-cd {my home directory}
-cd myapp        &lt;-- Normally leave a window open here
-ant
-</source>
+<source><![CDATA[cd {my home directory}
+cd myapp        <-- Normally leave a window open here
+ant]]></source>
 
 <p>The Ant tool will be execute the default "compile" target in your
 <code>build.xml</code> file, which will compile any new or updated Java
@@ -228,11 +212,9 @@ code.  If this is the first time you compile after a "build clean",
 it will cause everything to be recompiled.</p>
 
 <p>To force the recompilation of your entire application, do this instead:</p>
-<source>
-cd {my home directory}
+<source><![CDATA[cd {my home directory}
 cd myapp
-ant all
-</source>
+ant all]]></source>
 
 <p>This is a very good habit immediately before checking in changes, to
 make sure that you have not introduced any subtle problems that Javac's
@@ -248,36 +230,38 @@ quickest way to do that is to use the custom Ant tasks that are included in
 the sample <code>build.xml</code> script.  Using these commands might follow
 a pattern like this:</p>
 <ul>
-<li><em>Start Tomcat if needed</em>.  If Tomcat is not already running,
+<li><p><em>Start Tomcat if needed</em>.  If Tomcat is not already running,
     you will need to start it in the usual way.
-    <br/><br/></li>
-<li><em>Compile your application</em>.  Use the <code>ant compile</code>
+    </p></li>
+<li><p><em>Compile your application</em>.  Use the <code>ant compile</code>
     command (or just <code>ant</code>, since this is the default).  Make
     sure that there are no compilation errors.
-    <br/><br/></li>
-<li><em>Install the application</em>.  Use the <code>ant install</code>
+    </p></li>
+<li><p><em>Install the application</em>.  Use the <code>ant install</code>
     command.  This tells Tomcat to immediately start running your app on
     the context path defined in the <code>app.path</code> build property.
     Tomcat does <strong>NOT</strong> have to be restarted for this to
-    take effect.<br/><br/></li>
-<li><em>Test the application</em>.  Using your browser or other testing
+    take effect.
+    </p></li>
+<li><p><em>Test the application</em>.  Using your browser or other testing
     tools, test the functionality of your application.
-    <br/><br/></li>
-<li><em>Modify and rebuild as needed</em>.  As you discover that changes
+    </p></li>
+<li><p><em>Modify and rebuild as needed</em>.  As you discover that changes
     are required, make those changes in the original <strong>source</strong>
     files, not in the output build directory, and re-issue the
     <code>ant compile</code> command.  This ensures that your changes will
     be available to be saved (via <code>cvs commit</code>) later on --
     the output build directory is deleted and recreated as necessary.
-    <br/><br/></li>
-<li><em>Reload the application</em>.  Tomcat will recognize changes in
+    </p></li>
+<li><p><em>Reload the application</em>.  Tomcat will recognize changes in
     JSP pages automatically, but it will continue to use the old versions
     of any servlet or JavaBean classes until the application is reloaded.
     You can trigger this by executing the <code>ant reload</code> command.
-    <br/><br/></li>
-<li><em>Remove the application when you re done</em>.  When you are through
+    </p></li>
+<li><p><em>Remove the application when you are done</em>.  When you are through
     working on this application, you can remove it from live execution by
-    running the <code>ant remove</code> command.</li>
+    running the <code>ant remove</code> command.
+    </p></li>
 </ul>
 
 <p>Do not forget to commit your changes to the source code repository when
@@ -293,20 +277,22 @@ you have completed your testing!</p>
 of your web application that can be deployed on the production server.  The
 following general steps are required:</p>
 <ul>
-<li>Issue the command <code>ant all</code> from the project source
+<li><p>Issue the command <code>ant all</code> from the project source
     directory, to rebuild everything from scratch one last time.
-    <br/><br/></li>
-<li>Use the <code>cvs tag</code> command to create an identifier for
+    </p></li>
+<li><p>Use the <code>cvs tag</code> command to create an identifier for
     all of the source files utilized to create this release.  This allows
     you to reliably reconstruct a release (from sources) at a later
-    time.</li>
-<li>Issue the command <code>ant dist</code> to create a distributable
+    time.
+    </p></li>
+<li><p>Issue the command <code>ant dist</code> to create a distributable
     web application archive (WAR) file, as well as a JAR file containing
     the corresponding source code.
-    <br/><br/></li>
-<li>Package the contents of the <code>dist</code> directory using the
+    </p></li>
+<li><p>Package the contents of the <code>dist</code> directory using the
     <strong>tar</strong> or <strong>zip</strong> utility, according to
-    the standard release procedures used by your organization.</li>
+    the standard release procedures used by your organization.
+    </p></li>
 </ul>
 
 </subsection>

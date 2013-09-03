@@ -45,7 +45,7 @@
   the <a href="../jndi-resources-howto.html">JNDI Resources HOW-TO</a>.
   The resources defined in this element are <strong>not</strong> visible in
   the per-web-application contexts unless you explicitly link them with
-  <a href="context.html#Resource Links">&lt;ResourceLink&gt;</a> elements.
+  <a href="context.html#Resource_Links">&lt;ResourceLink&gt;</a> elements.
   </p>
 
 </section>
@@ -70,25 +70,21 @@
     web applications as environment entry resources by nesting
     <code>&lt;Environment&gt;</code> entries inside this element. For
     example, you can create an environment entry like this:</p>
-<source>
-&lt;GlobalNamingResources ...&gt;
+<source><![CDATA[<GlobalNamingResources ...>
   ...
-  &lt;Environment name="maxExemptions" value="10"
-         type="java.lang.Integer" override="false"/&gt;
+  <Environment name="maxExemptions" value="10"
+         type="java.lang.Integer" override="false"/>
   ...
-&lt;/GlobalNamingResources&gt;
-</source>
+</GlobalNamingResources>]]></source>
 
     <p>This is equivalent to the inclusion of the following element in the
     web application deployment descriptor (<code>/WEB-INF/web.xml</code>):
     </p>
-<source>
-&lt;env-entry&gt;
-  &lt;env-entry-name&gt;maxExemptions&lt;/env-entry-name&gt;
-  &lt;env-entry-value&gt;10&lt;/env-entry-value&gt;
-  &lt;env-entry-type&gt;java.lang.Integer&lt;/env-entry-type&gt;
-&lt;/env-entry&gt;
-</source>
+<source><![CDATA[<env-entry>
+  <env-entry-name>maxExemptions</env-entry-name>
+  <env-entry-value>10</env-entry-value>
+  <env-entry-type>java.lang.Integer</env-entry-type>
+</env-entry>]]></source>
     <p>but does <em>not</em> require modification of the deployment descriptor
     to customize this value.</p>
 
@@ -137,7 +133,7 @@
     to be returned for JNDI lookups of <code>&lt;resource-ref&gt;</code> and
     <code>&lt;resource-env-ref&gt;</code> elements in the web application
     deployment descriptor by defining them in this element and then linking
-    them with <a href="context.html#Resource Links">&lt;ResourceLink&gt;</a>
+    them with <a href="context.html#_Links">&lt;ResourceLink&gt;</a>
     elements
     in the <code><strong>&lt;Context&gt;</strong></code> element.
 
@@ -147,26 +143,22 @@
     the properties used to configure that object factory.</p>
 
     <p>For example, you can create a resource definition like this:</p>
-<source>
-&lt;GlobalNamingResources ...&gt;
+<source><![CDATA[<GlobalNamingResources ...>
   ...
-  &lt;Resource name="jdbc/EmployeeDB" auth="Container"
+  <Resource name="jdbc/EmployeeDB" auth="Container"
             type="javax.sql.DataSource"
-     description="Employees Database for HR Applications"/&gt;
+     description="Employees Database for HR Applications"/>
   ...
-&lt;/GlobalNamingResources&gt;
-</source>
+</GlobalNamingResources>]]></source>
 
     <p>This is equivalent to the inclusion of the following element in the
     web application deployment descriptor (<code>/WEB-INF/web.xml</code>):</p>
-<source>
-&lt;resource-ref&gt;
-  &lt;description&gt;Employees Database for HR Applications&lt;/description&gt;
-  &lt;res-ref-name&gt;jdbc/EmployeeDB&lt;/res-ref-name&gt;
-  &lt;res-ref-type&gt;javax.sql.DataSource&lt;/res-ref-type&gt;
-  &lt;res-auth&gt;Container&lt;/res-auth&gt;
-&lt;/resource-ref&gt;
-</source>
+<source><![CDATA[<resource-ref>
+  <description>Employees Database for HR Applications</description>
+  <res-ref-name>jdbc/EmployeeDB</res-ref-name>
+  <res-ref-type>javax.sql.DataSource</res-ref-type>
+  <res-auth>Container</res-auth>
+</resource-ref>]]></source>
 
     <p>but does <em>not</em> require modification of the deployment
     descriptor to customize this value.</p>
@@ -239,25 +231,21 @@
   </subsection>
 
   <subsection name="Resource Links">
-    <p>Use <a href="context.html#Resource Links">&lt;ResourceLink&gt;</a>
+    <p>Use <a href="context.html#Resource_Links"><code>&lt;ResourceLink&gt;</code></a>
     elements to link resources from the global context into
     per-web-application contexts. Here is an example of making a custom
     factory available to an application, based on the example definition in the
-    <a href="../jndi-resources-howto.html#Generic JavaBean Resources">
+    <a href="../jndi-resources-howto.html#Generic_JavaBean_Resources">
     JNDI Resource HOW-TO</a>:
     </p>
 
-    <source>
-      <![CDATA[
-        <Context>
-          <ResourceLink
-            name="bean/MyBeanFactory"
-            global="bean/MyBeanFactory"
-            type="com.mycompany.MyBean"
-          />
-        </Context>
-      ]]>
-    </source>
+    <source><![CDATA[<Context>
+  <ResourceLink
+    name="bean/MyBeanFactory"
+    global="bean/MyBeanFactory"
+    type="com.mycompany.MyBean"
+  />
+</Context>]]></source>
 
    </subsection>
 

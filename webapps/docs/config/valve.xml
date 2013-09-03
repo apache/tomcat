@@ -42,13 +42,11 @@
   Individual Valves have distinct processing capabilities, and are
   described individually below.</p>
 
-    <blockquote><em>
-    <p>The description below uses the variable name $CATALINA_BASE to refer the
+    <p><em>The description below uses the variable name $CATALINA_BASE to refer the
     base directory against which most relative paths are resolved. If you have
     not configured Tomcat for multiple instances by setting a CATALINA_BASE
     directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
-    the directory into which you have installed Tomcat.</p>
-    </em></blockquote>
+    the directory into which you have installed Tomcat.</em></p>
 
 </section>
 
@@ -297,6 +295,7 @@
     It is modeled after the
     <a href="http://httpd.apache.org/">Apache HTTP Server</a> log configuration
     syntax:
+    </p>
     <ul>
     <li><b><code>%{xxx}i</code></b> for incoming headers</li>
     <li><b><code>%{xxx}o</code></b> for outgoing response headers</li>
@@ -305,7 +304,6 @@
     <li><b><code>%{xxx}s</code></b> xxx is an attribute in the HttpSession</li>
     <li><b><code>%{xxx}t</code></b> xxx is an enhanced SimpleDateFormat pattern</li>
     </ul>
-    </p>
 
     <p>All formats supported by SimpleDateFormat are allowed in <code>%{xxx}t</code>.
     In addition the following extensions have been added:</p>
@@ -518,10 +516,8 @@
 
   <subsection name="Example">
     <p>To allow access only for the clients connecting from localhost:</p>
-<pre>
-    &lt;Valve className="org.apache.catalina.valves.RemoteAddrValve"
-       allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1"/&gt;
-</pre>
+    <source><![CDATA[<Valve className="org.apache.catalina.valves.RemoteAddrValve"
+   allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1"/>]]></source>
   </subsection>
 
 </section>
@@ -605,7 +601,7 @@
     your virtual host, and then have their identity recognized by all other
     web applications on the same virtual host.</p>
 
-    <p>See the <a href="host.html#Single Sign On">Single Sign On</a> special
+    <p>See the <a href="host.html#Single_Sign_On">Single Sign On</a> special
     feature on the <strong>Host</strong> element for more information.</p>
 
   </subsection>

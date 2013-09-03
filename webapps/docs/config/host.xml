@@ -48,7 +48,7 @@
   <p>In many cases, System Administrators wish to associate more than
   one network name (such as <code>www.mycompany.com</code> and
   <code>company.com</code>) with the same virtual host and applications.
-  This can be accomplished using the <a href="#Host Name Aliases">Host
+  This can be accomplished using the <a href="#Host_Name_Aliases">Host
   Name Aliases</a> feature discussed below.</p>
 
   <p>One or more <strong>Host</strong> elements are nested inside an
@@ -67,13 +67,11 @@
   not match the name of a <strong>Host</strong> element will be routed to the
   default host.</p>
 
-    <blockquote><em>
-    <p>The description below uses the variable name $CATALINA_BASE to refer the
+    <p><em>The description below uses the variable name $CATALINA_BASE to refer the
     base directory against which most relative paths are resolved. If you have
     not configured Tomcat for multiple instances by setting a CATALINA_BASE
     directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
-    the directory into which you have installed Tomcat.</p>
-    </em></blockquote>
+    the directory into which you have installed Tomcat.</em></p>
 
 </section>
 
@@ -183,7 +181,7 @@
         specify the host name, Tomcat will convert it to lower case internally.
         One of the Hosts nested within an <a href="engine.html">Engine</a> MUST
         have a name that matches the <code>defaultHost</code> setting for that
-        Engine.  See <a href="#Host Name Aliases">Host Name Aliases</a> for
+        Engine.  See <a href="#Host_Name_Aliases">Host Name Aliases</a> for
         information on how to assign more than one network name to the same
         virtual host.</p>
       </attribute>
@@ -337,17 +335,15 @@
     <a href="host.html">Host</a>, or <a href="context.html">Context</a>
     by nesting a <a href="valve.html">Valve</a> element like this:</p>
 
-<source>
-&lt;Host name="localhost" ...&gt;
+<source><![CDATA[<Host name="localhost" ...>
   ...
-  &lt;Valve className="org.apache.catalina.valves.AccessLogValve"
+  <Valve className="org.apache.catalina.valves.AccessLogValve"
          prefix="localhost_access_log." suffix=".txt"
-         pattern="common"/&gt;
+         pattern="common"/>
   ...
-&lt;/Host&gt;
-</source>
+</Host>]]></source>
 
-    <p>See <a href="valve.html#Access Log Valve">Access Log Valve</a>
+    <p>See <a href="valve.html#Access_Log_Valve">Access Log Valve</a>
     for more information on the configuration attributes that are
     supported.</p>
 
@@ -394,7 +390,7 @@
       for context.xml and/or WAR files.</li>
     </ol>
 
-    <p>When <code>autoDeploy</code> is <true>true</true>, the automatic
+    <p>When <code>autoDeploy</code> is <code>true</code>, the automatic
     deployment process will monitor the deployed web applications for changes.
     Depending on exactly what changes, the web application will either be
     re-deployed or reloaded. Re-deployment involves the creation of a new web
@@ -451,13 +447,11 @@
     <p>This is accomplished by utilizing one or more <strong>Alias</strong>
     elements nested inside your <strong>Host</strong> element.  For
     example:</p>
-<source>
-&lt;Host name="www.mycompany.com" ...&gt;
+<source><![CDATA[<Host name="www.mycompany.com" ...>
   ...
-  &lt;Alias&gt;mycompany.com&lt;/Alias&gt;
+  <Alias>mycompany.com</Alias>
   ...
-&lt;/Host&gt;
-</source>
+</Host>]]></source>
 
     <p>In order for this strategy to be effective, all of the network names
     involved must be registered in your DNS server to resolve to the
@@ -476,13 +470,11 @@
     it will be notified about the occurrence of the corresponding
     lifecycle events.  Configuration of such a listener looks like this:</p>
 
-<source>
-&lt;Host name="localhost" ...&gt;
+<source><![CDATA[<Host name="localhost" ...>
   ...
-  &lt;Listener className="com.mycompany.mypackage.MyListener" ... &gt;
+  <Listener className="com.mycompany.mypackage.MyListener" ... >
   ...
-&lt;/Host&gt;
-</source>
+</Host>]]></source>
 
     <p>Note that a Listener can have any number of additional properties
     that may be configured from this element.  Attribute names are matched
@@ -504,19 +496,17 @@
     not accepted will be rejected with an HTTP "Forbidden" error.
     Example filter declarations:</p>
 
-<source>
-&lt;Host name="localhost" ...&gt;
+<source><![CDATA[<Host name="localhost" ...>
   ...
-  &lt;Valve className="org.apache.catalina.valves.RemoteHostValve"
-         allow=".*\.mycompany\.com|www\.yourcompany\.com"/&gt;
-  &lt;Valve className="org.apache.catalina.valves.RemoteAddrValve"
-         deny="192\.168\.1\.\d+"/&gt;
+  <Valve className="org.apache.catalina.valves.RemoteHostValve"
+         allow=".*\.mycompany\.com|www\.yourcompany\.com"/>
+  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         deny="192\.168\.1\.\d+"/>
   ...
-&lt;/Host&gt;
-</source>
+</Host>]]></source>
 
-  <p>See <a href="valve.html#Remote Address Filter">Remote Address Filter</a>
-  and <a href="valve.html#Remote Host Filter">Remote Host Filter</a> for
+  <p>See <a href="valve.html#Remote_Address_Filter">Remote Address Filter</a>
+  and <a href="valve.html#Remote_Host_Filter">Remote Host Filter</a> for
   more information about the configuration options that are supported.</p>
 
   </subsection>
@@ -530,13 +520,11 @@
     host.  This can be accomplished by nesting an element like this inside
     the Host element for this virtual host:</p>
 
-<source>
-&lt;Host name="localhost" ...&gt;
+<source><![CDATA[<Host name="localhost" ...>
   ...
-  &lt;Valve className="org.apache.catalina.authenticator.SingleSignOn"/&gt;
+  <Valve className="org.apache.catalina.authenticator.SingleSignOn"/>
   ...
-&lt;/Host&gt;
-</source>
+</Host>]]></source>
 
     <p>The Single Sign On facility operates according to the following rules:
     </p>
@@ -582,39 +570,33 @@
     <strong>Listener</strong> element like this (on a Unix system that
     uses the <code>/etc/passwd</code> file to identify valid users):</p>
 
-<source>
-&lt;Host name="localhost" ...&gt;
+<source><![CDATA[<Host name="localhost" ...>
   ...
-  &lt;Listener className="org.apache.catalina.startup.UserConfig"
+  <Listener className="org.apache.catalina.startup.UserConfig"
             directoryName="public_html"
-            userClass="org.apache.catalina.startup.PasswdUserDatabase"/&gt;
+            userClass="org.apache.catalina.startup.PasswdUserDatabase"/>
   ...
-&lt;/Host&gt;
-</source>
+</Host>]]></source>
 
     <p>On a server where <code>/etc/passwd</code> is not in use, you can
     request Catalina to consider all directories found in a specified base
     directory (such as <code>c:\Homes</code> in this example) to be
     considered "user home" directories for the purposes of this directive:</p>
 
-<source>
-&lt;Host name="localhost" ...&gt;
+<source><![CDATA[<Host name="localhost" ...>
   ...
-  &lt;Listener className="org.apache.catalina.startup.UserConfig"
+  <Listener className="org.apache.catalina.startup.UserConfig"
             directoryName="public_html"
             homeBase=c:\Homes"
-            userClass="org.apache.catalina.startup.HomesUserDatabase"/&gt;
+            userClass="org.apache.catalina.startup.HomesUserDatabase"/>
   ...
-&lt;/Host&gt;
-</source>
+</Host>]]></source>
 
     <p>If a user home directory has been set up for a user named
     <code>craigmcc</code>, then its contents will be visible from a
     client browser by making a request to a URL like:</p>
 
-<source>
-http://www.mycompany.com:8080/~craigmcc
-</source>
+<source>http://www.mycompany.com:8080/~craigmcc</source>
 
     <p>Successful use of this feature requires recognition of the following
     considerations:</p>
