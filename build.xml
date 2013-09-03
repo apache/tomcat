@@ -611,7 +611,8 @@
            optimize="${compile.optimize}"
            excludes="**/.svn/**"
            encoding="ISO-8859-1"
-           includeAntRuntime="true" >
+           includeAntRuntime="true"
+           createMissingPackageInfoClass="false" >
       <compilerarg value="-Xlint:unchecked"/>
       <classpath refid="compile.classpath" />
         <exclude name="org/apache/naming/factory/webservices/**" />
