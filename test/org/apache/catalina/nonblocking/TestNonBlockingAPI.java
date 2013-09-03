@@ -80,15 +80,27 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
     }
 
+
     @Test
     public void testNonBlockingRead() throws Exception {
+        doTestNonBlockingRead(false);
+    }
+
+
+    @Test(expected=IOException.class)
+    public void testNonBlockingReadIgnoreIsReady() throws Exception {
+        doTestNonBlockingRead(true);
+    }
+
+
+    private void doTestNonBlockingRead(boolean ignoreIsReady) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // Must have a real docBase - just use temp
         StandardContext ctx = (StandardContext) tomcat.addContext("",
                 System.getProperty("java.io.tmpdir"));
 
-        NBReadServlet servlet = new NBReadServlet();
+        NBReadServlet servlet = new NBReadServlet(ignoreIsReady);
         String servletName = NBReadServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMapping("/", servletName);
@@ -98,6 +110,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Map<String, List<String>> resHeaders = new HashMap<>();
         int rc = postUrl(true, new DataWriter(500), "http://localhost:" +
                 getPort() + "/", new ByteChunk(), resHeaders, null);
+
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }
 
@@ -420,7 +433,13 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     @WebServlet(asyncSupported = true)
     public class NBReadServlet extends TesterServlet {
         private static final long serialVersionUID = 1L;
+        private final boolean ignoreIsReady;
         public volatile TestReadListener listener;
+
+        public NBReadServlet(boolean ignoreIsReady) {
+            this.ignoreIsReady = ignoreIsReady;
+        }
+
         @Override
         protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             // step 1 - start async
@@ -454,7 +473,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             });
             // step 2 - notify on read
             ServletInputStream in = req.getInputStream();
-            listener = new TestReadListener(actx, false);
+            listener = new TestReadListener(actx, false, ignoreIsReady);
             in.setReadListener(listener);
         }
     }
@@ -498,7 +517,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             });
             // step 2 - notify on read
             ServletInputStream in = req.getInputStream();
-            rlistener = new TestReadListener(actx, true);
+            rlistener = new TestReadListener(actx, true, false);
             in.setReadListener(rlistener);
             ServletOutputStream out = resp.getOutputStream();
             resp.setBufferSize(200 * 1024);
@@ -529,15 +548,18 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     private class TestReadListener implements ReadListener {
         private final AsyncContext ctx;
-        private final StringBuilder body = new StringBuilder();
         private final boolean usingNonBlockingWrite;
+        private final boolean ignoreIsReady;
+        private final StringBuilder body = new StringBuilder();
         public volatile boolean onErrorInvoked = false;
 
 
         public TestReadListener(AsyncContext ctx,
-                boolean usingNonBlockingWrite) {
+                boolean usingNonBlockingWrite,
+                boolean ignoreIsReady) {
             this.ctx = ctx;
             this.usingNonBlockingWrite = usingNonBlockingWrite;
+            this.ignoreIsReady = ignoreIsReady;
         }
 
         @Override
@@ -552,7 +574,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                     break;
                 }
                 s += new String(b, 0, read);
-            } while (in.isReady());
+            } while (ignoreIsReady || in.isReady());
             log.info(s);
             body.append(s);
         }
