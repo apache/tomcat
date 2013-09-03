@@ -86,14 +86,12 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         if (actionCode == ActionCode.ASYNC_COMPLETE) {
             socketWrapper.clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
-                ((AprEndpoint)endpoint).processSocketAsync(this.socketWrapper,
-                        SocketStatus.OPEN_READ);
+                endpoint.processSocketAsync(socketWrapper, SocketStatus.OPEN_READ);
             }
 
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
-                ((AprEndpoint)endpoint).processSocketAsync(this.socketWrapper,
-                        SocketStatus.OPEN_READ);
+                endpoint.processSocketAsync(socketWrapper, SocketStatus.OPEN_READ);
             }
         }
     }

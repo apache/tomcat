@@ -70,14 +70,12 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         if (actionCode == ActionCode.ASYNC_COMPLETE) {
             socketWrapper.clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
-                ((NioEndpoint)endpoint).dispatchForEvent(
-                        socketWrapper.getSocket(), SocketStatus.OPEN_READ, true);
+                endpoint.processSocketAsync(socketWrapper, SocketStatus.OPEN_READ);
             }
 
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
-                ((NioEndpoint)endpoint).dispatchForEvent(
-                        socketWrapper.getSocket(), SocketStatus.OPEN_READ, true);
+                endpoint.processSocketAsync(socketWrapper, SocketStatus.OPEN_READ);
             }
         }
     }
