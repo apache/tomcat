@@ -323,6 +323,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>55342</bug>: Remove unnecessary reset of interrupted flag. If
+        <code>InterruptedException</code> is thrown, the interrupted flag has
+        been cleared. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
