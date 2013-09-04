@@ -1338,7 +1338,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             swallowResponse = true;
         }
 
-        // Responses to HEAD requests are not permitted to incude a response
+        // Responses to HEAD requests are not permitted to include a response
         // body.
         MessageBytes methodMB = request.method();
         if (methodMB.equals("HEAD")) {
@@ -1495,8 +1495,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
          * Write chunk.
          */
         @Override
-        public int doWrite(ByteChunk chunk, Response res)
-            throws IOException {
+        public int doWrite(ByteChunk chunk, Response res) throws IOException {
 
             if (!response.isCommitted()) {
                 // Validate and write response headers
