@@ -110,7 +110,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
 
     @Override
-    protected void output(byte[] src, int offset, int length)
+    protected int output(byte[] src, int offset, int length, boolean block)
             throws IOException {
 
         NioEndpoint.KeyAttachment att =
@@ -132,8 +132,8 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             //ignore
         }
         try {
-            pool.write(writeBuffer, socketWrapper.getSocket(), selector,
-                    writeTimeout, true);
+            return pool.write(writeBuffer, socketWrapper.getSocket(), selector,
+                    writeTimeout, block);
         } finally {
             writeBuffer.clear();
             if (selector != null) {
