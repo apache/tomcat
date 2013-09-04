@@ -24,6 +24,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Socket;
+import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketWrapper;
 
@@ -102,22 +103,32 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
 
     @Override
-    protected void output(byte[] src, int offset, int length)
+    protected int output(byte[] src, int offset, int length, boolean block)
             throws IOException {
+
+        if (length == 0) {
+            return 0;
+        }
+
         outputBuffer.put(src, offset, length);
 
-        long socketRef = socketWrapper.getSocket().longValue();
+        int result = -1;
 
-        if (outputBuffer.position() > 0) {
-            if ((socketRef != 0) &&
-                    writeSocket(0, outputBuffer.position(), true) < 0) {
+        if (socketWrapper.getSocket().longValue() != 0) {
+            result = writeSocket(0, outputBuffer.position(), block);
+            if (Status.APR_STATUS_IS_EAGAIN(-result)) {
+                result = 0;
+            }
+            if (result < 0) {
                 // There are no re-tries so clear the buffer to prevent a
                 // possible overflow if the buffer is used again. BZ53119.
                 outputBuffer.clear();
                 throw new IOException(sm.getString("ajpprocessor.failedsend"));
             }
-            outputBuffer.clear();
         }
+        outputBuffer.clear();
+
+        return result;
     }
 
 

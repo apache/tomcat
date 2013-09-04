@@ -672,7 +672,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     }
                     cping = true;
                     try {
-                        output(pongMessageArray, 0, pongMessageArray.length);
+                        output(pongMessageArray, 0, pongMessageArray.length, true);
                     } catch (IOException e) {
                         error = true;
                     }
@@ -855,8 +855,8 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     protected abstract void resetTimeouts();
 
     // Methods called by prepareResponse()
-    protected abstract void output(byte[] src, int offset, int length)
-            throws IOException;
+    protected abstract int output(byte[] src, int offset, int length,
+            boolean block) throws IOException;
 
     // Methods called by process()
     protected abstract void setupSocket(SocketWrapper<S> socketWrapper)
@@ -1002,7 +1002,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         // Request more data immediately
         if (!first && !waitingForBodyMessage) {
-            output(getBodyMessageArray, 0, getBodyMessageArray.length);
+            output(getBodyMessageArray, 0, getBodyMessageArray.length, true);
             waitingForBodyMessage = true;
         }
 
@@ -1397,8 +1397,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         // Write to buffer
         responseMessage.end();
-        output(responseMessage.getBuffer(), 0,
-                responseMessage.getLen());
+        output(responseMessage.getBuffer(), 0, responseMessage.getLen(), true);
     }
 
 
@@ -1408,7 +1407,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     protected void flush(boolean explicit) throws IOException {
         if (explicit && !finished) {
             // Send the flush message
-            output(flushMessageArray, 0, flushMessageArray.length);
+            output(flushMessageArray, 0, flushMessageArray.length, true);
         }
     }
 
@@ -1440,9 +1439,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         // Add the end message
         if (error) {
-            output(endAndCloseMessageArray, 0, endAndCloseMessageArray.length);
+            output(endAndCloseMessageArray, 0, endAndCloseMessageArray.length, true);
         } else {
-            output(endMessageArray, 0, endMessageArray.length);
+            output(endMessageArray, 0, endMessageArray.length, true);
         }
     }
 
@@ -1523,7 +1522,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     responseMessage.appendByte(Constants.JK_AJP13_SEND_BODY_CHUNK);
                     responseMessage.appendBytes(chunk.getBytes(), chunk.getOffset() + off, thisTime);
                     responseMessage.end();
-                    output(responseMessage.getBuffer(), 0, responseMessage.getLen());
+                    output(responseMessage.getBuffer(), 0, responseMessage.getLen(), true);
 
                     off += thisTime;
                 }

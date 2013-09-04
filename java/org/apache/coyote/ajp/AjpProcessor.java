@@ -97,9 +97,10 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
 
 
     @Override
-    protected void output(byte[] src, int offset, int length)
+    protected int output(byte[] src, int offset, int length, boolean block)
             throws IOException {
         output.write(src, offset, length);
+        return length;
     }
 
 
