@@ -140,7 +140,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * AJP packet size.
      */
-    protected final int packetSize;
+    private final int outputMaxChunkSize;
 
     /**
      * Header message. Note that this header is merely the one used during the
@@ -248,7 +248,10 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         super(endpoint);
 
-        this.packetSize = packetSize;
+        // Calculate maximum chunk size as packetSize may have been changed from
+        // the default (Constants.MAX_PACKET_SIZE)
+        this.outputMaxChunkSize =
+                Constants.MAX_SEND_SIZE + packetSize - Constants.MAX_PACKET_SIZE;
 
         request.setInputBuffer(new SocketInputBuffer());
 
@@ -1509,13 +1512,11 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             if (!swallowResponse) {
                 int len = chunk.getLength();
                 // 4 - hardcoded, byte[] marshaling overhead
-                // Adjust allowed size if packetSize != default (Constants.MAX_PACKET_SIZE)
-                int chunkSize = Constants.MAX_SEND_SIZE + packetSize - Constants.MAX_PACKET_SIZE;
                 int off = 0;
                 while (len > 0) {
                     int thisTime = len;
-                    if (thisTime > chunkSize) {
-                        thisTime = chunkSize;
+                    if (thisTime > outputMaxChunkSize) {
+                        thisTime = outputMaxChunkSize;
                     }
                     len -= thisTime;
                     responseMessage.reset();
