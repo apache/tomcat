@@ -190,7 +190,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
         // Keep writing until all the data is written or a non-blocking write
         // leaves data in the buffer
-        while (!dataLeft && length>0) {
+        while (!dataLeft && length > 0) {
             int thisTime = transfer(buf,offset,length,socket.getBufHandler().getWriteBuffer());
             length = length - thisTime;
             offset = offset + thisTime;
@@ -204,11 +204,10 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         }
 
         NioEndpoint.KeyAttachment ka = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-        if ( ka!= null ) ka.access();//prevent timeouts for just doing client writes
+        if (ka != null) ka.access();//prevent timeouts for just doing client writes
 
-        if (!isBlocking() && length>0) {
-            //we must buffer as long as it fits
-            //ByteBufferHolder tail = bufferedWrite.
+        if (!isBlocking() && length > 0) {
+            // Remaining data must be buffered
             addToBuffers(buf, offset, length);
         }
     }
