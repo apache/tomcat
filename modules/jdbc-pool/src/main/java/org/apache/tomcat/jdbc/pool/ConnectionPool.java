@@ -487,9 +487,12 @@ public class ConnectionPool {
             } //for
 
         } catch (SQLException x) {
-            if (jmxPool!=null) jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
-            close(true);
-            throw x;
+            log.error("Unable to create initial connections of pool.", x);
+            if (!poolProperties.isIgnoreExceptionOnPreLoad()) {
+                if (jmxPool!=null) jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
+                close(true);
+                throw x;
+            }
         } finally {
             //return the members as idle to the pool
             for (int i = 0; i < initialPool.length; i++) {

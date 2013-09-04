@@ -92,7 +92,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private volatile boolean useDisposableConnectionFacade = true;
     private volatile boolean logValidationErrors = false;
     private volatile boolean propagateInterruptState = false;
-
+    private volatile boolean ignoreExceptionOnPreLoad = false;
 
     /**
      * {@inheritDoc}
@@ -1256,6 +1256,22 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     @Override
     public void setPropagateInterruptState(boolean propagateInterruptState) {
         this.propagateInterruptState = propagateInterruptState;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isIgnoreExceptionOnPreLoad() {
+        return ignoreExceptionOnPreLoad;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setIgnoreExceptionOnPreLoad(boolean ignoreExceptionOnPreLoad) {
+        this.ignoreExceptionOnPreLoad = ignoreExceptionOnPreLoad;
     }
 
     @Override

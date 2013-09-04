@@ -864,4 +864,16 @@ public interface PoolConfiguration {
      */
     public void setPropagateInterruptState(boolean propagateInterruptState);
 
+    /**
+     * Set to true if you want to ignore error of connection creation while initializing the pool.
+     * Set to false if you want to fail the initialization of the pool by throwing exception.
+     * @param ignoreExceptionOnPreLoad set to true if you want to ignore error of connection creation while initializing the pool.
+     */
+    public void setIgnoreExceptionOnPreLoad(boolean ignoreExceptionOnPreLoad);
+
+    /**
+     * @see PoolConfiguration#setIgnoreExceptionOnPreLoad(boolean)
+     */
+    public boolean isIgnoreExceptionOnPreLoad();
+
 }
