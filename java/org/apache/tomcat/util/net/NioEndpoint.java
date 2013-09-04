@@ -32,6 +32,8 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.WritableByteChannel;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -626,8 +628,30 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             SocketProcessor sc = processorCache.pop();
             if ( sc == null ) sc = new SocketProcessor(socket,status);
             else sc.reset(socket,status);
-            if ( dispatch && getExecutor()!=null ) getExecutor().execute(sc);
-            else sc.run();
+            if (dispatch && getExecutor() != null) {
+                ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                try {
+                    //threads should not be created by the webapp classloader
+                    if (Constants.IS_SECURITY_ENABLED) {
+                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                                getClass().getClassLoader());
+                        AccessController.doPrivileged(pa);
+                    } else {
+                        Thread.currentThread().setContextClassLoader(
+                                getClass().getClassLoader());
+                    }
+                    getExecutor().execute(sc);
+                } finally {
+                    if (Constants.IS_SECURITY_ENABLED) {
+                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
+                        AccessController.doPrivileged(pa);
+                    } else {
+                        Thread.currentThread().setContextClassLoader(loader);
+                    }
+                }
+            } else {
+                sc.run();
+            }
         } catch (RejectedExecutionException rx) {
             log.warn("Socket processing request was rejected for:"+socket,rx);
             return false;

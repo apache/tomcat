@@ -607,20 +607,4 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
     protected Log getLog() {
         return log;
     }
-
-    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
-
-        private ClassLoader cl;
-
-        PrivilegedSetTccl(ClassLoader cl) {
-            this.cl = cl;
-        }
-
-        @Override
-        public Void run() {
-            Thread.currentThread().setContextClassLoader(cl);
-            return null;
-        }
-    }
-
 }
