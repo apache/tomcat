@@ -1408,6 +1408,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      * Callback to write data from the buffer.
      */
     protected void flush(boolean explicit) throws IOException {
+        // Calling code should ensure that there is no data in the buffers for
+        // non-blocking writes.
+        // TODO Validate the assertion above
         if (explicit && !finished) {
             // Send the flush message
             output(flushMessageArray, 0, flushMessageArray.length, true);
