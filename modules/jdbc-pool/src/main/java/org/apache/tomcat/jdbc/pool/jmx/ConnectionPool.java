@@ -832,6 +832,22 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * {@inheritDoc}
      */
     @Override
+    public boolean isIgnoreExceptionOnPreLoad() {
+        return getPoolProperties().isIgnoreExceptionOnPreLoad();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setIgnoreExceptionOnPreLoad(boolean ignoreExceptionOnPreLoad) {
+        getPoolProperties().setIgnoreExceptionOnPreLoad(ignoreExceptionOnPreLoad);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void purge() {
         pool.purge();
 

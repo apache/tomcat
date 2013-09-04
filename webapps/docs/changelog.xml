@@ -330,6 +330,10 @@
         <code>InterruptedException</code> is thrown, the interrupted flag has
         been cleared. (kfujino)
       </fix>
+      <fix>
+        <bug>55343</bug>: Add flag to ignore exceptions of connection creation
+        while initializing the pool. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

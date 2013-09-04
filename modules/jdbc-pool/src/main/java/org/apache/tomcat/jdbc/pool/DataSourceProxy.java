@@ -1288,6 +1288,22 @@ public class DataSourceProxy implements PoolConfiguration {
         getPoolProperties().setPropagateInterruptState(propagateInterruptState);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isIgnoreExceptionOnPreLoad() {
+        return getPoolProperties().isIgnoreExceptionOnPreLoad();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setIgnoreExceptionOnPreLoad(boolean ignoreExceptionOnPreLoad) {
+        getPoolProperties().setIgnoreExceptionOnPreLoad(ignoreExceptionOnPreLoad);
+    }
+
     public void purge()  {
         try {
             createPool().purge();

@@ -495,6 +495,13 @@
       <p>(boolean) Set this to true to propagate the interrupt state for a thread that has been interrupted (not clearing the interrupt state). Default value is <code>false</code> for backwards compatibility.
       </p>
     </attribute>
+    <attribute name="ignoreExceptionOnPreLoad" required="false">
+      <p>(boolean) Flag whether ignore error of connection creation while initializing the pool.
+         Set to true if you want to ignore error of connection creation while initializing the pool.
+         Set to false if you want to fail the initialization of the pool by throwing exception.
+         The default value is <code>false</code>.
+      </p>
+    </attribute>
 
   </attributes>
   </subsection>
