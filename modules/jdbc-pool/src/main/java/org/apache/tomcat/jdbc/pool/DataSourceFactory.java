@@ -122,6 +122,8 @@ public class DataSourceFactory implements ObjectFactory {
 
     protected static final String PROP_PROPAGATEINTERRUPTSTATE = "propagateInterruptState";
 
+    protected static final String PROP_IGNOREEXCEPTIONONPRELOAD = "ignoreExceptionOnPreLoad";
+
     public static final int UNKNOWN_TRANSACTIONISOLATION = -1;
 
     public static final String OBJECT_NAME = "object_name";
@@ -175,7 +177,8 @@ public class DataSourceFactory implements ObjectFactory {
         PROP_ROLLBACKONRETURN,
         PROP_USEDISPOSABLECONNECTIONFACADE,
         PROP_LOGVALIDATIONERRORS,
-        PROP_PROPAGATEINTERRUPTSTATE
+        PROP_PROPAGATEINTERRUPTSTATE,
+        PROP_IGNOREEXCEPTIONONPRELOAD
     };
 
     // -------------------------------------------------- ObjectFactory Methods
@@ -512,6 +515,11 @@ public class DataSourceFactory implements ObjectFactory {
         value = properties.getProperty(PROP_PROPAGATEINTERRUPTSTATE);
         if (value != null) {
             poolProperties.setPropagateInterruptState(Boolean.parseBoolean(value));
+        }
+
+        value = properties.getProperty(PROP_IGNOREEXCEPTIONONPRELOAD);
+        if (value != null) {
+            poolProperties.setIgnoreExceptionOnPreLoad(Boolean.parseBoolean(value));
         }
 
         return poolProperties;
