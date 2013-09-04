@@ -158,6 +158,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     /**
+     * Location of next write of the response message (used withnon-blocking
+     * writes when the message may not be written in a single write). Avalue of
+     * -1 indicates that no message has been written to the buffer.
+     */
+    private int responseMsgPos = -1;
+
+    /**
      * Body message.
      */
     protected final AjpMessage bodyMessage;
@@ -1452,6 +1459,25 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     }
 
 
+    private void writeResponseMessage(boolean block) throws IOException {
+        int len = responseMessage.getLen();
+        int written = 1;
+        if (responseMsgPos == -1) {
+            // New message. Advance the write position to the beginning
+            responseMsgPos = 0;
+        }
+
+        while (written > 0 && responseMsgPos < len) {
+            written = output(
+                    responseMessage.getBuffer(), responseMsgPos, len, block);
+            responseMsgPos += written;
+        }
+
+        if (responseMsgPos == len) {
+            responseMsgPos = -1;
+        }
+    }
+
     // ------------------------------------- InputStreamInputBuffer Inner Class
 
 
@@ -1526,7 +1552,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     responseMessage.appendByte(Constants.JK_AJP13_SEND_BODY_CHUNK);
                     responseMessage.appendBytes(chunk.getBytes(), chunk.getOffset() + off, thisTime);
                     responseMessage.end();
-                    output(responseMessage.getBuffer(), 0, responseMessage.getLen(), true);
+                    writeResponseMessage(true);
 
                     off += thisTime;
                 }
