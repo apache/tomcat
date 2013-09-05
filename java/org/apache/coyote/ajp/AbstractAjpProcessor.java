@@ -219,6 +219,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     /**
+     * Is a body present for the current request? This is determined by the
+     * presence of the content-length header with a non-zero value.
+     */
+    private boolean bodyPresent = false;
+
+
+    /**
      * Indicates that a 'get body chunk' message has been sent but the body
      * chunk has not yet been received.
      */
@@ -842,6 +849,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         // Recycle Request object
         first = true;
         endOfStream = false;
+        bodyPresent = false;
         waitingForBodyMessage = false;
         empty = true;
         replay = false;
@@ -1017,7 +1025,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         }
 
         boolean moreData = receive(block);
-        if (!first && !waitingForBodyMessage && !moreData) {
+        if (!moreData && ((first && !bodyPresent) || (!first && !waitingForBodyMessage))) {
             endOfStream = true;
         }
         return moreData;
@@ -1090,7 +1098,11 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             if (hId == Constants.SC_REQ_CONTENT_LENGTH ||
                     (hId == -1 && tmpMB.equalsIgnoreCase("Content-Length"))) {
                 // just read the content-length header, so set it
-                request.setContentLength(vMB.getLong());
+                long cl = vMB.getLong();
+                request.setContentLength(cl);
+                if (cl != 0) {
+                    bodyPresent = true;
+                }
             } else if (hId == Constants.SC_REQ_CONTENT_TYPE ||
                     (hId == -1 && tmpMB.equalsIgnoreCase("Content-Type"))) {
                 // just read the content-type header, so set it
