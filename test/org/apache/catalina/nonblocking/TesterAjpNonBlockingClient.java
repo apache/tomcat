@@ -96,6 +96,8 @@ public class TesterAjpNonBlockingClient extends TomcatBaseTest {
         String resultString = result.toString();
         log.info("Client read " + resultString.length() + " bytes");
 
+        System.out.println(resultString);
+
         Assert.assertTrue(resultString.contains("00000000000000010000"));
     }
 }
