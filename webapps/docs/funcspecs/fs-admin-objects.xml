@@ -44,19 +44,19 @@ Operations</a> that can be performed when the administrative application is
 
 <p>The following Administered Objects are defined:</p>
 <ul>
-<li><a href="#Access Logger">Access Logger</a></li>
+<li><a href="#Access_Logger">Access Logger</a></li>
 <li><a href="#Connector">Connector</a></li>
 <li><a href="#Context">Context</a></li>
-<li><a href="#Default Context">Default Context</a></li>
-<li><a href="#Default Deployment Descriptor">Default Deployment Descriptor</a></li>
+<li><a href="#Default_Context">Default Context</a></li>
+<li><a href="#Default_Deployment_Descriptor">Default Deployment Descriptor</a></li>
 <li><a href="#Engine">Engine</a></li>
-<li><a href="#Environment Entry">Environment Entry</a></li>
+<li><a href="#Environment_Entry">Environment Entry</a></li>
 <li><a href="#Host">Host</a></li>
-<li><a href="#JDBC Resource">JDBC Resource</a></li>
+<li><a href="#JDBC_Resource">JDBC Resource</a></li>
 <li><a href="#Loader">Loader</a></li>
 <li><a href="#Manager">Manager</a></li>
 <li><a href="#Realm">Realm</a></li>
-<li><a href="#Request Filter">Request Filter</a></li>
+<li><a href="#Request_Filter">Request Filter</a></li>
 <li><a href="#Server">Server</a></li>
 <li><a href="#Service">Service</a></li>
 </ul>
