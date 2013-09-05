@@ -566,7 +566,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         kms = kmf.getKeyManagers();
         if (keyAlias != null) {
             String alias = keyAlias;
-            if (JSSESocketFactory.defaultKeystoreType.equals(keystoreType)) {
+            if ("JKS".equals(keystoreType)) {
                 alias = alias.toLowerCase(Locale.ENGLISH);
             }
             for(int i=0; i<kms.length; i++) {
