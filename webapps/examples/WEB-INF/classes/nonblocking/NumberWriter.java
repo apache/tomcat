@@ -68,7 +68,7 @@ public class NumberWriter extends HttpServlet {
     private static class NumberWriterListener implements ReadListener,
             WriteListener {
 
-        private static final int LIMIT =  1000;
+        private static final int LIMIT =  10000;
 
         private final AsyncContext ac;
         private final ServletInputStream sis;
