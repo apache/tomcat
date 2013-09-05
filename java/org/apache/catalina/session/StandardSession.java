@@ -658,12 +658,12 @@ public class StandardSession implements HttpSession, Session, Serializable {
     @Override
     public boolean isValid() {
 
-        if (this.expiring) {
-            return true;
-        }
-
         if (!this.isValid) {
             return false;
+        }
+
+        if (this.expiring) {
+            return true;
         }
 
         if (ACTIVITY_CHECK && accessCount.get() > 0) {
@@ -683,7 +683,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
             }
         }
 
-        return (this.isValid);
+        return this.isValid;
     }
 
 
@@ -777,14 +777,16 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     public void expire(boolean notify) {
 
-        // Check to see if expire is in progress or has previously been called
-        if (expiring || !isValid)
+        // Check to see if session has already been invalidated.
+        // Do not check expiring at this point as expire should not return until
+        // isValid is false
+        if (!isValid)
             return;
 
         synchronized (this) {
             // Check again, now we are inside the sync so this code only runs once
-            // Double check locking - expiring and isValid need to be volatile
-            if (expiring || !isValid)
+            // Double check locking - isValid needs to be volatile
+            if (!isValid)
                 return;
 
             if (manager == null)
@@ -860,7 +862,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
             if (ACTIVITY_CHECK) {
                 accessCount.set(0);
             }
-            setValid(false);
 
             // Remove this session from our manager's active sessions
             manager.remove(this, true);
@@ -883,6 +884,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
             }
 
             // We have completed expire of this session
+            setValid(false);
             expiring = false;
 
             // Unbind any objects associated with this session
@@ -1563,7 +1565,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      * check.
      */
     protected boolean isValidInternal() {
-        return (this.isValid || this.expiring);
+        return this.isValid;
     }
 
     /**
