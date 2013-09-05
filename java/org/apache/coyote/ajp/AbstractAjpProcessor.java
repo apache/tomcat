@@ -33,6 +33,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
+import org.apache.coyote.ByteBufferHolder;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
@@ -1667,49 +1668,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         @Override
         public long getBytesWritten() {
             return bytesWritten;
-        }
-    }
-
-
-    protected static class ByteBufferHolder {
-        private final ByteBuffer buf;
-        private final AtomicBoolean flipped;
-        public ByteBufferHolder(ByteBuffer buf, boolean flipped) {
-           this.buf = buf;
-           this.flipped = new AtomicBoolean(flipped);
-        }
-        public ByteBuffer getBuf() {
-            return buf;
-        }
-        public boolean isFlipped() {
-            return flipped.get();
-        }
-
-        public boolean flip() {
-            if (flipped.compareAndSet(false, true)) {
-                buf.flip();
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        public boolean hasData() {
-            if (flipped.get()) {
-                return buf.remaining()>0;
-            } else {
-                return buf.position()>0;
-            }
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder builder = new StringBuilder(super.toString());
-            builder.append("[flipped=");
-            builder.append(isFlipped()?"true, remaining=" : "false, position=");
-            builder.append(isFlipped()? buf.remaining(): buf.position());
-            builder.append("]");
-            return builder.toString();
         }
     }
 }
