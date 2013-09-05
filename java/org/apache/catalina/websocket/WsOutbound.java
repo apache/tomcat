@@ -41,6 +41,13 @@ public class WsOutbound {
             StringManager.getManager(Constants.Package);
     public static final int DEFAULT_BUFFER_SIZE = 8192;
 
+    /**
+     * This state lock is used rather than synchronized methods to allow error
+     * handling to be managed outside of the synchronization else deadlocks may
+     * occur such as https://issues.apache.org/bugzilla/show_bug.cgi?id=55524
+     */
+    private final Object stateLock = new Object();
+    
     private UpgradeOutbound upgradeOutbound;
     private StreamInbound streamInbound;
     private ByteBuffer bb;
@@ -78,22 +85,34 @@ public class WsOutbound {
      * @throws IOException  If a flush is required and an error occurs writing
      *                      the WebSocket frame to the client
      */
-    public synchronized void writeBinaryData(int b) throws IOException {
-        if (closed) {
-            throw new IOException(sm.getString("outbound.closed"));
+    public void writeBinaryData(int b) throws IOException {
+        try {
+            synchronized (stateLock) {
+                if (closed) {
+                    throw new IOException(sm.getString("outbound.closed"));
+                }
+        
+                if (bb.position() == bb.capacity()) {
+                    doFlush(false);
+                }
+                if (text == null) {
+                    text = Boolean.FALSE;
+                } else if (text == Boolean.TRUE) {
+                    // Flush the character data
+                    flush();
+                    text = Boolean.FALSE;
+                }
+                bb.put((byte) (b & 0xFF));
+            }
+        } catch (IOException ioe) {
+            // Any IOException is terminal. Make sure the inbound side knows
+            // that something went wrong.
+            // The exception handling needs to be outside of the sync to avoid
+            // possible deadlocks (e.g. BZ55524) when triggering the inbound
+            // close as that will execute user code
+            streamInbound.doOnClose(Constants.STATUS_CLOSED_UNEXPECTEDLY);
+            throw ioe;
         }
-
-        if (bb.position() == bb.capacity()) {
-            doFlush(false);
-        }
-        if (text == null) {
-            text = Boolean.FALSE;
-        } else if (text == Boolean.TRUE) {
-            // Flush the character data
-            flush();
-            text = Boolean.FALSE;
-        }
-        bb.put((byte) (b & 0xFF));
     }
 
 
@@ -108,23 +127,35 @@ public class WsOutbound {
      * @throws IOException  If a flush is required and an error occurs writing
      *                      the WebSocket frame to the client
      */
-    public synchronized void writeTextData(char c) throws IOException {
-        if (closed) {
-            throw new IOException(sm.getString("outbound.closed"));
+    public void writeTextData(char c) throws IOException {
+        try {
+            synchronized (stateLock) {
+                if (closed) {
+                    throw new IOException(sm.getString("outbound.closed"));
+                }
+        
+                if (cb.position() == cb.capacity()) {
+                    doFlush(false);
+                }
+        
+                if (text == null) {
+                    text = Boolean.TRUE;
+                } else if (text == Boolean.FALSE) {
+                    // Flush the binary data
+                    flush();
+                    text = Boolean.TRUE;
+                }
+                cb.append(c);
+            }
+        } catch (IOException ioe) {
+            // Any IOException is terminal. Make sure the Inbound side knows
+            // that something went wrong.
+            // The exception handling needs to be outside of the sync to avoid
+            // possible deadlocks (e.g. BZ55524) when triggering the inbound
+            // close as that will execute user code
+            streamInbound.doOnClose(Constants.STATUS_CLOSED_UNEXPECTEDLY);
+            throw ioe;
         }
-
-        if (cb.position() == cb.capacity()) {
-            doFlush(false);
-        }
-
-        if (text == null) {
-            text = Boolean.TRUE;
-        } else if (text == Boolean.FALSE) {
-            // Flush the binary data
-            flush();
-            text = Boolean.TRUE;
-        }
-        cb.append(c);
     }
 
 
@@ -137,19 +168,30 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public synchronized void writeBinaryMessage(ByteBuffer msgBb)
-            throws IOException {
+    public void writeBinaryMessage(ByteBuffer msgBb) throws IOException {
 
-        if (closed) {
-            throw new IOException(sm.getString("outbound.closed"));
+        try {
+            synchronized (stateLock) {
+                if (closed) {
+                    throw new IOException(sm.getString("outbound.closed"));
+                }
+        
+                if (text != null) {
+                    // Empty the buffer
+                    flush();
+                }
+                text = Boolean.FALSE;
+                doWriteBytes(msgBb, true);
+            }
+        } catch (IOException ioe) {
+            // Any IOException is terminal. Make sure the Inbound side knows
+            // that something went wrong.
+            // The exception handling needs to be outside of the sync to avoid
+            // possible deadlocks (e.g. BZ55524) when triggering the inbound
+            // close as that will execute user code
+            streamInbound.doOnClose(Constants.STATUS_CLOSED_UNEXPECTEDLY);
+            throw ioe;
         }
-
-        if (text != null) {
-            // Empty the buffer
-            flush();
-        }
-        text = Boolean.FALSE;
-        doWriteBytes(msgBb, true);
     }
 
 
@@ -162,19 +204,30 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public synchronized void writeTextMessage(CharBuffer msgCb)
-            throws IOException {
+    public void writeTextMessage(CharBuffer msgCb) throws IOException {
 
-        if (closed) {
-            throw new IOException(sm.getString("outbound.closed"));
+        try {
+            synchronized (stateLock) {
+                if (closed) {
+                    throw new IOException(sm.getString("outbound.closed"));
+                }
+        
+                if (text != null) {
+                    // Empty the buffer
+                    flush();
+                }
+                text = Boolean.TRUE;
+                doWriteText(msgCb, true);
+            }
+        } catch (IOException ioe) {
+            // Any IOException is terminal. Make sure the Inbound side knows
+            // that something went wrong.
+            // The exception handling needs to be outside of the sync to avoid
+            // possible deadlocks (e.g. BZ55524) when triggering the inbound
+            // close as that will execute user code
+            streamInbound.doOnClose(Constants.STATUS_CLOSED_UNEXPECTEDLY);
+            throw ioe;
         }
-
-        if (text != null) {
-            // Empty the buffer
-            flush();
-        }
-        text = Boolean.TRUE;
-        doWriteText(msgCb, true);
     }
 
 
@@ -183,11 +236,23 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public synchronized void flush() throws IOException {
-        if (closed) {
-            throw new IOException(sm.getString("outbound.closed"));
+    public void flush() throws IOException {
+        try {
+            synchronized (stateLock) {
+                if (closed) {
+                    throw new IOException(sm.getString("outbound.closed"));
+                }
+                doFlush(true);
+            }
+        } catch (IOException ioe) {
+            // Any IOException is terminal. Make sure the Inbound side knows
+            // that something went wrong.
+            // The exception handling needs to be outside of the sync to avoid
+            // possible deadlocks (e.g. BZ55524) when triggering the inbound
+            // close as that will execute user code
+            streamInbound.doOnClose(Constants.STATUS_CLOSED_UNEXPECTEDLY);
+            throw ioe;
         }
-        doFlush(true);
     }
 
 
@@ -270,39 +335,50 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public synchronized void close(int status, ByteBuffer data)
-            throws IOException {
+    public void close(int status, ByteBuffer data) throws IOException {
 
-        if (closed) {
-            return;
-        }
-
-        // Send any partial data we have
         try {
-            doFlush(false);
-        } finally {
-            closed = true;
+            synchronized (stateLock) {
+                if (closed) {
+                    return;
+                }
+        
+                // Send any partial data we have
+                try {
+                    doFlush(false);
+                } finally {
+                    closed = true;
+                }
+        
+                upgradeOutbound.write(0x88);
+                if (status == 0) {
+                    upgradeOutbound.write(0);
+                } else if (data == null || data.position() == data.limit()) {
+                    upgradeOutbound.write(2);
+                    upgradeOutbound.write(status >>> 8);
+                    upgradeOutbound.write(status);
+                } else {
+                    upgradeOutbound.write(2 + data.limit() - data.position());
+                    upgradeOutbound.write(status >>> 8);
+                    upgradeOutbound.write(status);
+                    upgradeOutbound.write(data.array(), data.position(),
+                            data.limit() - data.position());
+                }
+                upgradeOutbound.flush();
+        
+                bb = null;
+                cb = null;
+                upgradeOutbound = null;
+            }
+        } catch (IOException ioe) {
+            // Any IOException is terminal. Make sure the Inbound side knows
+            // that something went wrong.
+            // The exception handling needs to be outside of the sync to avoid
+            // possible deadlocks (e.g. BZ55524) when triggering the inbound
+            // close as that will execute user code
+            streamInbound.doOnClose(Constants.STATUS_CLOSED_UNEXPECTEDLY);
+            throw ioe;
         }
-
-        upgradeOutbound.write(0x88);
-        if (status == 0) {
-            upgradeOutbound.write(0);
-        } else if (data == null || data.position() == data.limit()) {
-            upgradeOutbound.write(2);
-            upgradeOutbound.write(status >>> 8);
-            upgradeOutbound.write(status);
-        } else {
-            upgradeOutbound.write(2 + data.limit() - data.position());
-            upgradeOutbound.write(status >>> 8);
-            upgradeOutbound.write(status);
-            upgradeOutbound.write(data.array(), data.position(),
-                    data.limit() - data.position());
-        }
-        upgradeOutbound.flush();
-
-        bb = null;
-        cb = null;
-        upgradeOutbound = null;
     }
 
 
@@ -313,7 +389,7 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public synchronized void pong(ByteBuffer data) throws IOException {
+    public void pong(ByteBuffer data) throws IOException {
         sendControlMessage(data, Constants.OPCODE_PONG);
     }
 
@@ -324,7 +400,7 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public synchronized void ping(ByteBuffer data) throws IOException {
+    public void ping(ByteBuffer data) throws IOException {
         sendControlMessage(data, Constants.OPCODE_PING);
     }
 
@@ -336,24 +412,36 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    private synchronized void sendControlMessage(ByteBuffer data, byte opcode) throws IOException {
+    private void sendControlMessage(ByteBuffer data, byte opcode) throws IOException {
 
-        if (closed) {
-            throw new IOException(sm.getString("outbound.closed"));
+        try {
+            synchronized (stateLock) {
+                if (closed) {
+                    throw new IOException(sm.getString("outbound.closed"));
+                }
+        
+                doFlush(false);
+        
+                upgradeOutbound.write(0x80 | opcode);
+                if (data == null) {
+                    upgradeOutbound.write(0);
+                } else {
+                    upgradeOutbound.write(data.limit() - data.position());
+                    upgradeOutbound.write(data.array(), data.position(),
+                            data.limit() - data.position());
+                }
+        
+                upgradeOutbound.flush();
+            }
+        } catch (IOException ioe) {
+            // Any IOException is terminal. Make sure the Inbound side knows
+            // that something went wrong.
+            // The exception handling needs to be outside of the sync to avoid
+            // possible deadlocks (e.g. BZ55524) when triggering the inbound
+            // close as that will execute user code
+            streamInbound.doOnClose(Constants.STATUS_CLOSED_UNEXPECTEDLY);
+            throw ioe;
         }
-
-        doFlush(false);
-
-        upgradeOutbound.write(0x80 | opcode);
-        if (data == null) {
-            upgradeOutbound.write(0);
-        } else {
-            upgradeOutbound.write(data.limit() - data.position());
-            upgradeOutbound.write(data.array(), data.position(),
-                    data.limit() - data.position());
-        }
-
-        upgradeOutbound.flush();
     }
 
 
@@ -372,60 +460,53 @@ public class WsOutbound {
             throw new IOException(sm.getString("outbound.closed"));
         }
 
-        try {
-            // Work out the first byte
-            int first = 0x00;
-            if (finalFragment) {
-                first = first + 0x80;
-            }
-            if (firstFrame) {
-                if (text.booleanValue()) {
-                    first = first + 0x1;
-                } else {
-                    first = first + 0x2;
-                }
-            }
-            // Continuation frame is OpCode 0
-            upgradeOutbound.write(first);
-    
-            if (buffer.limit() < 126) {
-                upgradeOutbound.write(buffer.limit());
-            } else if (buffer.limit() < 65536) {
-                upgradeOutbound.write(126);
-                upgradeOutbound.write(buffer.limit() >>> 8);
-                upgradeOutbound.write(buffer.limit() & 0xFF);
-            } else {
-                // Will never be more than 2^31-1
-                upgradeOutbound.write(127);
-                upgradeOutbound.write(0);
-                upgradeOutbound.write(0);
-                upgradeOutbound.write(0);
-                upgradeOutbound.write(0);
-                upgradeOutbound.write(buffer.limit() >>> 24);
-                upgradeOutbound.write(buffer.limit() >>> 16);
-                upgradeOutbound.write(buffer.limit() >>> 8);
-                upgradeOutbound.write(buffer.limit() & 0xFF);
-            }
-    
-            // Write the content
-            upgradeOutbound.write(buffer.array(), buffer.arrayOffset(),
-                    buffer.limit());
-            upgradeOutbound.flush();
-    
-            // Reset
-            if (finalFragment) {
-                text = null;
-                firstFrame = true;
-            } else {
-                firstFrame = false;
-            }
-            bb.clear();
-        } catch (IOException ioe) {
-            // Any IOException is terminal. Make sure the Inbound side knows
-            // that something went wrong.
-            streamInbound.doOnClose(Constants.STATUS_CLOSED_UNEXPECTEDLY);
-            throw ioe;
+        // Work out the first byte
+        int first = 0x00;
+        if (finalFragment) {
+            first = first + 0x80;
         }
+        if (firstFrame) {
+            if (text.booleanValue()) {
+                first = first + 0x1;
+            } else {
+                first = first + 0x2;
+            }
+        }
+        // Continuation frame is OpCode 0
+        upgradeOutbound.write(first);
+
+        if (buffer.limit() < 126) {
+            upgradeOutbound.write(buffer.limit());
+        } else if (buffer.limit() < 65536) {
+            upgradeOutbound.write(126);
+            upgradeOutbound.write(buffer.limit() >>> 8);
+            upgradeOutbound.write(buffer.limit() & 0xFF);
+        } else {
+            // Will never be more than 2^31-1
+            upgradeOutbound.write(127);
+            upgradeOutbound.write(0);
+            upgradeOutbound.write(0);
+            upgradeOutbound.write(0);
+            upgradeOutbound.write(0);
+            upgradeOutbound.write(buffer.limit() >>> 24);
+            upgradeOutbound.write(buffer.limit() >>> 16);
+            upgradeOutbound.write(buffer.limit() >>> 8);
+            upgradeOutbound.write(buffer.limit() & 0xFF);
+        }
+
+        // Write the content
+        upgradeOutbound.write(buffer.array(), buffer.arrayOffset(),
+                buffer.limit());
+        upgradeOutbound.flush();
+
+        // Reset
+        if (finalFragment) {
+            text = null;
+            firstFrame = true;
+        } else {
+            firstFrame = false;
+        }
+        bb.clear();
     }
 
 

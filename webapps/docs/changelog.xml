@@ -154,6 +154,11 @@
         Correct several incorrect formats of <code>JdkLoggerFormatter</code>.
         (kfujino)
       </fix>
+      <fix>
+        <bug>55524</bug>: Refactor to avoid a possible deadlock when handling an
+        <code>IOException</code> during output when using Tomcat&apos;
+        proprietary (and deprecated) WebSocket API. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
