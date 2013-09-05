@@ -224,6 +224,107 @@
                   type="java.lang.String"
              writeable="false"/>
 
+    <attribute    name="jmxEnabled"
+           description="Register the pool with JMX or not"
+                  type="java.lang.Boolean"
+                    is="true"
+             writeable="false"/>
+
+    <attribute    name="fairQueue"
+           description="a fair queue is being used by the connection pool"
+                  type="java.lang.Boolean"
+                    is="true"
+             writeable="false"/>
+
+    <attribute    name="abandonWhenPercentageFull"
+           description="Connections that have been abandoned isn't closed unless connections in use are above this percentage"
+                  type="java.lang.Integer"
+             writeable="false"/>
+
+    <attribute    name="maxAge"
+           description="Time in milliseconds to keep this connection alive even when used"
+                  type="java.lang.Long"
+             writeable="false"/>
+
+    <attribute    name="useEquals"
+           description="Set to true if you wish the ProxyConnection class to use String.equals and set to false when you wish to use == when comparing method names"
+                  type="java.lang.Boolean"
+                    is="true"
+             writeable="false"/>
+
+    <attribute    name="useLock"
+           description="If true, use a lock when operations are performed on the connection object"
+                  type="java.lang.Boolean"
+                    is="false"
+             writeable="false"/>
+
+    <attribute    name="suspectTimeout"
+           description="Timeout in seconds for connection that suspected to have been abandoned"
+                  type="java.lang.Integer"
+             writeable="false"/>
+
+    <attribute    name="rollbackOnReturn"
+           description="If autoCommit==false then the pool can terminate the transaction by calling rollback on the connection as it is returned to the pool"
+                  type="java.lang.Boolean"
+                    is="false"
+             writeable="false"/>
+
+    <attribute    name="commitOnReturn"
+           description="If autoCommit==false then the pool can complete the transaction by calling commit on the connection as it is returned to the pool"
+                  type="java.lang.Boolean"
+                    is="false"
+             writeable="false"/>
+
+    <attribute    name="alternateUsernameAllowed"
+           description="If true, getConnection(username,password) is allowed"
+                  type="java.lang.Boolean"
+                    is="true"
+             writeable="false"/>
+
+    <attribute    name="dataSource"
+           description="Data source that is injected into the pool"
+                  type="javax.sql.DataSource"
+             writeable="false"/>
+
+    <attribute    name="dataSourceJNDI"
+           description="The JNDI name for a data source to be looked up"
+                  type="java.lang.String"
+             writeable="false"/>
+
+    <attribute    name="useDisposableConnectionFacade"
+           description="If true, connection pool is configured to use a connection facade to prevent re-use of connection after close() has been invoked"
+                  type="java.lang.Boolean"
+                    is="false"
+             writeable="false"/>
+
+    <attribute    name="logValidationErrors"
+           description="Log errors during the validation phase to the log file"
+                  type="java.lang.Boolean"
+                    is="false"
+             writeable="false"/>
+
+    <attribute    name="validatorClassName"
+           description="The name of validator class which implements org.apache.tomcat.jdbc.pool.Validator interface"
+                  type="java.lang.String"
+             writeable="false"/>
+
+    <attribute    name="waitCount"
+           description="The number of threads waiting for a connection"
+                  type="java.lang.Integer"
+             writeable="false"/>
+
+    <attribute    name="propagateInterruptState"
+           description="If true, propagate the interrupt state for a thread that has been interrupted"
+                  type="java.lang.Boolean"
+                    is="false"
+             writeable="false"/>
+
+    <attribute    name="ignoreExceptionOnPreLoad"
+           description="If true, ignore error of connection creation while initializing the pool"
+                  type="java.lang.Boolean"
+                    is="true"
+             writeable="false"/>
+
     <operation    name="checkIdle"
                   description="forces a check of idle connections"
                   impact="ACTION"
@@ -238,6 +339,17 @@
                   description="forces a validation of abandoned connections"
                   impact="ACTION"
                   returnType="void" />
+
+    <operation    name="purge"
+                  description="Purges all connections in the pool"
+                  impact="ACTION"
+                  returnType="void" />
+
+    <operation    name="purgeOnReturn"
+                  description="Purges connections when they are returned from the pool"
+                  impact="ACTION"
+                  returnType="void" />
+
   </mbean>
 
 </mbeans-descriptors>
