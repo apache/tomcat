@@ -47,31 +47,29 @@
     <li>Create a class that implements: <code>org.apache.catalina.tribes.ChannelListener</code></li>
     <li>Create a class that implements: <code>org.apache.catalina.tribes.MembershipListener</code></li>
     <li>Simple class to demonstrate how to send a message:
-      <source>
-        //create a channel
-        Channel myChannel = new GroupChannel();
+      <source><![CDATA[//create a channel
+Channel myChannel = new GroupChannel();
 
-        //create my listeners
-        ChannelListener msgListener = new MyMessageListener();
-        MembershipListener mbrListener = new MyMemberListener();
+//create my listeners
+ChannelListener msgListener = new MyMessageListener();
+MembershipListener mbrListener = new MyMemberListener();
 
-        //attach the listeners to the channel
-        myChannel.addMembershipListener(mbrListener);
-        myChannel.addChannelListener(msgListener);
+//attach the listeners to the channel
+myChannel.addMembershipListener(mbrListener);
+myChannel.addChannelListener(msgListener);
 
-        //start the channel
-        myChannel.start(Channel.DEFAULT);
+//start the channel
+myChannel.start(Channel.DEFAULT);
 
-        //create a message to be sent, message must implement java.io.Serializable
-        //for performance reasons you probably want them to implement java.io.Externalizable
-        Serializable myMsg = new MyMessage();
+//create a message to be sent, message must implement java.io.Serializable
+//for performance reasons you probably want them to implement java.io.Externalizable
+Serializable myMsg = new MyMessage();
 
-        //retrieve my current members
-        Member[] group = myChannel.getMembers();
+//retrieve my current members
+Member[] group = myChannel.getMembers();
 
-        //send the message
-        channel.send(group,myMsg,Channel.SEND_OPTIONS_DEFAULT);
-      </source>
+//send the message
+channel.send(group,myMsg,Channel.SEND_OPTIONS_DEFAULT);]]></source>
     </li>
   </ul>
   <p>
@@ -160,7 +158,8 @@
   </p>
   <p>
     <b>Different Guarantee Levels</b><br/>
-    There are three different levels of delivery guarantee when a message is sent.<br/>
+    There are three different levels of delivery guarantee when a message is sent.
+  </p>
     <ol>
       <li>IO Based send guarantee. - fastest, least reliable<br/>
           This means that Tribes considers the message transfer to be successful
@@ -187,6 +186,7 @@
           and associate that exception with the member that didn't process the message.
       </li>
     </ol>
+  <p>
     You can of course write even more sophisticated guarantee levels, and some of them will be mentioned later on
     in the documentation. One mentionable level would be a 2-Phase-Commit, where the remote applications don't receive
     the message until all nodes have received the message. Sort of like a all-or-nothing protocol.
@@ -199,19 +199,19 @@
     that remains fixed after the message framework has been started.<br/>
     To give you an example of how powerful this feature is, I'll try to illustrate it with a simple example.
     Imagine you need to send 10 different messages, you could send the the following way:
-    <source>
-      Message_1 - asynchronous and fast, no guarantee required, fire and forget
-      Message_2 - all-or-nothing, either all receivers get it, or none.
-      Message_3 - encrypted and SYNC_ACK based
-      Message_4 - asynchronous, SYNC_ACK and call back when the message is processed on the remote nodes
-      Message_5 - totally ordered, this message should be received in the same order on all nodes that have been
-                  send totally ordered
-      Message_6 - asynchronous and totally ordered
-      Message_7 - RPC message, send a message, wait for all remote nodes to reply before returning
-      Message_8 - RPC message, wait for the first reply
-      Message_9 - RPC message, asynchronous, don't wait for a reply, collect them via a callback
-      Message_10- sent to a member that is not part of this group
-    </source>
+  </p>
+    <source><![CDATA[Message_1 - asynchronous and fast, no guarantee required, fire and forget
+Message_2 - all-or-nothing, either all receivers get it, or none.
+Message_3 - encrypted and SYNC_ACK based
+Message_4 - asynchronous, SYNC_ACK and call back when the message is processed on the remote nodes
+Message_5 - totally ordered, this message should be received in the same order on all nodes that have been
+            send totally ordered
+Message_6 - asynchronous and totally ordered
+Message_7 - RPC message, send a message, wait for all remote nodes to reply before returning
+Message_8 - RPC message, wait for the first reply
+Message_9 - RPC message, asynchronous, don't wait for a reply, collect them via a callback
+Message_10- sent to a member that is not part of this group]]></source>
+  <p>
     As you can imagine by now, these are just examples. The number of different semantics you can apply on a
     per-message-basis is almost limitless. Tribes allows you to set up to 28 different on a message
     and then configure Tribes to what flag results in what action on the message.<br/>
