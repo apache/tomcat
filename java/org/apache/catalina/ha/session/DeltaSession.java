@@ -385,11 +385,11 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      */
     @Override
     public boolean isValid() {
-        if (this.expiring) {
-            return true;
-        }
         if (!this.isValid) {
             return false;
+        }
+        if (this.expiring) {
+            return true;
         }
         if (ACTIVITY_CHECK && accessCount.get() > 0) {
             return true;
@@ -445,30 +445,49 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     }
 
     public void expire(boolean notify, boolean notifyCluster) {
-        if (expiring)
+
+        // Check to see if session has already been invalidated.
+        // Do not check expiring at this point as expire should not return until
+        // isValid is false
+        if (!isValid)
             return;
-        String expiredId = getIdInternal();
 
-        if(notifyCluster && expiredId != null && manager != null &&
-           manager instanceof DeltaManager) {
-            DeltaManager dmanager = (DeltaManager)manager;
-            CatalinaCluster cluster = dmanager.getCluster();
-            ClusterMessage msg = dmanager.requestCompleted(expiredId, true);
-            if (msg != null) {
-                cluster.send(msg);
+        synchronized (this) {
+            // Check again, now we are inside the sync so this code only runs once
+            // Double check locking - isValid needs to be volatile
+            if (!isValid)
+                return;
+
+            if (manager == null)
+                return;
+
+            // Mark this session as "being expired". The flag will be unset in
+            // the call to super.expire(notify)
+            expiring = true;
+
+            String expiredId = getIdInternal();
+
+            if(notifyCluster && expiredId != null &&
+                    manager instanceof DeltaManager) {
+                DeltaManager dmanager = (DeltaManager)manager;
+                CatalinaCluster cluster = dmanager.getCluster();
+                ClusterMessage msg = dmanager.requestCompleted(expiredId, true);
+                if (msg != null) {
+                    cluster.send(msg);
+                }
             }
-        }
 
-        super.expire(notify);
+            super.expire(notify);
 
-        if (notifyCluster) {
-            if (log.isDebugEnabled())
-                log.debug(sm.getString("deltaSession.notifying",
-                                       ((ClusterManager)manager).getName(), 
-                                       Boolean.valueOf(isPrimarySession()), 
-                                       expiredId));
-            if ( manager instanceof DeltaManager ) {
-                ( (DeltaManager) manager).sessionExpired(expiredId);
+            if (notifyCluster) {
+                if (log.isDebugEnabled())
+                    log.debug(sm.getString("deltaSession.notifying",
+                                           ((ClusterManager)manager).getName(),
+                                           Boolean.valueOf(isPrimarySession()),
+                                           expiredId));
+                if ( manager instanceof DeltaManager ) {
+                    ( (DeltaManager) manager).sessionExpired(expiredId);
+                }
             }
         }
     }

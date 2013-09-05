@@ -155,6 +155,13 @@
         (kfujino)
       </fix>
       <fix>
+        <bug>55521</bug>: Ensure that calls to
+        <code>HttpSession.invalidate()</code> do not return until the session
+        has been invalidated. Also ensure that checks on the validity of a
+        session return a result consistent with any previous call to
+        <code>HttpSession.invalidate()</code>. (markt)
+      </fix>
+      <fix>
         <bug>55524</bug>: Refactor to avoid a possible deadlock when handling an
         <code>IOException</code> during output when using Tomcat&apos;
         proprietary (and deprecated) WebSocket API. (markt)
