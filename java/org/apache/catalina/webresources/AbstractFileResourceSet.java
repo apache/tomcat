@@ -26,13 +26,12 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
 
     protected static final String[] EMPTY_STRING_ARRAY = new String[0];
 
-    protected final String internalPath;
     protected File fileBase;
     protected String absoluteBase;
     protected String canonicalBase;
 
     protected AbstractFileResourceSet(String internalPath) {
-        this.internalPath = checkInternalPath(internalPath);
+        setInternalPath(internalPath);
     }
 
     protected File file(String name, boolean mustExist) {
@@ -104,7 +103,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
     //-------------------------------------------------------- Lifecycle methods
     @Override
     protected void initInternal() throws LifecycleException {
-        fileBase = new File(getBase(), internalPath);
+        fileBase = new File(getBase(), getInternalPath());
         checkType(fileBase);
 
         String absolutePath = fileBase.getAbsolutePath();

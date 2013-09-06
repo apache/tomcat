@@ -351,4 +351,8 @@ public abstract class AbstractTestResourceSet {
                     getMount() + "/new-test", is, false));
         }
     }
+
+    // ------------------------------------------------------------ constructors
+
+    public abstract void testNoArgConstructor();
 }

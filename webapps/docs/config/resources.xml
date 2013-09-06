@@ -132,8 +132,8 @@
       the resources are not located at the root of the JAR as is the case with
       resource JARs. This attribute is required by the
       <code>org.apache.catalina.WebResourceSet</code> implementations provided
-      by Tomcat. Custom implementations may not require it. If not specified,
-      the default value of the empty string will be used.</p>
+      by Tomcat and must start with '/'. Custom implementations may not require
+      it. If not specified, the default value '/' will be used.</p>
     </attribute>
 
     <attribute name="webAppMount" required="false">
@@ -142,7 +142,7 @@
       <code>org.apache.catalina.WebResourceSet</code> implementations provided
       by Tomcat, this attribute is required and must start with '/'. Custom
       implementations may not require it. If not specified, the default value of
-      "/" will be used.</p>
+      '/' will be used.</p>
     </attribute>
 
   </attributes>

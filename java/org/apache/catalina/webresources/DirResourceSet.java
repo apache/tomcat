@@ -38,7 +38,7 @@ public class DirResourceSet extends AbstractFileResourceSet {
      * A no argument constructor is required for this to work with the digester.
      */
     public DirResourceSet() {
-        super("");
+        super("/");
     }
 
     /**
