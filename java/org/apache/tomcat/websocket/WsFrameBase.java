@@ -63,6 +63,10 @@ public abstract class WsFrameBase {
     private boolean textMessage = false;
     private ByteBuffer messageBufferBinary;
     private CharBuffer messageBufferText;
+    // Cache the message handler in force when the message starts so it is used
+    // consistently for the entire message
+    private MessageHandler binaryMsgHandler = null;
+    private MessageHandler textMsgHandler = null;
 
     // Attributes of the current frame
     private boolean fin = false;
@@ -168,6 +172,8 @@ public abstract class WsFrameBase {
                         if (size != messageBufferBinary.capacity()) {
                             messageBufferBinary = ByteBuffer.allocate(size);
                         }
+                        binaryMsgHandler = wsSession.getBinaryMessageHandler();
+                        textMsgHandler = null;
                     } else if (opCode == Constants.OPCODE_TEXT) {
                         // New text message
                         textMessage = true;
@@ -175,6 +181,8 @@ public abstract class WsFrameBase {
                         if (size != messageBufferText.capacity()) {
                             messageBufferText = CharBuffer.allocate(size);
                         }
+                        binaryMsgHandler = null;
+                        textMsgHandler = wsSession.getTextMessageHandler();
                     } else {
                         throw new WsIOException(new CloseReason(
                                 CloseCodes.PROTOCOL_ERROR,
@@ -338,11 +346,10 @@ public abstract class WsFrameBase {
 
     @SuppressWarnings("unchecked")
     private void sendMessageText(boolean last) throws WsIOException {
-        MessageHandler mh = wsSession.getTextMessageHandler();
-        if (mh != null) {
-            if (mh instanceof WrappedMessageHandler) {
+        if (textMsgHandler != null) {
+            if (textMsgHandler instanceof WrappedMessageHandler) {
                 long maxMessageSize =
-                        ((WrappedMessageHandler) mh).getMaxMessageSize();
+                        ((WrappedMessageHandler) textMsgHandler).getMaxMessageSize();
                 if (maxMessageSize > -1 &&
                         messageBufferText.remaining() > maxMessageSize) {
                     throw new WsIOException(new CloseReason(CloseCodes.TOO_BIG,
@@ -353,12 +360,12 @@ public abstract class WsFrameBase {
             }
 
             try {
-                if (mh instanceof MessageHandler.Partial<?>) {
-                    ((MessageHandler.Partial<String>) mh).onMessage(
+                if (textMsgHandler instanceof MessageHandler.Partial<?>) {
+                    ((MessageHandler.Partial<String>) textMsgHandler).onMessage(
                             messageBufferText.toString(), last);
                 } else {
                     // Caller ensures last == true if this branch is used
-                    ((MessageHandler.Whole<String>) mh).onMessage(
+                    ((MessageHandler.Whole<String>) textMsgHandler).onMessage(
                             messageBufferText.toString());
                 }
             } catch (Throwable t) {
@@ -522,11 +529,10 @@ public abstract class WsFrameBase {
     @SuppressWarnings("unchecked")
     private void sendMessageBinary(ByteBuffer msg, boolean last)
             throws WsIOException {
-        MessageHandler mh = wsSession.getBinaryMessageHandler();
-        if (mh != null) {
-            if (mh instanceof WrappedMessageHandler) {
+        if (binaryMsgHandler != null) {
+            if (binaryMsgHandler instanceof WrappedMessageHandler) {
                 long maxMessageSize =
-                        ((WrappedMessageHandler) mh).getMaxMessageSize();
+                        ((WrappedMessageHandler) binaryMsgHandler).getMaxMessageSize();
                 if (maxMessageSize > -1 && msg.remaining() > maxMessageSize) {
                     throw new WsIOException(new CloseReason(CloseCodes.TOO_BIG,
                             sm.getString("wsFrame.messageTooBig",
@@ -535,11 +541,11 @@ public abstract class WsFrameBase {
                 }
             }
             try {
-                if (mh instanceof MessageHandler.Partial<?>) {
-                    ((MessageHandler.Partial<ByteBuffer>) mh).onMessage(msg, last);
+                if (binaryMsgHandler instanceof MessageHandler.Partial<?>) {
+                    ((MessageHandler.Partial<ByteBuffer>) binaryMsgHandler).onMessage(msg, last);
                 } else {
                     // Caller ensures last == true if this branch is used
-                    ((MessageHandler.Whole<ByteBuffer>) mh).onMessage(msg);
+                    ((MessageHandler.Whole<ByteBuffer>) binaryMsgHandler).onMessage(msg);
                 }
             } catch(Throwable t) {
                 ExceptionUtils.handleThrowable(t);
@@ -604,16 +610,14 @@ public abstract class WsFrameBase {
         if (Util.isControl(opCode)) {
             return false;
         } else if (textMessage) {
-            MessageHandler mh = wsSession.getTextMessageHandler();
-            if (mh != null) {
-                return mh instanceof MessageHandler.Partial<?>;
+            if (textMsgHandler != null) {
+                return textMsgHandler instanceof MessageHandler.Partial<?>;
             }
             return false;
         } else {
             // Must be binary
-            MessageHandler mh = wsSession.getBinaryMessageHandler();
-            if (mh != null) {
-                return mh instanceof MessageHandler.Partial<?>;
+            if (binaryMsgHandler != null) {
+                return binaryMsgHandler instanceof MessageHandler.Partial<?>;
             }
             return false;
         }
