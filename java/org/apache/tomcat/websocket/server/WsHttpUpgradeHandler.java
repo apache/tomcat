@@ -124,11 +124,11 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
             WsFrameServer wsFrame = new WsFrameServer(
                     sis,
                     wsSession);
-            sis.setReadListener(new WsReadListener(this, wsFrame));
             sos.setWriteListener(
                     new WsWriteListener(this, wsRemoteEndpointServer));
             ep.onOpen(wsSession, endpointConfig);
             webSocketContainer.registerSession(ep, wsSession);
+            sis.setReadListener(new WsReadListener(this, wsFrame));
         } catch (DeploymentException e) {
             throw new IllegalArgumentException(e);
         } finally {
