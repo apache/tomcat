@@ -67,4 +67,9 @@ public abstract class AbstractTestResourceSetMount
         InputStream is = new ByteArrayInputStream("test".getBytes());
         Assert.assertFalse(resourceRoot.write("/", is, false));
     }
+
+    @Override
+    public void testNoArgConstructor() {
+        // NO-OP
+    }
 }

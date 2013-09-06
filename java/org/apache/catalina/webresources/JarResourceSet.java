@@ -40,7 +40,12 @@ public class JarResourceSet extends AbstractResourceSet {
 
     private HashMap<String,JarEntry> jarFileEntries = new HashMap<>();
     private String baseUrl;
-    private final String internalPath;
+
+    /**
+     * A no argument constructor is required for this to work with the digester.
+     */
+    public JarResourceSet() {
+    }
 
     /**
      * Creates a new {@link org.apache.catalina.WebResourceSet} based on a JAR
@@ -63,8 +68,8 @@ public class JarResourceSet extends AbstractResourceSet {
             String internalPath) throws IllegalArgumentException {
         setRoot(root);
         setBase(base);
+        setInternalPath(internalPath);
         setWebAppMount(webAppMount);
-        this.internalPath = checkInternalPath(internalPath);
 
         if (getRoot().getState().isAvailable()) {
             try {
@@ -100,7 +105,7 @@ public class JarResourceSet extends AbstractResourceSet {
         // an empty resource for requests outside of the mount point.
 
         if (path.startsWith(webAppMount)) {
-            String pathInJar = internalPath + path.substring(
+            String pathInJar = getInternalPath() + path.substring(
                     webAppMount.length(), path.length());
             // Always strip off the leading '/' to get the JAR path
             if (pathInJar.charAt(0) == '/') {
@@ -125,7 +130,7 @@ public class JarResourceSet extends AbstractResourceSet {
                     return new EmptyResource(root, path);
                 } else {
                     return new JarResource(root, getBase(), baseUrl, jarEntry,
-                            internalPath, path);
+                            getInternalPath(), path);
                 }
             }
         } else {
@@ -141,7 +146,7 @@ public class JarResourceSet extends AbstractResourceSet {
         ArrayList<String> result = new ArrayList<>();
         if (path.startsWith(webAppMount)) {
             String pathInJar =
-                    internalPath + path.substring(webAppMount.length());
+                    getInternalPath() + path.substring(webAppMount.length());
             // Always strip off the leading '/' to get the JAR path
             if (pathInJar.charAt(0) == '/') {
                 pathInJar = pathInJar.substring(1);
@@ -193,7 +198,7 @@ public class JarResourceSet extends AbstractResourceSet {
         ResourceSet<String> result = new ResourceSet<>();
         if (path.startsWith(webAppMount)) {
             String pathInJar =
-                    internalPath + path.substring(webAppMount.length());
+                    getInternalPath() + path.substring(webAppMount.length());
             // Always strip off the leading '/' to get the JAR path and make
             // sure it ends in '/'
             if (pathInJar.charAt(pathInJar.length() - 1) != '/') {
@@ -212,7 +217,7 @@ public class JarResourceSet extends AbstractResourceSet {
                     if (nextSlash == -1 || nextSlash == name.length() - 1) {
                         if (name.startsWith(pathInJar)) {
                             result.add(webAppMount + '/' +
-                                    name.substring(internalPath.length()));
+                                    name.substring(getInternalPath().length()));
                         }
                     }
                 }
