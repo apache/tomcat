@@ -80,6 +80,7 @@ public class DataSourceFactory implements ObjectFactory {
     protected static final String PROP_TESTWHILEIDLE = "testWhileIdle";
     protected static final String PROP_TESTONCONNECT = "testOnConnect";
     protected static final String PROP_VALIDATIONQUERY = "validationQuery";
+    protected static final String PROP_VALIDATIONQUERY_TIMEOUT = "validationQueryTimeout";
     protected static final String PROP_VALIDATOR_CLASS_NAME = "validatorClassName";
 
     protected static final String PROP_NUMTESTSPEREVICTIONRUN = "numTestsPerEvictionRun";
@@ -151,6 +152,7 @@ public class DataSourceFactory implements ObjectFactory {
         PROP_URL,
         PROP_USERNAME,
         PROP_VALIDATIONQUERY,
+        PROP_VALIDATIONQUERY_TIMEOUT,
         PROP_VALIDATOR_CLASS_NAME,
         PROP_VALIDATIONINTERVAL,
         PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
@@ -368,6 +370,11 @@ public class DataSourceFactory implements ObjectFactory {
         value = properties.getProperty(PROP_VALIDATIONQUERY);
         if (value != null) {
             poolProperties.setValidationQuery(value);
+        }
+        
+        value = properties.getProperty(PROP_VALIDATIONQUERY_TIMEOUT);
+        if (value != null) {
+            poolProperties.setValidationQueryTimeout(Integer.parseInt(value));
         }
 
         value = properties.getProperty(PROP_VALIDATOR_CLASS_NAME);

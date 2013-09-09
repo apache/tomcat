@@ -524,6 +524,19 @@ public interface PoolConfiguration {
     public void setValidationQuery(String validationQuery);
 
     /**
+     * The timeout in seconds before a connection validation queries fail.
+     * A value less than or equal to zero will disable this feature.  Defaults to -1. 
+     * @return the timeout value in seconds 
+     */
+    public int getValidationQueryTimeout();
+    
+    /**
+     * The timeout in seconds before a connection validation queries fail.
+     * A value less than or equal to zero will disable this feature.  Defaults to -1. 
+     */
+    public void setValidationQueryTimeout(int validationQueryTimeout);
+    
+    /**
      * Return the name of the optional validator class - may be null.
      *
      * @return the name of the optional validator class - may be null

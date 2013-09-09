@@ -712,7 +712,7 @@ public class ConnectionPool {
             } else {
                 //validation failed, make sure we disconnect
                 //and clean up
-                error =true;
+                throw new SQLException("Validation Query Failed, enable logValidationErrors for more details.");
             } //end if
         } catch (Exception e) {
             error = true;
@@ -732,7 +732,6 @@ public class ConnectionPool {
             }
             con.unlock();
         }//catch
-        return null;
     }
 
     /**
