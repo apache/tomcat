@@ -47,17 +47,18 @@
 
   <p>
     Features of the APR connector:
+    <ul>
+      <li>Non-blocking I/O for Keep-Alive requests (between requests)</li>
+      <li>Uses OpenSSL for TLS/SSL capabilities (if supported by linked APR library)</li>
+      <li>FIPS 140-2 support for TLS/SSL (if supported by linked OpenSSL library)</li>
+    </ul>
   </p>
-  <ul>
-    <li>Non-blocking I/O for Keep-Alive requests (between requests)</li>
-    <li>Uses OpenSSL for TLS/SSL capabilities (if supported by linked APR library)</li>
-    <li>FIPS 140-2 support for TLS/SSL (if supported by linked OpenSSL library)</li>
-  </ul>
 
+<p>
+  Select one of the links from the navigation menu (to the left) to drill
+  down to the more detailed documentation that is available. Each available
+  manual is described in more detail below.
 </p>
-<p>Select one of the links from the navigation menu (to the left) to drill
-down to the more detailed documentation that is available. Each available
-manual is described in more detail below.</p>
 
 </section>
 
@@ -164,7 +165,7 @@ manual is described in more detail below.</p>
     That should create a tcnative-1.dll.
   </p>
 </subsection>
-   
+
 </section>
 
 <section name="Install and tests">
