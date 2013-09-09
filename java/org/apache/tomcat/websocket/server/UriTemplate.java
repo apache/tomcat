@@ -59,10 +59,17 @@ public class UriTemplate {
 
         for (int i = 0; i < segments.length; i++) {
             String segment = segments[i];
-            // Ignore the first empty segment as the path must always start
-            // with '/'
-            if (i == 0 && segment.length() == 0) {
-                continue;
+            if (segment.length() == 0) {
+                if (i == 0) {
+                    // Ignore the first empty segment as the path must always
+                    // start with '/'
+                    continue;
+                } else {
+                    // As per EG discussion, all other empty segments are
+                    // invalid
+                    throw new IllegalArgumentException(sm.getString(
+                            "uriTemplate.emptySegment", path));
+                }
             }
             normalized.append('/');
             int index = -1;
