@@ -228,22 +228,14 @@ public class WARDirContext extends BaseDirContext {
     }
 
     /**
-     * Unbinds the named object. Removes the terminal atomic name in name 
-     * from the target context--that named by all but the terminal atomic 
-     * part of name.
-     * <p>
-     * This method is idempotent. It succeeds even if the terminal atomic 
-     * name is not bound in the target context, but throws 
-     * NameNotFoundException if any of the intermediate contexts do not exist. 
+     * {@inheritDoc}
      * 
-     * @param name the name to bind; may not be empty
-     * @exception NameNotFoundException if an intermediate context does not 
-     * exist
-     * @exception NamingException if a naming exception is encountered
+     * This method is not supported in this implementation
+     * 
+     * @throws OperationNotSupportedException for this implementation
      */
     @Override
-    public void unbind(String name)
-        throws NamingException {
+    public void unbind(String name) throws NamingException {
         throw new OperationNotSupportedException();
     }
 
@@ -298,33 +290,14 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Destroys the named context and removes it from the namespace. Any 
-     * attributes associated with the name are also removed. Intermediate 
-     * contexts are not destroyed.
-     * <p>
-     * This method is idempotent. It succeeds even if the terminal atomic 
-     * name is not bound in the target context, but throws 
-     * NameNotFoundException if any of the intermediate contexts do not exist. 
+     * {@inheritDoc}
      * 
-     * In a federated naming system, a context from one naming system may be 
-     * bound to a name in another. One can subsequently look up and perform 
-     * operations on the foreign context using a composite name. However, an 
-     * attempt destroy the context using this composite name will fail with 
-     * NotContextException, because the foreign context is not a "subcontext" 
-     * of the context in which it is bound. Instead, use unbind() to remove 
-     * the binding of the foreign context. Destroying the foreign context 
-     * requires that the destroySubcontext() be performed on a context from 
-     * the foreign context's "native" naming system.
+     * This method is not supported in this implementation
      * 
-     * @param name the name of the context to be destroyed; may not be empty
-     * @exception NameNotFoundException if an intermediate context does not 
-     * exist
-     * @exception javax.naming.NotContextException if the name is bound but does
-     * not name a context, or does not name a context of the appropriate type
+     * @throws OperationNotSupportedException for this implementation
      */
     @Override
-    public void destroySubcontext(String name)
-        throws NamingException {
+    public void destroySubcontext(String name) throws NamingException {
         throw new OperationNotSupportedException();
     }
 
