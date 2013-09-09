@@ -169,4 +169,37 @@ public class TestUriTemplate {
         Assert.assertEquals("x", result.get("a"));
         Assert.assertEquals("x", result.get("b"));
     }
+
+
+    @Test(expected=java.lang.IllegalArgumentException.class)
+    public void testEgMailingList01() throws Exception {
+        UriTemplate t = new UriTemplate("/a/{var}");
+        @SuppressWarnings("unused")
+        Map<String,String> result = t.match(new UriTemplate("/a/b/"));
+    }
+
+
+    @Test(expected=java.lang.IllegalArgumentException.class)
+    public void testEgMailingList02() throws Exception {
+        UriTemplate t = new UriTemplate("/a/{var}");
+        @SuppressWarnings("unused")
+        Map<String,String> result = t.match(new UriTemplate("/a/"));
+    }
+
+
+    @Test
+    public void testEgMailingList03() throws Exception {
+        UriTemplate t = new UriTemplate("/a/{var}");
+        Map<String,String> result = t.match(new UriTemplate("/a"));
+
+        Assert.assertNull(result);
+    }
+
+
+    @Test(expected=java.lang.IllegalArgumentException.class)
+    public void testEgMailingList04() throws Exception {
+        UriTemplate t = new UriTemplate("/a/{var1}/{var2}");
+        @SuppressWarnings("unused")
+        Map<String,String> result = t.match(new UriTemplate("/a//c"));
+    }
 }
