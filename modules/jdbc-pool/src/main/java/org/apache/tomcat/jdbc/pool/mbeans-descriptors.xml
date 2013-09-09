@@ -125,6 +125,11 @@
            description="The query to run during validation"
                   type="java.lang.String"
              writeable="false"/>
+             
+    <attribute    name="validationQueryTimeout"
+           description="The timeout in seconds before a connection validation queries fail"
+                  type="java.lang.Integer"
+             writeable="false" />
 
     <attribute    name="testOnBorrow"
            description="True if validation happens when a connection is requested"

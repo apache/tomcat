@@ -274,6 +274,15 @@
          Example values are <code>SELECT 1</code>(mysql), <code>select 1 from dual</code>(oracle), <code>SELECT 1</code>(MS Sql Server)
       </p>
     </attribute>
+    
+    <attribute name="validationQueryTimeout" required="false">
+      <p>(int) The timeout in seconds before a connection validation queries fail.  This works by calling 
+         <code>java.sql.Statement.setQueryTimeout(seconds)</code> on the statement that executes the <code>validationQuery</code>.
+         The pool itself doesn't timeout the query, it is still up to the JDBC driver to enforce query timeouts. 
+         A value less than or equal to zero will disable this feature. 
+         The default value is <code>-1</code>.
+      </p>
+    </attribute>
 
     <attribute name="validatorClassName" required="false">
       <p>(String) The name of a class which implements the
