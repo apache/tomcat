@@ -369,8 +369,7 @@ public class WebAnnotationSet {
             if (annotation.authenticationType()
                     == Resource.AuthenticationType.CONTAINER) {
                 resource.setAuth("Container");
-            }
-            else if (annotation.authenticationType()
+            } else if (annotation.authenticationType()
                     == Resource.AuthenticationType.APPLICATION) {
                 resource.setAuth("Application");
             }
