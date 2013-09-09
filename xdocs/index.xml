@@ -47,12 +47,12 @@
 
   <p>
     Features of the APR connector:
+  </p>
     <ul>
       <li>Non-blocking I/O for Keep-Alive requests (between requests)</li>
       <li>Uses OpenSSL for TLS/SSL capabilities (if supported by linked APR library)</li>
       <li>FIPS 140-2 support for TLS/SSL (if supported by linked OpenSSL library)</li>
     </ul>
-  </p>
 
 <p>
   Select one of the links from the navigation menu (to the left) to drill
@@ -210,7 +210,7 @@
   <p>
     Edit $CATALINA_BASE\bin\setenv.bat (creating the file if necessary) and add
     the path to the tc-native libraries, apr and OpenSSL to PATH. For example:
-  <p>
+  </p>
 
   <pre style="white-space:pre-wrap; word-wrap:break-word;">
     set PATH=%PATH;C:\cygwin\home\support\tomcat-native-current-win32-src\jni\native\Debug;C:\cygwin\home\support\tomcat-native-current-win32-src\jni\apr\Debug;C:\OpenSSL\lib\VC
@@ -226,7 +226,6 @@
     Feb 8, 2008 2:48:18 PM org.apache.coyote.http11.Http11AprProtocol init
     INFO: Initializing Coyote HTTP/1.1 on http-8080
   </pre>
-  </p>
 </subsection>
 
 </section>

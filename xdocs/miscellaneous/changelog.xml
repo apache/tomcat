@@ -47,7 +47,7 @@
       of APR improves performance. (rjung)
     </update>
     <fix>
-      <bug>29422</bug> Fixed double-free in ssl_ocsp_request</code>.
+      <bug>29422</bug> Fixed double-free in <code>ssl_ocsp_request</code>.
       Patch provided by Aristotelis. (schultz)
     </fix>
     <fix>
