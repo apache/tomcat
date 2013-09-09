@@ -281,7 +281,7 @@ public class MultipartStream {
      * @see #MultipartStream(InputStream, byte[],
      *     MultipartStream.ProgressNotifier)
      */
-    MultipartStream(InputStream input,
+    public MultipartStream(InputStream input,
             byte[] boundary,
             int bufSize,
             ProgressNotifier pNotifier) {

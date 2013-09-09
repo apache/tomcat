@@ -42,9 +42,6 @@ org.apache.tomcat.util.http.fileupload is copied from:
 /commons/proper/fileupload/trunk/src/main/java/org/apache/commons/fileupload
 Note: Tomcat's copy of fileupload also includes classes copied manually (rather
       than svn copied) from Commons IO.
-Note: There is a Javadoc comment at the top of the following file that mentions
-      what svn revision of Commons FileUpload trunk was used by Tomcat:
-      org/apache/tomcat/util/http/fileupload/package-info.java
 
 Codec
 org.apache.tomcat.util.codec is copied from:
