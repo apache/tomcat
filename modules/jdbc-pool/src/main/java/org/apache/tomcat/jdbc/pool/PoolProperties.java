@@ -387,7 +387,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     public int getValidationQueryTimeout() {
         return validationQueryTimeout;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -395,7 +395,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     public void setValidationQueryTimeout(int validationQueryTimeout) {
         this.validationQueryTimeout = validationQueryTimeout;
     }
-    
+
     /**
      * {@inheritDoc}
      */

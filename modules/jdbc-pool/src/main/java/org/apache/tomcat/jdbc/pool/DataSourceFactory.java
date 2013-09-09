@@ -371,7 +371,7 @@ public class DataSourceFactory implements ObjectFactory {
         if (value != null) {
             poolProperties.setValidationQuery(value);
         }
-        
+
         value = properties.getProperty(PROP_VALIDATIONQUERY_TIMEOUT);
         if (value != null) {
             poolProperties.setValidationQueryTimeout(Integer.parseInt(value));
