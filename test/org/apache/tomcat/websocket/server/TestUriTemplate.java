@@ -169,4 +169,43 @@ public class TestUriTemplate {
         Assert.assertEquals("x", result.get("a"));
         Assert.assertEquals("x", result.get("b"));
     }
+
+
+    @Test
+    public void testEgMailingList01() throws Exception {
+        UriTemplate t = new UriTemplate("/a/{var}");
+        Map<String,String> result = t.match(new UriTemplate("/a/b/"));
+
+        Assert.assertNull(result);
+    }
+
+
+    @Test
+    public void testEgMailingList02() throws Exception {
+        UriTemplate t = new UriTemplate("/a/{var}");
+        Map<String,String> result = t.match(new UriTemplate("/a/"));
+
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("", result.get("var"));
+    }
+
+
+    @Test
+    public void testEgMailingList03() throws Exception {
+        UriTemplate t = new UriTemplate("/a/{var}");
+        Map<String,String> result = t.match(new UriTemplate("/a"));
+
+        Assert.assertNull(result);
+    }
+
+
+    @Test
+    public void testEgMailingList04() throws Exception {
+        UriTemplate t = new UriTemplate("/a/{var1}/{var2}");
+        Map<String,String> result = t.match(new UriTemplate("/a//c"));
+
+        Assert.assertEquals(2, result.size());
+        Assert.assertEquals("", result.get("var1"));
+        Assert.assertEquals("c", result.get("var2"));
+    }
 }
