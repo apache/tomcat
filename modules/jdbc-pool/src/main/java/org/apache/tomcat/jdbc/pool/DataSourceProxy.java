@@ -442,11 +442,11 @@ public class DataSourceProxy implements PoolConfiguration {
     public void setValidatorClassName(String className) {
         this.poolProperties.setValidatorClassName(className);
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    
+
     @Override
     public void setValidationQueryTimeout(int validationQueryTimeout) {
         this.poolProperties.setValidationQueryTimeout(validationQueryTimeout);
@@ -927,12 +927,12 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * {@inheritDoc}
      */
-    
+
     @Override
     public int getValidationQueryTimeout() {
         return getPoolProperties().getValidationQueryTimeout();
     }
-    
+
     /**
      * {@inheritDoc}
      */
