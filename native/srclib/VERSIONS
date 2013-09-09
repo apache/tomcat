@@ -1,6 +1,4 @@
 Use the following version of the libraries
 
-- APR 1.4.6, http://apr.apache.org
-- OpenSSL 1.0.1d, http://www.openssl.org
-  Applied patch for openssl.org issue #2975
-  http://git.openssl.org/gitweb/?p=openssl.git;a=patch;h=32cc247
+- APR 1.4.8, http://apr.apache.org
+- OpenSSL 1.0.1e, http://www.openssl.org
