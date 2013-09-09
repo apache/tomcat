@@ -338,6 +338,14 @@
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
+        <bug>54693</bug>: Add a validationQueryTimeout property. Patch provided
+        by Daniel Mikusa. (kfujino)
+      </fix>
+      <fix>
+        <bug>54693#c6</bug>: Avoid NPE caused by <code>createConnection()</code>
+        method returns null. Patch provided by Daniel Mikusa. (kfujino)
+      </fix>
+      <fix>
         <bug>55342</bug>: Remove unnecessary reset of interrupted flag. If
         <code>InterruptedException</code> is thrown, the interrupted flag has
         been cleared. (kfujino)

@@ -452,6 +452,12 @@ public class PooledConnection {
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
+            
+            int validationQueryTimeout = poolProperties.getValidationQueryTimeout();
+            if (validationQueryTimeout > 0) {
+                stmt.setQueryTimeout(validationQueryTimeout);
+            }
+            
             stmt.execute(query);
             stmt.close();
             this.lastValidated = now;

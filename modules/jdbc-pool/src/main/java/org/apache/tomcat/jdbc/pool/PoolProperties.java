@@ -57,6 +57,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private volatile int minIdle = initialSize;
     private volatile int maxWait = 30000;
     private volatile String validationQuery;
+    private volatile int validationQueryTimeout = -1;
     private volatile String validatorClassName;
     private volatile Validator validator;
     private volatile boolean testOnBorrow = false;
@@ -380,6 +381,22 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         return validationQuery;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getValidationQueryTimeout() {
+        return validationQueryTimeout;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setValidationQueryTimeout(int validationQueryTimeout) {
+        this.validationQueryTimeout = validationQueryTimeout;
+    }
+    
     /**
      * {@inheritDoc}
      */

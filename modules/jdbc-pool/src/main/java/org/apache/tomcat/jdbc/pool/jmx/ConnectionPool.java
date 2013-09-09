@@ -309,6 +309,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public String getValidationQuery() {
         return getPoolProperties().getValidationQuery();
     }
+    
+    @Override
+    public int getValidationQueryTimeout() {
+        return getPoolProperties().getValidationQueryTimeout();
+    }
 
     /**
      * {@inheritDoc}
@@ -663,6 +668,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         getPoolProperties().setValidationQuery(validationQuery);
     }
 
+    @Override
+    public void setValidationQueryTimeout(int validationQueryTimeout) {
+        getPoolProperties().setValidationQueryTimeout(validationQueryTimeout);
+    }
+    
     /**
      * {@inheritDoc}
      */
