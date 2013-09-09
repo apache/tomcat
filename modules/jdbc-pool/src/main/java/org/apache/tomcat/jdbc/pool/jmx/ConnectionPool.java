@@ -310,7 +310,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public String getValidationQuery() {
         return getPoolProperties().getValidationQuery();
     }
-    
+
     @Override
     public int getValidationQueryTimeout() {
         return getPoolProperties().getValidationQueryTimeout();
@@ -673,7 +673,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public void setValidationQueryTimeout(int validationQueryTimeout) {
         getPoolProperties().setValidationQueryTimeout(validationQueryTimeout);
     }
-    
+
     /**
      * {@inheritDoc}
      */
