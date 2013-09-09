@@ -31,5 +31,5 @@ import java.lang.annotation.Target;
 public @interface Generated {
     public String[] value();
     public String date() default "";
-    public String comment() default "";
+    public String comments() default "";
 }
