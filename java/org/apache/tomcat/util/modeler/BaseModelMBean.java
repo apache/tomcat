@@ -270,7 +270,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      *
      * @exception MBeanException if the initializer of an object
      *  throws an exception
-     * @exception ReflectioNException if a Java reflection exception
+     * @exception ReflectionException if a Java reflection exception
      *  occurs when invoking a method
      */
     @Override
