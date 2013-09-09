@@ -34,8 +34,12 @@ public @interface Resource {
     public String name() default "";
     @SuppressWarnings("rawtypes") // Can't use Class<?> because API needs to match specification
     public Class type() default Object.class;
-    public AuthenticationType authentication() default AuthenticationType.CONTAINER;
+    public AuthenticationType authenticationType() default AuthenticationType.CONTAINER;
     public boolean shareable() default true;
     public String description() default "";
     public String mappedName() default "";
+    /**
+     * @since Common Annotations 1.1
+     */
+    public String lookup() default "";
 }
