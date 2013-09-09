@@ -52,19 +52,7 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  * it into memory, which may come handy with large files.
  *
  * <p>Temporary files, which are created for file items, should be
- * deleted later on. The best way to do this is using a
- * {@link org.apache.tomcat.util.http.fileupload.FileCleaningTracker
- * FileCleaningTracker}, which you can set on the
- * {@link DiskFileItemFactory}. However, if you do use such a tracker,
- * then you must consider the following: Temporary files are automatically
- * deleted as soon as they are no longer needed. (More precisely, when the
- * corresponding instance of {@link java.io.File} is garbage collected.)
- * This is done by the so-called reaper thread, which is started
- * automatically when the class {@link org.apache.commons.io.FileCleaner}
- * is loaded.
- * It might make sense to terminate that thread, for example, if
- * your web application ends. See the section on "Resource cleanup"
- * in the users guide of commons-fileupload.</p>
+ * deleted later on.</p>
  *
  * @since FileUpload 1.1
  *
