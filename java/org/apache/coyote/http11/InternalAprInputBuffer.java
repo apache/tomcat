@@ -638,7 +638,12 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                 writeLock.lock();
                 wrapper.setBlockingStatus(block);
                 // Set the current settings for this socket
-                Socket.optSet(socket, Socket.APR_SO_NONBLOCK, (block ? 0 : 1));
+                if (block) {
+                    Socket.optSet(socket, Socket.APR_SO_NONBLOCK, 0);
+                } else {
+                    Socket.optSet(socket, Socket.APR_SO_NONBLOCK, 1);
+                    Socket.timeoutSet(socket, 0);
+                }
                 // Downgrade the lock
                 try {
                     readLock.lock();
