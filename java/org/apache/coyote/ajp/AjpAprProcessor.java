@@ -17,6 +17,7 @@
 package org.apache.coyote.ajp;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -201,6 +202,21 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
             if (nRead == 0) {
                 // Must be a non-blocking read
                 return false;
+            } else if (-nRead == Status.EAGAIN) {
+                return false;
+            } else if ((-nRead) == Status.ETIMEDOUT || (-nRead) == Status.TIMEUP) {
+                if (block) {
+                    throw new SocketTimeoutException(
+                            sm.getString("ajpprocessor.readtimeout"));
+                } else {
+                    // Attempting to read from the socket when the poller
+                    // has not signalled that there is data to read appears
+                    // to behave like a blocking read with a short timeout
+                    // on OSX rather than like a non-blocking read. If no
+                    // data is read, treat the resulting timeout like a
+                    // non-blocking read that returned no data.
+                    return false;
+                }
             } else if (nRead > 0) {
                 inputBuffer.limit(inputBuffer.limit() + nRead);
                 nextReadBlocks = true;
