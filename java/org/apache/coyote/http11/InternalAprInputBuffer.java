@@ -556,33 +556,15 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
     @Override
     protected boolean fill(boolean block) throws IOException {
-        // Ignore the block parameter
 
         int nRead = 0;
 
         if (parsingHeader) {
-
             if (lastValid == buf.length) {
                 throw new IllegalArgumentException
                     (sm.getString("iib.requestheadertoolarge.error"));
             }
-
-            bbuf.clear();
-            nRead = doReadSocket(true);
-            if (nRead > 0) {
-                bbuf.limit(nRead);
-                bbuf.get(buf, pos, nRead);
-                lastValid = pos + nRead;
-            } else {
-                if ((-nRead) == Status.EAGAIN) {
-                    return false;
-                } else {
-                    throw new IOException(sm.getString("iib.failedread"));
-                }
-            }
-
         } else {
-
             if (buf.length - end < 4500) {
                 // In this case, the request header was really large, so we allocate a
                 // brand new one; the old one will get GCed when subsequent requests
@@ -592,34 +574,36 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
             }
             pos = end;
             lastValid = pos;
-            bbuf.clear();
-            nRead = doReadSocket(true);
-            if (nRead > 0) {
-                bbuf.limit(nRead);
-                bbuf.get(buf, pos, nRead);
-                lastValid = pos + nRead;
-            } else if (-nRead == Status.EAGAIN) {
-                return false;
-            } else if ((-nRead) == Status.ETIMEDOUT || (-nRead) == Status.TIMEUP) {
-                if (block) {
-                    throw new SocketTimeoutException(
-                            sm.getString("iib.readtimeout"));
-                } else {
-                    // Attempting to read from the socket when the poller
-                    // has not signalled that there is data to read appears
-                    // to behave like a blocking read with a short timeout
-                    // on OSX rather than like a non-blocking read. If no
-                    // data is read, treat the resulting timeout like a
-                    // non-blocking read that returned no data.
-                    return false;
-                }
-            } else if (nRead == 0) {
-                // APR_STATUS_IS_EOF, since native 1.1.22
-                return false;
+        }
+
+        bbuf.clear();
+
+        nRead = doReadSocket(block);
+        if (nRead > 0) {
+            bbuf.limit(nRead);
+            bbuf.get(buf, pos, nRead);
+            lastValid = pos + nRead;
+        } else if (-nRead == Status.EAGAIN) {
+            return false;
+        } else if ((-nRead) == Status.ETIMEDOUT || (-nRead) == Status.TIMEUP) {
+            if (block) {
+                throw new SocketTimeoutException(
+                        sm.getString("iib.readtimeout"));
             } else {
-                throw new IOException(sm.getString("iib.failedread.apr",
-                        Integer.valueOf(-nRead)));
+                // Attempting to read from the socket when the poller
+                // has not signalled that there is data to read appears
+                // to behave like a blocking read with a short timeout
+                // on OSX rather than like a non-blocking read. If no
+                // data is read, treat the resulting timeout like a
+                // non-blocking read that returned no data.
+                return false;
             }
+        } else if (nRead == 0) {
+            // APR_STATUS_IS_EOF, since native 1.1.22
+            return false;
+        } else {
+            throw new IOException(sm.getString("iib.failedread.apr",
+                    Integer.valueOf(-nRead)));
         }
 
         return (nRead > 0);
