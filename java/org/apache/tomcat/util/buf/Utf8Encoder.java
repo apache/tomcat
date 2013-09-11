@@ -160,7 +160,7 @@ public class Utf8Encoder extends CharsetEncoder {
                     if (outRemaining < 1) {
                         return CoderResult.OVERFLOW;
                     }
-                    out.put((byte) (jchar & 0xFF));
+                    out.put((byte) jchar);
                     outRemaining--;
 
                 } else if (jchar <= 0x7FF) {
