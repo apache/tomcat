@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +44,7 @@ import javax.websocket.SendResult;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.Utf8Encoder;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
@@ -75,7 +75,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     // Max size of WebSocket header is 14 bytes
     private final ByteBuffer headerBuffer = ByteBuffer.allocate(14);
     private final ByteBuffer outputBuffer = ByteBuffer.allocate(8192);
-    private final CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder();
+    private final CharsetEncoder encoder = new Utf8Encoder();
     private final ByteBuffer encoderBuffer = ByteBuffer.allocate(8192);
     private final AtomicBoolean batchingAllowed = new AtomicBoolean(false);
     private volatile long sendTimeout = -1;
