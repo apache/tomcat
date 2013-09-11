@@ -20,6 +20,7 @@ package org.apache.tomcat.util.res;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -53,6 +54,8 @@ import java.util.ResourceBundle;
  */
 
 public class StringManager {
+
+    private static int LOCALE_CACHE_SIZE = 10;
 
     /**
      * The ResourceBundle for this StringManager.
@@ -198,7 +201,25 @@ public class StringManager {
 
         Map<Locale,StringManager> map = managers.get(packageName);
         if (map == null) {
-            map = new Hashtable<>();
+            /*
+             * Don't want the HashMap to be expanded beyond LOCALE_CACHE_SIZE.
+             * Expansion occurs when size() exceeds capacity. Therefore keep
+             * size at or below capacity.
+             * removeEldestEntry() executes after insertion therefore the test
+             * for removal needs to use one less than the maximum desired size
+             *
+             */
+            map = new LinkedHashMap<Locale,StringManager>(LOCALE_CACHE_SIZE, 1, true) {
+                private static final long serialVersionUID = 1L;
+                @Override
+                protected boolean removeEldestEntry(
+                        Map.Entry<Locale,StringManager> eldest) {
+                    if (size() > (LOCALE_CACHE_SIZE - 1)) {
+                        return true;
+                    }
+                    return false;
+                }
+            };
             managers.put(packageName, map);
         }
 
@@ -230,6 +251,4 @@ public class StringManager {
         // Return the default
         return getManager(packageName);
     }
-
-
 }
