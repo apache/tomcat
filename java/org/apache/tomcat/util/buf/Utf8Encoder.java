@@ -23,7 +23,8 @@ import java.nio.charset.CoderResult;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Encodes characters as bytes using UTF-8. Extracted from Apache Harmony.
+ * Encodes characters as bytes using UTF-8. Extracted from Apache Harmony with
+ * some minor bug fixes applied.
  */
 public class Utf8Encoder extends CharsetEncoder {
 
@@ -132,7 +133,12 @@ public class Utf8Encoder extends CharsetEncoder {
             if (outRemaining == 0) {
                 in.position(x + 1);
                 out.position(outPos);
-                return CoderResult.OVERFLOW;
+                // If both input and output are exhausted, return UNDERFLOW
+                if (x + 1 == limit) {
+                    return CoderResult.UNDERFLOW;
+                } else {
+                    return CoderResult.OVERFLOW;
+                }
             }
 
         }
@@ -226,5 +232,4 @@ public class Utf8Encoder extends CharsetEncoder {
         }
         return CoderResult.UNDERFLOW;
     }
-
 }
