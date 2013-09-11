@@ -98,9 +98,20 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         ajpClient.disconnect();
     }
 
+    @Test
+    public void testPost() throws Exception {
+        doTestPost(false, HttpServletResponse.SC_OK);
+    }
+
 
     @Test
-    public void testSimplePost() throws Exception {
+    public void testPostMultipleContentLength() throws Exception {
+        // Multiple content lengths
+        doTestPost(true, HttpServletResponse.SC_BAD_REQUEST);
+    }
+
+
+    public void doTestPost(boolean multipleCL, int expectedStatus) throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
 
@@ -119,6 +130,9 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         TesterAjpMessage forwardMessage =
                 ajpClient.createForwardMessage("/echo-params.jsp", 4);
         forwardMessage.addHeader(0xA008, "9");
+        if (multipleCL) {
+            forwardMessage.addHeader(0xA008, "99");
+        }
         forwardMessage.addHeader(0xA007, "application/x-www-form-urlencoded");
         forwardMessage.end();
 
@@ -128,15 +142,20 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         TesterAjpMessage responseHeaders =
                 ajpClient.sendMessage(forwardMessage, bodyMessage);
 
-        // Expect 3 messages: headers, body, end
-        validateResponseHeaders(responseHeaders, 200);
-        // Skip the body
-        TesterAjpMessage responseBody = ajpClient.readMessage();
-        validateResponseBody(responseBody, "test - data");
-        validateResponseEnd(ajpClient.readMessage(), true);
+        validateResponseHeaders(responseHeaders, expectedStatus);
+        if (expectedStatus == HttpServletResponse.SC_OK) {
+            // Expect 3 messages: headers, body, end for a valid request
+            TesterAjpMessage responseBody = ajpClient.readMessage();
+            validateResponseBody(responseBody, "test - data");
+            validateResponseEnd(ajpClient.readMessage(), true);
 
-        // Double check the connection is still open
-        validateCpong(ajpClient.cping());
+            // Double check the connection is still open
+            validateCpong(ajpClient.cping());
+        } else {
+            // Expect 2 messages: headers, end for an invalid request
+            validateResponseEnd(ajpClient.readMessage(), false);
+        }
+
 
         ajpClient.disconnect();
     }

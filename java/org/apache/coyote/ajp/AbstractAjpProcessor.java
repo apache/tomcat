@@ -25,6 +25,8 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
@@ -691,6 +693,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         // Set this every time in case limit has been changed via JMX
         headers.setLimit(endpoint.getMaxHeaderCount());
 
+        boolean contentLengthSet = false;
         int hCount = requestHeaderMessage.getInt();
         for(int i = 0 ; i < hCount ; i++) {
             String hName = null;
@@ -725,8 +728,15 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
             if (hId == Constants.SC_REQ_CONTENT_LENGTH ||
                     (hId == -1 && tmpMB.equalsIgnoreCase("Content-Length"))) {
-                // just read the content-length header, so set it
-                request.setContentLength(vMB.getLong());
+                long cl = vMB.getLong();
+                if (contentLengthSet) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    error = true;
+                } else {
+                    contentLengthSet = true;
+                    // Set the content-length header for the request
+                    request.setContentLength(cl);
+                }
             } else if (hId == Constants.SC_REQ_CONTENT_TYPE ||
                     (hId == -1 && tmpMB.equalsIgnoreCase("Content-Type"))) {
                 // just read the content-type header, so set it
