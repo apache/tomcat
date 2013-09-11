@@ -212,6 +212,9 @@
         <bug>55500</bug>: Don&apos;t ignore the value of an asynchronous context
         timeout when using the AJP NIO connector. (markt)
       </fix>
+      <fix>
+        Better adherence to RFC2616 for content-length headers. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
