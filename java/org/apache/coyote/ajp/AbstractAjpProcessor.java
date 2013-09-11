@@ -29,6 +29,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProcessor;
@@ -1110,6 +1111,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         // Set this every time in case limit has been changed via JMX
         headers.setLimit(endpoint.getMaxHeaderCount());
 
+        boolean contentLengthSet = false;
         int hCount = requestHeaderMessage.getInt();
         for(int i = 0 ; i < hCount ; i++) {
             String hName = null;
@@ -1144,9 +1146,15 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
             if (hId == Constants.SC_REQ_CONTENT_LENGTH ||
                     (hId == -1 && tmpMB.equalsIgnoreCase("Content-Length"))) {
-                // just read the content-length header, so set it
                 long cl = vMB.getLong();
-                request.setContentLength(cl);
+                if (contentLengthSet) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    error = true;
+                } else {
+                    contentLengthSet = true;
+                    // Set the content-length header for the request
+                    request.setContentLength(cl);
+                }
                 if (cl != 0) {
                     bodyPresent = true;
                 }
