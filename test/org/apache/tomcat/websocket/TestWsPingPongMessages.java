@@ -80,7 +80,7 @@ public class TestWsPingPongMessages extends TomcatBaseTest {
         boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
         Assert.assertTrue(latchResult);
         Assert.assertArrayEquals(applicationData.array(),
-                (handler.getMessages().get(0)).getApplicationData().array());
+                (handler.getMessages().peek()).getApplicationData().array());
     }
 
     public static class PongMessageHandler extends
