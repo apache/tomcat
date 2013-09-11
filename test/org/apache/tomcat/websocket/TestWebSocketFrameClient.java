@@ -17,7 +17,7 @@
 package org.apache.tomcat.websocket;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -79,7 +79,7 @@ public class TestWebSocketFrameClient extends TomcatBaseTest {
         handler.getLatch().await(TesterFirehoseServer.WAIT_TIME_MILLIS,
                 TimeUnit.MILLISECONDS);
 
-        List<String> messages = handler.getMessages();
+        Queue<String> messages = handler.getMessages();
         Assert.assertEquals(
                 TesterFirehoseServer.MESSAGE_COUNT, messages.size());
         for (String message : messages) {

@@ -19,7 +19,7 @@ package org.apache.tomcat.websocket;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -105,9 +105,9 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         Assert.assertTrue(latchResult);
 
-        List<String> messages = handler.getMessages();
+        Queue<String> messages = handler.getMessages();
         Assert.assertEquals(1, messages.size());
-        Assert.assertEquals(MESSAGE_STRING_1, messages.get(0));
+        Assert.assertEquals(MESSAGE_STRING_1, messages.peek());
     }
 
 
@@ -263,14 +263,14 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         Assert.assertTrue(latchResult);
 
-        List<?> messages = handler.getMessages();
+        Queue<?> messages = handler.getMessages();
         if (pass) {
             Assert.assertEquals(1, messages.size());
             if (isTextMessage) {
-                Assert.assertEquals(MESSAGE_TEXT_4K, messages.get(0));
+                Assert.assertEquals(MESSAGE_TEXT_4K, messages.peek());
             } else {
                 Assert.assertEquals(ByteBuffer.wrap(MESSAGE_BINARY_4K),
-                        messages.get(0));
+                        messages.peek());
             }
         } else {
             // When the message exceeds the buffer size, the WebSocket is
@@ -807,9 +807,9 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         Assert.assertTrue(latchResult);
 
-        List<String> messages = handler.getMessages();
+        Queue<String> messages = handler.getMessages();
         Assert.assertEquals(1, messages.size());
-        Assert.assertEquals(MESSAGE_STRING_1, messages.get(0));
+        Assert.assertEquals(MESSAGE_STRING_1, messages.peek());
     }
 
 
