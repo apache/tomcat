@@ -93,7 +93,7 @@ public class StringManager {
             if (bundleLocale.equals(Locale.ROOT)) {
                 this.locale = Locale.ENGLISH;
             } else {
-                this.locale = bundle.getLocale();
+                this.locale = bundleLocale;
             }
         } else {
             this.locale = null;
