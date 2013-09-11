@@ -65,6 +65,9 @@ main {
 #header > div {
   padding-left: 15px;
   padding-right: 15px;
+
+  /* Work-around for old browsers: */
+  background-color: #F8F3E4;
   background: linear-gradient(to bottom, #ffffff -10%, #F8F3E4 100%);
   position: relative;
 }
