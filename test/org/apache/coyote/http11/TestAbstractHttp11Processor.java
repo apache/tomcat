@@ -103,6 +103,20 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
     @Test
     public void testWithTEChunked() throws Exception {
+        doTestWithTEChunked(false);
+    }
+
+
+    @Test
+    public void testWithTEChunkedWithCL() throws Exception {
+        // Should be ignored
+        doTestWithTEChunked(true);
+    }
+
+
+    private void doTestWithTEChunked(boolean withCL)
+            throws Exception {
+
         Tomcat tomcat = getTomcatInstance();
 
         // Use the normal Tomcat ROOT context
@@ -114,6 +128,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         String request =
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
+            (withCL ? "Content-length: 1" + SimpleHttpClient.CRLF : "") +
             "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
             "Content-Type: application/x-www-form-urlencoded" +
                     SimpleHttpClient.CRLF +
