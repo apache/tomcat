@@ -118,9 +118,23 @@ public class ChunkedInputFilter implements InputFilter {
      */
     private Request request;
     
+
+    /**
+     * Limit for extension size.
+     */
+    private final long maxExtensionSize;
+
+
+    /**
+     * Size of extensions processed for this request.
+     */
+    private long extensionSize;
+
+
     // ----------------------------------------------------------- Constructors
-    public ChunkedInputFilter(int maxTrailerSize) {
+    public ChunkedInputFilter(int maxTrailerSize, int maxExtensionSize) {
         this.trailingHeaders.setLimit(maxTrailerSize);
+        this.maxExtensionSize = maxExtensionSize;
     }
 
     // ---------------------------------------------------- InputBuffer Methods
@@ -250,6 +264,7 @@ public class ChunkedInputFilter implements InputFilter {
         endChunk = false;
         needCRLFParse = false;
         trailingHeaders.recycle();
+        extensionSize = 0;
     }
 
 
@@ -299,7 +314,7 @@ public class ChunkedInputFilter implements InputFilter {
         int result = 0;
         boolean eol = false;
         boolean readDigit = false;
-        boolean trailer = false;
+        boolean extension = false;
 
         while (!eol) {
 
@@ -312,8 +327,9 @@ public class ChunkedInputFilter implements InputFilter {
                 parseCRLF(false);
                 eol = true;
             } else if (buf[pos] == Constants.SEMI_COLON) {
-                trailer = true;
-            } else if (!trailer) { 
+                extension = true;
+                extensionSize++;
+            } else if (!extension) {
                 //don't read data after the trailer
                 int charValue = HexUtils.getDec(buf[pos]);
                 if (charValue != -1) {
@@ -324,6 +340,12 @@ public class ChunkedInputFilter implements InputFilter {
                     //we shouldn't allow invalid, non hex characters
                     //in the chunked header
                     return false;
+                }
+            } else {
+                // extension
+                extensionSize++;
+                if (maxExtensionSize > -1 && extensionSize > maxExtensionSize) {
+                    throw new IOException("maxExtensionSize exceeded");
                 }
             }
 

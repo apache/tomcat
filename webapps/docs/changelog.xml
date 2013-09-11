@@ -215,6 +215,10 @@
       <fix>
         Better adherence to RFC2616 for content-length headers. (markt)
       </fix>
+      <fix>
+        Add support for limiting the size of chunk extensions when using chunked
+        encoding. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -41,6 +41,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 public class TestChunkedInputFilter extends TomcatBaseTest {
 
     private static final String LF = "\n";
+    private static final int EXT_SIZE_LIMIT = 10;
 
     @Test
     public void testChunkHeaderCRLF() throws Exception {
@@ -200,6 +201,76 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         // Expected to fail because the trailers are longer
         // than the set limit of 10 bytes
         assertTrue(client.isResponse500());
+    }
+
+
+    @Test
+    public void testExtensionSizeLimitOneBelow() throws Exception {
+        doTestExtensionSizeLimit(EXT_SIZE_LIMIT - 1, true);
+    }
+
+
+    @Test
+    public void testExtensionSizeLimitExact() throws Exception {
+        doTestExtensionSizeLimit(EXT_SIZE_LIMIT, true);
+    }
+
+
+    @Test
+    public void testExtensionSizeLimitOneOver() throws Exception {
+        doTestExtensionSizeLimit(EXT_SIZE_LIMIT + 1, false);
+    }
+
+
+    private void doTestExtensionSizeLimit(int len, boolean ok) throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        tomcat.getConnector().setProperty(
+                "maxExtensionSize", Integer.toString(EXT_SIZE_LIMIT));
+
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+
+        Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet());
+        ctx.addServletMapping("/", "servlet");
+
+        tomcat.start();
+
+        String extName = ";foo=";
+        StringBuilder extValue = new StringBuilder(len);
+        for (int i = 0; i < (len - extName.length()); i++) {
+            extValue.append("x");
+        }
+
+        String[] request = new String[]{
+            "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
+            "Host: any" + SimpleHttpClient.CRLF +
+            "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
+            "Content-Type: application/x-www-form-urlencoded" +
+                    SimpleHttpClient.CRLF +
+            "Connection: close" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF +
+            "3" + extName + extValue.toString() + SimpleHttpClient.CRLF +
+            "a=0" + SimpleHttpClient.CRLF +
+            "4" + SimpleHttpClient.CRLF +
+            "&b=1" + SimpleHttpClient.CRLF +
+            "0" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF };
+
+        TrailerClient client =
+                new TrailerClient(tomcat.getConnector().getLocalPort());
+        client.setRequest(request);
+
+        client.connect();
+        client.processRequest();
+
+        if (ok) {
+            assertTrue(client.isResponse200());
+        } else {
+            assertTrue(client.isResponse500());
+        }
     }
 
     @Test

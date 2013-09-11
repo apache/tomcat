@@ -399,6 +399,12 @@
       and connections are not counted.</p>
     </attribute>
 
+    <attribute name="maxExtensionSize" required="false">
+      <p>Limits the total length of chunk extensions in chunked HTTP requests.
+      If the value is <code>-1</code>, no limit will be imposed. If not
+      specified, the default value of <code>8192</code> will be used.</p>
+    </attribute>
+
     <attribute name="maxHttpHeaderSize" required="false">
       <p>The maximum size of the request and response HTTP header, specified
       in bytes. If not specified, this attribute is set to 8192 (8 KB).</p>

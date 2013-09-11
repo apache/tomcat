@@ -63,7 +63,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
 
     public Http11NioProcessor(int maxHttpHeaderSize, NioEndpoint endpoint,
-            int maxTrailerSize) {
+            int maxTrailerSize, int maxExtensionSize) {
 
         super(endpoint);
 
@@ -73,7 +73,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         outputBuffer = new InternalNioOutputBuffer(response, maxHttpHeaderSize);
         response.setOutputBuffer(outputBuffer);
 
-        initializeFilters(maxTrailerSize);
+        initializeFilters(maxTrailerSize, maxExtensionSize);
     }
 
 

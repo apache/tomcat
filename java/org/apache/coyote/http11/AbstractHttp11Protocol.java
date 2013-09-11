@@ -153,6 +153,16 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocol {
 
 
     /**
+     * Maximum size of extension information in chunked encoding
+     */
+    private int maxExtensionSize = 8192;
+    public int getMaxExtensionSize() { return maxExtensionSize; }
+    public void setMaxExtensionSize(int maxExtensionSize) {
+        this.maxExtensionSize = maxExtensionSize;
+    }
+
+
+    /**
      * This field indicates if the protocol is treated as if it is secure. This
      * normally means https is being used but can be used to fake https e.g
      * behind a reverse proxy.
