@@ -18,8 +18,10 @@ package org.apache.tomcat.websocket;
 
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
@@ -111,7 +113,7 @@ public class TesterMessageCountClient {
 
         private final CountDownLatch latch;
 
-        private final List<T> messages = new CopyOnWriteArrayList<T>();
+        private final Queue<T> messages = new LinkedBlockingQueue<T>();
 
         public BasicHandler(CountDownLatch latch) {
             this.latch = latch;
@@ -121,7 +123,7 @@ public class TesterMessageCountClient {
             return latch;
         }
 
-        public List<T> getMessages() {
+        public Queue<T> getMessages() {
             return messages;
         }
     }
