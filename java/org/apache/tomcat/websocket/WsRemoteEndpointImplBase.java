@@ -680,10 +680,22 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             }
 
             // Write the payload
-            while (payload.hasRemaining() && outputBuffer.hasRemaining()) {
-                if (mask == null) {
-                    outputBuffer.put(payload.get());
-                } else {
+            int payloadLeft = payload.remaining();
+            int payloadLimit = payload.limit();
+            int outputSpace = outputBuffer.remaining();
+            int toWrite = payloadLeft;
+
+            if (payloadLeft > outputSpace) {
+                toWrite = outputSpace;
+                // Temporarily reduce the limit
+                payload.limit(payload.position() + toWrite);
+            }
+
+            if (mask == null) {
+                // Use a bulk copy
+                outputBuffer.put(payload);
+            } else {
+                for (int i = 0; i < toWrite; i++) {
                     outputBuffer.put(
                             (byte) (payload.get() ^ (mask[maskIndex++] & 0xFF)));
                     if (maskIndex > 3) {
@@ -691,7 +703,10 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                     }
                 }
             }
-            if (payload.hasRemaining()) {
+
+            if (payloadLeft > outputSpace) {
+                // Restore the original limit
+                payload.limit(payloadLimit);
                 // Still more headers to write, need to flush
                 outputBuffer.flip();
                 endpoint.doWrite(this, outputBuffer);
