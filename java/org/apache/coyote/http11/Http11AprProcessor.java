@@ -58,7 +58,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
 
     public Http11AprProcessor(int headerBufferSize, AprEndpoint endpoint,
-            int maxTrailerSize) {
+            int maxTrailerSize, int maxExtensionSize) {
 
         super(endpoint);
 
@@ -68,7 +68,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         outputBuffer = new InternalAprOutputBuffer(response, headerBufferSize);
         response.setOutputBuffer(outputBuffer);
 
-        initializeFilters(maxTrailerSize);
+        initializeFilters(maxTrailerSize, maxExtensionSize);
     }
 
 
