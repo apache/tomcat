@@ -72,14 +72,6 @@
     <xsl:value-of select="$relative-path"/><xsl:value-of select="$home-stylesheet"/>
   </xsl:variable>
   <link href="{$css-src}" rel="stylesheet" type="text/css"/>
-
-  <!-- CSS hack for IEs ≤ 9. -->
-  <xsl:variable name="css-iefix-src"><xsl:value-of select="$relative-path"/>/images/docs-stylesheet-ie-fix.css</xsl:variable>
-  <xsl:comment><![CDATA[[if IE]><link href="]]><!--
-    Note: The following <xsl:value-of> will not correctly encode HTML chars as this is a comment.
-    But as it is a fix for old IEs, it can be removed in future.
-  --><xsl:value-of select="$css-iefix-src"/><![CDATA[" rel="stylesheet" type="text/css"/><![endif]]]></xsl:comment>
-
   <style type="text/css" media="print"><![CDATA[
     .noPrint { display: none; }
     #middle > div > div#mainLeft { display: none; }
@@ -152,11 +144,7 @@
   <body>
   <div id="wrapper">
   <!-- Header -->
-  <!-- Workaround for old IEs: use <div id="..."> instead of <header id="...">, otherwise the CSS will not apply.
-       IE ≥ 10 dropped support for conditional comments in Standards Mode, so there it will use <header>. -->
-  <xsl:comment><![CDATA[[if IE]><div id="header"><![endif]]]></xsl:comment><xsl:comment><![CDATA[[if !IE]>]]></xsl:comment>
-  <header id="header">
-    <xsl:comment><![CDATA[<![endif]]]></xsl:comment>
+  <header><div id="header">
     <div>
       <div>
         <xsl:if test="project/logo">
@@ -179,10 +167,7 @@
         <div style="clear: left;"/>
       </div>
     </div>
-    <!-- Workaround for old IEs, see above. -->
-    <xsl:comment><![CDATA[[if IE]></div><![endif]]]></xsl:comment><xsl:comment><![CDATA[[if !IE]>]]></xsl:comment>
-  </header>
-  <xsl:comment><![CDATA[<![endif]]]></xsl:comment>
+  </div></header>
 
   <div id="middle">
     <div>
@@ -197,7 +182,6 @@
       <div id="mainRight">
         <div id="content">
           <!-- Main Part -->
-          <main>
             <h2><xsl:value-of select="properties/title"/></h2>
             <xsl:apply-templates select="body/section"/>
 
@@ -226,21 +210,15 @@
               </div>
             </xsl:if>
 
-          </main>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Footer -->
-  <!-- Workarounds for old IEs, see above. -->
-  <xsl:comment><![CDATA[[if IE]><div id="footer"><![endif]]]></xsl:comment><xsl:comment><![CDATA[[if !IE]>]]></xsl:comment>
-  <footer id="footer">
-    <xsl:comment><![CDATA[<![endif]]]></xsl:comment>
+  <footer><div id="footer">
     Copyright © 1999-<xsl:value-of select="$year"/>, The Apache Software Foundation
-    <xsl:comment><![CDATA[[if IE]></div><![endif]]]></xsl:comment><xsl:comment><![CDATA[[if !IE]>]]></xsl:comment>
-  </footer>
-  <xsl:comment><![CDATA[<![endif]]]></xsl:comment>
+  </div></footer>
 </div>
 </body>
 </html>
