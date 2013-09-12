@@ -477,7 +477,8 @@ public interface HttpServletRequest extends ServletRequest {
      * @throws IOException
      *             if an I/O error occurs
      * @throws IllegalStateException
-     *             if size limits are exceeded
+     *             if size limits are exceeded or no multipart configuration is
+     *             provided
      * @throws ServletException
      *             if the request is not multipart/form-data
      * @since Servlet 3.0
