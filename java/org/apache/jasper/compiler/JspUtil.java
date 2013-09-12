@@ -921,9 +921,9 @@ public class JspUtil {
     }
 
     /**
-     * Class.getName() return arrays in the form "[[[<et>", where et, the
-     * element type can be one of ZBCDFIJS or L<classname>; It is converted
-     * into forms that can be understood by javac.
+     * Class.getName() return arrays in the form "[[[&lt;et&gt;", where et, the
+     * element type can be one of ZBCDFIJS or L&lt;classname&gt;;. It is
+     * converted into forms that can be understood by javac.
      */
     public static String toJavaSourceType(String type) {
 
