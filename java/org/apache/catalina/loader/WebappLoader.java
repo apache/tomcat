@@ -691,35 +691,17 @@ public class WebappLoader extends LifecycleMBeanBase
 
         if (classes.isDirectory()) {
 
-            File classRepository = null;
-
-            String absoluteClassesPath = classes.getCanonicalPath();
-
-            if (absoluteClassesPath != null) {
-                classRepository = new File(absoluteClassesPath);
-            } else {
-                classRepository = new File(workDir, classesPath);
-                if (!classRepository.mkdirs() &&
-                        !classRepository.isDirectory()) {
-                    throw new IOException(
-                            sm.getString("webappLoader.mkdirFailure"));
-                }
-                if (!copyDir(classes, classRepository)) {
-                    throw new IOException(
-                            sm.getString("webappLoader.copyFailure"));
-                }
-            }
-
             if(log.isDebugEnabled())
                 log.debug(sm.getString("webappLoader.classDeploy", classesPath,
-                             classRepository.getAbsolutePath()));
+                        classes.getURL().toExternalForm()));
 
             // Adding the repository to the class loader
-            classLoader.setRepository(classesPath + "/", classRepository);
+            classLoader.setRepository(classesPath + "/", classes);
             loaderRepositories.add(classesPath + "/" );
         }
 
         // Setting up the JAR repository (/WEB-INF/lib), if it exists
+        // TODO Simplify this in a similar manner to WEB-INF/classes
 
         String libPath = "/WEB-INF/lib";
 
@@ -907,30 +889,6 @@ public class WebappLoader extends LifecycleMBeanBase
                 log.debug("getClasspath ", ex);
         }
         return null;
-    }
-
-    /**
-     * Copy directory.
-     */
-    private boolean copyDir(WebResource src, File destDir) {
-
-        WebResource[] resources =
-                src.getWebResourceRoot().listResources(src.getWebappPath());
-        for (WebResource resource : resources) {
-            File currentFile = new File(destDir, resource.getName());
-            if (resource.isFile()) {
-                InputStream is = resource.getInputStream();
-                if (!copy(is, currentFile))
-                    return false;
-            } else if (resource.isDirectory()) {
-                if (!currentFile.isDirectory() && !currentFile.mkdir())
-                    return false;
-                if (!copyDir(resource, currentFile))
-                    return false;
-            }
-        }
-
-        return true;
     }
 
 
