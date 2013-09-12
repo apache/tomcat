@@ -2535,7 +2535,7 @@ public class Request
     public Collection<Part> getParts() throws IOException, IllegalStateException,
             ServletException {
 
-        parseParts();
+        parseParts(true);
 
         if (partsParseException != null) {
             if (partsParseException instanceof IOException) {
@@ -2550,7 +2550,7 @@ public class Request
         return parts;
     }
 
-    private void parseParts() {
+    private void parseParts(boolean explicit) {
 
         // Return immediately if the parts have already been parsed
         if (parts != null || partsParseException != null) {
@@ -2566,8 +2566,14 @@ public class Request
                                                  connector.getMaxPostSize(),
                                                  connector.getMaxPostSize());
             } else {
-                parts = Collections.emptyList();
-                return;
+                if (explicit) {
+                    partsParseException = new IllegalStateException(
+                            sm.getString("coyoteRequest.noMultipartConfig"));
+                    return;
+                } else {
+                    parts = Collections.emptyList();
+                    return;
+                }
             }
         }
 
@@ -2928,7 +2934,7 @@ public class Request
             }
 
             if ("multipart/form-data".equals(contentType)) {
-                parseParts();
+                parseParts(false);
                 success = true;
                 return;
             }
