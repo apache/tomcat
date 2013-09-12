@@ -93,7 +93,7 @@
       <fix>
         <bug>52558</bug>: Refactor <code>CometConnectionManagerValve</code> so
         that it does not prevent the session from being serialized in when
-        running in a cluster. (markt) 
+        running in a cluster. (markt)
       </fix>
       <fix>
         <bug>52767</bug>: Remove reference to MySQL specific autoReconnect
