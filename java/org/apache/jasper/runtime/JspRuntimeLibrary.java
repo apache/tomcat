@@ -582,27 +582,6 @@ public class JspRuntimeLibrary {
     // __end lookupReadMethodMethod
 
     // handles <jsp:setProperty> with EL expression for 'value' attribute
-/** Use proprietaryEvaluate
-    public static void handleSetPropertyExpression(Object bean,
-        String prop, String expression, PageContext pageContext,
-        VariableResolver variableResolver, FunctionMapper functionMapper )
-        throws JasperException
-    {
-        try {
-            Method method = getWriteMethod(bean.getClass(), prop);
-            method.invoke(bean, new Object[] {
-                pageContext.getExpressionEvaluator().evaluate(
-                    expression,
-                    method.getParameterTypes()[0],
-                    variableResolver,
-                    functionMapper,
-                    null )
-            });
-        } catch (Exception ex) {
-            throw new JasperException(ex);
-        }
-    }
-**/
     public static void handleSetPropertyExpression(Object bean,
         String prop, String expression, PageContext pageContext,
         ProtectedFunctionMapper functionMapper )
