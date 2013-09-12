@@ -61,7 +61,7 @@ public class JarResource extends AbstractResource {
             } else {
                 name = resourceName.substring(index + 1);
             }
-    }
+        }
     }
 
     @Override
