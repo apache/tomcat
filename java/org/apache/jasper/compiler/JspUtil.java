@@ -357,32 +357,33 @@ public class JspUtil {
          * Determine whether to use the expected type's textual name or, if it's
          * a primitive, the name of its correspondent boxed type.
          */
-        String targetType = expectedType.getCanonicalName();
+        String returnType = expectedType.getCanonicalName();
+        String targetType = returnType;
         String primitiveConverterMethod = null;
         if (expectedType.isPrimitive()) {
             if (expectedType.equals(Boolean.TYPE)) {
-                targetType = Boolean.class.getName();
+                returnType = Boolean.class.getName();
                 primitiveConverterMethod = "booleanValue";
             } else if (expectedType.equals(Byte.TYPE)) {
-                targetType = Byte.class.getName();
+                returnType = Byte.class.getName();
                 primitiveConverterMethod = "byteValue";
             } else if (expectedType.equals(Character.TYPE)) {
-                targetType = Character.class.getName();
+                returnType = Character.class.getName();
                 primitiveConverterMethod = "charValue";
             } else if (expectedType.equals(Short.TYPE)) {
-                targetType = Short.class.getName();
+                returnType = Short.class.getName();
                 primitiveConverterMethod = "shortValue";
             } else if (expectedType.equals(Integer.TYPE)) {
-                targetType = Integer.class.getName();
+                returnType = Integer.class.getName();
                 primitiveConverterMethod = "intValue";
             } else if (expectedType.equals(Long.TYPE)) {
-                targetType = Long.class.getName();
+                returnType = Long.class.getName();
                 primitiveConverterMethod = "longValue";
             } else if (expectedType.equals(Float.TYPE)) {
-                targetType = Float.class.getName();
+                returnType = Float.class.getName();
                 primitiveConverterMethod = "floatValue";
             } else if (expectedType.equals(Double.TYPE)) {
-                targetType = Double.class.getName();
+                returnType = Double.class.getName();
                 primitiveConverterMethod = "doubleValue";
             }
         }
@@ -408,7 +409,7 @@ public class JspUtil {
         targetType = toJavaSourceType(targetType);
         StringBuilder call = new StringBuilder(
                 "("
-                        + targetType
+                        + returnType
                         + ") "
                         + "org.apache.jasper.runtime.PageContextImpl.proprietaryEvaluate"
                         + "(" + Generator.quote(expression) + ", " + targetType
