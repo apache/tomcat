@@ -2373,7 +2373,7 @@ public class Request
         if (response != null) {
             Cookie newCookie =
                 ApplicationSessionCookieConfig.createSessionCookie(context,
-                        newSessionId, secure);
+                        newSessionId, isSecure());
             response.addSessionCookieInternal(newCookie);
         }
     }
