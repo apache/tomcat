@@ -672,9 +672,8 @@ public class TestStandardContext extends TomcatBaseTest {
         // Make sure non-multipart works properly
         client.doRequest("/regular", false, false);
 
-        assertEquals("Incorrect response for GET request",
-                     "parts=0",
-                     client.getResponseBody());
+        // Servlet attempts to read parts which will trigger an ISE
+        assertTrue(client.isResponse500());
 
         client.reset();
 
@@ -688,12 +687,11 @@ public class TestStandardContext extends TomcatBaseTest {
         client.reset();
 
         // Make casual multipart request to "regular" servlet w/o config
-        // We expect that no parts will be available
+        // We expect an error
         client.doRequest("/regular", false, true); // send multipart request
 
-        assertEquals("Incorrect response for non-configured casual multipart request",
-                     "parts=0", // multipart request should be ignored
-                     client.getResponseBody());
+        // Servlet attempts to read parts which will trigger an ISE
+        assertTrue(client.isResponse500());
 
         client.reset();
 
