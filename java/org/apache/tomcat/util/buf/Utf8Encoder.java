@@ -20,7 +20,6 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Encodes characters as bytes using UTF-8. Extracted from Apache Harmony with
@@ -29,7 +28,7 @@ import java.nio.charset.StandardCharsets;
 public class Utf8Encoder extends CharsetEncoder {
 
     public Utf8Encoder() {
-        super(StandardCharsets.UTF_8, 1.1f, 4.0f);
+        super(B2CConverter.UTF_8, 1.1f, 4.0f);
     }
 
     @Override
