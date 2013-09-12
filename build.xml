@@ -572,8 +572,10 @@
     </copy>
   </target>
 
-  <target name="compile"
-          depends="build-prepare,download-compile,compile-prepare,validate,compile-java7">
+  <target name="compile" depends="compile-java6,compile-java7" />
+
+  <target name="compile-java6"
+          depends="build-prepare,download-compile,compile-prepare,validate">
     <!-- Compile internal server components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
@@ -604,10 +606,8 @@
 
   </target>
 
-  <target name="compile-java7"
-          depends="build-prepare,download-compile,compile-prepare,validate"
-          if="java.7.home" >
-    <javac srcdir="java" destdir="${tomcat.classes}"
+  <target name="compile-java7" depends="compile-java6" if="java.7.home" >
+    <javac sourcepath="" srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
