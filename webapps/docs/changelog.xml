@@ -166,6 +166,10 @@
         <code>IOException</code> during output when using Tomcat&apos;
         proprietary (and deprecated) WebSocket API. (markt)
       </fix>
+      <fix>
+        The loaded attribute never exists in <code>PersistentManager</code>.
+        isLoaded is defined as operation in mbeans-descriptors. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

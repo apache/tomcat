@@ -232,11 +232,6 @@
           description="Number of sessions that expired ( doesn't include explicit invalidations )"
                  type="long" />
                  
-    <attribute   name="loaded"
-          description="If the session id is loaded in memory?"
-                 type="boolean"
-           writeable = "false" />
-                 
     <attribute   name="jvmRoute"
           description="Retrieve the JvmRoute for the enclosing Engine"
                  type="java.lang.String"
@@ -393,6 +388,15 @@
           description="Return the list of active session ids"
                impact="ACTION"
            returnType="java.lang.String">
+    </operation>
+
+    <operation   name="isLoaded"
+          description="If the session id is loaded in memory?"
+               impact="ACTION"
+           returnType="booelan">
+      <parameter name="sessionId"
+          description="Id of the session"
+                 type="java.lang.String"/>
     </operation>
 
   </mbean>
