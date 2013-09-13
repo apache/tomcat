@@ -54,6 +54,10 @@
       <bug>51655</bug> Added a decent description of what tcnative actually is.
       (schultz)
     </fix>
+    <fix>
+      <bug>51813</bug> Add NULL-checking for <code>s-&gt;net</code> to
+      avoid SIGSEGV in situations where it appears a socket bas been recycled.
+    </fix>
   </changelog>
 </section>
 <section name="Changes between 1.1.26 and 1.1.27">
