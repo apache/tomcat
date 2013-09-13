@@ -41,7 +41,7 @@ Building
 To build the Java API. Note that Java 1.7 is required to build the Java API.
 > ant
 
-To build the native part see native/BUILDING
+To build the native part see jni/native/BUILDING (or native/BUILDING if you have a working copy of svn).
 
 
 Running the tests
