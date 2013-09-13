@@ -104,8 +104,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <strong>IMPLEMENTATION NOTE</strong> - No check for sealing violations or
  * security is made unless a security manager is present.
  * <p>
- * TODO: Is there any requirement to provide a proper Lifecycle implementation
- *       rather than the current stubbed implementation?
  *
  * @author Remy Maucherat
  * @author Craig R. McClanahan
