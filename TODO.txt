@@ -57,18 +57,10 @@ Java Tests and Examples
 Java Classes Source Distribution
 --------------------------------
 
-Aren't the official sources in trunk/java/org/apache/tomcat/jni?
-
-Note that they are not identical with the ones contained in tcnative.
-The tcnative version of the classes is outdated and not maintained any more.
-So IMHO we should no longer distribute these. I suggest removing them from
-native svn and adding the ones from tc 7 or tc trunk to the native source
-distribution.
-
-Then check on how to reintegrate the test and examples classes.
+Check on how to handle the test and examples classes.
 I think they have no other home.
 
-Furthermore some of the old files do not exist inside TC:
+Furthermore some of the Java files do not exist inside TC:
 - Apr.java, apr.properties, jni/Buffer.java and jni/Thread.java
 I don't know their purpose and whether we can delete them.
 
