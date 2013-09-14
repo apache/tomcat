@@ -76,7 +76,7 @@ public class Cache {
                 // newCacheEntry was inserted into the cache - validate it
                 cacheEntry = newCacheEntry;
                 cacheEntry.validate();
-                if (newCacheEntry.getContentLength() > getMaxObjectSize()) {
+                if (newCacheEntry.getContentLength() > getMaxSizeBytes()) {
                     // Cache size has not been updated at this point
                     removeCacheEntry(path, false);
                     return newCacheEntry;
@@ -182,6 +182,11 @@ public class Cache {
     public long getMaxSize() {
         // Internally bytes, externally kilobytes
         return maxSize / 1024;
+    }
+
+    public long getMaxSizeBytes() {
+        // Internally bytes, externally kilobytes
+        return maxSize;
     }
 
     public void setMaxSize(long maxSize) {
