@@ -205,6 +205,10 @@ public class Cache {
         return maxObjectSize / 1024;
     }
 
+    public void clear() {
+        resourceCache.clear();
+    }
+
     private static class EvictionOrder implements Comparator<CachedResource> {
 
         @Override

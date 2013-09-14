@@ -496,6 +496,8 @@ public class StandardRoot extends LifecycleMBeanBase
         }
         jarResources.clear();
 
+        cache.clear();
+
         setState(LifecycleState.STOPPING);
     }
 
