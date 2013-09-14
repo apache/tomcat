@@ -1659,7 +1659,6 @@ public class ContextConfig implements LifecycleListener {
             URL url = fragment.getURL();
             Jar jar = null;
             try {
-                // Note: Ignore file URLs for now since only jar URLs will be accepted
                 if ("jar".equals(url.getProtocol())) {
                     jar = JarFactory.newInstance(url);
                     jar.nextEntry();
