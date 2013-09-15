@@ -555,7 +555,6 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            target="${compile.target}"
-           optimize="${compile.optimize}"
            excludes="**/.svn/**"
            encoding="ISO-8859-1"
            includeAntRuntime="true" >
@@ -608,7 +607,6 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            target="${compile.target}"
-           optimize="${compile.optimize}"
            excludes="**/.svn/**"
            encoding="ISO-8859-1"
            includeAntRuntime="true"
@@ -993,7 +991,6 @@
              debug="${compile.debug}" deprecation="${compile.deprecation}"
              source="${compile.source}"
              target="${compile.target}"
-             optimize="${compile.optimize}"
              classpath="${tomcat.classes}"
              excludes="**/CVS/**,**/.svn/**"
              encoding="ISO-8859-1"
@@ -1005,7 +1002,6 @@
              debug="${compile.debug}" deprecation="${compile.deprecation}"
              source="${compile.source}"
              target="${compile.target}"
-             optimize="${compile.optimize}"
              classpath="$tomcat.lcasses}"
              excludes="**/CVS/**,**/.svn/**"
              encoding="ISO-8859-1"
@@ -1226,7 +1222,6 @@
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
-           optimize="${compile.optimize}"
            encoding="ISO-8859-1"
            includeantruntime="true">
       <classpath refid="tomcat.test.classpath" />
@@ -1506,7 +1501,6 @@
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
-           optimize="${compile.optimize}"
            encoding="ISO-8859-1"
            includeantruntime="false">
       <classpath refid="tomcat.webservices.classpath" />
