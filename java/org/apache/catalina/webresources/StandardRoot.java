@@ -264,7 +264,11 @@ public class StandardRoot extends LifecycleMBeanBase
         File file = new File(base);
 
         if (file.isFile()) {
-            if (file.getName().toLowerCase(Locale.ENGLISH).endsWith(".jar")) {
+            if (archivePath != null) {
+                // Must be a JAR nested inside a WAR if archivePath is non-null
+                resourceSet = new JarWarResourceSet(this, webAppMount, base,
+                        archivePath, internalPath);
+            } else if (file.getName().toLowerCase(Locale.ENGLISH).endsWith(".jar")) {
                 resourceSet = new JarResourceSet(this, base, webAppMount,
                         internalPath);
             } else {
