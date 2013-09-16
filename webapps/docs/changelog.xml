@@ -170,6 +170,11 @@
         The loaded attribute never exists in <code>PersistentManager</code>.
         isLoaded is defined as operation in mbeans-descriptors. (kfujino)
       </fix>
+      <add>
+          Added logging of logging.properties location when system property
+          <code></code>org.apache.juli.ClassLoaderLogManager.debug=true</code>
+          is set.
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessControlException;
 import java.security.AccessController;
@@ -43,8 +44,13 @@ import java.util.logging.Logger;
 
 /**
  * Per classloader LogManager implementation.
+ *
+ * For light debugging, set the system property
+ * <code>org.apache.juli.ClassLoaderLogManager.debug=true</code>.
+ * Short configuration information will be sent to <code>System.err</code>.
  */
 public class ClassLoaderLogManager extends LogManager {
+    public static final String DEBUG_PROPERTY = LogManager.class.getName() + ".debug";
 
     private final class Cleaner extends Thread {
         
@@ -415,9 +421,22 @@ public class ClassLoaderLogManager extends LogManager {
         // Special case for URL classloaders which are used in containers: 
         // only look in the local repositories to avoid redefining loggers 20 times
         try {
-            if ((classLoader instanceof URLClassLoader) 
-                    && (((URLClassLoader) classLoader).findResource("logging.properties") != null)) {
-                is = classLoader.getResourceAsStream("logging.properties");
+            if (classLoader instanceof URLClassLoader)
+            {
+                URL logConfig = ((URLClassLoader)classLoader).findResource("logging.properties");
+
+                if(null != logConfig)
+                {
+                    if(Boolean.getBoolean(DEBUG_PROPERTY))
+                        System.err.println("Found logging.properties at " + logConfig);
+
+                    is = classLoader.getResourceAsStream("logging.properties");
+                }
+                else
+                {
+                    if(Boolean.getBoolean(DEBUG_PROPERTY))
+                        System.err.println("Found no logging.properties");
+                }
             }
         } catch (AccessControlException ace) {
             // No permission to configure logging in context
