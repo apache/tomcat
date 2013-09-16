@@ -30,8 +30,22 @@ import org.apache.catalina.util.ResourceSet;
 
 public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
-    protected HashMap<String,JarEntry> jarFileEntries = new HashMap<>();
-    protected String baseUrl;
+    private final HashMap<String,JarEntry> jarFileEntries = new HashMap<>();
+    private String baseUrl;
+
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    public HashMap<String,JarEntry> getJarFileEntries() {
+        return jarFileEntries;
+    }
+
 
     @Override
     public final String[] list(String path) {

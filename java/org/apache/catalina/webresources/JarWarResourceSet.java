@@ -77,7 +77,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
     @Override
     protected WebResource createArchiveResource(JarEntry jarEntry,
             String webAppPath) {
-        return new JarWarResource(getRoot(), webAppPath, getBase(), baseUrl,
+        return new JarWarResource(getRoot(), webAppPath, getBase(), getBaseUrl(),
                 jarEntry, archivePath, getInternalPath());
     }
 
@@ -92,7 +92,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
             try (JarInputStream jarIs = new JarInputStream(jarFileIs)) {
                 JarEntry entry = jarIs.getNextJarEntry();
                 while (entry != null) {
-                    jarFileEntries.put(entry.getName(), entry);
+                    getJarFileEntries().put(entry.getName(), entry);
                     entry = jarIs.getNextJarEntry();
                 }
             }
@@ -102,7 +102,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
         }
 
         try {
-            this.baseUrl = (new File(getBase())).toURI().toURL().toString();
+            setBaseUrl((new File(getBase())).toURI().toURL().toString());
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(e);
         }
