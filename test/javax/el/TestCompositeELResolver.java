@@ -46,8 +46,8 @@ public class TestCompositeELResolver extends TomcatBaseTest {
         File lib = new File("webapps/examples/WEB-INF/lib");
         ctxt.setResources(new StandardRoot(ctxt));
         ctxt.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, lib.getAbsolutePath(),
-                "/WEB-INF/lib", "/");
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/lib",
+                lib.getAbsolutePath(), null, "/");
 
         tomcat.start();
 

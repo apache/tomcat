@@ -4947,8 +4947,8 @@ public class StandardContext extends ContainerBase
                     "/WEB-INF/classes/META-INF/resources");
             if (webinfClassesResource.isDirectory()) {
                 getResources().createWebResourceSet(
-                        WebResourceRoot.ResourceSetType.RESOURCE_JAR,
-                        webinfClassesResource.getURL(), "/", "/");
+                        WebResourceRoot.ResourceSetType.RESOURCE_JAR, "/",
+                        webinfClassesResource.getURL(), "/");
             }
         }
 

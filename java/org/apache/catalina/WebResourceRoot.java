@@ -179,15 +179,15 @@ public interface WebResourceRoot extends Lifecycle {
      * based on the provided parameters.
      *
      * @param type          The type of {@link WebResourceSet} to create
-     * @param url           The URL of the resource (must locate a JAR, file or
-     *                          directory)
      * @param webAppMount   The path within the web application that the
      *                          resources should be published at. It must start
      *                          with '/'.
+     * @param url           The URL of the resource (must locate a JAR, file or
+     *                          directory)
      * @param internalPath  The path within the resource where the content is to
      *                          be found. It must start with '/'.
      */
-    void createWebResourceSet(ResourceSetType type, URL url, String webAppMount,
+    void createWebResourceSet(ResourceSetType type, String webAppMount, URL url,
             String internalPath);
 
     /**
@@ -195,15 +195,19 @@ public interface WebResourceRoot extends Lifecycle {
      * based on the provided parameters.
      *
      * @param type          The type of {@link WebResourceSet} to create
-     * @param base          The location of the resources
      * @param webAppMount   The path within the web application that the
      *                          resources should be published at. It must start
      *                          with '/'.
-     * @param internalPath  The path within the resource where the content is to
-     *                          be found. It must start with '/'.
+     * @param base          The location of the resources
+     * @param archivePath   The path within the resource to the archive where
+     *                          the content is to be found. If there is no
+     *                          archive then this should be <code>null</code>.
+     * @param internalPath  The path within the archive (or the resource if the
+     *                          archivePath is <code>null</code> where the
+     *                          content is to be found. It must start with '/'.
      */
-    void createWebResourceSet(ResourceSetType type, String base,
-            String webAppMount, String internalPath);
+    void createWebResourceSet(ResourceSetType type, String webAppMount,
+            String base, String archivePath, String internalPath);
 
 
     /**

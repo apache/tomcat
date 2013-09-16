@@ -1667,7 +1667,7 @@ public class ContextConfig implements LifecycleListener {
                         if (entryName.startsWith("META-INF/resources/")) {
                             context.getResources().createWebResourceSet(
                                     WebResourceRoot.ResourceSetType.RESOURCE_JAR,
-                                    url, "/", "/META-INF/resources");
+                                    "/", url, "/META-INF/resources");
                             break;
                         }
                         jar.nextEntry();
@@ -1679,7 +1679,7 @@ public class ContextConfig implements LifecycleListener {
                     if (resources.isDirectory()) {
                         context.getResources().createWebResourceSet(
                                 WebResourceRoot.ResourceSetType.RESOURCE_JAR,
-                                file.getAbsolutePath(), "/", "/");
+                                "/", file.getAbsolutePath(), null, "/");
                     }
                 }
             } catch (IOException ioe) {

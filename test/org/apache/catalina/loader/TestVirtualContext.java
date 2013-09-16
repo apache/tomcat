@@ -77,23 +77,23 @@ public class TestVirtualContext extends TomcatBaseTest {
         File f5 = new File("test/webapp-virtual-webapp/src/main/misc");
         File f6 = new File("test/webapp-virtual-webapp/src/main/webapp2");
         ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, f1.getAbsolutePath(),
-                "/WEB-INF/classes", "/");
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+                f1.getAbsolutePath(), null, "/");
         ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, f2.getAbsolutePath(),
-                "/WEB-INF/classes", "/");
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+                f2.getAbsolutePath(), null, "/");
         ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, f3.getAbsolutePath(),
-                "/WEB-INF/classes", "/");
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+                f3.getAbsolutePath(), null, "/");
         ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, f4.getAbsolutePath(),
-                "/WEB-INF/classes", "/");
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+                f4.getAbsolutePath(), null, "/");
         ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, f5.getAbsolutePath(),
-                "/other", "/");
+                WebResourceRoot.ResourceSetType.POST, "/other",
+                f5.getAbsolutePath(), null, "/");
         ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, f6.getAbsolutePath(),
-                "/", "/");
+                WebResourceRoot.ResourceSetType.POST, "/",
+                f6.getAbsolutePath(), null, "/");
 
         StandardJarScanner jarScanner = new StandardJarScanner();
         jarScanner.setScanAllDirectories(true);
@@ -280,11 +280,11 @@ public class TestVirtualContext extends TomcatBaseTest {
         File f1 = new File("test/webapp-virtual-webapp/target/classes");
         File f2 = new File("test/webapp-virtual-library/target/classes");
         ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, f1.getAbsolutePath(),
-                "/WEB-INF/classes", "/");
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+                f1.getAbsolutePath(), null, "/");
         ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, f2.getAbsolutePath(),
-                "/WEB-INF/classes", "/");
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+                f2.getAbsolutePath(), null, "/");
 
         tomcat.start();
         // first test that without the setting on StandardContext the annotated
@@ -297,15 +297,14 @@ public class TestVirtualContext extends TomcatBaseTest {
         // path, the servlet is detected
         ctx.setResources(new StandardRoot(ctx));
         ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, f1.getAbsolutePath(),
-                "/WEB-INF/classes", "/");
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+                f1.getAbsolutePath(), null, "/");
         ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, f2.getAbsolutePath(),
-                "/WEB-INF/classes", "/");
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+                f2.getAbsolutePath(), null, "/");
         ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST,
-                additionWebInfClasses.getAbsolutePath(),
-                "/WEB-INF/classes", "/");
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+                additionWebInfClasses.getAbsolutePath(), null, "/");
 
         tomcat.start();
         assertPageContains("/test/annotatedServlet", MyAnnotatedServlet.MESSAGE);
