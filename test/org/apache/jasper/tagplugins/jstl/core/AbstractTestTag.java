@@ -43,16 +43,16 @@ public abstract class AbstractTestTag extends TomcatBaseTest {
         // Add the JSTL (we need the TLD)
         File lib = new File("webapps/examples/WEB-INF/lib");
         ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, lib.getAbsolutePath(),
-                "/WEB-INF/lib", "/");
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/lib",
+                lib.getAbsolutePath(), null, "/");
 
         // Configure the use of the plug-in rather than the standard impl
         File plugin = new File(
                 "java/org/apache/jasper/tagplugins/jstl/tagPlugins.xml");
         Assert.assertTrue(plugin.isFile());
         ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, plugin.getAbsolutePath(),
-                "/WEB-INF/tagPlugins.xml", "/");
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/tagPlugins.xml",
+                plugin.getAbsolutePath(), null, "/");
 
         tomcat.start();
     }

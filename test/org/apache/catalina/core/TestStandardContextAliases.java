@@ -51,8 +51,8 @@ public class TestStandardContextAliases extends TomcatBaseTest {
         File lib = new File("webapps/examples/WEB-INF/lib");
         ctx.setResources(new StandardRoot(ctx));
         ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, lib.getAbsolutePath(),
-                "/WEB-INF/lib", "/");
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/lib",
+                lib.getAbsolutePath(), null, "/");
 
 
         Tomcat.addServlet(ctx, "test", new TestServlet());

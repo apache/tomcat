@@ -91,14 +91,14 @@ public class TesterWebResourceRoot extends StandardRoot {
     }
 
     @Override
-    public void createWebResourceSet(ResourceSetType type, URL url,
-            String webAppPath, String internalPath) {
+    public void createWebResourceSet(ResourceSetType type, String webAppPath,
+            URL url, String internalPath) {
         // NO-OP
     }
 
     @Override
-    public void createWebResourceSet(ResourceSetType type, String base,
-            String webAppMount, String internalPath) {
+    public void createWebResourceSet(ResourceSetType type, String webAppPath,
+            String base, String archivePath, String internalPath) {
         // NO-OP
     }
 

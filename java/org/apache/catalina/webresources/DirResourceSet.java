@@ -71,8 +71,8 @@ public class DirResourceSet extends AbstractFileResourceSet {
             f = new File(f, "/WEB-INF/classes/META-INF/resources");
 
             if (f.isDirectory()) {
-                root.createWebResourceSet(ResourceSetType.RESOURCE_JAR,
-                         f.getAbsolutePath(), "/", "/");
+                root.createWebResourceSet(ResourceSetType.RESOURCE_JAR, "/",
+                         f.getAbsolutePath(), null, "/");
             }
         }
 

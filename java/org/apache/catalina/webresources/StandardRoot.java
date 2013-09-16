@@ -44,8 +44,8 @@ import org.apache.tomcat.util.res.StringManager;
  * </p><p>
  * This implementation assumes that the base attribute supplied to {@link
  * StandardRoot#createWebResourceSet(
- * org.apache.catalina.WebResourceRoot.ResourceSetType, String, String, String)}
- * represents the absolute path to a file.
+ * org.apache.catalina.WebResourceRoot.ResourceSetType, String, String, String,
+ * String)} represents the absolute path to a file.
  * </p>
  */
 public class StandardRoot extends LifecycleMBeanBase
@@ -231,15 +231,14 @@ public class StandardRoot extends LifecycleMBeanBase
 
 
     @Override
-    public void createWebResourceSet(ResourceSetType type, URL url,
-            String webAppMount, String internalPath) {
-        createWebResourceSet(type, toBase(url), webAppMount, internalPath);
+    public void createWebResourceSet(ResourceSetType type, String webAppMount,
+            URL url, String internalPath) {
+        createWebResourceSet(type, webAppMount, toBase(url), null, internalPath);
     }
 
     @Override
-    public void createWebResourceSet(ResourceSetType type, String base,
-            String webAppMount, String internalPath) {
-
+    public void createWebResourceSet(ResourceSetType type, String webAppMount,
+            String base, String archivePath, String internalPath) {
         ArrayList<WebResourceSet> resourceList;
         WebResourceSet resourceSet;
 
