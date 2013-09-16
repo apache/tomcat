@@ -233,7 +233,9 @@ public class StandardRoot extends LifecycleMBeanBase
     @Override
     public void createWebResourceSet(ResourceSetType type, String webAppMount,
             URL url, String internalPath) {
-        createWebResourceSet(type, webAppMount, toBase(url), null, internalPath);
+        BaseLocation baseLocation = new BaseLocation(url);
+        createWebResourceSet(type, webAppMount, baseLocation.getBasePath(),
+                baseLocation.getArchivePath(), internalPath);
     }
 
     @Override
@@ -380,27 +382,6 @@ public class StandardRoot extends LifecycleMBeanBase
         }
     }
 
-    protected String toBase(URL url) {
-        File f = null;
-
-        if ("jar".equals(url.getProtocol())) {
-            String jarUrl = url.toString();
-            String fileUrl = jarUrl.substring(4, jarUrl.length() - 2);
-            try {
-                f = new File(new URL(fileUrl).toURI());
-            } catch (MalformedURLException | URISyntaxException e) {
-                throw new IllegalArgumentException(e);
-            }
-        } else {
-            try {
-                f = new File(url.toURI());
-            } catch (URISyntaxException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
-        return f.getAbsolutePath();
-    }
-
     /**
      * For unit testing
      */
@@ -509,5 +490,56 @@ public class StandardRoot extends LifecycleMBeanBase
         }
 
         super.destroyInternal();
+    }
+
+
+    // Unit tests need to access this class
+    static class BaseLocation {
+
+        private final String basePath;
+        private final String archivePath;
+
+        BaseLocation(URL url) {
+            File f = null;
+
+            if ("jar".equals(url.getProtocol())) {
+                String jarUrl = url.toString();
+                int endOfFileUrl = jarUrl.indexOf("!/");
+                String fileUrl = jarUrl.substring(4, endOfFileUrl);
+                try {
+                    f = new File(new URL(fileUrl).toURI());
+                } catch (MalformedURLException | URISyntaxException e) {
+                    throw new IllegalArgumentException(e);
+                }
+                int startOfArchivePath = endOfFileUrl + 2;
+                if (jarUrl.length() >  startOfArchivePath) {
+                    archivePath = jarUrl.substring(startOfArchivePath);
+                } else {
+                    archivePath = null;
+                }
+            } else if ("file".equals(url.getProtocol())){
+                try {
+                    f = new File(url.toURI());
+                } catch (URISyntaxException e) {
+                    throw new IllegalArgumentException(e);
+                }
+                archivePath = null;
+            } else {
+                throw new IllegalArgumentException(sm.getString(
+                        "standardRoot.unsupportedProtocol", url.getProtocol()));
+            }
+
+            basePath = f.getAbsolutePath();
+        }
+
+
+        public String getBasePath() {
+            return basePath;
+        }
+
+
+        public String getArchivePath() {
+            return archivePath;
+        }
     }
 }
