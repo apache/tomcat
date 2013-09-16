@@ -40,9 +40,9 @@ public class JarWarResource extends AbstractArchiveResource {
     private final String baseUrl;
     private final String archivePath;
 
-    public JarWarResource(WebResourceRoot root, String base, String baseUrl,
-            JarEntry jarEntry, String archivePath, String internalPath,
-            String webAppPath) {
+    public JarWarResource(WebResourceRoot root, String webAppPath, String base,
+            String baseUrl, JarEntry jarEntry, String archivePath,
+            String internalPath) {
         super(root, webAppPath, jarEntry);
         this.base = base;
         this.archivePath = archivePath;

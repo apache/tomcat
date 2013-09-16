@@ -38,8 +38,8 @@ public class JarResource extends AbstractArchiveResource {
     private final String base;
     private final String baseUrl;
 
-    public JarResource(WebResourceRoot root, String base, String baseUrl,
-            JarEntry jarEntry, String internalPath, String webAppPath) {
+    public JarResource(WebResourceRoot root, String webAppPath, String base,
+            String baseUrl, JarEntry jarEntry, String internalPath) {
         super(root, webAppPath, jarEntry);
         this.base = base;
         this.baseUrl = "jar:" + baseUrl;

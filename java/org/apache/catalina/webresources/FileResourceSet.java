@@ -45,23 +45,23 @@ public class FileResourceSet extends AbstractFileResourceSet {
      * @param root          The {@link WebResourceRoot} this new
      *                          {@link org.apache.catalina.WebResourceSet} will
      *                          be added to.
-     * @param base          The absolute path to the file on the file system
-     *                          from which the resource will be served.
      * @param webAppMount   The path within the web application at which this
      *                          {@link org.apache.catalina.WebResourceSet} will
      *                          be mounted. For example, to add a directory of
      *                          JARs to a web application, the directory would
      *                          be mounted at "WEB-INF/lib/"
+     * @param base          The absolute path to the file on the file system
+     *                          from which the resource will be served.
      * @param internalPath  The path within this new {@link
      *                          org.apache.catalina.WebResourceSet} where
      *                          resources will be served from.
      */
-    public FileResourceSet(WebResourceRoot root, String base, String webAppMount,
-            String internalPath) {
+    public FileResourceSet(WebResourceRoot root, String webAppMount,
+            String base, String internalPath) {
         super(internalPath);
         setRoot(root);
-        setBase(base);
         setWebAppMount(webAppMount);
+        setBase(base);
 
         if (getRoot().getState().isAvailable()) {
             try {
@@ -84,7 +84,7 @@ public class FileResourceSet extends AbstractFileResourceSet {
             if (f == null) {
                 return new EmptyResource(root, path);
             }
-            return new FileResource(root, f, path);
+            return new FileResource(root, path, f);
         }
 
         if (path.charAt(path.length() - 1) != '/') {

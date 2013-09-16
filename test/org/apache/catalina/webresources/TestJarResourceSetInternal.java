@@ -30,7 +30,7 @@ public class TestJarResourceSetInternal extends AbstractTestResourceSet {
         File f = new File("test/webresources/dir1-internal.jar");
         TesterWebResourceRoot root = new TesterWebResourceRoot();
         WebResourceSet webResourceSet =
-                new JarResourceSet(root, f.getAbsolutePath(), "/", "/dir1");
+                new JarResourceSet(root, "/", f.getAbsolutePath(), "/dir1");
         root.setMainResources(webResourceSet);
         return root;
     }

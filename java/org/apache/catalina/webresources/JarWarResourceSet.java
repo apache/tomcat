@@ -77,8 +77,8 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
     @Override
     protected WebResource createArchiveResource(JarEntry jarEntry,
             String webAppPath) {
-        return new JarWarResource(getRoot(), getBase(), baseUrl, jarEntry,
-                archivePath, getInternalPath(), webAppPath);
+        return new JarWarResource(getRoot(), webAppPath, getBase(), baseUrl,
+                jarEntry, archivePath, getInternalPath());
     }
 
     //-------------------------------------------------------- Lifecycle methods
