@@ -21,12 +21,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResource;
@@ -263,12 +263,18 @@ public class JarWarResourceSet extends AbstractResourceSet {
     @Override
     protected void initInternal() throws LifecycleException {
 
-        try (JarFile jarFile = new JarFile(getBase())) {
-            Enumeration<JarEntry> entries = jarFile.entries();
-            while (entries.hasMoreElements()) {
-                JarEntry entry = entries.nextElement();
-                jarFileEntries.put(entry.getName(), entry);
+        try (JarFile warFile = new JarFile(getBase())) {
+            JarEntry jarFileInWar = warFile.getJarEntry(archivePath);
+            InputStream jarFileIs = warFile.getInputStream(jarFileInWar);
+
+            try (JarInputStream jarIs = new JarInputStream(jarFileIs)) {
+                JarEntry entry = jarIs.getNextJarEntry();
+                while (entry != null) {
+                    jarFileEntries.put(entry.getName(), entry);
+                    entry = jarIs.getNextJarEntry();
+                }
             }
+
         } catch (IOException ioe) {
             throw new IllegalArgumentException(ioe);
         }
