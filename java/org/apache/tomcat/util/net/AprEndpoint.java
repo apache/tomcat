@@ -1567,7 +1567,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             while (pollerRunning) {
 
                 // Loop if endpoint is paused
-                while (paused) {
+                while (pollerRunning && paused) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
