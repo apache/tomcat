@@ -46,7 +46,7 @@ public class JarWarResource extends AbstractArchiveResource {
         super(root, webAppPath, jarEntry);
         this.base = base;
         this.archivePath = archivePath;
-        this.baseUrl = "jar:" + baseUrl;
+        this.baseUrl = "jar:war:" + baseUrl + "^/" + archivePath;
 
         String resourceName = resource.getName();
         if (resourceName.charAt(resourceName.length() - 1) == '/') {

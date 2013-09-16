@@ -420,6 +420,10 @@ public class StandardRoot extends LifecycleMBeanBase
     protected void initInternal() throws LifecycleException {
         super.initInternal();
 
+        // Ensure support for jar:war:file:/ URKLs will be available (required
+        // for resource JARs in packed WAR files).
+        TomcatURLStreamHandlerFactory.register();
+
         if (context == null) {
             throw new IllegalStateException(
                     sm.getString("standardRoot.noContext"));
