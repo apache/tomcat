@@ -123,8 +123,8 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                 if (jarEntry == null) {
                     return new EmptyResource(root, path);
                 } else {
-                    return new JarResource(root, getBase(), baseUrl, jarEntry,
-                            getInternalPath(), path);
+                    return new JarWarResource(root, getBase(), baseUrl, jarEntry,
+                            archivePath, getInternalPath(), path);
                 }
             }
         } else {

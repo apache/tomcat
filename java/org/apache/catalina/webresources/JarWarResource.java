@@ -22,6 +22,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 
 import org.apache.catalina.WebResourceRoot;
 import org.apache.juli.logging.Log;
@@ -29,19 +30,22 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Represents a single resource (file or directory) that is located within a
- * JAR.
+ * JAR that in turn is located in a WAR file.
  */
-public class JarResource extends AbstractArchiveResource {
+public class JarWarResource extends AbstractArchiveResource {
 
     private static final Log log = LogFactory.getLog(JarResource.class);
 
     private final String base;
     private final String baseUrl;
+    private final String archivePath;
 
-    public JarResource(WebResourceRoot root, String base, String baseUrl,
-            JarEntry jarEntry, String internalPath, String webAppPath) {
+    public JarWarResource(WebResourceRoot root, String base, String baseUrl,
+            JarEntry jarEntry, String archivePath, String internalPath,
+            String webAppPath) {
         super(root, webAppPath, jarEntry);
         this.base = base;
+        this.archivePath = archivePath;
         this.baseUrl = "jar:" + baseUrl;
 
         String resourceName = resource.getName();
@@ -64,9 +68,32 @@ public class JarResource extends AbstractArchiveResource {
     @Override
     public InputStream getInputStream() {
         try {
-            JarFile jarFile = new JarFile(base);
-            InputStream is = jarFile.getInputStream(resource);
-            return new JarInputStreamWrapper(jarFile, is);
+            JarFile warFile = new JarFile(base);
+            JarEntry jarFileInWar = warFile.getJarEntry(archivePath);
+            InputStream isInWar = warFile.getInputStream(jarFileInWar);
+
+            JarInputStream jarIs = new JarInputStream(isInWar);
+            JarEntry entry = jarIs.getNextJarEntry();
+            while (entry != null &&
+                    !entry.getName().equals(resource.getName())) {
+                entry = jarIs.getNextJarEntry();
+            }
+
+            if (entry == null) {
+                try {
+                    jarIs.close();
+                } catch (IOException ioe) {
+                    // Ignore
+                }
+                try {
+                    warFile.close();
+                } catch (IOException ioe) {
+                    // Ignore
+                }
+                return null;
+            }
+
+            return new JarInputStreamWrapper(warFile, jarIs);
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("fileResource.getInputStreamFail",

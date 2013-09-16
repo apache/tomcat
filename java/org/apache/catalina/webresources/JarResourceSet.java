@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -33,7 +32,6 @@ import org.apache.catalina.WebResourceRoot;
  */
 public class JarResourceSet extends AbstractArchiveResourceSet {
 
-    protected HashMap<String,JarEntry> jarFileEntries = new HashMap<>();
     protected String baseUrl;
 
     /**
