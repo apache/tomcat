@@ -31,7 +31,11 @@ public class JarFactory {
     public static Jar newInstance(URL url) throws IOException {
         String jarUrl = url.toString();
         if (jarUrl.startsWith("jar:file:")) {
-            return new FileUrlJar(url);
+            if (jarUrl.endsWith("!/")) {
+                return new FileUrlJar(url);
+            } else {
+                return new FileUrlNestedJar(url);
+            }
         } else {
             return new UrlJar(url);
         }

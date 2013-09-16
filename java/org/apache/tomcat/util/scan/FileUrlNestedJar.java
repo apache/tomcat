@@ -20,65 +20,105 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
+
 
 /**
  * Implementation of {@link Jar} that is optimised for file based JAR URLs that
- * refer directly to a JAR file (e.g URLs of the form jar:file: ... .jar!/) .
+ * refer to a JAR file nested inside a WAR
+ * (e.g URLs of the form jar:file: ... .war!/ ... .jar).
  */
-public class FileUrlJar implements Jar {
+public class FileUrlNestedJar implements Jar {
 
-    private final JarFile jarFile;
-    private Enumeration<JarEntry> entries;
+    private final JarFile warFile;
+    private final JarEntry jarEntry;
+    private NonClosingJarInputStream jarInputStream = null;
     private JarEntry entry = null;
 
-    public FileUrlJar(URL url) throws IOException {
+    public FileUrlNestedJar(URL url) throws IOException {
         JarURLConnection jarConn = (JarURLConnection) url.openConnection();
         jarConn.setUseCaches(false);
-        jarFile = jarConn.getJarFile();
+        warFile = jarConn.getJarFile();
+
+        String urlAsString = url.toString();
+        int pathStart = urlAsString.indexOf("!/") + 2;
+        String jarPath = urlAsString.substring(pathStart);
+        jarEntry = warFile.getJarEntry(jarPath);
+
+        jarInputStream = createJarInputStream();
     }
 
+
     @Override
-    public boolean entryExists(String name) {
-        ZipEntry entry = jarFile.getEntry(name);
+    public boolean entryExists(String name) throws IOException {
+        JarEntry entry = jarInputStream.getNextJarEntry();
+        while (entry != null) {
+            if (name.equals(entry.getName())) {
+                break;
+            }
+            entry = jarInputStream.getNextJarEntry();
+        }
+
         return entry != null;
     }
 
+
     @Override
     public InputStream getInputStream(String name) throws IOException {
-        ZipEntry entry = jarFile.getEntry(name);
+        JarEntry entry = jarInputStream.getNextJarEntry();
+        while (entry != null) {
+            if (name.equals(entry.getName())) {
+                break;
+            }
+            entry = jarInputStream.getNextJarEntry();
+        }
+
         if (entry == null) {
             return null;
         } else {
-            return jarFile.getInputStream(entry);
+            return jarInputStream;
         }
     }
 
+
     @Override
     public void close() {
-        if (jarFile != null) {
+        closeInner();
+        if (warFile != null) {
             try {
-                jarFile.close();
+                warFile.close();
             } catch (IOException e) {
                 // Ignore
             }
         }
     }
 
+
+    private void closeInner() {
+        if (jarInputStream != null) {
+            try {
+                jarInputStream.reallyClose();
+            } catch (IOException ioe) {
+                // Ignore
+            }
+        }
+    }
+
+    private NonClosingJarInputStream createJarInputStream() throws IOException {
+        return new NonClosingJarInputStream(warFile.getInputStream(jarEntry));
+    }
+
+
     @Override
     public void nextEntry() {
-        if (entries == null) {
-            entries = jarFile.entries();
-        }
-        if (entries.hasMoreElements()) {
-            entry = entries.nextElement();
-        } else {
+        try {
+            entry = jarInputStream.getNextJarEntry();
+        } catch (IOException ioe) {
             entry = null;
         }
     }
+
 
     @Override
     public String getEntryName() {
@@ -89,18 +129,16 @@ public class FileUrlJar implements Jar {
         }
     }
 
+
     @Override
     public InputStream getEntryInputStream() throws IOException {
-        if (entry == null) {
-            return null;
-        } else {
-            return jarFile.getInputStream(entry);
-        }
+        return jarInputStream;
     }
+
 
     @Override
     public void reset() throws IOException {
-        entries = null;
-        entry = null;
+        closeInner();
+        jarInputStream = createJarInputStream();
     }
 }
