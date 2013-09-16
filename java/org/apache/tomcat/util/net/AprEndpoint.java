@@ -897,6 +897,7 @@ public class AprEndpoint extends AbstractEndpoint {
         // countDownConnection(). Once the connector is stopped, the latch is
         // removed so it does not matter that destroySocket() does not call
         // countDownConnection() in that case
+        poller.removeFromPoller(socket);
         connections.remove(Long.valueOf(socket));
         destroySocket(socket, running);
     }
