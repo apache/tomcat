@@ -223,6 +223,12 @@
         Add support for limiting the size of chunk extensions when using chunked
         encoding. (markt)
       </fix>
+      <fix>
+        Update the APR/native connector to version 1.1.28. Make this the minimum
+        acceptable version as the correct behaviour of the JSR-356 WebSocket
+        implementation when using the APR/native HTTP connector depends on a bug
+        fix in the 1.1.28 release. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
