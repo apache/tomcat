@@ -18,8 +18,6 @@ package org.apache.catalina.webresources;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
@@ -36,46 +34,27 @@ public class JarWarResource extends AbstractArchiveResource {
 
     private static final Log log = LogFactory.getLog(JarResource.class);
 
-    private final String base;
-    private final String baseUrl;
     private final String archivePath;
 
     public JarWarResource(WebResourceRoot root, String webAppPath, String base,
             String baseUrl, JarEntry jarEntry, String archivePath,
             String internalPath) {
-        super(root, webAppPath, jarEntry);
-        this.base = base;
+        super(root, webAppPath, base, "jar:war:" + baseUrl + "^/" + archivePath,
+                jarEntry, internalPath);
         this.archivePath = archivePath;
-        this.baseUrl = "jar:war:" + baseUrl + "^/" + archivePath;
-
-        String resourceName = resource.getName();
-        if (resourceName.charAt(resourceName.length() - 1) == '/') {
-            resourceName = resourceName.substring(0, resourceName.length() - 1);
-        }
-        if (internalPath.length() > 0 && resourceName.equals(
-                internalPath.subSequence(1, internalPath.length()))) {
-            name = "";
-        } else {
-            int index = resourceName.lastIndexOf('/');
-            if (index == -1) {
-                name = resourceName;
-            } else {
-                name = resourceName.substring(index + 1);
-            }
-        }
     }
 
     @Override
     public InputStream getInputStream() {
         try {
-            JarFile warFile = new JarFile(base);
+            JarFile warFile = new JarFile(getBase());
             JarEntry jarFileInWar = warFile.getJarEntry(archivePath);
             InputStream isInWar = warFile.getInputStream(jarFileInWar);
 
             JarInputStream jarIs = new JarInputStream(isInWar);
             JarEntry entry = jarIs.getNextJarEntry();
             while (entry != null &&
-                    !entry.getName().equals(resource.getName())) {
+                    !entry.getName().equals(getResource().getName())) {
                 entry = jarIs.getNextJarEntry();
             }
 
@@ -97,20 +76,7 @@ public class JarWarResource extends AbstractArchiveResource {
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("fileResource.getInputStreamFail",
-                        resource.getName(), baseUrl), e);
-            }
-            return null;
-        }
-    }
-
-    @Override
-    public URL getURL() {
-        try {
-            return new URL(baseUrl + "!/" + resource.getName());
-        } catch (MalformedURLException e) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("fileResource.getUrlFail",
-                        resource.getName(), baseUrl), e);
+                        getResource().getName(), getBaseUrl()), e);
             }
             return null;
         }
