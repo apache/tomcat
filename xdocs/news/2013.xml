@@ -31,6 +31,18 @@
 
 <section name="2013 News &amp; Status">
 <br />
+<a name="20130916.1">
+<h3>16 September - TC-Native-1.1.28 released</h3>
+</a>
+<p>The Apache Tomcat team is proud to announce the immediate availability
+of Tomcat Native 1.1.28. This is a bug fixing release.
+</p>
+<br />
+<p>
+ Please see the <a href="../miscellaneous/changelog.html">ChangeLog</a> for a full list of changes.
+</p>
+<hr size="1" noshade="noshade" />
+<br />
 <a name="20130212.1">
 <h3>12 February - TC-Native-1.1.27 released</h3>
 </a>
