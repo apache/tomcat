@@ -269,15 +269,15 @@ public class StandardRoot extends LifecycleMBeanBase
                 resourceSet = new JarWarResourceSet(this, webAppMount, base,
                         archivePath, internalPath);
             } else if (file.getName().toLowerCase(Locale.ENGLISH).endsWith(".jar")) {
-                resourceSet = new JarResourceSet(this, base, webAppMount,
+                resourceSet = new JarResourceSet(this, webAppMount, base,
                         internalPath);
             } else {
-                resourceSet = new FileResourceSet(this, base, webAppMount,
+                resourceSet = new FileResourceSet(this, webAppMount, base,
                         internalPath);
             }
         } else if (file.isDirectory()) {
             resourceSet =
-                    new DirResourceSet(this, base, webAppMount, internalPath);
+                    new DirResourceSet(this, webAppMount, base, internalPath);
         } else {
             throw new IllegalArgumentException(
                     sm.getString("standardRoot.createInvalidFile", file));
@@ -445,9 +445,9 @@ public class StandardRoot extends LifecycleMBeanBase
             f = new File(((Host)context.getParent()).getAppBaseFile(), f.getName());
         }
         if (f.isDirectory()) {
-            main = new DirResourceSet(this, f.getAbsolutePath(), "/", "/");
+            main = new DirResourceSet(this, "/", f.getAbsolutePath(), "/");
         } else if(f.isFile() && docBase.endsWith(".war")) {
-            main = new JarResourceSet(this, f.getAbsolutePath(), "/", "/");
+            main = new JarResourceSet(this, "/", f.getAbsolutePath(), "/");
         } else {
             throw new IllegalArgumentException(
                     sm.getString("standardRoot.startInvalidMain",

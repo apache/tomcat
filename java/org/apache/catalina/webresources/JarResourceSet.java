@@ -45,22 +45,22 @@ public class JarResourceSet extends AbstractArchiveResourceSet {
      * @param root          The {@link WebResourceRoot} this new
      *                          {@link org.apache.catalina.WebResourceSet} will
      *                          be added to.
-     * @param base          The absolute path to the JAR file on the file system
-     *                          from which the resources will be served.
      * @param webAppMount   The path within the web application at which this
      *                          {@link org.apache.catalina.WebResourceSet} will
      *                          be mounted.
+     * @param base          The absolute path to the JAR file on the file system
+     *                          from which the resources will be served.
      * @param internalPath  The path within this new {@link
      *                          org.apache.catalina.WebResourceSet} where
      *                          resources will be served from. E.g. for a
      *                          resource JAR, this would be "META-INF/resources"
      */
-    public JarResourceSet(WebResourceRoot root, String base, String webAppMount,
+    public JarResourceSet(WebResourceRoot root, String webAppMount, String base,
             String internalPath) throws IllegalArgumentException {
         setRoot(root);
+        setWebAppMount(webAppMount);
         setBase(base);
         setInternalPath(internalPath);
-        setWebAppMount(webAppMount);
 
         if (getRoot().getState().isAvailable()) {
             try {
@@ -74,8 +74,8 @@ public class JarResourceSet extends AbstractArchiveResourceSet {
     @Override
     protected WebResource createArchiveResource(JarEntry jarEntry,
             String webAppPath) {
-        return new JarResource(getRoot(), getBase(), baseUrl, jarEntry,
-                getInternalPath(), webAppPath);
+        return new JarResource(getRoot(), webAppPath, getBase(), baseUrl,
+                jarEntry, getInternalPath());
     }
 
     //-------------------------------------------------------- Lifecycle methods

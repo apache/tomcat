@@ -28,24 +28,24 @@ public class TestDirResourceSetVirtual extends TestDirResourceSet {
         File f = new File(getBaseDir());
         TesterWebResourceRoot root = new TesterWebResourceRoot();
         WebResourceSet webResourceSet =
-                new DirResourceSet(new TesterWebResourceRoot(),
-                        f.getAbsolutePath(), "/", "/");
+                new DirResourceSet(new TesterWebResourceRoot(), "/",
+                        f.getAbsolutePath(), "/");
         root.setMainResources(webResourceSet);
 
-        WebResourceSet f1 = new FileResourceSet(root,
-                "test/webresources/dir1/f1.txt", "/f1.txt", "/");
+        WebResourceSet f1 = new FileResourceSet(root, "/f1.txt",
+                "test/webresources/dir1/f1.txt", "/");
         root.addPreResources(f1);
 
-        WebResourceSet f2 = new FileResourceSet(root,
-                "test/webresources/dir1/f2.txt", "/f2.txt", "/");
+        WebResourceSet f2 = new FileResourceSet(root, "/f2.txt",
+                "test/webresources/dir1/f2.txt", "/");
         root.addPreResources(f2);
 
-        WebResourceSet d1 = new DirResourceSet(root,
-                "test/webresources/dir1/d1", "/d1", "/");
+        WebResourceSet d1 = new DirResourceSet(root, "/d1",
+                "test/webresources/dir1/d1", "/");
         root.addPreResources(d1);
 
-        WebResourceSet d2 = new DirResourceSet(root,
-                "test/webresources/dir1/d2", "/d2", "/");
+        WebResourceSet d2 = new DirResourceSet(root, "/d2",
+                "test/webresources/dir1/d2", "/");
         root.addPreResources(d2);
 
         return root;

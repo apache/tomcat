@@ -48,23 +48,23 @@ public class DirResourceSet extends AbstractFileResourceSet {
      * @param root          The {@link WebResourceRoot} this new
      *                          {@link org.apache.catalina.WebResourceSet} will
      *                          be added to.
-     * @param base          The absolute path to the directory on the file
-     *                          system from which the resources will be served.
      * @param webAppMount   The path within the web application at which this
      *                          {@link org.apache.catalina.WebResourceSet} will
      *                          be mounted. For example, to add a directory of
      *                          JARs to a web application, the directory would
      *                          be mounted at "/WEB-INF/lib/"
+     * @param base          The absolute path to the directory on the file
+     *                          system from which the resources will be served.
      * @param internalPath  The path within this new {@link
      *                          org.apache.catalina.WebResourceSet} where
      *                          resources will be served from.
      */
-    public DirResourceSet(WebResourceRoot root, String base, String webAppMount,
+    public DirResourceSet(WebResourceRoot root, String webAppMount, String base,
             String internalPath) {
         super(internalPath);
         setRoot(root);
-        setBase(base);
         setWebAppMount(webAppMount);
+        setBase(base);
 
         if (root.getContext().getAddWebinfClassesResources()) {
             File f = new File(base, internalPath);
@@ -99,7 +99,7 @@ public class DirResourceSet extends AbstractFileResourceSet {
             if (f.isDirectory() && path.charAt(path.length() - 1) != '/') {
                 path = path += '/';
             }
-            return new FileResource(root, f, path);
+            return new FileResource(root, path, f);
         } else {
             return new EmptyResource(root, path);
         }

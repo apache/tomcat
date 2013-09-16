@@ -30,8 +30,8 @@ public class TestDirResourceSet extends AbstractTestResourceSet {
         File f = new File(getBaseDir());
         TesterWebResourceRoot root = new TesterWebResourceRoot();
         WebResourceSet webResourceSet =
-                new DirResourceSet(new TesterWebResourceRoot(),
-                        f.getAbsolutePath(), "/", "/");
+                new DirResourceSet(new TesterWebResourceRoot(), "/",
+                        f.getAbsolutePath(), "/");
         root.setMainResources(webResourceSet);
         return root;
     }

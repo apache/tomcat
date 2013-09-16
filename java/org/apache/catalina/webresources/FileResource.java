@@ -41,8 +41,8 @@ public class FileResource extends AbstractResource {
     private final File resource;
     private final String name;
 
-    public FileResource(WebResourceRoot root, File resource,
-            String webAppPath) {
+    public FileResource(WebResourceRoot root, String webAppPath,
+            File resource) {
         super(root,webAppPath);
         this.resource = resource;
 
