@@ -18,8 +18,6 @@ package org.apache.catalina.webresources;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -35,55 +33,21 @@ public class JarResource extends AbstractArchiveResource {
 
     private static final Log log = LogFactory.getLog(JarResource.class);
 
-    private final String base;
-    private final String baseUrl;
-
     public JarResource(WebResourceRoot root, String webAppPath, String base,
             String baseUrl, JarEntry jarEntry, String internalPath) {
-        super(root, webAppPath, jarEntry);
-        this.base = base;
-        this.baseUrl = "jar:" + baseUrl;
-
-        String resourceName = resource.getName();
-        if (resourceName.charAt(resourceName.length() - 1) == '/') {
-            resourceName = resourceName.substring(0, resourceName.length() - 1);
-        }
-        if (internalPath.length() > 0 && resourceName.equals(
-                internalPath.subSequence(1, internalPath.length()))) {
-            name = "";
-        } else {
-            int index = resourceName.lastIndexOf('/');
-            if (index == -1) {
-                name = resourceName;
-            } else {
-                name = resourceName.substring(index + 1);
-            }
-        }
+        super(root, webAppPath, base, "jar:" + baseUrl, jarEntry, internalPath);
     }
 
     @Override
     public InputStream getInputStream() {
         try {
-            JarFile jarFile = new JarFile(base);
-            InputStream is = jarFile.getInputStream(resource);
+            JarFile jarFile = new JarFile(getBase());
+            InputStream is = jarFile.getInputStream(getResource());
             return new JarInputStreamWrapper(jarFile, is);
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("fileResource.getInputStreamFail",
-                        resource.getName(), baseUrl), e);
-            }
-            return null;
-        }
-    }
-
-    @Override
-    public URL getURL() {
-        try {
-            return new URL(baseUrl + "!/" + resource.getName());
-        } catch (MalformedURLException e) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("fileResource.getUrlFail",
-                        resource.getName(), baseUrl), e);
+                        getResource().getName(), getBaseUrl()), e);
             }
             return null;
         }
