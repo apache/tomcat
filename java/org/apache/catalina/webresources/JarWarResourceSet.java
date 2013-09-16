@@ -20,10 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
@@ -31,18 +27,15 @@ import java.util.jar.JarInputStream;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
-import org.apache.catalina.util.ResourceSet;
 
 /**
  * Represents a {@link org.apache.catalina.WebResourceSet} based on a JAR file
  * that is nested inside a packed WAR file. This is only intended for internal
  * use within Tomcat and therefore cannot be created via configuration.
  */
-public class JarWarResourceSet extends AbstractResourceSet {
+public class JarWarResourceSet extends JarResourceSet {
 
     private final String archivePath;
-    private HashMap<String,JarEntry> jarFileEntries = new HashMap<>();
-    private String baseUrl;
 
     /**
      * Creates a new {@link org.apache.catalina.WebResourceSet} based on a JAR
@@ -139,125 +132,6 @@ public class JarWarResourceSet extends AbstractResourceSet {
         }
     }
 
-    @Override
-    public String[] list(String path) {
-        checkPath(path);
-        String webAppMount = getWebAppMount();
-
-        ArrayList<String> result = new ArrayList<>();
-        if (path.startsWith(webAppMount)) {
-            String pathInJar =
-                    getInternalPath() + path.substring(webAppMount.length());
-            // Always strip off the leading '/' to get the JAR path
-            if (pathInJar.charAt(0) == '/') {
-                pathInJar = pathInJar.substring(1);
-            }
-            Iterator<String> entries = jarFileEntries.keySet().iterator();
-            while (entries.hasNext()) {
-                String name = entries.next();
-                if (name.length() > pathInJar.length() &&
-                        name.startsWith(pathInJar)) {
-                    if (name.charAt(name.length() - 1) == '/') {
-                        name = name.substring(
-                                pathInJar.length(), name.length() - 1);
-                    } else {
-                        name = name.substring(pathInJar.length());
-                    }
-                    if (name.length() == 0) {
-                        continue;
-                    }
-                    if (name.charAt(0) == '/') {
-                        name = name.substring(1);
-                    }
-                    if (name.length() > 0 && name.lastIndexOf('/') == -1) {
-                        result.add(name);
-                    }
-                }
-            }
-        } else {
-            if (!path.endsWith("/")) {
-                path = path + "/";
-            }
-            if (webAppMount.startsWith(path)) {
-                int i = webAppMount.indexOf('/', path.length());
-                if (i == -1) {
-                    return new String[] {webAppMount.substring(path.length())};
-                } else {
-                    return new String[] {
-                            webAppMount.substring(path.length(), i)};
-                }
-            }
-        }
-        return result.toArray(new String[result.size()]);
-    }
-
-    @Override
-    public Set<String> listWebAppPaths(String path) {
-        checkPath(path);
-        String webAppMount = getWebAppMount();
-
-        ResourceSet<String> result = new ResourceSet<>();
-        if (path.startsWith(webAppMount)) {
-            String pathInJar =
-                    getInternalPath() + path.substring(webAppMount.length());
-            // Always strip off the leading '/' to get the JAR path and make
-            // sure it ends in '/'
-            if (pathInJar.charAt(pathInJar.length() - 1) != '/') {
-                pathInJar = pathInJar.substring(1) + '/';
-            }
-            if (pathInJar.charAt(0) == '/') {
-                pathInJar = pathInJar.substring(1);
-            }
-
-            Iterator<String> entries = jarFileEntries.keySet().iterator();
-            while (entries.hasNext()) {
-                String name = entries.next();
-                if (name.length() > pathInJar.length() &&
-                        name.startsWith(pathInJar)) {
-                    int nextSlash = name.indexOf('/', pathInJar.length());
-                    if (nextSlash == -1 || nextSlash == name.length() - 1) {
-                        if (name.startsWith(pathInJar)) {
-                            result.add(webAppMount + '/' +
-                                    name.substring(getInternalPath().length()));
-                        }
-                    }
-                }
-            }
-        } else {
-            if (!path.endsWith("/")) {
-                path = path + "/";
-            }
-            if (webAppMount.startsWith(path)) {
-                int i = webAppMount.indexOf('/', path.length());
-                if (i == -1) {
-                    result.add(webAppMount + "/");
-                } else {
-                    result.add(webAppMount.substring(0, i + 1));
-                }
-            }
-        }
-        result.setLocked(true);
-        return result;
-    }
-
-    @Override
-    public boolean mkdir(String path) {
-        checkPath(path);
-
-        return false;
-    }
-
-    @Override
-    public boolean write(String path, InputStream is, boolean overwrite) {
-        checkPath(path);
-
-        if (is == null) {
-            throw new NullPointerException(
-                    sm.getString("dirResourceSet.writeNpe"));
-        }
-
-        return false;
-    }
 
     //-------------------------------------------------------- Lifecycle methods
     @Override

@@ -38,8 +38,8 @@ import org.apache.catalina.util.ResourceSet;
  */
 public class JarResourceSet extends AbstractResourceSet {
 
-    private HashMap<String,JarEntry> jarFileEntries = new HashMap<>();
-    private String baseUrl;
+    protected HashMap<String,JarEntry> jarFileEntries = new HashMap<>();
+    protected String baseUrl;
 
     /**
      * A no argument constructor is required for this to work with the digester.
