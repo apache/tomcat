@@ -725,7 +725,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             int count = 0;
             while (getOpenCount(setA) == expected && count < 5) {
                 count ++;
-                Thread.sleep(1000);
+                Thread.sleep(100);
             }
 
             expected--;
