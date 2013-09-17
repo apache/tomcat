@@ -166,16 +166,16 @@ public class BeanELResolver extends ELResolver {
 
         String methodName = (String) factory.coerceToType(method, String.class);
 
-        // Find the matching method
-        Method matchingMethod =
-                Util.findMethod(base.getClass(), methodName, paramTypes, params);
+        java.beans.Expression beanExpression =
+                new java.beans.Expression(base, methodName, params);
 
-        Object[] parameters = Util.buildParameters(
-                matchingMethod.getParameterTypes(), matchingMethod.isVarArgs(),
-                params);
-
-        Object result = null;
+        Object result;
         try {
+            result = beanExpression.getValue();
+        } catch (Exception e) {
+            throw new ELException(e);
+        }
+/*        try {
             result = matchingMethod.invoke(base, parameters);
         } catch (IllegalArgumentException | IllegalAccessException e) {
             throw new ELException(e);
@@ -184,7 +184,7 @@ public class BeanELResolver extends ELResolver {
             Util.handleThrowable(cause);
             throw new ELException(cause);
         }
-
+*/
         context.setPropertyResolved(base, method);
         return result;
     }

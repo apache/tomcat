@@ -17,10 +17,7 @@
 package javax.el;
 
 import java.beans.FeatureDescriptor;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Iterator;
 
@@ -92,61 +89,29 @@ public class StaticFieldELResolver extends ELResolver {
             throw new NullPointerException();
         }
 
+        Object result = null;
+
         if (base instanceof ELClass && method instanceof String) {
             context.setPropertyResolved(base, method);
 
-            Class<?> clazz = ((ELClass) base).getKlass();
             String methodName = (String) method;
-
             if ("<init>".equals(methodName)) {
-                Constructor<?> match =
-                        Util.findConstructor(clazz, paramTypes, params);
+                // java.beans.Expression uses 'new' for constructors
+                methodName = "new";
+            }
+            Class<?> clazz = ((ELClass) base).getKlass();
 
-                Object[] parameters = Util.buildParameters(
-                        match.getParameterTypes(), match.isVarArgs(), params);
+            java.beans.Expression beanExpression =
+                    new java.beans.Expression(clazz, methodName, params);
 
-                Object result = null;
-
-                try {
-                    result = match.newInstance(parameters);
-                } catch (IllegalArgumentException | IllegalAccessException |
-                        InstantiationException e) {
-                    throw new ELException(e);
-                } catch (InvocationTargetException e) {
-                    Throwable cause = e.getCause();
-                    Util.handleThrowable(cause);
-                    throw new ELException(cause);
-                }
-                return result;
-
-            } else {
-                Method match =
-                        Util.findMethod(clazz, methodName, paramTypes, params);
-
-                int modifiers = match.getModifiers();
-                if (!Modifier.isStatic(modifiers)) {
-                    throw new MethodNotFoundException(Util.message(context,
-                            "staticFieldELResolver.methodNotFound", methodName,
-                            clazz.getName()));
-                }
-
-                Object[] parameters = Util.buildParameters(
-                        match.getParameterTypes(), match.isVarArgs(), params);
-
-                Object result = null;
-                try {
-                    result = match.invoke(null, parameters);
-                } catch (IllegalArgumentException | IllegalAccessException e) {
-                    throw new ELException(e);
-                } catch (InvocationTargetException e) {
-                    Throwable cause = e.getCause();
-                    Util.handleThrowable(cause);
-                    throw new ELException(cause);
-                }
-                return result;
+            try {
+                result = beanExpression.getValue();
+            } catch (Exception e) {
+                throw new ELException(e);
             }
         }
-        return null;
+
+        return result;
     }
 
     @Override
