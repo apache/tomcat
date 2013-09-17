@@ -60,7 +60,7 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
         try {
             readLock.lock();
             if (wrapper.getBlockingStatus() == block) {
-                if (closed) {
+                if (closed || wrapper.isClosing()) {
                     throw new IOException(sm.getString("apr.closed"));
                 }
                 return doWriteInternal(b, off, len);
@@ -83,7 +83,7 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
             try {
                 readLock.lock();
                 writeLock.unlock();
-                if (closed) {
+                if (closed || wrapper.isClosing()) {
                     throw new IOException(sm.getString("apr.closed"));
                 }
                 return doWriteInternal(b, off, len);

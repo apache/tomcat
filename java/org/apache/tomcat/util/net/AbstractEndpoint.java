@@ -519,6 +519,18 @@ public abstract class AbstractEndpoint<S> {
                 //this is our internal one, so we need to shut it down
                 ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
                 tpe.shutdownNow();
+                int count = 0;
+                while (count < 50 && tpe.isTerminating()) {
+                    try {
+                        Thread.sleep(100);
+                        count++;
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
+                }
+                if (tpe.isTerminating()) {
+                    getLog().warn(sm.getString("endpoint.warn.executorShutdown", getName()));
+                }
                 TaskQueue queue = (TaskQueue) tpe.getQueue();
                 queue.setParent(null);
             }
