@@ -355,6 +355,9 @@
         Add document for
         <code>org.apache.catalina.tribes.group.GroupChannel</code>. (kfujino)
       </add>
+      <fix>
+        Correct Realm Component page of Tomcat documentation. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">

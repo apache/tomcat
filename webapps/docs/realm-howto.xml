@@ -81,7 +81,7 @@ a servlet container to some existing authentication database or mechanism
 that already exists in the production environment.  Therefore, Tomcat
 defines a Java interface (<code>org.apache.catalina.Realm</code>) that
 can be implemented by "plug in" components to establish this connection.
-Five standard plug-ins are provided, supporting connections to various
+Six standard plug-ins are provided, supporting connections to various
 sources of authentication information:</p>
 <ul>
 <li><a href="#JDBCRealm">JDBCRealm</a> - Accesses authentication information
