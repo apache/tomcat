@@ -17,12 +17,19 @@
 package javax.el;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
@@ -187,6 +194,321 @@ class Util {
      * This method duplicates code in org.apache.el.util.ReflectionUtil. When
      * making changes keep the code in sync.
      */
+    static Method findMethod(Class<?> clazz, String methodName,
+            Class<?>[] paramTypes, Object[] paramValues) {
+
+        if (clazz == null || methodName == null) {
+            throw new MethodNotFoundException(
+                    message(null, "util.method.notfound", clazz, methodName,
+                    paramString(paramTypes)));
+        }
+
+        if (paramTypes == null) {
+            paramTypes = getTypesFromValues(paramValues);
+        }
+
+        Method[] methods = clazz.getMethods();
+
+        List<Wrapper> wrappers = Wrapper.wrap(methods, methodName);
+
+        Wrapper result = findWrapper(
+                clazz, wrappers, methodName, paramTypes, paramValues);
+
+        if (result == null) {
+            return null;
+        }
+        return getMethod(clazz, (Method) result.unWrap());
+    }
+
+    /*
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
+     * making changes keep the code in sync.
+     */
+    @SuppressWarnings("null")
+    private static Wrapper findWrapper(Class<?> clazz, List<Wrapper> wrappers,
+            String name, Class<?>[] paramTypes, Object[] paramValues) {
+
+        Map<Wrapper,Integer> candidates = new HashMap<>();
+
+        int paramCount;
+        if (paramTypes == null) {
+            paramCount = 0;
+        } else {
+            paramCount = paramTypes.length;
+        }
+
+        for (Wrapper w : wrappers) {
+            Class<?>[] mParamTypes = w.getParameterTypes();
+            int mParamCount;
+            if (mParamTypes == null) {
+                mParamCount = 0;
+            } else {
+                mParamCount = mParamTypes.length;
+            }
+
+            // Check the number of parameters
+            if (!(paramCount == mParamCount ||
+                    (w.isVarArgs() && paramCount >= mParamCount))) {
+                // Method has wrong number of parameters
+                continue;
+            }
+
+            // Check the parameters match
+            int exactMatch = 0;
+            boolean noMatch = false;
+            for (int i = 0; i < mParamCount; i++) {
+                // Can't be null
+                if (mParamTypes[i].equals(paramTypes[i])) {
+                    exactMatch++;
+                } else if (i == (mParamCount - 1) && w.isVarArgs()) {
+                    Class<?> varType = mParamTypes[i].getComponentType();
+                    for (int j = i; j < paramCount; j++) {
+                        if (!isAssignableFrom(paramTypes[j], varType)) {
+                            if (paramValues == null) {
+                                noMatch = true;
+                                break;
+                            } else {
+                                if (!isCoercibleFrom(paramValues[j], varType)) {
+                                    noMatch = true;
+                                    break;
+                                }
+                            }
+                        }
+                        // Don't treat a varArgs match as an exact match, it can
+                        // lead to a varArgs method matching when the result
+                        // should be ambiguous
+                    }
+                } else if (!isAssignableFrom(paramTypes[i], mParamTypes[i])) {
+                    if (paramValues == null) {
+                        noMatch = true;
+                        break;
+                    } else {
+                        if (!isCoercibleFrom(paramValues[i], mParamTypes[i])) {
+                            noMatch = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (noMatch) {
+                continue;
+            }
+
+            // If a method is found where every parameter matches exactly,
+            // return it
+            if (exactMatch == paramCount) {
+                return w;
+            }
+
+            candidates.put(w, Integer.valueOf(exactMatch));
+        }
+
+        // Look for the method that has the highest number of parameters where
+        // the type matches exactly
+        int bestMatch = 0;
+        Wrapper match = null;
+        boolean multiple = false;
+        for (Map.Entry<Wrapper, Integer> entry : candidates.entrySet()) {
+            if (entry.getValue().intValue() > bestMatch ||
+                    match == null) {
+                bestMatch = entry.getValue().intValue();
+                match = entry.getKey();
+                multiple = false;
+            } else if (entry.getValue().intValue() == bestMatch) {
+                multiple = true;
+            }
+        }
+        if (multiple) {
+            if (bestMatch == paramCount - 1) {
+                // Only one parameter is not an exact match - try using the
+                // super class
+                match = resolveAmbiguousWrapper(candidates.keySet(), paramTypes);
+            } else {
+                match = null;
+            }
+
+            if (match == null) {
+                // If multiple methods have the same matching number of parameters
+                // the match is ambiguous so throw an exception
+                throw new MethodNotFoundException(message(
+                        null, "util.method.ambiguous", clazz, name,
+                        paramString(paramTypes)));
+                }
+        }
+
+        // Handle case where no match at all was found
+        if (match == null) {
+            throw new MethodNotFoundException(message(
+                        null, "util.method.notfound", clazz, name,
+                        paramString(paramTypes)));
+        }
+
+        return match;
+    }
+
+
+    private static final String paramString(Class<?>[] types) {
+        if (types != null) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < types.length; i++) {
+                if (types[i] == null) {
+                    sb.append("null, ");
+                } else {
+                    sb.append(types[i].getName()).append(", ");
+                }
+            }
+            if (sb.length() > 2) {
+                sb.setLength(sb.length() - 2);
+            }
+            return sb.toString();
+        }
+        return null;
+    }
+
+
+    /*
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
+     * making changes keep the code in sync.
+     */
+    private static Wrapper resolveAmbiguousWrapper(Set<Wrapper> candidates,
+            Class<?>[] paramTypes) {
+        // Identify which parameter isn't an exact match
+        Wrapper w = candidates.iterator().next();
+
+        int nonMatchIndex = 0;
+        Class<?> nonMatchClass = null;
+
+        for (int i = 0; i < paramTypes.length; i++) {
+            if (w.getParameterTypes()[i] != paramTypes[i]) {
+                nonMatchIndex = i;
+                nonMatchClass = paramTypes[i];
+                break;
+            }
+        }
+
+        if (nonMatchClass == null) {
+            // Null will always be ambiguous
+            return null;
+        }
+
+        for (Wrapper c : candidates) {
+           if (c.getParameterTypes()[nonMatchIndex] ==
+                   paramTypes[nonMatchIndex]) {
+               // Methods have different non-matching parameters
+               // Result is ambiguous
+               return null;
+           }
+        }
+
+        // Can't be null
+        Class<?> superClass = nonMatchClass.getSuperclass();
+        while (superClass != null) {
+            for (Wrapper c : candidates) {
+                if (c.getParameterTypes()[nonMatchIndex].equals(superClass)) {
+                    // Found a match
+                    return c;
+                }
+            }
+            superClass = superClass.getSuperclass();
+        }
+
+        // Treat instances of Number as a special case
+        Wrapper match = null;
+        if (Number.class.isAssignableFrom(nonMatchClass)) {
+            for (Wrapper c : candidates) {
+                Class<?> candidateType = c.getParameterTypes()[nonMatchIndex];
+                if (Number.class.isAssignableFrom(candidateType) ||
+                        candidateType.isPrimitive()) {
+                    if (match == null) {
+                        match = c;
+                    } else {
+                        // Match still ambiguous
+                        match = null;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return match;
+    }
+
+
+    /*
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
+     * making changes keep the code in sync.
+     */
+    private static boolean isAssignableFrom(Class<?> src, Class<?> target) {
+        // src will always be an object
+        // Short-cut. null is always assignable to an object and in EL null
+        // can always be coerced to a valid value for a primitive
+        if (src == null) {
+            return true;
+        }
+
+        Class<?> targetClass;
+        if (target.isPrimitive()) {
+            if (target == Boolean.TYPE) {
+                targetClass = Boolean.class;
+            } else if (target == Character.TYPE) {
+                targetClass = Character.class;
+            } else if (target == Byte.TYPE) {
+                targetClass = Byte.class;
+            } else if (target == Short.TYPE) {
+                targetClass = Short.class;
+            } else if (target == Integer.TYPE) {
+                targetClass = Integer.class;
+            } else if (target == Long.TYPE) {
+                targetClass = Long.class;
+            } else if (target == Float.TYPE) {
+                targetClass = Float.class;
+            } else {
+                targetClass = Double.class;
+            }
+        } else {
+            targetClass = target;
+        }
+        return targetClass.isAssignableFrom(src);
+    }
+
+
+    /*
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
+     * making changes keep the code in sync.
+     */
+    private static boolean isCoercibleFrom(Object src, Class<?> target) {
+        // TODO: This isn't pretty but it works. Significant refactoring would
+        //       be required to avoid the exception.
+        try {
+            getExpressionFactory().coerceToType(src, target);
+        } catch (ELException e) {
+            return false;
+        }
+        return true;
+    }
+
+
+    private static Class<?>[] getTypesFromValues(Object[] values) {
+        if (values == null) {
+            return null;
+        }
+
+        Class<?> result[] = new Class<?>[values.length];
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] == null) {
+                result[i] = null;
+            } else {
+                result[i] = values[i].getClass();
+            }
+        }
+        return result;
+    }
+
+
+    /*
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
+     * making changes keep the code in sync.
+     */
     static Method getMethod(Class<?> type, Method m) {
         if (m == null || Modifier.isPublic(type.getModifiers())) {
             return m;
@@ -217,5 +539,165 @@ class Util {
             }
         }
         return null;
+    }
+
+
+    static Constructor<?> findConstructor(Class<?> clazz, Class<?>[] paramTypes,
+            Object[] paramValues) {
+
+        String methodName = "<init>";
+
+        if (clazz == null) {
+            throw new MethodNotFoundException(
+                    message(null, "util.method.notfound", clazz, methodName,
+                    paramString(paramTypes)));
+        }
+
+        if (paramTypes == null) {
+            paramTypes = getTypesFromValues(paramValues);
+        }
+
+        Constructor<?>[] constructors = clazz.getConstructors();
+
+        List<Wrapper> wrappers = Wrapper.wrap(constructors);
+
+        Wrapper result = findWrapper(
+                clazz, wrappers, methodName, paramTypes, paramValues);
+
+        if (result == null) {
+            return null;
+        }
+        return getConstructor(clazz, (Constructor<?>) result.unWrap());
+    }
+
+
+    static Constructor<?> getConstructor(Class<?> type, Constructor<?> c) {
+        if (c == null || Modifier.isPublic(type.getModifiers())) {
+            return c;
+        }
+        Constructor<?> cp = null;
+        Class<?> sup = type.getSuperclass();
+        if (sup != null) {
+            try {
+                cp = sup.getConstructor(c.getParameterTypes());
+                cp = getConstructor(cp.getDeclaringClass(), cp);
+                if (cp != null) {
+                    return cp;
+                }
+            } catch (NoSuchMethodException e) {
+                // Ignore
+            }
+        }
+        return null;
+    }
+
+
+    static Object[] buildParameters(Class<?>[] parameterTypes,
+            boolean isVarArgs,Object[] params) {
+        ExpressionFactory factory = getExpressionFactory();
+        Object[] parameters = null;
+        if (parameterTypes.length > 0) {
+            parameters = new Object[parameterTypes.length];
+            int paramCount = params.length;
+            if (isVarArgs) {
+                int varArgIndex = parameterTypes.length - 1;
+                // First argCount-1 parameters are standard
+                for (int i = 0; (i < varArgIndex); i++) {
+                    parameters[i] = factory.coerceToType(params[i],
+                            parameterTypes[i]);
+                }
+                // Last parameter is the varargs
+                Class<?> varArgClass =
+                    parameterTypes[varArgIndex].getComponentType();
+                final Object varargs = Array.newInstance(
+                    varArgClass,
+                    (paramCount - varArgIndex));
+                for (int i = (varArgIndex); i < paramCount; i++) {
+                    Array.set(varargs, i - varArgIndex,
+                            factory.coerceToType(params[i], varArgClass));
+                }
+                parameters[varArgIndex] = varargs;
+            } else {
+                parameters = new Object[parameterTypes.length];
+                for (int i = 0; i < parameterTypes.length; i++) {
+                    parameters[i] = factory.coerceToType(params[i],
+                            parameterTypes[i]);
+                }
+            }
+        }
+        return parameters;
+    }
+
+
+    private abstract static class Wrapper {
+
+        public static List<Wrapper> wrap(Method[] methods, String name) {
+            List<Wrapper> result = new ArrayList<>();
+            for (Method method : methods) {
+                if (method.getName().equals(name)) {
+                    result.add(new MethodWrapper(method));
+                }
+            }
+            return result;
+        }
+
+        public static List<Wrapper> wrap(Constructor<?>[] constructors) {
+            List<Wrapper> result = new ArrayList<>();
+            for (Constructor<?> constructor : constructors) {
+                result.add(new ConstructorWrapper(constructor));
+            }
+            return result;
+        }
+
+        public abstract Object unWrap();
+        public abstract Class<?>[] getParameterTypes();
+        public abstract boolean isVarArgs();
+    }
+
+
+    private static class MethodWrapper extends Wrapper {
+        private final Method m;
+
+        public MethodWrapper(Method m) {
+            this.m = m;
+        }
+
+        @Override
+        public Object unWrap() {
+            return m;
+        }
+
+        @Override
+        public Class<?>[] getParameterTypes() {
+            return m.getParameterTypes();
+        }
+
+        @Override
+        public boolean isVarArgs() {
+            return m.isVarArgs();
+        }
+    }
+
+    private static class ConstructorWrapper extends Wrapper {
+        private final Constructor<?> c;
+
+        public ConstructorWrapper(Constructor<?> c) {
+            this.c = c;
+        }
+
+        @Override
+        public Object unWrap() {
+            return c;
+        }
+
+        @Override
+        public Class<?>[] getParameterTypes() {
+            return c.getParameterTypes();
+        }
+
+        @Override
+        public boolean isVarArgs() {
+            return c.isVarArgs();
+        }
     }
 }
