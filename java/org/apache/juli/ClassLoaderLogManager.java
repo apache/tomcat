@@ -420,21 +420,22 @@ public class ClassLoaderLogManager extends LogManager {
         // Special case for URL classloaders which are used in containers:
         // only look in the local repositories to avoid redefining loggers 20 times
         try {
-            if (classLoader instanceof URLClassLoader)
-            {
+            if (classLoader instanceof URLClassLoader) {
                 URL logConfig = ((URLClassLoader)classLoader).findResource("logging.properties");
 
-                if(null != logConfig)
-                {
+                if(null != logConfig) {
                     if(Boolean.getBoolean(DEBUG_PROPERTY))
-                        System.err.println("Found logging.properties at " + logConfig);
+                        System.err.println(getClass().getName()
+                                           + ".readConfiguration(): "
+                                           + "Found logging.properties at "
+                                           + logConfig);
 
                     is = classLoader.getResourceAsStream("logging.properties");
-                }
-                else
-                {
+                } else {
                     if(Boolean.getBoolean(DEBUG_PROPERTY))
-                        System.err.println("Found no logging.properties");
+                        System.err.println(getClass().getName()
+                                           + ".readConfiguration(): "
+                                           + "Found no logging.properties");
                 }
             }
         } catch (AccessControlException ace) {
