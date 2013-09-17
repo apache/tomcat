@@ -38,7 +38,7 @@ public class TestReflectionUtil {
     /*
      * Expect failure as it is not possible to identify which method named
      * "testB()" is intended. Note: In EL null can always be coerced to a valid
-     * value for a primative.
+     * value for a primitive.
      */
     @Test(expected=MethodNotFoundException.class)
     public void testBug54370b() {
