@@ -1585,6 +1585,10 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                 }
 
+                if (!pollerRunning) {
+                    break;
+                }
+
                 try {
                     // Add sockets which are waiting to the poller
                     if (addList.size() > 0) {

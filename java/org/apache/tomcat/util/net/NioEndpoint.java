@@ -1511,13 +1511,12 @@ public class NioEndpoint extends AbstractEndpoint {
         }
 
         public void reset(Poller poller, NioChannel channel, long soTimeout) {
-            this.socket = channel;
+            super.reset(channel, soTimeout);
+
+            cometNotify = false;
+            cometOps = SelectionKey.OP_READ;
+            interestOps = 0;
             this.poller = poller;
-            lastAccess = System.currentTimeMillis();
-            setComet(false);
-            timeout = soTimeout;
-            setWriteTimeout(soTimeout);
-            error = false;
             lastRegistered = 0;
             sendfileData = null;
             if (readLatch != null) {
@@ -1529,6 +1528,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 }
             }
             readLatch = null;
+            sendfileData = null;
             if (writeLatch != null) {
                 try {
                     for (int i = 0; i < (int) writeLatch.getCount(); i++) {
@@ -1538,11 +1538,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 }
             }
             writeLatch = null;
-            cometNotify = false;
-            cometOps = SelectionKey.OP_READ;
-            sendfileData = null;
-            keepAliveLeft = 100;
-            async = false;
+            setWriteTimeout(soTimeout);
         }
 
         public void reset() {
