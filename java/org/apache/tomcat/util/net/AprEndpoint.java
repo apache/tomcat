@@ -1858,6 +1858,7 @@ public class AprEndpoint extends AbstractEndpoint {
             // in the poller can cause problems
             try {
                 synchronized (this) {
+                    this.notify();
                     this.wait(pollTime / 1000);
                 }
             } catch (InterruptedException e) {
@@ -1962,7 +1963,7 @@ public class AprEndpoint extends AbstractEndpoint {
             while (sendfileRunning) {
 
                 // Loop if endpoint is paused
-                while (paused) {
+                while (sendfileRunning && paused) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -1970,7 +1971,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                 }
                 // Loop if poller is empty
-                while (sendfileCount < 1 && addS.size() < 1) {
+                while (sendfileRunning && sendfileCount < 1 && addS.size() < 1) {
                     // Reset maintain time.
                     maintainTime = 0;
                     try {
