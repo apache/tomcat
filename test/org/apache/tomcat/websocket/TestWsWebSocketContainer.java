@@ -723,7 +723,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             Assert.assertEquals(expected, getOpenCount(setA));
 
             int count = 0;
-            while (getOpenCount(setA) == expected && count < 5) {
+            while (getOpenCount(setA) == expected && count < 50) {
                 count ++;
                 Thread.sleep(100);
             }
