@@ -1593,6 +1593,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     }
                 }
 
+                // Don't add or poll if the poller has been stopped
                 if (!pollerRunning) {
                     break;
                 }
@@ -2037,6 +2038,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     } catch (InterruptedException e) {
                         // Ignore
                     }
+                }
+
+                // Don't add or poll if the poller has been stopped
+                if (!sendfileRunning) {
+                    break;
                 }
 
                 try {
