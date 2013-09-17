@@ -1585,6 +1585,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                 }
 
+                // Don't add or poll if the poller has been stopped
                 if (!pollerRunning) {
                     break;
                 }
@@ -1987,6 +1988,11 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                 }
 
+                // Don't add or poll if the poller has been stopped
+                if (!sendfileRunning) {
+                    break;
+                }
+                
                 try {
                     // Add socket to the poller
                     if (addS.size() > 0) {
