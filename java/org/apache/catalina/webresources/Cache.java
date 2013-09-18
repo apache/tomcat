@@ -102,7 +102,7 @@ public class Cache {
                         // Unable to create sufficient space for this resource
                         // Remove it from the cache
                         removeCacheEntry(path, true);
-                        log.warn(sm.getString("cache.addFail"));
+                        log.warn(sm.getString("cache.addFail", path));
                     }
                 }
             } else {
