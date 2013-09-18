@@ -877,7 +877,7 @@ public class WebappClassLoader
                     continue;
                 if (!name.equals(jarNames[i])) {
                     // Missing JAR
-                    log.info("    Additional JARs have been added : '"
+                    log.info("    One or more JARs have been added : '"
                              + name + "'");
                     return true;
                 }
@@ -894,7 +894,7 @@ public class WebappClassLoader
                 }
             } else if (i < jarNames.length) {
                 // There was less JARs
-                log.info("    Additional JARs have been added");
+                log.info("    One or more JARs have been removed");
                 return (true);
             }
         }
