@@ -50,7 +50,8 @@ import java.util.logging.Logger;
  * Short configuration information will be sent to <code>System.err</code>.
  */
 public class ClassLoaderLogManager extends LogManager {
-    public static final String DEBUG_PROPERTY = LogManager.class.getName() + ".debug";
+    public static final String DEBUG_PROPERTY =
+            ClassLoaderLogManager.class.getName() + ".debug";
 
     private final class Cleaner extends Thread {
 
