@@ -37,6 +37,7 @@ but possibly 7.1.x).
     - Complete
 
  6. Change the default URIEncoding on the connector to UTF-8.
+    - Complete
 
  7. Rip out all the JNDI code in resource handling and replace it with straight
     URLs (File or WAR).
