@@ -280,9 +280,7 @@ public final class SecurityClassLoad {
                 "util.net.NioBlockingSelector$BlockPoller$3");
         loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
         loader.loadClass
-            (basePackage + "util.net.JIoEndpoint$PrivilegedSetTccl");
-        loader.loadClass
-            (basePackage + "util.net.AprEndpoint$PrivilegedSetTccl");
+            (basePackage + "util.net.AbstractEndpoint$PrivilegedSetTccl");
     }
 }
 
