@@ -54,7 +54,7 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Classloader implementation which is specialized for handling web
  * applications in the most efficient way, while being Catalina aware (all
- * accesses to resources are made through the DirContext interface).
+ * accesses to resources are made through {@link WebResourceRoot}).
  * This class loader supports detection of modified
  * Java classes, which can be used to implement auto-reload support.
  * <p>
