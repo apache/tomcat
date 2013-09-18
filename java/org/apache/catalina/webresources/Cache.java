@@ -57,7 +57,9 @@ public class Cache {
 
     protected WebResource getResource(String path) {
 
-        // TODO Should some resources be excluded from caching?
+        if (noCache(path)) {
+            return root.getResourceInternal(path);
+        }
 
         CachedResource cacheEntry = resourceCache.get(path);
 
@@ -135,6 +137,15 @@ public class Cache {
                     root.getContext().getName(),
                     Long.valueOf(newSize / 1024)));
         }
+    }
+
+    private boolean noCache(String path) {
+        // Don't cache resources used by the class loader (it has its own cache)
+        if (path.startsWith("/WEB-INF/classes") ||
+                path.startsWith("/WEB-INF/lib")) {
+            return true;
+        }
+        return false;
     }
 
     private long evict(long targetSize, Iterator<CachedResource> iter) {
