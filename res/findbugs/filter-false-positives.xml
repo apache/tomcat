@@ -476,6 +476,19 @@
     <Method name="doGet" />
     <Bug code="HRS" />
   </Match>
+  <Match>
+    <!-- Not really unused as it registers itself during construction -->
+    <Class name="nonblocking.ByteCounter" />
+    <Method name="doPost" />
+    <Bug pattern="DLS_DEAD_LOCAL_STORE" />
+  </Match>
+  <Match>
+    <!-- Not really unused as it registers itself during construction -->
+    <Class name="nonblocking.NumberWriter" />
+    <Method name="doGet" />
+    <Bug pattern="DLS_DEAD_LOCAL_STORE" />
+  </Match>
+
 
   <!-- Generated code -->
   <Match>
@@ -606,6 +619,17 @@
     <Class name="org.apache.catalina.tribes.test.transport.SocketValidateReceive$1" />
     <Method name="run" />
     <Bug code="DE" />
+  </Match>
+  <Match>
+    <!-- Code is deliberately unused -->
+    <Or>
+      <Class name="org.apache.catalina.webresources.TestDirResourceSet" />
+      <Class name="org.apache.catalina.webresources.TestFileResourceSet" />
+      <Class name="org.apache.catalina.webresources.TestJarResourceSet" />
+      <Class name="org.apache.catalina.webresources.TestJarResourceSetInternal" />
+    </Or>
+    <Method name="testNoArgConstructor" />
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
   <Match>
     <!-- Use of static is unavoidable -->
