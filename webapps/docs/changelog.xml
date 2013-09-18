@@ -65,6 +65,11 @@
         contributions from Nick Williams, Rossen Stoyanchev and Niki Dokovski.
         (markt)
       </add>
+      <update>
+        <bug>46727</bug>: Refactor default servlet to make it easier to
+        sub-class to implement finer grained control of the file encoding. Based
+        on a patch by Fred Toth. (markt)
+      </update>
       <add>
         <bug>45995</bug>: Align Tomcat with Apache httpd and perform MIME type
         mapping based on file extension in a case insensitive manner. (markt)
