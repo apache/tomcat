@@ -780,7 +780,7 @@ public class WsWebSocketContainer
             backgroundProcessCount = 0;
 
             for (WsSession wsSession : sessions.keySet()) {
-                wsSession.expire();
+                wsSession.checkExpiration();
             }
         }
 

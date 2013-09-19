@@ -588,7 +588,7 @@ public class WsSession implements Session {
     }
 
 
-    protected void expire() {
+    protected void checkExpiration() {
         long timeout = maxIdleTimeout;
         if (timeout < 1) {
             return;
