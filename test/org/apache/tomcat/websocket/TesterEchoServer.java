@@ -27,11 +27,11 @@ import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
 
 import org.apache.tomcat.websocket.server.Constants;
-import org.apache.tomcat.websocket.server.WsListener;
+import org.apache.tomcat.websocket.server.WsContextListener;
 
 public class TesterEchoServer {
 
-    public static class Config extends WsListener {
+    public static class Config extends WsContextListener {
 
         public static final String PATH_ASYNC = "/echoAsync";
         public static final String PATH_BASIC = "/echoBasic";

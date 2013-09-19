@@ -53,7 +53,7 @@ public class TestWsServerContainer extends TomcatBaseTest {
     }
 
 
-    public static class Bug54807Config extends WsListener {
+    public static class Bug54807Config extends WsContextListener {
 
         @Override
         public void contextInitialized(ServletContextEvent sce) {
