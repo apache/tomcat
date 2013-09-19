@@ -55,7 +55,7 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
-<section name="Tomcat 7.0.43 (markt)">
+<section name="Tomcat 7.0.43 (voiletagg)">
   <subsection name="Catalina">
     <changelog>
       <add>
@@ -175,6 +175,10 @@
           <code>org.apache.juli.ClassLoaderLogManager.debug=true</code>
           is set.
       </add>
+      <fix>
+        <bug>55570</bug>: Correctly log exceptions for all error conditions in
+        the SPNEGO authenticator. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
