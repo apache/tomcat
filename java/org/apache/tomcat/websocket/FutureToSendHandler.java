@@ -31,12 +31,19 @@ import javax.websocket.SendResult;
 class FutureToSendHandler implements Future<Void>, SendHandler {
 
     private final CountDownLatch latch = new CountDownLatch(1);
+    private final WsSession wsSession;
     private volatile SendResult result = null;
+
+    public FutureToSendHandler(WsSession wsSession) {
+        this.wsSession = wsSession;
+    }
+
 
     // --------------------------------------------------------- SendHandler
 
     @Override
     public void onResult(SendResult result) {
+
         this.result = result;
         latch.countDown();
     }
@@ -64,7 +71,12 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
     @Override
     public Void get() throws InterruptedException,
             ExecutionException {
-        latch.await();
+        try {
+            wsSession.registerFuture(this);
+            latch.await();
+        } finally {
+            wsSession.unregisterFuture(this);
+        }
         if (result.getException() != null) {
             throw new ExecutionException(result.getException());
         }
@@ -75,7 +87,14 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
     public Void get(long timeout, TimeUnit unit)
             throws InterruptedException, ExecutionException,
             TimeoutException {
-        boolean retval = latch.await(timeout, unit);
+        boolean retval = false;
+        try {
+            wsSession.registerFuture(this);
+            retval = latch.await(timeout, unit);
+        } finally {
+            wsSession.unregisterFuture(this);
+
+        }
         if (retval == false) {
             throw new TimeoutException();
         }

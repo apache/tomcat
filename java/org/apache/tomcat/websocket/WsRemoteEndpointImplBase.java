@@ -119,7 +119,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
 
     public Future<Void> sendBytesByFuture(ByteBuffer data) {
-        FutureToSendHandler f2sh = new FutureToSendHandler();
+        FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
         sendBytesByCompletion(data, f2sh);
         return f2sh;
     }
@@ -156,7 +156,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
 
     public Future<Void> sendStringByFuture(String text) {
-        FutureToSendHandler f2sh = new FutureToSendHandler();
+        FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
         sendStringByCompletion(text, f2sh);
         return f2sh;
     }
@@ -191,7 +191,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             // trigger a session close and depending on timing the client
             // session may close before we can read the timeout.
             long timeout = getBlockingSendTimeout();
-            FutureToSendHandler f2sh = new FutureToSendHandler();
+            FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
             TextMessageSendHandler tmsh = new TextMessageSendHandler(f2sh, part,
                     last, encoder, encoderBuffer, this);
             tmsh.write();
@@ -213,7 +213,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         // trigger a session close and depending on timing the client
         // session may close before we can read the timeout.
         long timeout = getBlockingSendTimeout();
-        FutureToSendHandler f2sh = new FutureToSendHandler();
+        FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
         startMessage(opCode, payload, last, f2sh);
         try {
             if (timeout == -1) {
@@ -448,7 +448,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
     public Future<Void> sendObjectByFuture(Object obj) {
-        FutureToSendHandler f2sh = new FutureToSendHandler();
+        FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
         sendObjectByCompletion(obj, f2sh);
         return f2sh;
     }

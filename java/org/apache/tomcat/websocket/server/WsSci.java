@@ -44,7 +44,7 @@ public class WsSci implements ServletContainerInitializer {
     public void onStartup(Set<Class<?>> clazzes, ServletContext ctx)
             throws ServletException {
 
-        WsServerContainer sc = init(ctx);
+        WsServerContainer sc = init(ctx, true);
 
         if (clazzes == null || clazzes.size() == 0) {
             return;
@@ -125,7 +125,8 @@ public class WsSci implements ServletContainerInitializer {
     }
 
 
-    static WsServerContainer init(ServletContext servletContext) {
+    static WsServerContainer init(ServletContext servletContext,
+            boolean initBySciMechanism) {
 
         WsServerContainer sc = new WsServerContainer(servletContext);
 
@@ -133,6 +134,11 @@ public class WsSci implements ServletContainerInitializer {
                 Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE, sc);
 
         servletContext.addListener(new WsSessionListener(sc));
+        // Can't register the ContextListener again if the ContextListener is
+        // calling this method
+        if (initBySciMechanism) {
+            servletContext.addListener(new WsContextListener());
+        }
 
         return sc;
     }
