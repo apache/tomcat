@@ -52,17 +52,6 @@ public class SocketWrapper<E> {
      */
     private final Object writeThreadLock = new Object();
 
-    /*
-     * Used to indicate that the socket is in the process of closing / has been
-     * closed. Once this flag has been set, no further reads or writes should
-     * take place. Its primary purpose is with upgraded connections where a
-     * socket may be in use in application code with no immediate way to signal
-     * that the socket is no longer valid. Checking this flag before any
-     * application triggered read or write will enable an IOException to be
-     * thrown.
-     */
-    private boolean closing = false;
-
     public SocketWrapper(E socket) {
         this.socket = socket;
         ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
@@ -100,13 +89,10 @@ public class SocketWrapper<E> {
         return blockingStatusWriteLock;
     }
     public Object getWriteThreadLock() { return writeThreadLock; }
-    public boolean isClosing() { return closing; }
-    public void setClosing(boolean closing) { this.closing = closing; }
 
     public void reset(E socket, long timeout) {
         async = false;
         blockingStatus = true;
-        closing = false;
         comet = false;
         error = false;
         keepAliveLeft = 100;
