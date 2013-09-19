@@ -36,7 +36,7 @@
   <xsl:param    name="home-href"           select="'http://tomcat.apache.org/'"/>
   <xsl:param    name="home-logo"           select="'/images/tomcat.png'"/>
   <xsl:param    name="home-stylesheet"     select="'/images/docs-stylesheet.css'"/>
-  <xsl:param    name="apache-logo"         select="'/images/asf-logo.gif'"/>
+  <xsl:param    name="apache-logo"         select="'/images/asf-feather.png'"/>
   <xsl:param    name="subdir"              select="''"/>
   <xsl:param    name="relative-path"       select="'.'"/>
   <xsl:param    name="version"             select="'8.0.x'"/>
@@ -124,7 +124,6 @@
 
         (function(w, d) {
           if (w.location.hostname.toLowerCase() == "tomcat.apache.org") {
-            commentsDiv.appendChild(d.createTextNode("Loading comments…"));
             var s = d.createElement("script");
             s.type = "application/javascript";
             s.async = true;
@@ -157,7 +156,12 @@
         </xsl:if>
 
         <div style="height: 1px;"/>
-        <div class="asfLogo"><a href="http://www.apache.org/" target="_blank"><img src="http://www.apache.org/images/feather.png" alt="The Apache Software Foundation" style="width: 266px; height: 83px;"/></a></div>
+        <xsl:variable name="src">
+          <xsl:value-of select="$relative-path"/><xsl:value-of select="$apache-logo"/>
+        </xsl:variable>
+        <div class="asfLogo">
+          <a href="http://www.apache.org/" target="_blank"><img src="{$src}" alt="The Apache Software Foundation" style="width: 266px; height: 83px;"/></a>
+        </div>
         <h1><xsl:value-of select="$project/title"/></h1>
         <div class="versionInfo">
           Version <xsl:value-of select="$version"/>,
