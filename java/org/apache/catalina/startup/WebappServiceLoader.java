@@ -75,7 +75,9 @@ public class WebappServiceLoader<T> {
     public List<T> load(Class<T> serviceType) throws IOException {
         String configFile = SERVICES + serviceType.getName();
 
-        LinkedHashSet<String> servicesFound = new LinkedHashSet<>();
+        LinkedHashSet<String> applicationServicesFound = new LinkedHashSet<>();
+        LinkedHashSet<String> containerServicesFound = new LinkedHashSet<>();
+
         ClassLoader loader = context.getClassLoader();
 
         // if the ServletContext has ORDERED_LIBS, then use that to specify the
@@ -100,7 +102,7 @@ public class WebappServiceLoader<T> {
                     url = new URL("jar:" + base + "!/" + configFile);
                 }
                 try {
-                    parseConfigFile(servicesFound, url);
+                    parseConfigFile(applicationServicesFound, url);
                 } catch (FileNotFoundException e) {
                     // no provider file found, this is OK
                 }
@@ -117,14 +119,18 @@ public class WebappServiceLoader<T> {
             resources = loader.getResources(configFile);
         }
         while (resources.hasMoreElements()) {
-            parseConfigFile(servicesFound, resources.nextElement());
+            parseConfigFile(containerServicesFound, resources.nextElement());
         }
 
+        // Add the application services after the container services to ensure
+        // that the container services are loaded first
+        containerServicesFound.addAll(applicationServicesFound);
+
         // load the discovered services
-        if (servicesFound.isEmpty()) {
+        if (containerServicesFound.isEmpty()) {
             return Collections.emptyList();
         }
-        return loadServices(serviceType, servicesFound);
+        return loadServices(serviceType, containerServicesFound);
     }
 
     void parseConfigFile(LinkedHashSet<String> servicesFound, URL url)
