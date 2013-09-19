@@ -27,7 +27,7 @@ import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
 
 import org.apache.tomcat.websocket.server.Constants;
-import org.apache.tomcat.websocket.server.WsListener;
+import org.apache.tomcat.websocket.server.WsContextListener;
 
 /**
  * Sends {@link #MESSAGE_COUNT} messages of size {@link #MESSAGE_SIZE} bytes as
@@ -49,7 +49,7 @@ public class TesterFirehoseServer {
     }
 
 
-    public static class Config extends WsListener {
+    public static class Config extends WsContextListener {
 
         public static final String PATH = "/firehose";
 
