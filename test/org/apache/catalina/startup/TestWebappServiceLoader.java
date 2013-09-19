@@ -21,9 +21,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
@@ -73,13 +72,13 @@ public class TestWebappServiceLoader {
     public void testInitializerFromClasspath() throws IOException {
         URL url = new URL("file://test");
         loader = EasyMock.createMockBuilder(WebappServiceLoader.class)
-                .addMockedMethod("parseConfigFile", Set.class, URL.class)
+                .addMockedMethod("parseConfigFile", LinkedHashSet.class, URL.class)
                 .withConstructor(context).createMock(control);
         EasyMock.expect(context.getAttribute(ServletContext.ORDERED_LIBS))
                 .andReturn(null);
         EasyMock.expect(cl.getResources(CONFIG_FILE))
                 .andReturn(Collections.enumeration(Collections.singleton(url)));
-        loader.parseConfigFile(EasyMock.isA(Set.class), EasyMock.same(url));
+        loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.same(url));
         control.replay();
         Assert.assertTrue(loader.load(ServletContainerInitializer.class).isEmpty());
         control.verify();
@@ -93,17 +92,17 @@ public class TestWebappServiceLoader {
         URL url2 = new URL("file://dir/");
         URL sci2 = new URL("file://dir/" + CONFIG_FILE);
         loader = EasyMock.createMockBuilder(WebappServiceLoader.class)
-                .addMockedMethod("parseConfigFile", Set.class, URL.class)
+                .addMockedMethod("parseConfigFile", LinkedHashSet.class, URL.class)
                 .withConstructor(context).createMock(control);
         List<String> jars = Arrays.asList("jar1.jar", "dir/");
         EasyMock.expect(context.getAttribute(ServletContext.ORDERED_LIBS))
                 .andReturn(jars);
         EasyMock.expect(context.getResource("/WEB-INF/lib/jar1.jar"))
                 .andReturn(url1);
-        loader.parseConfigFile(EasyMock.isA(Set.class), EasyMock.eq(sci1));
+        loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.eq(sci1));
         EasyMock.expect(context.getResource("/WEB-INF/lib/dir/"))
                 .andReturn(url2);
-        loader.parseConfigFile(EasyMock.isA(Set.class), EasyMock.eq(sci2));
+        loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.eq(sci2));
         EasyMock.expect(parent.getResources(CONFIG_FILE))
                 .andReturn(Collections.<URL>emptyEnumeration());
 
@@ -114,7 +113,7 @@ public class TestWebappServiceLoader {
 
     @Test
     public void testParseConfigFile() throws IOException {
-        Set<String> found = new HashSet<>();
+        LinkedHashSet<String> found = new LinkedHashSet<>();
         loader = new WebappServiceLoader<>(context);
         loader.parseConfigFile(found, getClass().getResource("service-config.txt"));
         Assert.assertEquals(Collections.singleton("provider1"), found);
@@ -127,7 +126,8 @@ public class TestWebappServiceLoader {
         cl.loadClass(sci.getName());
         EasyMock.expectLastCall()
                 .andReturn(sci);
-        Set<String> names = Collections.singleton(sci.getName());
+        LinkedHashSet<String> names = new LinkedHashSet<>();
+        names.add(sci.getName());
         control.replay();
         Collection<ServletContainerInitializer> initializers =
                 loader.loadServices(ServletContainerInitializer.class, names);
@@ -143,7 +143,8 @@ public class TestWebappServiceLoader {
         cl.loadClass(sci.getName());
         EasyMock.expectLastCall()
                 .andReturn(sci);
-        Set<String> names = Collections.singleton(sci.getName());
+        LinkedHashSet<String> names = new LinkedHashSet<>();
+        names.add(sci.getName());
         control.replay();
         try {
             loader.loadServices(ServletContainerInitializer.class, names);
@@ -161,7 +162,8 @@ public class TestWebappServiceLoader {
         cl.loadClass(sci.getName());
         EasyMock.expectLastCall()
                 .andReturn(sci);
-        Set<String> names = Collections.singleton(sci.getName());
+        LinkedHashSet<String> names = new LinkedHashSet<>();
+        names.add(sci.getName());
         control.replay();
         try {
             loader.loadServices(ServletContainerInitializer.class, names);
