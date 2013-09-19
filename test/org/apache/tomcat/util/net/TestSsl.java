@@ -40,7 +40,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ApplicationListener;
-import org.apache.tomcat.websocket.server.WsListener;
+import org.apache.tomcat.websocket.server.WsContextListener;
 
 /**
  * The keys and certificates used in this file are all available in svn and were
@@ -59,7 +59,7 @@ public class TestSsl extends TomcatBaseTest {
         org.apache.catalina.Context ctxt  = tomcat.addWebapp(
                 null, "/examples", appDir.getAbsolutePath());
         ctxt.addApplicationListener(new ApplicationListener(
-                WsListener.class.getName(), false));
+                WsContextListener.class.getName(), false));
 
         TesterSupport.initSsl(tomcat);
 
@@ -79,7 +79,7 @@ public class TestSsl extends TomcatBaseTest {
         org.apache.catalina.Context ctxt  = tomcat.addWebapp(
                 null, "/examples", appDir.getAbsolutePath());
         ctxt.addApplicationListener(new ApplicationListener(
-                WsListener.class.getName(), false));
+                WsContextListener.class.getName(), false));
 
         TesterSupport.initSsl(tomcat, "localhost-copy1.jks", "changeit",
                 "tomcatpass");
@@ -174,7 +174,7 @@ public class TestSsl extends TomcatBaseTest {
         Context ctxt = tomcat.addWebapp(null, "/examples",
                 appDir.getAbsolutePath());
         ctxt.addApplicationListener(new ApplicationListener(
-                WsListener.class.getName(), false));
+                WsContextListener.class.getName(), false));
 
         TesterSupport.initSsl(tomcat);
 

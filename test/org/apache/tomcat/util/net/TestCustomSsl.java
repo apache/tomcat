@@ -36,7 +36,7 @@ import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.util.net.jsse.TesterBug50640SslImpl;
-import org.apache.tomcat.websocket.server.WsListener;
+import org.apache.tomcat.websocket.server.WsContextListener;
 
 /**
  * The keys and certificates used in this file are all available in svn and were
@@ -76,7 +76,7 @@ public class TestCustomSsl extends TomcatBaseTest {
         Context ctxt  = tomcat.addWebapp(
                 null, "/examples", appDir.getAbsolutePath());
         ctxt.addApplicationListener(new ApplicationListener(
-                WsListener.class.getName(), false));
+                WsContextListener.class.getName(), false));
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +

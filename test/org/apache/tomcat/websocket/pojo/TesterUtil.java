@@ -23,11 +23,11 @@ import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig.Configurator;
 
 import org.apache.tomcat.websocket.server.Constants;
-import org.apache.tomcat.websocket.server.WsListener;
+import org.apache.tomcat.websocket.server.WsContextListener;
 
 public class TesterUtil {
 
-    public static class ServerConfigListener extends WsListener {
+    public static class ServerConfigListener extends WsContextListener {
 
         private static Class<?> pojoClazz;
 

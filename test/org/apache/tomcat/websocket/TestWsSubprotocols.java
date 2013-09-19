@@ -43,7 +43,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 import org.apache.tomcat.websocket.server.Constants;
-import org.apache.tomcat.websocket.server.WsListener;
+import org.apache.tomcat.websocket.server.WsContextListener;
 
 public class TestWsSubprotocols extends TomcatBaseTest {
 
@@ -104,7 +104,7 @@ public class TestWsSubprotocols extends TomcatBaseTest {
 
     }
 
-    public static class Config extends WsListener {
+    public static class Config extends WsContextListener {
         @Override
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);

@@ -43,7 +43,7 @@ import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
-import org.apache.tomcat.websocket.server.WsListener;
+import org.apache.tomcat.websocket.server.WsContextListener;
 
 /*
  * Test FORM authentication for sessions that do and do not use cookies.
@@ -649,7 +649,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             setUseCookies(clientShouldUseCookies);
             ctx.setCookies(serverShouldUseCookies);
             ctx.addApplicationListener(new ApplicationListener(
-                    WsListener.class.getName(), false));
+                    WsContextListener.class.getName(), false));
 
             TesterMapRealm realm = new TesterMapRealm();
             realm.addUser("tomcat", "tomcat");

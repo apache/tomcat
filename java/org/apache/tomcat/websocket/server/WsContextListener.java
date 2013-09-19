@@ -27,7 +27,7 @@ import javax.servlet.ServletContextListener;
  * {@link javax.servlet.ServletContext} that uses WebSocket to bootstrap the
  * {@link WsServerContainer} correctly.
  */
-public class WsListener implements ServletContextListener {
+public class WsContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
