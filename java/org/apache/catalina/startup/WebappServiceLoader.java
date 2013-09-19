@@ -24,7 +24,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -74,7 +73,7 @@ public class WebappServiceLoader<T> {
      * @return an unmodifiable collection of service providers
      * @throws IOException if there was a problem loading any service
      */
-    public Collection<T> load(Class<T> serviceType) throws IOException {
+    public List<T> load(Class<T> serviceType) throws IOException {
         String configFile = SERVICES + serviceType.getName();
 
         Set<String> servicesFound = new HashSet<>();
@@ -149,7 +148,7 @@ public class WebappServiceLoader<T> {
         }
     }
 
-    Collection<T> loadServices(Class<T> serviceType, Set<String> servicesFound)
+    List<T> loadServices(Class<T> serviceType, Set<String> servicesFound)
             throws IOException {
         ClassLoader loader = context.getClassLoader();
         List<T> services = new ArrayList<>(servicesFound.size());
@@ -162,6 +161,6 @@ public class WebappServiceLoader<T> {
                 throw new IOException(e);
             }
         }
-        return Collections.unmodifiableCollection(services);
+        return Collections.unmodifiableList(services);
     }
 }

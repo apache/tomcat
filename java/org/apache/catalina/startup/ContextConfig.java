@@ -26,7 +26,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1592,7 +1591,7 @@ public class ContextConfig implements LifecycleListener {
      */
     protected void processServletContainerInitializers(ServletContext servletContext) {
 
-        Collection<ServletContainerInitializer> detectedScis;
+        List<ServletContainerInitializer> detectedScis;
         try {
             WebappServiceLoader<ServletContainerInitializer> loader =
                     new WebappServiceLoader<>(servletContext);
