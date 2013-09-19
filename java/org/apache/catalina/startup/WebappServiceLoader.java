@@ -26,9 +26,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 
@@ -76,7 +75,7 @@ public class WebappServiceLoader<T> {
     public List<T> load(Class<T> serviceType) throws IOException {
         String configFile = SERVICES + serviceType.getName();
 
-        Set<String> servicesFound = new HashSet<>();
+        LinkedHashSet<String> servicesFound = new LinkedHashSet<>();
         ClassLoader loader = context.getClassLoader();
 
         // if the ServletContext has ORDERED_LIBS, then use that to specify the
@@ -128,7 +127,8 @@ public class WebappServiceLoader<T> {
         return loadServices(serviceType, servicesFound);
     }
 
-    void parseConfigFile(Set<String> servicesFound, URL url) throws IOException {
+    void parseConfigFile(LinkedHashSet<String> servicesFound, URL url)
+            throws IOException {
         try (InputStream is = url.openStream()) {
             InputStreamReader in =
                     new InputStreamReader(is, StandardCharsets.UTF_8);
@@ -148,7 +148,7 @@ public class WebappServiceLoader<T> {
         }
     }
 
-    List<T> loadServices(Class<T> serviceType, Set<String> servicesFound)
+    List<T> loadServices(Class<T> serviceType, LinkedHashSet<String> servicesFound)
             throws IOException {
         ClassLoader loader = context.getClassLoader();
         List<T> services = new ArrayList<>(servicesFound.size());
