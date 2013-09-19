@@ -57,7 +57,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.pojo.TesterUtil.ServerConfigListener;
 import org.apache.tomcat.websocket.pojo.TesterUtil.SingletonConfigurator;
-import org.apache.tomcat.websocket.server.WsListener;
+import org.apache.tomcat.websocket.server.WsContextListener;
 
 public class TestEncodingDecoding extends TomcatBaseTest {
 
@@ -418,7 +418,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     }
 
 
-    public static class ProgramaticServerEndpointConfig extends WsListener {
+    public static class ProgramaticServerEndpointConfig extends WsContextListener {
 
         @Override
         public void contextInitialized(ServletContextEvent sce) {

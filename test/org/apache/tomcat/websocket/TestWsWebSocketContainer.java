@@ -58,7 +58,7 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterEndpoint;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 import org.apache.tomcat.websocket.server.Constants;
-import org.apache.tomcat.websocket.server.WsListener;
+import org.apache.tomcat.websocket.server.WsContextListener;
 
 public class TestWsWebSocketContainer extends TomcatBaseTest {
 
@@ -443,7 +443,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
     }
 
 
-    public static class BlockingConfig extends WsListener {
+    public static class BlockingConfig extends WsContextListener {
 
         public static final String PATH = "/block";
 
@@ -556,7 +556,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
     }
 
 
-    public static class ConstantTxConfig extends WsListener {
+    public static class ConstantTxConfig extends WsContextListener {
 
         private static final String PATH = "/test";
 

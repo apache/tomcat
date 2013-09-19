@@ -251,14 +251,13 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                     isStoreDelegatedCredential());
         } catch (GSSException e) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("spnegoAuthenticator.ticketValidateFail",
-                        e));
+                log.debug(sm.getString("spnegoAuthenticator.ticketValidateFail"), e);
             }
             response.setHeader("WWW-Authenticate", "Negotiate");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         } catch (PrivilegedActionException e) {
-            log.error(sm.getString("spnegoAuthenticator.serviceLoginFail", e));
+            log.error(sm.getString("spnegoAuthenticator.serviceLoginFail"), e);
             response.setHeader("WWW-Authenticate", "Negotiate");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;

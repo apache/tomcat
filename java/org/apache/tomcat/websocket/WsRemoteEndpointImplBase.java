@@ -27,7 +27,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -120,7 +119,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
 
     public Future<Void> sendBytesByFuture(ByteBuffer data) {
-        FutureToSendHandler f2sh = new FutureToSendHandler();
+        FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
         sendBytesByCompletion(data, f2sh);
         return f2sh;
     }
@@ -157,7 +156,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
 
     public Future<Void> sendStringByFuture(String text) {
-        FutureToSendHandler f2sh = new FutureToSendHandler();
+        FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
         sendStringByCompletion(text, f2sh);
         return f2sh;
     }
@@ -192,7 +191,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             // trigger a session close and depending on timing the client
             // session may close before we can read the timeout.
             long timeout = getBlockingSendTimeout();
-            FutureToSendHandler f2sh = new FutureToSendHandler();
+            FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
             TextMessageSendHandler tmsh = new TextMessageSendHandler(f2sh, part,
                     last, encoder, encoderBuffer, this);
             tmsh.write();
@@ -217,7 +216,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         // trigger a session close and depending on timing the client
         // session may close before we can read the timeout.
         long timeout = getBlockingSendTimeout();
-        FutureToSendHandler f2sh = new FutureToSendHandler();
+        FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
         startMessage(opCode, payload, last, f2sh);
         try {
             if (timeout == -1) {
@@ -457,7 +456,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
     public Future<Void> sendObjectByFuture(Object obj) {
-        FutureToSendHandler f2sh = new FutureToSendHandler();
+        FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
         sendObjectByCompletion(obj, f2sh);
         return f2sh;
     }
@@ -775,69 +774,6 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             }
         }
     }
-
-    /**
-     * Converts a Future to a SendHandler.
-     */
-    private static class FutureToSendHandler
-            implements Future<Void>, SendHandler {
-
-        private final CountDownLatch latch = new CountDownLatch(1);
-        private volatile SendResult result = null;
-
-        // --------------------------------------------------------- SendHandler
-
-        @Override
-        public void onResult(SendResult result) {
-            this.result = result;
-            latch.countDown();
-        }
-
-
-        // -------------------------------------------------------------- Future
-
-        @Override
-        public boolean cancel(boolean mayInterruptIfRunning) {
-            // Cancelling the task is not supported
-            return false;
-        }
-
-        @Override
-        public boolean isCancelled() {
-            // Cancelling the task is not supported
-            return false;
-        }
-
-        @Override
-        public boolean isDone() {
-            return latch.getCount() == 0;
-        }
-
-        @Override
-        public Void get() throws InterruptedException,
-                ExecutionException {
-            latch.await();
-            if (result.getException() != null) {
-                throw new ExecutionException(result.getException());
-            }
-            return null;
-        }
-
-        @Override
-        public Void get(long timeout, TimeUnit unit)
-                throws InterruptedException, ExecutionException,
-                TimeoutException {
-            boolean retval = latch.await(timeout, unit);
-            if (retval == false) {
-                throw new TimeoutException();
-            }
-            if (result.getException() != null) {
-                throw new ExecutionException(result.getException());
-            }
-            return null;
-        }
-    }
-
 
     private static class WsOutputStream extends OutputStream {
 

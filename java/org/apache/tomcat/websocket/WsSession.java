@@ -38,6 +38,7 @@ import javax.websocket.Extension;
 import javax.websocket.MessageHandler;
 import javax.websocket.PongMessage;
 import javax.websocket.RemoteEndpoint;
+import javax.websocket.SendResult;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
@@ -92,6 +93,8 @@ public class WsSession implements Session {
             Constants.DEFAULT_BUFFER_SIZE;
     private volatile long maxIdleTimeout = 0;
     private volatile long lastActive = System.currentTimeMillis();
+    private Map<FutureToSendHandler,FutureToSendHandler> futures =
+            new ConcurrentHashMap<FutureToSendHandler,FutureToSendHandler>();
 
     /**
      * Creates a new WebSocket session for communication between the two
@@ -415,6 +418,12 @@ public class WsSession implements Session {
 
             state = State.CLOSED;
         }
+
+        IOException ioe = new IOException(sm.getString("wsSession.messageFailed"));
+        SendResult sr = new SendResult(ioe);
+        for (FutureToSendHandler f2sh : futures.keySet()) {
+            f2sh.onResult(sr);
+        }
     }
 
 
@@ -510,6 +519,25 @@ public class WsSession implements Session {
         }
     }
 
+
+    /**
+     * Make the session aware of a {@link FutureToSendHandler} that will need to
+     * be forcibly closed if the session closes before the
+     * {@link FutureToSendHandler} completes.
+     */
+    protected void registerFuture(FutureToSendHandler f2sh) {
+        futures.put(f2sh, f2sh);
+    }
+
+
+    /**
+     * Remove a {@link FutureToSendHandler} from the set of tracked instances.
+     */
+    protected void unregisterFuture(FutureToSendHandler f2sh) {
+        futures.remove(f2sh);
+    }
+
+
     @Override
     public URI getRequestURI() {
         checkState();
@@ -588,7 +616,7 @@ public class WsSession implements Session {
     }
 
 
-    protected void expire() {
+    protected void checkExpiration() {
         long timeout = maxIdleTimeout;
         if (timeout < 1) {
             return;
