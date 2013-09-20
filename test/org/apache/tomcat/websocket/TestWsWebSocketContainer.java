@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -252,11 +253,17 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         }
 
         wsSession.addMessageHandler(handler);
-        if (isTextMessage) {
-            wsSession.getBasicRemote().sendText(MESSAGE_TEXT_4K);
-        } else {
-            wsSession.getBasicRemote().sendBinary(
-                    ByteBuffer.wrap(MESSAGE_BINARY_4K));
+        try {
+            if (isTextMessage) {
+                wsSession.getBasicRemote().sendText(MESSAGE_TEXT_4K);
+            } else {
+                wsSession.getBasicRemote().sendBinary(
+                        ByteBuffer.wrap(MESSAGE_BINARY_4K));
+            }
+        } catch (IOException ioe) {
+            // Some messages sends are expected to fail. Assertions further on
+            // in this method will check for the correct behaviour so ignore any
+            // exception here.
         }
 
         boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
