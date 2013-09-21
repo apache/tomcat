@@ -352,4 +352,51 @@
       <servlet-name>stock</servlet-name>
       <url-pattern>/async/stockticker</url-pattern>
     </servlet-mapping>
+    
+    <!-- WebSocket Examples using Deprecated Tomcat 7 API-->
+    <servlet>
+      <servlet-name>wsEchoStream</servlet-name>
+      <servlet-class>websocket.tc7.echo.EchoStream</servlet-class>
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>wsEchoStream</servlet-name>
+      <url-pattern>/websocket/tc7/echoStream</url-pattern>
+    </servlet-mapping>
+    <servlet>
+      <servlet-name>wsEchoMessage</servlet-name>
+      <servlet-class>websocket.tc7.echo.EchoMessage</servlet-class>
+      <!-- Uncomment the following block to increase the default maximum
+           WebSocket buffer size from 2MB to 20MB which is required for the
+           Autobahn test suite to pass fully. -->
+      <!--
+      <init-param>
+        <param-name>byteBufferMaxSize</param-name>
+        <param-value>20971520</param-value>
+      </init-param>
+      <init-param>
+        <param-name>charBufferMaxSize</param-name>
+        <param-value>20971520</param-value>
+      </init-param>
+      -->
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>wsEchoMessage</servlet-name>
+      <url-pattern>/websocket/tc7/echoMessage</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>wsChat</servlet-name>
+        <servlet-class>websocket.tc7.chat.ChatWebSocketServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>wsChat</servlet-name>
+        <url-pattern>/websocket/tc7/chat</url-pattern>
+    </servlet-mapping>
+    <servlet>
+      <servlet-name>wsSnake</servlet-name>
+      <servlet-class>websocket.tc7.snake.SnakeWebSocketServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>wsSnake</servlet-name>
+      <url-pattern>/websocket/tc7/snake</url-pattern>
+    </servlet-mapping>
 </web-app>
