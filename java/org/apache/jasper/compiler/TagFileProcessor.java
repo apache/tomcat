@@ -529,9 +529,9 @@ class TagFileProcessor {
 
         JspCompilationContext ctxt = compiler.getCompilationContext();
         JspRuntimeContext rctxt = ctxt.getRuntimeContext();
-        JspServletWrapper wrapper = rctxt.getWrapper(wrapperUri);
 
         synchronized (rctxt) {
+            JspServletWrapper wrapper = rctxt.getWrapper(wrapperUri);
             if (wrapper == null) {
                 wrapper = new JspServletWrapper(ctxt.getServletContext(), ctxt
                         .getOptions(), tagFilePath, tagInfo, ctxt
