@@ -259,7 +259,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, remove)(TCN_STDARGS, jlong pollset,
 
     if (s->pe == NULL) {
         /* Already removed */
-        return APR_SUCCESS;
+        return APR_NOTFOUND;
     }
     fd.desc_type   = APR_POLL_SOCKET;
     fd.desc.s      = s->sock;

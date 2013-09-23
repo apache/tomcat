@@ -36,6 +36,14 @@
   new documentation project for Tomcat Native was started.
   </p>
 </section>
+<section name="Changes between 1.1.28 and 1.1.29">
+  <changelog>
+    <fix>
+      Change return code when removing a socket from a poller, that was
+      actually not in the poller from APR_SUCCESS to APR_NOTFOUND. (rjung)
+    </fix>
+  </changelog>
+</section>
 <section name="Changes between 1.1.27 and 1.1.28">
   <changelog>
     <update>
