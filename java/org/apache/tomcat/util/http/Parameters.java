@@ -22,7 +22,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.tomcat.util.buf.B2CConverter;
@@ -49,8 +49,8 @@ public final class Parameters {
     protected static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.http");
 
-    private final HashMap<String,ArrayList<String>> paramHashValues =
-        new HashMap<String,ArrayList<String>>();
+    private final Map<String,ArrayList<String>> paramHashValues =
+            new LinkedHashMap<String,ArrayList<String>>();
 
     private boolean didQueryParameters=false;
 

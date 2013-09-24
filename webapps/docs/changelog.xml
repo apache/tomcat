@@ -56,6 +56,14 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.45 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        <bug>55576</bug>: Preserve the order in which request parameters were
+        received when accessing them via the Servlet API. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
@@ -68,9 +76,11 @@
 <section name="Tomcat 7.0.44 (violetagg)">
   <subsection name="Jasper">
     <changelog>
-      <bug>55582</bug>: Correct concurrency issue that can result in two
-      instances of JspServletWrapper being created for one tag Patch provided by
-      Sheldon Shao. (markt)
+      <fix>
+        <bug>55582</bug>: Correct concurrency issue that can result in two
+        instances of JspServletWrapper being created for one tag Patch provided
+        by Sheldon Shao. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

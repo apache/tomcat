@@ -207,8 +207,8 @@ public class TestParameters {
 
         names = p.getParameterNames();
         assertTrue(names.hasMoreElements());
-        assertEquals("foo2", names.nextElement());
         assertEquals("foo1", names.nextElement());
+        assertEquals("foo2", names.nextElement());
         assertFalse(names.hasMoreElements());
 
         values = p.getParameterValues("foo1");
@@ -231,8 +231,8 @@ public class TestParameters {
         // Check current parameters remain unaffected
         names = p.getParameterNames();
         assertTrue(names.hasMoreElements());
-        assertEquals("foo2", names.nextElement());
         assertEquals("foo1", names.nextElement());
+        assertEquals("foo2", names.nextElement());
         assertFalse(names.hasMoreElements());
 
         values = p.getParameterValues("foo1");

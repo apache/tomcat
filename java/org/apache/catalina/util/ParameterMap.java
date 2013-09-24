@@ -14,16 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.util;
 
-
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.tomcat.util.res.StringManager;
-
 
 /**
  * Extended implementation of <strong>HashMap</strong> that includes a
@@ -35,8 +31,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  * @version $Id$
  */
-
-public final class ParameterMap<K,V> extends HashMap<K,V> {
+public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 
     private static final long serialVersionUID = 1L;
 
