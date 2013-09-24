@@ -60,7 +60,7 @@ public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory{
      * Since the JVM only allows a single call to
      * {@link URL#setURLStreamHandlerFactory(URLStreamHandlerFactory)} and
      * Tomcat needs to register a handler, provide a mechanism to allow
-     * applications to registertheir own handlers.
+     * applications to register their own handlers.
      */
     public static void addUserFactory(URLStreamHandlerFactory factory) {
         instance.userFactories.add(factory);
