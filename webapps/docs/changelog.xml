@@ -55,6 +55,16 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.45 (violetagg)">
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Logger instance of cluster session manager is changed to non-static in
+        order to enable logging of each application. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.44 (violetagg)">
   <subsection name="Jasper">
     <changelog>
