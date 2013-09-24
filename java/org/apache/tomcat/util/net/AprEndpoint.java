@@ -907,7 +907,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         // countDownConnection() in that case
         Poller poller = this.poller;
         if (poller != null) {
-            poller.removeFromPoller(socket);
+            poller.remove(socket);
         }
         connections.remove(Long.valueOf(socket));
         destroySocket(socket, running);
@@ -1220,6 +1220,19 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             }
         }
 
+        public boolean remove(long socket) {
+            for (int i = 0; i < size; i++) {
+                if (sockets[i] == socket) {
+                    sockets[i] = sockets[size - 1];
+                    timeouts[i] = timeouts[size - 1];
+                    flags[size] = flags[size -1];
+                    size--;
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public void duplicate(SocketList copy) {
             copy.size = size;
             copy.pos = pos;
@@ -1273,6 +1286,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
          * List of sockets to be added to the poller.
          */
         private SocketList addList = null;
+
+
+        /**
+         * List of sockets to be removed from the poller.
+         */
+        private SocketList removeList = null;
 
 
         /**
@@ -1349,6 +1368,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             desc = new long[actualPollerSize * 2];
             connectionCount = 0;
             addList = new SocketList(defaultPollerSize);
+            removeList = new SocketList(defaultPollerSize);
         }
 
 
@@ -1464,8 +1484,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             }
         }
 
+
         /**
-         * Add specified socket to one of the pollers.
+         * Add specified socket to one of the pollers. Must only be called from
+         * {@link Poller#run()}.
          */
         private boolean addToPoller(long socket, int events) {
             int rv = -1;
@@ -1482,10 +1504,19 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             return false;
         }
 
+
+        protected void remove(long socket) {
+            synchronized (this) {
+                removeList.add(socket, 0, 0);
+            }
+        }
+
+
         /**
-         * Remove specified socket from the pollers.
+         * Remove specified socket from the pollers. Must only be called from
+         * {@link Poller#run()}.
          */
-        protected boolean removeFromPoller(long socket) {
+        private boolean removeFromPoller(long socket) {
             int rv = -1;
             for (int i = 0; i < pollers.length; i++) {
                 if (pollerSpace[i] < actualPollerSize) {
@@ -1560,7 +1591,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
             int maintain = 0;
             SocketList localAddList = new SocketList(getMaxConnections());
-
+            SocketList localRemoveList = new SocketList(getMaxConnections());
 
             // Loop until we receive a shutdown command
             while (pollerRunning) {
@@ -1598,7 +1629,18 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 }
 
                 try {
-                    // Add sockets which are waiting to the poller
+                    // Duplicate the add and remove lists so that the syncs are
+                    // minimised
+                    if (removeList.size() > 0) {
+                        synchronized (this) {
+                            // Duplicate to another list, so that the syncing is
+                            // minimal
+                            removeList.duplicate(localRemoveList);
+                            removeList.clear();
+                        }
+                    } else {
+                        localAddList.clear();
+                    }
                     if (addList.size() > 0) {
                         synchronized (this) {
                             // Duplicate to another list, so that the syncing is
@@ -1606,6 +1648,22 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                             addList.duplicate(localAddList);
                             addList.clear();
                         }
+                    } else {
+                        localAddList.clear();
+                    }
+
+                    // Remove sockets
+                    if (localRemoveList.size() > 0) {
+                        SocketInfo info = localRemoveList.get();
+                        while (info != null) {
+                            localAddList.remove(info.socket);
+                            removeFromPoller(info.socket);
+                            info = localRemoveList.get();
+                        }
+                    }
+
+                    // Add sockets which are waiting to the poller
+                    if (localAddList.size() > 0) {
                         SocketInfo info = localAddList.get();
                         while (info != null) {
                             if (log.isDebugEnabled()) {
