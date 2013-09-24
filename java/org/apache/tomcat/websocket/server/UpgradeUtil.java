@@ -181,7 +181,7 @@ public class UpgradeUtil {
         }
         if (inner instanceof RequestFacade) {
             WsHttpUpgradeHandler wsHandler =
-                    ((RequestFacade) req).upgrade(WsHttpUpgradeHandler.class);
+                    ((RequestFacade) inner).upgrade(WsHttpUpgradeHandler.class);
             wsHandler.preInit(ep, sec, sc, wsRequest, subProtocol,
                     pathParams, req.isSecure());
         } else {
