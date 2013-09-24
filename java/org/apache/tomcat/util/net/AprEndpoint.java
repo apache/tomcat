@@ -1274,10 +1274,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
          */
         private SocketList addList = null;
 
-        /**
-         * List of sockets to be added to the poller.
-         */
-        private SocketList localAddList = null;
 
         /**
          * Structure used for storing timeouts.
@@ -1353,7 +1349,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             desc = new long[actualPollerSize * 2];
             connectionCount = 0;
             addList = new SocketList(defaultPollerSize);
-            localAddList = new SocketList(defaultPollerSize);
         }
 
 
@@ -1502,6 +1497,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     }
                 }
             }
+            timeouts.remove(socket);
             return (rv == Status.APR_SUCCESS);
         }
 
@@ -1563,6 +1559,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         public void run() {
 
             int maintain = 0;
+            SocketList localAddList = new SocketList(getMaxConnections());
+
+
             // Loop until we receive a shutdown command
             while (pollerRunning) {
 
