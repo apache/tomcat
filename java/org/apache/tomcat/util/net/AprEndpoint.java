@@ -1237,64 +1237,64 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         /**
          * Pointers to the pollers.
          */
-        protected long[] pollers = null;
+        private long[] pollers = null;
 
         /**
          * Actual poller size.
          */
-        protected int actualPollerSize = 0;
+        private int actualPollerSize = 0;
 
         /**
          * Amount of spots left in the poller.
          */
-        protected int[] pollerSpace = null;
+        private int[] pollerSpace = null;
 
         /**
          * Amount of low level pollers in use by this poller.
          */
-        protected int pollerCount;
+        private int pollerCount;
 
         /**
          * Timeout value for the poll call.
          */
-        protected int pollerTime;
+        private int pollerTime;
 
         /**
          * Root pool.
          */
-        protected long pool = 0;
+        private long pool = 0;
 
         /**
          * Socket descriptors.
          */
-        protected long[] desc;
+        private long[] desc;
 
         /**
          * List of sockets to be added to the poller.
          */
-        protected SocketList addList = null;
+        private SocketList addList = null;
 
         /**
          * List of sockets to be added to the poller.
          */
-        protected SocketList localAddList = null;
+        private SocketList localAddList = null;
 
         /**
          * Structure used for storing timeouts.
          */
-        protected SocketTimeouts timeouts = null;
+        private SocketTimeouts timeouts = null;
 
 
         /**
          * Last run of maintain. Maintain will run usually every 5s.
          */
-        protected long lastMaintain = System.currentTimeMillis();
+        private long lastMaintain = System.currentTimeMillis();
 
 
         /**
          * Amount of connections inside this poller.
          */
-        protected int connectionCount = 0;
+        private int connectionCount = 0;
         public int getConnectionCount() { return connectionCount; }
 
 
@@ -1472,7 +1472,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         /**
          * Add specified socket to one of the pollers.
          */
-        protected boolean addToPoller(long socket, int events) {
+        private boolean addToPoller(long socket, int events) {
             int rv = -1;
             for (int i = 0; i < pollers.length; i++) {
                 if (pollerSpace[i] > 0) {
@@ -1506,9 +1506,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
         /**
-         * Timeout checks.
+         * Timeout checks. Must only be called from {@link Poller#run()}.
          */
-        protected void maintain() {
+        private void maintain() {
 
             long date = System.currentTimeMillis();
             // Maintain runs at most once every 5s, although it will likely get
