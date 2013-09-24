@@ -68,7 +68,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class DeltaManager extends ClusterManagerBase{
 
     // ---------------------------------------------------- Security Classes
-    public static final org.apache.juli.logging.Log log =
+    public final org.apache.juli.logging.Log log =
             org.apache.juli.logging.LogFactory.getLog(DeltaManager.class);
 
     /**
