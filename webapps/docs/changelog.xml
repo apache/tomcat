@@ -73,7 +73,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.44 (violetagg)">
+<section name="Tomcat 7.0.44 (violetagg)" rtext="not released">
   <subsection name="Jasper">
     <changelog>
       <fix>
