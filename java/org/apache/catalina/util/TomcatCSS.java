@@ -30,7 +30,7 @@ public class TomcatCSS {
         "P {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}" +
         "A {color : black;}" +
         "A.name {color : black;}" +
-        "HR {color : #525D76;}";
+        ".line {height: 1px; background-color: #525D76; border: none;}";
 
 
 }
