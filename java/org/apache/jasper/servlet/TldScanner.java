@@ -246,8 +246,8 @@ public class TldScanner {
             try {
                 jar.nextEntry();
                 for (String entryName = jar.getEntryName();
-                     entryName != null;
-                     jar.nextEntry(), entryName = jar.getEntryName()) {
+                    entryName != null;
+                    jar.nextEntry(), entryName = jar.getEntryName()) {
                     if (!(entryName.startsWith("META-INF/") &&
                             entryName.endsWith(TLD_EXT))) {
                         continue;
