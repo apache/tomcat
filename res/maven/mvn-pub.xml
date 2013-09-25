@@ -309,7 +309,7 @@
                   jarFileName="websocket-api.jar"
                srcJarFileName="websocket-api-src.jar"/>
 
-  	<doMavenDeploy artifactId="tomcat-api"/>
+    <doMavenDeploy artifactId="tomcat-api"/>
     <doMavenDeploy artifactId="tomcat-util"/>
     <doMavenDeploy artifactId="tomcat-coyote"/>
     <doMavenDeploy artifactId="tomcat-dbcp"/>
