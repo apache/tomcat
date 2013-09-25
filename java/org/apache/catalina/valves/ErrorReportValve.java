@@ -177,18 +177,18 @@ public class ErrorReportValve extends ValveBase {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("<html><head><title>");
+        sb.append("<!DOCTYPE html><html><head><title>");
         sb.append(ServerInfo.getServerInfo()).append(" - ");
         sb.append(smClient.getString("errorReportValve.errorReport"));
         sb.append("</title>");
-        sb.append("<style><!--");
+        sb.append("<style type=\"text/css\">");
         sb.append(org.apache.catalina.util.TomcatCSS.TOMCAT_CSS);
-        sb.append("--></style> ");
+        sb.append("</style> ");
         sb.append("</head><body>");
         sb.append("<h1>");
         sb.append(smClient.getString("errorReportValve.statusHeader",
                                "" + statusCode, message)).append("</h1>");
-        sb.append("<HR size=\"1\" noshade=\"noshade\">");
+        sb.append("<div class=\"line\"></div>");
         sb.append("<p><b>type</b> ");
         if (throwable != null) {
             sb.append(smClient.getString("errorReportValve.exceptionReport"));
@@ -211,9 +211,9 @@ public class ErrorReportValve extends ValveBase {
             String stackTrace = getPartialServletStackTrace(throwable);
             sb.append("<p><b>");
             sb.append(smClient.getString("errorReportValve.exception"));
-            sb.append("</b> <pre>");
+            sb.append("</b></p><pre>");
             sb.append(RequestUtil.filter(stackTrace));
-            sb.append("</pre></p>");
+            sb.append("</pre>");
 
             int loops = 0;
             Throwable rootCause = throwable.getCause();
@@ -221,9 +221,9 @@ public class ErrorReportValve extends ValveBase {
                 stackTrace = getPartialServletStackTrace(rootCause);
                 sb.append("<p><b>");
                 sb.append(smClient.getString("errorReportValve.rootCause"));
-                sb.append("</b> <pre>");
+                sb.append("</b></p><pre>");
                 sb.append(RequestUtil.filter(stackTrace));
-                sb.append("</pre></p>");
+                sb.append("</pre>");
                 // In case root cause is somehow heavily nested
                 rootCause = rootCause.getCause();
                 loops++;
@@ -238,7 +238,7 @@ public class ErrorReportValve extends ValveBase {
 
         }
 
-        sb.append("<HR size=\"1\" noshade=\"noshade\">");
+        sb.append("<hr class=\"line\">");
         sb.append("<h3>").append(ServerInfo.getServerInfo()).append("</h3>");
         sb.append("</body></html>");
 
