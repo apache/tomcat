@@ -21,7 +21,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
-public class WarURLStreamHandler extends URLStreamHandler{
+public class WarURLStreamHandler extends URLStreamHandler {
 
     @Override
     protected void parseURL(URL u, String spec, int start, int limit) {
