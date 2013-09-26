@@ -38,7 +38,7 @@
 <p>Using standard configurations of Tomcat, web applications can ask for
 the server name and port number to which the request was directed for
 processing.  When Tomcat is running standalone with the
-<a href="config/coyote.html">Coyote HTTP/1.1 Connector</a>, it will generally
+<a href="config/http.html">HTTP/1.1 Connector</a>, it will generally
 report the server name specified in the request, and the port number on
 which the <strong>Connector</strong> is listening.  The servlet API
 calls of interest, for this purpose, are:</p>
