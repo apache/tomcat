@@ -22,6 +22,8 @@ import java.io.FileOutputStream;
 import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.instrument.ClassFileTransformer;
+import java.lang.instrument.IllegalClassFormatException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -51,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
@@ -66,6 +69,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
+import org.apache.tomcat.InstrumentableClassLoader;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.res.StringManager;
@@ -105,15 +109,18 @@ import org.apache.tomcat.util.res.StringManager;
  * <strong>IMPLEMENTATION NOTE</strong> - No check for sealing violations or
  * security is made unless a security manager is present.
  * <p>
+ * <strong>IMPLEMENTATION NOTE</strong> - As of 8.0, this class
+ * loader implements {@link InstrumentableClassLoader}, permitting web
+ * application classes to instrument other classes in the same web
+ * application. It does not permit instrumentation of system or container
+ * classes or classes in other web apps.
  *
  * @author Remy Maucherat
  * @author Craig R. McClanahan
  * @version $Id$
  */
-public class WebappClassLoader
-    extends URLClassLoader
-    implements Lifecycle
- {
+public class WebappClassLoader extends URLClassLoader
+        implements Lifecycle, InstrumentableClassLoader {
 
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( WebappClassLoader.class );
@@ -125,6 +132,8 @@ public class WebappClassLoader
     private static final List<String> JVM_THREAD_GROUP_NAMES = new ArrayList<>();
 
     private static final String JVN_THREAD_GROUP_SYSTEM = "system";
+
+    private static final String CLASS_FILE_SUFFIX = ".class";
 
     static {
         JVM_THREAD_GROUP_NAMES.add(JVN_THREAD_GROUP_SYSTEM);
@@ -462,6 +471,14 @@ public class WebappClassLoader
      */
     private boolean clearReferencesHttpClientKeepAliveThread = true;
 
+    /**
+     * Holds the class file transformers decorating this class loader. The
+     * CopyOnWriteArrayList is thread safe. It is expensive on writes, but
+     * those should be rare. It is very fast on reads, since synchronization
+     * is not actually used. Importantly, the ClassLoader will never block
+     * iterating over the transformers while loading a class.
+     */
+    private final List<ClassFileTransformer> transformers = new CopyOnWriteArrayList<>();
 
     // ------------------------------------------------------------- Properties
 
@@ -736,6 +753,108 @@ public class WebappClassLoader
 
     // ------------------------------------------------------- Reloader Methods
 
+    /**
+     * Adds the specified class file transformer to this class loader. The
+     * transformer will then be able to modify the bytecode of any classes
+     * loaded by this class loader after the invocation of this method.
+     *
+     * @param transformer The transformer to add to the class loader
+     */
+    @Override
+    public void addTransformer(ClassFileTransformer transformer) {
+
+        if (transformer == null) {
+            throw new IllegalArgumentException(sm.getString(
+                    "webappClassLoader.addTransformer.illegalArgument", getContextName()));
+        }
+
+        if (this.transformers.contains(transformer)) {
+            // if the same instance of this transformer was already added, bail out
+            log.warn(sm.getString("webappClassLoader.addTransformer.duplicate",
+                    transformer, getContextName()));
+            return;
+        }
+        this.transformers.add(transformer);
+
+        log.info(sm.getString("webappClassLoader.addTransformer", transformer, getContextName()));
+
+    }
+
+    /**
+     * Removes the specified class file transformer from this class loader.
+     * It will no longer be able to modify the byte code of any classes
+     * loaded by the class loader after the invocation of this method.
+     * However, any classes already modified by this transformer will
+     * remain transformed.
+     *
+     * @param transformer The transformer to remove
+     */
+    @Override
+    public void removeTransformer(ClassFileTransformer transformer) {
+
+        if (transformer == null) {
+            return;
+        }
+
+        if (this.transformers.remove(transformer)) {
+            log.info(sm.getString("webappClassLoader.removeTransformer",
+                    transformer, getContextName()));
+            return;
+        }
+
+    }
+
+    /**
+     * Returns a copy of this class loader without any class file
+     * transformers. This is a tool often used by Java Persistence API
+     * providers to inspect entity classes in the absence of any
+     * instrumentation, something that can't be guaranteed within the
+     * context of a {@link ClassFileTransformer}'s
+     * {@link ClassFileTransformer#transform(ClassLoader, String, Class,
+     * ProtectionDomain, byte[]) transform} method.
+     * <p>
+     * The returned class loader's resource cache will have been cleared
+     * so that classes already instrumented will not be retained or
+     * returned.
+     *
+     * @return the transformer-free copy of this class loader.
+     */
+    @Override
+    public WebappClassLoader copyWithoutTransformers() {
+
+        WebappClassLoader loader = new WebappClassLoader(this.parent);
+
+        loader.antiJARLocking = this.antiJARLocking;
+        loader.resources = this.resources;
+        loader.delegate = this.delegate;
+        loader.lastJarAccessed = this.lastJarAccessed;
+        loader.repositoryPath = this.repositoryPath;
+        loader.repository = this.repository;
+        loader.jarPath = this.jarPath;
+        loader.loaderDir = this.loaderDir;
+        loader.canonicalLoaderDir = this.canonicalLoaderDir;
+        loader.started = this.started;
+        loader.needConvert = this.needConvert;
+        loader.clearReferencesStatic = this.clearReferencesStatic;
+        loader.clearReferencesStopThreads = this.clearReferencesStopThreads;
+        loader.clearReferencesStopTimerThreads = this.clearReferencesStopTimerThreads;
+        loader.clearReferencesLogFactoryRelease = this.clearReferencesLogFactoryRelease;
+        loader.clearReferencesHttpClientKeepAliveThread = this.clearReferencesHttpClientKeepAliveThread;
+
+        loader.repositoryURLs = this.repositoryURLs.clone();
+        loader.jarFiles = this.jarFiles.clone();
+        loader.jarRealFiles = this.jarRealFiles.clone();
+        loader.jarNames = this.jarNames.clone();
+        loader.lastModifiedDates = this.lastModifiedDates.clone();
+        loader.paths = this.paths.clone();
+
+        loader.notFoundResources.putAll(this.notFoundResources);
+        loader.permissionList.addAll(this.permissionList);
+        loader.loaderPC.putAll(this.loaderPC);
+
+        return loader;
+
+    }
 
     /**
      * Set the place this ClassLoader can look for classes to be loaded.
@@ -924,6 +1043,12 @@ public class WebappClassLoader
             sb.append("----------> Parent Classloader:\r\n");
             sb.append(this.parent.toString());
             sb.append("\r\n");
+        }
+        if (this.transformers.size() > 0) {
+            sb.append("----------> Class file transformers:\r\n");
+            for (ClassFileTransformer transformer : this.transformers) {
+                sb.append(transformer).append("\r\n");
+            }
         }
         return (sb.toString());
 
@@ -1180,7 +1305,7 @@ public class WebappClassLoader
                 try {
                     String repository = entry.codeBase.toString();
                     if ((repository.endsWith(".jar"))
-                            && (!(name.endsWith(".class")))) {
+                            && (!(name.endsWith(CLASS_FILE_SUFFIX)))) {
                         // Copy binary content to the work directory if not present
                         File resourceFile = new File(loaderDir, name);
                         url = getURI(resourceFile);
@@ -2549,7 +2674,7 @@ public class WebappClassLoader
             throw new ClassNotFoundException(name);
 
         String tempPath = name.replace('.', '/');
-        String classPath = tempPath + ".class";
+        String classPath = tempPath + CLASS_FILE_SUFFIX;
 
         ResourceEntry entry = null;
 
@@ -2650,7 +2775,7 @@ public class WebappClassLoader
      *
      * @return the loaded resource, or null if the resource isn't found
      */
-    protected ResourceEntry findResourceInternal(String name, String path) {
+    protected ResourceEntry findResourceInternal(final String name, final String path) {
 
         if (!started) {
             log.info(sm.getString("webappClassLoader.stopped", name));
@@ -2666,7 +2791,7 @@ public class WebappClassLoader
 
         int contentLength = -1;
         InputStream binaryStream = null;
-        boolean isClassResource = path.endsWith(".class");
+        boolean isClassResource = path.endsWith(CLASS_FILE_SUFFIX);
 
         int jarFilesLength = jarFiles.length;
 
@@ -2754,7 +2879,7 @@ public class WebappClassLoader
                         }
 
                         // Extract resources contained in JAR to the workdir
-                        if (antiJARLocking && !(path.endsWith(".class"))) {
+                        if (antiJARLocking && !(path.endsWith(CLASS_FILE_SUFFIX))) {
                             byte[] buf = new byte[1024];
                             File resourceFile = new File
                                 (loaderDir, jarEntry.getName());
@@ -2765,7 +2890,7 @@ public class WebappClassLoader
                                     JarEntry jarEntry2 =  entries.nextElement();
                                     if (!(jarEntry2.isDirectory())
                                         && (!jarEntry2.getName().endsWith
-                                            (".class"))) {
+                                            (CLASS_FILE_SUFFIX))) {
                                         resourceFile = new File
                                             (loaderDir, jarEntry2.getName());
                                         try {
@@ -2891,6 +3016,29 @@ public class WebappClassLoader
                     try {
                         binaryStream.close();
                     } catch (IOException e) { /* Ignore */}
+                }
+            }
+        }
+
+        if (isClassResource && entry.binaryContent != null &&
+                this.transformers.size() > 0) {
+            // If the resource is a class just being loaded, decorate it
+            // with any attached transformers
+            String className = name.endsWith(CLASS_FILE_SUFFIX) ?
+                    name.substring(0, name.length() - CLASS_FILE_SUFFIX.length()) : name;
+            String internalName = className.replace(".", "/");
+
+            for (ClassFileTransformer transformer : this.transformers) {
+                try {
+                    byte[] transformed = transformer.transform(
+                            this, internalName, null, null, entry.binaryContent
+                    );
+                    if (transformed != null) {
+                        entry.binaryContent = transformed;
+                    }
+                } catch (IllegalClassFormatException e) {
+                    log.error(sm.getString("webappClassLoader.transformError", name), e);
+                    return null;
                 }
             }
         }
@@ -3098,7 +3246,7 @@ public class WebappClassLoader
                 }
                 if (clazz == null)
                     continue;
-                String name = triggers[i].replace('.', '/') + ".class";
+                String name = triggers[i].replace('.', '/') + CLASS_FILE_SUFFIX;
                 if (log.isDebugEnabled())
                     log.debug(" Checking for " + name);
                 JarEntry jarEntry = jarFile.getJarEntry(name);
