@@ -33,7 +33,7 @@ import java.util.Objects;
  * </ul>
  * When configuring a mapping from a well-known URI to a TLD, a user is allowed
  * to specify just the name of a JAR file that implicitly contains a TLD in
- * <code>META-INF/taglib.tld</code>. Such a mapping must be explcitly converted
+ * <code>META-INF/taglib.tld</code>. Such a mapping must be explicitly converted
  * to a URL and entryName when using this implementation.
  */
 public class TldResourcePath {
