@@ -63,6 +63,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Correct the javadoc for <code>org.apache.catalina.Lifecycle</code>.
+        (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.45 (violetagg)">
   <subsection name="Catalina">
