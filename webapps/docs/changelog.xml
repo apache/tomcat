@@ -55,6 +55,15 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.46 (violetagg)">
+  <subsection name="Cluster">
+    <changelog>
+      <add>
+        Add support for notify periodic event of cluster. (kfujino)
+      </add>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.45 (violetagg)">
   <subsection name="Catalina">
     <changelog>
