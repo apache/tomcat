@@ -58,6 +58,7 @@
         <div id="console"/>
     </div>
     <script type="application/javascript"><![CDATA[
+        "use strict";
 
         var Game = {};
 
@@ -82,7 +83,7 @@
 
         Game.initialize = function() {
             this.entities = [];
-            canvas = document.getElementById('playground');
+            var canvas = document.getElementById('playground');
             if (!canvas.getContext) {
                 Console.log('Error: 2d canvas not supported by this browser.');
                 return;
