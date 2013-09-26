@@ -61,7 +61,7 @@
   <xsl:variable name="attributes-color" select="'#023264'"/>
   <xsl:variable name="table-th-bg"      select="'#039acc'"/>
   <xsl:variable name="table-td-bg"      select="'#a0ddf0'"/>
-  <xsl:variable name="commentslink">/<xsl:value-of select="$sitedir"/>comments.html</xsl:variable>
+  <xsl:variable name="commentslink"><xsl:value-of select="$relative-path"/>/comments.html</xsl:variable>
 
   <!-- Process an entire document into an HTML page -->
   <xsl:template match="document">
