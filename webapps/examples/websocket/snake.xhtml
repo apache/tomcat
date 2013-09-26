@@ -209,8 +209,7 @@
             };
 
             Game.socket.onmessage = function (message) {
-                // _Potential_ security hole, consider using json lib to parse data in production.
-                var packet = eval('(' + message.data + ')');
+                var packet = JSON.parse(message.data);
                 switch (packet.type) {
                     case 'update':
                         for (var i = 0; i < packet.data.length; i++) {
