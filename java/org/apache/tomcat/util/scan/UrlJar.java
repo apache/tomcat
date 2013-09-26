@@ -39,6 +39,11 @@ public class UrlJar implements Jar {
     }
 
     @Override
+    public URL getJarFileURL() {
+        return url;
+    }
+
+    @Override
     public boolean entryExists(String name) throws IOException {
         JarEntry entry = jarInputStream.getNextJarEntry();
         while (entry != null) {

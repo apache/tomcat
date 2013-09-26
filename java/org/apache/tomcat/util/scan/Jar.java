@@ -18,6 +18,7 @@ package org.apache.tomcat.util.scan;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 /**
  * Provides an abstraction for use by the various classes that need to scan
@@ -29,6 +30,11 @@ import java.io.InputStream;
  * temporary directory so {@link java.util.jar.JarInputStream} is faster.
  */
 public interface Jar {
+
+    /**
+     * Obtain the URL for accessing the JAR file.
+     */
+    URL getJarFileURL();
 
     /**
      * Determines if a specific entry exists within the JAR.

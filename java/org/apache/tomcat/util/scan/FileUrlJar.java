@@ -32,6 +32,7 @@ import java.util.zip.ZipEntry;
 public class FileUrlJar implements Jar {
 
     private final JarFile jarFile;
+    private final URL jarFileURL;
     private Enumeration<JarEntry> entries;
     private JarEntry entry = null;
 
@@ -39,7 +40,15 @@ public class FileUrlJar implements Jar {
         JarURLConnection jarConn = (JarURLConnection) url.openConnection();
         jarConn.setUseCaches(false);
         jarFile = jarConn.getJarFile();
+        jarFileURL = jarConn.getJarFileURL();
     }
+
+
+    @Override
+    public URL getJarFileURL() {
+        return jarFileURL;
+    }
+
 
     @Override
     public boolean entryExists(String name) {

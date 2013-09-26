@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Objects;
 
+import org.apache.tomcat.util.scan.JarFactory;
+
 /**
  * A TLD Resource Path as defined in JSP 7.3.2.
  * <p/>
@@ -104,8 +106,7 @@ public class TldResourcePath {
         if (entryName == null) {
             return url.openStream();
         } else {
-            // TODO: should this use the JarFactory abstraction?
-            URL entryUrl = new URL("jar:" + url.toExternalForm() + "!/" + entryName);
+            URL entryUrl = JarFactory.getJarEntryURL(url, entryName);
             return entryUrl.openStream();
         }
     }
