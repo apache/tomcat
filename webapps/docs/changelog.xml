@@ -169,6 +169,10 @@
         provided by Jasper. Includes removal of TldConfig lifecycle listener and
         associated Context properties. (jboynes)
       </scode>
+      <add>
+        <bug>55317</bug>: Facilitate weaving by allowing ClassFileTransformer to
+        be added to WebppClassLoader. Patch by Nick Williams. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
