@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.scan;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -39,5 +40,20 @@ public class JarFactory {
         } else {
             return new UrlJar(url);
         }
+    }
+
+    public static URL getJarEntryURL(URL baseUrl, String entryName)
+            throws MalformedURLException {
+
+        String baseExternal = baseUrl.toExternalForm();
+
+        if (baseExternal.startsWith("jar")) {
+            // Assume this is pointing to a JAR file within a WAR. Java doesn't
+            // support jar:jar:file:... so switch to Tomcat's war:file:...
+            baseExternal = baseExternal.replaceFirst("^jar:", "war:");
+            baseExternal = baseExternal.replaceFirst("!/", "^/");
+        }
+
+        return new URL("jar:" + baseExternal + "!/" + entryName);
     }
 }

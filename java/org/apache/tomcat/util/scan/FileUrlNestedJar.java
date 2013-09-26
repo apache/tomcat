@@ -31,12 +31,14 @@ import java.util.jar.JarFile;
  */
 public class FileUrlNestedJar implements Jar {
 
+    private final URL jarFileURL;
     private final JarFile warFile;
     private final JarEntry jarEntry;
     private NonClosingJarInputStream jarInputStream = null;
     private JarEntry entry = null;
 
     public FileUrlNestedJar(URL url) throws IOException {
+        jarFileURL = url;
         JarURLConnection jarConn = (JarURLConnection) url.openConnection();
         jarConn.setUseCaches(false);
         warFile = jarConn.getJarFile();
@@ -48,6 +50,13 @@ public class FileUrlNestedJar implements Jar {
 
         jarInputStream = createJarInputStream();
     }
+
+
+    @Override
+    public URL getJarFileURL() {
+        return jarFileURL;
+    }
+
 
 
     @Override

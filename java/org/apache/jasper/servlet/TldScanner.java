@@ -242,7 +242,7 @@ public class TldScanner {
             }
             boolean found = false;
             Jar jar = JarFactory.newInstance(urlConn.getURL());
-            URL jarURL = urlConn.getJarFileURL();
+            URL jarURL = jar.getJarFileURL();
             try {
                 jar.nextEntry();
                 for (String entryName = jar.getEntryName();
