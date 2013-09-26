@@ -73,7 +73,7 @@ public class SnakeTimer {
                 sb.append(',');
             }
         }
-        broadcast(String.format("{'type': 'update', 'data' : [%s]}",
+        broadcast(String.format("{\"type\": \"update\", \"data\" : [%s]}",
                 sb.toString()));
     }
 
