@@ -204,7 +204,7 @@ code {
   background-color: rgb(224,255,255);
 }
 
-div.codeBox pre code, code.attributeName, code.propertyName, code.noHighlight {
+div.codeBox pre code, code.attributeName, code.propertyName, code.noHighlight, .noHighlight code {
   background-color: transparent;
 }
 div.codeBox {
