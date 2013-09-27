@@ -58,8 +58,13 @@ main {
 }
 
 #header {
-  box-shadow: 0 0 7px #aaa;
   border-bottom: 1px solid #bbb;
+}
+
+@media not print {
+    #header {
+        box-shadow: 0 0 7px #aaa;
+    }
 }
 
 #header > div {
@@ -182,8 +187,13 @@ main {
   padding-left: 5px;
   padding-right: 5px;
   background-color: #eaeaea;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+}
+
+@media not print {
+    #content h3, #content h4, #content h5, #content h6 {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
 }
 
 #content h4, #content h5, #content h6 {
@@ -266,4 +276,12 @@ ul.changelog  li{
 
 ul.changelog img {
   vertical-align: middle
+}
+
+
+/* Printer-only Styles */
+@media print {
+    .noPrint { display: none; }
+    #middle > div > div#mainLeft { display: none; }
+    a { color: inherit; text-decoration: none; }
 }

@@ -72,11 +72,6 @@
     <xsl:value-of select="$relative-path"/><xsl:value-of select="$home-stylesheet"/>
   </xsl:variable>
   <link href="{$css-src}" rel="stylesheet" type="text/css"/>
-  <style type="text/css" media="print"><![CDATA[
-    .noPrint { display: none; }
-    #middle > div > div#mainLeft { display: none; }
-    a { color: inherit; text-decoration: none; }
-  ]]></style>
 
   <title><xsl:value-of select="project/title"/> (<xsl:value-of select="$version"/>) - <xsl:value-of select="properties/title"/></title>
   <xsl:for-each select="properties/author">
@@ -159,7 +154,7 @@
         <xsl:variable name="src">
           <xsl:value-of select="$relative-path"/><xsl:value-of select="$apache-logo"/>
         </xsl:variable>
-        <div class="asfLogo">
+        <div class="asfLogo noPrint">
           <a href="http://www.apache.org/" target="_blank"><img src="{$src}" alt="The Apache Software Foundation" style="width: 266px; height: 83px;"/></a>
         </div>
         <h1><xsl:value-of select="$project/title"/></h1>
