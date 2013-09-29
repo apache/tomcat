@@ -36,7 +36,7 @@
 
 <section name="Introduction">
 
-<p>Tomcat 8.0 uses the Jasper 2 JSP Engine to implement
+<p>Tomcat @VERSION_MAJOR_MINOR@ uses the Jasper 2 JSP Engine to implement
 the <a href="http://wiki.apache.org/tomcat/Specifications">JavaServer Pages 2.3</a>
 specification.</p>
 

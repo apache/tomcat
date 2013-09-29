@@ -170,14 +170,15 @@
       <p>The <strong>xpoweredBy</strong> attribute controls whether or not the
       X-Powered-By HTTP header is sent with each request. If sent, the value of
       the header contains the Servlet and JSP specification versions, the full
-      Tomcat version (e.g. Apache Tomcat/7.0.0), the name of the JVM vendor and
+      Tomcat version (e.g. Apache Tomcat/@VERSION_MAJOR_MINOR@.0), the name of
+      the JVM vendor and
       the version of the JVM. This header is disabled by default. This header
       can provide useful information to both legitimate clients and attackers.
       </p>
 
       <p>The <strong>server</strong> attribute controls the value of the Server
-      HTTP header. The default value of this header for Tomcat 4.1.x, 5.0.x,
-      5.5.x, 6.0.x and 7.0.x is Apache-Coyote/1.1. This header can provide
+      HTTP header. The default value of this header for Tomcat 4.1.x to
+      @VERSION_MAJOR_MINOR@.x is Apache-Coyote/1.1. This header can provide
       limited information to both legitimate clients and attackers.</p>
 
       <p>The <strong>SSLEnabled</strong>, <strong>scheme</strong> and
@@ -211,8 +212,8 @@
       to the BIO connector. It is only necessary if the underlying SSL
       implementation is vulnerable to CVE-2009-3555. For more information on the
       current state of this vulnerability and the work-arounds available see the
-      <a href="http://tomcat.apache.org/security-7.html">Tomcat 7 security
-      page</a>.</p>
+      <a href="http://tomcat.apache.org/security-@VERSION_MAJOR@.html">Tomcat
+      @VERSION_MAJOR@ security page</a>.</p>
 
       <p>The <strong>requiredSecret</strong> attribute in AJP connectors
       configures shared secret between Tomcat and reverse proxy in front of
@@ -279,7 +280,7 @@
       can be changed by creating the file
       CATALINA_BASE/lib/org/apache/catalina/util/ServerInfo.properties with
       content as follows:</p>
-      <source>server.info=Apache Tomcat/7.0.x</source>
+      <source>server.info=Apache Tomcat/@VERSION_MAJOR_MINOR@.x</source>
       <p>Modify the values as required. Note that this will also change the version
       number reported in some of the management tools and may make it harder to
       determine the real version installed. The CATALINA_HOME/bin/version.bat|sh

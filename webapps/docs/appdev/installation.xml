@@ -39,7 +39,7 @@ in the following subsections.</p>
 
 <subsection name="JDK">
 
-<p>Tomcat 8.0 was designed to run on Java SE 7.
+<p>Tomcat @VERSION_MAJOR_MINOR@ was designed to run on Java SE 7.
 </p>
 
 <p>Compatible JDKs for many platforms (or links to where they can be found)
@@ -53,7 +53,7 @@ are available at
 <p>Binary downloads of the <strong>Tomcat</strong> server are available from
 <a href="http://tomcat.apache.org/">http://tomcat.apache.org/</a>.
 This manual assumes you are using the most recent release
-of Tomcat 8.  Detailed instructions for downloading and installing
+of Tomcat @VERSION_MAJOR@.  Detailed instructions for downloading and installing
 Tomcat are available <a href="../setup.html">here</a>.</p>
 
 <p>In the remainder of this manual, example shell scripts assume that you have

@@ -108,12 +108,10 @@ meaning that any change to the files necessitates a restart of the container.
 written and easy to understand, we may have missed something.  Provided
 below are various web sites and mailing lists in case you get stuck.</p>
 
-<p>As Tomcat 7 is a new release of Tomcat, keep in mind that some of the
-issues and solutions vary between the major versions of Tomcat (6.x versus
-7.x).  As you search around the web, there will be some documentation that
-is not relevant to Tomcat 7, but 6.x, 5.x or earlier versions.  Doing 3.x
-or 4.x things to 7 will probably not work in most cases as the server.xml
-files are very different.</p>
+<p>Keep in mind that some of the issues and solutions vary between the
+major versions of Tomcat.  As you search around the web, there will be
+some documentation that is not relevant to Tomcat @VERSION_MAJOR@, but
+only to earlier versions.</p>
 
 <ul>
 <li>Current document - most documents will list potential hangups. Be sure

@@ -123,7 +123,7 @@ policy had to be relaxed. This is not recommended for production environments.
   <code>$CATALINA_BASE/conf/krb5.ini</code>. The file used in this how-to
   contained:<source>[libdefaults]
 default_realm = DEV.LOCAL
-default_keytab_name = FILE:c:\apache-tomcat-7.0.x\conf\tomcat.keytab
+default_keytab_name = FILE:c:\apache-tomcat-@VERSION_MAJOR_MINOR@.x\conf\tomcat.keytab
 default_tkt_enctypes = rc4-hmac,aes256-cts-hmac-sha1-96,aes128-cts-hmac-sha1-96
 default_tgs_enctypes = rc4-hmac,aes256-cts-hmac-sha1-96,aes128-cts-hmac-sha1-96
 forwardable=true
@@ -145,7 +145,7 @@ dev.local= DEV.LOCAL
     doNotPrompt=true
     principal="HTTP/win-tc01.dev.local@DEV.LOCAL"
     useKeyTab=true
-    keyTab="c:/apache-tomcat-7.0.x/conf/tomcat.keytab"
+    keyTab="c:/apache-tomcat-@VERSION_MAJOR_MINOR@.x/conf/tomcat.keytab"
     storeKey=true;
 };
 
@@ -154,7 +154,7 @@ com.sun.security.jgss.krb5.accept {
     doNotPrompt=true
     principal="HTTP/win-tc01.dev.local@DEV.LOCAL"
     useKeyTab=true
-    keyTab="c:/apache-tomcat-7.0.x/conf/tomcat.keytab"
+    keyTab="c:/apache-tomcat-@VERSION_MAJOR_MINOR@.x/conf/tomcat.keytab"
     storeKey=true;
 };</source>
   The location of this file can be changed by setting the

@@ -113,7 +113,7 @@
 
 <section name="Cluster Basics">
 
-<p>To run session replication in your Tomcat 7.0 container, the following steps
+<p>To run session replication in your Tomcat @VERSION_MAJOR@ container, the following steps
 should be completed:</p>
 <ul>
   <li>All your session attributes must implement <code>java.io.Serializable</code></li>
@@ -195,7 +195,7 @@ should be completed:</p>
     Synchronous vs. asynchronous is configured using the <code>channelSendOptions</code>
     flag and is an integer value. The default value for the <code>SimpleTcpCluster/DeltaManager</code> combo is
     8, which is asynchronous. You can read more on the <a href="tribes/introduction.html">send flag(overview)</a> or the
-    <a href="http://tomcat.apache.org/tomcat-7.0-doc/api/org/apache/catalina/tribes/Channel.html">send flag(javadoc)</a>.
+    <a href="http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/api/org/apache/catalina/tribes/Channel.html">send flag(javadoc)</a>.
     During async replication, the request is returned before the data has been replicated. async replication yields shorter
     request times, and synchronous replication guarantees the session to be replicated before the request returns.
 </p>
@@ -287,7 +287,7 @@ should be completed:</p>
       The main element, inside this element all cluster details can be configured.
       The <code>channelSendOptions</code> is the flag that is attached to each message sent by the
       SimpleTcpCluster class or any objects that are invoking the SimpleTcpCluster.send method.
-      The description of the send flags is available at <a href="http://tomcat.apache.org/tomcat-7.0-doc/api/org/apache/catalina/tribes/Channel.html">
+      The description of the send flags is available at <a href="http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/api/org/apache/catalina/tribes/Channel.html">
       our javadoc site</a>
       The <code>DeltaManager</code> sends information using the SimpleTcpCluster.send method, while the backup manager
       sends it itself directly through the channel.

@@ -82,7 +82,7 @@ available, which will be used to actually perform the build.
 
 </section>
 
-<section name="Checkout or obtain the source code for Tomcat 8">
+<section name="Checkout or obtain the source code for Tomcat @VERSION_MAJO@">
 
   <p>
   Tomcat SVN repository URL:
@@ -90,7 +90,7 @@ available, which will be used to actually perform the build.
   </p>
   <p>
   Tomcat source packages:
-  <a href="http://tomcat.apache.org/download-80.cgi">http://tomcat.apache.org/download-80.cgi</a>.
+  <a href="http://tomcat.apache.org/download-@VERSION_MAJOR@0.cgi">http://tomcat.apache.org/download-@VERSION_MAJOR@0.cgi</a>.
   </p>
 
   <p>

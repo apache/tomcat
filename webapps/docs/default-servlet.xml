@@ -237,7 +237,7 @@ Format:
         </table>
       <xsl:apply-templates select="readme"/>
       <hr style="height: 1px;" />
-      <h3>Apache Tomcat/8.0</h3>
+      <h3>Apache Tomcat/@VERSION_MAJOR_MINOR@</h3>
     </body>
    </html>
   </xsl:template>
