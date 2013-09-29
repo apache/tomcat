@@ -34,7 +34,7 @@
     <Valve className="org.apache.catalina.valves.CometConnectionManagerValve" />
     -->
 
-    <!-- Tomcat 8 uses SCIs to initialise both JSP and WebSocket support.    -->
+    <!-- Tomcat uses SCIs to initialise both JSP and WebSocket support.      -->
     <!-- This means that neither jasper.jar nor tomcat-websocket.jar can be  -->
     <!-- excluded from SCI scanning. Therefore, they do not appear in the    -->
     <!-- default list of JARs to skip. However, they do not contain TLDs so  -->
