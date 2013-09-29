@@ -129,8 +129,8 @@ You might end up with something like this:</p>
 <source><![CDATA[# Context path to install this application on
 app.path=/hello
 
-# Tomcat 7 installation directory
-catalina.home=/usr/local/apache-tomcat-7.0
+# Tomcat installation directory
+catalina.home=/usr/local/apache-tomcat-@VERSION_MAJOR_MINOR@
 
 # Manager webapp username and password
 manager.username=myusername

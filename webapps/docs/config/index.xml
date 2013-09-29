@@ -34,7 +34,7 @@
 
 <p>This manual contains reference information about all of the configuration
 directives that can be included in a <code>conf/server.xml</code> file to
-configure the behavior of the Tomcat 7 Servlet/JSP container.  It does not
+configure the behavior of the Tomcat Servlet/JSP container.  It does not
 attempt to describe which configuration directives should be used to perform
 specific tasks - for that, see the various <em>HOW-TO</em> documents on the
 main index page.</p>

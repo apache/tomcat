@@ -34,8 +34,8 @@
 <section name="Introduction">
 
 <p>This is the top-level entry point of the documentation bundle for the
-<strong>Apache Tomcat</strong> Servlet/JSP container.  Apache Tomcat version 8.0
-implements the Servlet 3.1 and JavaServer Pages 2.3
+<strong>Apache Tomcat</strong> Servlet/JSP container.  Apache Tomcat version
+@VERSION_MAJOR_MINOR@ implements the Servlet 3.1 and JavaServer Pages 2.3
 <a href="http://wiki.apache.org/tomcat/Specifications">specifications</a> from the
 <a href="http://www.jcp.org">Java Community Process</a>, and includes many
 additional features that make it a useful platform for developing and deploying
@@ -50,8 +50,8 @@ manual is described in more detail below.</p>
 
 <section name="Apache Tomcat User Guide">
 
-<p>The following documents will assist you in downloading, installing
-Apache Tomcat 7, and using many of the Apache Tomcat features.</p>
+<p>The following documents will assist you in downloading and installing
+Apache Tomcat, and using many of the Apache Tomcat features.</p>
 
 <ol>
 <li><a href="introduction.html"><strong>Introduction</strong></a> - A

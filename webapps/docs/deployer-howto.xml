@@ -86,7 +86,7 @@
             The TCD is not packaged with the Tomcat core
             distribution, and must therefore be downloaded separately from
             the Downloads area. The download is usually labelled
-            <i>apache-tomcat-8.0.x-deployer</i>.
+            <i>apache-tomcat-@VERSION_MAJOR_MINOR@.x-deployer</i>.
         </p>
         <p>
             TCD has prerequisites of Apache Ant 1.6.2+ and a Java installation.

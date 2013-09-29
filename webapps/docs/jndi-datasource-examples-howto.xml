@@ -54,7 +54,7 @@ to the wider audience, or if you feel we can improve this section in anyway.</p>
 <b>Please note that JNDI resource configuration changed somewhat between
 Tomcat 5.0.x and Tomcat 5.5.x.</b>  You will most likely need to modify older
 JNDI resource configurations to match the syntax in the example below in order
-to make them work in Tomcat 7.x.x.
+to make them work in Tomcat @VERSION_MAJOR@.
 </p>
 
 <p>
