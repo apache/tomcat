@@ -142,7 +142,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         // Has a protocol been specified
         String protocol = System.getProperty("tomcat.test.protocol");
 
-        // Use NIO by default in Tomcat 8
+        // Use NIO by default starting with Tomcat 8
         if (protocol == null) {
             protocol = Http11NioProtocol.class.getName();
         }
