@@ -915,7 +915,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
     /*
      * This method should only be called if there is no chance that the socket
-     * is currently being used by the Poller.
+     * is currently being used by the Poller. It is generally a bad idea to call
+     * this directly from a known error condition.
      */
     private void destroySocket(long socket) {
         connections.remove(Long.valueOf(socket));
@@ -998,12 +999,14 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     if (running && !paused) {
                         // Hand this socket off to an appropriate processor
                         if (!processSocketWithOptions(socket)) {
-                            // Close socket and pool right away
+                            // Close socket right away
                             closeSocket(socket);
                         }
                     } else {
-                        // Close socket and pool right away
-                        closeSocket(socket);
+                        // Close socket right away
+                        // No code path could have added the socket to the
+                        // Poller so use destroySocket()
+                        destroySocket(socket);
                     }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
@@ -1408,7 +1411,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         connections.get(Long.valueOf(info.socket)).isComet();
                 if (!comet || (comet && !processSocket(
                         info.socket, SocketStatus.STOP))) {
-                    closeSocket(info.socket);
+                    // Poller isn't running at this point so use destroySocket()
+                    // directly
+                    destroySocket(info.socket);
                 }
                 info = addList.get();
             }
