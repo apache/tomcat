@@ -63,8 +63,9 @@
         <code>localAddList</code>. (markt)
       </scode>
       <fix>
-        Ensure that sockets removed from the Poller in the APR/native connector
-        are removed in a thread-safe manner. (markt)
+        <bug>55602</bug>: Ensure that sockets removed from the Poller and then
+        closed in the APR/native connector are removed and then closed in a
+        thread-safe manner. (markt)
       </fix>
     </changelog>
   </subsection>
