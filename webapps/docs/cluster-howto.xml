@@ -221,7 +221,7 @@ should be completed:</p>
 <p>
     <b>Hint:</b><br/>
     With attribute <i>sessionIdAttribute</i> you can change the request attribute name that included the old session id.
-    Default attribute name is <i>org.apache.catalina.cluster.session.JvmRouteOrignalSessionID</i>.
+    Default attribute name is <i>org.apache.catalina.ha.session.JvmRouteOrignalSessionID</i>.
 </p>
 <p>
     <b>Trick:</b><br/>
