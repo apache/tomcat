@@ -908,16 +908,20 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         Poller poller = this.poller;
         if (poller != null) {
             if (!poller.close(socket)) {
-                destroySocketInternal(socket, true);
+                destroySocketInternal(socket);
             }
         }
     }
 
-    private void destroySocketInternal(long socket, boolean doIt) {
+    /*
+     * This method should only be called if there is no chance that the socket
+     * is currently being used by the Poller.
+     */
+    private void destroySocketInternal(long socket) {
         connections.remove(Long.valueOf(socket));
         if (log.isDebugEnabled()) {
             String msg = sm.getString("endpoint.debug.destroySocket",
-                    Long.valueOf(socket), Boolean.valueOf(doIt));
+                    Long.valueOf(socket));
             if (log.isTraceEnabled()) {
                 log.trace(msg, new Exception());
             } else {
@@ -928,7 +932,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         // twice for the same socket the JVM will core. Currently this is only
         // called from Poller.closePollset() to ensure kept alive connections
         // are closed when calling stop() followed by start().
-        if (doIt && socket != 0) {
+        if (socket != 0) {
             Socket.destroy(socket);
             countDownConnection();
         }
@@ -1418,7 +1422,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                                 Long.valueOf(desc[n*2+1])).isComet();
                         if (!comet || (comet && !processSocket(
                                 desc[n*2+1], SocketStatus.STOP))) {
-                            destroySocketInternal(desc[n*2+1], true);
+                            destroySocketInternal(desc[n*2+1]);
                         }
                     }
                 }
@@ -1564,7 +1568,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         Long.valueOf(socket)).isComet();
                 if (!comet || (comet && !processSocket(
                         socket, SocketStatus.TIMEOUT))) {
-                    destroySocketInternal(socket, true);
+                    destroySocketInternal(socket);
                 }
                 socket = timeouts.check(date);
             }
@@ -1666,7 +1670,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         while (info != null) {
                             localAddList.remove(info.socket);
                             removeFromPoller(info.socket);
-                            destroySocketInternal(info.socket, true);
+                            destroySocketInternal(info.socket);
                             info = localCloseList.get();
                         }
                     }
