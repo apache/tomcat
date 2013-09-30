@@ -56,6 +56,14 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.46 (violetagg)">
+  <subsection name="Coyote">
+    <changelog>
+      <scode>
+        Refactor APR endpoint to reduce scope of <code>localAddList</code>.
+        (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <add>
