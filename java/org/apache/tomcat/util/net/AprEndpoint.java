@@ -901,11 +901,11 @@ public class AprEndpoint extends AbstractEndpoint {
         if (poller != null) {
             poller.remove(socket);
         }
-        connections.remove(Long.valueOf(socket));
         destroySocket(socket, running);
     }
 
     private void destroySocket(long socket, boolean doIt) {
+        connections.remove(Long.valueOf(socket));
         if (log.isDebugEnabled()) {
             String msg = sm.getString("endpoint.debug.destroySocket",
                     Long.valueOf(socket), Boolean.valueOf(doIt));
