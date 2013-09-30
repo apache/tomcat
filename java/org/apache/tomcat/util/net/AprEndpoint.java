@@ -909,10 +909,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         if (poller != null) {
             poller.remove(socket);
         }
-        destroySocket(socket, running);
+        destroySocketInternal(socket, running);
     }
 
-    private void destroySocket(long socket, boolean doIt) {
+    private void destroySocketInternal(long socket, boolean doIt) {
         connections.remove(Long.valueOf(socket));
         if (log.isDebugEnabled()) {
             String msg = sm.getString("endpoint.debug.destroySocket",
@@ -1417,7 +1417,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                                 Long.valueOf(desc[n*2+1])).isComet();
                         if (!comet || (comet && !processSocket(
                                 desc[n*2+1], SocketStatus.STOP))) {
-                            destroySocket(desc[n*2+1], true);
+                            destroySocketInternal(desc[n*2+1], true);
                         }
                     }
                 }
