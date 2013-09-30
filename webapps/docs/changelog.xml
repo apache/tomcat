@@ -81,6 +81,11 @@
         Correct the javadoc for <code>org.apache.catalina.Lifecycle</code>.
         (kfujino)
       </fix>
+      <add>
+        Add document for sessionIdAttribute attribute in
+        <code>org.apache.catalina.ha.session.JvmRouteBinderValve</code>.
+        (kfujino)
+      </add>
     </changelog>
   </subsection>
 </section>
