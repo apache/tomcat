@@ -1639,7 +1639,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                             removeList.clear();
                         }
                     } else {
-                        localAddList.clear();
+                        localRemoveList.clear();
                     }
                     if (addList.size() > 0) {
                         synchronized (this) {
