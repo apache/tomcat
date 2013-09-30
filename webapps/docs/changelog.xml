@@ -59,9 +59,13 @@
   <subsection name="Coyote">
     <changelog>
       <scode>
-        Refactor APR endpoint to reduce scope of <code>localAddList</code>.
-        (markt)
+        Refactor APR/native connector to reduce the scope of
+        <code>localAddList</code>. (markt)
       </scode>
+      <fix>
+        Ensure that sockets removed from the Poller in the APR/native connector
+        are removed in a thread-safe manner. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
