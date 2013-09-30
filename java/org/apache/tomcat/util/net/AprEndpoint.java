@@ -907,9 +907,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         // countDownConnection() in that case
         Poller poller = this.poller;
         if (poller != null) {
-            poller.remove(socket);
+            if (!poller.close(socket)) {
+                destroySocketInternal(socket, true);
+            }
         }
-        destroySocketInternal(socket, running);
     }
 
     private void destroySocketInternal(long socket, boolean doIt) {
@@ -1289,9 +1290,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         /**
-         * List of sockets to be removed from the poller.
+         * List of sockets to be closed.
          */
-        private SocketList removeList = null;
+        private SocketList closeList = null;
 
 
         /**
@@ -1368,7 +1369,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             desc = new long[actualPollerSize * 2];
             connectionCount = 0;
             addList = new SocketList(defaultPollerSize);
-            removeList = new SocketList(defaultPollerSize);
+            closeList = new SocketList(defaultPollerSize);
         }
 
 
@@ -1505,9 +1506,16 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
 
-        protected void remove(long socket) {
+        protected boolean close(long socket) {
+            if (!pollerRunning) {
+                return false;
+            }
             synchronized (this) {
-                removeList.add(socket, 0, 0);
+                if (!pollerRunning) {
+                    return false;
+                }
+                closeList.add(socket, 0, 0);
+                return true;
             }
         }
 
@@ -1556,7 +1564,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         Long.valueOf(socket)).isComet();
                 if (!comet || (comet && !processSocket(
                         socket, SocketStatus.TIMEOUT))) {
-                    destroySocket(socket);
+                    destroySocketInternal(socket, true);
                 }
                 socket = timeouts.check(date);
             }
@@ -1591,7 +1599,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
             int maintain = 0;
             SocketList localAddList = new SocketList(getMaxConnections());
-            SocketList localRemoveList = new SocketList(getMaxConnections());
+            SocketList localCloseList = new SocketList(getMaxConnections());
 
             // Loop until we receive a shutdown command
             while (pollerRunning) {
@@ -1631,15 +1639,15 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 try {
                     // Duplicate the add and remove lists so that the syncs are
                     // minimised
-                    if (removeList.size() > 0) {
+                    if (closeList.size() > 0) {
                         synchronized (this) {
                             // Duplicate to another list, so that the syncing is
                             // minimal
-                            removeList.duplicate(localRemoveList);
-                            removeList.clear();
+                            closeList.duplicate(localCloseList);
+                            closeList.clear();
                         }
                     } else {
-                        localRemoveList.clear();
+                        localCloseList.clear();
                     }
                     if (addList.size() > 0) {
                         synchronized (this) {
@@ -1653,12 +1661,13 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     }
 
                     // Remove sockets
-                    if (localRemoveList.size() > 0) {
-                        SocketInfo info = localRemoveList.get();
+                    if (localCloseList.size() > 0) {
+                        SocketInfo info = localCloseList.get();
                         while (info != null) {
                             localAddList.remove(info.socket);
                             removeFromPoller(info.socket);
-                            info = localRemoveList.get();
+                            destroySocketInternal(info.socket, true);
+                            info = localCloseList.get();
                         }
                     }
 
