@@ -289,5 +289,5 @@ ul.changelog img {
 /* Fix for Comments section which contains a <h4> */
 #comments_thread h1, #comments_thread h2, #comments_thread h3, #comments_thread h4, #comments_thread h5, #comments_thread h6 {
     border: none;
-	background-color: transparent;
+    background-color: transparent;
 }
