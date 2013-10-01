@@ -1580,9 +1580,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         private void maintain() {
 
             long date = System.currentTimeMillis();
-            // Maintain runs at most once every 5s, although it will likely get
+            // Maintain runs at most once every 1s, although it will likely get
             // called more
-            if ((date - lastMaintain) < 5000L) {
+            if ((date - lastMaintain) < 1000L) {
                 return;
             } else {
                 lastMaintain = date;
