@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -1315,10 +1316,17 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         /**
-         * Amount of connections inside this poller.
+         * The number of connections currently inside this Poller. The correct
+         * operation of the Poller depends on this figure being correct. If it
+         * is not, it is possible that the Poller will enter a wait loop where
+         * it waits for the next connection to be added to the Poller before it
+         * calls poll when it should still be polling existing connections.
+         * Although not necessary at the time of writing this comment, it has
+         * been implemented as an AtomicInteger to ensure that it remains
+         * thread-safe.
          */
-        private int connectionCount = 0;
-        public int getConnectionCount() { return connectionCount; }
+        private AtomicInteger connectionCount = new AtomicInteger(0);
+        public int getConnectionCount() { return connectionCount.get(); }
 
 
         private volatile boolean pollerRunning = true;
@@ -1374,7 +1382,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             }
 
             desc = new long[actualPollerSize * 2];
-            connectionCount = 0;
+            connectionCount.set(0);
             addList = new SocketList(defaultPollerSize);
             closeList = new SocketList(defaultPollerSize);
         }
@@ -1433,7 +1441,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 }
             }
             Pool.destroy(pool);
-            connectionCount = 0;
+            connectionCount.set(0);
         }
 
 
@@ -1506,7 +1514,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     rv = Poll.add(pollers[i], socket, events);
                     if (rv == Status.APR_SUCCESS) {
                         pollerSpace[i]--;
-                        connectionCount++;
+                        connectionCount.incrementAndGet();
                         return true;
                     }
                 }
@@ -1540,7 +1548,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     rv = Poll.remove(pollers[i], socket);
                     if (rv != Status.APR_NOTFOUND) {
                         pollerSpace[i]++;
-                        connectionCount--;
+                        connectionCount.decrementAndGet();
                         break;
                     }
                 }
@@ -1622,7 +1630,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     }
                 }
                 // Check timeouts if the poller is empty
-                while (pollerRunning && connectionCount < 1 &&
+                while (pollerRunning && connectionCount.get() < 1 &&
                         addList.size() < 1) {
                     // Reset maintain time.
                     try {
@@ -1739,7 +1747,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         }
                         if (rv > 0) {
                             pollerSpace[i] += rv;
-                            connectionCount -= rv;
+                            connectionCount.addAndGet(-rv);
                             for (int n = 0; n < rv; n++) {
                                 timeouts.remove(desc[n*2+1]);
                                 AprSocketWrapper wrapper = connections.get(
@@ -1882,7 +1890,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                             long newPoller = allocatePoller(actualPollerSize, pool, -1);
                             // Don't restore connections for now, since I have not tested it
                             pollerSpace[i] = actualPollerSize;
-                            connectionCount -= count;
+                            connectionCount.addAndGet(-count);
                             Poll.destroy(pollers[i]);
                             pollers[i] = newPoller;
                         }
