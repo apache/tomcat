@@ -1532,6 +1532,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     return false;
                 }
                 closeList.add(socket, 0, 0);
+                this.notify();
                 return true;
             }
         }
