@@ -1282,6 +1282,13 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         private int pollerTime;
 
         /**
+         * Variable poller timeout that adjusts depending on how many poll sets
+         * are in use so that the total poll time across all poll sets remains
+         * equal to pollTime.
+         */
+        private int nextPollerTime;
+
+        /**
          * Root pool.
          */
         private long pool = 0;
@@ -1369,6 +1376,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
             pollerCount = defaultPollerSize / actualPollerSize;
             pollerTime = pollTime / pollerCount;
+            nextPollerTime = pollerTime;
 
             pollers = new long[pollerCount];
             pollers[0] = pollset;
@@ -1743,7 +1751,18 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         int rv = 0;
                         // Iterate on each pollers, but no need to poll empty pollers
                         if (pollerSpace[i] < actualPollerSize) {
-                            rv = Poll.poll(pollers[i], pollerTime, desc, true);
+                            rv = Poll.poll(pollers[i], nextPollerTime, desc, true);
+                            // Reset the nextPollerTime
+                            nextPollerTime = pollerTime;
+                        } else {
+                            // Skipping an empty poll set means skipping a wait
+                            // time of pollerTime microseconds. If most of the
+                            // poll sets are skipped then this loop will be
+                            // tighter than expected which could lead to higher
+                            // than expected CPU usage. Extending the
+                            // nextPollerTime ensures that this loop always
+                            // takes about the same time to execute.
+                            nextPollerTime += pollerTime;
                         }
                         if (rv > 0) {
                             pollerSpace[i] += rv;
