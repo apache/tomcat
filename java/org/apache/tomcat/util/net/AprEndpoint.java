@@ -1542,6 +1542,10 @@ public class AprEndpoint extends AbstractEndpoint {
          * {@link Poller#run()}.
          */
         private boolean removeFromPoller(long socket) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("endpoint.debug.pollerRemove",
+                        Long.valueOf(socket)));
+            }
             int rv = -1;
             for (int i = 0; i < pollers.length; i++) {
                 if (pollerSpace[i] < actualPollerSize) {
@@ -1549,6 +1553,10 @@ public class AprEndpoint extends AbstractEndpoint {
                     if (rv != Status.APR_NOTFOUND) {
                         pollerSpace[i]++;
                         connectionCount.decrementAndGet();
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("endpoint.debug.pollerRemoved",
+                                    Long.valueOf(socket)));
+                        }
                         break;
                     }
                 }
