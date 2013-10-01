@@ -1623,7 +1623,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 }
                 // Check timeouts if the poller is empty
                 while (pollerRunning && connectionCount.get() < 1 &&
-                        addList.size() < 1) {
+                        addList.size() < 1 && closeList.size() < 1) {
                     // Reset maintain time.
                     try {
                         if (getSoTimeout() > 0 && pollerRunning) {
