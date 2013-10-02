@@ -596,7 +596,7 @@
     </copy>
     <!-- Copy jdbc-pool documentation -->
     <copy tofile="webapps/docs/jdbc-pool.xml"
-          file="${tomcat.jdbc.dir}/doc/jdbc-pool.xml" encoding="ISO-8859-1">
+          file="${tomcat.jdbc.dir}/doc/jdbc-pool.xml" encoding="UTF-8">
       <filterset>
         <filter token="TOMCAT_PROJECT_DEST" value="project.xml"/>
       </filterset>
