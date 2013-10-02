@@ -198,6 +198,9 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
                 wsProtocolHandler.close(cr);
             } catch (IOException ioe) {
                 onError(ioe);
+                CloseReason cr = new CloseReason(
+                        CloseCodes.CLOSED_ABNORMALLY, ioe.getMessage());
+                wsProtocolHandler.close(cr);
             }
         }
 
