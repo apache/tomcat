@@ -91,6 +91,10 @@
         Handle the case when a user closes the browser whilst playing the
         snake game in the JSR356 WebSocket examples. (markt)
       </fix>
+      <fix>
+        Ensure Javadoc comments are associated with the correct elements in
+        <code>org.apache.tomcat.jni.Poll</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
