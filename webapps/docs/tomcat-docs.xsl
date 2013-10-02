@@ -73,7 +73,7 @@
   </xsl:variable>
   <link href="{$css-src}" rel="stylesheet" type="text/css"/>
 
-  <title><xsl:value-of select="project/title"/> (<xsl:value-of select="$version"/>) - <xsl:value-of select="properties/title"/></title>
+  <title><xsl:value-of select="$project/title"/> (<xsl:value-of select="$version"/>) - <xsl:value-of select="properties/title"/></title>
   <xsl:for-each select="properties/author">
     <xsl:variable name="name">
       <xsl:value-of select="."/>
@@ -141,12 +141,12 @@
   <header><div id="header">
     <div>
       <div>
-        <xsl:if test="project/logo">
+        <xsl:if test="$project/logo">
           <xsl:variable name="src">
             <xsl:value-of select="$relative-path"/><xsl:value-of select="$home-logo"/>
           </xsl:variable>
           <div class="logo noPrint">
-            <a href="{project/@href}"><img alt="Tomcat Home" src="{$src}"/></a>
+            <a href="{$project/@href}"><img alt="Tomcat Home" src="{$src}"/></a>
           </div>
         </xsl:if>
 
@@ -174,7 +174,7 @@
         <div>
           <!-- Navigation -->
           <nav>
-            <xsl:apply-templates select="project/body/menu"/>
+            <xsl:apply-templates select="$project/body/menu"/>
           </nav>
         </div>
       </div>
