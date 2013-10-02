@@ -87,6 +87,10 @@
         <code>org.apache.catalina.ha.session.JvmRouteBinderValve</code>.
         (kfujino)
       </add>
+      <fix>
+        Handle the case when a user closes the browser whilst playing the
+        snake game in the JSR356 WebSocket examples. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
