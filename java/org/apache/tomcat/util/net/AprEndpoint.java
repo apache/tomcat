@@ -1818,8 +1818,49 @@ public class AprEndpoint extends AbstractEndpoint {
                                 } else if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                                         || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
                                         || ((desc[n*2] & Poll.APR_POLLNVAL) == Poll.APR_POLLNVAL)) {
-                                    // Close socket and clear pool
-                                    closeSocket(desc[n*2+1]);
+                                    if (wrapper.isUpgraded()) {
+                                        // Using non-blocking IO. Need to trigger error handling.
+                                        // Poller may return error codes plus the flags it was
+                                        // waiting for or it may just return an error code. By
+                                        // signalling read/write is possible, a read/write will be
+                                        // attempted, fail and that will trigger an exception the
+                                        // application will see.
+                                        // Check the return flags first, followed by what the socket
+                                        // was registered for
+                                        if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
+                                            // Error probably occurred during a non-blocking read
+                                            if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
+                                                // Close socket and clear pool
+                                                closeSocket(desc[n*2+1]);
+                                            }
+                                        } else if ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
+                                            // Error probably occurred during a non-blocking write
+                                            if (!processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
+                                                // Close socket and clear pool
+                                                closeSocket(desc[n*2+1]);
+                                            }
+                                        } else if ((wrapper.pollerFlags & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
+                                            // Can't tell what was happening when the error occurred but the
+                                            // socket is registered for non-blocking read so use that
+                                            if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
+                                                // Close socket and clear pool
+                                                closeSocket(desc[n*2+1]);
+                                            }
+                                        } else if ((wrapper.pollerFlags & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
+                                            // Can't tell what was happening when the error occurred but the
+                                            // socket is registered for non-blocking write so use that
+                                            if (!processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
+                                                // Close socket and clear pool
+                                                closeSocket(desc[n*2+1]);
+                                            }
+                                        } else {
+                                            // Close socket and clear pool
+                                            closeSocket(desc[n*2+1]);
+                                        }
+                                    } else {
+                                        // Close socket and clear pool
+                                        closeSocket(desc[n*2+1]);
+                                    }
                                 } else if (((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN)
                                         || ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT)) {
                                     boolean error = false;
