@@ -24,14 +24,20 @@ package org.apache.tomcat.jni;
 public class Poll {
 
     /**
-     * Poll options
+     * Poll return values
      */
-    public static final int APR_POLLIN   = 0x001; /** Can read without blocking */
-    public static final int APR_POLLPRI  = 0x002; /** Priority data available */
-    public static final int APR_POLLOUT  = 0x004; /** Can write without blocking */
-    public static final int APR_POLLERR  = 0x010; /** Pending error */
-    public static final int APR_POLLHUP  = 0x020; /** Hangup occurred */
-    public static final int APR_POLLNVAL = 0x040; /** Descriptor invalid */
+    /** Can read without blocking */
+    public static final int APR_POLLIN   = 0x001;
+    /** Priority data available */
+    public static final int APR_POLLPRI  = 0x002;
+    /** Can write without blocking */
+    public static final int APR_POLLOUT  = 0x004;
+    /** Pending error */
+    public static final int APR_POLLERR  = 0x010;
+    /** Hangup occurred */
+    public static final int APR_POLLHUP  = 0x020;
+    /** Descriptor invalid */
+    public static final int APR_POLLNVAL = 0x040;
 
     /**
      * Pollset Flags
