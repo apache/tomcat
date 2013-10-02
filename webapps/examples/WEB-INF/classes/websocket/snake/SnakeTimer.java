@@ -79,7 +79,15 @@ public class SnakeTimer {
 
     protected static void broadcast(String message) {
         for (Snake snake : SnakeTimer.getSnakes()) {
-            snake.sendMessage(message);
+            try {
+                snake.sendMessage(message);
+            } catch (IllegalStateException ise) {
+                // An ISE can occur if an attempt is made to write to a
+                // WebSocket connection after it has been closed. The
+                // alternative to catching this exception is to synchronise
+                // the writes to the clients along with the addSnake() and
+                // removeSnake() methods that are already synchronised.
+            }
         }
     }
 
