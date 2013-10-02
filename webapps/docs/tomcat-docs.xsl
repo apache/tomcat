@@ -102,6 +102,7 @@
   <xsl:variable name="comments-identifier">
     <xsl:value-of select="$sitedir"/><xsl:value-of select="$subdir"/><xsl:value-of select="substring($filename,1,string-length($filename)-4)"/>
   </xsl:variable>
+  <xsl:if test="not(properties/no-comments)">
   <script type="application/javascript"
       data-comments-identifier="{$comments-identifier}"><![CDATA[
     "use strict"; // Enable strict mode
@@ -134,6 +135,7 @@
       }), false);
     })();
   ]]></script>
+  </xsl:if>
   </head>
 
   <body>
