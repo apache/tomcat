@@ -1826,7 +1826,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                                 } else if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                                         || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
                                         || ((desc[n*2] & Poll.APR_POLLNVAL) == Poll.APR_POLLNVAL)) {
-                                    if (wrapper.isAsync()) {
+                                    if (wrapper.isAsync() || wrapper.isUpgraded()) {
                                         // Must be using non-blocking IO for the socket to be in the
                                         // poller during async processing. Need to trigger error
                                         // handling. Poller may return error codes plus the flags it
