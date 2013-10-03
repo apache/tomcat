@@ -565,7 +565,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 } else {
                     Thread.currentThread().setContextClassLoader
                             (context.getLoader().getClassLoader());
-                }                wrapped.run();
+                }
+                wrapped.run();
             } finally {
                 if (Globals.IS_SECURITY_ENABLED) {
                     PrivilegedAction<Void> pa = new PrivilegedSetTccl(
