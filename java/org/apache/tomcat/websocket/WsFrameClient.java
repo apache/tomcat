@@ -102,7 +102,14 @@ public class WsFrameClient extends WsFrameBase {
             try {
                 processSocketRead();
             } catch (IOException e) {
-                close(e);
+                // Only send a close message on an IOException if the client
+                // has not yet received a close control message from the server
+                // as the IOException may be in response to the client
+                // continuing to send a message after the server sent a close
+                // control message.
+                if (isOpen()) {
+                    close(e);
+                }
             }
         }
 
