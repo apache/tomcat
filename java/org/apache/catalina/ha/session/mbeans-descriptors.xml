@@ -435,11 +435,6 @@
       description="Number of sessions that expired ( doesn't include explicit invalidations )"
       type="long"/>
     <attribute
-      name="expireSessionsOnShutdown"
-      is="true"
-      description="expire all sessions cluster wide as one node goes down"
-      type="boolean"/>
-    <attribute
       name="invalidatedSessions"
       description="Get the list of invalidated session."
       type="[Ljava.lang.String;"/>
