@@ -333,7 +333,11 @@ public class ClassLoaderLogManager extends LogManager {
         ClassLoader classLoader = thread.getContextClassLoader();
         ClassLoaderLogInfo clLogInfo = getClassLoaderInfo(classLoader);
         resetLoggers(clLogInfo);
-        super.reset();
+        // Do not call super.reset(). It should be a NO-OP as all loggers should
+        // have been registered via this manager. Very rarely a
+        // ConcurrentModificationException has been seen in the unit tests when
+        // calling super.reset() and that exception could cause the stop of a
+        // web application to fail.
     }
 
     /**
