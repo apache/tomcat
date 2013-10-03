@@ -94,6 +94,8 @@ public class AprServletInputStream extends AbstractServletInputStream {
         } else if (-result == Status.EAGAIN) {
             eagain = true;
             return 0;
+        } else if (-result == Status.APR_EOF) {
+            throw new EOFException(sm.getString("apr.clientAbort"));
         } else if ((OS.IS_WIN32 || OS.IS_WIN64) &&
                 (-result == Status.APR_OS_START_SYSERR + 10053)) {
             // 10053 on Windows is connection aborted
