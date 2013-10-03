@@ -51,7 +51,11 @@ public class BackupManager extends ClusterManagerBase
 
     protected static long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
 
-    /** Set to true if we don't want the sessions to expire on shutdown */
+    /**
+     * Set to true if we don't want the sessions to expire on shutdown
+     * @deprecated  Unused - will be removed in Tomcat 8.0.x
+     */
+    @Deprecated
     protected boolean mExpireSessionsOnShutdown = true;
 
     /**
@@ -91,11 +95,19 @@ public class BackupManager extends ClusterManagerBase
     public void messageDataReceived(ClusterMessage msg) {
     }
 
+    /**
+     * @deprecated  Unused - will be removed in Tomcat 8.0.x
+     */
+    @Deprecated
     public void setExpireSessionsOnShutdown(boolean expireSessionsOnShutdown)
     {
         mExpireSessionsOnShutdown = expireSessionsOnShutdown;
     }
 
+    /**
+     * @deprecated  Unused - will be removed in Tomcat 8.0.x
+     */
+    @Deprecated
     public boolean getExpireSessionsOnShutdown()
     {
         return mExpireSessionsOnShutdown;
