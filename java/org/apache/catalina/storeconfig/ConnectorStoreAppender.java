@@ -23,7 +23,6 @@ import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -100,10 +99,6 @@ public class ConnectorStoreAppender extends StoreAppender {
             }
             if (value == null) {
                 continue; // Null values are not persisted
-            }
-            // Convert IP addresses to strings so they will be persisted
-            if (value instanceof InetAddress) {
-                value = ((InetAddress) value).getHostAddress();
             }
             if (!isPersistable(value.getClass())) {
                 continue;

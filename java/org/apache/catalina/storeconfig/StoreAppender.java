@@ -21,6 +21,7 @@ import java.beans.IndexedPropertyDescriptor;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.util.Iterator;
 
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -38,7 +39,7 @@ public class StoreAppender {
             Integer.TYPE, Boolean.class, Boolean.TYPE, Byte.class, Byte.TYPE,
             Character.class, Character.TYPE, Double.class, Double.TYPE,
             Float.class, Float.TYPE, Long.class, Long.TYPE, Short.class,
-            Short.TYPE, };
+            Short.TYPE, InetAddress.class };
 
     /**
      * print the closing tag
@@ -328,6 +329,10 @@ public class StoreAppender {
      */
     public void printValue(PrintWriter writer, int indent, String name,
             Object value) {
+        // Convert IP addresses to strings so they will be persisted
+        if (value instanceof InetAddress) {
+            value = ((InetAddress) value).getHostAddress();
+        }
         if (!(value instanceof String)) {
             value = value.toString();
         }
@@ -377,7 +382,7 @@ public class StoreAppender {
     protected boolean isPersistable(Class<?> clazz) {
 
         for (int i = 0; i < persistables.length; i++) {
-            if (persistables[i] == clazz) {
+            if (persistables[i] == clazz || persistables[i].isAssignableFrom(clazz)) {
                 return (true);
             }
         }

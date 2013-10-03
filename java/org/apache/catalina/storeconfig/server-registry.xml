@@ -82,13 +82,13 @@
         <TransientAttribute>ignoreAnnotations</TransientAttribute>
      </Description>
      <Description
-        id="org.apache.catalina.deploy.NamingResources.[GlobalNamingResources]"
+        id="org.apache.catalina.deploy.NamingResourcesImpl.[GlobalNamingResources]"
         tag="GlobalNamingResources"
         standard="true"
         default="false"
         attributes="false"
         children="true"
-        tagClass="org.apache.catalina.deploy.NamingResources"
+        tagClass="org.apache.catalina.deploy.NamingResourcesImpl"
         storeFactoryClass="org.apache.catalina.storeconfig.GlobalNamingResourcesSF">
      </Description>
       <Description
@@ -109,7 +109,7 @@
         default="false"
         attributes="false"
         children="true"
-        tagClass="org.apache.catalina.deploy.NamingResources"
+        tagClass="org.apache.catalina.deploy.NamingResourcesImpl"
         storeFactoryClass="org.apache.catalina.storeconfig.NamingResourcesSF">
      </Description>
      <Description
@@ -168,7 +168,7 @@
         tag="Parameter"
         standard="true"
         default="false"
-        tagClass="org.apache.catalina.deploy.ApplicationParameter"
+        tagClass="org.apache.tomcat.util.descriptor.web.ApplicationParameter"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description
@@ -191,7 +191,7 @@
        <TransientChild>org.apache.catalina.startup.HostConfig</TransientChild>
        <TransientChild>org.apache.catalina.core.StandardHost$MemoryLeakTrackingListener</TransientChild>
        <TransientChild>org.apache.catalina.mapper.MapperListener</TransientChild>
-       <TransientChild>org.apache.catalina.core.ThreadLocalLeakPreventionListener</TransientChild>
+       <TransientChild>org.apache.catalina.core.StandardEngine$AccessLogListener</TransientChild>
      </Description>
      <Description
         id="org.apache.catalina.core.StandardServer.[ServerLifecycleListener]"
@@ -223,28 +223,28 @@
         tag="Environment"
         standard="true"
         default="false"
-        tagClass="org.apache.catalina.deploy.ContextEnvironment"
+        tagClass="org.apache.tomcat.util.descriptor.web.ContextEnvironment"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description
         tag="EJB"
         standard="true"
         default="false"
-        tagClass="org.apache.catalina.deploy.ContextEjb"
+        tagClass="org.apache.tomcat.util.descriptor.web.ContextEjb"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description
         tag="LocalEjb"
         standard="true"
         default="false"
-        tagClass="org.apache.catalina.deploy.ContextLocalEjb"
+        tagClass="org.apache.tomcat.util.descriptor.web.ContextLocalEjb"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description
         tag="Resource"
         standard="true"
         default="false"
-        tagClass="org.apache.catalina.deploy.ContextResource"
+        tagClass="org.apache.tomcat.util.descriptor.web.ContextResource"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
     <Description
@@ -291,21 +291,21 @@
         tag="ResourceEnvRef"
         standard="true"
         default="false"
-        tagClass="org.apache.catalina.deploy.ContextResourceEnvRef"
+        tagClass="org.apache.tomcat.util.descriptor.web.ContextResourceEnvRef"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description
         tag="ResourceLink"
         standard="true"
         default="false"
-        tagClass="org.apache.catalina.deploy.ContextResourceLink"
+        tagClass="org.apache.tomcat.util.descriptor.web.ContextResourceLink"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description
         tag="Transaction"
         standard="true"
         default="false"
-        tagClass="org.apache.catalina.deploy.ContextTransaction"
+        tagClass="org.apache.tomcat.util.descriptor.web.ContextTransaction"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description
