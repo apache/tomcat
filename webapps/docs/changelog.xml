@@ -56,6 +56,16 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.46 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Only send a WebSocket close message on an IOException if the client has
+        not yet received a close control message from the server as the
+        IOException may be in response to the client continuing to send a
+        message after the server sent a close control message. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <scode>
