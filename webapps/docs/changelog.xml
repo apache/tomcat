@@ -235,6 +235,10 @@
         Modify method signature in ReplicationValve. Cluster instance is not
         necessary to argument of method. (kfujino)
       </scode>
+      <scode>
+        Remove unused <code>expireSessionsOnShutdown</code> attribute in
+        <code>org.apache.catalina.ha.session.BackupManager</code>. (kfujino)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Web applications">

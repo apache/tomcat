@@ -51,9 +51,6 @@ public class BackupManager extends ClusterManagerBase
 
     protected static final long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
 
-    /** Set to true if we don't want the sessions to expire on shutdown */
-    protected boolean mExpireSessionsOnShutdown = true;
-
     /**
      * The name of this manager
      */
@@ -90,17 +87,6 @@ public class BackupManager extends ClusterManagerBase
     @Override
     public void messageDataReceived(ClusterMessage msg) {
     }
-
-    public void setExpireSessionsOnShutdown(boolean expireSessionsOnShutdown)
-    {
-        mExpireSessionsOnShutdown = expireSessionsOnShutdown;
-    }
-
-    public boolean getExpireSessionsOnShutdown()
-    {
-        return mExpireSessionsOnShutdown;
-    }
-
 
     @Override
     public ClusterMessage requestCompleted(String sessionId) {
@@ -256,7 +242,6 @@ public class BackupManager extends ClusterManagerBase
     public ClusterManager cloneFromTemplate() {
         BackupManager result = new BackupManager();
         clone(result);
-        result.mExpireSessionsOnShutdown = mExpireSessionsOnShutdown;
         result.mapSendOptions = mapSendOptions;
         result.rpcTimeout = rpcTimeout;
         result.terminateOnStartFailure = terminateOnStartFailure;
