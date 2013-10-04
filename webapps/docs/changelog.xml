@@ -111,6 +111,11 @@
         Ensure Javadoc comments are associated with the correct elements in
         <code>org.apache.tomcat.jni.Poll</code>. (markt)
       </fix>
+      <add>
+        Expand Context documentation for the use of
+        <code>sessionCookiePath=&quot;/&quot;</code> to make the implications
+        for session fixation protection clearer. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
