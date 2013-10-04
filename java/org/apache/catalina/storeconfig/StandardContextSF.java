@@ -37,7 +37,9 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.core.ThreadLocalLeakPreventionListener;
 import org.apache.catalina.deploy.NamingResourcesImpl;
+import org.apache.catalina.util.ContextName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
@@ -81,6 +83,19 @@ public class StandardContextSF extends StoreFactoryBase {
                         return;
                     }
                 } else if (desc.isExternalOnly()) {
+                    // Set a configFile so that the configuration is actually saved
+                    Context context = ((StandardContext) aContext);
+                    Host host = (Host) context.getParent();
+                    File configBase = host.getConfigBaseFile();
+                    ContextName cn = new ContextName(context.getName());
+                    String baseName = cn.getBaseName();
+                    File xml = new File(configBase, baseName + ".xml");
+                    context.setConfigFile(xml.toURI().toURL());
+                    if (desc.isBackup())
+                        storeWithBackup((StandardContext) aContext);
+                    else
+                        storeContextSeparate(aWriter, indent,
+                                (StandardContext) aContext);
                     return;
                 }
             }
@@ -243,7 +258,13 @@ public class StandardContextSF extends StoreFactoryBase {
             StandardContext context = (StandardContext) aContext;
             // Store nested <Listener> elements
             LifecycleListener listeners[] = context.findLifecycleListeners();
-            storeElementArray(aWriter, indent, listeners);
+            ArrayList<LifecycleListener> listenersArray = new ArrayList<>();
+            for (LifecycleListener listener : listeners) {
+                if (!(listener instanceof ThreadLocalLeakPreventionListener)) {
+                    listenersArray.add(listener);
+                }
+            }
+            storeElementArray(aWriter, indent, listenersArray.toArray());
 
             // Store nested <Valve> elements
             Valve valves[] = context.getPipeline().getValves();
@@ -352,7 +373,7 @@ public class StandardContextSF extends StoreFactoryBase {
                 "conf/web.xml").getCanonicalPath();
         String confHostDefault = new File(configBase, "context.xml.default")
                 .getCanonicalPath();
-        String configFile = new File(context.getConfigFile().toURI()).getCanonicalPath();
+        String configFile = (context.getConfigFile() != null ? new File(context.getConfigFile().toURI()).getCanonicalPath() : null);
         String webxml = "WEB-INF/web.xml" ;
 
         List<String> resource = new ArrayList<>();
