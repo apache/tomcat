@@ -221,5 +221,13 @@ public enum ActionCode {
      * Indicates that the container needs to trigger a call to onWritePossible()
      * for the registered non-blocking write listener.
      */
-    DISPATCH_WRITE
+    DISPATCH_WRITE,
+
+    /**
+     * Execute any non-blocking dispatches that have been registered via
+     * {@link #DISPATCH_READ} or {@link #DISPATCH_WRITE}. Typically required
+     * when the non-blocking listeners are configured on a thread where the
+     * processing wasn't triggered by a read or write event on the socket.
+     */
+    DISPATCH_EXECUTE
 }

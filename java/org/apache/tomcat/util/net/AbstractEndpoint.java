@@ -635,6 +635,17 @@ public abstract class AbstractEndpoint<S> {
             SocketStatus socketStatus, boolean dispatch);
 
 
+    public void executeNonBlockingDispatches(SocketWrapper<S> socketWrapper) {
+        // Synchronise on the socket wrapper to ensure no other threads are
+        // working with the socket
+        synchronized (socketWrapper) {
+            while (socketWrapper.hasNextDispatch()) {
+                DispatchType dispatchType = socketWrapper.getNextDispatch();
+                processSocket(socketWrapper, dispatchType.getSocketStatus(), false);
+            }
+        }
+    }
+
     // ------------------------------------------------------- Lifecycle methods
 
     /*
