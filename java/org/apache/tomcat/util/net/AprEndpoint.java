@@ -852,7 +852,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
     @Override
-    public void processSocketAsync(SocketWrapper<Long> socket,
+    public void processSocket(SocketWrapper<Long> socket,
             SocketStatus status) {
         try {
             synchronized (socket) {
@@ -1065,7 +1065,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         long access = socket.getLastAccess();
                         if (socket.getTimeout() > 0 &&
                                 (now-access)>socket.getTimeout()) {
-                            processSocketAsync(socket,SocketStatus.TIMEOUT);
+                            processSocket(socket,SocketStatus.TIMEOUT);
                         }
                     }
                 }

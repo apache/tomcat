@@ -169,7 +169,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                     long access = socket.getLastAccess();
                     if (socket.getTimeout() > 0 &&
                             (now-access)>socket.getTimeout()) {
-                        processSocketAsync(socket,SocketStatus.TIMEOUT);
+                        processSocket(socket,SocketStatus.TIMEOUT);
                     }
                 }
 
@@ -559,7 +559,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
      *                  Connector.
      */
     @Override
-    public void processSocketAsync(SocketWrapper<Socket> socket,
+    public void processSocket(SocketWrapper<Socket> socket,
             SocketStatus status) {
         try {
             synchronized (socket) {
