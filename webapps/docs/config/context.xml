@@ -448,6 +448,14 @@
         useful for portlet specification implementations) set this attribute to
         <code>/</code> in the global <code>CATALINA_BASE/conf/context.xml</code>
         file.</p>
+        <p>Note: Once one web application using
+        <code>sessionCookiePath=&quot;/&quot;</code> obtains a session, all
+        subsequent sessions for any other web application in the same host also
+        configured with <code>sessionCookiePath=&quot;/&quot;</code> will always
+        use the same session ID. This holds even if the session is invalidated
+        and a new one created. This makes session fixation protection more
+        difficult and requires custom, Tomcat specific code to change the
+        session ID shared by the multiple applications.</p>
       </attribute>
 
       <attribute name="sessionCookiePathUsesTrailingSlash" required="false">
