@@ -37,6 +37,7 @@ import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -605,8 +606,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
     @Override
     public void processSocket(SocketWrapper<NioChannel> socketWrapper,
-            SocketStatus socketStatus) {
-        dispatchForEvent(socketWrapper.getSocket(), socketStatus, true);
+            SocketStatus socketStatus, boolean dispatch) {
+        dispatchForEvent(socketWrapper.getSocket(), socketStatus, dispatch);
     }
 
     public boolean dispatchForEvent(NioChannel socket, SocketStatus status, boolean dispatch) {
@@ -628,7 +629,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             SocketProcessor sc = processorCache.pop();
             if ( sc == null ) sc = new SocketProcessor(socket,status);
             else sc.reset(socket,status);
-            if (dispatch && getExecutor() != null) {
+            Executor executor = getExecutor();
+            if (dispatch && executor != null) {
                 ClassLoader loader = Thread.currentThread().getContextClassLoader();
                 try {
                     //threads should not be created by the webapp classloader
@@ -640,7 +642,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                         Thread.currentThread().setContextClassLoader(
                                 getClass().getClassLoader());
                     }
-                    getExecutor().execute(sc);
+                    executor.execute(sc);
                 } finally {
                     if (Constants.IS_SECURITY_ENABLED) {
                         PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);

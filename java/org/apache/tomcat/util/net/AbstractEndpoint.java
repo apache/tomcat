@@ -628,9 +628,11 @@ public abstract class AbstractEndpoint<S> {
      *
      * @param socketWrapper The socket wrapper to process
      * @param socketStatus  The input status to the processing
+     * @param dispatch      Should the processing be performed on a new
+     *                          container thread
      */
     public abstract void processSocket(SocketWrapper<S> socketWrapper,
-            SocketStatus socketStatus);
+            SocketStatus socketStatus, boolean dispatch);
 
 
     // ------------------------------------------------------- Lifecycle methods

@@ -26,6 +26,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.apache.juli.logging.Log;
@@ -169,7 +170,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                     long access = socket.getLastAccess();
                     if (socket.getTimeout() > 0 &&
                             (now-access)>socket.getTimeout()) {
-                        processSocket(socket,SocketStatus.TIMEOUT);
+                        processSocket(socket, SocketStatus.TIMEOUT, true);
                     }
                 }
 
@@ -549,44 +550,41 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
     }
 
 
-    /**
-     * Process an existing async connection. If processing is required, passes
-     * the wrapped socket to an executor for processing.
-     *
-     * @param socket    The socket associated with the client.
-     * @param status    Only OPEN and TIMEOUT are used. The others are used for
-     *                  Comet requests that are not supported by the BIO (JIO)
-     *                  Connector.
-     */
     @Override
     public void processSocket(SocketWrapper<Socket> socket,
-            SocketStatus status) {
+            SocketStatus status, boolean dispatch) {
         try {
             if (waitingRequests.remove(socket)) {
                 SocketProcessor proc = new SocketProcessor(socket,status);
-                ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                try {
-                    //threads should not be created by the webapp classloader
-                    if (Constants.IS_SECURITY_ENABLED) {
-                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                                getClass().getClassLoader());
-                        AccessController.doPrivileged(pa);
-                    } else {
-                        Thread.currentThread().setContextClassLoader(
-                                getClass().getClassLoader());
+                Executor executor = getExecutor();
+                if (dispatch && executor != null) {
+                    ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                    try {
+                        //threads should not be created by the webapp classloader
+                        if (Constants.IS_SECURITY_ENABLED) {
+                            PrivilegedAction<Void> pa =
+                                    new PrivilegedSetTccl(
+                                    getClass().getClassLoader());
+                            AccessController.doPrivileged(pa);
+                        } else {
+                            Thread.currentThread().setContextClassLoader(
+                                    getClass().getClassLoader());
+                        }
+                        // During shutdown, executor may be null - avoid NPE
+                        if (!running) {
+                            return;
+                        }
+                        getExecutor().execute(proc);
+                    } finally {
+                        if (Constants.IS_SECURITY_ENABLED) {
+                            PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
+                            AccessController.doPrivileged(pa);
+                        } else {
+                            Thread.currentThread().setContextClassLoader(loader);
+                        }
                     }
-                    // During shutdown, executor may be null - avoid NPE
-                    if (!running) {
-                        return;
-                    }
-                    getExecutor().execute(proc);
-                } finally {
-                    if (Constants.IS_SECURITY_ENABLED) {
-                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
-                        AccessController.doPrivileged(pa);
-                    } else {
-                        Thread.currentThread().setContextClassLoader(loader);
-                    }
+                } else {
+                    proc.run();
                 }
             }
         } catch (RejectedExecutionException ree) {

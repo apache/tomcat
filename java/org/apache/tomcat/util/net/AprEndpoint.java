@@ -852,36 +852,35 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
     @Override
-    public void processSocket(SocketWrapper<Long> socket, SocketStatus status) {
+    public void processSocket(SocketWrapper<Long> socket, SocketStatus status,
+            boolean dispatch) {
         try {
             if (waitingRequests.remove(socket)) {
                 SocketProcessor proc = new SocketProcessor(socket, status);
-                ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                try {
-                    //threads should not be created by the webapp classloader
-                    if (Constants.IS_SECURITY_ENABLED) {
-                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                                getClass().getClassLoader());
-                        AccessController.doPrivileged(pa);
-                    } else {
-                        Thread.currentThread().setContextClassLoader(
-                                getClass().getClassLoader());
-                    }
-                    Executor executor = getExecutor();
-                    if (executor == null) {
-                        log.warn(sm.getString("endpoint.warn.noExector",
-                                socket, status));
-                        return;
-                    } else {
+                Executor executor = getExecutor();
+                if (dispatch && executor != null) {
+                    ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                    try {
+                        //threads should not be created by the webapp classloader
+                        if (Constants.IS_SECURITY_ENABLED) {
+                            PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                                    getClass().getClassLoader());
+                            AccessController.doPrivileged(pa);
+                        } else {
+                            Thread.currentThread().setContextClassLoader(
+                                    getClass().getClassLoader());
+                        }
                         executor.execute(proc);
+                    } finally {
+                        if (Constants.IS_SECURITY_ENABLED) {
+                            PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
+                            AccessController.doPrivileged(pa);
+                        } else {
+                            Thread.currentThread().setContextClassLoader(loader);
+                        }
                     }
-                } finally {
-                    if (Constants.IS_SECURITY_ENABLED) {
-                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
-                        AccessController.doPrivileged(pa);
-                    } else {
-                        Thread.currentThread().setContextClassLoader(loader);
-                    }
+                } else {
+                    proc.run();
                 }
             }
         } catch (RejectedExecutionException ree) {
@@ -1062,7 +1061,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         long access = socket.getLastAccess();
                         if (socket.getTimeout() > 0 &&
                                 (now-access)>socket.getTimeout()) {
-                            processSocket(socket,SocketStatus.TIMEOUT);
+                            processSocket(socket, SocketStatus.TIMEOUT, true);
                         }
                     }
                 }

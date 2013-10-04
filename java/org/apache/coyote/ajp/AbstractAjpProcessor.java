@@ -522,12 +522,12 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
             socketWrapper.clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
-                endpoint.processSocket(socketWrapper, SocketStatus.OPEN_READ);
+                endpoint.processSocket(socketWrapper, SocketStatus.OPEN_READ, true);
             }
 
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
-                endpoint.processSocket(socketWrapper, SocketStatus.OPEN_READ);
+                endpoint.processSocket(socketWrapper, SocketStatus.OPEN_READ, true);
             }
 
         } else if (actionCode == ActionCode.ASYNC_DISPATCHED) {
