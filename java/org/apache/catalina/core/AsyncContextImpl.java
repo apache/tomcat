@@ -261,7 +261,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             logDebug("start      ");
         }
         check();
-        Runnable wrapper = new RunnableWrapper(run, context);
+        Runnable wrapper = new RunnableWrapper(run, context, this.request.getCoyoteRequest());
         this.request.getCoyoteRequest().action(ActionCode.ASYNC_RUN, wrapper);
     }
 
@@ -539,12 +539,15 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     private static class RunnableWrapper implements Runnable {
 
-        private Runnable wrapped = null;
-        private Context context = null;
+        private final Runnable wrapped;
+        private final Context context;
+        private final org.apache.coyote.Request coyoteRequest;
 
-        public RunnableWrapper(Runnable wrapped, Context ctxt) {
+        public RunnableWrapper(Runnable wrapped, Context ctxt,
+                org.apache.coyote.Request coyoteRequest) {
             this.wrapped = wrapped;
             this.context = ctxt;
+            this.coyoteRequest = coyoteRequest;
         }
 
         @Override
@@ -576,8 +579,12 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                     Thread.currentThread().setContextClassLoader(oldCL);
                 }
             }
-        }
 
+            // Since this runnable is not executing as a result of a socket
+            // event, we need to ensure that any registered dispatches are
+            // executed.
+            coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
+        }
     }
 
 

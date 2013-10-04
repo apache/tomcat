@@ -834,6 +834,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             socketWrapper.addDispatch(DispatchType.NON_BLOCKING_READ);
         } else if (actionCode == ActionCode.DISPATCH_WRITE) {
             socketWrapper.addDispatch(DispatchType.NON_BLOCKING_WRITE);
+        } else if (actionCode == ActionCode.DISPATCH_EXECUTE) {
+            getEndpoint().executeNonBlockingDispatches(socketWrapper);
         } else {
             actionInternal(actionCode, param);
         }

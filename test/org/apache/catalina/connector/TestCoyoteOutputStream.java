@@ -159,11 +159,6 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
             @Override
             public void run() {
                 sos.setWriteListener(new MyWriteListener(asyncCtxt, sos));
-                try {
-                    doAsyncWrite(asyncCtxt, sos);
-                } catch (IOException ioe) {
-                    throw new RuntimeException(ioe);
-                }
             }
         }
 
