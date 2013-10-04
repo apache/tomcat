@@ -852,38 +852,35 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
     @Override
-    public void processSocket(SocketWrapper<Long> socket,
-            SocketStatus status) {
+    public void processSocket(SocketWrapper<Long> socket, SocketStatus status) {
         try {
-            synchronized (socket) {
-                if (waitingRequests.remove(socket)) {
-                    SocketProcessor proc = new SocketProcessor(socket, status);
-                    ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                    try {
-                        //threads should not be created by the webapp classloader
-                        if (Constants.IS_SECURITY_ENABLED) {
-                            PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                                    getClass().getClassLoader());
-                            AccessController.doPrivileged(pa);
-                        } else {
-                            Thread.currentThread().setContextClassLoader(
-                                    getClass().getClassLoader());
-                        }
-                        Executor executor = getExecutor();
-                        if (executor == null) {
-                            log.warn(sm.getString("endpoint.warn.noExector",
-                                    socket, status));
-                            return;
-                        } else {
-                            executor.execute(proc);
-                        }
-                    } finally {
-                        if (Constants.IS_SECURITY_ENABLED) {
-                            PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
-                            AccessController.doPrivileged(pa);
-                        } else {
-                            Thread.currentThread().setContextClassLoader(loader);
-                        }
+            if (waitingRequests.remove(socket)) {
+                SocketProcessor proc = new SocketProcessor(socket, status);
+                ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                try {
+                    //threads should not be created by the webapp classloader
+                    if (Constants.IS_SECURITY_ENABLED) {
+                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                                getClass().getClassLoader());
+                        AccessController.doPrivileged(pa);
+                    } else {
+                        Thread.currentThread().setContextClassLoader(
+                                getClass().getClassLoader());
+                    }
+                    Executor executor = getExecutor();
+                    if (executor == null) {
+                        log.warn(sm.getString("endpoint.warn.noExector",
+                                socket, status));
+                        return;
+                    } else {
+                        executor.execute(proc);
+                    }
+                } finally {
+                    if (Constants.IS_SECURITY_ENABLED) {
+                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
+                        AccessController.doPrivileged(pa);
+                    } else {
+                        Thread.currentThread().setContextClassLoader(loader);
                     }
                 }
             }
