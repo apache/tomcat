@@ -887,8 +887,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     }
                 }
             }
-        } catch (RejectedExecutionException x) {
-            log.warn("Socket processing request was rejected for: "+socket, x);
+        } catch (RejectedExecutionException ree) {
+            log.warn(sm.getString("endpoint.executor.fail", socket) , ree);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             // This means we got an OOM or similar creating a thread, or that
