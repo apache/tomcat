@@ -604,7 +604,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
 
     @Override
-    public void processSocketAsync(SocketWrapper<NioChannel> socketWrapper,
+    public void processSocket(SocketWrapper<NioChannel> socketWrapper,
             SocketStatus socketStatus) {
         dispatchForEvent(socketWrapper.getSocket(), socketStatus, true);
     }

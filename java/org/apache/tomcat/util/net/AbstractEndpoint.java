@@ -621,7 +621,15 @@ public abstract class AbstractEndpoint<S> {
 
     // ---------------------------------------------- Request processing methods
 
-    public abstract void processSocketAsync(SocketWrapper<S> socketWrapper,
+    /**
+     * Process the given SocketWrapper with the given status. Used to trigger
+     * processing as if the Poller (for those endpoints that have one)
+     * selected the socket.
+     *
+     * @param socketWrapper The socket wrapper to process
+     * @param socketStatus  The input status to the processing
+     */
+    public abstract void processSocket(SocketWrapper<S> socketWrapper,
             SocketStatus socketStatus);
 
 
