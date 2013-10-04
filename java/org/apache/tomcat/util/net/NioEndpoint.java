@@ -652,8 +652,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             } else {
                 sc.run();
             }
-        } catch (RejectedExecutionException rx) {
-            log.warn("Socket processing request was rejected for:"+socket,rx);
+        } catch (RejectedExecutionException ree) {
+            log.warn(sm.getString("endpoint.executor.fail", socket), ree);
             return false;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);

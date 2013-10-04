@@ -581,7 +581,6 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                             return;
                         }
                         getExecutor().execute(proc);
-                        //TODO gotta catch RejectedExecutionException and properly handle it
                     } finally {
                         if (Constants.IS_SECURITY_ENABLED) {
                             PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
@@ -592,6 +591,8 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                     }
                 }
             }
+        } catch (RejectedExecutionException ree) {
+            log.warn(sm.getString("endpoint.executor.fail", socket) , ree);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             // This means we got an OOM or similar creating a thread, or that
