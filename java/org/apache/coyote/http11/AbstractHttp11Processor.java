@@ -1044,7 +1044,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     // set the status to 500 and set the errorException.
                     // If we fail here, then the response is likely already
                     // committed, so we can't try and set headers.
-                    if(!error) { // Avoid checking twice.
+                    if(keepAlive && !error) { // Avoid checking twice.
                         error = response.getErrorException() != null ||
                                 (!isAsync() &&
                                 statusDropsConnection(response.getStatus()));
