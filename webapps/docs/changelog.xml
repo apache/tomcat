@@ -77,6 +77,12 @@
         closed in the APR/native connector are removed and then closed in a
         thread-safe manner. (markt)
       </fix>
+      <fix>
+        Ensure that unused input is not swallowed when keep-alive is disabled
+        and the connection enters an error state. This allows the connection to
+        be closed immediately rather than having to wait for the client to first
+        send any remaining data that is only going to be ignored. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
