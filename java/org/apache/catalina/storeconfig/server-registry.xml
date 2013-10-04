@@ -57,7 +57,7 @@
         default="true"
         externalAllowed="true"
         externalOnly="true"
-         storeSeparate="true"
+        storeSeparate="true"
         backup="true"
         children="true"
         tagClass="org.apache.catalina.core.StandardContext"
@@ -259,8 +259,7 @@
         <TransientAttribute>cacheTTL</TransientAttribute>
         <TransientAttribute>cacheMaxSize</TransientAttribute>
         <TransientAttribute>cacheMaxObjectSize</TransientAttribute>
-        <TransientAttribute>docBase</TransientAttribute>
-         <TransientAttribute>cached</TransientAttribute>
+        <TransientAttribute>cached</TransientAttribute>
         <TransientAttribute>caseSensitive</TransientAttribute>
      </Description>
     <Description
