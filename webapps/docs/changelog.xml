@@ -64,6 +64,11 @@
         IOException may be in response to the client continuing to send a
         message after the server sent a close control message. (markt)
       </fix>
+      <fix>
+        <bug>49134</bug>: Ensure nested realms are correctly destroyed, when a
+        CombinedRealm is destroyed. This ensures that the associated MBeans are
+        deregistered. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
