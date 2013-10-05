@@ -17,8 +17,8 @@
 package org.apache.tomcat.util.net;
 
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -62,7 +62,7 @@ public class SocketWrapper<E> {
      */
     private final Object writeThreadLock = new Object();
 
-    private Set<DispatchType> dispatches = new LinkedHashSet<>();
+    private Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
 
     public SocketWrapper(E socket) {
         this.socket = socket;
@@ -114,22 +114,22 @@ public class SocketWrapper<E> {
     }
     public Object getWriteThreadLock() { return writeThreadLock; }
     public void addDispatch(DispatchType dispatchType) {
-        dispatches.add(dispatchType);
+        synchronized (dispatches) {
+            dispatches.add(dispatchType);
+        }
     }
-    public boolean hasNextDispatch() {
-        return dispatches.size() > 0;
-    }
-    public DispatchType getNextDispatch() {
-        DispatchType result = null;
-        Iterator<DispatchType> iter = dispatches.iterator();
-        if (iter.hasNext()) {
-            result = iter.next();
-            iter.remove();
+    public Iterator<DispatchType> getIteratorAndClearDispatches() {
+        Iterator<DispatchType> result;
+        synchronized (dispatches) {
+            result = dispatches.iterator();
+            dispatches.clear();
         }
         return result;
     }
     public void clearDispatches() {
-        dispatches.clear();
+        synchronized (dispatches) {
+            dispatches.clear();
+        }
     }
 
     public void reset(E socket, long timeout) {

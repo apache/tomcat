@@ -18,6 +18,7 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -616,14 +617,19 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 initSsl(wrapper, processor);
 
                 SocketState state = SocketState.CLOSED;
+                Iterator<DispatchType> dispatches = null;
                 do {
-                    if (wrapper.hasNextDispatch()) {
-                        // Associate with the processor with the connection as
-                        // these calls may result in a nested call to process()
-                        connections.put(socket, processor);
-                        DispatchType nextDispatch = wrapper.getNextDispatch();
-                        state = processor.asyncDispatch(
-                                nextDispatch.getSocketStatus());
+                    if (dispatches != null) {
+                        if (dispatches.hasNext()) {
+                            // Associate with the processor with the connection as
+                            // these calls may result in a nested call to process()
+                            connections.put(socket, processor);
+                            DispatchType nextDispatch = dispatches.next();
+                            state = processor.asyncDispatch(
+                                    nextDispatch.getSocketStatus());
+                        } else {
+                            dispatches = null;
+                        }
                     } else if (status == SocketStatus.DISCONNECT &&
                             !processor.isComet()) {
                         // Do nothing here, just wait for it to get recycled
@@ -670,9 +676,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                                 "], Status in: [" + status +
                                 "], State out: [" + state + "]");
                     }
+                    if (dispatches == null || !dispatches.hasNext()) {
+                        dispatches = wrapper.getIteratorAndClearDispatches();
+                    }
                 } while (state == SocketState.ASYNC_END ||
                         state == SocketState.UPGRADING ||
-                        wrapper.hasNextDispatch() && state != SocketState.CLOSED);
+                        dispatches.hasNext() && state != SocketState.CLOSED);
 
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the

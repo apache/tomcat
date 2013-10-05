@@ -23,6 +23,7 @@ import java.net.InetSocketAddress;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -636,13 +637,11 @@ public abstract class AbstractEndpoint<S> {
 
 
     public void executeNonBlockingDispatches(SocketWrapper<S> socketWrapper) {
-        // Synchronise on the socket wrapper to ensure no other threads are
-        // working with the socket
-        synchronized (socketWrapper) {
-            while (socketWrapper.hasNextDispatch()) {
-                DispatchType dispatchType = socketWrapper.getNextDispatch();
-                processSocket(socketWrapper, dispatchType.getSocketStatus(), false);
-            }
+        Iterator<DispatchType> dispatches = socketWrapper.getIteratorAndClearDispatches();
+
+        while (dispatches.hasNext()) {
+            DispatchType dispatchType = dispatches.next();
+            processSocket(socketWrapper, dispatchType.getSocketStatus(), false);
         }
     }
 
