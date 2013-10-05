@@ -33,7 +33,11 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.Realm;
 import org.apache.catalina.core.StandardHost;
+import org.apache.catalina.realm.CombinedRealm;
+import org.apache.catalina.realm.NullRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.modeler.Registry;
@@ -108,6 +112,10 @@ public class TestRegistration extends TomcatBaseTest {
                 ",host=" + host,
             "Tomcat:type=WebResourceRoot,context=" + context +
                 ",host=" + host,
+            "Tomcat:type=Realm,realmPath=/realm0,context=" + context +
+                ",host=" + host,
+            "Tomcat:type=Realm,realmPath=/realm0/realm0,context=" + context +
+                ",host=" + host,
         };
     }
 
@@ -146,7 +154,13 @@ public class TestRegistration extends TomcatBaseTest {
         if (!contextDir.mkdirs() && !contextDir.isDirectory()) {
             fail("Failed to create: [" + contextDir.toString() + "]");
         }
-        tomcat.addContext(contextName, contextDir.getAbsolutePath());
+        Context ctx = tomcat.addContext(contextName, contextDir.getAbsolutePath());
+
+        CombinedRealm combinedRealm = new CombinedRealm();
+        Realm nullRealm = new NullRealm();
+        combinedRealm.addRealm(nullRealm);
+        ctx.setRealm(combinedRealm);
+
         tomcat.start();
 
         // Verify there are no Catalina MBeans

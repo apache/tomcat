@@ -245,6 +245,20 @@ public class CombinedRealm extends RealmBase {
 
 
     /**
+     * Ensure child Realms are destroyed when this Realm is destroyed.
+     */
+    @Override
+    protected void destroyInternal() throws LifecycleException {
+        for (Realm realm : realms) {
+            if (realm instanceof Lifecycle) {
+                ((Lifecycle) realm).destroy();
+            }
+        }
+        super.destroyInternal();
+    }
+
+
+    /**
      * Return the Principal associated with the specified chain of X509
      * client certificates.  If there is none, return <code>null</code>.
      *
