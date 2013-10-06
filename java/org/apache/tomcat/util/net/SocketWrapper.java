@@ -119,8 +119,13 @@ public class SocketWrapper<E> {
         }
     }
     public Iterator<DispatchType> getIteratorAndClearDispatches() {
+        // Note: Logic in AbstractProtocol depends on this method only returning
+        // a non-null value if the iterator is non-empty. i.e. it should never
+        // return an empty iterator.
         Iterator<DispatchType> result;
         synchronized (dispatches) {
+            // Synchronized as the generation of the iterator and the clearing
+            // of dispatches needs to be an atomic operation.
             result = dispatches.iterator();
             if (result.hasNext()) {
                 dispatches.clear();
