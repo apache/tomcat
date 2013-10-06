@@ -54,28 +54,28 @@ public final class Hello extends HttpServlet {
       throws IOException, ServletException {
 
         response.setContentType("text/html");
-		response.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
         try (PrintWriter writer = response.getWriter()) {
 
-			writer.println("<!DOCTYPE html><html>");
-			writer.println("<head>");
-			writer.println("<meta charset=\"UTF-8\" />");
-			writer.println("<title>Sample Application Servlet Page</title>");
-			writer.println("</head>");
-			writer.println("<body>");
+            writer.println("<!DOCTYPE html><html>");
+            writer.println("<head>");
+            writer.println("<meta charset=\"UTF-8\" />");
+            writer.println("<title>Sample Application Servlet Page</title>");
+            writer.println("</head>");
+            writer.println("<body>");
 
 
-			writer.println("<div style=\"float: left; padding: 10px;\">");
-			writer.println("<img src=\"images/tomcat.gif\" alt=\"\" />");
-			writer.println("</div>");
-			writer.println("<h1>Sample Application Servlet</h1>");
-			writer.println("<p>");
-			writer.println("This is the output of a servlet that is part of");
-			writer.println("the Hello, World application.");
-			writer.println("</p>");
+            writer.println("<div style=\"float: left; padding: 10px;\">");
+            writer.println("<img src=\"images/tomcat.gif\" alt=\"\" />");
+            writer.println("</div>");
+            writer.println("<h1>Sample Application Servlet</h1>");
+            writer.println("<p>");
+            writer.println("This is the output of a servlet that is part of");
+            writer.println("the Hello, World application.");
+            writer.println("</p>");
 
-			writer.println("</body>");
-			writer.println("</html>");
+            writer.println("</body>");
+            writer.println("</html>");
         }
     }
 
