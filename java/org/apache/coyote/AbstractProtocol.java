@@ -620,16 +620,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 Iterator<DispatchType> dispatches = null;
                 do {
                     if (dispatches != null) {
-                        if (dispatches.hasNext()) {
-                            // Associate with the processor with the connection as
-                            // these calls may result in a nested call to process()
-                            connections.put(socket, processor);
-                            DispatchType nextDispatch = dispatches.next();
-                            state = processor.asyncDispatch(
-                                    nextDispatch.getSocketStatus());
-                        } else {
-                            dispatches = null;
-                        }
+                        // Associate with the processor with the connection as
+                        // these calls may result in a nested call to process()
+                        connections.put(socket, processor);
+                        DispatchType nextDispatch = dispatches.next();
+                        state = processor.asyncDispatch(
+                                nextDispatch.getSocketStatus());
                     } else if (status == SocketStatus.DISCONNECT &&
                             !processor.isComet()) {
                         // Do nothing here, just wait for it to get recycled
@@ -677,11 +673,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                                 "], State out: [" + state + "]");
                     }
                     if (dispatches == null || !dispatches.hasNext()) {
+                        // Only returns non-null iterator if there are
+                        // dispatches to process.
                         dispatches = wrapper.getIteratorAndClearDispatches();
                     }
                 } while (state == SocketState.ASYNC_END ||
                         state == SocketState.UPGRADING ||
-                        dispatches != null && dispatches.hasNext() && state != SocketState.CLOSED);
+                        dispatches != null && state != SocketState.CLOSED);
 
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the
