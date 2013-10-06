@@ -122,7 +122,11 @@ public class SocketWrapper<E> {
         Iterator<DispatchType> result;
         synchronized (dispatches) {
             result = dispatches.iterator();
-            dispatches.clear();
+            if (result.hasNext()) {
+                dispatches.clear();
+            } else {
+                result = null;
+            }
         }
         return result;
     }
