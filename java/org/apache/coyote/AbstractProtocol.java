@@ -681,7 +681,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     }
                 } while (state == SocketState.ASYNC_END ||
                         state == SocketState.UPGRADING ||
-                        dispatches.hasNext() && state != SocketState.CLOSED);
+                        dispatches != null && dispatches.hasNext() && state != SocketState.CLOSED);
 
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the
