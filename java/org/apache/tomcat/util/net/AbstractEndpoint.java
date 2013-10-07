@@ -637,11 +637,31 @@ public abstract class AbstractEndpoint<S> {
 
 
     public void executeNonBlockingDispatches(SocketWrapper<S> socketWrapper) {
-        Iterator<DispatchType> dispatches = socketWrapper.getIteratorAndClearDispatches();
+        /*
+         * This method is called when non-blocking IO is initiated by defining
+         * a read and/or write listener in a non-container thread. It is called
+         * once the non-container thread completes so that the first calls to
+         * onWritePossible() and/or onDataAvailable() as appropriate are made by
+         * the container.
+         *
+         * Processing the dispatches requires (for BIO and APR/native at least)
+         * that the socket has been added to the waitingRequests queue. This may
+         * not have occurred by the time that the non-container thread completes
+         * triggering the call to this method. Therefore, the coded syncs on the
+         * SocketWrapper as the container thread that initiated this
+         * non-container thread holds a lock on the SocketWrapper. The container
+         * thread will add the socket to the waitingRequests queue before
+         * releasing the lock on the socketWrapper. Therefore, by obtaining the
+         * lock on socketWrapper before processing the dispatches, we can be
+         * sure that the socket has been added to the waitingRequests queue.
+         */
+        synchronized (socketWrapper) {
+            Iterator<DispatchType> dispatches = socketWrapper.getIteratorAndClearDispatches();
 
-        while (dispatches != null && dispatches.hasNext()) {
-            DispatchType dispatchType = dispatches.next();
-            processSocket(socketWrapper, dispatchType.getSocketStatus(), false);
+            while (dispatches != null && dispatches.hasNext()) {
+                DispatchType dispatchType = dispatches.next();
+                processSocket(socketWrapper, dispatchType.getSocketStatus(), false);
+            }
         }
     }
 
