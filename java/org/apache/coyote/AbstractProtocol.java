@@ -620,7 +620,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 Iterator<DispatchType> dispatches = null;
                 do {
                     if (dispatches != null) {
-                        // Associate with the processor with the connection as
+                        // Associate the processor with the connection as
                         // these calls may result in a nested call to process()
                         connections.put(socket, processor);
                         DispatchType nextDispatch = dispatches.next();
