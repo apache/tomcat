@@ -175,7 +175,7 @@
       </add>
       <fix>
         <bug>55620</bug>: Enable Tomcat to start when either $CATALINA_HOME
-        and/or $CATALINA_BASE contains a comma character. (markt) 
+        and/or $CATALINA_BASE contains a comma character. (markt)
       </fix>
     </changelog>
   </subsection>
