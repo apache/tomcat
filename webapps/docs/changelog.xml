@@ -121,6 +121,11 @@
         <code>sessionCookiePath=&quot;/&quot;</code> to make the implications
         for session fixation protection clearer. (markt)
       </add>
+      <fix>
+        <bug>55629</bug>: Ensure that the JMX notification listener added during
+        initialization of the servlet org.apache.catalina.manager.StatusManagerServlet
+        is removed in the destroy phase. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>
