@@ -639,7 +639,7 @@ public abstract class AbstractEndpoint<S> {
     public void executeNonBlockingDispatches(SocketWrapper<S> socketWrapper) {
         Iterator<DispatchType> dispatches = socketWrapper.getIteratorAndClearDispatches();
 
-        while (dispatches.hasNext()) {
+        while (dispatches != null && dispatches.hasNext()) {
             DispatchType dispatchType = dispatches.next();
             processSocket(socketWrapper, dispatchType.getSocketStatus(), false);
         }
