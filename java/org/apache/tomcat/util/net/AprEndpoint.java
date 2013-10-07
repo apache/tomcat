@@ -1881,7 +1881,16 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                                             ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) &&
                                             !processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
                                         // Close socket and clear pool
+                                        error = true;
                                         closeSocket(desc[n*2+1]);
+                                    }
+                                    if (!error) {
+                                        // If socket was registered for multiple events but
+                                        // only some of the occurred, re-register for the
+                                        // remaining events.
+                                        if (wrapper.pollerFlags != 0) {
+                                            add(desc[n*2+1], 1, wrapper.pollerFlags);
+                                        }
                                     }
                                 } else {
                                     // Unknown event
