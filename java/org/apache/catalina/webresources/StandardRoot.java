@@ -420,7 +420,7 @@ public class StandardRoot extends LifecycleMBeanBase
     protected void initInternal() throws LifecycleException {
         super.initInternal();
 
-        // Ensure support for jar:war:file:/ URKLs will be available (required
+        // Ensure support for jar:war:file:/ URLs will be available (required
         // for resource JARs in packed WAR files).
         TomcatURLStreamHandlerFactory.register();
 
