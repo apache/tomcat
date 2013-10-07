@@ -165,7 +165,15 @@ public class StatusManagerServlet
     @Override
     public void destroy() {
 
-        // No actions necessary
+        // Unregister with MBean server
+        String onStr = "JMImplementation:type=MBeanServerDelegate";
+        ObjectName objectName;
+        try {
+            objectName = new ObjectName(onStr);
+            mBeanServer.removeNotificationListener(objectName, this, null, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
