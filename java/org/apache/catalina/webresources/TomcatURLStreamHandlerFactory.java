@@ -23,47 +23,69 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-// TODO Add hook to enable user registered factories to be unloaded on web
-// application stop.
-public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory{
+public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
 
     private static final String WAR_PROTOCOL = "war";
 
     // Singleton instance
-    private static TomcatURLStreamHandlerFactory instance =
-            new TomcatURLStreamHandlerFactory();
+    private static volatile TomcatURLStreamHandlerFactory instance = null;
 
     /**
-     * Obtain a reference to the singleton instance,
+     * Obtain a reference to the singleton instance. It is recommended that
+     * callers check the value of {@link #isRegistered()} before using the
+     * returned instance.
      */
     public static TomcatURLStreamHandlerFactory getInstance() {
+        getInstanceInternal(true);
         return instance;
     }
 
+
+    private static TomcatURLStreamHandlerFactory getInstanceInternal(boolean register) {
+        // Double checked locking. OK because instance is volatile.
+        if (instance == null) {
+            synchronized (TomcatURLStreamHandlerFactory.class) {
+                if (instance == null) {
+                    instance = new TomcatURLStreamHandlerFactory(register);
+                }
+            }
+        }
+        return instance;
+    }
+
+
+    private final boolean registered;
 
     // List of factories for application defined stream handler factories.
     private List<URLStreamHandlerFactory> userFactories =
             new CopyOnWriteArrayList<>();
 
-
     /**
      * Register this factory with the JVM. May be called more than once. The
      * implementation ensures that registration only occurs once.
+     *
+     * @returns <code>true</code> if the factory is already registered with the
+     *          JVM or was successfully registered as a result of this call.
+     *          <code>false</code> if the factory was disabled prior to this
+     *          call.
      */
-    public static void register() {
-        // Calling this method loads this class which in turn triggers all the
-        // necessary registration.
+    public static boolean register() {
+        return getInstanceInternal(true).isRegistered();
     }
 
 
     /**
-     * Since the JVM only allows a single call to
-     * {@link URL#setURLStreamHandlerFactory(URLStreamHandlerFactory)} and
-     * Tomcat needs to register a handler, provide a mechanism to allow
-     * applications to register their own handlers.
+     * Prevent this this factory from registering with the JVM. May be called
+     * more than once.
+     *
+     * @returns <code>true</code> if the factory is already disabled or was
+     *          successfully disabled as a result of this call.
+     *          <code>false</code> if the factory was already registered prior
+     *          to this call.
+
      */
-    public static void addUserFactory(URLStreamHandlerFactory factory) {
-        instance.userFactories.add(factory);
+    public static boolean disable() {
+        return !getInstanceInternal(false).isRegistered();
     }
 
 
@@ -87,11 +109,30 @@ public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory{
     }
 
 
-    private TomcatURLStreamHandlerFactory() {
+    private TomcatURLStreamHandlerFactory(boolean register) {
         // Hide default constructor
         // Singleton pattern to ensure there is only one instance of this
         // factory
-        URL.setURLStreamHandlerFactory(this);
+        this.registered = register;
+        if (register) {
+            URL.setURLStreamHandlerFactory(this);
+        }
+    }
+
+
+    public boolean isRegistered() {
+        return registered;
+    }
+
+
+    /**
+     * Since the JVM only allows a single call to
+     * {@link URL#setURLStreamHandlerFactory(URLStreamHandlerFactory)} and
+     * Tomcat needs to register a handler, provide a mechanism to allow
+     * applications to register their own handlers.
+     */
+    public void addUserFactory(URLStreamHandlerFactory factory) {
+        userFactories.add(factory);
     }
 
 
