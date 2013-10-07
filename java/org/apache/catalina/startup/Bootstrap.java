@@ -24,7 +24,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityClassLoad;
@@ -51,18 +52,15 @@ public final class Bootstrap {
 
     private static final Log log = LogFactory.getLog(Bootstrap.class);
 
-
-    // ------------------------------------------------------- Static Variables
-
-
     /**
      * Daemon object used by main.
      */
     private static Bootstrap daemon = null;
 
-
     private static final File catalinaBaseFile;
     private static final File catalinaHomeFile;
+
+    private static final Pattern PATH_PATTERN = Pattern.compile("(\".*?\")|(([^,])*)");
 
     static {
         // Will always be non-null
@@ -172,13 +170,9 @@ public final class Bootstrap {
 
         List<Repository> repositories = new ArrayList<>();
 
-        StringTokenizer tokenizer = new StringTokenizer(value, ",");
-        while (tokenizer.hasMoreElements()) {
-            String repository = tokenizer.nextToken().trim();
-            if (repository.length() == 0) {
-                continue;
-            }
+        String[] repositoryPaths = getPaths(value);
 
+        for (String repository : repositoryPaths) {
             // Check for a JAR URL repository
             try {
                 @SuppressWarnings("unused")
@@ -207,6 +201,7 @@ public final class Bootstrap {
 
         return ClassLoaderFactory.createClassLoader(repositories, parent);
     }
+
 
     /**
      * System property replacement in the given string.
@@ -561,5 +556,31 @@ public final class Bootstrap {
             throw (VirtualMachineError) t;
         }
         // All other instances of Throwable will be silently swallowed
+    }
+
+
+    // Protected for unit testing
+    protected static String[] getPaths(String value) {
+
+        List<String> result = new ArrayList<>();
+        Matcher matcher = PATH_PATTERN.matcher(value);
+
+        while (matcher.find()) {
+            String path = value.substring(matcher.start(), matcher.end());
+
+            path = path.trim();
+
+            if (path.startsWith("\"") && path.length() > 1) {
+                path = path.substring(1, path.length() - 1);
+                path = path.trim();
+            }
+
+            if (path.length() == 0) {
+                continue;
+            }
+
+            result.add(path);
+        }
+        return result.toArray(new String[result.size()]);
     }
 }
