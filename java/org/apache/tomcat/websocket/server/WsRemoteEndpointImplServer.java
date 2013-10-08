@@ -92,11 +92,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     if (close) {
                         close();
                     }
-                    // Setting the result marks this (partial) message as
-                    // complete which means the next one may be sent which
-                    // could update the value of the handler. Therefore, keep a
-                    // local copy before signalling the end of the (partial)
-                    // message.
                     clearHandler(null);
                     break;
                 }
@@ -150,6 +145,11 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
 
     private void clearHandler(Throwable t) {
+        // Setting the result marks this (partial) message as
+        // complete which means the next one may be sent which
+        // could update the value of the handler. Therefore, keep a
+        // local copy before signalling the end of the (partial)
+        // message.
         SendHandler sh = handler;
         handler = null;
         if (sh != null) {
