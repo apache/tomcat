@@ -260,9 +260,9 @@
         the documentation web application. Patches provided by Konstantin
         Preißer. (markt)
       </update>
-	  <add>
+      <add>
         <bug>55639</bug>: Add a Drawboard WebSocket example. (kpreisser)
-	  </add>
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">
