@@ -714,7 +714,10 @@
         is likely to result in instability. As such, enabling this should be
         viewed as an option of last resort in a development environment and is
         not recommended in a production environment. If not specified, the
-        default value of <code>false</code> will be used.</p>
+        default value of <code>false</code> will be used. If this feature is
+        enabled, web applications may take up to two seconds longer to stop as
+        executor threads are given up to two seconds to stop gracefully before
+        <code>Thread.stop()</code> is called on any remaining threads.</p>
       </attribute>
 
       <attribute name="clearReferencesStopTimerThreads" required = "false">
