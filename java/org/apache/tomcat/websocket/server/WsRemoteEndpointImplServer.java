@@ -89,18 +89,18 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 }
                 if (complete) {
                     wsWriteTimeout.unregister(this);
+                    clearHandler(null);
                     if (close) {
                         close();
                     }
-                    clearHandler(null);
                     break;
                 }
             }
 
         } catch (IOException ioe) {
             wsWriteTimeout.unregister(this);
-            close();
             clearHandler(ioe);
+            close();
         }
         if (!complete) {
             // Async write is in progress
