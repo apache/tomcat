@@ -125,7 +125,7 @@ public final class Room {
     /**
      * The maximum number of players that can join this room.
      */
-    private static final int MAX_PLAYER_COUNT = 2;
+    private static final int MAX_PLAYER_COUNT = 100;
 
     /**
      * List of all currently joined players.
@@ -168,7 +168,8 @@ public final class Room {
      */
     public Player createAndAddPlayer(Client client) {
         if (players.size() >= MAX_PLAYER_COUNT) {
-            throw new IllegalStateException("MAX_PLAYER_COUNT has been reached.");
+            throw new IllegalStateException("Maximum player count ("
+                    + MAX_PLAYER_COUNT + ") has been reached.");
         }
 
         Player p = new Player(this, client);
