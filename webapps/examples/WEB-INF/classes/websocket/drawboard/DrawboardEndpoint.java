@@ -85,6 +85,8 @@ public final class DrawboardEndpoint extends Endpoint {
                         // reached.
                         client.sendMessage(new StringWebsocketMessage(
                                 "0" + ex.getLocalizedMessage()));
+                        // Close the connection.
+                        client.close();
                     }
 
                 } catch (RuntimeException ex) {
