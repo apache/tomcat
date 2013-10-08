@@ -261,7 +261,7 @@
         Preißer. (markt)
       </update>
 	  <add>
-	    <bug>55639</bug>: Add a Drawboard WebSocket example. (kpreisser)
+        <bug>55639</bug>: Add a Drawboard WebSocket example. (kpreisser)
 	  </add>
     </changelog>
   </subsection>
