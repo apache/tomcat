@@ -369,8 +369,8 @@
 
     <!-- Non-blocking IO examples -->
     <servlet>
-      <servlet-class>nonblocking.ByteCounter</servlet-class>
       <servlet-name>bytecounter</servlet-name>
+      <servlet-class>nonblocking.ByteCounter</servlet-class>
       <async-supported>true</async-supported>
     </servlet>
     <servlet-mapping>
@@ -378,8 +378,8 @@
       <url-pattern>/servlets/nonblocking/bytecounter</url-pattern>
     </servlet-mapping>
     <servlet>
-      <servlet-class>nonblocking.NumberWriter</servlet-class>
       <servlet-name>numberwriter</servlet-name>
+      <servlet-class>nonblocking.NumberWriter</servlet-class>
       <async-supported>true</async-supported>
     </servlet>
     <servlet-mapping>
