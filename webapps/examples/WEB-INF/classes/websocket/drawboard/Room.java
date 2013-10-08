@@ -389,8 +389,10 @@ public final class Room {
          * the client disconnects.
          */
         public void removeFromRoom() {
-            room.internalRemovePlayer(this);
-            room = null;
+            if (room != null) {
+                room.internalRemovePlayer(this);
+                room = null;
+            }
         }
 
 

@@ -70,7 +70,7 @@ public final class DrawboardEndpoint extends Endpoint {
         // Set maximum messages size to 10.000 bytes.
         session.setMaxTextMessageBufferSize(10000);
         session.addMessageHandler(stringHandler);
-        final Client client = new Client(session.getAsyncRemote());
+        final Client client = new Client(session);
 
         room.invoke(new Runnable() {
             @Override
