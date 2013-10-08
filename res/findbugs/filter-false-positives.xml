@@ -433,6 +433,12 @@
     <Bug code="ML"/>
   </Match>
   <Match>
+    <!-- Sync is there to protect referenced object not field -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint$SocketWithOptionsProcessor"/>
+    <Method name="run"/>
+    <Bug code="ML" />
+  </Match>
+  <Match>
     <!-- Return value is ignored at this point but logic further up call     -->
     <!-- stack will ensure that a SocketTimeoutException is thrown           -->
     <Class name="org.apache.tomcat.util.net.NioEndpoint$KeyAttachment"/>
@@ -451,10 +457,15 @@
     <Bug code="DE" />
   </Match>
   <Match>
-    <!-- Sync is there to protect referenced object not field -->
-    <Class name="org.apache.tomcat.util.net.AprEndpoint$SocketWithOptionsProcessor"/>
-    <Method name="run"/>
-    <Bug code="ML" />
+    <!-- Use of synchronisation is required to make a sequence of calls in   -->
+    <!-- one method appear to be atomic.                                     -->
+    <Class name="org.apache.tomcat.util.net.SocketWrapper"/>
+    <Or>
+      <Method name="addDispatch"/>
+      <Method name="getIteratorAndClearDispatches"/>
+      <Method name="clearDispatches"/>
+    </Or>
+    <Bug pattern="JLM_JSR166_UTILCONCURRENT_MONITORENTER" />
   </Match>
   <Match>
     <!-- Yes the simple name is the same as the super class. Accept it. -->
