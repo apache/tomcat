@@ -271,7 +271,7 @@ public abstract class WsFrameBase {
         } else if (textMessage) {
             result = processDataText();
         } else {
-            return processDataBinary();
+            result = processDataBinary();
         }
         checkRoomPayload();
         return result;
