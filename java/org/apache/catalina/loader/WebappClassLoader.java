@@ -2079,6 +2079,7 @@ public class WebappClassLoader extends URLClassLoader
     @SuppressWarnings("deprecation") // thread.stop()
     private void clearReferencesThreads() {
         Thread[] threads = getThreads();
+        List<Thread> executorThreadsToStop = new ArrayList<>();
 
         // Iterate over the set of threads
         for (Thread thread : threads) {
@@ -2137,6 +2138,7 @@ public class WebappClassLoader extends URLClassLoader
 
                     // If the thread has been started via an executor, try
                     // shutting down the executor
+                    boolean usingExecutor = false;
                     try {
 
                         // Runnable wrapped by Thread
@@ -2169,6 +2171,7 @@ public class WebappClassLoader extends URLClassLoader
                             Object executor = executorField.get(target);
                             if (executor instanceof ThreadPoolExecutor) {
                                 ((ThreadPoolExecutor) executor).shutdownNow();
+                                usingExecutor = true;
                             }
                         }
                     } catch (SecurityException e) {
@@ -2189,12 +2192,44 @@ public class WebappClassLoader extends URLClassLoader
                                 thread.getName(), getContextName()), e);
                     }
 
-                    // This method is deprecated and for good reason. This is
-                    // very risky code but is the only option at this point.
-                    // A *very* good reason for apps to do this clean-up
-                    // themselves.
-                    thread.stop();
+                    if (usingExecutor) {
+                        // Executor may take a short time to stop all the
+                        // threads. Make a note of threads that should be
+                        // stopped and check them at the end of the method.
+                        executorThreadsToStop.add(thread);
+                    } else {
+                        // This method is deprecated and for good reason. This
+                        // is very risky code but is the only option at this
+                        // point. A *very* good reason for apps to do this
+                        // clean-up themselves.
+                        thread.stop();
+                    }
                 }
+            }
+        }
+
+        // If thread stopping is enabled, executor threads should have been
+        // stopped above when the executor was shut down but that depends on the
+        // thread correctly handling the interrupt. Give all the executor
+        // threads a few seconds shutdown and if they are still running
+        // Give threads up to 2 seconds to shutdown
+        int count = 0;
+        for (Thread t : executorThreadsToStop) {
+            while (t.isAlive() && count < 100) {
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    // Quit the while loop
+                    break;
+                }
+                count++;
+            }
+            if (t.isAlive()) {
+                // This method is deprecated and for good reason. This is
+                // very risky code but is the only option at this point.
+                // A *very* good reason for apps to do this clean-up
+                // themselves.
+                t.stop();
             }
         }
     }
