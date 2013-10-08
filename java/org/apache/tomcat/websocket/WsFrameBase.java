@@ -97,7 +97,6 @@ public abstract class WsFrameBase {
     protected void processInputBuffer() throws IOException {
         while (true) {
             wsSession.updateLastActive();
-            System.out.println("pos0 readPos [" + readPos + "] writePos [" + writePos + "]");
             if (state == State.NEW_FRAME) {
                 if (!processInitialHeader()) {
                     break;
@@ -108,21 +107,17 @@ public abstract class WsFrameBase {
                     throw new IOException(sm.getString("wsFrame.closed"));
                 }
             }
-            System.out.println("pos1 readPos [" + readPos + "] writePos [" + writePos + "]");
             if (state == State.PARTIAL_HEADER) {
                 if (!processRemainingHeader()) {
                     break;
                 }
             }
-            System.out.println("pos2 readPos [" + readPos + "] writePos [" + writePos + "]");
             if (state == State.DATA) {
                 if (!processData()) {
                     break;
                 }
             }
-            System.out.println("pos3 readPos [" + readPos + "] writePos [" + writePos + "]");
         }
-        System.out.println("pos4 readPos [" + readPos + "] writePos [" + writePos + "]");
     }
 
 
@@ -276,7 +271,7 @@ public abstract class WsFrameBase {
         } else if (textMessage) {
             result = processDataText();
         } else {
-            result = processDataBinary();
+            return processDataBinary();
         }
         checkRoomPayload();
         return result;
