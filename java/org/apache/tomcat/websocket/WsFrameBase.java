@@ -97,7 +97,6 @@ public abstract class WsFrameBase {
     protected void processInputBuffer() throws IOException {
         while (true) {
             wsSession.updateLastActive();
-
             if (state == State.NEW_FRAME) {
                 if (!processInitialHeader()) {
                     break;
@@ -266,14 +265,16 @@ public abstract class WsFrameBase {
 
 
     private boolean processData() throws IOException {
-        checkRoomPayload();
+        boolean result;
         if (Util.isControl(opCode)) {
-            return processDataControl();
+            result = processDataControl();
         } else if (textMessage) {
-            return processDataText();
+            result = processDataText();
         } else {
-            return processDataBinary();
+            result = processDataBinary();
         }
+        checkRoomPayload();
+        return result;
     }
 
 
