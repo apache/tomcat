@@ -59,6 +59,7 @@ public class NioServletOutputStream extends AbstractServletOutputStream {
 
             writtenThisLoop = doWriteInternal(block, b, offset, writeThisLoop);
             count += writtenThisLoop;
+            offset += writtenThisLoop;
             leftToWrite -= writtenThisLoop;
 
             if (writtenThisLoop < writeThisLoop) {
