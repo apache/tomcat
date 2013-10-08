@@ -1247,44 +1247,19 @@ public class NioEndpoint extends AbstractEndpoint {
                     if (sk.isReadable() || sk.isWritable() ) {
                         if ( attachment.getSendfileData() != null ) {
                             processSendfile(sk,attachment, false);
-                        } else if ( attachment.isComet() ) {
-                            //check if thread is available
-                            if ( isWorkerAvailable() ) {
-                                //set interest ops to 0 so we don't get multiple
-                                //Invocations for both read and write on separate threads
-                                reg(sk, attachment, 0);
-                                //read goes before write
-                                if (sk.isReadable()) {
-                                    //read notification
-                                    if (!processSocket(channel, SocketStatus.OPEN_READ, true))
-                                        processSocket(channel, SocketStatus.DISCONNECT, true);
-                                } else {
-                                    //future placement of a WRITE notif
-                                    if (!processSocket(channel, SocketStatus.OPEN_WRITE, true))
-                                        processSocket(channel, SocketStatus.DISCONNECT, true);
-                                }
-                            } else {
-                                result = false;
-                            }
                         } else {
-                            //later on, improve latch behavior
                             if ( isWorkerAvailable() ) {
-
-                                boolean readAndWrite = sk.isReadable() && sk.isWritable();
-                                reg(sk, attachment, 0);
-                                if (attachment.isAsync() && readAndWrite) {
-                                    //remember the that we want to know about write too
-                                    attachment.interestOps(SelectionKey.OP_WRITE);
-                                }
-                                //read goes before write
+                                unreg(sk, attachment, sk.readyOps());
+                                // Read goes before write
                                 if (sk.isReadable()) {
-                                    //read notification
-                                    if (!processSocket(channel, SocketStatus.OPEN_READ, true))
+                                    if (!processSocket(channel, SocketStatus.OPEN_READ, true)) {
                                         close = true;
-                                } else {
-                                    //future placement of a WRITE notif
-                                    if (!processSocket(channel, SocketStatus.OPEN_WRITE, true))
+                                    }
+                                }
+                                if (!close && sk.isWritable()) {
+                                    if (!processSocket(channel, SocketStatus.OPEN_WRITE, true)) {
                                         close = true;
+                                    }
                                 }
                                 if (close) {
                                     cancelledKey(sk,SocketStatus.DISCONNECT,false);
