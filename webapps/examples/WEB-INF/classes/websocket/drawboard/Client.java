@@ -78,7 +78,7 @@ public class Client {
      * Sends the given message asynchronously to the client.
      * If there is already a async sending in progress, then the message
      * will be buffered and sent when possible.<br><br>
-     * 
+     *
      * This method can be called from multiple threads.
      * @param msg
      */
@@ -111,7 +111,7 @@ public class Client {
                         }
 
                     } else {
-    
+
                         // Check if the last message and the new message are
                         // String messages - in that case we concatenate them
                         // to reduce TCP overhead (using ";" as separator).

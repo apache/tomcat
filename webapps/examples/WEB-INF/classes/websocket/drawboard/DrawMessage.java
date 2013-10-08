@@ -24,12 +24,11 @@ import java.awt.Graphics2D;
  * A message that represents a drawing action.
  * Note that we use primitive types instead of Point, Color etc.
  * to reduce object allocation.<br><br>
- * 
+ *
  * TODO: But a Color objects needs to be created anyway for drawing this
  * onto a Graphics2D object, so this probably does not save much.
  */
 public final class DrawMessage {
-
 
     private int type;
     private byte colorR, colorG, colorB, colorA;
@@ -38,7 +37,6 @@ public final class DrawMessage {
 
     /**
      * The type. 1: Line.
-     * @return
      */
     public int getType() {
         return type;
@@ -156,7 +154,7 @@ public final class DrawMessage {
     public static DrawMessage parseFromString(String str)
             throws ParseException {
 
-        int type; 
+        int type;
         byte[] colors = new byte[4];
         double thickness;
         int[] coords = new int[4];

@@ -49,7 +49,7 @@ public final class DrawboardEndpoint extends Endpoint {
     /**
      * The player that is associated with this Endpoint and the current room.
      * Note that this variable is only accessed from the Room Thread.<br><br>
-     * 
+     *
      * TODO: Currently, Tomcat uses an Endpoint instance once - however
      * the java doc of endpoint says:
      * "Each instance of a websocket endpoint is guaranteed not to be called by
@@ -193,7 +193,7 @@ public final class DrawboardEndpoint extends Endpoint {
                         } catch (RuntimeException|ParseException ex) {
                             // Client sent invalid data.
                             // Ignore, TODO: maybe close connection
-                            if (dontSwallowException 
+                            if (dontSwallowException
                                     && ex instanceof RuntimeException) {
                                 throw (RuntimeException) ex;
                             }

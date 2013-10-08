@@ -40,7 +40,7 @@ import websocket.drawboard.wsmessages.StringWebsocketMessage;
 /**
  * A Room represents a drawboard where a number of
  * users participate.<br><br>
- * 
+ *
  * Each Room has its own "Room Thread" which manages all the actions
  * to be done in this Room. Instance methods should only be invoked
  * from this Room's thread by calling {@link #invoke(Runnable)} or
@@ -52,7 +52,7 @@ public final class Room {
      * Specifies the type of a room message that is sent to a client.<br>
      * Note: Currently we are sending simple string messages - for production
      * apps, a JSON lib should be used for object-level messages.<br><br>
-     * 
+     *
      * The number (single char) will be prefixed to the string when sending
      * the message.
      */
@@ -96,7 +96,7 @@ public final class Room {
      * drawmessageBroadcastTimer ticks. Otherwise they will be sent
      * immediately.
      */
-    private static final boolean BUFFER_DRAW_MESSAGES = true; 
+    private static final boolean BUFFER_DRAW_MESSAGES = true;
 
     /**
      * A single-threaded ExecutorService where tasks
@@ -163,8 +163,7 @@ public final class Room {
 
     /**
      * Creates a Player from the given Client and adds it to this room.
-     * @param c the client
-     * @return
+     * @param client the client
      */
     public Player createAndAddPlayer(Client client) {
         if (players.size() >= MAX_PLAYER_COUNT) {
@@ -294,7 +293,7 @@ public final class Room {
 
                     sb.append(s);
                 }
-                drawMessages.clear();            
+                drawMessages.clear();
 
                 p.sendRoomMessage(MessageType.DRAW_MESSAGE, sb.toString());
             }
@@ -302,11 +301,9 @@ public final class Room {
     }
 
 
-
-
     /**
      * Submits the given Runnable to the Room Executor.
-     * @param run
+     * @param task
      */
     public void invoke(Runnable task) {
         roomExecutor.submit(task);
@@ -318,7 +315,7 @@ public final class Room {
      * @param task
      * @throws InterruptedException if the current thread was interrupted
      * while waiting
-     * @throws ExecutionException if the computation threw an exception 
+     * @throws ExecutionException if the computation threw an exception
      */
     public void invokeAndWait(Runnable task)
             throws InterruptedException, ExecutionException {
@@ -335,11 +332,10 @@ public final class Room {
     }
 
 
-
     /**
      * A Player participates in a Room. It is the interface between the
      * {@link Room} and the {@link Client}.<br><br>
-     * 
+     *
      * Note: This means a player object is actually a join between Room and
      * Endpoint.
      */
@@ -369,8 +365,6 @@ public final class Room {
         private List<DrawMessage> getBufferedDrawMessages() {
             return bufferedDrawMessages;
         }
-
-
 
         private Player(Room room, Client client) {
             this.room = room;
@@ -408,7 +402,6 @@ public final class Room {
         /**
          * Handles the given DrawMessage by drawing it onto this Room's
          * image and by broadcasting it to the connected players.
-         * @param sender
          * @param msg
          * @param msgId
          */
@@ -430,10 +423,5 @@ public final class Room {
 
             client.sendMessage(new StringWebsocketMessage(completeMsg));
         }
-
-
-
     }
-
-
 }
