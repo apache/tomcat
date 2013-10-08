@@ -1,0 +1,611 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>Apache Tomcat WebSocket Examples: Drawboard</title>
+    <style type="text/css"><![CDATA[
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            background-color: #eeeeea;
+            padding: 10px;
+        }
+
+        #console-container {
+            float: left;
+            background-color: #fff;
+            width: 250px;
+        }
+
+        #console {
+            font-size: 10pt;
+            height: 600px;
+            overflow-y: scroll;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        #console p {
+            padding: 0;
+            margin: 0;
+        }
+
+        #drawContainer {
+            float: left;
+            display: none;
+            margin-right: 25px;
+        }
+
+        #drawContainer canvas {
+            display: block;
+            -ms-touch-action: none; /* Disable touch behaviors, like pan and zoom */
+        }
+
+        #labelContainer {
+            margin-bottom: 15px;
+        }
+
+        #drawContainer, #console-container {
+            box-shadow: 0px 0px 8px 3px #bbb;
+            border: 1px solid #CCCCCC;
+            
+        }
+
+    ]]></style>
+    <script type="application/javascript"><![CDATA[
+    "use strict";
+
+    (function() {
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Remove elements with "noscript" class - <noscript> is not
+            // allowed in XHTML
+            var noscripts = document.getElementsByClassName("noscript");
+            for (var i = 0; i < noscripts.length; i++) {
+                noscripts[i].parentNode.removeChild(noscripts[i]);
+            }
+
+
+            var Console = {};
+
+            Console.log = (function() {
+                var consoleContainer =
+                    document.getElementById("console-container");
+                var console = document.createElement("div");
+                console.setAttribute("id", "console");
+                consoleContainer.appendChild(console);
+
+                return function(message) {
+                    var p = document.createElement('p');
+                    p.style.wordWrap = "break-word";
+                    p.appendChild(document.createTextNode(message));
+                    console.appendChild(p);
+                    while (console.childNodes.length > 25) {
+                        console.removeChild(console.firstChild);
+                    }
+                    console.scrollTop = console.scrollHeight;
+                }
+            })();
+
+
+            function Room(drawContainer) {
+
+                // The WebSocket object.
+                var socket;
+                // ID of the timer which sends ping messages.
+                var pingTimerId;
+
+                var isStarted = false;
+                var playerCount = 0;
+
+                // An array of PathIdContainer objects that the server
+                // did not yet handle.
+                // They are ordered by id (ascending).
+                var pathsNotHandled = [];
+
+                var nextMsgId = 1;
+
+                var canvasDisplay = document.createElement("canvas");
+                var canvasBackground = document.createElement("canvas");
+                var canvasServerImage = document.createElement("canvas");
+                var canvasArray = [canvasDisplay, canvasBackground,
+                    canvasServerImage];
+
+                var labelPlayerCount = document.createTextNode("0");
+                var optionContainer = document.createElement("div");
+
+
+                var canvasDisplayCtx = canvasDisplay.getContext("2d");
+                var canvasBackgroundCtx = canvasBackground.getContext("2d");
+                var canvasServerImageCtx = canvasServerImage.getContext("2d");
+
+                var mouseInWindow = false;
+                var mouseDown = false;
+                var currentMouseX = 0, currentMouseY = 0;
+
+                var availableColors = [];
+                var currentColorIndex;
+                var colorContainers;
+
+                var availableThicknesses = [2, 3, 6, 10, 16, 28, 50];
+                var currentThicknessIndex;
+                var thicknessContainers;
+
+
+                var placeholder = document.createElement("div");
+                placeholder.appendChild(document.createTextNode("Loading... "));
+                var progressElem = document.createElement("progress");
+                placeholder.appendChild(progressElem);
+
+                labelContainer.appendChild(placeholder);
+
+                function rgb(color) {
+                       return "rgba(" + color[0] + "," + color[1] + ","
+                               + color[2] + "," + color[3] + ")";
+                   }
+
+                function PathIdContainer(path, id) {
+                    this.path = path;
+                    this.id = id;
+                }
+
+                function Path(type, color, thickness, x1, y1, x2, y2) {
+                    this.type = type;
+                    this.color = color;
+                    this.thickness = thickness;
+                    this.x1 = x1;
+                    this.y1 = y1;
+                    this.x2 = x2;
+                    this.y2 = y2;
+
+                    this.draw = function(ctx) {
+                        ctx.beginPath();
+                        ctx.lineCap = "round";
+                        ctx.lineWidth = thickness;
+                        var style = rgb(color);
+                        ctx.strokeStyle = style;
+                        
+                        if (x1 == x2 && y1 == y2) {
+                            // Always draw as arc to meet the behavior
+                            // in Java2D.
+                            ctx.fillStyle = style;
+                            ctx.arc(x1, y1, thickness / 2.0, 0,
+                                    Math.PI * 2.0, false);
+                            ctx.fill();
+                        } else {
+                            if (type == 1) {
+                                // Draw a line.
+                                ctx.moveTo(x1, y1);
+                                ctx.lineTo(x2, y2);
+                                ctx.stroke();
+                            }
+                        }
+                    };
+                }
+
+
+                function connect() {
+                    var host = (window.location.protocol == "https:"
+                            ? "wss://" : "ws://") + window.location.host
+                            + "/examples/websocket/drawboard";
+                    socket = new WebSocket(host);
+
+                    socket.onopen = function () {
+                        // Socket has opened. Now wait for the server to
+                        // send us the initial packet.
+                        Console.log("WebSocket connection opened.");
+
+                        // Set up a timer for pong messages.
+                        pingTimerId = window.setInterval(function() {
+                            socket.send("0");
+                        }, 30000);
+                    }
+
+                    socket.onclose = function () {
+                        Console.log("WebSocket connection closed.");
+                        disableControls();
+
+                        // Disable pong timer.
+                        window.clearInterval(pingTimerId);
+                    }
+
+                    socket.onmessage = function(message) {
+
+                        // Split joined message and process them
+                        // invidividually.
+                        var messages = message.data.split(";");
+                        for (var msgArrIdx = 0; msgArrIdx < messages.length;
+                                msgArrIdx++) {
+                            var msg = messages[msgArrIdx];
+                            var type = msg.substring(0, 1);
+
+                            if (type == "0") {
+                                // Error message.
+                                var error = msg.substring(1);
+                                // Log it to the console and show an alert.
+                                Console.log("Error: " + error);
+                                alert(error);
+
+                            } else {
+                                if (!isStarted) {
+                                    if (type == "2") {
+                                        // Initial message. It contains the
+                                        // number of players.
+                                        // After this message we will receive
+                                        // a binary message containing the current
+                                        // room image as PNG.
+                                        playerCount = parseInt(msg.substring(1));
+
+                                        refreshPlayerCount();
+
+                                        // The next message will be a binary
+                                        // message containing the room images
+                                        // as PNG. Therefore we temporarily swap
+                                        // the message handler.
+                                        var originalHandler = socket.onmessage;
+                                        socket.onmessage = function(message) {
+                                            // First, we restore the original handler.
+                                            socket.onmessage = originalHandler;
+
+                                            // Read the image.
+                                            var blob = message.data;
+                                            // Create new blob with correct MIME type.
+                                            blob = new Blob([blob], {type : "image/png"});
+
+                                            var url = URL.createObjectURL(blob);
+
+                                            var img = new Image(); 
+
+                                            // We must wait until the onload event is
+                                            // raised until we can draw the image onto
+                                            // the canvas.
+                                            
+                                            // TODO: I don't know if there is a guarantee
+                                            // that no WebSocket events (onmessage) will
+                                            // be raised until the onload event of this
+                                            // image is raised. Maybe we need to need to
+                                            // push websocket messages on a queue until
+                                            // this onload function is called.
+                                            img.onload = function() {
+
+                                                // Release the object URL.
+                                                URL.revokeObjectURL(url);
+
+                                                // Set the canvases to the correct size.
+            
+                                                for (var i = 0; i < canvasArray.length; i++) {
+                                                    canvasArray[i].width = img.width;
+                                                    canvasArray[i].height = img.height;
+                                                }
+
+                                                // Now draw the image on the last canvas.
+                                                canvasServerImageCtx.clearRect(0, 0,
+                                                        canvasServerImage.width,
+                                                        canvasServerImage.height);
+                                                canvasServerImageCtx.drawImage(img, 0, 0);
+
+                                                // Draw it on the background canvas.
+                                                canvasBackgroundCtx.drawImage(canvasServerImage,
+                                                        0, 0);
+
+                                                // Refresh the display canvas.
+                                                refreshDisplayCanvas();
+
+                                                isStarted = true;
+                                                startControls();
+                                            };
+
+                                            img.src = url;
+                                        };
+                                    }
+                                } else {
+                                    if (type == "3") {
+                                        // The number of players in this room changed.
+                                        var playerAdded = msg.substring(1) == "+";
+                                        playerCount += playerAdded ? 1 : -1;
+                                        refreshPlayerCount();
+
+                                        Console.log("Player " + (playerAdded
+                                                ? "joined." : "left."));
+
+                                    } else if (type == "1") {
+                                        // We received a new DrawMessage.
+                                        var maxLastHandledId = -1;
+                                        var drawMessages = msg.substring(1).split("|");
+                                        for (var i = 0; i < drawMessages.length; i++) {
+                                            var elements = drawMessages[i].split(",");
+                                            var lastHandledId = parseInt(elements[0]);
+                                               maxLastHandledId = Math.max(maxLastHandledId,
+                                                       lastHandledId);
+
+                                            var path = new Path(
+                                                    parseInt(elements[1]),
+                                                    [parseInt(elements[2]),
+                                                    parseInt(elements[3]),
+                                                    parseInt(elements[4]),
+                                                    parseInt(elements[5]) / 255.0],
+                                                    parseFloat(elements[6]),
+                                                    parseInt(elements[7]),
+                                                    parseInt(elements[8]),
+                                                    parseInt(elements[9]),
+                                                    parseInt(elements[10]));
+
+                                            // Draw the path onto the last canvas.
+                                            path.draw(canvasServerImageCtx);
+                                        }
+
+                                        // Draw the last canvas onto the background one.
+                                        canvasBackgroundCtx.drawImage(canvasServerImage,
+                                                0, 0);
+
+                                        // Now go through the pathsNotHandled array and
+                                        // remove the paths that were already handled by
+                                        // the server.
+                                        while (pathsNotHandled.length > 0 
+                                                && pathsNotHandled[0].id <= maxLastHandledId)
+                                            pathsNotHandled.shift();
+
+                                        // Now me must draw the remaining paths onto
+                                        // the background canvas.
+                                        for (var i = 0; i < pathsNotHandled.length; i++) {
+                                            pathsNotHandled[i].path.draw(canvasBackgroundCtx);
+                                        }
+
+                                        refreshDisplayCanvas();
+                                    } 
+                                }
+                            }
+                        }
+                    };
+
+                }
+
+                function refreshPlayerCount() {
+                    labelPlayerCount.nodeValue = String(playerCount);
+                }
+
+                function refreshDisplayCanvas() {
+                    canvasDisplayCtx.drawImage(canvasBackground, 0, 0);
+                    if (mouseInWindow && !mouseDown) {
+                        canvasDisplayCtx.beginPath();
+                        var color = availableColors[currentColorIndex].slice(0);
+                        color[3] = 0.5;
+                        canvasDisplayCtx.fillStyle = rgb(color);
+                        
+                        canvasDisplayCtx.arc(currentMouseX, currentMouseY, availableThicknesses[currentThicknessIndex] / 2, 0, Math.PI * 2.0, true);
+                        
+                        canvasDisplayCtx.fill();
+                    }
+                }
+
+                function startControls() {
+                    var labelContainer = document.getElementById("labelContainer");
+                    labelContainer.removeChild(placeholder);
+                    placeholder = undefined;
+                    
+                    labelContainer.appendChild(
+                            document.createTextNode("Number of Players: "));
+                    labelContainer.appendChild(labelPlayerCount);
+
+
+                    drawContainer.style.display = "block";
+                    drawContainer.appendChild(canvasDisplay);
+
+                    drawContainer.appendChild(optionContainer);
+
+                    canvasDisplay.onmousemove = function(e) {
+                        mouseInWindow = true;
+                        var oldMouseX = currentMouseX, oldMouseY = currentMouseY;
+                        currentMouseX = e.pageX - canvasDisplay.offsetLeft;
+                        currentMouseY = e.pageY - canvasDisplay.offsetTop;
+
+                        if (mouseDown) {
+                            var path = new Path(1, availableColors[currentColorIndex],
+                                    availableThicknesses[currentThicknessIndex],
+                                    oldMouseX, oldMouseY, currentMouseX,
+                                    currentMouseY);
+                            // Draw it on the background canvas.
+                            path.draw(canvasBackgroundCtx);
+
+                            // Send it to the sever.
+                            pushPath(path);
+                        }
+
+                        refreshDisplayCanvas();
+                    };
+
+                    canvasDisplay.onmousedown = function(e) {
+                        currentMouseX = e.pageX - canvasDisplay.offsetLeft;
+                        currentMouseY = e.pageY - canvasDisplay.offsetTop;
+
+                        if (e.button == 0) {
+                            mouseDown = true;
+
+                            var path = new Path(1, availableColors[currentColorIndex],
+                                    availableThicknesses[currentThicknessIndex],
+                                    currentMouseX, currentMouseY, currentMouseX,
+                                    currentMouseY);
+                            // Draw it on the background canvas.
+                            path.draw(canvasBackgroundCtx);
+
+                            // Send it to the sever.
+                            pushPath(path);
+
+                            refreshDisplayCanvas();
+
+                        } else if (mouseDown) {
+                            // Cancel drawing.
+                            mouseDown = false;
+
+                            refreshDisplayCanvas();
+                        }
+                    }
+
+                    canvasDisplay.onmouseup = function(e) {
+                        if (e.button == 0) {
+                            if (mouseDown) {
+                                mouseDown = false;
+
+                                refreshDisplayCanvas();
+                            }
+                        }
+                    };
+
+                    canvasDisplay.onmouseout = function() {
+                        mouseInWindow = false;
+                        refreshDisplayCanvas();
+                    };
+
+
+                    // Create color and thickness controls.
+                    var colorContainersBox = document.createElement("div");
+                    colorContainersBox.setAttribute("style",
+                            "margin: 4px; border: 1px solid #bbb; border-radius: 3px;");
+                    optionContainer.appendChild(colorContainersBox);
+
+
+                    colorContainers = new Array(3 * 3 * 3);
+                    for (var i = 0; i < colorContainers.length; i++) {
+                        var colorContainer = colorContainers[i] =
+                            document.createElement("div");
+                        var color = availableColors[i] = 
+                            [
+                                Math.floor((i % 3) * 255 / 2),
+                                Math.floor((Math.floor(i / 3) % 3) * 255 / 2),
+                                Math.floor((Math.floor(i / (3 * 3)) % 3) * 255 / 2), 
+                                1.0
+                            ];
+                        colorContainer.setAttribute("style",
+                                "margin: 3px; width: 18px; height: 18px; "
+                                + "float: left; background-color: " + rgb(color));
+                        colorContainer.style.border = '2px solid #000';
+                        colorContainer.onmousedown = (function(ix) {
+                            return function() {
+                                setColor(ix);
+                            };
+                        })(i);
+
+                        colorContainersBox.appendChild(colorContainer);
+                    }
+
+                    var divClearLeft = document.createElement("div");
+                    divClearLeft.setAttribute("style", "clear: left;");
+                    colorContainersBox.appendChild(divClearLeft);
+
+                    var thicknessContainersBox = document.createElement("div");
+                    thicknessContainersBox.setAttribute("style",
+                            "margin: 3px; border: 1px solid #bbb; border-radius: 3px;");
+                    optionContainer.appendChild(thicknessContainersBox);
+
+
+                    thicknessContainers = new Array(availableThicknesses.length);
+                    for (var i = 0; i < thicknessContainers.length; i++) {
+                        var thicknessContainer = thicknessContainers[i] =
+                            document.createElement("div");
+                        thicknessContainer.setAttribute("style",
+                                "text-align: center; margin: 3px; width: 18px; "
+                                + "height: 18px; float: left;");
+                        thicknessContainer.style.border = "2px solid #000";
+                        thicknessContainer.appendChild(document.createTextNode(
+                                String(availableThicknesses[i])));
+                        thicknessContainer.onmousedown = (function(ix) {
+                            return function() {
+                                setThickness(ix);
+                            };
+                        })(i);
+
+                        thicknessContainersBox.appendChild(thicknessContainer);
+                    }
+
+                    divClearLeft = document.createElement("div");
+                    divClearLeft.setAttribute("style", "clear: left;");
+                    thicknessContainersBox.appendChild(divClearLeft);
+
+
+                    setColor(0);
+                    setThickness(0);
+
+                }
+
+                function disableControls() {
+                    canvasDisplay.onmousemove = canvasDisplay.onmousedown =
+                        undefined;
+                    mouseInWindow = false;
+                    refreshDisplayCanvas();
+                }
+
+                function pushPath(path) {
+
+                    // Push it into the pathsNotHandled array.
+                    var container = new PathIdContainer(path, nextMsgId++);
+                    pathsNotHandled.push(container);
+
+                    // Send the path to the server.
+                    var message = container.id + "|" + path.type + ","
+                            + path.color[0] + "," + path.color[1] + ","
+                            + path.color[2] + ","
+                            + Math.round(path.color[3] * 255.0) + ","
+                            + path.thickness + "," + path.x1 + "," 
+                            + path.y1 + "," + path.x2 + "," + path.y2;
+                    
+                    socket.send("1" + message);
+                }
+
+                function setThickness(thicknessIndex) {
+                    if (typeof currentThicknessIndex !== "undefined")
+                        thicknessContainers[currentThicknessIndex]
+                            .style.borderColor = "#000";
+                    currentThicknessIndex = thicknessIndex;
+                    thicknessContainers[currentThicknessIndex]
+                        .style.borderColor = "#d08";
+                }
+                
+                function setColor(colorIndex) {
+                    if (typeof currentColorIndex !== "undefined")
+                        colorContainers[currentColorIndex]
+                            .style.borderColor = "#000";
+                    currentColorIndex = colorIndex;
+                    colorContainers[currentColorIndex]
+                        .style.borderColor = "#d08";
+                }
+
+
+                connect();
+
+            }
+
+
+            // Initialize the room
+            var room = new Room(document.getElementById("drawContainer"));
+
+
+        }, false);
+
+    })();
+    ]]></script>
+</head>
+<body>
+    <div class="noscript"><h2 style="color: #ff0000;">Seems your browser doesn't support Javascript! Websockets rely on Javascript being enabled. Please enable
+    Javascript and reload this page!</h2></div>
+    <div id="labelContainer"/>
+    <div id="drawContainer"/>
+    <div id="console-container"/>
+
+</body>
+</html>
