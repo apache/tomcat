@@ -150,8 +150,19 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     /**
      * Use sendfile for sending static files.
      */
-    protected boolean useSendfile = Library.APR_HAS_SENDFILE;
-    public void setUseSendfile(boolean useSendfile) { this.useSendfile = useSendfile; }
+    protected boolean useSendfile = false;
+    /*
+     * When the endpoint is created and configured, the APR library will not
+     * have been initialised. This flag is used to determine if the default
+     * value of useSendFile should be changed if the APR library indicates it
+     * supports send file once it has been initialised. If useSendFile is set
+     * by configuration, that configuration will always take priority.
+     */
+    private boolean useSendFileSet = false;
+    public void setUseSendfile(boolean useSendfile) {
+        useSendFileSet = true;
+        this.useSendfile = useSendfile;
+    }
     @Override
     public boolean getUseSendfile() { return useSendfile; }
 
@@ -606,6 +617,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             pollerThread.start();
 
             // Start sendfile thread
+            if (!useSendFileSet) {
+                useSendfile = Library.APR_HAS_SENDFILE;
+            }
             if (useSendfile) {
                 sendfile = new Sendfile();
                 sendfile.init();
