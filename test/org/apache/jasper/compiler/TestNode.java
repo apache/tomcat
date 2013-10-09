@@ -32,7 +32,7 @@ public class TestNode extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir =
-            new File("test/webapp");
+            new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "", appDir.getAbsolutePath());
 
@@ -42,9 +42,7 @@ public class TestNode extends TomcatBaseTest {
                 "/bug5nnnn/bug55642a.jsp");
 
         String result = res.toString();
-
-        System.out.println(result);
-
+        
         Assert.assertTrue(
                 result.indexOf("/bug5nnnn/bug55642b.jsp?foo=bar&a=1&b=2") > 0);
     }
