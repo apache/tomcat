@@ -43,8 +43,6 @@ public class TestNode extends TomcatBaseTest {
 
         String result = res.toString();
 
-        System.out.println(result);
-
         Assert.assertTrue(
                 result.indexOf("/bug5nnnn/bug55642b.jsp?foo=bar&a=1&b=2") > 0);
     }
