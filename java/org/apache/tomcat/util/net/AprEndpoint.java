@@ -1155,16 +1155,24 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             size++;
         }
 
-        public boolean remove(long socket) {
+        /**
+         * Removes the specified socket from the poller.
+         *
+         * @returns The configured timeout for the socket or zero if the socket
+         *          was not in the list of socket timeouts
+         */
+        public long remove(long socket) {
+            long result = 0;
             for (int i = 0; i < size; i++) {
                 if (sockets[i] == socket) {
+                    result = timeouts[i];
                     sockets[i] = sockets[size - 1];
                     timeouts[i] = timeouts[size - 1];
                     size--;
-                    return true;
+                    break;
                 }
             }
-            return false;
+            return result;
         }
 
         public long check(long date) {
@@ -1792,7 +1800,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                             pollerSpace[i] += rv;
                             connectionCount.addAndGet(-rv);
                             for (int n = 0; n < rv; n++) {
-                                timeouts.remove(desc[n*2+1]);
+                                long timeout = timeouts.remove(desc[n*2+1]);
                                 AprSocketWrapper wrapper = connections.get(
                                         Long.valueOf(desc[n*2+1]));
                                 if (getLog().isDebugEnabled()) {
@@ -1903,13 +1911,29 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                                         error = true;
                                         closeSocket(desc[n*2+1]);
                                     }
-                                    if (!error) {
+                                    if (!error && wrapper.pollerFlags != 0) {
                                         // If socket was registered for multiple events but
                                         // only some of the occurred, re-register for the
                                         // remaining events.
-                                        if (wrapper.pollerFlags != 0) {
-                                            add(desc[n*2+1], 1, wrapper.pollerFlags);
+                                        // timeout is the value of System.currentTimeMillis() that
+                                        // was set as the point that the socket will timeout. When
+                                        // adding to the poller, the timeout from now in
+                                        // milliseconds is required.
+                                        // So first, subtract the current timestamp
+                                        if (timeout > 0) {
+                                            timeout = timeout - System.currentTimeMillis();
                                         }
+                                        // If the socket should have already expired by now,
+                                        // re-add it with a very short timeout
+                                        if (timeout <= 0) {
+                                            timeout = 1;
+                                        }
+                                        // Should be impossible but just in case since timeout will
+                                        // be cast to an int.
+                                        if (timeout > Integer.MAX_VALUE) {
+                                            timeout = Integer.MAX_VALUE;
+                                        }
+                                        add(desc[n*2+1], (int) timeout, wrapper.pollerFlags);
                                     }
                                 } else {
                                     // Unknown event
