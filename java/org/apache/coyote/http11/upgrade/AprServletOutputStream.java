@@ -16,11 +16,13 @@
  */
 package org.apache.coyote.http11.upgrade;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import org.apache.tomcat.jni.OS;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.net.AprEndpoint;
@@ -132,6 +134,12 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
             }
             if (Status.APR_STATUS_IS_EAGAIN(-written)) {
                 written = 0;
+            } else if (-written == Status.APR_EOF) {
+                throw new EOFException(sm.getString("apr.clientAbort"));
+            } else if ((OS.IS_WIN32 || OS.IS_WIN64) &&
+                    (-written == Status.APR_OS_START_SYSERR + 10053)) {
+                // 10053 on Windows is connection aborted
+                throw new EOFException(sm.getString("apr.clientAbort"));
             } else if (written < 0) {
                 throw new IOException(sm.getString("apr.write.error",
                         Integer.valueOf(-written)));
