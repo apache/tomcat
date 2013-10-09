@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import java.util.ArrayList;
@@ -2289,7 +2288,7 @@ abstract class Node implements TagConstants {
          *         time.
          */
         public boolean isLiteral() {
-            return !expression && (el != null) && !namedAttribute;
+            return !expression && (el == null) && !namedAttribute;
         }
 
         /**
