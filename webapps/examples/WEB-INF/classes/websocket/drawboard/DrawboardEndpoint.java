@@ -163,6 +163,7 @@ public final class DrawboardEndpoint extends Endpoint {
                         boolean dontSwallowException = false;
                         try {
                             char messageType = message.charAt(0);
+                            String messageContent = message.substring(1);
                             switch (messageType) {
                             case '0':
                                 // Pong message.
@@ -171,12 +172,12 @@ public final class DrawboardEndpoint extends Endpoint {
 
                             case '1':
                                 // Draw message
-                                int indexOfChar = message.indexOf('|');
+                                int indexOfChar = messageContent.indexOf('|');
                                 long msgId = Long.parseLong(
-                                        message.substring(0, indexOfChar));
+                                        messageContent.substring(0, indexOfChar));
 
                                 DrawMessage msg = DrawMessage.parseFromString(
-                                        message.substring(indexOfChar + 1));
+                                        messageContent.substring(indexOfChar + 1));
 
                                 // Don't ingore RuntimeExceptions thrown by
                                 // this method
