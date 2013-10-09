@@ -106,6 +106,53 @@
 
             function Room(drawContainer) {
 
+                /* A pausable message handler that can be used for
+                 * the WebSocket's onmessage event (e.g. when we need to wait
+                 * for a Image's load event before we can process further
+                 * WebSocket messages).
+                 * The object's handleMessageInternal(message) method
+                 * should be called from socket.onmessage.
+                 * The object's messageHandler should be set to the
+                 * function which is actually processing the message.
+                 * Call pauseMessageProcessing() to pause processing and
+                 * resumeMessageProcessing() to resume it.
+                 */
+                function PausableMessageHandler() {
+
+                    var pauseMessageProcessing = false;
+                    // Queue for buffering incoming messages until they
+                    // can be processed.
+                    var messageQueue = [];
+
+
+                    this.messageHandler = function(message) { };
+
+                    this.handleMessageInternal = function(message) {
+                        // If message processing is paused, we push it
+                        // into the queue - otherwise we process it directly.
+                        if (pauseMessageProcessing) {
+                            messageQueue.push(message);
+                        } else {
+                            this.messageHandler(message);
+                        }
+                    };
+
+                    this.pauseMessageProcessing = function() {
+                        pauseMessageProcessing = true;
+                    };
+
+                    this.resumeMessageProcessing = function() {
+                        pauseMessageProcessing = false;
+
+                        // Process all queued messages until some handler calls 
+                        // pauseMessageProcessing() again.
+                        while (messageQueue.length > 0 && !pauseMessageProcessing) {
+                            var msg = messageQueue.pop();
+                            this.messageHandler(msg);
+                        }
+                    };
+                }
+
                 // The WebSocket object.
                 var socket;
                 // ID of the timer which sends ping messages.
@@ -207,6 +254,17 @@
                             + "/examples/websocket/drawboard";
                     socket = new WebSocket(host);
 
+                    /* If processing of messages should be paused.
+                     * This is needed when we load an Image object with data
+                     * from a previous message, because we must wait until the
+                     * Image's load event it raised before we can use it (and
+                     * in the meantime the socket.message event could be
+                     * raised).
+                     * Therefore we need to use a pausable message handler
+                     * to handle the incoming messages.
+                     */
+                    var messageHandler = new PausableMessageHandler();
+
                     socket.onopen = function () {
                         // Socket has opened. Now wait for the server to
                         // send us the initial packet.
@@ -226,7 +284,7 @@
                         window.clearInterval(pingTimerId);
                     }
 
-                    socket.onmessage = function(message) {
+                    messageHandler.messageHandler = function(message) {
 
                         // Split joined message and process them
                         // invidividually.
@@ -259,10 +317,10 @@
                                         // message containing the room images
                                         // as PNG. Therefore we temporarily swap
                                         // the message handler.
-                                        var originalHandler = socket.onmessage;
-                                        socket.onmessage = function(message) {
+                                        var originalHandler = messageHandler.messageHandler;
+                                        messageHandler.messageHandler = function(message) {
                                             // First, we restore the original handler.
-                                            socket.onmessage = originalHandler;
+                                            messageHandler.messageHandler = originalHandler;
 
                                             // Read the image.
                                             var blob = message.data;
@@ -276,20 +334,16 @@
                                             // We must wait until the onload event is
                                             // raised until we can draw the image onto
                                             // the canvas.
-                                            
-                                            // TODO: I don't know if there is a guarantee
-                                            // that no WebSocket events (onmessage) will
-                                            // be raised until the onload event of this
-                                            // image is raised. Maybe we need to need to
-                                            // push websocket messages on a queue until
-                                            // this onload function is called.
+                                            // Therefore we need to pause the message
+                                            // handler until the image is loaded.
+                                            messageHandler.pauseMessageProcessing();
+
                                             img.onload = function() {
 
                                                 // Release the object URL.
                                                 URL.revokeObjectURL(url);
 
                                                 // Set the canvases to the correct size.
-            
                                                 for (var i = 0; i < canvasArray.length; i++) {
                                                     canvasArray[i].width = img.width;
                                                     canvasArray[i].height = img.height;
@@ -310,6 +364,10 @@
 
                                                 isStarted = true;
                                                 startControls();
+
+
+                                                // Finally, resume the message handler.
+                                                messageHandler.resumeMessageProcessing();
                                             };
 
                                             img.src = url;
@@ -375,7 +433,12 @@
                         }
                     };
 
+                    socket.onmessage = function(message) {
+                        messageHandler.handleMessageInternal(message);
+                    };
+
                 }
+
 
                 function refreshPlayerCount() {
                     labelPlayerCount.nodeValue = String(playerCount);
