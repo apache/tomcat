@@ -90,6 +90,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>55642</bug>: Correct logic error in the JSP parser that was
+        incorrectly identifying EL expressions in jsp:param element values as a
+        literal string. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <add>
