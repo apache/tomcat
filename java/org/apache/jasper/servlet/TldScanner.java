@@ -115,6 +115,14 @@ public class TldScanner {
     }
 
     /**
+     * Set the class loader used by the digester to create objects as a result
+     * of this scan. Normally this only needs tobe set when using JspC.
+     */
+    public void setClassLoader(ClassLoader classLoader) {
+        tldParser.setClassLoader(classLoader);
+    }
+
+    /**
      * Scan for TLDs required by the platform specification.
      */
     protected void scanPlatform() {
