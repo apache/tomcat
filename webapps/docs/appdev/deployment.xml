@@ -222,7 +222,7 @@ approaches:</p>
     web applications</em>.  Tomcat includes a web application, deployed
     by default on context path <code>/manager</code>, that allows you to
     deploy and undeploy applications on a running Tomcat server without
-    restarting it.  See the administrator documentation (TODO: hyperlink)
+    restarting it. See <a href="../manager-howto.html">Manager App HOW-TO</a>
     for more information on using the Manager web application.<br/><br/></li>
 <li><em>Use "Manager" Ant Tasks In Your Build Script</em>.  Tomcat
     includes a set of custom task definitions for the <code>Ant</code>
