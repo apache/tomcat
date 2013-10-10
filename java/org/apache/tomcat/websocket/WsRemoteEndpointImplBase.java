@@ -275,7 +275,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             MessagePart mpNext = messagePartQueue.poll();
             if (mpNext == null) {
                 messagePartInProgress = false;
-            } else {
+            } else if (!closed){
+                // Session may have been closed unexpectedly in the middle of
+                // sending a fragmented message closing the endpoint. If this
+                // happens, clearly there is no point trying to send the rest of
+                // the message.
                 writeMessagePart(mpNext);
             }
         }
