@@ -106,49 +106,44 @@
 
             function Room(drawContainer) {
 
-                /* A pausable message handler that can be used for
-                 * the WebSocket's onmessage event (e.g. when we need to wait
+                /* A pausable event forwarder that can be used to pause and
+                 * resume handling of events (e.g. when we need to wait
                  * for a Image's load event before we can process further
                  * WebSocket messages).
-                 * The object's handleMessageInternal(message) method
-                 * should be called from socket.onmessage.
-                 * The object's messageHandler should be set to the
-                 * function which is actually processing the message.
-                 * Call pauseMessageProcessing() to pause processing and
-                 * resumeMessageProcessing() to resume it.
+                 * The object's callFunction(func) should be called from an
+                 * event handler and give the function to handle the event as
+                 * argument.
+                 * Call pauseProcessing() to suspend event forwarding and
+                 * resumeProcessing() to resume it.
                  */
-                function PausableMessageHandler() {
+                function PausableEventForwarder() {
 
-                    var pauseMessageProcessing = false;
-                    // Queue for buffering incoming messages until they
-                    // can be processed.
-                    var messageQueue = [];
+                    var pauseProcessing = false;
+                    // Queue for buffering functions to be called.
+                    var functionQueue = [];
 
-
-                    this.messageHandler = function(message) { };
-
-                    this.handleMessageInternal = function(message) {
+                    this.callFunction = function(func) {
                         // If message processing is paused, we push it
                         // into the queue - otherwise we process it directly.
-                        if (pauseMessageProcessing) {
-                            messageQueue.push(message);
+                        if (pauseProcessing) {
+                            functionQueue.push(func);
                         } else {
-                            this.messageHandler(message);
+                            func();
                         }
                     };
 
-                    this.pauseMessageProcessing = function() {
-                        pauseMessageProcessing = true;
+                    this.pauseProcessing = function() {
+                        pauseProcessing = true;
                     };
 
-                    this.resumeMessageProcessing = function() {
-                        pauseMessageProcessing = false;
+                    this.resumeProcessing = function() {
+                        pauseProcessing = false;
 
-                        // Process all queued messages until some handler calls 
-                        // pauseMessageProcessing() again.
-                        while (messageQueue.length > 0 && !pauseMessageProcessing) {
-                            var msg = messageQueue.pop();
-                            this.messageHandler(msg);
+                        // Process all queued functions until some handler calls 
+                        // pauseProcessing() again.
+                        while (functionQueue.length > 0 && !pauseProcessing) {
+                            var func = functionQueue.pop();
+                            func();
                         }
                     };
                 }
@@ -254,16 +249,16 @@
                             + "/examples/websocket/drawboard";
                     socket = new WebSocket(host);
 
-                    /* If processing of messages should be paused.
+                    /* Use a pausable event forwarder.
                      * This is needed when we load an Image object with data
                      * from a previous message, because we must wait until the
                      * Image's load event it raised before we can use it (and
                      * in the meantime the socket.message event could be
                      * raised).
-                     * Therefore we need to use a pausable message handler
-                     * to handle the incoming messages.
+                     * Therefore we need this pausable event handler to handle
+                     * e.g. socket.onmessage and socket.onclose.
                      */
-                    var messageHandler = new PausableMessageHandler();
+                    var eventForwarder = new PausableEventForwarder();
 
                     socket.onopen = function () {
                         // Socket has opened. Now wait for the server to
@@ -274,17 +269,20 @@
                         pingTimerId = window.setInterval(function() {
                             socket.send("0");
                         }, 30000);
-                    }
+                    };
 
                     socket.onclose = function () {
-                        Console.log("WebSocket connection closed.");
-                        disableControls();
+                        eventForwarder.callFunction(function() {
+                            Console.log("WebSocket connection closed.");
+                            disableControls();
 
-                        // Disable pong timer.
-                        window.clearInterval(pingTimerId);
-                    }
+                            // Disable pong timer.
+                            window.clearInterval(pingTimerId);
+                        });
+                    };
 
-                    messageHandler.messageHandler = function(message) {
+                    // Handles an incoming Websocket message.
+                    var handleOnMessage = function(message) {
 
                         // Split joined message and process them
                         // invidividually.
@@ -317,10 +315,10 @@
                                         // message containing the room images
                                         // as PNG. Therefore we temporarily swap
                                         // the message handler.
-                                        var originalHandler = messageHandler.messageHandler;
-                                        messageHandler.messageHandler = function(message) {
+                                        var originalHandler = handleOnMessage;
+                                        handleOnMessage = function(message) {
                                             // First, we restore the original handler.
-                                            messageHandler.messageHandler = originalHandler;
+                                            handleOnMessage = originalHandler;
 
                                             // Read the image.
                                             var blob = message.data;
@@ -334,9 +332,9 @@
                                             // We must wait until the onload event is
                                             // raised until we can draw the image onto
                                             // the canvas.
-                                            // Therefore we need to pause the message
-                                            // handler until the image is loaded.
-                                            messageHandler.pauseMessageProcessing();
+                                            // Therefore we need to pause the event
+                                            // forwarder until the image is loaded.
+                                            eventForwarder.pauseProcessing();
 
                                             img.onload = function() {
 
@@ -366,8 +364,8 @@
                                                 startControls();
 
 
-                                                // Finally, resume the message handler.
-                                                messageHandler.resumeMessageProcessing();
+                                                // Finally, resume the event forwarder.
+                                                eventForwarder.resumeProcessing();
                                             };
 
                                             img.src = url;
@@ -434,7 +432,9 @@
                     };
 
                     socket.onmessage = function(message) {
-                        messageHandler.handleMessageInternal(message);
+                        eventForwarder.callFunction(function() {
+                            handleOnMessage(message);
+                        });
                     };
 
                 }
