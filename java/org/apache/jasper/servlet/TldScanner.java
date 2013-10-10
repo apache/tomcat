@@ -185,7 +185,11 @@ public class TldScanner {
         Set<String> dirList = context.getResourcePaths(startPath);
         if (dirList != null) {
             for (String path : dirList) {
-                if (path.endsWith("/")) {
+                if (path.startsWith("/WEB-INF/classes/")) {
+                    // Skip: JSP.7.3.1
+                } else if (path.startsWith("/WEB-INF/lib/")) {
+                    // Skip: JSP.7.3.1
+                } else if (path.endsWith("/")) {
                     scanResourcePaths(path);
                 } else if (path.startsWith("/WEB-INF/tags/")) {
                     // JSP 7.3.1: in /WEB-INF/tags only consider implicit.tld
