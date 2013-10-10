@@ -537,6 +537,9 @@
                             mouseDown = false;
                             currentPreviewPath = null;
 
+                            currentMouseX = e.pageX - canvasDisplay.offsetLeft;
+                            currentMouseY = e.pageY - canvasDisplay.offsetTop;
+
                             refreshDisplayCanvas();
                         }
                     }
