@@ -64,10 +64,10 @@ public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
      * Register this factory with the JVM. May be called more than once. The
      * implementation ensures that registration only occurs once.
      *
-     * @returns <code>true</code> if the factory is already registered with the
-     *          JVM or was successfully registered as a result of this call.
-     *          <code>false</code> if the factory was disabled prior to this
-     *          call.
+     * @return <code>true</code> if the factory is already registered with the
+     *         JVM or was successfully registered as a result of this call.
+     *         <code>false</code> if the factory was disabled prior to this
+     *         call.
      */
     public static boolean register() {
         return getInstanceInternal(true).isRegistered();
@@ -78,10 +78,10 @@ public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
      * Prevent this this factory from registering with the JVM. May be called
      * more than once.
      *
-     * @returns <code>true</code> if the factory is already disabled or was
-     *          successfully disabled as a result of this call.
-     *          <code>false</code> if the factory was already registered prior
-     *          to this call.
+     * @return <code>true</code> if the factory is already disabled or was
+     *         successfully disabled as a result of this call.
+     *         <code>false</code> if the factory was already registered prior
+     *         to this call.
 
      */
     public static boolean disable() {
