@@ -35,7 +35,7 @@
     <property name="version.minor"         value="1" />
     <property name="version.build"         value="29" />
     <property name="version.patch"         value="0" />
-    <property name="version.suffix"        value="-dev" />
+    <property name="version.suffix"        value="" />
 
     <property name="junit.home"            value="/usr/local/junit3.8"/>
     <property name="junit.jar"             value="${junit.home}/junit.jar"/>
