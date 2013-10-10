@@ -104,6 +104,10 @@
             <param-name>listings</param-name>
             <param-value>false</param-value>
         </init-param>
+        <init-param>
+            <param-name>gzip</param-name>
+            <param-value>true</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
 

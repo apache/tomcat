@@ -94,6 +94,12 @@ directory listings are disabled and debugging is turned off.
         expensive. Multiple requests for large directory listings can consume
         significant proportions of server resources.
   </property>
+  <property name="gzip">
+        If a gzipped version of a file exists (a file with <code>.gz</code>
+        appended to the file name located alongside the original file), Tomcat
+        will serve the gzipped file if the user agent supports gzip and this
+        option is enabled. [true]
+  </property>
   <property name="readmeFile">
         If a directory listing is presented, a readme file may also
         be presented with the listing. This file is inserted as is
