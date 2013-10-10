@@ -43,7 +43,7 @@ public interface InstrumentableClassLoader {
      * classes loaded by this class loader after the invocation of this
      * method.
      *
-     * @param classFileTransformer The transformer to add to the class loader
+     * @param transformer The transformer to add to the class loader
      * @throws IllegalArgumentException if the {@literal transformer} is null.
      */
     void addTransformer(ClassFileTransformer transformer);
@@ -55,7 +55,7 @@ public interface InstrumentableClassLoader {
      * However, any classes already instrumented by this transformer before
      * this method call will remain in their instramented state.
      *
-     * @param classFileTransformer The transformer to remove
+     * @param transformer The transformer to remove
      */
     void removeTransformer(ClassFileTransformer transformer);
 
