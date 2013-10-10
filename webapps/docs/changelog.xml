@@ -230,6 +230,10 @@
         Servlet container itself. The scan is now performed only once rather than
         in two passes reducing startup time. (jboynes)
       </scode>
+      <fix>
+        <bug>55251</bug>: Do not allow JspC task to fail silently if the web.xml
+        or web.xml fragment can not be generated. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
