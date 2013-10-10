@@ -135,6 +135,10 @@
         initialization of the servlet org.apache.catalina.manager.StatusManagerServlet
         is removed in the destroy phase. (violetagg)
       </fix>
+      <fix>
+        Correct the documentation for Deployment Organization in the App Dev
+        Guide. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>
