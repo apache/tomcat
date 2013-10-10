@@ -132,6 +132,23 @@ if not "%CATALINA_BASE%" == "" goto gotBase
 set "CATALINA_BASE=%CATALINA_HOME%"
 :gotBase
 
+rem Ensure that neither CATALINA_HOME nor CATALINA_BASE contains a semi-colon
+rem as this is used as the separator in the classpath and Java provides no
+rem mechanism for escaping if the same character appears in the path. Check this
+rem by replacing all occurrences of ';' with '' and checking that neither
+rem CATALINA_HOME nor CATALINA_BASE have changed
+if "%CATALINA_HOME%" == "%CATALINA_HOME:;=%" goto homeNoSemicolon
+echo Using CATALINA_HOME:   "%CATALINA_HOME%"
+echo Unable to start as CATALINA_HOME contains a semicolon (;) character
+goto end
+:homeNoSemicolon
+
+if "%CATALINA_BASE%" == "%CATALINA_BASE:;=%" goto baseNoSemicolon
+echo Using CATALINA_BASE:   "%CATALINA_BASE%"
+echo Unable to start as CATALINA_HOME contains a semicolon (;) character
+goto end
+:baseNoSemicolon
+
 rem Ensure that any user defined CLASSPATH variables are not used on startup,
 rem but allow them to be specified in setenv.bat, in rare case when it is needed.
 set CLASSPATH=
