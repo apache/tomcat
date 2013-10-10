@@ -62,4 +62,8 @@ public class TldParser {
             digester.reset();
         }
     }
+
+    public void setClassLoader(ClassLoader classLoader) {
+        digester.setClassLoader(classLoader);
+    }
 }

@@ -1424,6 +1424,8 @@ public class JspC extends Task implements Options {
 
         context = new JspCServletContext(log, resourceBase, classLoader);
         TldScanner scanner = new TldScanner(context, true, validateXml);
+        scanner.setClassLoader(classLoader);
+
         try {
             scanner.scan();
         } catch (SAXException e) {
