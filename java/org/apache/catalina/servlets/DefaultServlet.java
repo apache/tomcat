@@ -32,6 +32,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
@@ -137,6 +138,12 @@ public class DefaultServlet
      * Read only flag. By default, it's set to true.
      */
     protected boolean readOnly = true;
+
+
+    /**
+     * Should be serve gzip versions of files. By default, it's set to true.
+     */
+    protected boolean gzip = true;
 
 
     /**
@@ -276,6 +283,9 @@ public class DefaultServlet
 
         if (getServletConfig().getInitParameter("readonly") != null)
             readOnly = Boolean.parseBoolean(getServletConfig().getInitParameter("readonly"));
+
+        if (getServletConfig().getInitParameter("gzip") != null)
+            gzip = Boolean.parseBoolean(getServletConfig().getInitParameter("gzip"));
 
         if (getServletConfig().getInitParameter("sendfileSize") != null)
             sendfileSize =
@@ -752,6 +762,19 @@ public class DefaultServlet
         if (contentType == null) {
             contentType = getServletContext().getMimeType(resource.getName());
             resource.setMimeType(contentType);
+        }
+
+        // Serve a gzipped version of the file if present
+        if (gzip
+                && checkIfGzip(request)
+                && resource.isFile()
+                && !path.endsWith(".gz")) {
+            WebResource gzipResource = resources.getResource(path + ".gz");
+            if (gzipResource.exists() && gzipResource.isFile()) {
+                gzipResource.setMimeType(contentType);
+                response.addHeader("Content-Encoding", "gzip");
+                resource = gzipResource;
+            }
         }
 
         ArrayList<Range> ranges = null;
@@ -1679,6 +1702,24 @@ public class DefaultServlet
             }
         }
         return true;
+    }
+
+    /**
+     * Check if the user agent supports gzip encoding.
+     *
+     * @param request   The servlet request we are processing
+     * @return boolean true if the user agent supports gzip encoding,
+     * and false if the user agent does not support gzip encoding
+     */
+    protected boolean checkIfGzip(HttpServletRequest request) {
+        Enumeration<String> headers = request.getHeaders("Accept-Encoding");
+        while (headers.hasMoreElements()) {
+            String header = headers.nextElement();
+            if (header.indexOf("gzip") != -1) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

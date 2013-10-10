@@ -89,6 +89,56 @@ public class TestDefaultServlet extends TomcatBaseTest {
     }
 
     /**
+     * Verify serving of gzipped resources from context root.
+     */
+    @Test
+    public void testGzippedFile() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir =
+            new File("test/webapp");
+
+        File gzipIndex = new File(appDir, "index.html.gz");
+        long gzipSize = gzipIndex.length();
+
+        File index = new File(appDir, "index.html");
+        long indexSize = index.length();
+
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        TestGzipClient gzipClient = new TestGzipClient(getPort());
+
+        gzipClient.reset();
+        gzipClient.setRequest(new String[] {
+                "GET /index.html HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Connection: Close" + CRLF +
+                "Accept-Encoding: gzip" + CRLF + CRLF });
+        gzipClient.connect();
+        gzipClient.processRequest();
+        assertTrue(gzipClient.isResponse200());
+        List<String> responseHeaders = gzipClient.getResponseHeaders();
+        assertTrue(responseHeaders.contains("Content-Length: " + gzipSize));
+
+        gzipClient.reset();
+        gzipClient.setRequest(new String[] {
+                "GET /index.html HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Connection: Close" + CRLF+ CRLF });
+        gzipClient.connect();
+        gzipClient.processRequest();
+        assertTrue(gzipClient.isResponse200());
+        responseHeaders = gzipClient.getResponseHeaders();
+        assertTrue(responseHeaders.contains("Content-Type: text/html"));
+        assertFalse(responseHeaders.contains("Content-Encoding: gzip"));
+        assertTrue(responseHeaders.contains("Content-Length: " + indexSize));
+    }
+
+    /**
      * Test https://issues.apache.org/bugzilla/show_bug.cgi?id=50026
      * Verify serving of resources from context root with subpath mapping.
      */
@@ -300,6 +350,18 @@ public class TestDefaultServlet extends TomcatBaseTest {
     private static class TestCustomErrorClient extends SimpleHttpClient {
 
         public TestCustomErrorClient(int port) {
+            setPort(port);
+        }
+
+        @Override
+        public boolean isResponseBodyOK() {
+            return true;
+        }
+    }
+
+    private static class TestGzipClient extends SimpleHttpClient {
+
+        public TestGzipClient(int port) {
             setPort(port);
         }
 

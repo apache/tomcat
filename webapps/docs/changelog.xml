@@ -141,6 +141,12 @@
         Port storeconfig functionality, which can persist to server.xml and
         context.xml runtime container configuration changes. (remm)
       </add>
+      <add>
+        <bug>54095</bug>: Add support to the Default Servlet for serving
+        gzipped versions of static resources directly from disk as an
+        alternative to Tomcat compressing them on each request. Patch by
+        Philippe Marschall. (markt)
+      </add>
       <fix>
         <bug>54708</bug>: Change the name of the working directory for the ROOT
         application (located under $CATALINA_BASE/work by default) from _ to
