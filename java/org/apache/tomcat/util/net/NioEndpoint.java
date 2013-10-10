@@ -1158,18 +1158,19 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                         } else {
                             if ( isWorkerAvailable() ) {
                                 unreg(sk, attachment, sk.readyOps());
+                                boolean closeSocket = false;
                                 // Read goes before write
                                 if (sk.isReadable()) {
                                     if (!processSocket(channel, SocketStatus.OPEN_READ, true)) {
-                                        close = true;
+                                        closeSocket = true;
                                     }
                                 }
-                                if (!close && sk.isWritable()) {
+                                if (!closeSocket && sk.isWritable()) {
                                     if (!processSocket(channel, SocketStatus.OPEN_WRITE, true)) {
-                                        close = true;
+                                        closeSocket = true;
                                     }
                                 }
-                                if (close) {
+                                if (closeSocket) {
                                     cancelledKey(sk,SocketStatus.DISCONNECT);
                                 }
                             } else {
