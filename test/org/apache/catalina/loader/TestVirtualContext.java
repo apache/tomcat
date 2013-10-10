@@ -69,7 +69,7 @@ public class TestVirtualContext extends TomcatBaseTest {
 
         ctx.setResources(new StandardRoot(ctx));
         File f1 = new File("test/webapp-virtual-webapp/target/classes");
-        File f2 = new File("test/webapp-virtual-library/target/classes");
+        File f2 = new File("test/webapp-virtual-library/target/WEB-INF");
         File f3 = new File(
                 "test/webapp-virtual-webapp/src/main/webapp/WEB-INF/classes");
         File f4 = new File(
@@ -80,7 +80,7 @@ public class TestVirtualContext extends TomcatBaseTest {
                 WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
                 f1.getAbsolutePath(), null, "/");
         ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF",
                 f2.getAbsolutePath(), null, "/");
         ctx.getResources().createWebResourceSet(
                 WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
@@ -159,7 +159,7 @@ public class TestVirtualContext extends TomcatBaseTest {
             allUrls.indexOf("/test/webapp-virtual-webapp/target/classes/rsrc") > 0);
         assertTrue(
             allUrls,
-            allUrls.indexOf("/test/webapp-virtual-library/target/classes/rsrc") > 0);
+            allUrls.indexOf("/test/webapp-virtual-library/target/WEB-INF/classes/rsrc") > 0);
 
         // check that there's no duplicate in the URLs
         String[] allUrlsArray = allUrls.split("\\s+");
