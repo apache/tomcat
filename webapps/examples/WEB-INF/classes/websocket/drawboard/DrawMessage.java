@@ -121,7 +121,6 @@ public final class DrawMessage {
     public void setLastInChain(boolean lastInChain) {
         this.lastInChain = lastInChain;
     }
-    
 
 
 
