@@ -163,7 +163,7 @@ commons-dbcp-src.loc.2=https://repository.apache.org/content/repositories/snapsh
 #commons-pool-src.loc.1=${base-commons.loc.1}/pool/source/commons-pool-${commons-pool.version}-src.tar.gz
 #commons-pool-src.loc.2=${base-commons.loc.2}/pool/source/commons-pool-${commons-pool.version}-src.tar.gz
 #Temporary use of snapshots until Commons Pool 2 has its first release
-commons-pool.version=2.0-20130809.062531-236
+commons-pool.version=2.0-20131011.073316-237
 commons-pool.home=${base.path}/commons-pool2-2.0-SNAPSHOT-src
 commons-pool-src.loc.1=https://repository.apache.org/content/repositories/snapshots/org/apache/commons/commons-pool2/2.0-SNAPSHOT/commons-pool2-${commons-pool.version}-src.tar.gz
 commons-pool-src.loc.2=https://repository.apache.org/content/repositories/snapshots/org/apache/commons/commons-pool2/2.0-SNAPSHOT/commons-pool2-${commons-pool.version}-src.tar.gz
