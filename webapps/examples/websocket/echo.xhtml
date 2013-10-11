@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -14,11 +15,10 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
     <title>Apache Tomcat WebSocket Examples: Echo</title>
-    <style type="text/css">
+    <style type="text/css"><![CDATA[
         #connect-container {
             float: left;
             width: 400px
@@ -48,8 +48,8 @@
             padding: 0;
             margin: 0;
         }
-    </style>
-    <script type="text/javascript">
+    ]]></style>
+    <script type="application/javascript"><![CDATA[
         var ws = null;
 
         function setConnected(connected) {
@@ -122,21 +122,30 @@
             }
             console.scrollTop = console.scrollHeight;
         }
-    </script>
+
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Remove elements with "noscript" class - <noscript> is not allowed in XHTML
+            var noscripts = document.getElementsByClassName("noscript");
+            for (var i = 0; i < noscripts.length; i++) {
+                noscripts[i].parentNode.removeChild(noscripts[i]);
+            }
+        }, false);
+    ]]></script>
 </head>
 <body>
-<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websockets rely on Javascript being enabled. Please enable
-    Javascript and reload this page!</h2></noscript>
+<div class="noscript"><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websockets rely on Javascript being enabled. Please enable
+    Javascript and reload this page!</h2></div>
 <div>
     <div id="connect-container">
         <div>
             <span>Connect to service implemented using:</span>
             <!-- echo example using new programmatic API on the server side -->
             <input id="radio1" type="radio" name="group1" value="/examples/websocket/echoProgrammatic"
-                   onclick="updateTarget(this.value);"> <label for="radio1">programmatic API</label>
+                   onclick="updateTarget(this.value);"/> <label for="radio1">programmatic API</label>
             <!-- echo example using new annotation API on the server side -->
             <input id="radio2" type="radio" name="group1" value="/examples/websocket/echoAnnotation"
-                   onclick="updateTarget(this.value);"> <label for="radio2">annotation API</label>
+                   onclick="updateTarget(this.value);"/> <label for="radio2">annotation API</label>
         </div>
         <div>
             <input id="target" type="text" size="40" style="width: 350px"/>
@@ -153,7 +162,7 @@
         </div>
     </div>
     <div id="console-container">
-        <div id="console"></div>
+        <div id="console"/>
     </div>
 </div>
 </body>
