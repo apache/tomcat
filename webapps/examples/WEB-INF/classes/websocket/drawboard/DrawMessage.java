@@ -153,7 +153,13 @@ public final class DrawMessage {
         g.setColor(new Color(colorR & 0xFF, colorG & 0xFF, colorB & 0xFF,
                 colorA & 0xFF));
 
-        if (type == 1 || type == 2) {
+        if (x1 == x2 && y1 == y2) {
+            // Always draw as arc to meet the behavior in the HTML5 Canvas.
+            Arc2D arc = new Arc2D.Double(x1, y1, 0, 0,
+                    0d, 360d, Arc2D.OPEN);
+            g.draw(arc);
+
+        } else if (type == 1 || type == 2) {
             // Draw a line.
             Line2D line = new Line2D.Double(x1, y1, x2, y2);
             g.draw(line);
@@ -170,6 +176,8 @@ public final class DrawMessage {
                 y2 = this.y1;
             }
 
+            // TODO: If (x1 == x2 || y1 == y2) draw as line.
+
             if (type == 3) {
                 // Draw a rectangle.
                 Rectangle2D rect = new Rectangle2D.Double(x1, y1,
@@ -179,7 +187,7 @@ public final class DrawMessage {
             } else if (type == 4) {
                 // Draw an ellipse.
                 Arc2D arc = new Arc2D.Double(x1, y1, x2 - x1, y2 - y1,
-                        0d, 360d, Arc2D.CHORD);
+                        0d, 360d, Arc2D.OPEN);
                 g.draw(arc);
 
             }
