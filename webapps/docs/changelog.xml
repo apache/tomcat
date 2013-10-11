@@ -139,6 +139,9 @@
         Correct the documentation for Deployment Organization in the App Dev
         Guide. (violetagg)
       </fix>
+      <add>
+        <bug>55639</bug>: Add a Drawboard WebSocket example. (kpreisser)
+      </add>
     </changelog>
   </subsection>
 </section>
