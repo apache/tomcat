@@ -19,6 +19,9 @@ package websocket.drawboard;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 
 /**
  * A message that represents a drawing action.
@@ -33,7 +36,7 @@ public final class DrawMessage {
     private int type;
     private byte colorR, colorG, colorB, colorA;
     private double thickness;
-    private int x1, y1, x2, y2;
+    private double x1, y1, x2, y2;
     private boolean lastInChain;
 
     /**
@@ -82,28 +85,28 @@ public final class DrawMessage {
         this.colorA = colorA;
     }
 
-    public long getX1() {
+    public double getX1() {
         return x1;
     }
-    public void setX1(int x1) {
+    public void setX1(double x1) {
         this.x1 = x1;
     }
-    public int getX2() {
+    public double getX2() {
         return x2;
     }
-    public void setX2(int x2) {
+    public void setX2(double x2) {
         this.x2 = x2;
     }
-    public int getY1() {
+    public double getY1() {
         return y1;
     }
-    public void setY1(int y1) {
+    public void setY1(double y1) {
         this.y1 = y1;
     }
-    public int getY2() {
+    public double getY2() {
         return y2;
     }
-    public void setY2(int y2) {
+    public void setY2(double y2) {
         this.y2 = y2;
     }
 
@@ -123,8 +126,8 @@ public final class DrawMessage {
 
 
     public DrawMessage(int type, byte colorR, byte colorG, byte colorB,
-            byte colorA, double thickness, int x1, int x2, int y1, int y2,
-            boolean lastInChain) {
+            byte colorA, double thickness, double x1, double x2, double y1,
+            double y2, boolean lastInChain) {
 
         this.type = type;
         this.colorR = colorR;
@@ -153,10 +156,11 @@ public final class DrawMessage {
 
         if (type == 1 || type == 2) {
             // Draw a line.
-            g.drawLine(x1, y1, x2, y2);
+            Line2D line = new Line2D.Double(x1, y1, x2, y2);
+            g.draw(line);
 
         } else if (type == 3 || type == 4) {
-            int x1 = this.x1, x2 = this.x2,
+            double x1 = this.x1, x2 = this.x2,
                     y1 = this.y1, y2 = this.y2;
             if (x1 > x2) {
                 x1 = this.x2;
@@ -169,11 +173,15 @@ public final class DrawMessage {
 
             if (type == 3) {
                 // Draw a rectangle.
-                g.drawRect(x1, y1, x2 - x1, y2 - y1);
+                Rectangle2D rect = new Rectangle2D.Double(x1, y1,
+                        x2 - x1, y2 - y1);
+                g.draw(rect);
 
             } else if (type == 4) {
                 // Draw an ellipse.
-                g.drawArc(x1, y1, x2 - x1, y2 - y1, 0, 360);
+                Arc2D arc = new Arc2D.Double(x1, y1, x2 - x1, y2 - y1,
+                        0d, 360d, Arc2D.CHORD);
+                g.draw(arc);
 
             }
         }
@@ -200,7 +208,7 @@ public final class DrawMessage {
         int type;
         byte[] colors = new byte[4];
         double thickness;
-        int[] coords = new int[4];
+        double[] coords = new double[4];
         boolean last;
 
         try {
@@ -219,8 +227,8 @@ public final class DrawMessage {
                 throw new ParseException("Invalid thickness: " + thickness);
 
             for (int i = 0; i < coords.length; i++) {
-                coords[i] = Integer.parseInt(elements[6 + i]);
-                if (coords[i] < -1000000L || coords[i] > 1000000L)
+                coords[i] = Double.parseDouble(elements[6 + i]);
+                if (Double.isNaN(coords[i]))
                     throw new ParseException("Invalid coordinate: "
                             + coords[i]);
             }
