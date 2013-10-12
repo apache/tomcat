@@ -231,7 +231,7 @@ public final class Room {
 
 
     /**
-     * Broadcasts the given drawboard message to all connected players.
+     * Broadcasts the given drawboard message to all connected players.<br>
      * Note: For DrawMessages, please use
      * {@link #broadcastDrawMessage(DrawMessage)}
      * as this method will buffer them and prefix them with the correct
@@ -276,7 +276,7 @@ public final class Room {
     private void broadcastTimerTick() {
         // For each Player, send all per Player buffered
         // DrawMessages, prefixing each DrawMessage with the player's
-        // lastReceuvedMessageId.
+        // lastReceivedMessageId.
         // Multiple messages are concatenated with "|".
 
         for (Player p : players) {
@@ -331,6 +331,7 @@ public final class Room {
     public void shutdown() {
         roomExecutor.shutdown();
         drawmessageBroadcastTimer.cancel();
+        // TODO: Dispose of BufferedImage and Graphics2D
     }
 
 
@@ -339,7 +340,7 @@ public final class Room {
      * {@link Room} and the {@link Client}.<br><br>
      *
      * Note: This means a player object is actually a join between Room and
-     * Endpoint.
+     * Client.
      */
     public final class Player {
 
@@ -358,8 +359,6 @@ public final class Room {
 
         /**
          * Buffered DrawMessages that will be sent by a Timer.
-         * TODO: This should be refactored to be in a Room-Player join class
-         * as this is room-specific.
          */
         private final List<DrawMessage> bufferedDrawMessages =
                 new ArrayList<DrawMessage>();

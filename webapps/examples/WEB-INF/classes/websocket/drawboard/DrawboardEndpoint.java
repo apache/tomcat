@@ -158,7 +158,7 @@ public final class DrawboardEndpoint extends Endpoint {
                         // (starting with char '1'), and pong messages (starting
                         // with char '0').
                         // Draw messages should look like this:
-                        // ID|type,colR,colB,colG,colA,thickness,x1,y1,x2,y2
+                        // ID|type,colR,colB,colG,colA,thickness,x1,y1,x2,y2,lastInChain
 
                         boolean dontSwallowException = false;
                         try {
