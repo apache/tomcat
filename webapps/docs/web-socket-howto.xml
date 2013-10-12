@@ -43,9 +43,9 @@
 
 <p>There are several example applications that demonstrate how the WebSocket API
    can be used. You will need to look at both the client side <a
-   href="http://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/websocket/">
+   href="http://svn.apache.org/viewvc/tomcat/tc7.0.x/trunk/webapps/examples/websocket/">
    HTML</a> and the server side <a
-   href="http://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/WEB-INF/classes/websocket/">
+   href="http://svn.apache.org/viewvc/tomcat/tc7.0.x/trunk/webapps/examples/WEB-INF/classes/websocket/">
    code</a>.</p>
 </section>
 
@@ -105,12 +105,10 @@
 
 <p>There are also several example applications that demonstrate how the
    WebSocket API can be used. You'll need to look at both the client side <a
-   href="http://svn.apache.org/viewvc/tomcat/tc7.0.x/tags/TOMCAT_7_0_42/webapps/examples/websocket/">
+   href="http://svn.apache.org/viewvc/tomcat/tc7.0.x/trunk/webapps/examples/websocket-deprecated/">
    HTML</a> and the server side <a
-   href="http://svn.apache.org/viewvc/tomcat/tc7.0.x/tags/TOMCAT_7_0_42/webapps/examples/WEB-INF/classes/websocket/">
-   code</a>. Note that as of 7.0.43, these sample applications have been
-   refactored to use the JSR-356 WebSocket implementation so the links above are
-   for the 7.0.42 tag.</p>
+   href="http://svn.apache.org/viewvc/tomcat/tc7.0.x/trunk/webapps/examples/WEB-INF/classes/websocket/tc7/">
+   code</a>.</p>
 </section>
 
 
