@@ -99,6 +99,10 @@ directory listings are disabled and debugging is turned off.
         appended to the file name located alongside the original file), Tomcat
         will serve the gzipped file if the user agent supports gzip and this
         option is enabled. [true]
+        <br />
+        The file with the <code>.gz</code> extension will be accessible if
+        requested directly so if the original resource is protected with a
+        security constraint, the gzipped version must be similarly protected.
   </property>
   <property name="readmeFile">
         If a directory listing is presented, a readme file may also
