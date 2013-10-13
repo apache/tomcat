@@ -744,11 +744,12 @@ public class DefaultServlet
         boolean isError =
             response.getStatus() >= HttpServletResponse.SC_BAD_REQUEST;
 
+        boolean included = false;
         // Check if the conditions specified in the optional If headers are
         // satisfied.
         if (resource.isFile()) {
             // Checking If headers
-            boolean included = (request.getAttribute(
+            included = (request.getAttribute(
                     RequestDispatcher.INCLUDE_CONTEXT_PATH) != null);
             if (!included && !isError &&
                     !checkIfHeaders(request, response, resource)) {
@@ -764,16 +765,29 @@ public class DefaultServlet
             resource.setMimeType(contentType);
         }
 
+        // These need to reflect the original resource, not the potentially
+        // gzip'd version of the resource so get them now if they are going to
+        // be needed later
+        String eTag = null;
+        String lastModifiedHttp = null;
+        if (resource.isFile() && !isError) {
+            eTag = resource.getETag();
+            lastModifiedHttp = resource.getLastModifiedHttp();
+        }
+
+
         // Serve a gzipped version of the file if present
-        if (gzip
-                && checkIfGzip(request)
-                && resource.isFile()
-                && !path.endsWith(".gz")) {
+        boolean usingGzippedVersion = false;
+        if (gzip &&
+                resource.isFile() &&
+                !included &&
+                !path.endsWith(".gz") &&
+                checkIfGzip(request)) {
             WebResource gzipResource = resources.getResource(path + ".gz");
             if (gzipResource.exists() && gzipResource.isFile()) {
-                gzipResource.setMimeType(contentType);
                 response.addHeader("Content-Encoding", "gzip");
                 resource = gzipResource;
+                usingGzippedVersion = true;
             }
         }
 
@@ -800,11 +814,10 @@ public class DefaultServlet
                 ranges = parseRange(request, response, resource);
 
                 // ETag header
-                response.setHeader("ETag", resource.getETag());
+                response.setHeader("ETag", eTag);
 
                 // Last-Modified header
-                response.setHeader("Last-Modified",
-                        resource.getLastModifiedHttp());
+                response.setHeader("Last-Modified", lastModifiedHttp);
             }
 
             // Get content length
@@ -829,10 +842,12 @@ public class DefaultServlet
             } catch (IllegalStateException e) {
                 // If it fails, we try to get a Writer instead if we're
                 // trying to serve a text file
-                if ( (contentType == null)
-                        || (contentType.startsWith("text"))
-                        || (contentType.endsWith("xml"))
-                        || (contentType.contains("/javascript")) ) {
+                if (!usingGzippedVersion &&
+                        ((contentType == null) ||
+                                (contentType.startsWith("text")) ||
+                                (contentType.endsWith("xml")) ||
+                                (contentType.contains("/javascript")))
+                        ) {
                     writer = response.getWriter();
                     // Cannot reliably serve partial content with a Writer
                     ranges = FULL;
