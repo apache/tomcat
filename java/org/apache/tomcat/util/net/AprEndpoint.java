@@ -457,8 +457,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             Socket.optSet(serverSock, Socket.APR_SO_REUSEADDR, 1);
         }
 
-        // Sendfile usage on systems which don't support it cause major problems
-        if (useSendfile && !Library.APR_HAS_SENDFILE) {
+        // Enable Sendfile by default if it has not been configured but usage on
+        // systems which don't support it cause major problems
+        if (!useSendFileSet) {
+            useSendfile = Library.APR_HAS_SENDFILE;
+        } else if (useSendfile && !Library.APR_HAS_SENDFILE) {
             useSendfile = false;
         }
 
@@ -583,7 +586,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             }
             SSLContext.setVerify(sslContext, value, SSLVerifyDepth);
             // For now, sendfile is not supported with SSL
-            useSendfile = false;
+            if (useSendfile) {
+                useSendfile = false;
+                if (useSendFileSet) {
+                    log.warn(sm.getString("endpoint.apr.noSendfileWithSSL"));
+                }
+            }
         }
     }
 
@@ -617,9 +625,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             pollerThread.start();
 
             // Start sendfile thread
-            if (!useSendFileSet) {
-                useSendfile = Library.APR_HAS_SENDFILE;
-            }
             if (useSendfile) {
                 sendfile = new Sendfile();
                 sendfile.init();
