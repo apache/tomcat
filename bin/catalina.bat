@@ -145,7 +145,7 @@ goto end
 
 if "%CATALINA_BASE%" == "%CATALINA_BASE:;=%" goto baseNoSemicolon
 echo Using CATALINA_BASE:   "%CATALINA_BASE%"
-echo Unable to start as CATALINA_HOME contains a semicolon (;) character
+echo Unable to start as CATALINA_BASE contains a semicolon (;) character
 goto end
 :baseNoSemicolon
 
