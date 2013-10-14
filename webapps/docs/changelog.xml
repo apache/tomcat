@@ -88,6 +88,9 @@
         be closed immediately rather than having to wait for the client to first
         send any remaining data that is only going to be ignored. (markt)
       </fix>
+      <fix>
+        Update the APR/native connector to version 1.1.29. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
