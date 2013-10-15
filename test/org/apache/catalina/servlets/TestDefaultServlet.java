@@ -39,6 +39,8 @@ import org.junit.Test;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -96,8 +98,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir =
-            new File("test/webapp");
+        File appDir = new File("test/webapp");
 
         File gzipIndex = new File(appDir, "index.html.gz");
         long gzipSize = gzipIndex.length();
@@ -106,7 +107,13 @@ public class TestDefaultServlet extends TomcatBaseTest {
         long indexSize = index.length();
 
         // app dir is relative to server home
-        tomcat.addWebapp(null, "", appDir.getAbsolutePath());
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
+                "org.apache.catalina.servlets.DefaultServlet");
+        defaultServlet.addInitParameter("gzip", "true");
+        ctxt.addServletMapping("/", "default");
+
+        ctxt.addMimeMapping("html", "text/html");
 
         tomcat.start();
 
