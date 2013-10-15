@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -30,23 +30,18 @@
 <body>
 
 <section name="2010 News &amp; Status">
-<br />
-<a name="20100217.1">
-<h3>17 February - TC-Native-1.1.20 released</h3>
-</a>
+<subsection anchor="20100217.1" name="17 February - TC-Native-1.1.20 released">
 <p>The Apache Tomcat team is proud to announce the immediate availability
 of Tomcat Native 1.1.20. This is a stable release adding some bug fixes.
 </p>
-<br />
-<a name="20100108.1">
-<h3>8 January - TC-Native-1.1.19 released</h3>
-</a>
+</subsection>
+<subsection anchor="20100108.1" name="8 January - TC-Native-1.1.19 released">
 <p>The Apache Tomcat team is proud to announce the immediate availability
 of Tomcat Native 1.1.19. This is a stable release adding some bug fixes.
 </p><p>
  Please see the <a href="../miscellaneous/changelog.html">ChangeLog</a> for a full list of changes.
 </p>
-<hr size="1" noshade="noshade" />
+</subsection>
 </section>
 </body>
 </document>

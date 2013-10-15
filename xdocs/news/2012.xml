@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -30,32 +30,24 @@
 <body>
 
 <section name="2012 News &amp; Status">
-<br />
-<a name="20120613.1">
-<h3>13 June - TC-Native-1.1.24 released</h3>
-</a>
+<subsection anchor="20120613.1" name="13 June - TC-Native-1.1.24 released">
 <p>The Apache Tomcat team is proud to announce the immediate availability
 of Tomcat Native 1.1.24. This is a feature-add release adding support for
 per-socket Poller timeouts.
 </p>
-<br />
 <p>
  Please see the <a href="../miscellaneous/changelog.html">ChangeLog</a> for a full list of changes.
 </p>
-<hr size="1" noshade="noshade" />
-<br />
-<a name="20120302.1">
-<h3>02 March - TC-Native-1.1.23 released</h3>
-</a>
+</subsection>
+<subsection anchor="20120302.1" name="02 March - TC-Native-1.1.23 released">
 <p>The Apache Tomcat team is proud to announce the immediate availability
 of Tomcat Native 1.1.23. This is a stable release adding some bug fixes and
 experimental support for OCSP and PKCS12 certificates.
 </p>
-<br />
 <p>
  Please see the <a href="../miscellaneous/changelog.html">ChangeLog</a> for a full list of changes.
 </p>
-<hr size="1" noshade="noshade" />
+</subsection>
 </section>
 </body>
 </document>

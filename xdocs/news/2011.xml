@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -30,18 +30,14 @@
 <body>
 
 <section name="2011 News &amp; Status">
-<br />
-<a name="20110808.1">
-<h3>08 August - TC-Native-1.1.22 released</h3>
-</a>
+<subsection anchor="20110808.1" name="08 August - TC-Native-1.1.22 released">
 <p>The Apache Tomcat team is proud to announce the immediate availability
 of Tomcat Native 1.1.22. This is a stable release adding some bug fixes.
 </p>
-<br />
 <p>
  Please see the <a href="../miscellaneous/changelog.html">ChangeLog</a> for a full list of changes.
 </p>
-<hr size="1" noshade="noshade" />
+</subsection>
 </section>
 </body>
 </document>

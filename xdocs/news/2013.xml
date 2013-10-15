@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -30,37 +30,27 @@
 <body>
 
 <section name="2013 News &amp; Status">
-<br />
-<a name="20131015.1">
-<h3>15 October - TC-Native-1.1.29 released</h3>
-</a>
+<subsection anchor="20131015.1" name="15 October - TC-Native-1.1.29 released">
 <p>The Apache Tomcat team is proud to announce the immediate availability
 of Tomcat Native 1.1.29. This is a bug fixing release.
 </p>
-<br />
-<a name="20130916.1">
-<h3>16 September - TC-Native-1.1.28 released</h3>
-</a>
+</subsection>
+<subsection anchor="20130916.1" name="16 September - TC-Native-1.1.28 released">
 <p>The Apache Tomcat team is proud to announce the immediate availability
 of Tomcat Native 1.1.28. This is a bug fixing release.
 </p>
-<br />
 <p>
  Please see the <a href="../miscellaneous/changelog.html">ChangeLog</a> for a full list of changes.
 </p>
-<hr size="1" noshade="noshade" />
-<br />
-<a name="20130212.1">
-<h3>12 February - TC-Native-1.1.27 released</h3>
-</a>
+</subsection>
+<subsection anchor="20130212.1" name="12 February - TC-Native-1.1.27 released">
 <p>The Apache Tomcat team is proud to announce the immediate availability
 of Tomcat Native 1.1.27. This is a bug fixing release.
 </p>
-<br />
 <p>
  Please see the <a href="../miscellaneous/changelog.html">ChangeLog</a> for a full list of changes.
 </p>
-<hr size="1" noshade="noshade" />
+</subsection>
 </section>
 </body>
 </document>

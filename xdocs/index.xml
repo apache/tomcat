@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -48,22 +48,20 @@
   <p>
     Features of the APR connector:
   </p>
-    <ul>
-      <li>Non-blocking I/O for Keep-Alive requests (between requests)</li>
-      <li>Uses OpenSSL for TLS/SSL capabilities (if supported by linked APR library)</li>
-      <li>FIPS 140-2 support for TLS/SSL (if supported by linked OpenSSL library)</li>
-    </ul>
+  <ul>
+    <li>Non-blocking I/O for Keep-Alive requests (between requests)</li>
+    <li>Uses OpenSSL for TLS/SSL capabilities (if supported by linked APR library)</li>
+    <li>FIPS 140-2 support for TLS/SSL (if supported by linked OpenSSL library)</li>
+  </ul>
 
-<p>
-  Select one of the links from the navigation menu (to the left) to drill
-  down to the more detailed documentation that is available. Each available
-  manual is described in more detail below.
-</p>
+
+<p>Select one of the links from the navigation menu (to the left) to drill
+down to the more detailed documentation that is available. Each available
+manual is described in more detail below.</p>
 
 </section>
 
 <section name="Headlines">
-<br />
 <ul>
 
 <li><a href="news/2013.html#20131015.1">15 October 2013 - <b>TC-Native-1.1.29 released</b></a>
@@ -84,62 +82,61 @@
 <subsection name="Requirements">
     <p>
       Build tc-native requires three components to be installed:
+    </p>
       <ul>
         <li>APR library</li>
         <li>OpenSSL libraries</li>
         <li>Java SE Development Kit (JDK)</li>
       </ul>
-    </p>
+
     <p>
-     In debian based Linux those dependencies could be installed by something like:
-      <pre>
-        apt-get install libapr1.0-dev libssl-dev
-      </pre>
-     In rpm based Linux those dependencies could be installed by something like:
-      <pre>
-        yum install apr-devel openssl-devel
-      </pre>
+      In debian based Linux those dependencies could be installed by something like:
     </p>
+    <source>apt-get install libapr1.0-dev libssl-dev</source>
+    <p>
+      In rpm based Linux those dependencies could be installed by something like:
+    </p>
+    <source>yum install apr-devel openssl-devel</source>
 </subsection>
 
 <subsection name="UNIX">
   <p>
     On all the POSIX systems (Linux, Solaris, HP-UX, AIX etc...) a well-known
     configure and make is used to build tc-native.<br/>
-    In the jni/native runs:<br/>
-    <pre>
-    ./configure --help
-    </pre>
-    to read the description of all the parameters.<br/>
-    <pre>
-    ./configure --with-apr=$HOME/APR \
-                --with-java-home=$JAVA_HOME \
-                --with-ssl=$HOME/OPENSSL \
-                --prefix=$CATALINA_HOME
-    </pre>
+    In the jni/native runs:
+  </p>
+    <source>./configure --help</source>
+    <p>to read the description of all the parameters.</p>
+    <source
+>./configure --with-apr=$HOME/APR \
+            --with-java-home=$JAVA_HOME \
+            --with-ssl=$HOME/OPENSSL \
+            --prefix=$CATALINA_HOME</source>
+  <p>
     to create the includes and makefiles to be able to build tc-native.<br/>
     Where:<br/>
-    $HOME/APR is something like /usr/bin/apr-1-config or the path where apr is
+    <code>$HOME/APR</code> is something like /usr/bin/apr-1-config or the path where apr is
     installed.<br/>
-    $JAVA_HOME is something /home/jfclere/JAVA/jdk1.5.0_09 path to a JDK
+    <code>$JAVA_HOME</code> is something /home/jfclere/JAVA/jdk1.5.0_09 path to a JDK
     installation. Any JDK should work but it is advisable to use the same
     JVM version the JVM you use with Tomcat.<br/>
-    $HOME/OPENSSL is the path where OpenSSL is installed.<br/>
-    $CATALINA_HOME is the path where the produced libraries will be installed. Something like $HOME/apache-tomcat-6.0.16/<br/>
+    <code>$HOME/OPENSSL</code> is the path where OpenSSL is installed.<br/>
+    <code>$CATALINA_HOME</code> is the path where the produced libraries will be
+    installed. Something like $HOME/apache-tomcat-6.0.16/<br/>
     <br/>
     The configure is able to guess most of OpenSSL standard installations.
     So most of the time the following will be enough:
-    <pre>
-    ./configure --with-apr=/usr/bin/apr-1-config \
-                --with-java-home=/home/jfclere/JAVA/jdk1.5.0_09/ \
-                --with-ssl=yes \
-                --prefix=$CATALINA_HOME
-    </pre>
-    <br/>
-    To build the libraries and install them:<br/>
-    <pre>
-    make &amp;&amp; make install
-    </pre>
+  </p>
+    <source
+>./configure --with-apr=/usr/bin/apr-1-config \
+            --with-java-home=/home/jfclere/JAVA/jdk1.5.0_09/ \
+            --with-ssl=yes \
+            --prefix=$CATALINA_HOME</source>
+  <p>
+    To build the libraries and install them:
+  </p>
+  <source>make &amp;&amp; make install</source>
+  <p>
     The libraries will be found in $CATALINA_HOME/lib
   </p>
 </subsection>
@@ -176,30 +173,31 @@
       to ensure that something like the following is present, and uncommented:
     </p>
 
-    <pre>
-      &lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" /&gt;
-    </pre>
-
-    Please see the Apache Tomcat documentation for configuration specifics.
+    <source wrapped="true"
+      ><![CDATA[<Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />]]></source>
+    <p>
+      Please see the Apache Tomcat documentation for configuration specifics.
+    </p>
   </subsection>
 
 <subsection name="UNIX">
   <p>
    Edit $CATALINA_HOME/bin/setenv.sh (creating the file if necessary) and add
    the path to the tc-native libraries to LD_LIBRARY_PATH. Something like:
-   <pre>
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CATALINA_HOME/lib
-    export LD_LIBRARY_PATH
-   </pre>
+  </p>
+  <source>LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CATALINA_HOME/lib
+export LD_LIBRARY_PATH</source>
+  <p>
    Start tomcat and check for the messages like this ones:
-   <pre>
-    Feb 8, 2008 12:27:41 PM org.apache.catalina.core.AprLifecycleListener init
-    INFO: Loaded APR based Apache Tomcat Native library 1.x.y.
-    Feb 8, 2008 12:27:41 PM org.apache.catalina.core.AprLifecycleListener init
-    INFO: APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
-    Feb 8, 2008 12:27:41 PM org.apache.coyote.http11.Http11AprProtocol init
-    INFO: Initializing Coyote HTTP/1.1 on http-8080
-   </pre>
+  </p>
+   <source wrapped="true"
+>Feb 8, 2008 12:27:41 PM org.apache.catalina.core.AprLifecycleListener init
+INFO: Loaded APR based Apache Tomcat Native library 1.x.y.
+Feb 8, 2008 12:27:41 PM org.apache.catalina.core.AprLifecycleListener init
+INFO: APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
+Feb 8, 2008 12:27:41 PM org.apache.coyote.http11.Http11AprProtocol init
+INFO: Initializing Coyote HTTP/1.1 on http-8080</source>
+  <p>
     Refer to the tomcat documentation to configure the connectors
     (See <a href="http://tomcat.apache.org/tomcat-6.0-doc/apr.html">Tomcat6.0.x</a>
     and  <a href="http://tomcat.apache.org/tomcat-5.5-doc/apr.html">Tomcat5.5.x</a>)
@@ -212,20 +210,19 @@
     the path to the tc-native libraries, apr and OpenSSL to PATH. For example:
   </p>
 
-  <pre style="white-space:pre-wrap; word-wrap:break-word;">
-    set PATH=%PATH;C:\cygwin\home\support\tomcat-native-current-win32-src\jni\native\Debug;C:\cygwin\home\support\tomcat-native-current-win32-src\jni\apr\Debug;C:\OpenSSL\lib\VC
-  </pre>
+  <source wrapped="true"
+    >set PATH=%PATH;C:\cygwin\home\support\tomcat-native-current-win32-src\jni\native\Debug;C:\cygwin\home\support\tomcat-native-current-win32-src\jni\apr\Debug;C:\OpenSSL\lib\VC</source>
   <p>
     Start tomcat and check for the messages like this ones:
   </p>
-  <pre>
-    Feb 8, 2008 2:48:17 PM org.apache.catalina.core.AprLifecycleListener init
-    INFO: Loaded APR based Apache Tomcat Native library 1.x.y.
-    Feb 8, 2008 2:48:17 PM org.apache.catalina.core.AprLifecycleListener init
-    INFO: APR capabilities: IPv6 [false], sendfile [true], accept filters [false], random [true].
-    Feb 8, 2008 2:48:18 PM org.apache.coyote.http11.Http11AprProtocol init
-    INFO: Initializing Coyote HTTP/1.1 on http-8080
-  </pre>
+  <source wrapped="true"
+>Feb 8, 2008 2:48:17 PM org.apache.catalina.core.AprLifecycleListener init
+INFO: Loaded APR based Apache Tomcat Native library 1.x.y.
+Feb 8, 2008 2:48:17 PM org.apache.catalina.core.AprLifecycleListener init
+INFO: APR capabilities: IPv6 [false], sendfile [true], accept filters [false], random [true].
+Feb 8, 2008 2:48:18 PM org.apache.coyote.http11.Http11AprProtocol init
+INFO: Initializing Coyote HTTP/1.1 on http-8080</source>
+
 </subsection>
 
 </section>

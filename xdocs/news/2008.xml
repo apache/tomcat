@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -30,38 +30,29 @@
 <body>
 
 <section name="2008 News &amp; Status">
-<br />
-<a name="20081118.1">
-<h3>18 November - TC-Native-1.1.16 released</h3>
-</a>
+<subsection anchor="20081118.1" name="18 November - TC-Native-1.1.16 released">
 <p>The Apache Tomcat team is proud to announce the immediate availability
 of Tomcat Native 1.1.16. This is a stable release adding some bug fixes.
 </p>
-
-<a name="20080911.1">
-<h3>11 September - TC-Native-1.1.15 released</h3>
-</a>
+</subsection>
+<subsection anchor="20080911.1" name="11 September - TC-Native-1.1.15 released">
 <p>The Apache Tomcat team is proud to announce the immediate availability
 of Tomcat Native 1.1.15. This is a stable release adding some bug fixes.
 </p>
-
-<a name="20080704.1">
-<h3>4 July - TC-Native-1.1.14 released</h3>
-</a>
+</subsection>
+<subsection anchor="20080704.1" name="4 July - TC-Native-1.1.14 released">
 <p>The Apache Tomcat team is proud to announce the immediate availability
 of Tomcat Native 1.1.14. This is a stable release adding some bug fixes.
 </p>
-
-<a name="20080115.1">
-<h3>15 February - TC-Native-1.1.13 released</h3>
-</a>
+</subsection>
+<subsection anchor="20080115.1" name="15 February - TC-Native-1.1.13 released">
 <p>The Apache Tomcat team is proud to announce the immediate availability
 of Tomcat Native 1.1.13. This is a stable release adding few new features
 and some bug fixes.
 </p><p>
  Please see the <a href="../miscellaneous/changelog.html">ChangeLog</a> for a full list of changes.
 </p>
-<hr size="1" noshade="noshade" />
+</subsection>
 </section>
 </body>
 </document>
