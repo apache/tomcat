@@ -186,8 +186,12 @@ grant {
     // Applications using Comet need to be able to access this package
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.comet";
 
-    // Applications using WebSocket need to be able to access this package
+    // Applications using the legacy WebSocket implementation need to be able to access this package
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.websocket";
+
+    // Applications using the JSR-356 WebSocket implementation need to be able to access these packages
+    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.tomcat.websocket";
+    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.tomcat.websocket.server";
 };
 
 
