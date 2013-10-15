@@ -815,7 +815,7 @@
         <exclude name="docs/architecture/*.xml"/>
       </fileset>
     </copy>
-    <copy todir="${tomcat.build}/webapps" encoding="ISO-8859-1">
+    <copy todir="${tomcat.build}/webapps" encoding="UTF-8">
       <filterset refid="version.filters"/>
       <fileset dir="webapps">
         <include name="docs/**/*.html"/>
@@ -979,7 +979,7 @@
         <include name="host-manager/**"/>
       </fileset>
     </copy>
-    <copy todir="${tomcat.build}/webapps" encoding="ISO-8859-1">
+    <copy todir="${tomcat.build}/webapps" encoding="UTF-8">
       <filterset refid="version.filters" />
       <fileset dir="webapps">
         <include name="ROOT/index.jsp"/>
@@ -1942,12 +1942,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </copy>
     <copy file="res/welcome.main.html"
         tofile="${tomcat.release}/v${version}/README.html"
-        encoding="ISO-8859-1">
+        encoding="UTF-8">
       <filterset refid="version.filters"/>
     </copy>
     <copy file="res/welcome.bin.html"
         tofile="${tomcat.release}/v${version}/bin/README.html"
-        encoding="ISO-8859-1">
+        encoding="UTF-8">
       <filterset refid="version.filters"/>
     </copy>
 
