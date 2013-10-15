@@ -124,7 +124,8 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
                     // APR + SSL requires that exactly the same parameters are
                     // passed when re-attempting the write
                 }
-                written = Socket.sendb(socket, sslOutputBuffer, start, left);
+                written = Socket.sendb(socket, sslOutputBuffer,
+                        sslOutputBuffer.position(), sslOutputBuffer.limit());
                 if (written > 0) {
                     sslOutputBuffer.position(
                             sslOutputBuffer.position() + written);
