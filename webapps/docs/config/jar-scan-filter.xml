@@ -41,9 +41,23 @@
   scan.</p>
 
   <p>A Jar Scan Filter element MAY be nested inside a
-  <a href="jar-scanner.html">Jar Scanner</a> component.  If it is not included,
-  a default Jar Scan Filter configuration will be created automatically, which
-  is sufficient for most requirements.</p>
+  <a href="jar-scanner.html">Jar Scanner</a> component.</p>
+
+  <p>For example you can specify additional jar files when scanning for pluggable
+  features:</p>
+<source><![CDATA[<Context>
+  ...
+  <JarScanner>
+    <JarScanFilter
+           pluggableScan="${tomcat.util.scan.StandardJarScanFilter.jarsToScan},
+                          my_pluggable_feature.jar"/>
+  </JarScanner>
+  ...
+</Context>]]></source>
+
+  <p>If a Jar Scan Filter element is not included, a default Jar Scan Filter
+  configuration will be created automatically, which is sufficient for most
+  requirements.</p>
 
 </section>
 
