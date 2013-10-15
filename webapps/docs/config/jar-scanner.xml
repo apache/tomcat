@@ -41,9 +41,18 @@
   the web application initialisation.</p>
 
   <p>A Jar Scanner element MAY be nested inside a
-  <a href="context.html">Context</a> component.  If it is not included,
-  a default Jar Scanner configuration will be created automatically, which
-  is sufficient for most requirements.</p>
+  <a href="context.html">Context</a> component.</p>
+
+  <p>For example you can include the bootstrap classpath when scanning for jar
+  files:</p>
+<source><![CDATA[<Context>
+  ...
+  <JarScanner scanBootstrapClassPath="true"/>
+  ...
+</Context>]]></source>
+
+  <p>If a Jar Scanner element is not included, a default Jar Scanner configuration
+  will be created automatically, which is sufficient for most requirements.</p>
 
 </section>
 
