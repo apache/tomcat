@@ -27,10 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
 
@@ -41,10 +37,8 @@ import websocket.drawboard.wsmessages.StringWebsocketMessage;
  * A Room represents a drawboard where a number of
  * users participate.<br><br>
  *
- * Each Room has its own "Room Thread" which manages all the actions
- * to be done in this Room. Instance methods should only be invoked
- * from this Room's thread by calling {@link #invoke(Runnable)} or
- * {@link #invokeAndWait(Runnable)}.
+ * Note: Instance methods should only be invoked by calling
+ * {@link #invokeAndWait(Runnable)} to ensure access is correctly synchronized.
  */
 public final class Room {
 
@@ -90,6 +84,15 @@ public final class Room {
     }
 
 
+    /**
+     * An object used to synchronize access to this Room.
+     */
+    private final Object syncObj = new Object();
+
+    /**
+     * Indicates if this room has already been shutdown.
+     */
+    private volatile boolean closed = false;
 
     /**
      * If <code>true</code>, outgoing DrawMessages will be buffered until the
@@ -97,13 +100,6 @@ public final class Room {
      * immediately.
      */
     private static final boolean BUFFER_DRAW_MESSAGES = true;
-
-    /**
-     * A single-threaded ExecutorService where tasks
-     * are scheduled that are to be run in the Room Thread.
-     */
-    private final ExecutorService roomExecutor =
-            Executors.newSingleThreadExecutor();
 
     /**
      * A timer which sends buffered drawmessages to the client at once
@@ -147,16 +143,12 @@ public final class Room {
         drawmessageBroadcastTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                try {
-                    invokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            broadcastTimerTick();
-                        }
-                    });
-                } catch (InterruptedException | ExecutionException e) {
-                    // TODO
-                }
+                invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        broadcastTimerTick();
+                    }
+                });
             }
         }, 30, 30);
     }
@@ -302,34 +294,31 @@ public final class Room {
 
 
     /**
-     * Submits the given Runnable to the Room Executor.
-     * @param task
-     */
-    public void invoke(Runnable task) {
-        roomExecutor.submit(task);
-    }
-
-    /**
      * Submits the given Runnable to the Room Executor and waits until it
-     * has been executed.
+     * has been executed. Currently, this simply means that the Runnable
+     * will be run directly inside of a synchronized() block.
      * @param task
-     * @throws InterruptedException if the current thread was interrupted
-     * while waiting
-     * @throws ExecutionException if the computation threw an exception
      */
-    public void invokeAndWait(Runnable task)
-            throws InterruptedException, ExecutionException {
-        Future<?> f = roomExecutor.submit(task);
-        f.get();
+    public void invokeAndWait(Runnable task)  {
+        synchronized (syncObj) {
+            if (!closed) {
+                task.run();
+            }
+        }
     }
 
     /**
      * Shuts down the roomExecutor and the drawmessageBroadcastTimer.
      */
     public void shutdown() {
-        roomExecutor.shutdown();
-        drawmessageBroadcastTimer.cancel();
-        // TODO: Dispose of BufferedImage and Graphics2D
+        invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                closed = true;
+                drawmessageBroadcastTimer.cancel();
+                roomGraphics.dispose();
+            }
+        });
     }
 
 
