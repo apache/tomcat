@@ -25,7 +25,7 @@ import javax.websocket.MessageHandler;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 
-public class EchoEndpoint extends Endpoint{
+public class EchoEndpoint extends Endpoint {
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
