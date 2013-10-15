@@ -43,6 +43,7 @@ import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -1234,20 +1235,7 @@ public class WebappClassLoader extends URLClassLoader
             }
         }
 
-        final Iterator<URL> iterator = result.iterator();
-
-        return new Enumeration<URL>() {
-            @Override
-            public boolean hasMoreElements() {
-                return iterator.hasNext();
-            }
-
-            @Override
-            public URL nextElement() {
-                return iterator.next();
-            }
-        };
-
+        return Collections.enumeration(result);
     }
 
 
