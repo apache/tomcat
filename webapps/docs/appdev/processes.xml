@@ -130,7 +130,7 @@ You might end up with something like this:</p>
 app.path=/hello
 
 # Tomcat installation directory
-catalina.home=/usr/local/apache-tomcat-@VERSION_MAJOR_MINOR@
+catalina.home=/usr/local/apache-tomcat-<version-major-minor/>
 
 # Manager webapp username and password
 manager.username=myusername

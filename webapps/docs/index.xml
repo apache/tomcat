@@ -35,7 +35,7 @@
 
 <p>This is the top-level entry point of the documentation bundle for the
 <strong>Apache Tomcat</strong> Servlet/JSP container.  Apache Tomcat version
-@VERSION_MAJOR_MINOR@ implements the Servlet 3.1 and JavaServer Pages 2.3
+<version-major-minor/> implements the Servlet 3.1 and JavaServer Pages 2.3
 <a href="http://wiki.apache.org/tomcat/Specifications">specifications</a> from the
 <a href="http://www.jcp.org">Java Community Process</a>, and includes many
 additional features that make it a useful platform for developing and deploying

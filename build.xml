@@ -850,6 +850,8 @@
       <param name="subdir" expression=""/>
       <param name="relative-path" expression="."/>
       <param name="version" expression="${version}"/>
+      <param name="majorversion" expression="${version.major}"/>
+      <param name="majorminorversion" expression="${version.major.minor}"/>
       <param name="build-date" expression="${today}"/>
       <param name="build-date-iso-8601" expression="${today-iso-8601}"/>
       <param name="year" expression="${year}"/>
@@ -865,6 +867,8 @@
       <param name="subdir" expression="appdev/"/>
       <param name="relative-path" expression=".."/>
       <param name="version" expression="${version}"/>
+      <param name="majorversion" expression="${version.major}"/>
+      <param name="majorminorversion" expression="${version.major.minor}"/>
       <param name="build-date" expression="${today}"/>
       <param name="build-date-iso-8601" expression="${today-iso-8601}"/>
       <param name="year" expression="${year}"/>
@@ -880,6 +884,8 @@
       <param name="subdir" expression="funcspecs/"/>
       <param name="relative-path" expression=".."/>
       <param name="version" expression="${version}"/>
+      <param name="majorversion" expression="${version.major}"/>
+      <param name="majorminorversion" expression="${version.major.minor}"/>
       <param name="build-date" expression="${today}"/>
       <param name="build-date-iso-8601" expression="${today-iso-8601}"/>
       <param name="year" expression="${year}"/>
@@ -895,6 +901,8 @@
       <param name="subdir" expression="config/"/>
       <param name="relative-path" expression=".."/>
       <param name="version" expression="${version}"/>
+      <param name="majorversion" expression="${version.major}"/>
+      <param name="majorminorversion" expression="${version.major.minor}"/>
       <param name="build-date" expression="${today}"/>
       <param name="build-date-iso-8601" expression="${today-iso-8601}"/>
       <param name="year" expression="${year}"/>
@@ -910,6 +918,8 @@
       <param name="subdir" expression="architecture/"/>
       <param name="relative-path" expression=".."/>
       <param name="version" expression="${version}"/>
+      <param name="majorversion" expression="${version.major}"/>
+      <param name="majorminorversion" expression="${version.major.minor}"/>
       <param name="build-date" expression="${today}"/>
       <param name="build-date-iso-8601" expression="${today-iso-8601}"/>
       <param name="year" expression="${year}"/>
@@ -926,6 +936,8 @@
       <param name="subdir" expression="tribes/"/>
       <param name="relative-path" expression=".."/>
       <param name="version" expression="${version}"/>
+      <param name="majorversion" expression="${version.major}"/>
+      <param name="majorminorversion" expression="${version.major.minor}"/>
       <param name="build-date" expression="${today}"/>
       <param name="build-date-iso-8601" expression="${today-iso-8601}"/>
       <param name="year" expression="${year}"/>
