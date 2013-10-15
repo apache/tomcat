@@ -55,12 +55,12 @@
 
   <!-- Defined variables (non-overrideable) -->
   <xsl:variable name="commentslink"><xsl:value-of select="$relative-path"/>/comments.html</xsl:variable>
-
-  <!-- Process an entire document into an HTML page -->
   <xsl:variable name="project-xml-filename"><xsl:value-of select="$subdir"/>project.xml</xsl:variable>
-  <xsl:template match="document">
   <xsl:variable name="project"
               select="document($project-xml-filename)/project"/>
+
+  <!-- Process an entire document into an HTML page -->
+  <xsl:template match="document">
 <html lang="en">
 <head>
   <!-- Note: XLST seems to always output a
@@ -89,9 +89,6 @@
       </xsl:variable>
     -->
     <meta name="author" content="{$name}"/>
-    <!-- Don't publish e-mail addresses
-    <meta name="email" content="{$email}"/>
-    -->
   </xsl:for-each>
 
   <!-- Script for ASF Comments System. -->
