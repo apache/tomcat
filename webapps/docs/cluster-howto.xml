@@ -538,7 +538,7 @@ should be completed:</p>
     </p>
 </li>
 <li><b><code>TomcatA</code> receives a request, invalidate is called on the session (<code>S1</code>)</b>
-    <p>The invalidate is call is intercepted, and the session is queued with invalidated sessions.
+    <p>The invalidate call is intercepted, and the session is queued with invalidated sessions.
         When the request is complete, instead of sending out the session that has changed, it sends out
         an "expire" message to TomcatB and TomcatB will invalidate the session as well.
     </p>
@@ -551,9 +551,9 @@ should be completed:</p>
 
 </li>
 <li><code>TomcatA</code> The session <code>S2</code> expires due to inactivity.
-    <p>The invalidate is call is intercepted the same was as when a session is invalidated by the user,
+    <p>The invalidate call is intercepted the same was as when a session is invalidated by the user,
        and the session is queued with invalidated sessions.
-       At this point, the invalidet session will not be replicated across until
+       At this point, the invalidated session will not be replicated across until
        another request comes through the system and checks the invalid queue.
     </p>
 </li>
