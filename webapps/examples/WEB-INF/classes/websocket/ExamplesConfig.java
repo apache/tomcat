@@ -53,7 +53,14 @@ public class ExamplesConfig implements ServerApplicationConfig {
     @Override
     public Set<Class<?>> getAnnotatedEndpointClasses(Set<Class<?>> scanned) {
         // Deploy all WebSocket endpoints defined by annotations in the examples
-        // web application.
-        return scanned;
+        // web application. Filter out all others to avoid issues when running
+        // tests on Gump
+        Set<Class<?>> results = new HashSet<>();
+        for (Class<?> clazz : scanned) {
+            if (clazz.getPackage().getName().startsWith("websocket.")) {
+                results.add(clazz);
+            }
+        }
+        return results;
     }
 }
