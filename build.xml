@@ -262,6 +262,7 @@
     <include name="**/*.tasks"/>
     <include name="**/*.tld"/>
     <include name="**/*.txt"/>
+    <include name="**/*.xhtml"/>
     <include name="**/*.xml"/>
     <include name="**/*.xsd"/>
     <include name="**/*.xsl"/>
