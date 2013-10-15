@@ -141,9 +141,9 @@ public class DefaultServlet
 
 
     /**
-     * Should be serve gzip versions of files. By default, it's set to true.
+     * Should be serve gzip versions of files. By default, it's set to false.
      */
-    protected boolean gzip = true;
+    protected boolean gzip = false;
 
 
     /**

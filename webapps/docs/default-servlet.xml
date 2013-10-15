@@ -98,7 +98,7 @@ directory listings are disabled and debugging is turned off.
         If a gzipped version of a file exists (a file with <code>.gz</code>
         appended to the file name located alongside the original file), Tomcat
         will serve the gzipped file if the user agent supports gzip and this
-        option is enabled. [true]
+        option is enabled. [false]
         <br />
         The file with the <code>.gz</code> extension will be accessible if
         requested directly so if the original resource is protected with a
