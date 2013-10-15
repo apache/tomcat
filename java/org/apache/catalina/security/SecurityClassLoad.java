@@ -272,6 +272,7 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "util.http.parser.MediaTypeCache");
         // net
         loader.loadClass(basePackage + "util.net.Constants");
+        loader.loadClass(basePackage + "util.net.DispatchType");
         loader.loadClass(basePackage +
                 "util.net.NioBlockingSelector$BlockPoller$1");
         loader.loadClass(basePackage +
