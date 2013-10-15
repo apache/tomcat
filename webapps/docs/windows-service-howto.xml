@@ -33,15 +33,16 @@
 <toc/>
 </section>
 
-<section name="Tomcat@VERSION_MAJOR@ service application">
+<section name="Tomcat service application">
 <p>
-    <b>Tomcat@VERSION_MAJOR@</b> is a service application for running Tomcat @VERSION_MAJOR@ as NT service.
+    <b>Tomcat<version-major/></b> is a service application for running Tomcat
+    <version-major/> as a Windows service.
 </p>
 </section>
-<section name="Tomcat@VERSION_MAJOR@w monitor application">
+<section name="Tomcat monitor application">
 <p>
-    <b>Tomcat@VERSION_MAJOR@w</b> is a GUI application for monitoring and configuring Tomcat
-    services.
+    <b>Tomcat<version-major/>w</b> is a GUI application for monitoring and
+    configuring Tomcat services.
 </p>
     <p>The available command line options are:</p>
 
@@ -69,7 +70,7 @@
         <td>Run the service as console application</td>
         <td>This is the default operation. It is called if the no option is
             provided. The ServiceName is the name of the executable without
-            exe suffix, meaning Tomcat@VERSION_MAJOR@</td>
+            exe suffix, meaning Tomcat<version-major/></td>
     </tr>
     <tr><td><b>//RS//</b></td>
         <td>Run the service</td>
@@ -321,7 +322,7 @@ neither being logged on with an Administrator account nor using the
 <code>/user</code> switch is sufficient.
 </p>
 
-<source>Install the service named 'Tomcat@VERSION_MAJOR@'
+<source>Install the service named 'Tomcat<version-major/>'
 C:\> service.bat install</source>
 
 <p>There is a 2nd optional parameter that lets you specify the name of the
@@ -331,11 +332,11 @@ service, as displayed in Windows services.</p>
 C:\> service.bat install MyService</source>
 
 <p>
-If using tomcat@VERSION_MAJOR@.exe, you need to use the <b>//IS//</b> parameter.</p>
+If using tomcat<version-major/>.exe, you need to use the <b>//IS//</b> parameter.</p>
 
-<source>Install the service named 'Tomcat@VERSION_MAJOR@'
-C:\> tomcat@VERSION_MAJOR@ //IS//Tomcat@VERSION_MAJOR@ --DisplayName="Apache Tomcat @VERSION_MAJOR@" \
-C:\> --Install="C:\Program Files\Tomcat\bin\tomcat@VERSION_MAJOR@.exe" --Jvm=auto \
+<source>Install the service named 'Tomcat<version-major/>'
+C:\> tomcat<version-major/> //IS//Tomcat<version-major/> --DisplayName="Apache Tomcat <version-major/>" \
+C:\> --Install="C:\Program Files\Tomcat\bin\tomcat<version-major/>.exe" --Jvm=auto \
 C:\> --StartMode=jvm --StopMode=jvm \
 C:\> --StartClass=org.apache.catalina.startup.Bootstrap --StartParams=start \
 C:\> --StopClass=org.apache.catalina.startup.Bootstrap --StopParams=stop</source>
@@ -346,15 +347,15 @@ C:\> --StopClass=org.apache.catalina.startup.Bootstrap --StopParams=stop</source
 To update the service parameters, you need to use the <b>//US//</b> parameter.
 </p>
 
-<source>Update the service named 'Tomcat@VERSION_MAJOR@'
-C:\> tomcat@VERSION_MAJOR@ //US//Tomcat@VERSION_MAJOR@ --Description="Apache Tomcat Server - http://tomcat.apache.org/ " \
+<source>Update the service named 'Tomcat<version-major/>'
+C:\> tomcat<version-major/> //US//Tomcat<version-major/> --Description="Apache Tomcat Server - http://tomcat.apache.org/ " \
 C:\> --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bootstrap.jar</source>
 
 <p>If you gave the service an optional name, you need to specify it like this:
 </p>
 
 <source>Update the service named 'MyService'
-C:\> tomcat@VERSION_MAJOR@ //US//MyService --Description="Apache Tomcat Server - http://tomcat.apache.org/ " \
+C:\> tomcat<version-major/> //US//MyService --Description="Apache Tomcat Server - http://tomcat.apache.org/ " \
 C:\> --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bootstrap.jar</source>
 
 </section>
@@ -363,14 +364,14 @@ C:\> --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bo
 To remove the service, you need to use the <b>//DS//</b> parameter.<br/>
 If the service is running it will be stopped and then deleted.</p>
 
-<source>Remove the service named 'Tomcat@VERSION_MAJOR@'
-C:\> tomcat@VERSION_MAJOR@ //DS//Tomcat@VERSION_MAJOR@</source>
+<source>Remove the service named 'Tomcat<version-major/>'
+C:\> tomcat<version-major/> //DS//Tomcat<version-major/></source>
 
 <p>If you gave the service an optional name, you need to specify it like this:
 </p>
 
 <source>Remove the service named 'MyService'
-C:\> tomcat@VERSION_MAJOR@ //DS//MyService</source>
+C:\> tomcat<version-major/> //DS//MyService</source>
 
 </section>
 <section name="Debugging services">
@@ -378,13 +379,13 @@ C:\> tomcat@VERSION_MAJOR@ //DS//MyService</source>
 To run the service in console mode, you need to use the <b>//TS//</b> parameter.
 The service shutdown can be initiated by pressing <b>CTRL+C</b> or
 <b>CTRL+BREAK</b>.
-If you rename the tomcat@VERSION_MAJOR@.exe to testservice.exe then you can just execute the
+If you rename the tomcat<version-major/>.exe to testservice.exe then you can just execute the
 testservice.exe and this command mode will be executed by default.</p>
 
-<source>Run the service named 'Tomcat@VERSION_MAJOR@' in console mode
-C:\> tomcat@VERSION_MAJOR@ //TS//Tomcat@VERSION_MAJOR@ [additional arguments]
+<source>Run the service named 'Tomcat<version-major/>' in console mode
+C:\> tomcat<version-major/> //TS//Tomcat<version-major/> [additional arguments]
 Or simply execute:
-C:\> tomcat@VERSION_MAJOR@</source>
+C:\> tomcat<version-major/></source>
 
 </section>
 <section name="Multiple Instances">
@@ -423,18 +424,18 @@ name of the Tomcat installation directory. Then create a second environment
 variable CATALINA_BASE and point this to the instance folder. Then run "service
 install" command specifying a service name.</p>
 
-<source>set CATALINA_HOME=c:\tomcat_@VERSION_MAJOR@
-set CATALINA_BASE=c:\tomcat_@VERSION_MAJOR@\instances\instance1
+<source>set CATALINA_HOME=c:\tomcat_<version-major/>
+set CATALINA_BASE=c:\tomcat_<version-major/>\instances\instance1
 service install instance1</source>
 
 <p>
-To modify the service settings, you can run <b>tomcat@VERSION_MAJOR@w //ES//instance1</b>.
+To modify the service settings, you can run <b>tomcat<version-major/>w //ES//instance1</b>.
 </p>
 <p>
 For additional instances, create additional instance folder, update the
 CATALINA_BASE environment variable, and run the service install again.</p>
 
-<source>set CATALINA_BASE=c:\tomcat_@VERSION_MAJOR@\instances\instance2
+<source>set CATALINA_BASE=c:\tomcat_<version-major/>\instances\instance2
 service install instance2</source>
 
 </section>

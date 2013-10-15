@@ -110,7 +110,7 @@ below are various web sites and mailing lists in case you get stuck.</p>
 
 <p>Keep in mind that some of the issues and solutions vary between the
 major versions of Tomcat.  As you search around the web, there will be
-some documentation that is not relevant to Tomcat @VERSION_MAJOR@, but
+some documentation that is not relevant to Tomcat <version-major/>, but
 only to earlier versions.</p>
 
 <ul>
