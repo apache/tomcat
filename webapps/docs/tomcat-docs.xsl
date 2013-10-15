@@ -521,7 +521,7 @@
   <xsl:template match="version-major">
     <xsl:value-of select="$majorversion"/>
   </xsl:template>
-  
+
   <!-- Process everything else by just passing it through -->
   <xsl:template match="*|@*">
     <xsl:copy>
