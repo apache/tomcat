@@ -72,7 +72,7 @@ public final class DrawboardEndpoint extends Endpoint {
         session.addMessageHandler(stringHandler);
         final Client client = new Client(session);
 
-        room.invoke(new Runnable() {
+        room.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -100,7 +100,7 @@ public final class DrawboardEndpoint extends Endpoint {
 
     @Override
     public void onClose(Session session, CloseReason closeReason) {
-        room.invoke(new Runnable() {
+        room.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -148,7 +148,7 @@ public final class DrawboardEndpoint extends Endpoint {
         @Override
         public void onMessage(final String message) {
             // Invoke handling of the message in the room.
-            room.invoke(new Runnable() {
+            room.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     try {
