@@ -979,6 +979,13 @@ public class AprEndpoint extends AbstractEndpoint {
                         // Accept the next incoming connection from the server
                         // socket
                         socket = Socket.accept(serverSock);
+                        if (log.isDebugEnabled()) {
+                            long sa = Address.get(Socket.APR_REMOTE, socket);
+                            Sockaddr addr = Address.getInfo(sa);
+                            log.debug(sm.getString("endpoint.apr.remoteport",
+                                    Long.valueOf(socket),
+                                    Long.valueOf(addr.port)));
+                        }
                     } catch (Exception e) {
                         //we didn't get a socket
                         countDownConnection();
