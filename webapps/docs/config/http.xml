@@ -162,7 +162,7 @@
         If the <code>PATH</code> (Windows) or <code>LD_LIBRARY_PATH</code> (on
         most unix systems) environment variables contain the Tomcat native
         library, the APR/native connector will be used. If the native library
-        cannot be found, the blocking Java based connector will be used. Note
+        cannot be found, the non blocking Java based connector will be used. Note
         that the APR/native connector has different settings for HTTPS than the
         Java connectors.<br/>
         To use an explicit protocol rather than rely on the auto-switching
