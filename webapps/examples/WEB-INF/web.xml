@@ -394,8 +394,8 @@
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 
-	<!-- Websocket examples -->
-	<listener>
+    <!-- Websocket examples -->
+    <listener>
         <listener-class>websocket.drawboard.DrawboardContextListener</listener-class>
     </listener>
 
