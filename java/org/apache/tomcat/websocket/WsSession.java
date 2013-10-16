@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
@@ -464,7 +465,8 @@ public class WsSession implements Session {
     private void sendCloseMessage(CloseReason closeReason) {
         // 125 is maximum size for the payload of a control message
         ByteBuffer msg = ByteBuffer.allocate(125);
-        msg.putShort((short) closeReason.getCloseCode().getCode());
+        CloseCode closeCode = closeReason.getCloseCode();
+        msg.putShort((short) closeCode.getCode());
 
         String reason = closeReason.getReasonPhrase();
         if (reason != null && reason.length() > 0) {
@@ -481,7 +483,13 @@ public class WsSession implements Session {
                 log.debug(sm.getString("wsSession.sendCloseFail"), ioe);
             }
             wsRemoteEndpoint.close();
-            localEndpoint.onError(this, ioe);
+            // Failure to send a close message is not unexpected in the case of
+            // an abnormal closure (usually triggered by a failure to read/write
+            // from/to the client. In this case do not trigger the endpoint's
+            // error handling
+            if (closeCode != CloseCodes.CLOSED_ABNORMALLY) {
+                localEndpoint.onError(this, ioe);
+            }
         } finally {
             webSocketContainer.unregisterSession(localEndpoint, this);
         }
