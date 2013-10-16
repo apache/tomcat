@@ -169,6 +169,11 @@
                 var canvasServerImage = document.createElement("canvas");
                 var canvasArray = [canvasDisplay, canvasBackground,
                     canvasServerImage];
+                canvasDisplay.addEventListener("mousedown", function(e) {
+                    // Prevent default mouse event to prevent browsers from marking text
+                    // (and Chrome from displaying the "text" cursor).
+                    e.preventDefault();
+                }, false);
 
                 var labelPlayerCount = document.createTextNode("0");
                 var optionContainer = document.createElement("div");
@@ -177,6 +182,8 @@
                 var canvasDisplayCtx = canvasDisplay.getContext("2d");
                 var canvasBackgroundCtx = canvasBackground.getContext("2d");
                 var canvasServerImageCtx = canvasServerImage.getContext("2d");
+                var canvasMouseMoveHandler;
+                var canvasMouseDownHandler;
 
                 var mouseInWindow = false;
                 var mouseDown = false;
@@ -525,14 +532,14 @@
                     drawContainer.appendChild(canvasDisplay);
 
                     drawContainer.appendChild(optionContainer);
-
-                    canvasDisplay.onmousedown = function(e) {
+                    
+                    canvasMouseDownHandler = function(e) {
                         if (e.button == 0) {
                             currentMouseX = e.pageX - canvasDisplay.offsetLeft;
                             currentMouseY = e.pageY - canvasDisplay.offsetTop;
 
                             mouseDown = true;
-                            canvasMouseMove(e);
+                            canvasMouseMoveHandler(e);
 
                         } else if (mouseDown) {
                             // Cancel drawing.
@@ -544,9 +551,10 @@
 
                             refreshDisplayCanvas();
                         }
-                    }
+                    };
+                    canvasDisplay.addEventListener("mousedown", canvasMouseDownHandler, false);
 
-                    var canvasMouseMove = canvasDisplay.onmousemove = function(e) {
+                    canvasMouseMoveHandler = function(e) {
                         mouseInWindow = true;
                         var mouseX = e.pageX - canvasDisplay.offsetLeft;
                         var mouseY = e.pageY - canvasDisplay.offsetTop;
@@ -588,8 +596,9 @@
 
                         refreshDisplayCanvas();
                     };
+                    canvasDisplay.addEventListener("mousemove", canvasMouseMoveHandler, false);
 
-                    canvasDisplay.onmouseup = function(e) {
+                    canvasDisplay.addEventListener("mouseup", function(e) {
                         if (e.button == 0) {
                             if (mouseDown) {
                                 mouseDown = false;
@@ -616,12 +625,12 @@
                                 refreshDisplayCanvas();
                             }
                         }
-                    };
+                    }, false);
 
-                    canvasDisplay.onmouseout = function() {
+                    canvasDisplay.addEventListener("mouseout", function(e) {
                         mouseInWindow = false;
                         refreshDisplayCanvas();
-                    };
+                    }, false);
 
 
                     // Create color and thickness controls.
@@ -645,11 +654,11 @@
                                 "margin: 3px; width: 18px; height: 18px; "
                                 + "float: left; background-color: " + rgb(color));
                         colorContainer.style.border = '2px solid #000';
-                        colorContainer.onmousedown = (function(ix) {
+                        colorContainer.addEventListener("mousedown", (function(ix) {
                             return function() {
                                 setColor(ix);
                             };
-                        })(i);
+                        })(i), false);
 
                         colorContainersBox.appendChild(colorContainer);
                     }
@@ -674,11 +683,11 @@
                         drawTypeContainer.style.border = "2px solid #000";
                         drawTypeContainer.appendChild(document.createTextNode(
                                 String(availableDrawTypes[i].name)));
-                        drawTypeContainer.onmousedown = (function(ix) {
+                        drawTypeContainer.addEventListener("mousedown", (function(ix) {
                             return function() {
                                 setDrawType(ix);
                             };
-                        })(i);
+                        })(i), false);
 
                         drawTypeContainersBox.appendChild(drawTypeContainer);
                     }
@@ -699,11 +708,11 @@
                         thicknessContainer.style.border = "2px solid #000";
                         thicknessContainer.appendChild(document.createTextNode(
                                 String(availableThicknesses[i])));
-                        thicknessContainer.onmousedown = (function(ix) {
+                        thicknessContainer.addEventListener("mousedown", (function(ix) {
                             return function() {
                                 setThickness(ix);
                             };
-                        })(i);
+                        })(i), false);
 
                         thicknessContainersBox.appendChild(thicknessContainer);
                     }
@@ -721,8 +730,8 @@
                 }
 
                 function disableControls() {
-                    canvasDisplay.onmousemove = canvasDisplay.onmousedown =
-                        undefined;
+                    canvasDisplay.removeEventListener("mousedown", canvasMouseDownHandler);
+                    canvasDisplay.removeEventListener("mousemove", canvasMouseMoveHandler);
                     mouseInWindow = false;
                     refreshDisplayCanvas();
                 }
