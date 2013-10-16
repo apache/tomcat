@@ -100,6 +100,9 @@ public class AprServletInputStream extends AbstractServletInputStream {
                 (-result == Status.APR_OS_START_SYSERR + 10053)) {
             // 10053 on Windows is connection aborted
             throw new EOFException(sm.getString("apr.clientAbort"));
+        } else if (-result == Status.APR_EGENERAL && wrapper.isSecure()) {
+            // Connection abort by client during SSL handshake
+            throw new EOFException(sm.getString("apr.clientAbort"));
         } else {
             throw new IOException(sm.getString("apr.read.error",
                     Integer.valueOf(-result), Long.valueOf(socket)));

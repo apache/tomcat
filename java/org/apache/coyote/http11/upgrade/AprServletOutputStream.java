@@ -141,6 +141,9 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
                     (-written == Status.APR_OS_START_SYSERR + 10053)) {
                 // 10053 on Windows is connection aborted
                 throw new EOFException(sm.getString("apr.clientAbort"));
+            } else if (-written == Status.APR_EGENERAL && wrapper.isSecure()) {
+                // Connection abort by client during SSL handshake
+                throw new EOFException(sm.getString("apr.clientAbort"));
             } else if (written < 0) {
                 throw new IOException(sm.getString("apr.write.error",
                         Integer.valueOf(-written), Long.valueOf(socket)));
