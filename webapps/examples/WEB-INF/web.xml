@@ -399,4 +399,9 @@
       <servlet-name>wsSnake</servlet-name>
       <url-pattern>/websocket/tc7/snake</url-pattern>
     </servlet-mapping>
+    <!-- Websocket examples -->
+    <listener>
+        <listener-class>websocket.drawboard.DrawboardContextListener</listener-class>
+    </listener>
+
 </web-app>
