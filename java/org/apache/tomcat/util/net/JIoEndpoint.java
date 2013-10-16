@@ -519,6 +519,7 @@ public class JIoEndpoint extends AbstractEndpoint {
         try {
             SocketWrapper<Socket> wrapper = new SocketWrapper<Socket>(socket);
             wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
+            wrapper.setSecure(isSSLEnabled());
             // During shutdown, executor may be null - avoid NPE
             if (!running) {
                 return false;

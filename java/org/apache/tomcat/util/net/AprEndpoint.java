@@ -792,6 +792,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 AprSocketWrapper wrapper =
                         new AprSocketWrapper(Long.valueOf(socket));
                 wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
+                wrapper.setSecure(isSSLEnabled());
                 connections.put(Long.valueOf(socket), wrapper);
                 getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
             }
