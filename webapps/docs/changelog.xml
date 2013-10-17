@@ -55,7 +55,17 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
-<section name="Tomcat 7.0.46 (violetagg)">
+<section name="Tomcat 7.0.47 (violetagg)">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix regression with legacy WebSocket implementation in NIO and APR
+        connectors. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 7.0.46 (violetagg)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
