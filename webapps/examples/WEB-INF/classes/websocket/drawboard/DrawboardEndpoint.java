@@ -119,13 +119,11 @@ public final class DrawboardEndpoint extends Endpoint {
                 @Override
                 public void run() {
                     try {
-    
                         // Player can be null if it couldn't enter the room
                         if (player != null) {
                             // Remove this player from the room.
                             player.removeFromRoom();
                         }
-    
                     } catch (RuntimeException ex) {
                         log.error("Unexpected exception: " + ex.toString(), ex);
                     }
