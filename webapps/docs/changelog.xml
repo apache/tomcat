@@ -64,6 +64,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Avoid hang observed with Java 6 on Windows when stopping the Tomcat
+        process via CTRL-C. (markt) 
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.46 (violetagg)" rtext="not released">
   <subsection name="Catalina">
@@ -91,12 +99,6 @@
         <bug>55602</bug>: Ensure that sockets removed from the Poller and then
         closed in the APR/native connector are removed and then closed in a
         thread-safe manner. (markt)
-      </fix>
-      <fix>
-        Ensure that unused input is not swallowed when keep-alive is disabled
-        and the connection enters an error state. This allows the connection to
-        be closed immediately rather than having to wait for the client to first
-        send any remaining data that is only going to be ignored. (markt)
       </fix>
       <fix>
         Update the APR/native connector to version 1.1.29. (violetagg)
