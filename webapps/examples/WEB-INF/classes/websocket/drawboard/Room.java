@@ -316,9 +316,7 @@ public final class Room {
             public void run() {
                 closed = true;
                 drawmessageBroadcastTimer.cancel();
-                if (!ShutdownDetection.hasShutdownStarted()) {
-                    roomGraphics.dispose();
-                }
+                roomGraphics.dispose();
             }
         });
     }
@@ -412,25 +410,6 @@ public final class Room {
             String completeMsg = String.valueOf(type.flag) + content;
 
             client.sendMessage(new StringWebsocketMessage(completeMsg));
-        }
-    }
-    
-    
-    static {
-        Runtime.getRuntime().addShutdownHook(new ShutdownDetection());
-    }
-    
-    
-    private static class ShutdownDetection extends Thread {
-        private static volatile boolean shutdownStarted = false;
-        
-        private static boolean hasShutdownStarted() {
-            return shutdownStarted;
-        }
-        
-        @Override
-        public void run() {
-            shutdownStarted = true;
         }
     }
 }
