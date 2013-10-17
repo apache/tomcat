@@ -29,6 +29,9 @@ public final class DrawboardContextListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         // Shutdown our room.
-        DrawboardEndpoint.getRoom().shutdown();
+        Room room = DrawboardEndpoint.getRoom(false);
+        if (room != null) {
+            room.shutdown();
+        }
     }
 }
