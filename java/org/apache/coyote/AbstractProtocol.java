@@ -664,6 +664,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     connections.remove(socket);
                     release(wrapper, processor, false, false);
                 } else if (state == SocketState.UPGRADED) {
+                    // Need to keep the connection associated with the processor
+                    connections.put(socket, processor);
                     // Don't add sockets back to the poller if this was a
                     // non-blocking write otherwise the poller may trigger
                     // multiple read events which may lead to thread starvation
