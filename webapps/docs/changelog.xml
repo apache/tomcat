@@ -83,6 +83,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>55663</bug>: NOTICE files are corrected according to
+        <a href="http://www.apache.org/legal/src-headers.html#notice">NOTICE files requirements</a>.
+        (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.46 (violetagg)" rtext="not released">
   <subsection name="Catalina">
