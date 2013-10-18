@@ -164,8 +164,8 @@ public class Util {
     }
 
 
-    public static Class<?> getDecoderType(Class<? extends Decoder> Decoder) {
-        return (Class<?>) Util.getGenericType(Decoder.class, Decoder);
+    public static Class<?> getDecoderType(Class<? extends Decoder> decoder) {
+        return (Class<?>) Util.getGenericType(Decoder.class, decoder);
     }
 
 
@@ -229,6 +229,8 @@ public class Util {
     private static Object getTypeParameter(Class<?> clazz, Type argType) {
         if (argType instanceof Class<?>) {
             return argType;
+        } else if (argType instanceof ParameterizedType) {
+            return ((ParameterizedType) argType).getRawType();
         } else {
             TypeVariable<?>[] tvs = clazz.getTypeParameters();
             for (int i = 0; i < tvs.length; i++) {

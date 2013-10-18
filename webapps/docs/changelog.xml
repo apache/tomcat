@@ -63,6 +63,11 @@
         when parsing server.xml rather than the class loader that loaded
         StandardServer. Patch provided by Roberto Benedetti. (markt)
       </fix>
+      <fix>
+        <bug>55664</bug>: Correctly handle JSR 356 WebSocket Encoder, Decoder
+        and MessageHandler implementations that use a generic type such as
+        <code>Encoder.Text&lt;List&lt;String&gt;&gt;</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
