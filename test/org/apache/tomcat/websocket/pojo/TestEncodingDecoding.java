@@ -46,7 +46,6 @@ import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -64,6 +63,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     private static final String MESSAGE_ONE = "message-one";
     private static final String PATH_PROGRAMMATIC_EP = "/echoProgrammaticEP";
     private static final String PATH_ANNOTATED_EP = "/echoAnnotatedEP";
+    private static final String PATH_GENERICS_EP = "/echoGenericsEP";
 
 
     @Test
@@ -174,6 +174,56 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testGenericsCoders() throws Exception {
+        // Set up utility classes
+        GenericsServer server = new GenericsServer();
+        SingletonConfigurator.setInstance(server);
+        ServerConfigListener.setPojoClazz(GenericsServer.class);
+
+        Tomcat tomcat = getTomcatInstance();
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(new ApplicationListener(
+                ServerConfigListener.class.getName(), false));
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
+
+        WebSocketContainer wsContainer =
+                ContainerProvider.getWebSocketContainer();
+
+        tomcat.start();
+
+        GenericsClient client = new GenericsClient();
+        URI uri = new URI("ws://localhost:" + getPort() + PATH_GENERICS_EP);
+        Session session = wsContainer.connectToServer(client, uri);
+
+        ArrayList<String> list = new ArrayList<>(2);
+        list.add("str1");
+        list.add("str2");
+        session.getBasicRemote().sendObject(list);
+
+        // Should not take very long
+        int i = 0;
+        while (i < 20) {
+            if (server.received.size() > 0 && client.received.size() > 0) {
+                break;
+            }
+            Thread.sleep(100);
+        }
+
+        // Check messages were received
+        Assert.assertEquals(1, server.received.size());
+        Assert.assertEquals(server.received.peek().toString(), "[str1, str2]");
+
+        Assert.assertEquals(1, client.received.size());
+        Assert.assertEquals(client.received.peek().toString(), "[str1, str2]");
+
+        session.close();
+    }
+
+
     private int testEvent(String name, int count) throws InterruptedException {
         int i = count;
         while (i < 50) {
@@ -185,6 +235,18 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         }
         Assert.assertTrue(Server.isLifeCycleEventCalled(name));
         return i;
+    }
+
+
+    @ClientEndpoint(decoders={ListStringDecoder.class},
+            encoders={ListStringEncoder.class})
+    public static class GenericsClient {
+        private Queue<Object> received = new ConcurrentLinkedQueue<>();
+
+        @OnMessage
+        public void rx(List<String> in) {
+            received.add(in);
+        }
     }
 
 
@@ -202,6 +264,24 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         @OnMessage
         public void  rx(MsgByte in) {
             received.add(in);
+        }
+    }
+
+
+    @ServerEndpoint(value=PATH_GENERICS_EP,
+            decoders={ListStringDecoder.class},
+            encoders={ListStringEncoder.class},
+            configurator=SingletonConfigurator.class)
+    public static class GenericsServer {
+
+        private Queue<Object> received = new ConcurrentLinkedQueue<>();
+
+
+        @OnMessage
+        public List<String> rx(List<String> in) {
+            received.add(in);
+            // Echo the message back
+            return in;
         }
     }
 
@@ -410,6 +490,61 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             }
             bb.reset();
             return false;
+        }
+    }
+
+
+    public static class ListStringEncoder implements Encoder.Text<List<String>> {
+
+        @Override
+        public void init(EndpointConfig endpointConfig) {
+            Server.addLifeCycleEvent(getClass().getName() + ":init");
+        }
+
+        @Override
+        public void destroy() {
+            Server.addLifeCycleEvent(getClass().getName() + ":destroy");
+        }
+
+        @Override
+        public String encode(List<String> str) throws EncodeException {
+            StringBuffer sbuf = new StringBuffer();
+            sbuf.append("[");
+            for (String s: str){
+                sbuf.append(s).append(",");
+            }
+            sbuf.deleteCharAt(sbuf.lastIndexOf(",")).append("]");
+            return sbuf.toString();
+        }
+    }
+
+
+    public static class ListStringDecoder implements Decoder.Text<List<String>> {
+
+        @Override
+        public void init(EndpointConfig endpointConfig) {
+             Server.addLifeCycleEvent(getClass().getName() + ":init");
+        }
+
+        @Override
+        public void destroy() {
+            Server.addLifeCycleEvent(getClass().getName() + ":destroy");
+        }
+
+        @Override
+        public List<String> decode(String str) throws DecodeException {
+            List<String> lst = new ArrayList<>(1);
+            str = str.substring(1,str.length()-1);
+            String[] strings = str.split(",");
+            for (String t : strings){
+                lst.add(t);
+            }
+            return lst;
+        }
+
+        @Override
+        public boolean willDecode(String str) {
+            return str.startsWith("[") && str.endsWith("]");
         }
     }
 

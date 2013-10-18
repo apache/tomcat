@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.util.List;
+
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
@@ -98,6 +100,13 @@ public class TestUtil {
     public void testGetEncoderTypeGenericMultipleSubclassSwap() {
         Assert.assertEquals(String.class,
                 Util.getEncoderType(GenericMultipleSubSubSwapEncoder.class));
+    }
+
+
+    @Test
+    public void testGetEncoderTypeSimpleWithGenericType() {
+        Assert.assertEquals(List.class,
+                Util.getEncoderType(SimpleEncoderWithGenericType.class));
     }
 
 
@@ -279,6 +288,26 @@ public class TestUtil {
         @Override
         public void doSomething(Boolean thing) {
             // NO-OP
+        }
+    }
+
+
+    private static class SimpleEncoderWithGenericType
+            implements Encoder.Text<List<String>> {
+
+        @Override
+        public void init(EndpointConfig endpointConfig) {
+            // NO-OP
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
+
+        @Override
+        public String encode(List<String> object) throws EncodeException {
+            return null;
         }
     }
 }
