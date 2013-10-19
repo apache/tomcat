@@ -1143,8 +1143,8 @@ public class AprEndpoint extends AbstractEndpoint {
         /**
          * Removes the specified socket from the poller.
          *
-         * @returns The configured timeout for the socket or zero if the socket
-         *          was not in the list of socket timeouts
+         * @return The configured timeout for the socket or zero if the socket
+         *         was not in the list of socket timeouts
          */
         public long remove(long socket) {
             long result = 0;
