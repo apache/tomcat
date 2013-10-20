@@ -110,6 +110,20 @@ public class TestUtil {
     }
 
 
+    @Test
+    public void testGenericArrayEncoderString() {
+        Assert.assertEquals(String[].class,
+                Util.getEncoderType(GenericArrayEncoderString.class));
+    }
+
+
+    @Test
+    public void testGenericArraySubEncoderString() {
+        Assert.assertEquals(String[][].class,
+                Util.getEncoderType(GenericArraySubEncoderString.class));
+    }
+
+
     private static class SimpleMessageHandler
             implements MessageHandler.Whole<String> {
         @Override
@@ -307,6 +321,52 @@ public class TestUtil {
 
         @Override
         public String encode(List<String> object) throws EncodeException {
+            return null;
+        }
+    }
+
+
+    private abstract static class GenericArrayEncoder<T> implements Encoder.Text<T[]> {
+    }
+
+
+    private static class GenericArrayEncoderString extends GenericArrayEncoder<String> {
+
+        @Override
+        public void init(EndpointConfig endpointConfig) {
+            // NO-OP
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
+
+        @Override
+        public String encode(String[] object) throws EncodeException {
+            return null;
+        }
+    }
+
+
+    private abstract static class GenericArraySubEncoder<T> extends GenericArrayEncoder<T[]> {
+    }
+
+
+    private static class GenericArraySubEncoderString extends GenericArraySubEncoder<String> {
+
+        @Override
+        public void init(EndpointConfig endpointConfig) {
+            // NO-OP
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
+
+        @Override
+        public String encode(String[][] object) throws EncodeException {
             return null;
         }
     }
