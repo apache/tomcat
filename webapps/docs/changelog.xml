@@ -69,6 +69,11 @@
         <code>Encoder.Text&lt;List&lt;String&gt;&gt;</code>. Includes a test
         case by Niki Dokovski. (markt)
       </fix>
+      <fix>
+        Correctly handle WebSocket <code>Encoder</code>s, <code>Decoder</code>s
+        and <code>MessageHandler</code>s that use arrays of generic types.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
