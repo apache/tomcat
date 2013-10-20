@@ -177,8 +177,7 @@ public class Util {
     private static <T> Object getGenericType(Class<T> type,
             Class<? extends T> clazz) {
 
-        // Look to see if this class implements the generic MessageHandler<>
-        // interface
+        // Look to see if this class implements the interface of interest
 
         // Get all the interfaces
         Type[] interfaces = clazz.getGenericInterfaces();
@@ -186,7 +185,7 @@ public class Util {
             // Only need to check interfaces that use generics
             if (iface instanceof ParameterizedType) {
                 ParameterizedType pi = (ParameterizedType) iface;
-                // Look for the MessageHandler<> interface
+                // Look for the interface of interest
                 if (pi.getRawType() instanceof Class) {
                     if (type.isAssignableFrom((Class<?>) pi.getRawType())) {
                         return getTypeParameter(
@@ -204,11 +203,11 @@ public class Util {
         Object result = getGenericType(type, superClazz);
         if (result instanceof Class<?>) {
             // Superclass implements interface and defines explicit type for
-            // MessageHandler<>
+            // the interface of interest
             return result;
         } else if (result instanceof Integer) {
             // Superclass implements interface and defines unknown type for
-            // MessageHandler<>
+            // the interface of interest
             // Map that unknown type to the generic types defined in this class
             ParameterizedType superClassType =
                     (ParameterizedType) clazz.getGenericSuperclass();
