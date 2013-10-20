@@ -74,6 +74,10 @@
         and <code>MessageHandler</code>s that use arrays of generic types.
         (markt)
       </fix>
+      <fix>
+        <bug>55681</bug>: Ensure that the WebSocket session is made available
+        to <code>MessageHandler</code> method calls. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

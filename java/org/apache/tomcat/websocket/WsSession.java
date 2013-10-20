@@ -178,7 +178,7 @@ public class WsSession implements Session {
         // just as easily.
 
         Set<MessageHandlerResult> mhResults =
-                Util.getMessageHandlers(listener, endpointConfig);
+                Util.getMessageHandlers(listener, endpointConfig, this);
 
         for (MessageHandlerResult mhResult : mhResults) {
             switch (mhResult.getType()) {
