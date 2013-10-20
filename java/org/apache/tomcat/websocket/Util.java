@@ -45,6 +45,7 @@ import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.PongMessage;
+import javax.websocket.Session;
 
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.pojo.PojoMessageHandlerWholeBinary;
@@ -348,7 +349,8 @@ public class Util {
 
 
     public static Set<MessageHandlerResult> getMessageHandlers(
-            MessageHandler listener, EndpointConfig endpointConfig) {
+            MessageHandler listener, EndpointConfig endpointConfig,
+            Session session) {
 
         Class<?> target = Util.getMessageType(listener);
 
@@ -377,7 +379,7 @@ public class Util {
         } else if (byte[].class.isAssignableFrom(target)) {
             MessageHandlerResult result = new MessageHandlerResult(
                     new PojoMessageHandlerWholeBinary(listener,
-                            getOnMessageMethod(listener), null,
+                            getOnMessageMethod(listener), session,
                             endpointConfig, null, new Object[1], 0, true, -1,
                             false, -1),
                     MessageHandlerResultType.BINARY);
@@ -385,7 +387,7 @@ public class Util {
         } else if (InputStream.class.isAssignableFrom(target)) {
             MessageHandlerResult result = new MessageHandlerResult(
                     new PojoMessageHandlerWholeBinary(listener,
-                            getOnMessageMethod(listener), null,
+                            getOnMessageMethod(listener), session,
                             endpointConfig, null, new Object[1], 0, true, -1,
                             true, -1),
                     MessageHandlerResultType.BINARY);
@@ -393,7 +395,7 @@ public class Util {
         } else if (Reader.class.isAssignableFrom(target)) {
             MessageHandlerResult result = new MessageHandlerResult(
                     new PojoMessageHandlerWholeText(listener,
-                            getOnMessageMethod(listener), null,
+                            getOnMessageMethod(listener), session,
                             endpointConfig, null, new Object[1], 0, true, -1,
                             -1),
                     MessageHandlerResultType.TEXT);
@@ -414,7 +416,7 @@ public class Util {
             Method m = getOnMessageMethod(listener);
             if (decoderMatch.getBinaryDecoders().size() > 0) {
                 MessageHandlerResult result = new MessageHandlerResult(
-                        new PojoMessageHandlerWholeBinary(listener, m, null,
+                        new PojoMessageHandlerWholeBinary(listener, m, session,
                                 endpointConfig,
                                 decoderMatch.getBinaryDecoders(), new Object[1],
                                 0, false, -1, false, -1),
@@ -423,7 +425,7 @@ public class Util {
             }
             if (decoderMatch.getTextDecoders().size() > 0) {
                 MessageHandlerResult result = new MessageHandlerResult(
-                        new PojoMessageHandlerWholeText(listener, m, null,
+                        new PojoMessageHandlerWholeText(listener, m, session,
                                 endpointConfig,
                                 decoderMatch.getTextDecoders(), new Object[1],
                                 0, false, -1, -1),
