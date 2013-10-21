@@ -196,7 +196,8 @@ public abstract class AbstractReplicatedMap<K,V>
      */
     protected void init(MapOwner owner, Channel channel, String mapContextName,
             long timeout, int channelSendOptions,ClassLoader[] cls, boolean terminate) {
-        log.info("Initializing AbstractReplicatedMap with context name:"+mapContextName);
+        long start = System.currentTimeMillis();
+        if (log.isInfoEnabled()) log.info("Initializing AbstractReplicatedMap with context name:"+mapContextName);
         this.mapOwner = owner;
         this.externalLoaders = cls;
         this.channelSendOptions = channelSendOptions;
@@ -230,6 +231,9 @@ public abstract class AbstractReplicatedMap<K,V>
                 throw new RuntimeException("Unable to start replicated map.",x);
             }
         }
+        long complete = System.currentTimeMillis() - start;
+        if (log.isInfoEnabled())
+            log.info("AbstractReplicatedMap[" +mapContextName + "] initialization was completed in " + complete + " ms.");
     }
 
 
