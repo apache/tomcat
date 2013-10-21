@@ -80,6 +80,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <add>
+        Add log message that initialization of
+        <code>AbstractReplicatedMap</code> has been completed. (kfujino)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.47 (violetagg)">
   <subsection name="Coyote">

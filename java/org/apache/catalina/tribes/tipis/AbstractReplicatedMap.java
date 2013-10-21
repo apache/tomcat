@@ -201,6 +201,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
      */
     protected void init(MapOwner owner, Channel channel, String mapContextName,
             long timeout, int channelSendOptions,ClassLoader[] cls, boolean terminate) {
+        long start = System.currentTimeMillis();
         log.info("Initializing AbstractReplicatedMap with context name:"+mapContextName);
         this.mapOwner = owner;
         this.externalLoaders = cls;
@@ -235,6 +236,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 throw new RuntimeException("Unable to start replicated map.",x);
             }
         }
+        long complete = System.currentTimeMillis() - start;
+        if (log.isInfoEnabled())
+            log.info("AbstractReplicatedMap[" +mapContextName + "] initialization was completed in " + complete + " ms.");
     }
 
 
