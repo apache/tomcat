@@ -84,6 +84,17 @@
    <code>org.apache.tomcat.websocket.STRICT_SPEC_COMPLIANCE</code> system
    property to <code>true</code> but any explicit setting on the servlet context
    will always take priority.</p>
+
+<p>When using the WebSocket client to connect to secure server endpoints, the
+   client SSL configuration is controlled by the <code>userProperties</code>
+   of the provided <code>javax.websocket.ClientEndpointConfig</code>. The
+   following user properties are supported:</p>
+   <ul>
+     <li><code>org.apache.tomcat.websocket.SSL_PROTOCOLS</code></li>
+     <li><code>org.apache.tomcat.websocket.SSL_TRUSTSTORE</code></li>
+     <li><code>org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD</code></li>
+   </ul>
+   <p>The default truststore password is <code>changeit</code>.</p>
 </section>
 
 <section name="Deprecated proprietary API">
