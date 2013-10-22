@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.imageio.ImageIO;
 
@@ -85,9 +86,9 @@ public final class Room {
 
 
     /**
-     * An object used to synchronize access to this Room.
+     * The lock used to synchronize access to this Room.
      */
-    private final Object syncObj = new Object();
+    private final ReentrantLock roomLock = new ReentrantLock();
 
     /**
      * Indicates if this room has already been shutdown.
@@ -196,7 +197,8 @@ public final class Room {
      * @param p
      */
     private void internalRemovePlayer(Player p) {
-        players.remove(p);
+        boolean removed = players.remove(p);
+        assert removed;
 
         // Broadcast that one player is removed.
         broadcastRoomMessage(MessageType.PLAYER_CHANGED, "-");
@@ -292,19 +294,63 @@ public final class Room {
         }
     }
 
+    /**
+     * A list of cached {@link Runnable}s to prevent recursive invocation of Runnables
+     * by one thread. This variable is only used by one thread at a time and then
+     * set to <code>null</code>.
+     */
+    private List<Runnable> cachedRunnables = null;
 
     /**
      * Submits the given Runnable to the Room Executor and waits until it
      * has been executed. Currently, this simply means that the Runnable
-     * will be run directly inside of a synchronized() block.
+     * will be run directly inside of a synchronized() block.<br>
+     * Note that if a runnable recursively calls invokeAndWait() with another
+     * runnable on this Room, it will not be executed recursively, but instead
+     * cached until the original runnable is finished, to keep the behavior of
+     * using a Executor.
      * @param task
      */
     public void invokeAndWait(Runnable task)  {
-        synchronized (syncObj) {
-            if (!closed) {
-                task.run();
+
+        // Check if the current thread already holds a lock on this room.
+        // If yes, then we must not directly execute the Runnable but instead
+        // cache it until the original invokeAndWait() has finished.
+        if (roomLock.isHeldByCurrentThread()) {
+
+            if (cachedRunnables == null) {
+                cachedRunnables = new ArrayList<Runnable>();
             }
+            cachedRunnables.add(task);
+
+        } else {
+
+            roomLock.lock();
+            try {
+                // Explicitely overwrite value to ensure data consistency in
+                // current thread
+                cachedRunnables = null;
+
+                if (!closed) {
+                    task.run();
+                }
+
+                // Run the cached runnables.
+                if (cachedRunnables != null) {
+                    for (int i = 0; i < cachedRunnables.size(); i++) {
+                        if (!closed) {
+                            cachedRunnables.get(i).run();
+                        }
+                    }
+                    cachedRunnables = null;
+                }
+
+            } finally {
+                roomLock.unlock();
+            }
+
         }
+
     }
 
     /**
