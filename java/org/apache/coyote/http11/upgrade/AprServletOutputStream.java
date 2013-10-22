@@ -56,15 +56,16 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
     protected int doWrite(boolean block, byte[] b, int off, int len)
             throws IOException {
 
+        if (closed) {
+            throw new IOException(sm.getString("apr.closed", Long.valueOf(socket)));
+        }
+
         Lock readLock = wrapper.getBlockingStatusReadLock();
         WriteLock writeLock = wrapper.getBlockingStatusWriteLock();
 
         try {
             readLock.lock();
             if (wrapper.getBlockingStatus() == block) {
-                if (closed) {
-                    throw new IOException(sm.getString("apr.closed", Long.valueOf(socket)));
-                }
                 return doWriteInternal(b, off, len);
             }
         } finally {
@@ -85,9 +86,6 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
             try {
                 readLock.lock();
                 writeLock.unlock();
-                if (closed) {
-                    throw new IOException(sm.getString("apr.closed", Long.valueOf(socket)));
-                }
                 return doWriteInternal(b, off, len);
             } finally {
                 readLock.unlock();
