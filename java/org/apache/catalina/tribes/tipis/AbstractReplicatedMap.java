@@ -56,7 +56,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
     private static final long serialVersionUID = 1L;
 
-    private static final Log log = LogFactory.getLog(AbstractReplicatedMap.class);
+    private final Log log = LogFactory.getLog(AbstractReplicatedMap.class);
 
     /**
      * The default initial capacity - MUST be a power of two.
@@ -1375,8 +1375,7 @@ public abstract class AbstractReplicatedMap<K,V>
             try {
                 return key(null);
             } catch ( Exception x ) {
-                log.error("Deserialization error of the MapMessage.key",x);
-                return null;
+                throw new RuntimeException("Deserialization error of the MapMessage.key", x);
             }
         }
 
@@ -1396,8 +1395,7 @@ public abstract class AbstractReplicatedMap<K,V>
             try {
                 return value(null);
             } catch ( Exception x ) {
-                log.error("Deserialization error of the MapMessage.value",x);
-                return null;
+                throw new RuntimeException("Deserialization error of the MapMessage.value", x);
             }
         }
 
