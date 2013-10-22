@@ -141,7 +141,7 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
                 throw new EOFException(sm.getString("apr.clientAbort"));
             } else if (written < 0) {
                 throw new IOException(sm.getString("apr.write.error",
-                        Integer.valueOf(-written), Long.valueOf(socket)));
+                        Integer.valueOf(-written), Long.valueOf(socket), wrapper));
             }
             start += written;
             left -= written;
