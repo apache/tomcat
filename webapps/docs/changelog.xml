@@ -86,6 +86,10 @@
         Add log message that initialization of
         <code>AbstractReplicatedMap</code> has been completed. (kfujino)
       </add>
+      <fix>
+        The logger of <code>AbstractReplicatedMap</code> should be non-static in
+        order to enable logging of each application. (kfujino)
+      </fix>
     </changelog>
   </subsection>
 </section>
