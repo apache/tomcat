@@ -165,13 +165,12 @@ public class SocketWrapper<E> {
 
     /**
      * Overridden for debug purposes. No guarantees are made about the format of
-     * this message which may vary significantly between poitn releases.
+     * this message which may vary significantly between point releases.
      * <p>
      * {@inheritDoc}
      */
     @Override
     public String toString() {
-        return super.toString() + ":" +
-                (socket == null ? "null" : socket.toString());
+        return super.toString() + ":" + String.valueOf(socket);
     }
 }
