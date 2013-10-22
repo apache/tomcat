@@ -85,6 +85,14 @@
    property to <code>true</code> but any explicit setting on the servlet context
    will always take priority.</p>
 
+<p>When using the WebSocket client to connect to server endpoints, the timeout
+   for IO operations while establishing the connection is controlled by the
+   <code>userProperties</code> of the provided
+   <code>javax.websocket.ClientEndpointConfig</code>. The property is
+   <code>org.apache.tomcat.websocket.IO_TIMEOUT_MS</code> and is the
+   timeout as a <code>String</code> in milliseconds. The default is 5000 (5
+   seconds).</p>
+
 <p>When using the WebSocket client to connect to secure server endpoints, the
    client SSL configuration is controlled by the <code>userProperties</code>
    of the provided <code>javax.websocket.ClientEndpointConfig</code>. The

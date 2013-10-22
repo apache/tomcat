@@ -47,6 +47,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.SSLContext;
@@ -86,6 +87,16 @@ public class WsWebSocketContainer
     public static final String SSL_TRUSTSTORE_PWD_PROPERTY =
             "org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD";
     public static final String SSL_TRUSTSTORE_PWD_DEFAULT = "changeit";
+
+    /**
+     * Property name to set to configure the timeout (in milliseconds) when
+     * establishing a WebSocket connection to server. The default is
+     * {@link #IO_TIMEOUT_MS_DEFAULT}.
+     */
+    public static final String IO_TIMEOUT_MS_PROPERTY =
+            "org.apache.tomcat.websocket.IO_TIMEOUT_MS";
+
+    public static final long IO_TIMEOUT_MS_DEFAULT = 5000;
 
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
@@ -292,30 +303,38 @@ public class WsWebSocketContainer
             channel = new AsyncChannelWrapperNonSecure(socketChannel);
         }
 
+        // Get the connection timeout
+        long timeout = IO_TIMEOUT_MS_DEFAULT;
+        String timeoutValue = (String) clientEndpointConfiguration.getUserProperties().get(
+                IO_TIMEOUT_MS_PROPERTY);
+        if (timeoutValue != null) {
+            timeout = Long.valueOf(timeoutValue).intValue();
+        }
+
         ByteBuffer response;
         String subProtocol;
         try {
-            fConnect.get();
+            fConnect.get(timeout, TimeUnit.MILLISECONDS);
 
             Future<Void> fHandshake = channel.handshake();
-            fHandshake.get();
+            fHandshake.get(timeout, TimeUnit.MILLISECONDS);
 
             int toWrite = request.limit();
 
             Future<Integer> fWrite = channel.write(request);
-            Integer thisWrite = fWrite.get();
+            Integer thisWrite = fWrite.get(timeout, TimeUnit.MILLISECONDS);
             toWrite -= thisWrite.intValue();
 
             while (toWrite > 0) {
                 fWrite = channel.write(request);
-                thisWrite = fWrite.get();
+                thisWrite = fWrite.get(timeout, TimeUnit.MILLISECONDS);
                 toWrite -= thisWrite.intValue();
             }
             // Same size as the WsFrame input buffer
             response = ByteBuffer.allocate(maxBinaryMessageBufferSize);
 
             HandshakeResponse handshakeResponse =
-                    processResponse(response, channel);
+                    processResponse(response, channel, timeout);
             clientEndpointConfiguration.getConfigurator().
                     afterResponse(handshakeResponse);
 
@@ -341,6 +360,9 @@ public class WsWebSocketContainer
             throw new DeploymentException(
                     sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
         } catch (EOFException e) {
+            throw new DeploymentException(
+                    sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
+        } catch (TimeoutException e) {
             throw new DeploymentException(
                     sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
         }
@@ -552,10 +574,12 @@ public class WsWebSocketContainer
      * @throws ExecutionException
      * @throws InterruptedException
      * @throws DeploymentException
+     * @throws TimeoutException
      */
     private HandshakeResponse processResponse(ByteBuffer response,
-            AsyncChannelWrapper channel) throws InterruptedException,
-            ExecutionException, DeploymentException, EOFException {
+            AsyncChannelWrapper channel, long timeout) throws InterruptedException,
+            ExecutionException, DeploymentException, EOFException,
+            TimeoutException {
 
         Map<String,List<String>> headers = new HashMap<String, List<String>>();
 
@@ -565,7 +589,7 @@ public class WsWebSocketContainer
         while (!readHeaders) {
             // Blocking read
             Future<Integer> read = channel.read(response);
-            Integer bytesRead = read.get();
+            Integer bytesRead = read.get(timeout, TimeUnit.MILLISECONDS);
             if (bytesRead.intValue() == -1) {
                 throw new EOFException();
             }
