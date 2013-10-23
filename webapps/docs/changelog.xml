@@ -95,7 +95,7 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection>
+  <subsection name="Web applications">
     <changelog>
       <add>
         Add some documentation on the SSL configuration options for WebSocket
