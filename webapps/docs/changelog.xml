@@ -88,7 +88,10 @@
       </add>
       <fix>
         The logger of <code>AbstractReplicatedMap</code> should be non-static in
-        order to enable logging of each application. (kfujino)
+        order to enable logging of each application. Side-effects of this change
+        is to throw <code>RuntimeException</code> in
+        <code>MapMessage#getKey()</code> and <code>getValue()</code> instead of
+        Null return and error log. (kfujino)
       </fix>
     </changelog>
   </subsection>
