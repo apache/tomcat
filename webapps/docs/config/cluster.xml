@@ -144,7 +144,14 @@
     </attribute>
 
     <attribute name="heartbeatBackgroundEnabled" required="false">
-      <p>Enable this flag don't forget to disable the channel heartbeat thread.
+      <p>Flag whether invoke channel heartbeat at container background thread. Default value is false.
+         Enable this flag don't forget to disable the channel heartbeat thread.
+      </p>
+    </attribute>
+
+    <attribute name="notifyLifecycleListenerOnFailure" required="false">
+      <p>Flag whether notify LifecycleListeners if all ClusterListener couldn't accept channel message.
+         Default value is false.
       </p>
     </attribute>
 
