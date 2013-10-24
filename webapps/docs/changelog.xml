@@ -78,6 +78,11 @@
         <bug>55681</bug>: Ensure that the WebSocket session is made available
         to <code>MessageHandler</code> method calls. (markt)
       </fix>
+      <fix>
+          Updated servlet spec version and documentation section-number reported
+          when JAR files are rejected for containing a trigger class
+          (e.g. javax.servlet.Servlet).
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

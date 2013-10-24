@@ -3446,8 +3446,8 @@ public class WebappClassLoader
                 JarEntry jarEntry = jarFile.getJarEntry(name);
                 if (jarEntry != null) {
                     log.info("validateJarFile(" + file +
-                        ") - jar not loaded. See Servlet Spec 2.3, "
-                        + "section 9.7.2. Offending class: " + name);
+                        ") - jar not loaded. See Servlet Spec 3.0, "
+                        + "section 10.7.2. Offending class: " + name);
                     return false;
                 }
             }
