@@ -104,4 +104,15 @@ public class SocketWrapper<E> {
         this.timeout = timeout;
         upgraded = false;
     }
+
+    /**
+     * Overridden for debug purposes. No guarantees are made about the format of
+     * this message which may vary significantly between point releases.
+     * <p>
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return super.toString() + ":" + String.valueOf(socket);
+    }
 }
