@@ -91,6 +91,11 @@
         Implement a number of small refactorings to the APR/native handler for
         upgraded HTTP connections. (markt)
       </scode>
+      <fix>
+        Fix an issue with upgraded HTTP connections over HTTPS (e.g. secure
+        WebSocket) when using the APR/native connector that resulted in the
+        unexpected closure of the connection. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

@@ -21,12 +21,16 @@ import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.OS;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 public class AprServletInputStream extends AbstractServletInputStream {
+
+    private static final Log log = LogFactory.getLog(AprServletInputStream.class);
 
     private final SocketWrapper<Long> wrapper;
     private final long socket;
@@ -92,6 +96,18 @@ public class AprServletInputStream extends AbstractServletInputStream {
         } else if (-result == Status.EAGAIN) {
             eagain = true;
             return 0;
+        } else if (-result == Status.APR_EGENERAL && wrapper.isSecure()) {
+            // Not entirely sure why this is necessary. Testing to date has not
+            // identified any issues with this but log it so it can be tracked
+            // if it is suspected of causing issues in the future.
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("apr.read.sslGeneralError",
+                        Long.valueOf(socket), wrapper));
+            }
+            eagain = true;
+            return 0;
+        } else if (-result == Status.APR_EOF) {
+            throw new EOFException(sm.getString("apr.clientAbort"));
         } else if ((OS.IS_WIN32 || OS.IS_WIN64) &&
                 (-result == Status.APR_OS_START_SYSERR + 10053)) {
             // 10053 on Windows is connection aborted
