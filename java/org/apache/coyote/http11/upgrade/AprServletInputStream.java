@@ -98,7 +98,7 @@ public class AprServletInputStream extends AbstractServletInputStream {
             throw new EOFException(sm.getString("apr.clientAbort"));
         } else {
             throw new IOException(sm.getString("apr.read.error",
-                    Integer.valueOf(-result), Long.valueOf(socket)));
+                    Integer.valueOf(-result), Long.valueOf(socket), wrapper));
         }
     }
 

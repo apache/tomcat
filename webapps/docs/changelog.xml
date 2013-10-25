@@ -85,6 +85,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <scode>
+        Implement a number of small refactorings to the APR/native handler for
+        upgraded HTTP connections. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <add>
