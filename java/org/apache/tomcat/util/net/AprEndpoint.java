@@ -895,6 +895,8 @@ public class AprEndpoint extends AbstractEndpoint {
         // parent pool or acceptor socket.
         // In any case disable double free which would cause JVM core.
 
+        connections.remove(Long.valueOf(socket));
+
         // While the connector is running, destroySocket() will call
         // countDownConnection(). Once the connector is stopped, the latch is
         // removed so it does not matter that destroySocket() does not call
