@@ -1376,14 +1376,14 @@
     <untar src="${tomcat.extras}/logging/commons-logging-src.tar"
       dest="${tomcat.extras}/logging/"/>
 
-    <replace dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/java/org/apache/commons"
+    <replace dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/main/java/org/apache/commons"
         encoding="ISO-8859-1">
       <replacefilter token="org.apache.commons"
             value="org.apache.juli" />
     </replace>
-    <mkdir dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/java/org/apache/juli" />
-    <move todir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/java/org/apache/juli">
-      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/java/org/apache/commons" />
+    <mkdir dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/main/java/org/apache/juli" />
+    <move todir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/main/java/org/apache/juli">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/main/java/org/apache/commons" />
     </move>
 
     <replace dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src"
@@ -1445,7 +1445,7 @@
     <!-- Source JARs -->
     <jar jarfile="${tomcat-juli-extras-src.jar}"
          manifest="${tomcat.manifests}/default.manifest" >
-      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/java">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/main/java">
         <include name="org/apache/juli/logging/*.java" />
         <include name="org/apache/juli/logging/impl/LogFactoryImpl*.java" />
         <include name="org/apache/juli/logging/impl/WeakHashtable*.java" />
@@ -1468,7 +1468,7 @@
         fullpath="META-INF/LICENSE" />
     </jar>
     <jarIt jarfile="${tomcat-juli-adapters-src.jar}"
-      filesDir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/java"
+      filesDir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/main/java"
       filesId="files.tomcat-extras-juli-adapters" />
 
   </target>
@@ -1574,7 +1574,7 @@
     
     <jar jarfile="${tomcat-embed-log4j-src.jar}"
          manifest="${tomcat.manifests}/default.manifest" >
-      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/java">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/main/java">
         <include name="org/apache/juli/logging/*.java" />
         <include name="org/apache/juli/logging/impl/*.java" />
         <!-- Javadoc and i18n exclusions -->
