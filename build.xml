@@ -1681,6 +1681,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="javadoc" depends="dist-source,extras-webservices-prepare"
     description="Create the Tomcat javadoc" >
+    <fail unless="java.7.home"
+          message="The java.7.home property must be set for javadoc build"/>
     <javadoc packagenames="javax.servlet.*"
       excludepackagenames="javax.servlet.jsp.*"
       sourcepath="${tomcat.dist}/src/java"
@@ -1692,15 +1694,14 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
       additionalparam="-breakiterator"
-      maxmemory="256m" >
+      maxmemory="256m"
+      executable="${java.7.home}/bin/javadoc">
       <classpath>
         <path refid="compile.classpath"/>
         <path refid="tomcat.webservices.classpath"/>
         <path location="${ant.core.lib}"/>
       </classpath>
     </javadoc>
-    <patch-javadoc dir="${tomcat.dist}/webapps/docs/servletapi"
-      docencoding="ISO-8859-1"/>
     <javadoc packagenames="javax.servlet.jsp.*"
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/jspapi"
@@ -1711,15 +1712,14 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
       additionalparam="-breakiterator"
-      maxmemory="256m" >
+      maxmemory="256m"
+      executable="${java.7.home}/bin/javadoc">
       <classpath>
         <path refid="compile.classpath"/>
         <path refid="tomcat.webservices.classpath"/>
         <path location="${ant.core.lib}"/>
       </classpath>
     </javadoc>
-    <patch-javadoc dir="${tomcat.dist}/webapps/docs/jspapi"
-      docencoding="ISO-8859-1"/>
     <javadoc packagenames="javax.el.*"
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/elapi"
@@ -1730,15 +1730,14 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
       additionalparam="-breakiterator"
-      maxmemory="256m" >
+      maxmemory="256m"
+      executable="${java.7.home}/bin/javadoc">
       <classpath>
         <path refid="compile.classpath"/>
         <path refid="tomcat.webservices.classpath"/>
         <path location="${ant.core.lib}"/>
       </classpath>
     </javadoc>
-    <patch-javadoc dir="${tomcat.dist}/webapps/docs/elapi"
-      docencoding="ISO-8859-1"/>
     <javadoc packagenames="javax.websocket.*"
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/websocketapi"
@@ -1749,15 +1748,14 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
       additionalparam="-breakiterator"
-      maxmemory="256m" >
+      maxmemory="256m"
+      executable="${java.7.home}/bin/javadoc">
       <classpath>
         <path refid="compile.classpath"/>
         <path refid="tomcat.webservices.classpath"/>
         <path location="${ant.core.lib}"/>
       </classpath>
     </javadoc>
-    <patch-javadoc dir="${tomcat.dist}/webapps/docs/websocketapi"
-      docencoding="ISO-8859-1"/>
     <javadoc packagenames="org.apache.*"
       destdir="${tomcat.dist}/webapps/docs/api"
       version="true"
@@ -1767,7 +1765,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
       additionalparam="-breakiterator"
-      maxmemory="256m" >
+      maxmemory="256m"
+      executable="${java.7.home}/bin/javadoc">
       <classpath>
         <path refid="compile.classpath"/>
         <path refid="tomcat.webservices.classpath"/>
@@ -1786,8 +1785,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <path location="${tomcat.dist}/src/modules/jdbc-pool/src/main/java"/>
       </sourcepath>
     </javadoc>
-    <patch-javadoc dir="${tomcat.dist}/webapps/docs/api"
-      docencoding="ISO-8859-1"/>
   </target>
 
   <!--
