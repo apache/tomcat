@@ -124,6 +124,10 @@
         <code>notifyLifecycleListenerOnFailure</code> and
         <code>heartbeatBackgroundEnabled</code>. (kfujino)
       </add>
+      <fix>
+        Update the documentation with information for WebSocket 1.0 specification
+        and javadoc. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Extras">
