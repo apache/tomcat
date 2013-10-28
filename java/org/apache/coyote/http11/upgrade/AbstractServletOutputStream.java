@@ -39,6 +39,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
     // Start in blocking-mode
     private volatile WriteListener listener = null;
     private volatile boolean fireListener = false;
+    private volatile ClassLoader applicationLoader = null;
     private volatile byte[] buffer;
 
     /**
@@ -68,6 +69,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
                     sm.getString("upgrade.sos.writeListener.null"));
         }
         this.listener = listener;
+        this.applicationLoader = Thread.currentThread().getContextClassLoader();
     }
 
     protected final boolean isCloseRequired() {
@@ -139,7 +141,14 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
                 writeInternal(buffer, 0, buffer.length);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                listener.onError(t);
+                Thread thread = Thread.currentThread();
+                ClassLoader originalClassLoader = thread.getContextClassLoader();
+                try {
+                    thread.setContextClassLoader(applicationLoader);
+                    listener.onError(t);
+                } finally {
+                    thread.setContextClassLoader(originalClassLoader);
+                }
                 if (t instanceof IOException) {
                     throw (IOException) t;
                 } else {
@@ -158,7 +167,14 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
                 }
             }
             if (fire) {
-                listener.onWritePossible();
+                Thread thread = Thread.currentThread();
+                ClassLoader originalClassLoader = thread.getContextClassLoader();
+                try {
+                    thread.setContextClassLoader(applicationLoader);
+                    listener.onWritePossible();
+                } finally {
+                    thread.setContextClassLoader(originalClassLoader);
+                }
             }
         }
     }

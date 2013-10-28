@@ -35,7 +35,7 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
     // Start in blocking-mode
     private volatile Boolean ready = Boolean.TRUE;
     private volatile ReadListener listener = null;
-
+    private volatile ClassLoader applicationLoader = null;
 
     /**
      * New Servlet 3.1 method.
@@ -68,7 +68,14 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
         try {
             ready = Boolean.valueOf(doIsReady());
         } catch (IOException e) {
-            listener.onError(e);
+            Thread thread = Thread.currentThread();
+            ClassLoader originalClassLoader = thread.getContextClassLoader();
+            try {
+                thread.setContextClassLoader(applicationLoader);
+                listener.onError(e);
+            } finally {
+                thread.setContextClassLoader(originalClassLoader);
+            }
             ready = Boolean.FALSE;
         }
         return ready.booleanValue();
@@ -84,6 +91,7 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
                     sm.getString("upgrade.sis.readListener.null"));
         }
         this.listener = listener;
+        this.applicationLoader = Thread.currentThread().getContextClassLoader();
         // Switching to non-blocking. Don't know if data is available.
         ready = null;
     }
@@ -151,11 +159,10 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
     private int readInternal() throws IOException {
         // Single byte reads for non-blocking need special handling so all
         // single byte reads run through this method.
-        ReadListener readListener = this.listener;
         byte[] b = new byte[1];
         int result;
         try {
-            result = doRead(readListener == null, b, 0, 1);
+            result = doRead(listener == null, b, 0, 1);
         } catch (IOException ioe) {
             closeRequired = true;
             throw ioe;
@@ -175,7 +182,14 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
 
     protected final void onDataAvailable() throws IOException {
         ready = Boolean.TRUE;
-        listener.onDataAvailable();
+        Thread thread = Thread.currentThread();
+        ClassLoader originalClassLoader = thread.getContextClassLoader();
+        try {
+            thread.setContextClassLoader(applicationLoader);
+            listener.onDataAvailable();
+        } finally {
+            thread.setContextClassLoader(originalClassLoader);
+        }
     }
 
 
