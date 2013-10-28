@@ -81,8 +81,16 @@
       <fix>
           Updated servlet spec version and documentation section-number reported
           when JAR files are rejected for containing a trigger class
-          (e.g. javax.servlet.Servlet).
+          (e.g. javax.servlet.Servlet). (schultz)
       </fix>
+      <add>
+        Modify the WebSocket handshake process so that the user properties
+        <code>Map</code> exposed by the <code>ServerEndpointConfig</code> during
+        the call to <code>Configurator.modifyHandshake()</code> is unique to the
+        connection rather than shared by all connections associated with the
+        Endpoint. This allows for easier configuration of per connection
+        properties from within <code>modifyHandshake()</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
