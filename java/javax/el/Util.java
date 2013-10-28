@@ -438,7 +438,7 @@ class Util {
      * This method duplicates code in org.apache.el.util.ReflectionUtil. When
      * making changes keep the code in sync.
      */
-    private static boolean isAssignableFrom(Class<?> src, Class<?> target) {
+    static boolean isAssignableFrom(Class<?> src, Class<?> target) {
         // src will always be an object
         // Short-cut. null is always assignable to an object and in EL null
         // can always be coerced to a valid value for a primitive
