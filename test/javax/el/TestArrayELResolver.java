@@ -246,6 +246,22 @@ public class TestArrayELResolver {
     }
 
     /**
+     * Tests setting arrays of primitives.
+     * https://issues.apache.org/bugzilla/show_bug.cgi?id=55691
+     */
+    @Test
+    public void testSetValue08() {
+        ArrayELResolver resolver = new ArrayELResolver();
+        ELContext context = new StandardELContext(
+                ELManager.getExpressionFactory());
+
+        int[] base = new int[] { 1, 2, 3 };
+        resolver.setValue(context, base, new Integer(1), Integer.valueOf(4));
+
+        Assert.assertEquals(Integer.valueOf(base[1]), Integer.valueOf(4));
+    }
+
+    /**
      * Tests that a null context results in an NPE as per EL Javadoc.
      */
     @Test(expected = NullPointerException.class)
