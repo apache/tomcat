@@ -160,7 +160,10 @@ public class UpgradeUtil {
 
         WsHandshakeRequest wsRequest = new WsHandshakeRequest(req);
         WsHandshakeResponse wsResponse = new WsHandshakeResponse();
-        sec.getConfigurator().modifyHandshake(sec, wsRequest, wsResponse);
+        WsPerSessionServerEndpointConfig perSessionServerEndpointConfig =
+                new WsPerSessionServerEndpointConfig(sec);
+        sec.getConfigurator().modifyHandshake(perSessionServerEndpointConfig,
+                wsRequest, wsResponse);
         wsRequest.finished();
 
         // Add any additional headers
@@ -173,8 +176,8 @@ public class UpgradeUtil {
 
         WsHttpUpgradeHandler wsHandler =
                 req.upgrade(WsHttpUpgradeHandler.class);
-        wsHandler.preInit(ep, sec, sc, wsRequest, subProtocol,
-                pathParams, req.isSecure());
+        wsHandler.preInit(ep, perSessionServerEndpointConfig, sc, wsRequest,
+                subProtocol, pathParams, req.isSecure());
 
     }
 
