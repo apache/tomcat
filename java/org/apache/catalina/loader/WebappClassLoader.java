@@ -2482,8 +2482,18 @@ public class WebappClassLoader extends URLClassLoader
         // Get the current thread group
         ThreadGroup tg = Thread.currentThread().getThreadGroup();
         // Find the root thread group
-        while (tg.getParent() != null) {
-            tg = tg.getParent();
+        try {
+            while (tg.getParent() != null) {
+                tg = tg.getParent();
+            }
+        } catch (SecurityException se) {
+            String msg = sm.getString(
+                    "webappClassLoader.getThreadGroupError", tg.getName());
+            if (log.isDebugEnabled()) {
+                log.debug(msg, se);
+            } else {
+                log.warn(msg);
+            }
         }
 
         int threadCountGuess = tg.activeCount() + 50;
