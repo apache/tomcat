@@ -23,6 +23,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -109,24 +111,32 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
     // resolveRelativeUri and/or getResourceAsStream don't seem to properly
     // handle relative paths when dealing when home and getDocBase are set
     // the following is a workaround until these problems are resolved.
-    private InputStream getResourceAsStream(String uri)
+    private InputStream getResourceAsStream(String uriAsString)
             throws FileNotFoundException {
         // Is uri absolute?
-        if (uri.startsWith("file:")) {
-            return new FileInputStream(new File(uri.substring(5)));
+        if (uriAsString.startsWith("file:")) {
+            URI uri;
+            try {
+                uri = new URI(uriAsString);
+            } catch (URISyntaxException e) {
+                FileNotFoundException fnfe = new FileNotFoundException(e.getMessage());
+                fnfe.initCause(e);
+                throw fnfe;
+            }
+            return new FileInputStream(new File(uri));
         } else {
             try {
                 // see if file exists on the filesystem
-                String real = ctxt.getRealPath(uri);
+                String real = ctxt.getRealPath(uriAsString);
                 if (real == null) {
-                    return ctxt.getResourceAsStream(uri);
+                    return ctxt.getResourceAsStream(uriAsString);
                 } else {
                     return new FileInputStream(real);
                 }
             } catch (FileNotFoundException ex) {
                 // if file not found on filesystem, get the resource through
                 // the context
-                return ctxt.getResourceAsStream(uri);
+                return ctxt.getResourceAsStream(uriAsString);
             }
         }
     }
