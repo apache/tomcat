@@ -2480,7 +2480,7 @@ public class WebappClassLoader extends URLClassLoader
      */
     private Thread[] getThreads() {
         // Get the current thread group
-        ThreadGroup tg = Thread.currentThread( ).getThreadGroup( );
+        ThreadGroup tg = Thread.currentThread().getThreadGroup();
         // Find the root thread group
         while (tg.getParent() != null) {
             tg = tg.getParent();
