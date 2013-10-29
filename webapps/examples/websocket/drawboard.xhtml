@@ -451,12 +451,12 @@
                                                 canvasBackgroundCtx.drawImage(canvasServerImage,
                                                         0, 0);
 
-                                                // Refresh the display canvas.
-                                                refreshDisplayCanvas();
-
                                                 isStarted = true;
                                                 startControls();
 
+                                                // Refresh the display canvas.
+                                                refreshDisplayCanvas();
+                                                
 
                                                 // Finally, resume the event forwarder.
                                                 eventForwarder.resumeProcessing();
