@@ -82,6 +82,45 @@
                 noscripts[i].parentNode.removeChild(noscripts[i]);
             }
 
+            // Add script for expand content.
+            var expandElements = document.getElementsByClassName("expand");
+            for (var ixx = 0; ixx < expandElements.length; ixx++) {
+                (function(el) {
+                    var expandContent = document.getElementById(el.getAttribute("data-content-id"));
+                    expandContent.style.display = "none";
+                    var arrow = document.createTextNode("◢ ");
+                    var arrowSpan = document.createElement("span");
+                    arrowSpan.appendChild(arrow);
+
+                    var link = document.createElement("a");
+                    link.setAttribute("href", "#!");
+                    while (el.firstChild != null) {
+                        link.appendChild(el.removeChild(el.firstChild));
+                    }
+                    el.appendChild(arrowSpan);
+                    el.appendChild(link);
+
+                    var textSpan = document.createElement("span");
+                    textSpan.setAttribute("style", "font-weight: normal;");
+                    textSpan.appendChild(document.createTextNode(" (click to expand)"));
+                    el.appendChild(textSpan);
+
+
+                    var visible = true;
+
+                    var switchExpand = function() {
+                        visible = !visible;
+                        expandContent.style.display = visible ? "block" : "none";
+                        arrowSpan.style.color = visible ? "#000" : "#888";
+                        return false;
+                    };
+
+                    link.onclick = switchExpand;
+                    switchExpand();
+
+                })(expandElements[ixx]);
+            }
+
 
             var Console = {};
 
@@ -812,11 +851,42 @@
     ]]></script>
 </head>
 <body>
-    <div class="noscript"><h2 style="color: #ff0000;">Seems your browser doesn't support Javascript! Websockets rely on Javascript being enabled. Please enable
-    Javascript and reload this page!</h2></div>
+    <div class="noscript"><div style="color: #ff0000; font-size: 16pt;">Seems your browser doesn't support Javascript! Websockets rely on Javascript being enabled. Please enable
+    Javascript and reload this page!</div></div>
     <div id="labelContainer"/>
     <div id="drawContainer"/>
     <div id="console-container"/>
+    <div style="clear: left;"/>
 
+    <h1 class="expand" data-content-id="expandContent" style="font-size: 1.3em;"
+        >About Drawbord WebSocket Example</h1>
+    <div id="expandContent">
+        <p>
+            This drawboard is a page where you can draw with your mouse or touch input
+            (using different colors) and everybody else which has the page open will
+            <em>immediately</em> see what you are drawing.<br/>
+            If someone opens the page later, they will get the current room image (so they
+            can see what was already drawn by other people).
+        </p>
+        <p>
+            It uses asynchronous sending of messages so that it doesn't need separate threads
+            for each client to send messages (this needs NIO or APR connector to be used).<br/>
+            Each "Room" (where the drawing happens) uses a ReentrantLock to synchronize access
+            (currently, only a single Room is implemented).
+        </p>
+        <p>
+            When you open the page, first you will receive a binary websocket message containing
+            the current room image as PNG image. After that, you will receive string messages
+            that contain the drawing actions (line from x1,y1 to x2,y2).<br/>
+            <small>Note that it currently only uses simple string messages instead of JSON because
+            I did not want to introduce a dependency on a JSON lib.</small>
+        </p>
+        <p>
+            It uses synchronization mechanisms to ensure that the final image will look the same
+            for every user, regardless of what their network latency/speed is – e.g. if two user
+            draw at the same time on the same place, the server will decide which line was the
+            first one, and that will be reflected on every client.
+        </p>
+    </div>
 </body>
 </html>
