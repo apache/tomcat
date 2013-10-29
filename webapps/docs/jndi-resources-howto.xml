@@ -229,8 +229,9 @@ conn.close();
     Java class that conforms to standard JavaBeans naming conventions (i.e.
     it has a zero-arguments constructor, and has property setters that
     conform to the setFoo() naming pattern.  The resource factory will
-    create a new instance of the appropriate bean class every time a
-    <code>lookup()</code> for this entry is made.</p>
+    only create a new instance of the appropriate bean class every time a
+    <code>lookup()</code> for this entry is made if the <code>singleton</code>
+    attribute of the factory is set to <code>false</code>.</p>
 
     <p>The steps required to use this facility are described below.</p>
 
@@ -815,8 +816,10 @@ conn.close();
   <p>You must write a class that implements the JNDI service provider
   <code>javax.naming.spi.ObjectFactory</code> inteface.  Every time your
   web application calls <code>lookup()</code> on a context entry that is
-  bound to this factory, the <code>getObjectInstance()</code> method is
-  called, with the following arguments:</p>
+  bound to this factory (assuming that the factory is configured with
+  <code>singleton=&quot;false&quot;</code>), the
+  <code>getObjectInstance()</code> method is called, with the following
+  arguments:</p>
   <ul>
   <li><strong>Object obj</strong> - The (possibly null) object containing
       location or reference information that can be used in creating an object.
@@ -960,6 +963,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
   &lt;Resource name="bean/MyBeanFactory" auth="Container"
             type="com.mycompany.MyBean"
             factory="com.mycompany.MyBeanFactory"
+            singleton="false"
             bar="23"/&gt;
   ...
 &lt;/Context&gt;

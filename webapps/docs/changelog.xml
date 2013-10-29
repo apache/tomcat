@@ -151,6 +151,10 @@
         Update the documentation with information for WebSocket 1.0 specification
         and javadoc. (violetagg)
       </fix>
+      <fix>
+        <bug>55703</bug>: Clarify the role of the singleton attribute for JNDI
+        resource factories. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Extras">
