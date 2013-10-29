@@ -91,6 +91,11 @@
         Endpoint. This allows for easier configuration of per connection
         properties from within <code>modifyHandshake()</code>. (markt)
       </add>
+      <fix>
+        <bug>55684</bug>: Log a warning but continue if the memory leak
+        detection code is unable to access all threads to check for possible
+        memory leaks when a web application is stopped. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
