@@ -96,6 +96,10 @@
         detection code is unable to access all threads to check for possible
         memory leaks when a web application is stopped. (markt)
       </fix>
+      <fix>
+        Define the web-fragment.xml in tomcat7-websocket.jar as a Servlet 3.0
+        web fragment rather than as a Servlet 3.1 web fragment. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
