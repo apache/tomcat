@@ -185,6 +185,7 @@
                 var canvasMouseMoveHandler;
                 var canvasMouseDownHandler;
 
+                var isActive = false;
                 var mouseInWindow = false;
                 var mouseDown = false;
                 var currentMouseX = 0, currentMouseY = 0;
@@ -500,6 +501,10 @@
                 }
 
                 function refreshDisplayCanvas() {
+                    if (!isActive) { // Don't draw a curser when not active.
+                        return;
+                    }
+
                     canvasDisplayCtx.drawImage(canvasBackground, 0, 0);
                     if (currentPreviewPath != null) {
                         // Draw the preview path.
@@ -520,6 +525,8 @@
                 }
 
                 function startControls() {
+                    isActive = true;
+
                     labelContainer.removeChild(placeholder);
                     placeholder = undefined;
 
@@ -555,7 +562,6 @@
                     canvasDisplay.addEventListener("mousedown", canvasMouseDownHandler, false);
 
                     canvasMouseMoveHandler = function(e) {
-                        mouseInWindow = true;
                         var mouseX = e.pageX - canvasDisplay.offsetLeft;
                         var mouseY = e.pageY - canvasDisplay.offsetTop;
 
@@ -596,9 +602,9 @@
 
                         refreshDisplayCanvas();
                     };
-                    canvasDisplay.addEventListener("mousemove", canvasMouseMoveHandler, false);
+                    document.addEventListener("mousemove", canvasMouseMoveHandler, false);
 
-                    canvasDisplay.addEventListener("mouseup", function(e) {
+                    document.addEventListener("mouseup", function(e) {
                         if (e.button == 0) {
                             if (mouseDown) {
                                 mouseDown = false;
@@ -630,6 +636,13 @@
                     canvasDisplay.addEventListener("mouseout", function(e) {
                         mouseInWindow = false;
                         refreshDisplayCanvas();
+                    }, false);
+
+                    canvasDisplay.addEventListener("mousemove", function(e) {
+                        if (!mouseInWindow) {
+                            mouseInWindow = true;
+                            refreshDisplayCanvas();
+                        }
                     }, false);
 
 
@@ -730,10 +743,12 @@
                 }
 
                 function disableControls() {
-                    canvasDisplay.removeEventListener("mousedown", canvasMouseDownHandler);
-                    canvasDisplay.removeEventListener("mousemove", canvasMouseMoveHandler);
+                    document.removeEventListener("mousedown", canvasMouseDownHandler);
+                    document.removeEventListener("mousemove", canvasMouseMoveHandler);
                     mouseInWindow = false;
                     refreshDisplayCanvas();
+
+                    isActive = false;
                 }
 
                 function pushPath(path) {
