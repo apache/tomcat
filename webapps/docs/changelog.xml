@@ -134,6 +134,10 @@
         <code>MapMessage#getKey()</code> and <code>getValue()</code> instead of
         Null return and error log. (kfujino)
       </fix>
+      <scode>
+        Simplify the code of <code>DeltaManager#startInternal()</code>. Reduce
+        unnecessary nesting for acquisition of cluster instance. (kfujino)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Web applications">
