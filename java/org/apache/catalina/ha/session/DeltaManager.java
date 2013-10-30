@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.Iterator;
 
 import org.apache.catalina.Cluster;
-import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
@@ -768,27 +767,15 @@ public class DeltaManager extends ClusterManagerBase{
             //the channel is already running
             Cluster cluster = getCluster() ;
             // stop remove cluster binding
-            //wow, how many nested levels of if statements can we have ;)
             if(cluster == null) {
                 Context context = getContext() ;
                 if (context != null) {
-                     Container host = context.getParent() ;
-                     if(host != null && host instanceof Host) {
-                         cluster = host.getCluster();
-                         if(cluster != null && cluster instanceof CatalinaCluster) {
-                             setCluster((CatalinaCluster) cluster) ;
-                         } else {
-                             Container engine = host.getParent() ;
-                             if(engine != null && engine instanceof Engine) {
-                                 cluster = engine.getCluster();
-                                 if(cluster != null && cluster instanceof CatalinaCluster) {
-                                     setCluster((CatalinaCluster) cluster) ;
-                                 }
-                             } else {
-                                     cluster = null ;
-                             }
-                         }
-                     }
+                    cluster = context.getCluster();
+                    if(cluster instanceof CatalinaCluster) {
+                        setCluster((CatalinaCluster) cluster);
+                    } else {
+                        cluster = null;
+                    }
                 }
             }
             if (cluster == null) {
