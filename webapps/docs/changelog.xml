@@ -138,6 +138,12 @@
         Simplify the code of <code>DeltaManager#startInternal()</code>. Reduce
         unnecessary nesting for acquisition of cluster instance. (kfujino)
       </scode>
+      <fix>
+        Remove unnecessary attributes of 
+        <code>stateTransferCreateSendTime</code> and <code>receiverQueue</code>
+        from cluster manager template. These attributes should not be defined as
+        a template. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
