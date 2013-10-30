@@ -90,7 +90,7 @@
    initiated the write. Since the container thread pool is not exposed via the
    Servlet API, the WebSocket implementation has to provide its own thread pool.
    This thread pool is controlled by the following servlet context
-   initialization parameters:<a>
+   initialization parameters:</p>
    <ul>
      <li><code>org.apache.tomcat.websocket.executorCoreSize</code>: The core
          size of the executor thread pool. If not set, the default of 0 (zero)
