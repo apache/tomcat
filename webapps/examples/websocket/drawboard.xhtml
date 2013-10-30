@@ -634,12 +634,17 @@
                                         currentMouseX, currentMouseY, mouseX,
                                         mouseY, false);
                             }
+
+                            refreshDisplayCanvas();
                         } else {
                             currentMouseX = mouseX;
                             currentMouseY = mouseY;
+
+                            if (mouseInWindow) {
+                                refreshDisplayCanvas();
+                            }
                         }
 
-                        refreshDisplayCanvas();
                     };
                     document.addEventListener("mousemove", canvasMouseMoveHandler, false);
 
