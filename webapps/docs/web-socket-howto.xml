@@ -82,7 +82,7 @@
    property to <code>true</code> but any explicit setting on the servlet context
    will always take priority.</p>
 
-<p>The Java WebSocket 1.0 specification requires that call backs for
+<p>The Java WebSocket 1.0 specification requires that callbacks for
    asynchronous writes are performed on a different thread to the thread that
    initiated the write. Since the container thread pool is not exposed via the
    Servlet API, the WebSocket implementation has to provide its own thread pool.

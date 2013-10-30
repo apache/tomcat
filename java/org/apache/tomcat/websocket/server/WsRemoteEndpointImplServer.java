@@ -129,7 +129,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     protected void doClose() {
         if (handler != null) {
             // close() can be triggered by a wide range of scenarios. It is far
-            // simpler just to always use a dispatch that it is to try and track
+            // simpler just to always use a dispatch than it is to try and track
             // whether or not this method was called by the same thread that
             // triggered the write
             clearHandler(new EOFException(), true);
