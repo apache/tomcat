@@ -31,6 +31,14 @@ public class Constants {
     public static final String ENFORCE_NO_ADD_AFTER_HANDSHAKE_CONTEXT_INIT_PARAM =
             "org.apache.tomcat.websocket.noAddAfterHandshake";
 
+    // Executor configuration
+    public static final String EXECUTOR_CORE_SIZE_INIT_PARAM =
+            "org.apache.tomcat.websocket.executorCoreSize";
+    public static final String EXECUTOR_MAX_SIZE_INIT_PARAM =
+            "org.apache.tomcat.websocket.executorMaxSize";
+    public static final String EXECUTOR_KEEPALIVETIME_SECONDS_INIT_PARAM =
+            "org.apache.tomcat.websocket.executorKeepAliveTimeSeconds";
+
     public static final String SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE =
             "javax.websocket.server.ServerContainer";
 

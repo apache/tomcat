@@ -45,6 +45,7 @@ public class WsContextListener implements ServletContextListener {
         ServletContext sc = sce.getServletContext();
         Object obj = sc.getAttribute(Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
         if (obj instanceof WsServerContainer) {
+            ((WsServerContainer) obj).shutdownExecutor();
             ((WsServerContainer) obj).destroy();
         }
     }
