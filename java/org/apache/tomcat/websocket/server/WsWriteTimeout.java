@@ -52,7 +52,9 @@ public class WsWriteTimeout implements BackgroundProcess {
             while (iter.hasNext()) {
                 WsRemoteEndpointImplServer endpoint = iter.next();
                 if (endpoint.getTimeoutExpiry() < now) {
-                    endpoint.onTimeout();
+                    // Background thread, not the thread that triggered the
+                    // write so no need to use a dispatch
+                    endpoint.onTimeout(false);
                 } else {
                     // Endpoints are ordered by timeout expiry so if this point
                     // is reached there is no need to check the remaining

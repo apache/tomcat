@@ -100,6 +100,12 @@
         Define the web-fragment.xml in tomcat7-websocket.jar as a Servlet 3.0
         web fragment rather than as a Servlet 3.1 web fragment. (markt) 
       </fix>
+      <fix>
+        <bug>55715</bug>: Add a per web application executor to the WebSocket
+        implementation and use it for calling
+        <code>SendHandler.onResult()</code> when there is a chance that the
+        current thread also initiated the write. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
