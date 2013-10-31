@@ -367,7 +367,6 @@
 
   <patternset id="files.tomcat-coyote">
     <include name="org/apache/coyote/**" />
-    <include name="org/apache/jk/**" />
     <include name="org/apache/tomcat/util/**" />
     <!-- Exclude the files shared between Catalina & Jasper and/or used by
          WebSockets -->
