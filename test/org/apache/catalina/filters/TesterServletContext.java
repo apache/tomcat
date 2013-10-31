@@ -42,9 +42,14 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 
 public class TesterServletContext implements ServletContext {
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This test implementation is hard coded to return an empty String.
+     */
     @Override
     public String getContextPath() {
-        throw new RuntimeException("Not implemented");
+        return "";
     }
 
     @Override
@@ -129,13 +134,11 @@ public class TesterServletContext implements ServletContext {
 
     @Override
     public String getRealPath(String path) {
-
         throw new RuntimeException("Not implemented");
     }
 
     @Override
     public String getServerInfo() {
-
         throw new RuntimeException("Not implemented");
     }
 
@@ -146,19 +149,16 @@ public class TesterServletContext implements ServletContext {
 
     @Override
     public Enumeration<String> getInitParameterNames() {
-
         throw new RuntimeException("Not implemented");
     }
 
     @Override
     public Object getAttribute(String name) {
-
         throw new RuntimeException("Not implemented");
     }
 
     @Override
     public Enumeration<String> getAttributeNames() {
-
         throw new RuntimeException("Not implemented");
     }
 
@@ -317,9 +317,13 @@ public class TesterServletContext implements ServletContext {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This test implementation is hard coded to return <code>localhost</code>.
+     */
     @Override
     public String getVirtualServerName() {
-        throw new RuntimeException("Not implemented");
+        return "localhost";
     }
-
 }
