@@ -309,13 +309,6 @@ public class WebappClassLoader extends URLClassLoader
 
 
     /**
-     * The path to the repository for locally loaded classes or resources. This
-     * would normally be /WEB-INF/classes/.
-     */
-    protected String repositoryPath = null;
-
-
-    /**
      * Repositories URLs, used to cache the result of getURLs.
      */
     protected URL[] repositoryURLs = null;
@@ -829,7 +822,6 @@ public class WebappClassLoader extends URLClassLoader
         loader.resources = this.resources;
         loader.delegate = this.delegate;
         loader.lastJarAccessed = this.lastJarAccessed;
-        loader.repositoryPath = this.repositoryPath;
         loader.repository = this.repository;
         loader.jarPath = this.jarPath;
         loader.loaderDir = this.loaderDir;
@@ -874,7 +866,6 @@ public class WebappClassLoader extends URLClassLoader
         if (log.isDebugEnabled())
             log.debug("addRepository(" + path + ")");
 
-        this.repositoryPath = path;
         this.repository = repository;
     }
 
@@ -1036,9 +1027,6 @@ public class WebappClassLoader extends URLClassLoader
         sb.append("\r\n");
         sb.append("  delegate: ");
         sb.append(delegate);
-        sb.append("\r\n");
-        sb.append("  repositoryPath: ");
-        sb.append(repositoryPath);
         sb.append("\r\n");
         if (this.parent != null) {
             sb.append("----------> Parent Classloader:\r\n");
@@ -1207,13 +1195,13 @@ public class WebappClassLoader extends URLClassLoader
 
         int jarFilesLength = jarFiles.length;
 
-        if (repositoryPath != null) {
-            // Looking at the repository
-            WebResource[] webResources = resources.getResources(repositoryPath + name);
-            for (WebResource webResource : webResources) {
-                if (webResource.exists()) {
-                    result.add(webResource.getURL());
-                }
+        // Looking at the repository
+        // TODO Add support to WebResourceRoot for looking up class loader
+        //      resoucres
+        WebResource[] webResources = resources.getResources("/WEB-INF/classes/" + name);
+        for (WebResource webResource : webResources) {
+            if (webResource.exists()) {
+                result.add(webResource.getURL());
             }
         }
 
@@ -1766,7 +1754,6 @@ public class WebappClassLoader extends URLClassLoader
         notFoundResources.clear();
         resourceEntries.clear();
         resources = null;
-        repositoryPath = null;
         repositoryURLs = null;
         repository = null;
         jarFiles = null;
@@ -2832,47 +2819,45 @@ public class WebappClassLoader extends URLClassLoader
 
         boolean fileNeedConvert = false;
 
-        if (repositoryPath != null) {
-            String fullPath = repositoryPath + path;
-            resource = resources.getResource(fullPath);
+        String fullPath = "/WEB-INF/classes/" + path;
+        resource = resources.getResource(fullPath);
 
-            if (resource.exists()) {
+        if (resource.exists()) {
 
-                contentLength = (int) resource.getContentLength();
-                entry = new ResourceEntry();
-                entry.source = resource.getURL();
-                entry.codeBase = entry.source;
-                entry.lastModified = resource.getLastModified();
+            contentLength = (int) resource.getContentLength();
+            entry = new ResourceEntry();
+            entry.source = resource.getURL();
+            entry.codeBase = entry.source;
+            entry.lastModified = resource.getLastModified();
 
-                binaryStream = resource.getInputStream();
+            binaryStream = resource.getInputStream();
 
-                if (needConvert) {
-                    if (path.endsWith(".properties")) {
-                        fileNeedConvert = true;
-                    }
+            if (needConvert) {
+                if (path.endsWith(".properties")) {
+                    fileNeedConvert = true;
                 }
+            }
 
-                // Register the full path for modification checking
-                // Note: Only syncing on a 'constant' object is needed
-                synchronized (allPermission) {
+            // Register the full path for modification checking
+            // Note: Only syncing on a 'constant' object is needed
+            synchronized (allPermission) {
 
-                    int j;
+                int j;
 
-                    long[] result2 =
-                        new long[lastModifiedDates.length + 1];
-                    for (j = 0; j < lastModifiedDates.length; j++) {
-                        result2[j] = lastModifiedDates[j];
-                    }
-                    result2[lastModifiedDates.length] = entry.lastModified;
-                    lastModifiedDates = result2;
-
-                    String[] result = new String[paths.length + 1];
-                    for (j = 0; j < paths.length; j++) {
-                        result[j] = paths[j];
-                    }
-                    result[paths.length] = fullPath;
-                    paths = result;
+                long[] result2 =
+                    new long[lastModifiedDates.length + 1];
+                for (j = 0; j < lastModifiedDates.length; j++) {
+                    result2[j] = lastModifiedDates[j];
                 }
+                result2[lastModifiedDates.length] = entry.lastModified;
+                lastModifiedDates = result2;
+
+                String[] result = new String[paths.length + 1];
+                for (j = 0; j < paths.length; j++) {
+                    result[j] = paths[j];
+                }
+                result[paths.length] = fullPath;
+                paths = result;
             }
         }
 
