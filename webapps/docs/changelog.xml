@@ -106,6 +106,10 @@
         <code>SendHandler.onResult()</code> when there is a chance that the
         current thread also initiated the write. (markt)
       </fix>
+      <fix>
+        Prevent file descriptors leak and ensure that files are closed when
+        configuring the web application. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

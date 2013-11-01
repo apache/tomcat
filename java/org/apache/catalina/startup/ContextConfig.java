@@ -2298,6 +2298,12 @@ public class ContextConfig implements LifecycleListener {
             } catch (IOException e) {
                 log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
                         className), e);
+            } finally {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    // ignore
+                }
             }
         }
     }
