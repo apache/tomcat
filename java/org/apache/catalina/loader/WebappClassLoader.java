@@ -315,16 +315,16 @@ public class WebappClassLoader extends URLClassLoader
     protected String repositoryPath = null;
 
 
-     /**
-      * Repositories URLs, used to cache the result of getURLs.
-      */
-     protected URL[] repositoryURLs = null;
+    /**
+     * Repositories URLs, used to cache the result of getURLs.
+     */
+    protected URL[] repositoryURLs = null;
 
 
-     /**
-      * The {@link WebResource} for the repository for locally loaded classes or
-      * resources. This would normally point to /WEB-INF/classes/.
-      */
+    /**
+     * The {@link WebResource} for the repository for locally loaded classes or
+     * resources. This would normally point to /WEB-INF/classes/.
+     */
     protected WebResource repository = null;
 
 
