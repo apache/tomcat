@@ -1,0 +1,107 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.tomcat.websocket;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.websocket.ClientEndpointConfig.Builder;
+import javax.websocket.ContainerProvider;
+import javax.websocket.DeploymentException;
+import javax.websocket.WebSocketContainer;
+
+import org.junit.Test;
+
+import org.apache.catalina.Context;
+import org.apache.catalina.servlets.DefaultServlet;
+import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.descriptor.web.ApplicationListener;
+import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
+
+
+public class TesterConnectionLimit extends TomcatBaseTest{
+
+    @Test
+    public void testSingleMachine() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(new ApplicationListener(
+                TesterEchoServer.Config.class.getName(), false));
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
+
+        tomcat.getConnector().setAttribute("maxConnections", "-1");
+
+        tomcat.start();
+
+        URI uri = new URI("ws://localhost:" + getPort() +
+                TesterEchoServer.Config.PATH_ASYNC);
+        AtomicInteger counter = new AtomicInteger(0);
+
+        int threadCount = 50;
+
+        Thread[] threads = new ConnectionThread[threadCount];
+
+        for (int i = 0; i < threadCount; i++) {
+            threads[i] = new ConnectionThread(counter, uri);
+            threads[i].start();
+        }
+
+        // Wait for the threads to die
+        for (Thread thread : threads) {
+            thread.join();
+        }
+
+        System.out.println("Maximum connection count was " + counter.get());
+    }
+
+    private static class ConnectionThread extends Thread {
+
+        private final AtomicInteger counter;
+        private final URI uri;
+
+        private ConnectionThread(AtomicInteger counter, URI uri) {
+            this.counter = counter;
+            this.uri = uri;
+        }
+
+        @Override
+        public void run() {
+            WebSocketContainer wsContainer =
+                    ContainerProvider.getWebSocketContainer();
+
+            int count = 0;
+
+            try {
+                while (true) {
+                    wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
+                            Builder.create().build(), uri);
+                    count = counter.incrementAndGet();
+                    if (count % 100 == 0) {
+                        System.out.println(count + " and counting...");
+                    }
+                }
+            } catch (IOException | DeploymentException ioe) {
+                // Let thread die
+            }
+        }
+    }
+}
