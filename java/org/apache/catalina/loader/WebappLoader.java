@@ -669,7 +669,7 @@ public class WebappLoader extends LifecycleMBeanBase
         if (servletContext == null)
             return;
 
-        loaderRepositories=new ArrayList<>();
+        loaderRepositories = new ArrayList<>();
         // Loading the work directory
         File workDir =
             (File) servletContext.getAttribute(ServletContext.TEMPDIR);
@@ -695,8 +695,6 @@ public class WebappLoader extends LifecycleMBeanBase
                 log.debug(sm.getString("webappLoader.classDeploy", classesPath,
                         classes.getURL().toExternalForm()));
 
-            // Adding the repository to the class loader
-            classLoader.setRepository(classesPath + "/", classes);
             loaderRepositories.add(classesPath + "/" );
         }
 

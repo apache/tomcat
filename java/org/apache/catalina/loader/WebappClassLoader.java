@@ -315,13 +315,6 @@ public class WebappClassLoader extends URLClassLoader
 
 
     /**
-     * The {@link WebResource} for the repository for locally loaded classes or
-     * resources. This would normally point to /WEB-INF/classes/.
-     */
-    protected WebResource repository = null;
-
-
-    /**
      * The list of JARs, in the order they should be searched
      * for locally loaded classes or resources.
      */
@@ -822,7 +815,6 @@ public class WebappClassLoader extends URLClassLoader
         loader.resources = this.resources;
         loader.delegate = this.delegate;
         loader.lastJarAccessed = this.lastJarAccessed;
-        loader.repository = this.repository;
         loader.jarPath = this.jarPath;
         loader.loaderDir = this.loaderDir;
         loader.canonicalLoaderDir = this.canonicalLoaderDir;
@@ -848,27 +840,6 @@ public class WebappClassLoader extends URLClassLoader
         return loader;
 
     }
-
-    /**
-     * Set the place this ClassLoader can look for classes to be loaded.
-     *
-     * @param path  Path of a source of classes to be loaded, such as a
-     *  directory pathname, a JAR file pathname, or a ZIP file pathname
-     *
-     * @exception IllegalArgumentException if the specified repository is
-     *  invalid or does not exist
-     */
-    synchronized void setRepository(String path, WebResource repository) {
-
-        if (path == null)
-            return;
-
-        if (log.isDebugEnabled())
-            log.debug("addRepository(" + path + ")");
-
-        this.repository = repository;
-    }
-
 
     synchronized void addJar(String jar, JarFile jarFile, File file)
         throws IOException {
@@ -1609,19 +1580,20 @@ public class WebappClassLoader extends URLClassLoader
             return repositoryURLs.clone();
         }
 
+        WebResource webInfClasses = resources.getResource("/WEB-INF/classes");
         int resultLength;
-        if (repository == null) {
-            resultLength = jarRealFiles.length;
-        } else {
+        if (webInfClasses.exists()) {
             resultLength = jarRealFiles.length + 1;
+        } else {
+            resultLength = jarRealFiles.length;
         }
 
         int off = 0;
 
         try {
             URL[] urls = new URL[resultLength];
-            if (repository != null) {
-                urls[off ++] = repository.getURL();
+            if (webInfClasses.exists()) {
+                urls[off ++] = webInfClasses.getURL();
             }
             for (File jarRealFile : jarRealFiles) {
                 urls[off++] = getURI(jarRealFile);
@@ -1755,7 +1727,6 @@ public class WebappClassLoader extends URLClassLoader
         resourceEntries.clear();
         resources = null;
         repositoryURLs = null;
-        repository = null;
         jarFiles = null;
         jarRealFiles = null;
         jarPath = null;
