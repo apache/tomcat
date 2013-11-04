@@ -258,9 +258,6 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         result = invokeDoMethodOnClass(copiedLoader, "TesterUnweavedClass");
         assertEquals("The fourth result is not correct.", "Hello, Unweaved World!", result);
 
-        assertEquals("getAntiJARLocking did not match.",
-                Boolean.valueOf(this.loader.getAntiJARLocking()),
-                Boolean.valueOf(copiedLoader.getAntiJARLocking()));
         assertEquals("getClearReferencesHttpClientKeepAliveThread did not match.",
                 Boolean.valueOf(this.loader.getClearReferencesHttpClientKeepAliveThread()),
                 Boolean.valueOf(copiedLoader.getClearReferencesHttpClientKeepAliveThread()));
