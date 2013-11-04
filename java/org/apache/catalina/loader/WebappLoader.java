@@ -680,8 +680,6 @@ public class WebappLoader extends LifecycleMBeanBase
         if( log.isDebugEnabled() && workDir != null)
             log.debug(sm.getString("webappLoader.deploy", workDir.getAbsolutePath()));
 
-        classLoader.setWorkDir(workDir);
-
         WebResourceRoot resources = context.getResources();
 
         // Setting up the class repository (/WEB-INF/classes), if it exists
