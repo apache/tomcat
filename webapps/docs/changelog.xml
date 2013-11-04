@@ -79,9 +79,9 @@
         to <code>MessageHandler</code> method calls. (markt)
       </fix>
       <fix>
-          Updated servlet spec version and documentation section-number reported
-          when JAR files are rejected for containing a trigger class
-          (e.g. javax.servlet.Servlet). (schultz)
+        Updated servlet spec version and documentation section-number reported
+        when JAR files are rejected for containing a trigger class
+        (e.g. javax.servlet.Servlet). (schultz)
       </fix>
       <add>
         Modify the WebSocket handshake process so that the user properties
@@ -109,6 +109,13 @@
       <fix>
         Prevent file descriptors leak and ensure that files are closed when
         configuring the web application. (violetagg)
+      </fix>
+      <fix>
+        Fixed the name of the provider-configuration file located in
+        <code>tomcat7-websocket.jar!/META-INF/services</code> that exposes
+        information for
+        <code>javax.websocket.server.ServerEndpointConfig$Configurator</code>
+        implementation. (violetagg)
       </fix>
     </changelog>
   </subsection>
