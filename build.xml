@@ -161,10 +161,16 @@
   <property name="tomcat-jdbc.jar" value="${tomcat.pool}/tomcat-jdbc.jar"/>
   <property name="tomcat-jdbc-src.jar" value="${tomcat.pool}/tomcat-jdbc-src.jar"/>
 
-
   <!-- Tests To Run -->
   <property name="test.name" value="**/Test*.java"/>
   <property name="test.formatter" value="-Dorg.apache.juli.formatter=java.util.logging.SimpleFormatter"/>
+
+  <!-- Cobertura code coverage settings -->
+  <property name="cobertura.out" value="${tomcat.build}/coverage"/>
+  <property name="cobertura.datafile" value="${cobertura.out}/cobertura.ser"/>
+  <property name="tomcat.classes.cobertura" value="${tomcat.classes}-cobertura"/>
+  <property name="cobertura.report.format" value="html"/>
+
 
   <!-- Include .gitignore in src distributions. -->
   <!-- .git and .gitignore are in defaultexcludes since Ant 1.8.2 -->
@@ -195,6 +201,13 @@
     <pathelement location="${objenesis.jar}"/>
     <path refid="compile.classpath" />
     <path refid="tomcat.classpath" />
+  </path>
+
+  <path id="cobertura.classpath">
+    <fileset dir="${cobertura.home}">
+      <include name="cobertura-${cobertura.version}.jar" />
+      <include name="lib/**/*.jar" />
+    </fileset>
   </path>
 
   <path id="tomcat.webservices.classpath">
@@ -1262,25 +1275,25 @@
   <property name="junit.formatter.extension" value=".txt" />
 
   <target name="test" description="Runs the JUnit test cases"
-          depends="test-bio,test-nio,test-apr" >
+          depends="test-bio,test-nio,test-apr,cobertura-report" >
     <fail if="test.result.error" message='Some tests completed with an Error. See ${tomcat.build}/logs for details, search for "FAILED".' />
     <fail if="test.result.failure" message='Some tests completed with a Failure. See ${tomcat.build}/logs for details, search for "FAILED".' />
   </target>
 
   <target name="test-bio" description="Runs the JUnit test cases for BIO. Does not stop on errors."
-          depends="test-compile,deploy" if="${execute.test.bio}">
+          depends="test-init,test-compile,deploy,cobertura-instrument" if="${execute.test.bio}">
     <runtests protocol="org.apache.coyote.http11.Http11Protocol"
               extension=".BIO" />
   </target>
 
   <target name="test-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
-          depends="test-compile,deploy" if="${execute.test.nio}">
+          depends="test-init,test-compile,deploy,cobertura-instrument" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
   </target>
 
   <target name="test-apr" description="Runs the JUnit test cases for APR. Does not stop on errors."
-          depends="test-compile,deploy,test-apr-exists"
+          depends="test-init,test-compile,deploy,test-apr-exists,cobertura-instrument"
           if="${apr.exists}">
     <runtests protocol="org.apache.coyote.http11.Http11AprProtocol"
               extension=".APR" />
@@ -1289,6 +1302,13 @@
   <target name="test-apr-exists" description="Checks for APR lib"
           if="${execute.test.apr}">
     <available file="${test.apr.loc}" property="apr.exists" />
+  </target>
+
+  <target name="test-init" >
+    <!-- This directory needs to exist even if it is empty otherwise the     -->
+    <!-- use of the cobertura.classpath class path when running the unit     -->
+    <!-- triggers an error.                                                  -->
+    <mkdir dir="${cobertura.home}" />
   </target>
 
   <macrodef name="runtests"
@@ -1311,12 +1331,17 @@
         <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
         <jvmarg value="-Dorg.apache.tomcat.util.net.NioSelectorShared=${org.apache.tomcat.util.net.NioSelectorShared}"/>
 
+        <!-- The Cobertura instrumented classes must appear first on the classpath -->
+        <classpath location="${tomcat.classes.cobertura}" />
         <classpath refid="tomcat.test.classpath" />
+        <classpath refid="cobertura.classpath"/>
 
         <sysproperty key="tomcat.test.temp" value="${test.temp}" />
         <sysproperty key="tomcat.test.tomcatbuild" value="${tomcat.build}" />
         <sysproperty key="tomcat.test.protocol" value="@{protocol}" />
         <sysproperty key="tomcat.test.accesslog" value="${test.accesslog}" />
+        <!-- File for Cobertura to write coverage results to -->
+        <sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.datafile}" />
 
         <formatter type="${junit.formatter.type}"
                    usefile="${junit.formatter.usefile}"
@@ -1337,6 +1362,40 @@
       </junit>
     </sequential>
   </macrodef>
+
+  <target name="cobertura-instrument" depends="compile,download-cobertura"
+          if="${test.cobertura}"
+          description="Adds Cobertura instrumentation to the compiled bytecode">
+
+    <taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
+
+    <cobertura-instrument datafile="${cobertura.datafile}"
+                          todir="${tomcat.classes.cobertura}">
+      <fileset dir="${tomcat.classes}">
+        <include name="**/*.class"/>
+        <exclude name="**/ClassLoaderLogManager.class"/>
+        <exclude name="**/ClassLoaderLogManager*.class"/>
+        <exclude name="**/FileHandler.class"/>
+        <exclude name="**/AsyncFileHandler.class"/>
+        <exclude name="**/AsyncFileHandler*.class"/>
+        <exclude name="**/OneLineFormatter.class"/>
+        <exclude name="**/OneLineFormatter*.class"/>
+        <exclude name="**/DateFormatCache.class"/>
+        <exclude name="**/DateFormatCache*.class"/>
+      </fileset>
+      <auxClasspath path="${jdt.jar}" />
+    </cobertura-instrument>
+
+  </target>
+
+  <target name="cobertura-report" if="${test.cobertura}"
+          depends="test-bio,test-nio,test-apr"
+          description="Creates report from gathered Cobertura results">
+
+    <cobertura-report srcdir="${basedir}/java" destdir="${cobertura.out}"
+                      datafile="${cobertura.datafile}"
+                      format="${cobertura.report.format}"/>
+  </target>
 
   <target name="extras-prepare" >
     <mkdir dir="${tomcat.extras}"/>
@@ -2566,6 +2625,16 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="sourcefile" value="${objenesis.loc}"/>
       <param name="destfile" value="${objenesis.jar}"/>
       <param name="destdir" value="${base.path}"/>
+    </antcall>
+
+  </target>
+
+  <target name="download-cobertura"
+          description="Download the Cobertura code coverage tool" >
+
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${cobertura.loc}"/>
+      <param name="destfile" value="${cobertura.jar}"/>
     </antcall>
 
   </target>

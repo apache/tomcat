@@ -43,6 +43,9 @@ test.haltonfailure=false
 # Activate AccessLog during testing
 test.accesslog=false
 
+# Note the Cobertura code coverage tool is GPLv2 licensed
+test.cobertura=false
+
 # Workaround against http://bugs.sun.com/view_bug.do?bug_id=6202721
 test.jvmarg.egd=-Djava.security.egd=file:/dev/./urandom
 
@@ -238,6 +241,13 @@ json-lib.jar=json.jar
 dojo-js.home=${base.path}/dojo-release-1.1.1
 dojo-js.loc=http://download.dojotoolkit.org/release-1.1.1/dojo-release-1.1.1.tar.gz
 dojo-js.jar=${dojo-js.home}/dojo/dojo.js
+
+# ----- Cobertura code coverage tool -----
+cobertura.version=2.0.3
+cobertura.home=${base.path}/cobertura-${cobertura.version}
+cobertura.jar=${cobertura.home}/cobertura-${cobertura.version}.jar
+cobertura.lib=${cobertura.home}/lib
+cobertura.loc=${base-sf.loc}/cobertura/cobertura-2.0.3-bin.tar.gz
 
 # ----- JVM settings for unit tests
 java.net.preferIPv4Stack=false
