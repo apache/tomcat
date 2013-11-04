@@ -17,30 +17,32 @@
 
 package org.apache.jasper.compiler;
 
+import java.io.IOException;
+import java.net.URL;
+
+import org.apache.tomcat.util.scan.Jar;
+import org.apache.tomcat.util.scan.JarFactory;
+
 @Deprecated
 public class TldLocation {
 
     private final String entryName;
-    private final JarResource jar;
+    private final Jar jar;
 
     public TldLocation(String entryName) {
-        this(entryName, (JarResource)null);
+        this(entryName, (Jar)null);
     }
 
-    public TldLocation(String entryName, String resourceUrl) {
-        this(entryName, getJarResource(resourceUrl));
+    public TldLocation(String entryName, URL url) throws IOException {
+        this(entryName, JarFactory.newInstance(url));
     }
 
-    public TldLocation(String entryName, JarResource jarResource) {
+    public TldLocation(String entryName, Jar jarResource) {
         if (entryName == null) {
             throw new IllegalArgumentException("Tld name is required");
         }
         this.entryName = entryName;
         this.jar = jarResource;
-    }
-
-    private static JarResource getJarResource(String resourceUrl) {
-        return (resourceUrl != null) ? new JarURLResource(resourceUrl) : null;
     }
 
     /**
@@ -55,7 +57,7 @@ public class TldLocation {
      * @return The jar resource the tag library is contained in.
      *         Might return null if the tag library is not contained in jar resource.
      */
-    public JarResource getJarResource() {
+    public Jar getJar() {
         return jar;
     }
 }

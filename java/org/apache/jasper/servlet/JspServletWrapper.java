@@ -38,7 +38,6 @@ import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.Options;
 import org.apache.jasper.compiler.ErrorDispatcher;
-import org.apache.jasper.compiler.JarResource;
 import org.apache.jasper.compiler.JavacErrorDetail;
 import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.Localizer;
@@ -49,6 +48,7 @@ import org.apache.jasper.util.FastRemovalDequeue;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.util.scan.Jar;
 
 /**
  * The JSP engine (a.k.a Jasper).
@@ -130,7 +130,7 @@ public class JspServletWrapper {
                              String tagFilePath,
                              TagInfo tagInfo,
                              JspRuntimeContext rctxt,
-                             JarResource tagJarResource) {
+                             Jar tagJar) {
 
         this.isTagFile = true;
         this.config = null;        // not used
@@ -142,7 +142,7 @@ public class JspServletWrapper {
         unloadAllowed = unloadByCount || unloadByIdle ? true : false;
         ctxt = new JspCompilationContext(jspUri, tagInfo, options,
                                          servletContext, this, rctxt,
-                                         tagJarResource);
+                                         tagJar);
     }
 
     public JspCompilationContext getJspEngineContext() {

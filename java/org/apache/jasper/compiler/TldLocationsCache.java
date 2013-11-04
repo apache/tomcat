@@ -16,6 +16,8 @@
  */
 package org.apache.jasper.compiler;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -63,16 +65,17 @@ public class TldLocationsCache {
 
     private final Hashtable<String, TldLocation> mappings;
 
-    public TldLocationsCache(Map<String, TldResourcePath> taglibMap) {
+    public TldLocationsCache(Map<String, TldResourcePath> taglibMap)
+            throws IOException {
         mappings = new Hashtable<>(taglibMap.size());
         for (Map.Entry<String, TldResourcePath> entry : taglibMap.entrySet()) {
             String uri = entry.getKey();
             TldResourcePath tldResourcePath = entry.getValue();
-            String url = tldResourcePath.getUrl().toExternalForm();
+            URL url = tldResourcePath.getUrl();
             String entryName = tldResourcePath.getEntryName();
             TldLocation tldLocation;
             if (entryName == null) {
-                tldLocation = new TldLocation(url);
+                tldLocation = new TldLocation(url.toExternalForm());
             } else {
                 tldLocation = new TldLocation(entryName, url);
             }

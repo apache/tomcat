@@ -20,6 +20,7 @@ package org.apache.jasper.compiler;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -52,6 +53,7 @@ import org.apache.jasper.xmlparser.ParserUtils;
 import org.apache.jasper.xmlparser.TreeNode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.scan.Jar;
 
 /**
  * Implementation of the TagLibraryInfo class from the JSP spec.
@@ -163,9 +165,9 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         }
 
         String tldName = location.getName();
-        JarResource jarResource = location.getJarResource();
+        Jar jar = location.getJar();
         try {
-            if (jarResource == null) {
+            if (jar == null) {
                 // Location points directly to TLD file
                 try {
                     in = getResourceAsStream(tldName);
@@ -186,11 +188,12 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             } else {
                 // Tag library is packaged in JAR file
                 try {
-                    in = jarResource.getEntry(tldName).openStream();
-                    parseTLD(jarResource.getUrl(), in, jarResource);
+                    in = jar.getInputStream(tldName);
+                    parseTLD(jar.getJarFileURL().toExternalForm(), in, jar);
                 } catch (Exception ex) {
-                    err.jspError(mark, "jsp.error.tld.unable_to_read", jarResource.getUrl(),
-                            tldName, ex.toString());
+                    err.jspError(mark, "jsp.error.tld.unable_to_read",
+                            jar.getJarFileURL().toExternalForm(), tldName,
+                            ex.toString());
                 }
             }
         } finally {
@@ -216,7 +219,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
      * in The TLD's input stream @param jarFileUrl The JAR file containing the
      * TLD, or null if the tag library is not packaged in a JAR
      */
-    private void parseTLD(String uri, InputStream in, JarResource jarResource)
+    private void parseTLD(String uri, InputStream in, Jar jar)
             throws JasperException {
         Vector<TagInfo> tagVector = new Vector<>();
         Vector<TagFileInfo> tagFileVector = new Vector<>();
@@ -255,8 +258,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             else if ("tag".equals(tname))
                 tagVector.addElement(createTagInfo(element, jspversion));
             else if ("tag-file".equals(tname)) {
-                TagFileInfo tagFileInfo = createTagFileInfo(element,
-                        jarResource);
+                TagFileInfo tagFileInfo = createTagFileInfo(element, jar);
                 tagFileVector.addElement(tagFileInfo);
             } else if ("function".equals(tname)) { // JSP2.0
                 FunctionInfo funcInfo = createFunctionInfo(element);
@@ -311,7 +313,6 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
      *
      * @return the location of the TLD identified by the uri
      */
-    @SuppressWarnings("null") // url can't be null
     private TldLocation generateTLDLocation(String uri, JspCompilationContext ctxt)
             throws JasperException {
 
@@ -336,7 +337,11 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             if (url == null) {
                 err.jspError("jsp.error.tld.missing_jar", uri);
             }
-            return new TldLocation("META-INF/taglib.tld", url.toString());
+            try {
+                return new TldLocation("META-INF/taglib.tld", url);
+            } catch (IOException ioe) {
+                throw new JasperException(ioe);
+            }
         } else {
             return new TldLocation(uri);
         }
@@ -450,7 +455,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
      *
      * @return TagInfo corresponding to tag file directives
      */
-    private TagFileInfo createTagFileInfo(TreeNode elem, JarResource jarResource)
+    private TagFileInfo createTagFileInfo(TreeNode elem, Jar jar)
             throws JasperException {
 
         String name = null;
@@ -488,13 +493,13 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             // See https://issues.apache.org/bugzilla/show_bug.cgi?id=46471
             // This needs to be removed once all the broken code that depends on
             // it has been removed
-            ctxt.setTagFileJarResource(path, jarResource);
+            ctxt.setTagFileJarResource(path, jar);
         } else if (!path.startsWith("/WEB-INF/tags")) {
             err.jspError("jsp.error.tagfile.illegalPath", path);
         }
 
         TagInfo tagInfo = TagFileProcessor.parseTagFileDirectives(
-                parserController, name, path, jarResource, this);
+                parserController, name, path, jar, this);
         return new TagFileInfo(name, path, tagInfo);
     }
 

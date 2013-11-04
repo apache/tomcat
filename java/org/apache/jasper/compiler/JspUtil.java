@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import java.io.FileNotFoundException;
@@ -23,12 +22,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Vector;
-import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
+import org.apache.tomcat.util.scan.Jar;
 import org.xml.sax.Attributes;
 
 /**
@@ -652,19 +650,14 @@ public class JspUtil {
         }
     }
 
-    public static InputStream getInputStream(String fname, JarFile jarFile,
+    public static InputStream getInputStream(String fname, Jar jar,
             JspCompilationContext ctxt) throws IOException {
 
         InputStream in = null;
 
-        if (jarFile != null) {
+        if (jar != null) {
             String jarEntryName = fname.substring(1, fname.length());
-            ZipEntry jarEntry = jarFile.getEntry(jarEntryName);
-            if (jarEntry == null) {
-                throw new FileNotFoundException(Localizer.getMessage(
-                        "jsp.error.file.not.found", fname));
-            }
-            in = jarFile.getInputStream(jarEntry);
+            in = jar.getInputStream(jarEntryName);
         } else {
             in = ctxt.getResourceAsStream(fname);
         }
@@ -883,18 +876,18 @@ public class JspUtil {
     }
 
     static InputStreamReader getReader(String fname, String encoding,
-            JarFile jarFile, JspCompilationContext ctxt, ErrorDispatcher err)
+            Jar jar, JspCompilationContext ctxt, ErrorDispatcher err)
             throws JasperException, IOException {
 
-        return getReader(fname, encoding, jarFile, ctxt, err, 0);
+        return getReader(fname, encoding, jar, ctxt, err, 0);
     }
 
     static InputStreamReader getReader(String fname, String encoding,
-            JarFile jarFile, JspCompilationContext ctxt, ErrorDispatcher err,
-            int skip) throws JasperException, IOException {
+            Jar jar, JspCompilationContext ctxt, ErrorDispatcher err, int skip)
+            throws JasperException, IOException {
 
         InputStreamReader reader = null;
-        InputStream in = getInputStream(fname, jarFile, ctxt);
+        InputStream in = getInputStream(fname, jar, ctxt);
         for (int i = 0; i < skip; i++) {
             in.read();
         }

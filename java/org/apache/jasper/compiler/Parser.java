@@ -29,6 +29,7 @@ import javax.servlet.jsp.tagext.TagLibraryInfo;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.util.UniqueAttributesImpl;
+import org.apache.tomcat.util.scan.Jar;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -60,7 +61,7 @@ class Parser implements TagConstants {
 
     private final boolean directivesOnly;
 
-    private final JarResource jarResource;
+    private final Jar jar;
 
     private final PageInfo pageInfo;
 
@@ -86,7 +87,7 @@ class Parser implements TagConstants {
      * The constructor
      */
     private Parser(ParserController pc, JspReader reader, boolean isTagFile,
-            boolean directivesOnly, JarResource jarResource) {
+            boolean directivesOnly, Jar jar) {
         this.parserController = pc;
         this.ctxt = pc.getJspCompilationContext();
         this.pageInfo = pc.getCompiler().getPageInfo();
@@ -95,7 +96,7 @@ class Parser implements TagConstants {
         this.scriptlessCount = 0;
         this.isTagFile = isTagFile;
         this.directivesOnly = directivesOnly;
-        this.jarResource = jarResource;
+        this.jar = jar;
         start = reader.mark();
     }
 
@@ -113,12 +114,11 @@ class Parser implements TagConstants {
      */
     public static Node.Nodes parse(ParserController pc, JspReader reader,
             Node parent, boolean isTagFile, boolean directivesOnly,
-            JarResource jarResource, String pageEnc, String jspConfigPageEnc,
+            Jar jar, String pageEnc, String jspConfigPageEnc,
             boolean isDefaultPageEncoding, boolean isBomPresent)
             throws JasperException {
 
-        Parser parser = new Parser(pc, reader, isTagFile, directivesOnly,
-                jarResource);
+        Parser parser = new Parser(pc, reader, isTagFile, directivesOnly, jar);
 
         Node.Root root = new Node.Root(reader.mark(), parent, false);
         root.setPageEncoding(pageEnc);
@@ -317,7 +317,7 @@ class Parser implements TagConstants {
         }
 
         try {
-            parserController.parse(file, parent, jarResource);
+            parserController.parse(file, parent, jar);
         } catch (FileNotFoundException ex) {
             err.jspError(start, "jsp.error.file.not.found", file);
         } catch (Exception ex) {
@@ -418,7 +418,7 @@ class Parser implements TagConstants {
                         // tag files
                         for (TagFileInfo info : impl.getTagFiles()) {
                             ctxt.setTagFileJarResource(info.getPath(),
-                                    ctxt.getTagFileJarResource());
+                                    ctxt.getTagFileJar());
                         }
                     }
                     pageInfo.addTaglib(uri, impl);
