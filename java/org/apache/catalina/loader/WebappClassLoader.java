@@ -205,14 +205,7 @@ public class WebappClassLoader extends URLClassLoader
         StringManager.getManager(Constants.Package);
 
 
-    /**
-     * Use anti JAR locking code, which does URL rerouting when accessing
-     * resources.
-     */
-    boolean antiJARLocking = false;
-
     // ----------------------------------------------------------- Constructors
-
 
     /**
      * Construct a new ClassLoader with no defined repositories and no
@@ -512,21 +505,6 @@ public class WebappClassLoader extends URLClassLoader
 
 
     /**
-     * @return Returns the antiJARLocking.
-     */
-    public boolean getAntiJARLocking() {
-        return antiJARLocking;
-    }
-
-
-    /**
-     * @param antiJARLocking The antiJARLocking to set.
-     */
-    public void setAntiJARLocking(boolean antiJARLocking) {
-        this.antiJARLocking = antiJARLocking;
-    }
-
-    /**
      * If there is a Java SecurityManager create a read FilePermission
      * or JndiPermission for the file directory path.
      *
@@ -795,7 +773,6 @@ public class WebappClassLoader extends URLClassLoader
 
         WebappClassLoader loader = new WebappClassLoader(this.parent);
 
-        loader.antiJARLocking = this.antiJARLocking;
         loader.resources = this.resources;
         loader.delegate = this.delegate;
         loader.lastJarAccessed = this.lastJarAccessed;
@@ -1205,22 +1182,6 @@ public class WebappClassLoader extends URLClassLoader
         // (2) Search local repositories
         url = findResource(name);
         if (url != null) {
-            // Locating the repository for special handling in the case
-            // of a JAR
-            if (antiJARLocking) {
-                ResourceEntry entry = resourceEntries.get(name);
-                try {
-                    String repository = entry.codeBase.toString();
-                    if ((repository.endsWith(".jar"))
-                            && (!(name.endsWith(CLASS_FILE_SUFFIX)))) {
-                        // Copy binary content to the work directory if not present
-                        File resourceFile = new File(loaderDir, name);
-                        url = getURI(resourceFile);
-                    }
-                } catch (Exception e) {
-                    // Ignore
-                }
-            }
             if (log.isDebugEnabled())
                 log.debug("  --> Returning '" + url.toString() + "'");
             return (url);
