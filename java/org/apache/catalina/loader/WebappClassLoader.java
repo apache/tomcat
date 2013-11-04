@@ -18,7 +18,6 @@ package org.apache.catalina.loader;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
@@ -2784,14 +2783,12 @@ public class WebappClassLoader extends URLClassLoader
         InputStream binaryStream = null;
         boolean isClassResource = path.endsWith(CLASS_FILE_SUFFIX);
 
-        int jarFilesLength = jarFiles.length;
-
         WebResource resource = null;
 
         boolean fileNeedConvert = false;
 
         String fullPath = "/WEB-INF/classes/" + path;
-        resource = resources.getResource(fullPath);
+        resource = resources.getClassLoaderResource("/" + path);
 
         if (resource.exists()) {
 
@@ -2840,107 +2837,6 @@ public class WebappClassLoader extends URLClassLoader
         synchronized (jarFiles) {
 
             try {
-                if (!openJARs()) {
-                    return null;
-                }
-                for (int i = 0; (entry == null) && (i < jarFilesLength); i++) {
-
-                    jarEntry = jarFiles[i].getJarEntry(path);
-
-                    if (jarEntry != null) {
-
-                        entry = new ResourceEntry();
-                        try {
-                            entry.codeBase = getURI(jarRealFiles[i]);
-                            String jarFakeUrl = entry.codeBase.toString();
-                            jarFakeUrl = "jar:" + jarFakeUrl + "!/" + path;
-                            entry.source = new URL(jarFakeUrl);
-                            entry.lastModified = jarRealFiles[i].lastModified();
-                        } catch (MalformedURLException e) {
-                            return null;
-                        }
-                        contentLength = (int) jarEntry.getSize();
-                        try {
-                            entry.manifest = jarFiles[i].getManifest();
-                            binaryStream = jarFiles[i].getInputStream(jarEntry);
-                        } catch (IOException e) {
-                            return null;
-                        }
-
-                        // Extract resources contained in JAR to the workdir
-                        if (antiJARLocking && !(path.endsWith(CLASS_FILE_SUFFIX))) {
-                            byte[] buf = new byte[1024];
-                            File resourceFile = new File
-                                (loaderDir, jarEntry.getName());
-                            if (!resourceFile.exists()) {
-                                Enumeration<JarEntry> entries =
-                                    jarFiles[i].entries();
-                                while (entries.hasMoreElements()) {
-                                    JarEntry jarEntry2 =  entries.nextElement();
-                                    if (!(jarEntry2.isDirectory())
-                                        && (!jarEntry2.getName().endsWith
-                                            (CLASS_FILE_SUFFIX))) {
-                                        resourceFile = new File
-                                            (loaderDir, jarEntry2.getName());
-                                        try {
-                                            if (!resourceFile.getCanonicalPath().startsWith(
-                                                    canonicalLoaderDir)) {
-                                                throw new IllegalArgumentException(
-                                                        sm.getString("webappClassLoader.illegalJarPath",
-                                                    jarEntry2.getName()));
-                                            }
-                                        } catch (IOException ioe) {
-                                            throw new IllegalArgumentException(
-                                                    sm.getString("webappClassLoader.validationErrorJarPath",
-                                                            jarEntry2.getName()), ioe);
-                                        }
-                                        File parentFile = resourceFile.getParentFile();
-                                        if (!parentFile.mkdirs() && !parentFile.exists()) {
-                                            // Ignore the error (like the IOExceptions below)
-                                        }
-                                        FileOutputStream os = null;
-                                        InputStream is = null;
-                                        try {
-                                            is = jarFiles[i].getInputStream
-                                                (jarEntry2);
-                                            os = new FileOutputStream
-                                                (resourceFile);
-                                            while (true) {
-                                                int n = is.read(buf);
-                                                if (n <= 0) {
-                                                    break;
-                                                }
-                                                os.write(buf, 0, n);
-                                            }
-                                            resourceFile.setLastModified(
-                                                    jarEntry2.getTime());
-                                        } catch (IOException e) {
-                                            // Ignore
-                                        } finally {
-                                            try {
-                                                if (is != null) {
-                                                    is.close();
-                                                }
-                                            } catch (IOException e) {
-                                                // Ignore
-                                            }
-                                            try {
-                                                if (os != null) {
-                                                    os.close();
-                                                }
-                                            } catch (IOException e) {
-                                                // Ignore
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                    }
-
-                }
-
                 if (entry == null) {
                     synchronized (notFoundResources) {
                         notFoundResources.put(name, name);
@@ -2995,6 +2891,7 @@ public class WebappClassLoader extends URLClassLoader
 
                     // The certificates are only available after the JarEntry
                     // associated input stream has been fully read
+                    // TODO
                     if (jarEntry != null) {
                         entry.certificates = jarEntry.getCertificates();
                     }
