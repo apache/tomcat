@@ -47,7 +47,6 @@ import java.util.ConcurrentModificationException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -273,20 +272,6 @@ public class WebappClassLoader extends URLClassLoader
      * keyed by resource name.
      */
     protected final HashMap<String, ResourceEntry> resourceEntries = new HashMap<>();
-
-
-    /**
-     * The list of not found resources.
-     */
-    protected final HashMap<String, String> notFoundResources =
-        new LinkedHashMap<String, String>() {
-        private static final long serialVersionUID = 1L;
-        @Override
-        protected boolean removeEldestEntry(
-                Map.Entry<String, String> eldest) {
-            return size() > 1000;
-        }
-    };
 
 
     /**
@@ -832,7 +817,6 @@ public class WebappClassLoader extends URLClassLoader
         loader.lastModifiedDates = this.lastModifiedDates.clone();
         loader.paths = this.paths.clone();
 
-        loader.notFoundResources.putAll(this.notFoundResources);
         loader.permissionList.addAll(this.permissionList);
         loader.loaderPC.putAll(this.loaderPC);
 
@@ -1699,7 +1683,6 @@ public class WebappClassLoader extends URLClassLoader
             jarFiles[i] = null;
         }
 
-        notFoundResources.clear();
         resourceEntries.clear();
         resources = null;
         repositoryURLs = null;
@@ -2767,53 +2750,44 @@ public class WebappClassLoader extends URLClassLoader
         String fullPath = "/WEB-INF/classes/" + path;
         resource = resources.getClassLoaderResource("/" + path);
 
-        if (resource.exists()) {
+        if (!resource.exists()) {
+            return null;
+        }
 
-            contentLength = (int) resource.getContentLength();
-            entry = new ResourceEntry();
-            entry.source = resource.getURL();
-            entry.codeBase = entry.source;
-            entry.lastModified = resource.getLastModified();
+        contentLength = (int) resource.getContentLength();
+        entry = new ResourceEntry();
+        entry.source = resource.getURL();
+        entry.codeBase = entry.source;
+        entry.lastModified = resource.getLastModified();
 
-            binaryStream = resource.getInputStream();
+        binaryStream = resource.getInputStream();
 
-            if (needConvert) {
-                if (path.endsWith(".properties")) {
-                    fileNeedConvert = true;
-                }
-            }
-
-            // Register the full path for modification checking
-            // Note: Only syncing on a 'constant' object is needed
-            synchronized (allPermission) {
-
-                int j;
-
-                long[] result2 =
-                    new long[lastModifiedDates.length + 1];
-                for (j = 0; j < lastModifiedDates.length; j++) {
-                    result2[j] = lastModifiedDates[j];
-                }
-                result2[lastModifiedDates.length] = entry.lastModified;
-                lastModifiedDates = result2;
-
-                String[] result = new String[paths.length + 1];
-                for (j = 0; j < paths.length; j++) {
-                    result[j] = paths[j];
-                }
-                result[paths.length] = fullPath;
-                paths = result;
+        if (needConvert) {
+            if (path.endsWith(".properties")) {
+                fileNeedConvert = true;
             }
         }
 
-        if ((entry == null) && (notFoundResources.containsKey(name)))
-            return null;
+        // Register the full path for modification checking
+        // Note: Only syncing on a 'constant' object is needed
+        synchronized (allPermission) {
 
-        if (entry == null) {
-            synchronized (notFoundResources) {
-                notFoundResources.put(name, name);
+            int j;
+
+            long[] result2 =
+                new long[lastModifiedDates.length + 1];
+            for (j = 0; j < lastModifiedDates.length; j++) {
+                result2[j] = lastModifiedDates[j];
             }
-            return null;
+            result2[lastModifiedDates.length] = entry.lastModified;
+            lastModifiedDates = result2;
+
+            String[] result = new String[paths.length + 1];
+            for (j = 0; j < paths.length; j++) {
+                result[j] = paths[j];
+            }
+            result[paths.length] = fullPath;
+            paths = result;
         }
 
         JarEntry jarEntry = null;
