@@ -176,7 +176,6 @@ public class WebappClassLoader extends URLClassLoader
 
     // ------------------------------------------------------- Static Variables
 
-
     /**
      * The set of trigger classes that will cause a proposed repository not
      * to be added if this class is visible to the class loader that loaded
@@ -250,7 +249,6 @@ public class WebappClassLoader extends URLClassLoader
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Associated web resources for this webapp.
@@ -444,6 +442,7 @@ public class WebappClassLoader extends URLClassLoader
      */
     private final List<ClassFileTransformer> transformers = new CopyOnWriteArrayList<>();
 
+
     // ------------------------------------------------------------- Properties
 
     /**
@@ -498,9 +497,7 @@ public class WebappClassLoader extends URLClassLoader
      * @param delegate The new "delegate first" flag
      */
     public void setDelegate(boolean delegate) {
-
         this.delegate = delegate;
-
     }
 
 
@@ -559,9 +556,7 @@ public class WebappClassLoader extends URLClassLoader
      * Return the JAR path.
      */
     public String getJarPath() {
-
         return this.jarPath;
-
     }
 
 
@@ -569,9 +564,7 @@ public class WebappClassLoader extends URLClassLoader
      * Change the Jar path.
      */
     public void setJarPath(String jarPath) {
-
         this.jarPath = jarPath;
-
     }
 
 
@@ -726,7 +719,6 @@ public class WebappClassLoader extends URLClassLoader
         this.transformers.add(transformer);
 
         log.info(sm.getString("webappClassLoader.addTransformer", transformer, getContextName()));
-
     }
 
     /**
