@@ -55,15 +55,15 @@ public class Cache {
         this.root = root;
     }
 
-    protected WebResource getResource(String path) {
+    protected WebResource getResource(String path, boolean useClassLoaderResources) {
 
         if (noCache(path)) {
-            return root.getResourceInternal(path);
+            return root.getResourceInternal(path, useClassLoaderResources);
         }
 
         CachedResource cacheEntry = resourceCache.get(path);
 
-        if (cacheEntry != null && !cacheEntry.validate()) {
+        if (cacheEntry != null && !cacheEntry.validate(useClassLoaderResources)) {
             removeCacheEntry(path, true);
             cacheEntry = null;
         }
@@ -77,7 +77,7 @@ public class Cache {
             if (cacheEntry == null) {
                 // newCacheEntry was inserted into the cache - validate it
                 cacheEntry = newCacheEntry;
-                cacheEntry.validate();
+                cacheEntry.validate(useClassLoaderResources);
                 if (newCacheEntry.getContentLength() > getMaxSizeBytes()) {
                     // Cache size has not been updated at this point
                     removeCacheEntry(path, false);
@@ -110,7 +110,7 @@ public class Cache {
             } else {
                 // Another thread added the entry to the cache
                 // Make sure it is validated
-                cacheEntry.validate();
+                cacheEntry.validate(useClassLoaderResources);
             }
         }
 
@@ -141,6 +141,8 @@ public class Cache {
 
     private boolean noCache(String path) {
         // Don't cache resources used by the class loader (it has its own cache)
+        // TODO. Review these exclusions once class loader resource handling is
+        // complete
         if (path.startsWith("/WEB-INF/classes") ||
                 path.startsWith("/WEB-INF/lib")) {
             return true;
