@@ -338,12 +338,6 @@ public class WebappClassLoader extends URLClassLoader
 
 
     /**
-     * Path where resources loaded from JARs will be extracted.
-     */
-    protected File loaderDir = null;
-    protected String canonicalLoaderDir = null;
-
-    /**
      * The PermissionCollection for each CodeSource for a web
      * application context.
      */
@@ -568,25 +562,6 @@ public class WebappClassLoader extends URLClassLoader
     }
 
 
-    /**
-     * Change the work directory.
-     */
-    public void setWorkDir(File workDir) {
-        this.loaderDir = new File(workDir, "loader");
-        if (loaderDir == null) {
-            canonicalLoaderDir = null;
-        } else {
-            try {
-                canonicalLoaderDir = loaderDir.getCanonicalPath();
-                if (!canonicalLoaderDir.endsWith(File.separator)) {
-                    canonicalLoaderDir += File.separator;
-                }
-            } catch (IOException ioe) {
-                canonicalLoaderDir = null;
-            }
-        }
-    }
-
      /**
       * Utility method for use in subclasses.
       * Must be called before Lifecycle methods to have any effect.
@@ -769,8 +744,6 @@ public class WebappClassLoader extends URLClassLoader
         loader.delegate = this.delegate;
         loader.lastJarAccessed = this.lastJarAccessed;
         loader.jarPath = this.jarPath;
-        loader.loaderDir = this.loaderDir;
-        loader.canonicalLoaderDir = this.canonicalLoaderDir;
         loader.started = this.started;
         loader.needConvert = this.needConvert;
         loader.clearReferencesStatic = this.clearReferencesStatic;
@@ -1649,11 +1622,6 @@ public class WebappClassLoader extends URLClassLoader
 
         permissionList.clear();
         loaderPC.clear();
-
-        if (loaderDir != null) {
-            deleteDir(loaderDir);
-        }
-
     }
 
 
