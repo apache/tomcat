@@ -2652,6 +2652,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   </target>
 
   <target name="download-cobertura"
+          if="${test.cobertura}"
           description="Download the Cobertura code coverage tool" >
 
     <antcall target="downloadgz">
