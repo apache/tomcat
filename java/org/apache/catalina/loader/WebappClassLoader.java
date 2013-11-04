@@ -2695,8 +2695,7 @@ public class WebappClassLoader extends URLClassLoader
 
             int j;
 
-            long[] result2 =
-                new long[lastModifiedDates.length + 1];
+            long[] result2 = new long[lastModifiedDates.length + 1];
             for (j = 0; j < lastModifiedDates.length; j++) {
                 result2[j] = lastModifiedDates[j];
             }
@@ -2713,69 +2712,66 @@ public class WebappClassLoader extends URLClassLoader
 
         JarEntry jarEntry = null;
 
-        synchronized (jarFiles) {
+        try {
 
-            try {
+            /* Only cache the binary content if there is some content
+             * available and either:
+             * a) It is a class file since the binary content is only cached
+             *    until the class has been loaded
+             *    or
+             * b) The file needs conversion to address encoding issues (see
+             *    below)
+             *
+             * In all other cases do not cache the content to prevent
+             * excessive memory usage if large resources are present (see
+             * https://issues.apache.org/bugzilla/show_bug.cgi?id=53081).
+             */
+            if (binaryStream != null &&
+                    (isClassResource || fileNeedConvert)) {
 
-                /* Only cache the binary content if there is some content
-                 * available and either:
-                 * a) It is a class file since the binary content is only cached
-                 *    until the class has been loaded
-                 *    or
-                 * b) The file needs conversion to address encoding issues (see
-                 *    below)
-                 *
-                 * In all other cases do not cache the content to prevent
-                 * excessive memory usage if large resources are present (see
-                 * https://issues.apache.org/bugzilla/show_bug.cgi?id=53081).
-                 */
-                if (binaryStream != null &&
-                        (isClassResource || fileNeedConvert)) {
+                byte[] binaryContent = new byte[contentLength];
 
-                    byte[] binaryContent = new byte[contentLength];
+                int pos = 0;
+                try {
 
-                    int pos = 0;
+                    while (true) {
+                        int n = binaryStream.read(binaryContent, pos,
+                                                  binaryContent.length - pos);
+                        if (n <= 0)
+                            break;
+                        pos += n;
+                    }
+                } catch (IOException e) {
+                    log.error(sm.getString("webappClassLoader.readError", name), e);
+                    return null;
+                }
+                if (fileNeedConvert) {
+                    // Workaround for certain files on platforms that use
+                    // EBCDIC encoding, when they are read through FileInputStream.
+                    // See commit message of rev.303915 for details
+                    // http://svn.apache.org/viewvc?view=revision&revision=303915
+                    String str = new String(binaryContent,0,pos);
                     try {
-
-                        while (true) {
-                            int n = binaryStream.read(binaryContent, pos,
-                                                      binaryContent.length - pos);
-                            if (n <= 0)
-                                break;
-                            pos += n;
-                        }
-                    } catch (IOException e) {
-                        log.error(sm.getString("webappClassLoader.readError", name), e);
+                        binaryContent = str.getBytes(StandardCharsets.UTF_8);
+                    } catch (Exception e) {
                         return null;
                     }
-                    if (fileNeedConvert) {
-                        // Workaround for certain files on platforms that use
-                        // EBCDIC encoding, when they are read through FileInputStream.
-                        // See commit message of rev.303915 for details
-                        // http://svn.apache.org/viewvc?view=revision&revision=303915
-                        String str = new String(binaryContent,0,pos);
-                        try {
-                            binaryContent = str.getBytes(StandardCharsets.UTF_8);
-                        } catch (Exception e) {
-                            return null;
-                        }
-                    }
-                    entry.binaryContent = binaryContent;
-
-                    // The certificates are only available after the JarEntry
-                    // associated input stream has been fully read
-                    // TODO
-                    if (jarEntry != null) {
-                        entry.certificates = jarEntry.getCertificates();
-                    }
-
                 }
-            } finally {
-                if (binaryStream != null) {
-                    try {
-                        binaryStream.close();
-                    } catch (IOException e) { /* Ignore */}
+                entry.binaryContent = binaryContent;
+
+                // The certificates are only available after the JarEntry
+                // associated input stream has been fully read
+                // TODO
+                if (jarEntry != null) {
+                    entry.certificates = jarEntry.getCertificates();
                 }
+
+            }
+        } finally {
+            if (binaryStream != null) {
+                try {
+                    binaryStream.close();
+                } catch (IOException e) { /* Ignore */}
             }
         }
 
@@ -3068,6 +3064,4 @@ public class WebappClassLoader extends URLClassLoader
         dir.delete();
 
     }
-
-
 }
