@@ -47,8 +47,6 @@ public class FileUrlNestedJar implements Jar {
         int pathStart = urlAsString.indexOf("!/") + 2;
         String jarPath = urlAsString.substring(pathStart);
         jarEntry = warFile.getJarEntry(jarPath);
-
-        jarInputStream = createJarInputStream();
     }
 
 
@@ -61,6 +59,7 @@ public class FileUrlNestedJar implements Jar {
 
     @Override
     public boolean entryExists(String name) throws IOException {
+        reset();
         JarEntry entry = jarInputStream.getNextJarEntry();
         while (entry != null) {
             if (name.equals(entry.getName())) {
@@ -75,6 +74,7 @@ public class FileUrlNestedJar implements Jar {
 
     @Override
     public InputStream getInputStream(String name) throws IOException {
+        reset();
         JarEntry entry = jarInputStream.getNextJarEntry();
         while (entry != null) {
             if (name.equals(entry.getName())) {
@@ -148,6 +148,14 @@ public class FileUrlNestedJar implements Jar {
 
     @Override
     public void nextEntry() {
+        if (jarInputStream == null) {
+            try {
+                jarInputStream = createJarInputStream();
+            } catch (IOException e) {
+                entry = null;
+                return;
+            }
+        }
         try {
             entry = jarInputStream.getNextJarEntry();
         } catch (IOException ioe) {
@@ -168,6 +176,9 @@ public class FileUrlNestedJar implements Jar {
 
     @Override
     public InputStream getEntryInputStream() throws IOException {
+        if (jarInputStream == null) {
+            createJarInputStream();
+        }
         return jarInputStream;
     }
 
