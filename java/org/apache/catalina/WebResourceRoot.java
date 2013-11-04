@@ -96,7 +96,7 @@ public interface WebResourceRoot extends Lifecycle {
     WebResource getResource(String path);
 
     /**
-     * Obtain the object(s) that represent the resource at the given path. Note
+     * Obtain the objects that represent the resource at the given path. Note
      * that the resource at that path may not exist. If the path does not
      * exist, the WebResource returned will be associated with the main
      * WebResourceSet. This will include all matches even if the resource would
@@ -106,7 +106,7 @@ public interface WebResourceRoot extends Lifecycle {
      * @param path  The path for the resource of interest relative to the root
      *              of the web application. It must start with '/'.
      *
-     * @return  The object that represents the resource at the given path
+     * @return  The objects that represents the resource at the given path
      */
     WebResource[] getResources(String path);
 
@@ -125,6 +125,23 @@ public interface WebResourceRoot extends Lifecycle {
      *          given path
      */
     WebResource getClassLoaderResource(String path);
+
+    /**
+     * Obtain the objects that represent the class loader resource at the given
+     * path. Note that the resource at that path may not exist. If the path does
+     * not exist, the WebResource returned will be associated with the main
+     * WebResourceSet. This will include all matches even if the resource would
+     * not normally be accessible (e.g. because it was overridden by another
+     * resource)
+     *
+     * @param path  The path for the class loader resource of interest relative
+     *              to the root of the class loader resources for the web
+     *              application. It must start with '/'.
+     *
+     * @return  The objects that represents the class loader resources at the
+     *          given path
+     */
+    WebResource[] getClassLoaderResources(String path);
 
     /**
      * Obtain the list of the names of all of the files and directories located

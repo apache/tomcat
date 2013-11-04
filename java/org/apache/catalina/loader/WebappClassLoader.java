@@ -1163,33 +1163,10 @@ public class WebappClassLoader extends URLClassLoader
 
         LinkedHashSet<URL> result = new LinkedHashSet<>();
 
-        int jarFilesLength = jarFiles.length;
-
-        // Looking at the repository
-        // TODO Add support to WebResourceRoot for looking up class loader
-        //      resoucres
-        WebResource[] webResources = resources.getResources("/WEB-INF/classes/" + name);
+        WebResource[] webResources = resources.getClassLoaderResources("/" + name);
         for (WebResource webResource : webResources) {
             if (webResource.exists()) {
                 result.add(webResource.getURL());
-            }
-        }
-
-        // Looking at the JAR files
-        synchronized (jarFiles) {
-            if (openJARs()) {
-                for (int i = 0; i < jarFilesLength; i++) {
-                    JarEntry jarEntry = jarFiles[i].getJarEntry(name);
-                    if (jarEntry != null) {
-                        try {
-                            String jarFakeUrl = getURI(jarRealFiles[i]).toString();
-                            jarFakeUrl = "jar:" + jarFakeUrl + "!/" + name;
-                            result.add(new URL(jarFakeUrl));
-                        } catch (MalformedURLException e) {
-                            // Ignore
-                        }
-                    }
-                }
             }
         }
 
@@ -2832,17 +2809,18 @@ public class WebappClassLoader extends URLClassLoader
         if ((entry == null) && (notFoundResources.containsKey(name)))
             return null;
 
+        if (entry == null) {
+            synchronized (notFoundResources) {
+                notFoundResources.put(name, name);
+            }
+            return null;
+        }
+
         JarEntry jarEntry = null;
 
         synchronized (jarFiles) {
 
             try {
-                if (entry == null) {
-                    synchronized (notFoundResources) {
-                        notFoundResources.put(name, name);
-                    }
-                    return null;
-                }
 
                 /* Only cache the binary content if there is some content
                  * available and either:

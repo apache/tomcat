@@ -197,6 +197,15 @@ public class StandardRoot extends LifecycleMBeanBase
     }
 
 
+    @Override
+    public WebResource[] getClassLoaderResources(String path) {
+        if (path == null || path.length() == 0 || !path.startsWith("/")) {
+            throw new IllegalArgumentException();
+        }
+        return getResources("/WEB-INF/classes" + path, true);
+    }
+
+
     protected WebResource getResourceInternal(String path,
             boolean useClassLoaderResources) {
         WebResource result = null;
@@ -226,12 +235,17 @@ public class StandardRoot extends LifecycleMBeanBase
 
     @Override
     public WebResource[] getResources(String path) {
+        return getResources(path, false);
+    }
+
+    private WebResource[] getResources(String path,
+            boolean useClassLoaderResources) {
         checkState();
 
         ArrayList<WebResource> result = new ArrayList<>();
         for (ArrayList<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
-                if (!webResourceSet.getClassLoaderOnly()) {
+                if (useClassLoaderResources || !webResourceSet.getClassLoaderOnly()) {
                     WebResource webResource = webResourceSet.getResource(path);
                     if (webResource.exists()) {
                         result.add(webResource);
