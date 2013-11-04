@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.jar.JarFile;
 
 import javax.servlet.jsp.tagext.TagFileInfo;
 import javax.servlet.jsp.tagext.TagInfo;
@@ -32,6 +31,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
+import org.apache.tomcat.util.scan.Jar;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -130,7 +130,7 @@ class JspDocumentParser
     public static Node.Nodes parse(
         ParserController pc,
         String path,
-        JarFile jarFile,
+        Jar jar,
         Node parent,
         boolean isTagFile,
         boolean directivesOnly,
@@ -166,8 +166,7 @@ class JspDocumentParser
             SAXParser saxParser = getSAXParser(false, jspDocParser);
             InputStream inStream = null;
             try {
-                inStream = JspUtil.getInputStream(path, jarFile,
-                                                  jspDocParser.ctxt);
+                inStream = JspUtil.getInputStream(path, jar, jspDocParser.ctxt);
                 saxParser.parse(new InputSource(inStream), jspDocParser);
             } catch (EnableDTDValidationException e) {
                 saxParser = getSAXParser(true, jspDocParser);
@@ -178,8 +177,7 @@ class JspDocumentParser
                     } catch (Exception any) {
                     }
                 }
-                inStream = JspUtil.getInputStream(path, jarFile,
-                                                  jspDocParser.ctxt);
+                inStream = JspUtil.getInputStream(path, jar, jspDocParser.ctxt);
                 saxParser.parse(new InputSource(inStream), jspDocParser);
             } finally {
                 if (inStream != null) {

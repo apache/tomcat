@@ -22,7 +22,6 @@
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-
 package org.apache.jasper.xmlparser;
 
 import java.io.EOFException;
@@ -31,13 +30,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Locale;
-import java.util.jar.JarFile;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.compiler.ErrorDispatcher;
 import org.apache.jasper.compiler.JspUtil;
 import org.apache.jasper.compiler.Localizer;
+import org.apache.tomcat.util.scan.Jar;
 
 public class XMLEncodingDetector {
 
@@ -95,12 +94,12 @@ public class XMLEncodingDetector {
      * encoding was specified using the 'encoding' attribute of an XML prolog
      * (TRUE) or autodetected (FALSE).
      */
-    public static Object[] getEncoding(String fname, JarFile jarFile,
+    public static Object[] getEncoding(String fname, Jar jar,
                                        JspCompilationContext ctxt,
                                        ErrorDispatcher err)
         throws IOException, JasperException
     {
-        InputStream inStream = JspUtil.getInputStream(fname, jarFile, ctxt);
+        InputStream inStream = JspUtil.getInputStream(fname, jar, ctxt);
         XMLEncodingDetector detector = new XMLEncodingDetector();
         Object[] ret = detector.getEncoding(inStream, err);
         inStream.close();

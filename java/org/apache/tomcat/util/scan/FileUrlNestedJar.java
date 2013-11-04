@@ -92,6 +92,33 @@ public class FileUrlNestedJar implements Jar {
 
 
     @Override
+    public long getLastModified(String name) throws IOException {
+        JarEntry entry = jarInputStream.getNextJarEntry();
+        while (entry != null) {
+            if (name.equals(entry.getName())) {
+                break;
+            }
+            entry = jarInputStream.getNextJarEntry();
+        }
+
+        if (entry == null) {
+            return -1;
+        } else {
+            return entry.getTime();
+        }
+    }
+
+    @Override
+    public String getURL(String entry) {
+        StringBuilder result = new StringBuilder("jar:");
+        result.append(getJarFileURL().toExternalForm());
+        result.append("!/");
+        result.append(entry);
+
+        return result.toString();
+    }
+
+    @Override
     public void close() {
         closeInner();
         if (warFile != null) {

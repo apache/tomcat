@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import java.io.CharArrayWriter;
@@ -23,13 +22,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Vector;
-import java.util.jar.JarFile;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.scan.Jar;
 
 /**
  * JspReader is an input buffer for the JSP parser. It should allow
@@ -97,7 +96,7 @@ class JspReader {
      * @param ctxt The compilation context
      * @param fname The file name
      * @param encoding The file encoding
-     * @param jarFile ?
+     * @param jar ?
      * @param err The error dispatcher
      * @throws JasperException If a Jasper-internal error occurs
      * @throws FileNotFoundException If the JSP file is not found (or is unreadable)
@@ -106,12 +105,11 @@ class JspReader {
     public JspReader(JspCompilationContext ctxt,
                      String fname,
                      String encoding,
-                     JarFile jarFile,
+                     Jar jar,
                      ErrorDispatcher err)
             throws JasperException, FileNotFoundException, IOException {
 
-        this(ctxt, fname,
-             JspUtil.getReader(fname, encoding, jarFile, ctxt, err),
+        this(ctxt, fname, JspUtil.getReader(fname, encoding, jar, ctxt, err),
              err);
     }
 

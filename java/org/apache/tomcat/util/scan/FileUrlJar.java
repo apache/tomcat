@@ -67,6 +67,26 @@ public class FileUrlJar implements Jar {
     }
 
     @Override
+    public long getLastModified(String name) throws IOException {
+        ZipEntry entry = jarFile.getEntry(name);
+        if (entry == null) {
+            return -1;
+        } else {
+            return entry.getTime();
+        }
+    }
+
+    @Override
+    public String getURL(String entry) {
+        StringBuilder result = new StringBuilder("jar:");
+        result.append(getJarFileURL().toExternalForm());
+        result.append("!/");
+        result.append(entry);
+
+        return result.toString();
+    }
+
+    @Override
     public void close() {
         if (jarFile != null) {
             try {

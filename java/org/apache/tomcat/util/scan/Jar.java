@@ -57,6 +57,17 @@ public interface Jar {
     InputStream getInputStream(String name) throws IOException;
 
     /**
+     * Obtain the last modified time for the given resource in the JAR.
+     *
+     * @param name  Entry to obtain the modification time for
+     *
+     * @return The time (in the same format as
+     *         {@link System#currentTimeMillis()} that the resource was last
+     *         modified. Returns -1 if the entry does not exist
+     */
+    long getLastModified(String name) throws IOException;
+
+    /**
      * Close any resources associated with this JAR.
      */
     void close();
@@ -80,6 +91,20 @@ public interface Jar {
      * @throws IOException  If the stream cannot be obtained
      */
     InputStream getEntryInputStream() throws IOException;
+
+    /**
+     * Obtain, in String form, the URL for an entry in this JAR. Note that for
+     * JARs nested in WAR files, the Tomact specific war:file:... form will not
+     * be used, rather the jar:jar:file:... form (that the JRE does not
+     * understand will be used). Note that this means that any code using these
+     * URLs will need to understand the jar;jar:file:... form and use the
+     * {@link JarFactory} to ensure resources are accessed correctly.
+     *
+     * @param entry The entry to generate the URL for
+     *
+     * @return a URL for the specified entry in the JAR
+     */
+    String getURL(String entry);
 
     /**
      * Resets the internal pointer used to track JAR entries to the beginning of

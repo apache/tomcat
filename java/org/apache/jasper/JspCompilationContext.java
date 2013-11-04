@@ -33,7 +33,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.jsp.tagext.TagInfo;
 
 import org.apache.jasper.compiler.Compiler;
-import org.apache.jasper.compiler.JarResource;
 import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.JspUtil;
 import org.apache.jasper.compiler.Localizer;
@@ -43,6 +42,7 @@ import org.apache.jasper.servlet.JasperLoader;
 import org.apache.jasper.servlet.JspServletWrapper;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.scan.Jar;
 
 /**
  * A place holder for various things that are used through out the JSP
@@ -62,7 +62,7 @@ public class JspCompilationContext {
 
     private final Log log = LogFactory.getLog(JspCompilationContext.class); // must not be static
 
-    private final Map<String, JarResource> tagFileJarUrls;
+    private final Map<String, Jar> tagFileJars;
 
     private String className;
     private final String jspUri;
@@ -93,27 +93,24 @@ public class JspCompilationContext {
     private final boolean isTagFile;
     private boolean protoTypeMode;
     private TagInfo tagInfo;
-    private final JarResource tagJarResource;
+    private final Jar tagJar;
 
     // jspURI _must_ be relative to the context
     public JspCompilationContext(String jspUri, Options options,
             ServletContext context, JspServletWrapper jsw,
             JspRuntimeContext rctxt) {
-
         this(jspUri, null, options, context, jsw, rctxt, null, false);
     }
 
     public JspCompilationContext(String tagfile, TagInfo tagInfo,
             Options options, ServletContext context, JspServletWrapper jsw,
-            JspRuntimeContext rctxt, JarResource tagJarResource) {
-        this(tagfile, tagInfo, options, context, jsw, rctxt, tagJarResource,
-                true);
+            JspRuntimeContext rctxt, Jar tagJar) {
+        this(tagfile, tagInfo, options, context, jsw, rctxt, tagJar, true);
     }
 
     private JspCompilationContext(String jspUri, TagInfo tagInfo,
             Options options, ServletContext context, JspServletWrapper jsw,
-            JspRuntimeContext rctxt, JarResource tagJarResource,
-            boolean isTagFile) {
+            JspRuntimeContext rctxt, Jar tagJar, boolean isTagFile) {
 
         this.jspUri = canonicalURI(jspUri);
         this.options = options;
@@ -135,11 +132,11 @@ public class JspCompilationContext {
         this.baseURI = baseURI;
 
         this.rctxt = rctxt;
-        this.tagFileJarUrls = new HashMap<>();
+        this.tagFileJars = new HashMap<>();
         this.basePackageName = Constants.JSP_PACKAGE_NAME;
 
         this.tagInfo = tagInfo;
-        this.tagJarResource = tagJarResource;
+        this.tagJar = tagJar;
         this.isTagFile = isTagFile;
     }
 
@@ -293,12 +290,12 @@ public class JspCompilationContext {
 
         if (res.startsWith("/META-INF/")) {
             // This is a tag file packaged in a jar that is being compiled
-            JarResource jarResource = tagFileJarUrls.get(res);
-            if (jarResource == null) {
-                jarResource = tagJarResource;
+            Jar jar = tagFileJars.get(res);
+            if (jar == null) {
+                jar = tagJar;
             }
-            if (jarResource != null) {
-                result = jarResource.getEntry(res.substring(1));
+            if (jar != null) {
+                result = new URL(jar.getURL(res.substring(1)));
             } else {
                 // May not be in a JAR in some IDE environments
                 result = context.getResource(canonicalURI(res));
@@ -338,12 +335,12 @@ public class JspCompilationContext {
      * The map is populated when parsing the tag-file elements of the TLDs
      * of any imported taglibs.
      */
-    public JarResource getTagFileJarResource(String tagFile) {
-        return this.tagFileJarUrls.get(tagFile);
+    public Jar getTagFileJar(String tagFile) {
+        return this.tagFileJars.get(tagFile);
     }
 
-    public void setTagFileJarResource(String tagFile, JarResource jarResource) {
-        this.tagFileJarUrls.put(tagFile, jarResource);
+    public void setTagFileJarResource(String tagFile, Jar jar) {
+        this.tagFileJars.put(tagFile, jar);
     }
 
     /**
@@ -352,8 +349,8 @@ public class JspCompilationContext {
      * JspCompilationContext does not correspond to a tag file, or if the
      * corresponding tag file is not packaged in a JAR.
      */
-    public JarResource getTagFileJarResource() {
-        return this.tagJarResource;
+    public Jar getTagFileJar() {
+        return this.tagJar;
     }
 
     /* ==================== Common implementation ==================== */

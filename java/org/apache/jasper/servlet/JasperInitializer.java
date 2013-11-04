@@ -65,6 +65,10 @@ public class JasperInitializer implements ServletContainerInitializer {
         }
 
         Map<String, TldResourcePath> taglibMap = scanner.getTaglibMap();
-        context.setAttribute(TldLocationsCache.KEY, new TldLocationsCache(taglibMap));
+        try {
+            context.setAttribute(TldLocationsCache.KEY, new TldLocationsCache(taglibMap));
+        } catch (IOException ioe) {
+            throw new ServletException(ioe);
+        }
     }
 }

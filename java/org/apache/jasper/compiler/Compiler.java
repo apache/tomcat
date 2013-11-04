@@ -36,6 +36,8 @@ import org.apache.jasper.Options;
 import org.apache.jasper.servlet.JspServletWrapper;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.scan.Jar;
+import org.apache.tomcat.util.scan.JarFactory;
 
 /**
  * Main JSP compiler class. This class uses Ant for compiling.
@@ -496,24 +498,31 @@ public abstract class Compiler {
             try {
                 String key = include.getKey();
                 URL includeUrl;
-                if (key.startsWith("jar:") || key.startsWith("file:")) {
-                    includeUrl = new URL(key);
-                } else {
-                    includeUrl = ctxt.getResource(include.getKey());
-                }
-                if (includeUrl == null) {
-                    return true;
-                }
-
-                URLConnection iuc = includeUrl.openConnection();
                 long includeLastModified = 0;
-                if (iuc instanceof JarURLConnection) {
-                    includeLastModified =
-                        ((JarURLConnection) iuc).getJarEntry().getTime();
+                if (key.startsWith("jar:jar:")) {
+                    // Assume we constructed this correctly
+                    int entryStart = key.lastIndexOf("!/");
+                    String entry = key.substring(entryStart + 2);
+                    Jar jar = JarFactory.newInstance(new URL(key.substring(4, entryStart)));
+                    includeLastModified = jar.getLastModified(entry);
                 } else {
-                    includeLastModified = iuc.getLastModified();
+                    if (key.startsWith("jar:") || key.startsWith("file:")) {
+                        includeUrl = new URL(key);
+                    } else {
+                        includeUrl = ctxt.getResource(include.getKey());
+                    }
+                    if (includeUrl == null) {
+                        return true;
+                    }
+                    URLConnection iuc = includeUrl.openConnection();
+                    if (iuc instanceof JarURLConnection) {
+                        includeLastModified =
+                            ((JarURLConnection) iuc).getJarEntry().getTime();
+                    } else {
+                        includeLastModified = iuc.getLastModified();
+                    }
+                    iuc.getInputStream().close();
                 }
-                iuc.getInputStream().close();
 
                 if (includeLastModified != include.getValue().longValue()) {
                     return true;
