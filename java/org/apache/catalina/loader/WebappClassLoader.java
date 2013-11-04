@@ -2944,7 +2944,6 @@ public class WebappClassLoader extends URLClassLoader
             }
         }
         return null;
-
     }
 
 
@@ -2961,8 +2960,7 @@ public class WebappClassLoader extends URLClassLoader
         if (entry != null) {
             return entry.loadedClass;
         }
-        return (null);  // FIXME - findLoadedResource()
-
+        return null;
     }
 
 
