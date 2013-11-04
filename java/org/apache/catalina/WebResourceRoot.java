@@ -111,6 +111,22 @@ public interface WebResourceRoot extends Lifecycle {
     WebResource[] getResources(String path);
 
     /**
+     * Obtain the object that represents the class loader resource at the given
+     * path. WEB-INF/classes is always searched prior to searching JAR files in
+     * WEB-INF/lib. The search order for JAR files will be consistent across
+     * subsequent calls to this method until the web application is reloaded. No
+     * guarantee is made as to what the search order for JAR files may be.
+     *
+     * @param path  The path of the class loader resource of interest relative
+     *              to the the root of class loader resources for this web
+     *              application.
+     *
+     * @return  The object that represents the class loader resource at the
+     *          given path
+     */
+    WebResource getClassLoaderResource(String path);
+
+    /**
      * Obtain the list of the names of all of the files and directories located
      * in the specified directory.
      *
@@ -336,6 +352,7 @@ public interface WebResourceRoot extends Lifecycle {
     public static enum ResourceSetType {
         PRE,
         RESOURCE_JAR,
-        POST
+        POST,
+        CLASSES_JAR
     }
 }

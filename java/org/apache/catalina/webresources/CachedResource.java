@@ -53,13 +53,14 @@ public class CachedResource implements WebResource {
         this.ttl = ttl;
     }
 
-    protected boolean validate() {
+    protected boolean validate(boolean useClassLoaderResources) {
         long now = System.currentTimeMillis();
 
         if (webResource == null) {
             synchronized (this) {
                 if (webResource == null) {
-                    webResource = root.getResourceInternal(webAppPath);
+                    webResource = root.getResourceInternal(
+                            webAppPath, useClassLoaderResources);
                     getLastModified();
                     getContentLength();
                     nextCheck = ttl + now;
@@ -72,8 +73,8 @@ public class CachedResource implements WebResource {
             return true;
         }
 
-        if (!webResource.exists() &&
-                root.getResourceInternal(webAppPath).exists()) {
+        if (!webResource.exists() && root.getResourceInternal(
+                webAppPath, useClassLoaderResources).exists()) {
             return false;
         }
 

@@ -58,6 +58,7 @@ public class StandardRoot extends LifecycleMBeanBase
     private boolean allowLinking = false;
     private ArrayList<WebResourceSet> preResources = new ArrayList<>();
     private WebResourceSet main;
+    private ArrayList<WebResourceSet> classResources = new ArrayList<>();
     private ArrayList<WebResourceSet> jarResources = new ArrayList<>();
     private ArrayList<WebResourceSet> postResources = new ArrayList<>();
 
@@ -71,6 +72,7 @@ public class StandardRoot extends LifecycleMBeanBase
     {
         allResources.add(preResources);
         allResources.add(mainResources);
+        allResources.add(classResources);
         allResources.add(jarResources);
         allResources.add(postResources);
     }
@@ -92,15 +94,23 @@ public class StandardRoot extends LifecycleMBeanBase
 
     @Override
     public String[] list(String path) {
-        checkState();
+        return list(path, true);
+    }
+
+    private String[] list(String path, boolean doStateCheck) {
+        if (doStateCheck) {
+            checkState();
+        }
 
         // Set because we don't want duplicates
         HashSet<String> result = new HashSet<>();
         for (ArrayList<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
-                String[] entries = webResourceSet.list(path);
-                for (String entry : entries) {
-                    result.add(entry);
+                if (!webResourceSet.getClassLoaderOnly()) {
+                    String[] entries = webResourceSet.list(path);
+                    for (String entry : entries) {
+                        result.add(entry);
+                    }
                 }
             }
         }
@@ -116,7 +126,9 @@ public class StandardRoot extends LifecycleMBeanBase
         HashSet<String> result = new HashSet<>();
         for (ArrayList<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
-                result.addAll(webResourceSet.listWebAppPaths(path));
+                if (!webResourceSet.getClassLoaderOnly()) {
+                    result.addAll(webResourceSet.listWebAppPaths(path));
+                }
             }
         }
         if (result.size() == 0) {
@@ -159,26 +171,46 @@ public class StandardRoot extends LifecycleMBeanBase
 
     @Override
     public WebResource getResource(String path) {
+        return getResource(path, true, false);
+    }
+
+    private WebResource getResource(String path, boolean doStateCheck,
+            boolean useClassLoaderResources) {
+        if (doStateCheck) {
+            checkState();
+        }
+
         if (isCachingAllowed()) {
-            return cache.getResource(path);
+            return cache.getResource(path, useClassLoaderResources);
         } else {
-            return getResourceInternal(path);
+            return getResourceInternal(path, useClassLoaderResources);
         }
     }
 
-    protected WebResource getResourceInternal(String path) {
-        checkState();
 
+    @Override
+    public WebResource getClassLoaderResource(String path) {
+        if (path == null || path.length() == 0 || !path.startsWith("/")) {
+            throw new IllegalArgumentException();
+        }
+        return getResource("/WEB-INF/classes" + path, true, true);
+    }
+
+
+    protected WebResource getResourceInternal(String path,
+            boolean useClassLoaderResources) {
         WebResource result = null;
         WebResource virtual = null;
         for (ArrayList<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
-                result = webResourceSet.getResource(path);
-                if (result.exists()) {
-                    return result;
-                }
-                if (virtual == null && result.isVirtual()) {
-                    virtual = result;
+                if (useClassLoaderResources || !webResourceSet.getClassLoaderOnly()) {
+                    result = webResourceSet.getResource(path);
+                    if (result.exists()) {
+                        return result;
+                    }
+                    if (virtual == null && result.isVirtual()) {
+                        virtual = result;
+                    }
                 }
             }
         }
@@ -199,9 +231,11 @@ public class StandardRoot extends LifecycleMBeanBase
         ArrayList<WebResource> result = new ArrayList<>();
         for (ArrayList<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
-                WebResource webResource = webResourceSet.getResource(path);
-                if (webResource.exists()) {
-                    result.add(webResource);
+                if (!webResourceSet.getClassLoaderOnly()) {
+                    WebResource webResource = webResourceSet.getResource(path);
+                    if (webResource.exists()) {
+                        result.add(webResource);
+                    }
                 }
             }
         }
@@ -215,15 +249,21 @@ public class StandardRoot extends LifecycleMBeanBase
 
     @Override
     public WebResource[] listResources(String path) {
-        checkState();
+        return listResources(path, true);
+    }
 
-        String[] resources = list(path);
+    private WebResource[] listResources(String path, boolean doStateCheck) {
+        if (doStateCheck) {
+            checkState();
+        }
+
+        String[] resources = list(path, false);
         WebResource[] result = new WebResource[resources.length];
         for (int i = 0; i < resources.length; i++) {
             if (path.charAt(path.length() - 1) == '/') {
-                result[i] = getResource(path + resources[i]);
+                result[i] = getResource(path + resources[i], false, false);
             } else {
-                result[i] = getResource(path + '/' + resources[i]);
+                result[i] = getResource(path + '/' + resources[i], false, false);
             }
         }
         return result;
@@ -247,6 +287,9 @@ public class StandardRoot extends LifecycleMBeanBase
         switch (type) {
             case PRE:
                 resourceList = preResources;
+                break;
+            case CLASSES_JAR:
+                resourceList = classResources;
                 break;
             case RESOURCE_JAR:
                 resourceList = jarResources;
@@ -281,6 +324,10 @@ public class StandardRoot extends LifecycleMBeanBase
         } else {
             throw new IllegalArgumentException(
                     sm.getString("standardRoot.createInvalidFile", file));
+        }
+
+        if (type.equals(ResourceSetType.CLASSES_JAR)) {
+            resourceSet.setClassLoaderOnly(true);
         }
 
         resourceList.add(resourceSet);
@@ -386,6 +433,28 @@ public class StandardRoot extends LifecycleMBeanBase
         }
     }
 
+    /*
+     * Class loader resources are handled by treating JARs in WEB-INF/lib as
+     * resource JARs (without the internal META-INF/resources/ prefix) mounted
+     * at WEB-INF/claasses (rather than the web app root). This enables reuse
+     * of the resource handling plumbing.
+     *
+     * These resources are marked as class loader only so they are only used in
+     * the methods that are explicitly defined to return class loader resources.
+     * This prevents calls to getResource("/WEB-INF/classes") returning from one
+     * or more of the JAR files.
+     */
+    private void processWebInfLib() {
+        WebResource[] possibleJars = listResources("/WEB-INF/lib", false);
+
+        for (WebResource possibleJar : possibleJars) {
+            if (possibleJar.isFile() && possibleJar.getName().endsWith(".jar")) {
+                createWebResourceSet(ResourceSetType.CLASSES_JAR,
+                        "/WEB-INF/classes", possibleJar.getURL(), "/");
+            }
+        }
+    }
+
     /**
      * For unit testing
      */
@@ -461,6 +530,14 @@ public class StandardRoot extends LifecycleMBeanBase
             for (WebResourceSet webResourceSet : list) {
                 webResourceSet.start();
             }
+        }
+
+        // This has to be called after the other resources have been started
+        // else it won't find all the matching resources
+        processWebInfLib();
+        // Need to start the newly found resources
+        for (WebResourceSet classResource : classResources) {
+            classResource.start();
         }
 
         setState(LifecycleState.STARTING);
