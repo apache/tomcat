@@ -330,8 +330,6 @@ public class WebappLoader extends LifecycleMBeanBase
                         (context.getLoader().getClassLoader());
                 }
             }
-        } else {
-            closeJARs(false);
         }
     }
 
@@ -371,16 +369,6 @@ public class WebappLoader extends LifecycleMBeanBase
     @Override
     public boolean modified() {
         return classLoader != null ? classLoader.modified() : false ;
-    }
-
-
-    /**
-     * Used to periodically signal to the classloader to release JAR resources.
-     */
-    public void closeJARs(boolean force) {
-        if (classLoader !=null) {
-            classLoader.closeJARs(force);
-        }
     }
 
 

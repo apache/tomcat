@@ -293,13 +293,6 @@ public class WebappClassLoader extends URLClassLoader
      * The list of JARs, in the order they should be searched
      * for locally loaded classes or resources.
      */
-    protected JarFile[] jarFiles = new JarFile[0];
-
-
-    /**
-     * The list of JARs, in the order they should be searched
-     * for locally loaded classes or resources.
-     */
     protected File[] jarRealFiles = new File[0];
 
 
@@ -753,7 +746,6 @@ public class WebappClassLoader extends URLClassLoader
         loader.clearReferencesHttpClientKeepAliveThread = this.clearReferencesHttpClientKeepAliveThread;
 
         loader.repositoryURLs = this.repositoryURLs.clone();
-        loader.jarFiles = this.jarFiles.clone();
         loader.jarRealFiles = this.jarRealFiles.clone();
         loader.jarNames = this.jarNames.clone();
         loader.lastModifiedDates = this.lastModifiedDates.clone();
@@ -818,13 +810,6 @@ public class WebappClassLoader extends URLClassLoader
         // for classloading
         if (!validateJarFile(file))
             return;
-
-        JarFile[] result2 = new JarFile[jarFiles.length + 1];
-        for (i = 0; i < jarFiles.length; i++) {
-            result2[i] = jarFiles[i];
-        }
-        result2[jarFiles.length] = jarFile;
-        jarFiles = result2;
 
         // Add the file to the list
         File[] result4 = new File[jarRealFiles.length + 1];
@@ -1597,22 +1582,9 @@ public class WebappClassLoader extends URLClassLoader
 
         started = false;
 
-        int length = jarFiles.length;
-        for (int i = 0; i < length; i++) {
-            try {
-                if (jarFiles[i] != null) {
-                    jarFiles[i].close();
-                }
-            } catch (IOException e) {
-                // Ignore
-            }
-            jarFiles[i] = null;
-        }
-
         resourceEntries.clear();
         resources = null;
         repositoryURLs = null;
-        jarFiles = null;
         jarRealFiles = null;
         jarPath = null;
         jarNames = null;
@@ -1631,35 +1603,7 @@ public class WebappClassLoader extends URLClassLoader
     }
 
 
-    /**
-     * Used to periodically signal to the classloader to release
-     * JAR resources.
-     */
-    public void closeJARs(boolean force) {
-        if (jarFiles.length > 0) {
-                synchronized (jarFiles) {
-                    if (force || (System.currentTimeMillis()
-                                  > (lastJarAccessed + 90000))) {
-                        for (int i = 0; i < jarFiles.length; i++) {
-                            try {
-                                if (jarFiles[i] != null) {
-                                    jarFiles[i].close();
-                                    jarFiles[i] = null;
-                                }
-                            } catch (IOException e) {
-                                if (log.isDebugEnabled()) {
-                                    log.debug("Failed to close JAR", e);
-                                }
-                            }
-                        }
-                    }
-                }
-        }
-    }
-
-
     // ------------------------------------------------------ Protected Methods
-
 
     /**
      * Clear references.
@@ -2507,29 +2451,6 @@ public class WebappClassLoader extends URLClassLoader
                     "webappClassLoader.clearReferencesResourceBundlesFail",
                     getContextName()), e);
         }
-    }
-
-
-    /**
-     * Used to periodically signal to the classloader to release JAR resources.
-     */
-    protected boolean openJARs() {
-        if (started && (jarFiles.length > 0)) {
-            lastJarAccessed = System.currentTimeMillis();
-            if (jarFiles[0] == null) {
-                for (int i = 0; i < jarFiles.length; i++) {
-                    try {
-                        jarFiles[i] = new JarFile(jarRealFiles[i]);
-                    } catch (IOException e) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Failed to open JAR", e);
-                        }
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
     }
 
 
