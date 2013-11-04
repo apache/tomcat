@@ -184,6 +184,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Add support for the Cobertura code coverage tool when running the unit
+        tests. Based on a patch by mhasko. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.47 (violetagg)" rtext="2013-10-24">
   <subsection name="Coyote">
