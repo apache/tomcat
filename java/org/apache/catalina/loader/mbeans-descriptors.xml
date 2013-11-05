@@ -79,10 +79,6 @@
           description="The 'follow standard delegation model' flag that will be used to configure our ClassLoader"
                  type="boolean"/>
 
-    <attribute   name="antiJARLocking"
-          description="The antiJARLocking flag for this Loader"
-                 type="boolean"/>
-
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
                  type="java.lang.String"

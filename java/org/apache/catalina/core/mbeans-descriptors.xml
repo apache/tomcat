@@ -74,10 +74,6 @@
                description="The alternate deployment descriptor name."
                type="java.lang.String" />
 
-    <attribute name="antiJARLocking"
-               description="Take care to not lock jar files"
-               type="boolean" />
-
     <attribute name="antiResourceLocking"
                description="Take care to not lock resources"
                type="boolean" />
