@@ -362,6 +362,11 @@ For example:
 
         junit.formatter.usefile=false
 
+ 4. Optional support is provided for the Cobertura code ocverage tool. It can be
+ enabled using the following property:
+
+        test.cobertura=true
+
 
 (8) Source code checks
 
