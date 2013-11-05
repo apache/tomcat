@@ -697,7 +697,7 @@ public class WebappClassLoader extends URLClassLoader
         result.clearReferencesStopTimerThreads = this.clearReferencesStopTimerThreads;
         result.clearReferencesLogFactoryRelease = this.clearReferencesLogFactoryRelease;
         result.clearReferencesHttpClientKeepAliveThread = this.clearReferencesHttpClientKeepAliveThread;
-
+        result.jarModificationTimes.putAll(this.jarModificationTimes);
         result.permissionList.addAll(this.permissionList);
         result.loaderPC.putAll(this.loaderPC);
 
