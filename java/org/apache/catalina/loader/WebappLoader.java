@@ -49,7 +49,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
-
 /**
  * Classloader implementation which is specialized for handling web
  * applications in the most efficient way, while being Catalina aware (all
@@ -67,21 +66,18 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Remy Maucherat
  * @version $Id$
  */
-
 public class WebappLoader extends LifecycleMBeanBase
     implements Loader, PropertyChangeListener {
 
-    // ----------------------------------------------------------- Constructors
 
+    // ----------------------------------------------------------- Constructors
 
     /**
      * Construct a new WebappLoader with no defined parent class loader
      * (so that the actual parent will be the system class loader).
      */
     public WebappLoader() {
-
         this(null);
-
     }
 
 
@@ -98,7 +94,6 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * The class loader being managed by this Loader component.
@@ -166,9 +161,7 @@ public class WebappLoader extends LifecycleMBeanBase
      */
     @Override
     public ClassLoader getClassLoader() {
-
         return classLoader;
-
     }
 
 
@@ -214,9 +207,7 @@ public class WebappLoader extends LifecycleMBeanBase
      */
     @Override
     public boolean getDelegate() {
-
-        return (this.delegate);
-
+        return this.delegate;
     }
 
 
@@ -228,12 +219,10 @@ public class WebappLoader extends LifecycleMBeanBase
      */
     @Override
     public void setDelegate(boolean delegate) {
-
         boolean oldDelegate = this.delegate;
         this.delegate = delegate;
         support.firePropertyChange("delegate", Boolean.valueOf(oldDelegate),
                                    Boolean.valueOf(this.delegate));
-
     }
 
 
@@ -241,9 +230,7 @@ public class WebappLoader extends LifecycleMBeanBase
      * Return the ClassLoader class name.
      */
     public String getLoaderClass() {
-
         return (this.loaderClass);
-
     }
 
 
@@ -253,9 +240,7 @@ public class WebappLoader extends LifecycleMBeanBase
      * @param loaderClass The new ClassLoader class name
      */
     public void setLoaderClass(String loaderClass) {
-
         this.loaderClass = loaderClass;
-
     }
 
 
@@ -264,9 +249,7 @@ public class WebappLoader extends LifecycleMBeanBase
      */
     @Override
     public boolean getReloadable() {
-
-        return (this.reloadable);
-
+        return this.reloadable;
     }
 
 
@@ -277,14 +260,12 @@ public class WebappLoader extends LifecycleMBeanBase
      */
     @Override
     public void setReloadable(boolean reloadable) {
-
         // Process this property change
         boolean oldReloadable = this.reloadable;
         this.reloadable = reloadable;
         support.firePropertyChange("reloadable",
                                    Boolean.valueOf(oldReloadable),
                                    Boolean.valueOf(this.reloadable));
-
     }
 
 
@@ -374,9 +355,7 @@ public class WebappLoader extends LifecycleMBeanBase
      */
     @Override
     public void removePropertyChangeListener(PropertyChangeListener listener) {
-
         support.removePropertyChangeListener(listener);
-
     }
 
 
@@ -385,13 +364,11 @@ public class WebappLoader extends LifecycleMBeanBase
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("WebappLoader[");
         if (context != null)
             sb.append(context.getName());
         sb.append("]");
         return (sb.toString());
-
     }
 
 
@@ -516,12 +493,10 @@ public class WebappLoader extends LifecycleMBeanBase
                                  event.getNewValue().toString()));
             }
         }
-
     }
 
 
     // ------------------------------------------------------- Private Methods
-
 
     /**
      * Create associated classLoader.
@@ -541,7 +516,6 @@ public class WebappLoader extends LifecycleMBeanBase
         classLoader = (WebappClassLoader) constr.newInstance(args);
 
         return classLoader;
-
     }
 
 
@@ -629,13 +603,10 @@ public class WebappLoader extends LifecycleMBeanBase
                         }
                     }
                 }
-
             }
-
         } catch (MalformedURLException e) {
             // Ignore
         }
-
     }
 
 
@@ -781,7 +752,6 @@ public class WebappLoader extends LifecycleMBeanBase
         // Store the assembled class path as a servlet context attribute
         servletContext.setAttribute(Globals.CLASS_PATH_ATTR,
                                     classpath.toString());
-
     }
 
 
@@ -879,7 +849,6 @@ public class WebappLoader extends LifecycleMBeanBase
         }
 
         return true;
-
     }
 
 
