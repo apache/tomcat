@@ -166,7 +166,7 @@
   <property name="test.formatter" value="-Dorg.apache.juli.formatter=java.util.logging.SimpleFormatter"/>
 
   <!-- Cobertura code coverage settings -->
-  <property name="cobertura.out" value="${tomcat.build}/coverage"/>
+  <property name="cobertura.out" value="${tomcat.output}/coverage"/>
   <property name="cobertura.datafile" value="${cobertura.out}/cobertura.ser"/>
   <property name="tomcat.classes.cobertura" value="${tomcat.classes}-cobertura"/>
   <property name="cobertura.report.format" value="html"/>
