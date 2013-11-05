@@ -16,9 +16,11 @@
  */
 package org.apache.tomcat.util.scan;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
@@ -27,7 +29,8 @@ import java.util.zip.ZipEntry;
 
 /**
  * Implementation of {@link Jar} that is optimised for file based JAR URLs that
- * refer directly to a JAR file (e.g URLs of the form jar:file: ... .jar!/) .
+ * refer directly to a JAR file (e.g URLs of the form jar:file: ... .jar!/ or
+ * file:... .jar) .
  */
 public class JarFileUrlJar implements Jar {
 
@@ -36,11 +39,24 @@ public class JarFileUrlJar implements Jar {
     private Enumeration<JarEntry> entries;
     private JarEntry entry = null;
 
-    public JarFileUrlJar(URL url) throws IOException {
-        JarURLConnection jarConn = (JarURLConnection) url.openConnection();
-        jarConn.setUseCaches(false);
-        jarFile = jarConn.getJarFile();
-        jarFileURL = jarConn.getJarFileURL();
+    public JarFileUrlJar(URL url, boolean startsWithJar) throws IOException {
+        if (startsWithJar) {
+            // jar:file:...
+            JarURLConnection jarConn = (JarURLConnection) url.openConnection();
+            jarConn.setUseCaches(false);
+            jarFile = jarConn.getJarFile();
+            jarFileURL = jarConn.getJarFileURL();
+        } else {
+            // file:...
+            File f;
+            try {
+                f = new File(url.toURI());
+            } catch (URISyntaxException e) {
+                throw new IOException(e);
+            }
+            jarFile = new JarFile(f);
+            jarFileURL = url;
+        }
     }
 
 
