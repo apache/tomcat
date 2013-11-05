@@ -65,9 +65,9 @@ abstract class ELNode {
             return expr;
         }
 
-    public char getType() {
-        return type;
-    }
+        public char getType() {
+            return type;
+        }
     }
 
     /**
