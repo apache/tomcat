@@ -215,12 +215,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * The antiJARLocking flag for this Context.
-     */
-    private boolean antiJARLocking = false;
-
-
-    /**
      * The antiResourceLocking flag for this Context.
      */
     private boolean antiResourceLocking = false;
@@ -1290,37 +1284,11 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the antiJARLocking flag for this Context.
-     */
-    public boolean getAntiJARLocking() {
-
-        return (this.antiJARLocking);
-
-    }
-
-
-    /**
      * Return the antiResourceLocking flag for this Context.
      */
     public boolean getAntiResourceLocking() {
 
         return (this.antiResourceLocking);
-
-    }
-
-
-    /**
-     * Set the antiJARLocking feature for this Context.
-     *
-     * @param antiJARLocking The new flag value
-     */
-    public void setAntiJARLocking(boolean antiJARLocking) {
-
-        boolean oldAntiJARLocking = this.antiJARLocking;
-        this.antiJARLocking = antiJARLocking;
-        support.firePropertyChange("antiJARLocking",
-                                   oldAntiJARLocking,
-                                   this.antiJARLocking);
 
     }
 
@@ -5135,7 +5103,6 @@ public class StandardContext extends ContainerBase
 
                 // since the loader just started, the webapp classloader is now
                 // created.
-                setClassLoaderProperty("antiJARLocking", getAntiJARLocking());
                 setClassLoaderProperty("clearReferencesStatic",
                         getClearReferencesStatic());
                 setClassLoaderProperty("clearReferencesStopThreads",

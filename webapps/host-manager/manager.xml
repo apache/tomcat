@@ -25,6 +25,6 @@
 
 
 <Context docBase="${catalina.home}/webapps/manager"
-         privileged="true" antiResourceLocking="false" antiJARLocking="false">
+         privileged="true" antiResourceLocking="false" >
 
 </Context>
