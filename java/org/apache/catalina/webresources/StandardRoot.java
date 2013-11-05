@@ -61,21 +61,21 @@ public class StandardRoot extends LifecycleMBeanBase
 
     private Context context;
     private boolean allowLinking = false;
-    private ArrayList<WebResourceSet> preResources = new ArrayList<>();
+    private final ArrayList<WebResourceSet> preResources = new ArrayList<>();
     private WebResourceSet main;
-    private ArrayList<WebResourceSet> classResources = new ArrayList<>();
-    private ArrayList<WebResourceSet> jarResources = new ArrayList<>();
-    private ArrayList<WebResourceSet> postResources = new ArrayList<>();
+    private final ArrayList<WebResourceSet> classResources = new ArrayList<>();
+    private final ArrayList<WebResourceSet> jarResources = new ArrayList<>();
+    private final ArrayList<WebResourceSet> postResources = new ArrayList<>();
 
-    private Cache cache = new Cache(this);
+    private final Cache cache = new Cache(this);
     private boolean cachingAllowed = true;
 
     private boolean traceLockedFiles = false;
-    private Set<WebResourceTraceWrapper> tracedResources = new HashSet<>();
+    private final Set<WebResourceTraceWrapper> tracedResources = new HashSet<>();
 
     // Constructs to make iteration over all WebResourceSets simpler
-    private ArrayList<WebResourceSet> mainResources = new ArrayList<>();
-    private ArrayList<ArrayList<WebResourceSet>> allResources =
+    private final ArrayList<WebResourceSet> mainResources = new ArrayList<>();
+    private final ArrayList<ArrayList<WebResourceSet>> allResources =
             new ArrayList<>();
     {
         allResources.add(preResources);
@@ -214,7 +214,7 @@ public class StandardRoot extends LifecycleMBeanBase
     }
 
 
-    protected WebResource getResourceInternal(String path,
+    protected final WebResource getResourceInternal(String path,
             boolean useClassLoaderResources) {
         WebResource result = null;
         WebResource virtual = null;
@@ -490,7 +490,7 @@ public class StandardRoot extends LifecycleMBeanBase
     /**
      * For unit testing
      */
-    protected void setMainResources(WebResourceSet main) {
+    protected final void setMainResources(WebResourceSet main) {
         this.main = main;
         mainResources.clear();
         mainResources.add(main);
@@ -674,12 +674,12 @@ public class StandardRoot extends LifecycleMBeanBase
         }
 
 
-        public String getBasePath() {
+        String getBasePath() {
             return basePath;
         }
 
 
-        public String getArchivePath() {
+        String getArchivePath() {
             return archivePath;
         }
     }

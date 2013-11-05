@@ -26,15 +26,19 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
 
     protected static final String[] EMPTY_STRING_ARRAY = new String[0];
 
-    protected File fileBase;
-    protected String absoluteBase;
-    protected String canonicalBase;
+    private File fileBase;
+    private String absoluteBase;
+    private String canonicalBase;
 
     protected AbstractFileResourceSet(String internalPath) {
         setInternalPath(internalPath);
     }
 
-    protected File file(String name, boolean mustExist) {
+    protected final File getFileBase() {
+        return fileBase;
+    }
+
+    protected final File file(String name, boolean mustExist) {
 
         if (name.equals("/")) {
             name = "";
@@ -96,7 +100,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
      *
      * @param path Path to be normalized
      */
-    protected String normalize(String path) {
+    private String normalize(String path) {
         return RequestUtil.normalize(path, File.separatorChar == '/');
     }
 

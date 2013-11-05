@@ -112,8 +112,8 @@ public class FileResourceSet extends AbstractFileResourceSet {
 
         if (webAppMount.startsWith(path)) {
             webAppMount = webAppMount.substring(path.length());
-            if (webAppMount.equals(fileBase.getName())) {
-                return new String[] {fileBase.getName()};
+            if (webAppMount.equals(getFileBase().getName())) {
+                return new String[] {getFileBase().getName()};
             } else {
                 // Virtual directory
                 int i = webAppMount.indexOf('/');
@@ -139,8 +139,8 @@ public class FileResourceSet extends AbstractFileResourceSet {
 
         if (webAppMount.startsWith(path)) {
             webAppMount = webAppMount.substring(path.length());
-            if (webAppMount.equals(fileBase.getName())) {
-                result.add(path + fileBase.getName());
+            if (webAppMount.equals(getFileBase().getName())) {
+                result.add(path + getFileBase().getName());
             } else {
                 // Virtual directory
                 int i = webAppMount.indexOf('/');
