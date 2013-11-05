@@ -29,14 +29,14 @@ import java.util.zip.ZipEntry;
  * Implementation of {@link Jar} that is optimised for file based JAR URLs that
  * refer directly to a JAR file (e.g URLs of the form jar:file: ... .jar!/) .
  */
-public class FileUrlJar implements Jar {
+public class JarFileUrlJar implements Jar {
 
     private final JarFile jarFile;
     private final URL jarFileURL;
     private Enumeration<JarEntry> entries;
     private JarEntry entry = null;
 
-    public FileUrlJar(URL url) throws IOException {
+    public JarFileUrlJar(URL url) throws IOException {
         JarURLConnection jarConn = (JarURLConnection) url.openConnection();
         jarConn.setUseCaches(false);
         jarFile = jarConn.getJarFile();
