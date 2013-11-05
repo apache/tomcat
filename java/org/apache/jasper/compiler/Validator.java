@@ -38,6 +38,7 @@ import javax.servlet.jsp.tagext.TagLibraryInfo;
 import javax.servlet.jsp.tagext.ValidationMessage;
 
 import org.apache.jasper.JasperException;
+import org.apache.jasper.compiler.ELNode.Text;
 import org.apache.jasper.el.ELContextImpl;
 import org.xml.sax.Attributes;
 
@@ -1377,8 +1378,16 @@ class Validator {
 
                         validateFunctions(el, n);
 
-                        result = new Node.JspAttribute(tai, qName, uri,
-                                localName, value, false, el, dynamic);
+                        if (n.getRoot().isXmlSyntax()) {
+                            // The non-EL elements need to be XML escaped
+                            XmlEscapeNonELVisitor v = new XmlEscapeNonELVisitor();
+                            el.visit(v);
+                            result = new Node.JspAttribute(tai, qName, uri,
+                                    localName, v.getText(), false, el, dynamic);
+                        } else {
+                            result = new Node.JspAttribute(tai, qName, uri,
+                                    localName, value, false, el, dynamic);
+                        }
 
                         ELContextImpl ctx = new ELContextImpl();
                         ctx.setFunctionMapper(getFunctionMapper(el));
@@ -1412,6 +1421,16 @@ class Validator {
 
             return result;
         }
+
+
+        private static class XmlEscapeNonELVisitor extends ELParser.TextBuilder {
+
+            @Override
+            public void visit(Text n) throws JasperException {
+                output.append(xmlEscape(n.getText()));
+            }
+        }
+
 
         /*
          * Return an empty StringBuilder [not thread-safe]
@@ -1857,5 +1876,68 @@ class Validator {
         if (errMsg != null) {
             errDisp.jspError(errMsg.toString());
         }
+    }
+
+    protected static String xmlEscape(String s) {
+        if (s == null) {
+            return null;
+        }
+        int len = s.length();
+
+        /*
+         * Look for any "bad" characters, Escape "bad" character was found
+         */
+        // ASCII " 34 & 38 ' 39 < 60 > 62
+        for (int i = 0; i < len; i++) {
+            char c = s.charAt(i);
+            if (c >= '\"' && c <= '>' &&
+                    (c == '<' || c == '>' || c == '\'' || c == '&' || c == '"')) {
+                // need to escape them and then quote the whole string
+                StringBuilder sb = new StringBuilder((int) (len * 1.2));
+                sb.append(s, 0, i);
+                int pos = i + 1;
+                for (int j = i; j < len; j++) {
+                    c = s.charAt(j);
+                    if (c >= '\"' && c <= '>') {
+                        if (c == '<') {
+                            if (j > pos) {
+                                sb.append(s, pos, j);
+                            }
+                            sb.append("&lt;");
+                            pos = j + 1;
+                        } else if (c == '>') {
+                            if (j > pos) {
+                                sb.append(s, pos, j);
+                            }
+                            sb.append("&gt;");
+                            pos = j + 1;
+                        } else if (c == '\'') {
+                            if (j > pos) {
+                                sb.append(s, pos, j);
+                            }
+                            sb.append("&#039;"); // &apos;
+                            pos = j + 1;
+                        } else if (c == '&') {
+                            if (j > pos) {
+                                sb.append(s, pos, j);
+                            }
+                            sb.append("&amp;");
+                            pos = j + 1;
+                        } else if (c == '"') {
+                            if (j > pos) {
+                                sb.append(s, pos, j);
+                            }
+                            sb.append("&#034;"); // &quot;
+                            pos = j + 1;
+                        }
+                    }
+                }
+                if (pos < len) {
+                    sb.append(s, pos, len);
+                }
+                return sb.toString();
+            }
+        }
+        return s;
     }
 }

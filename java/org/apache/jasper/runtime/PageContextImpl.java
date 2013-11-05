@@ -913,69 +913,6 @@ public class PageContextImpl extends PageContext {
         }
     }
 
-    protected static String XmlEscape(String s) {
-        if (s == null) {
-            return null;
-        }
-        int len = s.length();
-
-        /*
-         * Look for any "bad" characters, Escape "bad" character was found
-         */
-        // ASCII " 34 & 38 ' 39 < 60 > 62
-        for (int i = 0; i < len; i++) {
-            char c = s.charAt(i);
-            if (c >= '\"' && c <= '>' &&
-                    (c == '<' || c == '>' || c == '\'' || c == '&' || c == '"')) {
-                // need to escape them and then quote the whole string
-                StringBuilder sb = new StringBuilder((int) (len * 1.2));
-                sb.append(s, 0, i);
-                int pos = i + 1;
-                for (int j = i; j < len; j++) {
-                    c = s.charAt(j);
-                    if (c >= '\"' && c <= '>') {
-                        if (c == '<') {
-                            if (j > pos) {
-                                sb.append(s, pos, j);
-                            }
-                            sb.append("&lt;");
-                            pos = j + 1;
-                        } else if (c == '>') {
-                            if (j > pos) {
-                                sb.append(s, pos, j);
-                            }
-                            sb.append("&gt;");
-                            pos = j + 1;
-                        } else if (c == '\'') {
-                            if (j > pos) {
-                                sb.append(s, pos, j);
-                            }
-                            sb.append("&#039;"); // &apos;
-                            pos = j + 1;
-                        } else if (c == '&') {
-                            if (j > pos) {
-                                sb.append(s, pos, j);
-                            }
-                            sb.append("&amp;");
-                            pos = j + 1;
-                        } else if (c == '"') {
-                            if (j > pos) {
-                                sb.append(s, pos, j);
-                            }
-                            sb.append("&#034;"); // &quot;
-                            pos = j + 1;
-                        }
-                    }
-                }
-                if (pos < len) {
-                    sb.append(s, pos, len);
-                }
-                return sb.toString();
-            }
-        }
-        return s;
-    }
-
     /**
      * Proprietary method to evaluate EL expressions. XXX - This method should
      * go away once the EL interpreter moves out of JSTL and into its own
@@ -1024,9 +961,6 @@ public class PageContextImpl extends PageContext {
             ctx.setFunctionMapper(new FunctionMapperImpl(functionMap));
             ValueExpression ve = exprFactory.createValueExpression(ctx, expression, expectedType);
             retValue = ve.getValue(ctx);
-        }
-        if (escape && retValue != null) {
-            retValue = XmlEscape(retValue.toString());
         }
 
         return retValue;
