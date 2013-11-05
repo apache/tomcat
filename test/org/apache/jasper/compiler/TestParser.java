@@ -328,10 +328,16 @@ public class TestParser extends TomcatBaseTest {
 
         String result = res.toString();
 
-        Assert.assertTrue(result.contains("&quot;bar&quot;") ||
-                result.contains("&#034;bar&#034;"));
-        Assert.assertTrue(result.contains("&quot;foo&quot;") ||
-                result.contains("&#034;foo&#034;"));
+        Assert.assertTrue(result.contains("&quot;1foo1&quot;") ||
+                result.contains("&#034;1foo1&#034;"));
+        Assert.assertTrue(result.contains("&quot;2bar2&quot;") ||
+                result.contains("&#034;2bar2&#034;"));
+        Assert.assertTrue(result.contains("&quot;3a&amp;b3&quot;") ||
+                result.contains("&#034;3a&amp;b3&#034;"));
+        Assert.assertTrue(result.contains("&quot;4&4&quot;") ||
+                result.contains("&#034;4&4&#034;"));
+        Assert.assertTrue(result.contains("&quot;5&apos;5&quot;") ||
+                result.contains("&#034;5&apos;5&#034;"));
     }
 
     /** Assertion for text printed by tags:echo */
