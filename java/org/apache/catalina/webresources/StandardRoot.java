@@ -17,6 +17,7 @@
 package org.apache.catalina.webresources;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -33,7 +34,10 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.WebResourceSet;
+import org.apache.catalina.WebResourceTraceWrapper;
 import org.apache.catalina.util.LifecycleMBeanBase;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -51,6 +55,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class StandardRoot extends LifecycleMBeanBase
         implements WebResourceRoot {
 
+    private static final Log log = LogFactory.getLog(Cache.class);
     protected static final StringManager sm =
             StringManager.getManager(Constants.Package);
 
@@ -64,6 +69,9 @@ public class StandardRoot extends LifecycleMBeanBase
 
     private Cache cache = new Cache(this);
     private boolean cachingAllowed = true;
+
+    private boolean traceLockedFiles = false;
+    private Set<WebResourceTraceWrapper> tracedResources = new HashSet<>();
 
     // Constructs to make iteration over all WebResourceSets simpler
     private ArrayList<WebResourceSet> mainResources = new ArrayList<>();
@@ -431,6 +439,16 @@ public class StandardRoot extends LifecycleMBeanBase
     }
 
     @Override
+    public void setTraceLockedFiles(boolean traceLockedFiles) {
+        this.traceLockedFiles = traceLockedFiles;
+    }
+
+    @Override
+    public boolean getTraceLockedFiles() {
+        return traceLockedFiles;
+    }
+
+    @Override
     public Context getContext() {
         return context;
     }
@@ -482,6 +500,19 @@ public class StandardRoot extends LifecycleMBeanBase
     public void backgroundProcess() {
         cache.backgroundProcess();
     }
+
+
+    @Override
+    public void registerTracedResource(WebResourceTraceWrapper traceResource) {
+        tracedResources.add(traceResource);
+    }
+
+
+    @Override
+    public void deregisterTracedResource(WebResourceTraceWrapper traceResource) {
+        tracedResources.remove(traceResource);
+    }
+
 
     // ----------------------------------------------------------- JMX Lifecycle
     @Override
@@ -575,6 +606,17 @@ public class StandardRoot extends LifecycleMBeanBase
         }
         jarResources.clear();
 
+        for (WebResourceTraceWrapper tracedResource : tracedResources) {
+            log.error(sm.getString("standardRoot.lockedFile",
+                    context.getName(),
+                    tracedResource.getName()),
+                    tracedResource.getCreatedBy());
+            try {
+                tracedResource.close();
+            } catch (IOException e) {
+                // Ignore
+            }
+        }
         cache.clear();
 
         setState(LifecycleState.STOPPING);

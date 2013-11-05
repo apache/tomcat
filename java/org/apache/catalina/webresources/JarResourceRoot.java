@@ -104,7 +104,7 @@ public class JarResourceRoot extends AbstractResource {
     }
 
     @Override
-    public InputStream getInputStream() {
+    protected InputStream doGetInputStream() {
         return null;
     }
 

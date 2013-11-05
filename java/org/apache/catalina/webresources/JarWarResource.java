@@ -45,7 +45,7 @@ public class JarWarResource extends AbstractArchiveResource {
     }
 
     @Override
-    public InputStream getInputStream() {
+    protected InputStream doGetInputStream() {
         try {
             JarFile warFile = new JarFile(getBase());
             JarEntry jarFileInWar = warFile.getJarEntry(archivePath);

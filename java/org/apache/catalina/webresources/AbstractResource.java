@@ -128,5 +128,19 @@ public abstract class AbstractResource implements WebResource {
     }
 
 
+    @Override
+    public final InputStream getInputStream() {
+        InputStream is = doGetInputStream();
+
+        if (is == null || !root.getTraceLockedFiles()) {
+            return is;
+        }
+
+        return new TraceWrapperInputStream(root, getName(), is);
+    }
+
+    protected abstract InputStream doGetInputStream();
+
+
     protected abstract Log getLog();
 }
