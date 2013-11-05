@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
 
 import org.apache.catalina.WebResourceRoot;
 import org.apache.juli.logging.Log;
@@ -38,14 +39,14 @@ public class JarWarResource extends AbstractArchiveResource {
 
     public JarWarResource(WebResourceRoot root, String webAppPath, String base,
             String baseUrl, JarEntry jarEntry, String archivePath,
-            String internalPath) {
+            String internalPath, Manifest manifest) {
         super(root, webAppPath, base, "jar:war:" + baseUrl + "^/" + archivePath,
-                jarEntry, internalPath);
+                jarEntry, internalPath, manifest);
         this.archivePath = archivePath;
     }
 
     @Override
-    protected InputStream doGetInputStream() {
+    protected JarInputStreamWrapper getJarInputStreamWrapper() {
         try {
             JarFile warFile = new JarFile(getBase());
             JarEntry jarFileInWar = warFile.getJarEntry(archivePath);
@@ -72,7 +73,7 @@ public class JarWarResource extends AbstractArchiveResource {
                 return null;
             }
 
-            return new JarInputStreamWrapper(warFile, jarIs);
+            return new JarInputStreamWrapper(warFile, entry, jarIs);
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("fileResource.getInputStreamFail",

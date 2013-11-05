@@ -18,6 +18,8 @@ package org.apache.catalina;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.security.cert.Certificate;
+import java.util.jar.Manifest;
 
 /**
  * Represents a file or directory within a web application. It borrows heavily
@@ -139,4 +141,19 @@ public interface WebResource {
      * part.
      */
     WebResourceRoot getWebResourceRoot();
+
+    /**
+     * Obtain the certificates that were used to sign this resource to verify
+     * it or @null if none.
+     *
+     * @see java.util.jar.JarEntry#getCertificates()
+     */
+    Certificate[] getCertificates();
+
+    /**
+     * Obtain the manifest associated with this resource or @null if none.
+     *
+     * @see java.util.jar.JarFile#getManifest()
+     */
+    Manifest getManifest();
 }

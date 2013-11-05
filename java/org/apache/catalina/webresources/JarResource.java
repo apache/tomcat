@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 import org.apache.catalina.WebResourceRoot;
 import org.apache.juli.logging.Log;
@@ -34,16 +35,20 @@ public class JarResource extends AbstractArchiveResource {
     private static final Log log = LogFactory.getLog(JarResource.class);
 
     public JarResource(WebResourceRoot root, String webAppPath, String base,
-            String baseUrl, JarEntry jarEntry, String internalPath) {
-        super(root, webAppPath, base, "jar:" + baseUrl, jarEntry, internalPath);
+            String baseUrl, JarEntry jarEntry, String internalPath,
+            Manifest manifest) {
+        super(root, webAppPath, base, "jar:" + baseUrl, jarEntry, internalPath,
+                manifest);
     }
 
     @Override
-    protected InputStream doGetInputStream() {
+    protected JarInputStreamWrapper getJarInputStreamWrapper() {
         try {
             JarFile jarFile = new JarFile(getBase());
-            InputStream is = jarFile.getInputStream(getResource());
-            return new JarInputStreamWrapper(jarFile, is);
+            // Need to create a new JarEntry so the certificates can be read
+            JarEntry jarEntry = jarFile.getJarEntry(getResource().getName());
+            InputStream is = jarFile.getInputStream(jarEntry);
+            return new JarInputStreamWrapper(jarFile, jarEntry, is);
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("fileResource.getInputStreamFail",

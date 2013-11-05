@@ -60,7 +60,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
-import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
 
 import org.apache.catalina.Globals;
@@ -2427,8 +2426,6 @@ public class WebappClassLoader extends URLClassLoader
         if (entry != null)
             return entry;
 
-        int contentLength = -1;
-        InputStream binaryStream = null;
         boolean isClassResource = path.endsWith(CLASS_FILE_SUFFIX);
 
         WebResource resource = null;
@@ -2441,13 +2438,10 @@ public class WebappClassLoader extends URLClassLoader
             return null;
         }
 
-        contentLength = (int) resource.getContentLength();
         entry = new ResourceEntry();
         entry.source = resource.getURL();
         entry.codeBase = entry.source;
         entry.lastModified = resource.getLastModified();
-
-        binaryStream = resource.getInputStream();
 
         if (needConvert) {
             if (path.endsWith(".properties")) {
@@ -2455,47 +2449,27 @@ public class WebappClassLoader extends URLClassLoader
             }
         }
 
-        JarEntry jarEntry = null;
-
-        try {
-
-            /* Only cache the binary content if there is some content
-             * available and either:
-             * a) It is a class file since the binary content is only cached
-             *    until the class has been loaded
-             *    or
-             * b) The file needs conversion to address encoding issues (see
-             *    below)
-             *
-             * In all other cases do not cache the content to prevent
-             * excessive memory usage if large resources are present (see
-             * https://issues.apache.org/bugzilla/show_bug.cgi?id=53081).
-             */
-            if (binaryStream != null &&
-                    (isClassResource || fileNeedConvert)) {
-
-                byte[] binaryContent = new byte[contentLength];
-
-                int pos = 0;
-                try {
-
-                    while (true) {
-                        int n = binaryStream.read(binaryContent, pos,
-                                                  binaryContent.length - pos);
-                        if (n <= 0)
-                            break;
-                        pos += n;
-                    }
-                } catch (IOException e) {
-                    log.error(sm.getString("webappClassLoader.readError", name), e);
-                    return null;
-                }
-                if (fileNeedConvert) {
+        /* Only cache the binary content if there is some content
+         * available and either:
+         * a) It is a class file since the binary content is only cached
+         *    until the class has been loaded
+         *    or
+         * b) The file needs conversion to address encoding issues (see
+         *    below)
+         *
+         * In all other cases do not cache the content to prevent
+         * excessive memory usage if large resources are present (see
+         * https://issues.apache.org/bugzilla/show_bug.cgi?id=53081).
+         */
+        if (isClassResource || fileNeedConvert) {
+            byte[] binaryContent = resource.getContent();
+            if (binaryContent != null) {
+                 if (fileNeedConvert) {
                     // Workaround for certain files on platforms that use
                     // EBCDIC encoding, when they are read through FileInputStream.
                     // See commit message of rev.303915 for details
                     // http://svn.apache.org/viewvc?view=revision&revision=303915
-                    String str = new String(binaryContent,0,pos);
+                    String str = new String(binaryContent);
                     try {
                         binaryContent = str.getBytes(StandardCharsets.UTF_8);
                     } catch (Exception e) {
@@ -2503,22 +2477,12 @@ public class WebappClassLoader extends URLClassLoader
                     }
                 }
                 entry.binaryContent = binaryContent;
-
-                // The certificates are only available after the JarEntry
-                // associated input stream has been fully read
-                // TODO
-                if (jarEntry != null) {
-                    entry.certificates = jarEntry.getCertificates();
-                }
-
-            }
-        } finally {
-            if (binaryStream != null) {
-                try {
-                    binaryStream.close();
-                } catch (IOException e) { /* Ignore */}
+                // The certificates and manifest are made available as a side
+                // effect of reading the binary content
+                entry.certificates = resource.getCertificates();
             }
         }
+        entry.manifest = resource.getManifest();
 
         if (isClassResource && entry.binaryContent != null &&
                 this.transformers.size() > 0) {

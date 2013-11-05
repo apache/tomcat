@@ -18,6 +18,8 @@ package org.apache.catalina.webresources;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.security.cert.Certificate;
+import java.util.jar.Manifest;
 
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
@@ -129,6 +131,16 @@ public class EmptyResource implements WebResource {
 
     @Override
     public URL getURL() {
+        return null;
+    }
+
+    @Override
+    public Certificate[] getCertificates() {
+        return null;
+    }
+
+    @Override
+    public Manifest getManifest() {
         return null;
     }
 

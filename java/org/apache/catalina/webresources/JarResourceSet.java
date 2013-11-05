@@ -22,6 +22,7 @@ import java.net.MalformedURLException;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResource;
@@ -73,9 +74,9 @@ public class JarResourceSet extends AbstractArchiveResourceSet {
 
     @Override
     protected WebResource createArchiveResource(JarEntry jarEntry,
-            String webAppPath) {
+            String webAppPath, Manifest manifest) {
         return new JarResource(getRoot(), webAppPath, getBase(), getBaseUrl(),
-                jarEntry, getInternalPath());
+                jarEntry, getInternalPath(), manifest);
     }
 
     //-------------------------------------------------------- Lifecycle methods
@@ -88,6 +89,7 @@ public class JarResourceSet extends AbstractArchiveResourceSet {
                 JarEntry entry = entries.nextElement();
                 getJarFileEntries().put(entry.getName(), entry);
             }
+            setManifest(jarFile.getManifest());
         } catch (IOException ioe) {
             throw new IllegalArgumentException(ioe);
         }
