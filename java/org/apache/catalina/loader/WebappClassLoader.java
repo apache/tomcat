@@ -58,7 +58,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
 import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import org.apache.catalina.Globals;
@@ -292,26 +291,6 @@ public class WebappClassLoader extends URLClassLoader
 
 
     /**
-     * The list of JARs, in the order they should be searched
-     * for locally loaded classes or resources.
-     */
-    protected File[] jarRealFiles = new File[0];
-
-
-    /**
-     * The path which will be monitored for added Jar files.
-     */
-    protected String jarPath = null;
-
-
-    /**
-     * The list of JARs, in the order they should be searched
-     * for locally loaded classes or resources.
-     */
-    protected String[] jarNames = new String[0];
-
-
-    /**
      * The list of JARs last modified dates, in the order they should be
      * searched for locally loaded classes or resources.
      */
@@ -541,22 +520,6 @@ public class WebappClassLoader extends URLClassLoader
     }
 
 
-    /**
-     * Return the JAR path.
-     */
-    public String getJarPath() {
-        return this.jarPath;
-    }
-
-
-    /**
-     * Change the Jar path.
-     */
-    public void setJarPath(String jarPath) {
-        this.jarPath = jarPath;
-    }
-
-
      /**
       * Utility method for use in subclasses.
       * Must be called before Lifecycle methods to have any effect.
@@ -737,7 +700,6 @@ public class WebappClassLoader extends URLClassLoader
 
         loader.resources = this.resources;
         loader.delegate = this.delegate;
-        loader.jarPath = this.jarPath;
         loader.started = this.started;
         loader.needConvert = this.needConvert;
         loader.clearReferencesStatic = this.clearReferencesStatic;
@@ -746,9 +708,6 @@ public class WebappClassLoader extends URLClassLoader
         loader.clearReferencesLogFactoryRelease = this.clearReferencesLogFactoryRelease;
         loader.clearReferencesHttpClientKeepAliveThread = this.clearReferencesHttpClientKeepAliveThread;
 
-        loader.jarRealFiles = this.jarRealFiles.clone();
-        loader.jarNames = this.jarNames.clone();
-        loader.lastModifiedDates = this.lastModifiedDates.clone();
         loader.paths = this.paths.clone();
 
         loader.permissionList.addAll(this.permissionList);
@@ -757,64 +716,6 @@ public class WebappClassLoader extends URLClassLoader
         return loader;
 
     }
-
-    synchronized void addJar(String jar, JarFile jarFile, File file)
-        throws IOException {
-
-        if (jar == null)
-            return;
-        if (jarFile == null)
-            return;
-        if (file == null)
-            return;
-
-        if (log.isDebugEnabled())
-            log.debug("addJar(" + jar + ")");
-
-        int i;
-
-        if ((jarPath != null) && (jar.startsWith(jarPath))) {
-
-            String jarName = jar.substring(jarPath.length());
-            while (jarName.startsWith("/"))
-                jarName = jarName.substring(1);
-
-            String[] result = new String[jarNames.length + 1];
-            for (i = 0; i < jarNames.length; i++) {
-                result[i] = jarNames[i];
-            }
-            result[jarNames.length] = jarName;
-            jarNames = result;
-
-        }
-
-        // Register the JAR for tracking
-
-        long lastModified = resources.getResource(jar).getLastModified();
-
-        String[] result = new String[paths.length + 1];
-        for (i = 0; i < paths.length; i++) {
-            result[i] = paths[i];
-        }
-        result[paths.length] = jar;
-        paths = result;
-
-        long[] result3 = new long[lastModifiedDates.length + 1];
-        for (i = 0; i < lastModifiedDates.length; i++) {
-            result3[i] = lastModifiedDates[i];
-        }
-        result3[lastModifiedDates.length] = lastModified;
-        lastModifiedDates = result3;
-
-        // Add the file to the list
-        File[] result4 = new File[jarRealFiles.length + 1];
-        for (i = 0; i < jarRealFiles.length; i++) {
-            result4[i] = jarRealFiles[i];
-        }
-        result4[jarRealFiles.length] = file;
-        jarRealFiles = result4;
-    }
-
 
     /**
      * Have one or more classes or resources been modified so that a reload
@@ -1561,9 +1462,6 @@ public class WebappClassLoader extends URLClassLoader
         resourceEntries.clear();
         jarModificationTimes.clear();
         resources = null;
-        jarRealFiles = null;
-        jarPath = null;
-        jarNames = null;
         lastModifiedDates = null;
         paths = null;
         parent = null;

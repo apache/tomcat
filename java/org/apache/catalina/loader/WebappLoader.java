@@ -20,10 +20,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FilePermission;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -31,7 +29,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
-import java.util.jar.JarFile;
 
 import javax.management.ObjectName;
 import javax.servlet.ServletContext;
@@ -42,8 +39,6 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Loader;
-import org.apache.catalina.WebResource;
-import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
@@ -52,7 +47,8 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Classloader implementation which is specialized for handling web
  * applications in the most efficient way, while being Catalina aware (all
- * accesses to resources are made through {@link WebResourceRoot}).
+ * accesses to resources are made through
+ * {@link org.apache.catalina.WebResourceRoot}).
  * This class loader supports detection of modified
  * Java classes, which can be used to implement auto-reload support.
  * <p>
@@ -399,7 +395,6 @@ public class WebappLoader extends LifecycleMBeanBase
             classLoader.setDelegate(this.delegate);
 
             // Configure our repositories
-            setRepositories();
             setClassPath();
 
             setPermissions();
@@ -611,105 +606,6 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     /**
-     * Configure the repositories for our class loader, based on the
-     * associated Context.
-     * @throws IOException
-     */
-    private void setRepositories() throws IOException {
-
-        if (context == null)
-            return;
-        ServletContext servletContext = context.getServletContext();
-        if (servletContext == null)
-            return;
-
-        // Loading the work directory
-        File workDir =
-            (File) servletContext.getAttribute(ServletContext.TEMPDIR);
-        if (workDir == null) {
-            log.info("No work dir for " + servletContext);
-        }
-
-        if( log.isDebugEnabled() && workDir != null)
-            log.debug(sm.getString("webappLoader.deploy", workDir.getAbsolutePath()));
-
-        WebResourceRoot resources = context.getResources();
-
-        // Setting up the JAR repository (/WEB-INF/lib), if it exists
-        // TODO Simplify this in a similar manner to WEB-INF/classes
-
-        String libPath = "/WEB-INF/lib";
-
-        classLoader.setJarPath(libPath);
-
-        WebResource libDir = resources.getResource(libPath);
-
-        if (libDir.isDirectory()) {
-
-            boolean copyJars = false;
-            String absoluteLibPath = libDir.getCanonicalPath();
-
-            File destDir = null;
-
-            if (absoluteLibPath != null) {
-                destDir = new File(absoluteLibPath);
-            } else {
-                copyJars = true;
-                destDir = new File(workDir, libPath);
-                if (!destDir.mkdirs() && !destDir.isDirectory()) {
-                    throw new IOException(
-                            sm.getString("webappLoader.mkdirFailure"));
-                }
-            }
-
-            WebResource[] jars = resources.listResources(libPath);
-            for (WebResource jar : jars) {
-
-                String jarName = jar.getName();
-
-                if (!jarName.endsWith(".jar"))
-                    continue;
-
-                String filename = libPath + "/" + jarName;
-
-                // Copy JAR in the work directory, always (the JAR file
-                // would get locked otherwise, which would make it
-                // impossible to update it or remove it at runtime)
-                File destFile = new File(destDir, jarName);
-
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("webappLoader.jarDeploy", filename,
-                            destFile.getAbsolutePath()));
-                }
-
-                // Bug 45403 - Check that the resource is readable
-                if (!jar.canRead()) {
-                    IOException ioe = new IOException(sm.getString(
-                            "webappLoader.readFailure", filename));
-                    throw ioe;
-                }
-
-                if (copyJars) {
-                    if (!copy(jar.getInputStream(),destFile)) {
-                        throw new IOException(
-                                sm.getString("webappLoader.copyFailure"));
-                    }
-                }
-
-                try {
-                    JarFile jarFile = new JarFile(destFile);
-                    classLoader.addJar(filename, jarFile, destFile);
-                } catch (Exception ex) {
-                    // Catch the exception if there is an empty jar file
-                    // Should ignore and continue loading other jar files
-                    // in the dir
-                }
-            }
-        }
-    }
-
-
-    /**
      * Set the appropriate context attribute for our class path.  This
      * is required only because Jasper depends on it.
      */
@@ -747,11 +643,10 @@ public class WebappLoader extends LifecycleMBeanBase
             }
         }
 
-        this.classpath=classpath.toString();
+        this.classpath = classpath.toString();
 
         // Store the assembled class path as a servlet context attribute
-        servletContext.setAttribute(Globals.CLASS_PATH_ATTR,
-                                    classpath.toString());
+        servletContext.setAttribute(Globals.CLASS_PATH_ATTR, this.classpath);
     }
 
 
@@ -821,34 +716,6 @@ public class WebappLoader extends LifecycleMBeanBase
                 log.debug("getClasspath ", ex);
         }
         return null;
-    }
-
-
-    /**
-     * Copy a file to the specified temp directory. This is required only
-     * because Jasper depends on it.
-     */
-    private boolean copy(InputStream is, File file) {
-
-        try (FileOutputStream os = new FileOutputStream(file)){
-            byte[] buf = new byte[4096];
-            while (true) {
-                int len = is.read(buf);
-                if (len < 0)
-                    break;
-                os.write(buf, 0, len);
-            }
-        } catch (IOException e) {
-            return false;
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                // Ignore
-            }
-        }
-
-        return true;
     }
 
 
