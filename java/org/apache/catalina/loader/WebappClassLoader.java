@@ -700,6 +700,12 @@ public class WebappClassLoader extends URLClassLoader
         result.permissionList.addAll(this.permissionList);
         result.loaderPC.putAll(this.loaderPC);
 
+        try {
+            result.start();
+        } catch (LifecycleException e) {
+            throw new IllegalStateException(e);
+        }
+
         return result;
     }
 
