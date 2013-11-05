@@ -29,7 +29,7 @@ import java.util.jar.JarFile;
  * refer to a JAR file nested inside a WAR
  * (e.g URLs of the form jar:file: ... .war!/ ... .jar).
  */
-public class FileUrlNestedJar implements Jar {
+public class JarFileUrlNestedJar implements Jar {
 
     private final URL jarFileURL;
     private final JarFile warFile;
@@ -37,7 +37,7 @@ public class FileUrlNestedJar implements Jar {
     private NonClosingJarInputStream jarInputStream = null;
     private JarEntry entry = null;
 
-    public FileUrlNestedJar(URL url) throws IOException {
+    public JarFileUrlNestedJar(URL url) throws IOException {
         jarFileURL = url;
         JarURLConnection jarConn = (JarURLConnection) url.openConnection();
         jarConn.setUseCaches(false);
