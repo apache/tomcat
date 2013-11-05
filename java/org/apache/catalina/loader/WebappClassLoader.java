@@ -46,6 +46,7 @@ import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -177,24 +178,18 @@ public class WebappClassLoader extends URLClassLoader
     // ------------------------------------------------------- Static Variables
 
     /**
-     * The set of trigger classes that will cause a proposed repository not
-     * to be added if this class is visible to the class loader that loaded
-     * this factory class.  Typically, trigger classes will be listed for
-     * components that have been integrated into the JDK for later versions,
-     * but where the corresponding JAR files are required to run on
-     * earlier versions.
-     */
-    protected static final String[] triggers = {
-        "javax.servlet.Servlet", "javax.el.Expression"       // Servlet API
-    };
-
-
-    /**
      * Set of package names which are not allowed to be loaded from a webapp
      * class loader without delegating first.
      */
-    protected static final String[] packageTriggers = {
-    };
+    protected static final Set<String> packageTriggersDeny = new HashSet<>();
+
+
+    /**
+     * Set of package names which are allowed to be loaded from a webapp class
+     * loader without delegating first and override any set by
+     * {@link #packageTriggersDeny}.
+     */
+    protected static final Set<String> packageTriggersPermit = new HashSet<>();
 
 
     /**
@@ -204,6 +199,22 @@ public class WebappClassLoader extends URLClassLoader
         StringManager.getManager(Constants.Package);
 
 
+    {
+        // Configure packages that web applications are not allowed to override
+        packageTriggersDeny.add("javax.el");
+        packageTriggersDeny.add("javax.servlet");
+        packageTriggersDeny.add("org.apache.catalina");
+        packageTriggersDeny.add("org.apache.coyote");
+        packageTriggersDeny.add("org.apache.el");
+        packageTriggersDeny.add("org.apache.jasper");
+        packageTriggersDeny.add("org.apache.juli");
+        packageTriggersDeny.add("org.apache.naming");
+        packageTriggersDeny.add("org.apache.tomcat");
+
+        // Add some exceptions to the above
+        // Standard tag libraries
+        packageTriggersPermit.add("javax.servlet.jsp.jstl");
+    }
     // ----------------------------------------------------------- Constructors
 
     /**
@@ -794,11 +805,6 @@ public class WebappClassLoader extends URLClassLoader
         }
         result3[lastModifiedDates.length] = lastModified;
         lastModifiedDates = result3;
-
-        // If the JAR currently contains invalid classes, don't actually use it
-        // for classloading
-        if (!validateJarFile(file))
-            return;
 
         // Add the file to the list
         File[] result4 = new File[jarRealFiles.length + 1];
@@ -2810,13 +2816,15 @@ public class WebappClassLoader extends URLClassLoader
         else
             return false;
 
-        for (int i = 0; i < packageTriggers.length; i++) {
-            if (packageName.startsWith(packageTriggers[i]))
-                return true;
+        if (packageTriggersPermit.contains(packageName)) {
+            return false;
+        }
+
+        if (packageTriggersDeny.contains(packageName)) {
+            return true;
         }
 
         return false;
-
     }
 
 
@@ -2857,60 +2865,6 @@ public class WebappClassLoader extends URLClassLoader
         // Assume everything else is OK
         return true;
 
-    }
-
-
-    /**
-     * Check the specified JAR file, and return <code>true</code> if it does
-     * not contain any of the trigger classes.
-     *
-     * @param file  The JAR file to be checked
-     *
-     * @exception IOException if an input/output error occurs
-     */
-    protected boolean validateJarFile(File file)
-        throws IOException {
-
-        if (triggers == null)
-            return (true);
-
-        JarFile jarFile = null;
-        try {
-            jarFile = new JarFile(file);
-            for (int i = 0; i < triggers.length; i++) {
-                Class<?> clazz = null;
-                try {
-                    if (parent != null) {
-                        clazz = parent.loadClass(triggers[i]);
-                    } else {
-                        clazz = Class.forName(triggers[i]);
-                    }
-                } catch (Exception e) {
-                    clazz = null;
-                }
-                if (clazz == null)
-                    continue;
-                String name = triggers[i].replace('.', '/') + CLASS_FILE_SUFFIX;
-                if (log.isDebugEnabled())
-                    log.debug(" Checking for " + name);
-                JarEntry jarEntry = jarFile.getJarEntry(name);
-                if (jarEntry != null) {
-                    log.info("validateJarFile(" + file +
-                        ") - jar not loaded. See Servlet Spec 3.1, "
-                        + "section 10.7.2. Offending class: " + name);
-                    return false;
-                }
-            }
-            return true;
-        } finally {
-            if (jarFile != null) {
-                try {
-                    jarFile.close();
-                } catch (IOException ioe) {
-                    // Ignore
-                }
-            }
-        }
     }
 
 
