@@ -278,18 +278,6 @@ public class WebappClassLoader extends URLClassLoader
 
 
     /**
-     * Last time a JAR was accessed.
-     */
-    protected long lastJarAccessed = 0L;
-
-
-    /**
-     * Repositories URLs, used to cache the result of getURLs.
-     */
-    protected URL[] repositoryURLs = null;
-
-
-    /**
      * The list of JARs, in the order they should be searched
      * for locally loaded classes or resources.
      */
@@ -735,7 +723,6 @@ public class WebappClassLoader extends URLClassLoader
 
         loader.resources = this.resources;
         loader.delegate = this.delegate;
-        loader.lastJarAccessed = this.lastJarAccessed;
         loader.jarPath = this.jarPath;
         loader.started = this.started;
         loader.needConvert = this.needConvert;
@@ -745,7 +732,6 @@ public class WebappClassLoader extends URLClassLoader
         loader.clearReferencesLogFactoryRelease = this.clearReferencesLogFactoryRelease;
         loader.clearReferencesHttpClientKeepAliveThread = this.clearReferencesHttpClientKeepAliveThread;
 
-        loader.repositoryURLs = this.repositoryURLs.clone();
         loader.jarRealFiles = this.jarRealFiles.clone();
         loader.jarNames = this.jarNames.clone();
         loader.lastModifiedDates = this.lastModifiedDates.clone();
@@ -1568,7 +1554,6 @@ public class WebappClassLoader extends URLClassLoader
 
         resourceEntries.clear();
         resources = null;
-        repositoryURLs = null;
         jarRealFiles = null;
         jarPath = null;
         jarNames = null;
