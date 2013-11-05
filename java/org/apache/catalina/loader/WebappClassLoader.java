@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,8 +52,10 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.Attributes;
@@ -272,7 +275,8 @@ public class WebappClassLoader extends URLClassLoader
      * The cache of ResourceEntry for classes and resources we have loaded,
      * keyed by resource name.
      */
-    protected final HashMap<String, ResourceEntry> resourceEntries = new HashMap<>();
+    protected final Map<String, ResourceEntry> resourceEntries =
+            new ConcurrentHashMap<>();
 
 
     /**
@@ -288,20 +292,6 @@ public class WebappClassLoader extends URLClassLoader
 
 
     private final HashMap<String,Long> jarModificationTimes = new HashMap<>();
-
-
-    /**
-     * The list of JARs last modified dates, in the order they should be
-     * searched for locally loaded classes or resources.
-     */
-    protected long[] lastModifiedDates = new long[0];
-
-
-    /**
-     * The list of resources which should be checked when checking for
-     * modifications.
-     */
-    protected String[] paths = new String[0];
 
 
     /**
@@ -708,8 +698,6 @@ public class WebappClassLoader extends URLClassLoader
         loader.clearReferencesLogFactoryRelease = this.clearReferencesLogFactoryRelease;
         loader.clearReferencesHttpClientKeepAliveThread = this.clearReferencesHttpClientKeepAliveThread;
 
-        loader.paths = this.paths.clone();
-
         loader.permissionList.addAll(this.permissionList);
         loader.loaderPC.putAll(this.loaderPC);
 
@@ -726,29 +714,19 @@ public class WebappClassLoader extends URLClassLoader
         if (log.isDebugEnabled())
             log.debug("modified()");
 
-        // Checking for modified loaded resources
-        int length = paths.length;
-
-        // A rare race condition can occur in the updates of the two arrays
-        // It's totally ok if the latest class added is not checked (it will
-        // be checked the next time
-        int length2 = lastModifiedDates.length;
-        if (length > length2)
-            length = length2;
-
-        for (int i = 0; i < length; i++) {
-            long lastModified =
-                    resources.getResource(paths[i]).getLastModified();
-            if (lastModified != lastModifiedDates[i]) {
+        for (Entry<String,ResourceEntry> entry : resourceEntries.entrySet()) {
+            long cachedLastModified = entry.getValue().lastModified;
+            long lastModified = resources.getClassLoaderResource(
+                    entry.getKey()).getLastModified();
+            if (lastModified != cachedLastModified) {
                 if( log.isDebugEnabled() )
-                    log.debug("  Resource '" + paths[i]
-                              + "' was modified; Date is now: "
-                              + new java.util.Date(lastModified) + " Was: "
-                              + new java.util.Date(lastModifiedDates[i]));
+                    log.debug(sm.getString("webappClassLoader.resourceModified",
+                            entry.getKey(),
+                            new Date(cachedLastModified),
+                            new Date(lastModified)));
                 return true;
             }
         }
-
 
         // Check if JARs have been added or removed
         WebResource[] jars = resources.listResources("/WEB-INF/lib");
@@ -1462,8 +1440,6 @@ public class WebappClassLoader extends URLClassLoader
         resourceEntries.clear();
         jarModificationTimes.clear();
         resources = null;
-        lastModifiedDates = null;
-        paths = null;
         parent = null;
 
         permissionList.clear();
@@ -1595,9 +1571,7 @@ public class WebappClassLoader extends URLClassLoader
 
     private final void clearReferencesStaticFinal() {
 
-        @SuppressWarnings("unchecked")
-        Collection<ResourceEntry> values =
-            ((HashMap<String,ResourceEntry>) resourceEntries.clone()).values();
+        Collection<ResourceEntry> values = resourceEntries.values();
         Iterator<ResourceEntry> loadedClasses = values.iterator();
         //
         // walk through all loaded class to trigger initialization for
@@ -2432,7 +2406,6 @@ public class WebappClassLoader extends URLClassLoader
         }
 
         return clazz;
-
     }
 
 
@@ -2463,7 +2436,6 @@ public class WebappClassLoader extends URLClassLoader
 
         boolean fileNeedConvert = false;
 
-        String fullPath = "/WEB-INF/classes/" + path;
         resource = resources.getClassLoaderResource("/" + path);
 
         if (!resource.exists()) {
@@ -2482,27 +2454,6 @@ public class WebappClassLoader extends URLClassLoader
             if (path.endsWith(".properties")) {
                 fileNeedConvert = true;
             }
-        }
-
-        // Register the full path for modification checking
-        // Note: Only syncing on a 'constant' object is needed
-        synchronized (allPermission) {
-
-            int j;
-
-            long[] result2 = new long[lastModifiedDates.length + 1];
-            for (j = 0; j < lastModifiedDates.length; j++) {
-                result2[j] = lastModifiedDates[j];
-            }
-            result2[lastModifiedDates.length] = entry.lastModified;
-            lastModifiedDates = result2;
-
-            String[] result = new String[paths.length + 1];
-            for (j = 0; j < paths.length; j++) {
-                result[j] = paths[j];
-            }
-            result[paths.length] = fullPath;
-            paths = result;
         }
 
         JarEntry jarEntry = null;
