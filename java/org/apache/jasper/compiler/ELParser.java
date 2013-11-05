@@ -17,6 +17,12 @@
 
 package org.apache.jasper.compiler;
 
+import org.apache.jasper.JasperException;
+import org.apache.jasper.compiler.ELNode.ELText;
+import org.apache.jasper.compiler.ELNode.Function;
+import org.apache.jasper.compiler.ELNode.Root;
+import org.apache.jasper.compiler.ELNode.Text;
+
 /**
  * This class implements a parser for EL expressions.
  *
@@ -106,6 +112,7 @@ public class ELParser {
                 // Output whatever is in buffer
                 if (buf.length() > 0) {
                     ELexpr.add(new ELNode.ELText(buf.toString()));
+                    buf = new StringBuilder();
                 }
                 if (!parseFunction()) {
                     ELexpr.add(new ELNode.ELText(curToken.toString()));
@@ -131,8 +138,8 @@ public class ELParser {
         }
         String s1 = null; // Function prefix
         String s2 = curToken.toString(); // Function name
-        int mark = getIndex();
         if (hasNext()) {
+            int mark = getIndex();
             curToken = nextToken();
             if (curToken.toChar() == ':') {
                 if (hasNext()) {
@@ -150,8 +157,9 @@ public class ELParser {
                 ELexpr.add(new ELNode.Function(s1, s2));
                 return true;
             }
+            curToken = prevToken;
+            setIndex(mark);
         }
-        setIndex(mark);
         return false;
     }
 
@@ -388,5 +396,43 @@ public class ELParser {
 
     public char getType() {
         return type;
+    }
+
+
+    protected static class TextBuilder extends ELNode.Visitor {
+
+        protected StringBuilder output = new StringBuilder();
+
+        public String getText() {
+            return output.toString();
+        }
+
+        @Override
+        public void visit(Root n) throws JasperException {
+            output.append(n.getType());
+            output.append('{');
+            n.getExpression().visit(this);
+            output.append('}');
+        }
+
+        @Override
+        public void visit(Function n) throws JasperException {
+            if (n.getPrefix() != null) {
+                output.append(n.getPrefix());
+                output.append(':');
+            }
+            output.append(n.getName());
+            output.append('(');
+        }
+
+        @Override
+        public void visit(Text n) throws JasperException {
+            output.append(n.getText());
+        }
+
+        @Override
+        public void visit(ELText n) throws JasperException {
+            output.append(n.getText());
+        }
     }
 }
