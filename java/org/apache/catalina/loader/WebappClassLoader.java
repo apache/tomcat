@@ -1524,12 +1524,12 @@ public class WebappClassLoader extends URLClassLoader
     public void start() throws LifecycleException {
 
         WebResource classes = resources.getResource("/WEB-INF/classes");
-        if (classes.exists()) {
+        if (classes.isDirectory() && classes.canRead()) {
             addURL(classes.getURL());
         }
         WebResource[] jars = resources.listResources("/WEB-INF/lib");
         for (WebResource jar : jars) {
-            if (jar.getName().endsWith(".jar")) {
+            if (jar.getName().endsWith(".jar") && jar.isFile() && jar.canRead()) {
                 addURL(jar.getURL());
             }
         }
