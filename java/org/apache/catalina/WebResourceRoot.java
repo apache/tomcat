@@ -360,6 +360,33 @@ public interface WebResourceRoot extends Lifecycle {
     long getCacheMaxObjectSize();
 
     /**
+     * Controls whether the trace locked files feature is enabled. If enabled,
+     * all calls to methods that return objects that lock a file and need to be
+     * closed to release that lock (e.g. {@link WebResource#getInputStream()}
+     * will perform a number of additional tasks.
+     * <ul>
+     *   <li>The stack trace at the point where the method was called will be
+     *       recorded and associated with the returned object.</li>
+     *   <li>The returned object will be wrapped so that the point where close()
+     *       (or equivalent) is called to release the resources can be detected.
+     *       Tracking of the object will cease once the resources have been
+     *       released.</li>
+     *   <li>All remaining locked resources on web application shutdown will be
+     *       logged and then closed.</li>
+     * </ul>
+     *
+     * @param traceLockedFiles @true to enable it, @false to disable it
+     */
+    void setTraceLockedFiles(boolean traceLockedFiles);
+
+    /**
+     * Has the trace locked files feature been enabled?
+     *
+     * @return @true if it has been enabled, otherwise @false
+     */
+    boolean getTraceLockedFiles();
+
+    /**
      * This method will be invoked by the context on a periodic basis and allows
      * the implementation a method that executes periodic tasks, such as purging
      * expired cache entries.
@@ -372,4 +399,8 @@ public interface WebResourceRoot extends Lifecycle {
         POST,
         CLASSES_JAR
     }
+
+    void registerTracedResource(WebResourceTraceWrapper traceWrapper);
+
+    void deregisterTracedResource(WebResourceTraceWrapper traceWrapperInputStream);
 }

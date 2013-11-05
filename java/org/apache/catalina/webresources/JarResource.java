@@ -39,7 +39,7 @@ public class JarResource extends AbstractArchiveResource {
     }
 
     @Override
-    public InputStream getInputStream() {
+    protected InputStream doGetInputStream() {
         try {
             JarFile jarFile = new JarFile(getBase());
             InputStream is = jarFile.getInputStream(getResource());

@@ -123,7 +123,7 @@ public class FileResource extends AbstractResource {
     }
 
     @Override
-    public InputStream getInputStream() {
+    protected InputStream doGetInputStream() {
         if (resource.exists()) {
             try {
                 return new FileInputStream(resource);
