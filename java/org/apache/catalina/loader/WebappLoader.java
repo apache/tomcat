@@ -664,18 +664,6 @@ public class WebappLoader extends LifecycleMBeanBase
 
         WebResourceRoot resources = context.getResources();
 
-        // Setting up the class repository (/WEB-INF/classes), if it exists
-
-        String classesPath = "/WEB-INF/classes";
-        WebResource classes = resources.getResource(classesPath);
-
-        if (classes.isDirectory()) {
-
-            if(log.isDebugEnabled())
-                log.debug(sm.getString("webappLoader.classDeploy", classesPath,
-                        classes.getURL().toExternalForm()));
-        }
-
         // Setting up the JAR repository (/WEB-INF/lib), if it exists
         // TODO Simplify this in a similar manner to WEB-INF/classes
 
