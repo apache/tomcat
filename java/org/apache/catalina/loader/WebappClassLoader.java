@@ -686,23 +686,22 @@ public class WebappClassLoader extends URLClassLoader
     @Override
     public WebappClassLoader copyWithoutTransformers() {
 
-        WebappClassLoader loader = new WebappClassLoader(this.parent);
+        WebappClassLoader result = new WebappClassLoader(this.parent);
 
-        loader.resources = this.resources;
-        loader.delegate = this.delegate;
-        loader.started = this.started;
-        loader.needConvert = this.needConvert;
-        loader.clearReferencesStatic = this.clearReferencesStatic;
-        loader.clearReferencesStopThreads = this.clearReferencesStopThreads;
-        loader.clearReferencesStopTimerThreads = this.clearReferencesStopTimerThreads;
-        loader.clearReferencesLogFactoryRelease = this.clearReferencesLogFactoryRelease;
-        loader.clearReferencesHttpClientKeepAliveThread = this.clearReferencesHttpClientKeepAliveThread;
+        result.resources = this.resources;
+        result.delegate = this.delegate;
+        result.started = this.started;
+        result.needConvert = this.needConvert;
+        result.clearReferencesStatic = this.clearReferencesStatic;
+        result.clearReferencesStopThreads = this.clearReferencesStopThreads;
+        result.clearReferencesStopTimerThreads = this.clearReferencesStopTimerThreads;
+        result.clearReferencesLogFactoryRelease = this.clearReferencesLogFactoryRelease;
+        result.clearReferencesHttpClientKeepAliveThread = this.clearReferencesHttpClientKeepAliveThread;
 
-        loader.permissionList.addAll(this.permissionList);
-        loader.loaderPC.putAll(this.loaderPC);
+        result.permissionList.addAll(this.permissionList);
+        result.loaderPC.putAll(this.loaderPC);
 
-        return loader;
-
+        return result;
     }
 
     /**
