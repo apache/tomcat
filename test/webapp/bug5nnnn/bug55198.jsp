@@ -15,6 +15,9 @@
   limitations under the License.
 --%>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
+<%
+request.setAttribute("text", "a&amp;b");
+%>
 <html>
   <head><title>Bug 55198 test case</title></head>
   <body>

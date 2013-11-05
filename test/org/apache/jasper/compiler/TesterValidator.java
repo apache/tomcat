@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.jasper.runtime;
+package org.apache.jasper.compiler;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Performance tests for {@link PageContextImpl}.
+ * Performance tests for {@link Validator}.
  */
-public class TesterPageContextImpl {
+public class TesterValidator {
 
     private static String[] bug53867TestData = new String[] {
             "Hello World!",
@@ -42,7 +42,7 @@ public class TesterPageContextImpl {
 
         for (int j = 0; j < bug53867TestData.length; j++) {
             Assert.assertEquals(doTestBug53867OldVersion(bug53867TestData[j]),
-                    PageContextImpl.XmlEscape(bug53867TestData[j]));
+                    Validator.xmlEscape(bug53867TestData[j]));
         }
 
         for (int i = 0; i < 100; i++) {
@@ -52,7 +52,7 @@ public class TesterPageContextImpl {
         }
         for (int i = 0; i < 100; i++) {
             for (int j = 0; j < bug53867TestData.length; j++) {
-                PageContextImpl.XmlEscape(bug53867TestData[j]);
+                Validator.xmlEscape(bug53867TestData[j]);
             }
         }
 
@@ -68,7 +68,7 @@ public class TesterPageContextImpl {
         start = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
             for (int j = 0; j < bug53867TestData.length; j++) {
-                PageContextImpl.XmlEscape(bug53867TestData[j]);
+                Validator.xmlEscape(bug53867TestData[j]);
             }
         }
         System.out.println(
