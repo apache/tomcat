@@ -19,6 +19,8 @@ package org.apache.catalina.webresources;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.cert.Certificate;
+import java.util.jar.Manifest;
 
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
@@ -232,6 +234,16 @@ public class CachedResource implements WebResource {
     @Override
     public URL getURL() {
         return webResource.getURL();
+    }
+
+    @Override
+    public Certificate[] getCertificates() {
+        return webResource.getCertificates();
+    }
+
+    @Override
+    public Manifest getManifest() {
+        return webResource.getManifest();
     }
 
     @Override

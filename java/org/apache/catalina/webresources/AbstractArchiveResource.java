@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.cert.Certificate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 import org.apache.catalina.WebResourceRoot;
 
@@ -30,15 +32,19 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     private final String base;
     private final String baseUrl;
     private final JarEntry resource;
+    private final Manifest manifest;
     private final String name;
+    private boolean readCerts = false;
+    private Certificate[] certificates;
 
     protected AbstractArchiveResource(WebResourceRoot root, String webAppPath,
             String base, String baseUrl, JarEntry jarEntry,
-            String internalPath) {
+            String internalPath, Manifest manifest) {
         super(root, webAppPath);
         this.base = base;
         this.baseUrl = baseUrl;
         this.resource = jarEntry;
+        this.manifest = manifest;
 
         String resourceName = resource.getName();
         if (resourceName.charAt(resourceName.length() - 1) == '/') {
@@ -137,15 +143,74 @@ public abstract class AbstractArchiveResource extends AbstractResource {
         }
     }
 
+    @Override
+    public final byte[] getContent() {
+        long len = getContentLength();
 
-    protected static class JarInputStreamWrapper extends InputStream {
+        if (len > Integer.MAX_VALUE) {
+            // Can't create an array that big
+            throw new ArrayIndexOutOfBoundsException(sm.getString(
+                    "abstractResource.getContentTooLarge", getWebappPath(),
+                    Long.valueOf(len)));
+        }
+
+        int size = (int) len;
+        byte[] result = new byte[size];
+
+        int pos = 0;
+        try (JarInputStreamWrapper jisw = getJarInputStreamWrapper()) {
+            while (pos < size) {
+                int n = jisw.read(result, pos, size - pos);
+                if (n < 0) {
+                    break;
+                }
+                pos += n;
+            }
+            // Once the stream has been read, read the certs
+            certificates = jisw.getCertificates();
+            readCerts = true;
+        } catch (IOException ioe) {
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("abstractResource.getContentFail",
+                        getWebappPath()), ioe);
+            }
+        }
+
+        return result;
+    }
+
+
+    @Override
+    public Certificate[] getCertificates() {
+        if (!readCerts) {
+            // TODO - get content first
+            throw new IllegalStateException();
+        }
+        return certificates;
+    }
+
+    @Override
+    public Manifest getManifest() {
+        return manifest;
+    }
+
+    @Override
+    protected final InputStream doGetInputStream() {
+        return getJarInputStreamWrapper();
+    }
+
+    protected abstract JarInputStreamWrapper getJarInputStreamWrapper();
+
+    protected class JarInputStreamWrapper extends InputStream {
 
         private final JarFile jarFile;
+        private final JarEntry jarEntry;
         private final InputStream is;
 
 
-        public JarInputStreamWrapper(JarFile jarFile, InputStream is) {
+        public JarInputStreamWrapper(JarFile jarFile, JarEntry jarEntry, InputStream is) {
             this.jarFile = jarFile;
+            this.jarEntry = jarEntry;
             this.is = is;
         }
 
@@ -203,6 +268,10 @@ public abstract class AbstractArchiveResource extends AbstractResource {
         @Override
         public boolean markSupported() {
             return is.markSupported();
+        }
+
+        public Certificate[] getCertificates() {
+            return jarEntry.getCertificates();
         }
     }
 }

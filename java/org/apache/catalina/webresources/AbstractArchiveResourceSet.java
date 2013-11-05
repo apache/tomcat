@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.jar.JarEntry;
+import java.util.jar.Manifest;
 
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
@@ -32,7 +33,12 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
     private final HashMap<String,JarEntry> jarFileEntries = new HashMap<>();
     private String baseUrl;
+    private Manifest manifest;
 
+
+    protected void setManifest(Manifest manifest) {
+        this.manifest = manifest;
+    }
 
     public String getBaseUrl() {
         return baseUrl;
@@ -216,7 +222,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 if (jarEntry == null) {
                     return new EmptyResource(root, path);
                 } else {
-                    return createArchiveResource(jarEntry, path);
+                    return createArchiveResource(jarEntry, path, manifest);
                 }
             }
         } else {
@@ -225,5 +231,5 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
     }
 
     protected abstract WebResource createArchiveResource(JarEntry jarEntry,
-            String webAppPath);
+            String webAppPath, Manifest manifest);
 }

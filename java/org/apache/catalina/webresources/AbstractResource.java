@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.webresources;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 
@@ -87,44 +86,6 @@ public abstract class AbstractResource implements WebResource {
     @Override
     public final String getMimeType() {
         return mimeType;
-    }
-
-
-    @Override
-    public final byte[] getContent() {
-        long len = getContentLength();
-
-        if (len > Integer.MAX_VALUE) {
-            // Can't create an array that big
-            throw new ArrayIndexOutOfBoundsException(sm.getString(
-                    "abstractResource.getContentTooLarge", getWebappPath(),
-                    Long.valueOf(len)));
-        }
-
-        int size = (int) len;
-        byte[] result = new byte[size];
-
-        int pos = 0;
-        try (InputStream is = getInputStream()) {
-            if (is == null) {
-                return null;
-            }
-
-            while (pos < size) {
-                int n = is.read(result, pos, size - pos);
-                if (n < 0) {
-                    break;
-                }
-                pos += n;
-            }
-        } catch (IOException ioe) {
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("abstractResource.getContentFail",
-                        getWebappPath()), ioe);
-            }
-        }
-
-        return result;
     }
 
 
