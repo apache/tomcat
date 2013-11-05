@@ -278,8 +278,6 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         assertEquals("getDelegate did not match.",
                 Boolean.valueOf(this.loader.getDelegate()),
                 Boolean.valueOf(copiedLoader.getDelegate()));
-        assertEquals("getJarPath did not match.", this.loader.getJarPath(),
-                copiedLoader.getJarPath());
         assertEquals("getURLs did not match.", this.loader.getURLs().length,
                 copiedLoader.getURLs().length);
         assertSame("getParent did not match.", this.loader.getParent(), copiedLoader.getParent());
