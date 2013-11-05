@@ -305,6 +305,9 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     public String[] getLoaderRepositories() {
+        if (classLoader == null) {
+            return new String[0];
+        }
         URL[] urls = classLoader.getURLs();
         String[] result = new String[urls.length];
         for (int i = 0; i < urls.length; i++) {

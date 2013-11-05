@@ -251,6 +251,8 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         assertEquals("The second result is not correct.", "Hello, Weaver #2!", result);
 
         WebappClassLoader copiedLoader = this.loader.copyWithoutTransformers();
+        // class loader needs to be started to populate URLs
+        copiedLoader.start();
 
         result = invokeDoMethodOnClass(copiedLoader, "TesterNeverWeavedClass");
         assertEquals("The third result is not correct.", "This will never be weaved.", result);
