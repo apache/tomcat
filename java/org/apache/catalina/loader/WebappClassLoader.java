@@ -277,6 +277,9 @@ public class WebappClassLoader extends URLClassLoader
     protected boolean delegate = false;
 
 
+    private final HashMap<String,Long> jarModificationTimes = new HashMap<>();
+
+
     /**
      * The list of JARs, in the order they should be searched
      * for locally loaded classes or resources.
@@ -839,41 +842,36 @@ public class WebappClassLoader extends URLClassLoader
             }
         }
 
-        length = jarNames.length;
 
         // Check if JARs have been added or removed
-        if (getJarPath() != null) {
+        WebResource[] jars = resources.listResources("/WEB-INF/lib");
+        if (jars.length > jarModificationTimes.size()) {
+            log.info(sm.getString("webappClassLoader.jarsAdded",
+                    resources.getContext().getName()));
+            return true;
+        } else if (jars.length < jarModificationTimes.size()){
+            log.info(sm.getString("webappClassLoader.jarsRemoved",
+                    resources.getContext().getName()));
+            return true;
+        }
 
-            WebResource[] jars = resources.listResources(getJarPath());
-
-            int i = 0;
-            int j = 0;
-            for (; j < jars.length && i < length; j++) {
-                // Ignore non JARs present in the lib folder
-                String name = jars[j].getName();
-                if (!name.endsWith(".jar"))
-                    continue;
-                if (!name.equals(jarNames[i])) {
-                    // Missing JAR
-                    log.info("    One or more JARs have been added : '"
-                             + name + "'");
+        for (WebResource jar : jars) {
+            if (jar.getName().endsWith(".jar") && jar.isFile() && jar.canRead()) {
+                Long recordedLastModified = jarModificationTimes.get(jar.getName());
+                if (recordedLastModified == null) {
+                    // Jars have been added and removed
+                    log.info(sm.getString("webappClassLoader.jarsAdded",
+                            resources.getContext().getName()));
                     return true;
                 }
-                i++;
-            }
-            if (j < jars.length ) {
-                for (; j < jars.length; j++) {
-                    // Additional non-JAR files are allowed
-                    if (jars[j].getName().endsWith(".jar")) {
-                        // There was more JARs
-                        log.info("    Additional JARs have been added");
-                        return true;
-                    }
+                if (recordedLastModified.longValue() != jar.getLastModified()) {
+                    // Jar has been changed
+                    log.info(sm.getString("webappClassLoader.jarsModified",
+                            resources.getContext().getName()));
+                    return true;
                 }
-            } else if (i < jarNames.length) {
-                // There was less JARs
-                log.info("    One or more JARs have been removed");
-                return (true);
+                jarModificationTimes.put(
+                        jar.getName(), Long.valueOf(jar.getLastModified()));
             }
         }
 
@@ -1517,6 +1515,8 @@ public class WebappClassLoader extends URLClassLoader
         for (WebResource jar : jars) {
             if (jar.getName().endsWith(".jar") && jar.isFile() && jar.canRead()) {
                 addURL(jar.getURL());
+                jarModificationTimes.put(
+                        jar.getName(), Long.valueOf(jar.getLastModified()));
             }
         }
 
@@ -1553,6 +1553,7 @@ public class WebappClassLoader extends URLClassLoader
         started = false;
 
         resourceEntries.clear();
+        jarModificationTimes.clear();
         resources = null;
         jarRealFiles = null;
         jarPath = null;
