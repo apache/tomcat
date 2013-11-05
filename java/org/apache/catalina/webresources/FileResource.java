@@ -214,10 +214,6 @@ public class FileResource extends AbstractResource {
         return null;
     }
 
-    protected File getResourceInternal() {
-        return resource;
-    }
-
     @Override
     protected Log getLog() {
         return log;

@@ -48,7 +48,7 @@ public class Cache {
     private long maxSize = 10 * 1024 * 1024;
     private long maxObjectSize = maxSize / 20;
 
-    private ConcurrentMap<String,CachedResource> resourceCache =
+    private final ConcurrentMap<String,CachedResource> resourceCache =
             new ConcurrentHashMap<>();
 
     public Cache(StandardRoot root) {

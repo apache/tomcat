@@ -63,15 +63,15 @@ public abstract class AbstractArchiveResource extends AbstractResource {
         }
     }
 
-    public String getBase() {
+    protected final String getBase() {
         return base;
     }
 
-    public String getBaseUrl() {
+    protected final String getBaseUrl() {
         return baseUrl;
     }
 
-    public JarEntry getResource() {
+    protected final JarEntry getResource() {
         return resource;
     }
 

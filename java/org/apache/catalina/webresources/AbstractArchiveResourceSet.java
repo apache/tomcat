@@ -36,19 +36,19 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
     private Manifest manifest;
 
 
-    protected void setManifest(Manifest manifest) {
+    protected final void setManifest(Manifest manifest) {
         this.manifest = manifest;
     }
 
-    public String getBaseUrl() {
+    protected final String getBaseUrl() {
         return baseUrl;
     }
 
-    public void setBaseUrl(String baseUrl) {
+    protected final void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
     }
 
-    public HashMap<String,JarEntry> getJarFileEntries() {
+    protected final HashMap<String,JarEntry> getJarFileEntries() {
         return jarFileEntries;
     }
 

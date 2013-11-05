@@ -48,16 +48,16 @@ public abstract class AbstractResourceSet extends LifecycleBase
         this.root = root;
     }
 
-    public final WebResourceRoot getRoot() {
+    protected final WebResourceRoot getRoot() {
         return root;
     }
 
 
-    public String getInternalPath() {
+    protected final String getInternalPath() {
         return internalPath;
     }
 
-    public void setInternalPath(String internalPath) {
+    protected final void setInternalPath(String internalPath) {
         checkPath(internalPath);
         // Optimise internal processing
         if (internalPath.equals("/")) {
@@ -67,7 +67,7 @@ public abstract class AbstractResourceSet extends LifecycleBase
         }
     }
 
-    public final void setWebAppMount(String webAppMount) {
+    protected final void setWebAppMount(String webAppMount) {
         checkPath(webAppMount);
         // Optimise internal processing
         if (webAppMount.equals("/")) {
@@ -77,15 +77,15 @@ public abstract class AbstractResourceSet extends LifecycleBase
         }
     }
 
-    public final String getWebAppMount() {
+    protected final String getWebAppMount() {
         return webAppMount;
     }
 
-    public final void setBase(String base) {
+    protected final void setBase(String base) {
         this.base = base;
     }
 
-    public final String getBase() {
+    protected final String getBase() {
         return base;
     }
 
