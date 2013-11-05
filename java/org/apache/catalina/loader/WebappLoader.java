@@ -31,7 +31,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.jar.JarFile;
 
 import javax.management.ObjectName;
@@ -158,12 +157,6 @@ public class WebappLoader extends LifecycleMBeanBase
      * Classpath set in the loader.
      */
     private String classpath = null;
-
-
-    /**
-     * Repositories that are set in the loader, for JMX.
-     */
-    private ArrayList<String> loaderRepositories = null;
 
 
     // ------------------------------------------------------------- Properties
@@ -335,10 +328,12 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     public String[] getLoaderRepositories() {
-        if( loaderRepositories==null ) return  null;
-        String res[]=new String[ loaderRepositories.size()];
-        loaderRepositories.toArray(res);
-        return res;
+        URL[] urls = classLoader.getURLs();
+        String[] result = new String[urls.length];
+        for (int i = 0; i < urls.length; i++) {
+            result[i] = urls[i].toExternalForm();
+        }
+        return result;
     }
 
     public String getLoaderRepositoriesString() {
@@ -657,7 +652,6 @@ public class WebappLoader extends LifecycleMBeanBase
         if (servletContext == null)
             return;
 
-        loaderRepositories = new ArrayList<>();
         // Loading the work directory
         File workDir =
             (File) servletContext.getAttribute(ServletContext.TEMPDIR);
@@ -680,8 +674,6 @@ public class WebappLoader extends LifecycleMBeanBase
             if(log.isDebugEnabled())
                 log.debug(sm.getString("webappLoader.classDeploy", classesPath,
                         classes.getURL().toExternalForm()));
-
-            loaderRepositories.add(classesPath + "/" );
         }
 
         // Setting up the JAR repository (/WEB-INF/lib), if it exists
@@ -753,8 +745,6 @@ public class WebappLoader extends LifecycleMBeanBase
                     // Should ignore and continue loading other jar files
                     // in the dir
                 }
-
-                loaderRepositories.add( filename );
             }
         }
     }

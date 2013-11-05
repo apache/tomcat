@@ -1439,45 +1439,18 @@ public class WebappClassLoader extends URLClassLoader
 
 
     /**
-     * Returns the search path of URLs for loading classes and resources.
-     * This includes the original list of URLs specified to the constructor,
-     * along with any URLs subsequently appended by the addURL() method.
-     * @return the search path of URLs for loading classes and resources.
+     * {@inheritDoc}
+     * <p>
+     * Note that list of URLs returned by this method may not be complete. The
+     * web application class loader accesses class loader resources via the
+     * {@link WebResourceRoot} which supports the arbitrary mapping of
+     * additional files, directories and contents of JAR files under
+     * WEB-INF/classes. Any such resources will not be included in the URLs
+     * returned here.
      */
     @Override
     public URL[] getURLs() {
-
-        if (repositoryURLs != null) {
-            return repositoryURLs.clone();
-        }
-
-        WebResource webInfClasses = resources.getResource("/WEB-INF/classes");
-        int resultLength;
-        if (webInfClasses.exists()) {
-            resultLength = jarRealFiles.length + 1;
-        } else {
-            resultLength = jarRealFiles.length;
-        }
-
-        int off = 0;
-
-        try {
-            URL[] urls = new URL[resultLength];
-            if (webInfClasses.exists()) {
-                urls[off ++] = webInfClasses.getURL();
-            }
-            for (File jarRealFile : jarRealFiles) {
-                urls[off++] = getURI(jarRealFile);
-            }
-
-            repositoryURLs = urls;
-
-        } catch (MalformedURLException e) {
-            repositoryURLs = new URL[0];
-        }
-
-        return repositoryURLs.clone();
-
+        return super.getURLs();
     }
 
 
@@ -1549,6 +1522,17 @@ public class WebappClassLoader extends URLClassLoader
      */
     @Override
     public void start() throws LifecycleException {
+
+        WebResource classes = resources.getResource("/WEB-INF/classes");
+        if (classes.exists()) {
+            addURL(classes.getURL());
+        }
+        WebResource[] jars = resources.listResources("/WEB-INF/lib");
+        for (WebResource jar : jars) {
+            if (jar.getName().endsWith(".jar")) {
+                addURL(jar.getURL());
+            }
+        }
 
         started = true;
         String encoding = null;
