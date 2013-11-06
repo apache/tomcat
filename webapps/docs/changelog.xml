@@ -161,6 +161,11 @@
         from cluster manager template. These attributes should not be defined as
         a template. (kfujino)
       </fix>
+      <fix>
+        Fix MBean attribute definition of <code>stateTransfered</code>. The
+        method name is not <code>isStateTransfered()</code> but
+        <code>getStateTransfered()</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
