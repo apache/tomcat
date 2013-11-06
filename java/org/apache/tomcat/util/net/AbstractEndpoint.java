@@ -117,6 +117,7 @@ public abstract class AbstractEndpoint {
      */
     protected volatile boolean internalExecutor = false;
 
+
     /**
      * counter for nr of connections handled by an endpoint
      */
@@ -139,9 +140,26 @@ public abstract class AbstractEndpoint {
     // ----------------------------------------------------------------- Properties
 
     /**
+     * Time to wait for the internal executor (if used) to terminate when the
+     * endpoint is stopped in milliseconds. Defaults to 5000 (5 seconds).
+     */
+    private long executorTerminationTimeoutMillis = 5000;
+
+    public long getExecutorTerminationTimeoutMillis() {
+        return executorTerminationTimeoutMillis;
+    }
+
+    public void setExecutorTerminationTimeoutMillis(
+            long executorTerminationTimeoutMillis) {
+        this.executorTerminationTimeoutMillis = executorTerminationTimeoutMillis;
+    }
+
+
+    /**
      * Acceptor thread count.
      */
     protected int acceptorThreadCount = 0;
+
     public void setAcceptorThreadCount(int acceptorThreadCount) {
         this.acceptorThreadCount = acceptorThreadCount;
     }
@@ -505,7 +523,8 @@ public abstract class AbstractEndpoint {
                 ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
                 tpe.shutdownNow();
                 try {
-                    tpe.awaitTermination(5000, TimeUnit.MILLISECONDS);
+                    tpe.awaitTermination(getExecutorTerminationTimeoutMillis(),
+                            TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
                     // Ignore
                 }

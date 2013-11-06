@@ -71,6 +71,9 @@ public class JIoEndpoint extends AbstractEndpoint {
         // Set maxConnections to zero so we can tell if the user has specified
         // their own value on the connector when we reach bind()
         setMaxConnections(0);
+        // Reduce the executor timeout for BIO as threads in keep-alive will not
+        // terminate when the executor interrupts them.
+        setExecutorTerminationTimeoutMillis(0);
     }
 
     // ------------------------------------------------------------- Properties

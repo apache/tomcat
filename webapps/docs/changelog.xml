@@ -136,6 +136,11 @@
         using non-blocking IO. A side effect of not doing this was that JNDI was
         not available when processing WebSocket events. (markt)
       </fix>
+      <add>
+        Make the time that the internal executor (if used) waits for request
+        processing threads to terminate before continuing with the connector
+        stop process configurable. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
