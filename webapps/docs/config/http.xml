@@ -376,6 +376,14 @@
       provide the thread pool.</p>
     </attribute>
 
+    <attribute name="executorTerminationTimeoutMillis" required="false">
+      <p>The time that the private internal executor will wait for request
+      processing threads to terminate before continuing with the process of
+      stopping the connector. If not set, the default is <code>0</code> (zero)
+      for the BIO connector and <code>5000</code> (5 seconds) for the NIO and
+      APR/native connectors.</p>
+    </attribute>
+
     <attribute name="keepAliveTimeout" required="false">
       <p>The number of milliseconds this <strong>Connector</strong> will wait
       for another HTTP request before closing the connection. The default value
