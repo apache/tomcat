@@ -166,6 +166,10 @@
         method name is not <code>isStateTransfered()</code> but
         <code>getStateTransfered()</code>. (kfujino)
       </fix>
+      <fix>
+        Correct stop failure log of cluster. Failure cause is not only Valve.
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

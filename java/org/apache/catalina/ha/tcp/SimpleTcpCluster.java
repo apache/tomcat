@@ -780,7 +780,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             channel.removeMembershipListener(this);
             this.unregisterClusterValve();
         } catch (Exception x) {
-            log.error("Unable to stop cluster valve.", x);
+            log.error("Unable to stop cluster.", x);
         }
     }
 
