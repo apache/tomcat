@@ -1505,6 +1505,7 @@ public class DeltaManager extends ClusterManagerBase{
             sendSessions(sender, currentSessions, findSessionTimestamp);
         } else {
             // send session at blocks
+            int remain = currentSessions.length;
             for (int i = 0; i < currentSessions.length; i += getSendAllSessionsSize()) {
                 int len = i + getSendAllSessionsSize() > currentSessions.length ?
                         currentSessions.length - i :
@@ -1512,7 +1513,8 @@ public class DeltaManager extends ClusterManagerBase{
                 Session[] sendSessions = new Session[len];
                 System.arraycopy(currentSessions, i, sendSessions, 0, len);
                 sendSessions(sender, sendSessions,findSessionTimestamp);
-                if (getSendAllSessionsWaitTime() > 0) {
+                remain = remain - len;
+                if (getSendAllSessionsWaitTime() > 0 && remain > 0) {
                     try {
                         Thread.sleep(getSendAllSessionsWaitTime());
                     } catch (Exception sleep) {
