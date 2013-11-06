@@ -170,6 +170,10 @@
         Correct stop failure log of cluster. Failure cause is not only Valve.
         (kfujino)
       </fix>
+      <fix>
+        Remove unnecessary sleep when sending session blocks on session sync
+        phase. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
