@@ -56,7 +56,7 @@
           hence modifications for future requirement will require much less
           changes. This is all you need to run the connection pool itself, the
           rest is gravy.</li>
-      <li>Commons DBCP uses static interfaces. This means you have to use the 
+      <li>Commons DBCP uses static interfaces. This means you have to use the
           right version for a given JRE version or you may see
           <code>NoSuchMethodException</code> exceptions.</li>
       <li>It's not worth rewriting over 60 classes, when a connection pool can
