@@ -103,6 +103,21 @@ public abstract class AbstractTestResourceSet {
                 getMount() + "/d1/d1-f1.txt", webResource.getWebappPath());
     }
 
+    @Test
+    public final void testGetResourceCaseSensitive() {
+        WebResource webResource =
+                resourceRoot.getResource(getMount() + "/d1/d1-F1.txt");
+        Assert.assertFalse(webResource.exists());
+    }
+
+    @Test
+    public final void testGetResourceTraversal() {
+        WebResource webResource =
+                resourceRoot.getResource(getMount() + "/../");
+        Assert.assertFalse(webResource.exists());
+    }
+
+
     //------------------------------------------------------------------- list()
 
     @Test(expected = IllegalArgumentException.class)
