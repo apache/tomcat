@@ -272,7 +272,10 @@ public class WebappClassLoader extends URLClassLoader
 
     /**
      * The cache of ResourceEntry for classes and resources we have loaded,
-     * keyed by resource name.
+     * keyed by resource path, not binary name. Path is used as the key since
+     * resources may be requested by binary name (classes) or path (other
+     * resources such as property files) and the mapping from binary name to
+     * path is unambiguous but the reverse mapping is ambiguous.
      */
     protected final Map<String, ResourceEntry> resourceEntries =
             new ConcurrentHashMap<>();
@@ -813,7 +816,7 @@ public class WebappClassLoader extends URLClassLoader
      * Find the specified class in our local repositories, if possible.  If
      * not found, throw <code>ClassNotFoundException</code>.
      *
-     * @param name Name of the class to be loaded
+     * @param name The binary name of the class to be loaded
      *
      * @exception ClassNotFoundException if the class was not found
      */
@@ -905,14 +908,16 @@ public class WebappClassLoader extends URLClassLoader
 
         URL url = null;
 
-        ResourceEntry entry = resourceEntries.get(name);
+        String path = nameToPath(name);
+
+        ResourceEntry entry = resourceEntries.get(path);
         if (entry == null) {
             if (securityManager != null) {
                 PrivilegedAction<ResourceEntry> dp =
-                    new PrivilegedFindResourceByName(name, name);
+                    new PrivilegedFindResourceByName(name, path);
                 entry = AccessController.doPrivileged(dp);
             } else {
-                entry = findResourceInternal(name, name);
+                entry = findResourceInternal(name, path);
             }
         }
         if (entry != null) {
@@ -947,7 +952,9 @@ public class WebappClassLoader extends URLClassLoader
 
         LinkedHashSet<URL> result = new LinkedHashSet<>();
 
-        WebResource[] webResources = resources.getClassLoaderResources("/" + name);
+        String path = nameToPath(name);
+
+        WebResource[] webResources = resources.getClassLoaderResources(path);
         for (WebResource webResource : webResources) {
             if (webResource.exists()) {
                 result.add(webResource.getURL());
@@ -1113,7 +1120,7 @@ public class WebappClassLoader extends URLClassLoader
      * classes in the same manner as <code>loadClass(String, boolean)</code>
      * with <code>false</code> as the second argument.
      *
-     * @param name Name of the class to be loaded
+     * @param name The binary name of the class to be loaded
      *
      * @exception ClassNotFoundException if the class was not found
      */
@@ -1145,7 +1152,7 @@ public class WebappClassLoader extends URLClassLoader
      * <code>resolve</code> flag is <code>true</code>, this method will then
      * call <code>resolveClass(Class)</code> on the resulting Class object.
      *
-     * @param name Name of the class to be loaded
+     * @param name The binary name of the class to be loaded
      * @param resolve If <code>true</code> then resolve the class
      *
      * @exception ClassNotFoundException if the class was not found
@@ -2309,6 +2316,8 @@ public class WebappClassLoader extends URLClassLoader
     /**
      * Find specified class in local repositories.
      *
+     * @param name The binary name of the class to be loaded
+     *
      * @return the loaded class, or null if the class isn't found
      */
     protected Class<?> findClassInternal(String name)
@@ -2317,17 +2326,16 @@ public class WebappClassLoader extends URLClassLoader
         if (!validate(name))
             throw new ClassNotFoundException(name);
 
-        String tempPath = name.replace('.', '/');
-        String classPath = tempPath + CLASS_FILE_SUFFIX;
+        String path = binaryNameToPath(name);
 
         ResourceEntry entry = null;
 
         if (securityManager != null) {
             PrivilegedAction<ResourceEntry> dp =
-                new PrivilegedFindResourceByName(name, classPath);
+                new PrivilegedFindResourceByName(name, path);
             entry = AccessController.doPrivileged(dp);
         } else {
-            entry = findResourceInternal(name, classPath);
+            entry = findResourceInternal(name, path);
         }
 
         if (entry == null)
@@ -2413,6 +2421,28 @@ public class WebappClassLoader extends URLClassLoader
     }
 
 
+    private String binaryNameToPath(String binaryName) {
+        StringBuilder path = new StringBuilder(
+                1 + binaryName.length() + CLASS_FILE_SUFFIX.length());
+        path.append('/');
+        path.append(binaryName.replace('.', '/'));
+        path.append(CLASS_FILE_SUFFIX);
+        return path.toString();
+    }
+
+
+    private String nameToPath(String name) {
+        if (name.startsWith("/")) {
+            return name;
+        }
+        StringBuilder path = new StringBuilder(
+                1 + name.length());
+        path.append('/');
+        path.append(name);
+        return path.toString();
+    }
+
+
     /**
      * Find specified resource in local repositories.
      *
@@ -2428,7 +2458,7 @@ public class WebappClassLoader extends URLClassLoader
         if ((name == null) || (path == null))
             return null;
 
-        ResourceEntry entry = resourceEntries.get(name);
+        ResourceEntry entry = resourceEntries.get(path);
         if (entry != null)
             return entry;
 
@@ -2438,7 +2468,7 @@ public class WebappClassLoader extends URLClassLoader
 
         boolean fileNeedConvert = false;
 
-        resource = resources.getClassLoaderResource("/" + path);
+        resource = resources.getClassLoaderResource(path);
 
         if (!resource.exists()) {
             return null;
@@ -2518,9 +2548,9 @@ public class WebappClassLoader extends URLClassLoader
             // Ensures that all the threads which may be in a race to load
             // a particular class all end up with the same ResourceEntry
             // instance
-            ResourceEntry entry2 = resourceEntries.get(name);
+            ResourceEntry entry2 = resourceEntries.get(path);
             if (entry2 == null) {
-                resourceEntries.put(name, entry);
+                resourceEntries.put(path, entry);
             } else {
                 entry = entry2;
             }
@@ -2563,7 +2593,9 @@ public class WebappClassLoader extends URLClassLoader
      */
     protected InputStream findLoadedResource(String name) {
 
-        ResourceEntry entry = resourceEntries.get(name);
+        String path = nameToPath(name);
+
+        ResourceEntry entry = resourceEntries.get(path);
         if (entry != null) {
             if (entry.binaryContent != null)
                 return new ByteArrayInputStream(entry.binaryContent);
@@ -2584,11 +2616,13 @@ public class WebappClassLoader extends URLClassLoader
      * loaded and cached by this class loader, and return the Class object.
      * If this class has not been cached, return <code>null</code>.
      *
-     * @param name Name of the resource to return
+     * @param name The binary name of the resource to return
      */
     protected Class<?> findLoadedClass0(String name) {
 
-        ResourceEntry entry = resourceEntries.get(name);
+        String path = binaryNameToPath(name);
+
+        ResourceEntry entry = resourceEntries.get(path);
         if (entry != null) {
             return entry.loadedClass;
         }
