@@ -198,21 +198,24 @@ public class StandardRoot extends LifecycleMBeanBase
 
     @Override
     public WebResource getClassLoaderResource(String path) {
-        if (path == null || path.length() == 0 || !path.startsWith("/")) {
-            throw new IllegalArgumentException();
-        }
+        checkPath(path);
         return getResource("/WEB-INF/classes" + path, true, true);
     }
 
 
     @Override
     public WebResource[] getClassLoaderResources(String path) {
-        if (path == null || path.length() == 0 || !path.startsWith("/")) {
-            throw new IllegalArgumentException();
-        }
+        checkPath(path);
         return getResources("/WEB-INF/classes" + path, true);
     }
 
+
+    private void checkPath(String path) {
+        if (path == null || path.length() == 0 || !path.startsWith("/")) {
+            throw new IllegalArgumentException(
+                    sm.getString("standardRoot.invalidPath", path));
+        }
+    }
 
     protected final WebResource getResourceInternal(String path,
             boolean useClassLoaderResources) {
