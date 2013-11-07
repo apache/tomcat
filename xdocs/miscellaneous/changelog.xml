@@ -36,6 +36,16 @@
   new documentation project for Tomcat Native was started.
   </p>
 </section>
+<section name="Changes between 1.1.29 and 1.1.30">
+  <changelog>
+    <fix>
+      <bug>55663</bug>: Minor correction to the wording of the NOTICE file
+      to align it with the <a
+      href="http://www.apache.org/legal/src-headers.html#notice">requirements
+      for NOTICE files</a>. (kkolinko)
+    </fix>
+  </changelog>
+</section>
 <section name="Changes between 1.1.28 and 1.1.29">
   <changelog>
     <fix>
@@ -55,15 +65,15 @@
       of APR improves performance. (rjung)
     </update>
     <fix>
-      <bug>29422</bug> Fixed double-free in <code>ssl_ocsp_request</code>.
+      <bug>29422</bug>: Fixed double-free in <code>ssl_ocsp_request</code>.
       Patch provided by Aristotelis. (schultz)
     </fix>
     <fix>
-      <bug>51655</bug> Added a decent description of what tcnative actually is.
+      <bug>51655</bug>: Added a decent description of what tcnative actually is.
       (schultz)
     </fix>
     <fix>
-      <bug>51813</bug> Add NULL-checking for <code>s-&gt;net</code> to
+      <bug>51813</bug>: Add NULL-checking for <code>s-&gt;net</code> to
       avoid SIGSEGV in situations where it appears a socket bas been recycled.
       (schultz)
     </fix>
