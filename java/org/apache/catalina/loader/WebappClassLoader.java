@@ -2602,7 +2602,7 @@ public class WebappClassLoader extends URLClassLoader
         if (entry != null) {
             if (entry.binaryContent != null)
                 return new ByteArrayInputStream(entry.binaryContent);
-            else if (entry.source != null) {
+            else {
                 try {
                     return entry.source.openStream();
                 } catch (IOException ioe) {
