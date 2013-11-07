@@ -609,6 +609,11 @@ public class StandardRoot extends LifecycleMBeanBase
         }
         jarResources.clear();
 
+        for (WebResourceSet webResourceSet : classResources) {
+            webResourceSet.destroy();
+        }
+        classResources.clear();
+
         for (WebResourceTraceWrapper tracedResource : tracedResources) {
             log.error(sm.getString("standardRoot.lockedFile",
                     context.getName(),
