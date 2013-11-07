@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
 
@@ -111,7 +112,10 @@ public class StandardRoot extends LifecycleMBeanBase
         }
 
         // Set because we don't want duplicates
-        HashSet<String> result = new HashSet<>();
+        // LinkedHashSet to retain the order (shouldn't matter but Jira is
+        // sensitive to the order the JARs are returned in).
+        // TODO - Revert to HashSet
+        HashSet<String> result = new LinkedHashSet<>();
         for (ArrayList<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
                 if (!webResourceSet.getClassLoaderOnly()) {
