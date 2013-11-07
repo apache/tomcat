@@ -2409,12 +2409,15 @@ public class WebappClassLoader extends URLClassLoader
                         sm.getString("webappClassLoader.wrongVersion",
                                 name));
             }
+            // Now the class has been defined, clear the elements of the local
+            // resource cache that are no longer required.
             entry.loadedClass = clazz;
             entry.binaryContent = null;
-            entry.source = null;
             entry.codeBase = null;
             entry.manifest = null;
             entry.certificates = null;
+            // Retain entry.source in case of a getResourceAsStream() call on
+            // the class file after the class has been defined.
         }
 
         return clazz;
@@ -2599,7 +2602,7 @@ public class WebappClassLoader extends URLClassLoader
         if (entry != null) {
             if (entry.binaryContent != null)
                 return new ByteArrayInputStream(entry.binaryContent);
-            else {
+            else if (entry.source != null) {
                 try {
                     return entry.source.openStream();
                 } catch (IOException ioe) {
