@@ -36,28 +36,41 @@
 <section name="Introduction">
 
   <p>The <strong>JDBC Connection Pool <code>org.apache.tomcat.jdbc.pool</code></strong>
-  is a replacement or an alternative to the <a href="http://commons.apache.org/dbcp/">commons-dbcp</a>
+  is a replacement or an alternative to the <a href="http://commons.apache.org/dbcp/">Apache Commons DBCP</a>
   connection pool.</p>
 
   <p>So why do we need a new connection pool?</p>
 
   <p>Here are a few of the reasons:
     <ol>
-      <li>commons-dbcp is single threaded, in order to be thread safe commons-dbcp locks the entire pool, even during query validation.</li>
-      <li>commons-dbcp is slow - as the number of logical CPUs grow, the performance suffers, the above point shows that there is not support for high concurrency
-          Even with the enormous optimizations of the <code>synchronized</code> statement in Java 6, commons-dbcp still suffers in speed and concurrency.</li>
-      <li>commons-dbcp is complex, over 60 classes. tomcat-jdbc-pool, core is 8 classes, hence modifications for future requirement will require
-          much less changes. This is all you need to run the connection pool itself, the rest is gravy.</li>
-      <li>commons-dbcp uses static interfaces. This means you can't compile it with JDK 1.6, or if you run on JDK 1.6/1.7 you will get
-          <code>NoSuchMethodException</code> for all the methods not implemented, even if the driver supports it.  </li>
-      <li>The commons-dbcp has become fairly stagnant. Sparse updates, releases, and new feature support.</li>
-      <li>It's not worth rewriting over 60 classes, when something as a connection pool can be accomplished with as a much simpler implementation.</li>
-      <li>Tomcat jdbc pool implements a fairness option not available in commons-dbcp and still performs faster than commons-dbcp</li>
-      <li>Tomcat jdbc pool implements the ability retrieve a connection asynchronously, without adding additional threads to the library itself</li>
-      <li>Tomcat jdbc pool is a Tomcat module, it depends on Tomcat JULI, a simplified logging framework used in Tomcat.</li>
-      <li>Retrieve the underlying connection using the <code>javax.sql.PooledConnection</code> interface.</li>
-      <li>Starvation proof. If a pool is empty, and threads are waiting for a connection, when a connection is returned,
-          the pool will awake the correct thread waiting. Most pools will simply starve.</li>
+      <li>Commons DBCP 1.x is single threaded. In order to be thread safe
+          Commons locks the entire pool for short periods during both object
+          allocation and object return. Note that this does not apply to
+          Commons DBCP 2.x.</li>
+      <li>Commons DBCP 1.x can be slow. As the number of logical CPUs grows and
+          the number of concurrent threads attempting to borrow or return
+          objects increases, the performance suffers. For highly concurrent
+          systems the impact can be significant. Note that this does not apply
+          to Commons DBCP 2.x.</li>
+      <li>Commons DBCP is over 60 classes. tomcat-jdbc-pool core is 8 classes,
+          hence modifications for future requirement will require much less
+          changes. This is all you need to run the connection pool itself, the
+          rest is gravy.</li>
+      <li>Commons DBCP uses static interfaces. This means you have to use the 
+          right version for a given JRE version or you may see
+          <code>NoSuchMethodException</code> exceptions.</li>
+      <li>It's not worth rewriting over 60 classes, when a connection pool can
+          be accomplished with a much simpler implementation.</li>
+      <li>Tomcat jdbc pool implements the ability retrieve a connection
+          asynchronously, without adding additional threads to the library
+          itself.</li>
+      <li>Tomcat jdbc pool is a Tomcat module, it depends on Tomcat JULI, a
+          simplified logging framework used in Tomcat.</li>
+      <li>Retrieve the underlying connection using the
+          <code>javax.sql.PooledConnection</code> interface.</li>
+      <li>Starvation proof. If a pool is empty, and threads are waiting for a
+          connection, when a connection is returned, the pool will awake the
+          correct thread waiting. Most pools will simply starve.</li>
     </ol>
   </p>
 
