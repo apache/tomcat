@@ -557,7 +557,7 @@ public class ApplicationContext
      * Return a Set containing the resource paths of resources member of the
      * specified collection. Each path will be a String starting with
      * a "/" character. Paths representing directories will end with a "/"
-     * character. The returned set is immutable.
+     * character.
      *
      * @param path Collection path
      */
