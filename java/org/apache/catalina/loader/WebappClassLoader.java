@@ -1186,15 +1186,18 @@ public class WebappClassLoader extends URLClassLoader
 
         // (0.2) Try loading the class with the system class loader, to prevent
         //       the webapp from overriding J2SE classes
-        try {
-            clazz = system.loadClass(name);
-            if (clazz != null) {
-                if (resolve)
-                    resolveClass(clazz);
-                return (clazz);
+        String resourceName = binaryNameToPath(name, false);
+        if (system.getResource(resourceName) != null) {
+            try {
+                clazz = system.loadClass(name);
+                if (clazz != null) {
+                    if (resolve)
+                        resolveClass(clazz);
+                    return (clazz);
+                }
+            } catch (ClassNotFoundException e) {
+                // Ignore
             }
-        } catch (ClassNotFoundException e) {
-            // Ignore
         }
 
         // (0.5) Permission to access this class when using a SecurityManager
@@ -2316,7 +2319,7 @@ public class WebappClassLoader extends URLClassLoader
         if (!validate(name))
             throw new ClassNotFoundException(name);
 
-        String path = binaryNameToPath(name);
+        String path = binaryNameToPath(name, true);
 
         ResourceEntry entry = null;
 
@@ -2414,10 +2417,12 @@ public class WebappClassLoader extends URLClassLoader
     }
 
 
-    private String binaryNameToPath(String binaryName) {
+    private String binaryNameToPath(String binaryName, boolean withLeadingSlash) {
         StringBuilder path = new StringBuilder(
                 1 + binaryName.length() + CLASS_FILE_SUFFIX.length());
-        path.append('/');
+        if (withLeadingSlash) {
+            path.append('/');
+        }
         path.append(binaryName.replace('.', '/'));
         path.append(CLASS_FILE_SUFFIX);
         return path.toString();
@@ -2613,7 +2618,7 @@ public class WebappClassLoader extends URLClassLoader
      */
     protected Class<?> findLoadedClass0(String name) {
 
-        String path = binaryNameToPath(name);
+        String path = binaryNameToPath(name, true);
 
         ResourceEntry entry = resourceEntries.get(path);
         if (entry != null) {
