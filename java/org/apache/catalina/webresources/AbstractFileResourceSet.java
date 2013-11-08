@@ -44,7 +44,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
             name = "";
         }
         File file = new File(fileBase, name);
-        if (file.canRead() || !mustExist) {
+        if (!mustExist || file.canRead()) {
 
             if (getRoot().getAllowLinking()) {
                 return file;
