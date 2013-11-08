@@ -172,7 +172,8 @@ public class CachedResource implements WebResource {
         if (cachedContentLength == null) {
             long result = 0;
             if (webResource != null) {
-                cachedContentLength = Long.valueOf(webResource.getContentLength());
+                result = webResource.getContentLength();
+                cachedContentLength = Long.valueOf(result);
                 this.cachedContentLength = cachedContentLength;
             }
             return result;
