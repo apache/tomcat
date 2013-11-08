@@ -230,6 +230,10 @@ public class TldScanner {
     }
 
     private void parseTld(TldResourcePath path) throws IOException, SAXException {
+        if (tldCache.containsKey(path)) {
+            // TLD has already been parsed as a result of processing web.xml
+            return;
+        }
         TaglibXml tld = tldParser.parse(path);
         String uri = tld.getUri();
         if (uri != null) {
