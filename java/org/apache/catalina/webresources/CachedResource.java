@@ -66,6 +66,13 @@ public class CachedResource implements WebResource {
                     getLastModified();
                     getContentLength();
                     nextCheck = ttl + now;
+                    // exists() is a relatively expensive check for a file so
+                    // use the fact that we know if it exists at this point
+                    if (webResource instanceof EmptyResource) {
+                        cachedExists = Boolean.FALSE;
+                    } else {
+                        cachedExists = Boolean.TRUE;
+                    }
                     return true;
                 }
             }
