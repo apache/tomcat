@@ -150,7 +150,7 @@ tomcat-native.loc.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-nativ
 tomcat-native.win.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-win32-bin.zip
 tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-win32-bin.zip
 
-# ----- Commons DBCP, version 1.1 or later -----
+# ----- Commons DBCP, version 2.0 or later -----
 #commons-dbcp.version=1.4
 #commons-dbcp.home=${base.path}/commons-dbcp-${commons-dbcp.version}-src
 #commons-dbcp-src.loc.1=${base-commons.loc.1}/dbcp/source/commons-dbcp-${commons-dbcp.version}-src.tar.gz
@@ -160,16 +160,11 @@ commons-dbcp.home=${base.path}/commons-dbcp2-2.0-SNAPSHOT-src
 commons-dbcp-src.loc.1=https://repository.apache.org/content/repositories/snapshots/org/apache/commons/commons-dbcp2/2.0-SNAPSHOT/commons-dbcp2-${commons-dbcp.version}-src.tar.gz
 commons-dbcp-src.loc.2=https://repository.apache.org/content/repositories/snapshots/org/apache/commons/commons-dbcp2/2.0-SNAPSHOT/commons-dbcp2-${commons-dbcp.version}-src.tar.gz
 
-# ----- Commons Pool, version 1.1 or later -----
-#commons-pool.version=1.5.7
-#commons-pool.home=${base.path}/commons-pool-${commons-pool.version}-src
-#commons-pool-src.loc.1=${base-commons.loc.1}/pool/source/commons-pool-${commons-pool.version}-src.tar.gz
-#commons-pool-src.loc.2=${base-commons.loc.2}/pool/source/commons-pool-${commons-pool.version}-src.tar.gz
-#Temporary use of snapshots until Commons Pool 2 has its first release
-commons-pool.version=2.0-20131011.192519-241
-commons-pool.home=${base.path}/commons-pool2-2.0-SNAPSHOT-src
-commons-pool-src.loc.1=https://repository.apache.org/content/repositories/snapshots/org/apache/commons/commons-pool2/2.0-SNAPSHOT/commons-pool2-${commons-pool.version}-src.tar.gz
-commons-pool-src.loc.2=https://repository.apache.org/content/repositories/snapshots/org/apache/commons/commons-pool2/2.0-SNAPSHOT/commons-pool2-${commons-pool.version}-src.tar.gz
+# ----- Commons Pool, version 2.0 or later -----
+commons-pool.version=2.0
+commons-pool.home=${base.path}/commons-pool2-${commons-pool.version}-src
+commons-pool-src.loc.1=${base-commons.loc.1}/pool/source/commons-pool2-${commons-pool.version}-src.tar.gz
+commons-pool-src.loc.2=${base-commons.loc.2}/pool/source/commons-pool2-${commons-pool.version}-src.tar.gz
 
 
 
