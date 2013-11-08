@@ -47,7 +47,6 @@ import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -61,6 +60,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
 import java.util.jar.Manifest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
@@ -179,18 +180,23 @@ public class WebappClassLoader extends URLClassLoader
     // ------------------------------------------------------- Static Variables
 
     /**
-     * Set of package names which are not allowed to be loaded from a webapp
-     * class loader without delegating first.
+     * Regular expression of package names which are not allowed to be loaded
+     * from a webapp class loader without delegating first.
      */
-    protected static final Set<String> packageTriggersDeny = new HashSet<>();
+    protected final Matcher packageTriggersDeny = Pattern.compile(
+            "^javax\\.el\\.|" +
+            "^javax\\.servlet\\.|" +
+            "^org\\.apache\\.(catalina|coyote|el|jasper|juli|naming|tomcat)\\."
+            ).matcher("");
 
 
     /**
-     * Set of package names which are allowed to be loaded from a webapp class
-     * loader without delegating first and override any set by
+     * Regular expression of package names which are allowed to be loaded from a
+     * webapp class loader without delegating first and override any set by
      * {@link #packageTriggersDeny}.
      */
-    protected static final Set<String> packageTriggersPermit = new HashSet<>();
+    protected final Matcher packageTriggersPermit =
+            Pattern.compile("^javax\\.servlet\\.jsp\\.jstl\\.").matcher("");
 
 
     /**
@@ -200,22 +206,6 @@ public class WebappClassLoader extends URLClassLoader
         StringManager.getManager(Constants.Package);
 
 
-    {
-        // Configure packages that web applications are not allowed to override
-        packageTriggersDeny.add("javax.el");
-        packageTriggersDeny.add("javax.servlet");
-        packageTriggersDeny.add("org.apache.catalina");
-        packageTriggersDeny.add("org.apache.coyote");
-        packageTriggersDeny.add("org.apache.el");
-        packageTriggersDeny.add("org.apache.jasper");
-        packageTriggersDeny.add("org.apache.juli");
-        packageTriggersDeny.add("org.apache.naming");
-        packageTriggersDeny.add("org.apache.tomcat");
-
-        // Add some exceptions to the above
-        // Standard tag libraries
-        packageTriggersPermit.add("javax.servlet.jsp.jstl");
-    }
     // ----------------------------------------------------------- Constructors
 
     /**
@@ -2658,7 +2648,7 @@ public class WebappClassLoader extends URLClassLoader
      * @param name class name
      * @return true if the class should be filtered
      */
-    protected boolean filter(String name) {
+    protected synchronized boolean filter(String name) {
 
         if (name == null)
             return false;
@@ -2671,11 +2661,13 @@ public class WebappClassLoader extends URLClassLoader
         else
             return false;
 
-        if (packageTriggersPermit.contains(packageName)) {
+        packageTriggersPermit.reset(packageName);
+        if (packageTriggersPermit.lookingAt()) {
             return false;
         }
 
-        if (packageTriggersDeny.contains(packageName)) {
+        packageTriggersDeny.reset(packageName);
+        if (packageTriggersDeny.lookingAt()) {
             return true;
         }
 
