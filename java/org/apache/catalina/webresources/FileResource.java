@@ -126,14 +126,10 @@ public class FileResource extends AbstractResource {
 
     @Override
     protected InputStream doGetInputStream() {
-        if (resource.exists()) {
-            try {
-                return new FileInputStream(resource);
-            } catch (FileNotFoundException fnfe) {
-                // Race condition - not an error
-                return null;
-            }
-        } else {
+        try {
+            return new FileInputStream(resource);
+        } catch (FileNotFoundException fnfe) {
+            // Race condition (file has been deleted) - not an error
             return null;
         }
     }
