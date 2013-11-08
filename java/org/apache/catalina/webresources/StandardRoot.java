@@ -112,9 +112,9 @@ public class StandardRoot extends LifecycleMBeanBase
         }
 
         // Set because we don't want duplicates
-        // LinkedHashSet to retain the order (shouldn't matter but Jira is
-        // sensitive to the order the JARs are returned in).
-        // TODO - Revert to HashSet
+        // LinkedHashSet to retain the order. It is the order of the
+        // WebResourceSet that matters but it is simpler to retain the order
+        // over all of the JARs.
         HashSet<String> result = new LinkedHashSet<>();
         for (ArrayList<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
