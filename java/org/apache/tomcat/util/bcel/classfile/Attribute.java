@@ -42,7 +42,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * @see InnerClasses
  * @see Synthetic
  * @see Deprecated
- * @see Signature
  */
 public abstract class Attribute implements Cloneable, Serializable
 {
@@ -126,7 +125,8 @@ public abstract class Attribute implements Cloneable, Serializable
         case Constants.ATTR_PMG:
             return new PMGClass(name_index, length, file, constant_pool);
         case Constants.ATTR_SIGNATURE:
-            return new Signature(name_index, length, file, constant_pool);
+            Utility.swallowSignature(file);
+            return null;
         case Constants.ATTR_STACK_MAP:
             Utility.swallowStackMap(file);
             return null;
