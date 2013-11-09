@@ -45,30 +45,6 @@ public abstract class Utility {
         return str.replace('/', '.'); // Is `/' on all systems, even DOS
     }
 
-
-    // A-Z, g-z, _, $
-    private static final int FREE_CHARS = 48;
-    static int[] CHAR_MAP = new int[FREE_CHARS];
-    static int[] MAP_CHAR = new int[256]; // Reverse map
-    static {
-        int j = 0;
-        for (int i = 'A'; i <= 'Z'; i++) {
-            CHAR_MAP[j] = i;
-            MAP_CHAR[i] = j;
-            j++;
-        }
-        for (int i = 'g'; i <= 'z'; i++) {
-            CHAR_MAP[j] = i;
-            MAP_CHAR[i] = j;
-            j++;
-        }
-        CHAR_MAP[j] = '$';
-        MAP_CHAR['$'] = j;
-        j++;
-        CHAR_MAP[j] = '_';
-        MAP_CHAR['_'] = j;
-    }
-
     protected static void swallowCodeException(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused start_pc
         file.readUnsignedShort();   // Unused end_pc
