@@ -36,21 +36,6 @@ import java.io.IOException;
 public final class Synthetic extends Attribute {
 
     private static final long serialVersionUID = -5129612853226360165L;
-    private byte[] bytes;
-
-
-    /**
-     * @param name_index Index in constant pool to CONSTANT_Utf8, which
-     * should represent the string "Synthetic".
-     * @param length Content length in bytes - should be zero.
-     * @param bytes Attribute contents
-     * @param constant_pool The constant pool this attribute is associated
-     * with.
-     */
-    public Synthetic(int name_index, int length, byte[] bytes, ConstantPool constant_pool) {
-        super(name_index, length, constant_pool);
-        this.bytes = bytes;
-    }
 
 
     /**
@@ -63,11 +48,11 @@ public final class Synthetic extends Attribute {
      */
     Synthetic(int name_index, int length, DataInputStream file, ConstantPool constant_pool)
             throws IOException {
-        this(name_index, length, (byte[]) null, constant_pool);
+        super(name_index, length, constant_pool);
         if (length > 0) {
-            bytes = new byte[length];
+            byte[] bytes = new byte[length];
             file.readFully(bytes);
-            System.err.println("Synthetic attribute with length > 0");
+            throw new ClassFormatException("Synthetic attribute with length > 0");
         }
     }
 }
