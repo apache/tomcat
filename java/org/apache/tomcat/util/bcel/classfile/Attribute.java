@@ -26,7 +26,7 @@ import org.apache.tomcat.util.bcel.Constants;
 /**
  * Abstract super class for <em>Attribute</em> objects. Currently the
  * <em>ConstantValue</em>, <em>SourceFile</em>, <em>Code</em>,
- * <em>Exceptiontable</em>, <em>LineNumberTable</em>,
+ * <em>ExceptionTable</em>, <em>LineNumberTable</em>,
  * <em>LocalVariableTable</em>, <em>InnerClasses</em> and
  * <em>Synthetic</em> attributes are supported. The <em>Unknown</em>
  * attribute stands for non-standard-attributes.
@@ -36,7 +36,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * @see ConstantValue
  * @see SourceFile
  * @see Code
- * @see Unknown
  * @see ExceptionTable
  * @see LineNumberTable
  * @see LocalVariableTable
@@ -103,7 +102,8 @@ public abstract class Attribute implements Cloneable, Serializable
         switch (tag)
         {
         case Constants.ATTR_UNKNOWN:
-            return new Unknown(name_index, length, file, constant_pool);
+            Utility.swallowUnknownAttribute(file, length);
+            return null;
         case Constants.ATTR_CONSTANT_VALUE:
             return new ConstantValue(name_index, length, file, constant_pool);
         case Constants.ATTR_SOURCE_FILE:
