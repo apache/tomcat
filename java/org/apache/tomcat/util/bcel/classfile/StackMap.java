@@ -32,14 +32,10 @@ import java.io.IOException;
  * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Code
- * @see     StackMapEntry
  */
 public final class StackMap extends Attribute {
 
     private static final long serialVersionUID = 264958819110329590L;
-    private int map_length;
-    private StackMapEntry[] map; // Table of stack map entries
-
 
     /**
      * Construct object from file stream.
@@ -52,10 +48,9 @@ public final class StackMap extends Attribute {
     StackMap(int name_index, int length, DataInputStream file, ConstantPool constant_pool)
             throws IOException {
         super(name_index, length, constant_pool);
-        map_length = file.readUnsignedShort();
-        map = new StackMapEntry[map_length];
+        int map_length = file.readUnsignedShort();
         for (int i = 0; i < map_length; i++) {
-            map[i] = new StackMapEntry(file);
+            Utility.swallowStackMapEntry(file);
         }
     }
 }
