@@ -594,8 +594,7 @@ public class JspRuntimeLibrary {
                     expression,
                     method.getParameterTypes()[0],
                     pageContext,
-                    functionMapper,
-                    false )
+                    functionMapper)
             });
         } catch (Exception ex) {
             Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);

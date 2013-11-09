@@ -820,7 +820,7 @@ class Generator {
          *            attributes that aren't EL expressions)
          */
         private String attributeValue(Node.JspAttribute attr, boolean encode,
-                Class<?> expectedType, boolean isXml) {
+                Class<?> expectedType) {
             String v = attr.getValue();
             if (!attr.isNamedAttribute() && (v == null))
                 return "";
@@ -833,7 +833,7 @@ class Generator {
                 return v;
             } else if (attr.isELInterpreterInput()) {
                 v = elInterpreter.interpreterCall(ctxt, this.isTagFile, v,
-                        expectedType, attr.getEL().getMapName(), isXml);
+                        expectedType, attr.getEL().getMapName());
                 if (encode) {
                     return "org.apache.jasper.runtime.JspRuntimeLibrary.URLEncode("
                             + v + ", request.getCharacterEncoding())";
@@ -878,8 +878,7 @@ class Generator {
                             + "URLEncode(" + quote(n.getTextAttribute("name"))
                             + ", request.getCharacterEncoding())");
                     out.print("+ \"=\" + ");
-                    out.print(attributeValue(n.getValue(), true, String.class,
-                            n.getRoot().isXmlSyntax()));
+                    out.print(attributeValue(n.getValue(), true, String.class));
 
                     // The separator is '&' after the second use
                     separator = "\"&\"";
@@ -921,7 +920,7 @@ class Generator {
                 out.printil("out.write("
                         + elInterpreter.interpreterCall(ctxt, this.isTagFile,
                                 n.getType() + "{" + n.getText() + "}",
-                                String.class, n.getEL().getMapName(), false) +
+                                String.class, n.getEL().getMapName()) +
                         ");");
             } else {
                 out.printil("out.write("
@@ -950,8 +949,7 @@ class Generator {
                 pageParam = generateNamedAttributeValue(page
                         .getNamedAttributeNode());
             } else {
-                pageParam = attributeValue(page, false, String.class,
-                        n.getRoot().isXmlSyntax());
+                pageParam = attributeValue(page, false, String.class);
             }
 
             // If any of the params have their values specified by
@@ -1037,8 +1035,7 @@ class Generator {
                 pageParam = generateNamedAttributeValue(page
                         .getNamedAttributeNode());
             } else {
-                pageParam = attributeValue(page, false, String.class,
-                        n.getRoot().isXmlSyntax());
+                pageParam = attributeValue(page, false, String.class);
             }
 
             // If any of the params have their values specified by
@@ -1145,8 +1142,7 @@ class Generator {
                         + "_jspx_page_context.findAttribute(\""
                         + name
                         + "\"), \"" + property + "\",");
-                out.print(attributeValue(value, false, null,
-                        n.getRoot().isXmlSyntax()));
+                out.print(attributeValue(value, false, null));
                 out.println(");");
             } else if (value.isELInterpreterInput()) {
                 // We've got to resolve the very call to the interpreter
@@ -1191,8 +1187,7 @@ class Generator {
                         + "_jspx_page_context.findAttribute(\""
                         + name
                         + "\"), \"" + property + "\", ");
-                out.print(attributeValue(value, false, null,
-                        n.getRoot().isXmlSyntax()));
+                out.print(attributeValue(value, false, null));
                 out.println(", null, null, false);");
             }
 
@@ -1323,8 +1318,7 @@ class Generator {
                             binaryName = generateNamedAttributeValue(beanName
                                     .getNamedAttributeNode());
                         } else {
-                            binaryName = attributeValue(beanName, false,
-                                    String.class, n.getRoot().isXmlSyntax());
+                            binaryName = attributeValue(beanName, false, String.class);
                         }
                     } else {
                         // Implies klass is not null
@@ -1437,8 +1431,7 @@ class Generator {
                                 escape(name) +
                                 "\\\" value=\\\"\" + " +
                                 attributeValue(n.getValue(), false,
-                                        String.class,
-                                        n.getRoot().isXmlSyntax()) +
+                                        String.class) +
                                 " + \"\\\">\" );");
                         out.printil("out.write(\"\\n\");");
                     } else {
@@ -1448,8 +1441,7 @@ class Generator {
                                 escape(name) +
                                 "=\\\"\" + " +
                                 attributeValue(n.getValue(), false,
-                                        String.class,
-                                        n.getRoot().isXmlSyntax()) +
+                                        String.class) +
                                 " + \"\\\"\" );");
                     }
 
@@ -1477,8 +1469,7 @@ class Generator {
                     widthStr = generateNamedAttributeValue(width
                             .getNamedAttributeNode());
                 } else {
-                    widthStr = attributeValue(width, false, String.class,
-                            n.getRoot().isXmlSyntax());
+                    widthStr = attributeValue(width, false, String.class);
                 }
             }
 
@@ -1488,8 +1479,7 @@ class Generator {
                     heightStr = generateNamedAttributeValue(height
                             .getNamedAttributeNode());
                 } else {
-                    heightStr = attributeValue(height, false, String.class,
-                            n.getRoot().isXmlSyntax());
+                    heightStr = attributeValue(height, false, String.class);
                 }
             }
 
@@ -1844,8 +1834,7 @@ class Generator {
                     out.print("=");
                     if (jspAttrs[i].isELInterpreterInput()) {
                         out.print("\\\"\" + ");
-                        String debug = attributeValue(jspAttrs[i], false,
-                                String.class, n.getRoot().isXmlSyntax());
+                        String debug = attributeValue(jspAttrs[i], false, String.class);
                         out.print(debug);
                         out.print(" + \"\\\"");
                     } else {
@@ -1894,8 +1883,7 @@ class Generator {
                     if (omitAttr == null) {
                         omit = "false";
                     } else {
-                        omit = attributeValue(omitAttr, false, boolean.class,
-                                n.getRoot().isXmlSyntax());
+                        omit = attributeValue(omitAttr, false, boolean.class);
                         if ("true".equals(omit)) {
                             continue;
                         }
@@ -1911,8 +1899,7 @@ class Generator {
                                 " + \"\\\"\")";
                     }
                 } else {
-                    value = attributeValue(attrs[i], false, Object.class,
-                            n.getRoot().isXmlSyntax());
+                    value = attributeValue(attrs[i], false, Object.class);
                     nvp = " + \" " + attrs[i].getName() + "=\\\"\" + " +
                             value + " + \"\\\"\"";
                 }
@@ -1921,8 +1908,7 @@ class Generator {
 
             // Write begin tag, using XML-style 'name' attribute as the
             // element name
-            String elemName = attributeValue(n.getNameAttribute(), false,
-                    String.class, n.getRoot().isXmlSyntax());
+            String elemName = attributeValue(n.getNameAttribute(), false, String.class);
             out.printin("out.write(\"<\"");
             out.print(" + " + elemName);
 
@@ -2993,7 +2979,7 @@ class Generator {
                     String mapName = (attr.getEL() != null) ? attr.getEL()
                             .getMapName() : null;
                     attrValue = elInterpreter.interpreterCall(ctxt,
-                            this.isTagFile, attrValue, c[0], mapName, false);
+                            this.isTagFile, attrValue, c[0], mapName);
                 }
             } else {
                 attrValue = convertString(c[0], attrValue, localName,

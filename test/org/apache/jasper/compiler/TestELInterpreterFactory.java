@@ -36,7 +36,7 @@ public class TestELInterpreterFactory extends TomcatBaseTest {
         @Override
         public String interpreterCall(JspCompilationContext context,
                 boolean isTagFile, String expression, Class<?> expectedType,
-                String fnmapvar, boolean xmlEscape) {
+                String fnmapvar) {
             return expression;
         }
     }
