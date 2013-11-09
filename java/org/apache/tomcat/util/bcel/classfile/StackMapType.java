@@ -37,33 +37,19 @@ public final class StackMapType implements Cloneable, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private byte type;
-
-
     /**
      * Construct object from file stream.
      * @param file Input stream
      * @throws IOException
      */
     StackMapType(DataInput file) throws IOException {
-        setType(file.readByte());
-        if (hasIndex()) {
+        byte type = file.readByte();
+        if ((type < Constants.ITEM_Bogus) || (type > Constants.ITEM_NewObject)) {
+            throw new RuntimeException("Illegal type for StackMapType: " + type);
+        }
+        // Check to see if type has an index
+        if ((type == Constants.ITEM_Object) || (type == Constants.ITEM_NewObject)) {
             file.readShort();   // Unused index
         }
-    }
-
-
-    public void setType( byte t ) {
-        if ((t < Constants.ITEM_Bogus) || (t > Constants.ITEM_NewObject)) {
-            throw new RuntimeException("Illegal type for StackMapType: " + t);
-        }
-        type = t;
-    }
-
-
-    /** @return true, if type is either ITEM_Object or ITEM_NewObject
-     */
-    public final boolean hasIndex() {
-        return ((type == Constants.ITEM_Object) || (type == Constants.ITEM_NewObject));
     }
 }
