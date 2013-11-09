@@ -132,6 +132,18 @@ public abstract class Utility {
         }
     }
 
+    protected static void swallowStackMapEntry(DataInput file) throws IOException {
+        file.readShort();   // Unused byte_code_offset
+        int number_of_locals = file.readShort();
+        for (int i = 0; i < number_of_locals; i++) {
+            Utility.swallowStackMapType(file);
+        }
+        int number_of_stack_items = file.readShort();
+        for (int i = 0; i < number_of_stack_items; i++) {
+            Utility.swallowStackMapType(file);
+        }
+    }
+
     protected static void swallowStackMapTableEntry(DataInputStream file) throws IOException {
         int frame_type = file.read();
 
