@@ -40,7 +40,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * @see LineNumberTable
  * @see LocalVariableTable
  * @see InnerClasses
- * @see Synthetic
  * @see Deprecated
  */
 public abstract class Attribute implements Cloneable, Serializable
@@ -119,7 +118,8 @@ public abstract class Attribute implements Cloneable, Serializable
         case Constants.ATTR_INNER_CLASSES:
             return new InnerClasses(name_index, length, file, constant_pool);
         case Constants.ATTR_SYNTHETIC:
-            return new Synthetic(name_index, length, file, constant_pool);
+            Utility.swallowSynthetic(file, length);
+            return null;
         case Constants.ATTR_DEPRECATED:
             return new Deprecated(name_index, length, file, constant_pool);
         case Constants.ATTR_PMG:

@@ -162,4 +162,12 @@ final class Utility {
     static void swallowSignature(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused signature_index
     }
+
+    static void swallowSynthetic(DataInput file, int length) throws IOException {
+        if (length > 0) {
+            byte[] bytes = new byte[length];
+            file.readFully(bytes);
+            throw new ClassFormatException("Synthetic attribute with length > 0");
+        }
+    }
 }
