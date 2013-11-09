@@ -33,7 +33,6 @@ import java.io.IOException;
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Code
  * @see     StackMapEntry
- * @see     StackMapType
  */
 public final class StackMapTable extends Attribute {
 
