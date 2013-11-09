@@ -36,20 +36,15 @@ public final class StackMapTableEntry implements Cloneable, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private int frame_type;
-    private int number_of_locals;
-    private int number_of_stack_items;
-
-
     /**
      * Construct object from file stream.
      * @param file Input stream
      * @throws IOException
      */
     StackMapTableEntry(DataInputStream file) throws IOException {
-        this.frame_type = file.read();
-        this.number_of_locals = -1;
-        this.number_of_stack_items = -1;
+        int frame_type = file.read();
+        int number_of_locals = -1;
+        int number_of_stack_items = -1;
 
         if (frame_type >= Constants.SAME_FRAME && frame_type <= Constants.SAME_FRAME_MAX) {
             // NO-OP
