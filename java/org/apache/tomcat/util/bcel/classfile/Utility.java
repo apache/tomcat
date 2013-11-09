@@ -92,7 +92,7 @@ final class Utility {
     static void swallowStackMapType(DataInput file) throws IOException {
         byte type = file.readByte();
         if ((type < Constants.ITEM_Bogus) || (type > Constants.ITEM_NewObject)) {
-            throw new RuntimeException("Illegal type for StackMapType: " + type);
+            throw new ClassFormatException("Illegal type for StackMapType: " + type);
         }
         // Check to see if type has an index
         if ((type == Constants.ITEM_Object) || (type == Constants.ITEM_NewObject)) {
