@@ -909,14 +909,30 @@
     will be attempted against each <code>Realm</code> in the order they are
     listed. Authentication against any Realm will be sufficient to authenticate
     the user.</p>
-
-    <p>The CombinedRealm implementation does not support any additional
-    attributes.</p>
-
+    
     <p>See the <a href="../realm-howto.html">Container-Managed Security
     Guide</a> for more information on setting up container managed security
     using the CombinedRealm component.</p>
 
+    <p>The CombinedRealm implementation supports the following additional
+    attributes.</p>
+    
+    <attributes>
+
+      <attribute name="allRolesMode" required="false">
+        <p>This attribute controls how the special role name <code>*</code> is
+        handled when processing authorization constraints in web.xml. By
+        default, the specification compliant value of <code>strict</code> is
+        used which means that the user must be assigned one of the roles defined
+        in web.xml. The alternative values are <code>authOnly</code> which means
+        that the user must be authenticated but no check is made for assigned
+        roles and <code>strictAuthOnly</code> which means that the user must be
+        authenticated and no check will be made for assigned roles unless roles
+        are defined in web.xml in which case the user must be assigned at least
+        one of those roles.</p>
+      </attribute>
+     
+    </attributes>
   </subsection>
 
 
@@ -947,7 +963,19 @@
     attributes.</p>
 
     <attributes>
-
+       <attribute name="allRolesMode" required="false">
+        <p>This attribute controls how the special role name <code>*</code> is
+        handled when processing authorization constraints in web.xml. By
+        default, the specification compliant value of <code>strict</code> is
+        used which means that the user must be assigned one of the roles defined
+        in web.xml. The alternative values are <code>authOnly</code> which means
+        that the user must be authenticated but no check is made for assigned
+        roles and <code>strictAuthOnly</code> which means that the user must be
+        authenticated and no check will be made for assigned roles unless roles
+        are defined in web.xml in which case the user must be assigned at least
+        one of those roles.</p>
+      </attribute>
+      
       <attribute name="cacheRemovalWarningTime" required="false">
        <p>If a failed user is removed from the cache because the cache is too
        big before it has been in the cache for at least this period of time (in
