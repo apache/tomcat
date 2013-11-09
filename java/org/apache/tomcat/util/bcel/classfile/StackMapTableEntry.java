@@ -50,7 +50,11 @@ public final class StackMapTableEntry implements Cloneable, Serializable {
      * @throws IOException
      */
     StackMapTableEntry(DataInputStream file) throws IOException {
-        this(file.read(), -1, null, -1, null);
+        this.frame_type = file.read();
+        this.number_of_locals = -1;
+        this.types_of_locals = null;
+        this.number_of_stack_items = -1;
+        this.types_of_stack_items = null;
 
         if (frame_type >= Constants.SAME_FRAME && frame_type <= Constants.SAME_FRAME_MAX) {
             // NO-OP
@@ -90,16 +94,5 @@ public final class StackMapTableEntry implements Cloneable, Serializable {
             /* Can't happen */
             throw new ClassFormatException ("Invalid frame type found while parsing stack map table: " + frame_type);
         }
-    }
-
-
-    public StackMapTableEntry(int tag, int number_of_locals,
-            StackMapType[] types_of_locals, int number_of_stack_items,
-            StackMapType[] types_of_stack_items) {
-        this.frame_type = tag;
-        this.number_of_locals = number_of_locals;
-        this.types_of_locals = types_of_locals;
-        this.number_of_stack_items = number_of_stack_items;
-        this.types_of_stack_items = types_of_stack_items;
     }
 }
