@@ -128,7 +128,8 @@ public abstract class Attribute implements Cloneable, Serializable
         case Constants.ATTR_SIGNATURE:
             return new Signature(name_index, length, file, constant_pool);
         case Constants.ATTR_STACK_MAP:
-            return new StackMap(name_index, length, file, constant_pool);
+            Utility.swallowStackMap(file);
+            return null;
         case Constants.ATTR_RUNTIME_VISIBLE_ANNOTATIONS:
             return new RuntimeVisibleAnnotations(name_index, length, file,
                     constant_pool);
@@ -150,7 +151,8 @@ public abstract class Attribute implements Cloneable, Serializable
         case Constants.ATTR_ENCLOSING_METHOD:
             return new EnclosingMethod(name_index, length, file, constant_pool);
         case Constants.ATTR_STACK_MAP_TABLE:
-            return new StackMapTable(name_index, length, file, constant_pool);
+            Utility.swallowStackMapTable(file);
+            return null;
         default: // Never reached
             throw new IllegalStateException("Unrecognized attribute type tag parsed: " + tag);
         }
