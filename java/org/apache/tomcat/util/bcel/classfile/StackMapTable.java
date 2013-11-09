@@ -38,20 +38,8 @@ import java.io.IOException;
 public final class StackMapTable extends Attribute {
 
     private static final long serialVersionUID = -2931695092763099621L;
-    private int map_length;
-    private StackMapTableEntry[] map; // Table of stack map entries
-
-
-    /*
-     * @param name_index Index of name
-     * @param length Content length in bytes
-     * @param map Table of stack map entries
-     * @param constant_pool Array of constants
-     */
-    public StackMapTable(int name_index, int length, StackMapTableEntry[] map, ConstantPool constant_pool) {
-        super(name_index, length, constant_pool);
-        setStackMapTable(map);
-    }
+    private final int map_length;
+    private final StackMapTableEntry[] map; // Table of stack map entries
 
 
     /**
@@ -64,20 +52,11 @@ public final class StackMapTable extends Attribute {
      */
     StackMapTable(int name_index, int length, DataInputStream file, ConstantPool constant_pool)
             throws IOException {
-        this(name_index, length, (StackMapTableEntry[]) null, constant_pool);
+        super(name_index, length, constant_pool);
         map_length = file.readUnsignedShort();
         map = new StackMapTableEntry[map_length];
         for (int i = 0; i < map_length; i++) {
             map[i] = new StackMapTableEntry(file);
         }
-    }
-
-
-    /**
-     * @param map Array of stack map entries
-     */
-    public final void setStackMapTable( StackMapTableEntry[] map ) {
-        this.map = map;
-        map_length = (map == null) ? 0 : map.length;
     }
 }
