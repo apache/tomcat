@@ -121,6 +121,20 @@ public abstract class Utility {
         file.readUnsignedShort();   // Unused index
     }
 
+    protected static void swallowStackMap(DataInput file) throws IOException {
+        int map_length = file.readUnsignedShort();
+        for (int i = 0; i < map_length; i++) {
+            Utility.swallowStackMapEntry(file);
+        }
+    }
+
+    protected static void swallowStackMapTable(DataInputStream file) throws IOException {
+        int map_length = file.readUnsignedShort();
+        for (int i = 0; i < map_length; i++) {
+            Utility.swallowStackMapTableEntry(file);
+        }
+    }
+
     protected static void swallowStackMapType(DataInput file) throws IOException {
         byte type = file.readByte();
         if ((type < Constants.ITEM_Bogus) || (type > Constants.ITEM_NewObject)) {
