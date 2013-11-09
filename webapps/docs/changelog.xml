@@ -200,6 +200,11 @@
         <bug>55703</bug>: Clarify the role of the singleton attribute for JNDI
         resource factories. (markt)
       </fix>
+      <fix>
+        <bug>55746</bug>: Add documentation on the <code>allRolesMode</code> to
+        the <code>CombinedRealm</code> and <code>LockOutRealm</code>. Patch by
+        Cédric Couralet. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Extras">
