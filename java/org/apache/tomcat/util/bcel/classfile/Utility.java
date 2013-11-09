@@ -158,4 +158,8 @@ final class Utility {
             file.readFully(bytes);
         }
     }
+
+    static void swallowSignature(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused signature_index
+    }
 }
