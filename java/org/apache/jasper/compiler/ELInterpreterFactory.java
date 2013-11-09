@@ -96,9 +96,9 @@ public class ELInterpreterFactory {
         @Override
         public String interpreterCall(JspCompilationContext context,
                 boolean isTagFile, String expression,
-                Class<?> expectedType, String fnmapvar, boolean xmlEscape) {
+                Class<?> expectedType, String fnmapvar) {
             return JspUtil.interpreterCall(isTagFile, expression, expectedType,
-                    fnmapvar, xmlEscape);
+                    fnmapvar);
         }
     }
 }

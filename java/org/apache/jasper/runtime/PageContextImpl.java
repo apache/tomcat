@@ -920,7 +920,7 @@ public class PageContextImpl extends PageContext {
      */
     public static Object proprietaryEvaluate(final String expression,
             final Class<?> expectedType, final PageContext pageContext,
-            final ProtectedFunctionMapper functionMap, final boolean escape)
+            final ProtectedFunctionMapper functionMap)
             throws ELException {
         Object retValue;
         final ExpressionFactory exprFactory = jspf.getJspApplicationContext(pageContext.getServletContext()).getExpressionFactory();

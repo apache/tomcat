@@ -335,12 +335,10 @@ public class JspUtil {
      *            the expected type of the interpreted result
      * @param fnmapvar
      *            Variable pointing to a function map.
-     * @param XmlEscape
-     *            True if the result should do XML escaping
      * @return a String representing a call to the EL interpreter.
      */
     public static String interpreterCall(boolean isTagFile, String expression,
-            Class<?> expectedType, String fnmapvar, boolean XmlEscape) {
+            Class<?> expectedType, String fnmapvar) {
         /*
          * Determine which context object to use.
          */
@@ -386,10 +384,6 @@ public class JspUtil {
             }
         }
 
-        if (primitiveConverterMethod != null) {
-            XmlEscape = false;
-        }
-
         /*
          * Build up the base call to the interpreter.
          */
@@ -412,7 +406,7 @@ public class JspUtil {
                         + "org.apache.jasper.runtime.PageContextImpl.proprietaryEvaluate"
                         + "(" + Generator.quote(expression) + ", " + targetType
                         + ".class, " + "(javax.servlet.jsp.PageContext)" + jspCtxt + ", "
-                        + fnmapvar + ", " + XmlEscape + ")");
+                        + fnmapvar + ")");
 
         /*
          * Add the primitive converter method if we need to.
