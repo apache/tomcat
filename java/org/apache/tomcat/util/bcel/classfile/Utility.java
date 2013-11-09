@@ -23,14 +23,17 @@ import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
 
-
 /**
  * Utility functions that do not really belong to any class in particular.
  *
  * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public abstract class Utility {
+final class Utility {
+
+    private Utility() {
+        // Hide default constructor
+    }
 
     /**
      * Shorten long class name <em>str</em>, i.e., chop off the <em>prefix</em>,
@@ -41,30 +44,30 @@ public abstract class Utility {
      * @param str The long class name
      * @return Compacted class name
      */
-    public static final String compactClassName(String str) {
+    static String compactClassName(String str) {
         return str.replace('/', '.'); // Is `/' on all systems, even DOS
     }
 
-    protected static void swallowCodeException(DataInput file) throws IOException {
+    static void swallowCodeException(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused start_pc
         file.readUnsignedShort();   // Unused end_pc
         file.readUnsignedShort();   // Unused handler_pc
         file.readUnsignedShort();   // Unused catch_type
     }
 
-    protected static void swallowInnerClass(DataInput file) throws IOException {
+    static void swallowInnerClass(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused inner_class_index
         file.readUnsignedShort();   // Unused outer_class_index
         file.readUnsignedShort();   // Unused inner_name_index
         file.readUnsignedShort();   // Unused inner_access_flags
     }
 
-    protected static void swallowLineNumber(DataInput file) throws IOException {
+    static void swallowLineNumber(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused start_pc
         file.readUnsignedShort();   // Unused line_number
     }
 
-    protected static void swallowLocalVariable(DataInput file) throws IOException {
+    static void swallowLocalVariable(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused start_pc
         file.readUnsignedShort();   // Unused length
         file.readUnsignedShort();   // Unused name_index
@@ -72,21 +75,21 @@ public abstract class Utility {
         file.readUnsignedShort();   // Unused index
     }
 
-    protected static void swallowStackMap(DataInput file) throws IOException {
+    static void swallowStackMap(DataInput file) throws IOException {
         int map_length = file.readUnsignedShort();
         for (int i = 0; i < map_length; i++) {
             Utility.swallowStackMapEntry(file);
         }
     }
 
-    protected static void swallowStackMapTable(DataInputStream file) throws IOException {
+    static void swallowStackMapTable(DataInputStream file) throws IOException {
         int map_length = file.readUnsignedShort();
         for (int i = 0; i < map_length; i++) {
             Utility.swallowStackMapTableEntry(file);
         }
     }
 
-    protected static void swallowStackMapType(DataInput file) throws IOException {
+    static void swallowStackMapType(DataInput file) throws IOException {
         byte type = file.readByte();
         if ((type < Constants.ITEM_Bogus) || (type > Constants.ITEM_NewObject)) {
             throw new RuntimeException("Illegal type for StackMapType: " + type);
@@ -97,7 +100,7 @@ public abstract class Utility {
         }
     }
 
-    protected static void swallowStackMapEntry(DataInput file) throws IOException {
+    static void swallowStackMapEntry(DataInput file) throws IOException {
         file.readShort();   // Unused byte_code_offset
         int number_of_locals = file.readShort();
         for (int i = 0; i < number_of_locals; i++) {
@@ -109,7 +112,7 @@ public abstract class Utility {
         }
     }
 
-    protected static void swallowStackMapTableEntry(DataInputStream file) throws IOException {
+    static void swallowStackMapTableEntry(DataInputStream file) throws IOException {
         int frame_type = file.read();
 
         if (frame_type >= Constants.SAME_FRAME && frame_type <= Constants.SAME_FRAME_MAX) {
