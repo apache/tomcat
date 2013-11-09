@@ -31,7 +31,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     StackMap
- * @see     StackMapType
  */
 public final class StackMapTableEntry implements Cloneable, Serializable {
 
@@ -39,9 +38,7 @@ public final class StackMapTableEntry implements Cloneable, Serializable {
 
     private int frame_type;
     private int number_of_locals;
-    private StackMapType[] types_of_locals;
     private int number_of_stack_items;
-    private StackMapType[] types_of_stack_items;
 
 
     /**
@@ -52,21 +49,17 @@ public final class StackMapTableEntry implements Cloneable, Serializable {
     StackMapTableEntry(DataInputStream file) throws IOException {
         this.frame_type = file.read();
         this.number_of_locals = -1;
-        this.types_of_locals = null;
         this.number_of_stack_items = -1;
-        this.types_of_stack_items = null;
 
         if (frame_type >= Constants.SAME_FRAME && frame_type <= Constants.SAME_FRAME_MAX) {
             // NO-OP
         } else if (frame_type >= Constants.SAME_LOCALS_1_STACK_ITEM_FRAME && frame_type <= Constants.SAME_LOCALS_1_STACK_ITEM_FRAME_MAX) {
             number_of_stack_items = 1;
-            types_of_stack_items = new StackMapType[1];
-            types_of_stack_items[0] = new StackMapType(file);
+            Utility.swallowStackMapType(file);
         } else if (frame_type == Constants.SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED) {
             file.readShort(); // Unused byte_code_offset_delta
             number_of_stack_items = 1;
-            types_of_stack_items = new StackMapType[1];
-            types_of_stack_items[0] = new StackMapType(file);
+            Utility.swallowStackMapType(file);
         } else if (frame_type >= Constants.CHOP_FRAME && frame_type <= Constants.CHOP_FRAME_MAX) {
             file.readShort(); // Unused byte_code_offset_delta
         } else if (frame_type == Constants.SAME_FRAME_EXTENDED) {
@@ -74,21 +67,18 @@ public final class StackMapTableEntry implements Cloneable, Serializable {
         } else if (frame_type >= Constants.APPEND_FRAME && frame_type <= Constants.APPEND_FRAME_MAX) {
             file.readShort(); // Unused byte_code_offset_delta
             number_of_locals = frame_type - 251;
-            types_of_locals = new StackMapType[number_of_locals];
             for (int i = 0; i < number_of_locals; i++) {
-                types_of_locals[i] = new StackMapType(file);
+                Utility.swallowStackMapType(file);
             }
         } else if (frame_type == Constants.FULL_FRAME) {
             file.readShort(); // Unused byte_code_offset_delta
             number_of_locals = file.readShort();
-            types_of_locals = new StackMapType[number_of_locals];
             for (int i = 0; i < number_of_locals; i++) {
-                types_of_locals[i] = new StackMapType(file);
+                Utility.swallowStackMapType(file);
             }
             number_of_stack_items = file.readShort();
-            types_of_stack_items = new StackMapType[number_of_stack_items];
             for (int i = 0; i < number_of_stack_items; i++) {
-                types_of_stack_items[i] = new StackMapType(file);
+                Utility.swallowStackMapType(file);
             }
         } else {
             /* Can't happen */

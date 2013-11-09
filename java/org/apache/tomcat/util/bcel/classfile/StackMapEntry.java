@@ -29,7 +29,6 @@ import java.io.Serializable;
  * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     StackMap
- * @see     StackMapType
  */
 public final class StackMapEntry implements Cloneable, Serializable {
 
@@ -43,16 +42,12 @@ public final class StackMapEntry implements Cloneable, Serializable {
     StackMapEntry(DataInputStream file) throws IOException {
         file.readShort();   // Unused byte_code_offset
         int number_of_locals = file.readShort();
-        StackMapType[] types_of_locals = null;
-        StackMapType[] types_of_stack_items = null;
-        types_of_locals = new StackMapType[number_of_locals];
         for (int i = 0; i < number_of_locals; i++) {
-            types_of_locals[i] = new StackMapType(file);
+            Utility.swallowStackMapType(file);
         }
         int number_of_stack_items = file.readShort();
-        types_of_stack_items = new StackMapType[number_of_stack_items];
         for (int i = 0; i < number_of_stack_items; i++) {
-            types_of_stack_items[i] = new StackMapType(file);
+            Utility.swallowStackMapType(file);
         }
     }
 }
