@@ -19,8 +19,6 @@ package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.tomcat.util.bcel.Constants;
 
@@ -44,8 +42,6 @@ public final class Unknown extends Attribute {
     private static final long serialVersionUID = -4152422704743201314L;
     private byte[] bytes;
     private String name;
-    private static final Map<String, Unknown> unknown_attributes =
-            new HashMap<>();
 
 
     /**
@@ -61,7 +57,6 @@ public final class Unknown extends Attribute {
         this.bytes = bytes;
         name = ((ConstantUtf8) constant_pool.getConstant(name_index, Constants.CONSTANT_Utf8))
                 .getBytes();
-        unknown_attributes.put(name, this);
     }
 
 
