@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * This class represents a reference to an unknown (i.e.,
  * application-specific) attribute of a class.  It is instantiated from the
@@ -40,24 +38,6 @@ import org.apache.tomcat.util.bcel.Constants;
 public final class Unknown extends Attribute {
 
     private static final long serialVersionUID = -4152422704743201314L;
-    private byte[] bytes;
-    private String name;
-
-
-    /**
-     * Create a non-standard attribute.
-     *
-     * @param name_index Index in constant pool
-     * @param length Content length in bytes
-     * @param bytes Attribute contents
-     * @param constant_pool Array of constants
-     */
-    public Unknown(int name_index, int length, byte[] bytes, ConstantPool constant_pool) {
-        super(name_index, length, constant_pool);
-        this.bytes = bytes;
-        name = ((ConstantUtf8) constant_pool.getConstant(name_index, Constants.CONSTANT_Utf8))
-                .getBytes();
-    }
 
 
     /**
@@ -70,19 +50,10 @@ public final class Unknown extends Attribute {
      */
     Unknown(int name_index, int length, DataInputStream file, ConstantPool constant_pool)
             throws IOException {
-        this(name_index, length, (byte[]) null, constant_pool);
+        super(name_index, length, constant_pool);
         if (length > 0) {
-            bytes = new byte[length];
+            byte[] bytes = new byte[length];
             file.readFully(bytes);
         }
-    }
-
-
-    /**
-     * @return name of attribute.
-     */
-    @Override
-    public final String getName() {
-        return name;
     }
 }
