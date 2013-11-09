@@ -151,4 +151,11 @@ final class Utility {
                     "Invalid frame type found while parsing stack map table: " + frame_type);
         }
     }
+
+    static void swallowUnknownAttribute(DataInput file, int length) throws IOException {
+        if (length > 0) {
+            byte[] bytes = new byte[length];
+            file.readFully(bytes);
+        }
+    }
 }
