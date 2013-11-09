@@ -96,19 +96,19 @@ public class JavaClass extends AccessFlags
          * `ConstPool.getConstant' method.
          */
         class_name = constant_pool.getConstantString(class_name_index, Constants.CONSTANT_Class);
-        class_name = Utility.compactClassName(class_name, false);
+        class_name = Utility.compactClassName(class_name);
         if (superclass_name_index > 0) {
             // May be zero -> class is java.lang.Object
             superclass_name = constant_pool.getConstantString(superclass_name_index,
                     Constants.CONSTANT_Class);
-            superclass_name = Utility.compactClassName(superclass_name, false);
+            superclass_name = Utility.compactClassName(superclass_name);
         } else {
             superclass_name = "java.lang.Object";
         }
         interface_names = new String[interfaces.length];
         for (int i = 0; i < interfaces.length; i++) {
             String str = constant_pool.getConstantString(interfaces[i], Constants.CONSTANT_Class);
-            interface_names[i] = Utility.compactClassName(str, false);
+            interface_names[i] = Utility.compactClassName(str);
         }
     }
 

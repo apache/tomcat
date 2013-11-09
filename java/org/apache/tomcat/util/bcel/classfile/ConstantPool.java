@@ -87,7 +87,7 @@ public class ConstantPool implements Cloneable, Serializable {
             case Constants.CONSTANT_Class:
                 i = ((ConstantClass) c).getNameIndex();
                 c = getConstant(i, Constants.CONSTANT_Utf8);
-                str = Utility.compactClassName(((ConstantUtf8) c).getBytes(), false);
+                str = Utility.compactClassName(((ConstantUtf8) c).getBytes());
                 break;
             case Constants.CONSTANT_String:
                 i = ((ConstantString) c).getStringIndex();
