@@ -35,12 +35,6 @@ public final class StackMapEntry implements Cloneable, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private int number_of_locals;
-    private StackMapType[] types_of_locals;
-    private int number_of_stack_items;
-    private StackMapType[] types_of_stack_items;
-
-
     /**
      * Construct object from file stream.
      * @param file Input stream
@@ -48,14 +42,14 @@ public final class StackMapEntry implements Cloneable, Serializable {
      */
     StackMapEntry(DataInputStream file) throws IOException {
         file.readShort();   // Unused byte_code_offset
-        number_of_locals = file.readShort();
-        types_of_locals = null;
-        types_of_stack_items = null;
+        int number_of_locals = file.readShort();
+        StackMapType[] types_of_locals = null;
+        StackMapType[] types_of_stack_items = null;
         types_of_locals = new StackMapType[number_of_locals];
         for (int i = 0; i < number_of_locals; i++) {
             types_of_locals[i] = new StackMapType(file);
         }
-        number_of_stack_items = file.readShort();
+        int number_of_stack_items = file.readShort();
         types_of_stack_items = new StackMapType[number_of_stack_items];
         for (int i = 0; i < number_of_stack_items; i++) {
             types_of_stack_items[i] = new StackMapType(file);
