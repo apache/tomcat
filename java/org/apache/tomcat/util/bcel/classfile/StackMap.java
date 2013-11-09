@@ -41,18 +41,6 @@ public final class StackMap extends Attribute {
     private StackMapEntry[] map; // Table of stack map entries
 
 
-    /*
-     * @param name_index Index of name
-     * @param length Content length in bytes
-     * @param map Table of stack map entries
-     * @param constant_pool Array of constants
-     */
-    public StackMap(int name_index, int length, StackMapEntry[] map, ConstantPool constant_pool) {
-        super(name_index, length, constant_pool);
-        setStackMap(map);
-    }
-
-
     /**
      * Construct object from file stream.
      * @param name_index Index of name
@@ -63,20 +51,11 @@ public final class StackMap extends Attribute {
      */
     StackMap(int name_index, int length, DataInputStream file, ConstantPool constant_pool)
             throws IOException {
-        this(name_index, length, (StackMapEntry[]) null, constant_pool);
+        super(name_index, length, constant_pool);
         map_length = file.readUnsignedShort();
         map = new StackMapEntry[map_length];
         for (int i = 0; i < map_length; i++) {
             map[i] = new StackMapEntry(file);
         }
-    }
-
-
-    /**
-     * @param map Array of stack map entries
-     */
-    public final void setStackMap( StackMapEntry[] map ) {
-        this.map = map;
-        map_length = (map == null) ? 0 : map.length;
     }
 }
