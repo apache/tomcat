@@ -49,7 +49,7 @@ public class JasperInitializer implements ServletContainerInitializer {
             LOG.debug(Localizer.getMessage(MSG + ".onStartup", context.getServletContextName()));
         }
 
-        boolean validate = Boolean.valueOf(context.getInitParameter(VALIDATE)).booleanValue();
+        boolean validate = Boolean.valueOf(context.getInitParameter(VALIDATE));
 
         // scan the application for TLDs
         TldScanner scanner = new TldScanner(context, true, validate);
