@@ -141,6 +141,11 @@
         processing threads to terminate before continuing with the connector
         stop process configurable. (markt)
       </add>
+      <fix>
+        <bug>55749</bug>: Improve the error message when <code>SSLEngine</code>
+        is disabled in the <code>AprLifecycleListener</code> and SSL is
+        configured for an APR/native connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

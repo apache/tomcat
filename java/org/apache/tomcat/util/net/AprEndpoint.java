@@ -493,7 +493,15 @@ public class AprEndpoint extends AbstractEndpoint {
             }
 
             // Create SSL Context
-            sslContext = SSLContext.make(rootPool, value, SSL.SSL_MODE_SERVER);
+            try {
+                sslContext = SSLContext.make(rootPool, value, SSL.SSL_MODE_SERVER);
+            } catch (Exception e) {
+                // If the sslEngine is disabled on the AprLifecycleListener
+                // there will be an Exception here but there is no way to check
+                // the AprLifecycleListener settings from here
+                throw new Exception(
+                        sm.getString("endpoint.apr.failSslContextMake"), e);
+            }
             if (SSLInsecureRenegotiation) {
                 boolean legacyRenegSupported = false;
                 try {
