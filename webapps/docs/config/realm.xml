@@ -909,14 +909,14 @@
     will be attempted against each <code>Realm</code> in the order they are
     listed. Authentication against any Realm will be sufficient to authenticate
     the user.</p>
-    
+
     <p>See the <a href="../realm-howto.html">Container-Managed Security
     Guide</a> for more information on setting up container managed security
     using the CombinedRealm component.</p>
 
     <p>The CombinedRealm implementation supports the following additional
     attributes.</p>
-    
+
     <attributes>
 
       <attribute name="allRolesMode" required="false">
@@ -931,7 +931,7 @@
         are defined in web.xml in which case the user must be assigned at least
         one of those roles.</p>
       </attribute>
-     
+
     </attributes>
   </subsection>
 
@@ -975,7 +975,7 @@
         are defined in web.xml in which case the user must be assigned at least
         one of those roles.</p>
       </attribute>
-      
+
       <attribute name="cacheRemovalWarningTime" required="false">
        <p>If a failed user is removed from the cache because the cache is too
        big before it has been in the cache for at least this period of time (in
