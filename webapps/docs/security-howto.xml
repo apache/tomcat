@@ -72,10 +72,74 @@
   </section>
 
   <section name="Default web applications">
-    <p>Tomcat ships with a number of web applications by default.
-    Vulnerabilities have been discovered in these applications in the past.
-    Applications that are not required should be removed so the system will not
-    be at risk if another vulnerability is discovered.</p>
+
+    <subsection name="General">
+      <p>Tomcat ships with a number of web applications that are enabled by
+      default. Vulnerabilities have been discovered in these applications in the
+      past. Applications that are not required should be removed so the system
+      will not be at risk if another vulnerability is discovered.</p>
+    </subsection>
+
+    <subsection name="ROOT">
+      <p>The ROOT web application presents a very low security risk but it does
+      include the version of Tomcat that is being used. The ROOT web application
+      should normally be removed from a publicly accessible Tomcat instance, not
+      for security reasons, but so that a more appropriate default page is shown
+      to users.</p>
+    </subsection>
+
+    <subsection name="Documentation">
+      <p>The documentation web application presents a very low security risk but
+      it does identify the version of Tomcat that is being used. It should
+      normally be removed from a publicly accessible Tomcat instance.</p>
+    </subsection>
+
+    <subsection name="Examples">
+      <p>The examples web application should always be removed from any security
+      sensitive installation. While the examples web application does not
+      contain any known vulnerabilities, it is known to contain features
+      (particularly the cookie examples that display the contents of all
+      received and allow new cookies to be set) that may be used by an attacker
+      in conjunction with a vulnerability in another application deployed on the
+      Tomcat instance to obtain additional information that would otherwise be
+      unavailable.</p>
+    </subsection>
+
+    <subsection name="Manager">
+      <p>The Manager application allows the remote deployment of web
+      applications and is frequently targeted by attackers due to the widespread
+      use of weak passwords and publicly accessible Tomcat instances with the
+      Manager application enabled. The Manager application is not accessible by
+      default as no users are configured with the necessary access. If the
+      Manager application is enabled then guidance in the section
+      <strong>Securing Management Applications</strong> section should be
+      followed.</p>
+    </subsection>
+
+    <subsection name="Host Manager">
+      <p>The Host Manager application allows the creation and management of
+      virtual hosts - including the enabling of the Manager application for a
+      virtual host. The Host Manager application is not accessible by default a
+      no users are configured with the necessary access. If the Manager
+      application is enabled then guidance in the section <strong>Securing
+      Management Applications</strong> section should be followed.</p>
+    </subsection>
+
+   <subsection name="Securing Management Applications">
+     <p>When deploying a web application that provides management functions for
+     the Tomcat instance, the following guidelines should be followed:</p>
+     <ul>
+       <ol>Ensure that any users permitted to access the management application
+           have strong passwords.</ol>
+       <ol>Do not remove the use of the <a
+           href="config/realm.html#LockOut_Realm_-_org.apache.catalina.realm.LockOutRealm">LockOutRealm</a>
+           which prevents brute force attacks against user passwords.</ol>
+       <ol>Uncomment the <a href="config/valve.html#Remote_Address_Filter">RemoteAddrValve</a>
+           in <code>/META-INF/context.xml</code> which limits access to
+           localhost. If remote access is required, limit it to specific IP
+           addresses using this valve.</ol>
+     </ul>
+   </subsection>
   </section>
 
   <section name="Security manager">
