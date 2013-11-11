@@ -109,6 +109,15 @@ public final class Room {
      */
     private final Timer drawmessageBroadcastTimer = new Timer();
 
+    private static final int TIMER_DELAY = 30;
+
+    /**
+     * The current active broadcast timer task. If null, then no Broadcast task is scheduled.
+     * The Task will be scheduled if the first player enters the Room, and
+     * cancelled if the last player exits the Room, to avoid unnecessary timer executions.
+     */
+    private TimerTask activeBroadcastTimerTask;
+
 
     /**
      * The current image of the room drawboard. DrawMessages that are
@@ -139,9 +148,10 @@ public final class Room {
         roomGraphics.setBackground(Color.WHITE);
         roomGraphics.clearRect(0, 0, roomImage.getWidth(),
                 roomImage.getHeight());
+    }
 
-        // Schedule a TimerTask that broadcasts draw messages.
-        drawmessageBroadcastTimer.schedule(new TimerTask() {
+    private TimerTask createBroadcastTimerTask() {
+        return new TimerTask() {
             @Override
             public void run() {
                 invokeAndWait(new Runnable() {
@@ -151,7 +161,7 @@ public final class Room {
                     }
                 });
             }
-        }, 30, 30);
+        };
     }
 
     /**
@@ -171,6 +181,13 @@ public final class Room {
 
         // Add the new player to the list.
         players.add(p);
+
+        // If currently no Broacast Timer Task is scheduled, then we need to create one.
+        if (activeBroadcastTimerTask == null) {
+            activeBroadcastTimerTask = createBroadcastTimerTask();
+            drawmessageBroadcastTimer.schedule(activeBroadcastTimerTask,
+                    TIMER_DELAY, TIMER_DELAY);
+        }
 
         // Send him the current number of players and the current room image.
         String content = String.valueOf(players.size());
@@ -199,6 +216,18 @@ public final class Room {
     private void internalRemovePlayer(Player p) {
         boolean removed = players.remove(p);
         assert removed;
+
+        // If the last player left the Room, we need to cancel the Broadcast Timer Task.
+        if (players.size() == 0) {
+            // Cancel the task.
+            // Note that it can happen that the TimerTask is just about to execute (from
+            // the Timer thread) but waits until all players are gone (or even until a new
+            // player is added to the list), and then executes. This is OK. To prevent it,
+            // a TimerTask subclass would need to have some boolan "cancel" instance variable and
+            // query it in the invocation of Room#invokeAndWait.
+            activeBroadcastTimerTask.cancel();
+            activeBroadcastTimerTask = null;
+        }
 
         // Broadcast that one player is removed.
         broadcastRoomMessage(MessageType.PLAYER_CHANGED, "-");
