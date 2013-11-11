@@ -121,8 +121,8 @@
         <bug>55760</bug>: Remove the unnecessary setting of the
         <code>javax.security.auth.useSubjectCredsOnly</code> system property in
         the <code>SpnegoAuthenticator</code> as in addition to it being
-        unnecessary, it causes problems with using SPENGO with IBM JDKs. Patch
-        provided by Arunav Sanyal. (mark) 
+        unnecessary, it causes problems with using SPNEGO with IBM JDKs. Patch
+        provided by Arunav Sanyal. (markt)
       </fix>
     </changelog>
   </subsection>
