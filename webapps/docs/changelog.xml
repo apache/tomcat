@@ -153,6 +153,12 @@
         is disabled in the <code>AprLifecycleListener</code> and SSL is
         configured for an APR/native connector. (markt)
       </fix>
+      <add>
+        If a request that includes an <code>Expect: 100-continue</code> header
+        receives anything other than a 2xx response, close the connection This
+        protects against misbehaving clients that may not sent the request body
+        in that case and send the next request instead. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
