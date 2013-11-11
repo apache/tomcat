@@ -523,6 +523,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 throw new Exception(
                         sm.getString("endpoint.apr.failSslContextMake"), e);
             }
+
             if (SSLInsecureRenegotiation) {
                 boolean legacyRenegSupported = false;
                 try {
