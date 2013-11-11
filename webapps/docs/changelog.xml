@@ -217,6 +217,11 @@
         the <code>CombinedRealm</code> and <code>LockOutRealm</code>. Patch by
         Cédric Couralet. (markt)
       </fix>
+      <add>
+        Expand the information on web applications that ship as part of Tomcat
+        in the security how-to section of the documentation web application.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Extras">
