@@ -119,8 +119,8 @@
     <subsection name="Host Manager">
       <p>The Host Manager application allows the creation and management of
       virtual hosts - including the enabling of the Manager application for a
-      virtual host. The Host Manager application is not accessible by default a
-      no users are configured with the necessary access. If the Manager
+      virtual host. The Host Manager application is not accessible by default
+      as no users are configured with the necessary access. If the Host Manager
       application is enabled then guidance in the section <strong>Securing
       Management Applications</strong> section should be followed.</p>
     </subsection>
