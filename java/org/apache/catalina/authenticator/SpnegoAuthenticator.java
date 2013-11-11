@@ -118,9 +118,6 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             System.setProperty(Constants.JAAS_CONF_PROPERTY,
                     jaasConfFile.getAbsolutePath());
         }
-
-        // This property must be false for SPNEGO to work
-        System.setProperty(Constants.USE_SUBJECT_CREDS_ONLY_PROPERTY, "false");
     }
 
 
