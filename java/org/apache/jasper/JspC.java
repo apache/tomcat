@@ -1432,7 +1432,7 @@ public class JspC extends Task implements Options {
         } catch (SAXException e) {
             throw new JasperException(e);
         }
-        tldLocationsCache = new TldLocationsCache(scanner.getTaglibMap());
+        tldLocationsCache = new TldLocationsCache(scanner.getUriTldResourcePathMap());
         context.setAttribute(TldLocationsCache.KEY, tldLocationsCache);
         rctxt = new JspRuntimeContext(context, this);
         jspConfig = new JspConfig(context);
