@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper;
 
 import java.io.File;
@@ -24,7 +23,7 @@ import javax.servlet.jsp.tagext.TagLibraryInfo;
 
 import org.apache.jasper.compiler.JspConfig;
 import org.apache.jasper.compiler.TagPluginManager;
-import org.apache.jasper.compiler.TldLocationsCache;
+import org.apache.jasper.compiler.TldCache;
 
 /**
  * A class to hold all init parameters specific to the JSP engine.
@@ -142,9 +141,8 @@ public interface Options {
     public String getCompilerClassName();
 
     /**
-     * The cache for the location of the TLD's
-     * for the various tag libraries 'exposed'
-     * by the web application.
+     * The cache that maps URIs, resource paths and parsed TLD files for the
+     * various tag libraries 'exposed' by the web application.
      * A tag library is 'exposed' either explicitly in
      * web.xml or implicitly via the uri tag in the TLD
      * of a taglib deployed in a jar file (WEB-INF/lib).
@@ -152,7 +150,7 @@ public interface Options {
      * @return the instance of the TldLocationsCache
      * for the web-application.
      */
-    public TldLocationsCache getTldLocationsCache();
+    public TldCache getTldCache();
 
     /**
      * Java platform encoding to generate the JSP

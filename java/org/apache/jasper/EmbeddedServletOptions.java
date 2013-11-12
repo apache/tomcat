@@ -29,7 +29,7 @@ import javax.servlet.jsp.tagext.TagLibraryInfo;
 import org.apache.jasper.compiler.JspConfig;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.compiler.TagPluginManager;
-import org.apache.jasper.compiler.TldLocationsCache;
+import org.apache.jasper.compiler.TldCache;
 import org.apache.jasper.xmlparser.ParserUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -146,9 +146,9 @@ public final class EmbeddedServletOptions implements Options {
     private String compilerClassName = null;
 
     /**
-     * Cache for the TLD locations
+     * Cache for the TLD URIs, resource paths and parsed files.
      */
-    private TldLocationsCache tldLocationsCache = null;
+    private TldCache tldCache = null;
 
     /**
      * Jsp config information
@@ -378,12 +378,12 @@ public final class EmbeddedServletOptions implements Options {
     }
 
     @Override
-    public TldLocationsCache getTldLocationsCache() {
-        return tldLocationsCache;
+    public TldCache getTldCache() {
+        return tldCache;
     }
 
-    public void setTldLocationsCache( TldLocationsCache tldC ) {
-        tldLocationsCache = tldC;
+    public void setTldCache(TldCache tldCache) {
+        this.tldCache = tldCache;
     }
 
     @Override
@@ -748,7 +748,7 @@ public final class EmbeddedServletOptions implements Options {
 
         // Setup the global Tag Libraries location cache for this
         // web-application.
-        tldLocationsCache = TldLocationsCache.getInstance(context);
+        tldCache = TldCache.getInstance(context);
 
         // Setup the jsp config info for this web app.
         jspConfig = new JspConfig(context);
