@@ -191,7 +191,7 @@
   <subsection name="Coyote">
     <changelog>
       <add>
-        Experimental support for SDPY. Includes contributions from Sheldon Shao.
+        Experimental support for SPDY. Includes contributions from Sheldon Shao.
         (costin)
       </add>
       <scode>
