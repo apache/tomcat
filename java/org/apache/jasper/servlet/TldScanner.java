@@ -60,8 +60,8 @@ public class TldScanner {
     private static final String WEB_INF = "/WEB-INF/";
     private final ServletContext context;
     private final TldParser tldParser;
-    private final Map<String, TldResourcePath> taglibMap = new HashMap<>();
-    private final Map<TldResourcePath, TaglibXml> tldCache = new HashMap<>();
+    private final Map<String, TldResourcePath> uriTldResourcePathMap = new HashMap<>();
+    private final Map<TldResourcePath, TaglibXml> tldResourcePathTaglibXmlMap = new HashMap<>();
     private final List<String> listeners = new ArrayList<>();
 
     /**
@@ -97,12 +97,22 @@ public class TldScanner {
     }
 
     /**
-     * Returns the taglib map built by this scanner.
+     * Returns the map of URI to TldResourcePath built by this scanner.
      *
-     * @return the taglib map
+     * @return the map of URI to TldResourcePath
      */
-    public Map<String, TldResourcePath> getTaglibMap() {
-        return taglibMap;
+    public Map<String, TldResourcePath> getUriTldResourcePathMap() {
+        return uriTldResourcePathMap;
+    }
+
+    /**
+     * Returns the map of TldResourcePath to parsed XML files built by this
+     * scanner.
+     *
+     * @return the map of TldResourcePath to parsed XML files
+     */
+    public Map<TldResourcePath,TaglibXml> getTldResourcePathTaglibXmlMap() {
+        return tldResourcePathTaglibXmlMap;
     }
 
     /**
@@ -148,7 +158,7 @@ public class TldScanner {
             if (!resourcePath.startsWith("/")) {
                 resourcePath = WEB_INF + resourcePath;
             }
-            if (taglibMap.containsKey(taglibURI)) {
+            if (uriTldResourcePathMap.containsKey(taglibURI)) {
                 log.warn(Localizer.getMessage(MSG + ".webxmlSkip",
                         resourcePath,
                         taglibURI));
@@ -172,8 +182,8 @@ public class TldScanner {
             }
             // parse TLD but store using the URI supplied in the descriptor
             TaglibXml tld = tldParser.parse(tldResourcePath);
-            taglibMap.put(taglibURI, tldResourcePath);
-            tldCache.put(tldResourcePath, tld);
+            uriTldResourcePathMap.put(taglibURI, tldResourcePath);
+            tldResourcePathTaglibXmlMap.put(tldResourcePath, tld);
             if (tld.getListeners() != null) {
                 listeners.addAll(tld.getListeners());
             }
@@ -230,18 +240,18 @@ public class TldScanner {
     }
 
     private void parseTld(TldResourcePath path) throws IOException, SAXException {
-        if (tldCache.containsKey(path)) {
+        if (tldResourcePathTaglibXmlMap.containsKey(path)) {
             // TLD has already been parsed as a result of processing web.xml
             return;
         }
         TaglibXml tld = tldParser.parse(path);
         String uri = tld.getUri();
         if (uri != null) {
-            if (!taglibMap.containsKey(uri)) {
-                taglibMap.put(uri, path);
+            if (!uriTldResourcePathMap.containsKey(uri)) {
+                uriTldResourcePathMap.put(uri, path);
             }
         }
-        tldCache.put(path, tld);
+        tldResourcePathTaglibXmlMap.put(path, tld);
         if (tld.getListeners() != null) {
             listeners.addAll(tld.getListeners());
         }

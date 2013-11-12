@@ -36,7 +36,7 @@ public class TestTldScanner extends TomcatBaseTest {
 
         TldScanner scanner = new TldScanner(context.getServletContext(), true, true);
         scanner.scan();
-        Assert.assertEquals(5, scanner.getTaglibMap().size());
+        Assert.assertEquals(5, scanner.getUriTldResourcePathMap().size());
         Assert.assertEquals(1, scanner.getListeners().size());
     }
 }
