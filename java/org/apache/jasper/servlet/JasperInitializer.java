@@ -17,7 +17,6 @@
 package org.apache.jasper.servlet;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContainerInitializer;
@@ -25,10 +24,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 import org.apache.jasper.compiler.Localizer;
-import org.apache.jasper.compiler.TldLocationsCache;
+import org.apache.jasper.compiler.TldCache;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.xml.sax.SAXException;
 
 /**
@@ -64,11 +62,8 @@ public class JasperInitializer implements ServletContainerInitializer {
             context.addListener(listener);
         }
 
-        Map<String, TldResourcePath> taglibMap = scanner.getUriTldResourcePathMap();
-        try {
-            context.setAttribute(TldLocationsCache.KEY, new TldLocationsCache(taglibMap));
-        } catch (IOException ioe) {
-            throw new ServletException(ioe);
-        }
+        context.setAttribute(TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME,
+                new TldCache(scanner.getUriTldResourcePathMap(),
+                        scanner.getTldResourcePathTaglibXmlMap()));
     }
 }

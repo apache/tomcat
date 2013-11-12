@@ -565,7 +565,7 @@ public class JspCompilationContext {
      */
     public TldLocation getTldLocation(String uri) {
         TldLocation location =
-                getOptions().getTldLocationsCache().getLocation(uri);
+                getOptions().getTldCache().getLocation(uri);
         return location;
     }
 

@@ -49,7 +49,7 @@ import org.apache.jasper.compiler.JspConfig;
 import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.compiler.TagPluginManager;
-import org.apache.jasper.compiler.TldLocationsCache;
+import org.apache.jasper.compiler.TldCache;
 import org.apache.jasper.servlet.JspCServletContext;
 import org.apache.jasper.servlet.TldScanner;
 import org.apache.juli.logging.Log;
@@ -234,7 +234,7 @@ public class JspC extends Task implements Options {
     /**
      * Cache for the TLD locations
      */
-    protected TldLocationsCache tldLocationsCache = null;
+    protected TldCache tldCache = null;
 
     protected JspConfig jspConfig = null;
     protected TagPluginManager tagPluginManager = null;
@@ -705,8 +705,8 @@ public class JspC extends Task implements Options {
      * {@inheritDoc}
      */
     @Override
-    public TldLocationsCache getTldLocationsCache() {
-        return tldLocationsCache;
+    public TldCache getTldCache() {
+        return tldCache;
     }
 
     /**
@@ -1432,8 +1432,9 @@ public class JspC extends Task implements Options {
         } catch (SAXException e) {
             throw new JasperException(e);
         }
-        tldLocationsCache = new TldLocationsCache(scanner.getUriTldResourcePathMap());
-        context.setAttribute(TldLocationsCache.KEY, tldLocationsCache);
+        tldCache = new TldCache(scanner.getUriTldResourcePathMap(),
+                scanner.getTldResourcePathTaglibXmlMap());
+        context.setAttribute(TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME, tldCache);
         rctxt = new JspRuntimeContext(context, this);
         jspConfig = new JspConfig(context);
         tagPluginManager = new TagPluginManager(context);
