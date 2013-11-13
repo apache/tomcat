@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper;
 
 import java.io.File;
@@ -37,11 +36,11 @@ import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.JspUtil;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.compiler.ServletWriter;
-import org.apache.jasper.compiler.TldLocation;
 import org.apache.jasper.servlet.JasperLoader;
 import org.apache.jasper.servlet.JspServletWrapper;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.scan.Jar;
 
 /**
@@ -558,10 +557,8 @@ public class JspCompilationContext {
      * Returns null if the given uri is not associated with any tag library
      * 'exposed' in the web application.
      */
-    public TldLocation getTldLocation(String uri) {
-        TldLocation location =
-                getOptions().getTldCache().getLocation(uri);
-        return location;
+    public TldResourcePath getTldResourcePath(String uri) {
+        return getOptions().getTldCache().getTldResourcePath(uri);
     }
 
     /**

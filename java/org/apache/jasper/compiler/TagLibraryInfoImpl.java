@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import java.io.File;
@@ -53,6 +52,7 @@ import org.apache.jasper.xmlparser.ParserUtils;
 import org.apache.jasper.xmlparser.TreeNode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.scan.Jar;
 
 /**
@@ -147,8 +147,8 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
      * Constructor.
      */
     public TagLibraryInfoImpl(JspCompilationContext ctxt, ParserController pc,
-            PageInfo pi, String prefix, String uriIn, TldLocation location,
-            ErrorDispatcher err, Mark mark)
+            PageInfo pi, String prefix, String uriIn,
+            TldResourcePath tldResourcePath, ErrorDispatcher err, Mark mark)
             throws JasperException {
         super(prefix, uriIn);
 
@@ -158,17 +158,21 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         this.err = err;
         InputStream in = null;
 
-        if (location == null) {
+        if (tldResourcePath == null) {
             // The URI points to the TLD itself or to a JAR file in which the
             // TLD is stored
-            location = generateTLDLocation(uri, ctxt);
+            tldResourcePath = generateTldResourcePath(uri, ctxt);
         }
 
-        String tldName = location.getName();
-        Jar jar = location.getJar();
+        Jar jar;
+        try {
+            jar = tldResourcePath.getJar();
+        } catch (IOException ioe) {
+            throw new JasperException(ioe);
+        }
         try {
             if (jar == null) {
-                // Location points directly to TLD file
+                String tldName = tldResourcePath.getWebappPath();
                 try {
                     in = getResourceAsStream(tldName);
                     if (in == null) {
@@ -187,6 +191,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                 }
             } else {
                 // Tag library is packaged in JAR file
+                String tldName = tldResourcePath.getEntryName();
                 String uriExternal = jar.getJarFileURL().toExternalForm();
                 try {
                     in = jar.getInputStream(tldName);
@@ -313,8 +318,8 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
      *
      * @return the location of the TLD identified by the uri
      */
-    private TldLocation generateTLDLocation(String uri, JspCompilationContext ctxt)
-            throws JasperException {
+    private TldResourcePath generateTldResourcePath(String uri,
+            JspCompilationContext ctxt) throws JasperException {
 
         // TODO: this matches the current implementation but the URL logic looks fishy
         // map URI to location per JSP 7.3.6.2
@@ -326,24 +331,20 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             uri = ctxt.resolveRelativeUri(uri);
         }
 
+        URL url = null;
+        try {
+            url = ctxt.getResource(uri);
+        } catch (Exception ex) {
+            err.jspError("jsp.error.tld.unable_to_get_jar", uri, ex
+                    .toString());
+        }
         if (uri.endsWith(".jar")) {
-            URL url = null;
-            try {
-                url = ctxt.getResource(uri);
-            } catch (Exception ex) {
-                err.jspError("jsp.error.tld.unable_to_get_jar", uri, ex
-                        .toString());
-            }
             if (url == null) {
                 err.jspError("jsp.error.tld.missing_jar", uri);
             }
-            try {
-                return new TldLocation("META-INF/taglib.tld", url);
-            } catch (IOException ioe) {
-                throw new JasperException(ioe);
-            }
+            return new TldResourcePath(url, uri, "META-INF/taglib.tld");
         } else {
-            return new TldLocation(uri);
+            return new TldResourcePath(url, uri);
         }
     }
 

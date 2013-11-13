@@ -37,6 +37,7 @@ import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.runtime.JspSourceDependent;
 import org.apache.jasper.servlet.JspServletWrapper;
+import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.scan.Jar;
 
 /**
@@ -517,8 +518,12 @@ class TagFileProcessor {
 
         Jar tagJar = null;
         if (tagFilePath.startsWith("/META-INF/")) {
-            tagJar = compiler.getCompilationContext().getTldLocation(
-                        tagInfo.getTagLibrary().getURI()).getJar();
+            try {
+                tagJar = compiler.getCompilationContext().getTldResourcePath(
+                            tagInfo.getTagLibrary().getURI()).getJar();
+            } catch (IOException ioe) {
+                throw new JasperException(ioe);
+            }
         }
         String wrapperUri;
         if (tagJar == null) {
@@ -622,15 +627,20 @@ class TagFileProcessor {
                 String tagFilePath = tagFileInfo.getPath();
                 if (tagFilePath.startsWith("/META-INF/")) {
                     // For tags in JARs, add the TLD and the tag as a dependency
-                    TldLocation location =
-                        compiler.getCompilationContext().getTldLocation(
+                    TldResourcePath tldResourcePath =
+                        compiler.getCompilationContext().getTldResourcePath(
                             tagFileInfo.getTagInfo().getTagLibrary().getURI());
-                    Jar jar = location.getJar();
+                    Jar jar;
+                    try {
+                        jar = tldResourcePath.getJar();
+                    } catch (IOException ioe) {
+                        throw new JasperException(ioe);
+                    }
                     if (jar != null) {
                         try {
                             // Add TLD
-                            pageInfo.addDependant(jar.getURL(location.getName()),
-                                    Long.valueOf(jar.getLastModified(location.getName())));
+                            pageInfo.addDependant(jar.getURL(tldResourcePath.getEntryName()),
+                                    Long.valueOf(jar.getLastModified(tldResourcePath.getEntryName())));
                             // Add Tag
                             pageInfo.addDependant(jar.getURL(tagFilePath.substring(1)),
                                     Long.valueOf(jar.getLastModified(tagFilePath.substring(1))));

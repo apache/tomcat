@@ -31,6 +31,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
+import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.scan.Jar;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -1267,8 +1268,8 @@ class JspDocumentParser
                 isPlainUri = true;
             }
 
-            TldLocation location = ctxt.getTldLocation(uri);
-            if (location != null || !isPlainUri) {
+            TldResourcePath tldResourcePath = ctxt.getTldResourcePath(uri);
+            if (tldResourcePath != null || !isPlainUri) {
                 if (ctxt.getOptions().isCaching()) {
                     result = ctxt.getOptions().getCache().get(uri);
                 }
@@ -1286,7 +1287,7 @@ class JspDocumentParser
                             pageInfo,
                             prefix,
                             uri,
-                            location,
+                            tldResourcePath,
                             err,
                             null);
                     if (ctxt.getOptions().isCaching()) {
