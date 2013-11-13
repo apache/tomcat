@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Objects;
 
+import org.apache.tomcat.util.scan.Jar;
 import org.apache.tomcat.util.scan.JarFactory;
 
 /**
@@ -123,6 +124,14 @@ public class TldResourcePath {
         } else {
             URL entryUrl = JarFactory.getJarEntryURL(url, entryName);
             return entryUrl.openStream();
+        }
+    }
+
+    public Jar getJar() throws IOException {
+        if (entryName == null) {
+            return null;
+        } else {
+            return JarFactory.newInstance(url);
         }
     }
 

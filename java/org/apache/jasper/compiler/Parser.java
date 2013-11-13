@@ -29,6 +29,7 @@ import javax.servlet.jsp.tagext.TagLibraryInfo;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.util.UniqueAttributesImpl;
+import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.scan.Jar;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
@@ -406,9 +407,9 @@ class Parser implements TagConstants {
                                 .getCache().get(uri);
                     }
                     if (impl == null) {
-                        TldLocation location = ctxt.getTldLocation(uri);
+                        TldResourcePath tldResourcePath = ctxt.getTldResourcePath(uri);
                         impl = new TagLibraryInfoImpl(ctxt, parserController,
-                                pageInfo, prefix, uri, location, err,
+                                pageInfo, prefix, uri, tldResourcePath, err,
                                 reader.mark());
                         if (ctxt.getOptions().isCaching()) {
                             ctxt.getOptions().getCache().put(uri, impl);

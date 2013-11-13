@@ -16,8 +16,6 @@
  */
 package org.apache.jasper.compiler;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,29 +55,7 @@ public class TldCache {
     }
 
 
-    /**
-     * This method is a temporary bridge between the old TLD handling code and
-     * the new. It will be removed shortly, hopefully in the next wave of
-     * refactoring.
-     */
-    @Deprecated
-    public TldLocation getLocation(String uri) {
-        TldResourcePath tldResourcePath = uriTldResourcePathMap.get(uri);
-        if (tldResourcePath == null) {
-            return null;
-        }
-        URL url = tldResourcePath.getUrl();
-        String entryName = tldResourcePath.getEntryName();
-        TldLocation tldLocation;
-        if (entryName == null) {
-            tldLocation = new TldLocation(url.toExternalForm());
-        } else {
-            try {
-                tldLocation = new TldLocation(entryName, url);
-            } catch (IOException ioe) {
-                throw new IllegalArgumentException(ioe);
-            }
-        }
-        return tldLocation;
+    public TldResourcePath getTldResourcePath(String uri) {
+        return uriTldResourcePathMap.get(uri);
     }
 }
