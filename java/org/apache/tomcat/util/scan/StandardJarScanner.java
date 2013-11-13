@@ -155,7 +155,7 @@ public class StandardJarScanner implements JarScanner {
                     URL url = null;
                     try {
                         url = context.getResource(path);
-                        process(scanType, callback, url, true);
+                        process(scanType, callback, url, path, true);
                     } catch (IOException e) {
                         log.warn(sm.getString("jarScan.webinflibFail", url), e);
                     }
@@ -228,7 +228,7 @@ public class StandardJarScanner implements JarScanner {
                                         "jarScan.classloaderJarScan", urls[i]));
                             }
                             try {
-                                process(scanType, callback, urls[i], isWebapp);
+                                process(scanType, callback, urls[i], null, isWebapp);
                             } catch (IOException ioe) {
                                 log.warn(sm.getString(
                                         "jarScan.classloaderFail", urls[i]),
@@ -282,7 +282,7 @@ public class StandardJarScanner implements JarScanner {
      * and all directories.
      */
     private void process(JarScanType scanType, JarScannerCallback callback,
-            URL url, boolean isWebapp) throws IOException {
+            URL url, String webappPath, boolean isWebapp) throws IOException {
 
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("jarScan.jarUrlStart", url));
@@ -290,7 +290,7 @@ public class StandardJarScanner implements JarScanner {
 
         URLConnection conn = url.openConnection();
         if (conn instanceof JarURLConnection) {
-            callback.scan((JarURLConnection) conn, isWebapp);
+            callback.scan((JarURLConnection) conn, webappPath, isWebapp);
         } else {
             String urlStr = url.toString();
             if (urlStr.startsWith("file:") || urlStr.startsWith("jndi:") ||
@@ -298,7 +298,7 @@ public class StandardJarScanner implements JarScanner {
                 if (urlStr.endsWith(Constants.JAR_EXT)) {
                     URL jarURL = new URL("jar:" + urlStr + "!/");
                     callback.scan((JarURLConnection) jarURL.openConnection(),
-                            isWebapp);
+                            webappPath, isWebapp);
                 } else {
                     File f;
                     try {
@@ -308,15 +308,15 @@ public class StandardJarScanner implements JarScanner {
                             URL jarURL = new URL("jar:" + urlStr + "!/");
                             callback.scan(
                                     (JarURLConnection) jarURL.openConnection(),
-                                    isWebapp);
+                                    webappPath, isWebapp);
                         } else if (f.isDirectory()) {
                             if (scanType == JarScanType.PLUGGABILITY) {
-                                callback.scan(f, isWebapp);
+                                callback.scan(f, webappPath, isWebapp);
                             } else {
                                 File metainf = new File(f.getAbsoluteFile() +
                                         File.separator + "META-INF");
                                 if (metainf.isDirectory()) {
-                                    callback.scan(f, isWebapp);
+                                    callback.scan(f, webappPath, isWebapp);
                                 }
                             }
                         }

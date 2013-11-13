@@ -176,9 +176,10 @@ public class TldScanner {
             if (resourcePath.endsWith(".jar")) {
                 // if the path points to a jar file, the TLD is presumed to be
                 // inside at META-INF/taglib.tld
-                tldResourcePath = new TldResourcePath(url, "META-INF/taglib.tld");
+                tldResourcePath = new TldResourcePath(
+                        url, resourcePath, "META-INF/taglib.tld");
             } else {
-                tldResourcePath = new TldResourcePath(url);
+                tldResourcePath = new TldResourcePath(url, resourcePath);
             }
             // parse TLD but store using the URI supplied in the descriptor
             TaglibXml tld = tldParser.parse(tldResourcePath);
@@ -235,7 +236,7 @@ public class TldScanner {
 
     private void parseTld(String resourcePath) throws IOException, SAXException {
         TldResourcePath tldResourcePath =
-                new TldResourcePath(context.getResource(resourcePath));
+                new TldResourcePath(context.getResource(resourcePath), resourcePath);
         parseTld(tldResourcePath);
     }
 
@@ -262,7 +263,8 @@ public class TldScanner {
         private boolean jarFound = false;
 
         @Override
-        public void scan(JarURLConnection urlConn, boolean isWebapp) throws IOException {
+        public void scan(JarURLConnection urlConn, String webappPath,
+                boolean isWebapp) throws IOException {
             if (!jarFound) {
                 jarFound = true;
             }
@@ -280,7 +282,7 @@ public class TldScanner {
                     }
                     found = true;
                     TldResourcePath tldResourcePath =
-                            new TldResourcePath(jarURL, entryName);
+                            new TldResourcePath(jarURL, webappPath, entryName);
                     try {
                         parseTld(tldResourcePath);
                     } catch (SAXException e) {
@@ -301,7 +303,8 @@ public class TldScanner {
         }
 
         @Override
-        public void scan(File file, boolean isWebapp) throws IOException {
+        public void scan(File file, final String webappPath, boolean isWebapp)
+                throws IOException {
             if (!jarFound) {
                 jarFound = true;
             }
@@ -320,7 +323,7 @@ public class TldScanner {
 
                     try {
                         URL url = file.toUri().toURL();
-                        TldResourcePath path = new TldResourcePath(url);
+                        TldResourcePath path = new TldResourcePath(url, webappPath);
                         parseTld(path);
                         tldFound = true;
                     } catch (SAXException e) {

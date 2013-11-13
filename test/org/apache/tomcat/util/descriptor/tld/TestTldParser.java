@@ -166,7 +166,7 @@ public class TestTldParser {
 
     private TaglibXml parse(String pathname) throws IOException, SAXException {
         File file = new File(pathname);
-        TldResourcePath path = new TldResourcePath(file.toURI().toURL());
+        TldResourcePath path = new TldResourcePath(file.toURI().toURL(), null);
         return parser.parse(path);
     }
 

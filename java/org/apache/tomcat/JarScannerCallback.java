@@ -30,12 +30,13 @@ public interface JarScannerCallback {
      * A JAR was found (probably packaged in a WAR) and may be accessed for
      * further processing via the provided URL connection.
      *
-     * @param urlConn   The connection to the identified JAR
-     * @param isWebapp  Indicates if the JAR was found within a web application.
-     *                      If <code>false</code> the JAR should be treated as
-     *                      being provided by the container
+     * @param urlConn    The connection to the identified JAR
+     * @param webappPath The path, if any, to the JAR within the web application
+     * @param isWebapp   Indicates if the JAR was found within a web
+     *                       application. If <code>false</code> the JAR should
+     *                       be treated as being provided by the container
      */
-    public void scan(JarURLConnection urlConn, boolean isWebapp)
+    public void scan(JarURLConnection urlConn, String webappPath, boolean isWebapp)
             throws IOException;
 
     /**
@@ -43,12 +44,14 @@ public interface JarScannerCallback {
      * class path) and may be accessed for further processing via the provided
      * file.
      *
-     * @param file      The file for the identified JAR.
-     * @param isWebapp  Indicates if the JAR was found within a web application.
-     *                      If <code>false</code> the JAR should be treated as
-     *                      being provided by the container
+     * @param file       The file for the identified JAR.
+     * @param webappPath The path, if any, to the file within the web
+     *                       application
+     * @param isWebapp   Indicates if the JAR was found within a web
+     *                       application. If <code>false</code> the JAR should
+     *                       be treated as being provided by the container
      */
-    public void scan(File file, boolean isWebapp) throws IOException;
+    public void scan(File file, String webappPath, boolean isWebapp) throws IOException;
 
     /**
      * A directory structure was found within the web application at
