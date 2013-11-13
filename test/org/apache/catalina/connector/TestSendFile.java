@@ -120,8 +120,6 @@ public class TestSendFile extends TomcatBaseTest{
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
 
-
-
             resp.setContentType("'application/octet-stream");
             resp.setCharacterEncoding("ISO-8859-1");
             resp.setContentLengthLong(f.length());
