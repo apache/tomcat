@@ -300,11 +300,6 @@ public class JspCompilationContext {
                 // May not be in a JAR in some IDE environments
                 result = context.getResource(canonicalURI(res));
             }
-        } else if (res.startsWith("jar:jndi:")) {
-            // This is a tag file packaged in a jar that is being checked
-            // for a dependency
-            result = new URL(res);
-
         } else {
             result = context.getResource(canonicalURI(res));
         }
