@@ -48,7 +48,7 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
     }
 
     @Override
-    public void scan(JarURLConnection jarConn, boolean isWebapp)
+    public void scan(JarURLConnection jarConn, String webappPath, boolean isWebapp)
             throws IOException {
 
         URL url = jarConn.getURL();
@@ -104,7 +104,7 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
     }
 
     @Override
-    public void scan(File file, boolean isWebapp) throws IOException {
+    public void scan(File file, String webappPath, boolean isWebapp) throws IOException {
 
         InputStream stream = null;
         WebXml fragment = new WebXml();

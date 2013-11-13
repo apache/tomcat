@@ -40,25 +40,29 @@ import org.apache.tomcat.util.scan.JarFactory;
  */
 public class TldResourcePath {
     private final URL url;
+    private final String webappPath;
     private final String entryName;
 
     /**
      * Constructor identifying a TLD resource directly.
      *
-     * @param url the location of the TLD
+     * @param url        the location of the TLD
+     * @param webappPath the web application path, if any, of the TLD
      */
-    public TldResourcePath(URL url) {
-        this(url, null);
+    public TldResourcePath(URL url, String webappPath) {
+        this(url, webappPath, null);
     }
 
     /**
      * Constructor identifying a TLD packaged within a JAR file.
      *
-     * @param url       the location of the JAR
-     * @param entryName the name of the entry in the JAR
+     * @param url        the location of the JAR
+     * @param webappPath the web application path, if any, of the JAR
+     * @param entryName  the name of the entry in the JAR
      */
-    public TldResourcePath(URL url, String entryName) {
+    public TldResourcePath(URL url, String webappPath, String entryName) {
         this.url = url;
+        this.webappPath = webappPath;
         this.entryName = entryName;
     }
 
@@ -69,6 +73,17 @@ public class TldResourcePath {
      */
     public URL getUrl() {
         return url;
+    }
+
+    /**
+     * Returns the path within the web application, if any, that the resource
+     * returned by {@link #getUrl()} was obtained from.
+     *
+     * @return the web application path or @null if the the resource is not
+     *         located within a web application
+     */
+    public String getWebappPath() {
+        return webappPath;
     }
 
     /**
@@ -121,11 +136,17 @@ public class TldResourcePath {
         }
 
         TldResourcePath other = (TldResourcePath) o;
-        return url.equals(other.url) && Objects.equals(entryName, other.entryName);
+
+        return url.equals(other.url) &&
+                Objects.equals(webappPath, other.webappPath) &&
+                Objects.equals(entryName, other.entryName);
     }
 
     @Override
     public int hashCode() {
-        return url.hashCode() * 31 + Objects.hashCode(entryName);
+        int result = url.hashCode();
+        result = result * 31 + Objects.hashCode(webappPath);
+        result = result * 31 + Objects.hashCode(entryName);
+        return result;
     }
 }
