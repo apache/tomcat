@@ -197,7 +197,7 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
                 tagInfo = TagFileProcessor.parseTagFileDirectives(pc,
                         shortName,
                         path,
-                        pc.getJspCompilationContext().getTagFileJar(path),
+                        null,
                         this);
             } catch (JasperException je) {
                 throw new RuntimeException(je.toString(), je);
