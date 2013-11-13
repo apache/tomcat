@@ -517,7 +517,7 @@ class TagFileProcessor {
 
         Jar tagJar = null;
         if (tagFilePath.startsWith("/META-INF/")) {
-            tagJar= compiler.getCompilationContext().getTldLocation(
+            tagJar = compiler.getCompilationContext().getTldLocation(
                         tagInfo.getTagLibrary().getURI()).getJar();
         }
         String wrapperUri;
@@ -562,7 +562,7 @@ class TagFileProcessor {
                     JspServletWrapper tempWrapper = new JspServletWrapper(ctxt
                             .getServletContext(), ctxt.getOptions(),
                             tagFilePath, tagInfo, ctxt.getRuntimeContext(),
-                            ctxt.getTagFileJar(tagFilePath));
+                            tagJar);
                     // Use same classloader and classpath for compiling tag files
                     tempWrapper.getJspEngineContext().setClassLoader(
                             ctxt.getClassLoader());
