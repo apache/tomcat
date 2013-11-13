@@ -78,7 +78,7 @@ public class JarFileUrlJar implements Jar {
         if (entry == null) {
             return null;
         } else {
-            return jarFile.getInputStream(entry);
+            return new NonClosingJarInputStream(jarFile.getInputStream(entry));
         }
     }
 

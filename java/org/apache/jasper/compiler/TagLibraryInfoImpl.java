@@ -187,13 +187,13 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                 }
             } else {
                 // Tag library is packaged in JAR file
+                String uriExternal = jar.getJarFileURL().toExternalForm();
                 try {
                     in = jar.getInputStream(tldName);
-                    parseTLD(jar.getJarFileURL().toExternalForm(), in, jar);
+                    parseTLD(uriExternal + "!/" + tldName, in, jar);
                 } catch (Exception ex) {
-                    err.jspError(mark, "jsp.error.tld.unable_to_read",
-                            jar.getJarFileURL().toExternalForm(), tldName,
-                            ex.toString());
+                    err.jspError(mark, ex, "jsp.error.tld.unable_to_read",
+                            uriExternal, tldName, ex.toString());
                 }
             }
         } finally {
