@@ -48,13 +48,13 @@ public class TestTldParser {
         Assert.assertEquals("http://tomcat.apache.org/TldTests", xml.getUri());
         Assert.assertEquals(1, xml.getFunctions().size());
 
-        Validator validator = xml.getValidator();
+        ValidatorXml validator = xml.getValidator();
         Assert.assertEquals("com.example.Validator", validator.getValidatorClass());
         Assert.assertEquals(1, validator.getInitParams().size());
         Assert.assertEquals("value", validator.getInitParams().get("name"));
 
         Assert.assertEquals(1, xml.getTags().size());
-        Tag tag = xml.getTags().get(0);
+        TagXml tag = xml.getTags().get(0);
         Assert.assertEquals("org.apache.jasper.compiler.TestValidator$Echo", tag.getTagClass());
         Assert.assertEquals("empty", tag.getBodyContent());
         Assert.assertTrue(tag.hasDynamicAttributes());
@@ -93,7 +93,7 @@ public class TestTldParser {
         Assert.assertEquals("java.util.Date getDate()", attributeInfo.getMethodSignature());
 
         Assert.assertEquals(1, xml.getTagFiles().size());
-        TagFile tagFile = xml.getTagFiles().get(0);
+        TagFileXml tagFile = xml.getTagFiles().get(0);
         Assert.assertEquals("Echo", tag.getDisplayName());
         Assert.assertEquals("small", tag.getSmallIcon());
         Assert.assertEquals("large", tag.getLargeIcon());
@@ -147,9 +147,9 @@ public class TestTldParser {
         verifyTags(xml.getTags());
     }
 
-    private void verifyTags(List<Tag> tags) {
+    private void verifyTags(List<TagXml> tags) {
         Assert.assertEquals(1, tags.size());
-        Tag tag = tags.get(0);
+        TagXml tag = tags.get(0);
         Assert.assertEquals("Echo", tag.getName());
         Assert.assertEquals("org.apache.jasper.compiler.TestValidator$Echo", tag.getTagClass());
         Assert.assertEquals("empty", tag.getBodyContent());

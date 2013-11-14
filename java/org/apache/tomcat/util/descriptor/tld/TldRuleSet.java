@@ -62,16 +62,16 @@ public class TldRuleSet extends RuleSetBase {
         digester.addCallMethod(PREFIX + "/listener/listener-class", "addListener", 0);
 
         // validator
-        digester.addObjectCreate(VALIDATOR_PREFIX, Validator.class.getName());
+        digester.addObjectCreate(VALIDATOR_PREFIX, ValidatorXml.class.getName());
         digester.addCallMethod(VALIDATOR_PREFIX + "/validator-class", "setValidatorClass", 0);
         digester.addCallMethod(VALIDATOR_PREFIX + "/init-param", "addInitParam", 2);
         digester.addCallParam(VALIDATOR_PREFIX + "/init-param/param-name", 0);
         digester.addCallParam(VALIDATOR_PREFIX + "/init-param/param-value", 1);
-        digester.addSetNext(VALIDATOR_PREFIX, "setValidator", Validator.class.getName());
+        digester.addSetNext(VALIDATOR_PREFIX, "setValidator", ValidatorXml.class.getName());
 
 
         // tag
-        digester.addObjectCreate(TAG_PREFIX, Tag.class.getName());
+        digester.addObjectCreate(TAG_PREFIX, TagXml.class.getName());
         addDescriptionGroup(digester, TAG_PREFIX);
         digester.addCallMethod(TAG_PREFIX + "/name", "setName", 0);
         digester.addCallMethod(TAG_PREFIX + "/tagclass", "setTagClass", 0);
@@ -108,15 +108,15 @@ public class TldRuleSet extends RuleSetBase {
                 new GenericBooleanRule(Attribute.class, "setFragment"));
 
         digester.addRule(TAG_PREFIX + "/dynamic-attributes",
-                new GenericBooleanRule(Tag.class, "setDynamicAttributes"));
-        digester.addSetNext(TAG_PREFIX, "addTag", Tag.class.getName());
+                new GenericBooleanRule(TagXml.class, "setDynamicAttributes"));
+        digester.addSetNext(TAG_PREFIX, "addTag", TagXml.class.getName());
 
         // tag-file
-        digester.addObjectCreate(TAGFILE_PREFIX, TagFile.class.getName());
+        digester.addObjectCreate(TAGFILE_PREFIX, TagFileXml.class.getName());
         addDescriptionGroup(digester, TAGFILE_PREFIX);
         digester.addCallMethod(TAGFILE_PREFIX + "/name", "setName", 0);
         digester.addCallMethod(TAGFILE_PREFIX + "/path", "setPath", 0);
-        digester.addSetNext(TAGFILE_PREFIX, "addTagFile", TagFile.class.getName());
+        digester.addSetNext(TAGFILE_PREFIX, "addTagFile", TagFileXml.class.getName());
 
         // function
         digester.addCallMethod(FUNCTION_PREFIX, "addFunction", 3);
@@ -146,7 +146,7 @@ public class TldRuleSet extends RuleSetBase {
         @Override
         public void end(String namespace, String name) throws Exception {
             Attribute attribute = (Attribute) digester.pop();
-            Tag tag = (Tag) digester.peek();
+            TagXml tag = (TagXml) digester.peek();
             tag.getAttributes().add(attribute.toTagAttributeInfo());
         }
     }
@@ -292,7 +292,7 @@ public class TldRuleSet extends RuleSetBase {
         @Override
         public void end(String namespace, String name) throws Exception {
             Variable variable = (Variable) digester.pop();
-            Tag tag = (Tag) digester.peek();
+            TagXml tag = (TagXml) digester.peek();
             tag.getVariables().add(variable.toTagVariableInfo());
         }
     }

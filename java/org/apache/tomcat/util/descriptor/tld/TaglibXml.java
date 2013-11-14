@@ -36,9 +36,9 @@ public class TaglibXml {
     private String shortName;
     private String uri;
     private String info;
-    private Validator validator;
-    private List<Tag> tags;
-    private List<TagFile> tagFiles;
+    private ValidatorXml validator;
+    private List<TagXml> tags;
+    private List<TagFileXml> tagFiles;
     private List<String> listeners;
     private List<FunctionInfo> functions;
 
@@ -82,33 +82,33 @@ public class TaglibXml {
         this.info = info;
     }
 
-    public Validator getValidator() {
+    public ValidatorXml getValidator() {
         return validator;
     }
 
-    public void setValidator(Validator validator) {
+    public void setValidator(ValidatorXml validator) {
         this.validator = validator;
     }
 
-    public void addTag(Tag tag) {
+    public void addTag(TagXml tag) {
         if (tags == null) {
             tags = new ArrayList<>();
         }
         tags.add(tag);
     }
 
-    public List<Tag> getTags() {
+    public List<TagXml> getTags() {
         return tags;
     }
 
-    public void addTagFile(TagFile tag) {
+    public void addTagFile(TagFileXml tag) {
         if (tagFiles == null) {
             tagFiles = new ArrayList<>();
         }
         tagFiles.add(tag);
     }
 
-    public List<TagFile> getTagFiles() {
+    public List<TagFileXml> getTagFiles() {
         return tagFiles;
     }
 
