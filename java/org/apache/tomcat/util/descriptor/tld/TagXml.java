@@ -16,18 +16,31 @@
  */
 package org.apache.tomcat.util.descriptor.tld;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.jsp.tagext.TagAttributeInfo;
+import javax.servlet.jsp.tagext.TagInfo;
+import javax.servlet.jsp.tagext.TagVariableInfo;
+
 /**
- * Bare-bone model of a tag file loaded from a TLD.
- * This does not contain the tag-specific attributes that requiring parsing
- * the actual tag file to derive.
+ * Model of a tag define in a tag library descriptor.
+ * This represents the information as parsed from the XML but differs from
+ * TagInfo in that is does not provide a link back to the tag library that
+ * defined it.
  */
-public class TagFile {
+public class TagXml {
     private String name;
-    private String path;
+    private String tagClass;
+    private String teiClass;
+    private String bodyContent = TagInfo.BODY_CONTENT_JSP;
     private String displayName;
     private String smallIcon;
     private String largeIcon;
     private String info;
+    private boolean dynamicAttributes;
+    private List<TagAttributeInfo> attributes;
+    private List<TagVariableInfo> variables;
 
     public String getName() {
         return name;
@@ -37,12 +50,28 @@ public class TagFile {
         this.name = name;
     }
 
-    public String getPath() {
-        return path;
+    public String getTagClass() {
+        return tagClass;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setTagClass(String tagClass) {
+        this.tagClass = tagClass;
+    }
+
+    public String getTeiClass() {
+        return teiClass;
+    }
+
+    public void setTeiClass(String teiClass) {
+        this.teiClass = teiClass;
+    }
+
+    public String getBodyContent() {
+        return bodyContent;
+    }
+
+    public void setBodyContent(String bodyContent) {
+        this.bodyContent = bodyContent;
     }
 
     public String getDisplayName() {
@@ -75,5 +104,27 @@ public class TagFile {
 
     public void setInfo(String info) {
         this.info = info;
+    }
+
+    public boolean hasDynamicAttributes() {
+        return dynamicAttributes;
+    }
+
+    public void setDynamicAttributes(boolean dynamicAttributes) {
+        this.dynamicAttributes = dynamicAttributes;
+    }
+
+    public List<TagAttributeInfo> getAttributes() {
+        if (attributes == null) {
+            attributes = new ArrayList<>();
+        }
+        return attributes;
+    }
+
+    public List<TagVariableInfo> getVariables() {
+        if (variables == null) {
+            variables = new ArrayList<>();
+        }
+        return variables;
     }
 }

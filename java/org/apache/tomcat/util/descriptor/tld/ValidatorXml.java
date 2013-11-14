@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * Model of a Tag Library Validator from the XML descriptor.
  */
-public class Validator {
+public class ValidatorXml {
     private String validatorClass;
     private Map<String, String> initParams;
 
