@@ -63,7 +63,7 @@ public class JasperInitializer implements ServletContainerInitializer {
         }
 
         context.setAttribute(TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME,
-                new TldCache(scanner.getUriTldResourcePathMap(),
+                new TldCache(context, scanner.getUriTldResourcePathMap(),
                         scanner.getTldResourcePathTaglibXmlMap()));
     }
 }

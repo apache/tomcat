@@ -847,6 +847,10 @@ public class JspC extends Task implements Options {
         org.apache.jasper.xmlparser.ParserUtils.validating=b;
     }
 
+    public boolean isValidateXml() {
+        return validateXml;
+    }
+
     public void setListErrors( boolean b ) {
         listErrors = b;
     }
@@ -1432,7 +1436,7 @@ public class JspC extends Task implements Options {
         } catch (SAXException e) {
             throw new JasperException(e);
         }
-        tldCache = new TldCache(scanner.getUriTldResourcePathMap(),
+        tldCache = new TldCache(context, scanner.getUriTldResourcePathMap(),
                 scanner.getTldResourcePathTaglibXmlMap());
         context.setAttribute(TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME, tldCache);
         rctxt = new JspRuntimeContext(context, this);
