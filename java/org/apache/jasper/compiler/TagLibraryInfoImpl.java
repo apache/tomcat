@@ -47,7 +47,6 @@ import javax.servlet.jsp.tagext.VariableInfo;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
-import org.apache.jasper.util.ExceptionUtils;
 import org.apache.jasper.xmlparser.ParserUtils;
 import org.apache.jasper.xmlparser.TreeNode;
 import org.apache.juli.logging.Log;
@@ -156,7 +155,6 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         this.parserController = pc;
         this.pi = pi;
         this.err = err;
-        InputStream in = null;
 
         if (tldResourcePath == null) {
             // The URI points to the TLD itself or to a JAR file in which the
@@ -164,53 +162,30 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             tldResourcePath = generateTldResourcePath(uri, ctxt);
         }
 
-        Jar jar;
-        try {
-            jar = tldResourcePath.getJar();
-        } catch (IOException ioe) {
-            throw new JasperException(ioe);
-        }
-        try {
-            if (jar == null) {
-                String tldName = tldResourcePath.getWebappPath();
-                try {
-                    in = getResourceAsStream(tldName);
-                    if (in == null) {
-                        throw new FileNotFoundException(tldName);
-                    }
-                } catch (FileNotFoundException ex) {
-                    err.jspError(mark, "jsp.error.file.not.found", tldName);
-                }
 
-                parseTLD(tldName, in, null);
-                // Add TLD to dependency list
-                PageInfo pageInfo = ctxt.createCompiler().getPageInfo();
-                if (pageInfo != null) {
-                    pageInfo.addDependant(tldName,
-                            ctxt.getLastModified(tldName));
-                }
-            } else {
-                // Tag library is packaged in JAR file
-                String tldName = tldResourcePath.getEntryName();
-                String uriExternal = jar.getJarFileURL().toExternalForm();
-                try {
-                    in = jar.getInputStream(tldName);
-                    parseTLD(uriExternal + "!/" + tldName, in, jar);
-                } catch (Exception ex) {
-                    err.jspError(mark, ex, "jsp.error.tld.unable_to_read",
-                            uriExternal, tldName, ex.toString());
-                }
+        PageInfo pageInfo = ctxt.createCompiler().getPageInfo();
+        if (pageInfo != null) {
+            Jar jar;
+            try {
+                jar = tldResourcePath.getJar();
+            } catch (IOException ioe) {
+                throw new JasperException(ioe);
             }
-        } finally {
-            if (in != null) {
+
+            String path = tldResourcePath.getWebappPath();
+            // Add TLD (jar==null) / JAR (jar!=null) file to dependency list
+            pageInfo.addDependant(path, ctxt.getLastModified(path));
+            if (jar != null) {
+                // Add TLD within the JAR to the dependency list
+                String entryName = tldResourcePath.getEntryName();
                 try {
-                    in.close();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
+                    pageInfo.addDependant(jar.getURL(entryName),
+                            Long.valueOf(jar.getLastModified(entryName)));
+                } catch (IOException ioe) {
+                    throw new JasperException(ioe);
                 }
             }
         }
-
     }
 
     /*
