@@ -213,12 +213,6 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
 
     }
 
-    @Override
-    public TagLibraryInfo[] getTagLibraryInfos() {
-        Collection<TagLibraryInfo> coll = pi.getTaglibs();
-        return coll.toArray(new TagLibraryInfo[0]);
-    }
-
     /*
      * @param ctxt The JSP compilation context @param uri The TLD's uri @param
      * in The TLD's input stream @param jarFileUrl The JAR file containing the
@@ -310,6 +304,12 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         while (enumeration.hasMoreElements()) {
             this.functions[i++] = enumeration.nextElement();
         }
+    }
+
+    @Override
+    public TagLibraryInfo[] getTagLibraryInfos() {
+        Collection<TagLibraryInfo> coll = pi.getTaglibs();
+        return coll.toArray(new TagLibraryInfo[0]);
     }
 
     /*
