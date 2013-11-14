@@ -24,8 +24,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -60,8 +58,6 @@ import org.apache.tomcat.util.scan.Jar;
 public class JspCompilationContext {
 
     private final Log log = LogFactory.getLog(JspCompilationContext.class); // must not be static
-
-    private final Map<String, Jar> tagFileJars;
 
     private String className;
     private final String jspUri;
@@ -131,7 +127,6 @@ public class JspCompilationContext {
         this.baseURI = baseURI;
 
         this.rctxt = rctxt;
-        this.tagFileJars = new HashMap<>();
         this.basePackageName = Constants.JSP_PACKAGE_NAME;
 
         this.tagInfo = tagInfo;
@@ -285,24 +280,7 @@ public class JspCompilationContext {
 
 
     public URL getResource(String res) throws MalformedURLException {
-        URL result = null;
-
-        if (res.startsWith("/META-INF/")) {
-            // This is a tag file packaged in a jar that is being compiled
-            Jar jar = tagFileJars.get(res);
-            if (jar == null) {
-                jar = tagJar;
-            }
-            if (jar != null) {
-                result = new URL(jar.getURL(res.substring(1)));
-            } else {
-                // May not be in a JAR in some IDE environments
-                result = context.getResource(canonicalURI(res));
-            }
-        } else {
-            result = context.getResource(canonicalURI(res));
-        }
-        return result;
+        return context.getResource(canonicalURI(res));
     }
 
 
@@ -319,22 +297,6 @@ public class JspCompilationContext {
             return context.getRealPath(path);
         }
         return path;
-    }
-
-    /**
-     * Returns the tag-file-name-to-JAR-file map of this compilation unit,
-     * which maps tag file names to the JAR files in which the tag files are
-     * packaged.
-     *
-     * The map is populated when parsing the tag-file elements of the TLDs
-     * of any imported taglibs.
-     */
-    public Jar getTagFileJar(String tagFile) {
-        return this.tagFileJars.get(tagFile);
-    }
-
-    public void setTagFileJarResource(String tagFile, Jar jar) {
-        this.tagFileJars.put(tagFile, jar);
     }
 
     /**

@@ -413,13 +413,6 @@ class Parser implements TagConstants {
                         if (ctxt.getOptions().isCaching()) {
                             ctxt.getOptions().getCache().put(uri, impl);
                         }
-                    } else {
-                        // Current compilation context needs location of cached
-                        // tag files
-                        for (TagFileInfo info : impl.getTagFiles()) {
-                            ctxt.setTagFileJarResource(info.getPath(),
-                                    ctxt.getTagFileJar());
-                        }
                     }
                     pageInfo.addTaglib(uri, impl);
                 }
