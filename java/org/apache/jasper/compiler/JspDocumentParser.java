@@ -1288,8 +1288,7 @@ class JspDocumentParser
                             prefix,
                             uri,
                             tldResourcePath,
-                            err,
-                            null);
+                            err);
                     if (ctxt.getOptions().isCaching()) {
                         ctxt.getOptions().getCache().put(uri, result);
                     }
