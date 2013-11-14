@@ -37,10 +37,10 @@ public class TaglibXml {
     private String uri;
     private String info;
     private ValidatorXml validator;
-    private List<TagXml> tags;
-    private List<TagFileXml> tagFiles;
-    private List<String> listeners;
-    private List<FunctionInfo> functions;
+    private final List<TagXml> tags = new ArrayList<>();
+    private final List<TagFileXml> tagFiles = new ArrayList<>();
+    private final List<String> listeners = new ArrayList<>();
+    private final List<FunctionInfo> functions = new ArrayList<>();
 
     public String getTlibVersion() {
         return tlibVersion;
@@ -91,9 +91,6 @@ public class TaglibXml {
     }
 
     public void addTag(TagXml tag) {
-        if (tags == null) {
-            tags = new ArrayList<>();
-        }
         tags.add(tag);
     }
 
@@ -102,9 +99,6 @@ public class TaglibXml {
     }
 
     public void addTagFile(TagFileXml tag) {
-        if (tagFiles == null) {
-            tagFiles = new ArrayList<>();
-        }
         tagFiles.add(tag);
     }
 
@@ -113,9 +107,6 @@ public class TaglibXml {
     }
 
     public void addListener(String listener) {
-        if (listeners == null) {
-            listeners = new ArrayList<>();
-        }
         listeners.add(listener);
     }
 
@@ -124,9 +115,6 @@ public class TaglibXml {
     }
 
     public void addFunction(String name, String klass, String signature) {
-        if (functions == null) {
-            functions = new ArrayList<>();
-        }
         functions.add(new FunctionInfo(name, klass, signature));
     }
 

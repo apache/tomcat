@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public class ValidatorXml {
     private String validatorClass;
-    private Map<String, String> initParams;
+    private final Map<String, String> initParams = new HashMap<>();
 
     public String getValidatorClass() {
         return validatorClass;
@@ -35,9 +35,6 @@ public class ValidatorXml {
     }
 
     public void addInitParam(String name, String value) {
-        if (initParams == null) {
-            initParams = new HashMap<>();
-        }
         initParams.put(name, value);
     }
 

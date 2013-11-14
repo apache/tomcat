@@ -39,8 +39,8 @@ public class TagXml {
     private String largeIcon;
     private String info;
     private boolean dynamicAttributes;
-    private List<TagAttributeInfo> attributes;
-    private List<TagVariableInfo> variables;
+    private final List<TagAttributeInfo> attributes = new ArrayList<>();
+    private final List<TagVariableInfo> variables = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -115,16 +115,10 @@ public class TagXml {
     }
 
     public List<TagAttributeInfo> getAttributes() {
-        if (attributes == null) {
-            attributes = new ArrayList<>();
-        }
         return attributes;
     }
 
     public List<TagVariableInfo> getVariables() {
-        if (variables == null) {
-            variables = new ArrayList<>();
-        }
         return variables;
     }
 }
