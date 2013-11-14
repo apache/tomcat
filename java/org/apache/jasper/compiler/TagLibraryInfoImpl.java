@@ -446,6 +446,10 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
     private TagLibraryValidator createValidator(ValidatorXml validatorXml)
             throws JasperException {
 
+        if (validatorXml == null) {
+            return null;
+        }
+
         String validatorClass = validatorXml.getValidatorClass();
 
         Map<String,Object> initParams = new Hashtable<>();
