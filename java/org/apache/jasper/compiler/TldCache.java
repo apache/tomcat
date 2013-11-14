@@ -58,4 +58,9 @@ public class TldCache {
     public TldResourcePath getTldResourcePath(String uri) {
         return uriTldResourcePathMap.get(uri);
     }
+
+
+    public TaglibXml getTaglibXml(TldResourcePath tldResourcePath) {
+        return tldResourcePathTaglibXmlMap.get(tldResourcePath);
+    }
 }
