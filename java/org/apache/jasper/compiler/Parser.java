@@ -409,8 +409,7 @@ class Parser implements TagConstants {
                     if (impl == null) {
                         TldResourcePath tldResourcePath = ctxt.getTldResourcePath(uri);
                         impl = new TagLibraryInfoImpl(ctxt, parserController,
-                                pageInfo, prefix, uri, tldResourcePath, err,
-                                reader.mark());
+                                pageInfo, prefix, uri, tldResourcePath, err);
                         if (ctxt.getOptions().isCaching()) {
                             ctxt.getOptions().getCache().put(uri, impl);
                         }

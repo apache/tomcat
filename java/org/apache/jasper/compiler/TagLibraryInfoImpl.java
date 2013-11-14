@@ -112,7 +112,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
      */
     public TagLibraryInfoImpl(JspCompilationContext ctxt, ParserController pc,
             PageInfo pi, String prefix, String uriIn,
-            TldResourcePath tldResourcePath, ErrorDispatcher err, Mark mark)
+            TldResourcePath tldResourcePath, ErrorDispatcher err)
             throws JasperException {
         super(prefix, uriIn);
 
