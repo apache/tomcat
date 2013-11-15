@@ -510,13 +510,9 @@ public class ApplicationContext
             throw new MalformedURLException(sm.getString(
                     "applicationContext.requestDispatcher.iae", path));
 
-        String normPath = RequestUtil.normalize(path);
-        if (normPath == null)
-            return (null);
-
         WebResourceRoot resources = context.getResources();
         if (resources != null) {
-            return resources.getResource(normPath).getURL();
+            return resources.getResource(path).getURL();
         }
 
         return null;
@@ -540,13 +536,9 @@ public class ApplicationContext
         if (!path.startsWith("/") && GET_RESOURCE_REQUIRE_SLASH)
             return null;
 
-        String normalizedPath = RequestUtil.normalize(path);
-        if (normalizedPath == null)
-            return (null);
-
         WebResourceRoot resources = context.getResources();
         if (resources != null) {
-            return resources.getResource(normalizedPath).getInputStream();
+            return resources.getResource(path).getInputStream();
         }
 
         return null;
@@ -573,13 +565,9 @@ public class ApplicationContext
                 (sm.getString("applicationContext.resourcePaths.iae", path));
         }
 
-        String normalizedPath = RequestUtil.normalize(path);
-        if (normalizedPath == null)
-            return (null);
-
         WebResourceRoot resources = context.getResources();
         if (resources != null) {
-            return resources.listWebAppPaths(normalizedPath);
+            return resources.listWebAppPaths(path);
         }
 
         return null;
