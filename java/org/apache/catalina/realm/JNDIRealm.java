@@ -427,6 +427,14 @@ public class JNDIRealm extends RealmBase {
     protected boolean useDelegatedCredential = true;
 
 
+    /**
+     * The QOP that should be used for the connection to the LDAP server after
+     * authentication. This value is used to set the
+     * <code>javax.security.sasl.qop</code> environment property for the LDAP
+     * connection.
+     */
+    protected String spengoDelegationQop = "auth-conf";
+
     // ------------------------------------------------------------- Properties
 
     /**
@@ -980,13 +988,21 @@ public class JNDIRealm extends RealmBase {
     }
 
 
-
     public boolean isUseDelegatedCredential() {
         return useDelegatedCredential;
     }
 
     public void setUseDelegatedCredential(boolean useDelegatedCredential) {
         this.useDelegatedCredential = useDelegatedCredential;
+    }
+
+
+    public String getSpengoDelegationQop() {
+        return spengoDelegationQop;
+    }
+
+    public void setSpengoDelegationQop(String spengoDelegationQop) {
+        this.spengoDelegationQop = spengoDelegationQop;
     }
 
 
@@ -2062,7 +2078,7 @@ public class JNDIRealm extends RealmBase {
                 context.addToEnvironment(
                         "javax.security.sasl.server.authentication", "true");
                 context.addToEnvironment(
-                        "javax.security.sasl.qop", "auth-conf");
+                        "javax.security.sasl.qop", spengoDelegationQop);
                 // Note: Subject already set in SPNEGO authenticator so no need
                 //       for Subject.doAs() here
             }
