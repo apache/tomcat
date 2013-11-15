@@ -129,6 +129,13 @@
         after an error during asynchronous processing. Includes a test case
         based on code contributed by Todd West. (markt)
       </fix>
+      <fix>
+        <bug>55778</bug>: Add an option to the JNDI Realm to control the QOP
+        used for the connection to the LDAP server after authentication when
+        using SPNEFO with delegated credentials. This value is used to set the
+        <code>javax.security.sasl.qop</code> environment property for the LDAP
+        connection. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
