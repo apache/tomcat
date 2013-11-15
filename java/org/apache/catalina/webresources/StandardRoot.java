@@ -39,6 +39,7 @@ import org.apache.catalina.WebResourceTraceWrapper;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -106,9 +107,9 @@ public class StandardRoot extends LifecycleMBeanBase
         return list(path, true);
     }
 
-    private String[] list(String path, boolean doStateCheck) {
-        if (doStateCheck) {
-            checkState();
+    private String[] list(String path, boolean validate) {
+        if (validate) {
+            path = validate(path);
         }
 
         // Set because we don't want duplicates
@@ -132,7 +133,7 @@ public class StandardRoot extends LifecycleMBeanBase
 
     @Override
     public Set<String> listWebAppPaths(String path) {
-        checkState();
+        path = validate(path);
 
         // Set because we don't want duplicates
         HashSet<String> result = new HashSet<>();
@@ -151,7 +152,7 @@ public class StandardRoot extends LifecycleMBeanBase
 
     @Override
     public boolean mkdir(String path) {
-        checkState();
+        path = validate(path);
 
         if (preResourceExists(path)) {
             return false;
@@ -162,7 +163,7 @@ public class StandardRoot extends LifecycleMBeanBase
 
     @Override
     public boolean write(String path, InputStream is, boolean overwrite) {
-        checkState();
+        path = validate(path);
 
         if (!overwrite && preResourceExists(path)) {
             return false;
@@ -186,10 +187,10 @@ public class StandardRoot extends LifecycleMBeanBase
         return getResource(path, true, false);
     }
 
-    private WebResource getResource(String path, boolean doStateCheck,
+    private WebResource getResource(String path, boolean validate,
             boolean useClassLoaderResources) {
-        if (doStateCheck) {
-            checkState();
+        if (validate) {
+            path = validate(path);
         }
 
         if (isCachingAllowed()) {
@@ -202,23 +203,35 @@ public class StandardRoot extends LifecycleMBeanBase
 
     @Override
     public WebResource getClassLoaderResource(String path) {
-        checkPath(path);
         return getResource("/WEB-INF/classes" + path, true, true);
     }
 
 
     @Override
     public WebResource[] getClassLoaderResources(String path) {
-        checkPath(path);
         return getResources("/WEB-INF/classes" + path, true);
     }
 
 
-    private void checkPath(String path) {
+    /**
+     * Ensures that this object is in a valid state to serve resources, checks
+     * that the path is a String that starts with '/' and checks that the path
+     * can be normalized without stepping outside of the root.
+     *
+     * @param path
+     * @return  the normlized path
+     */
+    private String validate(String path) {
+        if (!getState().isAvailable()) {
+            throw new IllegalStateException(
+                    sm.getString("standardRoot.checkStateNotStarted"));
+        }
+
         if (path == null || path.length() == 0 || !path.startsWith("/")) {
             throw new IllegalArgumentException(
                     sm.getString("standardRoot.invalidPath", path));
         }
+        return RequestUtil.normalize(path);
     }
 
     protected final WebResource getResourceInternal(String path,
@@ -255,7 +268,7 @@ public class StandardRoot extends LifecycleMBeanBase
 
     private WebResource[] getResources(String path,
             boolean useClassLoaderResources) {
-        checkState();
+        path = validate(path);
 
         ArrayList<WebResource> result = new ArrayList<>();
         for (ArrayList<WebResourceSet> list : allResources) {
@@ -281,9 +294,9 @@ public class StandardRoot extends LifecycleMBeanBase
         return listResources(path, true);
     }
 
-    private WebResource[] listResources(String path, boolean doStateCheck) {
-        if (doStateCheck) {
-            checkState();
+    private WebResource[] listResources(String path, boolean validate) {
+        if (validate) {
+            path = validate(path);
         }
 
         String[] resources = list(path, false);
@@ -463,13 +476,6 @@ public class StandardRoot extends LifecycleMBeanBase
     @Override
     public void setContext(Context context) {
         this.context = context;
-    }
-
-    private void checkState() {
-        if (!getState().isAvailable()) {
-            throw new IllegalStateException(
-                    sm.getString("standardRoot.checkStateNotStarted"));
-        }
     }
 
     /*
