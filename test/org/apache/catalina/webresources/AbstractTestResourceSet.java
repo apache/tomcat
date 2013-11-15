@@ -112,8 +112,15 @@ public abstract class AbstractTestResourceSet {
 
     @Test
     public final void testGetResourceTraversal() {
-        WebResource webResource =
-                resourceRoot.getResource(getMount() + "/../");
+        WebResource webResource = null;
+        try {
+            webResource = resourceRoot.getResource(getMount() + "/../");
+        } catch (IllegalArgumentException iae) {
+            // Expected if mount point is zero length
+            Assert.assertTrue(getMount().length() == 0);
+            return;
+        }
+
         Assert.assertFalse(webResource.exists());
     }
 
