@@ -237,6 +237,9 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
             // error = true;
             // }
 
+        } else if (actionCode == ActionCode.IS_ERROR) {
+            ((AtomicBoolean) param).set(error);
+
         } else if (actionCode == ActionCode.DISABLE_SWALLOW_INPUT) {
             // TODO: Do not swallow request input but
             // make sure we are closing the connection
