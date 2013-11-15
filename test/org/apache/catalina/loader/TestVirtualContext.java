@@ -191,7 +191,7 @@ public class TestVirtualContext extends TomcatBaseTest {
 
         // tests context.getResource then the content
 
-        assertPageContains("/test/contextGetResource.jsp?path=nonexistent",
+        assertPageContains("/test/contextGetResource.jsp?path=/nonexistent",
             "resourceAInWebInfClasses=true", 404);
         assertPageContains(
             "/test/contextGetResource.jsp?path=/WEB-INF/classes/rsrc/resourceA.properties",
