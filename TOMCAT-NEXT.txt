@@ -203,7 +203,7 @@ but possibly 7.1.x).
 10. Code to the interfaces in the o.a.catalina package and avoid coding directly
     to implementations in other packages. This is likely to require a lot of
     work. Maybe use Structure 101 (or similar) to help.
-    - Partially complete - probably as far as is practical. 
+    - Partially complete - probably as far as is practical.
 
 11. Merge Service and Engine
     - Decided not to do this.
