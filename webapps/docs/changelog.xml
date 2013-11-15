@@ -124,6 +124,11 @@
         unnecessary, it causes problems with using SPNEGO with IBM JDKs. Patch
         provided by Arunav Sanyal. (markt)
       </fix>
+      <fix>
+        <bug>55772</bug>: Ensure that the request and response are recycled
+        after an error during asynchronous processing. Includes a test case
+        based on code contributed by Todd West. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.EnumSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.SessionTrackingMode;
@@ -451,8 +452,10 @@ public class CoyoteAdapter implements Adapter {
             // Ignore
         } finally {
             req.getRequestProcessor().setWorkerThreadName(null);
+            AtomicBoolean error = new AtomicBoolean(false);
+            res.action(ActionCode.IS_ERROR, error);
             // Recycle the wrapper request and response
-            if (!comet && !async) {
+            if (!comet && !async || error.get()) {
                 request.recycle();
                 response.recycle();
             } else {

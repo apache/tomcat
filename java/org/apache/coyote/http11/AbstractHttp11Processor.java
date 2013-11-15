@@ -809,6 +809,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 response.setErrorException(e);
             }
 
+        } else if (actionCode == ActionCode.IS_ERROR) {
+            ((AtomicBoolean) param).set(error);
+
         } else if (actionCode == ActionCode.DISABLE_SWALLOW_INPUT) {
             // Do not swallow request input but
             // make sure we are closing the connection
