@@ -24,6 +24,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.descriptor.XmlErrorHandler;
 import org.apache.tomcat.util.digester.Digester;
+import org.apache.tomcat.util.digester.RuleSet;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -35,7 +36,10 @@ public class TldParser {
     private final Digester digester;
 
     public TldParser(boolean namespaceAware, boolean validation) {
-        TldRuleSet ruleSet = new TldRuleSet();
+        this(namespaceAware, validation, new TldRuleSet());
+    }
+
+    public TldParser(boolean namespaceAware, boolean validation, RuleSet ruleSet) {
         digester = DigesterFactory.newDigester(validation, namespaceAware, ruleSet);
     }
 
