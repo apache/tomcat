@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,11 +38,9 @@ import javax.servlet.jsp.tagext.TagLibraryInfo;
 import javax.servlet.jsp.tagext.TagLibraryValidator;
 import javax.servlet.jsp.tagext.TagVariableInfo;
 import javax.servlet.jsp.tagext.ValidationMessage;
-import javax.servlet.jsp.tagext.VariableInfo;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
-import org.apache.jasper.xmlparser.TreeNode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.descriptor.tld.TagFileXml;
@@ -294,149 +291,6 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         return new TagFileInfo(name, path, tagInfo);
     }
 
-    TagAttributeInfo createAttribute(TreeNode elem, String jspVersion) {
-        String name = null;
-        String type = null;
-        String expectedType = null;
-        String methodSignature = null;
-        boolean required = false, rtexprvalue = false, isFragment = false, deferredValue = false, deferredMethod = false;
-
-        Iterator<TreeNode> list = elem.findChildren();
-        while (list.hasNext()) {
-            TreeNode element = list.next();
-            String tname = element.getName();
-
-            if ("name".equals(tname)) {
-                name = element.getBody();
-            } else if ("required".equals(tname)) {
-                String s = element.getBody();
-                if (s != null)
-                    required = JspUtil.booleanValue(s);
-            } else if ("rtexprvalue".equals(tname)) {
-                String s = element.getBody();
-                if (s != null)
-                    rtexprvalue = JspUtil.booleanValue(s);
-            } else if ("type".equals(tname)) {
-                type = element.getBody();
-                if ("1.2".equals(jspVersion)
-                        && (type.equals("Boolean") || type.equals("Byte")
-                                || type.equals("Character")
-                                || type.equals("Double")
-                                || type.equals("Float")
-                                || type.equals("Integer")
-                                || type.equals("Long") || type.equals("Object")
-                                || type.equals("Short") || type
-                                .equals("String"))) {
-                    type = "java.lang." + type;
-                }
-            } else if ("fragment".equals(tname)) {
-                String s = element.getBody();
-                if (s != null) {
-                    isFragment = JspUtil.booleanValue(s);
-                }
-            } else if ("deferred-value".equals(tname)) {
-                deferredValue = true;
-                type = "javax.el.ValueExpression";
-                TreeNode child = element.findChild("type");
-                if (child != null) {
-                    expectedType = child.getBody();
-                    if (expectedType != null) {
-                        expectedType = expectedType.trim();
-                    }
-                } else {
-                    expectedType = "java.lang.Object";
-                }
-            } else if ("deferred-method".equals(tname)) {
-                deferredMethod = true;
-                type = "javax.el.MethodExpression";
-                TreeNode child = element.findChild("method-signature");
-                if (child != null) {
-                    methodSignature = child.getBody();
-                    if (methodSignature != null) {
-                        methodSignature = methodSignature.trim();
-                    }
-                } else {
-                    methodSignature = "java.lang.Object method()";
-                }
-            } else if ("description".equals(tname) || false) {
-                // Ignored elements
-            } else {
-                if (log.isWarnEnabled()) {
-                    log.warn(Localizer.getMessage(
-                            "jsp.warning.unknown.element.in.attribute", tname));
-                }
-            }
-        }
-
-        if (isFragment) {
-            /*
-             * According to JSP.C-3 ("TLD Schema Element Structure - tag"),
-             * 'type' and 'rtexprvalue' must not be specified if 'fragment' has
-             * been specified (this will be enforced by validating parser).
-             * Also, if 'fragment' is TRUE, 'type' is fixed at
-             * javax.servlet.jsp.tagext.JspFragment, and 'rtexprvalue' is fixed
-             * at true. See also JSP.8.5.2.
-             */
-            type = "javax.servlet.jsp.tagext.JspFragment";
-            rtexprvalue = true;
-        }
-
-        if (!rtexprvalue && type == null) {
-            // According to JSP spec, for static values (those determined at
-            // translation time) the type is fixed at java.lang.String.
-            type = "java.lang.String";
-        }
-
-        return new TagAttributeInfo(name, required, type, rtexprvalue,
-                isFragment, null, deferredValue, deferredMethod, expectedType,
-                methodSignature);
-    }
-
-    TagVariableInfo createVariable(TreeNode elem) {
-        String nameGiven = null;
-        String nameFromAttribute = null;
-        String className = "java.lang.String";
-        boolean declare = true;
-        int scope = VariableInfo.NESTED;
-
-        Iterator<TreeNode> list = elem.findChildren();
-        while (list.hasNext()) {
-            TreeNode element = list.next();
-            String tname = element.getName();
-            if ("name-given".equals(tname))
-                nameGiven = element.getBody();
-            else if ("name-from-attribute".equals(tname))
-                nameFromAttribute = element.getBody();
-            else if ("variable-class".equals(tname))
-                className = element.getBody();
-            else if ("declare".equals(tname)) {
-                String s = element.getBody();
-                if (s != null)
-                    declare = JspUtil.booleanValue(s);
-            } else if ("scope".equals(tname)) {
-                String s = element.getBody();
-                if (s != null) {
-                    if ("NESTED".equals(s)) {
-                        scope = VariableInfo.NESTED;
-                    } else if ("AT_BEGIN".equals(s)) {
-                        scope = VariableInfo.AT_BEGIN;
-                    } else if ("AT_END".equals(s)) {
-                        scope = VariableInfo.AT_END;
-                    }
-                }
-            } else if ("description".equals(tname) || // Ignored elements
-            false) {
-            } else {
-                if (log.isWarnEnabled()) {
-                    log.warn(Localizer.getMessage(
-                            "jsp.warning.unknown.element.in.variable", tname));
-                }
-            }
-        }
-        return new TagVariableInfo(nameGiven, nameFromAttribute, className,
-                declare, scope);
-    }
-
     private TagLibraryValidator createValidator(ValidatorXml validatorXml)
             throws JasperException {
 
@@ -463,60 +317,6 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             tlv.setInitParameters(initParams);
         }
         return tlv;
-    }
-
-    String[] createInitParam(TreeNode elem) {
-        String[] initParam = new String[2];
-
-        Iterator<TreeNode> list = elem.findChildren();
-        while (list.hasNext()) {
-            TreeNode element = list.next();
-            String tname = element.getName();
-            if ("param-name".equals(tname)) {
-                initParam[0] = element.getBody();
-            } else if ("param-value".equals(tname)) {
-                initParam[1] = element.getBody();
-            } else if ("description".equals(tname)) {
-                 // Do nothing
-            } else {
-                if (log.isWarnEnabled()) {
-                    log.warn(Localizer.getMessage(
-                            "jsp.warning.unknown.element.in.initParam", tname));
-                }
-            }
-        }
-        return initParam;
-    }
-
-    FunctionInfo createFunctionInfo(TreeNode elem) {
-
-        String name = null;
-        String klass = null;
-        String signature = null;
-
-        Iterator<TreeNode> list = elem.findChildren();
-        while (list.hasNext()) {
-            TreeNode element = list.next();
-            String tname = element.getName();
-
-            if ("name".equals(tname)) {
-                name = element.getBody();
-            } else if ("function-class".equals(tname)) {
-                klass = element.getBody();
-            } else if ("function-signature".equals(tname)) {
-                signature = element.getBody();
-            } else if ("display-name".equals(tname) || // Ignored elements
-                    "small-icon".equals(tname) || "large-icon".equals(tname)
-                    || "description".equals(tname) || "example".equals(tname)) {
-            } else {
-                if (log.isWarnEnabled()) {
-                    log.warn(Localizer.getMessage(
-                            "jsp.warning.unknown.element.in.function", tname));
-                }
-            }
-        }
-
-        return new FunctionInfo(name, klass, signature);
     }
 
     // *********************************************************************
