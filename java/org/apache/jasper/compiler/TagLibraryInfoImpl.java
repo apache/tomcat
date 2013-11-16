@@ -41,8 +41,6 @@ import javax.servlet.jsp.tagext.ValidationMessage;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.descriptor.tld.TagFileXml;
 import org.apache.tomcat.util.descriptor.tld.TagXml;
 import org.apache.tomcat.util.descriptor.tld.TaglibXml;
@@ -61,9 +59,6 @@ import org.apache.tomcat.util.scan.Jar;
  */
 class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
 
-    // Logger
-    private final Log log = LogFactory.getLog(TagLibraryInfoImpl.class);
-
     private final JspCompilationContext ctxt;
 
     private final PageInfo pi;
@@ -72,7 +67,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
 
     private final ParserController parserController;
 
-    private final void print(String name, String value, PrintWriter w) {
+    private static void print(String name, String value, PrintWriter w) {
         if (value != null) {
             w.print(name + " = {\n\t");
             w.print(value);
@@ -92,14 +87,17 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         print("uri", uri, out);
         print("tagLibraryValidator", "" + tagLibraryValidator, out);
 
-        for (int i = 0; i < tags.length; i++)
-            out.println(tags[i].toString());
+        for (TagInfo tag : tags) {
+            out.println(tag.toString());
+        }
 
-        for (int i = 0; i < tagFiles.length; i++)
-            out.println(tagFiles[i].toString());
+        for (TagFileInfo tagFile : tagFiles) {
+            out.println(tagFile.toString());
+        }
 
-        for (int i = 0; i < functions.length; i++)
-            out.println(functions[i].toString());
+        for (FunctionInfo function : functions) {
+            out.println(function.toString());
+        }
 
         return sw.toString();
     }
@@ -119,8 +117,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         this.err = err;
 
         if (tldResourcePath == null) {
-            // The URI points to the TLD itself or to a JAR file in which the
-            // TLD is stored
+            // The URI points to the TLD itself or to a JAR file in which the TLD is stored
             tldResourcePath = generateTldResourcePath(uri, ctxt);
         }
 
@@ -141,8 +138,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                 // Add TLD within the JAR to the dependency list
                 String entryName = tldResourcePath.getEntryName();
                 try {
-                    pageInfo.addDependant(jar.getURL(entryName),
-                            Long.valueOf(jar.getLastModified(entryName)));
+                    pageInfo.addDependant(jar.getURL(entryName), jar.getLastModified(entryName));
                 } catch (IOException ioe) {
                     throw new JasperException(ioe);
                 }
@@ -183,12 +179,10 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         }
 
         if (tlibversion == null) {
-            err.jspError("jsp.error.tld.mandatory.element.missing",
-                    "tlib-version", uri);
+            err.jspError("jsp.error.tld.mandatory.element.missing", "tlib-version", uri);
         }
         if (jspversion == null) {
-            err.jspError("jsp.error.tld.mandatory.element.missing",
-                    "jsp-version", uri);
+            err.jspError("jsp.error.tld.mandatory.element.missing", "jsp-version", uri);
         }
 
         this.tags = tagInfos.toArray(new TagInfo[tagInfos.size()]);
@@ -199,7 +193,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
     @Override
     public TagLibraryInfo[] getTagLibraryInfos() {
         Collection<TagLibraryInfo> coll = pi.getTaglibs();
-        return coll.toArray(new TagLibraryInfo[0]);
+        return coll.toArray(new TagLibraryInfo[coll.size()]);
     }
 
     /*
@@ -225,8 +219,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         try {
             url = ctxt.getResource(uri);
         } catch (Exception ex) {
-            err.jspError("jsp.error.tld.unable_to_get_jar", uri, ex
-                    .toString());
+            err.jspError("jsp.error.tld.unable_to_get_jar", uri, ex.toString());
         }
         if (uri.endsWith(".jar")) {
             if (url == null) {
@@ -242,39 +235,33 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
 
         String teiClassName = tagXml.getTeiClass();
         TagExtraInfo tei = null;
-        if (teiClassName != null && !teiClassName.equals("")) {
+        if (teiClassName != null && !teiClassName.isEmpty()) {
             try {
-                Class<?> teiClass =
-                    ctxt.getClassLoader().loadClass(teiClassName);
+                Class<?> teiClass = ctxt.getClassLoader().loadClass(teiClassName);
                 tei = (TagExtraInfo) teiClass.newInstance();
             } catch (Exception e) {
-                err.jspError(e, "jsp.error.teiclass.instantiation",
-                        teiClassName);
+                err.jspError(e, "jsp.error.teiclass.instantiation", teiClassName);
             }
         }
 
-        String tagName = tagXml.getName();
-        String tagClassName = tagXml.getTagClass();
-        String bodycontent = tagXml.getBodyContent();
-        String info = tagXml.getInfo();
-        String displayName = tagXml.getDisplayName();
-        String smallIcon = tagXml.getSmallIcon();
-        String largeIcon = tagXml.getLargeIcon();
-        boolean dynamicAttributes = tagXml.hasDynamicAttributes();
         List<TagAttributeInfo> attributeInfos = tagXml.getAttributes();
         List<TagVariableInfo> variableInfos = tagXml.getVariables();
 
-        TagInfo taginfo = new TagInfo(tagName, tagClassName, bodycontent, info,
-                this, tei,
+        return new TagInfo(tagXml.getName(),
+                tagXml.getTagClass(),
+                tagXml.getBodyContent(),
+                tagXml.getInfo(),
+                this,
+                tei,
                 attributeInfos.toArray(new TagAttributeInfo[attributeInfos.size()]),
-                displayName, smallIcon, largeIcon,
+                tagXml.getDisplayName(),
+                tagXml.getSmallIcon(),
+                tagXml.getLargeIcon(),
                 variableInfos.toArray(new TagVariableInfo[variableInfos.size()]),
-                dynamicAttributes);
-        return taginfo;
+                tagXml.hasDynamicAttributes());
     }
 
-    private TagFileInfo createTagFileInfo(TagFileXml tagFileXml, Jar jar)
-            throws JasperException {
+    private TagFileInfo createTagFileInfo(TagFileXml tagFileXml, Jar jar) throws JasperException {
 
         String name = tagFileXml.getName();
         String path = tagFileXml.getPath();
@@ -286,37 +273,34 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             err.jspError("jsp.error.tagfile.illegalPath", path);
         }
 
-        TagInfo tagInfo = TagFileProcessor.parseTagFileDirectives(
-                parserController, name, path, jar, this);
+        TagInfo tagInfo =
+                TagFileProcessor.parseTagFileDirectives(parserController, name, path, jar, this);
         return new TagFileInfo(name, path, tagInfo);
     }
 
-    private TagLibraryValidator createValidator(ValidatorXml validatorXml)
-            throws JasperException {
+    private TagLibraryValidator createValidator(ValidatorXml validatorXml) throws JasperException {
 
         if (validatorXml == null) {
             return null;
         }
 
         String validatorClass = validatorXml.getValidatorClass();
+        if (validatorClass == null || validatorClass.isEmpty()) {
+            return null;
+        }
 
         Map<String,Object> initParams = new Hashtable<>();
         initParams.putAll(validatorXml.getInitParams());
 
-        TagLibraryValidator tlv = null;
-        if (validatorClass != null && !validatorClass.equals("")) {
-            try {
-                Class<?> tlvClass = ctxt.getClassLoader().loadClass(validatorClass);
-                tlv = (TagLibraryValidator) tlvClass.newInstance();
-            } catch (Exception e) {
-                err.jspError(e, "jsp.error.tlvclass.instantiation",
-                        validatorClass);
-            }
-        }
-        if (tlv != null) {
+        try {
+            Class<?> tlvClass = ctxt.getClassLoader().loadClass(validatorClass);
+            TagLibraryValidator tlv = (TagLibraryValidator) tlvClass.newInstance();
             tlv.setInitParameters(initParams);
+            return tlv;
+        } catch (Exception e) {
+            err.jspError(e, "jsp.error.tlvclass.instantiation", validatorClass);
+            return null;
         }
-        return tlv;
     }
 
     // *********************************************************************
