@@ -42,6 +42,7 @@ import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import javax.servlet.jsp.JspFactory;
 import javax.servlet.jsp.tagext.TagLibraryInfo;
 
 import org.apache.jasper.compiler.Compiler;
@@ -50,6 +51,7 @@ import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.compiler.TagPluginManager;
 import org.apache.jasper.compiler.TldCache;
+import org.apache.jasper.runtime.JspFactoryImpl;
 import org.apache.jasper.servlet.JspCServletContext;
 import org.apache.jasper.servlet.TldScanner;
 import org.apache.juli.logging.Log;
@@ -93,6 +95,11 @@ import org.xml.sax.SAXException;
  * @author Yoav Shapira
  */
 public class JspC extends Task implements Options {
+
+    static {
+        // the Validator uses this to access the EL ExpressionFactory
+        JspFactory.setDefaultFactory(new JspFactoryImpl());
+    }
 
     public static final String DEFAULT_IE_CLASS_ID =
             "clsid:8AD9C840-044E-11D1-B3E9-00805F499D93";
