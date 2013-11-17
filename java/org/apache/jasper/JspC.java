@@ -844,7 +844,6 @@ public class JspC extends Task implements Options {
 
     public void setValidateXml( boolean b ) {
         this.validateXml = b;
-        org.apache.jasper.xmlparser.ParserUtils.validating=b;
     }
 
     public boolean isValidateXml() {
