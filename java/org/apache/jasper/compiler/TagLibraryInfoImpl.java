@@ -138,7 +138,8 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                 // Add TLD within the JAR to the dependency list
                 String entryName = tldResourcePath.getEntryName();
                 try {
-                    pageInfo.addDependant(jar.getURL(entryName), jar.getLastModified(entryName));
+                    pageInfo.addDependant(jar.getURL(entryName),
+                            Long.valueOf(jar.getLastModified(entryName)));
                 } catch (IOException ioe) {
                     throw new JasperException(ioe);
                 }
