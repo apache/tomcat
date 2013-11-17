@@ -233,11 +233,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
             return log;
         }
 
-        @Override
-        public void recycle() {
-            recycledProcessors.clear();
-        }
-
         /**
          * Expected to be used by the handler once the processor is no longer
          * required.
