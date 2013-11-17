@@ -480,7 +480,7 @@ public final class Room {
          */
         private void sendRoomMessage(MessageType type, String content) {
             if (content == null || type == null)
-                throw null;
+                throw new NullPointerException();
 
             String completeMsg = String.valueOf(type.flag) + content;
 
