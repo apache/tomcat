@@ -553,15 +553,19 @@
         <code>0</code> is used which indicates no limit.</p>
       </attribute>
 
-      <attribute mame="spnegoDelegationQop" requireed="false">
+      <attribute name="spnegoDelegationQop" required="false">
         <p>When the JNDI Realm is used with the SPNEGO authenticator and
         <code>useDelegatedCredential</code> is <code>true</code> this attribute
-        controls the QOP that should be used for the connection to the LDAP
+        controls the QOP (Quality of Protection) that should be used for
+        the connection to the LDAP
         server after authentication. This value is used to set the
         <code>javax.security.sasl.qop</code> environment property for the LDAP
         connection. This attribute should be a comma-separated list of values
         selected from <code>auth-conf</code>, <code>auth-int</code> and
-        <code>auth</code>. The default value is <code>auth-conf</code>.</p>
+        <code>auth</code>. See <a
+        href="http://docs.oracle.com/javase/7/docs/api/javax/security/sasl/Sasl.html#QOP"
+        rel="nofollow">Java documentation</a> for more details.</p>
+        <p>The default value is <code>auth-conf</code>.</p>
       </attribute>
 
       <attribute name="stripRealmForGss" required="false">
@@ -580,7 +584,7 @@
       <attribute name="useDelegatedCredential" required="false">
         <p>When the JNDIRealm is used with the SPNEGO authenticator, delegated
         credentials for the user may be available. If such credentials are
-        present, this attribute controls whether are not they are used to
+        present, this attribute controls whether or not they are used to
         connect to the directory. If not specified, the default value of
         <code>true</code> is used.</p>
       </attribute>
