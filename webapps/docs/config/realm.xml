@@ -553,7 +553,7 @@
         <code>0</code> is used which indicates no limit.</p>
       </attribute>
 
-      <attribute mame="spengoDelegationQop" requireed="false">
+      <attribute mame="spnegoDelegationQop" requireed="false">
         <p>When the JNDI Realm is used with the SPNEGO authenticator and
         <code>useDelegatedCredential</code> is <code>true</code> this attribute
         controls the QOP that should be used for the connection to the LDAP

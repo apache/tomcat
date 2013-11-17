@@ -440,7 +440,7 @@ public class JNDIRealm extends RealmBase {
      * <code>javax.security.sasl.qop</code> environment property for the LDAP
      * connection.
      */
-    protected String spengoDelegationQop = "auth-conf";
+    protected String spnegoDelegationQop = "auth-conf";
 
     // ------------------------------------------------------------- Properties
 
@@ -1004,12 +1004,12 @@ public class JNDIRealm extends RealmBase {
     }
 
     
-    public String getSpengoDelegationQop() {
-        return spengoDelegationQop;
+    public String getSpnegoDelegationQop() {
+        return spnegoDelegationQop;
     }
 
-    public void setSpengoDelegationQop(String spengoDelegationQop) {
-        this.spengoDelegationQop = spengoDelegationQop;
+    public void setSpnegoDelegationQop(String spnegoDelegationQop) {
+        this.spnegoDelegationQop = spnegoDelegationQop;
     }
 
     
@@ -2096,7 +2096,7 @@ public class JNDIRealm extends RealmBase {
                 context.addToEnvironment(
                         "javax.security.sasl.server.authentication", "true");
                 context.addToEnvironment(
-                        "javax.security.sasl.qop", spengoDelegationQop);
+                        "javax.security.sasl.qop", spnegoDelegationQop);
                 // Note: Subject already set in SPNEGO authenticator so no need
                 //       for Subject.doAs() here
             }
