@@ -45,7 +45,7 @@ import org.ietf.jgss.Oid;
 
 
 /**
- * A SPNEGO authenticator that uses the SPENGO/Kerberos support built in to Java
+ * A SPNEGO authenticator that uses the SPNEGO/Kerberos support built in to Java
  * 6. Successful Kerberos authentication depends on the correct configuration of
  * multiple components. If the configuration is invalid, the error messages are
  * often cryptic although a Google search will usually point you in the right
