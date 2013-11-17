@@ -186,6 +186,10 @@
         on Windows. Prevent Tomcat from starting when $CATALINA_HOME and/or
         $CATALINA_BASE contains a colon on Linux/FreeBSD/etc. (markt)
       </fix>
+      <scode>
+        Initialize the JSP runtime in Jasper's initializer to avoid need for a
+        Jasper-specific lifecycle listener. JasperListener has been removed. (jboynes)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
