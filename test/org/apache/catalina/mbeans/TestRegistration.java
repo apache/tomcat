@@ -169,6 +169,11 @@ public class TestRegistration extends TomcatBaseTest {
         combinedRealm.addRealm(nullRealm);
         ctx.setRealm(combinedRealm);
 
+        // Disable keep-alive otherwise request processing threads in keep-alive
+        // won't shut down fast enough with BIO to de-register the processor
+        // triggering a test failure
+        tomcat.getConnector().setAttribute("maxKeepAliveRequests", Integer.valueOf(1));
+
         tomcat.start();
 
         getUrl("http://localhost:" + getPort());
