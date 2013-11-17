@@ -22,9 +22,12 @@ import java.util.Set;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.jsp.JspFactory;
 
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.compiler.TldCache;
+import org.apache.jasper.runtime.JspFactoryImpl;
+import org.apache.jasper.security.SecurityClassLoad;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.xml.sax.SAXException;
@@ -40,6 +43,37 @@ public class JasperInitializer implements ServletContainerInitializer {
     public static final String VALIDATE = "org.apache.jasper.validateDescriptors";
     private static final String MSG = "org.apache.jasper.servlet.JasperInitializer";
     private static final Log LOG = LogFactory.getLog(JasperInitializer.class);
+
+    /**
+     * Preload classes required at runtime by a JSP servlet so that
+     * we don't get a defineClassInPackage security exception.
+     */
+    static {
+        JspFactoryImpl factory = new JspFactoryImpl();
+        SecurityClassLoad.securityClassLoad(factory.getClass().getClassLoader());
+        if( System.getSecurityManager() != null ) {
+            String basePackage = "org.apache.jasper.";
+            try {
+                factory.getClass().getClassLoader().loadClass( basePackage +
+                        "runtime.JspFactoryImpl$PrivilegedGetPageContext");
+                factory.getClass().getClassLoader().loadClass( basePackage +
+                        "runtime.JspFactoryImpl$PrivilegedReleasePageContext");
+                factory.getClass().getClassLoader().loadClass( basePackage +
+                        "runtime.JspRuntimeLibrary");
+                factory.getClass().getClassLoader().loadClass( basePackage +
+                        "runtime.JspRuntimeLibrary$PrivilegedIntrospectHelper");
+                factory.getClass().getClassLoader().loadClass( basePackage +
+                        "runtime.ServletResponseWrapperInclude");
+                factory.getClass().getClassLoader().loadClass( basePackage +
+                        "servlet.JspServletWrapper");
+            } catch (ClassNotFoundException ex) {
+                throw new IllegalStateException(ex);
+            }
+        }
+
+        // TODO we should play nice and only set this if it's null
+        JspFactory.setDefaultFactory(factory);
+    }
 
     @Override
     public void onStartup(Set<Class<?>> types, ServletContext context) throws ServletException {
