@@ -391,16 +391,16 @@ public interface WebResourceRoot extends Lifecycle {
      * the implementation a method that executes periodic tasks, such as purging
      * expired cache entries.
      */
-    public void backgroundProcess();
+    void backgroundProcess();
 
-    public static enum ResourceSetType {
+    void registerTracedResource(WebResourceTraceWrapper traceWrapper);
+
+    void deregisterTracedResource(WebResourceTraceWrapper traceWrapperInputStream);
+
+    static enum ResourceSetType {
         PRE,
         RESOURCE_JAR,
         POST,
         CLASSES_JAR
     }
-
-    void registerTracedResource(WebResourceTraceWrapper traceWrapper);
-
-    void deregisterTracedResource(WebResourceTraceWrapper traceWrapperInputStream);
 }
