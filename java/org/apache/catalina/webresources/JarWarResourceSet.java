@@ -78,7 +78,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
     @Override
     protected WebResource createArchiveResource(JarEntry jarEntry,
             String webAppPath, Manifest manifest) {
-        return new JarWarResource(getRoot(), webAppPath, getBase(), getBaseUrl(),
+        return new JarWarResource(getRoot(), webAppPath, getBase(), getBaseUrlString(),
                 jarEntry, archivePath, getInternalPath(), manifest);
     }
 
@@ -103,7 +103,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
         }
 
         try {
-            setBaseUrl((new File(getBase())).toURI().toURL().toString());
+            setBaseUrl((new File(getBase())).toURI().toURL());
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(e);
         }

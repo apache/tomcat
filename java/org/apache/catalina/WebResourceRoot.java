@@ -18,6 +18,7 @@ package org.apache.catalina;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -396,6 +397,12 @@ public interface WebResourceRoot extends Lifecycle {
     void registerTracedResource(WebResourceTraceWrapper traceWrapper);
 
     void deregisterTracedResource(WebResourceTraceWrapper traceWrapperInputStream);
+
+    /**
+     * Obtain the set of {@link WebResourceSet#getBaseUrl()} for all
+     * {@link WebResourceSet}s used by this root.
+     */
+    List<URL> getBaseUrls();
 
     static enum ResourceSetType {
         PRE,

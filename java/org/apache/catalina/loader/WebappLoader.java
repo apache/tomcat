@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
@@ -546,64 +545,8 @@ public class WebappLoader extends LifecycleMBeanBase
             }
         }
 
-        try {
-
-            URL rootURL = servletContext.getResource("/");
-            classLoader.addPermission(rootURL);
-
-            String contextRoot = servletContext.getRealPath("/");
-            if (contextRoot != null) {
-                try {
-                    contextRoot = (new File(contextRoot)).getCanonicalPath();
-                    classLoader.addPermission(contextRoot);
-                } catch (IOException e) {
-                    // Ignore
-                }
-            }
-
-            URL classesURL = servletContext.getResource("/WEB-INF/classes/");
-            classLoader.addPermission(classesURL);
-            URL libURL = servletContext.getResource("/WEB-INF/lib/");
-            classLoader.addPermission(libURL);
-
-            if (contextRoot != null) {
-
-                if (libURL != null) {
-                    File rootDir = new File(contextRoot);
-                    File libDir = new File(rootDir, "WEB-INF/lib/");
-                    try {
-                        String path = libDir.getCanonicalPath();
-                        classLoader.addPermission(path);
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
-
-            } else {
-
-                if (workDir != null) {
-                    if (libURL != null) {
-                        File libDir = new File(workDir, "WEB-INF/lib/");
-                        try {
-                            String path = libDir.getCanonicalPath();
-                            classLoader.addPermission(path);
-                        } catch (IOException e) {
-                            // Ignore
-                        }
-                    }
-                    if (classesURL != null) {
-                        File classesDir = new File(workDir, "WEB-INF/classes/");
-                        try {
-                            String path = classesDir.getCanonicalPath();
-                            classLoader.addPermission(path);
-                        } catch (IOException e) {
-                            // Ignore
-                        }
-                    }
-                }
-            }
-        } catch (MalformedURLException e) {
-            // Ignore
+        for (URL url : context.getResources().getBaseUrls()) {
+           classLoader.addPermission(url);
         }
     }
 
