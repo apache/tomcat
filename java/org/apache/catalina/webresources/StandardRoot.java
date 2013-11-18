@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -526,6 +527,22 @@ public class StandardRoot extends LifecycleMBeanBase
         tracedResources.remove(traceResource);
     }
 
+
+    @Override
+    public List<URL> getBaseUrls() {
+        List<URL> result = new ArrayList<>();
+        for (List<WebResourceSet> list : allResources) {
+            for (WebResourceSet webResourceSet : list) {
+                if (!webResourceSet.getClassLoaderOnly()) {
+                    URL url = webResourceSet.getBaseUrl();
+                    if (url != null) {
+                        result.add(url);
+                    }
+                }
+            }
+        }
+        return result;
+    }
 
     // ----------------------------------------------------------- JMX Lifecycle
     @Override

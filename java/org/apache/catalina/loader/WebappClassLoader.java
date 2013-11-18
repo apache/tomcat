@@ -456,7 +456,7 @@ public class WebappClassLoader extends URLClassLoader
      *
      * @param filepath file directory path
      */
-    public void addPermission(String filepath) {
+    void addPermission(String filepath) {
         if (filepath == null) {
             return;
         }
@@ -465,13 +465,18 @@ public class WebappClassLoader extends URLClassLoader
 
         if (securityManager != null) {
             Permission permission = null;
-            if (!path.endsWith(File.separator)) {
-                permission = new FilePermission(path, "read");
+            if (path.startsWith("file:")) {
+                path = path.substring(5);
+                if (!path.endsWith(File.separator)) {
+                    permission = new FilePermission(path, "read");
+                    addPermission(permission);
+                    path = path + File.separator;
+                }
+                permission = new FilePermission(path + "-", "read");
                 addPermission(permission);
-                path = path + File.separator;
+            } else {
+                // Unsupported resource location.
             }
-            permission = new FilePermission(path + "-", "read");
-            addPermission(permission);
         }
     }
 
@@ -482,7 +487,7 @@ public class WebappClassLoader extends URLClassLoader
      *
      * @param url URL for a file or directory on local system
      */
-    public void addPermission(URL url) {
+    void addPermission(URL url) {
         if (url != null) {
             addPermission(url.toString());
         }
@@ -494,7 +499,7 @@ public class WebappClassLoader extends URLClassLoader
      *
      * @param permission The permission
      */
-    public void addPermission(Permission permission) {
+    void addPermission(Permission permission) {
         if ((securityManager != null) && (permission != null)) {
             permissionList.add(permission);
         }

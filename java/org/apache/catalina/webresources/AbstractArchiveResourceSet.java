@@ -18,6 +18,7 @@ package org.apache.catalina.webresources;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,7 +33,8 @@ import org.apache.catalina.util.ResourceSet;
 public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
     private final HashMap<String,JarEntry> jarFileEntries = new HashMap<>();
-    private String baseUrl;
+    private URL baseUrl;
+    private String baseUrlString;
     private Manifest manifest;
 
 
@@ -40,12 +42,22 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         this.manifest = manifest;
     }
 
-    protected final String getBaseUrl() {
+    protected final void setBaseUrl(URL baseUrl) {
+        this.baseUrl = baseUrl;
+        if (baseUrl == null) {
+            this.baseUrlString = null;
+        } else {
+            this.baseUrlString = baseUrl.toString();
+        }
+    }
+
+    @Override
+    public final URL getBaseUrl() {
         return baseUrl;
     }
 
-    protected final void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
+    protected final String getBaseUrlString() {
+        return baseUrlString;
     }
 
     protected final HashMap<String,JarEntry> getJarFileEntries() {

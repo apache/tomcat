@@ -18,6 +18,8 @@ package org.apache.catalina.webresources;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.tomcat.util.http.RequestUtil;
@@ -103,6 +105,16 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
     private String normalize(String path) {
         return RequestUtil.normalize(path, File.separatorChar == '/');
     }
+
+    @Override
+    public URL getBaseUrl() {
+        try {
+            return getFileBase().toURI().toURL();
+        } catch (MalformedURLException e) {
+            return null;
+        }
+    }
+
 
     //-------------------------------------------------------- Lifecycle methods
     @Override

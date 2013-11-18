@@ -17,6 +17,7 @@
 package org.apache.catalina;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Set;
 
 /**
@@ -102,4 +103,11 @@ public interface WebResourceSet extends Lifecycle {
     boolean getClassLoaderOnly();
 
     void setClassLoaderOnly(boolean classLoaderOnly);
+
+    /**
+     * Obtain the base URL for this set of resources. One of the uses of this is
+     * to grant read permissions to the resources when running under a security
+     * manager.
+     */
+    URL getBaseUrl();
 }
