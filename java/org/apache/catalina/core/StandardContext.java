@@ -5836,34 +5836,6 @@ public class StandardContext extends ContainerBase
     }
 
 
-
-    /**
-     * Get base path.
-     */
-    protected String getBasePath() {
-        String docBase = null;
-        Container container = this;
-        while (container != null) {
-            if (container instanceof Host)
-                break;
-            container = container.getParent();
-        }
-        File file = new File(getDocBase());
-        if (!file.isAbsolute()) {
-            if (container == null) {
-                docBase = (new File(getCatalinaBase(), getDocBase())).getPath();
-            } else {
-                // Use the "appBase" property of this container
-                file = ((Host) container).getAppBaseFile();
-                docBase = (new File(file, getDocBase())).getPath();
-            }
-        } else {
-            docBase = file.getPath();
-        }
-        return docBase;
-    }
-
-
     /**
      * Get naming context full name.
      */
