@@ -28,6 +28,8 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
@@ -451,45 +453,47 @@ public class WebappClassLoader extends URLClassLoader
 
 
     /**
-     * If there is a Java SecurityManager create a read FilePermission
-     * or JndiPermission for the file directory path.
-     *
-     * @param filepath file directory path
-     */
-    void addPermission(String filepath) {
-        if (filepath == null) {
-            return;
-        }
-
-        String path = filepath;
-
-        if (securityManager != null) {
-            Permission permission = null;
-            if (path.startsWith("file:")) {
-                path = path.substring(5);
-                if (!path.endsWith(File.separator)) {
-                    permission = new FilePermission(path, "read");
-                    addPermission(permission);
-                    path = path + File.separator;
-                }
-                permission = new FilePermission(path + "-", "read");
-                addPermission(permission);
-            } else {
-                // Unsupported resource location.
-            }
-        }
-    }
-
-
-    /**
-     * If there is a Java SecurityManager create a read FilePermission
-     * or JndiPermission for URL.
+     * If there is a Java SecurityManager create a read permission for the
+     * target of the given URL as appropriate.
      *
      * @param url URL for a file or directory on local system
      */
     void addPermission(URL url) {
-        if (url != null) {
-            addPermission(url.toString());
+        if (url == null) {
+            return;
+        }
+        if (securityManager != null) {
+            String protocol = url.getProtocol();
+            if ("file".equalsIgnoreCase(protocol)) {
+                URI uri;
+                File f;
+                String path;
+                try {
+                    uri = url.toURI();
+                    f = new File(uri);
+                    path = f.getCanonicalPath();
+                } catch (IOException | URISyntaxException e) {
+                    log.warn(sm.getString(
+                            "webappClassLoader.addPermisionNoCanonicalFile",
+                            url.toExternalForm()));
+                    return;
+                }
+                if (f.isFile()) {
+                    // Allow the file to be read
+                    addPermission(new FilePermission(path, "read"));
+                } else if (f.isDirectory()) {
+                    addPermission(new FilePermission(path, "read"));
+                    addPermission(new FilePermission(
+                            path + File.separator + "-", "read"));
+                } else {
+                    // File does not exist - ignore (shouldn't happen)
+                }
+            } else {
+                // Unsupported URL protocol
+                log.warn(sm.getString(
+                        "webappClassLoader.addPermisionNoProtocol",
+                        protocol, url.toExternalForm()));
+            }
         }
     }
 
