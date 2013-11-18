@@ -1123,7 +1123,7 @@ public class ContextConfig implements LifecycleListener {
 
         // Step 3. Look for ServletContainerInitializer implementations
         if (ok) {
-            processServletContainerInitializers(context.getServletContext());
+            processServletContainerInitializers(sContext);
         }
 
         if  (!webXml.isMetadataComplete() || typeInitializerMap.size() > 0) {
