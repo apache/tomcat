@@ -16,10 +16,10 @@
   limitations under the License.
 -->
 <classpath>
-    <classpathentry kind="src" path="java"/>
-    <classpathentry kind="src" path="test"/>
+    <classpathentry excluding="org/apache/tomcat/websocket/" kind="src" path="java"/>
+    <classpathentry excluding="org/apache/tomcat/websocket/|org/apache/catalina/websocket/" kind="src" path="test"/>
     <classpathentry kind="src" path="webapps/examples/WEB-INF/classes"/>
-    <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+    <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
     <classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
     <classpathentry kind="var" path="ANT_HOME/lib/ant.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/tomcat7-deps/dbcp/tomcat-dbcp.jar" sourcepath="/TOMCAT_LIBS_BASE/tomcat7-deps/dbcp/src/java"/>

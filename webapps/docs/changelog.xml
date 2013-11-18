@@ -255,6 +255,11 @@
         Add support for the Cobertura code coverage tool when running the unit
         tests. Based on a patch by mhasko. (markt)
       </add>
+      <update>
+        Update sample Eclipse IDE project. Explicitly use a Java 6 SE JDK.
+        Exclude JSR356 WebSocket classes from build path, as they cannot be
+        compiled with Java 6. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
