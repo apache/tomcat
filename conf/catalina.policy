@@ -127,7 +127,7 @@ grant codeBase "file:${catalina.home}/lib/-" {
 
 // These permissions are granted by default to all web applications
 // In addition, a web application will be given a read FilePermission
-// and JndiPermission for all files and directories in its document root.
+// for all files and directories in its document root.
 grant {
     // Required for JNDI lookup of named JDBC DataSource's and
     // javamail named MimePart DataSource used to send mail
