@@ -5840,25 +5840,25 @@ public class StandardContext extends ContainerBase
      * Get naming context full name.
      */
     private String getNamingContextName() {
-    if (namingContextName == null) {
-        Container parent = getParent();
-        if (parent == null) {
-        namingContextName = getName();
-        } else {
-        Stack<String> stk = new Stack<>();
-        StringBuilder buff = new StringBuilder();
-        while (parent != null) {
-            stk.push(parent.getName());
-            parent = parent.getParent();
+        if (namingContextName == null) {
+            Container parent = getParent();
+            if (parent == null) {
+            namingContextName = getName();
+            } else {
+            Stack<String> stk = new Stack<>();
+            StringBuilder buff = new StringBuilder();
+            while (parent != null) {
+                stk.push(parent.getName());
+                parent = parent.getParent();
+            }
+            while (!stk.empty()) {
+                buff.append("/" + stk.pop());
+            }
+            buff.append(getName());
+            namingContextName = buff.toString();
+            }
         }
-        while (!stk.empty()) {
-            buff.append("/" + stk.pop());
-        }
-        buff.append(getName());
-        namingContextName = buff.toString();
-        }
-    }
-    return namingContextName;
+        return namingContextName;
     }
 
 
