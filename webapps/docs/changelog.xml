@@ -188,7 +188,8 @@
       </fix>
       <scode>
         Initialize the JSP runtime in Jasper's initializer to avoid need for a
-        Jasper-specific lifecycle listener. JasperListener has been removed. (jboynes)
+        Jasper-specific lifecycle listener. <code>JasperListener</code> has been
+        removed. (jboynes)
       </scode>
     </changelog>
   </subsection>
