@@ -1820,38 +1820,8 @@ public class Digester extends DefaultHandler2 {
         log = LogFactory.getLog("org.apache.tomcat.util.digester.Digester");
         saxLog = LogFactory.getLog("org.apache.tomcat.util.digester.Digester.sax");
 
-        // Perform lazy configuration as needed
-        initialize(); // call hook method for subclasses that want to be initialized once only
-        // Nothing else required by default
-
         // Set the configuration flag to avoid repeating
         configured = true;
-
-    }
-
-    /**
-     * <p>
-     * Provides a hook for lazy initialization of this <code>Digester</code>
-     * instance.
-     * The default implementation does nothing, but subclasses
-     * can override as needed.
-     * Digester (by default) only calls this method once.
-     * </p>
-     *
-     * <p>
-     * <strong>Note</strong> This method will be called by {@link #configure}
-     * only when the {@link #configured} flag is false.
-     * Subclasses that override <code>configure</code> or who set <code>configured</code>
-     * may find that this method may be called more than once.
-     * </p>
-     *
-     * @since 1.6
-     */
-    protected void initialize() {
-
-        // Perform lazy initialization as needed
-        // Nothing required by default
-
     }
 
 
