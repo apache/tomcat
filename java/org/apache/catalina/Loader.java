@@ -14,13 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
 
-
 import java.beans.PropertyChangeListener;
-
 
 /**
  * A <b>Loader</b> represents a Java ClassLoader implementation that can
@@ -52,11 +48,7 @@ import java.beans.PropertyChangeListener;
  * @author Craig R. McClanahan
  * @version $Id$
  */
-
 public interface Loader {
-
-
-    // ------------------------------------------------------------- Properties
 
 
     /**
@@ -117,9 +109,6 @@ public interface Loader {
     public void setReloadable(boolean reloadable);
 
 
-    // --------------------------------------------------------- Public Methods
-
-
     /**
      * Add a property change listener to this component.
      *
@@ -141,6 +130,4 @@ public interface Loader {
      * @param listener The listener to remove
      */
     public void removePropertyChangeListener(PropertyChangeListener listener);
-
-
 }
