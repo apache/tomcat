@@ -28,7 +28,6 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
@@ -2716,49 +2715,6 @@ public class WebappClassLoader extends URLClassLoader
 
         // Assume everything else is OK
         return true;
-
-    }
-
-
-    /**
-     * Get the URI for the given file.
-     */
-    protected URL getURI(File file)
-        throws MalformedURLException {
-
-
-        File realFile = file;
-        try {
-            realFile = realFile.getCanonicalFile();
-        } catch (IOException e) {
-            // Ignore
-        }
-        return realFile.toURI().toURL();
-
-    }
-
-
-    /**
-     * Delete the specified directory, including all of its contents and
-     * subdirectories recursively.
-     *
-     * @param dir File object representing the directory to be deleted
-     */
-    protected static void deleteDir(File dir) {
-
-        String files[] = dir.list();
-        if (files == null) {
-            files = new String[0];
-        }
-        for (int i = 0; i < files.length; i++) {
-            File file = new File(dir, files[i]);
-            if (file.isDirectory()) {
-                deleteDir(file);
-            } else {
-                file.delete();
-            }
-        }
-        dir.delete();
 
     }
 }
