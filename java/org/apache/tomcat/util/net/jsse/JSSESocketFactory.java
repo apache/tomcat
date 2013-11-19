@@ -90,7 +90,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
     private static final boolean RFC_5746_SUPPORTED;
 
     private static final String[] DEFAULT_SERVER_PROTOCOLS;
-    private static final String[] DEAFULT_SERVER_CIPHER_SUITES;
+    private static final String[] DEFAULT_SERVER_CIPHER_SUITES;
 
     // Defaults - made public where re-used
     private static final String defaultProtocol = "TLS";
@@ -137,7 +137,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
             // Unable to determine default ciphers/protocols so use none
         }
         RFC_5746_SUPPORTED = result;
-        DEAFULT_SERVER_CIPHER_SUITES = ciphers;
+        DEFAULT_SERVER_CIPHER_SUITES = ciphers;
         DEFAULT_SERVER_PROTOCOLS = protocols;
     }
 
@@ -231,7 +231,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         }
         if ((requestedCiphersStr == null)
                 || (requestedCiphersStr.trim().length() == 0)) {
-            return DEAFULT_SERVER_CIPHER_SUITES;
+            return DEFAULT_SERVER_CIPHER_SUITES;
         }
 
         List<String> requestedCiphers = new ArrayList<String>();
@@ -242,7 +242,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
             }
         }
         if (requestedCiphers.isEmpty()) {
-            return DEAFULT_SERVER_CIPHER_SUITES;
+            return DEFAULT_SERVER_CIPHER_SUITES;
         }
         List<String> ciphers = new ArrayList<String>(requestedCiphers);
         ciphers.retainAll(Arrays.asList(context.getSupportedSSLParameters()
