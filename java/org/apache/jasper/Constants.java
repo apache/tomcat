@@ -14,13 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 
 /**
  * Some constants and other global data that are used by the compiler and the runtime.
@@ -114,62 +112,6 @@ public class Constants {
      */
     public static final String TAG_FILE_PACKAGE_NAME =
         System.getProperty("org.apache.jasper.Constants.TAG_FILE_PACKAGE_NAME", "org.apache.jsp.tag");
-
-    // Must be kept in sync with org/apache/catalina/Globals.java
-    public static final String ALT_DD_ATTR =
-        System.getProperty("org.apache.jasper.Constants.ALT_DD_ATTR", "org.apache.catalina.deploy.alt_dd");
-
-    /**
-     * Public Id and the Resource path (of the cached copy)
-     * of the DTDs for tag library descriptors.
-     */
-    private static final String TAGLIB_DTD_PUBLIC_ID_11 =
-        "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN";
-    private static final String TAGLIB_DTD_RESOURCE_PATH_11 =
-        "/javax/servlet/resources/web-jsptaglibrary_1_1.dtd";
-    private static final String TAGLIB_DTD_PUBLIC_ID_12 =
-        "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN";
-    private static final String TAGLIB_DTD_RESOURCE_PATH_12 =
-        "/javax/servlet/resources/web-jsptaglibrary_1_2.dtd";
-
-    /**
-     * Public Id and the Resource path (of the cached copy)
-     * of the DTDs for web application deployment descriptors
-     */
-    private static final String WEBAPP_DTD_PUBLIC_ID_22 =
-        "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN";
-    private static final String WEBAPP_DTD_RESOURCE_PATH_22 =
-        "/javax/servlet/resources/web-app_2_2.dtd";
-    private static final String WEBAPP_DTD_PUBLIC_ID_23 =
-        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN";
-    private static final String WEBAPP_DTD_RESOURCE_PATH_23 =
-        "/javax/servlet/resources/web-app_2_3.dtd";
-
-    /**
-     * List of the Public IDs that we cache, and their
-     * associated location. This is used by
-     * an EntityResolver to return the location of the
-     * cached copy of a DTD.
-     */
-    // TODO Add 2.4, 2.5, 3.0
-    private static final String[] PRIVATE_CACHED_DTD_PUBLIC_IDS = {
-        TAGLIB_DTD_PUBLIC_ID_11,
-        TAGLIB_DTD_PUBLIC_ID_12,
-        WEBAPP_DTD_PUBLIC_ID_22,
-        WEBAPP_DTD_PUBLIC_ID_23,
-    };
-    public static final List<String> CACHED_DTD_PUBLIC_IDS =
-        Collections.unmodifiableList(
-                Arrays.asList(PRIVATE_CACHED_DTD_PUBLIC_IDS));
-    private static final String[] PRIVATE_CACHED_DTD_RESOURCE_PATHS = {
-        TAGLIB_DTD_RESOURCE_PATH_11,
-        TAGLIB_DTD_RESOURCE_PATH_12,
-        WEBAPP_DTD_RESOURCE_PATH_22,
-        WEBAPP_DTD_RESOURCE_PATH_23,
-    };
-    public static final List<String> CACHED_DTD_RESOURCE_PATHS =
-        Collections.unmodifiableList(
-                Arrays.asList(PRIVATE_CACHED_DTD_RESOURCE_PATHS));
 
     /**
      * Default URLs to download the plugin for Netscape and IE.
