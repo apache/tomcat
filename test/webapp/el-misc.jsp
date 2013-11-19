@@ -38,5 +38,7 @@
     <tags:echo echo='17-${"foo"}\\${&apos;bar&apos;}\\${&quot;baz&quot;}' />
     <tags:echo echo='18-${((x,y)->x+y)(1,2)}' />
     <tags:echo echo='19-${{1,2,3,4}.stream().max().orElse(-1)}' />
-  </body>
+    <p>20-${{1,2,3,4}.stream().max().orElse(-1)}</p>
+    <tags:echo echo='21-${{1,2,3,4}.stream().sorted().map(u->{"value":u+10}).toList()}' />
+    <p>22-${{1,2,3,4}.stream().sorted().map(u->{"value":u+10}).toList()}</p>  </body>
 </html>

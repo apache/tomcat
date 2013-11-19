@@ -391,6 +391,9 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "17-foo\\bar\\baz");
         assertEcho(result, "18-3");
         assertEcho(result, "19-4");
+        assertEcho(result, "20-4");
+        assertEcho(result, "21-[{value=11}, {value=12}, {value=13}, {value=14}]");
+        assertEcho(result, "22-[{value=11}, {value=12}, {value=13}, {value=14}]");
     }
 
     @Test
