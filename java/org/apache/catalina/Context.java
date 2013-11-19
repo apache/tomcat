@@ -583,15 +583,21 @@ public interface Context extends Container {
     /**
      * Get the server.xml <context> attribute's xmlNamespaceAware.
      * @return true if namespace awareness is enabled.
-     *
      */
     public boolean getXmlNamespaceAware();
 
 
     /**
+     * Set the namespace aware feature of the XML parser used when
+     * parsing xml instances.
+     * @param xmlNamespaceAware true to enable namespace awareness
+     */
+    public void setXmlNamespaceAware(boolean xmlNamespaceAware);
+
+
+    /**
      * Get the server.xml <context> attribute's xmlValidation.
      * @return true if validation is enabled.
-     *
      */
     public boolean getXmlValidation();
 
@@ -603,13 +609,6 @@ public interface Context extends Container {
      */
     public void setXmlValidation(boolean xmlValidation);
 
-
-   /**
-     * Set the namespace aware feature of the XML parser used when
-     * parsing xml instances.
-     * @param xmlNamespaceAware true to enable namespace awareness
-     */
-    public void setXmlNamespaceAware(boolean xmlNamespaceAware);
 
     /**
      * Get the Jar Scanner to be used to scan for JAR resources for this
