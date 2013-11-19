@@ -299,7 +299,7 @@ public class Request
 
 
     /**
-     * The Subject associated with the current AccessControllerContext
+     * The Subject associated with the current AccessControlContext
      */
     protected transient Subject subject = null;
 
