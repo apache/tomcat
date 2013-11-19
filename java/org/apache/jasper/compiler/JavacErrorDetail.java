@@ -82,6 +82,8 @@ public class JavacErrorDetail {
         this.javaLineNum = javaLineNum;
         this.errMsg = errMsg;
         this.jspFileName = jspFileName;
+        // Note: this.jspBeginLineNum is set at the end of this method as it may
+        //       be modified (corrected) during the execution of this method
 
         if (jspBeginLineNum > 0 && ctxt != null) {
             InputStream is = null;
@@ -120,9 +122,9 @@ public class JavacErrorDetail {
 
                 // copy out a fragment of JSP to display to the user
                 StringBuilder fragment = new StringBuilder(1024);
-                int startIndex = Math.max(0, this.jspBeginLineNum-1-3);
+                int startIndex = Math.max(0, jspBeginLineNum-1-3);
                 int endIndex = Math.min(
-                        jspLines.length-1, this.jspBeginLineNum-1+3);
+                        jspLines.length-1, jspBeginLineNum-1+3);
 
                 for (int i=startIndex;i<=endIndex; ++i) {
                     fragment.append(i+1);
