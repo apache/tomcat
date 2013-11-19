@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
  * Parser for Tag Plugin descriptors.
  */
 public class TagPluginParser {
-    private static final Log LOG = LogFactory.getLog(TagPluginParser.class);
+    private static final Log log = LogFactory.getLog(TagPluginParser.class);
     private static final String PREFIX = "tag-plugins/tag-plugin";
     private final Digester digester;
     private final Map<String, String> plugins = new HashMap<>();
@@ -58,7 +58,7 @@ public class TagPluginParser {
             source.setByteStream(is);
             digester.parse(source);
             if (!handler.getWarnings().isEmpty() || !handler.getErrors().isEmpty()) {
-                handler.logFindings(LOG, source.getSystemId());
+                handler.logFindings(log, source.getSystemId());
                 if (!handler.getErrors().isEmpty()) {
                     // throw the first to indicate there was a error during processing
                     throw handler.getErrors().iterator().next();

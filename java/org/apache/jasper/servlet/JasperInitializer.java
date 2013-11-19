@@ -42,7 +42,7 @@ public class JasperInitializer implements ServletContainerInitializer {
      */
     public static final String VALIDATE = "org.apache.jasper.validateDescriptors";
     private static final String MSG = "org.apache.jasper.servlet.JasperInitializer";
-    private static final Log LOG = LogFactory.getLog(JasperInitializer.class);
+    private static final Log log = LogFactory.getLog(JasperInitializer.class);
 
     /**
      * Preload classes required at runtime by a JSP servlet so that
@@ -77,8 +77,8 @@ public class JasperInitializer implements ServletContainerInitializer {
 
     @Override
     public void onStartup(Set<Class<?>> types, ServletContext context) throws ServletException {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(Localizer.getMessage(MSG + ".onStartup", context.getServletContextName()));
+        if (log.isDebugEnabled()) {
+            log.debug(Localizer.getMessage(MSG + ".onStartup", context.getServletContextName()));
         }
 
         boolean validate = Boolean.parseBoolean(context.getInitParameter(VALIDATE));
