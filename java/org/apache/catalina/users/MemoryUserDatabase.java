@@ -402,6 +402,8 @@ public class MemoryUserDatabase implements UserDatabase {
                                     pathname);
                 }
                 if (!file.exists()) {
+                    log.error(sm.getString("memoryUserDatabase.fileNotFound",
+                            file.getAbsolutePath()));
                     return;
                 }
 

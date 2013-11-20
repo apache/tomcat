@@ -136,6 +136,10 @@
         <code>javax.security.sasl.qop</code> environment property for the LDAP
         connection. (markt)
       </fix>
+      <fix>
+        <bug>55798</bug>: Log an error if the MemoryUserDatabase is unable to
+        find the specified user database file. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
