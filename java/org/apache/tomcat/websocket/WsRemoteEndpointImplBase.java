@@ -64,7 +64,6 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     private boolean messagePartInProgress = false;
     private final Queue<MessagePart> messagePartQueue = new ArrayDeque<>();
     private final Object messagePartLock = new Object();
-    private boolean dataMessageInProgress = false;
 
     // State
     private boolean closed = false;
@@ -265,14 +264,15 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 }
             }
             if (messagePartInProgress) {
+                // This must be a Control message else the state machine would
+                // have thrown an IllegalStateException.
+                // Leave the check in place for now.
+                // TODO Remove this check if there are no reports of problems
                 if (!Util.isControl(opCode)) {
-                    if (dataMessageInProgress) {
-                        throw new IllegalStateException(
-                                sm.getString("wsRemoteEndpoint.inProgress"));
-                    } else {
-                        dataMessageInProgress = true;
-                    }
+                    throw new IllegalStateException(
+                            sm.getString("wsRemoteEndpoint.inProgress"));
                 }
+                // Add it to the queue
                 messagePartQueue.add(mp);
             } else {
                 messagePartInProgress = true;
@@ -282,16 +282,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    void endMessage(SendHandler handler, SendResult result,
-            boolean dataMessage) {
+    void endMessage(SendHandler handler, SendResult result) {
         synchronized (messagePartLock) {
 
             fragmented = nextFragmented;
             text = nextText;
 
-            if (dataMessage) {
-                dataMessageInProgress = false;
-            }
             MessagePart mpNext = messagePartQueue.poll();
             if (mpNext == null) {
                 messagePartInProgress = false;
@@ -411,8 +407,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             this.opCode = opCode;
             this.payload = payload;
             this.last = last;
-            this.handler = new EndMessageHandler(
-                    endpoint, handler, !Util.isControl(opCode));
+            this.handler = new EndMessageHandler(endpoint, handler);
         }
 
 
@@ -445,19 +440,17 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         private final WsRemoteEndpointImplBase endpoint;
         private final SendHandler handler;
-        private final boolean dataMessage;
 
         public EndMessageHandler(WsRemoteEndpointImplBase endpoint,
-                SendHandler handler, boolean dataMessage) {
+                SendHandler handler) {
             this.endpoint = endpoint;
             this.handler = handler;
-            this.dataMessage = dataMessage;
         }
 
 
         @Override
         public void onResult(SendResult result) {
-            endpoint.endMessage(handler, result, dataMessage);
+            endpoint.endMessage(handler, result);
         }
     }
 
