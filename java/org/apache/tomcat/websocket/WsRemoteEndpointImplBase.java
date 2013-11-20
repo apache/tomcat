@@ -116,11 +116,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     public void sendBytes(ByteBuffer data) throws IOException {
         stateMachine.binaryStart();
-        try {
-            startMessageBlock(Constants.OPCODE_BINARY, data, true);
-        } finally {
-            stateMachine.complete(true);
-        }
+        startMessageBlock(Constants.OPCODE_BINARY, data, true);
+        stateMachine.complete(true);
     }
 
 
@@ -141,11 +138,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     public void sendPartialBytes(ByteBuffer partialByte, boolean last)
             throws IOException {
         stateMachine.binaryPartialStart();
-        try {
-            startMessageBlock(Constants.OPCODE_BINARY, partialByte, last);
-        } finally {
-            stateMachine.complete(last);
-        }
+        startMessageBlock(Constants.OPCODE_BINARY, partialByte, last);
+        stateMachine.complete(last);
     }
 
 
@@ -646,8 +640,10 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         @Override
         public void onResult(SendResult result) {
-            if (isDone || !result.isOK()) {
+            if (isDone) {
                 endpoint.stateMachine.complete(isLast);
+                handler.onResult(result);
+            } else if(!result.isOK()) {
                 handler.onResult(result);
             } else {
                 write();
@@ -1024,7 +1020,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         @Override
         public void onResult(SendResult result) {
-            stateMachine.complete(true);
+            if (result.isOK()) {
+                stateMachine.complete(true);
+            }
             handler.onResult(result);
         }
     }
