@@ -244,6 +244,10 @@
         in the security how-to section of the documentation web application.
         (markt)
       </add>
+      <fix>
+        Expand the description of the WebSocket buffers in the documentation web
+        application to clarify their purpose. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Extras">
