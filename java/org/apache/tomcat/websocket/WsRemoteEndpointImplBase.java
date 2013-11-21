@@ -258,14 +258,14 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 }
             }
             if (messagePartInProgress) {
-                // This must be a Control message else the state machine would
-                // have thrown an IllegalStateException.
-                // Leave the check in place for now.
-                // TODO Remove this check if there are no reports of problems
-                if (!Util.isControl(opCode)) {
-                    throw new IllegalStateException(
-                            sm.getString("wsRemoteEndpoint.inProgress"));
-                }
+                // When a control message is sent while another message is being
+                // the control message is queued. Chances are the subsequent
+                // data message part will end up queued while the control
+                // message is sent. The logic in this class (state machine,
+                // EndMessageHanlder, TextMessageSendHandler) ensures that there
+                // will only ever be one data message part in the queue. There
+                // could be multiple control messages in the queue.
+
                 // Add it to the queue
                 messagePartQueue.add(mp);
             } else {
