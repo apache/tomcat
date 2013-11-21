@@ -144,6 +144,11 @@
         Extend the reach of the Context attribute xmlValidation to cover XML
         parsing by Jasper the JSP engine. (markt)
       </add>
+      <fix>
+        <bug>55799</bug>: Correctly enforce the restriction in JSR356 that no
+        more than one data message may be sent to a remote WebSocket endpoint at
+        a time. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

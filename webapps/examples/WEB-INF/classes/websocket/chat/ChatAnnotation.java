@@ -22,15 +22,21 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 import util.HTMLFilter;
 
 @ServerEndpoint(value = "/websocket/chat")
 public class ChatAnnotation {
+
+    private static final Log log = LogFactory.getLog(ChatAnnotation.class);
 
     private static final String GUEST_PREFIX = "Guest";
     private static final AtomicInteger connectionIds = new AtomicInteger(0);
@@ -72,11 +78,22 @@ public class ChatAnnotation {
     }
 
 
+
+
+    @OnError
+    public void onError(Throwable t) throws Throwable {
+        log.error("Chat Error: " + t.toString(), t);
+    }
+
+
     private static void broadcast(String msg) {
         for (ChatAnnotation client : connections) {
             try {
-                client.session.getBasicRemote().sendText(msg);
+                synchronized (client) {
+                    client.session.getBasicRemote().sendText(msg);
+                }
             } catch (IOException e) {
+                log.debug("Chat Error: Failed to send message to client", e);
                 connections.remove(client);
                 try {
                     client.session.close();

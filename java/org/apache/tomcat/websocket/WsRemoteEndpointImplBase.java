@@ -59,13 +59,14 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     private final Log log = LogFactory.getLog(WsRemoteEndpointImplBase.class);
 
+    private final StateMachine stateMachine = new StateMachine();
+
     private boolean messagePartInProgress = false;
     private final Queue<MessagePart> messagePartQueue = new ArrayDeque<MessagePart>();
     private final Object messagePartLock = new Object();
-    private boolean dataMessageInProgress = false;
 
     // State
-    private boolean closed = false;
+    private volatile boolean closed = false;
     private boolean fragmented = false;
     private boolean nextFragmented = false;
     private boolean text = false;
@@ -114,7 +115,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
 
     public void sendBytes(ByteBuffer data) throws IOException {
+        stateMachine.binaryStart();
         startMessageBlock(Constants.OPCODE_BINARY, data, true);
+        stateMachine.complete(true);
     }
 
 
@@ -126,13 +129,17 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
 
     public void sendBytesByCompletion(ByteBuffer data, SendHandler handler) {
-        startMessage(Constants.OPCODE_BINARY, data, true, handler);
+        StateUpdateSendHandler sush = new StateUpdateSendHandler(handler);
+        stateMachine.binaryStart();
+        startMessage(Constants.OPCODE_BINARY, data, true, sush);
     }
 
 
     public void sendPartialBytes(ByteBuffer partialByte, boolean last)
             throws IOException {
+        stateMachine.binaryPartialStart();
         startMessageBlock(Constants.OPCODE_BINARY, partialByte, last);
+        stateMachine.complete(last);
     }
 
 
@@ -151,6 +158,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
 
     public void sendString(String text) throws IOException {
+        stateMachine.textStart();
         sendPartialString(CharBuffer.wrap(text), true);
     }
 
@@ -163,24 +171,29 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
 
     public void sendStringByCompletion(String text, SendHandler handler) {
+        stateMachine.textStart();
         TextMessageSendHandler tmsh = new TextMessageSendHandler(handler,
                 CharBuffer.wrap(text), true, encoder, encoderBuffer, this);
         tmsh.write();
+        // TextMessageSendHandler will update stateMachine when it completes
     }
 
 
     public void sendPartialString(String fragment, boolean isLast)
             throws IOException {
+        stateMachine.textPartialStart();
         sendPartialString(CharBuffer.wrap(fragment), isLast);
     }
 
 
     public OutputStream getSendStream() {
+        stateMachine.streamStart();
         return new WsOutputStream(this);
     }
 
 
     public Writer getSendWriter() {
+        stateMachine.writeStart();
         return new WsWriter(this);
     }
 
@@ -251,14 +264,15 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 }
             }
             if (messagePartInProgress) {
-                if (!Util.isControl(opCode)) {
-                    if (dataMessageInProgress) {
-                        throw new IllegalStateException(
-                                sm.getString("wsRemoteEndpoint.inProgress"));
-                    } else {
-                        dataMessageInProgress = true;
-                    }
-                }
+                // When a control message is sent while another message is being
+                // the control message is queued. Chances are the subsequent
+                // data message part will end up queued while the control
+                // message is sent. The logic in this class (state machine,
+                // EndMessageHanlder, TextMessageSendHandler) ensures that there
+                // will only ever be one data message part in the queue. There
+                // could be multiple control messages in the queue.
+
+                // Add it to the queue
                 messagePartQueue.add(mp);
             } else {
                 messagePartInProgress = true;
@@ -268,16 +282,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    void endMessage(SendHandler handler, SendResult result,
-            boolean dataMessage) {
+    void endMessage(SendHandler handler, SendResult result) {
         synchronized (messagePartLock) {
 
             fragmented = nextFragmented;
             text = nextText;
 
-            if (dataMessage) {
-                dataMessageInProgress = false;
-            }
             MessagePart mpNext = messagePartQueue.poll();
             if (mpNext == null) {
                 messagePartInProgress = false;
@@ -397,8 +407,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             this.opCode = opCode;
             this.payload = payload;
             this.last = last;
-            this.handler = new EndMessageHandler(
-                    endpoint, handler, !Util.isControl(opCode));
+            this.handler = new EndMessageHandler(endpoint, handler);
         }
 
 
@@ -431,19 +440,17 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         private final WsRemoteEndpointImplBase endpoint;
         private final SendHandler handler;
-        private final boolean dataMessage;
 
         public EndMessageHandler(WsRemoteEndpointImplBase endpoint,
-                SendHandler handler, boolean dataMessage) {
+                SendHandler handler) {
             this.endpoint = endpoint;
             this.handler = handler;
-            this.dataMessage = dataMessage;
         }
 
 
         @Override
         public void onResult(SendResult result) {
-            endpoint.endMessage(handler, result, dataMessage);
+            endpoint.endMessage(handler, result);
         }
     }
 
@@ -633,7 +640,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    private static class TextMessageSendHandler implements SendHandler {
+    private class TextMessageSendHandler implements SendHandler {
 
         private final SendHandler handler;
         private final CharBuffer message;
@@ -668,8 +675,15 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         @Override
         public void onResult(SendResult result) {
-            if (isDone || !result.isOK()) {
+            if (isDone) {
+                endpoint.stateMachine.complete(isLast);
                 handler.onResult(result);
+            } else if(!result.isOK()) {
+                handler.onResult(result);
+            } else if (closed){
+                SendResult sr = new SendResult(new IOException(
+                        sm.getString("wsRemoteEndpoint.closedDuringMessage")));
+                handler.onResult(sr);
             } else {
                 write();
             }
@@ -948,6 +962,109 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         public Encoder getEncoder() {
             return encoder;
+        }
+    }
+
+
+    private static enum State {
+        OPEN,
+        STREAM_WRITING,
+        WRITER_WRITING,
+        BINARY_PARTIAL_WRITING,
+        BINARY_PARTIAL_READY,
+        BINARY_FULL_WRITING,
+        TEXT_PARTIAL_WRITING,
+        TEXT_PARTIAL_READY,
+        TEXT_FULL_WRITING
+    }
+
+
+    private static class StateMachine {
+        private State state = State.OPEN;
+
+        public synchronized void streamStart() {
+            checkState(State.OPEN);
+            state = State.STREAM_WRITING;
+        }
+
+        public synchronized void writeStart() {
+            checkState(State.OPEN);
+            state = State.WRITER_WRITING;
+        }
+
+        public synchronized void binaryPartialStart() {
+            checkState(State.OPEN, State.BINARY_PARTIAL_READY);
+            state = State.BINARY_PARTIAL_WRITING;
+        }
+
+        public synchronized void binaryStart() {
+            checkState(State.OPEN);
+            state = State.BINARY_FULL_WRITING;
+        }
+
+        public synchronized void textPartialStart() {
+            checkState(State.OPEN, State.TEXT_PARTIAL_READY);
+            state = State.TEXT_PARTIAL_WRITING;
+        }
+
+        public synchronized void textStart() {
+            checkState(State.OPEN);
+            state = State.TEXT_FULL_WRITING;
+        }
+
+        public synchronized void complete(boolean last) {
+            if (last) {
+                checkState(State.TEXT_PARTIAL_WRITING, State.TEXT_FULL_WRITING,
+                        State.BINARY_PARTIAL_WRITING, State.BINARY_FULL_WRITING,
+                        State.STREAM_WRITING, State.WRITER_WRITING);
+                state = State.OPEN;
+            } else {
+                checkState(State.TEXT_PARTIAL_WRITING, State.BINARY_PARTIAL_WRITING,
+                        State.STREAM_WRITING, State.WRITER_WRITING);
+                if (state == State.TEXT_PARTIAL_WRITING) {
+                    state = State.TEXT_PARTIAL_READY;
+                } else if (state == State.BINARY_PARTIAL_WRITING){
+                    state = State.BINARY_PARTIAL_READY;
+                } else if (state == State.WRITER_WRITING) {
+                    // NO-OP. Leave state as is.
+                } else if (state == State.STREAM_WRITING) {
+                 // NO-OP. Leave state as is.
+                } else {
+                    // Should never happen
+                    // The if ... else ... blocks above should cover all states
+                    // permitted by the preceding checkState() call
+                    throw new IllegalStateException(
+                            "BUG: This code should never be called");
+                }
+            }
+        }
+
+        private void checkState(State... required) {
+            for (State state : required) {
+                if (this.state == state) {
+                    return;
+                }
+            }
+            throw new IllegalStateException(
+                    sm.getString("wsRemoteEndpoint.wrongState", this.state));
+        }
+    }
+
+
+    private class StateUpdateSendHandler implements SendHandler {
+
+        private final SendHandler handler;
+
+        public StateUpdateSendHandler(SendHandler handler) {
+            this.handler = handler;
+        }
+
+        @Override
+        public void onResult(SendResult result) {
+            if (result.isOK()) {
+                stateMachine.complete(true);
+            }
+            handler.onResult(result);
         }
     }
 }
