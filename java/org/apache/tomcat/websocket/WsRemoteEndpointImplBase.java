@@ -66,7 +66,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     private final Object messagePartLock = new Object();
 
     // State
-    private boolean closed = false;
+    private volatile boolean closed = false;
     private boolean fragmented = false;
     private boolean nextFragmented = false;
     private boolean text = false;
@@ -605,7 +605,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    private static class TextMessageSendHandler implements SendHandler {
+    private class TextMessageSendHandler implements SendHandler {
 
         private final SendHandler handler;
         private final CharBuffer message;
@@ -645,6 +645,10 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 handler.onResult(result);
             } else if(!result.isOK()) {
                 handler.onResult(result);
+            } else if (closed){
+                SendResult sr = new SendResult(new IOException(
+                        sm.getString("wsRemoteEndpoint.closedDuringMessage")));
+                handler.onResult(sr);
             } else {
                 write();
             }
