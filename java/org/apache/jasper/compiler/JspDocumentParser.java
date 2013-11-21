@@ -1428,16 +1428,24 @@ class JspDocumentParser
         throws Exception {
 
         SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
 
+        factory.setNamespaceAware(true);
         // Preserve xmlns attributes
         factory.setFeature(
             "http://xml.org/sax/features/namespace-prefixes",
             true);
+
         factory.setValidating(validating);
-        //factory.setFeature(
-        //    "http://xml.org/sax/features/validation",
-        //    validating);
+        if (validating) {
+            // Enable DTD validation
+            factory.setFeature(
+                    "http://xml.org/sax/features/validation",
+                    true);
+            // Enable schema validation
+            factory.setFeature(
+                    "http://apache.org/xml/features/validation/schema",
+                    true);
+        }
 
         // Configure the parser
         SAXParser saxParser = factory.newSAXParser();

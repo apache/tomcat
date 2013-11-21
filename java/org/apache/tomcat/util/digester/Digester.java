@@ -468,7 +468,15 @@ public class Digester extends DefaultHandler {
 
         if (factory == null) {
             factory = SAXParserFactory.newInstance();
+
             factory.setNamespaceAware(namespaceAware);
+            // Preserve xmlns attributes
+            if (namespaceAware) {
+                factory.setFeature(
+                        "http://xml.org/sax/features/namespace-prefixes",
+                        true);
+            }
+
             factory.setValidating(validating);
             if (validating) {
                 // Enable DTD validation
