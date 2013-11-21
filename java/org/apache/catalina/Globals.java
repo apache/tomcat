@@ -69,8 +69,8 @@ public final class Globals {
 
 
     /**
-     * The JNDI directory context which is associated with the context. This
-     * context can be used to manipulate static files.
+     * The WebResourceRoot which is associated with the context. This can be
+     * used to manipulate static files.
      */
     public static final String RESOURCES_ATTR =
         "org.apache.catalina.resources";
