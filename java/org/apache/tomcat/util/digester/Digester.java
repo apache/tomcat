@@ -416,9 +416,11 @@ public class Digester extends DefaultHandler2 {
 
             factory.setNamespaceAware(namespaceAware);
             // Preserve xmlns attributes
-            factory.setFeature(
-                "http://xml.org/sax/features/namespace-prefixes",
-                true);
+            if (namespaceAware) {
+                factory.setFeature(
+                        "http://xml.org/sax/features/namespace-prefixes",
+                        true);
+            }
 
             factory.setValidating(validating);
             if (validating) {
