@@ -25,8 +25,8 @@ import java.util.Map.Entry;
 
 import javax.servlet.ServletContext;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
-import org.apache.jasper.servlet.JasperInitializer;
 import org.apache.tomcat.util.descriptor.tld.TaglibXml;
 import org.apache.tomcat.util.descriptor.tld.TldParser;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
@@ -73,7 +73,7 @@ public class TldCache {
             this.tldResourcePathTaglibXmlMap.put(tldResourcePath, cacheEntry);
         }
         boolean validate = Boolean.parseBoolean(
-                servletContext.getInitParameter(JasperInitializer.VALIDATE));
+                servletContext.getInitParameter(Constants.XML_VALIDATION_ATTR));
         tldParser = new TldParser(true, validate);
     }
 
