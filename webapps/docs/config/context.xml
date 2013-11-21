@@ -537,10 +537,15 @@
       </attribute>
 
       <attribute name="xmlNamespaceAware" required="false">
-        <p>If the value of this flag is <code>true</code>, the validation of
-        XML files will be namespace-aware.  If you turn this flag on,
-        you should probably also turn <code>xmlValidation</code> on. If
-        the <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
+        <p>If the value of this flag is <code>true</code>, the parsing of
+        <code>web.xml</code> and <code>web-fragment.xml</code> files for this
+        web application will be namespace-aware. Note that <code>*.tld</code>,
+        <code>*.jspx</code> and <code>*.tagx</code> files are always parsed
+        using a namespace-aware parser and that the <code>tagPlugins.xml</code>
+        file (if any) is never parsed using a namespace-aware parser. Note also
+        that if you turn this flag on, you should probably also turn
+        <code>xmlValidation</code> on. If the
+        <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
         <a href="systemprops.html">system property</a> is set to
         <code>true</code>, the default value of this attribute will be
         <code>true</code>, else the default value will be <code>false</code>.
