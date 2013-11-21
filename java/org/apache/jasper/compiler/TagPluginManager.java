@@ -120,7 +120,7 @@ public class TagPluginManager {
             throws JasperException {
 
         TreeNode root =
-                (new ParserUtils()).parseXMLDocument(TAG_PLUGINS_XML, is);
+                (new ParserUtils(false)).parseXMLDocument(TAG_PLUGINS_XML, is);
         if (root == null) {
             return;
         }

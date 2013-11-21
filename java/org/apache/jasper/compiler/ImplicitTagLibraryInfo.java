@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import java.io.InputStream;
@@ -29,6 +28,7 @@ import javax.servlet.jsp.tagext.TagFileInfo;
 import javax.servlet.jsp.tagext.TagInfo;
 import javax.servlet.jsp.tagext.TagLibraryInfo;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.util.ExceptionUtils;
@@ -124,7 +124,11 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
                                 pi.addDependant(path, ctxt.getLastModified(path));
                             }
                             
-                            ParserUtils pu = new ParserUtils();
+                            boolean validate = Boolean.parseBoolean(
+                                    ctxt.getServletContext().getInitParameter(
+                                            Constants.XML_VALIDATION_ATTR));
+
+                            ParserUtils pu = new ParserUtils(validate);
                             TreeNode tld = pu.parseXMLDocument(uri, in);
 
                             if (tld.findAttribute("version") != null) {

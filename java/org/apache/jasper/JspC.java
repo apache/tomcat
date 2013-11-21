@@ -156,6 +156,7 @@ public class JspC extends Task implements Options {
     protected URLClassLoader loader = null;
     protected boolean trimSpaces = false;
     protected boolean genStringAsCharArray = false;
+    protected boolean validateXml;
     protected boolean xpoweredBy;
     protected boolean mappedFile = false;
     protected boolean poolingEnabled = true;
@@ -843,7 +844,11 @@ public class JspC extends Task implements Options {
     }
 
     public void setValidateXml( boolean b ) {
-        org.apache.jasper.xmlparser.ParserUtils.validating=b;
+        this.validateXml = b;
+    }
+
+    public boolean isValidateXml() {
+        return validateXml;
     }
 
     public void setListErrors( boolean b ) {

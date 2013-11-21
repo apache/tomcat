@@ -30,6 +30,7 @@ import javax.servlet.jsp.tagext.TagLibraryInfo;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.xml.sax.Attributes;
@@ -162,8 +163,13 @@ class JspDocumentParser
                 jspDocParser.isTop = false;
             }
 
+            boolean validate = Boolean.parseBoolean(
+                    pc.getJspCompilationContext().getServletContext().getInitParameter(
+                            Constants.XML_VALIDATION_ATTR));
+            jspDocParser.isValidating = validate;
+
             // Parse the input
-            SAXParser saxParser = getSAXParser(false, jspDocParser);
+            SAXParser saxParser = getSAXParser(validate, jspDocParser);
             InputStream inStream = null;
             try {
                 inStream = JspUtil.getInputStream(path, jarFile,

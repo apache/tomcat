@@ -140,6 +140,10 @@
         <bug>55798</bug>: Log an error if the MemoryUserDatabase is unable to
         find the specified user database file. (markt)
       </fix>
+      <add>
+        Extend the reach of the Context attribute xmlValidation to cover XML
+        parsing by Jasper the JSP engine. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

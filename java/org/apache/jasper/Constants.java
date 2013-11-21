@@ -14,13 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 
 /**
  * Some constants and other global data that are used by the compiler and the runtime.
@@ -233,4 +231,13 @@ public class Constants {
      */
     public static final String TLD_JAR_SKIP_PROP=
             "org.apache.catalina.startup.TldConfig.jarsToSkip";
+
+
+    /**
+     * Name of the ServletContext attribute that determines if the XML parsers
+     * used for *.tld, *.jspx and *.tagx files will be validating or not.
+     * <p>
+     * This must be kept in sync with org.apache.catalina.Globals
+     */
+    public static final String XML_VALIDATION_ATTR = "org.apache.jasper.XML_VALIDATE";
 }

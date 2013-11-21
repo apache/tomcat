@@ -30,7 +30,6 @@ import org.apache.jasper.compiler.JspConfig;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.compiler.TagPluginManager;
 import org.apache.jasper.compiler.TldLocationsCache;
-import org.apache.jasper.xmlparser.ParserUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -456,11 +455,7 @@ public final class EmbeddedServletOptions implements Options {
             String v=config.getInitParameter( k );
             setProperty( k, v);
         }
-        
-        // quick hack
-        String validating=config.getInitParameter( "validating");
-        if( "false".equals( validating )) ParserUtils.validating=false;
-        
+                
         String keepgen = config.getInitParameter("keepgenerated");
         if (keepgen != null) {
             if (keepgen.equalsIgnoreCase("true")) {

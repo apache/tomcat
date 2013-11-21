@@ -22,6 +22,7 @@ import java.util.Vector;
 
 import javax.servlet.ServletContext;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.xmlparser.ParserUtils;
 import org.apache.jasper.xmlparser.TreeNode;
@@ -77,9 +78,12 @@ public class JspConfig {
         try {
             webXml = new WebXml(ctxt);
             
+            boolean validate = Boolean.parseBoolean(
+                    ctxt.getInitParameter(Constants.XML_VALIDATION_ATTR));
+
             TreeNode webApp = null;
             if (webXml.getInputSource() != null) {
-                ParserUtils pu = new ParserUtils();
+                ParserUtils pu = new ParserUtils(validate);
                 webApp = pu.parseXMLDocument(webXml.getSystemId(),
                         webXml.getInputSource());
             }

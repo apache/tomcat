@@ -286,9 +286,13 @@ public class TldLocationsCache {
                 return;
             }
 
+            boolean validate = Boolean.parseBoolean(
+                    ctxt.getInitParameter(
+                            Constants.XML_VALIDATION_ATTR));
+
             // Parse the web application deployment descriptor
             TreeNode webtld = null;
-            webtld = new ParserUtils().parseXMLDocument(webXml.getSystemId(),
+            webtld = new ParserUtils(validate).parseXMLDocument(webXml.getSystemId(),
                     webXml.getInputSource());
 
             // Allow taglib to be an element of the root or jsp-config (JSP2.0)
@@ -491,8 +495,12 @@ public class TldLocationsCache {
             // Parse the tag library descriptor at the specified resource path
             String uri = null;
 
-            TreeNode tld =
-                new ParserUtils().parseXMLDocument(resourcePath, stream);
+            boolean validate = Boolean.parseBoolean(
+                    ctxt.getInitParameter(
+                            Constants.XML_VALIDATION_ATTR));
+
+            TreeNode tld = new ParserUtils(validate).parseXMLDocument(
+                    resourcePath, stream);
             TreeNode uriNode = tld.findChild("uri");
             if (uriNode != null) {
                 String body = uriNode.getBody();
