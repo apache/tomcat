@@ -557,8 +557,12 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         @SuppressWarnings("deprecation") // Old HTTP upgrade method has been deprecated
         public SocketState process(SocketWrapper<S> wrapper,
                 SocketStatus status) {
-            S socket = wrapper.getSocket();
+            if (wrapper == null) {
+                // Nothing to do. Socket has been closed.
+                return SocketState.CLOSED;
+            }
 
+            S socket = wrapper.getSocket();
             if (socket == null) {
                 // Nothing to do. Socket has been closed.
                 return SocketState.CLOSED;
