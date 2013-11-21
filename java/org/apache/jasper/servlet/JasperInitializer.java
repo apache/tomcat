@@ -24,6 +24,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.jsp.JspFactory;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.compiler.TldCache;
 import org.apache.jasper.runtime.JspFactoryImpl;
@@ -36,11 +37,7 @@ import org.xml.sax.SAXException;
  * Initializer for the Jasper JSP Engine.
  */
 public class JasperInitializer implements ServletContainerInitializer {
-    /**
-     * Name of ServletContext initParam that determines if descriptor XML
-     * should be validated.
-     */
-    public static final String VALIDATE = "org.apache.jasper.validateDescriptors";
+
     private static final String MSG = "org.apache.jasper.servlet.JasperInitializer";
     private static final Log log = LogFactory.getLog(JasperInitializer.class);
 
@@ -81,7 +78,8 @@ public class JasperInitializer implements ServletContainerInitializer {
             log.debug(Localizer.getMessage(MSG + ".onStartup", context.getServletContextName()));
         }
 
-        boolean validate = Boolean.parseBoolean(context.getInitParameter(VALIDATE));
+        boolean validate = Boolean.parseBoolean(
+                context.getInitParameter(Constants.XML_VALIDATION_ATTR));
 
         // scan the application for TLDs
         TldScanner scanner = new TldScanner(context, true, validate);

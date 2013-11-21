@@ -150,4 +150,13 @@ public class Constants {
      * the tomcat product installation path
      */
     public static final String CATALINA_HOME_PROP = "catalina.home";
+
+
+    /**
+     * Name of the ServletContext attribute that determines if the XML parsers
+     * used for *.tld, *.jspx and *.tagx files will be validating or not.
+     * <p>
+     * This must be kept in sync with org.apache.catalina.Globals
+     */
+    public static final String XML_VALIDATION_ATTR = "org.apache.jasper.XML_VALIDATE";
 }

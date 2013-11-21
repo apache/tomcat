@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
-
 
 /**
  * Global constants that are applicable to multiple packages within Catalina.
@@ -25,7 +22,6 @@ package org.apache.catalina;
  * @author Craig R. McClanahan
  * @version $Id$
  */
-
 public final class Globals {
 
     /**
@@ -273,4 +269,14 @@ public final class Globals {
      * the tomcat instance installation path
      */
     public static final String CATALINA_BASE_PROP = "catalina.base";
+
+
+    /**
+     * Name of the ServletContext attribute that determines if the JSP engine
+     * should validate *.tld, *.jspx and *.tagx files when parsing them.
+     * <p>
+     * This must be kept in sync with org.apache.japser.Constants
+     */
+    public static final String JASPER_XML_VALIDATION_ATTR =
+            "org.apache.jasper.XML_VALIDATE";
 }

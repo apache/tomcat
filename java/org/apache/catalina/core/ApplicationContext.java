@@ -221,6 +221,12 @@ public class ApplicationContext
     @Override
     public Object getAttribute(String name) {
 
+        // Special handling for XML validation as the context setting must
+        // always override anything that might have been set by an application.
+        if (Globals.JASPER_XML_VALIDATION_ATTR.equals(name) &&
+                context.getXmlValidation()) {
+            return Boolean.TRUE;
+        }
         return (attributes.get(name));
 
     }
@@ -234,6 +240,11 @@ public class ApplicationContext
     public Enumeration<String> getAttributeNames() {
         Set<String> names = new HashSet<>();
         names.addAll(attributes.keySet());
+        // Special handling for XML validation as this attribute will always be
+        // available if validation has been enabled on the context
+        if (context.getXmlValidation()) {
+            names.add(Globals.JASPER_XML_VALIDATION_ATTR);
+        }
         return Collections.enumeration(names);
     }
 

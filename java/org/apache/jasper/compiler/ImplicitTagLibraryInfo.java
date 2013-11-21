@@ -29,6 +29,7 @@ import javax.servlet.jsp.tagext.TagFileInfo;
 import javax.servlet.jsp.tagext.TagInfo;
 import javax.servlet.jsp.tagext.TagLibraryInfo;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.tomcat.util.descriptor.tld.ImplicitTldRuleSet;
@@ -118,8 +119,10 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
                     try {
                         URL url = ctxt.getResource(path);
                         TldResourcePath resourcePath = new TldResourcePath(url, path);
-                        // TODO enable validation
-                        TldParser parser = new TldParser(true, false, new ImplicitTldRuleSet());
+                        boolean validate = Boolean.parseBoolean(
+                                ctxt.getServletContext().getInitParameter(
+                                        Constants.XML_VALIDATION_ATTR));
+                        TldParser parser = new TldParser(true, validate, new ImplicitTldRuleSet());
                         taglibXml = parser.parse(resourcePath);
                     } catch (IOException | SAXException e) {
                         err.jspError(e);
