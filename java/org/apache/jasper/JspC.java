@@ -133,6 +133,8 @@ public class JspC extends Task implements Options {
     protected static final String SWITCH_ENCODING = "-javaEncoding";
     protected static final String SWITCH_SMAP = "-smap";
     protected static final String SWITCH_DUMP_SMAP = "-dumpsmap";
+    protected static final String SWITCH_VALIDATE_TLD = "-validateTld";
+    protected static final String SWITCH_VALIDATE_DOC = "-validateDoc";
     protected static final String SHOW_SUCCESS ="-s";
     protected static final String LIST_ERRORS = "-l";
     protected static final int INC_WEBXML = 10;
@@ -164,6 +166,7 @@ public class JspC extends Task implements Options {
     protected boolean trimSpaces = false;
     protected boolean genStringAsCharArray = false;
     protected boolean validateXml;
+    protected boolean validateJspDoc;
     protected boolean xpoweredBy;
     protected boolean mappedFile = false;
     protected boolean poolingEnabled = true;
@@ -370,6 +373,10 @@ public class JspC extends Task implements Options {
                 smapSuppressed = false;
             } else if (tok.equals(SWITCH_DUMP_SMAP)) {
                 smapDumped = true;
+            } else if (tok.equals(SWITCH_VALIDATE_TLD)) {
+                setValidateXml(true);
+            } else if (tok.equals(SWITCH_VALIDATE_DOC)) {
+                setValidateJspDoc(true);
             } else {
                 if (tok.startsWith("-")) {
                     throw new JasperException("Unrecognized option: " + tok +
@@ -855,6 +862,14 @@ public class JspC extends Task implements Options {
 
     public boolean isValidateXml() {
         return validateXml;
+    }
+
+    public void setValidateJspDoc( boolean b ) {
+        this.validateJspDoc = b;
+    }
+
+    public boolean isValidateJspDoc() {
+        return validateJspDoc;
     }
 
     public void setListErrors( boolean b ) {
@@ -1434,6 +1449,11 @@ public class JspC extends Task implements Options {
         URL resourceBase = new File(uriRoot).getCanonicalFile().toURI().toURL();
 
         context = new JspCServletContext(log, resourceBase, classLoader);
+        if (isValidateJspDoc()) {
+            context.setAttribute(Constants.XML_VALIDATION_DOC_ATTR,
+                    Boolean.TRUE);
+        }
+
         TldScanner scanner = new TldScanner(context, true, validateXml);
         scanner.setClassLoader(classLoader);
 
