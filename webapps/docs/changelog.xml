@@ -140,10 +140,6 @@
         <bug>55798</bug>: Log an error if the MemoryUserDatabase is unable to
         find the specified user database file. (markt)
       </fix>
-      <add>
-        Extend the reach of the Context attribute xmlValidation to cover XML
-        parsing by Jasper the JSP engine. (markt)
-      </add>
       <fix>
         <bug>55799</bug>: Correctly enforce the restriction in JSR356 that no
         more than one data message may be sent to a remote WebSocket endpoint at
@@ -159,6 +155,11 @@
         Deprecate the <code>tldNamespaceAware</code> Context attribute as TLDs
         are always parsed with a namespace aware parser. (markt)
       </fix>
+      <add>
+        Add a new <code>xmlValidationJspDoc</code> attribute to the Context to
+        control if Jasper (the JSP engine) uses a validating parser when
+        processing *.jspx and *.tagx files. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
