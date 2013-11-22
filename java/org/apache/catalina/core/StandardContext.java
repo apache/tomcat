@@ -6372,8 +6372,8 @@ public class StandardContext extends ContainerBase
 
 
     @Override
-    public void setXmlValidation(boolean webXmlValidation){
-        this.xmlValidation = webXmlValidation;
+    public void setXmlValidation(boolean xmlValidation){
+        this.xmlValidation = xmlValidation;
     }
 
 
@@ -6384,8 +6384,8 @@ public class StandardContext extends ContainerBase
 
 
     @Override
-    public void setXmlValidationJspDoc(boolean webXmlValidationJspDoc){
-        this.xmlValidationJspDoc = webXmlValidationJspDoc;
+    public void setXmlValidationJspDoc(boolean xmlValidationJspDoc){
+        this.xmlValidationJspDoc = xmlValidationJspDoc;
     }
 
 
@@ -6402,8 +6402,8 @@ public class StandardContext extends ContainerBase
 
 
     @Override
-    public void setXmlNamespaceAware(boolean webXmlNamespaceAware){
-        this.xmlNamespaceAware= webXmlNamespaceAware;
+    public void setXmlNamespaceAware(boolean xmlNamespaceAware){
+        this.xmlNamespaceAware = xmlNamespaceAware;
     }
 
 
