@@ -732,6 +732,13 @@ public class StandardContext extends ContainerBase
 
 
     /**
+     * Attribute value used to turn on/off XML validation for *.jspx and *.tagx
+     * files.
+     */
+    private boolean xmlValidationJspDoc = false;
+
+
+    /**
      * Attribute value used to turn on/off XML namespace validation
      */
     private boolean webXmlNamespaceAware = Globals.STRICT_SERVLET_COMPLIANCE;
@@ -6628,6 +6635,18 @@ public class StandardContext extends ContainerBase
     @Override
     public boolean getTldValidation(){
         return tldValidation;
+    }
+
+
+    @Override
+    public void setXmlValidationJspDoc(boolean webXmlValidationJspDoc){
+        this.xmlValidationJspDoc = webXmlValidationJspDoc;
+    }
+
+
+    @Override
+    public boolean getXmlValidationJspDoc(){
+        return xmlValidationJspDoc;
     }
 
     
