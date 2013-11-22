@@ -220,15 +220,6 @@ public class ApplicationContext
      */
     @Override
     public Object getAttribute(String name) {
-        // Special handling for XML validation as the context setting must
-        // always override anything that might have been set by an application.
-        if (Globals.JASPER_XML_VALIDATION_TLD_ATTR.equals(name) &&
-                context.getTldValidation()) {
-            return Boolean.TRUE;
-        } else if (Globals.JASPER_XML_VALIDATION_DOC_ATTR.equals(name) &&
-                context.getXmlValidationJspDoc()) {
-            return Boolean.TRUE;
-        }
         return (attributes.get(name));
     }
 
@@ -241,14 +232,6 @@ public class ApplicationContext
     public Enumeration<String> getAttributeNames() {
         Set<String> names = new HashSet<>();
         names.addAll(attributes.keySet());
-        // Special handling for XML validation as this attribute will always be
-        // available if validation has been enabled on the context
-        if (context.getTldValidation()) {
-            names.add(Globals.JASPER_XML_VALIDATION_TLD_ATTR);
-        }
-        if (context.getXmlValidationJspDoc()) {
-            names.add(Globals.JASPER_XML_VALIDATION_DOC_ATTR);
-        }
         return Collections.enumeration(names);
     }
 
@@ -321,6 +304,15 @@ public class ApplicationContext
      */
     @Override
     public String getInitParameter(final String name) {
+        // Special handling for XML validation as the context setting must
+        // always override anything that might have been set by an application.
+        if (Globals.JASPER_XML_VALIDATION_TLD_INIT_PARAM.equals(name) &&
+                context.getTldValidation()) {
+            return "true";
+        } else if (Globals.JASPER_XML_VALIDATION_DOC_INIT_PARAM.equals(name) &&
+                context.getXmlValidationJspDoc()) {
+            return "true";
+        }
         return parameters.get(name);
     }
 
@@ -331,7 +323,17 @@ public class ApplicationContext
      */
     @Override
     public Enumeration<String> getInitParameterNames() {
-        return Collections.enumeration(parameters.keySet());
+        Set<String> names = new HashSet<>();
+        names.addAll(parameters.keySet());
+        // Special handling for XML validation as this attribute will always be
+        // available if validation has been enabled on the context
+        if (context.getTldValidation()) {
+            names.add(Globals.JASPER_XML_VALIDATION_TLD_INIT_PARAM);
+        }
+        if (context.getXmlValidationJspDoc()) {
+            names.add(Globals.JASPER_XML_VALIDATION_DOC_INIT_PARAM);
+        }
+        return Collections.enumeration(names);
     }
 
 
