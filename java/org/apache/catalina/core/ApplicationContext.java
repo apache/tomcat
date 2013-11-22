@@ -220,15 +220,16 @@ public class ApplicationContext
      */
     @Override
     public Object getAttribute(String name) {
-
         // Special handling for XML validation as the context setting must
         // always override anything that might have been set by an application.
         if (Globals.JASPER_XML_VALIDATION_ATTR.equals(name) &&
-                context.getXmlValidation()) {
+                context.getTldValidation()) {
+            return Boolean.TRUE;
+        } else if (Globals.JASPER_XML_VALIDATION_DOC_ATTR.equals(name) &&
+                context.getXmlValidationJspDoc()) {
             return Boolean.TRUE;
         }
         return (attributes.get(name));
-
     }
 
 
@@ -242,8 +243,11 @@ public class ApplicationContext
         names.addAll(attributes.keySet());
         // Special handling for XML validation as this attribute will always be
         // available if validation has been enabled on the context
-        if (context.getXmlValidation()) {
+        if (context.getTldValidation()) {
             names.add(Globals.JASPER_XML_VALIDATION_ATTR);
+        }
+        if (context.getXmlValidationJspDoc()) {
+            names.add(Globals.JASPER_XML_VALIDATION_DOC_ATTR);
         }
         return Collections.enumeration(names);
     }

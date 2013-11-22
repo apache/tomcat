@@ -688,10 +688,10 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Attribute value used to turn on/off XML validation for web.xml,
-     * web-fragment.xml and *.tld files.
+     * Attribute value used to turn on/off XML validation for web.xml and
+     * web-fragment.xml files.
      */
-    private boolean xmlValidation = Globals.STRICT_SERVLET_COMPLIANCE;
+    private boolean webXmlValidation = Globals.STRICT_SERVLET_COMPLIANCE;
 
 
     /**
@@ -704,7 +704,12 @@ public class StandardContext extends ContainerBase
     /**
      * Attribute value used to turn on/off XML namespace validation
      */
-    private boolean xmlNamespaceAware = Globals.STRICT_SERVLET_COMPLIANCE;
+    private boolean webXmlNamespaceAware = Globals.STRICT_SERVLET_COMPLIANCE;
+
+    /**
+     * Attribute value used to turn on/off XML validation
+     */
+    private boolean tldValidation = Globals.STRICT_SERVLET_COMPLIANCE;
 
 
     /**
@@ -6372,38 +6377,50 @@ public class StandardContext extends ContainerBase
 
 
     @Override
-    public void setXmlValidation(boolean xmlValidation){
-        this.xmlValidation = xmlValidation;
+    public boolean getXmlNamespaceAware() {
+        return webXmlNamespaceAware;
     }
 
 
     @Override
-    public boolean getXmlValidation(){
-        return xmlValidation;
+    public void setXmlNamespaceAware(boolean webXmlNamespaceAware) {
+        this.webXmlNamespaceAware = webXmlNamespaceAware;
     }
 
 
     @Override
-    public void setXmlValidationJspDoc(boolean xmlValidationJspDoc){
-        this.xmlValidationJspDoc = xmlValidationJspDoc;
+    public void setXmlValidation(boolean webXmlValidation) {
+        this.webXmlValidation = webXmlValidation;
     }
 
 
     @Override
-    public boolean getXmlValidationJspDoc(){
+    public boolean getXmlValidation() {
+        return webXmlValidation;
+    }
+
+
+    @Override
+    public void setTldValidation(boolean tldValidation) {
+        this.tldValidation = tldValidation;
+    }
+
+
+    @Override
+    public boolean getTldValidation() {
+        return tldValidation;
+    }
+
+
+    @Override
+    public void setXmlValidationJspDoc(boolean webXmlValidationJspDoc) {
+        this.xmlValidationJspDoc = webXmlValidationJspDoc;
+    }
+
+
+    @Override
+    public boolean getXmlValidationJspDoc() {
         return xmlValidationJspDoc;
-    }
-
-
-    @Override
-    public boolean getXmlNamespaceAware(){
-        return xmlNamespaceAware;
-    }
-
-
-    @Override
-    public void setXmlNamespaceAware(boolean xmlNamespaceAware){
-        this.xmlNamespaceAware = xmlNamespaceAware;
     }
 
 

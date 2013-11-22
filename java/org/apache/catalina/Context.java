@@ -599,8 +599,8 @@ public interface Context extends Container {
 
 
     /**
-     * Will the parsing of web.xml, web-fragment.xml and *.tld files for this
-     * Context be performed by a validating parser?
+     * Will the parsing of web.xml and web-fragment.xml files for this Context
+     * be performed by a validating parser?
      *
      * @return true if validation is enabled.
      */
@@ -608,12 +608,30 @@ public interface Context extends Container {
 
 
     /**
-     * Controls whether the parsing of web.xml, web-fragment.xml and *.tld files
+     * Controls whether the parsing of web.xml and web-fragment.xml files
      * for this Context will be performed by a validating parser.
      *
      * @param xmlValidation true to enable xml validation
      */
     public void setXmlValidation(boolean xmlValidation);
+
+
+    /**
+     * Will the parsing of *.tld files for this Context be performed by a
+     * validating parser?
+     *
+     * @return true if validation is enabled.
+     */
+    public boolean getTldValidation();
+
+
+    /**
+     * Controls whether the parsing of *.tld files for this Context will be
+     * performed by a validating parser.
+     *
+     * @param tldValidation true to enable xml validation
+     */
+    public void setTldValidation(boolean tldValidation);
 
 
     /**
