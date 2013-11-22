@@ -165,7 +165,7 @@ public class JspC extends Task implements Options {
     protected ClassLoader loader = null;
     protected boolean trimSpaces = false;
     protected boolean genStringAsCharArray = false;
-    protected boolean validateXml;
+    protected boolean validateTld;
     protected boolean validateJspDoc;
     protected boolean xpoweredBy;
     protected boolean mappedFile = false;
@@ -374,7 +374,7 @@ public class JspC extends Task implements Options {
             } else if (tok.equals(SWITCH_DUMP_SMAP)) {
                 smapDumped = true;
             } else if (tok.equals(SWITCH_VALIDATE_TLD)) {
-                setValidateXml(true);
+                setValidateTld(true);
             } else if (tok.equals(SWITCH_VALIDATE_DOC)) {
                 setValidateJspDoc(true);
             } else {
@@ -856,12 +856,12 @@ public class JspC extends Task implements Options {
         }
     }
 
-    public void setValidateXml( boolean b ) {
-        this.validateXml = b;
+    public void setValidateTld( boolean b ) {
+        this.validateTld = b;
     }
 
-    public boolean isValidateXml() {
-        return validateXml;
+    public boolean isValidateTld() {
+        return validateTld;
     }
 
     public void setValidateJspDoc( boolean b ) {
@@ -1454,7 +1454,7 @@ public class JspC extends Task implements Options {
                     Boolean.TRUE);
         }
 
-        TldScanner scanner = new TldScanner(context, true, validateXml);
+        TldScanner scanner = new TldScanner(context, true, validateTld);
         scanner.setClassLoader(classLoader);
 
         try {

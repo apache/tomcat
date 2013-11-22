@@ -101,7 +101,7 @@ public class TestJspC {
         webappOut.mkdirs();
         jspc.setUriroot(appDir.toString());
         jspc.setOutputDir(webappOut.toString());
-        jspc.setValidateXml(false);
+        jspc.setValidateTld(false);
         jspc.setWebXml(new File(webappOut, "generated_web.xml").toString());
         jspc.execute();
     }
