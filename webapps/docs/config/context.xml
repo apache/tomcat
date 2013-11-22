@@ -543,13 +543,8 @@
 
       <attribute name="xmlValidation" required="false">
         <p>If the value of this flag is <code>true</code>, the parsing of
-        <code>web.xml</code>, <code>web-fragment.xml</code> and
-        <code>*.tld</code> files for this web application will use a validating
-        parser. Note that validation of <code>*.jspx</code> and
-        <code>*.tagx</code> files is controlled separately by the
-        <strong>xmlValidationJspDoc</strong> attribute and that
-        <code>tagPlugins.xml</code> files (if any) are never parsed using a
-        validating parser. If the
+        <code>web.xml</code> and <code>web-fragment.xml</code> files for this
+        web application will use a validating parser. If the
         <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
         <a href="systemprops.html">system property</a> is set to
         <code>true</code>, the default value of this attribute will be
