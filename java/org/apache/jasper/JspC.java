@@ -1429,6 +1429,10 @@ public class JspC extends Task implements Options {
         } catch (MalformedURLException me) {
             System.out.println("**" + me);
         }
+        if (isValidateXml()) {
+            context.setAttribute(Constants.XML_VALIDATION_ATTR,
+                    Boolean.TRUE);
+        }
         rctxt = new JspRuntimeContext(context, this);
         jspConfig = new JspConfig(context);
         tagPluginManager = new TagPluginManager(context);
