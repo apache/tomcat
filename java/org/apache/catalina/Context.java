@@ -617,70 +617,76 @@ public interface Context extends Container {
 
 
     /**
-     * Get the server.xml <context> attribute's xmlNamespaceAware.
-     * @return true if namespace awareness is enabled.
+     * Will the parsing of web.xml and web-fragment.xml files for this Context
+     * be performed by a namespace aware parser?
      *
+     * @return true if namespace awareness is enabled.
      */
     public boolean getXmlNamespaceAware();
 
-
+    
     /**
-     * Get the server.xml <context> attribute's xmlValidation.
-     * @return true if validation is enabled.
+     * Controls whether the parsing of web.xml and web-fragment.xml files for
+     * this Context will be performed by a namespace aware parser.
      *
+     * @param xmlNamespaceAware true to enable namespace awareness
+     */
+    public void setXmlNamespaceAware(boolean xmlNamespaceAware);
+
+    
+    /**
+     * Will the parsing of web.xml and web-fragment.xml files for this Context
+     * be performed by a validating parser?
+     *
+     * @return true if validation is enabled.
      */
     public boolean getXmlValidation();
 
 
     /**
-     * Set the validation feature of the XML parser used when
-     * parsing xml instances.
-     * @param xmlValidation true to enable xml instance validation
+     * Controls whether the parsing of web.xml and web-fragment.xml files
+     * for this Context will be performed by a validating parser.
+     *
+     * @param xmlValidation true to enable xml validation
      */
     public void setXmlValidation(boolean xmlValidation);
 
 
-   /**
-     * Set the namespace aware feature of the XML parser used when
-     * parsing xml instances.
-     * @param xmlNamespaceAware true to enable namespace awareness
-     */
-    public void setXmlNamespaceAware(boolean xmlNamespaceAware);
     /**
-     * Get the server.xml <context> attribute's xmlValidation.
-     * @return true if validation is enabled.
-     */
-
-
-    /**
-     * Set the validation feature of the XML parser used when
-     * parsing tlds files.
-     * @param tldValidation true to enable xml instance validation
-     */
-    public void setTldValidation(boolean tldValidation);
-
-
-    /**
-     * Get the server.xml <context> attribute's webXmlValidation.
-     * @return true if validation is enabled.
+     * Will the parsing of *.tld files for this Context be performed by a
+     * namespace aware parser?
      *
-     */
-    public boolean getTldValidation();
-
-
-    /**
-     * Get the server.xml &lt;host&gt; attribute's xmlNamespaceAware.
      * @return true if namespace awareness is enabled.
      */
     public boolean getTldNamespaceAware();
 
 
     /**
-     * Set the namespace aware feature of the XML parser used when
-     * parsing xml instances.
+     * Controls whether the parsing of *.tld files for this Context will be
+     * performed by a namespace aware parser.
+     *
      * @param tldNamespaceAware true to enable namespace awareness
      */
     public void setTldNamespaceAware(boolean tldNamespaceAware);
+
+
+    /**
+     * Will the parsing of *.tld files for this Context be performed by a
+     * validating parser?
+     *
+     * @return true if validation is enabled.
+     */
+    public boolean getTldValidation();
+
+
+    /**
+     * Controls whether the parsing of *.tld files for this Context will be
+     * performed by a validating parser.
+     *
+     * @param tldValidation true to enable xml validation
+     */
+    public void setTldValidation(boolean tldValidation);
+
 
     /**
      * Get the Jar Scanner to be used to scan for JAR resources for this
