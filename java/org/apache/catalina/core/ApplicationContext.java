@@ -240,6 +240,9 @@ public class ApplicationContext
         if (Globals.JASPER_XML_VALIDATION_ATTR.equals(name) &&
                 context.getTldValidation()) {
             return Boolean.TRUE;
+        } else if (Globals.JASPER_XML_VALIDATION_DOC_ATTR.equals(name) &&
+                context.getXmlValidationJspDoc()) {
+            return Boolean.TRUE;
         }
         return (attributes.get(name));
 
