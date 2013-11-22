@@ -726,7 +726,8 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Attribute value used to turn on/off XML validation
+     * Attribute value used to turn on/off XML validation for web.xml and
+     * web-fragment.xml files.
      */
     private boolean webXmlValidation = Globals.STRICT_SERVLET_COMPLIANCE;
 
