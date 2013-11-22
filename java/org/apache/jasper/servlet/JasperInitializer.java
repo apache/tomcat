@@ -79,7 +79,7 @@ public class JasperInitializer implements ServletContainerInitializer {
         }
 
         boolean validate = Boolean.parseBoolean(
-                context.getInitParameter(Constants.XML_VALIDATION_ATTR));
+                context.getInitParameter(Constants.XML_VALIDATION_TLD_ATTR));
 
         // scan the application for TLDs
         TldScanner scanner = new TldScanner(context, true, validate);

@@ -121,7 +121,7 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
                         TldResourcePath resourcePath = new TldResourcePath(url, path);
                         boolean validate = Boolean.parseBoolean(
                                 ctxt.getServletContext().getInitParameter(
-                                        Constants.XML_VALIDATION_ATTR));
+                                        Constants.XML_VALIDATION_TLD_ATTR));
                         TldParser parser = new TldParser(true, validate, new ImplicitTldRuleSet());
                         taglibXml = parser.parse(resourcePath);
                     } catch (IOException | SAXException e) {
