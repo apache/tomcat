@@ -155,6 +155,10 @@
         <code>tldNamespaceAware</code> attribute of the Context is now ignored.
         (markt) 
       </fix>
+      <fix>
+        Deprecate the <code>tldNamespaceAware</code> Context attribute as TLDs
+        are always parsed with a namespace aware parser. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
