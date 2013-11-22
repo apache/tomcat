@@ -238,7 +238,7 @@ public class ApplicationContext
         // Special handling for XML validation as the context setting must
         // always override anything that might have been set by an application.
         if (Globals.JASPER_XML_VALIDATION_ATTR.equals(name) &&
-                context.getXmlValidation()) {
+                context.getTldValidation()) {
             return Boolean.TRUE;
         }
         return (attributes.get(name));
