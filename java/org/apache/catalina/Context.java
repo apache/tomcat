@@ -581,31 +581,37 @@ public interface Context extends Container {
 
 
     /**
-     * Get the server.xml <context> attribute's xmlNamespaceAware.
+     * Will the parsing of web.xml and web-fragment.xml files for this Context
+     * be performed by a namespace aware parser?
+     *
      * @return true if namespace awareness is enabled.
      */
     public boolean getXmlNamespaceAware();
 
 
     /**
-     * Set the namespace aware feature of the XML parser used when
-     * parsing xml instances.
+     * Controls whether the parsing of web.xml and web-fragment.xml files for
+     * this Context be performed by a namespace aware parser.
+     *
      * @param xmlNamespaceAware true to enable namespace awareness
      */
     public void setXmlNamespaceAware(boolean xmlNamespaceAware);
 
 
     /**
-     * Get the server.xml <context> attribute's xmlValidation.
+     * Will the parsing of web.xml, web-fragment.xml and *.tld files for this
+     * Context be performed by a validating parser?
+     *
      * @return true if validation is enabled.
      */
     public boolean getXmlValidation();
 
 
     /**
-     * Set the validation feature of the XML parser used when
-     * parsing xml instances.
-     * @param xmlValidation true to enable xml instance validation
+     * Controls whether the parsing of web.xml, web-fragment.xml and *.tld files
+     * for this Context be performed by a validating parser.
+     *
+     * @param xmlValidation true to enable xml validation
      */
     public void setXmlValidation(boolean xmlValidation);
 
