@@ -1055,11 +1055,13 @@ public class StandardContext extends ContainerBase
     }
 
      
+    @Override
     public InstanceManager getInstanceManager() {
        return instanceManager;
     }
 
 
+    @Override
     public void setInstanceManager(InstanceManager instanceManager) {
        this.instanceManager = instanceManager;
     }
@@ -6580,72 +6582,55 @@ public class StandardContext extends ContainerBase
 
     }
 
-     /**
-     * Set the validation feature of the XML parser used when
-     * parsing xml instances.
-     * @param webXmlValidation true to enable xml instance validation
-     */
-    @Override
-    public void setXmlValidation(boolean webXmlValidation){
-        
-        this.webXmlValidation = webXmlValidation;
-
-    }
-
-    /**
-     * Get the server.xml <context> attribute's xmlValidation.
-     * @return true if validation is enabled.
-     *
-     */
-    @Override
-    public boolean getXmlValidation(){
-        return webXmlValidation;
-    }
-
-
-    /**
-     * Get the server.xml <context> attribute's xmlNamespaceAware.
-     * @return true if namespace awarenes is enabled.
-     */
+    
     @Override
     public boolean getXmlNamespaceAware(){
         return webXmlNamespaceAware;
     }
 
 
-    /**
-     * Set the namespace aware feature of the XML parser used when
-     * parsing xml instances.
-     * @param webXmlNamespaceAware true to enable namespace awareness
-     */
     @Override
     public void setXmlNamespaceAware(boolean webXmlNamespaceAware){
-        this.webXmlNamespaceAware= webXmlNamespaceAware;
+        this.webXmlNamespaceAware = webXmlNamespaceAware;
     }    
 
 
-    /**
-     * Set the validation feature of the XML parser used when
-     * parsing tlds files. 
-     * @param tldValidation true to enable xml instance validation
-     */
     @Override
-    public void setTldValidation(boolean tldValidation){
-        
-        this.tldValidation = tldValidation;
-
+    public void setXmlValidation(boolean webXmlValidation){
+        this.webXmlValidation = webXmlValidation;
     }
 
-    /**
-     * Get the server.xml <context> attribute's webXmlValidation.
-     * @return true if validation is enabled.
-     *
-     */
+
+    @Override
+    public boolean getXmlValidation(){
+        return webXmlValidation;
+    }
+
+
+    @Override
+    public boolean getTldNamespaceAware(){
+        return tldNamespaceAware;
+    }
+
+
+    @Override
+    public void setTldNamespaceAware(boolean tldNamespaceAware){
+        this.tldNamespaceAware = tldNamespaceAware;
+    }    
+
+
+    @Override
+    public void setTldValidation(boolean tldValidation){
+        this.tldValidation = tldValidation;
+    }
+
+
     @Override
     public boolean getTldValidation(){
         return tldValidation;
     }
 
+    
     /**
      * Sets the process TLDs attribute.
      *
@@ -6661,26 +6646,6 @@ public class StandardContext extends ContainerBase
     public boolean getProcessTlds() {
         return processTlds;
     }
-
-    /**
-     * Get the server.xml &lt;host&gt; attribute's xmlNamespaceAware.
-     * @return true if namespace awarenes is enabled.
-     */
-    @Override
-    public boolean getTldNamespaceAware(){
-        return tldNamespaceAware;
-    }
-
-
-    /**
-     * Set the namespace aware feature of the XML parser used when
-     * parsing xml instances.
-     * @param tldNamespaceAware true to enable namespace awareness
-     */
-    @Override
-    public void setTldNamespaceAware(boolean tldNamespaceAware){
-        this.tldNamespaceAware= tldNamespaceAware;
-    }    
 
 
     /** 
