@@ -153,19 +153,19 @@ public class Constants {
 
 
     /**
-     * Name of the ServletContext attribute that determines if the XML parsers
+     * Name of the ServletContext init-param that determines if the XML parsers
      * used for *.tld files will be validating or not.
      * <p>
      * This must be kept in sync with org.apache.catalina.Globals
      */
-    public static final String XML_VALIDATION_TLD_ATTR = "org.apache.jasper.XML_VALIDATE_TLD";
+    public static final String XML_VALIDATION_TLD_INIT_PARAM = "org.apache.jasper.XML_VALIDATE_TLD";
 
 
     /**
-     * Name of the ServletContext attribute that determines if the XML parsers
+     * Name of the ServletContext init-param that determines if the XML parsers
      * used for *.jspx and *.tagx files will be validating or not.
      * <p>
      * This must be kept in sync with org.apache.catalina.Globals
      */
-    public static final String XML_VALIDATION_DOC_ATTR = "org.apache.jasper.XML_VALIDATE_DOC";
+    public static final String XML_VALIDATION_DOC_INIT_PARAM = "org.apache.jasper.XML_VALIDATE_DOC";
 }

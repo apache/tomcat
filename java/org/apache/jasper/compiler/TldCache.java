@@ -73,7 +73,7 @@ public class TldCache {
             this.tldResourcePathTaglibXmlMap.put(tldResourcePath, cacheEntry);
         }
         boolean validate = Boolean.parseBoolean(
-                servletContext.getInitParameter(Constants.XML_VALIDATION_TLD_ATTR));
+                servletContext.getInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM));
         tldParser = new TldParser(true, validate);
     }
 

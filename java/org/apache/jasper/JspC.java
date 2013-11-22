@@ -1450,11 +1450,13 @@ public class JspC extends Task implements Options {
 
         context = new JspCServletContext(log, resourceBase, classLoader);
         if (isValidateJspDoc()) {
-            context.setAttribute(Constants.XML_VALIDATION_DOC_ATTR,
-                    Boolean.TRUE);
+            context.setInitParameter(Constants.XML_VALIDATION_DOC_INIT_PARAM, "true");
+        }
+        if (isValidateTld()) {
+            context.setInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM, "true");
         }
 
-        TldScanner scanner = new TldScanner(context, true, validateTld);
+        TldScanner scanner = new TldScanner(context, true, isValidateTld());
         scanner.setClassLoader(classLoader);
 
         try {

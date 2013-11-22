@@ -272,21 +272,21 @@ public final class Globals {
 
 
     /**
-     * Name of the ServletContext attribute that determines if the JSP engine
+     * Name of the ServletContext init-param that determines if the JSP engine
      * should validate *.tld files when parsing them.
      * <p>
      * This must be kept in sync with org.apache.jasper.Constants
      */
-    public static final String JASPER_XML_VALIDATION_TLD_ATTR =
+    public static final String JASPER_XML_VALIDATION_TLD_INIT_PARAM =
             "org.apache.jasper.XML_VALIDATE_TLD";
 
 
     /**
-     * Name of the ServletContext attribute that determines if the JSP engine
+     * Name of the ServletContext init-param that determines if the JSP engine
      * should validate *.jspx and *.tagx files when parsing them.
      * <p>
      * This must be kept in sync with org.apache.jasper.Constants
      */
-    public static final String JASPER_XML_VALIDATION_DOC_ATTR =
+    public static final String JASPER_XML_VALIDATION_DOC_INIT_PARAM =
             "org.apache.jasper.XML_VALIDATE_DOC";
 }
