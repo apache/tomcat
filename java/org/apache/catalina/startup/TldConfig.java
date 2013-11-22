@@ -77,44 +77,29 @@ public final class TldConfig  implements LifecycleListener {
     /**
      * The <code>Digester</code>s available to process tld files.
      */
-    private static Digester[] tldDigesters = new Digester[4];
+    private static Digester[] tldDigesters = new Digester[2];
 
     /**
      * Create (if necessary) and return a Digester configured to process the
      * tld.
      */
-    private static Digester createTldDigester(boolean namespaceAware,
-            boolean validation) {
+    private static Digester createTldDigester(boolean validation) {
         
         Digester digester = null;
-        if (!namespaceAware && !validation) {
+        if (!validation) {
             if (tldDigesters[0] == null) {
                 tldDigesters[0] = DigesterFactory.newDigester(validation,
-                        namespaceAware, new TldRuleSet());
+                        true, new TldRuleSet());
                 tldDigesters[0].getParser();
             }
             digester = tldDigesters[0];
-        } else if (!namespaceAware && validation) {
+        } else {
             if (tldDigesters[1] == null) {
                 tldDigesters[1] = DigesterFactory.newDigester(validation,
-                        namespaceAware, new TldRuleSet());
+                        true, new TldRuleSet());
                 tldDigesters[1].getParser();
             }
             digester = tldDigesters[1];
-        } else if (namespaceAware && !validation) {
-            if (tldDigesters[2] == null) {
-                tldDigesters[2] = DigesterFactory.newDigester(validation,
-                        namespaceAware, new TldRuleSet());
-                tldDigesters[2].getParser();
-            }
-            digester = tldDigesters[2];
-        } else {
-            if (tldDigesters[3] == null) {
-                tldDigesters[3] = DigesterFactory.newDigester(validation,
-                        namespaceAware, new TldRuleSet());
-                tldDigesters[3].getParser();
-            }
-            digester = tldDigesters[3];
         }
         return digester;
     }
@@ -580,8 +565,7 @@ public final class TldConfig  implements LifecycleListener {
     
     private void init() {
         if (tldDigester == null){
-            tldDigester = createTldDigester(context.getTldNamespaceAware(),
-                    context.getTldValidation());
+            tldDigester = createTldDigester(context.getTldValidation());
         }
     }
 

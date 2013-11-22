@@ -602,7 +602,7 @@ public class TesterContext implements Context {
 
     @Override
     public boolean getTldNamespaceAware() {
-        return false;
+        return true;
     }
 
     @Override

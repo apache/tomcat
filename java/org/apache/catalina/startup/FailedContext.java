@@ -431,7 +431,7 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public boolean getTldValidation() { return false; }
 
     @Override
-    public boolean getTldNamespaceAware() { return false; }
+    public boolean getTldNamespaceAware() { return true; }
     @Override
     public void setTldNamespaceAware(boolean tldNamespaceAware) { /* NO-OP */ }
 

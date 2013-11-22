@@ -755,12 +755,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Attribute value used to turn on/off TLD XML namespace validation
-     */
-    private boolean tldNamespaceAware = Globals.STRICT_SERVLET_COMPLIANCE;
-
-
-    /**
      * Should we save the configuration.
      */
     private boolean saveConfig = true;
@@ -6616,13 +6610,13 @@ public class StandardContext extends ContainerBase
 
     @Override
     public boolean getTldNamespaceAware(){
-        return tldNamespaceAware;
+        return true;
     }
 
 
     @Override
     public void setTldNamespaceAware(boolean tldNamespaceAware){
-        this.tldNamespaceAware = tldNamespaceAware;
+        // NO-OP;
     }    
 
 

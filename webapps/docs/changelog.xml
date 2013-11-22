@@ -149,6 +149,12 @@
         more than one data message may be sent to a remote WebSocket endpoint at
         a time. (markt)
       </fix>
+      <fix>
+        When Catalina parses TLD files, always use a namespace aware parser to
+        be consistent with how Jasper parses TLD files. The
+        <code>tldNamespaceAware</code> attribute of the Context is now ignored.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
