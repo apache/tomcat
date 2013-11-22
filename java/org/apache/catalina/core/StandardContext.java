@@ -688,7 +688,8 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Attribute value used to turn on/off XML validation
+     * Attribute value used to turn on/off XML validation for web.xml,
+     * web-fragment.xml and *.tld files.
      */
     private boolean xmlValidation = Globals.STRICT_SERVLET_COMPLIANCE;
 
@@ -6362,44 +6363,25 @@ public class StandardContext extends ContainerBase
 
     }
 
-     /**
-     * Set the validation feature of the XML parser used when
-     * parsing xml instances.
-     * @param webXmlValidation true to enable xml instance validation
-     */
+
     @Override
     public void setXmlValidation(boolean webXmlValidation){
-
         this.xmlValidation = webXmlValidation;
-
     }
 
-    /**
-     * Get the server.xml <context> attribute's xmlValidation.
-     * @return true if validation is enabled.
-     *
-     */
+
     @Override
     public boolean getXmlValidation(){
         return xmlValidation;
     }
 
 
-    /**
-     * Get the server.xml <context> attribute's xmlNamespaceAware.
-     * @return true if namespace awarenes is enabled.
-     */
     @Override
     public boolean getXmlNamespaceAware(){
         return xmlNamespaceAware;
     }
 
 
-    /**
-     * Set the namespace aware feature of the XML parser used when
-     * parsing xml instances.
-     * @param webXmlNamespaceAware true to enable namespace awareness
-     */
     @Override
     public void setXmlNamespaceAware(boolean webXmlNamespaceAware){
         this.xmlNamespaceAware= webXmlNamespaceAware;
