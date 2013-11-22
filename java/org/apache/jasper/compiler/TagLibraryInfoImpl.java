@@ -215,7 +215,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
 
         boolean validate = Boolean.parseBoolean(
                 ctxt.getServletContext().getInitParameter(
-                        Constants.XML_VALIDATION_TLD_ATTR));
+                        Constants.XML_VALIDATION_TLD_INIT_PARAM));
 
         // Create an iterator over the child elements of our <taglib> element
         ParserUtils pu = new ParserUtils(validate);

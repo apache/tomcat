@@ -79,7 +79,7 @@ public class JspConfig {
             webXml = new WebXml(ctxt);
             
             boolean validate = Boolean.parseBoolean(
-                    ctxt.getInitParameter(Constants.XML_VALIDATION_TLD_ATTR));
+                    ctxt.getInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM));
 
             TreeNode webApp = null;
             if (webXml.getInputSource() != null) {

@@ -165,7 +165,7 @@ class JspDocumentParser
 
             boolean validate = Boolean.parseBoolean(
                     pc.getJspCompilationContext().getServletContext().getInitParameter(
-                            Constants.XML_VALIDATION_DOC_ATTR));
+                            Constants.XML_VALIDATION_DOC_INIT_PARAM));
             jspDocParser.isValidating = validate;
 
             // Parse the input
