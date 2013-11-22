@@ -690,13 +690,13 @@ public class StandardContext extends ContainerBase
     /**
      * Attribute value used to turn on/off XML validation
      */
-    private boolean webXmlValidation = Globals.STRICT_SERVLET_COMPLIANCE;
+    private boolean xmlValidation = Globals.STRICT_SERVLET_COMPLIANCE;
 
 
     /**
      * Attribute value used to turn on/off XML namespace validation
      */
-    private boolean webXmlNamespaceAware = Globals.STRICT_SERVLET_COMPLIANCE;
+    private boolean xmlNamespaceAware = Globals.STRICT_SERVLET_COMPLIANCE;
 
 
     /**
@@ -6370,7 +6370,7 @@ public class StandardContext extends ContainerBase
     @Override
     public void setXmlValidation(boolean webXmlValidation){
 
-        this.webXmlValidation = webXmlValidation;
+        this.xmlValidation = webXmlValidation;
 
     }
 
@@ -6381,7 +6381,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public boolean getXmlValidation(){
-        return webXmlValidation;
+        return xmlValidation;
     }
 
 
@@ -6391,7 +6391,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public boolean getXmlNamespaceAware(){
-        return webXmlNamespaceAware;
+        return xmlNamespaceAware;
     }
 
 
@@ -6402,7 +6402,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public void setXmlNamespaceAware(boolean webXmlNamespaceAware){
-        this.webXmlNamespaceAware= webXmlNamespaceAware;
+        this.xmlNamespaceAware= webXmlNamespaceAware;
     }
 
 
