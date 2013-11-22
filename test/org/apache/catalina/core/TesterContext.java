@@ -650,6 +650,16 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public boolean getTldValidation(){
+        return false;
+    }
+
+    @Override
+    public void setTldValidation(boolean tldValidation){
+        // NO-OP
+    }
+
+    @Override
     public void setXmlNamespaceAware(boolean xmlNamespaceAware) {
         // NO-OP
     }
