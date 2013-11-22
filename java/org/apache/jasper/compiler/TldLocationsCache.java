@@ -288,7 +288,7 @@ public class TldLocationsCache {
 
             boolean validate = Boolean.parseBoolean(
                     ctxt.getInitParameter(
-                            Constants.XML_VALIDATION_ATTR));
+                            Constants.XML_VALIDATION_TLD_ATTR));
 
             // Parse the web application deployment descriptor
             TreeNode webtld = null;
@@ -497,7 +497,7 @@ public class TldLocationsCache {
 
             boolean validate = Boolean.parseBoolean(
                     ctxt.getInitParameter(
-                            Constants.XML_VALIDATION_ATTR));
+                            Constants.XML_VALIDATION_TLD_ATTR));
 
             TreeNode tld = new ParserUtils(validate).parseXMLDocument(
                     resourcePath, stream);

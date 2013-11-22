@@ -1445,7 +1445,7 @@ public class JspC extends Task implements Options {
             System.out.println("**" + me);
         }
         if (isValidateTld()) {
-            context.setAttribute(Constants.XML_VALIDATION_ATTR,
+            context.setAttribute(Constants.XML_VALIDATION_TLD_ATTR,
                     Boolean.TRUE);
         }
         if (isValidateJspDoc()) {

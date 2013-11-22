@@ -314,8 +314,8 @@ public final class Globals {
      * <p>
      * This must be kept in sync with org.apache.japser.Constants
      */
-    public static final String JASPER_XML_VALIDATION_ATTR =
-            "org.apache.jasper.XML_VALIDATE";
+    public static final String JASPER_XML_VALIDATION_TLD_ATTR =
+            "org.apache.jasper.XML_VALIDATE_TLD";
 
 
     /**

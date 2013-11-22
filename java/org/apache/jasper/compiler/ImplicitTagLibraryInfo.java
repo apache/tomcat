@@ -126,7 +126,7 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
                             
                             boolean validate = Boolean.parseBoolean(
                                     ctxt.getServletContext().getInitParameter(
-                                            Constants.XML_VALIDATION_ATTR));
+                                            Constants.XML_VALIDATION_TLD_ATTR));
 
                             ParserUtils pu = new ParserUtils(validate);
                             TreeNode tld = pu.parseXMLDocument(uri, in);

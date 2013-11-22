@@ -239,7 +239,7 @@ public class Constants {
      * <p>
      * This must be kept in sync with org.apache.catalina.Globals
      */
-    public static final String XML_VALIDATION_ATTR = "org.apache.jasper.XML_VALIDATE";
+    public static final String XML_VALIDATION_TLD_ATTR = "org.apache.jasper.XML_VALIDATE_TLD";
 
 
     /**
