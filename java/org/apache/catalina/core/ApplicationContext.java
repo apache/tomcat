@@ -259,8 +259,11 @@ public class ApplicationContext
         names.addAll(attributes.keySet());
         // Special handling for XML validation as this attribute will always be
         // available if validation has been enabled on the context
-        if (context.getXmlValidation()) {
+        if (context.getTldValidation()) {
             names.add(Globals.JASPER_XML_VALIDATION_ATTR);
+        }
+        if (context.getXmlValidationJspDoc()) {
+            names.add(Globals.JASPER_XML_VALIDATION_DOC_ATTR);
         }
         return Collections.enumeration(names);
     }
