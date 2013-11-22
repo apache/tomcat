@@ -532,10 +532,12 @@
 
       <attribute name="xmlValidation" required="false">
         <p>If the value of this flag is <code>true</code>, the parsing of
-        <code>web.xml</code>, <code>web-fragment.xml</code>, <code>*.tld</code>,
-        <code>*.jspx</code> and <code>*.tagx</code> files for this web
-        application will use a validating parser. Note that the
-        <code>tagPlugins.xml</code> file (if any) is never parsed using a
+        <code>web.xml</code>, <code>web-fragment.xml</code> and
+        <code>*.tld</code> files for this web application will use a validating
+        parser. Note that validation of <code>*.jspx</code> and
+        <code>*.tagx</code> files is controlled separately by the
+        <strong>xmlValidationJspDoc</strong> attribute and that
+        <code>tagPlugins.xml</code> files (if any) are never parsed using a
         validating parser. If the
         <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
         <a href="systemprops.html">system property</a> is set to
@@ -543,6 +545,15 @@
         <code>true</code>, else the default value will be <code>false</code>.
         Setting this attribute to <code>true</code> will incur a performance
         penalty.</p>
+      </attribute>
+
+      <attribute name="xmlValidationJspDoc" required="false">
+        <p>If the value of this flag is <code>true</code>, the parsing of
+        <code>*.jspx</code> and <code>*.tagx</code> files for this web
+        application will use a validating parser. Before enabling this option
+        users should review section JSP.6.2.4 of the JSP 2.3 specification. The
+        default value will be <code>false</code>. Setting this attribute to
+        <code>true</code> will incur a performance penalty.</p>
       </attribute>
 
 
