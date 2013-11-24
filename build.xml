@@ -203,13 +203,6 @@
     <path refid="tomcat.classpath" />
   </path>
 
-  <path id="cobertura.classpath">
-    <fileset dir="${cobertura.home}">
-      <include name="cobertura-${cobertura.version}.jar" />
-      <include name="lib/**/*.jar" />
-    </fileset>
-  </path>
-
   <path id="tomcat.webservices.classpath">
     <path refid="tomcat.classpath" />
     <fileset dir="${tomcat.extras}/webservices">
@@ -1281,19 +1274,19 @@
   </target>
 
   <target name="test-bio" description="Runs the JUnit test cases for BIO. Does not stop on errors."
-          depends="test-init,test-compile,deploy,cobertura-instrument" if="${execute.test.bio}">
+          depends="test-compile,deploy,cobertura-instrument" if="${execute.test.bio}">
     <runtests protocol="org.apache.coyote.http11.Http11Protocol"
               extension=".BIO" />
   </target>
 
   <target name="test-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
-          depends="test-init,test-compile,deploy,cobertura-instrument" if="${execute.test.nio}">
+          depends="test-compile,deploy,cobertura-instrument" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
   </target>
 
   <target name="test-apr" description="Runs the JUnit test cases for APR. Does not stop on errors."
-          depends="test-init,test-compile,deploy,test-apr-exists,cobertura-instrument"
+          depends="test-compile,deploy,test-apr-exists,cobertura-instrument"
           if="${apr.exists}">
     <runtests protocol="org.apache.coyote.http11.Http11AprProtocol"
               extension=".APR" />
@@ -1302,13 +1295,6 @@
   <target name="test-apr-exists" description="Checks for APR lib"
           if="${execute.test.apr}">
     <available file="${test.apr.loc}" property="apr.exists" />
-  </target>
-
-  <target name="test-init" >
-    <!-- This directory needs to exist even if it is empty otherwise the     -->
-    <!-- use of the cobertura.classpath class path when running the unit     -->
-    <!-- triggers an error.                                                  -->
-    <mkdir dir="${cobertura.home}" />
   </target>
 
   <macrodef name="runtests"
@@ -1320,6 +1306,10 @@
                description="The extension to use to distinguish the output"/>
 
     <sequential>
+      <!-- Define classpaths when Cobertura is turned off. -->
+      <path id="cobertura.classpath" />
+      <path id="tomcat.classes.cobertura.classpath" />
+
       <junit printsummary="yes" fork="yes" dir="." showoutput="yes"
         errorproperty="test.result.error"
         failureproperty="test.result.failure"
@@ -1332,7 +1322,7 @@
         <jvmarg value="-Dorg.apache.tomcat.util.net.NioSelectorShared=${org.apache.tomcat.util.net.NioSelectorShared}"/>
 
         <!-- The Cobertura instrumented classes must appear first on the classpath -->
-        <classpath location="${tomcat.classes.cobertura}" />
+        <classpath refid="tomcat.classes.cobertura.classpath" />
         <classpath refid="tomcat.test.classpath" />
         <classpath refid="cobertura.classpath"/>
 
@@ -1366,6 +1356,18 @@
   <target name="cobertura-instrument" depends="compile,download-cobertura"
           if="${test.cobertura}"
           description="Adds Cobertura instrumentation to the compiled bytecode">
+
+    <mkdir dir="${tomcat.classes.cobertura}"/>
+
+    <path id="tomcat.classes.cobertura.classpath"
+      location="${tomcat.classes.cobertura}" />
+
+    <path id="cobertura.classpath">
+      <fileset dir="${cobertura.home}">
+        <include name="cobertura-${cobertura.version}.jar" />
+        <include name="lib/**/*.jar" />
+      </fileset>
+    </path>
 
     <taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
 
