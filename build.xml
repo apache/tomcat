@@ -1366,6 +1366,8 @@
       <fileset dir="${cobertura.home}">
         <include name="cobertura-${cobertura.version}.jar" />
         <include name="lib/**/*.jar" />
+        <exclude name="lib/**/jetty*.jar" />
+        <exclude name="lib/**/servlet-api*.jar" />
       </fileset>
     </path>
 
