@@ -280,8 +280,9 @@
   <subsection name="Other">
     <changelog>
       <add>
-        Add support for the Cobertura code coverage tool when running the unit
-        tests. Based on a patch by mhasko. (markt)
+        <bug>52323</bug>: Add support for the Cobertura code coverage tool
+        when running the unit tests. Based on a patch by mhasko.
+        (markt/kkolinko)
       </add>
       <update>
         Update sample Eclipse IDE project. Explicitly use a Java 6 SE JDK.
