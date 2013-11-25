@@ -1115,34 +1115,35 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         tomcat.start();
         host.backgroundProcess();
 
-        // Change the specified file
+        // Update the last modified time. Add a few seconds to make sure that
+        // the OS reports a change in modification time.
         switch (toModify) {
             case XML:
                 if (xml == null) {
                     Assert.fail();
                 } else {
-                    xml.setLastModified(System.currentTimeMillis());
+                    xml.setLastModified(System.currentTimeMillis() + 5000);
                 }
                 break;
             case EXT:
                 if (ext == null) {
                     Assert.fail();
                 } else {
-                    ext.setLastModified(System.currentTimeMillis());
+                    ext.setLastModified(System.currentTimeMillis() + 5000);
                 }
                 break;
             case WAR:
                 if (war == null) {
                     Assert.fail();
                 } else {
-                    war.setLastModified(System.currentTimeMillis());
+                    war.setLastModified(System.currentTimeMillis() + 5000);
                 }
                 break;
             case DIR:
                 if (dir == null) {
                     Assert.fail();
                 } else {
-                    dir.setLastModified(System.currentTimeMillis());
+                    dir.setLastModified(System.currentTimeMillis() + 5000);
                 }
                 break;
             default:
