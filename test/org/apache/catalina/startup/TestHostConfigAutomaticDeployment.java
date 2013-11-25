@@ -55,7 +55,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             new File("test/deployment/dirContext");
 
     private static final String XML_COOKIE_NAME = "XML_CONTEXT";
-    //private static final String WAR_COOKIE_NAME = "WAR_CONTEXT";
+    private static final String WAR_COOKIE_NAME = "WAR_CONTEXT";
     //private static final String DIR_COOKIE_NAME = "DIR_CONTEXT";
 
     private File external;
@@ -346,6 +346,79 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     }
 
 
+    /*
+     * Expected behaviour for deployment of a WAR with an embedded XML file.
+     * deployXML  copyXML  unpackWARs      XML  WAR  DIR
+     *     N        Y/N        N            N    Y    N
+     *     N        Y/N        Y            N    Y    Y
+     *     Y         N         N            N    Y    N
+     *     Y         N         Y            N    Y    Y
+     *     Y         Y         N            Y    Y    N
+     *     Y         Y         Y            Y    Y    Y
+     */
+    @Test
+    public void testDeploymentWarXmlFFF() throws Exception {
+        initTestDeploymentWarXml();
+        doTestDeployment(false, false, false,
+                LifecycleState.STARTED, null, false, true, false);
+    }
+
+    @Test
+    public void testDeploymentWarXmlFFT() throws Exception {
+        initTestDeploymentWarXml();
+        doTestDeployment(false, false, true,
+                LifecycleState.STARTED, null, false, true, true);
+    }
+
+    @Test
+    public void testDeploymentWarXmlFTF() throws Exception {
+        initTestDeploymentWarXml();
+        doTestDeployment(false, true, false,
+                LifecycleState.STARTED, null, false, true, false);
+    }
+
+    @Test
+    public void testDeploymentWarXmlFTT() throws Exception {
+        initTestDeploymentWarXml();
+        doTestDeployment(false, true, true,
+                LifecycleState.STARTED, null, false, true, true);
+    }
+
+    @Test
+    public void testDeploymentWarXmlTFF() throws Exception {
+        initTestDeploymentWarXml();
+        doTestDeployment(true, false, false,
+                LifecycleState.STARTED, WAR_COOKIE_NAME, false, true, false);
+    }
+
+    @Test
+    public void testDeploymentWarXmlTFT() throws Exception {
+        initTestDeploymentWarXml();
+        doTestDeployment(true, false, true,
+                LifecycleState.STARTED, WAR_COOKIE_NAME, false, true, true);
+    }
+
+    @Test
+    public void testDeploymentWarXmlTTF() throws Exception {
+        initTestDeploymentWarXml();
+        doTestDeployment(true, true, false,
+                LifecycleState.STARTED, WAR_COOKIE_NAME, true, true, false);
+    }
+
+    @Test
+    public void testDeploymentWarXmlTTT() throws Exception {
+        initTestDeploymentWarXml();
+        doTestDeployment(true, true, true,
+                LifecycleState.STARTED, WAR_COOKIE_NAME, true, true, true);
+    }
+
+    private void initTestDeploymentWarXml() throws IOException {
+        // Copy the test DIR file to the external directory
+        File dest = new File(getAppBaseFile(getTomcatInstance().getHost()),
+                APP_NAME.getBaseName() + ".war");
+        Files.copy(WAR_XML_SOURCE.toPath(), dest.toPath());
+    }
+
 
     private void doTestDeployment(boolean deployXML, boolean copyXML,
             boolean unpackWARs, LifecycleState resultState, String cookieName,
@@ -390,6 +463,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         Assert.assertEquals(
                 Boolean.valueOf(resultDir), Boolean.valueOf(dir.isDirectory()));
     }
+
 
     private static void recurrsiveCopy(final Path src, final Path dest)
             throws IOException {
