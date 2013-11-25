@@ -160,6 +160,11 @@
         control if Jasper (the JSP engine) uses a validating parser when
         processing *.jspx and *.tagx files. (markt)
       </add>
+      <add>
+        When running under a security manager, change the default value of the
+        Host&apos;s <code>deloyXML</code> attribute to <code>false</code>.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

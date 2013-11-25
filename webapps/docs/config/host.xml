@@ -244,7 +244,8 @@
         then be responsible for providing an external context configuration
         file, and putting it in the location defined by the
         <strong>xmlBase</strong> attribute. The flag's value defaults to
-        <code>true</code>.</p>
+        <code>true</code> unless a security manager is enabled when the default
+        is <code>false</code>.</p>
       </attribute>
 
       <attribute name="errorReportValveClass" required="false">

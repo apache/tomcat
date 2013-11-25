@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -120,7 +121,7 @@ public class StandardHost extends ContainerBase implements Host {
     /**
      * deploy Context XML config files property.
      */
-    private boolean deployXML = true;
+    private boolean deployXML = !Globals.IS_SECURITY_ENABLED;
 
 
     /**
