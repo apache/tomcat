@@ -1508,26 +1508,33 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         doTestUnpackWAR(false, false, true, false);
     }
 
+    @Test
     public void testUnpackWARFTF() throws Exception  {
         doTestUnpackWAR(false, true, false, false);
     }
 
+    @Test
     public void testUnpackWARFTT() throws Exception  {
         doTestUnpackWAR(false, true, true, false);
     }
 
+    @Test
     public void testUnpackWARTFF() throws Exception  {
         doTestUnpackWAR(true, false, false, false);
     }
 
+    @Test
     public void testUnpackWARTFT() throws Exception  {
-        doTestUnpackWAR(true, false, true, false);
+        // External WAR - therefore XML in WAR will be ignored
+        doTestUnpackWAR(true, false, true, true);
     }
 
+    @Test
     public void testUnpackWARTTF() throws Exception  {
         doTestUnpackWAR(true, true, false, true);
     }
 
+    @Test
     public void testUnpackWARTTT() throws Exception  {
         doTestUnpackWAR(true, true, true, true);
     }
@@ -1542,10 +1549,14 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
 
         tomcat.start();
 
+        File war;
         if (unpackWAR) {
-            createWar(WAR_XML_UNPACKWAR_TRUE_SOURCE, external);
+            war = createWar(WAR_XML_UNPACKWAR_TRUE_SOURCE, !external);
         } else {
-            createWar(WAR_XML_UNPACKWAR_FALSE_SOURCE, external);
+            war = createWar(WAR_XML_UNPACKWAR_FALSE_SOURCE, !external);
+        }
+        if (external) {
+            createXmlInConfigBaseForExternal(war);
         }
 
         host.backgroundProcess();
