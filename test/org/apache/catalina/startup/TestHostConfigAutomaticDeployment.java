@@ -29,6 +29,9 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
@@ -58,6 +61,10 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     private static final int EXT = 2;
     private static final int WAR = 3;
     private static final int DIR = 4;
+
+    private static final int NONE = 1;
+    private static final int RELOAD = 2;
+    private static final int REDEPLOY = 3;
 
     private static final String XML_COOKIE_NAME = "XML_CONTEXT";
     private static final String WAR_COOKIE_NAME = "WAR_CONTEXT";
@@ -1010,6 +1017,250 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     }
 
 
+    /*
+     * Expected behaviour for modification of files.
+     *
+     * Artifacts present      Artifact   Artifacts remaining
+     * XML  WAR  EXT  DIR    Modified    XML  WAR  EXT DIR   Action
+     *  N    N    N    Y       DIR        -    -    -   M     None
+     *  N    Y    N    N       WAR        -    M    -   -    Reload
+     *  N    Y    N    Y       DIR        -    Y    -   M     None
+     *  N    Y    N    Y       WAR        -    M    -   R    Reload
+     *  Y    N    N    N       XML        M    -    -   -   Redeploy
+     *  Y    N    N    Y       DIR        Y    -    -   M     None
+     *  Y    N    N    Y       XML        M    -    -   Y   Redeploy
+     *  Y    N    Y    N       EXT        Y    -    M   -   Reload if WAR
+     *  Y    N    Y    N       XML        M    -    Y   -   Redeploy
+     *  Y    N    Y    Y       DIR        Y    -    Y   M     None
+     *  Y    N    Y    Y       EXT        Y    -    M   R    Reload
+     *  Y    N    Y    Y       XML        M    -    Y   Y   Redeploy
+     *  Y    Y    N    N       WAR        Y    M    -   -    Reload
+     *  Y    Y    N    N       XML        M    Y    -   -   Redeploy
+     *  Y    Y    N    Y       DIR        Y    Y    -   M     None
+     *  Y    Y    N    Y       WAR        Y    M    -   -    Reload
+     *  Y    Y    N    Y       XML        M    Y    -   Y    Reload
+     */
+    @Test
+    public void testModifyDirUpdateDir() throws Exception {
+        doTestModify(false, false, false, false, true, DIR,
+                false, false, true, DIR_COOKIE_NAME, NONE);
+    }
+
+    @Test
+    public void testModifyWarUpdateWar() throws Exception {
+        doTestModify(false, false, false, true, false, WAR,
+                false, true, false, WAR_COOKIE_NAME, REDEPLOY);
+    }
+
+    @Test
+    public void testModifyWarDirUpdateDir() throws Exception {
+        // DIR_COOKIE_NAME since Tomcat is going to assume DIR is expanded WAR
+        doTestModify(false, false, false, true, true, DIR,
+                false, true, true, DIR_COOKIE_NAME, NONE);
+    }
+
+    @Test
+    public void testModifyWarDirUpdateWar() throws Exception {
+        doTestModify(false, false, false, true, true, WAR,
+                false, true, true, WAR_COOKIE_NAME, REDEPLOY);
+    }
+
+    @Test
+    public void testModifyXmlUpdateXml() throws Exception {
+        doTestModify(true, false, false, false, false, XML,
+                true, false, false, XML_COOKIE_NAME, REDEPLOY);
+    }
+
+    private void doTestModify(boolean startXml, boolean startExternalWar,
+            boolean startExternalDir, boolean startWar, boolean startDir,
+            int toModify, boolean resultXml, boolean resultWar,
+            boolean resultDir, String resultCookieName, int resultAction)
+            throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+
+        // Init
+        File xml = null;
+        File ext = null;
+        File war = null;
+        File dir = null;
+
+        if (startXml && !startExternalWar && !startExternalDir) {
+            xml = new File(getConfigBaseFile(host), APP_NAME + ".xml");
+            File parent = xml.getParentFile();
+            if (!parent.isDirectory()) {
+                Assert.assertTrue(parent.mkdirs());
+            }
+            copy(XML_SOURCE, xml);
+        }
+        if (startExternalWar) {
+            // Copy the test WAR file to the external directory
+            ext = new File(external, "external" + ".war");
+            copy(WAR_XML_SOURCE, ext);
+
+            // Create the XML file
+            xml = new File(getConfigBaseFile(host), APP_NAME + ".xml");
+            File parent = xml.getParentFile();
+            if (!parent.isDirectory()) {
+                Assert.assertTrue(parent.mkdirs());
+            }
+
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(xml);
+                fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
+                        "\" docBase=\"" + ext.getAbsolutePath() +
+                        "\" />").getBytes(B2CConverter.ISO_8859_1));
+            } finally {
+                if (fos != null) {
+                    fos.close();
+                }
+            }
+        }
+        if (startExternalDir) {
+            // Copy the test DIR file to the external directory
+            ext = new File(external, "external");
+            recurrsiveCopy(DIR_XML_SOURCE, ext);
+
+            // Create the XML file
+            xml = new File(getConfigBaseFile(getTomcatInstance().getHost()),
+                    APP_NAME + ".xml");
+            File parent = xml.getParentFile();
+            if (!parent.isDirectory()) {
+                Assert.assertTrue(parent.mkdirs());
+            }
+
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(xml);
+                fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
+                        "\" docBase=\"" + ext.getAbsolutePath() +
+                        "\" />").getBytes(B2CConverter.ISO_8859_1));
+            } finally {
+                if (fos != null) {
+                    fos.close();
+                }
+            }
+        }
+        if (startWar) {
+            // Copy the test WAR file to the appBase
+            war = new File(getAppBaseFile(getTomcatInstance().getHost()),
+                    APP_NAME.getBaseName() + ".war");
+            copy(WAR_XML_SOURCE, war);
+        }
+        if (startDir) {
+            // Copy the test DIR file to the appBase
+            dir = new File(getAppBaseFile(getTomcatInstance().getHost()),
+                    APP_NAME.getBaseName());
+            recurrsiveCopy(DIR_XML_SOURCE, dir);
+        }
+
+        if ((startWar || startExternalWar) && !startDir) {
+            host.setUnpackWARs(false);
+        }
+
+        // Deploy the files we copied
+        tomcat.start();
+        host.backgroundProcess();
+
+        // Remove the specified file
+        switch (toModify) {
+            case XML:
+                if (xml == null) {
+                    Assert.fail();
+                } else {
+                    xml.setLastModified(System.currentTimeMillis());
+                }
+                break;
+            case EXT:
+                if (ext == null) {
+                    Assert.fail();
+                } else {
+                    ext.setLastModified(System.currentTimeMillis());
+                }
+                break;
+            case WAR:
+                if (war == null) {
+                    Assert.fail();
+                } else {
+                    war.setLastModified(System.currentTimeMillis());
+                }
+                break;
+            case DIR:
+                if (dir == null) {
+                    Assert.fail();
+                } else {
+                    dir.setLastModified(System.currentTimeMillis());
+                }
+                break;
+            default:
+                Assert.fail();
+        }
+
+        Context oldContext = (Context) host.findChild(APP_NAME.getName());
+        StateTracker tracker = new StateTracker();
+        oldContext.addLifecycleListener(tracker);
+
+        // Trigger an auto-deployment cycle
+        host.backgroundProcess();
+
+        Context newContext = (Context) host.findChild(APP_NAME.getName());
+
+        // Check the results
+        if (resultXml) {
+            if (xml == null) {
+                Assert.fail();
+            } else {
+                Assert.assertTrue(xml.isFile());
+            }
+        }
+        if (resultWar) {
+            if (war == null) {
+                Assert.fail();
+            } else {
+                Assert.assertTrue(war.isFile());
+            }
+        }
+        if (resultDir) {
+            if (dir == null) {
+                Assert.fail();
+            } else {
+                Assert.assertTrue(dir.isDirectory());
+            }
+        }
+
+        if (!resultXml && (startExternalWar || startExternalDir)) {
+            Assert.assertNull(newContext);
+        }
+        if (!resultWar && !resultDir) {
+            if (resultXml) {
+                Assert.assertEquals(LifecycleState.FAILED, newContext.getState());
+            } else {
+                Assert.assertNull(newContext);
+            }
+        }
+
+        if (newContext != null) {
+            Assert.assertEquals(resultCookieName, newContext.getSessionCookieName());
+        }
+
+        if (resultAction == NONE) {
+            Assert.assertSame(oldContext, newContext);
+            Assert.assertEquals("", tracker.getHistory());
+        } else if (resultAction == RELOAD) {
+            Assert.assertSame(oldContext, newContext);
+            Assert.assertEquals("stopstart", tracker.getHistory());
+        } else if (resultAction == REDEPLOY) {
+            Assert.assertNotSame(oldContext, newContext);
+            // No init or start as that will be in a new context object
+            Assert.assertEquals("stopafter_destroy", tracker.getHistory());
+        } else {
+            Assert.fail();
+        }
+    }
+
+
     @Test
     public void testSetContextClassName() throws Exception {
 
@@ -1051,6 +1302,29 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     }
 
 
+    private static class StateTracker implements LifecycleListener {
+
+        private StringBuilder stateHistory = new StringBuilder();
+
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+
+            String type = event.getType();
+
+            if (type.equals(Lifecycle.START_EVENT) ||
+                    type.equals(Lifecycle.STOP_EVENT) ||
+                    type.equals(Lifecycle.AFTER_DESTROY_EVENT)) {
+                stateHistory.append(type);
+            }
+        }
+
+
+        public String getHistory() {
+            return stateHistory.toString();
+        }
+    }
+
+    
     // Static methods to compensate for methods that are present in 8.0.x but
     // not in 7.0.x
     
@@ -1118,6 +1392,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             }
         }
     }
+
     
     private static void recurrsiveCopy(File src, File dest) throws IOException {
         dest.mkdirs();
