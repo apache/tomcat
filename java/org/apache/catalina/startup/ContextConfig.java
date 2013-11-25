@@ -709,12 +709,12 @@ public class ContextConfig implements LifecycleListener {
                 context.getWebappVersion());
         String pathName = cn.getBaseName();
 
-        boolean unpackWARs = true;
-        if (host instanceof StandardHost &&
-                context instanceof StandardContext) {
-            unpackWARs = ((StandardHost) host).isUnpackWARs() &&
-                    ((StandardContext) context).getUnpackWAR() &&
-                    (docBase.startsWith(canonicalAppBase.getPath()));
+        boolean unpackWARs = docBase.startsWith(canonicalAppBase.getPath());
+        if (unpackWARs && host instanceof StandardHost) {
+            unpackWARs = ((StandardHost) host).isUnpackWARs();
+            if (unpackWARs && context instanceof StandardContext) {
+                unpackWARs =  ((StandardContext) context).getUnpackWAR();
+            }
         }
 
         if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war") && !file.isDirectory() && unpackWARs) {

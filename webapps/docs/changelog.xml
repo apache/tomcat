@@ -165,6 +165,10 @@
         Host&apos;s <code>deloyXML</code> attribute to <code>false</code>.
         (markt)
       </add>
+      <fix>
+        Correct a logic error that meant that unpackWARs was ignored and the WAR
+        was always expanded if a WAR failed to deploy. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
