@@ -176,84 +176,66 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
      */
     @Test
     public void testDeploymentXmlExternalWarXmlFFF() throws Exception {
-        initTestDeploymentXmlExternalWarXml();
+        File war = createWarInExternal(true);
+        createXmlInConfigBaseForExternal(war);
         doTestDeployment(false, false, false,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlExternalWarXmlFFT() throws Exception {
-        initTestDeploymentXmlExternalWarXml();
+        File war = createWarInExternal(true);
+        createXmlInConfigBaseForExternal(war);
         doTestDeployment(false, false, true,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, true);
     }
 
     @Test
     public void testDeploymentXmlExternalWarXmlFTF() throws Exception {
-        initTestDeploymentXmlExternalWarXml();
+        File war = createWarInExternal(true);
+        createXmlInConfigBaseForExternal(war);
         doTestDeployment(false, true, false,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlExternalWarXmlFTT() throws Exception {
-        initTestDeploymentXmlExternalWarXml();
+        File war = createWarInExternal(true);
+        createXmlInConfigBaseForExternal(war);
         doTestDeployment(false, true, true,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, true);
     }
 
     @Test
     public void testDeploymentXmlExternalWarXmlTFF() throws Exception {
-        initTestDeploymentXmlExternalWarXml();
+        File war = createWarInExternal(true);
+        createXmlInConfigBaseForExternal(war);
         doTestDeployment(true, false, false,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlExternalWarXmlTFT() throws Exception {
-        initTestDeploymentXmlExternalWarXml();
+        File war = createWarInExternal(true);
+        createXmlInConfigBaseForExternal(war);
         doTestDeployment(true, false, true,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, true);
     }
 
     @Test
     public void testDeploymentXmlExternalWarXmlTTF() throws Exception {
-        initTestDeploymentXmlExternalWarXml();
+        File war = createWarInExternal(true);
+        createXmlInConfigBaseForExternal(war);
         doTestDeployment(true, true, false,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlExternalWarXmlTTT() throws Exception {
-        initTestDeploymentXmlExternalWarXml();
+        File war = createWarInExternal(true);
+        createXmlInConfigBaseForExternal(war);
         doTestDeployment(true, true, true,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, true);
-    }
-
-    private void initTestDeploymentXmlExternalWarXml() throws IOException {
-        // Copy the test WAR file to the external directory
-        File war = new File(external, "external" + ".war");
-        copy(WAR_XML_SOURCE, war);
-
-        // Create the XML file
-        File xml = new File(getConfigBaseFile(getTomcatInstance().getHost()),
-                APP_NAME + ".xml");
-        File parent = xml.getParentFile();
-        if (!parent.isDirectory()) {
-            Assert.assertTrue(parent.mkdirs());
-        }
-
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(xml);
-            fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
-                    "\" docBase=\"" + war.getAbsolutePath() + "\" />").getBytes(
-                    B2CConverter.ISO_8859_1));
-        } finally {
-            if (fos != null) {
-                fos.close();
-            }
-        }
     }
 
 
@@ -267,84 +249,66 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
      */
     @Test
     public void testDeploymentXmlExternalDirXmlFFF() throws Exception {
-        initTestDeploymentXmlExternalDirXml();
+        File dir = createDirInExternal(true);
+        createXmlInConfigBaseForExternal(dir);
         doTestDeployment(false, false, false,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlExternalDirXmlFFT() throws Exception {
-        initTestDeploymentXmlExternalDirXml();
+        File dir = createDirInExternal(true);
+        createXmlInConfigBaseForExternal(dir);
         doTestDeployment(false, false, true,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlExternalDirXmlFTF() throws Exception {
-        initTestDeploymentXmlExternalDirXml();
+        File dir = createDirInExternal(true);
+        createXmlInConfigBaseForExternal(dir);
         doTestDeployment(false, true, false,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlExternalDirXmlFTT() throws Exception {
-        initTestDeploymentXmlExternalDirXml();
+        File dir = createDirInExternal(true);
+        createXmlInConfigBaseForExternal(dir);
         doTestDeployment(false, true, true,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlExternalDirXmlTFF() throws Exception {
-        initTestDeploymentXmlExternalDirXml();
+        File dir = createDirInExternal(true);
+        createXmlInConfigBaseForExternal(dir);
         doTestDeployment(true, false, false,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlExternalDirXmlTFT() throws Exception {
-        initTestDeploymentXmlExternalDirXml();
+        File dir = createDirInExternal(true);
+        createXmlInConfigBaseForExternal(dir);
         doTestDeployment(true, false, true,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlExternalDirXmlTTF() throws Exception {
-        initTestDeploymentXmlExternalDirXml();
+        File dir = createDirInExternal(true);
+        createXmlInConfigBaseForExternal(dir);
         doTestDeployment(true, true, false,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlExternalDirXmlTTT() throws Exception {
-        initTestDeploymentXmlExternalDirXml();
+        File dir = createDirInExternal(true);
+        createXmlInConfigBaseForExternal(dir);
         doTestDeployment(true, true, true,
                 LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
-    }
-
-    private void initTestDeploymentXmlExternalDirXml() throws IOException {
-        // Copy the test DIR file to the external directory
-        File dir = new File(external, "external");
-        recurrsiveCopy(DIR_XML_SOURCE, dir);
-
-        // Create the XML file
-        File xml = new File(getConfigBaseFile(getTomcatInstance().getHost()),
-                APP_NAME + ".xml");
-        File parent = xml.getParentFile();
-        if (!parent.isDirectory()) {
-            Assert.assertTrue(parent.mkdirs());
-        }
-
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(xml);
-            fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
-                    "\" docBase=\"" + dir.getAbsolutePath() + "\" />").getBytes(
-                    B2CConverter.ISO_8859_1));
-        } finally {
-            if (fos != null) {
-                fos.close();
-            }
-        }
     }
 
 
@@ -487,65 +451,58 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
      */
     @Test
     public void testDeploymentDirXmlFFF() throws Exception {
-        initTestDeploymentDirXml();
+        createDirInAppbase(true);
         doTestDeployment(false, false, false,
                 LifecycleState.STARTED, null, false, false, true);
     }
 
     @Test
     public void testDeploymentDirXmlFFT() throws Exception {
-        initTestDeploymentDirXml();
+        createDirInAppbase(true);
         doTestDeployment(false, false, true,
                 LifecycleState.STARTED, null, false, false, true);
     }
 
     @Test
     public void testDeploymentDirXmlFTF() throws Exception {
-        initTestDeploymentDirXml();
+        createDirInAppbase(true);
         doTestDeployment(false, true, false,
                 LifecycleState.STARTED, null, false, false, true);
     }
 
     @Test
     public void testDeploymentDirXmlFTT() throws Exception {
-        initTestDeploymentDirXml();
+        createDirInAppbase(true);
         doTestDeployment(false, true, true,
                 LifecycleState.STARTED, null, false, false, true);
     }
 
     @Test
     public void testDeploymentDirXmlTFF() throws Exception {
-        initTestDeploymentDirXml();
+        createDirInAppbase(true);
         doTestDeployment(true, false, false,
                 LifecycleState.STARTED, DIR_COOKIE_NAME, false, false, true);
     }
 
     @Test
     public void testDeploymentDirXmlTFT() throws Exception {
-        initTestDeploymentDirXml();
+        createDirInAppbase(true);
         doTestDeployment(true, false, true,
                 LifecycleState.STARTED, DIR_COOKIE_NAME, false, false, true);
     }
 
     @Test
     public void testDeploymentDirXmlTTF() throws Exception {
-        initTestDeploymentDirXml();
+        createDirInAppbase(true);
         doTestDeployment(true, true, false,
                 LifecycleState.STARTED, DIR_COOKIE_NAME, true, false, true);
     }
 
     @Test
     public void testDeploymentDirXmlTTT() throws Exception {
-        initTestDeploymentDirXml();
+        createDirInAppbase(true);
         doTestDeployment(true, true, true,
                 LifecycleState.STARTED, DIR_COOKIE_NAME, true, false, true);
-    }
-
-    private void initTestDeploymentDirXml() throws IOException {
-        // Copy the test DIR file to the appBase
-        File dest = new File(getAppBaseFile(getTomcatInstance().getHost()),
-                APP_NAME.getBaseName());
-        recurrsiveCopy(DIR_XML_SOURCE, dest);
     }
 
 
@@ -849,53 +806,12 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             xml = createXmlInConfigBaseForAppbase();
         }
         if (startExternalWar) {
-            // Copy the test WAR file to the external directory
-            ext = new File(external, "external" + ".war");
-            copy(WAR_XML_SOURCE, ext);
-
-            // Create the XML file
-            xml = new File(getConfigBaseFile(host), APP_NAME + ".xml");
-            File parent = xml.getParentFile();
-            if (!parent.isDirectory()) {
-                Assert.assertTrue(parent.mkdirs());
-            }
-            
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(xml);
-                fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
-                        "\" docBase=\"" + ext.getAbsolutePath() +
-                        "\" />").getBytes(B2CConverter.ISO_8859_1));
-            } finally {
-                if (fos != null) {
-                    fos.close();
-                }
-            }
+            ext = createWarInExternal(true);
+            xml = createXmlInConfigBaseForExternal(ext);
         }
         if (startExternalDir) {
-            // Copy the test DIR file to the external directory
-            ext = new File(external, "external");
-            recurrsiveCopy(DIR_XML_SOURCE, ext);
-
-            // Create the XML file
-            xml = new File(getConfigBaseFile(getTomcatInstance().getHost()),
-                    APP_NAME + ".xml");
-            File parent = xml.getParentFile();
-            if (!parent.isDirectory()) {
-                Assert.assertTrue(parent.mkdirs());
-            }
-
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(xml);
-                fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
-                        "\" docBase=\"" + ext.getAbsolutePath() +
-                        "\" />").getBytes(B2CConverter.ISO_8859_1));
-            } finally {
-                if (fos != null) {
-                    fos.close();
-                }
-            }
+            ext = createDirInExternal(true);
+            xml = createXmlInConfigBaseForExternal(ext);
         }
         if (startWar) {
             war = createWarInAppbase(true);
@@ -1171,53 +1087,12 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             xml = createXmlInConfigBaseForAppbase();
         }
         if (startExternalWar) {
-            // Copy the test WAR file to the external directory
-            ext = new File(external, "external" + ".war");
-            copy(WAR_XML_SOURCE, ext);
-
-            // Create the XML file
-            xml = new File(getConfigBaseFile(host), APP_NAME + ".xml");
-            File parent = xml.getParentFile();
-            if (!parent.isDirectory()) {
-                Assert.assertTrue(parent.mkdirs());
-            }
-
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(xml);
-                fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
-                        "\" docBase=\"" + ext.getAbsolutePath() +
-                        "\" />").getBytes(B2CConverter.ISO_8859_1));
-            } finally {
-                if (fos != null) {
-                    fos.close();
-                }
-            }
+            ext = createWarInExternal(true);
+            xml = createXmlInConfigBaseForExternal(ext);
         }
         if (startExternalDir) {
-            // Copy the test DIR file to the external directory
-            ext = new File(external, "external");
-            recurrsiveCopy(DIR_XML_SOURCE, ext);
-
-            // Create the XML file
-            xml = new File(getConfigBaseFile(getTomcatInstance().getHost()),
-                    APP_NAME + ".xml");
-            File parent = xml.getParentFile();
-            if (!parent.isDirectory()) {
-                Assert.assertTrue(parent.mkdirs());
-            }
-
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(xml);
-                fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
-                        "\" docBase=\"" + ext.getAbsolutePath() +
-                        "\" />").getBytes(B2CConverter.ISO_8859_1));
-            } finally {
-                if (fos != null) {
-                    fos.close();
-                }
-            }
+            ext = createDirInAppbase(true);
+            xml = createXmlInConfigBaseForExternal(ext);
         }
         if (startWar) {
             war = createWarInAppbase(true);
@@ -1342,22 +1217,21 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     /*
      * Expected behaviour for the addition of files.
      *
-     * Artifacts present      Artifact   Artifacts remaining
-     * XML  WAR  EXT  DIR    Modified    XML  WAR  EXT DIR   Action
-     *  N    Y    N    Y       DIR        -    Y    -   M     None
-     *  N    Y    N    Y       WAR        -    M    -   R   Redeploy
-     *  Y    N    N    Y       DIR        Y    -    -   M     None
-     *  Y    N    N    Y       XML        M    -    -   Y   Redeploy
-     *  Y    N    Y    N       EXT        Y    -    M   -   Reload if WAR
-     *  Y    N    Y    N       XML        M    -    Y   -   Redeploy
-     *  Y    N    Y    Y       DIR        Y    -    Y   M     None
-     *  Y    N    Y    Y       EXT        Y    -    M   R    Reload
-     *  Y    N    Y    Y       XML        M    -    Y   Y   Redeploy
-     *  Y    Y    N    N       WAR        Y    M    -   -    Reload
-     *  Y    Y    N    N       XML        M    Y    -   -   Redeploy
-     *  Y    Y    N    Y       DIR        Y    Y    -   M     None
-     *  Y    Y    N    Y       WAR        Y    M    -   -    Reload
-     *  Y    Y    N    Y       XML        M    Y    -   Y   Redeploy
+     * Artifacts present     Artifact   Artifacts remaining
+     * XML  WAR  EXT  DIR     Added      XML  WAR  EXT DIR   Action
+     *  N    Y    N    N       DIR        -    Y    -   A     None
+     *  N    N    N    Y       WAR        -    A    -   R   Redeploy
+     *  Y    N    N    N       DIR        Y    -    -   A     None
+     *  N    N    N    Y       XML        A    -    -   Y   Redeploy
+     *  Y    N    N    N       WAR        Y    A    -   -    Reload
+     *  N    Y    N    N       XML        A    Y    -   -   Redeploy
+     *  Y    Y    N    N       DIR        Y    Y    -   A     None
+     *  Y    N    N    Y       WAR        Y    A    -   N    Reload
+     *  N    Y    N    Y       XML        A    Y    -   Y   Redeploy
+     *  Y    N    Y    N       DIR        Y    -    Y   A     None
+     *  Y    N    Y    N       WAR        Y    A    Y   -     None
+     *  N    N    N    Y       EXT        A    -    A   R   Redeploy
+     *  N    Y    N    N       EXT        A    Y    A   -   Redeploy
      *
      * Addition of a file  is treated as if the added file has been modified
      * with the following additional actions:
@@ -1398,6 +1272,72 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 true, false, true, XML_COOKIE_NAME, REDEPLOY);
     }
 
+    @Test
+    public void testAdditionXmlAddWar() throws Exception {
+        doTestAddition(true, false, false, false, false, WAR,
+                true, true, false, XML_COOKIE_NAME, RELOAD);
+    }
+
+    @Test
+    public void testAdditionWarAddXml() throws Exception {
+        doTestAddition(false, false, false, true, false, XML,
+                true, true, false, XML_COOKIE_NAME, REDEPLOY);
+    }
+
+    @Test
+    public void testAdditionXmlWarAddDir() throws Exception {
+        doTestAddition(true, false, false, true, false, DIR,
+                true, true, true, XML_COOKIE_NAME, NONE);
+    }
+
+    @Test
+    public void testAdditionXmlDirAddWar() throws Exception {
+        doTestAddition(true, false, false, false, true, WAR,
+                true, true, false, XML_COOKIE_NAME, RELOAD);
+    }
+
+    @Test
+    public void testAdditionWarDirAddXml() throws Exception {
+        doTestAddition(false, false, false, true, true, XML,
+                true, true, true, XML_COOKIE_NAME, REDEPLOY);
+    }
+
+    @Test
+    public void testAdditionXmlExtwarAddDir() throws Exception {
+        doTestAddition(true, true, false, false, false, DIR,
+                true, false, true, XML_COOKIE_NAME, NONE);
+    }
+
+    @Test
+    public void testAdditionXmlExtdirAddDir() throws Exception {
+        doTestAddition(true, false, true, false, false, DIR,
+                true, false, true, XML_COOKIE_NAME, NONE);
+    }
+
+    @Test
+    public void testAdditionXmlExtwarAddWar() throws Exception {
+        doTestAddition(true, true, false, false, false, WAR,
+                true, true, false, XML_COOKIE_NAME, NONE);
+    }
+
+    @Test
+    public void testAdditionXmlExtdirAddWar() throws Exception {
+        doTestAddition(true, false, true, false, false, WAR,
+                true, true, false, XML_COOKIE_NAME, NONE);
+    }
+
+    @Test
+    public void testAdditionDirAddXmlExtwar() throws Exception {
+        doTestAddition(false, false, false, false, true, EXT,
+                true, false, true, XML_COOKIE_NAME, REDEPLOY);
+    }
+
+    @Test
+    public void testAdditionWarAddXmlExtwar() throws Exception {
+        doTestAddition(false, false, false, true, false, EXT,
+                true, true, false, XML_COOKIE_NAME, REDEPLOY);
+    }
+
     private void doTestAddition(boolean startXml, boolean startExternalWar,
             boolean startExternalDir, boolean startWar, boolean startDir,
             int toAdd, boolean resultXml, boolean resultWar,
@@ -1417,53 +1357,12 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             xml = createXmlInConfigBaseForAppbase();
         }
         if (startExternalWar) {
-            // Copy the test WAR file to the external directory
-            ext = new File(external, "external" + ".war");
-            copy(WAR_XML_SOURCE, ext);
-
-            // Create the XML file
-            xml = new File(getConfigBaseFile(host), APP_NAME + ".xml");
-            File parent = xml.getParentFile();
-            if (!parent.isDirectory()) {
-                Assert.assertTrue(parent.mkdirs());
-            }
-
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(xml);
-                fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
-                        "\" docBase=\"" + ext.getAbsolutePath() +
-                        "\" />").getBytes(B2CConverter.ISO_8859_1));
-            } finally {
-                if (fos != null) {
-                    fos.close();
-                }
-            }
+            ext = createWarInExternal(true);
+            xml = createXmlInConfigBaseForExternal(ext);
         }
         if (startExternalDir) {
-            // Copy the test DIR file to the external directory
-            ext = new File(external, "external");
-            recurrsiveCopy(DIR_XML_SOURCE, ext);
-
-            // Create the XML file
-            xml = new File(getConfigBaseFile(getTomcatInstance().getHost()),
-                    APP_NAME + ".xml");
-            File parent = xml.getParentFile();
-            if (!parent.isDirectory()) {
-                Assert.assertTrue(parent.mkdirs());
-            }
-
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(xml);
-                fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
-                        "\" docBase=\"" + ext.getAbsolutePath() +
-                        "\" />").getBytes(B2CConverter.ISO_8859_1));
-            } finally {
-                if (fos != null) {
-                    fos.close();
-                }
-            }
+            ext = createDirInExternal(true);
+            xml = createXmlInConfigBaseForExternal(ext);
         }
         if (startWar) {
             war = createWarInAppbase(true);
@@ -1490,10 +1389,11 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 }
                 break;
             case EXT:
-                if (ext == null) {
-                    Assert.fail();
+                if (ext == null && xml == null) {
+                    ext = createWarInExternal(true);
+                    xml = createXmlInConfigBaseForExternal(ext);
                 } else {
-                    ext.setLastModified(System.currentTimeMillis());
+                    Assert.fail();
                 }
                 break;
             case WAR:
@@ -1602,6 +1502,17 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     }
 
 
+    private File createDirInExternal(boolean withXml) throws IOException {
+        File ext = new File(external, "external" + ".war");
+        if (withXml) {
+            recurrsiveCopy(DIR_XML_SOURCE, ext);
+        } else {
+            recurrsiveCopy(DIR_SOURCE, ext);
+        }
+        return ext;
+    }
+
+
     private File createWarInAppbase(boolean withXml) throws IOException {
         File war = new File(getAppBaseFile(getTomcatInstance().getHost()),
                 APP_NAME.getBaseName() + ".war");
@@ -1613,6 +1524,16 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         return war;
     }
 
+    private File createWarInExternal(boolean withXml) throws IOException {
+        File ext = new File(external, "external" + ".war");
+        if (withXml) {
+            copy(WAR_XML_SOURCE, ext);
+        } else {
+            copy(WAR_SOURCE, ext);
+        }
+        return ext;
+    }
+
     private File createXmlInConfigBaseForAppbase() throws IOException {
         Host host = getTomcatInstance().getHost();
         File xml = new File(getConfigBaseFile(host), APP_NAME + ".xml");
@@ -1621,6 +1542,29 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             Assert.assertTrue(parent.mkdirs());
         }
         copy(XML_SOURCE, xml);
+        return xml;
+    }
+
+
+    private File createXmlInConfigBaseForExternal(File ext) throws IOException {
+        File xml = new File(getConfigBaseFile(getTomcatInstance().getHost()),
+                APP_NAME + ".xml");
+        File parent = xml.getParentFile();
+        if (!parent.isDirectory()) {
+            Assert.assertTrue(parent.mkdirs());
+        }
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(xml);
+            fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
+                    "\" docBase=\"" + ext.getAbsolutePath() +
+                    "\" />").getBytes(B2CConverter.ISO_8859_1));
+        } finally {
+            if (fos != null) {
+                fos.close();
+            }
+        }
         return xml;
     }
 
