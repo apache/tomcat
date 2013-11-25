@@ -708,32 +708,43 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     @Test
     public void testDeleteDirRemoveDir() throws Exception {
         doTestDelete(false, false, false, false, true, DIR, false, false, false,
-                false, null);
+                null);
     }
 
     @Test
     public void testDeleteWarRemoveWar() throws Exception {
         doTestDelete(false, false, false, true, false, WAR, false, false, false,
-                false, null);
+                null);
     }
 
     @Test
     public void testDeleteWarDirRemoveDir() throws Exception {
-        doTestDelete(false, false, false, true, true, DIR, false, false, true,
-                true, WAR_COOKIE_NAME);
+        doTestDelete(false, false, false, true, true, DIR, false, true, true,
+                WAR_COOKIE_NAME);
     }
 
     @Test
     public void testDeleteWarDirRemoveWar() throws Exception {
         doTestDelete(false, false, false, true, true, WAR, false, false, false,
-                false, null);
+                null);
+    }
+
+    @Test
+    public void testDeleteXmlRemoveXml() throws Exception {
+        doTestDelete(true, false, false, false, false, XML, false, false, false,
+                null);
+    }
+
+    // @Test Disable as this currently fails
+    public void testDeleteXmlDirRemoveDir() throws Exception {
+        doTestDelete(true, false, false, false, true, DIR, true, false, false,
+                null);
     }
 
     private void doTestDelete(boolean startXml, boolean startExternalWar,
             boolean startExternalDir, boolean startWar, boolean startDir,
-            int toDelete, boolean resultXml, boolean resultExternal,
-            boolean resultWar, boolean resultDir, String resultCookieName)
-            throws Exception {
+            int toDelete, boolean resultXml, boolean resultWar,
+            boolean resultDir, String resultCookieName) throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
         StandardHost host = (StandardHost) tomcat.getHost();
@@ -849,13 +860,36 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         Context ctxt = (Context) host.findChild(APP_NAME.getName());
 
         // Check the results
-        if (!resultXml && !resultWar && !resultDir) {
-            // App should have been undeployed
-            Assert.assertNull(ctxt);
-            return;
+        if (resultXml) {
+            if (xml == null) {
+                Assert.fail();
+            } else {
+                Assert.assertTrue(xml.isFile());
+            }
+        }
+        if (resultWar) {
+            if (war == null) {
+                Assert.fail();
+            } else {
+                Assert.assertTrue(war.isFile());
+            }
+        }
+        if (resultDir) {
+            if (dir == null) {
+                Assert.fail();
+            } else {
+                Assert.assertTrue(dir.isDirectory());
+            }
         }
 
-        if (resultWar) {
+        if (!resultXml && (startExternalWar || startExternalDir)) {
+            Assert.assertNull(ctxt);
+        }
+        if (!resultWar && !resultDir) {
+            Assert.assertNull(ctxt);
+        }
+
+        if (ctxt != null) {
             Assert.assertEquals(resultCookieName, ctxt.getSessionCookieName());
         }
     }
