@@ -344,7 +344,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
 
     <h5>1. Create/edit the XML file</h5>
 
-    <p>The XMl file is typically located at
+    <p>The XML file is typically located at
     <code>$CATALINA_BASE/conf/tomcat-users.xml</code> however, you are free to
     locate the file anywhere on the file system. It is recommended that the XML
     files are placed in <code>$CATALINA_BASE/conf</code>. A typical XML would
@@ -362,7 +362,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
     <h5>2.  Declare Your Resource</h5>
 
     <p>Next, modify <code>$CATALINA_BASE/conf/server.xml</code> to create the
-    UserDatabase resource based on your XMl file. It should look something like
+    UserDatabase resource based on your XML file. It should look something like
     this:</p>
 
 <source><![CDATA[<Resource name="UserDatabase"
