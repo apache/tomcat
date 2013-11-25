@@ -5237,8 +5237,7 @@ public class StandardContext extends ContainerBase
         }
         if (ok) {
             if (!resourcesStart()) {
-                log.error( "Error in resourceStart()");
-                ok = false;
+                throw new LifecycleException("Error in resourceStart()");
             }
         }
 
