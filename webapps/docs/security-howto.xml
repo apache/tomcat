@@ -173,6 +173,13 @@
     manager should be introduced at the start of the development cycle as it can
     be time-consuming to track down and fix issues caused by enabling a security
     manager for a mature application.</p>
+    
+    <p>Enabling the security manager changes the defaults for the following
+    settings:</p>
+    <ul>
+      <li>The default value for the <strong>deployXML</strong> attribute of the
+      <strong>Host</strong> element is changed to <code>false</code>.</li>
+    </ul>
   </section>
 
   <section name="server.xml">
@@ -293,9 +300,11 @@
       </p>
 
       <p>In a hosted environment where web applications may not be trusted, set
-      the <strong>deployXML</strong> attribute to <code>false</code> to ignore any
-      context.xml packaged with the web application that may try to assign
-      increased privileges to the web application. </p>
+      the <strong>deployXML</strong> attribute to <code>false</code> to ignore
+      any context.xml packaged with the web application that may try to assign
+      increased privileges to the web application. Note that if the security
+      manager is enabled that the <strong>deployXML</strong> attribute will
+      default to <code>false</code>.</p>
     </subsection>
 
     <subsection name="Context">

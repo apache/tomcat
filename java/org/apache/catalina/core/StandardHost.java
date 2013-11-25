@@ -31,6 +31,7 @@ import javax.management.ObjectName;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.JmxEnabled;
 import org.apache.catalina.Lifecycle;
@@ -128,7 +129,7 @@ public class StandardHost extends ContainerBase implements Host {
     /**
      * deploy Context XML config files property.
      */
-    private boolean deployXML = true;
+    private boolean deployXML = !Globals.IS_SECURITY_ENABLED;
 
 
     /**
