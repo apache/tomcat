@@ -838,14 +838,6 @@ public class ContextConfig implements LifecycleListener {
 
         createWebXmlDigester(context.getXmlNamespaceAware(),
                 context.getXmlValidation());
-
-        try {
-            fixDocBase();
-        } catch (IOException e) {
-            log.error(sm.getString(
-                    "contextConfig.fixDocBase", context.getName()), e);
-        }
-
     }
 
 
@@ -854,8 +846,14 @@ public class ContextConfig implements LifecycleListener {
      */
     protected synchronized void beforeStart() {
 
-        antiLocking();
+        try {
+            fixDocBase();
+        } catch (IOException e) {
+            log.error(sm.getString(
+                    "contextConfig.fixDocBase", context.getName()), e);
+        }
 
+        antiLocking();
     }
 
 
