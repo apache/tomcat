@@ -17,19 +17,26 @@
 package org.apache.catalina.startup;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
+import org.apache.tomcat.util.buf.B2CConverter;
 
 /**
  * The purpose of this class is to test the automatic deployment features of the
@@ -40,6 +47,16 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     private static final ContextName  APP_NAME = new ContextName("myapp");
     private static final File XML_SOURCE =
             new File("test/deployment/context.xml");
+    private static final File WAR_XML_SOURCE =
+            new File("test/deployment/context.war");
+    //private static final File WAR_SOURCE =
+    //        new File("test/deployment/noContext.war");
+    private static final File DIR_XML_SOURCE =
+            new File("test/deployment/dirContext");
+
+    private static final String XML_COOKIE_NAME = "XML_CONTEXT";
+    //private static final String WAR_COOKIE_NAME = "WAR_CONTEXT";
+    //private static final String DIR_COOKIE_NAME = "DIR_CONTEXT";
 
     private File external;
 
@@ -68,76 +85,272 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         addDeleteOnTearDown(external);
     }
 
+
+    /*
+     * Expected behaviour for deployment of an XML file.
+     * deployXML  copyXML  unpackWARs      XML  WAR  DIR
+     *    Y/N       Y/N       Y/N           Y    N    N
+     *
+     * Note: Context will fail to start because no valid docBase is present.
+     */
     @Test
     public void testDeploymentXmlFFF() throws Exception {
         initTestDeploymentXml();
         doTestDeployment(false, false, false,
-                LifecycleState.FAILED, true, false, false);
+                LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlFFT() throws Exception {
         initTestDeploymentXml();
         doTestDeployment(false, false, true,
-                LifecycleState.FAILED, true, false, false);
+                LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlFTF() throws Exception {
         initTestDeploymentXml();
         doTestDeployment(false, true, false,
-                LifecycleState.FAILED, true, false, false);
+                LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlFTT() throws Exception {
         initTestDeploymentXml();
         doTestDeployment(false, true, true,
-                LifecycleState.FAILED, true, false, false);
+                LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlTFF() throws Exception {
         initTestDeploymentXml();
         doTestDeployment(true, false, false,
-                LifecycleState.FAILED, true, false, false);
+                LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlTFT() throws Exception {
         initTestDeploymentXml();
         doTestDeployment(true, false, true,
-                LifecycleState.FAILED, true, false, false);
+                LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlTTF() throws Exception {
         initTestDeploymentXml();
         doTestDeployment(true, true, false,
-                LifecycleState.FAILED, true, false, false);
+                LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
     }
 
     @Test
     public void testDeploymentXmlTTT() throws Exception {
         initTestDeploymentXml();
         doTestDeployment(true, true, true,
-                LifecycleState.FAILED, true, false, false);
+                LifecycleState.FAILED, XML_COOKIE_NAME, true, false, false);
     }
 
     private void initTestDeploymentXml() throws IOException {
-        File dest = new File(getConfigBaseFile(getTomcatInstance().getHost()),
+        File xml = new File(getConfigBaseFile(getTomcatInstance().getHost()),
                 APP_NAME + ".xml");
-        File parent = dest.getParentFile();
+        File parent = xml.getParentFile();
         if (!parent.isDirectory()) {
             Assert.assertTrue(parent.mkdirs());
         }
 
-        Files.copy(XML_SOURCE.toPath(), dest.toPath());
+        Files.copy(XML_SOURCE.toPath(), xml.toPath());
     }
 
+
+    /*
+     * Expected behaviour for deployment of an XML file that points to an
+     * external WAR.
+     * deployXML  copyXML  unpackWARs      XML  WAR  DIR
+     *    Y/N       Y/N        Y            Y    N    Y
+     *    Y/N       Y/N        N            Y    N    N
+     *
+     * Notes: No WAR file is present in the appBase because it is an external
+     *        WAR.
+     *        Any context.xml file embedded in the external WAR file is ignored.
+     */
+    @Test
+    public void testDeploymentXmlExternalWarXmlFFF() throws Exception {
+        initTestDeploymentXmlExternalWarXml();
+        doTestDeployment(false, false, false,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
+    }
+
+    @Test
+    public void testDeploymentXmlExternalWarXmlFFT() throws Exception {
+        initTestDeploymentXmlExternalWarXml();
+        doTestDeployment(false, false, true,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, true);
+    }
+
+    @Test
+    public void testDeploymentXmlExternalWarXmlFTF() throws Exception {
+        initTestDeploymentXmlExternalWarXml();
+        doTestDeployment(false, true, false,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
+    }
+
+    @Test
+    public void testDeploymentXmlExternalWarXmlFTT() throws Exception {
+        initTestDeploymentXmlExternalWarXml();
+        doTestDeployment(false, true, true,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, true);
+    }
+
+    @Test
+    public void testDeploymentXmlExternalWarXmlTFF() throws Exception {
+        initTestDeploymentXmlExternalWarXml();
+        doTestDeployment(true, false, false,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
+    }
+
+    @Test
+    public void testDeploymentXmlExternalWarXmlTFT() throws Exception {
+        initTestDeploymentXmlExternalWarXml();
+        doTestDeployment(true, false, true,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, true);
+    }
+
+    @Test
+    public void testDeploymentXmlExternalWarXmlTTF() throws Exception {
+        initTestDeploymentXmlExternalWarXml();
+        doTestDeployment(true, true, false,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
+    }
+
+    @Test
+    public void testDeploymentXmlExternalWarXmlTTT() throws Exception {
+        initTestDeploymentXmlExternalWarXml();
+        doTestDeployment(true, true, true,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, true);
+    }
+
+    private void initTestDeploymentXmlExternalWarXml() throws IOException {
+        // Copy the test WAR file to the external directory
+        File war = new File(external, "external" + ".war");
+        Files.copy(WAR_XML_SOURCE.toPath(), war.toPath());
+
+        // Create the XML file
+        File xml = new File(getConfigBaseFile(getTomcatInstance().getHost()),
+                APP_NAME + ".xml");
+        File parent = xml.getParentFile();
+        if (!parent.isDirectory()) {
+            Assert.assertTrue(parent.mkdirs());
+        }
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(xml);
+            fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
+                    "\" docBase=\"" + war.getAbsolutePath() + "\" />").getBytes(
+                    B2CConverter.ISO_8859_1));
+        } finally {
+            if (fos != null) {
+                fos.close();
+            }
+        }
+    }
+
+
+    /*
+     * Expected behaviour for deployment of an XML file that points to an
+     * external DIR.
+     * deployXML  copyXML  unpackWARs      XML  WAR  DIR
+     *    Y/N       Y/N       Y/N           Y    N    N
+     *
+     * Notes: Any context.xml file embedded in the external DIR file is ignored.
+     */
+    @Test
+    public void testDeploymentXmlExternalDirXmlFFF() throws Exception {
+        initTestDeploymentXmlExternalDirXml();
+        doTestDeployment(false, false, false,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
+    }
+
+    @Test
+    public void testDeploymentXmlExternalDirXmlFFT() throws Exception {
+        initTestDeploymentXmlExternalDirXml();
+        doTestDeployment(false, false, true,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
+    }
+
+    @Test
+    public void testDeploymentXmlExternalDirXmlFTF() throws Exception {
+        initTestDeploymentXmlExternalDirXml();
+        doTestDeployment(false, true, false,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
+    }
+
+    @Test
+    public void testDeploymentXmlExternalDirXmlFTT() throws Exception {
+        initTestDeploymentXmlExternalDirXml();
+        doTestDeployment(false, true, true,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
+    }
+
+    @Test
+    public void testDeploymentXmlExternalDirXmlTFF() throws Exception {
+        initTestDeploymentXmlExternalDirXml();
+        doTestDeployment(true, false, false,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
+    }
+
+    @Test
+    public void testDeploymentXmlExternalDirXmlTFT() throws Exception {
+        initTestDeploymentXmlExternalDirXml();
+        doTestDeployment(true, false, true,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
+    }
+
+    @Test
+    public void testDeploymentXmlExternalDirXmlTTF() throws Exception {
+        initTestDeploymentXmlExternalDirXml();
+        doTestDeployment(true, true, false,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
+    }
+
+    @Test
+    public void testDeploymentXmlExternalDirXmlTTT() throws Exception {
+        initTestDeploymentXmlExternalDirXml();
+        doTestDeployment(true, true, true,
+                LifecycleState.STARTED, XML_COOKIE_NAME, true, false, false);
+    }
+
+    private void initTestDeploymentXmlExternalDirXml() throws IOException {
+        // Copy the test DIR file to the external directory
+        File dir = new File(external, "external");
+        recurrsiveCopy(DIR_XML_SOURCE.toPath(), dir.toPath());
+
+        // Create the XML file
+        File xml = new File(getConfigBaseFile(getTomcatInstance().getHost()),
+                APP_NAME + ".xml");
+        File parent = xml.getParentFile();
+        if (!parent.isDirectory()) {
+            Assert.assertTrue(parent.mkdirs());
+        }
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(xml);
+            fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
+                    "\" docBase=\"" + dir.getAbsolutePath() + "\" />").getBytes(
+                    B2CConverter.ISO_8859_1));
+        } finally {
+            if (fos != null) {
+                fos.close();
+            }
+        }
+    }
+
+
+
     private void doTestDeployment(boolean deployXML, boolean copyXML,
-            boolean unpackWARs, LifecycleState resultState, boolean resultXml,
-            boolean resultWar, boolean resultDir) throws Exception {
+            boolean unpackWARs, LifecycleState resultState, String cookieName,
+            boolean resultXml, boolean resultWar, boolean resultDir)
+            throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
 
@@ -154,12 +367,13 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         host.backgroundProcess();
 
         // Test the results
-        Container ctxt = tomcat.getHost().findChild(APP_NAME.getPath());
+        Context ctxt = (Context) tomcat.getHost().findChild(APP_NAME.getPath());
         if (resultState == null) {
             Assert.assertNull(ctxt);
         } else {
             Assert.assertNotNull(ctxt);
             Assert.assertEquals(resultState, ctxt.getState());
+            Assert.assertEquals(cookieName, ctxt.getSessionCookieName());
         }
 
         File xml = new File(
@@ -175,7 +389,38 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         File dir = new File(host.getAppBase(), APP_NAME.getBaseName());
         Assert.assertEquals(
                 Boolean.valueOf(resultDir), Boolean.valueOf(dir.isDirectory()));
+    }
 
+    private static void recurrsiveCopy(final Path src, final Path dest)
+            throws IOException {
+
+        Files.walkFileTree(src, new FileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir,
+                    BasicFileAttributes attrs) throws IOException {
+                Files.copy(dir, dest.resolve(src.relativize(dir)));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file,
+                    BasicFileAttributes attrs) throws IOException {
+                Files.copy(file, dest.resolve(src.relativize(file)));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException ioe)
+                    throws IOException {
+                throw ioe;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException ioe)
+                    throws IOException {
+                // NO-OP
+                return FileVisitResult.CONTINUE;
+            }});
     }
     
     
