@@ -34,6 +34,7 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
 import org.apache.tomcat.util.buf.B2CConverter;
@@ -55,6 +56,11 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             new File("test/deployment/dirContext");
     private static final File DIR_SOURCE =
             new File("test/deployment/dirNoContext");
+
+    private static final int XML = 1;
+    private static final int EXT = 2;
+    private static final int WAR = 3;
+    private static final int DIR = 4;
 
     private static final String XML_COOKIE_NAME = "XML_CONTEXT";
     private static final String WAR_COOKIE_NAME = "WAR_CONTEXT";
@@ -677,6 +683,187 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     }
 
 
+    /*
+     * Expected behaviour for deletion of files.
+     *
+     * Artifacts present(6)   Artifact     Artifacts remaining
+     *  XML  WAR  EXT  DIR    Removed     XML  WAR  EXT DIR    Notes
+     *   N    N    N    Y       DIR        -    -    -   N
+     *   N    Y    N    N       WAR        -    N    -   -
+     *   N    Y    N    Y       DIR        -    Y    -   R     8
+     *   N    Y    N    Y       WAR        -    N    -   N
+     *   Y    N    N    N       XML        N    -    -   -
+     *   Y    N    N    Y       DIR        Y    -    -   N     2
+     *   Y    N    N    Y       XML        N    -    -   N
+     *   Y    N    Y    N       EXT        Y    -    N   -     2
+     *   Y    N    Y    N       XML        N    -    Y   -     9
+     *   Y    N    Y    Y       DIR        Y    -    Y   R     10,8
+     *   Y    N    Y    Y       EXT        Y    -    N   N     2
+     *   Y    N    Y    Y       XML        N    -    Y   N
+     *   Y    Y    N    N       WAR        Y    N    -   -     2
+     *   Y    Y    N    N       XML        N    N    -   -
+     *   Y    Y    N    Y       DIR        Y    Y    -   R     8
+     *   Y    Y    N    Y       WAR        Y    N    -   -     2
+     *   Y    Y    N    Y       XML        N    N    -   N
+     *
+     *   Notes:
+     */
+    @Test
+    public void testDeleteDirRemoveDir() throws Exception {
+        doTestDelete(false, false, false, false, true, DIR, false, false, false,
+                false, null);
+    }
+
+    @Test
+    public void testDeleteWarRemoveWar() throws Exception {
+        doTestDelete(false, false, false, true, false, WAR, false, false, false,
+                false, null);
+    }
+
+    @Test
+    public void testDeleteWarDirRemoveDir() throws Exception {
+        doTestDelete(false, false, false, true, true, DIR, false, false, true,
+                true, WAR_COOKIE_NAME);
+    }
+
+    @Test
+    public void testDeleteWarDirRemoveWar() throws Exception {
+        doTestDelete(false, false, false, true, true, WAR, false, false, false,
+                false, null);
+    }
+
+    private void doTestDelete(boolean startXml, boolean startExternalWar,
+            boolean startExternalDir, boolean startWar, boolean startDir,
+            int toDelete, boolean resultXml, boolean resultExternal,
+            boolean resultWar, boolean resultDir, String resultCookieName)
+            throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+
+        // Init
+        File xml = null;
+        File ext = null;
+        File war = null;
+        File dir = null;
+
+        if (startXml) {
+            xml = new File(getConfigBaseFile(host), APP_NAME + ".xml");
+            File parent = xml.getParentFile();
+            if (!parent.isDirectory()) {
+                Assert.assertTrue(parent.mkdirs());
+            }
+            Files.copy(XML_SOURCE.toPath(), xml.toPath());
+        }
+        if (startExternalWar) {
+            // Copy the test WAR file to the external directory
+            ext = new File(external, "external" + ".war");
+            Files.copy(WAR_XML_SOURCE.toPath(), ext.toPath());
+
+            // Create the XML file
+            xml = new File(getConfigBaseFile(host), APP_NAME + ".xml");
+            File parent = xml.getParentFile();
+            if (!parent.isDirectory()) {
+                Assert.assertTrue(parent.mkdirs());
+            }
+            
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(xml);
+                fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
+                        "\" docBase=\"" + ext.getAbsolutePath() +
+                        "\" />").getBytes(B2CConverter.ISO_8859_1));
+            } finally {
+                if (fos != null) {
+                    fos.close();
+                }
+            }
+        }
+        if (startExternalDir) {
+            // Copy the test DIR file to the external directory
+            ext = new File(external, "external");
+            recurrsiveCopy(DIR_XML_SOURCE.toPath(), ext.toPath());
+
+            // Create the XML file
+            xml = new File(getConfigBaseFile(getTomcatInstance().getHost()),
+                    APP_NAME + ".xml");
+            File parent = xml.getParentFile();
+            if (!parent.isDirectory()) {
+                Assert.assertTrue(parent.mkdirs());
+            }
+
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(xml);
+                fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
+                        "\" docBase=\"" + ext.getAbsolutePath() +
+                        "\" />").getBytes(B2CConverter.ISO_8859_1));
+            } finally {
+                if (fos != null) {
+                    fos.close();
+                }
+            }
+        }
+        if (startWar) {
+            // Copy the test WAR file to the appBase
+            war = new File(getAppBaseFile(getTomcatInstance().getHost()),
+                    APP_NAME.getBaseName() + ".war");
+            Files.copy(WAR_XML_SOURCE.toPath(), war.toPath());
+        }
+        if (startDir) {
+            // Copy the test DIR file to the appBase
+            dir = new File(getAppBaseFile(getTomcatInstance().getHost()),
+                    APP_NAME.getBaseName());
+            recurrsiveCopy(DIR_XML_SOURCE.toPath(), dir.toPath());
+        }
+
+        if (startWar && !startDir) {
+            host.setUnpackWARs(false);
+            // WARDirContext always locks the WAR file so need to use
+            // anti-resource locking to enable the WAR to be deleted
+            host.setContextClass(AntiResourceLockingContext.class.getName());
+        }
+
+        // Deploy the files we copied
+        tomcat.start();
+        host.backgroundProcess();
+
+        // Remove the specified file
+        switch (toDelete) {
+            case XML:
+                ExpandWar.delete(xml);
+                break;
+            case EXT:
+                ExpandWar.delete(ext);
+                break;
+            case WAR:
+                ExpandWar.delete(war);
+                break;
+            case DIR:
+                ExpandWar.delete(dir);
+                break;
+            default:
+                Assert.fail();
+        }
+
+        // Trigger an auto-deployment cycle
+        host.backgroundProcess();
+
+        Context ctxt = (Context) host.findChild(APP_NAME.getName());
+
+        // Check the results
+        if (!resultXml && !resultWar && !resultDir) {
+            // App should have been undeployed
+            Assert.assertNull(ctxt);
+            return;
+        }
+
+        if (resultWar) {
+            Assert.assertEquals(resultCookieName, ctxt.getSessionCookieName());
+        }
+    }
+
+
     private static void recurrsiveCopy(final Path src, final Path dest)
             throws IOException {
 
@@ -746,5 +933,45 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         } catch (IOException e) {
             return file;
         }
+    }
+    
+    private static class AntiResourceLockingContext extends StandardContext {
+
+        @Override
+        public boolean getAntiResourceLocking() {
+            return true;
+        }
+    }
+
+
+    @Test
+    public void testSetContextClassName() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Host host = tomcat.getHost();
+        if (host instanceof StandardHost) {
+            StandardHost standardHost = (StandardHost) host;
+            standardHost.setContextClass(TesterContext.class.getName());
+        }
+
+        // Copy the WAR file
+        File war = new File(getAppBaseFile(host),
+                APP_NAME.getBaseName() + ".war");
+        Files.copy(WAR_XML_SOURCE.toPath(), war.toPath());
+
+        // Deploy the copied war
+        tomcat.start();
+        host.backgroundProcess();
+
+        // Check the Context class
+        Context ctxt = (Context) host.findChild(APP_NAME.getName());
+
+        Assert.assertTrue(ctxt instanceof TesterContext);
+    }
+
+
+    public static class TesterContext extends StandardContext {
+        // No functional change
     }
 }
