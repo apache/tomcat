@@ -17,13 +17,9 @@
 package org.apache.catalina.startup;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,6 +33,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
+import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.buf.B2CConverter;
 
 /**
@@ -165,7 +162,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             Assert.assertTrue(parent.mkdirs());
         }
 
-        Files.copy(XML_SOURCE.toPath(), xml.toPath());
+        copy(XML_SOURCE, xml);
     }
 
 
@@ -239,7 +236,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     private void initTestDeploymentXmlExternalWarXml() throws IOException {
         // Copy the test WAR file to the external directory
         File war = new File(external, "external" + ".war");
-        Files.copy(WAR_XML_SOURCE.toPath(), war.toPath());
+        copy(WAR_XML_SOURCE, war);
 
         // Create the XML file
         File xml = new File(getConfigBaseFile(getTomcatInstance().getHost()),
@@ -330,7 +327,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     private void initTestDeploymentXmlExternalDirXml() throws IOException {
         // Copy the test DIR file to the external directory
         File dir = new File(external, "external");
-        recurrsiveCopy(DIR_XML_SOURCE.toPath(), dir.toPath());
+        recurrsiveCopy(DIR_XML_SOURCE, dir);
 
         // Create the XML file
         File xml = new File(getConfigBaseFile(getTomcatInstance().getHost()),
@@ -424,7 +421,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         // Copy the test WAR file to the appBase
         File dest = new File(getAppBaseFile(getTomcatInstance().getHost()),
                 APP_NAME.getBaseName() + ".war");
-        Files.copy(WAR_XML_SOURCE.toPath(), dest.toPath());
+        copy(WAR_XML_SOURCE, dest);
     }
 
 
@@ -494,7 +491,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         // Copy the test WAR file to the appBase
         File dest = new File(getAppBaseFile(getTomcatInstance().getHost()),
                 APP_NAME.getBaseName() + ".war");
-        Files.copy(WAR_SOURCE.toPath(), dest.toPath());
+        copy(WAR_SOURCE, dest);
     }
 
 
@@ -565,7 +562,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         // Copy the test DIR file to the appBase
         File dest = new File(getAppBaseFile(getTomcatInstance().getHost()),
                 APP_NAME.getBaseName());
-        recurrsiveCopy(DIR_XML_SOURCE.toPath(), dest.toPath());
+        recurrsiveCopy(DIR_XML_SOURCE, dest);
     }
 
 
@@ -634,7 +631,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         // Copy the test DIR file to the appBase
         File dest = new File(getAppBaseFile(getTomcatInstance().getHost()),
                 APP_NAME.getBaseName());
-        recurrsiveCopy(DIR_SOURCE.toPath(), dest.toPath());
+        recurrsiveCopy(DIR_SOURCE, dest);
     }
 
 
@@ -753,12 +750,12 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             if (!parent.isDirectory()) {
                 Assert.assertTrue(parent.mkdirs());
             }
-            Files.copy(XML_SOURCE.toPath(), xml.toPath());
+            copy(XML_SOURCE, xml);
         }
         if (startExternalWar) {
             // Copy the test WAR file to the external directory
             ext = new File(external, "external" + ".war");
-            Files.copy(WAR_XML_SOURCE.toPath(), ext.toPath());
+            copy(WAR_XML_SOURCE, ext);
 
             // Create the XML file
             xml = new File(getConfigBaseFile(host), APP_NAME + ".xml");
@@ -782,7 +779,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         if (startExternalDir) {
             // Copy the test DIR file to the external directory
             ext = new File(external, "external");
-            recurrsiveCopy(DIR_XML_SOURCE.toPath(), ext.toPath());
+            recurrsiveCopy(DIR_XML_SOURCE, ext);
 
             // Create the XML file
             xml = new File(getConfigBaseFile(getTomcatInstance().getHost()),
@@ -808,13 +805,13 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             // Copy the test WAR file to the appBase
             war = new File(getAppBaseFile(getTomcatInstance().getHost()),
                     APP_NAME.getBaseName() + ".war");
-            Files.copy(WAR_XML_SOURCE.toPath(), war.toPath());
+            copy(WAR_XML_SOURCE, war);
         }
         if (startDir) {
             // Copy the test DIR file to the appBase
             dir = new File(getAppBaseFile(getTomcatInstance().getHost()),
                     APP_NAME.getBaseName());
-            recurrsiveCopy(DIR_XML_SOURCE.toPath(), dir.toPath());
+            recurrsiveCopy(DIR_XML_SOURCE, dir);
         }
 
         if (startWar && !startDir) {
@@ -864,39 +861,47 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     }
 
 
-    private static void recurrsiveCopy(final Path src, final Path dest)
-            throws IOException {
+    @Test
+    public void testSetContextClassName() throws Exception {
 
-        Files.walkFileTree(src, new FileVisitor<Path>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir,
-                    BasicFileAttributes attrs) throws IOException {
-                Files.copy(dir, dest.resolve(src.relativize(dir)));
-                return FileVisitResult.CONTINUE;
-            }
+        Tomcat tomcat = getTomcatInstance();
 
-            @Override
-            public FileVisitResult visitFile(Path file,
-                    BasicFileAttributes attrs) throws IOException {
-                Files.copy(file, dest.resolve(src.relativize(file)));
-                return FileVisitResult.CONTINUE;
-            }
+        Host host = tomcat.getHost();
+        if (host instanceof StandardHost) {
+            StandardHost standardHost = (StandardHost) host;
+            standardHost.setContextClass(TesterContext.class.getName());
+        }
 
-            @Override
-            public FileVisitResult visitFileFailed(Path file, IOException ioe)
-                    throws IOException {
-                throw ioe;
-            }
+        // Copy the WAR file
+        File war = new File(getAppBaseFile(host),
+                APP_NAME.getBaseName() + ".war");
+        copy(WAR_XML_SOURCE, war);
 
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException ioe)
-                    throws IOException {
-                // NO-OP
-                return FileVisitResult.CONTINUE;
-            }});
+        // Deploy the copied war
+        tomcat.start();
+        host.backgroundProcess();
+
+        // Check the Context class
+        Context ctxt = (Context) host.findChild(APP_NAME.getName());
+
+        Assert.assertTrue(ctxt instanceof TesterContext);
     }
+
     
-    
+    private static class AntiResourceLockingContext extends StandardContext {
+
+        @Override
+        public boolean getAntiResourceLocking() {
+            return true;
+        }
+    }
+
+
+    public static class TesterContext extends StandardContext {
+        // No functional change
+    }
+
+
     // Static methods to compensate for methods that are present in 8.0.x but
     // not in 7.0.x
     
@@ -935,43 +940,47 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         }
     }
     
-    private static class AntiResourceLockingContext extends StandardContext {
+    
+    // Static methods to replace the java.nio.file.Files methods used in Tomcat
+    // 8 that aren't available in Tomcat 7. These methods are not intended to be
+    // 100% robust - just good enough for the unit tests to pass.
 
-        @Override
-        public boolean getAntiResourceLocking() {
-            return true;
+    private static void copy(File src, File dest) throws IOException {
+        FileInputStream in = null;
+        FileOutputStream out = null;
+        try {
+            in = new FileInputStream(src);
+            out = new FileOutputStream(dest);
+            IOTools.flow(in, out);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
         }
     }
-
-
-    @Test
-    public void testSetContextClassName() throws Exception {
-
-        Tomcat tomcat = getTomcatInstance();
-
-        Host host = tomcat.getHost();
-        if (host instanceof StandardHost) {
-            StandardHost standardHost = (StandardHost) host;
-            standardHost.setContextClass(TesterContext.class.getName());
+    
+    private static void recurrsiveCopy(File src, File dest) throws IOException {
+        dest.mkdirs();
+        File[] files = src.listFiles();
+        
+        for (File file : files) {
+            File newFile = new File(dest, file.getName());
+            if (file.isDirectory()) {
+                recurrsiveCopy(file, newFile);
+            } else {
+                copy(file, newFile);
+            }
         }
-
-        // Copy the WAR file
-        File war = new File(getAppBaseFile(host),
-                APP_NAME.getBaseName() + ".war");
-        Files.copy(WAR_XML_SOURCE.toPath(), war.toPath());
-
-        // Deploy the copied war
-        tomcat.start();
-        host.backgroundProcess();
-
-        // Check the Context class
-        Context ctxt = (Context) host.findChild(APP_NAME.getName());
-
-        Assert.assertTrue(ctxt instanceof TesterContext);
-    }
-
-
-    public static class TesterContext extends StandardContext {
-        // No functional change
     }
 }
