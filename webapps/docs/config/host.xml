@@ -357,115 +357,59 @@
 
   <subsection name="Automatic Application Deployment">
 
-    <p>If you are using the standard <strong>Host</strong> implementation,
-    the following actions take place automatically when Catalina is first
-    started, if the <code>deployOnStartup</code> property is set to
-    <code>true</code> (which is the default value):</p>
-    <ul>
-    <li>Any XML file in the Host's <code>xmlBase</code> directory (by
-        default <code>$CATALINA_BASE/conf/[engine_name]/[host_name]</code>) is
-        assumed to be a context XML descriptor containing a
-        <a href="context.html">Context</a> element (and its associated
-        sub-elements) for a single web application. The web applications
-        associated with each of these context XML descriptor files will be
-        deployed first.<br/>
-        The <code>docBase</code> attribute of this <code>&lt;Context&gt;</code>
-        element must only be set if the docBase is outside the Host's
-        <code>appBase</code>. For web applications located inside the Host's
-        <code>appBase</code>, the <code>docBase</code> will be the name of the
-        XML file with ".xml" replaced with ".war" for a web application archive
-        or the name of the XML file with ".xml" removed for a directory.<br/>
-        The <code>path</code> attribute must not be set. The context path used
-        will be a slash character ("/") followed by the name of the XML file
-        (less the .xml extension). Multi-level context paths may be defined
-        using #, e.g. <code>foo#bar.xml</code> for a context path of
-        <code>/foo/bar</code>. The default web application that has a context
-        path of <code>/</code> may be defined by using a file called
-        <code>ROOT.xml</code>.</li>
-    <li>Any web application archive file within the Host's <code>appBase</code>
-        directory that has not already been deployed as a result of a context
-        XML descriptor, does not have a corresponding directory of the same
-        name (without the ".war" extension), and is not excluded by
-        <code>deployIgnore</code> will be deployed next. The context path
-        used will be a slash character ("/") followed by the web application
-        archive name less the ".war" extension. The one exception to this rule
-        is that a web application archive named "ROOT.war" will be deployed with
-        a context path of <code>/</code>. Multi-level contexts may be defined by
-        using #, e.g. use a WAR named <code>foo#bar.war</code> for a context
-        path of <code>/foo/bar</code>.<br/>
-        If the <code>unpackWARs</code> attribute is <code>true</code>, the web
-        application archive file will be expanded to a directory of the same
-        name (without the ".war" extension".<br/>
-        Note: If you re-deploy an updated WAR file while Tomcat is stopped, be
-        sure to delete the associated expanded directory before restarting
-        Tomcat, so that the updated WAR file will be re-expanded when Tomcat
-        restarts.<br/>
-        If <code>copyXML</code> is <code>true</code> (it is <code>false</code>
-        by default), any web application archive file within the Hosts's
-        <code>appBase</code> directory that does not have a corresponding
-        context XML descriptor (with a ".xml" extension rather than a ".war"
-        extension) in the Host's <code>xmlBase</code> will be scanned to see
-        if it contains a context XML descriptor (located at
-        <code>/META-INF/context.xml</code>) and if one is found the descriptor
-        will be copied to the <code>xmlBase</code> directory and renamed.
-        </li>
-    <li>Finally, any sub-directory within the Host's <code>appBase</code> that
-        has not already been deployed as a result of a context XML descriptor
-        and is not excluded by <code>deployIgnore</code> will be deployed.
-        The context path used will be a slash character ("/") followed by the
-        directory name, unless the directory name is ROOT, in which case the
-        context path will <code>/</code>. Multi-level contexts may be defined by
-        using #, e.g. use a directory named <code>foo#bar</code> for a context
-        path of <code>/foo/bar</code>.<br/>
-        If <code>copyXML</code> is <code>true</code> (it is <code>false</code>
-        by default), any directory within the Hosts's <code>appBase</code>
-        directory that does not have a corresponding context XML descriptor in
-        the Host's <code>xmlBase</code> will be scanned to see if it contains
-        a context XML descriptor (located at <code>/META-INF/context.xml</code>)
-        and if one is found the descriptor will be copied to the
-        <code>xmlBase</code> directory and renamed.
-        </li>
-    </ul>
+    <p>If you are using the standard <strong>Host</strong> implementation with
+    default settings then applications in the <em>appBase</em> or with context
+    files in the <em>configBase</em> are automatically deployed when Tomcat
+    starts (the <code>deployOnStartup</code> property defaults to
+    <code>true</code>) and reloaded or redeployed (as appropriate) when a change
+    is detected while Tomcat is running (the \ attribute
+    also defaults to <code>true</code>).</p>
 
-    <p>In addition to the automatic deployment that occurs at startup time,
-    you can also request that new XML configuration files, WAR files, or
-    sub-directories that are dropped in to the <code>appBase</code> (or
-    <code>xmlBase</code> in the case of an XML configuration file) directory
-    while Tomcat is running will be automatically deployed, according to the
-    rules described above. The  auto deployer will also track web applications
-    for the following changes:
-    <ul>
-        <li>An update to the WEB-INF/web.xml file will trigger a reload of the
-          web application</li>
-        <li>Deleting a WAR file will trigger an undeploy of the application with
-          the removal of any associated expanded directory, context file and
-          work directory. Any current user sessions will not be persisted.</li>
-        <li>Deleting a directory will trigger an undeploy of the application
-          with the removal of any associated context file and work directory.
-          Any current user sessions will not be persisted. If there is an
-          associated WAR file, it will not be deleted and the application will
-          be redeployed from the WAR file the next time the auto deployer checks
-          for changes.</li>
-        <li>Deleting a context file will trigger an undeploy of the application
-          with the removal of any associated work directory. Any current user
-          sessions will not be persisted. If there is an associated WAR file
-          and/or directory, they will not be deleted and the application will be
-          redeployed from the WAR file (or from directory if there is no WAR
-          file) the next time the auto deployer checks for changes.</li>
-        <li>Updating a WAR file will trigger an undeploy of the application with
-          the removal of any associated expanded directory, context file and
-          work directory. Any current user sessions will not be persisted.</li>
-        <li>Updating a directory (not the directory contents) will trigger an
-          undeploy of the application with the removal of any associated context
-          file and work directory. Any current user sessions will not be
-          persisted. The application will be redeployed the next time the auto
-          deployer checks for changes.</li>
-        <li>Updating a context file will trigger an undeploy of the application
-          with the removal of any associated work directory. Any current user
-          sessions will not be persisted. The application will be redeployed the
-          next time the auto deployer checks for changes.</li>
-    </ul>
-    </p>
+    <p><code>deployOnStartup</code> and <code>autoDeploy</code> trigger
+    execution of exactly the same code so the behaviour is very similar.
+    However, there is one key difference. When Tomcat starts it has no knowledge
+    of which files are the same, which have been changed and which are new. It
+    therefore treats all files as new. While Tomcat is running, it can
+    differentiate between unchanged, modified and new files. This leads to some
+    differences in behaviour between files being modified while Tomcat is
+    running and files being modified while Tomcat is stopped.</p>
+
+    <p>When you use automatic deployment, related files (a web application may
+    have a context.xml file, a WAR and a directory) that exist in the
+    <strong>Host</strong>&apos;s <em>appBase</em> and/or <em>configBase</em>
+    must conform to the expected <a href="context.html#Naming">naming
+    convention</a>. In short, this means files for the same web application must
+    share the same <em>base name</em>.</p>
+
+    <p>The automatic deployment process identifies new and/or modified web
+    applications using the following search order:</p>
+
+    <ol>
+      <li>Web applications with a context.xml file located in the Host&apos;s
+      <em>configBase</em>.</li>
+      <li>Web applications with a WAR file located in the Host&apos;s
+      <em>appBase</em> that have not already been identified during the scan for
+      context.xml files.</li>
+      <li>Web applications with a directory located in the Host&apos;s
+      <em>appBase</em> that have not already been identified during the scans
+      for context.xml and/or WAR files.</li>
+    </ol>
+
+    <p>When <code>autoDeploy</code> is <true>true</true>, the automatic
+    deployment process will monitor the deployed web applications for changes.
+    Depending on exactly what changes, the web application will either be
+    re-deployed or reloaded. Re-deployment involves the creation of a new web
+    application and, if using the standard session manager, user sessions will
+    not be retained. Reloading uses the existing web application but re-parses
+    the web.xml and reloads any classes. If using the standard session manager,
+    user sessions will be persisted.</p>
+
+    <p>Users may add to the files that the automatic deployment process monitors
+    for reloading (i.e. any change to one of these files triggers a reload of
+    the web application) by adding a <em>WatchedResources</em> element to the
+    context.xml file. See the
+    <a href="context.html#Nested_Components">Context</a> documentation for
+    further details.</p>
 
     <p>When using automatic deployment, the <code>docBase</code> defined by
     an XML <a href="context.html">Context</a> file should be outside of the
@@ -474,11 +418,16 @@
     be deployed twice. The <code>deployIgnore</code> attribute can be used
     to avoid this situation.</p>
 
-    <p>Finally, note that if you are defining contexts explicitly in server.xml,
-    you should probably turn off automatic application deployment or specify
+    <p>Note that if you are defining contexts explicitly in server.xml, you
+    should probably turn off automatic application deployment or specify
     <code>deployIgnore</code> carefully. Otherwise, the web applications
     will each be deployed twice, and that may cause problems for the
     applications.</p>
+
+    <p>There are many possible combinations of settings, new files, changed
+    files and deleted files. A separate page describes the
+    <a href="automatic-deployment.html">expected behaviour of the automatic
+    deployment process</a> in many of these scenarios.</p>
 
   </subsection>
 
