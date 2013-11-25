@@ -56,6 +56,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Manager;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.IOTools;
@@ -864,68 +865,25 @@ public class HostConfig
 
         // Checking for a nested /META-INF/context.xml
         JarFile jar = null;
-        JarEntry entry = null;
         InputStream istream = null;
         FileOutputStream fos = null;
         BufferedOutputStream ostream = null;
-        File xml;
-        if (copyXML) {
-            xml = new File(configBase(), cn.getBaseName() + ".xml");
-        } else {
-            xml = new File(appBase(),
-                    cn.getBaseName() + "/META-INF/context.xml");
-        }
-        boolean xmlInWar = false;
 
-        if (deployXML && !xml.exists()) {
+        File xml = new File(appBase(),
+                cn.getBaseName() + "/META-INF/context.xml");
+
+        boolean xmlInWar = false;
+        if (deployXML) {
+            JarEntry entry = null;
             try {
                 jar = new JarFile(war);
                 entry = jar.getJarEntry(Constants.ApplicationContextXml);
                 if (entry != null) {
                     xmlInWar = true;
                 }
-                if ((copyXML || unpackWARs) && xmlInWar) {
-                    istream = jar.getInputStream(entry);
-
-                    fos = new FileOutputStream(xml);
-                    ostream = new BufferedOutputStream(fos, 1024);
-                    byte buffer[] = new byte[1024];
-                    while (true) {
-                        int n = istream.read(buffer);
-                        if (n < 0) {
-                            break;
-                        }
-                        ostream.write(buffer, 0, n);
-                    }
-                    ostream.flush();
-                }
             } catch (IOException e) {
                 /* Ignore */
             } finally {
-                if (ostream != null) {
-                    try {
-                        ostream.close();
-                    } catch (IOException ioe) {
-                        // Ignore
-                    }
-                    ostream = null;
-                }
-                if (fos != null) {
-                    try {
-                        fos.close();
-                    } catch (IOException ioe) {
-                        // Ignore
-                    }
-                    fos = null;
-                }
-                if (istream != null) {
-                    try {
-                        istream.close();
-                    } catch (IOException ioe) {
-                        // Ignore
-                    }
-                    istream = null;
-                }
                 entry = null;
                 if (jar != null) {
                     try {
@@ -938,17 +896,9 @@ public class HostConfig
             }
         }
 
-        DeployedApplication deployedApp = new DeployedApplication(cn.getName(),
-                xml.exists() && deployXML && copyXML);
-
-        // Deploy the application in this WAR file
-        if(log.isInfoEnabled())
-            log.info(sm.getString("hostConfig.deployWar",
-                    war.getAbsolutePath()));
-
         Context context = null;
         try {
-            if (deployXML && xml.exists()) {
+            if (deployXML && xml.exists() && !copyXML) {
                 synchronized (digesterLock) {
                     try {
                         context = (Context) digester.parse(xml);
@@ -964,6 +914,7 @@ public class HostConfig
                 context.setConfigFile(xml.toURI().toURL());
             } else if (deployXML && xmlInWar) {
                 synchronized (digesterLock) {
+                    JarEntry entry = null;
                     try {
                         jar = new JarFile(war);
                         entry =
@@ -1004,7 +955,96 @@ public class HostConfig
             } else {
                 context = (Context) Class.forName(contextClass).newInstance();
             }
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.error(sm.getString("hostConfig.deployWar.error",
+                    war.getAbsolutePath()), t);
+        } finally {
+            if (context == null) {
+                context = new FailedContext();
+            }
+        }
 
+        boolean copyThisXml = false;
+        if (deployXML) {
+            if (host instanceof StandardHost) {
+                copyThisXml = ((StandardHost) host).isCopyXML();
+            }
+
+            // If Host is using default value Context can override it.
+            if (!copyThisXml && context instanceof StandardContext) {
+                copyThisXml = ((StandardContext) context).getCopyXML();
+            }
+
+            if (xmlInWar && copyThisXml) {
+                // Change location of XML file to config base
+                xml = new File(configBase(), cn.getBaseName() + ".xml");
+                JarEntry entry = null;
+                try {
+                    jar = new JarFile(war);
+                    entry =
+                        jar.getJarEntry(Constants.ApplicationContextXml);
+                    istream = jar.getInputStream(entry);
+
+                    fos = new FileOutputStream(xml);
+                    ostream = new BufferedOutputStream(fos, 1024);
+                    byte buffer[] = new byte[1024];
+                    while (true) {
+                        int n = istream.read(buffer);
+                        if (n < 0) {
+                            break;
+                        }
+                        ostream.write(buffer, 0, n);
+                    }
+                    ostream.flush();
+                } catch (IOException e) {
+                    /* Ignore */
+                } finally {
+                    if (ostream != null) {
+                        try {
+                            ostream.close();
+                        } catch (IOException ioe) {
+                            // Ignore
+                        }
+                        ostream = null;
+                    }
+                    if (fos != null) {
+                        try {
+                            fos.close();
+                        } catch (IOException ioe) {
+                            // Ignore
+                        }
+                        fos = null;
+                    }
+                    if (istream != null) {
+                        try {
+                            istream.close();
+                        } catch (IOException ioe) {
+                            // Ignore
+                        }
+                        istream = null;
+                    }
+                    if (jar != null) {
+                        try {
+                            jar.close();
+                        } catch (IOException ioe) {
+                            // Ignore;
+                        }
+                        jar = null;
+                    }
+                }
+            }
+        }
+
+        DeployedApplication deployedApp = new DeployedApplication(cn.getName(),
+                xml.exists() && deployXML && copyXML);
+
+        // Deploy the application in this WAR file
+        if(log.isInfoEnabled())
+            log.info(sm.getString("hostConfig.deployWar",
+                    war.getAbsolutePath()));
+
+        try {
             // Populate redeploy resources with the WAR file
             deployedApp.redeployResources.put
                 (war.getAbsolutePath(), Long.valueOf(war.lastModified()));
@@ -1114,8 +1154,7 @@ public class HostConfig
         File xml = new File(dir, Constants.ApplicationContextXml);
         File xmlCopy = new File(configBase(), cn.getBaseName() + ".xml");
 
-        DeployedApplication deployedApp = new DeployedApplication(cn.getName(),
-                xml.exists() && deployXML && copyXML);
+        DeployedApplication deployedApp;
 
         try {
             if (deployXML && xml.exists()) {
@@ -1131,7 +1170,14 @@ public class HostConfig
                         digester.reset();
                     }
                 }
-                if (copyXML) {
+
+                boolean copyThisXml = copyXML;
+                if (copyThisXml == false && context instanceof StandardContext) {
+                    // Host is using default value. Context may override it.
+                    copyThisXml = ((StandardContext) context).getCopyXML();
+                }
+
+                if (copyThisXml) {
                     InputStream is = null;
                     OutputStream os = null;
                     try {
@@ -1174,6 +1220,9 @@ public class HostConfig
             log.error(sm.getString("hostConfig.deployDir.error",
                     dir.getAbsolutePath()), t);
         } finally {
+            deployedApp = new DeployedApplication(cn.getName(),
+                    xml.exists() && deployXML && copyXML);
+
             // Fake re-deploy resource to detect if a WAR is added at a later
             // point
             deployedApp.redeployResources.put(dir.getAbsolutePath() + ".war",
