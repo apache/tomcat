@@ -241,9 +241,13 @@
         interacting with the container's configuration. The  administrator will
         then be responsible for providing an external context configuration
         file, and putting it in the location defined by the
-        <strong>xmlBase</strong> attribute. The flag's value defaults to
-        <code>true</code> unless a security manager is enabled when the default
-        is <code>false</code>.</p>
+        <strong>xmlBase</strong> attribute. If this flag is <code>false</code>,
+        a descriptor is located at <code>/META-INF/context.xml</code> and no
+        descriptor is present in <strong>xmlBase</strong> then the context will
+        fail to start in case the descriptor contains necessary configuration
+        for secure deployment (such as a RemoteAddrValve) which should not be
+        ignored. The flag's value defaults to <code>true</code> unless a
+        security manager is enabled when the default is <code>false</code>.</p>
       </attribute>
 
       <attribute name="errorReportValveClass" required="false">
