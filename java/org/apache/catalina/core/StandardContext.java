@@ -4905,9 +4905,7 @@ public class StandardContext extends ContainerBase
      * Return <code>true</code> if initialization was successfull,
      * or <code>false</code> otherwise.
      */
-    public boolean resourcesStart() throws LifecycleException {
-
-        boolean ok = true;
+    public void resourcesStart() throws LifecycleException {
 
         resources.setAllowLinking(isAllowLinking());
 
@@ -4931,8 +4929,6 @@ public class StandardContext extends ContainerBase
                         webinfClassesResource.getURL(), "/");
             }
         }
-
-        return ok;
     }
 
 
@@ -5046,10 +5042,7 @@ public class StandardContext extends ContainerBase
             }
         }
         if (ok) {
-            if (!resourcesStart()) {
-                log.error( "Error in resourceStart()");
-                ok = false;
-            }
+            resourcesStart();
         }
 
         if (getLoader() == null) {
