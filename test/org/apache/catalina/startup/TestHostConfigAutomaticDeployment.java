@@ -56,6 +56,8 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             new File("test/deployment/contextUnpackWARTrue.war");
     private static final File WAR_SOURCE =
             new File("test/deployment/noContext.war");
+    private static final File WAR_BROKEN_SOURCE =
+            new File("test/deployment/broken.war");
     private static final File DIR_XML_SOURCE =
             new File("test/deployment/dirContext");
     private static final File DIR_SOURCE =
@@ -1567,6 +1569,41 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testBrokenAppWithAntiLockingF() throws Exception {
+        testBrokenAppWithAntiLocking(false);
+    }
+
+    @Test
+    public void testBrokenAppWithAntiLockingT() throws Exception {
+        testBrokenAppWithAntiLocking(true);
+    }
+
+    private void testBrokenAppWithAntiLocking(boolean unpackWARs)
+            throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+
+        host.setUnpackWARs(unpackWARs);
+
+        File war = createWar(WAR_BROKEN_SOURCE, false);
+        createXmlInConfigBaseForExternal(war, true);
+
+        File dir = new File(getAppBaseFile(host), APP_NAME.getBaseName());
+
+        tomcat.start();
+
+        // Simulate deploy on start-up
+        tomcat.getHost().backgroundProcess();
+
+        Assert.assertTrue(war.isFile());
+        if (unpackWARs) {
+            Assert.assertTrue(dir.isDirectory());
+        }
+    }
+
+    
     private File createDirInAppbase(boolean withXml) throws IOException {
         File dir = new File(getAppBaseFile(getTomcatInstance().getHost()),
                 APP_NAME.getBaseName());
@@ -1616,6 +1653,11 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
 
 
     private File createXmlInConfigBaseForExternal(File ext) throws IOException {
+        return createXmlInConfigBaseForExternal(ext, false);
+    }
+
+    private File createXmlInConfigBaseForExternal(File ext, boolean antiLocking)
+            throws IOException {
         File xml = new File(getConfigBaseFile(getTomcatInstance().getHost()),
                 APP_NAME + ".xml");
         File parent = xml.getParentFile();
@@ -1626,9 +1668,16 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(xml);
-            fos.write(("<Context sessionCookieName=\"" + XML_COOKIE_NAME +
-                    "\" docBase=\"" + ext.getAbsolutePath() +
-                    "\" />").getBytes(B2CConverter.ISO_8859_1));
+            StringBuilder context = new StringBuilder();
+            context.append("<Context sessionCookieName=\"");
+            context.append(XML_COOKIE_NAME);
+            context.append("\" docBase=\"");
+            context.append(ext.getAbsolutePath());
+            if (antiLocking) {
+                context.append("\" antiResourceLocking=\"true");
+            }
+            context.append("\" />");
+            fos.write(context.toString().getBytes(B2CConverter.ISO_8859_1));
         } finally {
             if (fos != null) {
                 fos.close();
