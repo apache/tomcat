@@ -49,14 +49,16 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             new File("test/deployment/context.xml");
     private static final File WAR_XML_SOURCE =
             new File("test/deployment/context.war");
-    //private static final File WAR_SOURCE =
-    //        new File("test/deployment/noContext.war");
+    private static final File WAR_SOURCE =
+            new File("test/deployment/noContext.war");
     private static final File DIR_XML_SOURCE =
             new File("test/deployment/dirContext");
+    private static final File DIR_SOURCE =
+            new File("test/deployment/dirNoContext");
 
     private static final String XML_COOKIE_NAME = "XML_CONTEXT";
     private static final String WAR_COOKIE_NAME = "WAR_CONTEXT";
-    //private static final String DIR_COOKIE_NAME = "DIR_CONTEXT";
+    private static final String DIR_COOKIE_NAME = "DIR_CONTEXT";
 
     private File external;
 
@@ -413,10 +415,220 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     }
 
     private void initTestDeploymentWarXml() throws IOException {
-        // Copy the test DIR file to the external directory
+        // Copy the test WAR file to the appBase
         File dest = new File(getAppBaseFile(getTomcatInstance().getHost()),
                 APP_NAME.getBaseName() + ".war");
         Files.copy(WAR_XML_SOURCE.toPath(), dest.toPath());
+    }
+
+
+    /*
+     * Expected behaviour for deployment of a WAR without an embedded XML file.
+     * deployXML  copyXML  unpackWARs      XML  WAR  DIR
+     *    Y/N       Y/N        N            N    Y    N
+     *    Y/N       Y/N        Y            N    Y    Y
+     */
+    @Test
+    public void testDeploymentWarFFF() throws Exception {
+        initTestDeploymentWar();
+        doTestDeployment(false, false, false,
+                LifecycleState.STARTED, null, false, true, false);
+    }
+
+    @Test
+    public void testDeploymentWarFFT() throws Exception {
+        initTestDeploymentWar();
+        doTestDeployment(false, false, true,
+                LifecycleState.STARTED, null, false, true, true);
+    }
+
+    @Test
+    public void testDeploymentWarFTF() throws Exception {
+        initTestDeploymentWar();
+        doTestDeployment(false, true, false,
+                LifecycleState.STARTED, null, false, true, false);
+    }
+
+    @Test
+    public void testDeploymentWarFTT() throws Exception {
+        initTestDeploymentWar();
+        doTestDeployment(false, true, true,
+                LifecycleState.STARTED, null, false, true, true);
+    }
+
+    @Test
+    public void testDeploymentWarTFF() throws Exception {
+        initTestDeploymentWar();
+        doTestDeployment(true, false, false,
+                LifecycleState.STARTED, null, false, true, false);
+    }
+
+    @Test
+    public void testDeploymentWarTFT() throws Exception {
+        initTestDeploymentWar();
+        doTestDeployment(true, false, true,
+                LifecycleState.STARTED, null, false, true, true);
+    }
+
+    @Test
+    public void testDeploymentWarTTF() throws Exception {
+        initTestDeploymentWar();
+        doTestDeployment(true, true, false,
+                LifecycleState.STARTED, null, false, true, false);
+    }
+
+    @Test
+    public void testDeploymentWarTTT() throws Exception {
+        initTestDeploymentWar();
+        doTestDeployment(true, true, true,
+                LifecycleState.STARTED, null, false, true, true);
+    }
+
+    private void initTestDeploymentWar() throws IOException {
+        // Copy the test WAR file to the appBase
+        File dest = new File(getAppBaseFile(getTomcatInstance().getHost()),
+                APP_NAME.getBaseName() + ".war");
+        Files.copy(WAR_SOURCE.toPath(), dest.toPath());
+    }
+
+
+    /*
+     * Expected behaviour for deployment of a DIR with an embedded XML file.
+     * deployXML  copyXML  unpackWARs      XML  WAR  DIR
+     *     N        Y/N       Y/N           N    N    Y
+     *     Y         N        Y/N           N    N    Y
+     *     Y         Y        Y/N           Y    N    Y
+     */
+    @Test
+    public void testDeploymentDirXmlFFF() throws Exception {
+        initTestDeploymentDirXml();
+        doTestDeployment(false, false, false,
+                LifecycleState.STARTED, null, false, false, true);
+    }
+
+    @Test
+    public void testDeploymentDirXmlFFT() throws Exception {
+        initTestDeploymentDirXml();
+        doTestDeployment(false, false, true,
+                LifecycleState.STARTED, null, false, false, true);
+    }
+
+    @Test
+    public void testDeploymentDirXmlFTF() throws Exception {
+        initTestDeploymentDirXml();
+        doTestDeployment(false, true, false,
+                LifecycleState.STARTED, null, false, false, true);
+    }
+
+    @Test
+    public void testDeploymentDirXmlFTT() throws Exception {
+        initTestDeploymentDirXml();
+        doTestDeployment(false, true, true,
+                LifecycleState.STARTED, null, false, false, true);
+    }
+
+    @Test
+    public void testDeploymentDirXmlTFF() throws Exception {
+        initTestDeploymentDirXml();
+        doTestDeployment(true, false, false,
+                LifecycleState.STARTED, DIR_COOKIE_NAME, false, false, true);
+    }
+
+    @Test
+    public void testDeploymentDirXmlTFT() throws Exception {
+        initTestDeploymentDirXml();
+        doTestDeployment(true, false, true,
+                LifecycleState.STARTED, DIR_COOKIE_NAME, false, false, true);
+    }
+
+    @Test
+    public void testDeploymentDirXmlTTF() throws Exception {
+        initTestDeploymentDirXml();
+        doTestDeployment(true, true, false,
+                LifecycleState.STARTED, DIR_COOKIE_NAME, true, false, true);
+    }
+
+    @Test
+    public void testDeploymentDirXmlTTT() throws Exception {
+        initTestDeploymentDirXml();
+        doTestDeployment(true, true, true,
+                LifecycleState.STARTED, DIR_COOKIE_NAME, true, false, true);
+    }
+
+    private void initTestDeploymentDirXml() throws IOException {
+        // Copy the test DIR file to the appBase
+        File dest = new File(getAppBaseFile(getTomcatInstance().getHost()),
+                APP_NAME.getBaseName());
+        recurrsiveCopy(DIR_XML_SOURCE.toPath(), dest.toPath());
+    }
+
+
+    /*
+     * Expected behaviour for deployment of a DIR without an embedded XML file.
+     * deployXML  copyXML  unpackWARs      XML  WAR  DIR
+     *    Y/N       Y/N       Y/N           N    N    Y
+     */
+    @Test
+    public void testDeploymentDirFFF() throws Exception {
+        initTestDeploymentDir();
+        doTestDeployment(false, false, false,
+                LifecycleState.STARTED, null, false, false, true);
+    }
+
+    @Test
+    public void testDeploymentDirFFT() throws Exception {
+        initTestDeploymentDir();
+        doTestDeployment(false, false, true,
+                LifecycleState.STARTED, null, false, false, true);
+    }
+
+    @Test
+    public void testDeploymentDirFTF() throws Exception {
+        initTestDeploymentDir();
+        doTestDeployment(false, true, false,
+                LifecycleState.STARTED, null, false, false, true);
+    }
+
+    @Test
+    public void testDeploymentDirFTT() throws Exception {
+        initTestDeploymentDir();
+        doTestDeployment(false, true, true,
+                LifecycleState.STARTED, null, false, false, true);
+    }
+
+    @Test
+    public void testDeploymentDirTFF() throws Exception {
+        initTestDeploymentDir();
+        doTestDeployment(true, false, false,
+                LifecycleState.STARTED, null, false, false, true);
+    }
+
+    @Test
+    public void testDeploymentDirTFT() throws Exception {
+        initTestDeploymentDir();
+        doTestDeployment(true, false, true,
+                LifecycleState.STARTED, null, false, false, true);
+    }
+
+    @Test
+    public void testDeploymentDirTTF() throws Exception {
+        initTestDeploymentDir();
+        doTestDeployment(true, true, false,
+                LifecycleState.STARTED, null, false, false, true);
+    }
+
+    @Test
+    public void testDeploymentDirTTT() throws Exception {
+        initTestDeploymentDir();
+        doTestDeployment(true, true, true,
+                LifecycleState.STARTED, null, false, false, true);
+    }
+
+    private void initTestDeploymentDir() throws IOException {
+        // Copy the test DIR file to the appBase
+        File dest = new File(getAppBaseFile(getTomcatInstance().getHost()),
+                APP_NAME.getBaseName());
+        recurrsiveCopy(DIR_SOURCE.toPath(), dest.toPath());
     }
 
 
