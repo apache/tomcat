@@ -35,6 +35,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
 
@@ -1812,5 +1813,37 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             Assert.assertEquals(WAR_COOKIE_NAME,
                     context.getSessionCookieName());
         }
+    }
+
+
+    @Test
+    public void testSetContextClassName() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Host host = tomcat.getHost();
+        if (host instanceof StandardHost) {
+            StandardHost standardHost = (StandardHost) host;
+            standardHost.setContextClass(TesterContext.class.getName());
+        }
+
+        // Copy the WAR file
+        File war = new File(host.getAppBaseFile(),
+                APP_NAME.getBaseName() + ".war");
+        Files.copy(WAR_XML_SOURCE.toPath(), war.toPath());
+
+        // Deploy the copied war
+        tomcat.start();
+        host.backgroundProcess();
+
+        // Check the Context class
+        Context ctxt = (Context) host.findChild(APP_NAME.getName());
+
+        Assert.assertTrue(ctxt instanceof TesterContext);
+    }
+
+
+    public static class TesterContext extends StandardContext {
+        // No functional change
     }
 }

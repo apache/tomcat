@@ -145,7 +145,8 @@ public class HostConfig
     /**
      * The <code>Digester</code> instance used to parse context descriptors.
      */
-    protected static final Digester digester = createDigester();
+    protected Digester digester = createDigester(contextClass);
+    private final Object digesterLock = new Object();
 
     /**
      * The list of Wars in the appBase to be ignored because they are invalid
@@ -173,8 +174,14 @@ public class HostConfig
      */
     public void setContextClass(String contextClass) {
 
+        String oldContextClass = this.contextClass;
         this.contextClass = contextClass;
 
+        if (oldContextClass != contextClass) {
+            synchronized (digesterLock) {
+                digester = createDigester(getContextClass());
+            }
+        }
     }
 
 
@@ -343,12 +350,11 @@ public class HostConfig
     /**
      * Create the digester which will be used to parse context config files.
      */
-    protected static Digester createDigester() {
+    protected static Digester createDigester(String contextClassName) {
         Digester digester = new Digester();
         digester.setValidating(false);
         // Add object creation rule
-        digester.addObjectCreate("Context", "org.apache.catalina.core.StandardContext",
-            "className");
+        digester.addObjectCreate("Context", contextClassName, "className");
         // Set the properties on that object (it doesn't matter if extra
         // properties are set)
         digester.addSetProperties("Context");
@@ -521,7 +527,7 @@ public class HostConfig
         File expandedDocBase = null;
 
         try (FileInputStream fis = new FileInputStream(contextXml)) {
-            synchronized (digester) {
+            synchronized (digesterLock) {
                 try {
                     context = (Context) digester.parse(fis);
                 } catch (Exception e) {
@@ -790,7 +796,7 @@ public class HostConfig
         Context context = null;
         try {
             if (deployXML && xml.exists() && !copyXML) {
-                synchronized (digester) {
+                synchronized (digesterLock) {
                     try {
                         context = (Context) digester.parse(xml);
                     } catch (Exception e) {
@@ -806,7 +812,7 @@ public class HostConfig
                 }
                 context.setConfigFile(xml.toURI().toURL());
             } else if (deployXML && xmlInWar) {
-                synchronized (digester) {
+                synchronized (digesterLock) {
                     try {
                         jar = new JarFile(war);
                         entry =
@@ -1062,7 +1068,7 @@ public class HostConfig
 
         try {
             if (deployXML && xml.exists()) {
-                synchronized (digester) {
+                synchronized (digesterLock) {
                     try {
                         context = (Context) digester.parse(xml);
                     } catch (Exception e) {
