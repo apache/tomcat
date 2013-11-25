@@ -1071,6 +1071,12 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 true, false, false, XML_COOKIE_NAME, REDEPLOY);
     }
 
+    @Test
+    public void testModifyXmlDirUpdateDir() throws Exception {
+        doTestModify(true, false, false, false, true, DIR,
+                true, false, true, XML_COOKIE_NAME, NONE);
+    }
+
     private void doTestModify(boolean startXml, boolean startExternalWar,
             boolean startExternalDir, boolean startWar, boolean startDir,
             int toModify, boolean resultXml, boolean resultWar,
@@ -1234,7 +1240,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             Assert.assertNull(newContext);
         }
         if (!resultWar && !resultDir) {
-            if (resultXml) {
+            if (resultXml && !startExternalWar && !startExternalDir) {
                 Assert.assertEquals(LifecycleState.FAILED, newContext.getState());
             } else {
                 Assert.assertNull(newContext);
