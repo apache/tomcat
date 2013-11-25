@@ -766,26 +766,24 @@ public class HostConfig
                 cn.getBaseName() + "/META-INF/context.xml");
 
         boolean xmlInWar = false;
-        if (deployXML) {
-            JarEntry entry = null;
-            try {
-                jar = new JarFile(war);
-                entry = jar.getJarEntry(Constants.ApplicationContextXml);
-                if (entry != null) {
-                    xmlInWar = true;
+        JarEntry entry = null;
+        try {
+            jar = new JarFile(war);
+            entry = jar.getJarEntry(Constants.ApplicationContextXml);
+            if (entry != null) {
+                xmlInWar = true;
+            }
+        } catch (IOException e) {
+            /* Ignore */
+        } finally {
+            entry = null;
+            if (jar != null) {
+                try {
+                    jar.close();
+                } catch (IOException ioe) {
+                    // Ignore;
                 }
-            } catch (IOException e) {
-                /* Ignore */
-            } finally {
-                entry = null;
-                if (jar != null) {
-                    try {
-                        jar.close();
-                    } catch (IOException ioe) {
-                        // Ignore;
-                    }
-                    jar = null;
-                }
+                jar = null;
             }
         }
 
@@ -809,7 +807,6 @@ public class HostConfig
                 context.setConfigFile(xml.toURI().toURL());
             } else if (deployXML && xmlInWar) {
                 synchronized (digester) {
-                    JarEntry entry = null;
                     try {
                         jar = new JarFile(war);
                         entry =
@@ -847,6 +844,12 @@ public class HostConfig
                         digester.reset();
                     }
                 }
+            } else if (!deployXML && xmlInWar) {
+                // Block deployment as META-INF/context.xml may contain security
+                // configuration necessary for a secure deployment.
+                log.error(sm.getString("hostConfig.deployDescriptor.blocked",
+                        cn.getPath(), Constants.ApplicationContextXml,
+                        new File(host.getConfigBaseFile(), cn.getBaseName() + ".xml")));
             } else {
                 context = (Context) Class.forName(contextClass).newInstance();
             }
@@ -875,7 +878,7 @@ public class HostConfig
                 // Change location of XML file to config base
                 xml = new File(host.getConfigBaseFile(),
                         cn.getBaseName() + ".xml");
-                JarEntry entry = null;
+                entry = null;
                 try {
                     jar = new JarFile(war);
                     entry =
@@ -1103,6 +1106,12 @@ public class HostConfig
                 } else {
                     context.setConfigFile(xml.toURI().toURL());
                 }
+            } else if (!deployXML && xml.exists()) {
+                // Block deployment as META-INF/context.xml may contain security
+                // configuration necessary for a secure deployment.
+                log.error(sm.getString("hostConfig.deployDescriptor.blocked",
+                        cn.getPath(), xml, xmlCopy));
+                context = new FailedContext();
             } else {
                 context = (Context) Class.forName(contextClass).newInstance();
             }
