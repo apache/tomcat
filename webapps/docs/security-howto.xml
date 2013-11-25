@@ -173,7 +173,7 @@
     manager should be introduced at the start of the development cycle as it can
     be time-consuming to track down and fix issues caused by enabling a security
     manager for a mature application.</p>
-    
+
     <p>Enabling the security manager changes the defaults for the following
     settings:</p>
     <ul>
