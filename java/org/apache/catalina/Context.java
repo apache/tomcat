@@ -693,24 +693,6 @@ public interface Context extends Container {
 
 
     /**
-     * Will the parsing of *.jspx and *.tagx files for this Context be performed
-     * by a validating parser?
-     *
-     * @return true if validation is enabled.
-     */
-    public boolean getXmlValidationJspDoc();
-
-
-    /**
-     * Controls whether the parsing of *.jspx and *.tagx files for this Context
-     * will be performed by a validating parser.
-     *
-     * @param xmlValidationJspDoc true to enable xml validation
-     */
-    public void setXmlValidationJspDoc(boolean xmlValidationJspDoc);
-
-
-    /**
      * Get the Jar Scanner to be used to scan for JAR resources for this
      * context.
      * @return  The Jar Scanner configured for this context.

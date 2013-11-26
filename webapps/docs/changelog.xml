@@ -155,11 +155,6 @@
         Deprecate the <code>tldNamespaceAware</code> Context attribute as TLDs
         are always parsed with a namespace aware parser. (markt)
       </fix>
-      <add>
-        Add a new <code>xmlValidationJspDoc</code> attribute to the Context to
-        control if Jasper (the JSP engine) uses a validating parser when
-        processing *.jspx and *.tagx files. (markt)
-      </add>
       <fix>
         Correct a logic error that meant that unpackWARs was ignored and the WAR
         was always expanded if a WAR failed to deploy. (markt)

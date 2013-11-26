@@ -325,9 +325,6 @@ public class ApplicationContext
         if (Globals.JASPER_XML_VALIDATION_TLD_INIT_PARAM.equals(name) &&
                 context.getTldValidation()) {
             return "true";
-        } else if (Globals.JASPER_XML_VALIDATION_DOC_INIT_PARAM.equals(name) &&
-                context.getXmlValidationJspDoc()) {
-            return "true";
         }
         return parameters.get(name);
     }
@@ -345,9 +342,6 @@ public class ApplicationContext
         // available if validation has been enabled on the context
         if (context.getTldValidation()) {
             names.add(Globals.JASPER_XML_VALIDATION_TLD_INIT_PARAM);
-        }
-        if (context.getXmlValidationJspDoc()) {
-            names.add(Globals.JASPER_XML_VALIDATION_DOC_INIT_PARAM);
         }
         return Collections.enumeration(names);
     }

@@ -571,16 +571,6 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public boolean getXmlValidationJspDoc() {
-        return false;
-    }
-
-    @Override
-    public void setXmlValidationJspDoc(boolean xmlValidationJspDoc) {
-       // NO-OP
-    }
-
-    @Override
     public void setXmlValidation(boolean xmlValidation) {
         // NO-OP
     }

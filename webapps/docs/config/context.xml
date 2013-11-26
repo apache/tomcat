@@ -553,15 +553,6 @@
         penalty.</p>
       </attribute>
 
-      <attribute name="xmlValidationJspDoc" required="false">
-        <p>If the value of this flag is <code>true</code>, the parsing of
-        <code>*.jspx</code> and <code>*.tagx</code> files for this web
-        application will use a validating parser. Before enabling this option
-        users should review section JSP.6.2.4 of the JSP 2.3 specification. The
-        default value will be <code>false</code>. Setting this attribute to
-        <code>true</code> will incur a performance penalty.</p>
-      </attribute>
-
 
     </attributes>
 
