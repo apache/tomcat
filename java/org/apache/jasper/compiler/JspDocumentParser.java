@@ -19,7 +19,6 @@ package org.apache.jasper.compiler;
 import java.io.CharArrayWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -171,27 +170,24 @@ class JspDocumentParser
 
             // Parse the input
             SAXParser saxParser = getSAXParser(validate, jspDocParser);
-            InputStream inStream = null;
+            InputSource source = JspUtil.getInputSource(path, jar, jspDocParser.ctxt);
             try {
-                inStream = JspUtil.getInputStream(path, jar, jspDocParser.ctxt);
-                saxParser.parse(new InputSource(inStream), jspDocParser);
+                saxParser.parse(source, jspDocParser);
             } catch (EnableDTDValidationException e) {
                 saxParser = getSAXParser(true, jspDocParser);
                 jspDocParser.isValidating = true;
-                if (inStream != null) {
-                    try {
-                        inStream.close();
-                    } catch (Exception any) {
-                    }
+                try {
+                    source.getByteStream().close();
+                } catch (IOException e2) {
+                    // ignore
                 }
-                inStream = JspUtil.getInputStream(path, jar, jspDocParser.ctxt);
-                saxParser.parse(new InputSource(inStream), jspDocParser);
+                source = JspUtil.getInputSource(path, jar, jspDocParser.ctxt);
+                saxParser.parse(source, jspDocParser);
             } finally {
-                if (inStream != null) {
-                    try {
-                        inStream.close();
-                    } catch (Exception any) {
-                    }
+                try {
+                    source.getByteStream().close();
+                } catch (IOException e) {
+                    // ignore
                 }
             }
 

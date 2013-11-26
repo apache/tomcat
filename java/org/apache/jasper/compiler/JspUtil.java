@@ -28,6 +28,7 @@ import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.tomcat.util.scan.Jar;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 
 /**
  * This class has all the utility method(s). Ideally should move all the bean
@@ -662,6 +663,20 @@ public class JspUtil {
         }
 
         return in;
+    }
+
+    public static InputSource getInputSource(String fname, Jar jar, JspCompilationContext ctxt)
+        throws IOException {
+        InputSource source;
+        if (jar != null) {
+            String jarEntryName = fname.substring(1, fname.length());
+            source = new InputSource(jar.getInputStream(jarEntryName));
+            source.setSystemId(jar.getURL(jarEntryName));
+        } else {
+            source = new InputSource(ctxt.getResourceAsStream(fname));
+            source.setSystemId(ctxt.getResource(fname).toExternalForm());
+        }
+        return source;
     }
 
     /**
