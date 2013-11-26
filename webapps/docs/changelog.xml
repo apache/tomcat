@@ -162,7 +162,7 @@
       </add>
       <add>
         When running under a security manager, change the default value of the
-        Host&apos;s <code>deloyXML</code> attribute to <code>false</code>.
+        Host&apos;s <code>deployXML</code> attribute to <code>false</code>.
         (markt)
       </add>
       <fix>
@@ -180,7 +180,7 @@
       <fix>
         Define the expected behaviour of the automatic deployment and align the
         implementation to that definition. (markt)
-      </fix
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
