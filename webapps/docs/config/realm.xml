@@ -868,7 +868,7 @@
         be searched for using <code>ClassLoader#getResource(String)</code> so it
         is possible for the configuration to be bundled within a web
         application. If not specified, the default JVM global JAAS configuration
-        willbe used.</p>
+        will be used.</p>
       </attribute>
 
       <attribute name="roleClassNames" required="false">
