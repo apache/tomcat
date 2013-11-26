@@ -172,26 +172,29 @@
       </attribute>
       <attribute name="sendAllSessions" required="false">
         Flag whether send sessions as split blocks.
-        If set to <code>true</code>, send all sessions at one big block.
+        If set to <code>true</code>, send all sessions as one big block.
         If set to <code>false</code>, send sessions as split blocks.
         Default value is <code>true</code>.
       </attribute>
       <attribute name="sendAllSessionsSize" required="false">
-        Number of sessions of a block session message. This attribute is enable
-        only if sendAllSessions is <code>false</code>.
+        The number of sessions in a session block message. This value is
+        effective only when <code>sendAllSessions</code> is <code>false</code>.
         Default is <code>1000</code>.
       </attribute>
       <attribute name="sendAllSessionsWaitTime" required="false">
-        Wait time between send session block.
+        Wait time between sending of session block messages. This value is
+        effective only when <code>sendAllSessions</code> is <code>false</code>.
         Default is <code>2000</code> milliseconds.
       </attribute>
       <attribute name="stateTimestampDrop" required="false">
-        All session messages are queued when send <code>GET_ALL_SESSION</code>
-        message to other node. If this attribute set to <code>true</code>, all
-        session messages before state transfer message creation are dropped. 
-        Only other <code>GET_ALL_SESSION</code> message are handle with date
-        before state transfer message.
-        if set to <code>false</code>, all queued sessions messages are handled.
+        When this node sends a <code>GET_ALL_SESSIONS</code> message to other
+        node, all session messages that are received as a response are queued.
+        If this attribute is set to <code>true</code>, the received session
+        messages (except any <code>GET_ALL_SESSIONS</code> sent by other nodes)
+        are filtered by their timestamp. A message is dropped if it is not a
+        <code>GET_ALL_SESSIONS</code> message and its timestamp is earlier than
+        the timestamp of our <code>GET_ALL_SESSIONS</code> message.
+        If set to <code>false</code>, all queued session messages are handled.
         Default is <code>true</code>.
       </attribute>
     </attributes>
