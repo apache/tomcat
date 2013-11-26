@@ -181,8 +181,8 @@ public class TagPluginManager {
     }
 
     private static class NodeVisitor extends Node.Visitor {
-        private TagPluginManager manager;
-        private PageInfo pageInfo;
+        private final TagPluginManager manager;
+        private final PageInfo pageInfo;
 
         public NodeVisitor(TagPluginManager manager, PageInfo pageInfo) {
             this.manager = manager;
