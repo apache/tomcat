@@ -612,7 +612,7 @@ public class HostConfig
                         deployedApp.redeployResources.put(warDocBase.getAbsolutePath(),
                                 Long.valueOf(warDocBase.lastModified()));
                     } else {
-                        // Trigger a reload if a WAR is added
+                        // Trigger a redeploy if a WAR is added
                         deployedApp.redeployResources.put(
                                 warDocBase.getAbsolutePath(),
                                 Long.valueOf(0));
@@ -1075,6 +1075,7 @@ public class HostConfig
                         log.error(sm.getString(
                                 "hostConfig.deployDescriptor.error",
                                 xml), e);
+                        context = new FailedContext();
                     } finally {
                         if (context == null) {
                             context = new FailedContext();
