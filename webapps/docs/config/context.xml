@@ -731,6 +731,22 @@
         not specified, the default value of <code>false</code> will be used.</p>
       </attribute>
 
+      <attribute name="copyXML" required="false">
+        <p>Set to <code>true</code> if you want a context XML descriptor
+        embedded inside the application (located at
+        <code>/META-INF/context.xml</code>) to be copied to the owning
+        <a href="host.html">Host</a>'s <code>xmlBase</code> when the application
+        is deployed. On subsequent starts, the copied context XML descriptor
+        will be used in preference to any context XML descriptor embedded inside
+        the application even if the descriptor embedded inside the application
+        is more recent. The flag's value defaults to <code>false</code>. Note if
+        the <strong>deployXML</strong> attribute of the owning
+        <a href="host.html">Host</a> is <code>false</code> or if the
+        <strong>copyXML</strong> attribute of the owning
+        <a href="host.html">Host</a> is <code>true</code>, this attribute will
+        have no effect.</p>
+      </attribute>
+
       <attribute name="jndiExceptionOnFailedWrite" required="false">
         <p>If <code>true</code>, any attempt by an application to modify the
         provided JNDI context with a call to bind(), unbind(),

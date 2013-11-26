@@ -169,6 +169,18 @@
         Correct a logic error that meant that unpackWARs was ignored and the WAR
         was always expanded if a WAR failed to deploy. (markt)
       </fix>
+      <add>
+        <bug>51294</bug>: Add support for unpacking WARs located outside of the
+        Host's appBase in to the appBase. (markt) 
+      </add>
+      <add>
+        Add support for defining <code>copyXML</code> on a per Context basis.
+        (markt)
+      </add>
+      <fix>
+        Define the expected behaviour of the automatic deployment and align the
+        implementation to that definition. (markt)
+      </fix
     </changelog>
   </subsection>
   <subsection name="Coyote">
