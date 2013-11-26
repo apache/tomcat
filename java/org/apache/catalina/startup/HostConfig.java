@@ -953,7 +953,7 @@ public class HostConfig
                 // configuration necessary for a secure deployment.
                 log.error(sm.getString("hostConfig.deployDescriptor.blocked",
                         cn.getPath(), Constants.ApplicationContextXml,
-                        new File(host.getConfigBaseFile(), cn.getBaseName() + ".xml")));
+                        new File(configBase(), cn.getBaseName() + ".xml")));
             } else {
                 context = (Context) Class.forName(contextClass).newInstance();
             }
