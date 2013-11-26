@@ -870,7 +870,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         private void doWrite(boolean last) throws IOException {
             buffer.flip();
-            endpoint.sendPartialBytes(buffer, last);
+            endpoint.startMessageBlock(Constants.OPCODE_BINARY, buffer, last);
             buffer.clear();
         }
     }
