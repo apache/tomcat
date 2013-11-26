@@ -328,10 +328,6 @@
                description="Flag to set to cause the system.out and system.err to be redirected to the logger when executing a servlet"
                type="boolean"/>
 
-    <attribute name="tldNamespaceAware"
-               description="Should TLD XML namespace validation be turned on?"
-               type="boolean"/>
-
     <attribute name="tldScanTime"
                description="Time spend scanning jars for TLDs for this context"
                type="long"/>
