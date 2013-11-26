@@ -25,10 +25,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -121,14 +119,12 @@ public class TestJspDocumentParser extends TomcatBaseTest {
    }
 
     @Test
-    @Ignore
     public void testSchemaValidation() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File("test/webapp");
         // app dir is relative to server home
-        Context context = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        context.setXmlValidationJspDoc(true);
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         tomcat.start();
 
