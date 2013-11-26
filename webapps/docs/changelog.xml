@@ -160,11 +160,6 @@
         control if Jasper (the JSP engine) uses a validating parser when
         processing *.jspx and *.tagx files. (markt)
       </add>
-      <add>
-        When running under a security manager, change the default value of the
-        Host&apos;s <code>deployXML</code> attribute to <code>false</code>.
-        (markt)
-      </add>
       <fix>
         Correct a logic error that meant that unpackWARs was ignored and the WAR
         was always expanded if a WAR failed to deploy. (markt)
@@ -182,17 +177,18 @@
         implementation to that definition. (markt)
       </fix>
       <add>
-        When a security manager is configured change the default value of
-        <code>deployXML</code> of the Host element to <code>false</code>.
-        (markt) 
+        When running under a security manager, change the default value of the
+        Host&apos;s <code>deployXML</code> attribute to <code>false</code>.
+        (markt)
       </add>
       <add>
         If a Host is configured with a value of <code>false</code> for
-        <code>deployXML</code>, an application has an embedded descriptor at
-        <code>META-INF/context.xml</code> and no explicit descriptor has been
-        defined, do not allow the application to start as the descriptor may
-        contain configuration necessary for secure operation such as a
-        <code>RemoteAddrValve</code>. (markt)
+        <code>deployXML</code>, a web application has an embedded
+        descriptor at <code>META-INF/context.xml</code> and no explicit
+        descriptor has been defined for this application, do not allow the
+        application to start. The reason for this is that the embedded
+        descriptor may contain configuration necessary for secure operation
+        such as a <code>RemoteAddrValve</code>. (markt)
       </add>
     </changelog>
   </subsection>
