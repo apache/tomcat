@@ -16,8 +16,12 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +40,7 @@ import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.descriptor.web.ApplicationListener;
+import org.apache.tomcat.websocket.TesterMessageCountClient.AsyncBinary;
 import org.apache.tomcat.websocket.TesterMessageCountClient.AsyncHandler;
 import org.apache.tomcat.websocket.TesterMessageCountClient.AsyncText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterAnnotatedEndpoint;
@@ -58,15 +63,25 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
 
     @Test
     public void testWriterAnnotation() throws Exception {
-        doTestWriter(TesterAnnotatedEndpoint.class);
+        doTestWriter(TesterAnnotatedEndpoint.class, true);
     }
 
     @Test
     public void testWriterProgrammatic() throws Exception {
-        doTestWriter(TesterProgrammaticEndpoint.class);
+        doTestWriter(TesterProgrammaticEndpoint.class, true);
     }
 
-    private void doTestWriter(Class<?> clazz) throws Exception {
+    @Test
+    public void testStreamAnnotation() throws Exception {
+        doTestWriter(TesterAnnotatedEndpoint.class, false);
+    }
+
+    @Test
+    public void testStreamProgrammatic() throws Exception {
+        doTestWriter(TesterProgrammaticEndpoint.class, false);
+    }
+
+    private void doTestWriter(Class<?> clazz, boolean useWriter) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // Must have a real docBase - just use temp
         Context ctx =
@@ -98,40 +113,70 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
         TesterEndpoint tep =
                 (TesterEndpoint) wsSession.getUserProperties().get("endpoint");
         tep.setLatch(latch);
-        AsyncHandler<?> handler = new AsyncText(latch);
+        AsyncHandler<?> handler;
+        if (useWriter) {
+            handler = new AsyncText(latch);
+        } else {
+            handler = new AsyncBinary(latch);
+        }
 
         wsSession.addMessageHandler(handler);
 
-        Writer w = wsSession.getBasicRemote().getSendWriter();
+        if (useWriter) {
+            Writer w = wsSession.getBasicRemote().getSendWriter();
 
-        for (int i = 0; i < 8; i++) {
-            w.write(TEST_MESSAGE_5K);
+            for (int i = 0; i < 8; i++) {
+                w.write(TEST_MESSAGE_5K);
+            }
+
+            w.close();
+        } else {
+            OutputStream s = wsSession.getBasicRemote().getSendStream();
+
+            for (int i = 0; i < 8; i++) {
+                s.write(TEST_MESSAGE_5K.getBytes(StandardCharsets.UTF_8));
+            }
+
+            s.close();
         }
-
-        w.close();
 
         boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
 
         Assert.assertTrue(latchResult);
 
-        @SuppressWarnings("unchecked")
-        List<String> messages = (List<String>) handler.getMessages();
+        List<String> results = new ArrayList<>();
+        if (useWriter) {
+            @SuppressWarnings("unchecked")
+            List<String> messages = (List<String>) handler.getMessages();
+            results.addAll(messages);
+        } else {
+            // Take advantage of the fact that the message uses characters that
+            // are represented as a single UTF-8 byte so won't be split across
+            // binary messages
+            @SuppressWarnings("unchecked")
+            List<ByteBuffer> messages = (List<ByteBuffer>) handler.getMessages();
+            for (ByteBuffer message : messages) {
+                byte[] bytes = new byte[message.limit()];
+                message.get(bytes);
+                results.add(new String(bytes, StandardCharsets.UTF_8));
+            }
+        }
 
         int offset = 0;
         int i = 0;
-        for (String message : messages) {
+        for (String result : results) {
             // First may be a fragment
             Assert.assertEquals(SEQUENCE.substring(offset, S_LEN),
-                    message.substring(0, S_LEN - offset));
+                    result.substring(0, S_LEN - offset));
             i = S_LEN - offset;
-            while (i + S_LEN < message.length()) {
-                if (!SEQUENCE.equals(message.substring(i, i + S_LEN))) {
+            while (i + S_LEN < result.length()) {
+                if (!SEQUENCE.equals(result.substring(i, i + S_LEN))) {
                     Assert.fail();
                 }
                 i += S_LEN;
             }
-            offset = message.length() - i;
-            if (!SEQUENCE.substring(0, offset).equals(message.substring(i))) {
+            offset = result.length() - i;
+            if (!SEQUENCE.substring(0, offset).equals(result.substring(i))) {
                 Assert.fail();
             }
         }
