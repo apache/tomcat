@@ -1306,10 +1306,6 @@
                description="The extension to use to distinguish the output"/>
 
     <sequential>
-      <!-- Define classpaths when Cobertura is turned off. -->
-      <path id="cobertura.classpath" />
-      <path id="tomcat.classes.cobertura.classpath" />
-
       <junit printsummary="yes" fork="yes" dir="." showoutput="yes"
         errorproperty="test.result.error"
         failureproperty="test.result.failure"
@@ -1321,10 +1317,7 @@
         <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
         <jvmarg value="-Dorg.apache.tomcat.util.net.NioSelectorShared=${org.apache.tomcat.util.net.NioSelectorShared}"/>
 
-        <!-- The Cobertura instrumented classes must appear first on the classpath -->
-        <classpath refid="tomcat.classes.cobertura.classpath" />
-        <classpath refid="tomcat.test.classpath" />
-        <classpath refid="cobertura.classpath"/>
+        <classpath refid="tomcat.test.run.classpath" />
 
         <sysproperty key="tomcat.test.temp" value="${test.temp}" />
         <sysproperty key="tomcat.test.tomcatbuild" value="${tomcat.build}" />
@@ -1353,14 +1346,16 @@
     </sequential>
   </macrodef>
 
-  <target name="cobertura-instrument" depends="compile,download-cobertura"
+  <target name="cobertura-disabled" unless="${test.cobertura}">
+    <!-- Define classpath used to run tests when Cobertura is turned off. -->
+    <path id="tomcat.test.run.classpath">
+      <path refid="tomcat.test.classpath" />
+    </path>
+  </target>
+
+  <target name="cobertura-instrument" depends="compile,download-cobertura,cobertura-disabled"
           if="${test.cobertura}"
           description="Adds Cobertura instrumentation to the compiled bytecode">
-
-    <mkdir dir="${tomcat.classes.cobertura}"/>
-
-    <path id="tomcat.classes.cobertura.classpath"
-      location="${tomcat.classes.cobertura}" />
 
     <path id="cobertura.classpath">
       <fileset dir="${cobertura.home}">
@@ -1392,6 +1387,13 @@
       <auxClasspath path="${jdt.jar}" />
     </cobertura-instrument>
 
+    <!-- Define classpath used to run tests -->
+    <!-- The Cobertura instrumented classes must appear first on the classpath -->
+    <path id="tomcat.test.run.classpath">
+      <path location="${tomcat.classes.cobertura}" />
+      <path refid="tomcat.test.classpath" />
+      <path refid="cobertura.classpath"/>
+    </path>
   </target>
 
   <target name="cobertura-report" if="${test.cobertura}"
