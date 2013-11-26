@@ -336,28 +336,28 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     public void testDeploymentWarXmlFFF() throws Exception {
         createWar(WAR_XML_SOURCE, true);
         doTestDeployment(false, false, false,
-                LifecycleState.STARTED, null, false, true, false);
+                LifecycleState.FAILED, null, false, true, false);
     }
 
     @Test
     public void testDeploymentWarXmlFFT() throws Exception {
         createWar(WAR_XML_SOURCE, true);
         doTestDeployment(false, false, true,
-                LifecycleState.STARTED, null, false, true, true);
+                LifecycleState.FAILED, null, false, true, true);
     }
 
     @Test
     public void testDeploymentWarXmlFTF() throws Exception {
         createWar(WAR_XML_SOURCE, true);
         doTestDeployment(false, true, false,
-                LifecycleState.STARTED, null, false, true, false);
+                LifecycleState.FAILED, null, false, true, false);
     }
 
     @Test
     public void testDeploymentWarXmlFTT() throws Exception {
         createWar(WAR_XML_SOURCE, true);
         doTestDeployment(false, true, true,
-                LifecycleState.STARTED, null, false, true, true);
+                LifecycleState.FAILED, null, false, true, true);
     }
 
     @Test
@@ -463,28 +463,28 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     public void testDeploymentDirXmlFFF() throws Exception {
         createDirInAppbase(true);
         doTestDeployment(false, false, false,
-                LifecycleState.STARTED, null, false, false, true);
+                LifecycleState.FAILED, null, false, false, true);
     }
 
     @Test
     public void testDeploymentDirXmlFFT() throws Exception {
         createDirInAppbase(true);
         doTestDeployment(false, false, true,
-                LifecycleState.STARTED, null, false, false, true);
+                LifecycleState.FAILED, null, false, false, true);
     }
 
     @Test
     public void testDeploymentDirXmlFTF() throws Exception {
         createDirInAppbase(true);
         doTestDeployment(false, true, false,
-                LifecycleState.STARTED, null, false, false, true);
+                LifecycleState.FAILED, null, false, false, true);
     }
 
     @Test
     public void testDeploymentDirXmlFTT() throws Exception {
         createDirInAppbase(true);
         doTestDeployment(false, true, true,
-                LifecycleState.STARTED, null, false, false, true);
+                LifecycleState.FAILED, null, false, false, true);
     }
 
     @Test

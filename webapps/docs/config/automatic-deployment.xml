@@ -527,8 +527,9 @@
     <li><em>unpackWARs</em> is ignored since there is no WAR file.</li>
     <li>The context will fail to start because there is no content in the
         expected <em>docBase</em>.</li>
-    <li>The embedded META-INF/context.xml is ignored because <em>deployXML</em>
-        is <code>false</code>.</li>
+    <li>The web application fails to deploy because it contains an embedded
+        META-INF/context.xml, <em>deployXML</em> is <code>false</code> and an
+        XML has not been provided in the <em>configBase</em>.</li>
     <li>The XML file is only deleted if <em>copyXML</em> is <code>true</code>
         and <em>deployXML</em> is <code>true</code>.</li>
     <li>Although the external resource is still present, the web application is

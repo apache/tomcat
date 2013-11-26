@@ -181,6 +181,19 @@
         Define the expected behaviour of the automatic deployment and align the
         implementation to that definition. (markt)
       </fix>
+      <add>
+        When a security manager is configured change the default value of
+        <code>deployXML</code> of the Host element to <code>false</code>.
+        (markt) 
+      </add>
+      <add>
+        If a Host is configured with a value of <code>false</code> for
+        <code>deployXML</code>, an application has an embedded descriptor at
+        <code>META-INF/context.xml</code> and no explicit descriptor has been
+        defined, do not allow the application to start as the descriptor may
+        contain configuration necessary for secure operation such as a
+        <code>RemoteAddrValve</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
