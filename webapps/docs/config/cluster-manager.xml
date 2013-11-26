@@ -92,6 +92,53 @@
         session attributes named <code>userName</code> and
         <code>sessionHistory</code>.
       </attribute>
+      <attribute name="maxInactiveInterval" required="false">
+        <p>The initial maximum time interval, in seconds,
+        between client requests before a session is invalidated. A negative value
+        will result in sessions never timing out. If the attribute is not provided,
+        a default of 1800 seconds (30 minutes) is used.</p>
+        <p>This attribute provides the initial value whenever a
+        new session is created, but the interval may be dynamically
+        varied by a servlet via the
+        <code>setMaxInactiveInterval</code> method of the <code>HttpSession</code> object.</p>
+      </attribute>
+      <attribute name="sessionIdLength" required="false">
+       <p>The length of session ids created by this Manager, measured in bytes,
+        excluding subsequent conversion to a hexadecimal string and
+        excluding any JVM route information used for load balancing.
+        The default is 16.</p>
+      </attribute>
+      <attribute name="processExpiresFrequency" required="false">
+        <p>Frequency of the session expiration, and related manager operations.
+        Manager operations will be done once for the specified amount of
+        backgroundProcess calls (i.e., the lower the amount, the more often the
+        checks will occur). The minimum value is 1, and the default value is 6.
+        </p>
+      </attribute>
+      <attribute name="secureRandomClass" required="false">
+        <p>Name of the Java class that extends
+        <code>java.security.SecureRandom</code> to use to generate session IDs.
+        If not specified, the default value is
+        <code>java.security.SecureRandom</code>.</p>
+      </attribute>
+      <attribute name="secureRandomProvider" required="false">
+        <p>Name of the provider to use to create the
+        <code>java.security.SecureRandom</code> instances that generate session
+        IDs. If an invalid algorithm and/or provider is specified, the Manager
+        will use the platform default provider and the default algorithm. If not
+        specified, the platform default provider will be used.</p>
+      </attribute>
+      <attribute name="secureRandomAlgorithm" required="false">
+        <p>Name of the algorithm to use to create the
+        <code>java.security.SecureRandom</code> instances that generate session
+        IDs. If an invalid algorithm and/or provider is specified, the Manager
+        will use the platform default provider and the default algorithm. If not
+        specified, the default algorithm of SHA1PRNG will be used. If the
+        default algorithm is not supported, the platform default will be used.
+        To specify that the platform default should be used, do not set the
+        secureRandomProvider attribute and set this attribute to the empty
+        string.</p>
+      </attribute>
     </attributes>
   </subsection>
   <subsection name="org.apache.catalina.ha.session.DeltaManager Attributes">
@@ -122,6 +169,30 @@
         The time in seconds to wait for a session state transfer to complete
         from another node when a node is starting up.
         Default value is <code>60</code> seconds.
+      </attribute>
+      <attribute name="sendAllSessions" required="false">
+        Flag whether send sessions as split blocks.
+        If set to <code>true</code>, send all sessions at one big block.
+        If set to <code>false</code>, send sessions as split blocks.
+        Default value is <code>true</code>.
+      </attribute>
+      <attribute name="sendAllSessionsSize" required="false">
+        Number of sessions of a block session message. This attribute is enable
+        only if sendAllSessions is <code>false</code>.
+        Default is <code>1000</code>.
+      </attribute>
+      <attribute name="sendAllSessionsWaitTime" required="false">
+        Wait time between send session block.
+        Default is <code>2000</code> milliseconds.
+      </attribute>
+      <attribute name="stateTimestampDrop" required="false">
+        All session messages are queued when send <code>GET_ALL_SESSION</code>
+        message to other node. If this attribute set to <code>true</code>, all
+        session messages before state transfer message creation are dropped. 
+        Only other <code>GET_ALL_SESSION</code> message are handle with date
+        before state transfer message.
+        if set to <code>false</code>, all queued sessions messages are handled.
+        Default is <code>true</code>.
       </attribute>
     </attributes>
   </subsection>
