@@ -364,6 +364,9 @@ public class CoyoteAdapter implements Adapter {
                     try {
                         Thread.currentThread().setContextClassLoader(newCL);
                         res.onWritePossible();
+                        if (request.isFinished() && req.sendAllDataReadEvent()) {
+                            req.getReadListener().onAllDataRead();
+                        }
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
                         res.getWriteListener().onError(t);
@@ -381,7 +384,7 @@ public class CoyoteAdapter implements Adapter {
                     try {
                         Thread.currentThread().setContextClassLoader(newCL);
                         req.getReadListener().onDataAvailable();
-                        if (request.isFinished()) {
+                        if (request.isFinished() && req.sendAllDataReadEvent()) {
                             req.getReadListener().onAllDataRead();
                         }
                     } catch (Throwable t) {
@@ -548,7 +551,9 @@ public class CoyoteAdapter implements Adapter {
                             request.getContext().getLoader().getClassLoader();
                     try {
                         Thread.currentThread().setContextClassLoader(newCL);
-                        req.getReadListener().onAllDataRead();
+                        if (req.sendAllDataReadEvent()) {
+                            req.getReadListener().onAllDataRead();
+                        }
                     } finally {
                         Thread.currentThread().setContextClassLoader(oldCL);
                     }
