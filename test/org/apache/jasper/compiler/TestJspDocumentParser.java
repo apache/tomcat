@@ -132,7 +132,6 @@ public class TestJspDocumentParser extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk bc = new ByteChunk();
         String path = "http://localhost:" + getPort() + "/test/valid.jspx";
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
