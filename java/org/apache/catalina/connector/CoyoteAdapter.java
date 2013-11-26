@@ -539,7 +539,7 @@ public class CoyoteAdapter implements Adapter {
             if (asyncConImpl != null) {
                 async = true;
                 ReadListener readListener = req.getReadListener();
-                if (readListener != null) {
+                if (readListener != null && request.isFinished()) {
                     // Possible the all data may have been read during service()
                     // method so this needs to be checked here
                     ClassLoader oldCL =
@@ -548,9 +548,7 @@ public class CoyoteAdapter implements Adapter {
                             request.getContext().getLoader().getClassLoader();
                     try {
                         Thread.currentThread().setContextClassLoader(newCL);
-                        if (request.isFinished()) {
-                            req.getReadListener().onAllDataRead();
-                        }
+                        req.getReadListener().onAllDataRead();
                     } finally {
                         Thread.currentThread().setContextClassLoader(oldCL);
                     }
