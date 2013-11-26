@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.startup;
 
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -602,6 +601,7 @@ public class HostConfig
      * @param cn
      * @param contextXml
      */
+    @SuppressWarnings("null") // context is not null
     protected void deployDescriptor(ContextName cn, File contextXml) {
 
         DeployedApplication deployedApp =
@@ -685,7 +685,7 @@ public class HostConfig
 
             // default to appBase dir + name
             expandedDocBase = new File(appBase(), cn.getBaseName());
-            if (context != null && context.getDocBase() != null) {
+            if (context.getDocBase() != null) {
                 // first assume docBase is absolute
                 expandedDocBase = new File(context.getDocBase());
                 if (!expandedDocBase.isAbsolute()) {
@@ -710,8 +710,8 @@ public class HostConfig
                         deployedApp.redeployResources.put(warDocBase.getAbsolutePath(),
                                 Long.valueOf(warDocBase.lastModified()));
                     } else {
-                        // Trigger a reload if a WAR is added
-                        deployedApp.reloadResources.put(
+                        // Trigger a redeploy if a WAR is added
+                        deployedApp.redeployResources.put(
                                 warDocBase.getAbsolutePath(),
                                 Long.valueOf(0));
                     }
@@ -742,7 +742,7 @@ public class HostConfig
             addGlobalRedeployResources(deployedApp);
         }
 
-        if (context != null && host.findChild(context.getName()) != null) {
+        if (host.findChild(context.getName()) != null) {
             deployed.put(context.getName(), deployedApp);
         }
     }
@@ -802,9 +802,6 @@ public class HostConfig
                     invalidWars.add(files[i]);
                     continue;
                 }
-
-                if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
-                    continue;
 
                 results.add(es.submit(new DeployWar(this, cn, war)));
             }
@@ -906,8 +903,10 @@ public class HostConfig
                         log.error(sm.getString(
                                 "hostConfig.deployDescriptor.error",
                                 war.getAbsolutePath()), e);
-                        context = new FailedContext();
                     } finally {
+                        if (context == null) {
+                            context = new FailedContext();
+                        }
                         digester.reset();
                     }
                 }
@@ -1037,7 +1036,7 @@ public class HostConfig
         }
 
         DeployedApplication deployedApp = new DeployedApplication(cn.getName(),
-                xml.exists() && deployXML && copyXML);
+                xml.exists() && deployXML && copyThisXml);
 
         // Deploy the application in this WAR file
         if(log.isInfoEnabled())
@@ -1049,10 +1048,10 @@ public class HostConfig
             deployedApp.redeployResources.put
                 (war.getAbsolutePath(), Long.valueOf(war.lastModified()));
 
-            if (deployXML && xml.exists() && copyXML) {
+            if (deployXML && xml.exists() && copyThisXml) {
                 deployedApp.redeployResources.put(xml.getAbsolutePath(),
                         Long.valueOf(xml.lastModified()));
-            } else if (!copyXML ) {
+            } else if (!copyThisXml ) {
                 // In case an XML file is added to the config base later
                 deployedApp.redeployResources.put(
                         (new File(configBase(),
@@ -1083,11 +1082,13 @@ public class HostConfig
                         Long.valueOf(docBase.lastModified()));
                 addWatchedResources(deployedApp, docBase.getAbsolutePath(),
                         context);
-                if (deployXML && !copyXML && (xmlInWar || xml.exists())) {
+                if (deployXML && !copyThisXml && (xmlInWar || xml.exists())) {
                     deployedApp.redeployResources.put(xml.getAbsolutePath(),
                             Long.valueOf(xml.lastModified()));
                 }
             } else {
+                // Passing null for docBase means that no resources will be
+                // watched. This will be logged at debug level.
                 addWatchedResources(deployedApp, null, context);
             }
             // Add the global redeploy resources (which are never deleted) at
@@ -1155,6 +1156,7 @@ public class HostConfig
         File xmlCopy = new File(configBase(), cn.getBaseName() + ".xml");
 
         DeployedApplication deployedApp;
+        boolean copyThisXml = copyXML;
 
         try {
             if (deployXML && xml.exists()) {
@@ -1167,11 +1169,13 @@ public class HostConfig
                                 xml), e);
                         context = new FailedContext();
                     } finally {
+                        if (context == null) {
+                            context = new FailedContext();
+                        }
                         digester.reset();
                     }
                 }
 
-                boolean copyThisXml = copyXML;
                 if (copyThisXml == false && context instanceof StandardContext) {
                     // Host is using default value. Context may override it.
                     copyThisXml = ((StandardContext) context).getCopyXML();
@@ -1221,7 +1225,7 @@ public class HostConfig
                     dir.getAbsolutePath()), t);
         } finally {
             deployedApp = new DeployedApplication(cn.getName(),
-                    xml.exists() && deployXML && copyXML);
+                    xml.exists() && deployXML && copyThisXml);
 
             // Fake re-deploy resource to detect if a WAR is added at a later
             // point
@@ -1230,7 +1234,7 @@ public class HostConfig
             deployedApp.redeployResources.put(dir.getAbsolutePath(),
                     Long.valueOf(dir.lastModified()));
             if (deployXML && xml.exists()) {
-                if (copyXML) {
+                if (copyThisXml) {
                     deployedApp.redeployResources.put(
                             xmlCopy.getAbsolutePath(),
                             Long.valueOf(xmlCopy.lastModified()));
@@ -1372,6 +1376,15 @@ public class HostConfig
                             context.setDocBase(resource.getAbsolutePath());
                         }
                         reload(app);
+                        // Update times
+                        app.redeployResources.put(resources[i],
+                                Long.valueOf(resource.lastModified()));
+                        app.timestamp = System.currentTimeMillis();
+                        if (unpackWARs) {
+                            addWatchedResources(app, context.getDocBase(), context);
+                        } else {
+                            addWatchedResources(app, null, context);
+                        }
                         return;
                     } else {
                         // Everything else triggers a redeploy
@@ -1583,9 +1596,6 @@ public class HostConfig
             }
         }
         oname = null;
-        appBase = null;
-        configBase = null;
-
     }
 
 

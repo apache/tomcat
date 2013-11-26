@@ -1608,7 +1608,6 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         }
     }
 
-    
     private File createDirInAppbase(boolean withXml) throws IOException {
         File dir = new File(getAppBaseFile(getTomcatInstance().getHost()),
                 APP_NAME.getBaseName());
@@ -1620,7 +1619,6 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         return dir;
     }
 
-
     private File createDirInExternal(boolean withXml) throws IOException {
         File ext = new File(external, "external" + ".war");
         if (withXml) {
@@ -1631,7 +1629,6 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         return ext;
     }
 
-    
     private File createWar(File src, boolean useAppbase) throws IOException {
         File dest;
         if (useAppbase) {
@@ -1644,7 +1641,6 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         return dest;
     }
 
-
     private File createXmlInConfigBaseForAppbase() throws IOException {
         Host host = getTomcatInstance().getHost();
         File xml = new File(getConfigBaseFile(host), APP_NAME + ".xml");
@@ -1655,7 +1651,6 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         copy(XML_SOURCE, xml);
         return xml;
     }
-
 
     private File createXmlInConfigBaseForExternal(File ext) throws IOException {
         return createXmlInConfigBaseForExternal(ext, false);
