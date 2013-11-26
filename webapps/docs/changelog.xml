@@ -263,6 +263,11 @@
         Remove unnecessary sleep when sending session blocks on session sync
         phase. (kfujino)
       </fix>
+      <fix>
+        Expose <code>stateTimestampDrop</code> of
+        <code>org.apache.catalina.ha.session.DeltaManager</code> via JMX.
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

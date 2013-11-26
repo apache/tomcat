@@ -331,6 +331,11 @@
       name="secureRandomProvider"
       description="The secure random number generator provider name"
       type="java.lang.String"/>
+    <attribute
+      name="stateTimestampDrop"
+      is="true"
+      description="All session messages before state transfer message creation are dropped."
+      type="boolean"/>
     <operation
       name="expireSession"
       description="Expired the given session"
