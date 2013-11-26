@@ -167,7 +167,7 @@ public final class Request {
         this.listener = listener;
     }
 
-    private AtomicBoolean allDataReadEventSent = new AtomicBoolean(false);
+    private final AtomicBoolean allDataReadEventSent = new AtomicBoolean(false);
 
     public boolean sendAllDataReadEvent() {
         return allDataReadEventSent.compareAndSet(false, true);
