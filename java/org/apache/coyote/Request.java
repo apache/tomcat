@@ -167,8 +167,14 @@ public final class Request {
         this.listener = listener;
     }
 
-    // ------------------------------------------------------------- Properties
+    private AtomicBoolean allDataReadEventSent = new AtomicBoolean(false);
 
+    public boolean sendAllDataReadEvent() {
+        return allDataReadEventSent.compareAndSet(false, true);
+    }
+
+
+    // ------------------------------------------------------------- Properties
 
     /**
      * Get the instance id (or JVM route). Currently Ajp is sending it with each
@@ -545,6 +551,7 @@ public final class Request {
         attributes.clear();
 
         listener = null;
+        allDataReadEventSent.set(false);
 
         startTime = -1;
     }
