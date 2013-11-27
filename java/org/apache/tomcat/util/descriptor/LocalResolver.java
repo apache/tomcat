@@ -32,7 +32,6 @@ import org.xml.sax.ext.EntityResolver2;
  */
 public class LocalResolver implements EntityResolver2 {
 
-    private final Class<?> base;
     private final Map<String,String> publicIds;
     private final Map<String,String> systemIds;
 
@@ -40,16 +39,13 @@ public class LocalResolver implements EntityResolver2 {
     /**
      * Constructor providing mappings of public and system identifiers to local
      * resources. Each map contains a mapping from a well-known identifier to a
-     * resource path that will be further resolved using the base Class using
-     * Class#getResource(String).
+     * URL for a local resource path.
      *
-     * @param base the class to use to locate local copies
      * @param publicIds mapping of public identifiers to local resources
      * @param systemIds mapping of system identifiers to local resources
      */
-    public LocalResolver(Class<?> base, Map<String,String> publicIds,
+    public LocalResolver(Map<String,String> publicIds,
             Map<String,String> systemIds) {
-        this.base = base;
         this.publicIds = publicIds;
         this.systemIds = systemIds;
     }
@@ -71,10 +67,6 @@ public class LocalResolver implements EntityResolver2 {
             return null;
         }
 
-        URL url = base.getResource(resolved);
-        if (url != null) {
-            resolved = url.toExternalForm();
-        }
         InputSource is = new InputSource(resolved);
         is.setPublicId(publicId);
         return is;
