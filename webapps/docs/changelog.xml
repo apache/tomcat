@@ -245,13 +245,6 @@
         <bug>55251</bug>: Do not allow JspC task to fail silently if the web.xml
         or web.xml fragment can not be generated. (markt)
       </fix>
-      <fix>
-        <bug>55807</bug>: The JSP compiler used a last modified time of -1 for
-        TLDs in JARs expanded in to WEB-INF/classes (IDEs often do this
-        expansion) when creating the dependency list for JSPs that used that
-        TLD. This meant JSPs using that TLD were recompiled on every access.
-        (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
