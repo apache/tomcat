@@ -22,6 +22,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
@@ -432,6 +434,15 @@ public class JspCompilationContext {
 
     public Long getLastModified(String resource) {
         long result = -1;
+        if (resource.startsWith("file:/")) {
+            File f;
+            try {
+                f = new File(new URI(resource));
+            } catch (URISyntaxException e) {
+                return Long.valueOf(-1);
+            }
+            return Long.valueOf(f.lastModified());
+        }
         URLConnection uc = null;
         try {
             URL jspUrl = getResource(resource);
