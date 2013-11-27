@@ -17,6 +17,9 @@
 package org.apache.jasper.servlet;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,6 +27,8 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.scan.StandardJarScanner;
 
 public class TestTldScanner extends TomcatBaseTest {
 
@@ -39,4 +44,45 @@ public class TestTldScanner extends TomcatBaseTest {
         Assert.assertEquals(5, scanner.getUriTldResourcePathMap().size());
         Assert.assertEquals(1, scanner.getListeners().size());
     }
+
+
+    @Test
+    public void testBug55807() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        Context context = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        ((StandardJarScanner) context.getJarScanner()).setScanAllDirectories(true);
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        Map<String,List<String>> headers = new HashMap<>();
+
+        getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug55807.jsp",
+                res, headers);
+
+        // Check request completed
+        String result = res.toString();
+        assertEcho(result, "OK");
+
+        // Check the dependencies count
+        Assert.assertTrue(result.contains("<p>DependenciesCount: 1</p>"));
+
+        // Check the right timestamp was used in the dependency
+        File tld = new File("test/webapp/WEB-INF/classes/META-INF/bug55807.tld");
+        String expected = "<p>/WEB-INF/classes/META-INF/bug55807.tld : " +
+                tld.lastModified() + "</p>";
+        Assert.assertTrue(result.contains(expected));
+
+
+        // Check content type
+        Assert.assertTrue(headers.get("Content-Type").get(0).startsWith("text/html"));
+    }
+
+
+    /** Assertion for text printed by tags:echo */
+    private static void assertEcho(String result, String expected) {
+        Assert.assertTrue(result, result.indexOf("<p>" + expected + "</p>") > 0);
+    }
+
 }

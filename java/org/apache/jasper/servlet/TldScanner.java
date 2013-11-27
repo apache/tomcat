@@ -313,6 +313,7 @@ public class TldScanner {
             if (!metaInf.isDirectory()) {
                 return;
             }
+            final Path filePath = file.toPath();
             Files.walkFileTree(metaInf.toPath(), new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file,
@@ -322,9 +323,11 @@ public class TldScanner {
                         return FileVisitResult.CONTINUE;
                     }
 
+                    String resourcePath = webappPath + "/" +
+                            file.subpath(filePath.getNameCount(), file.getNameCount());
                     try {
                         URL url = file.toUri().toURL();
-                        TldResourcePath path = new TldResourcePath(url, webappPath);
+                        TldResourcePath path = new TldResourcePath(url, resourcePath);
                         parseTld(path);
                         tldFound = true;
                     } catch (SAXException e) {
