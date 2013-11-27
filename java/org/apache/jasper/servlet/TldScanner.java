@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -317,7 +318,7 @@ public class TldScanner {
                 public FileVisitResult visitFile(Path file,
                                                  BasicFileAttributes attrs)
                         throws IOException {
-                    if (!file.endsWith(TLD_EXT)) {
+                    if (!file.toString().toLowerCase(Locale.ENGLISH).endsWith(TLD_EXT)) {
                         return FileVisitResult.CONTINUE;
                     }
 
@@ -336,7 +337,17 @@ public class TldScanner {
 
         @Override
         public void scanWebInfClasses() throws IOException {
-            // this is now handled when WEB-INF is scanned for resources
+            // This is used when scanAllDirectories is enabled and one or more
+            // JARs have been unpacked into WEB-INF/classes as happens with some
+            // IDEs.
+
+            // We know that WEB-INF/classes/META-INF must be a directory on disk
+            String webappPath = WEB_INF + "classes";
+            String realPath = context.getRealPath(webappPath);
+
+            File webInfClasses = new File(realPath);
+
+            scan(webInfClasses, webappPath, true);
         }
 
 
