@@ -403,7 +403,10 @@ public class WsServerContainer extends WsWebSocketContainer
     private void unregisterAuthenticatedSession(WsSession wsSession,
             String httpSessionId) {
         Set<WsSession> wsSessions = authenticatedSessions.get(httpSessionId);
-        wsSessions.remove(wsSession);
+        // wsSessions will be null if the HTTP session has ended
+        if (wsSessions != null) {
+            wsSessions.remove(wsSession);
+        }
     }
 
 
