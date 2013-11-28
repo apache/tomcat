@@ -18,9 +18,12 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.tomcat</groupId>
-  <artifactId>tomcat-util</artifactId>
+  <artifactId>tomcat-util-scan</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>Common code shared by multiple Tomcat components</description>
+  <description>
+    Common code shared by Catalina and Jasper for scanning JARS and processing
+    XML descriptors
+  </description>
   <url>http://tomcat.apache.org/</url>
   <licenses>
     <license>
@@ -32,7 +35,19 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-util</artifactId>
+      <version>@MAVEN.DEPLOY.VERSION@</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
       <artifactId>tomcat-juli</artifactId>
+      <version>@MAVEN.DEPLOY.VERSION@</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-api</artifactId>
       <version>@MAVEN.DEPLOY.VERSION@</version>
       <scope>compile</scope>
     </dependency>

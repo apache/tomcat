@@ -101,6 +101,7 @@
   <property name="tomcat-spdy.jar" value="${tomcat.build}/lib/tomcat-spdy.jar"/>
   <property name="tomcat-api.jar" value="${tomcat.build}/lib/tomcat-api.jar"/>
   <property name="tomcat-util.jar" value="${tomcat.build}/lib/tomcat-util.jar"/>
+  <property name="tomcat-util-scan.jar" value="${tomcat.build}/lib/tomcat-util-scan.jar"/>
 
   <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
   <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
@@ -128,6 +129,7 @@
   <property name="tomcat-coyote-src.jar" value="${tomcat.src.jars}/tomcat-coyote-src.jar"/>
   <property name="tomcat-api-src.jar" value="${tomcat.src.jars}/tomcat-api-src.jar"/>
   <property name="tomcat-util-src.jar" value="${tomcat.src.jars}/tomcat-util-src.jar"/>
+  <property name="tomcat-util-scan-src.jar" value="${tomcat.src.jars}/tomcat-util-scan-src.jar"/>
 
   <property name="jasper-src.jar" value="${tomcat.src.jars}/jasper-src.jar"/>
   <property name="jasper-el-src.jar" value="${tomcat.src.jars}/jasper-el-src.jar"/>
@@ -331,9 +333,16 @@
   <patternset id="files.tomcat-util">
     <include name="org/apache/tomcat/util/buf/**" />
     <include name="org/apache/tomcat/util/codec/**" />
-    <include name="org/apache/tomcat/util/descriptor/**" />
     <include name="org/apache/tomcat/util/file/**" />
     <include name="org/apache/tomcat/util/res/**" />
+    <include name="org/apache/tomcat/util/threads/**" />
+    <include name="org/apache/tomcat/util/*" />
+  </patternset>
+
+  <patternset id="files.tomcat-util-scan">
+    <include name="org/apache/tomcat/util/descriptor/**" />
+    <include name="org/apache/tomcat/util/digester/**" />
+    <include name="org/apache/tomcat/util/file/**" />
     <include name="org/apache/tomcat/util/scan/**" />
   </patternset>
 
@@ -360,7 +369,6 @@
   <patternset id="files.catalina-ant">
     <include name="org/apache/catalina/ant/*" />
     <include name="org/apache/catalina/ant/jmx/*" />
-    <include name="org/apache/catalina/util/Base64.*" />
   </patternset>
 
   <patternset id="files.catalina-storeconfig">
@@ -373,16 +381,15 @@
 
   <patternset id="files.tomcat-coyote">
     <include name="org/apache/coyote/**" />
-    <include name="org/apache/tomcat/util/**" />
-    <!-- Exclude the files shared between Catalina & Jasper and/or used by
-         WebSockets -->
-    <exclude name="org/apache/tomcat/util/buf/**" />
-    <exclude name="org/apache/tomcat/util/codec/**" />
-    <exclude name="org/apache/tomcat/util/descriptor/**" />
-    <exclude name="org/apache/tomcat/util/file/**" />
-    <exclude name="org/apache/tomcat/util/res/**" />
-    <exclude name="org/apache/tomcat/util/scan/**" />
+  	<!-- Included in tomcat-spdy -->
     <exclude name="org/apache/coyote/spdy/**" />
+  	<!-- Remaining tomcat-util packages -->
+    <include name="org/apache/tomcat/util/bcel/**" />
+    <include name="org/apache/tomcat/util/collections/**" />
+    <include name="org/apache/tomcat/util/http/**" />
+    <include name="org/apache/tomcat/util/log/**" />
+    <include name="org/apache/tomcat/util/modeler/**" />
+    <include name="org/apache/tomcat/util/net/**" />
   </patternset>
 
   <patternset id="files.tomcat-spdy">
@@ -416,6 +423,7 @@
     <!-- These pattern sets conflict so include files directly
       <patternset refid="files.tomcat-coyote" />
       <patternset refid="files.tomcat-util" />
+      <patternset refid="files.tomcat-util-scan" />
     -->
     <include name="org/apache/coyote/**" />
     <include name="org/apache/tomcat/jni/**" />
@@ -748,6 +756,11 @@
     <jarIt jarfile="${tomcat-util.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.tomcat-util" />
+
+    <!-- Tomcat Util Scan JAR File -->
+    <jarIt jarfile="${tomcat-util-scan.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.tomcat-util-scan" />
 
     <!-- Protocol handlers - Coyote -->
     <jarIt jarfile="${tomcat-coyote.jar}"
@@ -1880,6 +1893,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <include name="tomcat-websocket.jar"/>
         <include name="tomcat-coyote.jar"/>
         <include name="tomcat-util.jar"/>
+        <include name="tomcat-util-scan.jar"/>
       </fileset>
       <fileset dir="${tomcat.build}/bin">
         <include name="tomcat-juli.jar"/>
@@ -2465,6 +2479,11 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <jarIt jarfile="${tomcat-util-src.jar}"
       filesDir="java"
       filesId="files.tomcat-util" />
+
+    <!-- Tomcat Util Scan JAR File -->
+    <jarIt jarfile="${tomcat-util-scan-src.jar}"
+      filesDir="java"
+      filesId="files.tomcat-util-scan" />
 
     <!-- Protocol handlers - Coyote -->
     <jarIt jarfile="${tomcat-coyote-src.jar}"
