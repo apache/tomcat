@@ -185,6 +185,10 @@
         descriptor may contain configuration necessary for secure operation
         such as a <code>RemoteAddrValve</code>. (markt)
       </add>
+      <fix>
+        Prevent an NPE in the WebSocket <code>ServerContainer</code> when
+        processing an HTTP session end event. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
