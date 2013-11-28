@@ -319,7 +319,8 @@ public class TldScanner {
                 public FileVisitResult visitFile(Path file,
                                                  BasicFileAttributes attrs)
                         throws IOException {
-                    if (!file.toString().toLowerCase(Locale.ENGLISH).endsWith(TLD_EXT)) {
+                    if (!file.getFileName().toString()
+                            .toLowerCase(Locale.ENGLISH).endsWith(TLD_EXT)) {
                         return FileVisitResult.CONTINUE;
                     }
 
