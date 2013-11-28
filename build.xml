@@ -381,9 +381,9 @@
 
   <patternset id="files.tomcat-coyote">
     <include name="org/apache/coyote/**" />
-  	<!-- Included in tomcat-spdy -->
+    <!-- Included in tomcat-spdy -->
     <exclude name="org/apache/coyote/spdy/**" />
-  	<!-- Remaining tomcat-util packages -->
+    <!-- Remaining tomcat-util packages -->
     <include name="org/apache/tomcat/util/bcel/**" />
     <include name="org/apache/tomcat/util/collections/**" />
     <include name="org/apache/tomcat/util/http/**" />
