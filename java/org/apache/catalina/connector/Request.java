@@ -96,6 +96,8 @@ import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
 import org.apache.tomcat.util.res.StringManager;
+import org.ietf.jgss.GSSCredential;
+import org.ietf.jgss.GSSException;
 
 
 /**
@@ -2333,6 +2335,27 @@ public class Request
     @Override
     public Principal getUserPrincipal() {
         if (userPrincipal instanceof TomcatPrincipal) {
+            GSSCredential gssCredential =
+                    ((TomcatPrincipal) userPrincipal).getGssCredential();
+            if (gssCredential != null) {
+                int left = -1;
+                try {
+                    left = gssCredential.getRemainingLifetime();
+                } catch (GSSException e) {
+                    log.warn(sm.getString("coyoteRequest.gssLifetimeFail",
+                            userPrincipal.getName()), e);
+                }
+                if (left == 0) {
+                    // GSS credential has expired. Need to re-authenticate.
+                    try {
+                        logout();
+                    } catch (ServletException e) {
+                        // Should never happen (no code called by logout()
+                        // throws a ServletException
+                    }
+                    return null;
+                }
+            }
             return ((TomcatPrincipal) userPrincipal).getUserPrincipal();
         }
 
