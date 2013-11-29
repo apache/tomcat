@@ -724,9 +724,17 @@ public abstract class AuthenticatorBase extends ValveBase
 
         if (session != null) {
             if (changeSessionIdOnAuthentication) {
+                String oldId = null;
+                if (log.isDebugEnabled()) {
+                    oldId = session.getId();
+                }
                 Manager manager = request.getContext().getManager();
                 manager.changeSessionId(session);
                 request.changeSessionId(session.getId());
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("authenticator.changeSessionId",
+                            oldId, session.getId()));
+                }
             }
         } else if (alwaysUseSession) {
             session = request.getSessionInternal(true);
