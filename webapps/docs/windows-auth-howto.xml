@@ -51,10 +51,19 @@ sections.</p>
 </section>
 
 <section name="Built-in Tomcat support">
-<p><strong>This documentation is a work in progress. There are a number of
-outstanding questions around the edge cases that require further
-testing.</strong> These include:
-</p>
+<p>Kerberos (the basis for integrated Windows authentication) requires careful
+configuration. If the steps in this guide are followed exactly, then a working
+configuration will result. There may be some flexibility in some of the steps
+below but further testing is required to explore this. From the testing to date
+it is known that:</p>
+<ul>
+<li>The host name of the Tomcat server must match the host name in the SPN
+exactly else authentication will fail. A checksum error may be reported in the
+debug logs in this case.</li>
+<li>The client must be of the view that the server is part of the local trusted
+intranet.</li>
+</ul>
+<p>The areas where further testing is required include:</p>
 <ul>
 <li>Does the domain name have to be in upper case?</li>
 <li>Does the SPN have to start with HTTP/...?</li>
@@ -110,7 +119,7 @@ policy had to be relaxed. This is not recommended for production environments.
   </p>
   </subsection>
 
-  <subsection name="Tomcat instance">
+  <subsection name="Tomcat instance (Windows server)">
   <p>These steps assume that Tomcat and a Java 6 JDK/JRE have already been
   installed and configured and that Tomcat is running as the tc01@DEV.LOCAL
   user. The steps to configure the Tomcat instance for Windows authentication
@@ -173,6 +182,25 @@ com.sun.security.jgss.krb5.accept {
   </p>
   <p>The above steps have been tested on a Tomcat server running Windows Server
   2008 R2 64-bit Standard with an Oracle 1.6.0_24 64-bit JDK.</p>
+  </subsection>
+
+  <subsection name="Tomcat instance (Linux server)">
+  <p>This was tested with:</p>
+  <ul>
+  <li>Java 1.7.0, update 45, 64-bit</li>
+  <li>Ubuntu Server 12.04.3 LTS 64-bit</li>
+  <li>Tomcat 8.0.x (r1546570)</li>
+  </ul>
+  <p>It should work with any Tomcat 7 release from 7.0.12 onwards although it is
+  recommended that the latest stable release is used.</p>
+  <p>The configuration is the same as for Windows but with the following
+  changes:</p>
+  <ul>
+  <li>The Linux server does not have to be part of the Windows domain.</li>
+  <li>The path to the keytab file in krb5.ini and jass.conf should be updated
+      to reflect the path to the keytab file on the Linux server using Linux
+      style file paths (e.g. /usr/local/tomcat/...).</li>
+  </ul>
   </subsection>
 
   <subsection name="Web application">

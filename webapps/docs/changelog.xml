@@ -320,6 +320,10 @@
       <add>
         Correct the documentation for Cluster manager. (kfujino)
       </add>
+      <add>
+        Add information on how to configure integrated Windows authentication
+        when Tomcat is running on a non-Windows host. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Extras">
