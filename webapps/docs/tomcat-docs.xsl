@@ -233,7 +233,7 @@
   <!-- Process a menu for the navigation bar -->
   <xsl:template match="menu">
   <div>
-    <h2><strong><xsl:value-of select="@name"/></strong></h2>
+    <h2><xsl:value-of select="@name"/></h2>
     <ul>
       <xsl:apply-templates select="item"/>
     </ul>
