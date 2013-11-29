@@ -51,5 +51,5 @@ public interface Authenticator {
     public void login(String userName, String password, Request request)
             throws ServletException;
 
-    public void logout(Request request) throws ServletException;
+    public void logout(Request request);
 }
