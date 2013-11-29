@@ -58,6 +58,10 @@
 <section name="Tomcat 7.0.48 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>51294</bug>: Add support for unpacking WARs located outside of the
+        Host's appBase in to the appBase. (markt) 
+      </add>
       <fix>
         <bug>55656</bug>: Configure the Digester to use the server class loader
         when parsing server.xml rather than the class loader that loaded
@@ -160,10 +164,6 @@
         was always expanded if a WAR failed to deploy. (markt)
       </fix>
       <add>
-        <bug>51294</bug>: Add support for unpacking WARs located outside of the
-        Host's appBase in to the appBase. (markt) 
-      </add>
-      <add>
         Add support for defining <code>copyXML</code> on a per Context basis.
         (markt)
       </add>
@@ -188,6 +188,10 @@
       <fix>
         Prevent an NPE in the WebSocket <code>ServerContainer</code> when
         processing an HTTP session end event. (markt)
+      </fix>
+      <fix>
+        <bug>55804</bug>: If the GSSCredential for the cached Principal expires
+        when using SPNEGO authentication, force a re-authentication. (markt)
       </fix>
     </changelog>
   </subsection>
