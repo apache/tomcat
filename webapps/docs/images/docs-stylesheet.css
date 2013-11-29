@@ -16,15 +16,21 @@
   limitations under the License.
 */
 
+/* Fonts */
+@import url("fonts/fonts.css");
 
 /* General style */
+
+h1, h2, h3, h4, h5, h6, th {
+	font-weight: 600;
+}
 
 body {
   margin: 0;
 }
 
 body, input {
-  font-family: 'Lucida Sans Unicode', Arial, Helvetica, sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 10.5pt;
 }
 
