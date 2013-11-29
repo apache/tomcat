@@ -849,7 +849,7 @@ public abstract class AuthenticatorBase extends ValveBase
     }
 
     @Override
-    public void logout(Request request) throws ServletException {
+    public void logout(Request request) {
         register(request, request.getResponse(), null,
                 null, null, null);
 
