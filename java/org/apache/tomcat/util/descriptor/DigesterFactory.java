@@ -116,10 +116,10 @@ public class DigesterFactory {
         digester.setValidating(xmlValidation);
         digester.setUseContextClassLoader(true);
         digester.setEntityResolver(SERVLET_API_RESOLVER);
-        if ( rule != null ) {
+        if (rule != null) {
             digester.addRuleSet(rule);
         }
 
-        return (digester);
+        return digester;
     }
 }
