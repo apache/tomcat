@@ -2690,7 +2690,8 @@ public class ContextConfig implements LifecycleListener {
                     fragment.setDistributable(true);
                 } else {
                     InputSource source = new InputSource(
-                            resourceURL.toString() + "!/" + FRAGMENT_LOCATION);
+                            "jar:" + resourceURL.toString() + "!/" +
+                            FRAGMENT_LOCATION);
                     source.setByteStream(is);
                     parseWebXml(source, fragment, true);
                 }
