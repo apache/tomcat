@@ -73,7 +73,7 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
                 fragment.setDistributable(true);
             } else {
                 InputSource source = new InputSource(
-                        resourceURL.toString() + "!/" + FRAGMENT_LOCATION);
+                        "jar:" + resourceURL.toString() + "!/" + FRAGMENT_LOCATION);
                 source.setByteStream(is);
                 if (!webXmlParser.parseWebXml(source, fragment, true)) {
                     ok = false;
