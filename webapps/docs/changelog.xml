@@ -282,6 +282,14 @@
         <code>org.apache.catalina.ha.session.DeltaManager</code> via JMX.
         (kfujino)
       </fix>
+      <fix>
+        When the ping timeouted, make sure that <code>memberDisappeared</code>
+        method is not called by specifying the members that has already been
+        removed. (kfujino)
+      </fix>
+      <add>
+        Add log message of session relocation when member disappeared. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

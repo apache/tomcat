@@ -278,14 +278,12 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         }
         //update our map of members, expire some if we didn't receive a ping back
         synchronized (mapMembers) {
-            Iterator<Map.Entry<Member, Long>> it = mapMembers.entrySet().iterator();
+            Member[] members = mapMembers.keySet().toArray(new Member[mapMembers.size()]);
             long now = System.currentTimeMillis();
-            while ( it.hasNext() ) {
-                Map.Entry<Member,Long> entry = it.next();
-                long access = entry.getValue().longValue();
+            for (Member member : members) {
+                long access = mapMembers.get(member);
                 if ( (now - access) > timeout ) {
-                    it.remove();
-                    memberDisappeared(entry.getKey());
+                    memberDisappeared(member);
                 }
             }
         }//synch
@@ -778,6 +776,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             }
         }
 
+        if (log.isInfoEnabled())
+            log.info("Member["+member+"] disappeared. Related map entries will be relocated to the new node.");
+        long start = System.currentTimeMillis();
         @SuppressWarnings("unchecked")
         Iterator<Map.Entry<?,?>> i = super.entrySet().iterator();
         while (i.hasNext()) {
@@ -826,6 +827,8 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             }
 
         } //while
+        long complete = System.currentTimeMillis() - start;
+        if (log.isInfoEnabled()) log.info("Relocation of map entries was complete in " + complete + " ms.");
     }
 
     public int getNextBackupIndex() {
