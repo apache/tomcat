@@ -767,7 +767,9 @@ public abstract class AbstractReplicatedMap<K,V>
                 return; //the member was not part of our map.
             }
         }
-
+        if (log.isInfoEnabled())
+            log.info("Member["+member+"] disappeared. Related map entries will be relocated to the new node.");
+        long start = System.currentTimeMillis();
         Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
         while (i.hasNext()) {
             Map.Entry<K,MapEntry<K,V>> e = i.next();
@@ -815,6 +817,8 @@ public abstract class AbstractReplicatedMap<K,V>
             }
 
         } //while
+        long complete = System.currentTimeMillis() - start;
+        if (log.isInfoEnabled()) log.info("Relocation of map entries was complete in " + complete + " ms.");
     }
 
     public int getNextBackupIndex() {
