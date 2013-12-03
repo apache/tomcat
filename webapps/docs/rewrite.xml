@@ -31,7 +31,7 @@
 
 <section name="Introduction">
 
-  <p>The rewrite valve implements URL rewrite functionnality in a way that is
+  <p>The rewrite valve implements URL rewrite functionality in a way that is
   very similar to mod_rewrite from Apache HTTP Server.</p>
 
 </section>
@@ -211,7 +211,7 @@
 
                   <dt><code>REQUEST_FILENAME</code></dt>
 
-                  <dd>The full local filesystem path to the file or
+                  <dd>The full local file system path to the file or
                   script matching the request.</dd>
 
                   <dt><code>HTTPS</code></dt>
@@ -342,7 +342,7 @@
         expanded <em>TestString</em> and the <em>CondPattern</em>.
         This flag is effective only for comparisons between
         <em>TestString</em> and <em>CondPattern</em>. It has no
-        effect on filesystem and subrequest checks.</li>
+        effect on file system and subrequest checks.</li>
 
         <li>
           '<strong><code>ornext|OR</code></strong>'
@@ -478,7 +478,7 @@ public interface RewriteMap {
 <p>
 Note: When using the NOT character to negate a pattern, you cannot include
 grouped wildcard parts in that pattern. This is because, when the
-pattern does NOT match (ie, the negation matches), there are no
+pattern does NOT match (i.e., the negation matches), there are no
 contents for the groups. Thus, if negated patterns are used, you
 cannot use <code>$N</code> in the substitution string!
 </p>
