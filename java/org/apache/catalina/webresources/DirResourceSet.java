@@ -92,9 +92,12 @@ public class DirResourceSet extends AbstractFileResourceSet {
         String webAppMount = getWebAppMount();
         WebResourceRoot root = getRoot();
         if (path.startsWith(webAppMount)) {
-            File f = file(path.substring(webAppMount.length()), true);
+            File f = file(path.substring(webAppMount.length()), false);
             if (f == null) {
                 return new EmptyResource(root, path);
+            }
+            if (!f.exists()) {
+                return new EmptyResource(root, path, f);
             }
             if (f.isDirectory() && path.charAt(path.length() - 1) != '/') {
                 path = path += '/';

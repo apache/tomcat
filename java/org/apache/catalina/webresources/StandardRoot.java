@@ -239,6 +239,7 @@ public class StandardRoot extends LifecycleMBeanBase
             boolean useClassLoaderResources) {
         WebResource result = null;
         WebResource virtual = null;
+        WebResource mainEmpty = null;
         for (ArrayList<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
                 if (useClassLoaderResources || !webResourceSet.getClassLoaderOnly()) {
@@ -246,8 +247,12 @@ public class StandardRoot extends LifecycleMBeanBase
                     if (result.exists()) {
                         return result;
                     }
-                    if (virtual == null && result.isVirtual()) {
-                        virtual = result;
+                    if (virtual == null) {
+                        if (result.isVirtual()) {
+                            virtual = result;
+                        } else if (main.equals(webResourceSet)) {
+                            mainEmpty = result;
+                        }
                     }
                 }
             }
@@ -259,7 +264,7 @@ public class StandardRoot extends LifecycleMBeanBase
         }
 
         // Default is empty resource in main resources
-        return new EmptyResource(this, path);
+        return mainEmpty;
     }
 
     @Override
