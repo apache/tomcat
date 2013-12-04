@@ -38,9 +38,8 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.ext.LexicalHandler;
+import org.xml.sax.ext.DefaultHandler2;
 import org.xml.sax.helpers.AttributesImpl;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Class implementing a parser for a JSP document, that is, a JSP page in XML
@@ -51,8 +50,8 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 
 class JspDocumentParser
-    extends DefaultHandler
-    implements LexicalHandler, TagConstants {
+    extends DefaultHandler2
+    implements TagConstants {
 
     private static final String LEXICAL_HANDLER_PROPERTY =
         "http://xml.org/sax/properties/lexical-handler";
@@ -238,6 +237,12 @@ class JspDocumentParser
                 processIncludeDirective(file, includeDir);
             }
         }
+    }
+
+    @Override
+    public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId)
+            throws SAXException, IOException {
+        return null;
     }
 
     /*
