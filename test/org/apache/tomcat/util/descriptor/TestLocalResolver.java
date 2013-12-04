@@ -36,17 +36,17 @@ public class TestLocalResolver {
 
     private LocalResolver resolver = new LocalResolver(publicIds, systemIds);
     private String WEB_22_LOCAL;
-    private String WEB_31_LOCAL;
-    private String WEBCOMMON_31_LOCAL;
+    private String WEB_30_LOCAL;
+    private String WEBCOMMON_30_LOCAL;
 
     @Before
     public void init() {
         WEB_22_LOCAL = urlFor("resources/web-app_2_2.dtd");
-        WEB_31_LOCAL = urlFor("resources/web-app_3_1.xsd");
-        WEBCOMMON_31_LOCAL = urlFor("resources/web-common_3_1.xsd");
+        WEB_30_LOCAL = urlFor("resources/web-app_3_0.xsd");
+        WEBCOMMON_30_LOCAL = urlFor("resources/web-common_3_0.xsd");
         publicIds.put(XmlIdentifiers.WEB_22_PUBLIC, WEB_22_LOCAL);
-        systemIds.put(XmlIdentifiers.WEB_31_XSD, WEB_31_LOCAL);
-        systemIds.put(WEBCOMMON_31_LOCAL, WEBCOMMON_31_LOCAL);
+        systemIds.put(XmlIdentifiers.WEB_30_XSD, WEB_30_LOCAL);
+        systemIds.put(WEBCOMMON_30_LOCAL, WEBCOMMON_30_LOCAL);
     }
 
     public String urlFor(String id) {
@@ -99,26 +99,26 @@ public class TestLocalResolver {
     @Test
     public void systemIdIsResolved() throws IOException, SAXException {
         InputSource source =
-                resolver.resolveEntity(null, XmlIdentifiers.WEB_31_XSD);
+                resolver.resolveEntity(null, XmlIdentifiers.WEB_30_XSD);
         Assert.assertEquals(null, source.getPublicId());
-        Assert.assertEquals(WEB_31_LOCAL, source.getSystemId());
+        Assert.assertEquals(WEB_30_LOCAL, source.getSystemId());
     }
 
     @Test
     public void relativeSystemIdIsResolvedAgainstBaseURI()
             throws IOException, SAXException {
         InputSource source = resolver.resolveEntity(
-                null, null, WEB_31_LOCAL, "web-common_3_1.xsd");
+                null, null, WEB_30_LOCAL, "web-common_3_1.xsd");
         Assert.assertEquals(null, source.getPublicId());
-        Assert.assertEquals(WEBCOMMON_31_LOCAL, source.getSystemId());
+        Assert.assertEquals(WEBCOMMON_30_LOCAL, source.getSystemId());
     }
 
     @Test
     public void absoluteSystemIdOverridesBaseURI()
             throws IOException, SAXException {
         InputSource source = resolver.resolveEntity(null, null,
-                "http://example.com/home.html", XmlIdentifiers.WEB_31_XSD);
+                "http://example.com/home.html", XmlIdentifiers.WEB_30_XSD);
         Assert.assertEquals(null, source.getPublicId());
-        Assert.assertEquals(WEB_31_LOCAL, source.getSystemId());
+        Assert.assertEquals(WEB_30_LOCAL, source.getSystemId());
     }
 }

@@ -72,14 +72,6 @@ public final class XmlIdentifiers {
     public static final String WEBSERVICES_13_XSD =
             "http://java.sun.com/xml/ns/javaee/javaee_web_services_1_3.xsd";
 
-    // from JavaEE 7
-    public static final String WEB_31_XSD =
-            "http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd";
-    public static final String WEB_FRAGMENT_31_XSD =
-            "http://xmlns.jcp.org/xml/ns/javaee/web-fragment_3_1.xsd";
-    public static final String WEBSERVICES_14_XSD =
-            "http://xmlns.jcp.org/xml/ns/javaee/javaee_web_services_1_4.xsd";
-
     private XmlIdentifiers() {
     }
 }

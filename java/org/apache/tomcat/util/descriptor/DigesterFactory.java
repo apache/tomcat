@@ -80,15 +80,6 @@ public class DigesterFactory {
         addSelf(systemIds, "javaee_web_services_1_3.xsd");
         addSelf(systemIds, "javaee_web_services_client_1_3.xsd");
 
-        // from JavaEE 7
-        systemIds.put(XmlIdentifiers.WEB_31_XSD, idFor("web-app_3_1.xsd"));
-        systemIds.put(XmlIdentifiers.WEB_FRAGMENT_31_XSD, idFor("web-fragment_3_1.xsd"));
-        addSelf(systemIds, "web-common_3_1.xsd");
-        addSelf(systemIds, "javaee_7.xsd");
-        addSelf(systemIds, "jsp_2_3.xsd");
-        addSelf(systemIds, "javaee_web_services_1_4.xsd");
-        addSelf(systemIds, "javaee_web_services_client_1_4.xsd");
-
         SERVLET_API_RESOLVER = new LocalResolver(publicIds, systemIds);
     }
 
