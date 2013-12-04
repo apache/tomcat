@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.descriptor;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,7 +90,11 @@ public class DigesterFactory {
     }
 
     private static String idFor(String url) {
-        return ServletContext.class.getResource("resources/" + url).toExternalForm();
+        URL id = ServletContext.class.getResource("resources/" + url);
+        if (id == null) {
+            id = ServletContext.class.getResource("jsp/resources/" + url);
+        }
+        return id.toExternalForm();
     }
 
 
