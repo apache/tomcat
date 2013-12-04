@@ -30,16 +30,6 @@ import org.apache.tomcat.util.digester.Digester;
 public class TestSchemaValidation {
 
     @Test
-    public void testWebapp() throws Exception {
-        Digester digester =
-                DigesterFactory.newDigester(true, true, new WebRuleSet(false));
-        digester.push(new WebXml());
-        WebXml desc = (WebXml) digester.parse(
-                new File("test/webapp/WEB-INF/web.xml"));
-        Assert.assertEquals("3.1", desc.getVersion());
-    }
-
-    @Test
     public void testWebapp_2_2() throws Exception {
         Digester digester =
                 DigesterFactory.newDigester(true, true, new WebRuleSet(false));
@@ -89,15 +79,5 @@ public class TestSchemaValidation {
         WebXml desc = (WebXml) digester.parse(
                 new File("test/webapp-3.0/WEB-INF/web.xml"));
         Assert.assertEquals("3.0", desc.getVersion());
-    }
-
-    @Test
-    public void testWebapp_3_1() throws Exception {
-        Digester digester =
-                DigesterFactory.newDigester(true, true, new WebRuleSet(false));
-        digester.push(new WebXml());
-        WebXml desc = (WebXml) digester.parse(
-                new File("test/webapp-3.1/WEB-INF/web.xml"));
-        Assert.assertEquals("3.1", desc.getVersion());
     }
 }
