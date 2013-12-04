@@ -277,7 +277,7 @@ public abstract class AbstractReplicatedMap<K,V>
             Member[] members = mapMembers.keySet().toArray(new Member[mapMembers.size()]);
             long now = System.currentTimeMillis();
             for (Member member : members) {
-                long access = mapMembers.get(member);
+                long access = mapMembers.get(member).longValue();
                 if ( (now - access) > timeout ) {
                     memberDisappeared(member);
                 }
