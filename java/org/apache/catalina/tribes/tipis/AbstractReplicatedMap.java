@@ -269,6 +269,7 @@ public abstract class AbstractReplicatedMap<K,V>
                 for (FaultyMember faultyMember : faultyMembers) {
                     memberDisappeared(faultyMember.getMember());
                 }
+                throw ce;
             }
         }
         //update our map of members, expire some if we didn't receive a ping back
