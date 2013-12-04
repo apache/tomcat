@@ -89,8 +89,8 @@ public interface Constants {
     "CONSTANT_Float", "CONSTANT_Long", "CONSTANT_Double",
     "CONSTANT_Class", "CONSTANT_String", "CONSTANT_Fieldref",
     "CONSTANT_Methodref", "CONSTANT_InterfaceMethodref",
-    "CONSTANT_NameAndType", "CONSTANT_MethodHandle",
-    "CONSTANT_MethodType", "CONSTANT_InvokeDynamic" };
+    "CONSTANT_NameAndType", "", "", "CONSTANT_MethodHandle",
+    "CONSTANT_MethodType", "", "CONSTANT_InvokeDynamic" };
 
 
   /** Attributes and their corresponding names.
