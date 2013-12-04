@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.webresources;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.cert.Certificate;
@@ -28,10 +30,16 @@ public class EmptyResource implements WebResource {
 
     private final WebResourceRoot root;
     private final String webAppPath;
+    private final File file;
 
     public EmptyResource(WebResourceRoot root, String webAppPath) {
+        this(root, webAppPath, null);
+    }
+
+    public EmptyResource(WebResourceRoot root, String webAppPath, File file) {
         this.root = root;
         this.webAppPath = webAppPath;
+        this.file = file;
     }
 
     @Override
@@ -86,7 +94,15 @@ public class EmptyResource implements WebResource {
 
     @Override
     public String getCanonicalPath() {
-        return null;
+        if (file == null) {
+            return null;
+        } else {
+            try {
+                return file.getCanonicalPath();
+            } catch (IOException e) {
+                return null;
+            }
+        }
     }
 
     @Override

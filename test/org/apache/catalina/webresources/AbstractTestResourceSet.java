@@ -19,6 +19,7 @@ package org.apache.catalina.webresources;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -373,6 +374,43 @@ public abstract class AbstractTestResourceSet {
                     getMount() + "/new-test", is, false));
         }
     }
+
+    // ------------------------------------------------------ getCanonicalPath()
+
+    @Test
+    public final void testGetCanonicalPathExists() {
+        WebResource exists =
+                resourceRoot.getResource(getMount() + "/d1/d1-f1.txt");
+        String existsCanonicalPath = exists.getCanonicalPath();
+
+        URL existsUrl = exists.getURL();
+        if ("file".equals(existsUrl.getProtocol())) {
+            // Should have a canonical path
+            Assert.assertNotNull(existsCanonicalPath);
+        } else {
+            Assert.assertNull(existsCanonicalPath);
+        }
+    }
+
+    @Test
+    public final void testGetCanonicalPathDoesNotExist() {
+        WebResource exists =
+                resourceRoot.getResource(getMount() + "/d1/d1-f1.txt");
+        WebResource doesNotExist =
+                resourceRoot.getResource(getMount() + "/d1/dummy.txt");
+        String doesNotExistCanonicalPath = doesNotExist.getCanonicalPath();
+
+        URL existsUrl = exists.getURL();
+        if ("file".equals(existsUrl.getProtocol())) {
+            // Should be possible to construct a canonical path for a resource
+            // that doesn't exist given that a resource that does exist in the
+            // same directory has a URL with the file protocol
+            Assert.assertNotNull(doesNotExistCanonicalPath);
+        } else {
+            Assert.assertNull(doesNotExistCanonicalPath);
+        }
+    }
+
 
     // ------------------------------------------------------------ constructors
 
