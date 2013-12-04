@@ -290,6 +290,10 @@
       <add>
         Add log message of session relocation when member disappeared. (kfujino)
       </add>
+      <fix>
+        If ping message fails, prevent wrong timeout detection of normal member
+        that is no failure members. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
