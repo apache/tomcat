@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,8 +50,8 @@ import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.ext.DefaultHandler2;
 import org.xml.sax.helpers.AttributesImpl;
-import org.xml.sax.helpers.DefaultHandler;
 
 
 /**
@@ -71,8 +73,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * the support of XML schema. You need Xerces 2.1/2.3 and up to make
  * this class working with XML schema</p>
  */
-
-public class Digester extends DefaultHandler {
+public class Digester extends DefaultHandler2 {
 
     
     // ---------------------------------------------------------- Static Fields    
@@ -904,6 +905,9 @@ public class Digester extends DefaultHandler {
             reader.setEntityResolver(entityResolver);           
         }
         
+        reader.setProperty(
+                "http://xml.org/sax/properties/lexical-handler", this);
+
         reader.setErrorHandler(this);
         return reader;
     }
@@ -1388,26 +1392,15 @@ public class Digester extends DefaultHandler {
         return entityResolver;
     }
 
-    /**
-     * Resolve the requested external entity.
-     *
-     * @param publicId The public identifier of the entity being referenced
-     * @param systemId The system identifier of the entity being referenced
-     *
-     * @exception SAXException if a parsing exception occurs
-     * 
-     */
     @Override
-    public InputSource resolveEntity(String publicId, String systemId)
-            throws SAXException {     
-                
+    public InputSource resolveEntity(String name, String publicId,
+            String baseURI, String systemId) throws SAXException, IOException {
+
         if (saxLog.isDebugEnabled()) {
-            saxLog.debug("resolveEntity('" + publicId + "', '" + systemId + "')");
+            saxLog.debug("resolveEntity('" + publicId + "', '" + systemId +
+                    "', '" + baseURI + "')");
         }
         
-        if (publicId != null)
-            this.publicId = publicId;
-                                       
         // Has this system identifier been registered?
         String entityURL = null;
         if (publicId != null) {
@@ -1425,9 +1418,24 @@ public class Digester extends DefaultHandler {
             } else {
                 // try to resolve using system ID
                 if (log.isDebugEnabled()) {
-                    log.debug(" Trying to resolve using system ID '" + systemId + "'");
+                    log.debug(" Trying to resolve using system ID '" +
+                            systemId + "'");
                 } 
                 entityURL = systemId;
+                // resolve systemId against baseURI if it is not absolute
+                if (baseURI != null) {
+                    try {
+                        URI uri = new URI(systemId);
+                        if (!uri.isAbsolute()) {
+                            entityURL = new URI(baseURI).resolve(uri).toString();
+                        }
+                    } catch (URISyntaxException e) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Invalid URI '" + baseURI + "' or '" +
+                                    systemId + "'");
+                        }
+                    }
+                }
             }
         }
         
@@ -1444,8 +1452,16 @@ public class Digester extends DefaultHandler {
     }
 
 
-    // ------------------------------------------------- ErrorHandler Methods
+    // ----------------------------------------------- LexicalHandler Methods
 
+    @Override
+    public void startDTD(String name, String publicId, String systemId)
+            throws SAXException {
+        setPublicId(publicId);
+    }
+
+
+    // ------------------------------------------------- ErrorHandler Methods
 
     /**
      * Forward notification of a parsing error to the application supplied

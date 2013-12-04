@@ -24,6 +24,9 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.tomcat.util.descriptor.XmlIdentifiers;
+
+
 /**
  * Test case for {@link WebXml}.
  */
@@ -43,38 +46,15 @@ public class TestWebXml {
         Assert.assertEquals(2, webxml.getMajorVersion());
         Assert.assertEquals(5, webxml.getMinorVersion());
 
-        // Reset
+        // unknown input should be ignored
         webxml.setVersion("0.0");
-        Assert.assertEquals(0, webxml.getMajorVersion());
-        Assert.assertEquals(0, webxml.getMinorVersion());
+        Assert.assertEquals(2, webxml.getMajorVersion());
+        Assert.assertEquals(5, webxml.getMinorVersion());
 
         // null input should be ignored
         webxml.setVersion(null);
-        Assert.assertEquals(0, webxml.getMajorVersion());
-        Assert.assertEquals(0, webxml.getMinorVersion());
-
-        // major only
-        webxml.setVersion("3");
-        Assert.assertEquals(3, webxml.getMajorVersion());
-        Assert.assertEquals(0, webxml.getMinorVersion());
-
-        // no minor digit
-        webxml.setVersion("0.0");   // reset
-        webxml.setVersion("3.");
-        Assert.assertEquals(3, webxml.getMajorVersion());
-        Assert.assertEquals(0, webxml.getMinorVersion());
-
-        // minor only
-        webxml.setVersion("0.0");   // reset
-        webxml.setVersion(".5");
-        Assert.assertEquals(0, webxml.getMajorVersion());
-        Assert.assertEquals(5, webxml.getMinorVersion());
-
-        // leading & training zeros
-        webxml.setVersion("0.0");   // reset
-        webxml.setVersion("002.500");
         Assert.assertEquals(2, webxml.getMajorVersion());
-        Assert.assertEquals(500, webxml.getMinorVersion());
+        Assert.assertEquals(5, webxml.getMinorVersion());
     }
 
     @Test
@@ -82,8 +62,7 @@ public class TestWebXml {
 
         WebXml webxml = new WebXml();
 
-        webxml.setPublicId(
-                org.apache.catalina.startup.Constants.WebDtdPublicId_22);
+        webxml.setPublicId(XmlIdentifiers.WEB_22_PUBLIC);
         Assert.assertEquals(2, webxml.getMajorVersion());
         Assert.assertEquals(2, webxml.getMinorVersion());
         Assert.assertEquals("2.2", webxml.getVersion());
@@ -94,8 +73,7 @@ public class TestWebXml {
 
         WebXml webxml = new WebXml();
 
-        webxml.setPublicId(
-                org.apache.catalina.startup.Constants.WebDtdPublicId_23);
+        webxml.setPublicId(XmlIdentifiers.WEB_23_PUBLIC);
         Assert.assertEquals(2, webxml.getMajorVersion());
         Assert.assertEquals(3, webxml.getMinorVersion());
         Assert.assertEquals("2.3", webxml.getVersion());
@@ -106,8 +84,7 @@ public class TestWebXml {
 
         WebXml webxml = new WebXml();
 
-        webxml.setPublicId(
-                org.apache.catalina.startup.Constants.WebSchemaPublicId_24);
+        webxml.setVersion("2.4");
         Assert.assertEquals(2, webxml.getMajorVersion());
         Assert.assertEquals(4, webxml.getMinorVersion());
         Assert.assertEquals("2.4", webxml.getVersion());
@@ -118,8 +95,7 @@ public class TestWebXml {
 
         WebXml webxml = new WebXml();
 
-        webxml.setPublicId(
-                org.apache.catalina.startup.Constants.WebSchemaPublicId_25);
+        webxml.setVersion("2.5");
         Assert.assertEquals(2, webxml.getMajorVersion());
         Assert.assertEquals(5, webxml.getMinorVersion());
         Assert.assertEquals("2.5", webxml.getVersion());
@@ -130,8 +106,7 @@ public class TestWebXml {
 
         WebXml webxml = new WebXml();
 
-        webxml.setPublicId(
-                org.apache.catalina.startup.Constants.WebSchemaPublicId_30);
+        webxml.setVersion("3.0");
         Assert.assertEquals(3, webxml.getMajorVersion());
         Assert.assertEquals(0, webxml.getMinorVersion());
         Assert.assertEquals("3.0", webxml.getVersion());

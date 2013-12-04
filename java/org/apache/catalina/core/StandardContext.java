@@ -126,6 +126,7 @@ import org.apache.naming.resources.WARDirContext;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.descriptor.XmlIdentifiers;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 
@@ -5835,16 +5836,9 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public boolean isServlet22() {
-
-        if (this.publicId == null)
-            return (false);
-        if (this.publicId.equals
-            (org.apache.catalina.startup.Constants.WebDtdPublicId_22))
-            return (true);
-        else
-            return (false);
-
+        return XmlIdentifiers.WEB_22_PUBLIC.equals(publicId);
     }
+
 
     @Override
     public Set<String> addServletSecurity(
