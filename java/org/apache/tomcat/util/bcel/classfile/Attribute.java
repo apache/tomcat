@@ -198,18 +198,18 @@ public abstract class Attribute implements Cloneable, Serializable
      * @return shallow copy of this attribute
      */
     @Override
-    public Object clone()
+    public Attribute clone()
     {
-        Object o = null;
+        Attribute attr = null;
         try
         {
-            o = super.clone();
+            attr = (Attribute) super.clone();
         }
         catch (CloneNotSupportedException e)
         {
-            e.printStackTrace(); // Never occurs
+            throw new Error("Clone Not Supported"); // never happens
         }
-        return o;
+        return attr;
     }
 
     /**

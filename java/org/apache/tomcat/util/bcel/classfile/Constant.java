@@ -86,8 +86,12 @@ public abstract class Constant implements Cloneable, Serializable {
 
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public Constant clone() {
+        try {
+            return (Constant) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new Error("Clone Not Supported"); // never happens
+        }
     }
 
 
