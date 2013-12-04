@@ -108,7 +108,7 @@ public class TestLocalResolver {
     public void relativeSystemIdIsResolvedAgainstBaseURI()
             throws IOException, SAXException {
         InputSource source = resolver.resolveEntity(
-                null, null, WEB_30_LOCAL, "web-common_3_1.xsd");
+                null, null, WEB_30_LOCAL, "web-common_3_0.xsd");
         Assert.assertEquals(null, source.getPublicId());
         Assert.assertEquals(WEBCOMMON_30_LOCAL, source.getSystemId());
     }
