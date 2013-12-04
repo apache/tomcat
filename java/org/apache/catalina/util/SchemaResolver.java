@@ -30,7 +30,9 @@ import org.xml.sax.SAXException;
  * to a local file stored in the servlet-api.jar and jsp-api.jar.
  *
  * @author Jean-Francois Arcand
+ * @deprecated Use {@link org.apache.tomcat.util.descriptor.LocalResolver}
  */
+@Deprecated
 public class SchemaResolver implements EntityResolver {
 
     /**

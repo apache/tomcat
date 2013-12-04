@@ -30,7 +30,10 @@ import org.apache.tomcat.util.digester.RuleSet;
  * Wrapper class around the Digester that hide Digester's initialization details
  *
  * @author Jean-Francois Arcand
+ * 
+ * @deprecated Use {@link org.apache.tomcat.util.descriptor.DigesterFactory}
  */
+@Deprecated
 public class DigesterFactory {
     /**
      * The log.
