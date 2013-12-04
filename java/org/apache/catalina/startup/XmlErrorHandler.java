@@ -25,6 +25,10 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+/**
+ * @deprecated Use {@link import org.apache.tomcat.util.descriptor.XmlErrorHandler}
+ */
+@Deprecated
 public class XmlErrorHandler implements ErrorHandler {
 
     private static final StringManager sm =
