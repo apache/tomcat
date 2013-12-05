@@ -116,6 +116,12 @@ public class TldCache {
             URL url = servletContext.getResource(tldResourcePath.getWebappPath());
             URLConnection conn = url.openConnection();
             result[0] = conn.getLastModified();
+            if ("file".equals(url.getProtocol())) {
+                // Reading the last modified time opens an input stream so we
+                // need to make sure it is closed again otherwise the TLD file
+                // will be locked until GC runs.
+                conn.getInputStream().close();
+            }
             Jar jar = tldResourcePath.getJar();
             if (jar != null) {
                 result[1] = jar.getLastModified(tldResourcePath.getEntryName());
