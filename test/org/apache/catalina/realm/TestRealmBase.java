@@ -17,6 +17,7 @@
 package org.apache.catalina.realm;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +47,58 @@ public class TestRealmBase {
     private static final String ROLE2 = "role2";
     private static final String ROLE3 = "role3";
     private static final String ROLE99 = "role99";
+
+    // All digested passwords are the digested form of "password"
+    private static final String PWD_MD5 = "5f4dcc3b5aa765d61d8327deb882cf99";
+    private static final String PWD_SHA = "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8";
+    private static final String PWD_MD5_PREFIX =
+            "{MD5}X03MO1qnZdYdgyfeuILPmQ==";
+    private static final String PWD_SHA_PREFIX =
+            "{SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=";
+    // Salt added to "password" is "salttoprotectpassword"
+    private static final String PWD_SSHA_PREFIX =
+            "{SSHA}oFLhvfQVqFykEWu8v1pPE6nN0QRzYWx0dG9wcm90ZWN0cGFzc3dvcmQ=";
+
+    @Test
+    public void testDigestMD5() throws Exception {
+        doTestDigestDigestPasswords(PWD, "MD5", PWD_MD5);
+    }
+
+    @Test
+    public void testDigestSHA() throws Exception {
+        doTestDigestDigestPasswords(PWD, "SHA", PWD_SHA);
+    }
+
+    @Test
+    public void testDigestMD5Prefix() throws Exception {
+        doTestDigestDigestPasswords(PWD, "MD5", PWD_MD5_PREFIX);
+    }
+
+    @Test
+    public void testDigestSHAPrefix() throws Exception {
+        doTestDigestDigestPasswords(PWD, "SHA", PWD_SHA_PREFIX);
+    }
+
+    @Test
+    public void testDigestSSHAPrefix() throws Exception {
+        doTestDigestDigestPasswords(PWD, "SHA", PWD_SSHA_PREFIX);
+    }
+
+    private void doTestDigestDigestPasswords(String password,
+            String digest, String digestedPassword) throws Exception {
+        Context context = new TesterContext();
+        TesterMapRealm realm = new TesterMapRealm();
+        realm.setContainer(context);
+        realm.setDigest(digest);
+        realm.start();
+
+        realm.addUser(USER1, digestedPassword);
+
+        Principal p = realm.authenticate(USER1, password);
+
+        Assert.assertNotNull(p);
+        Assert.assertEquals(USER1, p.getName());
+    }
 
     @Test
     public void testUserWithSingleRole() throws IOException {
