@@ -19,11 +19,9 @@ package org.apache.catalina.realm;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -53,7 +51,6 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
 import org.apache.catalina.LifecycleException;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.ietf.jgss.GSSCredential;
 
 /**
@@ -1547,64 +1544,16 @@ public class JNDIRealm extends RealmBase {
                                          String credentials)
         throws NamingException {
 
-        if (info == null || credentials == null)
-            return (false);
-
-        String password = info.getPassword();
-        if (password == null)
-            return (false);
-
         // Validate the credentials specified by the user
         if (containerLog.isTraceEnabled())
             containerLog.trace("  validating credentials");
 
-        boolean validated = false;
-        if (hasMessageDigest()) {
-            // Some directories prefix the password with the hash type
-            // The string is in a format compatible with Base64.encode not
-            // the Hex encoding of the parent class.
-            if (password.startsWith("{MD5}") || password.startsWith("{SHA}")) {
-                /* sync since super.digest() does this same thing */
-                synchronized (this) {
-                    password = password.substring(5);
-                    md.reset();
-                    md.update(credentials.getBytes(StandardCharsets.ISO_8859_1));
-                    byte[] encoded = Base64.encodeBase64(md.digest());
-                    String digestedPassword =
-                            new String(encoded, StandardCharsets.ISO_8859_1);
-                    validated = password.equals(digestedPassword);
-                }
-            } else if (password.startsWith("{SSHA}")) {
-                // Bugzilla 32938
-                /* sync since super.digest() does this same thing */
-                synchronized (this) {
-                    password = password.substring(6);
+        if (info == null || credentials == null)
+            return (false);
 
-                    md.reset();
-                    md.update(credentials.getBytes(StandardCharsets.ISO_8859_1));
+        String password = info.getPassword();
 
-                    // Decode stored password.
-                    byte[] decoded = Base64.decodeBase64(password);
-
-                    // Split decoded password into hash and salt.
-                    final int saltpos = 20;
-                    byte[] hash = new byte[saltpos];
-                    System.arraycopy(decoded, 0, hash, 0, saltpos);
-
-                    md.update(decoded, saltpos, decoded.length - saltpos);
-
-                    byte[] dp = md.digest();
-
-                    validated = Arrays.equals(dp, hash);
-                } // End synchronized(this) block
-            } else {
-                // Hex hashes should be compared case-insensitive
-                validated = (digest(credentials).equalsIgnoreCase(password));
-            }
-        } else
-            validated = (digest(credentials).equals(password));
-        return (validated);
-
+        return compareCredentials(credentials, password);
     }
 
 

@@ -52,6 +52,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.descriptor.web.ApplicationListener;
@@ -66,6 +67,8 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
  * Minimal implementation for use in unit tests.
  */
 public class TesterContext implements Context {
+
+    private static final Log log = LogFactory.getLog(TesterContext.class);
 
     private List<String> securityRoles = new ArrayList<>();
     @Override
@@ -108,7 +111,7 @@ public class TesterContext implements Context {
 
     @Override
     public Log getLogger() {
-        return null;
+        return log;
     }
 
     @Override
