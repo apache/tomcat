@@ -389,13 +389,7 @@ public class JDBCRealm
         String dbCredentials = getPassword(username);
 
         // Validate the user's credentials
-        boolean validated = false;
-        if (hasMessageDigest()) {
-            // Hex hashes should be compared case-insensitive
-            validated = (digest(credentials).equalsIgnoreCase(dbCredentials));
-        } else {
-            validated = (digest(credentials).equals(dbCredentials));
-        }
+        boolean validated = compareCredentials(credentials, dbCredentials);
 
         if (validated) {
             if (containerLog.isTraceEnabled())
