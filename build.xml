@@ -324,7 +324,7 @@
   </patternset>
 
   <patternset id="files.tomcat-util">
-  	<include name="org/apache/tomcat/util/descriptor/**" />
+    <include name="org/apache/tomcat/util/descriptor/**" />
     <include name="org/apache/tomcat/util/file/**" />
     <include name="org/apache/tomcat/util/res/**" />
     <include name="org/apache/tomcat/util/scan/**" />
