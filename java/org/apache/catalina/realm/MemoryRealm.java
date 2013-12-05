@@ -115,17 +115,7 @@ public class MemoryRealm  extends RealmBase {
 
         GenericPrincipal principal = principals.get(username);
 
-        boolean validated = false;
-        if (principal != null && credentials != null) {
-            if (hasMessageDigest()) {
-                // Hex hashes should be compared case-insensitive
-                validated = (digest(credentials)
-                             .equalsIgnoreCase(principal.getPassword()));
-            } else {
-                validated =
-                    (digest(credentials).equals(principal.getPassword()));
-            }
-        }
+        boolean validated = compareCredentials(credentials, principal.getPassword());
 
         if (validated) {
             if (log.isDebugEnabled())
