@@ -19,6 +19,8 @@ package org.apache.catalina.core;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -58,6 +60,7 @@ import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.http.mapper.Mapper;
@@ -67,9 +70,51 @@ import org.apache.tomcat.util.http.mapper.Mapper;
  */
 public class TesterContext implements Context {
 
+    private static final Log log = LogFactory.getLog(TesterContext.class);
+
+    private List<String> securityRoles = new ArrayList<String>();
+    @Override
+    public void addSecurityRole(String role) {
+        securityRoles.add(role);
+    }
+
+    @Override
+    public boolean findSecurityRole(String role) {
+        return securityRoles.contains(role);
+    }
+
+    @Override
+    public String[] findSecurityRoles() {
+        return securityRoles.toArray(new String[securityRoles.size()]);
+    }
+
+    @Override
+    public void removeSecurityRole(String role) {
+        securityRoles.remove(role);
+    }
+
+    private List<SecurityConstraint> securityConstraints =
+            new ArrayList<SecurityConstraint>();
+    @Override
+    public void addConstraint(SecurityConstraint constraint) {
+        securityConstraints.add(constraint);
+    }
+
+    @Override
+    public SecurityConstraint[] findConstraints() {
+        return securityConstraints.toArray(
+                new SecurityConstraint[securityConstraints.size()]);
+    }
+
+    @Override
+    public void removeConstraint(SecurityConstraint constraint) {
+        securityConstraints.remove(constraint);
+    }
+    
+    
     @Override
     public Log getLogger() {
-        return null;
+        return log;
     }
 
     @Override
@@ -641,11 +686,6 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public void addConstraint(SecurityConstraint constraint) {
-        // NO-OP
-    }
-
-    @Override
     public void addErrorPage(ErrorPage errorPage) {
         // NO-OP
     }
@@ -687,11 +727,6 @@ public class TesterContext implements Context {
 
     @Override
     public void addRoleMapping(String role, String link) {
-        // NO-OP
-    }
-
-    @Override
-    public void addSecurityRole(String role) {
         // NO-OP
     }
 
@@ -738,11 +773,6 @@ public class TesterContext implements Context {
 
     @Override
     public ApplicationParameter[] findApplicationParameters() {
-        return null;
-    }
-
-    @Override
-    public SecurityConstraint[] findConstraints() {
         return null;
     }
 
@@ -803,16 +833,6 @@ public class TesterContext implements Context {
 
     @Override
     public String findRoleMapping(String role) {
-        return null;
-    }
-
-    @Override
-    public boolean findSecurityRole(String role) {
-        return false;
-    }
-
-    @Override
-    public String[] findSecurityRoles() {
         return null;
     }
 
@@ -887,11 +907,6 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public void removeConstraint(SecurityConstraint constraint) {
-        // NO-OP
-    }
-
-    @Override
     public void removeErrorPage(ErrorPage errorPage) {
         // NO-OP
     }
@@ -923,11 +938,6 @@ public class TesterContext implements Context {
 
     @Override
     public void removeRoleMapping(String role) {
-        // NO-OP
-    }
-
-    @Override
-    public void removeSecurityRole(String role) {
         // NO-OP
     }
 

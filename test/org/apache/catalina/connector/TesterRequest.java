@@ -16,7 +16,7 @@
  */
 package org.apache.catalina.connector;
 
-public class TesterMockRequest extends Request {
+public class TesterRequest extends Request {
     @Override
     public String getScheme() {
         return "http";
@@ -35,5 +35,14 @@ public class TesterMockRequest extends Request {
     @Override
     public String getDecodedRequestURI() {
         return "/level1/level2/foo.html";
+    }
+
+    private String method;
+    public void setMethod(String method) {
+        this.method = method;
+    }
+    @Override
+    public String getMethod() {
+        return method;
     }
 }

@@ -193,6 +193,10 @@
         <bug>55804</bug>: If the GSSCredential for the cached Principal expires
         when using SPNEGO authentication, force a re-authentication. (markt)
       </fix>
+      <fix>
+        <bug>55839</bug>: Extend support for digest prefixes {MD5}, {SHA} and
+        {SSHA} to all Realms rather than just the JNDIRealm. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

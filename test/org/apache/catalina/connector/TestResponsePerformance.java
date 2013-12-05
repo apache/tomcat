@@ -24,7 +24,7 @@ import org.junit.Test;
 public class TestResponsePerformance {
     @Test
     public void testToAbsolutePerformance() throws Exception {
-        Request req = new TesterMockRequest();
+        Request req = new TesterRequest();
         Response resp = new Response();
         resp.setRequest(req);
 

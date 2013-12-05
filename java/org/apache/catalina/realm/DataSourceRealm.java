@@ -319,12 +319,7 @@ public class DataSourceRealm
         String dbCredentials = getPassword(dbConnection, username);
 
         // Validate the user's credentials
-        boolean validated = false;
-        if (hasMessageDigest()) {
-            // Hex hashes should be compared case-insensitive
-            validated = (digest(credentials).equalsIgnoreCase(dbCredentials));
-        } else
-            validated = (digest(credentials).equals(dbCredentials));
+        boolean validated = compareCredentials(credentials, dbCredentials);
 
         if (validated) {
             if (containerLog.isTraceEnabled())
@@ -342,8 +337,7 @@ public class DataSourceRealm
         ArrayList<String> list = getRoles(dbConnection, username);
 
         // Create and return a suitable Principal for this user
-        return (new GenericPrincipal(username, credentials, list));
-
+        return new GenericPrincipal(username, credentials, list);
     }
 
 

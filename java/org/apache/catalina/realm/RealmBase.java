@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.realm;
-
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -29,6 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletResponse;
@@ -55,6 +53,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.HexUtils;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.res.StringManager;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
@@ -362,15 +361,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         String serverCredentials = getPassword(username);
 
-        boolean validated ;
-        if ( serverCredentials == null ) {
-            validated = false;
-        } else if(hasMessageDigest()) {
-            validated = serverCredentials.equalsIgnoreCase(digest(credentials));
-        } else {
-            validated = serverCredentials.equals(credentials);
-        }
-        if(! validated ) {
+        boolean validated = compareCredentials(credentials, serverCredentials);
+        if (!validated) {
             if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("realmBase.authenticateFailure",
                                                 username));
@@ -529,6 +521,72 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     }
 
     
+    protected boolean compareCredentials(String userCredentials,
+            String serverCredentials) {
+
+        if (serverCredentials == null) {
+            return false;
+        }
+
+        if (hasMessageDigest()) {
+            // Some directories and databases prefix the password with the hash
+            // type. The string is in a format compatible with Base64.encode not
+            // the normal hex encoding of the digest
+            if (serverCredentials.startsWith("{MD5}") ||
+                    serverCredentials.startsWith("{SHA}")) {
+                // Server is storing digested passwords with a prefix indicating
+                // the digest type
+                String serverDigest = serverCredentials.substring(5);
+                String userDigest;
+                synchronized (this) {
+                    md.reset();
+                    md.update(userCredentials.getBytes(B2CConverter.ISO_8859_1));
+                    userDigest = Base64.encodeBase64String(md.digest());
+                }
+                return userDigest.equals(serverDigest);
+
+            } else if (serverCredentials.startsWith("{SSHA}")) {
+                // Server is storing digested passwords with a prefix indicating
+                // the digest type and the salt used when creating that digest
+
+                String serverDigestPlusSalt = serverCredentials.substring(6);
+
+                // Need to convert the salt to bytes to apply it to the user's
+                // digested password.
+                byte[] serverDigestPlusSaltBytes =
+                        Base64.decodeBase64(serverDigestPlusSalt);
+                final int saltPos = 20;
+                byte[] serverDigestBytes = new byte[saltPos];
+                System.arraycopy(serverDigestPlusSaltBytes, 0,
+                        serverDigestBytes, 0, saltPos);
+
+                // Generate the digested form of the user provided password
+                // using the salt
+                byte[] userDigestBytes;
+                synchronized (this) {
+                    md.reset();
+                    // User provided password
+                    md.update(userCredentials.getBytes(B2CConverter.ISO_8859_1));
+                    // Add the salt
+                    md.update(serverDigestPlusSaltBytes, saltPos,
+                            serverDigestPlusSaltBytes.length - saltPos);
+                    userDigestBytes = md.digest();
+                }
+
+                return Arrays.equals(userDigestBytes, serverDigestBytes);
+
+            } else {
+                // Hex hashes should be compared case-insensitively
+                String userDigest = digest(userCredentials);
+                return serverCredentials.equalsIgnoreCase(userDigest);
+            }
+        } else {
+            // No digests, compare directly
+            return serverCredentials.equals(userCredentials);
+        }
+    }
+
+
     /**
      * Execute a periodic task, such as reloading, etc. This method will be
      * invoked inside the classloading context of this container. Unexpected
