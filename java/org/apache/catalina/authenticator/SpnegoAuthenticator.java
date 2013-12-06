@@ -231,7 +231,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                 };
             gssContext = manager.createContext(Subject.doAs(lc.getSubject(), action));
 
-            outToken = gssContext.acceptSecContext(decoded, 0, decoded.length);
+            outToken = Subject.doAs(lc.getSubject(), new AcceptAction(gssContext, decoded));
 
             if (outToken == null) {
                 if (log.isDebugEnabled()) {
@@ -297,5 +297,27 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         return false;
+    }
+
+
+    /**
+     * This class gets a gss credential via a privileged action.
+     */
+    private static class AcceptAction implements PrivilegedExceptionAction<byte[]> {
+
+        GSSContext gssContext;
+
+        byte[] decoded;
+
+        AcceptAction(GSSContext context, byte[] decodedToken) {
+            this.gssContext = context;
+            this.decoded = decodedToken;
+        }
+
+        @Override
+        public byte[] run() throws GSSException {
+            return gssContext.acceptSecContext(decoded,
+                    0, decoded.length);
+        }
     }
 }

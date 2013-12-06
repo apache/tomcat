@@ -202,6 +202,10 @@
         is configured that the full buffer is used when a Servlet outputs via a
         Writer. (markt)
       </fix>
+      <fix>
+        <bug>55851</bug>: Further fixes to enable SPNEGO authentication to work
+        with IBM JDKs. Based on a patch by Arunav Sanyal. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
