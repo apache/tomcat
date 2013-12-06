@@ -481,11 +481,11 @@ public final class ByteChunk implements Cloneable, Serializable {
         end=start;
     }
 
-    /** Make space for len chars. If len is small, allocate
-     *        a reserve space too. Never grow bigger than limit.
+    /**
+     * Make space for len chars. If len is small, allocate a reserve space too.
+     * Never grow bigger than limit.
      */
-    private void makeSpace(int count)
-    {
+    public void makeSpace(int count) {
         byte[] tmp = null;
 
         int newSize;

@@ -484,7 +484,12 @@ public class OutputBuffer extends Writer
                 break;
             }
             if (outputCharChunk.getLength() > 0) {
-                bb.flushBuffer();
+                if (bb.getBuffer().length == bb.getEnd() && bb.getLength() < bb.getLimit()) {
+                    // Need to expand output buffer
+                    bb.makeSpace(outputCharChunk.getLength());
+                } else {
+                    bb.flushBuffer();
+                }
             }
         }
 

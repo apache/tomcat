@@ -197,6 +197,11 @@
         <bug>55839</bug>: Extend support for digest prefixes {MD5}, {SHA} and
         {SSHA} to all Realms rather than just the JNDIRealm. (markt)
       </fix>
+      <fix>
+        <bug>55842</bug>: Ensure that if a larger than default response buffer
+        is configured that the full buffer is used when a Servlet outputs via a
+        Writer. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
