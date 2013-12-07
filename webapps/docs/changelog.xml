@@ -370,6 +370,9 @@
         Exclude JSR356 WebSocket classes from build path, as they cannot be
         compiled with Java 6. (kkolinko)
       </update>
+      <update>
+        Update the Eclipse compiler to 4.3.1. (kkolinko/markt)
+      </update>
     </changelog>
   </subsection>
 </section>
