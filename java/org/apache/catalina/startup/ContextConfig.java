@@ -1258,7 +1258,7 @@ public class ContextConfig implements LifecycleListener {
         // Step 1. Identify all the JARs packaged with the application
         // If the JARs have a web-fragment.xml it will be parsed at this
         // point.
-        Map<String,WebXml> fragments = processJarsForWebFragments();
+        Map<String,WebXml> fragments = processJarsForWebFragments(webXml);
 
         // Step 2. Order the fragments.
         Set<WebXml> orderedFragments = null;
@@ -1939,10 +1939,21 @@ public class ContextConfig implements LifecycleListener {
      *
      * @return A map of JAR name to processed web fragment (if any)
      */
-    protected Map<String,WebXml> processJarsForWebFragments() {
+    protected Map<String,WebXml> processJarsForWebFragments(WebXml application) {
 
         JarScanner jarScanner = context.getJarScanner();
-        FragmentJarScannerCallback callback = new FragmentJarScannerCallback();
+
+        boolean parseRequired = true;
+        Set<String> absoluteOrder = application.getAbsoluteOrdering();
+        if (absoluteOrder != null && absoluteOrder.isEmpty() &&
+                !context.getXmlValidation()) {
+            // Skip parsing when there is an empty absolute ordering and
+            // validation is not enabled
+            parseRequired = false;
+        }
+
+        FragmentJarScannerCallback callback =
+                new FragmentJarScannerCallback(parseRequired);
 
         jarScanner.scan(context.getServletContext(),
                 context.getLoader().getClassLoader(), callback,
@@ -2672,7 +2683,12 @@ public class ContextConfig implements LifecycleListener {
         private static final String FRAGMENT_LOCATION =
             "META-INF/web-fragment.xml";
         private Map<String,WebXml> fragments = new HashMap<String,WebXml>();
+        private final boolean parseRequired;
 
+        public FragmentJarScannerCallback(boolean parseRequired) {
+            this.parseRequired = parseRequired;
+        }
+        
         @Override
         public void scan(JarURLConnection jarConn) throws IOException {
 
@@ -2684,11 +2700,13 @@ public class ContextConfig implements LifecycleListener {
 
             try {
                 jar = JarFactory.newInstance(url);
-                is = jar.getInputStream(FRAGMENT_LOCATION);
+                if (parseRequired || context.getXmlValidation()) {
+                    is = jar.getInputStream(FRAGMENT_LOCATION);
+                }
 
                 if (is == null) {
-                    // If there is no web.xml, normal JAR no impact on
-                    // distributable
+                    // If there is no web-fragment.xml to process there is no
+                    // impact on distributable
                     fragment.setDistributable(true);
                 } else {
                     InputSource source = new InputSource(

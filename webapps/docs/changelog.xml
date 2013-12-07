@@ -198,6 +198,11 @@
         <bug>55804</bug>: If the GSSCredential for the cached Principal expires
         when using SPNEGO authentication, force a re-authentication. (markt)
       </fix>
+      <add>
+        <bug>55811</bug>: If the main web.xml contains an empty
+        absolute-ordering element and validation of web.xml is not enabled, skip
+        parsing any web-fragment.xml files as the result is never used. (markt)
+      </add>
       <fix>
         <bug>55839</bug>: Extend support for digest prefixes {MD5}, {SHA} and
         {SSHA} to all Realms rather than just the JNDIRealm. (markt)
