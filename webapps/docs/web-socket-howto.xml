@@ -125,11 +125,16 @@
    of the provided <code>javax.websocket.ClientEndpointConfig</code>. The
    following user properties are supported:</p>
    <ul>
+     <li><code>org.apache.tomcat.websocket.SSL_CONTEXT</code></li>
      <li><code>org.apache.tomcat.websocket.SSL_PROTOCOLS</code></li>
      <li><code>org.apache.tomcat.websocket.SSL_TRUSTSTORE</code></li>
      <li><code>org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD</code></li>
    </ul>
    <p>The default truststore password is <code>changeit</code>.</p>
+   <p>If the <code>org.apache.tomcat.websocket.SSL_CONTEXT</code> property is
+      set then the <code>org.apache.tomcat.websocket.SSL_TRUSTSTORE</code> and
+      <code>org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD</code> properties
+      will be ignored.</p>
 </section>
 
 <section name="Deprecated proprietary API">

@@ -87,6 +87,13 @@ public class WsWebSocketContainer
     public static final String SSL_TRUSTSTORE_PWD_PROPERTY =
             "org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD";
     public static final String SSL_TRUSTSTORE_PWD_DEFAULT = "changeit";
+    /**
+     * Property name to set to configure used SSLContext. The value should be an
+     * instance of SSLContext. If this property is present, the SSL_TRUSTSTORE*
+     * properties are ignored.
+     */
+    public static final String SSL_CONTEXT_PROPERTY =
+            "org.apache.tomcat.websocket.SSL_CONTEXT";
 
     /**
      * Property name to set to configure the timeout (in milliseconds) when
@@ -671,42 +678,48 @@ public class WsWebSocketContainer
             throws DeploymentException {
 
         try {
-            // Create the SSL Context
-            SSLContext sslContext = SSLContext.getInstance("TLS");
+            // See if a custom SSLContext has been provided
+            SSLContext sslContext =
+                    (SSLContext) userProperties.get(SSL_CONTEXT_PROPERTY);
 
-            // Trust store
-            String sslTrustStoreValue =
-                    (String) userProperties.get(SSL_TRUSTSTORE_PROPERTY);
-            if (sslTrustStoreValue != null) {
-                String sslTrustStorePwdValue = (String) userProperties.get(
-                        SSL_TRUSTSTORE_PWD_PROPERTY);
-                if (sslTrustStorePwdValue == null) {
-                    sslTrustStorePwdValue = SSL_TRUSTSTORE_PWD_DEFAULT;
-                }
+            if (sslContext == null) {
+                // Create the SSL Context
+                sslContext = SSLContext.getInstance("TLS");
 
-                File keyStoreFile = new File(sslTrustStoreValue);
-                KeyStore ks = KeyStore.getInstance("JKS");
-                InputStream is = null;
-                try {
-                    is = new FileInputStream(keyStoreFile);
-                    ks.load(is, sslTrustStorePwdValue.toCharArray());
-                } finally {
-                    if (is != null) {
-                        try {
-                            is.close();
-                        } catch (IOException ioe) {
-                           // Ignore
+                // Trust store
+                String sslTrustStoreValue =
+                        (String) userProperties.get(SSL_TRUSTSTORE_PROPERTY);
+                if (sslTrustStoreValue != null) {
+                    String sslTrustStorePwdValue = (String) userProperties.get(
+                            SSL_TRUSTSTORE_PWD_PROPERTY);
+                    if (sslTrustStorePwdValue == null) {
+                        sslTrustStorePwdValue = SSL_TRUSTSTORE_PWD_DEFAULT;
+                    }
+                    
+                    File keyStoreFile = new File(sslTrustStoreValue);
+                    KeyStore ks = KeyStore.getInstance("JKS");
+                    InputStream is = null;
+                    try {
+                        is = new FileInputStream(keyStoreFile);
+                        ks.load(is, sslTrustStorePwdValue.toCharArray());
+                    } finally {
+                        if (is != null) {
+                            try {
+                                is.close();
+                            } catch (IOException ioe) {
+                               // Ignore
+                            }
                         }
                     }
+
+                    TrustManagerFactory tmf = TrustManagerFactory.getInstance(
+                            TrustManagerFactory.getDefaultAlgorithm());
+                    tmf.init(ks);
+
+                    sslContext.init(null, tmf.getTrustManagers(), null);
+                } else {
+                    sslContext.init(null, null, null);
                 }
-
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(
-                        TrustManagerFactory.getDefaultAlgorithm());
-                tmf.init(ks);
-
-                sslContext.init(null, tmf.getTrustManagers(), null);
-            } else {
-                sslContext.init(null, null, null);
             }
 
             SSLEngine engine = sslContext.createSSLEngine();

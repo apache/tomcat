@@ -189,6 +189,11 @@
         Prevent an NPE in the WebSocket <code>ServerContainer</code> when
         processing an HTTP session end event. (markt)
       </fix>
+      <add>
+        <bug>55801</bug>: Add the ability to set a custom
+        <code>SSLContext</code> to use for client wss connections. Patch
+        provided by Maciej Lypik. (markt)
+      </add>
       <fix>
         <bug>55804</bug>: If the GSSCredential for the cached Principal expires
         when using SPNEGO authentication, force a re-authentication. (markt)
