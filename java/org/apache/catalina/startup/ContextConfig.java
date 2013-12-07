@@ -1115,7 +1115,7 @@ public class ContextConfig implements LifecycleListener {
         // provided by the container. If any of the application JARs have a
         // web-fragment.xml it will be parsed at this point. web-fragment.xml
         // files are ignored for container provided JARs.
-        Map<String,WebXml> fragments = processJarsForWebFragments();
+        Map<String,WebXml> fragments = processJarsForWebFragments(webXml);
 
         // Step 2. Order the fragments.
         Set<WebXml> orderedFragments = null;
@@ -1840,15 +1840,23 @@ public class ContextConfig implements LifecycleListener {
      *
      * @return A map of JAR name to processed web fragment (if any)
      */
-    protected Map<String,WebXml> processJarsForWebFragments() {
+    protected Map<String,WebXml> processJarsForWebFragments(WebXml application) {
 
         JarScanner jarScanner = context.getJarScanner();
         boolean delegate = false;
         if (context instanceof StandardContext) {
             delegate = ((StandardContext) context).getDelegate();
         }
+        boolean parseRequired = true;
+        Set<String> absoluteOrder = application.getAbsoluteOrdering();
+        if (absoluteOrder != null && absoluteOrder.isEmpty() &&
+                !context.getXmlValidation()) {
+            // Skip parsing when there is an empty absolute ordering and
+            // validation is not enabled
+            parseRequired = false;
+        }
         FragmentJarScannerCallback callback =
-                new FragmentJarScannerCallback(webXmlParser, delegate);
+                new FragmentJarScannerCallback(webXmlParser, delegate, parseRequired);
 
         jarScanner.scan(JarScanType.PLUGGABILITY,
                 context.getServletContext(), callback);
