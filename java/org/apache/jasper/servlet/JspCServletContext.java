@@ -143,6 +143,13 @@ public class JspCServletContext implements ServletContext {
             return webXml;
         }
 
+        // If an empty absolute ordering element is present, fragment processing
+        // may be skipped.
+        Set<String> absoluteOrdering = webXml.getAbsoluteOrdering();
+        if (absoluteOrdering != null && absoluteOrdering.isEmpty()) {
+            return webXml;
+        }
+
         Map<String, WebXml> fragments = scanForFragments(webXmlParser);
         Set<WebXml> orderedFragments = WebXml.orderWebFragments(webXml, fragments, this);
 
@@ -158,7 +165,8 @@ public class JspCServletContext implements ServletContext {
         // TODO - configure filter rules from Ant rather then system properties
         scanner.setJarScanFilter(new StandardJarScanFilter());
 
-        FragmentJarScannerCallback callback = new FragmentJarScannerCallback(webXmlParser, false);
+        FragmentJarScannerCallback callback =
+                new FragmentJarScannerCallback(webXmlParser, false, true);
         scanner.scan(JarScanType.PLUGGABILITY, this, callback);
         if (!callback.isOk()) {
             throw new JasperException(Localizer.getMessage("jspc.error.invalidFragment"));
