@@ -19,7 +19,8 @@ package org.apache.catalina.websocket;
 /**
  * Constants for this Java package.
  * 
- * @deprecated  Will be removed in Tomcat 8.0.x.
+ * @deprecated  Replaced by the JSR356 WebSocket 1.0 implementation and will be
+ *              removed in Tomcat 8.0.x.  
  */
 @Deprecated
 public class Constants {

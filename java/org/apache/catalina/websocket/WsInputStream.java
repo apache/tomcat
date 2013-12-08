@@ -28,7 +28,8 @@ import org.apache.tomcat.util.res.StringManager;
  * makes the number of bytes declared in the payload length available for
  * reading even if more bytes are available from the socket.
  * 
- * @deprecated  Will be removed in Tomcat 8.0.x.
+ * @deprecated  Replaced by the JSR356 WebSocket 1.0 implementation and will be
+ *              removed in Tomcat 8.0.x.  
  */
 @Deprecated
 public class WsInputStream extends InputStream {

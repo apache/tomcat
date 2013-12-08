@@ -43,7 +43,8 @@ import org.apache.tomcat.util.res.StringManager;
  * connections as per RFC6455. It is expected that applications will extend this
  * implementation and provide application specific functionality.
  * 
- * @deprecated  Will be removed in Tomcat 8.0.x.
+ * @deprecated  Replaced by the JSR356 WebSocket 1.0 implementation and will be
+ *              removed in Tomcat 8.0.x.  
  */
 @Deprecated
 public abstract class WebSocketServlet extends HttpServlet {
