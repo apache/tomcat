@@ -96,9 +96,9 @@ public interface WebResourceSet extends Lifecycle {
      * Are resources provided by this resource set only intended for use by
      * calls to {@link WebResourceRoot#getClassLoaderResource(String)}.
      *
-     * @return @true if these resources should only be used for calls to
+     * @return true if these resources should only be used for calls to
      *         {@link WebResourceRoot#getClassLoaderResource(String)}, otherwise
-     *         @false
+     *         false
      */
     boolean getClassLoaderOnly();
 
