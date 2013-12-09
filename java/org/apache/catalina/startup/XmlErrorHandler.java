@@ -26,7 +26,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
- * @deprecated Use {@link import org.apache.tomcat.util.descriptor.XmlErrorHandler}
+ * @deprecated Use {@link org.apache.tomcat.util.descriptor.XmlErrorHandler}
  */
 @Deprecated
 public class XmlErrorHandler implements ErrorHandler {
