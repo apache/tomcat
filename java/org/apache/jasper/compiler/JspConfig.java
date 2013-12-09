@@ -80,10 +80,18 @@ public class JspConfig {
             
             boolean validate = Boolean.parseBoolean(
                     ctxt.getInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM));
+            String blockExternalString =
+                    ctxt.getInitParameter(Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+            boolean blockExternal;
+            if (blockExternalString == null) {
+                blockExternal = Constants.IS_SECURITY_ENABLED;
+            } else {
+                blockExternal = Boolean.parseBoolean(blockExternalString);
+            }
 
             TreeNode webApp = null;
             if (webXml.getInputSource() != null) {
-                ParserUtils pu = new ParserUtils(validate);
+                ParserUtils pu = new ParserUtils(validate, blockExternal);
                 webApp = pu.parseXMLDocument(webXml.getSystemId(),
                         webXml.getInputSource());
             }

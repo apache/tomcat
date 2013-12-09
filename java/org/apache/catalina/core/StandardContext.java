@@ -698,6 +698,13 @@ public class StandardContext extends ContainerBase
     protected int cacheMaxSize = 10240; // 10 MB
 
 
+
+    /**
+     * Attribute used to turn on/off the use of external entities.
+     */
+    private boolean xmlBlockExternal = Globals.IS_SECURITY_ENABLED;
+
+
     /**
      * Cache object max size in KB.
      */
@@ -6622,6 +6629,18 @@ public class StandardContext extends ContainerBase
     public void setTldNamespaceAware(boolean tldNamespaceAware){
         // NO-OP;
     }    
+
+
+    @Override
+    public void setXmlBlockExternal(boolean xmlBlockExternal) {
+        this.xmlBlockExternal = xmlBlockExternal;
+    }
+
+
+    @Override
+    public boolean getXmlBlockExternal() {
+        return xmlBlockExternal;
+    }
 
 
     @Override

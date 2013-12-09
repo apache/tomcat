@@ -524,6 +524,16 @@
         Context.  If not specified, a standard default value will be used.</p>
       </attribute>
 
+      <attribute name="xmlBlockExternal" required="false">
+        <p>If the value of this flag is <code>true</code>, the parsing of
+        <code>web.xml</code>, <code>web-fragment.xml</code>, <code>*.tld</code>,
+        <code>*.jspx</code>, <code>*.tagx</code> and <code>tagPlugins.xml</code>
+        files for this web application will not permit external entities to be
+        loaded. If a <code>SecurityManager</code> is configured then the default
+        value of this attribute will be <code>true</code>, else the default
+        value will be <code>false</code>.</p>
+      </attribute>
+
       <attribute name="xmlNamespaceAware" required="false">
         <p>If the value of this flag is <code>true</code>, the parsing of
         <code>web.xml</code> and <code>web-fragment.xml</code> files for this

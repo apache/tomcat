@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.descriptor;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ import javax.servlet.ServletContext;
 
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
+import org.xml.sax.ext.EntityResolver2;
 
 /**
  * Wrapper class around the Digester that hide Digester's initialization
@@ -32,10 +34,16 @@ import org.apache.tomcat.util.digester.RuleSet;
 public class DigesterFactory {
 
     /**
-     * A resolver for the resources packaged in servlet-api.jar
+     * Mapping of well-known public IDs used by the Servlet API to the matching
+     * local resource.
      */
-    public static final LocalResolver SERVLET_API_RESOLVER;
+    public static final Map<String,String> SERVLET_API_PUBLIC_IDS;
 
+    /**
+     * Mapping of well-known system IDs used by the Servlet API to the matching
+     * local resource.
+     */
+    public static final Map<String,String> SERVLET_API_SYSTEM_IDS;
 
     static {
         Map<String, String> publicIds = new HashMap<String, String>();
@@ -81,7 +89,8 @@ public class DigesterFactory {
         addSelf(systemIds, "javaee_web_services_1_3.xsd");
         addSelf(systemIds, "javaee_web_services_client_1_3.xsd");
 
-        SERVLET_API_RESOLVER = new LocalResolver(publicIds, systemIds);
+        SERVLET_API_PUBLIC_IDS = Collections.unmodifiableMap(publicIds);
+        SERVLET_API_SYSTEM_IDS = Collections.unmodifiableMap(systemIds);
     }
 
     private static void addSelf(Map<String, String> ids, String id) {
@@ -103,15 +112,19 @@ public class DigesterFactory {
      * @param xmlValidation turn on/off xml validation
      * @param xmlNamespaceAware turn on/off namespace validation
      * @param rule an instance of <code>RuleSet</code> used for parsing the xml.
+     * @param blockExternal turn on/off the blocking of external resources
      */
     public static Digester newDigester(boolean xmlValidation,
                                        boolean xmlNamespaceAware,
-                                       RuleSet rule) {
+                                       RuleSet rule,
+                                       boolean blockExternal) {
         Digester digester = new Digester();
         digester.setNamespaceAware(xmlNamespaceAware);
         digester.setValidating(xmlValidation);
         digester.setUseContextClassLoader(true);
-        digester.setEntityResolver(SERVLET_API_RESOLVER);
+        EntityResolver2 resolver = new LocalResolver(SERVLET_API_PUBLIC_IDS,
+                SERVLET_API_SYSTEM_IDS, blockExternal);
+        digester.setEntityResolver(resolver);
         if (rule != null) {
             digester.addRuleSet(rule);
         }

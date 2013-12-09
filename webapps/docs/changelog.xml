@@ -216,6 +216,12 @@
         <bug>55851</bug>: Further fixes to enable SPNEGO authentication to work
         with IBM JDKs. Based on a patch by Arunav Sanyal. (markt)
       </fix>
+      <add>
+        Add an option to the Context to control the blocking of XML external
+        entities when parsing XML configuration files and enable this blocking
+        by default when a security manager is used. The block is implemented via
+        a custom resolver to enable the logging of any blocked entities. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

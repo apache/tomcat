@@ -30,8 +30,11 @@ import javax.servlet.jsp.tagext.TagLibraryInfo;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
+import org.apache.tomcat.util.descriptor.DigesterFactory;
+import org.apache.tomcat.util.descriptor.LocalResolver;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -39,6 +42,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DefaultHandler2;
+import org.xml.sax.ext.EntityResolver2;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -91,6 +95,7 @@ class JspDocumentParser
     private boolean inDTD;
 
     private boolean isValidating;
+    private final EntityResolver2 entityResolver;
 
     private ErrorDispatcher err;
     private boolean isTagFile;
@@ -119,6 +124,20 @@ class JspDocumentParser
         this.isTagFile = isTagFile;
         this.directivesOnly = directivesOnly;
         this.isTop = true;
+
+        String blockExternalString = ctxt.getServletContext().getInitParameter(
+                Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+        boolean blockExternal;
+        if (blockExternalString == null) {
+            blockExternal = Constants.IS_SECURITY_ENABLED;
+        } else {
+            blockExternal = Boolean.parseBoolean(blockExternalString);
+        }
+
+        this.entityResolver = new LocalResolver(
+                DigesterFactory.SERVLET_API_PUBLIC_IDS,
+                DigesterFactory.SERVLET_API_SYSTEM_IDS,
+                blockExternal);
     }
 
     /*
@@ -239,12 +258,29 @@ class JspDocumentParser
         }
     }
 
+    
+    @Override
+    public InputSource getExternalSubset(String name, String baseURI)
+            throws SAXException, IOException {
+        return entityResolver.getExternalSubset(name, baseURI);
+    }
+
+    
+    
+    @Override
+    public InputSource resolveEntity(String publicId, String systemId)
+            throws SAXException, IOException {
+        return entityResolver.resolveEntity(publicId, systemId);
+    }
+
+    
     @Override
     public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId)
             throws SAXException, IOException {
-        return null;
+        return entityResolver.resolveEntity(name, publicId, baseURI, systemId);
     }
 
+    
     /*
      * Receives notification of the start of an element.
      *

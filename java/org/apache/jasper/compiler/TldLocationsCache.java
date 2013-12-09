@@ -289,10 +289,20 @@ public class TldLocationsCache {
             boolean validate = Boolean.parseBoolean(
                     ctxt.getInitParameter(
                             Constants.XML_VALIDATION_TLD_INIT_PARAM));
-
+            String blockExternalString = ctxt.getInitParameter(
+                    Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+            boolean blockExternal;
+            if (blockExternalString == null) {
+                blockExternal = Constants.IS_SECURITY_ENABLED;
+            } else {
+                blockExternal = Boolean.parseBoolean(blockExternalString);
+            }
+            
             // Parse the web application deployment descriptor
+            ParserUtils pu = new ParserUtils(validate, blockExternal);
+            
             TreeNode webtld = null;
-            webtld = new ParserUtils(validate).parseXMLDocument(webXml.getSystemId(),
+            webtld = pu.parseXMLDocument(webXml.getSystemId(),
                     webXml.getInputSource());
 
             // Allow taglib to be an element of the root or jsp-config (JSP2.0)
@@ -498,9 +508,17 @@ public class TldLocationsCache {
             boolean validate = Boolean.parseBoolean(
                     ctxt.getInitParameter(
                             Constants.XML_VALIDATION_TLD_INIT_PARAM));
-
-            TreeNode tld = new ParserUtils(validate).parseXMLDocument(
-                    resourcePath, stream);
+            String blockExternalString = ctxt.getInitParameter(
+                    Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+            boolean blockExternal;
+            if (blockExternalString == null) {
+                blockExternal = Constants.IS_SECURITY_ENABLED;
+            } else {
+                blockExternal = Boolean.parseBoolean(blockExternalString);
+            }
+            
+            ParserUtils pu = new ParserUtils(validate, blockExternal); 
+            TreeNode tld = pu.parseXMLDocument(resourcePath, stream);
             TreeNode uriNode = tld.findChild("uri");
             if (uriNode != null) {
                 String body = uriNode.getBody();

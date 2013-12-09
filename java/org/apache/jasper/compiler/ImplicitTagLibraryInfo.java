@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.servlet.ServletContext;
 import javax.servlet.jsp.tagext.FunctionInfo;
 import javax.servlet.jsp.tagext.TagFileInfo;
 import javax.servlet.jsp.tagext.TagInfo;
@@ -124,11 +125,21 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
                                 pi.addDependant(path, ctxt.getLastModified(path));
                             }
                             
+                            ServletContext servletContext = ctxt.getServletContext();
                             boolean validate = Boolean.parseBoolean(
-                                    ctxt.getServletContext().getInitParameter(
+                                    servletContext.getInitParameter(
                                             Constants.XML_VALIDATION_TLD_INIT_PARAM));
-
-                            ParserUtils pu = new ParserUtils(validate);
+                            String blockExternalString =
+                                    servletContext.getInitParameter(
+                                            Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+                            boolean blockExternal;
+                            if (blockExternalString == null) {
+                                blockExternal = Constants.IS_SECURITY_ENABLED;
+                            } else {
+                                blockExternal = Boolean.parseBoolean(blockExternalString);
+                            }
+                            
+                            ParserUtils pu = new ParserUtils(validate, blockExternal);
                             TreeNode tld = pu.parseXMLDocument(uri, in);
 
                             if (tld.findAttribute("version") != null) {

@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.servlet.ServletContext;
 import javax.servlet.jsp.tagext.FunctionInfo;
 import javax.servlet.jsp.tagext.PageData;
 import javax.servlet.jsp.tagext.TagAttributeInfo;
@@ -213,12 +214,20 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         Vector<TagFileInfo> tagFileVector = new Vector<TagFileInfo>();
         Hashtable<String, FunctionInfo> functionTable = new Hashtable<String, FunctionInfo>();
 
-        boolean validate = Boolean.parseBoolean(
-                ctxt.getServletContext().getInitParameter(
-                        Constants.XML_VALIDATION_TLD_INIT_PARAM));
+        ServletContext servletContext = ctxt.getServletContext();
+        boolean validate = Boolean.parseBoolean(servletContext.getInitParameter(
+                Constants.XML_VALIDATION_TLD_INIT_PARAM));
+        String blockExternalString = servletContext.getInitParameter(
+                Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+        boolean blockExternal;
+        if (blockExternalString == null) {
+            blockExternal = Constants.IS_SECURITY_ENABLED;
+        } else {
+            blockExternal = Boolean.parseBoolean(blockExternalString);
+        }
 
         // Create an iterator over the child elements of our <taglib> element
-        ParserUtils pu = new ParserUtils(validate);
+        ParserUtils pu = new ParserUtils(validate, blockExternal);
         TreeNode tld = pu.parseXMLDocument(uri, in);
 
         // Check to see if the <taglib> root element contains a 'version'

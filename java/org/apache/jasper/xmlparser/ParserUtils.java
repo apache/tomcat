@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.xmlparser;
 
 import java.io.IOException;
@@ -24,9 +23,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.tomcat.util.descriptor.DigesterFactory;
+import org.apache.tomcat.util.descriptor.LocalResolver;
 import org.apache.tomcat.util.descriptor.XmlErrorHandler;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
@@ -49,7 +50,6 @@ import org.xml.sax.SAXParseException;
  * @author Craig R. McClanahan
  * @version $Id$
  */
-
 public class ParserUtils {
 
     /**
@@ -60,12 +60,25 @@ public class ParserUtils {
     /**
      * An entity resolver for use when parsing XML documents.
      */
-    static EntityResolver entityResolver = DigesterFactory.SERVLET_API_RESOLVER;
+    static EntityResolver entityResolver;
+    
+    private final EntityResolver entityResolverInstance;
     
     private final boolean validating;
 
     public ParserUtils(boolean validating) {
+        this(validating, Constants.IS_SECURITY_ENABLED);
+    }
+
+    public ParserUtils(boolean validating, boolean blockExternal) {
         this.validating = validating;
+        if (entityResolver == null) {
+            this.entityResolverInstance = new LocalResolver(
+                    DigesterFactory.SERVLET_API_PUBLIC_IDS,
+                    DigesterFactory.SERVLET_API_SYSTEM_IDS, blockExternal);
+        } else {
+            this.entityResolverInstance = entityResolver;
+        }
     }
 
     // --------------------------------------------------------- Public Methods
@@ -92,7 +105,7 @@ public class ParserUtils {
             factory.setNamespaceAware(true);
             factory.setValidating(validating);
             DocumentBuilder builder = factory.newDocumentBuilder();
-            builder.setEntityResolver(entityResolver);
+            builder.setEntityResolver(entityResolverInstance);
             builder.setErrorHandler(errorHandler);
             document = builder.parse(is);
         } catch (ParserConfigurationException ex) {

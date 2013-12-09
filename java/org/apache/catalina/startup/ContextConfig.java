@@ -516,14 +516,16 @@ public class ContextConfig implements LifecycleListener {
     public void createWebXmlDigester(boolean namespaceAware,
             boolean validation) {
 
+        boolean blockExternal = context.getXmlBlockExternal();
+        
         webRuleSet = new WebRuleSet(false);
         webDigester = DigesterFactory.newDigester(validation,
-                namespaceAware, webRuleSet);
+                namespaceAware, webRuleSet, blockExternal);
         webDigester.getParser();
 
         webFragmentRuleSet = new WebRuleSet(true);
         webFragmentDigester = DigesterFactory.newDigester(validation,
-                namespaceAware, webFragmentRuleSet);
+                namespaceAware, webFragmentRuleSet, blockExternal);
         webFragmentDigester.getParser();
     }
 

@@ -25,6 +25,7 @@ import java.util.Iterator;
 
 import javax.servlet.ServletContext;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
@@ -119,8 +120,18 @@ public class TagPluginManager {
     private void loadTagPlugins(ErrorDispatcher err, InputStream is)
             throws JasperException {
 
-        TreeNode root =
-                (new ParserUtils(false)).parseXMLDocument(TAG_PLUGINS_XML, is);
+        String blockExternalString = ctxt.getInitParameter(
+                Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+        boolean blockExternal;
+        if (blockExternalString == null) {
+            blockExternal = Constants.IS_SECURITY_ENABLED;
+        } else {
+            blockExternal = Boolean.parseBoolean(blockExternalString);
+        }
+        
+        ParserUtils pu = new ParserUtils(false, blockExternal);
+        
+        TreeNode root = pu.parseXMLDocument(TAG_PLUGINS_XML, is);
         if (root == null) {
             return;
         }
