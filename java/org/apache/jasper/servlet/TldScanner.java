@@ -326,8 +326,13 @@ public class TldScanner {
                         return FileVisitResult.CONTINUE;
                     }
 
-                    String resourcePath = webappPath + "/" +
-                            file.subpath(filePath.getNameCount(), file.getNameCount());
+                    String subPath = file.subpath(
+                            filePath.getNameCount(), file.getNameCount()).toString();
+                    if ('/' != File.separatorChar) {
+                        subPath = subPath.replace(File.separatorChar, '/');
+                    }
+                    String resourcePath = webappPath + "/" + subPath;
+
                     try {
                         URL url = file.toUri().toURL();
                         TldResourcePath path = new TldResourcePath(url, resourcePath);
