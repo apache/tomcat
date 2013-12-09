@@ -78,10 +78,12 @@ public class Cache {
                 // newCacheEntry was inserted into the cache - validate it
                 cacheEntry = newCacheEntry;
                 cacheEntry.validate(useClassLoaderResources);
-                if (newCacheEntry.getContentLength() > getMaxSizeBytes()) {
+                if (cacheEntry.getContentLength() > getMaxSizeBytes()) {
                     // Cache size has not been updated at this point
                     removeCacheEntry(path, false);
-                    return newCacheEntry;
+                    // Return the original resource not the one wrapped in the
+                    // cache otherwise content will be cached any way.
+                    return cacheEntry.getWebResource();
                 }
 
                 // Assume that the cache entry will include the content.
