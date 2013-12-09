@@ -35,12 +35,15 @@ public class TldParser {
     private static final Log log = LogFactory.getLog(TldParser.class);
     private final Digester digester;
 
-    public TldParser(boolean namespaceAware, boolean validation) {
-        this(namespaceAware, validation, new TldRuleSet());
+    public TldParser(boolean namespaceAware, boolean validation,
+            boolean blockExternal) {
+        this(namespaceAware, validation, new TldRuleSet(), blockExternal);
     }
 
-    public TldParser(boolean namespaceAware, boolean validation, RuleSet ruleSet) {
-        digester = DigesterFactory.newDigester(validation, namespaceAware, ruleSet);
+    public TldParser(boolean namespaceAware, boolean validation, RuleSet ruleSet,
+            boolean blockExternal) {
+        digester = DigesterFactory.newDigester(
+                validation, namespaceAware, ruleSet, blockExternal);
     }
 
     public TaglibXml parse(TldResourcePath path) throws IOException, SAXException {

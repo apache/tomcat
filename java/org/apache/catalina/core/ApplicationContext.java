@@ -304,11 +304,19 @@ public class ApplicationContext
      */
     @Override
     public String getInitParameter(final String name) {
-        // Special handling for XML validation as the context setting must
+        // Special handling for XML settings as the context setting must
         // always override anything that might have been set by an application.
         if (Globals.JASPER_XML_VALIDATION_TLD_INIT_PARAM.equals(name) &&
                 context.getTldValidation()) {
             return "true";
+        }
+        if (Globals.JASPER_XML_BLOCK_EXTERNAL_INIT_PARAM.equals(name)) {
+            if (context.getXmlBlockExternal()) {
+                return "true";
+            } else if (Globals.IS_SECURITY_ENABLED) {
+                // System admin has explicitly changed the default
+                return "false";
+            }
         }
         return parameters.get(name);
     }
@@ -322,10 +330,13 @@ public class ApplicationContext
     public Enumeration<String> getInitParameterNames() {
         Set<String> names = new HashSet<>();
         names.addAll(parameters.keySet());
-        // Special handling for XML validation as this attribute will always be
-        // available if validation has been enabled on the context
+        // Special handling for XML settings as these attributes will always be
+        // available if they have been set on the context
         if (context.getTldValidation()) {
             names.add(Globals.JASPER_XML_VALIDATION_TLD_INIT_PARAM);
+        }
+        if (context.getXmlBlockExternal() || Globals.IS_SECURITY_ENABLED) {
+            names.add(Globals.JASPER_XML_BLOCK_EXTERNAL_INIT_PARAM);
         }
         return Collections.enumeration(names);
     }

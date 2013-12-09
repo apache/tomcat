@@ -279,4 +279,15 @@ public final class Globals {
      */
     public static final String JASPER_XML_VALIDATION_TLD_INIT_PARAM =
             "org.apache.jasper.XML_VALIDATE_TLD";
+
+
+    /**
+     * Name of the ServletContext init-param that determines if the JSP engine
+     * will block external entities from being used in *.tld, *.jspx, *.tagx and
+     * tagplugin.xml files.
+     * <p>
+     * This must be kept in sync with org.apache.jasper.Constants
+     */
+    public static final String JASPER_XML_BLOCK_EXTERNAL_INIT_PARAM =
+            "org.apache.jasper.XML_BLOCK_EXTERNAL";
 }

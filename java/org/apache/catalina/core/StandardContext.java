@@ -699,6 +699,13 @@ public class StandardContext extends ContainerBase
      */
     private boolean webXmlNamespaceAware = Globals.STRICT_SERVLET_COMPLIANCE;
 
+
+    /**
+     * Attribute used to turn on/off the use of external entities.
+     */
+    private boolean xmlBlockExternal = Globals.IS_SECURITY_ENABLED;
+
+
     /**
      * Attribute value used to turn on/off XML validation
      */
@@ -6383,6 +6390,18 @@ public class StandardContext extends ContainerBase
     @Override
     public boolean getXmlValidation() {
         return webXmlValidation;
+    }
+
+
+    @Override
+    public void setXmlBlockExternal(boolean xmlBlockExternal) {
+        this.xmlBlockExternal = xmlBlockExternal;
+    }
+
+
+    @Override
+    public boolean getXmlBlockExternal() {
+        return xmlBlockExternal;
     }
 
 

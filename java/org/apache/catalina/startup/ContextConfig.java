@@ -730,7 +730,7 @@ public class ContextConfig implements LifecycleListener {
         contextConfig(contextDigester);
 
         webXmlParser = new WebXmlParser(context.getXmlNamespaceAware(),
-                context.getXmlValidation());
+                context.getXmlValidation(), context.getXmlBlockExternal());
     }
 
 

@@ -36,7 +36,7 @@ public class TestTldParser {
 
     @Before
     public void init() {
-        parser = new TldParser(true, true);
+        parser = new TldParser(true, true, null, true);
     }
 
     @Test

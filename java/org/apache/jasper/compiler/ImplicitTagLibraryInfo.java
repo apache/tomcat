@@ -24,6 +24,7 @@ import java.util.Hashtable;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.servlet.ServletContext;
 import javax.servlet.jsp.tagext.FunctionInfo;
 import javax.servlet.jsp.tagext.TagFileInfo;
 import javax.servlet.jsp.tagext.TagInfo;
@@ -119,10 +120,20 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
                     try {
                         URL url = ctxt.getResource(path);
                         TldResourcePath resourcePath = new TldResourcePath(url, path);
+                        ServletContext servletContext = ctxt.getServletContext();
                         boolean validate = Boolean.parseBoolean(
-                                ctxt.getServletContext().getInitParameter(
+                                servletContext.getInitParameter(
                                         Constants.XML_VALIDATION_TLD_INIT_PARAM));
-                        TldParser parser = new TldParser(true, validate, new ImplicitTldRuleSet());
+                        String blockExternalString = servletContext.getInitParameter(
+                                Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+                        boolean blockExternal;
+                        if (blockExternalString == null) {
+                            blockExternal = Constants.IS_SECURITY_ENABLED;
+                        } else {
+                            blockExternal = Boolean.parseBoolean(blockExternalString);
+                        }
+                        TldParser parser = new TldParser(true, validate,
+                                new ImplicitTldRuleSet(), blockExternal);
                         taglibXml = parser.parse(resourcePath);
                     } catch (IOException | SAXException e) {
                         err.jspError(e);

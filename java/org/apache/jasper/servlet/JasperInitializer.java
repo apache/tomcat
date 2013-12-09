@@ -80,9 +80,17 @@ public class JasperInitializer implements ServletContainerInitializer {
 
         boolean validate = Boolean.parseBoolean(
                 context.getInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM));
+        String blockExternalString = context.getInitParameter(
+                Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+        boolean blockExternal;
+        if (blockExternalString == null) {
+            blockExternal = Constants.IS_SECURITY_ENABLED;
+        } else {
+            blockExternal = Boolean.parseBoolean(blockExternalString);
+        }
 
         // scan the application for TLDs
-        TldScanner scanner = new TldScanner(context, true, validate);
+        TldScanner scanner = new TldScanner(context, true, validate, blockExternal);
         try {
             scanner.scan();
         } catch (IOException | SAXException e) {

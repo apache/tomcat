@@ -28,8 +28,11 @@ import javax.servlet.jsp.tagext.TagLibraryInfo;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
+import org.apache.tomcat.util.descriptor.DigesterFactory;
+import org.apache.tomcat.util.descriptor.LocalResolver;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.scan.Jar;
 import org.xml.sax.Attributes;
@@ -39,6 +42,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DefaultHandler2;
+import org.xml.sax.ext.EntityResolver2;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -91,6 +95,7 @@ class JspDocumentParser
     private boolean inDTD;
 
     private boolean isValidating;
+    private final EntityResolver2 entityResolver;
 
     private final ErrorDispatcher err;
     private final boolean isTagFile;
@@ -119,6 +124,20 @@ class JspDocumentParser
         this.isTagFile = isTagFile;
         this.directivesOnly = directivesOnly;
         this.isTop = true;
+
+        String blockExternalString = ctxt.getServletContext().getInitParameter(
+                Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+        boolean blockExternal;
+        if (blockExternalString == null) {
+            blockExternal = Constants.IS_SECURITY_ENABLED;
+        } else {
+            blockExternal = Boolean.parseBoolean(blockExternalString);
+        }
+
+        this.entityResolver = new LocalResolver(
+                DigesterFactory.SERVLET_API_PUBLIC_IDS,
+                DigesterFactory.SERVLET_API_SYSTEM_IDS,
+                blockExternal);
     }
 
     /*
@@ -232,13 +251,26 @@ class JspDocumentParser
         }
     }
 
+
     @Override
-    public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId)
+    public InputSource getExternalSubset(String name, String baseURI)
             throws SAXException, IOException {
-        // TODO URLs returned by the Jar abstraction may be of the form jar:jar: which
-        // is not a URL that can be resolved by the JRE. This should use the JarFactory
-        // to construct and return a valid InputSource.
-        return null;
+        return entityResolver.getExternalSubset(name, baseURI);
+    }
+
+    @Override
+    public InputSource resolveEntity(String publicId, String systemId)
+            throws SAXException, IOException {
+        return entityResolver.resolveEntity(publicId, systemId);
+    }
+
+    @Override
+    public InputSource resolveEntity(String name, String publicId,
+            String baseURI, String systemId) throws SAXException, IOException {
+        // TODO URLs returned by the Jar abstraction may be of the form jar:jar:
+        //      which is not a URL that can be resolved by the JRE. This should
+        //      use the JarFactory to construct and return a valid InputSource.
+        return entityResolver.resolveEntity(name, publicId, baseURI, systemId);
     }
 
     /*

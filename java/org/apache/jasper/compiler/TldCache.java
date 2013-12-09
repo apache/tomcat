@@ -74,7 +74,15 @@ public class TldCache {
         }
         boolean validate = Boolean.parseBoolean(
                 servletContext.getInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM));
-        tldParser = new TldParser(true, validate);
+        String blockExternalString = servletContext.getInitParameter(
+                Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+        boolean blockExternal;
+        if (blockExternalString == null) {
+            blockExternal = Constants.IS_SECURITY_ENABLED;
+        } else {
+            blockExternal = Boolean.parseBoolean(blockExternalString);
+        }
+        tldParser = new TldParser(true, validate, blockExternal);
     }
 
 

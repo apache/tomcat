@@ -42,8 +42,9 @@ public class TagPluginParser {
     private final Digester digester;
     private final Map<String, String> plugins = new HashMap<>();
 
-    public TagPluginParser(ServletContext context) {
-        digester = DigesterFactory.newDigester(false, false, new TagPluginRuleSet());
+    public TagPluginParser(ServletContext context, boolean blockExternal) {
+        digester = DigesterFactory.newDigester(
+                false, false, new TagPluginRuleSet(), blockExternal);
         digester.setClassLoader(context.getClassLoader());
     }
 

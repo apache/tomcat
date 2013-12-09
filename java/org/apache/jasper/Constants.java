@@ -160,4 +160,13 @@ public class Constants {
      */
     public static final String XML_VALIDATION_TLD_INIT_PARAM =
             "org.apache.jasper.XML_VALIDATE_TLD";
+
+    /**
+     * Name of the ServletContext init-param that determines if the XML parsers
+     * will block the resolution of external entities.
+     * <p>
+     * This must be kept in sync with org.apache.catalina.Globals
+     */
+    public static final String XML_BLOCK_EXTERNAL_INIT_PARAM =
+            "org.apache.jasper.XML_BLOCK_EXTERNAL";
 }

@@ -39,7 +39,8 @@ public class TestTldScanner extends TomcatBaseTest {
         Context context = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
-        TldScanner scanner = new TldScanner(context.getServletContext(), true, true);
+        TldScanner scanner =
+                new TldScanner(context.getServletContext(), true, true, true);
         scanner.scan();
         Assert.assertEquals(5, scanner.getUriTldResourcePathMap().size());
         Assert.assertEquals(1, scanner.getListeners().size());

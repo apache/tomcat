@@ -456,6 +456,11 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void setXmlValidation(boolean xmlValidation) { /* NO-OP */ }
 
     @Override
+    public boolean getXmlBlockExternal() { return true; }
+    @Override
+    public void setXmlBlockExternal(boolean xmlBlockExternal) { /* NO-OP */ }
+
+    @Override
     public boolean getTldValidation() { return false; }
     @Override
     public void setTldValidation(boolean tldValidation){ /* NO-OP */ }
