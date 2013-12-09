@@ -126,6 +126,11 @@ public class ChunkedInputFilter implements InputFilter {
 
 
     /**
+     * Limit for trailer size.
+     */
+    private int maxTrailerSize;
+
+    /**
      * Size of extensions processed for this request.
      */
     private long extensionSize;
@@ -135,6 +140,7 @@ public class ChunkedInputFilter implements InputFilter {
     public ChunkedInputFilter(int maxTrailerSize, int maxExtensionSize) {
         this.trailingHeaders.setLimit(maxTrailerSize);
         this.maxExtensionSize = maxExtensionSize;
+        this.maxTrailerSize = maxTrailerSize;
     }
 
     // ---------------------------------------------------- InputBuffer Methods
@@ -264,6 +270,7 @@ public class ChunkedInputFilter implements InputFilter {
         endChunk = false;
         needCRLFParse = false;
         trailingHeaders.recycle();
+        trailingHeaders.setLimit(maxTrailerSize);
         extensionSize = 0;
     }
 
@@ -326,7 +333,10 @@ public class ChunkedInputFilter implements InputFilter {
             if (buf[pos] == Constants.CR || buf[pos] == Constants.LF) {
                 parseCRLF(false);
                 eol = true;
-            } else if (buf[pos] == Constants.SEMI_COLON) {
+            } else if (buf[pos] == Constants.SEMI_COLON && !extension) {
+                // First semi-colon marks the start of the extension. Further
+                // semi-colons may appear to separate multiple chunk-extensions.
+                // These need to be processed as part of parsing the extensions.
                 extension = true;
                 extensionSize++;
             } else if (!extension) {
@@ -342,7 +352,9 @@ public class ChunkedInputFilter implements InputFilter {
                     return false;
                 }
             } else {
-                // extension
+                // Extension 'parsing'
+                // Note that the chunk-extension is neither parsed nor
+                // validated. Currently it is simply ignored.
                 extensionSize++;
                 if (maxExtensionSize > -1 && extensionSize > maxExtensionSize) {
                     throw new IOException("maxExtensionSize exceeded");
@@ -511,6 +523,13 @@ public class ChunkedInputFilter implements InputFilter {
                 chr = buf[pos];
                 if ((chr == Constants.SP) || (chr == Constants.HT)) {
                     pos++;
+                    // If we swallow whitespace, make sure it counts towards the
+                    // limit placed on trailing header size
+                    int newlimit = trailingHeaders.getLimit() -1;
+                    if (trailingHeaders.getEnd() > newlimit) {
+                        throw new IOException("Exceeded maxTrailerSize");
+                    }
+                    trailingHeaders.setLimit(newlimit);
                 } else {
                     space = false;
                 }
