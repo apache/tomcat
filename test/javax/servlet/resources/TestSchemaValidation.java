@@ -31,8 +31,8 @@ public class TestSchemaValidation {
 
     @Test
     public void testWebapp() throws Exception {
-        Digester digester =
-                DigesterFactory.newDigester(true, true, new WebRuleSet(false));
+        Digester digester = DigesterFactory.newDigester(
+                true, true, new WebRuleSet(false), true);
         digester.push(new WebXml());
         WebXml desc = (WebXml) digester.parse(
                 new File("test/webapp/WEB-INF/web.xml"));
@@ -41,8 +41,8 @@ public class TestSchemaValidation {
 
     @Test
     public void testWebapp_2_2() throws Exception {
-        Digester digester =
-                DigesterFactory.newDigester(true, true, new WebRuleSet(false));
+        Digester digester = DigesterFactory.newDigester(
+                true, true, new WebRuleSet(false), true);
         digester.push(new WebXml());
         WebXml desc = (WebXml) digester.parse(
                 new File("test/webapp-2.2/WEB-INF/web.xml"));
@@ -52,8 +52,8 @@ public class TestSchemaValidation {
 
     @Test
     public void testWebapp_2_3() throws Exception {
-        Digester digester =
-                DigesterFactory.newDigester(true, true, new WebRuleSet(false));
+        Digester digester = DigesterFactory.newDigester(
+                true, true, new WebRuleSet(false), true);
         digester.push(new WebXml());
         WebXml desc = (WebXml) digester.parse(
                 new File("test/webapp-2.3/WEB-INF/web.xml"));
@@ -63,8 +63,8 @@ public class TestSchemaValidation {
 
     @Test
     public void testWebapp_2_4() throws Exception {
-        Digester digester =
-                DigesterFactory.newDigester(true, true, new WebRuleSet(false));
+        Digester digester = DigesterFactory.newDigester(
+                true, true, new WebRuleSet(false), true);
         digester.push(new WebXml());
         WebXml desc = (WebXml) digester.parse(
                 new File("test/webapp-2.4/WEB-INF/web.xml"));
@@ -73,8 +73,8 @@ public class TestSchemaValidation {
 
     @Test
     public void testWebapp_2_5() throws Exception {
-        Digester digester =
-                DigesterFactory.newDigester(true, true, new WebRuleSet(false));
+        Digester digester = DigesterFactory.newDigester(
+                true, true, new WebRuleSet(false), true);
         digester.push(new WebXml());
         WebXml desc = (WebXml) digester.parse(
                 new File("test/webapp-2.5/WEB-INF/web.xml"));
@@ -83,8 +83,8 @@ public class TestSchemaValidation {
 
     @Test
     public void testWebapp_3_0() throws Exception {
-        Digester digester =
-                DigesterFactory.newDigester(true, true, new WebRuleSet(false));
+        Digester digester = DigesterFactory.newDigester(
+                true, true, new WebRuleSet(false), true);
         digester.push(new WebXml());
         WebXml desc = (WebXml) digester.parse(
                 new File("test/webapp-3.0/WEB-INF/web.xml"));
@@ -93,8 +93,8 @@ public class TestSchemaValidation {
 
     @Test
     public void testWebapp_3_1() throws Exception {
-        Digester digester =
-                DigesterFactory.newDigester(true, true, new WebRuleSet(false));
+        Digester digester = DigesterFactory.newDigester(
+                true, true, new WebRuleSet(false), true);
         digester.push(new WebXml());
         WebXml desc = (WebXml) digester.parse(
                 new File("test/webapp-3.1/WEB-INF/web.xml"));

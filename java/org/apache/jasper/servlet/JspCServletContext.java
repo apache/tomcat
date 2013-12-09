@@ -44,11 +44,11 @@ import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.util.ExceptionUtils;
 import org.apache.tomcat.JarScanType;
-import org.apache.tomcat.util.descriptor.web.Constants;
 import org.apache.tomcat.util.descriptor.web.FragmentJarScannerCallback;
 import org.apache.tomcat.util.descriptor.web.WebXml;
 import org.apache.tomcat.util.descriptor.web.WebXmlParser;
@@ -124,13 +124,21 @@ public class JspCServletContext implements ServletContext {
 
     private WebXml buildMergedWebXml() throws JasperException {
         WebXml webXml = new WebXml();
-
-        WebXmlParser webXmlParser = new WebXmlParser(false, false);
+        String blockExternalString = getInitParameter(
+                Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+        boolean blockExternal;
+        if (blockExternalString == null) {
+            blockExternal = Constants.IS_SECURITY_ENABLED;
+        } else {
+            blockExternal = Boolean.parseBoolean(blockExternalString);
+        }
+        WebXmlParser webXmlParser = new WebXmlParser(false, false, blockExternal);
         // Use this class's classloader as Ant will have set the TCCL to its own
         webXmlParser.setClassLoader(getClass().getClassLoader());
 
         try {
-            URL url = getResource(Constants.WEB_XML_LOCATION);
+            URL url = getResource(
+                    org.apache.tomcat.util.descriptor.web.Constants.WEB_XML_LOCATION);
             if (!webXmlParser.parseWebXml(url, webXml, false)) {
                 throw new JasperException(Localizer.getMessage("jspc.error.invalidWebXml"));
             }

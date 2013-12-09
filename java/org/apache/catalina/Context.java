@@ -617,6 +617,25 @@ public interface Context extends Container {
 
 
     /**
+     * Will the parsing of web.xml, web-fragment.xml, *.tld, *.jspx, *.tagx and
+     * tagplugin.xml files for this Context block the use of external entities?
+     *
+     * @return true if access to external entities is blocked
+     */
+    public boolean getXmlBlockExternal();
+
+
+    /**
+     * Controls whether the parsing of web.xml, web-fragment.xml, *.tld, *.jspx,
+     * *.tagx and tagplugin.xml files for this Context will block the use of
+     * external entities.
+     *
+     * @param xmlBlockExternal true to block external entities
+     */
+    public void setXmlBlockExternal(boolean xmlBlockExternal);
+
+
+    /**
      * Will the parsing of *.tld files for this Context be performed by a
      * validating parser?
      *

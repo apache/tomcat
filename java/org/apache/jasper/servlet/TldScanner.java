@@ -72,9 +72,11 @@ public class TldScanner {
      */
     public TldScanner(ServletContext context,
                       boolean namespaceAware,
-                      boolean validation) {
+                      boolean validation,
+                      boolean blockExternal) {
         this.context = context;
-        this.tldParser = new TldParser(namespaceAware, validation);
+
+        this.tldParser = new TldParser(namespaceAware, validation, blockExternal);
     }
 
     /**

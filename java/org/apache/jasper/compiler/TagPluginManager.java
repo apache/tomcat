@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
@@ -61,7 +62,16 @@ public class TagPluginManager {
         if (initialized)
             return;
 
-        TagPluginParser parser = new TagPluginParser(ctxt);
+        String blockExternalString = ctxt.getInitParameter(
+                Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+        boolean blockExternal;
+        if (blockExternalString == null) {
+            blockExternal = Constants.IS_SECURITY_ENABLED;
+        } else {
+            blockExternal = Boolean.parseBoolean(blockExternalString);
+        }
+
+        TagPluginParser parser = new TagPluginParser(ctxt, blockExternal);
 
         try {
             Enumeration<URL> urls =

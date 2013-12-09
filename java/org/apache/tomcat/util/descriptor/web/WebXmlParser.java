@@ -55,15 +55,16 @@ public class WebXmlParser {
     private final WebRuleSet webFragmentRuleSet;
 
 
-    public WebXmlParser(boolean namespaceAware, boolean validation) {
+    public WebXmlParser(boolean namespaceAware, boolean validation,
+            boolean blockExternal) {
         webRuleSet = new WebRuleSet(false);
         webDigester = DigesterFactory.newDigester(validation,
-                namespaceAware, webRuleSet);
+                namespaceAware, webRuleSet, blockExternal);
         webDigester.getParser();
 
         webFragmentRuleSet = new WebRuleSet(true);
         webFragmentDigester = DigesterFactory.newDigester(validation,
-                namespaceAware, webFragmentRuleSet);
+                namespaceAware, webFragmentRuleSet, blockExternal);
         webFragmentDigester.getParser();
     }
 

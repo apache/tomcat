@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.descriptor;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class TestLocalResolver {
     private final Map<String, String> publicIds = new HashMap<>();
     private final Map<String, String> systemIds = new HashMap<>();
 
-    private LocalResolver resolver = new LocalResolver(publicIds, systemIds);
+    private LocalResolver resolver = new LocalResolver(publicIds, systemIds, true);
     private String WEB_22_LOCAL;
     private String WEB_31_LOCAL;
     private String WEBCOMMON_31_LOCAL;
@@ -53,25 +54,25 @@ public class TestLocalResolver {
         return ServletContext.class.getResource(id).toExternalForm();
     }
 
-    @Test
-    public void unknownNullIdIsNull() throws IOException, SAXException {
+    @Test(expected = FileNotFoundException.class)
+    public void unknownNullId() throws IOException, SAXException {
         Assert.assertNull(resolver.resolveEntity(null, null));
     }
 
-    @Test
-    public void unknownPublicIdIsNull() throws IOException, SAXException {
+    @Test(expected = FileNotFoundException.class)
+    public void unknownPublicId() throws IOException, SAXException {
         Assert.assertNull(resolver.resolveEntity("unknown", null));
     }
 
-    @Test
-    public void unknownSystemIdIsReturned() throws IOException, SAXException {
+    @Test(expected = FileNotFoundException.class)
+    public void unknownSystemId() throws IOException, SAXException {
         InputSource source = resolver.resolveEntity(null, "unknown");
         Assert.assertEquals(null, source.getPublicId());
         Assert.assertEquals("unknown", source.getSystemId());
     }
 
-    @Test
-    public void unknownSystemIdIsResolvedAgainstBaseURI()
+    @Test(expected = FileNotFoundException.class)
+    public void unknownRelativeSystemId()
             throws IOException, SAXException {
         InputSource source = resolver.resolveEntity(
                 null, null, "http://example.com/home.html", "unknown");

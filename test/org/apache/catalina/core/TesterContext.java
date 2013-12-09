@@ -643,6 +643,16 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public boolean getXmlBlockExternal() {
+        return false;
+    }
+
+    @Override
+    public void setXmlBlockExternal(boolean xmlBlockExternal) {
+        // NO-OP
+    }
+
+    @Override
     public boolean getTldValidation(){
         return false;
     }
