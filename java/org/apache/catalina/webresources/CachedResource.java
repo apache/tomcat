@@ -262,4 +262,8 @@ public class CachedResource implements WebResource {
     public WebResourceRoot getWebResourceRoot() {
         return webResource.getWebResourceRoot();
     }
+
+    WebResource getWebResource() {
+        return webResource;
+    }
 }
