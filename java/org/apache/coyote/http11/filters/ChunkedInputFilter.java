@@ -128,7 +128,7 @@ public class ChunkedInputFilter implements InputFilter {
     /**
      * Limit for trailer size.
      */
-    private int maxTrailerSize;
+    private final int maxTrailerSize;
 
     /**
      * Size of extensions processed for this request.
