@@ -1813,9 +1813,6 @@ public class Digester extends DefaultHandler2 {
      *
      * <p>
      * <strong>Note</strong> This method may be called more than once.
-     * Once only initialization code should be placed in {@link #initialize}
-     * or the code should take responsibility by checking and setting the
-     * {@link #configured} flag.
      * </p>
      */
     protected void configure() {
