@@ -25,8 +25,7 @@ but possibly 7.1.x).
  2. Refactor the XML parsing (org.apache.tomcat.util.xml ?) to remove duplicate
     XML parsing code in Catalina and Jasper such as the entity resolvers used
     for validation.
-    - Partial.
-    - More sharing possible?
+    - Complete
 
  3. TLDs may have a many to many relationship between URIs and TLD files. This
     can result in the same TLD file being parsed many times. Refactor the
