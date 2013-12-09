@@ -899,15 +899,15 @@ public class DefaultServlet
             }
 
             InputStream renderResult = null;
-            if (resource.isDirectory()) {
-                if (serveContent) {
+            if (serveContent) {
+                if (resource.isDirectory()) {
                     // Serve the directory browser
                     renderResult = render(getPathPrefix(request), resource);
+                } else {
+                    renderResult = resource.getInputStream();
                 }
-            }
 
-            // Copy the input stream to our output stream (if requested)
-            if (serveContent) {
+                // Copy the input stream to our output stream
                 try {
                     response.setBufferSize(output);
                 } catch (IllegalStateException e) {
@@ -1785,23 +1785,7 @@ public class DefaultServlet
         throws IOException {
 
         IOException exception = null;
-        InputStream resourceInputStream = null;
-
-        // Optimization: If the binary content has already been loaded, send
-        // it directly
-        if (resource.isFile()) {
-            byte buffer[] = resource.getContent();
-            if (buffer != null) {
-                ostream.write(buffer, 0, buffer.length);
-                return;
-            }
-            resourceInputStream = resource.getInputStream();
-        } else {
-            resourceInputStream = is;
-        }
-
-        InputStream istream = new BufferedInputStream
-            (resourceInputStream, input);
+        InputStream istream = new BufferedInputStream(is, input);
 
         // Copy the input stream to the output stream
         exception = copyRange(istream, ostream);
