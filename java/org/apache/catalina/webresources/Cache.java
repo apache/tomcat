@@ -46,7 +46,8 @@ public class Cache {
 
     private long ttl = 5000;
     private long maxSize = 10 * 1024 * 1024;
-    private long maxObjectSize = maxSize / 20;
+    private int maxObjectSize =
+            (int) (maxSize / 20 > Integer.MAX_VALUE ? Integer.MAX_VALUE : maxSize / 20);
 
     private final ConcurrentMap<String,CachedResource> resourceCache =
             new ConcurrentHashMap<>();
@@ -78,7 +79,7 @@ public class Cache {
                 // newCacheEntry was inserted into the cache - validate it
                 cacheEntry = newCacheEntry;
                 cacheEntry.validate(useClassLoaderResources);
-                if (cacheEntry.getContentLength() > getMaxSizeBytes()) {
+                if (cacheEntry.getContentLength() > getMaxObjectSizeBytes()) {
                     // Cache size has not been updated at this point
                     removeCacheEntry(path, false);
                     // Return the original resource not the one wrapped in the
@@ -199,25 +200,30 @@ public class Cache {
         return maxSize / 1024;
     }
 
-    public long getMaxSizeBytes() {
-        // Internally bytes, externally kilobytes
-        return maxSize;
-    }
-
     public void setMaxSize(long maxSize) {
         // Internally bytes, externally kilobytes
         this.maxSize = maxSize * 1024;
     }
 
 
-    public void setMaxObjectSize(long maxObjectSize) {
+    public void setMaxObjectSize(int maxObjectSize) {
+        if (maxObjectSize * 1024L > Integer.MAX_VALUE) {
+            log.warn(sm.getString("cache.maxObjectSizeTooBig",
+                    Integer.valueOf(maxObjectSize)));
+            this.maxObjectSize = Integer.MAX_VALUE;
+        }
         // Internally bytes, externally kilobytes
         this.maxObjectSize = maxObjectSize * 1024;
     }
 
-    public long getMaxObjectSize() {
+    public int getMaxObjectSize() {
         // Internally bytes, externally kilobytes
         return maxObjectSize / 1024;
+    }
+
+    public long getMaxObjectSizeBytes() {
+        // Internally bytes, externally kilobytes
+        return maxObjectSize;
     }
 
     public void clear() {
