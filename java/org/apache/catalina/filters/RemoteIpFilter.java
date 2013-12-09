@@ -107,9 +107,12 @@ import org.apache.juli.logging.LogFactory;
  * <td>RemoteIPInternalProxy</td>
  * <td>Regular expression (in the syntax supported by
  * {@link java.util.regex.Pattern java.util.regex})</td>
- * <td>10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3} <br/>
- * By default, 10/8, 192.168/16, 169.254/16 and 127/8 are allowed ; 172.16/12 has not been enabled by default because it is complex to
- * describe with regular expressions</td>
+ * <td>10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|
+ *     169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|
+ *     172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}|
+ *     172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}
+ *     <br/>
+ * By default, 10/8, 192.168/16, 169.254/16, 127/8 and 172.16/12 are allowed.</td>
  * </tr>
  * </tr>
  * <tr>
@@ -695,7 +698,10 @@ public class RemoteIpFilter implements Filter {
             "10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" +
             "192\\.168\\.\\d{1,3}\\.\\d{1,3}|" +
             "169\\.254\\.\\d{1,3}\\.\\d{1,3}|" +
-            "127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
+            "127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" +
+            "172\\.1[6-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
+            "172\\.2[0-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
+            "172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}");
 
     /**
      * @see #setProtocolHeader(String)
