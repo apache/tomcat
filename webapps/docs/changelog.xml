@@ -251,6 +251,9 @@
         protects against misbehaving clients that may not sent the request body
         in that case and send the next request instead. (markt)
       </add>
+      <fix>
+        Improve the parsing of trailing headers in HTTP requests. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
