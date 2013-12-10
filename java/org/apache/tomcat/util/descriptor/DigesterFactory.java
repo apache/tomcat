@@ -96,6 +96,7 @@ public class DigesterFactory {
     private static void addSelf(Map<String, String> ids, String id) {
         String systemId = idFor(id);
         ids.put(systemId, systemId);
+        ids.put(id, systemId);
     }
 
     private static String idFor(String url) {
