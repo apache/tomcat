@@ -58,8 +58,14 @@
 <section name="Tomcat 7.0.49 (violetagg)">
   <subsection name="Catalina">
     <changelog>
-      Correct a regression in the new XML local resolver that triggered false
-      failures when XML validation was configured. (markt)
+      <fix>
+        Correct a regression in the new XML local resolver that triggered false
+        failures when XML validation was configured. (markt)
+      </fix>
+      <fix>
+        Prevent a NPE when destroying HTTP upgrade handler for WebSocket
+        connections. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>
