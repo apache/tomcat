@@ -56,6 +56,12 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.49 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      Correct a regression in the new XML local resolver that triggered false
+      failures when XML validation was configured. (markt)
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.48 (violetagg)" rtext="not released">
   <subsection name="Catalina">
