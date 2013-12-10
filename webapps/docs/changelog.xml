@@ -55,7 +55,9 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
-<section name="Tomcat 7.0.48 (violetagg)">
+<section name="Tomcat 7.0.49 (violetagg)">
+</section>
+<section name="Tomcat 7.0.48 (violetagg)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <add>
