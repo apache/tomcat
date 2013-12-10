@@ -34,10 +34,6 @@ public class Cache {
     protected static final StringManager sm =
             StringManager.getManager(Constants.Package);
 
-    // Estimate (on high side to be safe) of average size excluding content
-    // based on profiler data.
-    private static final long CACHE_ENTRY_SIZE = 500;
-
     private static final long TARGET_FREE_PERCENT_GET = 5;
     private static final long TARGET_FREE_PERCENT_BACKGROUND = 10;
 
@@ -70,7 +66,11 @@ public class Cache {
         }
 
         if (cacheEntry == null) {
-            CachedResource newCacheEntry = new CachedResource(root, path, ttl);
+            // Local copy to ensure consistency
+            int maxObjectSizeBytes = getMaxObjectSizeBytes();
+            CachedResource newCacheEntry =
+                    new CachedResource(root, path, getTtl(), maxObjectSizeBytes);
+
             // Concurrent callers will end up with the same CachedResource
             // instance
             cacheEntry = resourceCache.putIfAbsent(path, newCacheEntry);
@@ -79,19 +79,11 @@ public class Cache {
                 // newCacheEntry was inserted into the cache - validate it
                 cacheEntry = newCacheEntry;
                 cacheEntry.validate(useClassLoaderResources);
-                if (cacheEntry.getContentLength() > getMaxObjectSizeBytes()) {
-                    // Cache size has not been updated at this point
-                    removeCacheEntry(path, false);
-                    // Return the original resource not the one wrapped in the
-                    // cache otherwise content will be cached any way.
-                    return cacheEntry.getWebResource();
-                }
 
-                // Assume that the cache entry will include the content.
-                // This isn't always the case but it makes tracking the
-                // current cache size easier.
-                long delta = CACHE_ENTRY_SIZE;
-                delta += cacheEntry.getContentLength();
+                // Even if the resource content larger than maxObjectSizeBytes
+                // there is still benefit in caching the resource metadata
+
+                long delta = cacheEntry.getSize();
                 size.addAndGet(delta);
 
                 if (size.get() > maxSize) {
@@ -181,9 +173,8 @@ public class Cache {
         // once and the cache size is only updated (if required) once.
         CachedResource cachedResource = resourceCache.remove(path);
         if (cachedResource != null && updateSize) {
-            long delta =
-                    0 - CACHE_ENTRY_SIZE - cachedResource.getContentLength();
-            size.addAndGet(delta);
+            long delta = cachedResource.getSize();
+            size.addAndGet(-delta);
         }
     }
 
@@ -221,8 +212,7 @@ public class Cache {
         return maxObjectSize / 1024;
     }
 
-    public long getMaxObjectSizeBytes() {
-        // Internally bytes, externally kilobytes
+    public int getMaxObjectSizeBytes() {
         return maxObjectSize;
     }
 

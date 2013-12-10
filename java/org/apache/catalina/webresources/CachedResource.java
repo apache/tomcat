@@ -32,9 +32,14 @@ import org.apache.catalina.WebResourceRoot;
  */
 public class CachedResource implements WebResource {
 
+    // Estimate (on high side to be safe) of average size excluding content
+    // based on profiler data.
+    private static final long CACHE_ENTRY_SIZE = 500;
+
     private final StandardRoot root;
     private final String webAppPath;
     private final long ttl;
+    private final int maxObjectSizeBytes;
 
     private volatile WebResource webResource;
     private volatile long nextCheck;
@@ -49,10 +54,12 @@ public class CachedResource implements WebResource {
     private volatile Long cachedContentLength = null;
 
 
-    public CachedResource(StandardRoot root, String path, long ttl) {
+    public CachedResource(StandardRoot root, String path, long ttl,
+            int maxObjectSizeBytes) {
         this.root = root;
         this.webAppPath = path;
         this.ttl = ttl;
+        this.maxObjectSizeBytes = maxObjectSizeBytes;
     }
 
     protected boolean validate(boolean useClassLoaderResources) {
@@ -232,6 +239,9 @@ public class CachedResource implements WebResource {
     public byte[] getContent() {
         byte[] cachedContent = this.cachedContent;
         if (cachedContent == null) {
+            if (getContentLength() > maxObjectSizeBytes) {
+                return null;
+            }
             cachedContent = webResource.getContent();
             this.cachedContent = cachedContent;
         }
@@ -265,5 +275,16 @@ public class CachedResource implements WebResource {
 
     WebResource getWebResource() {
         return webResource;
+    }
+
+    // Assume that the cache entry will always include the content unless the
+    // resource content is larger than maxObjectSizeBytes. This isn't always the
+    // case but it makes tracking the current cache size easier.
+    long getSize() {
+        long result = CACHE_ENTRY_SIZE;
+        if (getContentLength() <= maxObjectSizeBytes) {
+            result += getContentLength();
+        }
+        return result;
     }
 }
