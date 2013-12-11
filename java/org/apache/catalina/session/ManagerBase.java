@@ -1261,15 +1261,15 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
         StringBuilder name = new StringBuilder("type=Manager");
 
+        name.append(",host=");
+        name.append(context.getParent().getName());
+
         name.append(",context=");
         String contextName = context.getName();
         if (!contextName.startsWith("/")) {
             name.append('/');
         }
         name.append(contextName);
-
-        name.append(",host=");
-        name.append(context.getParent().getName());
 
         return name.toString();
     }

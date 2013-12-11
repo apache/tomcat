@@ -745,10 +745,10 @@ public class NamingContextListener
                 contextName = "/" + contextName;
             Host host = (Host) ((Context)container).getParent();
             name = new ObjectName(domain + ":type=DataSource" +
-                        ",context=" + contextName +
-                        ",host=" + host.getName() +
-                        ",class=" + resource.getType() +
-                        ",name=" + quotedResourceName);
+                    ",host=" + host.getName() +
+                    ",context=" + contextName +
+                    ",class=" + resource.getType() +
+                    ",name=" + quotedResourceName);
         }
 
         return (name);

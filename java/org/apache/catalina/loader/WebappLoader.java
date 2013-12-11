@@ -408,8 +408,8 @@ public class WebappLoader extends LifecycleMBeanBase
                 contextName = "/" + contextName;
             }
             ObjectName cloname = new ObjectName(context.getDomain() +
-                    ":type=WebappClassLoader,context=" + contextName +
-                    ",host=" + context.getParent().getName());
+                    ":type=WebappClassLoader,host=" + context.getParent().getName() +
+                    ",context=" + contextName);
             Registry.getRegistry(null, null)
                 .registerComponent(classLoader, cloname, null);
 
@@ -454,8 +454,8 @@ public class WebappLoader extends LifecycleMBeanBase
                 contextName = "/" + contextName;
             }
             ObjectName cloname = new ObjectName(context.getDomain() +
-                    ":type=WebappClassLoader,context=" + contextName +
-                    ",host=" + context.getParent().getName());
+                    ":type=WebappClassLoader,host=" + context.getParent().getName() +
+                    ",context=" + contextName);
             Registry.getRegistry(null, null).unregisterComponent(cloname);
         } catch (Exception e) {
             log.error("LifecycleException ", e);
@@ -680,6 +680,9 @@ public class WebappLoader extends LifecycleMBeanBase
 
         StringBuilder name = new StringBuilder("type=Loader");
 
+        name.append(",host=");
+        name.append(context.getParent().getName());
+
         name.append(",context=");
 
         String contextName = context.getName();
@@ -687,9 +690,6 @@ public class WebappLoader extends LifecycleMBeanBase
             name.append("/");
         }
         name.append(contextName);
-
-        name.append(",host=");
-        name.append(context.getParent().getName());
 
         return name.toString();
     }

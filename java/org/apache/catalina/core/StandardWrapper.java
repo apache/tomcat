@@ -1050,10 +1050,14 @@ public class StandardWrapper extends ContainerBase
         if (isJspServlet) {
             StringBuilder oname = new StringBuilder(getDomain());
 
-            oname.append(":type=JspMonitor,name=");
-            oname.append(getName());
+            oname.append(":type=JspMonitor");
 
             oname.append(getWebModuleKeyProperties());
+
+            oname.append(",name=");
+            oname.append(getName());
+
+            oname.append(getJ2EEKeyProperties());
 
             try {
                 jspMonitorON = new ObjectName(oname.toString());
@@ -1795,7 +1799,11 @@ public class StandardWrapper extends ContainerBase
     protected String getObjectNameKeyProperties() {
 
         StringBuilder keyProperties =
-            new StringBuilder("j2eeType=Servlet,name=");
+            new StringBuilder("j2eeType=Servlet");
+
+        keyProperties.append(getWebModuleKeyProperties());
+
+        keyProperties.append(",name=");
 
         String name = getName();
         if (Util.objectNameValueNeedsQuote(name)) {
@@ -1803,7 +1811,7 @@ public class StandardWrapper extends ContainerBase
         }
         keyProperties.append(name);
 
-        keyProperties.append(getWebModuleKeyProperties());
+        keyProperties.append(getJ2EEKeyProperties());
 
         return keyProperties.toString();
     }
@@ -1825,12 +1833,18 @@ public class StandardWrapper extends ContainerBase
         }
         keyProperties.append(contextName);
 
+        return keyProperties.toString();
+    }
+
+    private String getJ2EEKeyProperties() {
+
+        StringBuilder keyProperties = new StringBuilder(",J2EEApplication=");
+
         StandardContext ctx = null;
         if (parent instanceof StandardContext) {
             ctx = (StandardContext) getParent();
         }
 
-        keyProperties.append(",J2EEApplication=");
         if (ctx == null) {
             keyProperties.append("none");
         } else {
