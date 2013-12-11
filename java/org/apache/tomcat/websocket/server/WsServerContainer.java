@@ -132,7 +132,7 @@ public class WsServerContainer extends WsWebSocketContainer
         }
 
         FilterRegistration.Dynamic fr = servletContext.addFilter(
-                WsFilter.class.getName(), new WsFilter());
+                "Tomcat WebSocket (JSR356) Filter", new WsFilter());
         fr.setAsyncSupported(true);
 
         EnumSet<DispatcherType> types = EnumSet.of(DispatcherType.REQUEST,
