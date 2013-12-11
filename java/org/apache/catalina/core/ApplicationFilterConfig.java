@@ -373,10 +373,10 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         }
         if (context instanceof StandardContext) {
             StandardContext standardContext = (StandardContext) context;
-            onameStr = domain + ":j2eeType=Filter,name=" + filterName +
-                 ",WebModule=" + webMod + ",J2EEApplication=" +
-                 standardContext.getJ2EEApplication() + ",J2EEServer=" +
-                 standardContext.getJ2EEServer();
+            onameStr = domain + ":j2eeType=Filter,WebModule=" + webMod +
+                    ",name=" + filterName + ",J2EEApplication=" +
+                    standardContext.getJ2EEApplication() + ",J2EEServer=" +
+                    standardContext.getJ2EEServer();
         } else {
             onameStr = domain + ":j2eeType=Filter,name=" + filterName +
                  ",WebModule=" + webMod;

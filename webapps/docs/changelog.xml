@@ -191,6 +191,11 @@
         Jasper-specific lifecycle listener. <code>JasperListener</code> has been
         removed. (jboynes)
       </scode>
+      <fix>
+        Chnage ordering of elements of JMX objects names so components are
+        grouped more logically in JConsole. Generally, components are now
+        grouped by Host and then by Context. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

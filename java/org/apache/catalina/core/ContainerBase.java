@@ -1230,15 +1230,15 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // each container
         while (!(c instanceof Engine)) {
             if (c instanceof Wrapper) {
-                keyProperties.append(",servlet=");
-                keyProperties.append(c.getName());
+                keyProperties.insert(0, ",servlet=");
+                keyProperties.insert(9, c.getName());
             } else if (c instanceof Context) {
-                keyProperties.append(",context=");
+                keyProperties.insert(0, ",context=");
                 ContextName cn = new ContextName(c.getName());
-                keyProperties.append(cn.getDisplayName());
+                keyProperties.insert(9,cn.getDisplayName());
             } else if (c instanceof Host) {
-                keyProperties.append(",host=");
-                keyProperties.append(c.getName());
+                keyProperties.insert(0, ",host=");
+                keyProperties.insert(6, c.getName());
             } else if (c == null) {
                 // May happen in unit testing and/or some embedding scenarios
                 keyProperties.append(",container");
