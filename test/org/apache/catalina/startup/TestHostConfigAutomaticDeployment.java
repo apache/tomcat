@@ -64,6 +64,8 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             new File("test/deployment/broken.war");
     private static final File DIR_XML_SOURCE =
             new File("test/deployment/dirContext");
+    private static final File DIR_XML_SOURCE_META_INF =
+            new File("test/deployment/dirContext/META-INF");
     private static final File DIR_SOURCE =
             new File("test/deployment/dirNoContext");
 
@@ -71,6 +73,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     private static final int EXT = 2;
     private static final int WAR = 3;
     private static final int DIR = 4;
+    private static final int DIR_XML = 5;
 
     private static final int NONE = 1;
     private static final int RELOAD = 2;
@@ -1228,21 +1231,25 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     /*
      * Expected behaviour for the addition of files.
      *
-     * Artifacts present     Artifact   Artifacts remaining
-     * XML  WAR  EXT  DIR     Added      XML  WAR  EXT DIR   Action
-     *  N    Y    N    N       DIR        -    Y    -   A     None
-     *  N    N    N    Y       WAR        -    A    -   R   Redeploy
-     *  Y    N    N    N       DIR        Y    -    -   A     None
-     *  N    N    N    Y       XML        A    -    -   Y   Redeploy
-     *  Y    N    N    N       WAR        Y    A    -   -    Reload
-     *  N    Y    N    N       XML        A    Y    -   -   Redeploy
-     *  Y    Y    N    N       DIR        Y    Y    -   A     None
-     *  Y    N    N    Y       WAR        Y    A    -   N    Reload
-     *  N    Y    N    Y       XML        A    Y    -   Y   Redeploy
-     *  Y    N    Y    N       DIR        Y    -    Y   A     None
-     *  Y    N    Y    N       WAR        Y    A    Y   -     None
-     *  N    N    N    Y       EXT        A    -    A   R   Redeploy
-     *  N    Y    N    N       EXT        A    Y    A   -   Redeploy
+     * Artifacts present   copyXML  deployXML  Artifact   Artifacts remaining
+     * XML  WAR  EXT  DIR                       Added      XML  WAR  EXT DIR   Action
+     *  N    Y    N    N      N        Y         DIR        -    Y    -   A     None
+     *  N    N    N    Y      N        Y         WAR        -    A    -   R   Redeploy
+     *  Y    N    N    N      N        Y         DIR        Y    -    -   A     None
+     *  N    N    N    Y      N        Y         XML        A    -    -   Y   Redeploy
+     *  Y    N    N    N      N        Y         WAR        Y    A    -   -    Reload
+     *  N    Y    N    N      N        Y         XML        A    Y    -   -   Redeploy
+     *  Y    Y    N    N      N        Y         DIR        Y    Y    -   A     None
+     *  Y    N    N    Y      N        Y         WAR        Y    A    -   N    Reload
+     *  N    Y    N    Y      N        Y         XML        A    Y    -   Y   Redeploy
+     *  Y    N    Y    N      N        Y         DIR        Y    -    Y   A     None
+     *  Y    N    Y    N      N        Y         WAR        Y    A    Y   -     None
+     *  N    N    N    Y      N        Y         EXT        A    -    A   R   Redeploy
+     *  N    Y    N    N      N        Y         EXT        A    Y    A   -   Redeploy
+     *
+     *  N    N    N    Y     Y/N       N       DIR+XML      -    -    -   Y   Redeploy (failed)
+     *  N    N    N    Y      Y        Y       DIR+XML      A    -    -   Y   Redeploy
+     *  N    N    N    Y      N        Y       DIR+XML      -    -    -   Y   Redeploy
      *
      * Addition of a file  is treated as if the added file has been modified
      * with the following additional actions:
@@ -1349,10 +1356,48 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 true, true, false, XML_COOKIE_NAME, REDEPLOY);
     }
 
+    @Test
+    public void testAdditionDirAddDirXmlTF() throws Exception {
+        doTestAddition(false, false, false, false, true, true, false, DIR_XML,
+                false, false, true, null, REDEPLOY, LifecycleState.FAILED);
+    }
+
+    @Test
+    public void testAdditionDirAddDirXmlFF() throws Exception {
+        doTestAddition(false, false, false, false, true, false, false, DIR_XML,
+                false, false, true, null, REDEPLOY, LifecycleState.FAILED);
+    }
+
+    @Test
+    public void testAdditionDirAddDirXmlTT() throws Exception {
+        doTestAddition(false, false, false, false, true, true, true, DIR_XML,
+                true, false, true, DIR_COOKIE_NAME, REDEPLOY,
+                LifecycleState.STARTED);
+    }
+
+    @Test
+    public void testAdditionDirAddDirXmlFT() throws Exception {
+        doTestAddition(false, false, false, false, true, false, true, DIR_XML,
+                false, false, true, DIR_COOKIE_NAME, REDEPLOY,
+                LifecycleState.STARTED);
+    }
+
     private void doTestAddition(boolean startXml, boolean startExternalWar,
             boolean startExternalDir, boolean startWar, boolean startDir,
             int toAdd, boolean resultXml, boolean resultWar,
             boolean resultDir, String resultCookieName, int resultAction)
+            throws Exception {
+
+        doTestAddition(startXml, startExternalWar, startExternalDir, startWar,
+                startDir, false, true, toAdd, resultXml, resultWar, resultDir,
+                resultCookieName, resultAction, LifecycleState.STARTED);
+    }
+
+    private void doTestAddition(boolean startXml, boolean startExternalWar,
+            boolean startExternalDir, boolean startWar, boolean startDir,
+            boolean copyXML, boolean deployXML, int toAdd, boolean resultXml,
+            boolean resultWar, boolean resultDir, String resultCookieName,
+            int resultAction, LifecycleState state)
             throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
@@ -1379,12 +1424,15 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             war = createWar(WAR_XML_SOURCE, true);
         }
         if (startDir) {
-            dir = createDirInAppbase(true);
+            dir = createDirInAppbase(toAdd != DIR_XML);
         }
 
         if ((startWar || startExternalWar) && !startDir) {
             host.setUnpackWARs(false);
         }
+
+        host.setCopyXML(copyXML);
+        host.setDeployXML(deployXML);
 
         // Deploy the files we copied
         tomcat.start();
@@ -1420,6 +1468,10 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 } else {
                     Assert.fail();
                 }
+                break;
+            case DIR_XML:
+                dir = createDirXmlInAppbase();
+                xml = getXmlInConfigBaseForAppbase();
                 break;
             default:
                 Assert.fail();
@@ -1489,8 +1541,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             if (newContext == null) {
                 Assert.fail();
             } else {
-                Assert.assertEquals(
-                        LifecycleState.STARTED, newContext.getState());
+                Assert.assertEquals(state, newContext.getState());
             }
             Assert.assertNotSame(oldContext, newContext);
             // No init or start as that will be in a new context object
@@ -1619,6 +1670,13 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         return dir;
     }
 
+    private File createDirXmlInAppbase() throws IOException {
+        File dir = new File(getAppBaseFile(getTomcatInstance().getHost()),
+                APP_NAME.getBaseName() + "/META-INF");
+        recurrsiveCopy(DIR_XML_SOURCE_META_INF, dir);
+        return dir;
+    }
+
     private File createDirInExternal(boolean withXml) throws IOException {
         File ext = new File(external, "external" + ".war");
         if (withXml) {
@@ -1642,14 +1700,18 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     }
 
     private File createXmlInConfigBaseForAppbase() throws IOException {
-        Host host = getTomcatInstance().getHost();
-        File xml = new File(getConfigBaseFile(host), APP_NAME + ".xml");
+        File xml = getXmlInConfigBaseForAppbase();
         File parent = xml.getParentFile();
         if (!parent.isDirectory()) {
             Assert.assertTrue(parent.mkdirs());
         }
         copy(XML_SOURCE, xml);
         return xml;
+    }
+
+    private File getXmlInConfigBaseForAppbase() {
+        Host host = getTomcatInstance().getHost();
+        return new File(getConfigBaseFile(host), APP_NAME + ".xml");
     }
 
     private File createXmlInConfigBaseForExternal(File ext) throws IOException {

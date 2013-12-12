@@ -66,6 +66,12 @@
         added to member map again by ping at heartbeat thread in the node that
         received the <code>MapMessage.MSG_STOP</code>. (kfujino)
       </fix>
+      <fix>
+        Handle the case where a <code>context.xml</code> file is added to a
+        web application deployed from a directory. Previously the file was
+        ignored until Tomcat was restarted. Now (assuming automatic deployment
+        is enabled)it will trigger a redploy of the web application. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

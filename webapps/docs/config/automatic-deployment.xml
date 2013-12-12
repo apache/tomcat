@@ -514,6 +514,9 @@
         will be logged when the WAR in the <em>appBase</em> is first detected.
         If the external WAR is removed, the WAR in the <em>appBaase</em> will be
         left and may be deployed via automatic deployment.</li>
+    <li>If an XML file is added to the META-INF directory of an application
+        deployed from that DIR, the application will always be redeployed. The
+        result will be the same as for a new deployment.</li>
   </ul>
 
 </section>

@@ -1263,6 +1263,11 @@ public class HostConfig
                 deployedApp.redeployResources.put(
                         xmlCopy.getAbsolutePath(),
                         Long.valueOf(0));
+                if (!xml.exists()) {
+                    deployedApp.redeployResources.put(
+                            xml.getAbsolutePath(),
+                            Long.valueOf(0));
+                }
             }
             addWatchedResources(deployedApp, dir.getAbsolutePath(), context);
             // Add the global redeploy resources (which are never deleted) at
