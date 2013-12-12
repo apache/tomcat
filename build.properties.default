@@ -94,13 +94,13 @@ commons-logging-src.loc.2=${base-commons.loc.2}/logging/source/commons-logging-$
 commons-logging-src.tar.gz=${commons-logging.home}/commons-logging-${commons-logging.version}-src.tar.gz
 
 # ----- Avalon Framework (required by commons logging) -----
-avalon-framework.version=4.1.3
+avalon-framework.version=4.1.5
 avalon-framework.home=${base.path}/avalon-framework-${avalon-framework.version}
 avalon-framework.loc=${base-maven.loc}/avalon-framework/avalon-framework/${avalon-framework.version}/avalon-framework-${avalon-framework.version}.jar
 avalon-framework.jar=${avalon-framework.home}/avalon-framework-${avalon-framework.version}.jar
 
 # ----- log4j (required by commons logging) -----
-log4j.version=1.2.12
+log4j.version=1.2.17
 log4j.home=${base.path}/log4j-${log4j.version}
 log4j.loc=${base-maven.loc}/log4j/log4j/${log4j.version}/log4j-${log4j.version}.jar
 log4j.jar=${log4j.home}/log4j-${log4j.version}.jar
