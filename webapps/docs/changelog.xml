@@ -55,6 +55,20 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.50 (violetagg)">
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        In <code>AbstractReplicatedMap#finalize</code>, remove rpcChannel from
+        channel Listener of group channel before sending
+        <code>MapMessage.MSG_STOP</code> message. This prevent that the node
+        that sent the <code>MapMessage.MSG_STOP</code> by normal shutdown is
+        added to member map again by ping at heartbeat thread in the node that
+        received the <code>MapMessage.MSG_STOP</code>. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.49 (violetagg)">
   <subsection name="Catalina">
     <changelog>
