@@ -333,11 +333,11 @@ public abstract class AbstractReplicatedMap<K,V>
 
     @Override
     public void finalize() {
-        try {broadcast(MapMessage.MSG_STOP,false); }catch ( Exception ignore){}
-        //cleanup
         if (this.rpcChannel != null) {
             this.rpcChannel.breakdown();
         }
+        try {broadcast(MapMessage.MSG_STOP,false); }catch ( Exception ignore){}
+        //cleanup
         if (this.channel != null) {
             this.channel.removeChannelListener(this);
             this.channel.removeMembershipListener(this);
