@@ -119,6 +119,8 @@ public class TestRegistration extends TomcatBaseTest {
                     ",name=StandardContextValve",
             "Tomcat:type=WebappClassLoader,host=" + host + ",context=" + context,
             "Tomcat:type=WebResourceRoot,host=" + host + ",context=" + context,
+            "Tomcat:type=WebResourceRoot,host=" + host + ",context=" + context +
+                    ",name=Cache",
             "Tomcat:type=Realm,realmPath=/realm0,host=" + host +
             ",context=" + context,
             "Tomcat:type=Realm,realmPath=/realm0/realm0,host=" + host +
