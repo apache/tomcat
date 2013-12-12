@@ -45,6 +45,9 @@ public class Cache {
     private int maxObjectSize =
             (int) (maxSize / 20 > Integer.MAX_VALUE ? Integer.MAX_VALUE : maxSize / 20);
 
+    private AtomicLong lookupCount = new AtomicLong(0);
+    private AtomicLong hitCount = new AtomicLong(0);
+
     private final ConcurrentMap<String,CachedResource> resourceCache =
             new ConcurrentHashMap<>();
 
@@ -53,6 +56,8 @@ public class Cache {
     }
 
     protected WebResource getResource(String path, boolean useClassLoaderResources) {
+
+        lookupCount.incrementAndGet();
 
         if (noCache(path)) {
             return root.getResourceInternal(path, useClassLoaderResources);
@@ -107,6 +112,8 @@ public class Cache {
                 // Make sure it is validated
                 cacheEntry.validate(useClassLoaderResources);
             }
+        } else {
+            hitCount.incrementAndGet();
         }
 
         return cacheEntry;
@@ -196,6 +203,13 @@ public class Cache {
         this.maxSize = maxSize * 1024;
     }
 
+    public long getLookupCount() {
+        return lookupCount.get();
+    }
+
+    public long getHitCount() {
+        return hitCount.get();
+    }
 
     public void setMaxObjectSize(int maxObjectSize) {
         if (maxObjectSize * 1024L > Integer.MAX_VALUE) {
@@ -218,6 +232,10 @@ public class Cache {
 
     public void clear() {
         resourceCache.clear();
+    }
+
+    public long getSize() {
+        return size.get() / 1024;
     }
 
     private static class EvictionOrder implements Comparator<CachedResource> {

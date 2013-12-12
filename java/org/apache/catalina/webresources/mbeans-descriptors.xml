@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<mbeans-descriptors>
+
+  <mbean         name="StandardRoot"
+          description="Provides the resources implementation for a web application"
+               domain="Catalina"
+                group="WebResourceRoot"
+                 type="org.apache.catalina.webresources.StandardRoot">
+
+    <attribute   name="allowLinking"
+          description="Does this resources implementaion allow the use of symbolic links?"
+                 type="boolean"
+            writeable="true"/>
+
+    <attribute   name="cachingAllowed"
+          description="Is in memory caching of resource content and metadata enabled?"
+                 type="boolean"
+                   is="true"
+            writeable="true"/>
+
+    <attribute   name="traceLockedFiles"
+          description="Does this resources implementation track requests that lock files?"
+                 type="boolean"
+            writeable="true"/>
+
+    <attribute   name="stateName"
+          description="The current Lifecycle state of this object"
+                 type="java.lang.String"
+            writeable="false"/>
+
+  </mbean>
+
+  <mbean         name="Cache"
+          description="Provides caching of resource metadata and content"
+               domain="Catalina"
+                group="WebResourceRoot"
+                 type="org.apache.catalina.webresources.Cache">
+
+    <attribute   name="size"
+          description="The current estimate of the cache size in kB"
+                 type="long"
+            writeable="false"/>
+
+    <attribute   name="maxSize"
+          description="The maximum permitted size of the cache in kB"
+                 type="long"
+            writeable="true"/>
+
+    <attribute   name="maxObjectSize"
+          description="The maximum permitted size of the cache in kB"
+                 type="int"
+            writeable="true"/>
+
+    <attribute   name="ttl"
+          description="The time-to-live for cache entries in milliseconds"
+                 type="long"
+            writeable="true"/>
+
+    <attribute   name="ttl"
+          description="The time-to-live for cache entries in milliseconds"
+                 type="long"
+            writeable="true"/>
+
+    <attribute   name="lookupCount"
+          description="The number of requests for resources"
+                 type="long"
+            writeable="false"/>
+
+    <attribute   name="hitCount"
+          description="The number of requests for resources that were served from the cache"
+                 type="long"
+            writeable="false"/>
+
+  </mbean>
+
+</mbeans-descriptors>
