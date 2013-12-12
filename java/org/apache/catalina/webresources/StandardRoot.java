@@ -486,6 +486,14 @@ public class StandardRoot extends LifecycleMBeanBase
         return traceLockedFiles;
     }
 
+    public List<String> getTraceResources() {
+        List<String> result = new ArrayList<>(tracedResources.size());
+        for (WebResourceTraceWrapper traceWrapper : tracedResources) {
+            result.add(traceWrapper.toString());
+        }
+        return result;
+    }
+
     @Override
     public Context getContext() {
         return context;

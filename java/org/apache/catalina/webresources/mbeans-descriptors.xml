@@ -34,14 +34,19 @@
                    is="true"
             writeable="true"/>
 
+    <attribute   name="stateName"
+          description="The current Lifecycle state of this object"
+                 type="java.lang.String"
+            writeable="false"/>
+
     <attribute   name="traceLockedFiles"
           description="Does this resources implementation track requests that lock files?"
                  type="boolean"
             writeable="true"/>
 
-    <attribute   name="stateName"
-          description="The current Lifecycle state of this object"
-                 type="java.lang.String"
+    <attribute   name="traceResources"
+          description="List of resources currently being tracked for possible resource leaks"
+                 type="java.util.List"
             writeable="false"/>
 
   </mbean>
