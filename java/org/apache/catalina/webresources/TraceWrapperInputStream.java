@@ -18,6 +18,8 @@ package org.apache.catalina.webresources;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.WebResourceTraceWrapper;
@@ -92,5 +94,19 @@ class TraceWrapperInputStream extends InputStream implements WebResourceTraceWra
     @Override
     public Exception getCreatedBy() {
         return creation;
+    }
+
+    @Override
+    public String toString() {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        sw.append('[');
+        sw.append(name);
+        sw.append(']');
+        sw.append(System.lineSeparator());
+        creation.printStackTrace(pw);
+        pw.flush();
+
+        return sw.toString();
     }
 }
