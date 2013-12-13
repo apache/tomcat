@@ -215,9 +215,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         } else if (uri.charAt(0) != '/') {
             // noroot_rel_uri, resolve against the current JSP page
             uri = ctxt.resolveRelativeUri(uri);
-            if (uri != null) {
-                uri = RequestUtil.normalize(uri);
-            }
+            uri = RequestUtil.normalize(uri);
         }
 
         URL url = null;
