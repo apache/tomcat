@@ -28,9 +28,9 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * Test case for {@link TagLibraryInfo}.
+ * Test case for {@link TagLibraryInfoImpl}.
  */
-public class TestTagLibraryInfo extends TomcatBaseTest {
+public class TestTagLibraryInfoImpl extends TomcatBaseTest {
 
     @Test
     public void testRelativeTldLocation() throws Exception {
