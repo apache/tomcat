@@ -19,6 +19,8 @@ package org.apache.jasper.compiler;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,7 +48,6 @@ import org.apache.tomcat.util.descriptor.tld.TagXml;
 import org.apache.tomcat.util.descriptor.tld.TaglibXml;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.descriptor.tld.ValidatorXml;
-import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.scan.Jar;
 
 /**
@@ -215,7 +216,17 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         } else if (uri.charAt(0) != '/') {
             // noroot_rel_uri, resolve against the current JSP page
             uri = ctxt.resolveRelativeUri(uri);
-            uri = RequestUtil.normalize(uri);
+            try {
+                // Can't use RequestUtils.normalize since that package is not
+                // available to Jasper.
+                uri = (new URI(uri)).normalize().toString();
+                if (uri.startsWith("../")) {
+                    // Trying to go outside context root
+                    err.jspError("jsp.error.taglibDirective.uriInvalid", uri);
+                }
+            } catch (URISyntaxException e) {
+                err.jspError("jsp.error.taglibDirective.uriInvalid", uri);
+            }
         }
 
         URL url = null;
