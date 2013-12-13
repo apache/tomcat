@@ -72,7 +72,7 @@
                   securePort="-1"
                   host="tomcat01.mydomain.com"
                   domain="staging-cluster"
-                  uniqueId="{0,1,2,3,4,5,6,7,8,9}"/>
+                  uniqueId="{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}"/>
      </Interceptor>]]></source>
 </section>
 
