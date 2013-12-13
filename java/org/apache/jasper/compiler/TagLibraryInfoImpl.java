@@ -283,7 +283,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         if (path == null) {
             // path is required
             err.jspError("jsp.error.tagfile.missingPath");
-        } else if (!path.startsWith("/WEB-INF/tags")) {
+        } else if (!path.startsWith("/META-INF/tags") && !path.startsWith("/WEB-INF/tags")) {
             err.jspError("jsp.error.tagfile.illegalPath", path);
         }
 
