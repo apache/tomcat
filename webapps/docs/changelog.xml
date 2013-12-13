@@ -86,10 +86,11 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="Other">
+  <subsection name="Extras">
     <changelog>
       <update>
-        Update Apache Avalon Framework to version 4.1.5. Update Apache Log4J 
+        Update dependencies that are used to build tomcat-juli extras component.
+        Apache Avalon Framework is updated to version 4.1.5, Apache Log4J to
         version 1.2.17. (rjung)
       </update>
     </changelog>
