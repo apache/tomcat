@@ -350,16 +350,23 @@ public class JspCompilationContext {
         long result = -1;
         URLConnection uc = null;
         try {
-            URL jspUrl = getResource(resource);
-            if (jspUrl == null) {
-                incrementRemoved();
-                return Long.valueOf(result);
-            }
-            uc = jspUrl.openConnection();
-            if (uc instanceof JarURLConnection) {
-                result = ((JarURLConnection) uc).getJarEntry().getTime();
+            if (tagJar != null) {
+                if (resource.startsWith("/")) {
+                    resource = resource.substring(1);
+                }
+                result = tagJar.getLastModified(resource);
             } else {
-                result = uc.getLastModified();
+                URL jspUrl = getResource(resource);
+                if (jspUrl == null) {
+                    incrementRemoved();
+                    return Long.valueOf(result);
+                }
+                uc = jspUrl.openConnection();
+                if (uc instanceof JarURLConnection) {
+                    result = ((JarURLConnection) uc).getJarEntry().getTime();
+                } else {
+                    result = uc.getLastModified();
+                }
             }
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
