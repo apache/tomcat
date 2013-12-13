@@ -78,6 +78,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Fix the sample configuration of <code>StaticMembershipInterceptor</code>
+        in order to prevent warning log. uniqueId must be 16 bytes. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.49 (violetagg)">
   <subsection name="Catalina">
