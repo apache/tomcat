@@ -86,8 +86,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update Apache Avalon Framework to version 4.1.5. Update Apache Log4J 
+        version 1.2.17. (rjung)
+      </update>
+    </changelog>
+  </subsection>
 </section>
-<section name="Tomcat 7.0.49 (violetagg)">
+<section name="Tomcat 7.0.49 (violetagg)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
