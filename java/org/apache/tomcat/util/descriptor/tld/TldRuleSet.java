@@ -301,7 +301,7 @@ public class TldRuleSet extends RuleSetBase {
         private String nameGiven;
         private String nameFromAttribute;
         private String className = "java.lang.String";
-        private boolean declare;
+        private boolean declare = true;
         private int scope = VariableInfo.NESTED;
 
         public void setNameGiven(String nameGiven) {
