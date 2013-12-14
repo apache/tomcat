@@ -487,7 +487,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 if (manager instanceof DistributedManager && showProxySessions) {
                     args[5] = Integer.valueOf(
                             ((DistributedManager)manager).getActiveSessionsFull());
-                } else if (ctxt.getManager() != null){
+                } else if (manager != null){
                     args[5] = Integer.valueOf(manager.getActiveSessions());
                 } else {
                     args[5] = Integer.valueOf(0);
