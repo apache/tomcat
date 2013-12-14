@@ -225,7 +225,7 @@ public class HostConfig
         String oldContextClass = this.contextClass;
         this.contextClass = contextClass;
 
-        if (oldContextClass != contextClass) {
+        if (!oldContextClass.equals(contextClass)) {
             synchronized (digesterLock) {
                 digester = createDigester(getContextClass());
             }

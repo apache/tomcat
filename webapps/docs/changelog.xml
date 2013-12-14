@@ -64,6 +64,10 @@
         ignored until Tomcat was restarted. Now (assuming automatic deployment
         is enabled) it will trigger a redeploy of the web application. (markt)
       </fix>
+      <fix>
+        Fix string comparison in <code>HostConfig.setContextClass()</code>.
+        (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
