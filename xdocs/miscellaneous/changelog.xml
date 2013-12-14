@@ -74,7 +74,7 @@
     </fix>
     <fix>
       <bug>51813</bug>: Add NULL-checking for <code>s-&gt;net</code> to
-      avoid SIGSEGV in situations where it appears a socket bas been recycled.
+      avoid SIGSEGV in situations where it appears a socket has been recycled.
       (schultz)
     </fix>
   </changelog>
