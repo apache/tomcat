@@ -1406,6 +1406,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         response.setCommitted(true);
 
+        responseMsgPos = -1;
         responseMessage.reset();
         responseMessage.appendByte(Constants.JK_AJP13_SEND_HEADERS);
 
@@ -1655,6 +1656,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             responseMsgPos += written;
         }
 
+        // Message fully written, reset the position for a new message.
         if (responseMsgPos == len) {
             responseMsgPos = -1;
         }
