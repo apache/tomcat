@@ -76,6 +76,11 @@
         Handle the case where a WebSocket annotation configures a message size
         limit larger than the default permitted by Tomcat. (markt)
       </fix>
+      <fix>
+        <bug>55855</bug>: This is a partial fix that makes the additional of the
+        WebSocket Filter lazy so that it is not added to web applications that
+        do not need it. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
