@@ -56,7 +56,8 @@ public class PojoMessageHandlerWholeBinary
         // Update binary text size handled by session
         if (maxMessageSize > -1 && maxMessageSize > session.getMaxBinaryMessageBufferSize()) {
             if (maxMessageSize > Integer.MAX_VALUE) {
-                // IAE
+                throw new IllegalArgumentException(sm.getString(
+                        "pojoMessageHandlerWhole.maxBufferSize"));
             }
             session.setMaxBinaryMessageBufferSize((int) maxMessageSize);
         }
