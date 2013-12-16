@@ -52,6 +52,15 @@ public class PojoMessageHandlerWholeBinary
             boolean isForInputStream, long maxMessageSize) {
         super(pojo, method, session, params, indexPayload, convert,
                 indexSession, maxMessageSize);
+
+        // Update binary text size handled by session
+        if (maxMessageSize > -1 && maxMessageSize > session.getMaxBinaryMessageBufferSize()) {
+            if (maxMessageSize > Integer.MAX_VALUE) {
+                // IAE
+            }
+            session.setMaxBinaryMessageBufferSize((int) maxMessageSize);
+        }
+
         try {
             if (decoderClazzes != null) {
                 for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
