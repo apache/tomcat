@@ -269,9 +269,17 @@ public abstract class WsFrameBase {
         if (Util.isControl(opCode)) {
             result = processDataControl();
         } else if (textMessage) {
-            result = processDataText();
+            if (textMsgHandler == null) {
+                result = swallowInput();
+            } else {
+                result = processDataText();
+            }
         } else {
-            result = processDataBinary();
+            if (binaryMsgHandler == null) {
+                result = swallowInput();
+            } else {
+                result = processDataBinary();
+            }
         }
         checkRoomPayload();
         return result;
@@ -347,34 +355,32 @@ public abstract class WsFrameBase {
 
     @SuppressWarnings("unchecked")
     private void sendMessageText(boolean last) throws WsIOException {
-        if (textMsgHandler != null) {
-            if (textMsgHandler instanceof WrappedMessageHandler) {
-                long maxMessageSize =
-                        ((WrappedMessageHandler) textMsgHandler).getMaxMessageSize();
-                if (maxMessageSize > -1 &&
-                        messageBufferText.remaining() > maxMessageSize) {
-                    throw new WsIOException(new CloseReason(CloseCodes.TOO_BIG,
-                            sm.getString("wsFrame.messageTooBig",
-                                    Long.valueOf(messageBufferText.remaining()),
-                                    Long.valueOf(maxMessageSize))));
-                }
+        if (textMsgHandler instanceof WrappedMessageHandler) {
+            long maxMessageSize =
+                    ((WrappedMessageHandler) textMsgHandler).getMaxMessageSize();
+            if (maxMessageSize > -1 &&
+                    messageBufferText.remaining() > maxMessageSize) {
+                throw new WsIOException(new CloseReason(CloseCodes.TOO_BIG,
+                        sm.getString("wsFrame.messageTooBig",
+                                Long.valueOf(messageBufferText.remaining()),
+                                Long.valueOf(maxMessageSize))));
             }
+        }
 
-            try {
-                if (textMsgHandler instanceof MessageHandler.Partial<?>) {
-                    ((MessageHandler.Partial<String>) textMsgHandler).onMessage(
-                            messageBufferText.toString(), last);
-                } else {
-                    // Caller ensures last == true if this branch is used
-                    ((MessageHandler.Whole<String>) textMsgHandler).onMessage(
-                            messageBufferText.toString());
-                }
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                wsSession.getLocal().onError(wsSession, t);
-            } finally {
-                messageBufferText.clear();
+        try {
+            if (textMsgHandler instanceof MessageHandler.Partial<?>) {
+                ((MessageHandler.Partial<String>) textMsgHandler).onMessage(
+                        messageBufferText.toString(), last);
+            } else {
+                // Caller ensures last == true if this branch is used
+                ((MessageHandler.Whole<String>) textMsgHandler).onMessage(
+                        messageBufferText.toString());
             }
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            wsSession.getLocal().onError(wsSession, t);
+        } finally {
+            messageBufferText.clear();
         }
     }
 
@@ -530,28 +536,26 @@ public abstract class WsFrameBase {
     @SuppressWarnings("unchecked")
     private void sendMessageBinary(ByteBuffer msg, boolean last)
             throws WsIOException {
-        if (binaryMsgHandler != null) {
-            if (binaryMsgHandler instanceof WrappedMessageHandler) {
-                long maxMessageSize =
-                        ((WrappedMessageHandler) binaryMsgHandler).getMaxMessageSize();
-                if (maxMessageSize > -1 && msg.remaining() > maxMessageSize) {
-                    throw new WsIOException(new CloseReason(CloseCodes.TOO_BIG,
-                            sm.getString("wsFrame.messageTooBig",
-                                    Long.valueOf(msg.remaining()),
-                                    Long.valueOf(maxMessageSize))));
-                }
+        if (binaryMsgHandler instanceof WrappedMessageHandler) {
+            long maxMessageSize =
+                    ((WrappedMessageHandler) binaryMsgHandler).getMaxMessageSize();
+            if (maxMessageSize > -1 && msg.remaining() > maxMessageSize) {
+                throw new WsIOException(new CloseReason(CloseCodes.TOO_BIG,
+                        sm.getString("wsFrame.messageTooBig",
+                                Long.valueOf(msg.remaining()),
+                                Long.valueOf(maxMessageSize))));
             }
-            try {
-                if (binaryMsgHandler instanceof MessageHandler.Partial<?>) {
-                    ((MessageHandler.Partial<ByteBuffer>) binaryMsgHandler).onMessage(msg, last);
-                } else {
-                    // Caller ensures last == true if this branch is used
-                    ((MessageHandler.Whole<ByteBuffer>) binaryMsgHandler).onMessage(msg);
-                }
-            } catch(Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                wsSession.getLocal().onError(wsSession, t);
+        }
+        try {
+            if (binaryMsgHandler instanceof MessageHandler.Partial<?>) {
+                ((MessageHandler.Partial<ByteBuffer>) binaryMsgHandler).onMessage(msg, last);
+            } else {
+                // Caller ensures last == true if this branch is used
+                ((MessageHandler.Whole<ByteBuffer>) binaryMsgHandler).onMessage(msg);
             }
+        } catch(Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            wsSession.getLocal().onError(wsSession, t);
         }
     }
 
@@ -611,16 +615,10 @@ public abstract class WsFrameBase {
         if (Util.isControl(opCode)) {
             return false;
         } else if (textMessage) {
-            if (textMsgHandler != null) {
-                return textMsgHandler instanceof MessageHandler.Partial<?>;
-            }
-            return false;
+            return textMsgHandler instanceof MessageHandler.Partial<?>;
         } else {
             // Must be binary
-            if (binaryMsgHandler != null) {
-                return binaryMsgHandler instanceof MessageHandler.Partial<?>;
-            }
-            return false;
+            return binaryMsgHandler instanceof MessageHandler.Partial<?>;
         }
     }
 
@@ -649,6 +647,23 @@ public abstract class WsFrameBase {
             payloadWritten += toWrite;
             return (payloadWritten == payloadLength);
 
+        }
+    }
+
+
+    private boolean swallowInput() {
+        long toSkip = Math.min(payloadLength - payloadWritten, writePos - readPos);
+        readPos += toSkip;
+        payloadWritten += toSkip;
+        if (payloadWritten == payloadLength) {
+            if (continuationExpected) {
+                newFrame();
+            } else {
+                newMessage();
+            }
+            return true;
+        } else {
+            return false;
         }
     }
 
