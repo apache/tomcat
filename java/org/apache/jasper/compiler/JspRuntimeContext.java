@@ -20,8 +20,10 @@ package org.apache.jasper.compiler;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilePermission;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLDecoder;
 import java.security.CodeSource;
 import java.security.PermissionCollection;
 import java.security.Policy;
@@ -402,14 +404,20 @@ public final class JspRuntimeContext {
         if (parentClassLoader instanceof URLClassLoader) {
             URL [] urls = ((URLClassLoader)parentClassLoader).getURLs();
 
-            for(int i = 0; i < urls.length; i++) {
-                // Tomcat 4 can use URL's other than file URL's,
-                // a protocol other than file: will generate a
-                // bad file system path, so only add file:
-                // protocol URL's to the classpath.
+            for (int i = 0; i < urls.length; i++) {
+                // Tomcat can use URLs other than file URLs. However, a protocol
+                // other than file: will generate a bad file system path, so
+                // only add file: protocol URLs to the classpath.
 
-                if( urls[i].getProtocol().equals("file") ) {
-                    cpath.append(urls[i].getFile()+sep);
+                if (urls[i].getProtocol().equals("file") ) {
+                    try {
+                        // Need to decode the URL, primarily to convert %20
+                        // sequences back to spaces
+                        String decoded = URLDecoder.decode(urls[i].getPath(), "UTF-8");
+                        cpath.append(decoded + sep);
+                    } catch (UnsupportedEncodingException e) {
+                        // All JREs are required to support UTF-8
+                    }
                 }
             }
         }
