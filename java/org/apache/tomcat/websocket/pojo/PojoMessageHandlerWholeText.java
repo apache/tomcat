@@ -56,7 +56,8 @@ public class PojoMessageHandlerWholeText
         // Update max text size handled by session
         if (maxMessageSize > -1 && maxMessageSize > session.getMaxTextMessageBufferSize()) {
             if (maxMessageSize > Integer.MAX_VALUE) {
-                // IAE
+                throw new IllegalArgumentException(sm.getString(
+                        "pojoMessageHandlerWhole.maxBufferSize"));
             }
             session.setMaxTextMessageBufferSize((int) maxMessageSize);
         }
