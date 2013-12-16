@@ -17,8 +17,6 @@
 
 package org.apache.tomcat.util.net;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -892,26 +890,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     SocketProcessor proc = new SocketProcessor(socket, status);
                     Executor executor = getExecutor();
                     if (dispatch && executor != null) {
-                        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                        try {
-                            //threads should not be created by the webapp classloader
-                            if (Constants.IS_SECURITY_ENABLED) {
-                                PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                                        getClass().getClassLoader());
-                                AccessController.doPrivileged(pa);
-                            } else {
-                                Thread.currentThread().setContextClassLoader(
-                                        getClass().getClassLoader());
-                            }
-                            executor.execute(proc);
-                        } finally {
-                            if (Constants.IS_SECURITY_ENABLED) {
-                                PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
-                                AccessController.doPrivileged(pa);
-                            } else {
-                                Thread.currentThread().setContextClassLoader(loader);
-                            }
-                        }
+                        executor.execute(proc);
                     } else {
                         proc.run();
                     }
