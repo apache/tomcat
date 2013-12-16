@@ -72,6 +72,10 @@
         Streamline handling of WebSocket messages whe no handler is configured
         for the message currently being received. (markt)
       </scode>
+      <fix>
+        Handle the case where a WebSocket annotation configures a message size
+        limit larger than the default permitted by Tomcat. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

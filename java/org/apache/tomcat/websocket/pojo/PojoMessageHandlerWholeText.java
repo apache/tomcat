@@ -53,6 +53,15 @@ public class PojoMessageHandlerWholeText
         super(pojo, method, session, params, indexPayload, convert,
                 indexSession, maxMessageSize);
 
+        // Update max text size handled by session
+        if (maxMessageSize > -1 && maxMessageSize > session.getMaxTextMessageBufferSize()) {
+            if (maxMessageSize > Integer.MAX_VALUE) {
+                throw new IllegalArgumentException(sm.getString(
+                        "pojoMessageHandlerWhole.maxBufferSize"));
+            }
+            session.setMaxTextMessageBufferSize((int) maxMessageSize);
+        }
+
         // Check for primitives
         Class<?> type = method.getParameterTypes()[indexPayload];
         if (Util.isPrimitive(type)) {

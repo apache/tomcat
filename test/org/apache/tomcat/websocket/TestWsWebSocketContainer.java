@@ -822,23 +822,47 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
     @Test
     public void testMaxMessageSize01() throws Exception {
-        doMaxMessageSize(TesterEchoServer.BasicLimit.MAX_SIZE - 1, true);
+        doMaxMessageSize(TesterEchoServer.Config.PATH_BASIC_LIMIT_LOW,
+                TesterEchoServer.BasicLimitLow.MAX_SIZE - 1, true);
     }
 
 
     @Test
     public void testMaxMessageSize02() throws Exception {
-        doMaxMessageSize(TesterEchoServer.BasicLimit.MAX_SIZE, true);
+        doMaxMessageSize(TesterEchoServer.Config.PATH_BASIC_LIMIT_LOW,
+                TesterEchoServer.BasicLimitLow.MAX_SIZE, true);
     }
 
 
     @Test
     public void testMaxMessageSize03() throws Exception {
-        doMaxMessageSize(TesterEchoServer.BasicLimit.MAX_SIZE + 1, false);
+        doMaxMessageSize(TesterEchoServer.Config.PATH_BASIC_LIMIT_LOW,
+                TesterEchoServer.BasicLimitLow.MAX_SIZE + 1, false);
     }
 
 
-    private void doMaxMessageSize(long size, boolean expectOpen)
+    @Test
+    public void testMaxMessageSize04() throws Exception {
+        doMaxMessageSize(TesterEchoServer.Config.PATH_BASIC_LIMIT_HIGH,
+                TesterEchoServer.BasicLimitHigh.MAX_SIZE - 1, true);
+    }
+
+
+    @Test
+    public void testMaxMessageSize05() throws Exception {
+        doMaxMessageSize(TesterEchoServer.Config.PATH_BASIC_LIMIT_HIGH,
+                TesterEchoServer.BasicLimitHigh.MAX_SIZE, true);
+    }
+
+
+    @Test
+    public void testMaxMessageSize06() throws Exception {
+        doMaxMessageSize(TesterEchoServer.Config.PATH_BASIC_LIMIT_HIGH,
+                TesterEchoServer.BasicLimitHigh.MAX_SIZE + 1, false);
+    }
+
+
+    private void doMaxMessageSize(String path, long size, boolean expectOpen)
             throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
@@ -855,8 +879,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         WebSocketContainer wsContainer =
                 ContainerProvider.getWebSocketContainer();
 
-        Session s = connectToEchoServer(wsContainer, EndpointA.class,
-                TesterEchoServer.Config.PATH_BASIC_LIMIT);
+        Session s = connectToEchoServer(wsContainer, EndpointA.class, path);
 
         StringBuilder msg = new StringBuilder();
         for (long i = 0; i < size; i++) {
