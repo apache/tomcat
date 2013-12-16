@@ -22,8 +22,6 @@ import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
@@ -566,31 +564,11 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                     SocketProcessor proc = new SocketProcessor(socket,status);
                     Executor executor = getExecutor();
                     if (dispatch && executor != null) {
-                        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                        try {
-                            //threads should not be created by the webapp classloader
-                            if (Constants.IS_SECURITY_ENABLED) {
-                                PrivilegedAction<Void> pa =
-                                        new PrivilegedSetTccl(
-                                        getClass().getClassLoader());
-                                AccessController.doPrivileged(pa);
-                            } else {
-                                Thread.currentThread().setContextClassLoader(
-                                        getClass().getClassLoader());
-                            }
-                            // During shutdown, executor may be null - avoid NPE
-                            if (!running) {
-                                return;
-                            }
-                            getExecutor().execute(proc);
-                        } finally {
-                            if (Constants.IS_SECURITY_ENABLED) {
-                                PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
-                                AccessController.doPrivileged(pa);
-                            } else {
-                                Thread.currentThread().setContextClassLoader(loader);
-                            }
+                        // During shutdown, executor may be null - avoid NPE
+                        if (!running) {
+                            return;
                         }
+                        getExecutor().execute(proc);
                     } else {
                         proc.run();
                     }

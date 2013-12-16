@@ -32,8 +32,6 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.WritableByteChannel;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -631,26 +629,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             else sc.reset(socket,status);
             Executor executor = getExecutor();
             if (dispatch && executor != null) {
-                ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                try {
-                    //threads should not be created by the webapp classloader
-                    if (Constants.IS_SECURITY_ENABLED) {
-                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                                getClass().getClassLoader());
-                        AccessController.doPrivileged(pa);
-                    } else {
-                        Thread.currentThread().setContextClassLoader(
-                                getClass().getClassLoader());
-                    }
-                    executor.execute(sc);
-                } finally {
-                    if (Constants.IS_SECURITY_ENABLED) {
-                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
-                        AccessController.doPrivileged(pa);
-                    } else {
-                        Thread.currentThread().setContextClassLoader(loader);
-                    }
-                }
+                executor.execute(sc);
             } else {
                 sc.run();
             }
@@ -872,7 +851,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         private volatile boolean close = false;
         private long nextExpiration = 0;//optimize expiration handling
 
-        private AtomicLong wakeupCounter = new AtomicLong(0l);
+        private AtomicLong wakeupCounter = new AtomicLong(0);
 
         private volatile int keyCount = 0;
 
