@@ -575,7 +575,7 @@ public class WebappLoader extends LifecycleMBeanBase
         }
 
         while (loader != null) {
-            if (!buildClassPath(servletContext, classpath, loader)) {
+            if (!buildClassPath(classpath, loader)) {
                 break;
             }
             loader = loader.getParent();
@@ -585,7 +585,7 @@ public class WebappLoader extends LifecycleMBeanBase
             // Delegation was enabled, go back and add the webapp paths
             loader = getClassLoader();
             if (loader != null) {
-                buildClassPath(servletContext, classpath, loader);
+                buildClassPath(classpath, loader);
             }
         }
 
@@ -596,8 +596,7 @@ public class WebappLoader extends LifecycleMBeanBase
     }
 
 
-    private boolean buildClassPath(ServletContext servletContext,
-            StringBuilder classpath, ClassLoader loader) {
+    private boolean buildClassPath(StringBuilder classpath, ClassLoader loader) {
         if (loader instanceof URLClassLoader) {
             URL repositories[] =
                     ((URLClassLoader) loader).getURLs();
@@ -607,9 +606,6 @@ public class WebappLoader extends LifecycleMBeanBase
                         repository = utf8Decode(repository.substring(7));
                     else if (repository.startsWith("file:"))
                         repository = utf8Decode(repository.substring(5));
-                    else if (repository.startsWith("jndi:"))
-                        repository =
-                            servletContext.getRealPath(repository.substring(5));
                     else
                         continue;
                     if (repository == null)
