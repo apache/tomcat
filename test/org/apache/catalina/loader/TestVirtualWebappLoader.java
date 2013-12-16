@@ -63,7 +63,7 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
 
         loader.start();
         String[] repos = loader.getLoaderRepositories();
-        assertEquals(3,repos.length);
+        assertEquals(4,repos.length);
         loader.stop();
 
         repos = loader.getLoaderRepositories();
@@ -72,7 +72,7 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
         // no leak
         loader.start();
         repos = loader.getLoaderRepositories();
-        assertEquals(3,repos.length);
+        assertEquals(4,repos.length);
 
         // clear loader
         ctx.setLoader(null);
