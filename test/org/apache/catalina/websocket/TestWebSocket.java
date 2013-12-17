@@ -16,13 +16,11 @@
  */
 package org.apache.catalina.websocket;
 
-import java.io.BufferedReader;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -382,12 +380,11 @@ public class TestWebSocket extends TomcatBaseTest {
 
     private static class WebSocketClient {
         private OutputStream os;
-        private InputStream is;
         private boolean isContinuation = false;
         final String encoding = "ISO-8859-1";
-        private Socket socket ;
-        private Writer writer ;
-        private BufferedReader reader;
+        private Socket socket;
+        private Writer writer;
+        private CustomReader reader;
 
         public WebSocketClient(int port) {
             SocketAddress addr = new InetSocketAddress("localhost", port);
@@ -397,9 +394,7 @@ public class TestWebSocket extends TomcatBaseTest {
                 socket.connect(addr, 10000);
                 os = socket.getOutputStream();
                 writer = new OutputStreamWriter(os, encoding);
-                is = socket.getInputStream();
-                Reader r = new InputStreamReader(is, encoding);
-                reader = new BufferedReader(r);
+                reader = new CustomReader(socket.getInputStream(), encoding);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -449,28 +444,100 @@ public class TestWebSocket extends TomcatBaseTest {
         }
 
         private String readMessage() throws IOException {
-            ByteChunk bc = new ByteChunk(125);
-            CharChunk cc = new CharChunk(125);
 
             // Skip first byte
-            is.read();
+            reader.read();
 
             // Get payload length
-            int len = is.read() & 0x7F;
+            int len = reader.read() & 0x7F;
             assertTrue(len < 126);
 
             // Read payload
-            int read = 0;
-            while (read < len) {
-                read = read + is.read(bc.getBytes(), read, len - read);
+            reader.setEncoding("UTF-8");
+            return reader.read(len);
+        }
+        /*
+         * This is not a real reader but just a thin wrapper around
+         * an input stream that allows to switch encoding during
+         * reading.
+         * An example is reading headers using ISO-8859-1 and a body
+         * using UTF-8.
+         * The class is not thread-safe and not well-performing.
+         */
+        private class CustomReader {
+            private InputStream is;
+            private String encoding;
+            private boolean markSupported;
+            private B2CConverter b2c;
+
+            public CustomReader(InputStream is, String encoding) throws IOException {
+                this.is = new BufferedInputStream(is);
+                this.encoding = encoding;
+                markSupported = is.markSupported();
+                b2c = new B2CConverter(encoding);
             }
 
-            bc.setEnd(len);
+            public String getEncoding() {
+                return encoding;
+            }
 
-            B2CConverter b2c = new B2CConverter("UTF-8");
-            b2c.convert(bc, cc, true);
+            public void setEncoding(String encoding) throws IOException {
+                this.encoding = encoding;
+                b2c = new B2CConverter(encoding);
+            }
 
-            return cc.toString();
+            public int read() throws IOException {
+                return is.read();
+            }
+
+            public String read(int len) throws IOException {
+                ByteChunk bc = new ByteChunk(125);
+                CharChunk cc = new CharChunk(125);
+                int read = 0;
+                while (read < len) {
+                    read = read + is.read(bc.getBytes(), read, len - read);
+                }
+
+                bc.setEnd(len);
+                b2c.convert(bc, cc, true);
+                return cc.toString();
+            }
+
+            public String readLine() throws IOException {
+                ByteChunk bc = new ByteChunk(125);
+                CharChunk cc = new CharChunk(125);
+                char c;
+                int i = is.read();
+                int read = 0;
+                while (i != -1) {
+                    if (i != '\r' && i != '\n') {
+                        bc.append((byte)i);
+                        read++;
+                    } else if (i == '\n') {
+                        break;
+                    } else if (i == '\r') {
+                        if (markSupported) {
+                            is.mark(2);
+                        }
+                        i = read();
+                        if (i == -1) {
+                            break;
+                        } else {
+                            if (i == '\n') {
+                                break;
+                            } else {
+                                if (markSupported) {
+                                    is.reset();
+                                }
+                            }
+                        }
+                    }
+                    i = is.read();
+                }
+                bc.setEnd(read);
+                b2c.convert(bc, cc, true);
+                return cc.toString();
+            }
         }
     }
 }
