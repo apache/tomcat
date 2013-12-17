@@ -314,6 +314,7 @@
     <doMavenDeploy artifactId="tomcat-jni"/>
     <doMavenDeploy artifactId="tomcat-spdy"/>
     <doMavenDeploy artifactId="tomcat-util"/>
+    <doMavenDeploy artifactId="tomcat-util-scan"/>
     <doMavenDeploy artifactId="tomcat-coyote"/>
     <doMavenDeploy artifactId="tomcat-dbcp"/>
     <doMavenDeploy artifactId="tomcat-websocket"/>
