@@ -522,14 +522,16 @@ public abstract class AbstractEndpoint {
                 //this is our internal one, so we need to shut it down
                 ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
                 tpe.shutdownNow();
-                try {
-                    tpe.awaitTermination(getExecutorTerminationTimeoutMillis(),
-                            TimeUnit.MILLISECONDS);
-                } catch (InterruptedException e) {
-                    // Ignore
-                }
-                if (tpe.isTerminating()) {
-                    getLog().warn(sm.getString("endpoint.warn.executorShutdown", getName()));
+                long timeout = getExecutorTerminationTimeoutMillis();
+                if (timeout > 0) {
+                    try {
+                        tpe.awaitTermination(timeout, TimeUnit.MILLISECONDS);
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
+                    if (tpe.isTerminating()) {
+                        getLog().warn(sm.getString("endpoint.warn.executorShutdown", getName()));
+                    }
                 }
                 TaskQueue queue = (TaskQueue) tpe.getQueue();
                 queue.setParent(null);

@@ -83,6 +83,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        When using the BIO connector with an internal executor, do not display a
+        warning that the executor has not shutdown as the default configuration
+        for BIO connectors is not to wait. This is because threads in
+        keep-alive connections cannot be interrupted and therefore the warning
+        was nearly always displayed. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
