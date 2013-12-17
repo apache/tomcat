@@ -21,10 +21,10 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.servlet.ServletContextEvent;
@@ -293,7 +293,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     public static class Server {
 
         private Queue<Object> received = new ConcurrentLinkedQueue<>();
-        static HashMap<String, Boolean> lifeCyclesCalled = new HashMap<>(8);
+        static Map<String, Boolean> lifeCyclesCalled = new ConcurrentHashMap<>(8);
 
         @OnMessage
         public MsgString rx(MsgString in) {
