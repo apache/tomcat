@@ -451,6 +451,9 @@ public class WsServerContainer extends WsWebSocketContainer
 
 
     void shutdownExecutor() {
+        if (executorService == null) {
+            return;
+        }
         executorService.shutdown();
         try {
             executorService.awaitTermination(10, TimeUnit.SECONDS);
