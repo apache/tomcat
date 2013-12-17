@@ -30,10 +30,15 @@ package org.apache.catalina.security;
 
 public final class SecurityClassLoad {
 
-    public static void securityClassLoad(ClassLoader loader)
-        throws Exception {
+    public static void securityClassLoad(ClassLoader loader) throws Exception {
+        securityClassLoad(loader, true);
+    }
 
-        if( System.getSecurityManager() == null ){
+
+    static void securityClassLoad(ClassLoader loader, boolean requireSecurityManager)
+            throws Exception {
+
+        if (requireSecurityManager && System.getSecurityManager() == null) {
             return;
         }
 
@@ -280,8 +285,9 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage +
                 "util.net.NioBlockingSelector$BlockPoller$3");
         loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
+        // threads
         loader.loadClass
-            (basePackage + "util.net.AbstractEndpoint$PrivilegedSetTccl");
+            (basePackage + "util.threads.TaskThreadFactory$PrivilegedSetTccl");
     }
 }
 
