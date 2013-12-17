@@ -104,6 +104,9 @@
         added to member map again by ping at heartbeat thread in the node that
         received the <code>MapMessage.MSG_STOP</code>. (kfujino)
       </fix>
+      <fix>
+        Add time stamp to <code>GET_ALL_SESSION</code> message. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
