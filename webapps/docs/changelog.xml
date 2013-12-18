@@ -76,6 +76,7 @@
         Handle the case where a WebSocket annotation configures a message size
         limit larger than the default permitted by Tomcat. (markt)
       </fix>
+      <fix>
         <bug>55855</bug>: This is a partial fix that bypasses the relatively
         expensive check for a WebSocket upgrade request if not WebSocket
         endpoints have been registered. (markt) 
