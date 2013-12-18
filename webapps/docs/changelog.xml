@@ -81,6 +81,10 @@
         WebSocket Filter lazy so that it is not added to web applications that
         do not need it. (markt) 
       </fix>
+      <fix>
+        <bug>55905</bug>: Prevent a NPE when web.xml references a taglib file
+        that does not exist. Provide better error message. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

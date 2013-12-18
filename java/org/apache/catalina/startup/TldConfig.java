@@ -342,10 +342,15 @@ public final class TldConfig  implements LifecycleListener {
                 try {
                     stream = context.getServletContext().getResourceAsStream(
                             resourcePath);
-                    XmlErrorHandler handler = tldScanStream(stream);
-                    handler.logFindings(log, resourcePath);
-                    taglibUris.add(descriptor.getTaglibURI());
-                    webxmlTaglibUris.add(descriptor.getTaglibURI());
+                    if (stream != null) {
+                        XmlErrorHandler handler = tldScanStream(stream);
+                        handler.logFindings(log, resourcePath);
+                        taglibUris.add(descriptor.getTaglibURI());
+                        webxmlTaglibUris.add(descriptor.getTaglibURI());
+                    } else {
+                        log.warn(sm.getString("tldConfig.webxmlFailPathDoesNotExist", resourcePath,
+                                descriptor.getTaglibURI()));
+                    }
                 } catch (IOException ioe) {
                     log.warn(sm.getString("tldConfig.webxmlFail", resourcePath,
                             descriptor.getTaglibURI()), ioe);
