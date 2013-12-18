@@ -72,11 +72,17 @@ public class TestWsSubprotocols extends TomcatBaseTest {
                         .build(), new URI("ws://localhost:" + getPort()
                         + SubProtocolsEndpoint.PATH_BASIC));
 
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            // Ignore
+        }
         Assert.assertTrue(wsSession.isOpen());
         if (wsSession.getNegotiatedSubprotocol() != null) {
             Assert.assertTrue(wsSession.getNegotiatedSubprotocol().isEmpty());
         }
         wsSession.close();
+        SubProtocolsEndpoint.recycle();
 
         wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class, ClientEndpointConfig.Builder
@@ -84,11 +90,17 @@ public class TestWsSubprotocols extends TomcatBaseTest {
                         .build(), new URI("ws://localhost:" + getPort()
                         + SubProtocolsEndpoint.PATH_BASIC));
 
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            // Ignore
+        }
         Assert.assertTrue(wsSession.isOpen());
         Assert.assertEquals("sp2", wsSession.getNegotiatedSubprotocol());
         Assert.assertArrayEquals(new String[]{"sp1","sp2"},
                 SubProtocolsEndpoint.subprotocols.toArray(new String[2]));
         wsSession.close();
+        SubProtocolsEndpoint.recycle();
     }
 
     @ServerEndpoint(value = "/echo", subprotocols = {"sp1","sp2"})
@@ -100,6 +112,10 @@ public class TestWsSubprotocols extends TomcatBaseTest {
         public void processOpen(@SuppressWarnings("unused") Session session,
                 EndpointConfig  epc) {
             subprotocols = ((ServerEndpointConfig)epc).getSubprotocols();
+        }
+
+        public static void recycle() {
+            subprotocols = null;
         }
 
     }
