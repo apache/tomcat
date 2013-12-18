@@ -72,11 +72,6 @@ public class TestWsSubprotocols extends TomcatBaseTest {
                         .build(), new URI("ws://localhost:" + getPort()
                         + SubProtocolsEndpoint.PATH_BASIC));
 
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            // Ignore
-        }
         Assert.assertTrue(wsSession.isOpen());
         if (wsSession.getNegotiatedSubprotocol() != null) {
             Assert.assertTrue(wsSession.getNegotiatedSubprotocol().isEmpty());
@@ -90,13 +85,16 @@ public class TestWsSubprotocols extends TomcatBaseTest {
                         .build(), new URI("ws://localhost:" + getPort()
                         + SubProtocolsEndpoint.PATH_BASIC));
 
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            // Ignore
-        }
         Assert.assertTrue(wsSession.isOpen());
         Assert.assertEquals("sp2", wsSession.getNegotiatedSubprotocol());
+        // Client thread might move faster than server. Wait for upto 5s for the
+        // subProtocols to be set
+        int count = 0;
+        while (count < 50 && SubProtocolsEndpoint.subprotocols == null) {
+            count++;
+            Thread.sleep(100);
+        }
+        Assert.assertNotNull(SubProtocolsEndpoint.subprotocols);
         Assert.assertArrayEquals(new String[]{"sp1","sp2"},
                 SubProtocolsEndpoint.subprotocols.toArray(new String[2]));
         wsSession.close();
@@ -106,7 +104,7 @@ public class TestWsSubprotocols extends TomcatBaseTest {
     @ServerEndpoint(value = "/echo", subprotocols = {"sp1","sp2"})
     public static class SubProtocolsEndpoint {
         public static String PATH_BASIC = "/echo";
-        public static List<String> subprotocols;
+        public static volatile List<String> subprotocols;
 
         @OnOpen
         public void processOpen(@SuppressWarnings("unused") Session session,
