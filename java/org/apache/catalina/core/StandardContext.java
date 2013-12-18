@@ -35,6 +35,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -4629,34 +4630,33 @@ public class StandardContext extends ContainerBase
      */
     public boolean filterStart() {
 
-        if (getLogger().isDebugEnabled())
+        if (getLogger().isDebugEnabled()) {
             getLogger().debug("Starting filters");
+        }
         // Instantiate and record a FilterConfig for each defined filter
         boolean ok = true;
         synchronized (filterConfigs) {
             filterConfigs.clear();
-            Iterator<String> names = filterDefs.keySet().iterator();
-            while (names.hasNext()) {
-                String name = names.next();
-                if (getLogger().isDebugEnabled())
+            for (Entry<String,FilterDef> entry : filterDefs.entrySet()) {
+                String name = entry.getKey();
+                if (getLogger().isDebugEnabled()) {
                     getLogger().debug(" Starting filter '" + name + "'");
-                ApplicationFilterConfig filterConfig = null;
+                }
                 try {
-                    filterConfig =
-                        new ApplicationFilterConfig(this, filterDefs.get(name));
+                    ApplicationFilterConfig filterConfig =
+                            new ApplicationFilterConfig(this, entry.getValue());
                     filterConfigs.put(name, filterConfig);
                 } catch (Throwable t) {
                     t = ExceptionUtils.unwrapInvocationTargetException(t);
                     ExceptionUtils.handleThrowable(t);
-                    getLogger().error
-                        (sm.getString("standardContext.filterStart", name), t);
+                    getLogger().error(sm.getString(
+                            "standardContext.filterStart", name), t);
                     ok = false;
                 }
             }
         }
 
-        return (ok);
-
+        return ok;
     }
 
 
