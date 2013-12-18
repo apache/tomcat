@@ -47,10 +47,12 @@ public class RequestInfoExample extends HttpServlet {
         throws IOException, ServletException
     {
         response.setContentType("text/html");
+        response.setCharacterEncoding("UTF-8");
 
         PrintWriter out = response.getWriter();
-        out.println("<html>");
+        out.println("<!DOCTYPE html><html>");
         out.println("<head>");
+        out.println("<meta charset=\"UTF-8\" />");
 
         String title = RB.getString("requestinfo.title");
         out.println("<title>" + title + "</title>");
