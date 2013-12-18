@@ -4638,25 +4638,32 @@ public class StandardContext extends ContainerBase
         synchronized (filterConfigs) {
             filterConfigs.clear();
             for (Entry<String,FilterDef> entry : filterDefs.entrySet()) {
-                String name = entry.getKey();
-                if (getLogger().isDebugEnabled()) {
-                    getLogger().debug(" Starting filter '" + name + "'");
-                }
-                try {
-                    ApplicationFilterConfig filterConfig =
-                            new ApplicationFilterConfig(this, entry.getValue());
-                    filterConfigs.put(name, filterConfig);
-                } catch (Throwable t) {
-                    t = ExceptionUtils.unwrapInvocationTargetException(t);
-                    ExceptionUtils.handleThrowable(t);
-                    getLogger().error(sm.getString(
-                            "standardContext.filterStart", name), t);
+                if (!filterStart(entry.getKey(), entry.getValue())) {
                     ok = false;
                 }
             }
         }
 
         return ok;
+    }
+
+
+    private boolean filterStart(String name, FilterDef filterDef) {
+        if (getLogger().isDebugEnabled()) {
+            getLogger().debug(" Starting filter '" + name + "'");
+        }
+        try {
+            ApplicationFilterConfig filterConfig =
+                    new ApplicationFilterConfig(this, filterDef);
+            filterConfigs.put(name, filterConfig);
+        } catch (Throwable t) {
+            t = ExceptionUtils.unwrapInvocationTargetException(t);
+            ExceptionUtils.handleThrowable(t);
+            getLogger().error(sm.getString(
+                    "standardContext.filterStart", name), t);
+            return false;
+        }
+        return true;
     }
 
 
