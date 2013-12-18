@@ -44,9 +44,10 @@
 
   <section name="Downloading">
   <p>
-    To download the extras components open the Tomcat download page and
-    select "browse" from the Quick Navigation Links. The extras components can be
-    found in bin/extras.
+    To download the extras components open the
+    <a href="http://tomcat.apache.org/download-80.cgi">Tomcat download page</a>
+    and select "Browse" from the Quick Navigation Links. The extras components
+    can be found in bin/extras.
   </p>
   </section>
 
