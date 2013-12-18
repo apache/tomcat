@@ -175,21 +175,27 @@ public class TldScanner {
             }
 
             URL url = context.getResource(resourcePath);
-            TldResourcePath tldResourcePath;
-            if (resourcePath.endsWith(".jar")) {
-                // if the path points to a jar file, the TLD is presumed to be
-                // inside at META-INF/taglib.tld
-                tldResourcePath = new TldResourcePath(
-                        url, resourcePath, "META-INF/taglib.tld");
+            if (url != null) {
+                TldResourcePath tldResourcePath;
+                if (resourcePath.endsWith(".jar")) {
+                    // if the path points to a jar file, the TLD is presumed to be
+                    // inside at META-INF/taglib.tld
+                    tldResourcePath = new TldResourcePath(url, resourcePath, "META-INF/taglib.tld");
+                } else {
+                    tldResourcePath = new TldResourcePath(url, resourcePath);
+                }
+                // parse TLD but store using the URI supplied in the descriptor
+                TaglibXml tld = tldParser.parse(tldResourcePath);
+                uriTldResourcePathMap.put(taglibURI, tldResourcePath);
+                tldResourcePathTaglibXmlMap.put(tldResourcePath, tld);
+                if (tld.getListeners() != null) {
+                    listeners.addAll(tld.getListeners());
+                }
             } else {
-                tldResourcePath = new TldResourcePath(url, resourcePath);
-            }
-            // parse TLD but store using the URI supplied in the descriptor
-            TaglibXml tld = tldParser.parse(tldResourcePath);
-            uriTldResourcePathMap.put(taglibURI, tldResourcePath);
-            tldResourcePathTaglibXmlMap.put(tldResourcePath, tld);
-            if (tld.getListeners() != null) {
-                listeners.addAll(tld.getListeners());
+                log.warn(Localizer.getMessage(MSG + ".webxmlFailPathDoesNotExist",
+                        resourcePath,
+                        taglibURI));
+                continue;
             }
         }
     }
