@@ -88,6 +88,7 @@ public class WsServerContainer extends WsWebSocketContainer
     private final ConcurrentHashMap<String,Set<WsSession>> authenticatedSessions =
             new ConcurrentHashMap<String, Set<WsSession>>();
     private final ExecutorService executorService;
+    private volatile boolean endpointsRegistered = false;
 
     WsServerContainer(ServletContext servletContext) {
 
@@ -208,6 +209,8 @@ public class WsServerContainer extends WsWebSocketContainer
                         sm.getString("serverContainer.duplicatePaths", path));
             }
         }
+
+        endpointsRegistered = true;
     }
 
 
@@ -267,6 +270,11 @@ public class WsServerContainer extends WsWebSocketContainer
                 methodMapping);
 
         addEndpoint(sec);
+    }
+
+
+    boolean areEndpointsRegistered() {
+        return endpointsRegistered;
     }
 
 

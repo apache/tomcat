@@ -47,7 +47,8 @@ public class WsFilter implements Filter {
             FilterChain chain) throws IOException, ServletException {
 
         // This filter only needs to handle WebSocket upgrade requests
-        if (!UpgradeUtil.isWebSocketUpgrageRequest(request, response)) {
+        if (!sc.areEndpointsRegistered() ||
+                !UpgradeUtil.isWebSocketUpgradeRequest(request, response)) {
             chain.doFilter(request, response);
             return;
         }

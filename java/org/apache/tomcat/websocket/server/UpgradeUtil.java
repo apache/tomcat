@@ -67,7 +67,7 @@ public class UpgradeUtil {
      *       WebSocket spec 1.0, section 8.2 implies such a limitation and RFC
      *       6455 section 4.1 requires that a WebSocket Upgrade uses GET.
      */
-    public static boolean isWebSocketUpgrageRequest(ServletRequest request,
+    public static boolean isWebSocketUpgradeRequest(ServletRequest request,
             ServletResponse response) {
 
         return ((request instanceof HttpServletRequest) &&
