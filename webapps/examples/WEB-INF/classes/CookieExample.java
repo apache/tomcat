@@ -57,10 +57,12 @@ public class CookieExample extends HttpServlet {
         }
 
         response.setContentType("text/html");
+        response.setCharacterEncoding("UTF-8");
 
         PrintWriter out = response.getWriter();
-        out.println("<html>");
+        out.println("<!DOCTYPE html><html>");
         out.println("<head>");
+        out.println("<meta charset=\"UTF-8\" />");
 
         String title = RB.getString("cookies.title");
         out.println("<title>" + title + "</title>");
