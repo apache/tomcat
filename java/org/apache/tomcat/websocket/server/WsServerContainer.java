@@ -87,89 +87,74 @@ public class WsServerContainer extends WsWebSocketContainer
     private volatile boolean addAllowed = true;
     private final ConcurrentHashMap<String,Set<WsSession>> authenticatedSessions =
             new ConcurrentHashMap<String, Set<WsSession>>();
-    private ExecutorService executorService;
-    private volatile boolean initialized = false;
+    private final ExecutorService executorService;
 
     WsServerContainer(ServletContext servletContext) {
+
         this.servletContext = servletContext;
-    }
 
-    private void init() {
-
-        // Double checked locking. This is safe since Java > 1.5 and initialized
-        // is volatile
-        if (initialized) {
-            return;
+        // Configure servlet context wide defaults
+        String value = servletContext.getInitParameter(
+                Constants.BINARY_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM);
+        if (value != null) {
+            setDefaultMaxBinaryMessageBufferSize(Integer.parseInt(value));
         }
-        synchronized (this) {
-            if (initialized) {
-                return;
-            }
-            initialized = true;
 
-            // Configure servlet context wide defaults
-            String value = servletContext.getInitParameter(
-                    Constants.BINARY_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM);
-            if (value != null) {
-                setDefaultMaxBinaryMessageBufferSize(Integer.parseInt(value));
-            }
-
-            value = servletContext.getInitParameter(
-                    Constants.TEXT_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM);
-            if (value != null) {
-                setDefaultMaxTextMessageBufferSize(Integer.parseInt(value));
-            }
-
-            value = servletContext.getInitParameter(
-                    Constants.ENFORCE_NO_ADD_AFTER_HANDSHAKE_CONTEXT_INIT_PARAM);
-            if (value != null) {
-                setEnforceNoAddAfterHandshake(Boolean.parseBoolean(value));
-            }
-            // Executor config
-            int executorCoreSize = 0;
-            int executorMaxSize = 10;
-            long executorKeepAliveTimeSeconds = 60;
-            value = servletContext.getInitParameter(
-                    Constants.EXECUTOR_CORE_SIZE_INIT_PARAM);
-            if (value != null) {
-                executorCoreSize = Integer.parseInt(value);
-            }
-            value = servletContext.getInitParameter(
-                    Constants.EXECUTOR_MAX_SIZE_INIT_PARAM);
-            if (value != null) {
-                executorMaxSize = Integer.parseInt(value);
-            }
-            value = servletContext.getInitParameter(
-                    Constants.EXECUTOR_KEEPALIVETIME_SECONDS_INIT_PARAM);
-            if (value != null) {
-                executorKeepAliveTimeSeconds = Long.parseLong(value);
-            }
-
-            FilterRegistration.Dynamic fr = servletContext.addFilter(
-                    "Tomcat WebSocket (JSR356) Filter", new WsFilter());
-            fr.setAsyncSupported(true);
-
-            EnumSet<DispatcherType> types = EnumSet.of(DispatcherType.REQUEST,
-                    DispatcherType.FORWARD);
-
-            fr.addMappingForUrlPatterns(types, true, "/*");
-
-            // Use a per web application executor for any threads the the WebSocket
-            // server code needs to create. Group all of the threads under a single
-            // ThreadGroup.
-            StringBuffer threadGroupName = new StringBuffer("WebSocketServer-");
-            if ("".equals(servletContext.getContextPath())) {
-                threadGroupName.append("ROOT");
-            } else {
-                threadGroupName.append(servletContext.getContextPath());
-            }
-            ThreadGroup threadGroup = new ThreadGroup(threadGroupName.toString());
-            WsThreadFactory wsThreadFactory = new WsThreadFactory(threadGroup);
-
-            executorService = new ThreadPoolExecutor(executorCoreSize,
-                    executorMaxSize, executorKeepAliveTimeSeconds, TimeUnit.SECONDS,
-                    new LinkedBlockingQueue<Runnable>(), wsThreadFactory);
+        value = servletContext.getInitParameter(
+                Constants.TEXT_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM);
+        if (value != null) {
+            setDefaultMaxTextMessageBufferSize(Integer.parseInt(value));
         }
+
+        value = servletContext.getInitParameter(
+                Constants.ENFORCE_NO_ADD_AFTER_HANDSHAKE_CONTEXT_INIT_PARAM);
+        if (value != null) {
+            setEnforceNoAddAfterHandshake(Boolean.parseBoolean(value));
+        }
+        // Executor config
+        int executorCoreSize = 0;
+        int executorMaxSize = 10;
+        long executorKeepAliveTimeSeconds = 60;
+        value = servletContext.getInitParameter(
+                Constants.EXECUTOR_CORE_SIZE_INIT_PARAM);
+        if (value != null) {
+            executorCoreSize = Integer.parseInt(value);
+        }
+        value = servletContext.getInitParameter(
+                Constants.EXECUTOR_MAX_SIZE_INIT_PARAM);
+        if (value != null) {
+            executorMaxSize = Integer.parseInt(value);
+        }
+        value = servletContext.getInitParameter(
+                Constants.EXECUTOR_KEEPALIVETIME_SECONDS_INIT_PARAM);
+        if (value != null) {
+            executorKeepAliveTimeSeconds = Long.parseLong(value);
+        }
+
+        FilterRegistration.Dynamic fr = servletContext.addFilter(
+                WsFilter.class.getName(), new WsFilter());
+        fr.setAsyncSupported(true);
+
+        EnumSet<DispatcherType> types = EnumSet.of(DispatcherType.REQUEST,
+                DispatcherType.FORWARD);
+
+        fr.addMappingForUrlPatterns(types, true, "/*");
+
+        // Use a per web application executor for any threads the the WebSocket
+        // server code needs to create. Group all of the threads under a single
+        // ThreadGroup.
+        StringBuffer threadGroupName = new StringBuffer("WebSocketServer-");
+        if ("".equals(servletContext.getContextPath())) {
+            threadGroupName.append("ROOT");
+        } else {
+            threadGroupName.append(servletContext.getContextPath());
+        }
+        ThreadGroup threadGroup = new ThreadGroup(threadGroupName.toString());
+        WsThreadFactory wsThreadFactory = new WsThreadFactory(threadGroup);
+
+        executorService = new ThreadPoolExecutor(executorCoreSize,
+                executorMaxSize, executorKeepAliveTimeSeconds, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<Runnable>(), wsThreadFactory);
     }
 
 
@@ -184,8 +169,6 @@ public class WsServerContainer extends WsWebSocketContainer
     @Override
     public void addEndpoint(ServerEndpointConfig sec)
             throws DeploymentException {
-
-        init();
 
         if (enforceNoAddAfterHandshake && !addAllowed) {
             throw new DeploymentException(
@@ -237,8 +220,6 @@ public class WsServerContainer extends WsWebSocketContainer
      */
     @Override
     public void addEndpoint(Class<?> pojo) throws DeploymentException {
-
-        init();
 
         ServerEndpoint annotation = pojo.getAnnotation(ServerEndpoint.class);
         if (annotation == null) {
