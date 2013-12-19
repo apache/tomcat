@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterRegistration;
@@ -76,6 +77,12 @@ public class JspCServletContext implements ServletContext {
 
 
     /**
+     * Servlet context initialization parameters.
+     */
+    private final ConcurrentHashMap<String,String> myParameters;
+
+
+    /**
      * The log writer we will write log messages to.
      */
     private final PrintWriter myLogWriter;
@@ -114,6 +121,7 @@ public class JspCServletContext implements ServletContext {
         throws JasperException {
 
         myAttributes = new HashMap<>();
+        myParameters = new ConcurrentHashMap<>();
         myLogWriter = aLogWriter;
         myResourceBaseURL = aResourceBaseURL;
         this.loader = classLoader;
@@ -232,7 +240,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getInitParameter(String name) {
-        return null;
+        return myParameters.get(name);
     }
 
 
@@ -242,7 +250,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public Enumeration<String> getInitParameterNames() {
-        return new Vector<String>().elements();
+        return myParameters.keys();
     }
 
 
@@ -619,7 +627,7 @@ public class JspCServletContext implements ServletContext {
 
     @Override
     public boolean setInitParameter(String name, String value) {
-        return false;
+        return myParameters.putIfAbsent(name, value) == null;
     }
 
 
