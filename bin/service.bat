@@ -19,14 +19,14 @@ rem ---------------------------------------------------------------------------
 rem NT Service Install/Uninstall script
 rem
 rem Options
-rem install                Install the service using Tomcat@VERSION_MAJOR@ as service name.
+rem install                Install the service using Tomcat7 as service name.
 rem                        Service is installed using default settings.
 rem remove                 Remove the service from the System.
 rem
 rem name        (optional) If the second argument is present it is considered
 rem                        to be new service name
 rem
-rem $Id$
+rem $Id: service.bat 1000718 2010-09-24 06:00:00Z mturk $
 rem ---------------------------------------------------------------------------
 
 set "SELF=%~dp0%service.bat"
@@ -34,19 +34,19 @@ rem Guess CATALINA_HOME if not defined
 set "CURRENT_DIR=%cd%"
 if not "%CATALINA_HOME%" == "" goto gotHome
 set "CATALINA_HOME=%cd%"
-if exist "%CATALINA_HOME%\bin\tomcat@VERSION_MAJOR@.exe" goto okHome
+if exist "%CATALINA_HOME%\bin\tomcat7.exe" goto okHome
 rem CD to the upper dir
 cd ..
 set "CATALINA_HOME=%cd%"
 :gotHome
-if exist "%CATALINA_HOME%\bin\tomcat@VERSION_MAJOR@.exe" goto okHome
-echo The tomcat.exe was not found...
+if exist "%CATALINA_HOME%\bin\tomcat7.exe" goto okHome
+echo The tomcat7.exe was not found...
 echo The CATALINA_HOME environment variable is not defined correctly.
 echo This environment variable is needed to run this program
 goto end
 :okHome
 rem Make sure prerequisite environment variables are set
-if not "%JAVA_HOME%" == "" goto gotJdkHome
+rem if not "%JAVA_HOME%" == "" goto gotJdkHome
 if not "%JRE_HOME%" == "" goto gotJreHome
 echo Neither the JAVA_HOME nor the JRE_HOME environment variable is defined
 echo Service will try to guess them from the registry.
@@ -54,6 +54,7 @@ goto okJavaHome
 :gotJreHome
 if not exist "%JRE_HOME%\bin\java.exe" goto noJavaHome
 if not exist "%JRE_HOME%\bin\javaw.exe" goto noJavaHome
+set "JRE_HOME=%JRE_HOME%"
 goto okJavaHome
 :gotJdkHome
 if not exist "%JAVA_HOME%\jre\bin\java.exe" goto noJavaHome
@@ -72,11 +73,11 @@ if not "%CATALINA_BASE%" == "" goto gotBase
 set "CATALINA_BASE=%CATALINA_HOME%"
 :gotBase
 
-set "EXECUTABLE=%CATALINA_HOME%\bin\tomcat@VERSION_MAJOR@.exe"
+set "EXECUTABLE=%CATALINA_HOME%\bin\tomcat7.exe"
 
 rem Set default Service name
-set SERVICE_NAME=Tomcat@VERSION_MAJOR@
-set PR_DISPLAYNAME=Apache Tomcat @VERSION_MAJOR@
+set SERVICE_NAME=Tomcat7
+set PR_DISPLAYNAME=Apache Tomcat 7
 
 if "x%1x" == "xx" goto displayUsage
 set SERVICE_CMD=%1
@@ -128,7 +129,7 @@ echo Using JRE_HOME:         "%JRE_HOME%"
 rem Use the environment variables as an example
 rem Each command line option is prefixed with PR_
 
-set PR_DESCRIPTION=Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/
+set PR_DESCRIPTION=Apache Tomcat 7.0.47 Server - http://tomcat.apache.org/
 set "PR_INSTALL=%EXECUTABLE%"
 set "PR_LOGPATH=%CATALINA_BASE%\logs"
 set "PR_CLASSPATH=%CATALINA_HOME%\bin\bootstrap.jar;%CATALINA_BASE%\bin\tomcat-juli.jar;%CATALINA_HOME%\bin\tomcat-juli.jar"
