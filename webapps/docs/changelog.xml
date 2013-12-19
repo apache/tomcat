@@ -98,6 +98,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        JspC uses servlet context initialization parameters to pass
+        configuration so ensure that the servlet context used supports
+        initialization parameters. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
