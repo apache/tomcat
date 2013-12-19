@@ -655,7 +655,7 @@ public interface Context extends Container {
     /**
      * *.tld files are always parsed using a namespace aware parser.
      *
-     * @return Always <code>true</true>
+     * @return Always <code>true</code>
      * 
      * @deprecated This option will be removed in 8.0.x.
      */
@@ -668,7 +668,7 @@ public interface Context extends Container {
      *
      * @param tldNamespaceAware ignored
      * 
-     * @deprecated
+     * @deprecated This option will be removed in 8.0.x.
      */
     @Deprecated
     public void setTldNamespaceAware(boolean tldNamespaceAware);
