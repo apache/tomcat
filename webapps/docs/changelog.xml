@@ -57,10 +57,12 @@
 -->
 <section name="Tomcat 7.0.51 (violetagg)">
   <subsection name="Coyote">
-    <fix>
-      Avoid possible NPE if a content type is specified without a character set.
-      (markt)
+    <changelog>
+      <fix>
+        Avoid possible NPE if a content type is specified without a character
+        set. (markt)
     </fix>
+    </changelog>
   </subsection>
 </section>
 <section name="Tomcat 7.0.50 (violetagg)">
