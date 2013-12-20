@@ -64,6 +64,14 @@
     </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Correct a regression in the XML refactoring that meant that errors in
+        TLD files were swallowed. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.50 (violetagg)">
   <subsection name="Catalina">

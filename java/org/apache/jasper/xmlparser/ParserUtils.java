@@ -36,7 +36,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.EntityResolver;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -51,11 +50,6 @@ import org.xml.sax.SAXParseException;
  * @version $Id$
  */
 public class ParserUtils {
-
-    /**
-     * An error handler for use when parsing XML documents.
-     */
-    static ErrorHandler errorHandler = new XmlErrorHandler();
 
     /**
      * An entity resolver for use when parsing XML documents.
@@ -106,8 +100,13 @@ public class ParserUtils {
             factory.setValidating(validating);
             DocumentBuilder builder = factory.newDocumentBuilder();
             builder.setEntityResolver(entityResolverInstance);
-            builder.setErrorHandler(errorHandler);
+            XmlErrorHandler handler = new XmlErrorHandler();
+            builder.setErrorHandler(handler);
             document = builder.parse(is);
+            if (!handler.getErrors().isEmpty()) {
+                // throw the first to indicate there was a error during processing
+                throw handler.getErrors().iterator().next();
+            }
         } catch (ParserConfigurationException ex) {
             throw new JasperException
                 (Localizer.getMessage("jsp.error.parse.xml", location), ex);
