@@ -72,6 +72,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Add index.xhtml to the welcome files list for the examples web
+        application. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.50 (violetagg)">
   <subsection name="Catalina">
