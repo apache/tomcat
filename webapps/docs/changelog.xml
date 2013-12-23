@@ -225,6 +225,10 @@
         Change the default URIEncoding for all connectors from ISO-8859-1 to
         UTF-8. (markt)
       </update>
+      <scode>
+        <bug>55917</bug>: Allow ISO-8859-1 characters 0xA0-0xFF in V0 cookie
+        values (jboynes).
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -17,9 +17,113 @@
 
 package org.apache.tomcat.util.http;
 
+import java.nio.charset.StandardCharsets;
+
+import javax.servlet.http.Cookie;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestCookies {
+    private Cookies cookies;
+
+    @Before
+    public void init() {
+        this.cookies = new Cookies(null);
+    }
+
+    @Test
+    public void skipJsonInV0Value() {
+        process("bad={\"v\":1,\"x\":2}; a=b");
+        expect(makeCookie("a", "b", 0));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void disallow8bitInName() {
+        process("f\u00f6o=bar");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void disallowControlInName() {
+        process("f\010o=bar");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void disallow8BitControlInName() {
+        process("f\210o=bar");
+    }
+
+    @Test
+    public void allow8BitInV0Value() {
+        process("foo=b\u00e1r");
+        expect(makeCookie("foo", "b\u00e1r", 0));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void disallow8bitInV1UnquotedValue() {
+        process("$Version=1; foo=b\u00e1r");
+    }
+
+    @Test
+    public void allow8bitInV1QuotedValue() {
+        process("$Version=1; foo=\"b\u00e1r\"");
+        expect(makeCookie("foo", "b\u00e1r", 1));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void disallowControlInV0Value() {
+        process("foo=b\010r");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void disallow8BitControlInV0Value() {
+        process("foo=b\210r");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void disallowControlInV1UnquotedValue() {
+        process("$Version=1; foo=b\010r");
+    }
+
+    @Ignore
+    @Test(expected = IllegalArgumentException.class)
+    public void disallowControlInV1QuotedValue() {
+        process("$Version=1; foo=\"b\010r\"");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void disallow8BitControlInV1UnquotedValue() {
+        process("$Version=1; foo=b\210r");
+    }
+
+    @Ignore
+    @Test
+    public void allow8BitControlInV1QuotedValue() {
+        process("$Version=1; foo=\"b\210r\"");
+        expect(makeCookie("foo", "b\210r", 1));
+    }
+
+    private void process(String header) {
+        byte[] bytes = header.getBytes(StandardCharsets.ISO_8859_1);
+        cookies.processCookieHeader(bytes, 0, bytes.length);
+    }
+
+    private void expect(Cookie... expected) {
+        Assert.assertEquals(expected.length, cookies.getCookieCount());
+        for (int i = 0; i < expected.length; i++) {
+            ServerCookie actual = cookies.getCookie(i);
+            Assert.assertEquals(expected[i].getName(), actual.getName().toString());
+            Assert.assertEquals(expected[i].getValue(), actual.getValue().toString());
+        }
+    }
+
+    private static Cookie makeCookie(String name, String value, int version) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setVersion(version);
+        return cookie;
+    }
 
     @Test
     public void testCookies() throws Exception {
