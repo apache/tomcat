@@ -508,7 +508,14 @@ public final class Cookies {
     private static final int getTokenEndPosition(byte bytes[], int off, int end,
             int version, boolean isName){
         int pos = off;
-        while (pos < end && allowInToken(bytes[pos], version, isName)) {
+        while (pos < end &&
+                (!CookieSupport.isHttpSeparator((char)bytes[pos]) ||
+                 version == 0 &&
+                        CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
+                        bytes[pos] != '=' &&
+                        !CookieSupport.isV0Separator((char)bytes[pos]) ||
+                 !isName && bytes[pos] == '=' &&
+                         CookieSupport.ALLOW_EQUALS_IN_VALUE)) {
             pos++;
         }
 
@@ -516,34 +523,6 @@ public final class Cookies {
             return end;
         }
         return pos;
-    }
-
-    private static boolean allowInToken(byte b, int version, boolean isName) {
-        // byte is signed so cast into a positive int for comparisons
-        int octet = ((int)b) & 0xff;
-
-        // disallow all controls
-        if (octet < 0x20 && octet != 0x09 || octet >= 0x7f && octet < 0xa0) {
-            throw new IllegalArgumentException(
-                    "Control character in cookie value or attribute.");
-        }
-
-        // values 0xa0-0xff are allowed in V0 values, otherwise disallow
-        if (octet >= 0x80) {
-            if (isName || version != 0) {
-                throw new IllegalArgumentException(
-                        "Control character in cookie value or attribute.");
-            }
-            return true;
-        }
-
-        return !CookieSupport.isHttpSeparator((char) b) ||
-                version == 0 &&
-                        CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
-                        b != '=' &&
-                        !CookieSupport.isV0Separator((char) b) ||
-                !isName && b == '=' &&
-                        CookieSupport.ALLOW_EQUALS_IN_VALUE;
     }
 
     /**
