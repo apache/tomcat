@@ -192,7 +192,7 @@
         removed. (jboynes)
       </scode>
       <fix>
-        Chnage ordering of elements of JMX objects names so components are
+        Change ordering of elements of JMX objects names so components are
         grouped more logically in JConsole. Generally, components are now
         grouped by Host and then by Context. (markt)
       </fix>
