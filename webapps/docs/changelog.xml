@@ -78,6 +78,10 @@
         Add index.xhtml to the welcome files list for the examples web
         application. (kkolinko)
       </fix>
+      <fix>
+        Clarify that the connectionTimeout may also be used as the read timeout
+        when reading a request body (if any). (markt) 
+      </fix>
     </changelog>
   </subsection>
 </section>

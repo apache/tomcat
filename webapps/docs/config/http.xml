@@ -347,7 +347,8 @@
       presented. Use a value of -1 to indicate no (i.e. infinite) timeout.
       The default value is 60000 (i.e. 60 seconds) but note that the standard
       server.xml that ships with Tomcat sets this to 20000 (i.e. 20 seconds).
-      </p>
+      Unless <strong>disableUploadTimeout</strong> is set to <code>false</code>,
+      this timeout will also be used when reading the request body (if any).</p>
     </attribute>
 
     <attribute name="connectionUploadTimeout" required="false">
