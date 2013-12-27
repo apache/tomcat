@@ -4912,7 +4912,7 @@ public class StandardContext extends ContainerBase
         resources.setCachingAllowed(isCachingAllowed());
         resources.setCacheTtl(getCacheTTL());
         resources.setCacheMaxSize(getCacheMaxSize());
-        resources.setCacheMaxObjectSize(getCacheObjectMaxSize());
+        resources.setCacheObjectMaxSize(getCacheObjectMaxSize());
 
         // May have been started (but not fully configured) in init() so no need
         // to start the resources if they are already available

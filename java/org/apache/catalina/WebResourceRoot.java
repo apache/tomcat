@@ -349,10 +349,10 @@ public interface WebResourceRoot extends Lifecycle {
      * Set the maximum permitted size for a single object in the cache. Note
      * that the maximum size in bytes may not exceed {@link Integer#MAX_VALUE}.
      *
-     * @param cacheMaxObjectSize    Maximum size for a single cached object in
+     * @param cacheObjectMaxSize    Maximum size for a single cached object in
      *                              kilobytes
      */
-    void setCacheMaxObjectSize(int cacheMaxObjectSize);
+    void setCacheObjectMaxSize(int cacheObjectMaxSize);
 
     /**
      * Get the maximum permitted size for a single object in the cache. Note
@@ -360,7 +360,7 @@ public interface WebResourceRoot extends Lifecycle {
      *
      * @return  Maximum size for a single cached object in kilobytes
      */
-    int getCacheMaxObjectSize();
+    int getCacheObjectMaxSize();
 
     /**
      * Controls whether the trace locked files feature is enabled. If enabled,

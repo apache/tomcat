@@ -143,12 +143,12 @@ public class TesterWebResourceRoot extends StandardRoot {
     }
 
     @Override
-    public void setCacheMaxObjectSize(int cacheMaxObjectSize) {
+    public void setCacheObjectMaxSize(int cacheObjectMaxSize) {
         // NO-OP
     }
 
     @Override
-    public int getCacheMaxObjectSize() {
+    public int getCacheObjectMaxSize() {
         return 0;
     }
 
