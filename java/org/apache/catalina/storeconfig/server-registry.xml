@@ -258,7 +258,7 @@
         <TransientAttribute>cachingAllowed</TransientAttribute>
         <TransientAttribute>cacheTTL</TransientAttribute>
         <TransientAttribute>cacheMaxSize</TransientAttribute>
-        <TransientAttribute>cacheMaxObjectSize</TransientAttribute>
+        <TransientAttribute>cacheObjectMaxSize</TransientAttribute>
         <TransientAttribute>cached</TransientAttribute>
         <TransientAttribute>caseSensitive</TransientAttribute>
      </Description>

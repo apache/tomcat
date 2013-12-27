@@ -85,7 +85,7 @@ public class Cache {
                 cacheEntry = newCacheEntry;
                 cacheEntry.validate(useClassLoaderResources);
 
-                // Even if the resource content larger than maxObjectSizeBytes
+                // Even if the resource content larger than objectMaxSizeBytes
                 // there is still benefit in caching the resource metadata
 
                 long delta = cacheEntry.getSize();
