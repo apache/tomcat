@@ -278,7 +278,7 @@ public class CachedResource implements WebResource {
     }
 
     // Assume that the cache entry will always include the content unless the
-    // resource content is larger than maxObjectSizeBytes. This isn't always the
+    // resource content is larger than objectMaxSizeBytes. This isn't always the
     // case but it makes tracking the current cache size easier.
     long getSize() {
         long result = CACHE_ENTRY_SIZE;
