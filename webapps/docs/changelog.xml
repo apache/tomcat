@@ -80,7 +80,12 @@
       </fix>
       <fix>
         Clarify that the connectionTimeout may also be used as the read timeout
-        when reading a request body (if any). (markt) 
+        when reading a request body (if any) in the documentation web
+        application. (markt) 
+      </fix>
+      <fix>
+        Clarify the behaviour of the maxConnections attribute for a connector in
+        the documentation web application. (markt) 
       </fix>
     </changelog>
   </subsection>

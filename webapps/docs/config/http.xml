@@ -393,10 +393,13 @@
     <attribute name="maxConnections" required="false">
       <p>The maximum number of connections that the server will accept and
       process at any given time. When this number has been reached, the server
-      will not accept any more connections until the number of connections
-      falls below this value. The operating system may still accept
-      connections based on the <code>acceptCount</code> setting. Default value
-      varies by connector type. For BIO the default is the value of
+      will accept, but not process, one further connection. This additional
+      connection be blocked until the number of connections being processed
+      falls below <strong>maxConnections</strong> at which point the server will
+      start accepting and processing new connections again. Note that once the
+      limit has been reached, the operating system may still accept connections
+      based on the <code>acceptCount</code> setting. The default value varies by
+      connector type. For BIO the default is the value of
       <strong>maxThreads</strong> unless an <a href="executor.html">Executor</a>
       is used in which case the default will be the value of maxThreads from the
       executor. For NIO the default is <code>10000</code>.
