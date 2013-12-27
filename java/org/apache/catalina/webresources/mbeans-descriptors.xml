@@ -67,7 +67,7 @@
                  type="long"
             writeable="true"/>
 
-    <attribute   name="maxObjectSize"
+    <attribute   name="objectMaxSize"
           description="The maximum permitted size for a single object in the cache in kB"
                  type="int"
             writeable="true"/>
