@@ -464,13 +464,13 @@ public class StandardRoot extends LifecycleMBeanBase
     }
 
     @Override
-    public void setCacheMaxObjectSize(int cacheMaxObjectSize) {
-        cache.setMaxObjectSize(cacheMaxObjectSize);
+    public void setCacheObjectMaxSize(int cacheObjectMaxSize) {
+        cache.setObjectMaxSize(cacheObjectMaxSize);
     }
 
     @Override
-    public int getCacheMaxObjectSize() {
-        return cache.getMaxObjectSize();
+    public int getCacheObjectMaxSize() {
+        return cache.getObjectMaxSize();
     }
 
     @Override
