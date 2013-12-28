@@ -126,7 +126,7 @@
         <p>Controls whether the track locked files feature is enabled. If
         enabled, all calls to methods that return objects that lock a file and
         need to be closed to release that lock (e.g.
-        <code>ServletContext.getResourceAsStream()</code> will perform a number
+        <code>ServletContext.getResourceAsStream()</code>) will perform a number
         of additional tasks.</p>
         <ul>
           <li>The stack trace at the point where the method was called will be
