@@ -396,9 +396,9 @@ public interface WebResourceRoot extends Lifecycle {
      */
     void backgroundProcess();
 
-    void registerTrackedResource(TrackedWebResource traceWrapper);
+    void registerTrackedResource(TrackedWebResource trackedResource);
 
-    void deregisterTrackedResource(TrackedWebResource traceWrapperInputStream);
+    void deregisterTrackedResource(TrackedWebResource trackedResource);
 
     /**
      * Obtain the set of {@link WebResourceSet#getBaseUrl()} for all
