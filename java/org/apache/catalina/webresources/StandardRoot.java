@@ -492,8 +492,8 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
     public List<String> getTrackedResources() {
         List<String> result = new ArrayList<>(trackedResources.size());
-        for (TrackedWebResource traceWrapper : trackedResources) {
-            result.add(traceWrapper.toString());
+        for (TrackedWebResource resource : trackedResources) {
+            result.add(resource.toString());
         }
         return result;
     }
