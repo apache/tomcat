@@ -93,11 +93,11 @@ public abstract class AbstractResource implements WebResource {
     public final InputStream getInputStream() {
         InputStream is = doGetInputStream();
 
-        if (is == null || !root.getTraceLockedFiles()) {
+        if (is == null || !root.getTrackLockedFiles()) {
             return is;
         }
 
-        return new TraceWrapperInputStream(root, getName(), is);
+        return new TrackedInputStream(root, getName(), is);
     }
 
     protected abstract InputStream doGetInputStream();
