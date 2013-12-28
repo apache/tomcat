@@ -21,23 +21,23 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.apache.catalina.TrackedWebResource;
 import org.apache.catalina.WebResourceRoot;
-import org.apache.catalina.WebResourceTraceWrapper;
 
-class TraceWrapperInputStream extends InputStream implements WebResourceTraceWrapper {
+class TrackedInputStream extends InputStream implements TrackedWebResource {
 
     private final WebResourceRoot root;
     private final String name;
     private final InputStream is;
     private final Exception creation;
 
-    TraceWrapperInputStream(WebResourceRoot root, String name, InputStream is) {
+    TrackedInputStream(WebResourceRoot root, String name, InputStream is) {
         this.root = root;
         this.name = name;
         this.is = is;
         this.creation = new Exception();
 
-        root.registerTracedResource(this);
+        root.registerTrackedResource(this);
     }
 
     @Override
@@ -67,7 +67,7 @@ class TraceWrapperInputStream extends InputStream implements WebResourceTraceWra
 
     @Override
     public void close() throws IOException {
-        root.deregisterTracedResource(this);
+        root.deregisterTrackedResource(this);
         is.close();
     }
 

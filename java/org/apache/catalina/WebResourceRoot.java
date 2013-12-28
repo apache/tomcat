@@ -363,7 +363,7 @@ public interface WebResourceRoot extends Lifecycle {
     int getCacheObjectMaxSize();
 
     /**
-     * Controls whether the trace locked files feature is enabled. If enabled,
+     * Controls whether the track locked files feature is enabled. If enabled,
      * all calls to methods that return objects that lock a file and need to be
      * closed to release that lock (e.g. {@link WebResource#getInputStream()}
      * will perform a number of additional tasks.
@@ -378,16 +378,16 @@ public interface WebResourceRoot extends Lifecycle {
      *       logged and then closed.</li>
      * </ul>
      *
-     * @param traceLockedFiles @true to enable it, @false to disable it
+     * @param trackLockedFiles @true to enable it, @false to disable it
      */
-    void setTraceLockedFiles(boolean traceLockedFiles);
+    void setTrackLockedFiles(boolean trackLockedFiles);
 
     /**
-     * Has the trace locked files feature been enabled?
+     * Has the track locked files feature been enabled?
      *
      * @return @true if it has been enabled, otherwise @false
      */
-    boolean getTraceLockedFiles();
+    boolean getTrackLockedFiles();
 
     /**
      * This method will be invoked by the context on a periodic basis and allows
@@ -396,9 +396,9 @@ public interface WebResourceRoot extends Lifecycle {
      */
     void backgroundProcess();
 
-    void registerTracedResource(WebResourceTraceWrapper traceWrapper);
+    void registerTrackedResource(TrackedWebResource traceWrapper);
 
-    void deregisterTracedResource(WebResourceTraceWrapper traceWrapperInputStream);
+    void deregisterTrackedResource(TrackedWebResource traceWrapperInputStream);
 
     /**
      * Obtain the set of {@link WebResourceSet#getBaseUrl()} for all
