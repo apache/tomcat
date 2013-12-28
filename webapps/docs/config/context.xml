@@ -588,17 +588,6 @@
         </p>
       </attribute>
 
-      <attribute name="allowLinking" required="false">
-        <p>If the value of this flag is <code>true</code>, symlinks will be
-        allowed inside the web application, pointing to resources outside the
-        web application base path. If not specified, the default value
-        of the flag is <code>false</code>.</p>
-        <p><b>NOTE: This flag MUST NOT be set to true on the Windows platform
-        (or any other OS which does not have a case sensitive filesystem),
-        as it will disable case sensitivity checks, allowing JSP source code
-        disclosure, among other security problems.</b></p>
-      </attribute>
-
       <attribute name="antiResourceLocking" required="false">
         <p>If true, Tomcat will prevent any file locking.
         This will significantly impact startup time of applications,
@@ -617,32 +606,6 @@
         Tomcat shutdown.  You probably don't want to do this, so think twice
         before setting antiResourceLocking=true on a webapp that's outside the
         appBase for its Host.</p>
-      </attribute>
-
-      <attribute name="cacheMaxSize" required="false">
-        <p>Maximum size of the static resource cache in kilobytes.
-        If not specified, the default value is <code>10240</code>
-        (10 megabytes).</p>
-      </attribute>
-
-      <attribute name="cacheObjectMaxSize" required="false">
-        <p>Maximum size of the static resource that will be placed in the cache.
-        If not specified, the default value is <code>512</code>
-        (512 kilobytes). If this value is greater than
-        <code>cacheMaxSize/20</code> it will be reduced to
-        <code>cacheMaxSize/20</code>.</p>
-      </attribute>
-
-      <attribute name="cacheTTL" required="false">
-        <p>Amount of time in milliseconds between cache entries revalidation.
-        If not specified, the default value is <code>5000</code>
-        (5 seconds).</p>
-      </attribute>
-
-      <attribute name="cachingAllowed" required="false">
-        <p>If the value of this flag is <code>true</code>, the cache for static
-        resources will be used. If not specified, the default value
-        of the flag is <code>true</code>.</p>
       </attribute>
 
       <attribute name="clearReferencesHttpClientKeepAliveThread" required = "false">

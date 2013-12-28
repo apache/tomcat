@@ -466,6 +466,11 @@ public class StandardRoot extends LifecycleMBeanBase
     @Override
     public void setCacheObjectMaxSize(int cacheObjectMaxSize) {
         cache.setObjectMaxSize(cacheObjectMaxSize);
+        // Don't enforce the limit when not running as attributes may get set in
+        // any order.
+        if (getState().isAvailable()) {
+            cache.enforceObjectMaxSizeLimit();
+        }
     }
 
     @Override
@@ -641,6 +646,8 @@ public class StandardRoot extends LifecycleMBeanBase
         for (WebResourceSet classResource : classResources) {
             classResource.start();
         }
+
+        cache.enforceObjectMaxSizeLimit();
 
         setState(LifecycleState.STARTING);
     }

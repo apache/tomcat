@@ -65,11 +65,6 @@
          type="org.apache.catalina.core.StandardContext"
          className="org.apache.catalina.mbeans.ContextMBean">
 
-    <attribute name="allowLinking"
-               description="Allow symlinking to outside the webapp root directory, if the webapp is an exploded directory"
-               is="true"
-               type="boolean"/>
-
     <attribute name="altDDName"
                description="The alternate deployment descriptor name."
                type="java.lang.String" />
@@ -82,23 +77,6 @@
                description="The base name used for directories, WAR files (with .war appended) and context.xml files (with .xml appended)."
                type="java.lang.String"
                writeable="false"/>
-
-    <attribute name="cacheMaxSize"
-               description="Maximum cache size in KB"
-               type="int"/>
-
-    <attribute name="cacheObjectMaxSize"
-               description="Maximum cached object size in KB"
-               type="int"/>
-
-    <attribute name="cacheTTL"
-               description="Time interval in ms between cache refeshes"
-               type="int"/>
-
-    <attribute name="cachingAllowed"
-               description="Should we cache static resources for this webapp"
-               is="true"
-               type="boolean"/>
 
     <attribute name="children"
                description="Object names of all children"

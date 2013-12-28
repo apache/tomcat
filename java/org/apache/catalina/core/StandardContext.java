@@ -644,36 +644,6 @@ public class StandardContext extends ContainerBase
     private String namingContextName = null;
 
 
-    /**
-     * Caching allowed flag.
-     */
-    private boolean cachingAllowed = true;
-
-
-    /**
-     * Allow linking.
-     */
-    protected boolean allowLinking = false;
-
-
-    /**
-     * Cache max size in KB.
-     */
-    protected int cacheMaxSize = 10240; // 10 MB
-
-
-    /**
-     * Cache object max size in KB.
-     */
-    protected int cacheObjectMaxSize = 512; // 512K
-
-
-    /**
-     * Cache TTL in ms.
-     */
-    protected int cacheTTL = 5000;
-
-
     private WebResourceRoot resources;
     private final ReadWriteLock resourcesLock = new ReentrantReadWriteLock();
 
@@ -1027,37 +997,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Is caching allowed ?
-     */
-    public boolean isCachingAllowed() {
-        return cachingAllowed;
-    }
-
-
-    /**
-     * Set caching allowed flag.
-     */
-    public void setCachingAllowed(boolean cachingAllowed) {
-        this.cachingAllowed = cachingAllowed;
-    }
-
-
-    /**
-     * Set allow linking.
-     */
-    public void setAllowLinking(boolean allowLinking) {
-        this.allowLinking = allowLinking;
-    }
-
-
-    /**
-     * Is linking allowed.
-     */
-    public boolean isAllowLinking() {
-        return allowLinking;
-    }
-
-    /**
      * Set to <code>true</code> to allow requests mapped to servlets that
      * do not explicitly declare @MultipartConfig or have
      * &lt;multipart-config&gt; specified in web.xml to parse
@@ -1108,54 +1047,6 @@ public class StandardContext extends ContainerBase
     public boolean getSwallowAbortedUploads() {
         return this.swallowAbortedUploads;
     }
-
-    /**
-     * Set cache TTL.
-     */
-    public void setCacheTTL(int cacheTTL) {
-        this.cacheTTL = cacheTTL;
-    }
-
-
-    /**
-     * Get cache TTL.
-     */
-    public int getCacheTTL() {
-        return cacheTTL;
-    }
-
-
-    /**
-     * Return the maximum size of the cache in KB.
-     */
-    public int getCacheMaxSize() {
-        return cacheMaxSize;
-    }
-
-
-    /**
-     * Set the maximum size of the cache in KB.
-     */
-    public void setCacheMaxSize(int cacheMaxSize) {
-        this.cacheMaxSize = cacheMaxSize;
-    }
-
-
-    /**
-     * Return the maximum size of objects to be cached in KB.
-     */
-    public int getCacheObjectMaxSize() {
-        return cacheObjectMaxSize;
-    }
-
-
-    /**
-     * Set the maximum size of objects to be placed the cache in KB.
-     */
-    public void setCacheObjectMaxSize(int cacheObjectMaxSize) {
-        this.cacheObjectMaxSize = cacheObjectMaxSize;
-    }
-
 
     /**
      * Add a ServletContainerInitializer instance to this web application.
@@ -4906,13 +4797,6 @@ public class StandardContext extends ContainerBase
      * or <code>false</code> otherwise.
      */
     public void resourcesStart() throws LifecycleException {
-
-        resources.setAllowLinking(isAllowLinking());
-
-        resources.setCachingAllowed(isCachingAllowed());
-        resources.setCacheTtl(getCacheTTL());
-        resources.setCacheMaxSize(getCacheMaxSize());
-        resources.setCacheObjectMaxSize(getCacheObjectMaxSize());
 
         // May have been started (but not fully configured) in init() so no need
         // to start the resources if they are already available

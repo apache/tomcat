@@ -57,8 +57,13 @@
                 group="WebResourceRoot"
                  type="org.apache.catalina.webresources.Cache">
 
-    <attribute   name="size"
-          description="The current estimate of the cache size in kB"
+    <attribute   name="hitCount"
+          description="The number of requests for resources that were served from the cache"
+                 type="long"
+            writeable="false"/>
+
+    <attribute   name="lookupCount"
+          description="The number of requests for resources"
                  type="long"
             writeable="false"/>
 
@@ -72,20 +77,15 @@
                  type="int"
             writeable="true"/>
 
+    <attribute   name="size"
+          description="The current estimate of the cache size in kB"
+                 type="long"
+            writeable="false"/>
+
     <attribute   name="ttl"
           description="The time-to-live for cache entries in milliseconds"
                  type="long"
             writeable="true"/>
-
-    <attribute   name="lookupCount"
-          description="The number of requests for resources"
-                 type="long"
-            writeable="false"/>
-
-    <attribute   name="hitCount"
-          description="The number of requests for resources that were served from the cache"
-                 type="long"
-            writeable="false"/>
 
   </mbean>
 
