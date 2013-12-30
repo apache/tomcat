@@ -540,7 +540,10 @@ public final class Response {
         commitTime = -1;
         errorException = null;
         headers.clear();
+        // Servlet 3.1 non-blocking write listener
         listener = null;
+        fireListener = false;
+        registeredForWrite = false;
 
         // update counters
         contentWritten=0;
