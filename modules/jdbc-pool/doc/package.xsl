@@ -150,7 +150,7 @@ td#mainBody {width: 100%;}
       <xsl:comment>PAGE FOOTER</xsl:comment>
       <tr><td colspan="2">
         <div align="center"><font color="{$body-link}" size="-1"><em>
-        Copyright &#169; 1999-2013, Apache Software Foundation
+        Copyright &#169; 1999-2014, Apache Software Foundation
         </em></font></div>
       </td></tr>
 
