@@ -30,7 +30,7 @@
     <property name="project"               value="tomcat-native" />
     <property name="name"                  value="Tomcat Native" />
     <property name="title"                 value="Tomcat Native Library"/>
-    <property name="year"                  value="2013" />
+    <property name="year"                  value="2014" />
     <property name="version.major"         value="1" />
     <property name="version.minor"         value="1" />
     <property name="version.build"         value="29" />
@@ -175,7 +175,7 @@
             packagenames="org.apache.tomcat.*"
             windowtitle="${title} (Version ${version})"
             doctitle="&lt;h1&gt;${title} (Version ${version})&lt;/h1&gt;"
-            bottom="Copyright 2002-2013 The Apache Software Foundation.&lt;!--
+            bottom="Copyright 2002-2014 The Apache Software Foundation.&lt;!--
 
 Licensed under the Apache License, Version 2.0 (the 'License');
 you may not use this file except in compliance with the License.
