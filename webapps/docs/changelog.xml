@@ -70,6 +70,10 @@
         Correct a regression in the XML refactoring that meant that errors in
         TLD files were swallowed. (markt)
       </fix>
+      <fix>
+        <bug>55973</bug>: Fix processing of XML schemas when validation is
+        enabled in Jasper. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
