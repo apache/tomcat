@@ -161,14 +161,10 @@ commons-dbcp-src.loc.1=https://repository.apache.org/content/repositories/snapsh
 commons-dbcp-src.loc.2=https://repository.apache.org/content/repositories/snapshots/org/apache/commons/commons-dbcp2/2.0-SNAPSHOT/commons-dbcp2-${commons-dbcp.version}-src.tar.gz
 
 # ----- Commons Pool, version 2.1 or later -----
-#commons-pool.version=2.0
-#commons-pool.home=${base.path}/commons-pool2-${commons-pool.version}-src
-#commons-pool-src.loc.1=${base-commons.loc.1}/pool/source/commons-pool2-${commons-pool.version}-src.tar.gz
-#commons-pool-src.loc.2=${base-commons.loc.2}/pool/source/commons-pool2-${commons-pool.version}-src.tar.gz
-commons-pool.version=2.1-20131211.110902-1
-commons-pool.home=${base.path}/commons-pool2-2.1-SNAPSHOT-src
-commons-pool-src.loc.1=https://repository.apache.org/content/repositories/snapshots/org/apache/commons/commons-pool2/2.1-SNAPSHOT/commons-pool2-${commons-pool.version}-src.tar.gz
-commons-pool-src.loc.2=https://repository.apache.org/content/repositories/snapshots/org/apache/commons/commons-pool2/2.1-SNAPSHOT/commons-pool2-${commons-pool.version}-src.tar.gz
+commons-pool.version=2.1
+commons-pool.home=${base.path}/commons-pool2-${commons-pool.version}-src
+commons-pool-src.loc.1=${base-commons.loc.1}/pool/source/commons-pool2-${commons-pool.version}-src.tar.gz
+commons-pool-src.loc.2=${base-commons.loc.2}/pool/source/commons-pool2-${commons-pool.version}-src.tar.gz
 
 
 
