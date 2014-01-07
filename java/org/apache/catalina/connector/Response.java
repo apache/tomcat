@@ -49,7 +49,7 @@ import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.http.ServerCookie;
+import org.apache.tomcat.util.http.SetCookieSupport;
 import org.apache.tomcat.util.http.parser.MediaTypeCache;
 import org.apache.tomcat.util.net.URL;
 import org.apache.tomcat.util.res.StringManager;
@@ -913,21 +913,21 @@ public class Response
             AccessController.doPrivileged(new PrivilegedAction<Void>() {
                 @Override
                 public Void run(){
-                    ServerCookie.appendCookieValue
-                        (sb, cookie.getVersion(), cookie.getName(),
-                         cookie.getValue(), cookie.getPath(),
-                         cookie.getDomain(), cookie.getComment(),
-                         cookie.getMaxAge(), cookie.getSecure(),
-                         cookie.isHttpOnly());
+                    SetCookieSupport.appendCookieValue
+                            (sb, cookie.getVersion(), cookie.getName(),
+                                    cookie.getValue(), cookie.getPath(),
+                                    cookie.getDomain(), cookie.getComment(),
+                                    cookie.getMaxAge(), cookie.getSecure(),
+                                    cookie.isHttpOnly());
                     return null;
                 }
             });
         } else {
-            ServerCookie.appendCookieValue
-                (sb, cookie.getVersion(), cookie.getName(), cookie.getValue(),
-                     cookie.getPath(), cookie.getDomain(), cookie.getComment(),
-                     cookie.getMaxAge(), cookie.getSecure(),
-                     cookie.isHttpOnly());
+            SetCookieSupport.appendCookieValue
+                    (sb, cookie.getVersion(), cookie.getName(), cookie.getValue(),
+                            cookie.getPath(), cookie.getDomain(), cookie.getComment(),
+                            cookie.getMaxAge(), cookie.getSecure(),
+                            cookie.isHttpOnly());
         }
         return sb;
     }
