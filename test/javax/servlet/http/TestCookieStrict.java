@@ -24,7 +24,8 @@ import org.junit.Test;
  */
 public class TestCookieStrict {
     static {
-        System.setProperty("org.apache.catalina.STRICT_NAMING", "true");
+        System.setProperty("org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING", "true");
+        System.setProperty("org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR", "true");
     }
 
     @Test
