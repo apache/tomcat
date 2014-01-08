@@ -48,28 +48,11 @@ public class SetCookieSupport {
     }
 
     public static String generateHeader(Cookie cookie) {
-        StringBuffer sb = new StringBuffer();
-        appendCookieValue(sb, cookie.getVersion(), cookie.getName(), cookie.getValue(),
-                cookie.getPath(), cookie.getDomain(), cookie.getComment(),
-                cookie.getMaxAge(), cookie.getSecure(),
-                cookie.isHttpOnly());
-        return sb.toString();
-    }
 
-    private static void appendCookieValue( StringBuffer headerBuf,
-                                          int version,
-                                          String name,
-                                          String value,
-                                          String path,
-                                          String domain,
-                                          String comment,
-                                          int maxAge,
-                                          boolean isSecure,
-                                          boolean isHttpOnly)
-    {
-        StringBuffer buf = new StringBuffer();
+        StringBuffer buf = new StringBuffer(); // can't use StringBuilder due to DateFormat
+
         // Servlet implementation checks name
-        buf.append( name );
+        buf.append(cookie.getName());
         buf.append("=");
         // Servlet implementation does not check anything else
 
@@ -82,8 +65,14 @@ public class SetCookieSupport {
          * Note that by checking for tokens we will also throw an exception if a
          * control character is encountered.
          */
+
+        String value = cookie.getValue();
+        String path = cookie.getPath();
+        String domain = cookie.getDomain();
+        String comment = cookie.getComment();
+
         // Start by using the version we were asked for
-        int newVersion = version;
+        int newVersion = cookie.getVersion();
 
         // If it is v0, check if we need to switch
         if (newVersion == 0 &&
@@ -140,6 +129,7 @@ public class SetCookieSupport {
         }
 
         // Max-Age=secs ... or use old "Expires" format
+        int maxAge = cookie.getMaxAge();
         if (maxAge >= 0) {
             if (newVersion > 0) {
                 buf.append ("; Max-Age=");
@@ -155,9 +145,9 @@ public class SetCookieSupport {
                     buf.append( ancientDate );
                 } else {
                     OLD_COOKIE_FORMAT.get().format(
-                            new Date(System.currentTimeMillis() +
-                                    maxAge*1000L),
-                            buf, new FieldPosition(0));
+                            new Date(System.currentTimeMillis() + maxAge * 1000L),
+                            buf,
+                            new FieldPosition(0));
                 }
             }
         }
@@ -169,15 +159,15 @@ public class SetCookieSupport {
         }
 
         // Secure
-        if (isSecure) {
+        if (cookie.getSecure()) {
           buf.append ("; Secure");
         }
 
         // HttpOnly
-        if (isHttpOnly) {
+        if (cookie.isHttpOnly()) {
             buf.append("; HttpOnly");
         }
-        headerBuf.append(buf);
+        return buf.toString();
     }
 
     /**
