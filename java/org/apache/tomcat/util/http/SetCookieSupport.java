@@ -77,9 +77,9 @@ public class SetCookieSupport {
         // If it is v0, check if we need to switch
         if (newVersion == 0 &&
                 (!CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
-                 CookieSupport.isHttpToken(value) ||
+                 isHttpToken(value) ||
                  CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
-                 CookieSupport.isV0Token(value))) {
+                 isV0Token(value))) {
             // HTTP token in value - need to use v1
             newVersion = 1;
         }
@@ -91,18 +91,18 @@ public class SetCookieSupport {
 
         if (newVersion == 0 &&
                 (!CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
-                 CookieSupport.isHttpToken(path) ||
+                 isHttpToken(path) ||
                  CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
-                 CookieSupport.isV0Token(path))) {
+                 isV0Token(path))) {
             // HTTP token in path - need to use v1
             newVersion = 1;
         }
 
         if (newVersion == 0 &&
                 (!CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
-                 CookieSupport.isHttpToken(domain) ||
+                 isHttpToken(domain) ||
                  CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
-                 CookieSupport.isV0Token(domain))) {
+                 isV0Token(domain))) {
             // HTTP token in domain - need to use v1
             newVersion = 1;
         }
@@ -178,13 +178,13 @@ public class SetCookieSupport {
     private static void maybeQuote (StringBuffer buf, String value) {
         if (value==null || value.length()==0) {
             buf.append("\"\"");
-        } else if (CookieSupport.alreadyQuoted(value)) {
+        } else if (alreadyQuoted(value)) {
             buf.append('"');
             buf.append(escapeDoubleQuotes(value,1,value.length()-1));
             buf.append('"');
-        } else if (CookieSupport.isHttpToken(value) &&
+        } else if (isHttpToken(value) &&
                 !CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 ||
-                CookieSupport.isV0Token(value) &&
+                isV0Token(value) &&
                 CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0) {
             buf.append('"');
             buf.append(escapeDoubleQuotes(value,0,value.length()));
@@ -226,5 +226,58 @@ public class SetCookieSupport {
         }
 
         return b.toString();
+    }
+
+    private static boolean isV0Token(String value) {
+        if( value==null) {
+            return false;
+        }
+
+        int i = 0;
+        int len = value.length();
+
+        if (alreadyQuoted(value)) {
+            i++;
+            len--;
+        }
+
+        for (; i < len; i++) {
+            char c = value.charAt(i);
+
+            if (CookieSupport.isV0Separator(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isHttpToken(String value) {
+        if( value==null) {
+            return false;
+        }
+
+        int i = 0;
+        int len = value.length();
+
+        if (alreadyQuoted(value)) {
+            i++;
+            len--;
+        }
+
+        for (; i < len; i++) {
+            char c = value.charAt(i);
+
+            if (CookieSupport.isHttpSeparator(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean alreadyQuoted (String value) {
+        if (value==null || value.length() < 2) {
+            return false;
+        }
+        return (value.charAt(0)=='\"' && value.charAt(value.length()-1)=='\"');
     }
 }

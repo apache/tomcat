@@ -173,29 +173,6 @@ public final class CookieSupport {
         return V0_SEPARATOR_FLAGS[c];
     }
 
-    public static boolean isV0Token(String value) {
-        if( value==null) {
-            return false;
-        }
-
-        int i = 0;
-        int len = value.length();
-
-        if (alreadyQuoted(value)) {
-            i++;
-            len--;
-        }
-
-        for (; i < len; i++) {
-            char c = value.charAt(i);
-
-            if (isV0Separator(c)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Returns true if the byte is a separator as defined by V1 of the cookie
      * spec, RFC2109.
@@ -211,36 +188,6 @@ public final class CookieSupport {
         }
 
         return HTTP_SEPARATOR_FLAGS[c];
-    }
-
-    public static boolean isHttpToken(String value) {
-        if( value==null) {
-            return false;
-        }
-
-        int i = 0;
-        int len = value.length();
-
-        if (alreadyQuoted(value)) {
-            i++;
-            len--;
-        }
-
-        for (; i < len; i++) {
-            char c = value.charAt(i);
-
-            if (isHttpSeparator(c)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean alreadyQuoted (String value) {
-        if (value==null || value.length() < 2) {
-            return false;
-        }
-        return (value.charAt(0)=='\"' && value.charAt(value.length()-1)=='\"');
     }
 
 
