@@ -865,12 +865,12 @@ public class Response
             return;
         }
 
-        final StringBuffer sb = generateCookieString(cookie);
+        String header = generateCookieString(cookie);
         //if we reached here, no exception, cookie is valid
         // the header name is Set-Cookie for both "old" and v.1 ( RFC2109 )
         // RFC2965 is not supported by browsers and the Servlet spec
         // asks for 2109.
-        addHeader("Set-Cookie", sb.toString());
+        addHeader("Set-Cookie", header);
     }
 
     /**
@@ -886,50 +886,38 @@ public class Response
         String name = cookie.getName();
         final String headername = "Set-Cookie";
         final String startsWith = name + "=";
-        final StringBuffer sb = generateCookieString(cookie);
+        String header = generateCookieString(cookie);
         boolean set = false;
         MimeHeaders headers = coyoteResponse.getMimeHeaders();
         int n = headers.size();
         for (int i = 0; i < n; i++) {
             if (headers.getName(i).toString().equals(headername)) {
                 if (headers.getValue(i).toString().startsWith(startsWith)) {
-                    headers.getValue(i).setString(sb.toString());
+                    headers.getValue(i).setString(header);
                     set = true;
                 }
             }
         }
         if (!set) {
-            addHeader(headername, sb.toString());
+            addHeader(headername, header);
         }
 
 
     }
 
-    public StringBuffer generateCookieString(final Cookie cookie) {
-        final StringBuffer sb = new StringBuffer();
+    public String generateCookieString(final Cookie cookie) {
         //web application code can receive a IllegalArgumentException
         //from the appendCookieValue invocation
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            return AccessController.doPrivileged(new PrivilegedAction<String>() {
                 @Override
-                public Void run(){
-                    SetCookieSupport.appendCookieValue
-                            (sb, cookie.getVersion(), cookie.getName(),
-                                    cookie.getValue(), cookie.getPath(),
-                                    cookie.getDomain(), cookie.getComment(),
-                                    cookie.getMaxAge(), cookie.getSecure(),
-                                    cookie.isHttpOnly());
-                    return null;
+                public String run(){
+                    return SetCookieSupport.generateHeader(cookie);
                 }
             });
         } else {
-            SetCookieSupport.appendCookieValue
-                    (sb, cookie.getVersion(), cookie.getName(), cookie.getValue(),
-                            cookie.getPath(), cookie.getDomain(), cookie.getComment(),
-                            cookie.getMaxAge(), cookie.getSecure(),
-                            cookie.isHttpOnly());
+            return SetCookieSupport.generateHeader(cookie);
         }
-        return sb;
     }
 
 
