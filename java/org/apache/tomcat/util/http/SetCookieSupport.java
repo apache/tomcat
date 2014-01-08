@@ -23,6 +23,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import javax.servlet.http.Cookie;
+
 /**
  * Support class for generating Set-Cookie header values.
  */
@@ -45,7 +47,16 @@ public class SetCookieSupport {
         ancientDate = OLD_COOKIE_FORMAT.get().format(new Date(10000));
     }
 
-    public static void appendCookieValue( StringBuffer headerBuf,
+    public static String generateHeader(Cookie cookie) {
+        StringBuffer sb = new StringBuffer();
+        appendCookieValue(sb, cookie.getVersion(), cookie.getName(), cookie.getValue(),
+                cookie.getPath(), cookie.getDomain(), cookie.getComment(),
+                cookie.getMaxAge(), cookie.getSecure(),
+                cookie.isHttpOnly());
+        return sb.toString();
+    }
+
+    private static void appendCookieValue( StringBuffer headerBuf,
                                           int version,
                                           String name,
                                           String value,
