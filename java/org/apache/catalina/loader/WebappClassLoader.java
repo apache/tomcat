@@ -735,21 +735,15 @@ public class WebappClassLoader extends URLClassLoader
 
         // Check if JARs have been added or removed
         WebResource[] jars = resources.listResources("/WEB-INF/lib");
-        if (jars.length > jarModificationTimes.size()) {
-            log.info(sm.getString("webappClassLoader.jarsAdded",
-                    resources.getContext().getName()));
-            return true;
-        } else if (jars.length < jarModificationTimes.size()){
-            log.info(sm.getString("webappClassLoader.jarsRemoved",
-                    resources.getContext().getName()));
-            return true;
-        }
+        // Filter out non-JAR resources
 
+        int jarCount = 0;
         for (WebResource jar : jars) {
             if (jar.getName().endsWith(".jar") && jar.isFile() && jar.canRead()) {
+                jarCount++;
                 Long recordedLastModified = jarModificationTimes.get(jar.getName());
                 if (recordedLastModified == null) {
-                    // Jars have been added and removed
+                    // Jar has been added
                     log.info(sm.getString("webappClassLoader.jarsAdded",
                             resources.getContext().getName()));
                     return true;
@@ -760,10 +754,15 @@ public class WebappClassLoader extends URLClassLoader
                             resources.getContext().getName()));
                     return true;
                 }
-                jarModificationTimes.put(
-                        jar.getName(), Long.valueOf(jar.getLastModified()));
             }
         }
+
+        if (jarCount < jarModificationTimes.size()){
+            log.info(sm.getString("webappClassLoader.jarsRemoved",
+                    resources.getContext().getName()));
+            return true;
+        }
+
 
         // No classes have been modified
         return false;
