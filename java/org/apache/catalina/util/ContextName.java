@@ -96,8 +96,8 @@ public final class ContextName {
      * @param version   Context version to use
      */
     public ContextName(String path, String version) {
-        // Path should never be null or '/'
-        if (path == null || "/".equals(path)) {
+        // Path should never be null, '/' or '/ROOT'
+        if (path == null || "/".equals(path) || "/ROOT".equals(path)) {
             this.path = "";
         } else {
             this.path = path;

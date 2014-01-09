@@ -40,6 +40,10 @@ public class TestContextName {
     private ContextName cn14;
     private ContextName cn15;
     private ContextName cn16;
+    private ContextName cn17;
+    private ContextName cn18;
+    private ContextName cn19;
+    private ContextName cn20;
 
     @Before
     public void setUp() throws Exception {
@@ -59,6 +63,10 @@ public class TestContextName {
         cn14 = new ContextName("ROOT##A");
         cn15 = new ContextName("foo##D");
         cn16 = new ContextName("foo#bar##E");
+        cn17 = new ContextName("/ROOT", null);
+        cn18 = new ContextName("/ROOT#bar");
+        cn19 = new ContextName("/ROOT#bar##A");
+        cn20 = new ContextName("/ROOT##A");
     }
 
     @Test
@@ -79,6 +87,10 @@ public class TestContextName {
         assertEquals("ROOT##A", cn14.getBaseName());
         assertEquals("foo##D", cn15.getBaseName());
         assertEquals("foo#bar##E", cn16.getBaseName());
+        assertEquals("ROOT", cn17.getBaseName());
+        assertEquals("ROOT#bar", cn18.getBaseName());
+        assertEquals("ROOT#bar##A", cn19.getBaseName());
+        assertEquals("ROOT##A", cn20.getBaseName());
     }
 
     @Test
@@ -99,6 +111,10 @@ public class TestContextName {
         assertEquals("", cn14.getPath());
         assertEquals("/foo", cn15.getPath());
         assertEquals("/foo/bar", cn16.getPath());
+        assertEquals("", cn17.getPath());
+        assertEquals("/ROOT/bar", cn18.getPath());
+        assertEquals("/ROOT/bar", cn19.getPath());
+        assertEquals("", cn20.getPath());
     }
 
     @Test
@@ -119,6 +135,10 @@ public class TestContextName {
         assertEquals("A", cn14.getVersion());
         assertEquals("D", cn15.getVersion());
         assertEquals("E", cn16.getVersion());
+        assertEquals("", cn17.getVersion());
+        assertEquals("", cn18.getVersion());
+        assertEquals("A", cn19.getVersion());
+        assertEquals("A", cn20.getVersion());
     }
 
     @Test
@@ -139,6 +159,10 @@ public class TestContextName {
         assertEquals("##A", cn14.getName());
         assertEquals("/foo##D", cn15.getName());
         assertEquals("/foo/bar##E", cn16.getName());
+        assertEquals("", cn17.getName());
+        assertEquals("/ROOT/bar", cn18.getName());
+        assertEquals("/ROOT/bar##A", cn19.getName());
+        assertEquals("##A", cn20.getName());
     }
 
     @Test
@@ -159,6 +183,10 @@ public class TestContextName {
         assertEquals("/##A", cn14.getDisplayName());
         assertEquals("/foo##D", cn15.getDisplayName());
         assertEquals("/foo/bar##E", cn16.getDisplayName());
+        assertEquals("/", cn17.getDisplayName());
+        assertEquals("/ROOT/bar", cn18.getDisplayName());
+        assertEquals("/ROOT/bar##A", cn19.getDisplayName());
+        assertEquals("/##A", cn20.getDisplayName());
     }
 
     @Test
@@ -179,6 +207,10 @@ public class TestContextName {
         doTestConstructorString(cn14);
         doTestConstructorString(cn15);
         doTestConstructorString(cn16);
+        doTestConstructorString(cn17);
+        doTestConstructorString(cn18);
+        doTestConstructorString(cn19);
+        doTestConstructorString(cn20);
     }
 
     private void doTestConstructorString(ContextName src) {
