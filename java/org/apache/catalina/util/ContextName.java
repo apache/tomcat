@@ -32,13 +32,17 @@ public final class ContextName {
     private final String version;
     private final String name;
 
+
     /**
      * Creates an instance from a context name, display name, base name,
      * directory name, WAR name or context.xml name.
      *
      * @param name  The name to use as the basis for this object
+     * @param stripFileExtension    If a .war or .xml file extension is present
+     *                              at the end of the provided name should it be
+     *                              removed?
      */
-    public ContextName(String name) {
+    public ContextName(String name, boolean stripFileExtension) {
 
         String tmp1 = name;
 
@@ -58,8 +62,9 @@ public final class ContextName {
         }
 
         // Remove any file extensions
-        if (tmp1.toLowerCase(Locale.ENGLISH).endsWith(".war") ||
-                tmp1.toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
+        if (stripFileExtension &&
+                (tmp1.toLowerCase(Locale.ENGLISH).endsWith(".war") ||
+                        tmp1.toLowerCase(Locale.ENGLISH).endsWith(".xml"))) {
             tmp1 = tmp1.substring(0, tmp1.length() -4);
         }
 

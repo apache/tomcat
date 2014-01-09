@@ -344,7 +344,7 @@ public class MBeanUtils {
                         ",resourcetype=Global,name=" + environment.getName());
         } else if (container instanceof Context) {
             Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
+            ContextName cn = new ContextName(context.getName(), false);
             Container host = context.getParent();
             name = new ObjectName(domain + ":type=Environment" +
                         ",resourcetype=Context,host=" + host.getName() +
@@ -379,7 +379,7 @@ public class MBeanUtils {
                     ",name=" + quotedResourceName);
         } else if (container instanceof Context) {
             Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
+            ContextName cn = new ContextName(context.getName(), false);
             Container host = context.getParent();
             name = new ObjectName(domain + ":type=Resource" +
                     ",resourcetype=Context,host=" + host.getName() +
@@ -417,7 +417,7 @@ public class MBeanUtils {
                     ",name=" + quotedResourceLinkName);
         } else if (container instanceof Context) {
             Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
+            ContextName cn = new ContextName(context.getName(), false);
             Container host = context.getParent();
             name = new ObjectName(domain + ":type=ResourceLink" +
                     ",resourcetype=Context,host=" + host.getName() +
@@ -467,7 +467,7 @@ public class MBeanUtils {
         ObjectName name = null;
         Context context = loader.getContext();
 
-        ContextName cn = new ContextName(context.getName());
+        ContextName cn = new ContextName(context.getName(), false);
         Container host = context.getParent();
         name = new ObjectName(domain + ":type=Loader,host=" + host.getName() +
                 ",context=" + cn.getDisplayName());

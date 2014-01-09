@@ -144,7 +144,7 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
         while (!(c instanceof Engine)) {
             if (c instanceof Context) {
                 keyProperties.append(",context=");
-                ContextName cn = new ContextName(c.getName());
+                ContextName cn = new ContextName(c.getName(), false);
                 keyProperties.append(cn.getDisplayName());
             } else if (c instanceof Host) {
                 keyProperties.append(",host=");

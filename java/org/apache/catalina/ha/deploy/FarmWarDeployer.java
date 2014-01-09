@@ -452,7 +452,7 @@ public class FarmWarDeployer extends ClusterListener
     public void fileModified(File newWar) {
         try {
             File deployWar = new File(getDeployDirFile(), newWar.getName());
-            ContextName cn = new ContextName(deployWar.getName());
+            ContextName cn = new ContextName(deployWar.getName(), true);
             if (deployWar.exists() && deployWar.lastModified() > newWar.lastModified()) {
                 if (log.isInfoEnabled())
                     log.info(sm.getString("farmWarDeployer.alreadyDeployed", cn.getName()));
@@ -488,7 +488,7 @@ public class FarmWarDeployer extends ClusterListener
     @Override
     public void fileRemoved(File removeWar) {
         try {
-            ContextName cn = new ContextName(removeWar.getName());
+            ContextName cn = new ContextName(removeWar.getName(), true);
             if (log.isInfoEnabled())
                 log.info(sm.getString("farmWarDeployer.removeLocal",
                         cn.getName()));
