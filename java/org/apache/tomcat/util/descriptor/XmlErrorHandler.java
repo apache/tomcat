@@ -16,8 +16,8 @@
  */
 package org.apache.tomcat.util.descriptor;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.res.StringManager;
@@ -30,9 +30,9 @@ public class XmlErrorHandler implements ErrorHandler {
     private static final StringManager sm =
         StringManager.getManager(Constants.PACKAGE_NAME);
 
-    private final Set<SAXParseException> errors = new HashSet<SAXParseException>();
+    private final List<SAXParseException> errors = new ArrayList<SAXParseException>();
 
-    private final Set<SAXParseException> warnings = new HashSet<SAXParseException>();
+    private final List<SAXParseException> warnings = new ArrayList<SAXParseException>();
 
     @Override
     public void error(SAXParseException exception) throws SAXException {
@@ -52,12 +52,12 @@ public class XmlErrorHandler implements ErrorHandler {
         warnings.add(exception);
     }
 
-    public Set<SAXParseException> getErrors() {
+    public List<SAXParseException> getErrors() {
         // Internal use only - don't worry about immutability
         return errors;
     }
 
-    public Set<SAXParseException> getWarnings() {
+    public List<SAXParseException> getWarnings() {
         // Internal use only - don't worry about immutability
         return warnings;
     }

@@ -74,6 +74,10 @@
         <bug>55960</bug>: Improve the single sign on (SSO) unit tests. Patch
         provided by Brian Burch. (markt)
       </fix>
+      <fix>
+        <bug>55974</bug>: Retain order when reporting errors and warnings while
+        parsing XML configuration files. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
