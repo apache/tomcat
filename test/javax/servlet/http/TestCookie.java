@@ -83,53 +83,63 @@ public class TestCookie {
 
     @Test(expected = IllegalArgumentException.class)
     public void leadingDollar() {
-        new Cookie("$Version", null);
+        @SuppressWarnings("unused")
+        Cookie c = new Cookie("$Version", null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void tokenVersion() {
-        new Cookie("Version", null);
+        @SuppressWarnings("unused")
+        Cookie c = new Cookie("Version", null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void attributeVersion() {
-        new Cookie("Comment", null);
+        @SuppressWarnings("unused")
+        Cookie c = new Cookie("Comment", null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void attributeDiscard() {
-        new Cookie("Discard", null);
+        @SuppressWarnings("unused")
+        Cookie c = new Cookie("Discard", null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void attributeExpires() {
-        new Cookie("Expires", null);
+        @SuppressWarnings("unused")
+        Cookie c = new Cookie("Expires", null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void attributeMaxAge() {
-        new Cookie("Max-Age", null);
+        @SuppressWarnings("unused")
+        Cookie c = new Cookie("Max-Age", null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void attributeDomain() {
-        new Cookie("Domain", null);
+        @SuppressWarnings("unused")
+        Cookie c = new Cookie("Domain", null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void attributePath() {
-        new Cookie("Path", null);
+        @SuppressWarnings("unused")
+        Cookie c = new Cookie("Path", null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void attributeSecure() {
-        new Cookie("Secure", null);
+        @SuppressWarnings("unused")
+        Cookie c = new Cookie("Secure", null);
     }
 
     @Ignore("HttpOnly is not checked for")
     @Test(expected = IllegalArgumentException.class)
     public void attributeHttpOnly() {
-        new Cookie("HttpOnly", null);
+        @SuppressWarnings("unused")
+        Cookie c = new Cookie("HttpOnly", null);
     }
 
     public static void checkCharInName(BitSet allowed) {
@@ -138,7 +148,8 @@ public class TestCookie {
             String name = "X" + ch + "X";
             Boolean actual;
             try {
-                new Cookie(name, null);
+                @SuppressWarnings("unused")
+                Cookie c = new Cookie(name, null);
                 actual = Boolean.TRUE;
             } catch (IllegalArgumentException e) {
                 actual = Boolean.FALSE;
