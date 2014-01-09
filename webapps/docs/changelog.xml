@@ -70,6 +70,10 @@
         <bug>55958</bug>: Differentiate between <code>foo.war</code> the WAR
         file and <code>foo.war</code> the directory. (markt)
       </fix>
+      <fix>
+        <bug>55960</bug>: Improve the single sign on (SSO) unit tests. Patch
+        provided by Brian Burch. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
