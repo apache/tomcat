@@ -62,6 +62,10 @@
         Avoid possible NPE if a content type is specified without a character
         set. (markt)
       </fix>
+      <fix>
+        <bug>55937</bug>: When deploying applications, treat a context path of
+        <code>/ROOT</code> as equivalent to <code>/</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
