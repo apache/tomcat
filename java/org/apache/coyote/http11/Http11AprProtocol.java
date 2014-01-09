@@ -74,7 +74,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
     private final Http11ConnectionHandler cHandler;
 
-    public boolean getUseSendfile() { return ((AprEndpoint)endpoint).getUseSendfile(); }
+    public boolean getUseSendfile() { return endpoint.getUseSendfile(); }
     public void setUseSendfile(boolean useSendfile) { ((AprEndpoint)endpoint).setUseSendfile(useSendfile); }
 
     public int getPollTime() { return ((AprEndpoint)endpoint).getPollTime(); }
