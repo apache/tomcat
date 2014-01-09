@@ -66,6 +66,10 @@
         <bug>55937</bug>: When deploying applications, treat a context path of
         <code>/ROOT</code> as equivalent to <code>/</code>. (markt)
       </fix>
+      <fix>
+        <bug>55958</bug>: Differentiate between <code>foo.war</code> the WAR
+        file and <code>foo.war</code> the directory. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

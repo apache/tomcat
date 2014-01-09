@@ -509,7 +509,7 @@ public class MBeanUtils {
 
         ObjectName name = null;
         Host host = (Host)context.getParent();
-        ContextName cn = new ContextName(context.getName());
+        ContextName cn = new ContextName(context.getName(), false);
         name = new ObjectName(domain + ":j2eeType=WebModule,name=//" +
                               host.getName()+ cn.getDisplayName() +
                               ",J2EEApplication=none,J2EEServer=none");
@@ -540,7 +540,7 @@ public class MBeanUtils {
                         ",resourcetype=Global,name=" + environment.getName());
         } else if (container instanceof Context) {        
             Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
+            ContextName cn = new ContextName(context.getName(), false);
             Container host = context.getParent();
             name = new ObjectName(domain + ":type=Environment" + 
                         ",resourcetype=Context,context=" + cn.getDisplayName() + 
@@ -575,7 +575,7 @@ public class MBeanUtils {
                         ",name=" + quotedResourceName);
         } else if (container instanceof Context) {                    
             Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
+            ContextName cn = new ContextName(context.getName(), false);
             Container host = context.getParent();
             name = new ObjectName(domain + ":type=Resource" +
                         ",resourcetype=Context,context=" + cn.getDisplayName() + 
@@ -613,7 +613,7 @@ public class MBeanUtils {
                         ",name=" + quotedResourceLinkName);
         } else if (container instanceof Context) {                    
             Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
+            ContextName cn = new ContextName(context.getName(), false);
             Container host = context.getParent();
             name = new ObjectName(domain + ":type=ResourceLink" +
                         ",resourcetype=Context,context=" + cn.getDisplayName() + 
@@ -715,7 +715,7 @@ public class MBeanUtils {
                               container.getName());
         } else if (container instanceof Context) {
             Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
+            ContextName cn = new ContextName(context.getName(), false);
             Container host = context.getParent();
             name = new ObjectName(domain + ":type=Loader,context=" +
                     cn.getDisplayName() + ",host=" + host.getName());
@@ -751,7 +751,7 @@ public class MBeanUtils {
                               container.getName());
         } else if (container instanceof Context) {
             Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
+            ContextName cn = new ContextName(context.getName(), false);
             Container host = context.getParent();
             name = new ObjectName(domain + ":type=Manager,context=" +
                     cn.getDisplayName() + ",host=" + host.getName());
@@ -784,7 +784,7 @@ public class MBeanUtils {
                         ",resourcetype=Global");
         } else if (container instanceof Context) {        
             Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
+            ContextName cn = new ContextName(context.getName(), false);
             Container host = context.getParent();
             name = new ObjectName(domain + ":type=NamingResources" + 
                         ",resourcetype=Context,context=" + cn.getDisplayName() + 
@@ -842,7 +842,7 @@ public class MBeanUtils {
                               container.getName());
         } else if (container instanceof Context) {
             Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
+            ContextName cn = new ContextName(context.getName(), false);
             Container host = context.getParent();
             name = new ObjectName(domain + ":type=Realm,context=" +
                     cn.getDisplayName() + ",host=" + host.getName());
@@ -1015,7 +1015,7 @@ public class MBeanUtils {
                                     ext + local );
         } else if (container instanceof Context) {
             Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
+            ContextName cn = new ContextName(context.getName(), false);
             Container host = context.getParent();
             String local=",context=" + cn.getDisplayName() + ",host=" +
                     host.getName();
@@ -1750,7 +1750,7 @@ public class MBeanUtils {
                 keyProperties.append(c.getName());
             } else if (c instanceof Context) {
                 keyProperties.append(",context=");
-                ContextName cn = new ContextName(c.getName());
+                ContextName cn = new ContextName(c.getName(), false);
                 keyProperties.append(cn.getDisplayName());
             } else if (c instanceof Host) {
                 keyProperties.append(",host=");

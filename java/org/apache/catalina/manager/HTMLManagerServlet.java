@@ -285,7 +285,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     break;
                 }
                 
-                ContextName cn = new ContextName(filename);
+                ContextName cn = new ContextName(filename, true);
                 String name = cn.getName();
 
                 if ((host.findChild(name) != null) && !isDeployed(name)) {
