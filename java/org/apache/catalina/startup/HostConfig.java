@@ -443,7 +443,7 @@ public class HostConfig
 
         File appBase = host.getAppBaseFile();
         File configBase = host.getConfigBaseFile();
-        ContextName cn = new ContextName(name);
+        ContextName cn = new ContextName(name, false);
         String baseName = cn.getBaseName();
 
         if (deploymentExists(baseName)) {
@@ -484,7 +484,7 @@ public class HostConfig
             File contextXml = new File(configBase, files[i]);
 
             if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
-                ContextName cn = new ContextName(files[i]);
+                ContextName cn = new ContextName(files[i], true);
 
                 if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
                     continue;
@@ -671,7 +671,7 @@ public class HostConfig
             if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".war") &&
                     war.isFile() && !invalidWars.contains(files[i]) ) {
 
-                ContextName cn = new ContextName(files[i]);
+                ContextName cn = new ContextName(files[i], true);
 
                 if (isServiced(cn.getName())) {
                     continue;
@@ -1025,7 +1025,7 @@ public class HostConfig
                 continue;
             File dir = new File(appBase, files[i]);
             if (dir.isDirectory()) {
-                ContextName cn = new ContextName(files[i]);
+                ContextName cn = new ContextName(files[i], false);
 
                 if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
                     continue;
@@ -1569,9 +1569,9 @@ public class HostConfig
         }
         Iterator<String> iter = sortedAppNames.iterator();
 
-        ContextName previous = new ContextName(iter.next());
+        ContextName previous = new ContextName(iter.next(), false);
         do {
-            ContextName current = new ContextName(iter.next());
+            ContextName current = new ContextName(iter.next(), false);
 
             if (current.getPath().equals(previous.getPath())) {
                 // Current and previous are same path - current will always

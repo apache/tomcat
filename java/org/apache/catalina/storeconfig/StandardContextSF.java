@@ -87,7 +87,7 @@ public class StandardContextSF extends StoreFactoryBase {
                     Context context = ((StandardContext) aContext);
                     Host host = (Host) context.getParent();
                     File configBase = host.getConfigBaseFile();
-                    ContextName cn = new ContextName(context.getName());
+                    ContextName cn = new ContextName(context.getName(), false);
                     String baseName = cn.getBaseName();
                     File xml = new File(configBase, baseName + ".xml");
                     context.setConfigFile(xml.toURI().toURL());

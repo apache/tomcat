@@ -1234,7 +1234,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 keyProperties.insert(9, c.getName());
             } else if (c instanceof Context) {
                 keyProperties.insert(0, ",context=");
-                ContextName cn = new ContextName(c.getName());
+                ContextName cn = new ContextName(c.getName(), false);
                 keyProperties.insert(9,cn.getDisplayName());
             } else if (c instanceof Host) {
                 keyProperties.insert(0, ",host=");
