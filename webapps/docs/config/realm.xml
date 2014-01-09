@@ -43,11 +43,14 @@
   <em>Container Managed Security</em> as described in the Servlet
   Specification.</p>
 
-  <p>You may nest a Realm inside any Catalina container
-  <a href="engine.html">Engine</a>, <a href="host.html">Host</a>, or
-  <a href="context.html">Context</a>).  In addition, Realms associated with
-  an Engine or a Host are automatically inherited by lower-level
-  containers, unless explicitly overridden.</p>
+  <p>A Catalina container (<a href="engine.html">Engine</a>,
+  <a href="host.html">Host</a>, or <a href="context.html">Context</a>) may
+  contain no more than one Realm element (although if supported by the Realm
+  this one Realm may itself contain multiple nested Realms). In addition, the
+  Realm associated with an Engine or a Host is automatically inherited by
+  lower-level containers unless the lower level container explicitly defines its
+  own Realm.
+  </p>
 
   <p>For more in-depth information about container managed security in web
   applications, as well as more information on configuring and using the
