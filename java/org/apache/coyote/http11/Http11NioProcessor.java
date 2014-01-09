@@ -276,6 +276,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     @Override
     protected boolean breakKeepAliveLoop(
             SocketWrapper<NioChannel> socketWrapper) {
+        openSocket = keepAlive;
         // Do sendfile as needed: add socket to sendfile and end
         if (sendfileData != null && !error) {
             ((KeyAttachment) socketWrapper).setSendfileData(sendfileData);
@@ -283,8 +284,16 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
                     socketWrapper.getSocket().getPoller().getSelector());
             //do the first write on this thread, might as well
-            openSocket = socketWrapper.getSocket().getPoller().processSendfile(key,
-                    (KeyAttachment) socketWrapper, true);
+            if (socketWrapper.getSocket().getPoller().processSendfile(key,
+                    (KeyAttachment) socketWrapper, true)) {
+                sendfileInProgress = true;
+            } else {
+                // Write failed
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("http11processor.sendfile.error"));
+                }
+                error = true;
+            }
             return true;
         }
         return false;
