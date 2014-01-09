@@ -71,6 +71,11 @@
         TLD files were swallowed. (markt)
       </fix>
       <fix>
+        <bug>55671</bug>: Correct typo in the log message for a wrong value of
+        genStringAsCharArray init-param of JspServlet. This parameter
+        had a different name in Tomcat 6. (kkolinko)
+      </fix>
+      <fix>
         <bug>55973</bug>: Fix processing of XML schemas when validation is
         enabled in Jasper. (kkolinko)
       </fix>
