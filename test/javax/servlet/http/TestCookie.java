@@ -134,16 +134,16 @@ public class TestCookie {
 
     public static void checkCharInName(BitSet allowed) {
         for (char ch = 0; ch < allowed.size(); ch++) {
-            boolean expected = allowed.get(ch);
+            Boolean expected = Boolean.valueOf(allowed.get(ch));
             String name = "X" + ch + "X";
-            boolean actual;
+            Boolean actual;
             try {
                 new Cookie(name, null);
-                actual = true;
+                actual = Boolean.TRUE;
             } catch (IllegalArgumentException e) {
-                actual = false;
+                actual = Boolean.FALSE;
             }
-            String msg = String.format("Check for char %d in name", (int) ch);
+            String msg = String.format("Check for char %d in name", Integer.valueOf(ch));
             Assert.assertEquals(msg, expected, actual);
         }
     }
