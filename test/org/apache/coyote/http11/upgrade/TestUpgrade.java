@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.Writer;
 import java.net.Socket;
 
@@ -72,6 +73,37 @@ public class TestUpgrade extends TomcatBaseTest {
         doTestMessages(EchoNonBlocking.class);
     }
 
+    @Test
+    public void testSetNullReadListener() throws Exception {
+        doTestCheckClosed(SetNullReadListener.class);
+    }
+
+    @Test
+    public void testSetNullWriteListener() throws Exception {
+        doTestCheckClosed(SetNullWriteListener.class);
+    }
+
+    @Test
+    public void testSetReadListenerTwice() throws Exception {
+        doTestCheckClosed(SetReadListenerTwice.class);
+    }
+
+    @Test
+    public void testSetWriteListenerTwice() throws Exception {
+        doTestCheckClosed(SetWriteListenerTwice.class);
+    }
+
+    private void doTestCheckClosed(
+            Class<? extends HttpUpgradeHandler> upgradeHandlerClass)
+                    throws Exception {
+        UpgradeConnection conn = doUpgrade(upgradeHandlerClass);
+
+        Reader r = conn.getReader();
+        int c = r.read();
+
+        Assert.assertEquals(-1, c);
+    }
+
     private void doTestMessages (
             Class<? extends HttpUpgradeHandler> upgradeHandlerClass)
             throws Exception {
@@ -116,7 +148,7 @@ public class TestUpgrade extends TomcatBaseTest {
         Socket socket =
                 SocketFactory.getDefault().createSocket("localhost", getPort());
 
-        socket.setSoTimeout(10000);
+        socket.setSoTimeout(5000);
 
         InputStream is = socket.getInputStream();
         OutputStream os = socket.getOutputStream();
@@ -248,6 +280,96 @@ public class TestUpgrade extends TomcatBaseTest {
                     throw new RuntimeException(ioe);
                 }
             }
+        }
+    }
+
+
+    public static class SetNullReadListener implements HttpUpgradeHandler {
+
+        @Override
+        public void init(WebConnection connection) {
+            ServletInputStream sis;
+            try {
+                sis = connection.getInputStream();
+            } catch (IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+            sis.setReadListener(null);
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
+    }
+
+
+    public static class SetNullWriteListener implements HttpUpgradeHandler {
+
+        @Override
+        public void init(WebConnection connection) {
+            ServletOutputStream sos;
+            try {
+                sos = connection.getOutputStream();
+            } catch (IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+            sos.setWriteListener(null);
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
+    }
+
+
+    public static class SetReadListenerTwice implements HttpUpgradeHandler {
+
+        @Override
+        public void init(WebConnection connection) {
+            ServletInputStream sis;
+            ServletOutputStream sos;
+            try {
+                sis = connection.getInputStream();
+                sos = connection.getOutputStream();
+            } catch (IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+            sos.setWriteListener(new NoOpWriteListener());
+            ReadListener rl = new NoOpReadListener();
+            sis.setReadListener(rl);
+            sis.setReadListener(rl);
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
+    }
+
+
+    public static class SetWriteListenerTwice implements HttpUpgradeHandler {
+
+        @Override
+        public void init(WebConnection connection) {
+            ServletInputStream sis;
+            ServletOutputStream sos;
+            try {
+                sis = connection.getInputStream();
+                sos = connection.getOutputStream();
+            } catch (IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+            sis.setReadListener(new NoOpReadListener());
+            WriteListener wl = new NoOpWriteListener();
+            sos.setWriteListener(wl);
+            sos.setWriteListener(wl);
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
         }
     }
 
