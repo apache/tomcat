@@ -28,21 +28,20 @@ import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketWrapper;
 
-public class AprServletOutputStream extends AbstractServletOutputStream {
+public class AprServletOutputStream extends AbstractServletOutputStream<Long> {
 
     private static final int SSL_OUTPUT_BUFFER_SIZE = 8192;
 
     private final AprEndpoint endpoint;
-    private final SocketWrapper<Long> wrapper;
     private final long socket;
     private volatile boolean closed = false;
     private final ByteBuffer sslOutputBuffer;
 
-    public AprServletOutputStream(SocketWrapper<Long> wrapper,
+    public AprServletOutputStream(SocketWrapper<Long> socketWrapper,
             AprEndpoint endpoint) {
+        super(socketWrapper);
         this.endpoint = endpoint;
-        this.wrapper = wrapper;
-        this.socket = wrapper.getSocket().longValue();
+        this.socket = socketWrapper.getSocket().longValue();
         if (endpoint.isSSLEnabled()) {
             sslOutputBuffer = ByteBuffer.allocateDirect(SSL_OUTPUT_BUFFER_SIZE);
             sslOutputBuffer.position(SSL_OUTPUT_BUFFER_SIZE);
@@ -60,12 +59,12 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
             throw new IOException(sm.getString("apr.closed", Long.valueOf(socket)));
         }
 
-        Lock readLock = wrapper.getBlockingStatusReadLock();
-        WriteLock writeLock = wrapper.getBlockingStatusWriteLock();
+        Lock readLock = socketWrapper.getBlockingStatusReadLock();
+        WriteLock writeLock = socketWrapper.getBlockingStatusWriteLock();
 
         try {
             readLock.lock();
-            if (wrapper.getBlockingStatus() == block) {
+            if (socketWrapper.getBlockingStatus() == block) {
                 return doWriteInternal(b, off, len);
             }
         } finally {
@@ -75,7 +74,7 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
         try {
             writeLock.lock();
             // Set the current settings for this socket
-            wrapper.setBlockingStatus(block);
+            socketWrapper.setBlockingStatus(block);
             if (block) {
                 Socket.timeoutSet(socket, endpoint.getSoTimeout() * 1000);
             } else {
@@ -141,7 +140,7 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
                 throw new EOFException(sm.getString("apr.clientAbort"));
             } else if (written < 0) {
                 throw new IOException(sm.getString("apr.write.error",
-                        Integer.valueOf(-written), Long.valueOf(socket), wrapper));
+                        Integer.valueOf(-written), Long.valueOf(socket), socketWrapper));
             }
             start += written;
             left -= written;

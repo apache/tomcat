@@ -22,12 +22,16 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.net.DispatchType;
+import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractServletOutputStream extends ServletOutputStream {
+public abstract class AbstractServletOutputStream<S> extends ServletOutputStream {
 
     protected static final StringManager sm =
             StringManager.getManager(Constants.Package);
+
+    protected final SocketWrapper<S> socketWrapper;
 
     private final Object fireListenerLock = new Object();
     private final Object writeLock = new Object();
@@ -38,6 +42,12 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
     private volatile boolean fireListener = false;
     private volatile ClassLoader applicationLoader = null;
     private volatile byte[] buffer;
+
+
+    public AbstractServletOutputStream(SocketWrapper<S> socketWrapper) {
+        this.socketWrapper = socketWrapper;
+    }
+
 
     @Override
     public final boolean isReady() {
@@ -55,6 +65,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
         }
     }
 
+
     @Override
     public final void setWriteListener(WriteListener listener) {
         if (listener == null) {
@@ -65,13 +76,22 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
             throw new IllegalArgumentException(
                     sm.getString("upgrade.sos.writeListener.set"));
         }
+        // Container is responsible for first call to onWritePossible() but only
+        // need to do this if setting the listener for the first time rather
+        // than changing it.
+        synchronized (fireListenerLock) {
+            fireListener = true;
+        }
+        socketWrapper.addDispatch(DispatchType.NON_BLOCKING_WRITE);
         this.listener = listener;
         this.applicationLoader = Thread.currentThread().getContextClassLoader();
     }
 
+
     protected final boolean isCloseRequired() {
         return closeRequired;
     }
+
 
     @Override
     public void write(int b) throws IOException {
@@ -96,6 +116,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
         closeRequired = true;
         doClose();
     }
+
 
     private void preWriteChecks() {
         if (buffer != null) {
@@ -135,7 +156,9 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
     protected final void onWritePossible() throws IOException {
         synchronized (writeLock) {
             try {
-                writeInternal(buffer, 0, buffer.length);
+                if (buffer != null) {
+                    writeInternal(buffer, 0, buffer.length);
+                }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 Thread thread = Thread.currentThread();
@@ -153,8 +176,9 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
                 }
             }
 
-           // Make sure isReady() and onWritePossible() have a consistent view of
-            // buffer and fireListener when determining if the listener should fire
+            // Make sure isReady() and onWritePossible() have a consistent view
+            // of buffer and fireListener when determining if the listener
+            // should fire
             boolean fire = false;
 
             synchronized (fireListenerLock) {
@@ -175,6 +199,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
             }
         }
     }
+
 
     /**
      * Abstract method to be overridden by concrete implementations. The base

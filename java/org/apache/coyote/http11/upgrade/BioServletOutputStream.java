@@ -22,13 +22,14 @@ import java.net.Socket;
 
 import org.apache.tomcat.util.net.SocketWrapper;
 
-public class BioServletOutputStream extends AbstractServletOutputStream {
+public class BioServletOutputStream extends AbstractServletOutputStream<Socket> {
 
     private final OutputStream os;
 
-    public BioServletOutputStream(SocketWrapper<Socket> wrapper)
+    public BioServletOutputStream(SocketWrapper<Socket> socketWrapper)
             throws IOException {
-        os = wrapper.getSocket().getOutputStream();
+        super(socketWrapper);
+        os = socketWrapper.getSocket().getOutputStream();
     }
 
     @Override
