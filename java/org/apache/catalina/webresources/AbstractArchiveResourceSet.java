@@ -213,7 +213,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
             String pathInJar = getInternalPath() + path.substring(
                     webAppMount.length(), path.length());
             // Always strip off the leading '/' to get the JAR path
-            if (pathInJar.charAt(0) == '/') {
+            if (pathInJar.length() > 0 && pathInJar.charAt(0) == '/') {
                 pathInJar = pathInJar.substring(1);
             }
             if (pathInJar.equals("")) {
