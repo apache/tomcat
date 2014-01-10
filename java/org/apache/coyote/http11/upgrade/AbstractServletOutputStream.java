@@ -61,6 +61,10 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
             throw new IllegalArgumentException(
                     sm.getString("upgrade.sos.writeListener.null"));
         }
+        if (this.listener != null) {
+            throw new IllegalArgumentException(
+                    sm.getString("upgrade.sos.writeListener.set"));
+        }
         this.listener = listener;
         this.applicationLoader = Thread.currentThread().getContextClassLoader();
     }

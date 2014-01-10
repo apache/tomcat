@@ -81,6 +81,10 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
             throw new IllegalArgumentException(
                     sm.getString("upgrade.sis.readListener.null"));
         }
+        if (this.listener != null) {
+            throw new IllegalArgumentException(
+                    sm.getString("upgrade.sis.readListener.set"));
+        }
         this.listener = listener;
         this.applicationLoader = Thread.currentThread().getContextClassLoader();
         // Switching to non-blocking. Don't know if data is available.
