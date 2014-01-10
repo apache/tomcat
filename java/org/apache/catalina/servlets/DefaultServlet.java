@@ -1340,8 +1340,6 @@ public class DefaultServlet
     protected InputStream renderHtml(String contextPath, WebResource resource)
         throws IOException {
 
-        String name = resource.getName();
-
         // Prepare a writer to a buffered area
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         OutputStreamWriter osWriter = new OutputStreamWriter(stream, "UTF8");
@@ -1359,7 +1357,7 @@ public class DefaultServlet
         sb.append("<html>\r\n");
         sb.append("<head>\r\n");
         sb.append("<title>");
-        sb.append(sm.getString("directory.title", name));
+        sb.append(sm.getString("directory.title", directoryWebappPath));
         sb.append("</title>\r\n");
         sb.append("<STYLE><!--");
         sb.append(org.apache.catalina.util.TomcatCSS.TOMCAT_CSS);
@@ -1367,17 +1365,17 @@ public class DefaultServlet
         sb.append("</head>\r\n");
         sb.append("<body>");
         sb.append("<h1>");
-        sb.append(sm.getString("directory.title", name));
+        sb.append(sm.getString("directory.title", directoryWebappPath));
 
         // Render the link to our parent (if required)
-        String parentDirectory = name;
+        String parentDirectory = directoryWebappPath;
         if (parentDirectory.endsWith("/")) {
             parentDirectory =
                 parentDirectory.substring(0, parentDirectory.length() - 1);
         }
         int slash = parentDirectory.lastIndexOf('/');
         if (slash >= 0) {
-            String parent = name.substring(0, slash);
+            String parent = directoryWebappPath.substring(0, slash);
             sb.append(" - <a href=\"");
             sb.append(rewrittenContextPath);
             if (parent.equals(""))
