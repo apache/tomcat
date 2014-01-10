@@ -724,6 +724,27 @@ public class DefaultServlet
             return;
         }
 
+        if (!resource.canRead()) {
+            // Check if we're included so we can return the appropriate
+            // missing resource name in the error
+            String requestUri = (String) request.getAttribute(
+                    RequestDispatcher.INCLUDE_REQUEST_URI);
+            if (requestUri == null) {
+                requestUri = request.getRequestURI();
+            } else {
+                // We're included
+                // Spec doesn't say what to do in this case but a FNFE seems
+                // reasonable
+                throw new FileNotFoundException(
+                        sm.getString("defaultServlet.missingResource",
+                    requestUri));
+            }
+
+            response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                               requestUri);
+            return;
+        }
+
         // If the resource is not a collection, and the resource path
         // ends with "/" or "\", return NOT FOUND
         if (resource.isFile()) {
