@@ -28,7 +28,7 @@ public abstract class AbstractResourceSet extends LifecycleBase
 
     private WebResourceRoot root;
     private String base;
-    private String internalPath;
+    private String internalPath = "";
     private String webAppMount;
     private boolean classLoaderOnly;
 
