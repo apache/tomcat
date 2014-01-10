@@ -153,7 +153,7 @@ public final class SecurityClassLoad {
     private static final void loadValvesPackage(ClassLoader loader)
             throws Exception {
         final String basePackage = "org.apache.catalina.valves.";
-        loader.loadClass(basePackage + "AccessLogValve$3");
+        loader.loadClass(basePackage + "AbstractAccessLogValve$3");
     }
 
 
