@@ -82,6 +82,10 @@
         Avoid possible NPE if a content type is specified without a character
         set. (markt)
       </fix>
+      <fix>
+        <bug>55976</bug>: Fix sendfile support for the HTTP NIO connector.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
