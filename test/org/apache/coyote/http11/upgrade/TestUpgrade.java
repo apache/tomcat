@@ -218,7 +218,7 @@ public class TestUpgrade extends TomcatBaseTest {
             }
 
             sis.setReadListener(new EchoReadListener());
-            sos.setWriteListener(new EchoWriteListener());
+            sos.setWriteListener(new NoOpWriteListener());
         }
 
         @Override
@@ -226,7 +226,7 @@ public class TestUpgrade extends TomcatBaseTest {
             // NO-OP
         }
 
-        private class EchoReadListener implements ReadListener {
+        private class EchoReadListener extends NoOpReadListener {
 
             private byte[] buffer = new byte[8096];
 
@@ -248,29 +248,38 @@ public class TestUpgrade extends TomcatBaseTest {
                     throw new RuntimeException(ioe);
                 }
             }
+        }
+    }
 
-            @Override
-            public void onAllDataRead() {
-                // NO-OP for HTTP Upgrade
-            }
 
-            @Override
-            public void onError(Throwable throwable) {
-                // NO-OP
-            }
+    private static class NoOpReadListener implements ReadListener {
+
+        @Override
+        public void onDataAvailable() {
+            // NO-OP
         }
 
-        private class EchoWriteListener implements WriteListener {
+        @Override
+        public void onAllDataRead() {
+            // Always NO-OP for HTTP Upgrade
+        }
 
-            @Override
-            public void onWritePossible() {
-                // NO-OP
-            }
+        @Override
+        public void onError(Throwable throwable) {
+            // NO-OP
+        }
+    }
 
-            @Override
-            public void onError(Throwable throwable) {
-                // NO-OP
-            }
+    private static class NoOpWriteListener implements WriteListener {
+
+        @Override
+        public void onWritePossible() {
+            // NO-OP
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            // NO-OP
         }
     }
 }
