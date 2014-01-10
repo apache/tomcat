@@ -56,12 +56,8 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.51 (violetagg)">
-  <subsection name="Coyote">
+  <subsection name="Catalina">
     <changelog>
-      <fix>
-        Avoid possible NPE if a content type is specified without a character
-        set. (markt)
-      </fix>
       <fix>
         <bug>55937</bug>: When deploying applications, treat a context path of
         <code>/ROOT</code> as equivalent to <code>/</code>. (markt)
@@ -77,6 +73,14 @@
       <fix>
         <bug>55974</bug>: Retain order when reporting errors and warnings while
         parsing XML configuration files. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Avoid possible NPE if a content type is specified without a character
+        set. (markt)
       </fix>
     </changelog>
   </subsection>
