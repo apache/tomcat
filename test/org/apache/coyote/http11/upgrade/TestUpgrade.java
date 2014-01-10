@@ -93,6 +93,11 @@ public class TestUpgrade extends TomcatBaseTest {
         doTestCheckClosed(SetWriteListenerTwice.class);
     }
 
+    @Test
+    public void testFirstCallToOnWritePossible() throws Exception {
+        doTestFixedResponse(FixedResponseNonBlocking.class);
+    }
+
     private void doTestCheckClosed(
             Class<? extends HttpUpgradeHandler> upgradeHandlerClass)
                     throws Exception {
@@ -102,6 +107,17 @@ public class TestUpgrade extends TomcatBaseTest {
         int c = r.read();
 
         Assert.assertEquals(-1, c);
+    }
+
+    private void doTestFixedResponse(
+            Class<? extends HttpUpgradeHandler> upgradeHandlerClass)
+                    throws Exception {
+        UpgradeConnection conn = doUpgrade(upgradeHandlerClass);
+
+        Reader r = conn.getReader();
+        int c = r.read();
+
+        Assert.assertEquals(FixedResponseNonBlocking.FIXED_RESPONSE, c);
     }
 
     private void doTestMessages (
@@ -374,6 +390,46 @@ public class TestUpgrade extends TomcatBaseTest {
     }
 
 
+    public static class FixedResponseNonBlocking implements HttpUpgradeHandler {
+
+        public static final char FIXED_RESPONSE = 'F';
+
+        private ServletInputStream sis;
+        private ServletOutputStream sos;
+
+        @Override
+        public void init(WebConnection connection) {
+
+            try {
+                sis = connection.getInputStream();
+                sos = connection.getOutputStream();
+            } catch (IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+
+            sis.setReadListener(new NoOpReadListener());
+            sos.setWriteListener(new FixedResponseWriteListener());
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
+
+        private class FixedResponseWriteListener extends NoOpWriteListener {
+            @Override
+            public void onWritePossible() {
+                try {
+                    sos.write(FIXED_RESPONSE);
+                    sos.flush();
+                } catch (IOException ioe) {
+                    throw new IllegalStateException(ioe);
+                }
+            }
+        }
+    }
+
+
     private static class NoOpReadListener implements ReadListener {
 
         @Override
@@ -391,6 +447,7 @@ public class TestUpgrade extends TomcatBaseTest {
             // NO-OP
         }
     }
+
 
     private static class NoOpWriteListener implements WriteListener {
 
