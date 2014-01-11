@@ -17,251 +17,198 @@
 
 package org.apache.tomcat.util.http;
 
+import java.nio.charset.StandardCharsets;
+
+import javax.servlet.http.Cookie;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestCookies {
+    private Cookie FOO = new Cookie("foo", "bar");
+    private Cookie BAR = new Cookie("bar", "rab");
+    private Cookie A = new Cookie("a", "b");
 
     @Test
-    public void testCookies() throws Exception {
-        test("foo=bar; a=b", "foo", "bar", "a", "b");
-        test("foo=bar;a=b", "foo", "bar", "a", "b");
-        test("foo=bar;a=b;", "foo", "bar", "a", "b");
-        test("foo=bar;a=b; ", "foo", "bar", "a", "b");
-        test("foo=bar;a=b; ;", "foo", "bar", "a", "b");
-        test("foo=;a=b; ;",  "a", "b");
-        test("foo;a=b; ;", "a", "b");
-        // v1
-        test("$Version=1; foo=bar;a=b", "foo", "bar", "a", "b");
-
-        // OK
-        test("$Version=1;foo=bar;a=b; ; ",  "foo", "bar", "a", "b");
-        test("$Version=1;foo=;a=b; ; ",  "a", "b");
-        test("$Version=1;foo= ;a=b; ; ",  "a", "b");
-        test("$Version=1;foo;a=b; ; ", "a", "b");
-        test("$Version=1;foo=\"bar\";a=b; ; ", "foo", "bar", "a", "b");
-
-        test("$Version=1;foo=\"bar\";$Domain=apache.org;a=b", "foo", "bar", "a", "b");
-        test("$Version=1;foo=\"bar\";$Domain=apache.org;a=b;$Domain=yahoo.com", "foo", "bar", "a", "b");
-        // rfc2965
-        test("$Version=1;foo=\"bar\";$Domain=apache.org;$Port=8080;a=b", "foo", "bar", "a", "b");
-
-        // make sure these never split into two cookies - JVK
-        test("$Version=1;foo=\"b\"ar\";$Domain=apache.org;$Port=8080;a=b",  "foo", "b", "a", "b"); // Incorrectly escaped.
-        test("$Version=1;foo=\"b\\\"ar\";$Domain=apache.org;$Port=8080;a=b", "foo", "b\"ar", "a", "b"); // correctly escaped.
-        test("$Version=1;foo=\"b'ar\";$Domain=apache.org;$Port=8080;a=b", "foo", "b'ar", "a", "b");
-        // ba'r is OK - ' is not a separator
-        test("$Version=1;foo=b'ar;$Domain=apache.org;$Port=8080;a=b", "foo", "b'ar", "a", "b");
-
-        // Ends in quoted value
-        test("foo=bar;a=\"b\"",  "foo", "bar", "a", "b");
-        test("foo=bar;a=\"b\";",  "foo", "bar", "a", "b");
-
-        // Last character is an escape character
-        test("$Version=1;foo=b'ar;$Domain=\"apache.org\";$Port=8080;a=\"b\\\"", "foo", "b'ar");
-        test("$Version=1;foo=b'ar;$Domain=\"apache.org\";$Port=8080;a=\"b\\",  "foo", "b'ar");
-
-        // A token cannot be quoted with ' chars - they should be treated as part of the value
-        test("$Version=\"1\"; foo='bar'; $Path=/path; $Domain=\"localhost\"", "foo", "'bar'");
-
-        // wrong, path should not have '/' JVK
-        test("$Version=1;foo=\"bar\";$Path=/examples;a=b; ; ", "foo", "bar", "a", "b");
-
-        // wrong
-        test("$Version=1;foo=\"bar\";$Domain=apache.org;$Port=8080;a=b", "foo", "bar", "a", "b");
-
-        // Test name-only at the end of the header
-        test("foo;a=b;bar", "a", "b");
-        test("foo;a=b;bar;", "a", "b");
-        test("foo;a=b;bar ", "a", "b");
-        test("foo;a=b;bar ;", "a", "b");
-
-        // Multiple delimiters next to each other
-
-        // BUG -- the ' ' needs to be skipped.
-        test("foo;a=b; ;bar", "a", "b");
-        // BUG -- ';' needs skipping
-        test("foo;a=b;;bar", "a", "b");
-        test("foo;a=b; ;;bar=rab", "a", "b", "bar", "rab");
-        // These pass currently
-        test("foo;a=b;; ;bar=rab", "a", "b", "bar", "rab");
-
-        // '#' is a valid cookie name (not a separator)
-        test("foo;a=b;;#;bar=rab","a", "b", "bar", "rab");
-
-
-        test("foo;a=b;;\\;bar=rab", "a", "b", "bar", "rab");
-
-        // Try all the separators of version1 in version0 cookie.
-        // Won't work we only parse version1 cookie result 1 cookie.
-        test("a=()<>@:\\\"/[]?={}\t; foo=bar", "foo", "bar");
-
-        // Test the version.
-        test("$Version=1;foo=bar", 1);
-        test("$Version=0;foo=bar", 0);
+    public void testBasicCookie() {
+        test("foo=bar; a=b", FOO, A);
+        test("foo=bar;a=b", FOO, A);
+        test("foo=bar;a=b;", FOO, A);
+        test("foo=bar;a=b; ", FOO, A);
+        test("foo=bar;a=b; ;", FOO, A);
     }
 
     @Test
-    public void testNameOnlyCookies() throws Exception {
+    public void testNameOnlyAreDropped() {
+        test("foo=;a=b; ;", A);
+        test("foo;a=b; ;", A);
+        test("foo;a=b;bar", A);
+        test("foo;a=b;bar;", A);
+        test("foo;a=b;bar ", A);
+        test("foo;a=b;bar ;", A);
+
         // Bug 49000
-        test("fred=1; jim=2; bob", "fred", "1", "jim", "2");
-        test("fred=1; jim=2; bob; george=3", "fred", "1", "jim", "2",
-                "george", "3");
-        test("fred=1; jim=2; bob=; george=3", "fred", "1", "jim", "2",
-                "george", "3");
-        test("fred=1; jim=2; bob=", "fred", "1", "jim", "2");
+        Cookie fred = new Cookie("fred", "1");
+        Cookie jim = new Cookie("jim", "2");
+        Cookie george = new Cookie("george", "3");
+        test("fred=1; jim=2; bob", fred, jim);
+        test("fred=1; jim=2; bob; george=3", fred, jim, george);
+        test("fred=1; jim=2; bob=; george=3", fred, jim, george);
+        test("fred=1; jim=2; bob=", fred, jim);
+    }
+
+    @Test
+    public void testQuotedValue() {
+        test("foo=bar;a=\"b\"", FOO, A);
+        test("foo=bar;a=\"b\";", FOO, A);
+    }
+
+    @Test
+    public void testEmptyPairs() {
+        test("foo;a=b; ;bar", A);
+        test("foo;a=b;;bar", A);
+        test("foo;a=b; ;;bar=rab", A, BAR);
+        test("foo;a=b;; ;bar=rab", A, BAR);
+        test("foo;a=b;;#;bar=rab", A, BAR);
+        test("foo;a=b;;\\;bar=rab", A, BAR);
+    }
+
+    @Test
+    public void testSeparatorsInValue() {
+        test("a=()<>@:\\\"/[]?={}\t; foo=bar", FOO);
     }
 
 
-    public static void test( String s, int val ) throws Exception {
-        System.out.println("Processing [" + s + "]");
-        Cookies cs=new Cookies(null);
-        cs.processCookieHeader( s.getBytes(), 0, s.length());
-        int num = cs.getCookieCount();
-        if (num != 1)
-          throw new Exception("wrong number of cookies " + num);
-        ServerCookie co = cs.getCookie(0);
-        System.out.println("One Cookie: " + co);
-        if (co.getVersion() != val)
-          throw new Exception("wrong version " + co.getVersion() + " != " + val);
+    @Test
+    public void v1TokenValue() {
+        FOO.setVersion(1);
+        A.setVersion(1);
+        test("$Version=1; foo=bar;a=b", FOO, A);
+        test("$Version=1;foo=bar;a=b; ; ", FOO, A);
     }
-    public static void test( String s ) throws Exception {
-        System.out.println("Processing [" + s + "]");
-        Cookies cs=new Cookies(null);
-        cs.processCookieHeader( s.getBytes(), 0, s.length());
 
-        int num = cs.getCookieCount();
-        for( int i=0; i< num ; i++ ) {
-            System.out.println("Cookie: " + cs.getCookie( i ));
+    @Test
+    public void v1NameOnlyIsDropped() {
+        A.setVersion(1);
+        test("$Version=1;foo=;a=b; ; ", A);
+        test("$Version=1;foo= ;a=b; ; ", A);
+        test("$Version=1;foo;a=b; ; ", A);
+    }
+
+    @Test
+    public void v1QuotedValue() {
+        FOO.setVersion(1);
+        A.setVersion(1);
+        // presumes quotes are removed
+        test("$Version=1;foo=\"bar\";a=b; ; ", FOO, A);
+    }
+
+    @Test
+    public void v1DQuoteInValue() {
+        FOO.setValue("b");
+        FOO.setVersion(1);
+        A.setVersion(1);
+        test("$Version=1;foo=\"b\"ar\";a=b", FOO, A); // Incorrectly escaped.
+    }
+
+    @Test
+    public void v1QuoteInValue() {
+        FOO.setValue("b'ar");
+        FOO.setVersion(1);
+        A.setVersion(1);
+        test("$Version=1;foo=b'ar;a=b", FOO, A);
+    }
+
+
+    @Test
+    public void v1QuoteInQuotedValue() {
+        FOO.setValue("b'ar");
+        FOO.setVersion(1);
+        A.setVersion(1);
+        test("$Version=1;foo=\"b'ar\";a=b", FOO, A);
+    }
+
+    @Test
+    public void v1EscapedDQuoteInValue() {
+        FOO.setValue("b\"ar");
+        FOO.setVersion(1);
+        A.setVersion(1);
+        test("$Version=1;foo=\"b\\\"ar\";a=b", FOO, A); // correctly escaped.
+    }
+
+    @Test
+    public void v1QuotedValueEndsInBackslash() {
+        FOO.setVersion(1);
+        test("$Version=1;foo=bar;a=\"b\\\"", FOO);
+    }
+
+    @Test
+    public void v1MismatchedQuotes() {
+        FOO.setVersion(1);
+        test("$Version=1;foo=bar;a=\"b\\", FOO);
+    }
+
+    @Test
+    public void v1SingleQuotesAreValidTokenCharacters() {
+        FOO.setVersion(1);
+        FOO.setValue("'bar'");
+        test("$Version=1; foo='bar'", FOO);
+    }
+
+    @Test
+    public void v1DomainIsParsed() {
+        FOO.setVersion(1);
+        FOO.setDomain("apache.org");
+        A.setVersion(1);
+        A.setDomain("yahoo.com");
+        test("$Version=1;foo=\"bar\";$Domain=apache.org;a=b;$Domain=yahoo.com", FOO, A);
+    }
+
+    @Test
+    public void v1DomainOnlyAffectsPrecedingCookie() {
+        FOO.setVersion(1);
+        FOO.setDomain("apache.org");
+        A.setVersion(1);
+        test("$Version=1;foo=\"bar\";$Domain=apache.org;a=b", FOO, A);
+    }
+
+    @Test
+    public void v1PortIsIgnored() {
+        FOO.setVersion(1);
+        FOO.setDomain("apache.org");
+        A.setVersion(1);
+        test("$Version=1;foo=\"bar\";$Domain=apache.org;$Port=8080;a=b", FOO, A);
+    }
+
+    @Test
+    public void v1PathAffectsPrecedingCookie() {
+        FOO.setVersion(1);
+        FOO.setPath("/examples");
+        A.setVersion(1);
+        test("$Version=1;foo=\"bar\";$Path=/examples;a=b; ; ", FOO, A);
+    }
+
+    @Test
+    public void rfc2109Version0() {
+        // rfc2109 semantically does not allow $Version to be 0 but it is valid syntax
+        test("$Version=0;foo=bar", FOO);
+    }
+
+    private void test(String header, Cookie... expected) {
+        Cookies cookies = new Cookies(null);
+        byte[] bytes = header.getBytes(StandardCharsets.UTF_8);
+        cookies.processCookieHeader(bytes, 0, bytes.length);
+        Assert.assertEquals(expected.length, cookies.getCookieCount());
+        for (int i = 0; i < expected.length; i++) {
+            Cookie cookie = expected[i];
+            ServerCookie actual = cookies.getCookie(i);
+            Assert.assertEquals(cookie.getVersion(), actual.getVersion());
+            Assert.assertEquals(cookie.getName(), actual.getName().toString());
+            Assert.assertEquals(cookie.getValue(), actual.getValue().toString());
+            if (cookie.getVersion() == 1) {
+                Assert.assertEquals(cookie.getDomain(), actual.getDomain().toString());
+                Assert.assertEquals(cookie.getPath(), actual.getPath().toString());
+            }
         }
-        if (num != 0)
-          throw new Exception("wrong number of cookies " + num);
-    }
-    public static void test( String s, String name, String val ) throws Exception {
-        System.out.println("Processing [" + s + "]");
-        Cookies cs=new Cookies(null);
-        cs.processCookieHeader( s.getBytes(), 0, s.length());
-
-        int num = cs.getCookieCount();
-        if (num != 1)
-          throw new Exception("wrong number of cookies " + num);
-        ServerCookie co = cs.getCookie(0);
-        System.out.println("One Cookie: " + co);
-        String coname = co.getName().toString();
-        String coval  = co.getValue().toString();
-        if ( ! name.equals(coname))
-          throw new Exception("wrong name " + coname + " != " + name);
-        if ( ! val.equals(coval))
-          throw new Exception("wrong value " + coval + " != " + val);
-    }
-    public static void test( String s, String name, String val, String name2, String val2 ) throws Exception {
-        System.out.println("Processing [" + s + "]");
-        Cookies cs=new Cookies(null);
-        cs.processCookieHeader( s.getBytes(), 0, s.length());
-
-        int num = cs.getCookieCount();
-        if (num != 2)
-          throw new Exception("wrong number of cookies " + num);
-        ServerCookie co = cs.getCookie(0);
-        System.out.println("1 - Cookie: " + co);
-        ServerCookie co2 = cs.getCookie(1);
-        System.out.println("2 - Cookie: " + co2);
-
-        String coname = co.getName().toString();
-        String coval  = co.getValue().toString();
-        if ( ! name.equals(coname))
-          throw new Exception("1 - wrong name " + coname + " != " + name);
-        if ( ! val.equals(coval))
-          throw new Exception("1 - wrong value " + coval + " != " + val);
-
-        String coname2 = co2.getName().toString();
-        String coval2  = co2.getValue().toString();
-        if ( ! name2.equals(coname2))
-          throw new Exception("2 - wrong name " + coname2 + " != " + name2);
-        if ( ! val2.equals(coval2))
-          throw new Exception("2 - wrong value " + coval2 + " != " + val2);
-    }
-    public static void test( String s, String name, String val, String name2,
-                             String val2, String name3, String val3 ) throws Exception {
-        System.out.println("Processing [" + s + "]");
-        Cookies cs=new Cookies(null);
-        cs.processCookieHeader( s.getBytes(), 0, s.length());
-
-        int num = cs.getCookieCount();
-        if (num != 3)
-          throw new Exception("wrong number of cookies " + num);
-        ServerCookie co = cs.getCookie(0);
-        System.out.println("1 - Cookie: " + co);
-        ServerCookie co2 = cs.getCookie(1);
-        System.out.println("2 - Cookie: " + co2);
-        ServerCookie co3 = cs.getCookie(2);
-        System.out.println("3 - Cookie: " + co3);
-
-        String coname = co.getName().toString();
-        String coval  = co.getValue().toString();
-        if ( ! name.equals(coname))
-          throw new Exception("1 - wrong name " + coname + " != " + name);
-        if ( ! val.equals(coval))
-          throw new Exception("1 - wrong value " + coval + " != " + val);
-
-        String coname2 = co2.getName().toString();
-        String coval2  = co2.getValue().toString();
-        if ( ! name2.equals(coname2))
-          throw new Exception("2 - wrong name " + coname2 + " != " + name2);
-        if ( ! val2.equals(coval2))
-          throw new Exception("2 - wrong value " + coval2 + " != " + val2);
-
-        String coname3 = co3.getName().toString();
-        String coval3  = co3.getValue().toString();
-        if ( ! name3.equals(coname3))
-          throw new Exception("3 - wrong name " + coname3 + " != " + name3);
-        if ( ! val2.equals(coval2))
-          throw new Exception("3 - wrong value " + coval3 + " != " + val3);
-    }
-    public static void test( String s, String name, String val, String name2,
-                             String val2, String name3, String val3,
-                             String name4, String val4 ) throws Exception {
-        System.out.println("Processing [" + s + "]");
-        Cookies cs=new Cookies(null);
-        cs.processCookieHeader( s.getBytes(), 0, s.length());
-
-        int num = cs.getCookieCount();
-        if (num != 4)
-          throw new Exception("wrong number of cookies " + num);
-        ServerCookie co = cs.getCookie(0);
-        System.out.println("1 - Cookie: " + co);
-        ServerCookie co2 = cs.getCookie(1);
-        System.out.println("2 - Cookie: " + co2);
-        ServerCookie co3 = cs.getCookie(2);
-        System.out.println("3 - Cookie: " + co3);
-        ServerCookie co4 = cs.getCookie(3);
-        System.out.println("4 - Cookie: " + co4);
-
-        String coname = co.getName().toString();
-        String coval  = co.getValue().toString();
-        if ( ! name.equals(coname))
-          throw new Exception("1 - wrong name " + coname + " != " + name);
-        if ( ! val.equals(coval))
-          throw new Exception("1 - wrong value " + coval + " != " + val);
-
-        String coname2 = co2.getName().toString();
-        String coval2  = co2.getValue().toString();
-        if ( ! name2.equals(coname2))
-          throw new Exception("2 - wrong name " + coname2 + " != " + name2);
-        if ( ! val2.equals(coval2))
-          throw new Exception("2 - wrong value " + coval2 + " != " + val2);
-
-        String coname3 = co3.getName().toString();
-        String coval3  = co3.getValue().toString();
-        if ( ! name3.equals(coname3))
-          throw new Exception("3 - wrong name " + coname3 + " != " + name3);
-        if ( ! val3.equals(coval3))
-          throw new Exception("3 - wrong value " + coval3 + " != " + val3);
-
-        String coname4 = co4.getName().toString();
-        String coval4  = co4.getValue().toString();
-        if ( ! name4.equals(coname4))
-          throw new Exception("4 - wrong name " + coname4 + " != " + name4);
-        if ( ! val4.equals(coval4))
-          throw new Exception("4 - wrong value " + coval4 + " != " + val4);
     }
 }
