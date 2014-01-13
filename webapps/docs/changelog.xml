@@ -126,6 +126,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>55743</bug>: Enable the stop script to work when the shutdown port
+        is disabled and a PID file is defined. This is only available on
+        platforms that use <code>catalina.sh</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.50 (violetagg)" rtext="2014-01-08">
   <subsection name="Catalina">
