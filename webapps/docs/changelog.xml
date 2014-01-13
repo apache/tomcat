@@ -133,6 +133,12 @@
         is disabled and a PID file is defined. This is only available on
         platforms that use <code>catalina.sh</code>. (markt)
       </fix>
+      <fix>
+        <bug>55986</bug>: When forcing Tomcat to stop via
+        <code>kill -9 $CATALINA_PID</code>, the <code>catalina.sh</code> script
+        could incorrectly report that Tomcat had not yet completely stopped when
+        it had. Based on a patch by jess. (markt) 
+      </fix>
     </changelog>
   </subsection>
 </section>

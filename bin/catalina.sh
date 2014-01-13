@@ -500,11 +500,12 @@ elif [ "$1" = "stop" ] ; then
                     if [ -w "$CATALINA_PID" ]; then
                         cat /dev/null > "$CATALINA_PID"
                     else
-                        echo "Tomcat was killed but the PID file could not be removed."
+                        echo "The PID file could not be removed."
                     fi
-                    # Set this to zero else a warning will be issued about the process still running
-                    KILL_SLEEP_INTERVAL=0
                 fi
+                # Set this to zero else a warning will be issued about the process still running
+                KILL_SLEEP_INTERVAL=0
+                echo "The Tomcat process has been killed."
                 break
             fi
             if [ $KILL_SLEEP_INTERVAL -gt 0 ]; then
