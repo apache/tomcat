@@ -30,6 +30,7 @@
       <fileset file="${catalina.home}/bin/tomcat-juli.jar"/>
       <fileset file="${catalina.home}/lib/tomcat-api.jar"/>
       <fileset file="${catalina.home}/lib/tomcat-util.jar"/>
+      <fileset file="${catalina.home}/lib/tomcat-util-scan.jar"/>
       <fileset file="${catalina.home}/lib/jasper.jar"/>
       <fileset file="${catalina.home}/lib/jasper-el.jar"/>
       <fileset file="${catalina.home}/lib/el-api.jar"/>
