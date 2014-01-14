@@ -86,6 +86,10 @@
         <bug>55976</bug>: Fix sendfile support for the HTTP NIO connector.
         (markt)
       </fix>
+      <fix>
+        <bug>55996</bug>: Ensure Async requests timeout correctly when using the
+        NIO HTTP connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -73,7 +73,15 @@ public class SocketWrapper<E> {
     public boolean isSecure() { return secure; }
     public void setSecure(boolean secure) { this.secure = secure; }
     public long getLastAccess() { return lastAccess; }
-    public void access() { access(System.currentTimeMillis()); }
+    public void access() {
+        // Async timeouts are based on the time between the call to startAsync()
+        // and complete() / dispatch() so don't update the last access time
+        // (that drives the timeout) on every read and write when using async
+        // processing.
+        if (!isAsync()) {
+            access(System.currentTimeMillis());
+        }
+    }
     public void access(long access) { lastAccess = access; }
     public void setTimeout(long timeout) {this.timeout = timeout;}
     public long getTimeout() {return this.timeout;}
