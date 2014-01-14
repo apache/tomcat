@@ -121,14 +121,19 @@ public class TldCache {
         result[0] = -1;
         result[1] = -1;
         try {
-            URL url = servletContext.getResource(tldResourcePath.getWebappPath());
-            URLConnection conn = url.openConnection();
-            result[0] = conn.getLastModified();
-            if ("file".equals(url.getProtocol())) {
-                // Reading the last modified time opens an input stream so we
-                // need to make sure it is closed again otherwise the TLD file
-                // will be locked until GC runs.
-                conn.getInputStream().close();
+            String webappPath = tldResourcePath.getWebappPath();
+            if (webappPath != null) {
+                // webappPath will be null for JARs containing TLDs that are on
+                // the class path but not part of the web application
+                URL url = servletContext.getResource(tldResourcePath.getWebappPath());
+                URLConnection conn = url.openConnection();
+                result[0] = conn.getLastModified();
+                if ("file".equals(url.getProtocol())) {
+                    // Reading the last modified time opens an input stream so we
+                    // need to make sure it is closed again otherwise the TLD file
+                    // will be locked until GC runs.
+                    conn.getInputStream().close();
+                }
             }
             Jar jar = tldResourcePath.getJar();
             if (jar != null) {
