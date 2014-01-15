@@ -63,6 +63,10 @@
         the container may not be found. (markt/jboynes)
       </fix>
       <fix>
+        <bug>55855</bug>: Provide a per Context option (containerSciFilter) to
+        exclude container SCIs. (markt)
+      </fix>
+      <fix>
         <bug>55937</bug>: When deploying applications, treat a context path of
         <code>/ROOT</code> as equivalent to <code>/</code>. (markt)
       </fix>

@@ -1213,4 +1213,10 @@ public class TesterContext implements Context {
     public void setInstanceManager(InstanceManager instanceManager) {
         // NO-OP
     }
+
+    @Override
+    public void setContainerSciFilter(String containerSciFilter) { /* NO-OP */ }
+
+    @Override
+    public String getContainerSciFilter() { return null; }
 }

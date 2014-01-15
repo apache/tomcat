@@ -291,6 +291,15 @@
         If not specified, the standard value (defined below) will be used.</p>
       </attribute>
 
+      <attribute name="containerSciFilter" required="false">
+        <p>The regular expression that specifies which container provided SCIs
+        should be filtered out and not used for this context. Matching uses
+        <code>java.util.regex.Matcher.find()</code> so the regular expression
+        only has to match a sub-string of the fully qualified class name of the
+        container provided SCI for it to be filtered out. If not specified,
+        no filtering will be applied.</p>
+      </attribute>
+
       <attribute name="cookies" required="false">
         <p>Set to <code>true</code> if you want cookies to be used for
         session identifier communication if supported by the client (this

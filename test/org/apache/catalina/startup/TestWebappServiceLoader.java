@@ -36,7 +36,8 @@ public class TestWebappServiceLoader extends TomcatBaseTest {
         tomcat.start();
 
         WebappServiceLoader<ServletContainerInitializer> loader =
-                new WebappServiceLoader<ServletContainerInitializer>(ctxt.getServletContext());
+                new WebappServiceLoader<ServletContainerInitializer>(ctxt.getServletContext(), null);
+        @SuppressWarnings("unused")
         Collection<ServletContainerInitializer> initializers = loader.load(ServletContainerInitializer.class);
     }
 }
