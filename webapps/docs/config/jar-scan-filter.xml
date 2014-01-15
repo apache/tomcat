@@ -141,6 +141,13 @@
 
     </attributes>
 
+    <p>Note that excluding a JAR from the pluggability scan will prevent a
+    ServletContainerInitializer from being loaded from a web application JAR
+    (i.e. one located in <code>/WEB-INF/lib</code>) but it will not prevent
+    a ServletContainerInitializer from being loaded from the container. To
+    prevent a ServletContainerInitializer from being loaded from the container,
+    use the <code>containerSciFilter</code> property of the Context.</p>
+
   </subsection>
 
 
