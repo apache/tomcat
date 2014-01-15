@@ -74,8 +74,7 @@ public interface WebResourceSet extends Lifecycle {
 
     /**
      * Create a new resource at the requested path using the provided
-     * InputStream. If a resource already exists at the provided path it will
-     * not be overwritten.
+     * InputStream.
      *
      * @param path      The path to be used for the new Resource. It is relative
      *                  to the root of the web application and must start with
