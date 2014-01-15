@@ -33,17 +33,4 @@
     <!--
     <Valve className="org.apache.catalina.valves.CometConnectionManagerValve" />
     -->
-
-    <!-- Tomcat uses SCIs to initialise both JSP and WebSocket support.      -->
-    <!-- This means that neither jasper.jar nor tomcat-websocket.jar can be  -->
-    <!-- excluded from SCI scanning. Therefore, they do not appear in the    -->
-    <!-- default list of JARs to skip. However, they do not contain TLDs so  -->
-    <!-- they can be skipped for TLD scanning. The JarScanFilter below       -->
-    <!-- configures a custom TLD skip list that is all the default JARs plus -->
-    <!-- these two.                                                          -->
-    <JarScanner>
-        <JarScanFilter
-                tldSkip="${tomcat.util.scan.StandardJarScanFilter.jarsToSkip},
-                         jasper.jar,tomcat-websocket.jar"/>
-    </JarScanner>
 </Context>
