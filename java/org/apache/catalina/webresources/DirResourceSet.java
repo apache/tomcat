@@ -102,7 +102,7 @@ public class DirResourceSet extends AbstractFileResourceSet {
             if (f.isDirectory() && path.charAt(path.length() - 1) != '/') {
                 path = path += '/';
             }
-            return new FileResource(root, path, f);
+            return new FileResource(root, path, f, isReadOnly());
         } else {
             return new EmptyResource(root, path);
         }
@@ -183,6 +183,9 @@ public class DirResourceSet extends AbstractFileResourceSet {
     @Override
     public boolean mkdir(String path) {
         checkPath(path);
+        if (isReadOnly()) {
+            return false;
+        }
         String webAppMount = getWebAppMount();
         if (path.startsWith(webAppMount)) {
             File f = file(path.substring(webAppMount.length()), false);
@@ -202,6 +205,10 @@ public class DirResourceSet extends AbstractFileResourceSet {
         if (is == null) {
             throw new NullPointerException(
                     sm.getString("dirResourceSet.writeNpe"));
+        }
+
+        if (isReadOnly()) {
+            return false;
         }
 
         File dest = null;

@@ -16,40 +16,9 @@
  */
 package org.apache.catalina.webresources;
 
-import java.io.File;
+public class TestDirResourceSet extends AbstractTestDirResourceSet {
 
-import org.junit.Test;
-
-import org.apache.catalina.WebResourceRoot;
-import org.apache.catalina.WebResourceSet;
-
-public class TestDirResourceSet extends AbstractTestResourceSet {
-
-    @Override
-    public WebResourceRoot getWebResourceRoot() {
-        File f = new File(getBaseDir());
-        TesterWebResourceRoot root = new TesterWebResourceRoot();
-        WebResourceSet webResourceSet =
-                new DirResourceSet(new TesterWebResourceRoot(), "/",
-                        f.getAbsolutePath(), "/");
-        root.setMainResources(webResourceSet);
-        return root;
-    }
-
-    @Override
-    protected boolean isWriteable() {
-        return true;
-    }
-
-    @Override
-    public String getBaseDir() {
-        return "test/webresources/dir1";
-    }
-
-    @Override
-    @Test
-    public void testNoArgConstructor() {
-        @SuppressWarnings("unused")
-        Object obj = new DirResourceSet();
+    public TestDirResourceSet() {
+        super(false);
     }
 }

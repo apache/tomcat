@@ -16,9 +16,9 @@
  */
 package org.apache.catalina.webresources;
 
-public class TestFileResourceSet extends AbstractTestFileResourceSet {
+public class TestFileResourceSetReadOnly extends AbstractTestFileResourceSet {
 
-    public TestFileResourceSet() {
+    public TestFileResourceSetReadOnly() {
         super(false);
     }
 }

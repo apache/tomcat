@@ -95,9 +95,9 @@ public interface WebResourceSet extends Lifecycle {
      * Are resources provided by this resource set only intended for use by
      * calls to {@link WebResourceRoot#getClassLoaderResource(String)}.
      *
-     * @return true if these resources should only be used for calls to
-     *         {@link WebResourceRoot#getClassLoaderResource(String)}, otherwise
-     *         false
+     * @return <code>true</code> if these resources should only be used for
+     *         calls to {@link WebResourceRoot#getClassLoaderResource(String)},
+     *         otherwise <code>false</code>
      */
     boolean getClassLoaderOnly();
 
@@ -109,4 +109,25 @@ public interface WebResourceSet extends Lifecycle {
      * manager.
      */
     URL getBaseUrl();
+
+    /**
+     * Configures whether or not this set of resources is read-only.
+     *
+     * @param readOnly <code>true</code> if this set of resources should be
+     *                 configured to be read-only
+     *
+     * @throws IllegalArgumentException if an attempt is made to configure a
+     *         {@link WebResourceSet} that is hard-coded to be read-only as
+     *         writable
+     */
+    void setReadOnly(boolean readOnly);
+
+    /**
+     * Obtains the current value of the read-only setting for this set of
+     * resources.
+     *
+     * @return <code>true</code> if this set of resources is configured to be
+     *         read-only, otherwise <code>false</code>
+     */
+    boolean isReadOnly();
 }

@@ -203,6 +203,16 @@
       it. If not specified, the default value '/' will be used.</p>
     </attribute>
 
+    <attribute name="readOnly" required="false">
+      <p>If <code>true</code>, resources within this resource set may not be
+      deleted, created or modified. For instance of
+      <code>org.apache.catalina.webresources.JarResourceSet</code>, this
+      attribute is hard-coded to <code>true</code> and may not be changed. For
+      instances of <code>org.apache.catalina.webresources.DirResourceSet</code>
+      and <code>org.apache.catalina.webresources.FileResourceSet</code> the
+      default value of this attribute is <code>false</code>.</p>
+    </attribute>
+
     <attribute name="webAppMount" required="false">
       <p>Identifies the path within the web application that these resources
       will be made available. For the
