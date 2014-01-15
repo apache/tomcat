@@ -59,6 +59,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>55287</bug>: <code>ServletContainerInitializer</code> defined in
+        the container may not be found. (markt/jboynes)
+      </fix>
+      <fix>
         <bug>55937</bug>: When deploying applications, treat a context path of
         <code>/ROOT</code> as equivalent to <code>/</code>. (markt)
       </fix>
