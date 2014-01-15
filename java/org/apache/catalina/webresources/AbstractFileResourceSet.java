@@ -31,6 +31,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
     private File fileBase;
     private String absoluteBase;
     private String canonicalBase;
+    private boolean readOnly = false;
 
     protected AbstractFileResourceSet(String internalPath) {
         setInternalPath(internalPath);
@@ -38,6 +39,16 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
 
     protected final File getFileBase() {
         return fileBase;
+    }
+
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
+    }
+
+    @Override
+    public boolean isReadOnly() {
+        return readOnly;
     }
 
     protected final File file(String name, boolean mustExist) {

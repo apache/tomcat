@@ -244,4 +244,20 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
     protected abstract WebResource createArchiveResource(JarEntry jarEntry,
             String webAppPath, Manifest manifest);
+
+    @Override
+    public final boolean isReadOnly() {
+        return true;
+    }
+
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        if (readOnly) {
+            // This is the hard-coded default - ignore the call
+            return;
+        }
+
+        throw new IllegalArgumentException(
+                sm.getString("abstractArchiveResourceSet.setReadOnlyFalse"));
+    }
 }

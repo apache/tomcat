@@ -42,9 +42,10 @@ public class FileResource extends AbstractResource {
 
     private final File resource;
     private final String name;
+    private final boolean readOnly;
 
     public FileResource(WebResourceRoot root, String webAppPath,
-            File resource) {
+            File resource, boolean readOnly) {
         super(root,webAppPath);
         this.resource = resource;
 
@@ -64,6 +65,8 @@ public class FileResource extends AbstractResource {
             // Must be a file
             name = resource.getName();
         }
+
+        this.readOnly = readOnly;
     }
 
     @Override
@@ -93,6 +96,9 @@ public class FileResource extends AbstractResource {
 
     @Override
     public boolean delete() {
+        if (readOnly) {
+            return false;
+        }
         return resource.delete();
     }
 
