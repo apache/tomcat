@@ -724,4 +724,10 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
 
     @Override
     public void setInstanceManager(InstanceManager instanceManager) { /* NO-OP */ }
+
+    @Override
+    public void setContainerSciFilter(String containerSciFilter) { /* NO-OP */ }
+
+    @Override
+    public String getContainerSciFilter() { return null; }
 }

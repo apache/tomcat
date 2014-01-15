@@ -1595,7 +1595,7 @@ public class ContextConfig implements LifecycleListener {
         List<ServletContainerInitializer> detectedScis;
         try {
             WebappServiceLoader<ServletContainerInitializer> loader =
-                    new WebappServiceLoader<>(servletContext);
+                    new WebappServiceLoader<>(servletContext, context.getContainerSciFilter());
             detectedScis = loader.load(ServletContainerInitializer.class);
         } catch (IOException e) {
             log.error(sm.getString(

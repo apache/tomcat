@@ -26,8 +26,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 
@@ -55,14 +57,20 @@ public class WebappServiceLoader<T> {
     private static final String SERVICES = "META-INF/services/";
 
     private final ServletContext context;
+    private final Pattern containerSciFilterPattern;
 
     /**
      * Construct a loader to load services from a ServletContext.
      *
      * @param context the context to use
      */
-    public WebappServiceLoader(ServletContext context) {
+    public WebappServiceLoader(ServletContext context, String containerSciFilter) {
         this.context = context;
+        if (containerSciFilter != null && containerSciFilter.length() > 0) {
+            containerSciFilterPattern = Pattern.compile(containerSciFilter);
+        } else {
+            containerSciFilterPattern = null;
+        }
     }
 
     /**
@@ -120,6 +128,16 @@ public class WebappServiceLoader<T> {
         }
         while (resources.hasMoreElements()) {
             parseConfigFile(containerServicesFound, resources.nextElement());
+        }
+
+        // Filter the discovered container SCIs if required
+        if (containerSciFilterPattern != null) {
+            Iterator<String> iter = containerServicesFound.iterator();
+            while (iter.hasNext()) {
+                if (containerSciFilterPattern.matcher(iter.next()).find()) {
+                    iter.remove();
+                }
+            }
         }
 
         // Add the application services after the container services to ensure
