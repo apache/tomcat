@@ -805,8 +805,22 @@ public class StandardContext extends ContainerBase
     private Map<String, String> postConstructMethods = new HashMap<>();
     private Map<String, String> preDestroyMethods = new HashMap<>();
 
+    private String containerSciFilter;
+
 
     // ----------------------------------------------------- Context Properties
+
+    @Override
+    public void setContainerSciFilter(String containerSciFilter) {
+        this.containerSciFilter = containerSciFilter;
+    }
+
+
+    @Override
+    public String getContainerSciFilter() {
+        return containerSciFilter;
+    }
+
 
     @Override
     public boolean getSendRedirectBody() {

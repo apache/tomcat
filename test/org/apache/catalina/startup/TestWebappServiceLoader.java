@@ -57,7 +57,7 @@ public class TestWebappServiceLoader {
 
     @Test
     public void testNoInitializersFound() throws IOException {
-        loader = new WebappServiceLoader<>(context);
+        loader = new WebappServiceLoader<>(context, null);
         EasyMock.expect(context.getAttribute(ServletContext.ORDERED_LIBS))
                 .andReturn(null);
         EasyMock.expect(cl.getResources(CONFIG_FILE))
@@ -73,7 +73,7 @@ public class TestWebappServiceLoader {
         URL url = new URL("file://test");
         loader = EasyMock.createMockBuilder(WebappServiceLoader.class)
                 .addMockedMethod("parseConfigFile", LinkedHashSet.class, URL.class)
-                .withConstructor(context).createMock(control);
+                .withConstructor(context, "").createMock(control);
         EasyMock.expect(context.getAttribute(ServletContext.ORDERED_LIBS))
                 .andReturn(null);
         EasyMock.expect(cl.getResources(CONFIG_FILE))
@@ -93,7 +93,7 @@ public class TestWebappServiceLoader {
         URL sci2 = new URL("file://dir/" + CONFIG_FILE);
         loader = EasyMock.createMockBuilder(WebappServiceLoader.class)
                 .addMockedMethod("parseConfigFile", LinkedHashSet.class, URL.class)
-                .withConstructor(context).createMock(control);
+                .withConstructor(context, "").createMock(control);
         List<String> jars = Arrays.asList("jar1.jar", "dir/");
         EasyMock.expect(context.getAttribute(ServletContext.ORDERED_LIBS))
                 .andReturn(jars);
@@ -114,7 +114,7 @@ public class TestWebappServiceLoader {
     @Test
     public void testParseConfigFile() throws IOException {
         LinkedHashSet<String> found = new LinkedHashSet<>();
-        loader = new WebappServiceLoader<>(context);
+        loader = new WebappServiceLoader<>(context, null);
         loader.parseConfigFile(found, getClass().getResource("service-config.txt"));
         Assert.assertEquals(Collections.singleton("provider1"), found);
     }
@@ -122,7 +122,7 @@ public class TestWebappServiceLoader {
     @Test
     public void testLoadServices() throws Exception {
         Class<?> sci = TesterServletContainerInitializer1.class;
-        loader = new WebappServiceLoader<>(context);
+        loader = new WebappServiceLoader<>(context, null);
         cl.loadClass(sci.getName());
         EasyMock.expectLastCall()
                 .andReturn(sci);
@@ -139,7 +139,7 @@ public class TestWebappServiceLoader {
     @Test
     public void testServiceIsNotExpectedType() throws Exception {
         Class<?> sci = Object.class;
-        loader = new WebappServiceLoader<>(context);
+        loader = new WebappServiceLoader<>(context, null);
         cl.loadClass(sci.getName());
         EasyMock.expectLastCall()
                 .andReturn(sci);
@@ -158,7 +158,7 @@ public class TestWebappServiceLoader {
     @Test
     public void testServiceCannotBeConstructed() throws Exception {
         Class<?> sci = Integer.class;
-        loader = new WebappServiceLoader<>(context);
+        loader = new WebappServiceLoader<>(context, null);
         cl.loadClass(sci.getName());
         EasyMock.expectLastCall()
                 .andReturn(sci);

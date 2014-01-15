@@ -694,8 +694,33 @@ public interface Context extends Container {
      */
     public void setInstanceManager(InstanceManager instanceManager);
 
-    // --------------------------------------------------------- Public Methods
+    /**
+     * Sets the regular expression that specifies which container provided SCIs
+     * should be filtered out and not used for this context. Matching uses
+     * {@link java.util.regex.Matcher#find()} so the regular expression only has
+     * to match a sub-string of the fully qualified class name of the container
+     * provided SCI for it to be filtered out.
+     *
+     * @param containerSciFilter The regular expression against which the fully
+     *                           qualified class name of each container provided
+     *                           SCI should be checked
+     */
+    public void setContainerSciFilter(String containerSciFilter);
 
+    /**
+     * Obtains the regular expression that specifies which container provided
+     * SCIs should be filtered out and not used for this context. Matching uses
+     * {@link java.util.regex.Matcher#find()} so the regular expression only has
+     * to match a sub-string of the fully qualified class name of the container
+     * provided SCI for it to be filtered out.
+     *
+     * @return The regular expression against which the fully qualified class
+     *         name of each container provided SCI will be checked
+     */
+    public String getContainerSciFilter();
+
+
+    // --------------------------------------------------------- Public Methods
 
     /**
      * Add a new Listener class name to the set of Listeners
