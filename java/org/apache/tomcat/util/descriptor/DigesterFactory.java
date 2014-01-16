@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
+import javax.servlet.jsp.JspContext;
 
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
@@ -102,7 +103,7 @@ public class DigesterFactory {
     private static String idFor(String url) {
         URL id = ServletContext.class.getResource("resources/" + url);
         if (id == null) {
-            id = ServletContext.class.getResource("jsp/resources/" + url);
+            id = JspContext.class.getResource("jsp/resources/" + url);
         }
         return id.toExternalForm();
     }

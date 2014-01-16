@@ -82,6 +82,12 @@
         <bug>55974</bug>: Retain order when reporting errors and warnings while
         parsing XML configuration files. (markt)
       </fix>
+      <fix>
+        <bug>56016</bug>: When loading resources for XML schema validation, take
+        account of the possibility that servlet-api.jar and jsp-api.jar may not
+        be loaded by the same class loader. Patch by Juan Carlos Estibariz.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
