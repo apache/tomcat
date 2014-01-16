@@ -103,7 +103,7 @@ public class DigesterFactory {
     private static String idFor(String url) {
         URL id = ServletContext.class.getResource("resources/" + url);
         if (id == null) {
-            id = JspContext.class.getResource("jsp/resources/" + url);
+            id = JspContext.class.getResource("resources/" + url);
         }
         return id.toExternalForm();
     }
