@@ -115,6 +115,13 @@
         <bug>55973</bug>: Fix processing of XML schemas when validation is
         enabled in Jasper. (kkolinko)
       </fix>
+      <fix>
+        <bug>56010</bug>: Don&apos;t throw an
+        <code>IllegalArgumentException</code> when
+        <code>JspFactory.getPageContext</code> is used with
+        <code>JspWriter.DEFAULT_BUFFER</code>. Based on a patch by Eugene Chung.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
