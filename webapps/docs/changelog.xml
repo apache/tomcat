@@ -168,7 +168,7 @@
         (kkolinko)
       </fix>
       <scode>
-        Streamline handling of WebSocket messages whe no handler is configured
+        Streamline handling of WebSocket messages when no handler is configured
         for the message currently being received. (markt)
       </scode>
       <fix>
