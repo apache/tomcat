@@ -47,6 +47,7 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.BodyContent;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.el.ELContextImpl;
 import org.apache.jasper.security.SecurityUtil;
@@ -137,6 +138,9 @@ public class PageContextImpl extends PageContext {
 
         // initialize the initial out ...
         depth = -1;
+        if (bufferSize == JspWriter.DEFAULT_BUFFER) {
+            bufferSize = Constants.DEFAULT_BUFFER_SIZE;
+        }
         if (this.baseOut == null) {
             this.baseOut = new JspWriterImpl(response, bufferSize, autoFlush);
         } else {
