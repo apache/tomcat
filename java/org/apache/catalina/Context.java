@@ -1069,6 +1069,18 @@ public interface Context extends Container {
 
 
     /**
+     * Get the associated ThreadBindingListener.
+     */
+    public ThreadBindingListener getThreadBindingListener();
+
+
+    /**
+     * Get the associated ThreadBindingListener.
+     */
+    public void setThreadBindingListener(ThreadBindingListener threadBindingListener);
+
+
+    /**
      * Return the set of watched resources for this Context. If none are
      * defined, a zero length array will be returned.
      */

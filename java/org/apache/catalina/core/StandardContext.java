@@ -92,6 +92,7 @@ import org.apache.catalina.Loader;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
+import org.apache.catalina.ThreadBindingListener;
 import org.apache.catalina.Valve;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
@@ -807,6 +808,11 @@ public class StandardContext extends ContainerBase
 
     private String containerSciFilter;
 
+    protected static final ThreadBindingListener DEFAULT_NAMING_LISTENER = (new ThreadBindingListener() {
+        public void bind() {}
+        public void unbind() {}
+    });
+    protected ThreadBindingListener threadBindingListener = DEFAULT_NAMING_LISTENER;
 
     // ----------------------------------------------------- Context Properties
 
@@ -2385,6 +2391,17 @@ public class StandardContext extends ContainerBase
     public void setJspConfigDescriptor(JspConfigDescriptor descriptor) {
         this.jspConfigDescriptor = descriptor;
     }
+
+    @Override
+    public ThreadBindingListener getThreadBindingListener() {
+        return threadBindingListener;
+    }
+
+    @Override
+    public void setThreadBindingListener(ThreadBindingListener threadBindingListener) {
+        this.threadBindingListener = threadBindingListener;
+    }
+
 
     // ------------------------------------------------------ Public Properties
 
@@ -5712,6 +5729,9 @@ public class StandardContext extends ContainerBase
             Thread.currentThread().setContextClassLoader
                 (getLoader().getClassLoader());
         }
+        if (getThreadBindingListener() != null) {
+            getThreadBindingListener().bind();
+        }
 
         if (isUseNaming()) {
             try {
@@ -5735,6 +5755,9 @@ public class StandardContext extends ContainerBase
             ContextBindings.unbindThread(this, this);
         }
 
+        if (getThreadBindingListener() != null) {
+            getThreadBindingListener().unbind();
+        }
         Thread.currentThread().setContextClassLoader(oldContextClassLoader);
     }
 

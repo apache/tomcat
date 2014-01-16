@@ -20,17 +20,23 @@ package org.apache.catalina.authenticator;
 
 
 import java.io.IOException;
+import java.security.AccessController;
 import java.security.Principal;
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
+import org.apache.catalina.Manager;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.SessionEvent;
 import org.apache.catalina.SessionListener;
+import org.apache.catalina.ThreadBindingListener;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
@@ -415,7 +421,15 @@ public class SingleSignOn extends ValveBase implements SessionListener {
                 reverse.remove(sessions[i]);
             }
             // Invalidate this session
-            sessions[i].expire();
+            ClassLoader oldContextClassLoader = null;
+            try {
+                oldContextClassLoader = bindThread(sessions[i]);
+                sessions[i].expire();
+            } finally {
+                if (oldContextClassLoader != null) {
+                    unbindThread(sessions[i], oldContextClassLoader);
+                }
+            }
         }
 
         // NOTE:  Clients may still possess the old single sign on cookie,
@@ -424,6 +438,94 @@ public class SingleSignOn extends ValveBase implements SessionListener {
 
     }
 
+    protected ClassLoader bindThread(Session session) {
+
+        Manager manager = session.getManager();
+        Context context = null;
+        ClassLoader contextClassLoader = null;
+        ThreadBindingListener threadBindingListener = null;
+        if (manager != null) {
+            context = manager.getContext();
+        }
+        if (context != null) {
+            if (context.getLoader() != null && context.getLoader().getClassLoader() != null) {
+                contextClassLoader = context.getLoader().getClassLoader();
+            }
+            threadBindingListener = context.getThreadBindingListener();
+        }
+        if (threadBindingListener == null || contextClassLoader == null) {
+            return null;
+        }
+
+        if (Globals.IS_SECURITY_ENABLED) {
+            return AccessController.doPrivileged(new PrivilegedBind(contextClassLoader, threadBindingListener));
+        } else {
+            ClassLoader oldContextClassLoader =
+                    Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+            threadBindingListener.bind();
+            return oldContextClassLoader;
+        }
+
+    }
+
+    protected class PrivilegedBind implements PrivilegedAction<ClassLoader> {
+        private ClassLoader contextClassLoader;
+        private ThreadBindingListener threadBindingListener;
+
+        PrivilegedBind(ClassLoader contextClassLoader, ThreadBindingListener threadBindingListener) {
+            this.contextClassLoader = contextClassLoader;
+            this.threadBindingListener = threadBindingListener;
+        }
+
+        public ClassLoader run() {
+            ClassLoader oldContextClassLoader =
+                    Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+            threadBindingListener.bind();
+            return oldContextClassLoader;
+        }
+    }
+
+    protected void unbindThread(Session session, ClassLoader oldContextClassLoader) {
+
+        Manager manager = session.getManager();
+        Context context = null;
+        ThreadBindingListener threadBindingListener = null;
+        if (manager != null) {
+            context = manager.getContext();
+        }
+        if (context != null) {
+            threadBindingListener = context.getThreadBindingListener();
+        }
+        if (threadBindingListener == null) {
+            return;
+        }
+
+        if (Globals.IS_SECURITY_ENABLED) {
+            AccessController.doPrivileged(new PrivilegedUnbind(oldContextClassLoader, threadBindingListener));
+        } else {
+            threadBindingListener.unbind();
+            Thread.currentThread().setContextClassLoader(oldContextClassLoader);
+        }
+
+    }
+
+    protected class PrivilegedUnbind implements PrivilegedAction<Void> {
+        private ClassLoader oldContextClassLoader;
+        private ThreadBindingListener threadBindingListener;
+
+        PrivilegedUnbind(ClassLoader oldContextClassLoader, ThreadBindingListener threadBindingListener) {
+            this.oldContextClassLoader = oldContextClassLoader;
+            this.threadBindingListener = threadBindingListener;
+        }
+
+        public Void run() {
+            threadBindingListener.unbind();
+            Thread.currentThread().setContextClassLoader(oldContextClassLoader);
+            return null;
+        }
+    }
 
     /**
      * Attempts reauthentication to the given <code>Realm</code> using

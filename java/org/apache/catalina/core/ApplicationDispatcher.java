@@ -670,6 +670,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
 
         if (oldCCL != contextClassLoader) {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
+            context.getThreadBindingListener().bind();
         } else {
             oldCCL = null;
         }
@@ -795,8 +796,10 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         }
 
         // Reset the old context class loader
-        if (oldCCL != null)
+        if (oldCCL != null) {
+            context.getThreadBindingListener().unbind();
             Thread.currentThread().setContextClassLoader(oldCCL);
+        }
 
         // Unwrap request/response if needed
         // See Bugzilla 30949
