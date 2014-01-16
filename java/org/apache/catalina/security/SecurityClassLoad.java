@@ -42,6 +42,7 @@ public final class SecurityClassLoad {
             return;
         }
 
+        loadAuthenticatorPackage(loader);
         loadCorePackage(loader);
         loadCoyotePackage(loader);
         loadLoaderPackage(loader);
@@ -53,6 +54,18 @@ public final class SecurityClassLoad {
         loadConnectorPackage(loader);
         loadTomcatPackage(loader);
     }
+
+
+    private static final void loadAuthenticatorPackage(ClassLoader loader)
+            throws Exception {
+        final String basePackage = "org.apache.catalina.authenticator.";
+        loader.loadClass
+            (basePackage +
+             "SingleSignOn$PrivilegedBind");
+        loader.loadClass
+            (basePackage +
+             "SingleSignOn$PrivilegedUnbind");
+   }
 
 
     private static final void loadCorePackage(ClassLoader loader)

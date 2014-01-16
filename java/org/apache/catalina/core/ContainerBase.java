@@ -55,6 +55,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
+import org.apache.catalina.ThreadBindingListener;
 import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
@@ -1354,6 +1355,10 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                             Thread.currentThread().getContextClassLoader();
                     Thread.currentThread().setContextClassLoader(
                             loader.getClassLoader());
+                    ThreadBindingListener tbl = ((Context) container).getThreadBindingListener();
+                    if (tbl != null) {
+                        tbl.bind();
+                    }
                 }
                 container.backgroundProcess();
                 Container[] children = container.findChildren();
@@ -1367,9 +1372,15 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 log.error("Exception invoking periodic operation: ", t);
             } finally {
                 if (originalClassLoader != null) {
+                    if (container instanceof Context) {
+                        ThreadBindingListener tbl = ((Context) container).getThreadBindingListener();
+                        if (tbl != null) {
+                            tbl.unbind();
+                        }
+                    }
                     Thread.currentThread().setContextClassLoader(
                             originalClassLoader);
-                }
+               }
             }
         }
     }

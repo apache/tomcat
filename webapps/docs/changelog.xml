@@ -196,6 +196,9 @@
         grouped more logically in JConsole. Generally, components are now
         grouped by Host and then by Context. (markt)
       </fix>
+      <add>
+        Context listener to allow better EE and framework integration. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

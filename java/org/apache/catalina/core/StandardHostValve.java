@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
+import org.apache.catalina.ThreadBindingListener;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.connector.ClientAbortException;
@@ -130,11 +131,14 @@ final class StandardHostValve extends ValveBase {
             // This should eventually move to Engine, it's generic.
             if (Globals.IS_SECURITY_ENABLED) {
                 PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                        context.getLoader().getClassLoader());
+                        context.getLoader().getClassLoader(), 
+                        context.getThreadBindingListener(),
+                        true);
                 AccessController.doPrivileged(pa);
             } else {
                 Thread.currentThread().setContextClassLoader
                         (context.getLoader().getClassLoader());
+                context.getThreadBindingListener().bind();
             }
         }
         if (request.isAsyncSupported()) {
@@ -201,9 +205,11 @@ final class StandardHostValve extends ValveBase {
 
         // Restore the context classloader
         if (Globals.IS_SECURITY_ENABLED) {
-            PrivilegedAction<Void> pa = new PrivilegedSetTccl(MY_CLASSLOADER);
+            PrivilegedAction<Void> pa = new PrivilegedSetTccl(MY_CLASSLOADER, 
+                    context.getThreadBindingListener(), false);
             AccessController.doPrivileged(pa);
         } else {
+            context.getThreadBindingListener().unbind();
             Thread.currentThread().setContextClassLoader(MY_CLASSLOADER);
         }
     }
@@ -232,6 +238,7 @@ final class StandardHostValve extends ValveBase {
             // This should eventually move to Engine, it's generic.
             Thread.currentThread().setContextClassLoader
                     (context.getLoader().getClassLoader());
+            context.getThreadBindingListener().bind();
         }
 
         // Ask this Context to process this request
@@ -257,6 +264,7 @@ final class StandardHostValve extends ValveBase {
         }
 
         // Restore the context classloader
+        context.getThreadBindingListener().unbind();
         Thread.currentThread().setContextClassLoader
             (StandardHostValve.class.getClassLoader());
 
@@ -508,14 +516,23 @@ final class StandardHostValve extends ValveBase {
     private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
 
         private final ClassLoader cl;
+        private final ThreadBindingListener tbl;
+        private final boolean bind;
 
-        PrivilegedSetTccl(ClassLoader cl) {
+        PrivilegedSetTccl(ClassLoader cl, ThreadBindingListener tbl, boolean bind) {
             this.cl = cl;
+            this.bind = bind;
+            this.tbl = tbl;
         }
 
         @Override
         public Void run() {
             Thread.currentThread().setContextClassLoader(cl);
+            if (bind) {
+                tbl.bind();
+            } else {
+                tbl.unbind();
+            }
             return null;
         }
     }

@@ -43,6 +43,7 @@ import org.apache.catalina.Loader;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
+import org.apache.catalina.ThreadBindingListener;
 import org.apache.catalina.Valve;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
@@ -730,4 +731,11 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
 
     @Override
     public String getContainerSciFilter() { return null; }
+
+    @Override
+    public ThreadBindingListener getThreadBindingListener() { return null; }
+
+    @Override
+    public void setThreadBindingListener(ThreadBindingListener threadBindingListener) { /* NO-OP */ }
+
 }
