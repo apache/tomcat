@@ -510,102 +510,102 @@ public class WebappClassLoader extends URLClassLoader
     }
 
 
-     /**
-      * Return the clearReferencesStatic flag for this Context.
-      */
-     public boolean getClearReferencesStatic() {
-         return (this.clearReferencesStatic);
-     }
+    /**
+     * Return the clearReferencesStatic flag for this Context.
+     */
+    public boolean getClearReferencesStatic() {
+        return (this.clearReferencesStatic);
+    }
 
 
-     /**
-      * Set the clearReferencesStatic feature for this Context.
-      *
-      * @param clearReferencesStatic The new flag value
-      */
-     public void setClearReferencesStatic(boolean clearReferencesStatic) {
-         this.clearReferencesStatic = clearReferencesStatic;
-     }
+    /**
+     * Set the clearReferencesStatic feature for this Context.
+     *
+     * @param clearReferencesStatic The new flag value
+     */
+    public void setClearReferencesStatic(boolean clearReferencesStatic) {
+        this.clearReferencesStatic = clearReferencesStatic;
+    }
 
 
-     /**
-      * Return the clearReferencesStopThreads flag for this Context.
-      */
-     public boolean getClearReferencesStopThreads() {
-         return (this.clearReferencesStopThreads);
-     }
+    /**
+     * Return the clearReferencesStopThreads flag for this Context.
+     */
+    public boolean getClearReferencesStopThreads() {
+        return (this.clearReferencesStopThreads);
+    }
 
 
-     /**
-      * Set the clearReferencesStopThreads feature for this Context.
-      *
-      * @param clearReferencesStopThreads The new flag value
-      */
-     public void setClearReferencesStopThreads(
-             boolean clearReferencesStopThreads) {
-         this.clearReferencesStopThreads = clearReferencesStopThreads;
-     }
+    /**
+     * Set the clearReferencesStopThreads feature for this Context.
+     *
+     * @param clearReferencesStopThreads The new flag value
+     */
+    public void setClearReferencesStopThreads(
+            boolean clearReferencesStopThreads) {
+        this.clearReferencesStopThreads = clearReferencesStopThreads;
+    }
 
 
-     /**
-      * Return the clearReferencesStopTimerThreads flag for this Context.
-      */
-     public boolean getClearReferencesStopTimerThreads() {
-         return (this.clearReferencesStopTimerThreads);
-     }
+    /**
+     * Return the clearReferencesStopTimerThreads flag for this Context.
+     */
+    public boolean getClearReferencesStopTimerThreads() {
+        return (this.clearReferencesStopTimerThreads);
+    }
 
 
-     /**
-      * Set the clearReferencesStopTimerThreads feature for this Context.
-      *
-      * @param clearReferencesStopTimerThreads The new flag value
-      */
-     public void setClearReferencesStopTimerThreads(
-             boolean clearReferencesStopTimerThreads) {
-         this.clearReferencesStopTimerThreads = clearReferencesStopTimerThreads;
-     }
+    /**
+     * Set the clearReferencesStopTimerThreads feature for this Context.
+     *
+     * @param clearReferencesStopTimerThreads The new flag value
+     */
+    public void setClearReferencesStopTimerThreads(
+            boolean clearReferencesStopTimerThreads) {
+        this.clearReferencesStopTimerThreads = clearReferencesStopTimerThreads;
+    }
 
 
-     /**
-      * Return the clearReferencesLogFactoryRelease flag for this Context.
-      */
-     public boolean getClearReferencesLogFactoryRelease() {
-         return (this.clearReferencesLogFactoryRelease);
-     }
+    /**
+     * Return the clearReferencesLogFactoryRelease flag for this Context.
+     */
+    public boolean getClearReferencesLogFactoryRelease() {
+        return (this.clearReferencesLogFactoryRelease);
+    }
 
 
-     /**
-      * Set the clearReferencesLogFactoryRelease feature for this Context.
-      *
-      * @param clearReferencesLogFactoryRelease The new flag value
-      */
-     public void setClearReferencesLogFactoryRelease(
-             boolean clearReferencesLogFactoryRelease) {
-         this.clearReferencesLogFactoryRelease =
-             clearReferencesLogFactoryRelease;
-     }
+    /**
+     * Set the clearReferencesLogFactoryRelease feature for this Context.
+     *
+     * @param clearReferencesLogFactoryRelease The new flag value
+     */
+    public void setClearReferencesLogFactoryRelease(
+            boolean clearReferencesLogFactoryRelease) {
+        this.clearReferencesLogFactoryRelease =
+            clearReferencesLogFactoryRelease;
+    }
 
 
-     /**
-      * Return the clearReferencesHttpClientKeepAliveThread flag for this
-      * Context.
-      */
-     public boolean getClearReferencesHttpClientKeepAliveThread() {
-         return (this.clearReferencesHttpClientKeepAliveThread);
-     }
+    /**
+     * Return the clearReferencesHttpClientKeepAliveThread flag for this
+     * Context.
+     */
+    public boolean getClearReferencesHttpClientKeepAliveThread() {
+        return (this.clearReferencesHttpClientKeepAliveThread);
+    }
 
 
-     /**
-      * Set the clearReferencesHttpClientKeepAliveThread feature for this
-      * Context.
-      *
-      * @param clearReferencesHttpClientKeepAliveThread The new flag value
-      */
-     public void setClearReferencesHttpClientKeepAliveThread(
-             boolean clearReferencesHttpClientKeepAliveThread) {
-         this.clearReferencesHttpClientKeepAliveThread =
-             clearReferencesHttpClientKeepAliveThread;
-     }
+    /**
+     * Set the clearReferencesHttpClientKeepAliveThread feature for this
+     * Context.
+     *
+     * @param clearReferencesHttpClientKeepAliveThread The new flag value
+     */
+    public void setClearReferencesHttpClientKeepAliveThread(
+            boolean clearReferencesHttpClientKeepAliveThread) {
+        this.clearReferencesHttpClientKeepAliveThread =
+            clearReferencesHttpClientKeepAliveThread;
+    }
 
 
     // ------------------------------------------------------- Reloader Methods
