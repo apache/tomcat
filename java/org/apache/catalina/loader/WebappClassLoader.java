@@ -511,17 +511,6 @@ public class WebappClassLoader extends URLClassLoader
 
 
      /**
-      * Utility method for use in subclasses.
-      * Must be called before Lifecycle methods to have any effect.
-      *
-      * @deprecated Will be removed in 8.0.x onwards.
-      */
-    @Deprecated
-     protected void setParentClassLoader(ClassLoader pcl) {
-         parent = pcl;
-     }
-
-     /**
       * Return the clearReferencesStatic flag for this Context.
       */
      public boolean getClearReferencesStatic() {
