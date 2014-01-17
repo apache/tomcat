@@ -117,11 +117,8 @@ public class UpgradeUtil {
         // Sub-protocols
         List<String> subProtocols = getTokensFromHeader(req,
                 "Sec-WebSocket-Protocol");
-        if (!subProtocols.isEmpty()) {
-            subProtocol = sec.getConfigurator().
-                    getNegotiatedSubprotocol(
-                            sec.getSubprotocols(), subProtocols);
-        }
+        subProtocol = sec.getConfigurator().getNegotiatedSubprotocol(
+                sec.getSubprotocols(), subProtocols);
 
         // Extensions
         // Currently no extensions are supported by this implementation
@@ -147,18 +144,6 @@ public class UpgradeUtil {
             }
             resp.setHeader("Sec-WebSocket-Extensions", sb.toString());
         }
-        Endpoint ep;
-        try {
-            Class<?> clazz = sec.getEndpointClass();
-            if (Endpoint.class.isAssignableFrom(clazz)) {
-                ep = (Endpoint) sec.getConfigurator().getEndpointInstance(
-                        clazz);
-            } else {
-                ep = new PojoEndpointServer();
-            }
-        } catch (InstantiationException e) {
-            throw new ServletException(e);
-        }
 
         WsHandshakeRequest wsRequest = new WsHandshakeRequest(req);
         WsHandshakeResponse wsResponse = new WsHandshakeResponse();
@@ -174,6 +159,19 @@ public class UpgradeUtil {
             for (String headerValue: entry.getValue()) {
                 resp.addHeader(entry.getKey(), headerValue);
             }
+        }
+
+        Endpoint ep;
+        try {
+            Class<?> clazz = sec.getEndpointClass();
+            if (Endpoint.class.isAssignableFrom(clazz)) {
+                ep = (Endpoint) sec.getConfigurator().getEndpointInstance(
+                        clazz);
+            } else {
+                ep = new PojoEndpointServer();
+            }
+        } catch (InstantiationException e) {
+            throw new ServletException(e);
         }
 
         // Small hack until the Servlet API provides a way to do this.

@@ -88,6 +88,13 @@
         be loaded by the same class loader. Patch by Juan Carlos Estibariz.
         (markt)
       </fix>
+      <fix>
+        <bug>56025</bug>: When creating a WebSocket connection, always call
+        <code>ServerEndpointConfig.Configurator.getNegotiatedSubprotocol()</code>
+        and always create the EndPoint instance after calling
+        <code>ServerEndpointConfig.Configurator.modifyHandshake()</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
