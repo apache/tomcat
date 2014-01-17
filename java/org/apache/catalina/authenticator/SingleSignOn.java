@@ -478,6 +478,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             this.threadBindingListener = threadBindingListener;
         }
 
+        @Override
         public ClassLoader run() {
             ClassLoader oldContextClassLoader =
                     Thread.currentThread().getContextClassLoader();
@@ -520,6 +521,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             this.threadBindingListener = threadBindingListener;
         }
 
+        @Override
         public Void run() {
             threadBindingListener.unbind();
             Thread.currentThread().setContextClassLoader(oldContextClassLoader);

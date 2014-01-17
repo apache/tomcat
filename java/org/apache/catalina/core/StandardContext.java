@@ -809,7 +809,9 @@ public class StandardContext extends ContainerBase
     private String containerSciFilter;
 
     protected static final ThreadBindingListener DEFAULT_NAMING_LISTENER = (new ThreadBindingListener() {
+        @Override
         public void bind() {}
+        @Override
         public void unbind() {}
     });
     protected ThreadBindingListener threadBindingListener = DEFAULT_NAMING_LISTENER;
