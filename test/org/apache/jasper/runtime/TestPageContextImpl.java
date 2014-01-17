@@ -64,7 +64,7 @@ public class TestPageContextImpl extends TomcatBaseTest {
     public void testDefaultBufferSize() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp");
+        File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         Context ctx = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
