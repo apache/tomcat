@@ -747,6 +747,19 @@ TCN_IMPLEMENT_CALL(void, SSL, randSet)(TCN_STDARGS, jstring file)
     TCN_FREE_CSTRING(file);
 }
 
+TCN_IMPLEMENT_CALL(jint, SSL, fipsModeGet)(TCN_STDARGS)
+{
+    UNREFERENCED(o);
+#ifdef OPENSSL_FIPS
+    return FIPS_mode();
+#else
+    /* FIPS is unavailable */
+    tcn_ThrowException(e, "FIPS was not available to tcnative at build time. You will need to re-build tcnative against an OpenSSL with FIPS.");
+
+    return 0;
+#endif
+}
+
 TCN_IMPLEMENT_CALL(jint, SSL, fipsModeSet)(TCN_STDARGS, jint mode)
 {
     int r = 0;
