@@ -227,14 +227,26 @@ public class WebappClassLoader
     public WebappClassLoader() {
 
         super(new URL[0]);
-        this.parent = getParent();
-        system = getSystemClassLoader();
-        securityManager = System.getSecurityManager();
 
+        ClassLoader p = getParent();
+        if (p == null) {
+            p = getSystemClassLoader();
+        }
+        this.parent = p;
+
+        ClassLoader j = String.class.getClassLoader();
+        if (j == null) {
+            j = getSystemClassLoader();
+            while (j.getParent() != null) {
+                j = j.getParent();
+            }
+        }
+        this.j2seClassLoader = j;
+
+        securityManager = System.getSecurityManager();
         if (securityManager != null) {
             refreshPolicy();
         }
-
     }
 
 
@@ -251,11 +263,22 @@ public class WebappClassLoader
 
         super(new URL[0], parent);
 
-        this.parent = getParent();
+        ClassLoader p = getParent();
+        if (p == null) {
+            p = getSystemClassLoader();
+        }
+        this.parent = p;
 
-        system = getSystemClassLoader();
+        ClassLoader j = String.class.getClassLoader();
+        if (j == null) {
+            j = getSystemClassLoader();
+            while (j.getParent() != null) {
+                j = j.getParent();
+            }
+        }
+        this.j2seClassLoader = j;
+
         securityManager = System.getSecurityManager();
-
         if (securityManager != null) {
             refreshPolicy();
         }
@@ -410,6 +433,15 @@ public class WebappClassLoader
      * The system class loader.
      */
     protected ClassLoader system = null;
+
+
+    /**
+     * The bootstrap class loader used to load the J2SE classes. In some
+     * implementations this class loader is always <code>null</null> and in
+     * those cases {@link ClassLoader#getParent()} will be called recursively on
+     * the system class loader and the last non-null result used.
+     */
+    protected final ClassLoader j2seClassLoader;
 
 
     /**
@@ -1396,10 +1428,7 @@ public class WebappClassLoader
         if (delegate) {
             if (log.isDebugEnabled())
                 log.debug("  Delegating to parent classloader " + parent);
-            ClassLoader loader = parent;
-            if (loader == null)
-                loader = system;
-            url = loader.getResource(name);
+            url = parent.getResource(name);
             if (url != null) {
                 if (log.isDebugEnabled())
                     log.debug("  --> Returning '" + url.toString() + "'");
@@ -1433,10 +1462,7 @@ public class WebappClassLoader
 
         // (3) Delegate to parent unconditionally if not already attempted
         if( !delegate ) {
-            ClassLoader loader = parent;
-            if (loader == null)
-                loader = system;
-            url = loader.getResource(name);
+            url = parent.getResource(name);
             if (url != null) {
                 if (log.isDebugEnabled())
                     log.debug("  --> Returning '" + url.toString() + "'");
@@ -1480,10 +1506,7 @@ public class WebappClassLoader
         if (delegate) {
             if (log.isDebugEnabled())
                 log.debug("  Delegating to parent classloader " + parent);
-            ClassLoader loader = parent;
-            if (loader == null)
-                loader = system;
-            stream = loader.getResourceAsStream(name);
+            stream = parent.getResourceAsStream(name);
             if (stream != null) {
                 // FIXME - cache???
                 if (log.isDebugEnabled())
@@ -1515,10 +1538,7 @@ public class WebappClassLoader
         if (!delegate) {
             if (log.isDebugEnabled())
                 log.debug("  Delegating to parent classloader unconditionally " + parent);
-            ClassLoader loader = parent;
-            if (loader == null)
-                loader = system;
-            stream = loader.getResourceAsStream(name);
+            stream = parent.getResourceAsStream(name);
             if (stream != null) {
                 // FIXME - cache???
                 if (log.isDebugEnabled())
@@ -1617,7 +1637,7 @@ public class WebappClassLoader
         // (0.2) Try loading the class with the system class loader, to prevent
         //       the webapp from overriding J2SE classes
         try {
-            clazz = system.loadClass(name);
+            clazz = j2seClassLoader.loadClass(name);
             if (clazz != null) {
                 if (resolve)
                     resolveClass(clazz);
@@ -1648,11 +1668,8 @@ public class WebappClassLoader
         if (delegateLoad) {
             if (log.isDebugEnabled())
                 log.debug("  Delegating to parent classloader1 " + parent);
-            ClassLoader loader = parent;
-            if (loader == null)
-                loader = system;
             try {
-                clazz = Class.forName(name, false, loader);
+                clazz = Class.forName(name, false, parent);
                 if (clazz != null) {
                     if (log.isDebugEnabled())
                         log.debug("  Loading class from parent");
@@ -1685,11 +1702,8 @@ public class WebappClassLoader
         if (!delegateLoad) {
             if (log.isDebugEnabled())
                 log.debug("  Delegating to parent classloader at end: " + parent);
-            ClassLoader loader = parent;
-            if (loader == null)
-                loader = system;
             try {
-                clazz = Class.forName(name, false, loader);
+                clazz = Class.forName(name, false, parent);
                 if (clazz != null) {
                     if (log.isDebugEnabled())
                         log.debug("  Loading class from parent");

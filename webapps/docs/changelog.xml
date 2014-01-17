@@ -71,6 +71,13 @@
         <code>/ROOT</code> as equivalent to <code>/</code>. (markt)
       </fix>
       <fix>
+        <bug>55943</bug>: Improve the implementation of the class loader check
+        that prevents web applications from trying to override J2SE
+        implementation classes. As part of this fix, refactor the way a null
+        parent class loader is handled which enables a number of null checks and
+        object creation calls to be removed. (markt)
+      </fix>
+      <fix>
         <bug>55958</bug>: Differentiate between <code>foo.war</code> the WAR
         file and <code>foo.war</code> the directory. (markt)
       </fix>
