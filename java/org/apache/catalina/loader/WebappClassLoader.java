@@ -216,14 +216,26 @@ public class WebappClassLoader extends URLClassLoader
     public WebappClassLoader() {
 
         super(new URL[0]);
-        this.parent = getParent();
-        system = getSystemClassLoader();
-        securityManager = System.getSecurityManager();
 
+        ClassLoader p = getParent();
+        if (p == null) {
+            p = getSystemClassLoader();
+        }
+        this.parent = p;
+
+        ClassLoader j = String.class.getClassLoader();
+        if (j == null) {
+            j = getSystemClassLoader();
+            while (j.getParent() != null) {
+                j = j.getParent();
+            }
+        }
+        this.j2seClassLoader = j;
+
+        securityManager = System.getSecurityManager();
         if (securityManager != null) {
             refreshPolicy();
         }
-
     }
 
 
@@ -240,11 +252,22 @@ public class WebappClassLoader extends URLClassLoader
 
         super(new URL[0], parent);
 
-        this.parent = getParent();
+        ClassLoader p = getParent();
+        if (p == null) {
+            p = getSystemClassLoader();
+        }
+        this.parent = p;
 
-        system = getSystemClassLoader();
+        ClassLoader j = String.class.getClassLoader();
+        if (j == null) {
+            j = getSystemClassLoader();
+            while (j.getParent() != null) {
+                j = j.getParent();
+            }
+        }
+        this.j2seClassLoader = j;
+
         securityManager = System.getSecurityManager();
-
         if (securityManager != null) {
             refreshPolicy();
         }
@@ -310,13 +333,16 @@ public class WebappClassLoader extends URLClassLoader
     /**
      * The parent class loader.
      */
-    protected ClassLoader parent = null;
+    protected final ClassLoader parent;
 
 
     /**
-     * The system class loader.
+     * The bootstrap class loader used to load the J2SE classes. In some
+     * implementations this class loader is always <code>null</null> and in
+     * those cases {@link ClassLoader#getParent()} will be called recursively on
+     * the system class loader and the last non-null result used.
      */
-    protected final ClassLoader system;
+    protected final ClassLoader j2seClassLoader;
 
 
     /**
@@ -678,7 +704,7 @@ public class WebappClassLoader extends URLClassLoader
     @Override
     public WebappClassLoader copyWithoutTransformers() {
 
-        WebappClassLoader result = new WebappClassLoader(this.parent);
+        WebappClassLoader result = new WebappClassLoader(getParent());
 
         result.resources = this.resources;
         result.delegate = this.delegate;
@@ -987,10 +1013,7 @@ public class WebappClassLoader extends URLClassLoader
         if (delegate) {
             if (log.isDebugEnabled())
                 log.debug("  Delegating to parent classloader " + parent);
-            ClassLoader loader = parent;
-            if (loader == null)
-                loader = system;
-            url = loader.getResource(name);
+            url = parent.getResource(name);
             if (url != null) {
                 if (log.isDebugEnabled())
                     log.debug("  --> Returning '" + url.toString() + "'");
@@ -1008,10 +1031,7 @@ public class WebappClassLoader extends URLClassLoader
 
         // (3) Delegate to parent unconditionally if not already attempted
         if( !delegate ) {
-            ClassLoader loader = parent;
-            if (loader == null)
-                loader = system;
-            url = loader.getResource(name);
+            url = parent.getResource(name);
             if (url != null) {
                 if (log.isDebugEnabled())
                     log.debug("  --> Returning '" + url.toString() + "'");
@@ -1055,10 +1075,7 @@ public class WebappClassLoader extends URLClassLoader
         if (delegate) {
             if (log.isDebugEnabled())
                 log.debug("  Delegating to parent classloader " + parent);
-            ClassLoader loader = parent;
-            if (loader == null)
-                loader = system;
-            stream = loader.getResourceAsStream(name);
+            stream = parent.getResourceAsStream(name);
             if (stream != null) {
                 // FIXME - cache???
                 if (log.isDebugEnabled())
@@ -1084,10 +1101,7 @@ public class WebappClassLoader extends URLClassLoader
         if (!delegate) {
             if (log.isDebugEnabled())
                 log.debug("  Delegating to parent classloader unconditionally " + parent);
-            ClassLoader loader = parent;
-            if (loader == null)
-                loader = system;
-            stream = loader.getResourceAsStream(name);
+            stream = parent.getResourceAsStream(name);
             if (stream != null) {
                 // FIXME - cache???
                 if (log.isDebugEnabled())
@@ -1186,9 +1200,9 @@ public class WebappClassLoader extends URLClassLoader
         // (0.2) Try loading the class with the system class loader, to prevent
         //       the webapp from overriding J2SE classes
         String resourceName = binaryNameToPath(name, false);
-        if (system.getResource(resourceName) != null) {
+        if (j2seClassLoader.getResource(resourceName) != null) {
             try {
-                clazz = system.loadClass(name);
+                clazz = j2seClassLoader.loadClass(name);
                 if (clazz != null) {
                     if (resolve)
                         resolveClass(clazz);
@@ -1220,11 +1234,8 @@ public class WebappClassLoader extends URLClassLoader
         if (delegateLoad) {
             if (log.isDebugEnabled())
                 log.debug("  Delegating to parent classloader1 " + parent);
-            ClassLoader loader = parent;
-            if (loader == null)
-                loader = system;
             try {
-                clazz = Class.forName(name, false, loader);
+                clazz = Class.forName(name, false, parent);
                 if (clazz != null) {
                     if (log.isDebugEnabled())
                         log.debug("  Loading class from parent");
@@ -1257,11 +1268,8 @@ public class WebappClassLoader extends URLClassLoader
         if (!delegateLoad) {
             if (log.isDebugEnabled())
                 log.debug("  Delegating to parent classloader at end: " + parent);
-            ClassLoader loader = parent;
-            if (loader == null)
-                loader = system;
             try {
-                clazz = Class.forName(name, false, loader);
+                clazz = Class.forName(name, false, parent);
                 if (clazz != null) {
                     if (log.isDebugEnabled())
                         log.debug("  Loading class from parent");
@@ -1443,7 +1451,6 @@ public class WebappClassLoader extends URLClassLoader
         resourceEntries.clear();
         jarModificationTimes.clear();
         resources = null;
-        parent = null;
 
         permissionList.clear();
         loaderPC.clear();
