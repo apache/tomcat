@@ -123,7 +123,7 @@ class Validator {
                     }
                 } else if ("extends".equals(attr)) {
                     if (pageInfo.getExtends(false) == null) {
-                        pageInfo.setExtends(value, n);
+                        pageInfo.setExtends(value);
                     } else if (!pageInfo.getExtends(false).equals(value)) {
                         err.jspError(n, "jsp.error.page.conflict.extends",
                                 pageInfo.getExtends(false), value);
