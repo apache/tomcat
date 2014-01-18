@@ -18,6 +18,7 @@ package javax.servlet.http;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
+import java.util.BitSet;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -52,6 +53,48 @@ import java.util.ResourceBundle;
  * to ensure the best interoperability.
  */
 public class Cookie implements Cloneable, Serializable {
+
+    private static final BitSet allowed;
+    static {
+        boolean STRICT_SERVLET_COMPLIANCE =
+                Boolean.getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
+
+        boolean STRICT_NAMING =
+                getBoolean("org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING",
+                        STRICT_SERVLET_COMPLIANCE);
+
+        String separators;
+        if (STRICT_NAMING) {
+            separators = "()<>@,;:\\\"/[]?={} \t"; // separators as defined by RFC2616 2.2
+        }
+        else {
+            separators = ",; "; // semi-colon, comma and space as defined by Netscape
+        }
+
+        allowed = new BitSet(128);
+        allowed.set(0x20, 0x7f); // any CHAR except CTLs or separators
+        for (int i = 0; i < separators.length(); i++) {
+            char ch = separators.charAt(i);
+            allowed.clear(ch);
+        }
+
+        // special treatment to allow for FWD_SLASH_IS_SEPARATOR property
+        if (STRICT_NAMING) {
+            boolean FWD_SLASH_IS_SEPARATOR =
+                    getBoolean("org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR",
+                               STRICT_SERVLET_COMPLIANCE);
+            allowed.set('/', !FWD_SLASH_IS_SEPARATOR);
+        }
+    }
+
+    private static boolean getBoolean(String prop, boolean def) {
+        String value = System.getProperty(prop);
+        if (value == null) {
+            return def;
+        } else {
+            return Boolean.parseBoolean(value);
+        }
+    }
 
     private static final long serialVersionUID = 1L;
 
@@ -120,6 +163,18 @@ public class Cookie implements Cloneable, Serializable {
 
         this.name = name;
         this.value = value;
+    }
+
+    private boolean isToken(String possibleToken) {
+        int len = possibleToken.length();
+
+        for (int i = 0; i < len; i++) {
+            char c = possibleToken.charAt(i);
+            if (!allowed.get(c)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -341,83 +396,6 @@ public class Cookie implements Cloneable, Serializable {
      */
     public void setVersion(int v) {
         version = v;
-    }
-
-    private static final String tspecials = ",; ";
-    private static final String tspecials2NoSlash = "()<>@,;:\\\"[]?={} \t";
-    private static final String tspecials2WithSlash = tspecials2NoSlash + "/";
-    private static final String tspecials2;
-
-    /**
-     * If set to true, we parse cookies strictly according to the servlet,
-     * cookie and HTTP specs by default.
-     */
-    private static final boolean STRICT_SERVLET_COMPLIANCE;
-
-    /**
-     * If set to true, the <code>/</code> character will be treated as a
-     * separator. Default is usually false. If STRICT_SERVLET_COMPLIANCE==true
-     * then default is true. Explicitly setting always takes priority.
-     */
-    private static final boolean FWD_SLASH_IS_SEPARATOR;
-
-    /**
-     * If set to true, enforce the cookie naming rules in the spec that require
-     * no separators in the cookie name. Default is usually false. If
-     * STRICT_SERVLET_COMPLIANCE==true then default is true. Explicitly setting
-     * always takes priority.
-     */
-    private static final boolean STRICT_NAMING;
-
-    static {
-        STRICT_SERVLET_COMPLIANCE = Boolean.valueOf(
-                System.getProperty(
-                        "org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
-                        "false")).booleanValue();
-
-        String fwdSlashIsSeparator = System.getProperty(
-                "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
-        if (fwdSlashIsSeparator == null) {
-            FWD_SLASH_IS_SEPARATOR = STRICT_SERVLET_COMPLIANCE;
-        } else {
-            FWD_SLASH_IS_SEPARATOR = Boolean.valueOf(fwdSlashIsSeparator).booleanValue();
-        }
-
-        if (FWD_SLASH_IS_SEPARATOR) {
-            tspecials2 = tspecials2WithSlash;
-        } else {
-            tspecials2 = tspecials2NoSlash;
-        }
-
-        String strictNaming = System.getProperty(
-                "org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING");
-        if (strictNaming == null) {
-            STRICT_NAMING = STRICT_SERVLET_COMPLIANCE;
-        } else {
-            STRICT_NAMING = Boolean.valueOf(strictNaming).booleanValue();
-        }
-
-    }
-
-    /*
-     * Tests a string and returns true if the string counts as a reserved token
-     * in the Java language.
-     * @param value the <code>String</code> to be tested
-     * @return <code>true</code> if the <code>String</code> is a reserved token;
-     * <code>false</code> if it is not
-     */
-    private boolean isToken(String possibleToken) {
-        int len = possibleToken.length();
-
-        for (int i = 0; i < len; i++) {
-            char c = possibleToken.charAt(i);
-
-            if (c < 0x20 || c >= 0x7f || tspecials.indexOf(c) != -1 ||
-                    (STRICT_NAMING && tspecials2.indexOf(c) != -1)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
