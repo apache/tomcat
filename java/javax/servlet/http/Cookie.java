@@ -56,27 +56,21 @@ public class Cookie implements Cloneable, Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final String LSTRING_FILE = "javax.servlet.http.LocalStrings";
-    private static final ResourceBundle lStrings =
-            ResourceBundle.getBundle(LSTRING_FILE);
+    private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
-    //
-    // The value of the cookie itself.
-    //
+    private final String name;
+    private String value;
 
-    private final String name; // NAME= ... "$Name" style is reserved
-    private String value; // value of NAME
+    private int version = 0; // ;Version=1 ... means RFC 2109 style
 
     //
     // Attributes encoded in the header's cookie fields.
     //
-
     private String comment; // ;Comment=VALUE ... describes cookie's use
-    // ;Discard ... implied by maxAge < 0
     private String domain; // ;Domain=VALUE ... domain that sees cookie
     private int maxAge = -1; // ;Max-Age=VALUE ... cookies auto-expire
     private String path; // ;Path=VALUE ... URLs that see the cookie
     private boolean secure; // ;Secure ... e.g. use SSL
-    private int version = 0; // ;Version=1 ... means RFC 2109++ style
     private boolean httpOnly; // Not in cookie specs, but supported by browsers
 
     /**
@@ -108,26 +102,20 @@ public class Cookie implements Cloneable, Serializable {
      */
     public Cookie(String name, String value) {
         if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException(
-                    lStrings.getString("err.cookie_name_blank"));
+            throw new IllegalArgumentException(lStrings.getString("err.cookie_name_blank"));
         }
         if (!isToken(name) ||
-                name.equalsIgnoreCase("Comment") // rfc2019
-                ||
-                name.equalsIgnoreCase("Discard") // 2019++
-                ||
+                name.equalsIgnoreCase("Comment") ||
+                name.equalsIgnoreCase("Discard") ||
                 name.equalsIgnoreCase("Domain") ||
-                name.equalsIgnoreCase("Expires") // (old cookies)
-                ||
-                name.equalsIgnoreCase("Max-Age") // rfc2019
-                || name.equalsIgnoreCase("Path") ||
+                name.equalsIgnoreCase("Expires") ||
+                name.equalsIgnoreCase("Max-Age") ||
+                name.equalsIgnoreCase("Path") ||
                 name.equalsIgnoreCase("Secure") ||
-                name.equalsIgnoreCase("Version") || name.startsWith("$")) {
+                name.equalsIgnoreCase("Version") ||
+                name.startsWith("$")) {
             String errMsg = lStrings.getString("err.cookie_name_is_token");
-            Object[] errArgs = new Object[1];
-            errArgs[0] = name;
-            errMsg = MessageFormat.format(errMsg, errArgs);
-            throw new IllegalArgumentException(errMsg);
+            throw new IllegalArgumentException(MessageFormat.format(errMsg, name));
         }
 
         this.name = name;
@@ -355,11 +343,6 @@ public class Cookie implements Cloneable, Serializable {
         version = v;
     }
 
-    // Note -- disabled for now to allow full Netscape compatibility
-    // from RFC 2068, token special case characters
-    //
-    // private static final String tspecials = "()<>@,;:\\\"/[]?={} \t";
-
     private static final String tspecials = ",; ";
     private static final String tspecials2NoSlash = "()<>@,;:\\\"[]?={} \t";
     private static final String tspecials2WithSlash = tspecials2NoSlash + "/";
@@ -397,8 +380,7 @@ public class Cookie implements Cloneable, Serializable {
         if (fwdSlashIsSeparator == null) {
             FWD_SLASH_IS_SEPARATOR = STRICT_SERVLET_COMPLIANCE;
         } else {
-            FWD_SLASH_IS_SEPARATOR =
-                    Boolean.valueOf(fwdSlashIsSeparator).booleanValue();
+            FWD_SLASH_IS_SEPARATOR = Boolean.valueOf(fwdSlashIsSeparator).booleanValue();
         }
 
         if (FWD_SLASH_IS_SEPARATOR) {
