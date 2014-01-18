@@ -85,6 +85,49 @@ public class TestELParser {
     }
 
 
+    @Test
+    public void testTernary01() throws JasperException {
+        doTestParser("${true?true:false}");
+    }
+
+
+    @Test
+    public void testTernary02() throws JasperException {
+        doTestParser("${a==1?true:false}");
+    }
+
+
+    @Test
+    public void testTernary03() throws JasperException {
+        doTestParser("${a eq1?true:false}");
+    }
+
+
+    @Test
+    public void testTernary04() throws JasperException {
+        doTestParser(" ${ a eq 1 ? true : false } ");
+    }
+
+
+    @Test
+    public void testTernary05() throws JasperException {
+        // Note this is invalid EL
+        doTestParser("${aeq1?true:false}");
+    }
+
+
+    @Test
+    public void testTernary06() throws JasperException {
+        doTestParser("${do:it(a eq1?true:false,y)}");
+    }
+
+
+    @Test
+    public void testTernary07() throws JasperException {
+        doTestParser(" $ { do:it( a eq 1 ? true : false, y ) } ");
+    }
+
+
     private void doTestParser(String input) throws JasperException {
         Nodes nodes = ELParser.parse(input, false);
 

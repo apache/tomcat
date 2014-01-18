@@ -142,6 +142,11 @@
         <code>JspWriter.DEFAULT_BUFFER</code>. Based on a patch by Eugene Chung.
         (markt)
       </fix>
+      <fix>
+        <bug>56029</bug>: A regression in the fix for <bug>55198</bug> meant
+        that when EL containing a ternary expression was used in an attribute
+        a compilation error would occur for some expressions. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
