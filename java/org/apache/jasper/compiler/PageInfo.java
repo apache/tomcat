@@ -399,14 +399,6 @@ class PageInfo {
     }
 
     /**
-     * @deprecated Use {@link #setExtends(String)}
-     */
-    @Deprecated
-    public void setExtends(String value, @SuppressWarnings("unused") Node.PageDirective n) {
-        xtends = value;
-    }
-
-    /**
      * Gets the value of the 'extends' page directive attribute.
      *
      * @param useDefault TRUE if the default
