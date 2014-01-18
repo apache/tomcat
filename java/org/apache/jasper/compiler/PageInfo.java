@@ -402,17 +402,16 @@ class PageInfo {
     /*
      * extends
      */
-    public void setExtends(String value, Node.PageDirective n) {
-
+    public void setExtends(String value) {
         xtends = value;
+    }
 
-        /*
-         * If page superclass is top level class (i.e. not in a package)
-         * explicitly import it. If this is not done, the compiler will assume
-         * the extended class is in the same pkg as the generated servlet.
-         */
-        if (value.indexOf('.') < 0)
-            n.addImport(value);
+    /**
+     * @deprecated Use {@link #setExtends(String)}
+     */
+    @Deprecated
+    public void setExtends(String value, @SuppressWarnings("unused") Node.PageDirective n) {
+        xtends = value;
     }
 
     /**

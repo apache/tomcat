@@ -143,6 +143,11 @@
         (markt)
       </fix>
       <fix>
+        <bug>56012</bug>: When using the extends attribute of the page directive
+        do not import the super class if it is in an unnamed package as imports
+        from unnamed packages are now explicitly illegal. (markt)
+      </fix>
+      <fix>
         <bug>56029</bug>: A regression in the fix for <bug>55198</bug> meant
         that when EL containing a ternary expression was used in an attribute
         a compilation error would occur for some expressions. (markt)
