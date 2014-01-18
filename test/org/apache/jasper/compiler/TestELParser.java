@@ -127,6 +127,10 @@ public class TestELParser {
         doTestParser(" $ { do:it( a eq 1 ? true : false, y ) } ");
     }
 
+    @Test
+    public void testTernaryBug56031() throws JasperException {
+        doTestParser("${my:link(!empty registration ? registration : '/test/registration')}");
+    }
 
     private void doTestParser(String input) throws JasperException {
         Nodes nodes = ELParser.parse(input, false);
