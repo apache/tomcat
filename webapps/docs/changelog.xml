@@ -90,6 +90,12 @@
         parsing XML configuration files. (markt)
       </fix>
       <fix>
+        <bug>56013</bug>: Fix issue with SPNEGO authentication when using IBM
+        JREs. IBM JREs only understand the option of infinite lifetime for
+        Kerberos credentials. Based on a patch provided by Arunav Sanyal.
+        (markt)
+      </fix>
+      <fix>
         <bug>56016</bug>: When loading resources for XML schema validation, take
         account of the possibility that servlet-api.jar and jsp-api.jar may not
         be loaded by the same class loader. Patch by Juan Carlos Estibariz.

@@ -28,6 +28,7 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.LoginConfig;
@@ -219,12 +220,19 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             // Assume the GSSContext is stateless
             // TODO: Confirm this assumption
             final GSSManager manager = GSSManager.getInstance();
+            // IBM JDK only understands indefinite lifetime
+            final int credentialLifetime;
+            if (Globals.IS_IBM_JVM) {
+                credentialLifetime = GSSCredential.INDEFINITE_LIFETIME;
+            } else {
+                credentialLifetime = GSSCredential.DEFAULT_LIFETIME;
+            }
             final PrivilegedExceptionAction<GSSCredential> action =
                 new PrivilegedExceptionAction<GSSCredential>() {
                     @Override
                     public GSSCredential run() throws GSSException {
                         return manager.createCredential(null,
-                                GSSCredential.DEFAULT_LIFETIME,
+                                credentialLifetime,
                                 new Oid("1.3.6.1.5.5.2"),
                                 GSSCredential.ACCEPT_ONLY);
                     }
