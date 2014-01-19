@@ -398,7 +398,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
         assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
         if (responseBody.getLength() > 0) {
-            // It will be >0 if the standard error page handlign has been
+            // It will be >0 if the standard error page handling has been
             // triggered
             assertFalse(responseBody.toString().contains("FAIL"));
         }
