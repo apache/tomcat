@@ -752,7 +752,7 @@ public abstract class AbstractEndpoint<S> {
     }
 
 
-    public String adjustRelativePath(String path, String relativeTo) {
+    private String adjustRelativePath(String path, String relativeTo) {
         // Empty or null path can't point to anything useful. The assumption is
         // that the value is deliberately empty / null so leave it that way.
         if (path == null || path.length() == 0) {
