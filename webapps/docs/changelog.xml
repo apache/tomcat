@@ -124,6 +124,12 @@
         <bug>55996</bug>: Ensure Async requests timeout correctly when using the
         NIO HTTP connector. (markt)
       </fix>
+      <add>
+        <bug>56021</bug>: Make it possible to use the Windows-MY key store with
+        the BIO and NIo connectors for SSL configuration. It requires a
+        <code>keystoreFile=&quot;&quot; keystoreType=&quot;Windows-My&quot;</code>
+        to be set on the connector. Based on a patch provided by Asanka. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -709,6 +709,11 @@ public abstract class AbstractEndpoint {
 
 
     public String adjustRelativePath(String path, String relativeTo) {
+        // Empty or null path can't point to anything useful. The assumption is
+        // that the value is deliberately empty / null so leave it that way.
+        if (path == null || path.length() == 0) {
+            return path;
+        }
         String newPath = path;
         File f = new File(newPath);
         if ( !f.isAbsolute()) {
@@ -807,9 +812,8 @@ public abstract class AbstractEndpoint {
     private String keystoreFile = System.getProperty("user.home")+"/.keystore";
     public String getKeystoreFile() { return keystoreFile;}
     public void setKeystoreFile(String s ) {
-        String file = adjustRelativePath(s,
+        keystoreFile = adjustRelativePath(s,
                 System.getProperty(Constants.CATALINA_BASE_PROP));
-        this.keystoreFile = file;
     }
 
     private String keystorePass = null;
@@ -855,13 +859,8 @@ public abstract class AbstractEndpoint {
     private String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
     public String getTruststoreFile() {return truststoreFile;}
     public void setTruststoreFile(String s) {
-        if (s == null) {
-            this.truststoreFile = null;
-        } else {
-            String file = adjustRelativePath(s,
-                    System.getProperty(Constants.CATALINA_BASE_PROP));
-            this.truststoreFile = file;
-        }
+        truststoreFile = adjustRelativePath(s,
+                System.getProperty(Constants.CATALINA_BASE_PROP));
     }
 
     private String truststorePass =
