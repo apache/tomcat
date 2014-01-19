@@ -101,7 +101,7 @@ public class ELParser {
 
         StringBuilder buf = new StringBuilder();
         ELexpr = new ELNode.Nodes();
-        while (hasNextChar()) {
+        while (hasNext()) {
             curToken = nextToken();
             if (curToken instanceof Char) {
                 if (curToken.toChar() == '}') {
@@ -138,16 +138,16 @@ public class ELParser {
         }
         String s1 = null; // Function prefix
         String s2 = curToken.toString(); // Function name
-        if (hasNextChar()) {
+        if (hasNext()) {
             int mark = getIndex();
             curToken = nextToken();
             if (curToken.toChar() == ':') {
-                if (hasNextChar()) {
+                if (hasNext()) {
                     Token t2 = nextToken();
                     if (t2 instanceof Id) {
                         s1 = s2;
                         s2 = t2.toString();
-                        if (hasNextChar()) {
+                        if (hasNext()) {
                             curToken = nextToken();
                         }
                     }
@@ -167,12 +167,11 @@ public class ELParser {
      * Test if an id is a reserved word in EL
      */
     private boolean isELReserved(String id) {
-        String trimmed = id.trim();
         int i = 0;
         int j = reservedWords.length;
         while (i < j) {
             int k = (i + j) / 2;
-            int result = reservedWords[k].compareTo(trimmed);
+            int result = reservedWords[k].compareTo(id);
             if (result == 0) {
                 return true;
             }
@@ -230,10 +229,20 @@ public class ELParser {
     }
 
     /*
+     * @return true if there is something left in EL expression buffer other
+     * than white spaces.
+     */
+    private boolean hasNext() {
+        skipSpaces();
+        return hasNextChar();
+    }
+
+    /*
      * @return The next token in the EL expression buffer.
      */
     private Token nextToken() {
         prevToken = curToken;
+        skipSpaces();
         if (hasNextChar()) {
             char ch = nextChar();
             if (Character.isJavaIdentifierStart(ch)) {
@@ -287,6 +296,14 @@ public class ELParser {
      * A collection of low level parse methods dealing with character in the EL
      * expression buffer.
      */
+
+    private void skipSpaces() {
+        while (hasNextChar()) {
+            if (expression.charAt(index) > ' ')
+                break;
+            index++;
+        }
+    }
 
     private boolean hasNextChar() {
         return index < expression.length();
