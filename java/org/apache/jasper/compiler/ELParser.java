@@ -38,6 +38,7 @@ public class ELParser {
 
     private Token curToken;  // current token
     private Token prevToken; // previous token
+    private StringBuilder whiteSpace = new StringBuilder();
 
     private ELNode.Nodes expr;
 
@@ -103,13 +104,15 @@ public class ELParser {
 
         StringBuilder buf = new StringBuilder();
         ELexpr = new ELNode.Nodes();
+        curToken = null;
+        prevToken = null;
         while (hasNext()) {
             curToken = nextToken();
             if (curToken instanceof Char) {
                 if (curToken.toChar() == '}') {
                     break;
                 }
-                buf.append(curToken.toChar());
+                buf.append(curToken.toString());
             } else {
                 // Output whatever is in buffer
                 if (buf.length() > 0) {
@@ -120,6 +123,9 @@ public class ELParser {
                     ELexpr.add(new ELNode.ELText(curToken.toString()));
                 }
             }
+        }
+        if (curToken != null) {
+            buf.append(curToken.getWhiteSpace());
         }
         if (buf.length() > 0) {
             ELexpr.add(new ELNode.ELText(buf.toString()));
@@ -140,8 +146,9 @@ public class ELParser {
         }
         String s1 = null; // Function prefix
         String s2 = curToken.toString(); // Function name
+        Token original = curToken;
         if (hasNext()) {
-            int mark = getIndex();
+            int mark = getIndex() - whiteSpace.length();
             curToken = nextToken();
             if (curToken.toChar() == ':') {
                 if (hasNext()) {
@@ -159,7 +166,7 @@ public class ELParser {
                 ELexpr.add(new ELNode.Function(s1, s2));
                 return true;
             }
-            curToken = prevToken;
+            curToken = original;
             setIndex(mark);
         }
         return false;
@@ -240,6 +247,12 @@ public class ELParser {
         return hasNextChar();
     }
 
+    private String getAndResetWhiteSpace() {
+        String result = whiteSpace.toString();
+        whiteSpace = new StringBuilder();
+        return result;
+    }
+
     /*
      * @return The next token in the EL expression buffer.
      */
@@ -256,14 +269,14 @@ public class ELParser {
                     buf.append(ch);
                     nextChar();
                 }
-                return new Id(buf.toString());
+                return new Id(getAndResetWhiteSpace(), buf.toString());
             }
 
             if (ch == '\'' || ch == '"') {
                 return parseQuotedChars(ch);
             } else {
                 // For now...
-                return new Char(ch);
+                return new Char(getAndResetWhiteSpace(), ch);
             }
         }
         return null;
@@ -291,7 +304,7 @@ public class ELParser {
                 buf.append(ch);
             }
         }
-        return new QuotedString(buf.toString());
+        return new QuotedString(getAndResetWhiteSpace(), buf.toString());
     }
 
     /*
@@ -301,8 +314,10 @@ public class ELParser {
 
     private void skipSpaces() {
         while (hasNextChar()) {
-            if (expression.charAt(index) > ' ')
+            char c = expression.charAt(index);
+            if (c > ' ')
                 break;
+            whiteSpace.append(c);
             index++;
         }
     }
@@ -338,13 +353,23 @@ public class ELParser {
      */
     private static class Token {
 
+        protected final String whiteSpace;
+
+        Token(String whiteSpace) {
+            this.whiteSpace = whiteSpace;
+        }
+
         char toChar() {
             return 0;
         }
 
         @Override
         public String toString() {
-            return "";
+            return whiteSpace;
+        }
+
+        String getWhiteSpace() {
+            return whiteSpace;
         }
     }
 
@@ -354,13 +379,14 @@ public class ELParser {
     private static class Id extends Token {
         String id;
 
-        Id(String id) {
+        Id(String whiteSpace, String id) {
+            super(whiteSpace);
             this.id = id;
         }
 
         @Override
         public String toString() {
-            return id;
+            return whiteSpace + id;
         }
     }
 
@@ -371,7 +397,8 @@ public class ELParser {
 
         private char ch;
 
-        Char(char ch) {
+        Char(String whiteSpace, char ch) {
+            super(whiteSpace);
             this.ch = ch;
         }
 
@@ -382,7 +409,7 @@ public class ELParser {
 
         @Override
         public String toString() {
-            return (new Character(ch)).toString();
+            return whiteSpace + ch;
         }
     }
 
@@ -393,13 +420,14 @@ public class ELParser {
 
         private String value;
 
-        QuotedString(String v) {
+        QuotedString(String whiteSpace, String v) {
+            super(whiteSpace);
             this.value = v;
         }
 
         @Override
         public String toString() {
-            return value;
+            return whiteSpace + value;
         }
     }
 
