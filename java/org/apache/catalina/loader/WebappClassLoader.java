@@ -2812,14 +2812,14 @@ public class WebappClassLoader
                     "webappClassLoader.clearReferencesResourceBundlesFail",
                     contextName), e);
         } catch (NoSuchFieldException e) {
-            if (System.getProperty("java.vendor").startsWith("Sun")) {
+            if (Globals.IS_ORACLE_JVM) {
                 log.error(sm.getString(
-                "webappClassLoader.clearReferencesResourceBundlesFail",
-                contextName), e);
+                        "webappClassLoader.clearReferencesResourceBundlesFail",
+                        getContextName()), e);
             } else {
                 log.debug(sm.getString(
-                "webappClassLoader.clearReferencesResourceBundlesFail",
-                contextName), e);
+                        "webappClassLoader.clearReferencesResourceBundlesFail",
+                        getContextName()), e);
             }
         } catch (IllegalArgumentException e) {
             log.error(sm.getString(
