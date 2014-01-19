@@ -126,7 +126,7 @@
       </fix>
       <add>
         <bug>56021</bug>: Make it possible to use the Windows-MY key store with
-        the BIO and NIo connectors for SSL configuration. It requires a
+        the BIO and NIO connectors for SSL configuration. It requires a
         <code>keystoreFile=&quot;&quot; keystoreType=&quot;Windows-My&quot;</code>
         to be set on the connector. Based on a patch provided by Asanka. (markt)
       </add>
