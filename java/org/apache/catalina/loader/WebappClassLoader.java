@@ -2291,14 +2291,14 @@ public class WebappClassLoader extends URLClassLoader
                     "webappClassLoader.clearReferencesResourceBundlesFail",
                     getContextName()), e);
         } catch (NoSuchFieldException e) {
-            if (System.getProperty("java.vendor").startsWith("Sun")) {
+            if (Globals.IS_ORACLE_JVM) {
                 log.error(sm.getString(
-                "webappClassLoader.clearReferencesResourceBundlesFail",
-                getContextName()), e);
+                        "webappClassLoader.clearReferencesResourceBundlesFail",
+                        getContextName()), e);
             } else {
                 log.debug(sm.getString(
-                "webappClassLoader.clearReferencesResourceBundlesFail",
-                getContextName()), e);
+                        "webappClassLoader.clearReferencesResourceBundlesFail",
+                        getContextName()), e);
             }
         } catch (IllegalArgumentException e) {
             log.error(sm.getString(
