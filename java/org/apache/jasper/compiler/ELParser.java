@@ -154,7 +154,7 @@ public class ELParser {
                 if (hasNext()) {
                     Token t2 = nextToken();
                     if (t2 instanceof Id) {
-                        s1 = s2;
+                        s1 = s2.trim();
                         s2 = t2.toString();
                         if (hasNext()) {
                             curToken = nextToken();
@@ -163,7 +163,7 @@ public class ELParser {
                 }
             }
             if (curToken.toChar() == '(') {
-                ELexpr.add(new ELNode.Function(s1.trim(), s2.trim()));
+                ELexpr.add(new ELNode.Function(s1, s2.trim()));
                 return true;
             }
             curToken = original;
