@@ -914,6 +914,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       <li><code>org.apache.catalina.AccessLog.RemoteHost</code></li>
       <li><code>org.apache.catalina.AccessLog.Protocol</code></li>
       <li><code>org.apache.catalina.AccessLog.ServerPort</code></li>
+      <li><code>org.apache.tomcat.remoteAddr</code></li>
     </ul>
 
   </subsection>
@@ -1250,6 +1251,8 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         <p>Set to <code>true</code> to set the request attributes used by
         AccessLog implementations to override the values returned by the
         request for remote address, remote host, server port and protocol.
+        Request attributes are also used to enable the forwarded remote address
+        to be displayed on the status page of the Manager web application.
         If not set, the default value of <code>true</code> will be used.</p>
       </attribute>
 

@@ -117,6 +117,10 @@
         set. (markt)
       </fix>
       <fix>
+        <bug>55956</bug>: Make the forwarded remote IP address available to the
+        Connectors via a request attribute. (markt)
+      </fix>
+      <fix>
         <bug>55976</bug>: Fix sendfile support for the HTTP NIO connector.
         (markt)
       </fix>
@@ -184,6 +188,11 @@
       <fix>
         <bug>55888</bug>: Update the documentation web application to make it
         clearer that a Container may define no more than one Realm. (markt)
+      </fix>
+      <fix>
+        <bug>55956</bug>: Where available, displayed the forwarded remote IP
+        address available on the status page of the Manager web application.
+        (markt)
       </fix>
     </changelog>
   </subsection>

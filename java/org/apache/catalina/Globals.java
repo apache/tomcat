@@ -258,6 +258,19 @@ public final class Globals {
 
 
     /**
+     * The request attribute set by the RemoteIpFilter, RemoteIpValve (and may
+     * be set by other similar components) that identifies for the connector the
+     * remote IP address claimed to be associated with this request when a
+     * request is received via one or more proxies. It is typically provided via
+     * the X-Forwarded-For HTTP header.
+     *
+     * Duplicated here for neater code in the catalina packages.
+     */
+    public static final String REMOTE_ADDR_ATTRIBUTE =
+            org.apache.coyote.Constants.REMOTE_ADDR_ATTRIBUTE;
+
+
+    /**
      *
      */
     public static final String ASYNC_SUPPORTED_ATTR =
