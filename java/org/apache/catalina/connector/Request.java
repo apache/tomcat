@@ -203,12 +203,6 @@ public class Request
      */
     protected boolean sslAttributesParsed = false;
 
-    /**
-     * List of read only attributes for this Request.
-     */
-    private final HashMap<String,Object> readOnlyAttributes =
-        new HashMap<String,Object>();
-
 
     /**
      * The preferred Locales associated with this Request.
@@ -1468,12 +1462,6 @@ public class Request
     @Override
     public void removeAttribute(String name) {
         // Remove the specified attribute
-        // Check for read only attribute
-        // requests are per thread so synchronization unnecessary
-        if (readOnlyAttributes.containsKey(name)) {
-            return;
-        }
-
         // Pass special attributes to the native layer
         if (name.startsWith("org.apache.tomcat.")) {
             coyoteRequest.getAttributes().remove(name);
@@ -1521,12 +1509,6 @@ public class Request
         }
 
         // Add or replace the specified attribute
-        // Check for read only attribute
-        // requests are per thread so synchronization unnecessary
-        if (readOnlyAttributes.containsKey(name)) {
-            return;
-        }
-
         // Do the security check before any updates are made
         if (Globals.IS_SECURITY_ENABLED &&
                 name.equals(Globals.SENDFILE_FILENAME_ATTR)) {
