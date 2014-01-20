@@ -128,4 +128,15 @@ public final class Constants {
      */
     public static final String SENDFILE_FILE_END_ATTR =
         "org.apache.tomcat.sendfile.end";
+
+
+    /**
+     * The request attribute set by the RemoteIpFilter, RemoteIpValve (and may
+     * be set by other similar components) that identifies for the connector the
+     * remote IP address claimed to be associated with this request when a
+     * request is received via one or more proxies. It is typically provided via
+     * the X-Forwarded-For HTTP header.
+     */
+    public static final String REMOTE_ADDR_ATTRIBUTE =
+            "org.apache.tomcat.remoteAddr";
 }

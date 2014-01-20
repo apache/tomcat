@@ -42,6 +42,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.AccessLog;
+import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -827,6 +828,8 @@ public class RemoteIpFilter implements Filter {
             if (requestAttributesEnabled) {
                 request.setAttribute(AccessLog.REMOTE_ADDR_ATTRIBUTE,
                         xRequest.getRemoteAddr());
+                request.setAttribute(Globals.REMOTE_ADDR_ATTRIBUTE,
+                        xRequest.getRemoteAddr());
                 request.setAttribute(AccessLog.REMOTE_HOST_ATTRIBUTE,
                         xRequest.getRemoteHost());
                 request.setAttribute(AccessLog.PROTOCOL_ATTRIBUTE,
@@ -1114,6 +1117,7 @@ public class RemoteIpFilter implements Filter {
      * <li>org.apache.catalina.AccessLog.RemoteHost</li>
      * <li>org.apache.catalina.AccessLog.Protocol</li>
      * <li>org.apache.catalina.AccessLog.ServerPort</li>
+     * <li>org.apache.tomcat.remoteAddr</li>
      * </ul>
      *
      * @param requestAttributesEnabled  <code>true</code> causes the attributes
