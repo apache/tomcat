@@ -21,10 +21,14 @@ import java.io.File;
 
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.webresources.StandardRoot;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -445,6 +449,32 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "04-Hello JUnit from Tomcat");
         assertEcho(result, "05-Hello JUnit from Tomcat");
     }
+
+    @Test
+    public void testBug56029() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        // app dir is relative to server home
+        Context ctxt = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        // This test needs the JSTL libraries
+        File lib = new File("webapps/examples/WEB-INF/lib");
+        ctxt.setResources(new StandardRoot(ctxt));
+        ctxt.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/lib",
+                lib.getAbsolutePath(), null, "/");
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/bug5nnnn/bug56029.jspx");
+
+        String result = res.toString();
+
+        Assert.assertTrue(result.contains("[1]"));
+    }
+
 
     // Assertion for text contained with <p></p>, e.g. printed by tags:echo
     private static void assertEcho(String result, String expected) {

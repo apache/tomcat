@@ -161,7 +161,7 @@ public class ELParser {
                 }
             }
             if (curToken.toChar() == '(') {
-                ELexpr.add(new ELNode.Function(s1, s2));
+                ELexpr.add(new ELNode.Function(s1.trim(), s2.trim()));
                 return true;
             }
             curToken = original;
