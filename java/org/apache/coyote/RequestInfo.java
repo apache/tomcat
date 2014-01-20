@@ -98,6 +98,18 @@ public class RequestInfo  {
         return req.remoteAddr().toString();
     }
 
+    /**
+     * Obtain the remote address for this connection as reported by an
+     * intermediate proxy (if any).
+     */
+    public String getRemoteAddrForwarded() {
+        String remoteAddrProxy = (String) req.getAttribute(Constants.REMOTE_ADDR_ATTRIBUTE);
+        if (remoteAddrProxy == null) {
+            return getRemoteAddr();
+        }
+        return remoteAddrProxy;
+    }
+
     public int getContentLength() {
         return req.getContentLength();
     }

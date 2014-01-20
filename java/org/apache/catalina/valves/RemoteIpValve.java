@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 
 import org.apache.catalina.AccessLog;
+import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.juli.logging.Log;
@@ -662,6 +663,8 @@ public class RemoteIpValve extends ValveBase {
         if (requestAttributesEnabled) {
             request.setAttribute(AccessLog.REMOTE_ADDR_ATTRIBUTE,
                     request.getRemoteAddr());
+            request.setAttribute(Globals.REMOTE_ADDR_ATTRIBUTE,
+                    request.getRemoteAddr());
             request.setAttribute(AccessLog.REMOTE_HOST_ATTRIBUTE,
                     request.getRemoteHost());
             request.setAttribute(AccessLog.PROTOCOL_ATTRIBUTE,
@@ -820,6 +823,7 @@ public class RemoteIpValve extends ValveBase {
      * <li>org.apache.catalina.AccessLog.RemoteHost</li>
      * <li>org.apache.catalina.AccessLog.Protocol</li>
      * <li>org.apache.catalina.AccessLog.ServerPort</li>
+     * <li>org.apache.tomcat.remoteAddr</li>
      * </ul>
      *
      * @param requestAttributesEnabled  <code>true</code> causes the attributes
