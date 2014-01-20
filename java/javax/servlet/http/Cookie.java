@@ -54,52 +54,25 @@ import java.util.ResourceBundle;
  */
 public class Cookie implements Cloneable, Serializable {
 
-    private static final BitSet allowed;
+    private static final CookieNameValidator validation;
     static {
-        boolean STRICT_SERVLET_COMPLIANCE =
-                Boolean.getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
+        boolean strictNaming;
+        String prop = System.getProperty("org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING");
+        if (prop != null) {
+            strictNaming = Boolean.parseBoolean(prop);
+        } else {
+            strictNaming = Boolean.getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
+        }
 
-        boolean STRICT_NAMING =
-                getBoolean("org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING",
-                        STRICT_SERVLET_COMPLIANCE);
-
-        String separators;
-        if (STRICT_NAMING) {
-            separators = "()<>@,;:\\\"/[]?={} \t"; // separators as defined by RFC2616 2.2
+        if (strictNaming) {
+            validation = new RFC2109Validator();
         }
         else {
-            separators = ",; "; // semi-colon, comma and space as defined by Netscape
-        }
-
-        allowed = new BitSet(128);
-        allowed.set(0x20, 0x7f); // any CHAR except CTLs or separators
-        for (int i = 0; i < separators.length(); i++) {
-            char ch = separators.charAt(i);
-            allowed.clear(ch);
-        }
-
-        // special treatment to allow for FWD_SLASH_IS_SEPARATOR property
-        if (STRICT_NAMING) {
-            boolean FWD_SLASH_IS_SEPARATOR =
-                    getBoolean("org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR",
-                               STRICT_SERVLET_COMPLIANCE);
-            allowed.set('/', !FWD_SLASH_IS_SEPARATOR);
-        }
-    }
-
-    private static boolean getBoolean(String prop, boolean def) {
-        String value = System.getProperty(prop);
-        if (value == null) {
-            return def;
-        } else {
-            return Boolean.parseBoolean(value);
+            validation = new NetscapeValidator();
         }
     }
 
     private static final long serialVersionUID = 1L;
-
-    private static final String LSTRING_FILE = "javax.servlet.http.LocalStrings";
-    private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
     private final String name;
     private String value;
@@ -144,37 +117,9 @@ public class Cookie implements Cloneable, Serializable {
      * @see #setVersion
      */
     public Cookie(String name, String value) {
-        if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException(lStrings.getString("err.cookie_name_blank"));
-        }
-        if (!isToken(name) ||
-                name.equalsIgnoreCase("Comment") ||
-                name.equalsIgnoreCase("Discard") ||
-                name.equalsIgnoreCase("Domain") ||
-                name.equalsIgnoreCase("Expires") ||
-                name.equalsIgnoreCase("Max-Age") ||
-                name.equalsIgnoreCase("Path") ||
-                name.equalsIgnoreCase("Secure") ||
-                name.equalsIgnoreCase("Version") ||
-                name.startsWith("$")) {
-            String errMsg = lStrings.getString("err.cookie_name_is_token");
-            throw new IllegalArgumentException(MessageFormat.format(errMsg, name));
-        }
-
+        validation.validate(name);
         this.name = name;
         this.value = value;
-    }
-
-    private boolean isToken(String possibleToken) {
-        int len = possibleToken.length();
-
-        for (int i = 0; i < len; i++) {
-            char c = possibleToken.charAt(i);
-            if (!allowed.get(c)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -433,5 +378,81 @@ public class Cookie implements Cloneable, Serializable {
      */
     public boolean isHttpOnly() {
         return httpOnly;
+    }
+}
+
+
+class CookieNameValidator {
+    private static final String LSTRING_FILE = "javax.servlet.http.LocalStrings";
+    private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
+
+    protected final BitSet allowed;
+
+    protected CookieNameValidator(String separators) {
+        allowed = new BitSet(128);
+        allowed.set(0x20, 0x7f); // any CHAR except CTLs or separators
+        for (int i = 0; i < separators.length(); i++) {
+            char ch = separators.charAt(i);
+            allowed.clear(ch);
+        }
+    }
+
+    void validate(String name) {
+        if (name == null || name.length() == 0) {
+            throw new IllegalArgumentException(lStrings.getString("err.cookie_name_blank"));
+        }
+        if (!isToken(name) ||
+                name.equalsIgnoreCase("Comment") ||
+                name.equalsIgnoreCase("Discard") ||
+                name.equalsIgnoreCase("Domain") ||
+                name.equalsIgnoreCase("Expires") ||
+                name.equalsIgnoreCase("Max-Age") ||
+                name.equalsIgnoreCase("Path") ||
+                name.equalsIgnoreCase("Secure") ||
+                name.equalsIgnoreCase("Version") ||
+                name.startsWith("$")) {
+            String errMsg = lStrings.getString("err.cookie_name_is_token");
+            throw new IllegalArgumentException(MessageFormat.format(errMsg, name));
+        }
+    }
+
+    private boolean isToken(String possibleToken) {
+        int len = possibleToken.length();
+
+        for (int i = 0; i < len; i++) {
+            char c = possibleToken.charAt(i);
+            if (!allowed.get(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+class NetscapeValidator extends CookieNameValidator {
+    private static final String NETSCAPE_SEPARATORS = ",; ";
+
+    NetscapeValidator() {
+        super(NETSCAPE_SEPARATORS);
+    }
+}
+
+class RFC2109Validator extends CookieNameValidator {
+    private static final String RFC2616_SEPARATORS = "()<>@,;:\\\"/[]?={} \t";
+
+    RFC2109Validator() {
+        super(RFC2616_SEPARATORS);
+
+        // special treatment to allow for FWD_SLASH_IS_SEPARATOR property
+        boolean allowSlash;
+        String prop = System.getProperty("org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
+        if (prop != null) {
+            allowSlash = !Boolean.parseBoolean(prop);
+        } else {
+            allowSlash = !Boolean.getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
+        }
+        if (allowSlash) {
+            allowed.set('/');
+        }
     }
 }
