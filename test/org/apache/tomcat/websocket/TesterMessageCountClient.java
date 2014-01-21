@@ -173,6 +173,24 @@ public class TesterMessageCountClient {
         }
     }
 
+    public static class SleepingText implements MessageHandler.Whole<String> {
+
+        private final int sleep;
+
+        public SleepingText(int sleep) {
+            this.sleep = sleep;
+        }
+
+        @Override
+        public void onMessage(String message) {
+            try {
+                Thread.sleep(sleep);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        }
+    }
+
     public abstract static class AsyncHandler<T>
             implements MessageHandler.Partial<T> {
 
