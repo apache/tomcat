@@ -17,10 +17,14 @@
 package org.apache.tomcat.websocket;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletContextEvent;
 import javax.websocket.DeploymentException;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
 import javax.websocket.RemoteEndpoint.Basic;
 import javax.websocket.Session;
 import javax.websocket.server.ServerContainer;
@@ -39,6 +43,7 @@ public class TesterFirehoseServer {
     public static final String MESSAGE;
     public static final int MESSAGE_SIZE = 1024;
     public static final int WAIT_TIME_MILLIS = 60000;
+    public static final int SEND_TIME_OUT_MILLIS = 5000;
 
     static {
         StringBuilder sb = new StringBuilder(MESSAGE_SIZE);
@@ -71,7 +76,23 @@ public class TesterFirehoseServer {
     @ServerEndpoint(Config.PATH)
     public static class Endpoint {
 
+        private static AtomicInteger openConnectionCount = new AtomicInteger(0);
+        private static AtomicInteger errorCount = new AtomicInteger(0);
+
         private volatile boolean started = false;
+
+        public static int getOpenConnectionCount() {
+            return openConnectionCount.intValue();
+        }
+
+        public static int getErrorCount() {
+            return errorCount.intValue();
+        }
+
+        @OnOpen
+        public void onOpen() {
+            openConnectionCount.incrementAndGet();
+        }
 
         @OnMessage
         public void onMessage(Session session,
@@ -90,7 +111,7 @@ public class TesterFirehoseServer {
 
             session.getUserProperties().put(
                     "org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT",
-                    Long.valueOf(WAIT_TIME_MILLIS));
+                    Long.valueOf(SEND_TIME_OUT_MILLIS));
 
             Basic remote = session.getBasicRemote();
             remote.setBatchingAllowed(true);
@@ -101,6 +122,16 @@ public class TesterFirehoseServer {
 
             // Ensure remaining messages are flushed
             remote.setBatchingAllowed(false);
+        }
+
+        @OnError
+        public void onError(@SuppressWarnings("unused") Throwable t) {
+            errorCount.incrementAndGet();
+        }
+
+        @OnClose
+        public void onClose() {
+            openConnectionCount.decrementAndGet();
         }
     }
 }

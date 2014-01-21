@@ -108,6 +108,10 @@
         <code>ServerEndpointConfig.Configurator.modifyHandshake()</code>.
         (markt)
       </fix>
+      <fix>
+        <bug>56032</bug>: Ensure that the WebSocket connection is closed after
+        an IO error or an interrupt while sending a WebSocket message. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -466,7 +466,13 @@ public class WsSession implements Session {
         // 125 is maximum size for the payload of a control message
         ByteBuffer msg = ByteBuffer.allocate(125);
         CloseCode closeCode = closeReason.getCloseCode();
-        msg.putShort((short) closeCode.getCode());
+        // CLOSED_ABNORMALLY should not be put on the wire
+        if (closeCode == CloseCodes.CLOSED_ABNORMALLY) {
+            // PROTOCOL_ERROR is probably better than GOING_AWAY here
+            msg.putShort((short) CloseCodes.PROTOCOL_ERROR.getCode());
+        } else {
+            msg.putShort((short) closeCode.getCode());
+        }
 
         String reason = closeReason.getReasonPhrase();
         if (reason != null && reason.length() > 0) {
