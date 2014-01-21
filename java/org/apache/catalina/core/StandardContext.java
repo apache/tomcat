@@ -5015,9 +5015,7 @@ public class StandardContext extends ContainerBase
         ClassLoader oldCCL = bindThread();
 
         try {
-
             if (ok) {
-
                 // Start our subordinate components, if any
                 Loader loader = getLoader();
                 if ((loader != null) && (loader instanceof Lifecycle))
@@ -5104,40 +5102,31 @@ public class StandardContext extends ContainerBase
                 }
             }
 
-        } finally {
-            // Unbinding thread
-            unbindThread(oldCCL);
-        }
-
-        if (!getConfigured()) {
-            log.error( "Error getConfigured");
-            ok = false;
-        }
-
-        // We put the resources into the servlet context
-        if (ok)
-            getServletContext().setAttribute
-                (Globals.RESOURCES_ATTR, getResources());
-
-        // Binding thread
-        oldCCL = bindThread();
-
-        if (ok ) {
-            if (getInstanceManager() == null) {
-                javax.naming.Context context = null;
-                if (isUseNaming() && getNamingContextListener() != null) {
-                    context = getNamingContextListener().getEnvContext();
-                }
-                Map<String, Map<String, String>> injectionMap = buildInjectionMap(
-                        getIgnoreAnnotations() ? new NamingResourcesImpl(): getNamingResources());
-                setInstanceManager(new DefaultInstanceManager(context,
-                        injectionMap, this, this.getClass().getClassLoader()));
-                getServletContext().setAttribute(
-                        InstanceManager.class.getName(), getInstanceManager());
+            if (!getConfigured()) {
+                log.error( "Error getConfigured");
+                ok = false;
             }
-        }
 
-        try {
+            // We put the resources into the servlet context
+            if (ok)
+                getServletContext().setAttribute
+                    (Globals.RESOURCES_ATTR, getResources());
+
+            if (ok ) {
+                if (getInstanceManager() == null) {
+                    javax.naming.Context context = null;
+                    if (isUseNaming() && getNamingContextListener() != null) {
+                        context = getNamingContextListener().getEnvContext();
+                    }
+                    Map<String, Map<String, String>> injectionMap = buildInjectionMap(
+                            getIgnoreAnnotations() ? new NamingResourcesImpl(): getNamingResources());
+                    setInstanceManager(new DefaultInstanceManager(context,
+                            injectionMap, this, this.getClass().getClassLoader()));
+                    getServletContext().setAttribute(
+                            InstanceManager.class.getName(), getInstanceManager());
+                }
+            }
+
             // Create context attributes that will be required
             if (ok) {
                 getServletContext().setAttribute(
