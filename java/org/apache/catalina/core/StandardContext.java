@@ -5356,33 +5356,27 @@ public class StandardContext extends ContainerBase
         ClassLoader oldCCL = bindThread();
 
         try {
-
             // Stop our child containers, if any
             final Container[] children = findChildren();
 
-            ClassLoader old = bindThread();
-            try {
-                // Stop ContainerBackgroundProcessor thread
-                threadStop();
+            // Stop ContainerBackgroundProcessor thread
+            threadStop();
 
-                for (int i = 0; i < children.length; i++) {
-                    children[i].stop();
-                }
-
-                // Stop our filters
-                filterStop();
-
-                Manager manager = getManager();
-                if (manager != null && manager instanceof Lifecycle &&
-                        ((Lifecycle) manager).getState().isAvailable()) {
-                    ((Lifecycle) manager).stop();
-                }
-
-                // Stop our application listeners
-                listenerStop();
-            } finally{
-                unbindThread(old);
+            for (int i = 0; i < children.length; i++) {
+                children[i].stop();
             }
+
+            // Stop our filters
+            filterStop();
+
+            Manager manager = getManager();
+            if (manager != null && manager instanceof Lifecycle &&
+                    ((Lifecycle) manager).getState().isAvailable()) {
+                ((Lifecycle) manager).stop();
+            }
+
+            // Stop our application listeners
+            listenerStop();
 
             // Finalize our character set mapper
             setCharsetMapper(null);
