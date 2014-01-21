@@ -124,7 +124,31 @@ public class TestELParser {
 
     @Test
     public void testTernary07() throws JasperException {
-        doTestParser(" $ { do:it( a eq 1 ? true : false, y ) } ");
+        doTestParser(" ${ do:it( a eq 1 ? true : false, y ) } ");
+    }
+
+    
+    @Test
+    public void testTernary08() throws JasperException {
+        doTestParser(" ${ do:it ( a eq 1 ? true : false, y ) } ");
+    }
+
+
+    @Test
+    public void testTernary09() throws JasperException {
+        doTestParser(" ${ do : it ( a eq 1 ? true : false, y ) } ");
+    }
+
+
+    @Test
+    public void testTernary10() throws JasperException {
+        doTestParser(" ${!empty my:link(foo)} ");
+    }
+
+
+    @Test
+    public void testTernaryBug56031() throws JasperException {
+        doTestParser("${my:link(!empty registration ? registration : '/test/registration')}");
     }
 
 

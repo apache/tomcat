@@ -461,7 +461,7 @@ public class TestELInJsp extends TomcatBaseTest {
 
         String result = res.toString();
 
-        Assert.assertTrue(result.contains("[1]"));
+        Assert.assertTrue(result.contains("[1]:[1]"));
     }
 
 

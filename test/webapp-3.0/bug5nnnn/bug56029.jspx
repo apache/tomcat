@@ -20,6 +20,7 @@
  xmlns:fn="http://java.sun.com/jsp/jstl/functions">
  <jsp:directive.page contentType="text/html; charset=UTF-8" session="false" />
  <c:set var="list" value="%=new java.util.ArrayList() %" />
- <c:set var="limit" value="${1 + fn:length(list)}" />
- [${limit}]
+ <c:set var="limitA" value="${1 + fn:length(list)}" />
+ <c:set var="limitB" value="${1 + fn : length ( list ) }" />
+ [${limitA}]:[${limitB}]
 </jsp:root>

@@ -122,14 +122,16 @@ abstract class ELNode {
 
         private String prefix;
         private String name;
+        private final String originalText;
         private String uri;
         private FunctionInfo functionInfo;
         private String methodName;
         private String[] parameters;
 
-        Function(String prefix, String name) {
+        Function(String prefix, String name, String originalText) {
             this.prefix = prefix;
             this.name = name;
+            this.originalText = originalText;
         }
 
         @Override
@@ -143,6 +145,10 @@ abstract class ELNode {
 
         public String getName() {
             return name;
+        }
+
+        public String getOriginalText() {
+            return originalText;
         }
 
         public void setUri(String uri) {

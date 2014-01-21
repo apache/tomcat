@@ -38,7 +38,7 @@ public class ELParser {
 
     private Token curToken;  // current token
     private Token prevToken; // previous token
-    private StringBuilder whiteSpace = new StringBuilder();
+    private String whiteSpace = "";
 
     private ELNode.Nodes expr;
 
@@ -98,7 +98,9 @@ public class ELParser {
      * 
      * @return An ELNode.Nodes representing the EL expression
      * 
-     * TODO: Can this be refactored to use the standard EL implementation?
+     * Note: This can not be refactored to use the standard EL implementation as
+     *       the EL API does not provide the level of access required to the
+     *       parsed expression.
      */
     private ELNode.Nodes parseEL() {
 
@@ -117,7 +119,7 @@ public class ELParser {
                 // Output whatever is in buffer
                 if (buf.length() > 0) {
                     ELexpr.add(new ELNode.ELText(buf.toString()));
-                    buf = new StringBuilder();
+                    buf.setLength(0);
                 }
                 if (!parseFunction()) {
                     ELexpr.add(new ELNode.ELText(curToken.toString()));
@@ -140,12 +142,13 @@ public class ELParser {
      * arguments
      */
     private boolean parseFunction() {
-        if (!(curToken instanceof Id) || isELReserved(curToken.toString()) ||
+        if (!(curToken instanceof Id) || isELReserved(curToken.toTrimmedString()) ||
                 prevToken instanceof Char && prevToken.toChar() == '.') {
             return false;
         }
         String s1 = null; // Function prefix
-        String s2 = curToken.toString(); // Function name
+        String s2 = curToken.toTrimmedString(); // Function name
+        int start = index - curToken.toString().length();
         Token original = curToken;
         if (hasNext()) {
             int mark = getIndex() - whiteSpace.length();
@@ -155,7 +158,7 @@ public class ELParser {
                     Token t2 = nextToken();
                     if (t2 instanceof Id) {
                         s1 = s2.trim();
-                        s2 = t2.toString();
+                        s2 = t2.toTrimmedString();
                         if (hasNext()) {
                             curToken = nextToken();
                         }
@@ -163,7 +166,7 @@ public class ELParser {
                 }
             }
             if (curToken.toChar() == '(') {
-                ELexpr.add(new ELNode.Function(s1, s2.trim()));
+                ELexpr.add(new ELNode.Function(s1, s2, expression.substring(start, index - 1)));
                 return true;
             }
             curToken = original;
@@ -248,28 +251,28 @@ public class ELParser {
     }
 
     private String getAndResetWhiteSpace() {
-        String result = whiteSpace.toString();
-        whiteSpace = new StringBuilder();
+        String result = whiteSpace;
+        whiteSpace = "";
         return result;
     }
 
     /*
+     * Implementation note: This method assumes that it is always preceded by a
+     * call to hasNext() in order for whitespace handling to be correct.
+     *
      * @return The next token in the EL expression buffer.
      */
     private Token nextToken() {
         prevToken = curToken;
-        skipSpaces();
         if (hasNextChar()) {
             char ch = nextChar();
             if (Character.isJavaIdentifierStart(ch)) {
-                StringBuilder buf = new StringBuilder();
-                buf.append(ch);
+                int start = index - 1;
                 while ((ch = peekChar()) != -1
                         && Character.isJavaIdentifierPart(ch)) {
-                    buf.append(ch);
                     nextChar();
                 }
-                return new Id(getAndResetWhiteSpace(), buf.toString());
+                return new Id(getAndResetWhiteSpace(), expression.substring(start, index));
             }
 
             if (ch == '\'' || ch == '"') {
@@ -313,13 +316,14 @@ public class ELParser {
      */
 
     private void skipSpaces() {
+        int start = index;
         while (hasNextChar()) {
             char c = expression.charAt(index);
             if (c > ' ')
                 break;
-            whiteSpace.append(c);
             index++;
         }
+        whiteSpace = expression.substring(start, index);
     }
 
     private boolean hasNextChar() {
@@ -368,6 +372,10 @@ public class ELParser {
             return whiteSpace;
         }
 
+        String toTrimmedString() {
+            return "";
+        }
+
         String getWhiteSpace() {
             return whiteSpace;
         }
@@ -387,6 +395,11 @@ public class ELParser {
         @Override
         public String toString() {
             return whiteSpace + id;
+        }
+
+        @Override
+        String toTrimmedString() {
+            return id;
         }
     }
 
@@ -411,6 +424,11 @@ public class ELParser {
         public String toString() {
             return whiteSpace + ch;
         }
+
+        @Override
+        String toTrimmedString() {
+            return "" + ch;
+        }
     }
 
     /*
@@ -428,6 +446,11 @@ public class ELParser {
         @Override
         public String toString() {
             return whiteSpace + value;
+        }
+
+        @Override
+        String toTrimmedString() {
+            return value;
         }
     }
 
@@ -454,11 +477,7 @@ public class ELParser {
 
         @Override
         public void visit(Function n) throws JasperException {
-            if (n.getPrefix() != null) {
-                output.append(n.getPrefix());
-                output.append(':');
-            }
-            output.append(n.getName());
+            output.append(n.getOriginalText());
             output.append('(');
         }
 
