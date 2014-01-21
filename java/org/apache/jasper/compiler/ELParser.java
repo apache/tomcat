@@ -155,7 +155,7 @@ public class ELParser {
                 if (hasNext()) {
                     Token t2 = nextToken();
                     if (t2 instanceof Id) {
-                        s1 = s2.trim();
+                        s1 = s2;
                         s2 = t2.toTrimmedString();
                         if (hasNext()) {
                             curToken = nextToken();
