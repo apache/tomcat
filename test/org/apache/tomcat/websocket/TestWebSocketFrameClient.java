@@ -142,7 +142,7 @@ public class TestWebSocketFrameClient extends TomcatBaseTest {
         // should be a lot faster.
         System.out.println("Waiting for connection to be closed");
         count = 0;
-        limit = 10000;
+        limit = 100;
         while (TesterFirehoseServer.Endpoint.getOpenConnectionCount() != 0 && count < limit) {
             Thread.sleep(100);
             count ++;
