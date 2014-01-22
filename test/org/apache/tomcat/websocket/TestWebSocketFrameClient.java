@@ -100,8 +100,7 @@ public class TestWebSocketFrameClient extends TomcatBaseTest {
     public void testBug56032() throws Exception {
         // TODO Investigate options to get this test to pass with the HTTP BIO
         //      connector.
-        if (getTomcatInstance().getConnector().getProtocol().equals(
-                "org.apache.coyote.http11.Http11Protocol")) {
+        if (getTomcatInstance().getConnector().getProtocol().equals("HTTP/1.1")) {
             return;
         }
 
