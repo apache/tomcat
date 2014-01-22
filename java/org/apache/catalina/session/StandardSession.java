@@ -53,6 +53,7 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.SessionEvent;
 import org.apache.catalina.SessionListener;
+import org.apache.catalina.ThreadBindingListener;
 import org.apache.catalina.TomcatPrincipal;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -802,20 +803,9 @@ public class StandardSession implements HttpSession, Session, Serializable {
             // The call to expire() may not have been triggered by the webapp.
             // Make sure the webapp's class loader is set when calling the
             // listeners
-            ClassLoader oldTccl = null;
-            if (context.getLoader() != null &&
-                    context.getLoader().getClassLoader() != null) {
-                oldTccl = Thread.currentThread().getContextClassLoader();
-                if (Globals.IS_SECURITY_ENABLED) {
-                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                            context.getLoader().getClassLoader());
-                    AccessController.doPrivileged(pa);
-                } else {
-                    Thread.currentThread().setContextClassLoader(
-                            context.getLoader().getClassLoader());
-                }
-            }
+            ClassLoader oldContextClassLoader = null;
             try {
+                oldContextClassLoader = bindThread(context);
                 if (notify) {
                     Object listeners[] = context.getApplicationLifecycleListeners();
                     if (listeners != null && listeners.length > 0) {
@@ -848,15 +838,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
                     }
                 }
             } finally {
-                if (oldTccl != null) {
-                    if (Globals.IS_SECURITY_ENABLED) {
-                        PrivilegedAction<Void> pa =
-                            new PrivilegedSetTccl(oldTccl);
-                        AccessController.doPrivileged(pa);
-                    } else {
-                        Thread.currentThread().setContextClassLoader(oldTccl);
-                    }
-                }
+                unbindThread(context, oldContextClassLoader);
             }
 
             if (ACTIVITY_CHECK) {
@@ -894,6 +876,99 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
         }
 
+    }
+
+
+    protected ClassLoader bindThread(Context context) {
+
+        ClassLoader contextClassLoader = null;
+        ThreadBindingListener threadBindingListener = null;
+        if (context != null) {
+            if (context.getLoader() != null && context.getLoader().getClassLoader() != null) {
+                contextClassLoader = context.getLoader().getClassLoader();
+            }
+            threadBindingListener = context.getThreadBindingListener();
+        }
+        if (threadBindingListener == null || contextClassLoader == null) {
+            return null;
+        }
+
+        if (Globals.IS_SECURITY_ENABLED) {
+            return AccessController.doPrivileged(new PrivilegedBind(contextClassLoader, threadBindingListener));
+        } else {
+            ClassLoader oldContextClassLoader =
+                    Thread.currentThread().getContextClassLoader();
+            if (oldContextClassLoader == contextClassLoader) {
+                return null;
+            } else {
+                Thread.currentThread().setContextClassLoader(contextClassLoader);
+                threadBindingListener.bind();
+                return oldContextClassLoader;
+            }
+        }
+
+    }
+
+    protected class PrivilegedBind implements PrivilegedAction<ClassLoader> {
+        private ClassLoader contextClassLoader;
+        private ThreadBindingListener threadBindingListener;
+
+        PrivilegedBind(ClassLoader contextClassLoader, ThreadBindingListener threadBindingListener) {
+            this.contextClassLoader = contextClassLoader;
+            this.threadBindingListener = threadBindingListener;
+        }
+
+        @Override
+        public ClassLoader run() {
+            ClassLoader oldContextClassLoader =
+                    Thread.currentThread().getContextClassLoader();
+            if (oldContextClassLoader == contextClassLoader) {
+                return null;
+            } else {
+                Thread.currentThread().setContextClassLoader(contextClassLoader);
+                threadBindingListener.bind();
+                return oldContextClassLoader;
+            }
+        }
+    }
+
+    protected void unbindThread(Context context, ClassLoader oldContextClassLoader) {
+
+        if (oldContextClassLoader == null) {
+            return;
+        }
+        ThreadBindingListener threadBindingListener = null;
+        if (context != null) {
+            threadBindingListener = context.getThreadBindingListener();
+        }
+        if (threadBindingListener == null) {
+            return;
+        }
+
+        if (Globals.IS_SECURITY_ENABLED) {
+            AccessController.doPrivileged(new PrivilegedUnbind(oldContextClassLoader, threadBindingListener));
+        } else {
+            threadBindingListener.unbind();
+            Thread.currentThread().setContextClassLoader(oldContextClassLoader);
+        }
+
+    }
+
+    protected class PrivilegedUnbind implements PrivilegedAction<Void> {
+        private ClassLoader oldContextClassLoader;
+        private ThreadBindingListener threadBindingListener;
+
+        PrivilegedUnbind(ClassLoader oldContextClassLoader, ThreadBindingListener threadBindingListener) {
+            this.oldContextClassLoader = oldContextClassLoader;
+            this.threadBindingListener = threadBindingListener;
+        }
+
+        @Override
+        public Void run() {
+            threadBindingListener.unbind();
+            Thread.currentThread().setContextClassLoader(oldContextClassLoader);
+            return null;
+        }
     }
 
 
@@ -1837,22 +1912,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
     }
 
-
-    private static class PrivilegedSetTccl
-    implements PrivilegedAction<Void> {
-
-        private ClassLoader cl;
-
-        PrivilegedSetTccl(ClassLoader cl) {
-            this.cl = cl;
-        }
-
-        @Override
-        public Void run() {
-            Thread.currentThread().setContextClassLoader(cl);
-            return null;
-        }
-    }
 
 }
 
