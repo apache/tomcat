@@ -40,17 +40,15 @@ public class ELParser {
     private Token prevToken; // previous token
     private String whiteSpace = "";
 
-    private ELNode.Nodes expr;
+    private final ELNode.Nodes expr;
 
     private ELNode.Nodes ELexpr;
 
     private int index; // Current index of the expression
 
-    private String expression; // The EL expression
+    private final String expression; // The EL expression
     
     private char type;
-
-    private boolean escapeBS; // is '\' an escape char in text outside EL?
 
     private final boolean isDeferredSyntaxAllowedAsLiteral;
 
@@ -211,8 +209,7 @@ public class ELParser {
                 prev = 0;
                 if (ch == '\\') {
                     buf.append('\\');
-                    if (!escapeBS)
-                        prev = '\\';
+                    prev = '\\';
                 } else if (ch == '$'
                         || (!isDeferredSyntaxAllowedAsLiteral && ch == '#')) {
                     buf.append(ch);

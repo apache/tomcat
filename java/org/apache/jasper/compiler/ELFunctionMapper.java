@@ -74,7 +74,7 @@ public class ELFunctionMapper {
          * Use a global name map to facilitate reuse of function maps.
          * The key used is prefix:function:uri.
          */
-        private HashMap<String, String> gMap = new HashMap<String, String>();
+        private final HashMap<String, String> gMap = new HashMap<String, String>();
 
         @Override
         public void visit(Node.ParamAction n) throws JasperException {
@@ -163,9 +163,8 @@ public class ELFunctionMapper {
 
             // Only care about functions in ELNode's
             class Fvisitor extends ELNode.Visitor {
-                ArrayList<ELNode.Function> funcs =
-                    new ArrayList<ELNode.Function>();
-                HashMap<String, String> keyMap = new HashMap<String, String>();
+                final ArrayList<ELNode.Function> funcs = new ArrayList<ELNode.Function>();
+                final HashMap<String, String> keyMap = new HashMap<String, String>();
                 @Override
                 public void visit(ELNode.Function n) throws JasperException {
                     String key = n.getPrefix() + ":" + n.getName();
