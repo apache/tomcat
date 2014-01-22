@@ -265,8 +265,9 @@ public class ELParser {
             char ch = nextChar();
             if (Character.isJavaIdentifierStart(ch)) {
                 int start = index - 1;
-                while ((ch = peekChar()) != -1
-                        && Character.isJavaIdentifierPart(ch)) {
+                while (index < expression.length() &&
+                        Character.isJavaIdentifierPart(
+                                ch = expression.charAt(index))) {
                     nextChar();
                 }
                 return new Id(getAndResetWhiteSpace(), expression.substring(start, index));
@@ -332,13 +333,6 @@ public class ELParser {
             return (char) -1;
         }
         return expression.charAt(index++);
-    }
-
-    private char peekChar() {
-        if (index >= expression.length()) {
-            return (char) -1;
-        }
-        return expression.charAt(index);
     }
 
     private int getIndex() {
