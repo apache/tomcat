@@ -832,20 +832,10 @@ public abstract class AbstractEndpoint {
     public String getSslProtocol() { return sslProtocol;}
     public void setSslProtocol(String s) { sslProtocol = s;}
 
-    // Note: Some implementations use the comma separated string, some use
-    // the array
     private String ciphers = null;
-    private String[] ciphersarr = new String[0];
-    public String[] getCiphersArray() { return this.ciphersarr;}
     public String getCiphers() { return ciphers;}
     public void setCiphers(String s) {
         ciphers = s;
-        if ( s == null ) ciphersarr = new String[0];
-        else {
-            StringTokenizer t = new StringTokenizer(s,",");
-            ciphersarr = new String[t.countTokens()];
-            for (int i=0; i<ciphersarr.length; i++ ) ciphersarr[i] = t.nextToken();
-        }
     }
 
     private String keyAlias = null;
