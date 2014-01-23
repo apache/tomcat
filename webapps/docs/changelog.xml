@@ -200,6 +200,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Extras">
+    <changelog>
+      <fix>
+        <bug>56039</bug>: Enable the JmxRemoteLifecycleListener to work over
+        SSL. Patch by esengstrom. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
