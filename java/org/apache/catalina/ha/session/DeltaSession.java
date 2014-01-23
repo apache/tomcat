@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.ha.session;
 
 import java.io.Externalizable;
@@ -41,7 +40,6 @@ import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.ha.ClusterSession;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.session.ManagerBase;
-import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.catalina.tribes.tipis.ReplicatedMapEntry;
@@ -147,15 +145,12 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     }
 
     public ClassLoader[] getClassLoaders() {
-        if ( manager instanceof BackupManager ) return ((BackupManager)manager).getClassLoaders();
-        else if ( manager instanceof ClusterManagerBase ) return ((ClusterManagerBase)manager).getClassLoaders();
-        else if ( manager instanceof StandardManager ) {
-            StandardManager sm = (StandardManager)manager;
-            return ClusterManagerBase.getClassLoaders(sm.getContext());
-        } else if ( manager instanceof ManagerBase ) {
+        if (manager instanceof ClusterManagerBase) {
+            return ((ClusterManagerBase)manager).getClassLoaders();
+        } else if (manager instanceof ManagerBase) {
             ManagerBase mb = (ManagerBase)manager;
             return ClusterManagerBase.getClassLoaders(mb.getContext());
-        }//end if
+        }
         return null;
     }
 
