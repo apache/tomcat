@@ -18,8 +18,6 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -99,22 +97,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
         listenersCopy.addAll(listeners);
 
-        ClassLoader oldCL;
-        if (Globals.IS_SECURITY_ENABLED) {
-            PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
-            oldCL = AccessController.doPrivileged(pa);
-        } else {
-            oldCL = Thread.currentThread().getContextClassLoader();
-        }
-        ClassLoader newCL = context.getLoader().getClassLoader();
-
+        ClassLoader oldCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
         try {
-            if (Globals.IS_SECURITY_ENABLED) {
-                PrivilegedAction<Void> pa = new PrivilegedSetTccl(newCL);
-                AccessController.doPrivileged(pa);
-            } else {
-                Thread.currentThread().setContextClassLoader(newCL);
-            }
             for (AsyncListenerWrapper listener : listenersCopy) {
                 try {
                     listener.fireOnComplete(event);
@@ -125,12 +109,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 }
             }
         } finally {
-            if (Globals.IS_SECURITY_ENABLED) {
-                PrivilegedAction<Void> pa = new PrivilegedSetTccl(oldCL);
-                AccessController.doPrivileged(pa);
-            } else {
-                Thread.currentThread().setContextClassLoader(oldCL);
-            }
+            context.unbind(Globals.IS_SECURITY_ENABLED, oldCL);
         }
     }
 
@@ -139,11 +118,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         request.getCoyoteRequest().action(ActionCode.ASYNC_TIMEOUT, result);
 
         if (result.get()) {
-
-            ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
-            ClassLoader newCL = request.getContext().getLoader().getClassLoader();
+            ClassLoader oldCL = context.bind(false, null);
             try {
-                Thread.currentThread().setContextClassLoader(newCL);
                 List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
                 listenersCopy.addAll(listeners);
                 for (AsyncListenerWrapper listener : listenersCopy) {
@@ -157,12 +133,11 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 }
                 request.getCoyoteRequest().action(
                         ActionCode.ASYNC_IS_TIMINGOUT, result);
-                return !result.get();
             } finally {
-                Thread.currentThread().setContextClassLoader(oldCL);
+                context.unbind(false, oldCL);
             }
         }
-        return true;
+        return !result.get();
     }
 
     @Override
@@ -552,32 +527,11 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
         @Override
         public void run() {
-            ClassLoader oldCL;
-            if (Globals.IS_SECURITY_ENABLED) {
-                PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
-                oldCL = AccessController.doPrivileged(pa);
-            } else {
-                oldCL = Thread.currentThread().getContextClassLoader();
-            }
-
+            ClassLoader oldCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
             try {
-                if (Globals.IS_SECURITY_ENABLED) {
-                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                            context.getLoader().getClassLoader());
-                    AccessController.doPrivileged(pa);
-                } else {
-                    Thread.currentThread().setContextClassLoader
-                            (context.getLoader().getClassLoader());
-                }
                 wrapped.run();
             } finally {
-                if (Globals.IS_SECURITY_ENABLED) {
-                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                            oldCL);
-                    AccessController.doPrivileged(pa);
-                } else {
-                    Thread.currentThread().setContextClassLoader(oldCL);
-                }
+                context.unbind(Globals.IS_SECURITY_ENABLED, oldCL);
             }
 
             // Since this runnable is not executing as a result of a socket
@@ -586,30 +540,4 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
         }
     }
-
-
-    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
-
-        private ClassLoader cl;
-
-        PrivilegedSetTccl(ClassLoader cl) {
-            this.cl = cl;
-        }
-
-        @Override
-        public Void run() {
-            Thread.currentThread().setContextClassLoader(cl);
-            return null;
-        }
-    }
-
-    private static class PrivilegedGetTccl
-            implements PrivilegedAction<ClassLoader> {
-
-        @Override
-        public ClassLoader run() {
-            return Thread.currentThread().getContextClassLoader();
-        }
-    }
-
 }

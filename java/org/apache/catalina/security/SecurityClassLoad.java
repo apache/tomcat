@@ -81,12 +81,6 @@ public final class SecurityClassLoad {
             "AsyncContextImpl$1");
         loader.loadClass
             (basePackage +
-            "AsyncContextImpl$PrivilegedGetTccl");
-        loader.loadClass
-            (basePackage +
-            "AsyncContextImpl$PrivilegedSetTccl");
-        loader.loadClass
-            (basePackage +
             "AsyncListenerWrapper");
         loader.loadClass
             (basePackage +
@@ -109,6 +103,12 @@ public final class SecurityClassLoad {
         loader.loadClass
             (basePackage +
              "ApplicationHttpRequest$AttributeNamesEnumerator");
+        loader.loadClass
+            (basePackage +
+             "StandardContext$PrivilegedGetTccl");
+        loader.loadClass
+            (basePackage +
+             "StandardContext$PrivilegedSetTccl");
     }
 
 
