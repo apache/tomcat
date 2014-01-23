@@ -14,14 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.ha.session;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Loader;
 import org.apache.catalina.ha.CatalinaCluster;
@@ -34,9 +32,7 @@ import org.apache.catalina.tribes.io.ReplicationStream;
  * @author Filip Hanik
  * @version $Id$
  */
-
-public abstract class ClusterManagerBase extends ManagerBase
-        implements ClusterManager {
+public abstract class ClusterManagerBase extends ManagerBase implements ClusterManager {
 
     /**
      * A reference to the cluster
@@ -127,18 +123,20 @@ public abstract class ClusterManagerBase extends ManagerBase
         return sessionAttributePattern.matcher(name).matches();
     }
 
-    public static ClassLoader[] getClassLoaders(Container container) {
-        Loader loader = null;
+    public static ClassLoader[] getClassLoaders(Context context) {
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        Loader loader = context.getLoader();
         ClassLoader classLoader = null;
-        if (container instanceof Context) {
-            loader = ((Context) container).getLoader();
+        if (loader != null) {
+            classLoader = loader.getClassLoader();
         }
-        if (loader != null) classLoader = loader.getClassLoader();
-        else classLoader = Thread.currentThread().getContextClassLoader();
-        if ( classLoader == Thread.currentThread().getContextClassLoader() ) {
+        if (classLoader == null) {
+            classLoader = tccl;
+        }
+        if (classLoader == tccl) {
             return new ClassLoader[] {classLoader};
         } else {
-            return new ClassLoader[] {classLoader,Thread.currentThread().getContextClassLoader()};
+            return new ClassLoader[] {classLoader, tccl};
         }
     }
 
