@@ -139,10 +139,14 @@
   <!-- Embedded JARs & source JARs -->
   <property name="tomcat-embed-core.jar" value="${tomcat.embed}/tomcat-embed-core.jar"/>
   <property name="tomcat-embed-jasper.jar" value="${tomcat.embed}/tomcat-embed-jasper.jar"/>
+  <property name="tomcat-embed-el.jar" value="${tomcat.embed}/tomcat-embed-el.jar"/>
+  <property name="tomcat-embed-websocket.jar" value="${tomcat.embed}/tomcat-embed-websocket.jar"/>
   <property name="tomcat-embed-juli.jar" value="${tomcat.embed}/tomcat-embed-logging-juli.jar"/>
 
   <property name="tomcat-embed-core-sources.jar" value="${tomcat.embed.sources}/tomcat-embed-core-src.jar"/>
   <property name="tomcat-embed-jasper-sources.jar" value="${tomcat.embed.sources}/tomcat-embed-jasper-src.jar"/>
+  <property name="tomcat-embed-el-sources.jar" value="${tomcat.embed.sources}/tomcat-embed-el-src.jar"/>
+  <property name="tomcat-embed-websocket-sources.jar" value="${tomcat.embed.sources}/tomcat-embed-websocket-src.jar"/>
   <property name="tomcat-embed-juli-sources.jar" value="${tomcat.embed.sources}/tomcat-embed-logging-juli-src.jar"/>
   <property name="tomcat-embed-dbcp-sources.jar" value="${tomcat.embed.sources}/tomcat-dbcp-src.jar"/>
 
@@ -415,10 +419,7 @@
     <patternset refid="files.annotations-api" />
     <patternset refid="files.bootstrap" />
     <patternset refid="files.catalina" />
-    <patternset refid="files.el-api" />
     <patternset refid="files.servlet-api" />
-    <patternset refid="files.websocket-api" />
-    <patternset refid="files.tomcat-websocket" />
     <patternset refid="files.tomcat-api" />
     <!-- These pattern sets conflict so include files directly
       <patternset refid="files.tomcat-coyote" />
@@ -434,8 +435,17 @@
 
   <patternset id="files.tomcat-embed-jasper" >
     <patternset refid="files.jasper" />
-    <patternset refid="files.jasper-el" />
     <patternset refid="files.jsp-api" />
+  </patternset>
+
+  <patternset id="files.tomcat-embed-el" >
+    <patternset refid="files.el-api" />
+    <patternset refid="files.jasper-el" />
+  </patternset>
+
+  <patternset id="files.tomcat-embed-websocket" >
+    <patternset refid="files.websocket-api" />
+    <patternset refid="files.tomcat-websocket" />
   </patternset>
 
   <!-- Pattern sets used directly -->
@@ -1179,11 +1189,18 @@
          solution will be required. -->
     <jarIt jarfile="${tomcat-embed-core.jar}"
            filesDir="${tomcat.classes}"
-           filesId="files.tomcat-embed-core"
-           meta-inf="${tomcat.manifests}/tomcat-websocket.jar"/>
+           filesId="files.tomcat-embed-core"/>
     <jarIt jarfile="${tomcat-embed-jasper.jar}"
            filesDir="${tomcat.classes}"
-           filesId="files.tomcat-embed-jasper"/>
+           filesId="files.tomcat-embed-jasper"
+           meta-inf="${tomcat.manifests}/jasper.jar"/>
+    <jarIt jarfile="${tomcat-embed-el.jar}"
+           filesDir="${tomcat.classes}"
+           filesId="files.tomcat-embed-el"/>
+    <jarIt jarfile="${tomcat-embed-websocket.jar}"
+           filesDir="${tomcat.classes}"
+           filesId="files.tomcat-embed-websocket"
+           meta-inf="${tomcat.manifests}/tomcat-websocket.jar"/>
     <jarIt jarfile="${tomcat-embed-juli.jar}"
            filesDir="${tomcat.classes}"
            filesId="files.tomcat-juli"/>
@@ -1204,6 +1221,12 @@
     <jarIt jarfile="${tomcat-embed-jasper-sources.jar}"
            filesDir="java"
            filesId="files.tomcat-embed-jasper"/>
+    <jarIt jarfile="${tomcat-embed-el-sources.jar}"
+           filesDir="java"
+           filesId="files.tomcat-embed-el"/>
+    <jarIt jarfile="${tomcat-embed-websocket-sources.jar}"
+           filesDir="java"
+           filesId="files.tomcat-embed-websocket"/>
     <jarIt jarfile="${tomcat-embed-juli-sources.jar}"
            filesDir="java"
            filesId="files.tomcat-juli"/>
