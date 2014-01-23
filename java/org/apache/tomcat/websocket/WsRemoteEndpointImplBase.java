@@ -234,6 +234,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             } else {
                 f2sh.get(timeout, TimeUnit.MILLISECONDS);
             }
+            payload.clear();
         } catch (InterruptedException | ExecutionException |
                 TimeoutException e) {
             throw new IOException(e);

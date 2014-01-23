@@ -64,14 +64,14 @@ public abstract class PojoEndpointBase extends Endpoint {
                 log.error(sm.getString(
                         "pojoEndpointBase.onOpenFail",
                         pojo.getClass().getName()), e);
-                handleOnOpenError(session, e);
+                handleOnOpenOrCloseError(session, e);
                 return;
             } catch (InvocationTargetException e) {
                 Throwable cause = e.getCause();
-                handleOnOpenError(session, cause);
+                handleOnOpenOrCloseError(session, cause);
                 return;
             } catch (Throwable t) {
-                handleOnOpenError(session, t);
+                handleOnOpenOrCloseError(session, t);
                 return;
             }
         }
@@ -83,7 +83,7 @@ public abstract class PojoEndpointBase extends Endpoint {
     }
 
 
-    private void handleOnOpenError(Session session, Throwable t) {
+    private void handleOnOpenOrCloseError(Session session, Throwable t) {
         // If really fatal - re-throw
         ExceptionUtils.handleThrowable(t);
 
@@ -104,9 +104,9 @@ public abstract class PojoEndpointBase extends Endpoint {
                 methodMapping.getOnClose().invoke(pojo,
                         methodMapping.getOnCloseArgs(pathParameters, session, closeReason));
             } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
                 log.error(sm.getString("pojoEndpointBase.onCloseFail",
                         pojo.getClass().getName()), t);
+                handleOnOpenOrCloseError(session, t);
             }
         }
 
