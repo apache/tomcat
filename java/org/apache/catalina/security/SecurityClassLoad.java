@@ -135,10 +135,6 @@ public final class SecurityClassLoad {
         loader.loadClass
             (basePackage + "StandardSession");
         loader.loadClass
-            (basePackage + "StandardSession$PrivilegedBind");
-        loader.loadClass
-            (basePackage + "StandardSession$PrivilegedUnbind");
-        loader.loadClass
             (basePackage + "StandardSession$1");
         loader.loadClass
             (basePackage + "StandardManager$PrivilegedDoUnload");
