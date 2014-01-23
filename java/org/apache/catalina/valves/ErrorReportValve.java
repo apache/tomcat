@@ -106,8 +106,8 @@ public class ErrorReportValve extends ValveBase {
         Throwable throwable =
                 (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 
-        if (request.isAsyncStarted() && response.getStatus() < 400 &&
-                throwable == null) {
+        if (request.isAsyncStarted() && ((response.getStatus() < 400 &&
+                throwable == null) || request.isAsyncDispatching())) {
             return;
         }
 

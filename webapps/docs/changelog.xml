@@ -112,6 +112,11 @@
         <bug>56032</bug>: Ensure that the WebSocket connection is closed after
         an IO error or an interrupt while sending a WebSocket message. (markt)
       </fix>
+      <fix>
+        <bug>56042</bug>: If a request in async mode has an error but has
+        already been dispatched don't generate an error page in the
+        ErrorReportValve so the dispatch target can handle it. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
