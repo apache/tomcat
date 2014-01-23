@@ -736,6 +736,17 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public ThreadBindingListener getThreadBindingListener() { return null; }
 
     @Override
-    public void setThreadBindingListener(ThreadBindingListener threadBindingListener) { /* NO-OP */ }
+    public void setThreadBindingListener(ThreadBindingListener threadBindingListener) {
+        // NO-OP
+    }
 
+    @Override
+    public ClassLoader bind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
+        return null;
+    }
+
+    @Override
+    public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
+        // NO-OP
+    }
 }

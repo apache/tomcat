@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -5707,16 +5709,7 @@ public class StandardContext extends ContainerBase
      */
     protected ClassLoader bindThread() {
 
-        ClassLoader oldContextClassLoader =
-            Thread.currentThread().getContextClassLoader();
-
-        if (getLoader() != null && getLoader().getClassLoader() != null) {
-            Thread.currentThread().setContextClassLoader
-                (getLoader().getClassLoader());
-        }
-        if (getThreadBindingListener() != null) {
-            getThreadBindingListener().bind();
-        }
+        ClassLoader oldContextClassLoader = bind(false, null);
 
         if (isUseNaming()) {
             try {
@@ -5740,10 +5733,102 @@ public class StandardContext extends ContainerBase
             ContextBindings.unbindThread(this, this);
         }
 
-        if (getThreadBindingListener() != null) {
-            getThreadBindingListener().unbind();
+        unbind(false, oldContextClassLoader);
+    }
+
+
+    @Override
+    public ClassLoader bind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
+        Loader loader = getLoader();
+        ClassLoader webApplicationClassLoader = null;
+        if (loader != null) {
+            webApplicationClassLoader = loader.getClassLoader();
         }
-        Thread.currentThread().setContextClassLoader(oldContextClassLoader);
+
+        if (originalClassLoader == null) {
+            if (usePrivilegedAction) {
+                PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
+                originalClassLoader = AccessController.doPrivileged(pa);
+            } else {
+                originalClassLoader = Thread.currentThread().getContextClassLoader();
+            }
+        }
+
+        if (webApplicationClassLoader == null ||
+                webApplicationClassLoader == originalClassLoader) {
+            // Not possible or not necessary to switch class loaders. Return
+            // null to indicate this.
+            return null;
+        }
+
+        ThreadBindingListener threadBindingListener = getThreadBindingListener();
+
+        if (usePrivilegedAction) {
+            PrivilegedAction<Void> pa = new PrivilegedSetTccl(webApplicationClassLoader);
+            AccessController.doPrivileged(pa);
+        } else {
+            Thread.currentThread().setContextClassLoader(webApplicationClassLoader);
+        }
+        if (threadBindingListener != null) {
+            try {
+                threadBindingListener.bind();
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.error(sm.getString(
+                        "standardContext.threadBindingListenerError", getName()), t);
+            }
+        }
+
+        return originalClassLoader;
+    }
+
+
+    @Override
+    public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
+        if (originalClassLoader == null) {
+            return;
+        }
+
+        if (threadBindingListener != null) {
+            try {
+                threadBindingListener.unbind();
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.error(sm.getString(
+                        "standardContext.threadBindingListenerError", getName()), t);
+            }
+        }
+
+        if (usePrivilegedAction) {
+            PrivilegedAction<Void> pa = new PrivilegedSetTccl(originalClassLoader);
+            AccessController.doPrivileged(pa);
+        } else {
+            Thread.currentThread().setContextClassLoader(originalClassLoader);
+        }
+    }
+
+
+    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
+
+        private ClassLoader cl;
+
+        PrivilegedSetTccl(ClassLoader cl) {
+            this.cl = cl;
+        }
+
+        @Override
+        public Void run() {
+            Thread.currentThread().setContextClassLoader(cl);
+            return null;
+        }
+    }
+
+
+    private static class PrivilegedGetTccl implements PrivilegedAction<ClassLoader> {
+        @Override
+        public ClassLoader run() {
+            return Thread.currentThread().getContextClassLoader();
+        }
     }
 
 
