@@ -646,10 +646,7 @@ public class DeltaManager extends ClusterManagerBase{
      */
     protected void deserializeSessions(byte[] data) throws ClassNotFoundException,IOException {
 
-        // Initialize our internal data structures
-        //sessions.clear(); //should not do this
         // Open an input stream to the specified pathname, if any
-        ClassLoader originalLoader = Thread.currentThread().getContextClassLoader();
         ObjectInputStream ois = null;
         // Load the previously unloaded active sessions
         try {
@@ -702,11 +699,7 @@ public class DeltaManager extends ClusterManagerBase{
                 // ignored
             }
             ois = null;
-            if (originalLoader != null) {
-                Thread.currentThread().setContextClassLoader(originalLoader);
-            }
         }
-
     }
 
 
