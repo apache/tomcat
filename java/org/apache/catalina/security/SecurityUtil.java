@@ -45,8 +45,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Servlet/Filter.
  *
  * This class uses reflection to invoke the methods.
- *
- * @author Jean-Francois Arcand
  */
 
 public final class SecurityUtil{

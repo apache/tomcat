@@ -54,7 +54,6 @@ import org.apache.tomcat.util.ExceptionUtils;
  * object from the web application.
  *
  * @author Remy Maucherat
- * @author Jean-Francois Arcand
  * @version $Id$
  */
 

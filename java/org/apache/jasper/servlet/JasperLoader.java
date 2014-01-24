@@ -32,7 +32,6 @@ import org.apache.jasper.Constants;
  *
  * @author Anil K. Vijendran
  * @author Harish Prabandham
- * @author Jean-Francois Arcand
  */
 public class JasperLoader extends URLClassLoader {
 

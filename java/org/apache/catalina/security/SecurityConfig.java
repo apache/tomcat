@@ -24,7 +24,6 @@ import org.apache.catalina.startup.CatalinaProperties;
  * Util class to protect Catalina against package access and insertion.
  * The code are been moved from Catalina.java
  * @author the Catalina.java authors
- * @author Jean-Francois Arcand
  */
 public final class SecurityConfig{
     private static SecurityConfig singleton = null;

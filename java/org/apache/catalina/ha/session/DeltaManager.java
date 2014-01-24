@@ -59,7 +59,6 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Filip Hanik
  * @author Craig R. McClanahan
- * @author Jean-Francois Arcand
  * @author Peter Rossbach
  * @version $Id$
  */
