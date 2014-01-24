@@ -29,9 +29,7 @@ import java.io.Serializable;
  * to modify the application deployment descriptor itself.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class ApplicationParameter implements Serializable {
 
     private static final long serialVersionUID = 1L;

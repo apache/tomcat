@@ -23,7 +23,6 @@ package org.apache.tomcat.util.descriptor.web;
  * an <code>&lt;env-entry&gt;</code> element in the deployment descriptor.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
 public class ContextEnvironment extends ResourceBase {
 

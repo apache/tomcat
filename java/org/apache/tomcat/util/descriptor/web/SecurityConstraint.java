@@ -49,9 +49,7 @@ import org.apache.tomcat.util.res.StringManager;
  * this class is synchronized.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class SecurityConstraint implements Serializable {
 
     private static final long serialVersionUID = 1L;

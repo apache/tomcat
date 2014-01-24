@@ -25,7 +25,6 @@ package org.apache.tomcat.util.descriptor.web;
  *
  * @author Craig R. McClanahan
  * @author Peter Rossbach (pero@apache.org)
- * @version $Id$
  */
 public class ContextLocalEjb extends ResourceBase {
 

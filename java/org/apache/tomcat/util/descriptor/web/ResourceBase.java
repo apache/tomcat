@@ -28,7 +28,6 @@ import java.util.List;
  * Representation of an Context element
  *
  * @author Peter Rossbach (pero@apache.org)
- * @version $Id$
  */
 public class ResourceBase implements Serializable, Injectable {
 
