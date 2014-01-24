@@ -117,6 +117,10 @@
         already been dispatched don't generate an error page in the
         ErrorReportValve so the dispatch target can handle it. (markt)
       </fix>
+      <fix>
+        Add missing <code>javax.annotation.sql.*</code> classes to
+        annotations-api.jar. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
