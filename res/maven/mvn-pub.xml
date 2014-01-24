@@ -353,11 +353,11 @@
         file="${tomcat.embed.path}/tomcat-embed-el.jar"
         pom="tomcat-embed-el.pom"
         src="${tomcat.embed.src.path}/tomcat-embed-el-src.jar"/>
-    <doMavenDeploy artifactId="tomcat-embed-websocket"
+    <doMavenDeploy artifactId="tomcat7-embed-websocket"
         groupId="org.apache.tomcat.embed"
-        file="${tomcat.embed.path}/tomcat-embed-websocket.jar"
-        pom="tomcat-embed-websocket.pom"
-        src="${tomcat.embed.src.path}/tomcat-embed-websocket-src.jar"/>
+        file="${tomcat.embed.path}/tomcat7-embed-websocket.jar"
+        pom="tomcat7-embed-websocket.pom"
+        src="${tomcat.embed.src.path}/tomcat7-embed-websocket-src.jar"/>
     <doMavenDeploy artifactId="tomcat-embed-logging-juli"
         groupId="org.apache.tomcat.embed"
         file="${tomcat.embed.path}/tomcat-embed-logging-juli.jar"
