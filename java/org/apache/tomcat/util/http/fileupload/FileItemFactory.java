@@ -20,8 +20,6 @@ package org.apache.tomcat.util.http.fileupload;
  * <p>A factory interface for creating {@link FileItem} instances. Factories
  * can provide their own custom configuration, over and above that provided
  * by the default file upload implementation.</p>
- *
- * @version $Id$
  */
 public interface FileItemFactory {
 

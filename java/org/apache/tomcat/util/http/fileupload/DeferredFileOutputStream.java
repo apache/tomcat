@@ -32,8 +32,6 @@ import java.io.OutputStream;
  * not know in advance the size of the file being uploaded. If the file is small
  * you want to store it in memory (for speed), but if the file is large you want
  * to store it to file (to avoid memory issues).
- *
- * @version $Id$
  */
 public class DeferredFileOutputStream
     extends ThresholdingOutputStream

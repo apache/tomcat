@@ -21,8 +21,6 @@ import java.io.IOException;
 /**
  * An iterator, as returned by
  * {@link FileUploadBase#getItemIterator(RequestContext)}.
- *
- * @version $Id$
  */
 public interface FileItemIterator {
 
