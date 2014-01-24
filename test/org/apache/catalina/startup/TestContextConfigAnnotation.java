@@ -49,7 +49,6 @@ import org.apache.tomcat.util.descriptor.web.WebXml;
  * fragment.
  *
  * @author Peter Rossbach
- * @version $Revision$
  */
 public class TestContextConfigAnnotation {
 

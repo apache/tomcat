@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  *
  * @author Peter Rossbach
- * @version $Id$
  */
 @WebServlet(value = "/annotation/overwrite", name = "param", initParams = {
         @WebInitParam(name = "foo", value = "Hello"),

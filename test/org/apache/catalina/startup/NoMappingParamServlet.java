@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  *
  * @author Peter Rossbach
- * @version $Id$
  */
 @WebServlet(name = "param1", initParams = {
         @WebInitParam(name = "foo", value = "Hello"),
