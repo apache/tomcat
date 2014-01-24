@@ -26,7 +26,6 @@ import org.apache.tomcat.util.bcel.Constants;
 /**
  * Utility functions that do not really belong to any class in particular.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 final class Utility {

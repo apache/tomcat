@@ -24,7 +24,6 @@ import java.io.IOException;
  * value, i.e., a default value for initializing a class field.
  * This class is instantiated by the <em>Attribute.readAttribute()</em> method.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Attribute
  */

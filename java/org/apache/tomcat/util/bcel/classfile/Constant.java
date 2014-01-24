@@ -29,7 +29,6 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
  * in the constant pool of a class file. The classes keep closely to
  * the JVM specification.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public abstract class Constant implements Cloneable, Serializable {

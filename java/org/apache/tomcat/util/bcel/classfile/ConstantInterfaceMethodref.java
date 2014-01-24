@@ -25,7 +25,6 @@ import org.apache.tomcat.util.bcel.Constants;
 /**
  * This class represents a constant pool reference to an interface method.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public final class ConstantInterfaceMethodref extends ConstantCP {

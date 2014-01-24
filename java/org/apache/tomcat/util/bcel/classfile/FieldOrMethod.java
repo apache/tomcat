@@ -26,7 +26,6 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
 /**
  * Class for fields and methods.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public class FieldOrMethod extends AccessFlags implements Cloneable {

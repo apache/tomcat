@@ -23,7 +23,6 @@ import java.io.IOException;
 /**
  * Abstract super class for Fieldref and Methodref constants.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     ConstantFieldref
  * @see     ConstantMethodref

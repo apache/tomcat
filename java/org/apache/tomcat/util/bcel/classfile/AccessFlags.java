@@ -21,7 +21,6 @@ package org.apache.tomcat.util.bcel.classfile;
  * Super class for all objects that have modifiers like private, final, ...
  * I.e. classes, fields, and methods.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public abstract class AccessFlags implements java.io.Serializable {
