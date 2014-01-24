@@ -348,6 +348,16 @@
         file="${tomcat.embed.path}/tomcat-embed-jasper.jar"
         pom="tomcat-embed-jasper.pom"
         src="${tomcat.embed.src.path}/tomcat-embed-jasper-src.jar"/>
+    <doMavenDeploy artifactId="tomcat-embed-el"
+        groupId="org.apache.tomcat.embed"
+        file="${tomcat.embed.path}/tomcat-embed-el.jar"
+        pom="tomcat-embed-el.pom"
+        src="${tomcat.embed.src.path}/tomcat-embed-el-src.jar"/>
+    <doMavenDeploy artifactId="tomcat-embed-websocket"
+        groupId="org.apache.tomcat.embed"
+        file="${tomcat.embed.path}/tomcat-embed-websocket.jar"
+        pom="tomcat-embed-websocket.pom"
+        src="${tomcat.embed.src.path}/tomcat-embed-websocket-src.jar"/>
     <doMavenDeploy artifactId="tomcat-embed-logging-juli"
         groupId="org.apache.tomcat.embed"
         file="${tomcat.embed.path}/tomcat-embed-logging-juli.jar"

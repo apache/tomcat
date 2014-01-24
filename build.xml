@@ -1153,7 +1153,6 @@
     <jarIt jarfile="${tomcat-embed-jasper.jar}"
            filesDir="${tomcat.classes}"
            filesId="files.tomcat-embed-jasper"
-           meta-inf="${tomcat.manifests}/jasper.jar"
            notice="${tomcat.manifests}/jsp-api.jar.notice"
            license="${tomcat.manifests}/jsp-api.jar.jar.license"/>
     <jarIt jarfile="${tomcat-embed-el.jar}"
