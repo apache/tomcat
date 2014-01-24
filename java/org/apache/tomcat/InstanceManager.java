@@ -20,9 +20,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.naming.NamingException;
 
-/**
- * @version $Id$
- */
 public interface InstanceManager {
 
     public Object newInstance(Class<?> clazz)
