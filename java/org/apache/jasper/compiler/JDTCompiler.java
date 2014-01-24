@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import java.io.BufferedOutputStream;
@@ -57,7 +56,8 @@ import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
  * context classloader, reducing dramatically disk access during
  * the compilation process.
  *
- * @author Cocoon2
+ * Based on code from Cocoon2.
+ *
  * @author Remy Maucherat
  */
 public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
