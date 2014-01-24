@@ -20,8 +20,6 @@ package org.apache.catalina.ha;
 /**
  * A <b>ClusterDeployer</b> interface allows to plug in and out the
  * different deployment implementations
- *
- * @version $Id$
  */
 import java.io.File;
 import java.io.IOException;
