@@ -27,10 +27,8 @@ import java.security.Principal;
  * environments like JAAS that want to deal with <code>Principals</code>.</p>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  * @since 4.1
  */
-
 public interface Role extends Principal {
 
 

@@ -98,7 +98,6 @@ package org.apache.catalina;
  *       components should use MUST_DESTROY to signal this.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
 public interface Lifecycle {
 

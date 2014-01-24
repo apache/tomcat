@@ -25,9 +25,7 @@ package org.apache.catalina;
  * operation of the application containing this component.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public final class LifecycleException extends Exception {
 
     private static final long serialVersionUID = 1L;

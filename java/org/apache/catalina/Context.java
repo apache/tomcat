@@ -56,7 +56,6 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
  * <p>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
 public interface Context extends Container {
 

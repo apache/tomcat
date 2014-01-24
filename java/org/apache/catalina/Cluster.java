@@ -28,9 +28,7 @@ package org.apache.catalina;
  *
  * @author Bip Thelin
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public interface Cluster {
 
     // ------------------------------------------------------------- Properties
