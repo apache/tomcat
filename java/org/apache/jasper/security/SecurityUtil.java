@@ -20,8 +20,6 @@ import org.apache.jasper.Constants;
 
 /**
  * Util class for Security related operations.
- *
- * @author Jean-Francois Arcand
  */
 
 public final class SecurityUtil{

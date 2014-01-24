@@ -24,7 +24,6 @@ package org.apache.catalina.security;
  * RuntimePermission does not trigger an AccessControlException.
  *
  * @author Glenn L. Nielsen
- * @author Jean-Francois Arcand
  * @version $Id$
  */
 

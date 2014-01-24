@@ -46,7 +46,6 @@ import org.apache.juli.logging.LogFactory;
  * <code>stop()</code> methods of this class at the correct times.
  *
  * @author Craig R. McClanahan
- * @author Jean-Francois Arcand
  * @version $Id$
  */
 
