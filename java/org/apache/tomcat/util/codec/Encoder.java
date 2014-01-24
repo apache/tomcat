@@ -22,8 +22,6 @@ package org.apache.tomcat.util.codec;
  * This is the sister interface of {@link Decoder}.  Every implementation of Encoder provides this
  * common generic interface which allows a user to pass a generic Object to any Encoder implementation
  * in the codec package.
- *
- * @version $Id$
  */
 public interface Encoder {
 
