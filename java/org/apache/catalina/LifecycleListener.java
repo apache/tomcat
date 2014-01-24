@@ -26,9 +26,7 @@ package org.apache.catalina;
  * change has taken place.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public interface LifecycleListener {
 
 

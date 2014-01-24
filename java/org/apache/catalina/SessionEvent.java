@@ -26,9 +26,7 @@ import java.util.EventObject;
  * General event for notifying listeners of significant changes on a Session.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public final class SessionEvent extends EventObject {
 
     private static final long serialVersionUID = 1L;

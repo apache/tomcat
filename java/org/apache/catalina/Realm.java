@@ -35,9 +35,7 @@ import org.ietf.jgss.GSSContext;
  * Container.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public interface Realm {
 
 

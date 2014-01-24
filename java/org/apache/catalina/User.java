@@ -30,10 +30,8 @@ import java.util.Iterator;
  * of specific {@link Role}s.</p>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  * @since 4.1
  */
-
 public interface User extends Principal {
 
 
