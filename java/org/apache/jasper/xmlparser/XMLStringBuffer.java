@@ -43,8 +43,6 @@ package org.apache.jasper.xmlparser;
  *
  * @author Andy Clark, IBM
  * @author Eric Ye, IBM
- *
- * @version $Id$
  */
 public class XMLStringBuffer
     extends XMLString {

@@ -26,8 +26,6 @@ import java.io.Reader;
  * (i.e., encodings from ISO-10646-UCS-(2|4)).
  *
  * @author Neil Graham, IBM
- *
- * @version $Id$
  */
 public class UCSReader extends Reader {
 
