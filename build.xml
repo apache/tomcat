@@ -283,6 +283,8 @@
     <include name="javax/servlet/descriptor/*" />
     <include name="javax/servlet/http/*" />
     <include name="javax/servlet/resources/*" />
+    <include name="javax/servlet/jsp/resources/*" />
+    <exclude name="javax/servlet/jsp/resources/jspxml*" />
   </patternset>
 
   <patternset id="files.jsp-api">
