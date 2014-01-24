@@ -35,7 +35,6 @@ import org.apache.naming.EjbRef;
  *
  * @author Jacek Laskowski
  * @author Remy Maucherat
- * @version $Id$
  */
 public class OpenEjbFactory implements ObjectFactory {
 

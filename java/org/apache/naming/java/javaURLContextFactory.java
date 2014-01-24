@@ -46,9 +46,7 @@ import org.apache.naming.SelectorContext;
  * </ul>
  *
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class javaURLContextFactory
     implements ObjectFactory, InitialContextFactory {
 
