@@ -30,8 +30,6 @@ import org.apache.catalina.tribes.transport.SenderState;
  * A <b>membership</b> implementation using simple multicast.
  * This is the representation of a multicast member.
  * Carries the host, and port of the this or other cluster nodes.
- *
- * @version $Id$
  */
 public class MemberImpl implements Member, java.io.Externalizable {
 

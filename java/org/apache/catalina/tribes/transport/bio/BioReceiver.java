@@ -27,10 +27,6 @@ import org.apache.catalina.tribes.transport.RxTaskPool;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-/**
- *
- * @version $Id$
- */
 public class BioReceiver extends ReceiverBase implements Runnable {
 
     private static final Log log = LogFactory.getLog(BioReceiver.class);

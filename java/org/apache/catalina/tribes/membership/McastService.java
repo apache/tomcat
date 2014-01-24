@@ -39,11 +39,7 @@ import org.apache.catalina.tribes.util.UUIDGenerator;
  * This is the representation of a multicast membership service.
  * This class is responsible for maintaining a list of active cluster nodes in the cluster.
  * If a node fails to send out a heartbeat, the node will be dismissed.
- *
- * @version $Id$
  */
-
-
 public class McastService implements MembershipService,MembershipListener,MessageListener {
 
     private static final org.apache.juli.logging.Log log =

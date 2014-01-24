@@ -19,10 +19,6 @@ package org.apache.catalina.tribes.transport;
 
 import org.apache.catalina.tribes.io.ListenCallback;
 
-
-/**
- * @version $Id$
- */
 public abstract class AbstractRxTask implements Runnable
 {
 

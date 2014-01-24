@@ -42,7 +42,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <li><b>DATA</b>      - should be as many bytes as the prev SIZE</li>
  * <li><b>END_DATA</b>  - 7 bytes - <i>TLF2003</i></lI>
  * </ul>
- * @version $Id$
  */
 public class XByteBuffer
 {
