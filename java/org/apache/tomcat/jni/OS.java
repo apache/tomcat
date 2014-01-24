@@ -20,9 +20,7 @@ package org.apache.tomcat.jni;
 /** OS
  *
  * @author Mladen Turk
- * @version $Id$
  */
-
 public class OS {
 
     /* OS Enums */

@@ -20,9 +20,7 @@ package org.apache.tomcat.jni;
 /** SSL Context
  *
  * @author Mladen Turk
- * @version $Id$
  */
-
 public final class SSLContext {
 
 

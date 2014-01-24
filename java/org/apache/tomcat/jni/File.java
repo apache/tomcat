@@ -18,12 +18,11 @@
 package org.apache.tomcat.jni;
 /* Import needed classes */
 import java.nio.ByteBuffer;
+
 /** File
  *
  * @author Mladen Turk
- * @version $Id$
  */
-
 public class File {
 
     /** Open the file for reading */
