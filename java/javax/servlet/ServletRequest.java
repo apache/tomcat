@@ -33,7 +33,6 @@ import java.util.Map;
  * (for example, HTTP data is provided by
  * {@link javax.servlet.http.HttpServletRequest}.
  *
- * @version $Version$
  * @see javax.servlet.http.HttpServletRequest
  */
 public interface ServletRequest {

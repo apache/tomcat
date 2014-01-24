@@ -26,7 +26,6 @@ import java.util.Locale;
  * This class implements the Wrapper or Decorator pattern. Methods default to
  * calling through to the wrapped response object.
  *
- * @version $Version$
  * @since v 2.3
  * @see javax.servlet.ServletResponse
  */

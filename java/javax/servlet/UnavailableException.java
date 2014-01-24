@@ -38,8 +38,6 @@ package javax.servlet;
  * the servlet container more robust. Specifically, the servlet container might
  * block requests to the servlet or filter for a period of time suggested by the
  * exception, rather than rejecting them until the servlet container restarts.
- *
- * @version $Version$
  */
 public class UnavailableException extends ServletException {
 

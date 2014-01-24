@@ -46,7 +46,6 @@ import javax.servlet.descriptor.JspConfigDescriptor;
  * {@link ServletConfig} object, which the Web server provides the servlet when
  * the servlet is initialized.
  *
- * @version $Version$
  * @see Servlet#getServletConfig
  * @see ServletConfig#getServletContext
  */

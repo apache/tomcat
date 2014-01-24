@@ -32,7 +32,6 @@ import java.io.InputStream;
  * This is an abstract class that a servlet container implements. Subclasses of
  * this class must implement the <code>java.io.InputStream.read()</code> method.
  *
- * @version $Version$
  * @see ServletRequest
  */
 public abstract class ServletInputStream extends InputStream {

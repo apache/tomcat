@@ -29,8 +29,6 @@ import java.io.IOException;
  * This interface is intended to wrap servlets, but a servlet container can
  * create <code>RequestDispatcher</code> objects to wrap any type of resource.
  *
- * @version $Version$
- *
  * @see ServletContext#getRequestDispatcher(java.lang.String)
  * @see ServletContext#getNamedDispatcher(java.lang.String)
  * @see ServletRequest#getRequestDispatcher(java.lang.String)

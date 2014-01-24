@@ -31,7 +31,6 @@ import java.util.ResourceBundle;
  * of this class must implement the <code>java.io.OutputStream.write(int)</code>
  * method.
  *
- * @version $Version$
  * @see ServletResponse
  */
 public abstract class ServletOutputStream extends OutputStream {
