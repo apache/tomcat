@@ -42,9 +42,7 @@ import org.apache.tomcat.util.res.StringManager;
  * classes (<code>/WEB-INF/classes</code> and <code>/WEB-INF/lib</code>).</p>
  *
  * @author Fabien Carrion
- * @version $Id$
  */
-
 public class WebAnnotationSet {
 
     private static final String SEPARATOR = "/";

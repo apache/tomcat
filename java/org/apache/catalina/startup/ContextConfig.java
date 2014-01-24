@@ -113,7 +113,6 @@ import org.xml.sax.SAXParseException;
  * of that Context, and the associated defined servlets.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
 public class ContextConfig implements LifecycleListener {
 
