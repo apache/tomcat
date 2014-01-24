@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 package org.apache.tomcat.jdbc.pool.jmx;
-/**
- */
+
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;

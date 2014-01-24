@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -31,9 +30,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-/**
- *
- */
 public class PoolProperties implements PoolConfiguration, Cloneable, Serializable {
 
     private static final long serialVersionUID = -8519283440854213745L;
