@@ -22,11 +22,11 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * As task queue specifically designed to run with a thread pool executor.
- * The task queue is optimised to properly utilize threads within
- * a thread pool executor. If you use a normal queue, the executor will spawn threads
- * when there are idle threads and you wont be able to force items unto the queue itself
- *
+ * As task queue specifically designed to run with a thread pool executor. The
+ * task queue is optimised to properly utilize threads within a thread pool
+ * executor. If you use a normal queue, the executor will spawn threads when
+ * there are idle threads and you wont be able to force items unto the queue
+ * itself.
  */
 public class TaskQueue extends LinkedBlockingQueue<Runnable> {
 

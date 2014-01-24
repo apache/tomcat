@@ -162,9 +162,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     }
 
     /**
-     * Class to measure query execute time
-     *
-     *
+     * Class to measure query execute time.
      */
     protected class StatementProxy<T extends java.sql.Statement> implements InvocationHandler {
 
