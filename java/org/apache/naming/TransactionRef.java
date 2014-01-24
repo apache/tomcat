@@ -25,9 +25,7 @@ import javax.naming.Reference;
  * Represents a reference address to a transaction.
  *
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class TransactionRef extends Reference {
 
     private static final long serialVersionUID = 1L;

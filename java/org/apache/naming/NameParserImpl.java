@@ -27,9 +27,7 @@ import javax.naming.NamingException;
  * Parses names.
  *
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class NameParserImpl
     implements NameParser {
 

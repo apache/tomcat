@@ -31,9 +31,7 @@ import javax.naming.NamingException;
  * </ul>
  *
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class ContextBindings {
 
 
