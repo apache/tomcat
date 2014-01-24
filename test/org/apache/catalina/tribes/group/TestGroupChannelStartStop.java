@@ -26,7 +26,6 @@ import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 
 /**
- * @author Filip Hanik
  * @version 1.0
  */
 public class TestGroupChannelStartStop {

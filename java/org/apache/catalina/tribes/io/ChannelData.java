@@ -31,7 +31,6 @@ import org.apache.catalina.tribes.util.UUIDGenerator;
  * to another node. While the message is being processed by the different
  * interceptors, the message data can be manipulated as each interceptor seems appropriate.
  * @author Peter Rossbach
- * @author Filip Hanik
  * @version $Id$
  *
  */

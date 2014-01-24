@@ -23,7 +23,6 @@ import org.apache.tomcat.bayeux.HttpError;
  * messages.
  *
  * @author Guy A. Molinari
- * @author Filip Hanik
  * @version 0.9
  */
 public interface BayeuxRequest {

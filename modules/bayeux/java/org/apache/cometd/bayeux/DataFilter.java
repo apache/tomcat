@@ -25,7 +25,6 @@ package org.apache.cometd.bayeux;
  * a remote client, and the Bayeux implementation invokes the publish method directly.
  * The second scenario is when a local client invokes {@link Channel#publish(Message)} directly in the local JVM.
  * @author Greg Wilkins
- * @author Filip Hanik
  *
  */
 public interface DataFilter

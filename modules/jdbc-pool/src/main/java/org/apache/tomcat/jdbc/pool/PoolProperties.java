@@ -32,7 +32,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * @author Filip Hanik
  *
  */
 public class PoolProperties implements PoolConfiguration, Cloneable, Serializable {

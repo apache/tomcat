@@ -21,7 +21,6 @@ package org.apache.catalina.ha;
  * A <b>ClusterDeployer</b> interface allows to plug in and out the
  * different deployment implementations
  *
- * @author Filip Hanik
  * @version $Id$
  */
 import java.io.File;

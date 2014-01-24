@@ -30,7 +30,6 @@ import org.apache.catalina.tribes.Member;
  * A <b>CatalinaCluster</b> interface allows to plug in and out the
  * different cluster implementations
  *
- * @author Filip Hanik
  * @version $Id$
  */
 

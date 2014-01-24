@@ -32,7 +32,6 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
 //import com.mchange.v2.log.MLog;
 
 /**
- * @author Filip Hanik
  * @version 1.0
  */
 public abstract class DefaultTestCase {

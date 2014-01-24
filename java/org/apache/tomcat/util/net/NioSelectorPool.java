@@ -32,7 +32,6 @@ import org.apache.juli.logging.LogFactory;
 /**
  *
  * Thread safe non blocking selector pool
- * @author Filip Hanik
  * @version 1.0
  * @since 6.0
  */

@@ -54,7 +54,6 @@ import org.apache.catalina.tribes.membership.StaticMember;
  * 2. It catches send errors
  * </p>
  *
- * @author Filip Hanik
  * @version 1.0
  */
 public class TcpFailureDetector extends ChannelInterceptorBase {

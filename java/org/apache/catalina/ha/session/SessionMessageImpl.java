@@ -22,7 +22,6 @@ import org.apache.catalina.ha.ClusterMessageBase;
 /**
  * Session cluster message
  *
- * @author Filip Hanik
  * @author Peter Rossbach
  *
  * @version $Id$

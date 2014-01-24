@@ -47,7 +47,6 @@ import org.apache.tomcat.util.res.StringManager;
 
    @author EKR
    @author Craig R. McClanahan
-   @author Filip Hanik
    Parts cribbed from JSSECertCompat
    Parts cribbed from CertificatesValve
 */

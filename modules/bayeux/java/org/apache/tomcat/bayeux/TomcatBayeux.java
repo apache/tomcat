@@ -31,7 +31,6 @@ import org.apache.cometd.bayeux.Message;
 import org.apache.cometd.bayeux.SecurityPolicy;
 /**
  *
- * @author Filip Hanik
  * @version 1.0
  */
 public class TomcatBayeux implements Bayeux {

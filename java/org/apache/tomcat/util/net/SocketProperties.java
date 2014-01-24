@@ -25,7 +25,6 @@ import java.net.SocketException;
  * in server.xml. All properties are prefixed with &quot;socket.&quot;
  * and are currently only working for the Nio connector
  *
- * @author Filip Hanik
  */
 public class SocketProperties {
     /**

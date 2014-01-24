@@ -22,7 +22,6 @@ import org.apache.catalina.tribes.Member;
 
 
 /**
- * @author Filip Hanik
  *
  */
 public interface ClusterMessage extends Serializable {

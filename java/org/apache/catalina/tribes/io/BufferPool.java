@@ -22,7 +22,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  *
- * @author Filip Hanik
  *
  * @version 1.0
  */

@@ -32,7 +32,6 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
  * Properties arrive in a key-value pair of Strings as they were received through the configuration.
  * This method is called once per cached connection object when the object is first configured.
  *
- * @author Filip Hanik
  * @version 1.0
  */
 public abstract class JdbcInterceptor implements InvocationHandler {

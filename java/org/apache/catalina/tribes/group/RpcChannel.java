@@ -33,7 +33,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * A channel to handle RPC messaging
- * @author Filip Hanik
  */
 public class RpcChannel implements ChannelListener{
     private static final Log log = LogFactory.getLog(RpcChannel.class);

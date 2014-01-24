@@ -34,7 +34,6 @@ import org.apache.juli.logging.LogFactory;
  * This object uses an XByteBuffer which is an extendable object buffer that also allows
  * for message encoding and decoding.
  *
- * @author Filip Hanik
  * @version $Id$
  */
 public class ObjectReader {

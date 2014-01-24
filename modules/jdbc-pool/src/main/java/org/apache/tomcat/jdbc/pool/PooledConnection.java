@@ -31,7 +31,6 @@ import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
 /**
  * Represents a pooled connection
  * and holds a reference to the {@link java.sql.Connection} object
- * @author Filip Hanik
  * @version 1.0
  */
 public class PooledConnection {

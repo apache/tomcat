@@ -55,7 +55,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Currently we only support deployment of WAR files since they are easier to
  * send across the wire.
  *
- * @author Filip Hanik
  * @author Peter Rossbach
  * @version $Revision$
  */

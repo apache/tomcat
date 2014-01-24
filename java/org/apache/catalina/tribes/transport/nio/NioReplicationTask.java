@@ -48,7 +48,6 @@ import org.apache.catalina.tribes.util.Logs;
  * calls notify() to wake it up. When the channel has been drained, the worker
  * thread returns itself to its parent pool.
  *
- * @author Filip Hanik
  *
  * @version $Id$
  */

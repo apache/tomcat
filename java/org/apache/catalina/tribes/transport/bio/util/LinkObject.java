@@ -28,7 +28,6 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
  * data object and a pointer to the next element.
  *
  * @author Peter Rossbach
- * @author Filip Hanik
  * @version $Id$
 
  */

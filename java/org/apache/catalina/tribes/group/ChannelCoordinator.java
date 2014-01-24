@@ -37,7 +37,6 @@ import org.apache.catalina.tribes.util.Logs;
  * The channel coordinator object coordinates the membership service,
  * the sender and the receiver.
  * This is the last interceptor in the chain.
- * @author Filip Hanik
  * @version $Id$
  */
 public class ChannelCoordinator extends ChannelInterceptorBase implements MessageListener {

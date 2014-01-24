@@ -22,7 +22,6 @@ import org.apache.tomcat.jdbc.pool.DataSourceFactory;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 
 /**
- * @author Filip Hanik
  * @version 1.0
  */
 public class DefaultProperties extends PoolProperties {

@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * The CometEvent interface.
  *
- * @author Filip Hanik
  * @author Remy Maucherat
  */
 public interface CometEvent {

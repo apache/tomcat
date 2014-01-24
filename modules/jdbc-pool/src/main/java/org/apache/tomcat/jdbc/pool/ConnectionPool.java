@@ -50,7 +50,6 @@ import org.apache.juli.logging.LogFactory;
  * The ConnectionPool uses a {@link PoolProperties} object for storing all the meta information about the connection pool.
  * As the underlying implementation, the connection pool uses {@link java.util.concurrent.BlockingQueue} to store active and idle connections.
  * A custom implementation of a fair {@link FairBlockingQueue} blocking queue is provided with the connection pool itself.
- * @author Filip Hanik
  * @version 1.0
  */
 

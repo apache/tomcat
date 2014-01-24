@@ -37,7 +37,6 @@ import org.apache.tomcat.util.res.StringManager;
  * is available for use by <code>Realm</code> implementations.
  * The GenericPrincipal does NOT implement serializable and I didn't want to
  * change that implementation hence I implemented this one instead.
- * @author Filip Hanik
  * @version $Id$
  */
 public class SerializablePrincipal  implements java.io.Serializable {

@@ -24,7 +24,6 @@ import java.util.Map;
  * The message contains information about the channel it was published through and who the sender was
  *
  * @author Greg Wilkins
- * @author Filip Hanik
  */
 public interface Message extends Map<String,Object>
 {

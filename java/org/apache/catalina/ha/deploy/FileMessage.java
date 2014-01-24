@@ -23,7 +23,6 @@ import org.apache.catalina.tribes.Member;
 /**
  * Contains the data for a file being transferred over TCP, this is
  * essentially a fragment of a file, read and written by the FileMessageFactory
- * @author Filip Hanik
  * @version 1.0
  */
 

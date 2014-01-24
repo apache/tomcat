@@ -38,7 +38,6 @@ import org.apache.tomcat.util.res.StringManager;
  * and destroy APR.
  *
  * @author Remy Maucherat
- * @author Filip Hanik
  * @version $Id$
  * @since 4.1
  */

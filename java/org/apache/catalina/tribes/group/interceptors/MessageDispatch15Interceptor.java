@@ -33,7 +33,6 @@ import org.apache.catalina.tribes.util.TcclThreadFactory;
  * except it uses an atomic long for the currentSize calculation
  * and uses a thread pool for message sending.
  *
- * @author Filip Hanik
  * @version 1.0
  */
 

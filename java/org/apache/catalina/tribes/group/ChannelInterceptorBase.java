@@ -23,7 +23,6 @@ import org.apache.catalina.tribes.Member;
 
 /**
  * Abstract class for the interceptor base class.
- * @author Filip Hanik
  * @version $Id$
  */
 

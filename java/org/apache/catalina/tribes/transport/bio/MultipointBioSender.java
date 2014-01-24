@@ -32,7 +32,6 @@ import org.apache.catalina.tribes.transport.MultiPointSender;
 
 /**
  *
- * @author Filip Hanik
  * @version $Id$
  *
  */

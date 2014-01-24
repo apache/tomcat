@@ -40,7 +40,6 @@ import org.apache.catalina.tribes.util.UUIDGenerator;
  * This class is responsible for maintaining a list of active cluster nodes in the cluster.
  * If a node fails to send out a heartbeat, the node will be dismissed.
  *
- * @author Filip Hanik
  * @version $Id$
  */
 

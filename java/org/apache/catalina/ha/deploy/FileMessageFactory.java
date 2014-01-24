@@ -42,7 +42,6 @@ import org.apache.tomcat.util.res.StringManager;
  * To force a cleanup, call cleanup() from the calling object. <BR>
  * This class is not thread safe.
  *
- * @author Filip Hanik
  * @version 1.0
  */
 public class FileMessageFactory {

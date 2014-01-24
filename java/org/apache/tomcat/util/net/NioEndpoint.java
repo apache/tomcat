@@ -70,7 +70,6 @@ import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
  *
  * @author Mladen Turk
  * @author Remy Maucherat
- * @author Filip Hanik
  */
 public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 

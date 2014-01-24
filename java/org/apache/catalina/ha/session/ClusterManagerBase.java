@@ -29,7 +29,6 @@ import org.apache.catalina.tribes.io.ReplicationStream;
 
 /**
  *
- * @author Filip Hanik
  * @version $Id$
  */
 public abstract class ClusterManagerBase extends ManagerBase implements ClusterManager {

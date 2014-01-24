@@ -24,7 +24,6 @@ import org.apache.catalina.tribes.Member;
 
 /**
  *
- * @author Filip Hanik
  * @version 1.0
  * @since 5.5.16
  */
