@@ -43,7 +43,6 @@ import org.apache.cometd.bayeux.Message;
  * Common functionality and member variables for all Bayeux requests.
  *
  * @author Guy A. Molinari
- * @author Filip Hanik
  * @version 0.9
  *
  */

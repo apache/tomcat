@@ -44,7 +44,6 @@ import org.apache.juli.logging.LogFactory;
  * - READY_TO_READ -> read() -> READY_TO_READ | TRANSFER_COMPLETE
  * - TRANSFER_COMPLETE -> CONNECTED
  *
- * @author Filip Hanik
  * @version 1.0
  */
 public class NioSender extends AbstractSender {

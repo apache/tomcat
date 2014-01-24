@@ -28,7 +28,6 @@ import org.apache.catalina.tribes.group.AbsoluteOrder;
 import org.apache.catalina.tribes.membership.Membership;
 
 /**
- * @author Filip Hanik
  * @version 1.0
  */
 public class Arrays {

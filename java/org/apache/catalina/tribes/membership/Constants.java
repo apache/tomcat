@@ -24,7 +24,6 @@ import org.apache.catalina.tribes.util.Arrays;
  *
  * @author Peter Rossbach
  * @version $Id$
- * @author Filip Hanik
  */
 public class Constants {
 

@@ -50,7 +50,6 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  * false means, forget the message and reset the message counter. <b>default=true</b>
  *
  *
- * @author Filip Hanik
  * @version 1.1
  */
 public class OrderInterceptor extends ChannelInterceptorBase {

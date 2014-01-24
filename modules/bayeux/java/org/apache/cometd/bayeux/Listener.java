@@ -22,7 +22,6 @@ package org.apache.cometd.bayeux;
  * when the local client is created using the {@link Bayeux#newClient(String,Listener)} method.
  * This callback object, implementing the Listener interface, is used to deliver messages to local, in JVM, clients.
  * @author Greg Wilkins
- * @author Filip Hanik
  *
  */
 public interface Listener

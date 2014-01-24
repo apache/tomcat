@@ -27,7 +27,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Receive replicated SessionMessage form other cluster node.
- * @author Filip Hanik
  * @author Peter Rossbach
  * @version $Id$
  */

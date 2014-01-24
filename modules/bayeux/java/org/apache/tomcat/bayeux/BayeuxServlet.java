@@ -35,7 +35,6 @@ import org.apache.cometd.bayeux.Bayeux;
 
 /**
  *
- * @author Filip Hanik
  * @author Guy Molinari
  * @version 1.0
  */

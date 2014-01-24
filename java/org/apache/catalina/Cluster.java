@@ -28,7 +28,6 @@ package org.apache.catalina;
  *
  * @author Bip Thelin
  * @author Remy Maucherat
- * @author Filip Hanik
  * @version $Id$
  */
 

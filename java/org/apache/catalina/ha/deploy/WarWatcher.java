@@ -32,7 +32,6 @@ import org.apache.juli.logging.LogFactory;
  * notifies a listener of the changes made
  * </p>
  *
- * @author Filip Hanik
  * @author Peter Rossbach
  * @version 1.1
  */

@@ -35,7 +35,6 @@ import org.apache.juli.logging.LogFactory;
  * <code>Channel.SEND_OPTIONS_ASYNCHRONOUS</code> flag to be set, if it is, it
  * will queue the message for delivery and immediately return to the sender.
  *
- * @author Filip Hanik
  * @version 1.0
  */
 public class MessageDispatchInterceptor extends ChannelInterceptorBase implements Runnable {

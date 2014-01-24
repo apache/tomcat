@@ -44,7 +44,6 @@ import java.io.Serializable;
  * <br>
  *
  *
- * @author Filip Hanik
  * @version 1.0
  */
 public interface ReplicatedMapEntry extends Serializable {

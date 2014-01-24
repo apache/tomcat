@@ -21,7 +21,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
- * @author Filip Hanik
  * @version 1.0
  */
 class BufferPool15Impl implements BufferPool.BufferPoolAPI {

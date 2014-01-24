@@ -53,7 +53,6 @@ import org.apache.juli.logging.LogFactory;
  *</ol>
  * @author Craig R. McClanahan
  * @author Dirk Verbeeck
- * @author Filip Hanik
  */
 public class DataSourceFactory implements ObjectFactory {
     private static final Log log = LogFactory.getLog(DataSourceFactory.class);

@@ -22,7 +22,6 @@ package org.apache.catalina.tribes;
  *
  * <p>Description: The listener to be registered with the ChannelReceiver, internal Tribes component</p>
  *
- * @author Filip Hanik
  * @version 1.0
  */
 

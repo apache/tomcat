@@ -25,7 +25,6 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
  * other actions when a message is sent or received.<br>
  * Interceptors are tied together in a linked list.
  * @see org.apache.catalina.tribes.group.ChannelInterceptorBase
- * @author Filip Hanik
  * @version $Id$
  */
 

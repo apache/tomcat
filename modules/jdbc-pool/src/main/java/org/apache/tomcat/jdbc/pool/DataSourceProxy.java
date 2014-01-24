@@ -40,7 +40,6 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
  * I could put in Java 6 methods of javax.sql.DataSource here, and compile it with JDK 1.5
  * and still be able to run under Java 6 without getting NoSuchMethodException.
  *
- * @author Filip Hanik
  * @version 1.0
  */
 

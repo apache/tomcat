@@ -32,7 +32,6 @@ import javax.net.ssl.SSLEngineResult.Status;
 /**
  *
  * Implementation of a secure socket channel
- * @author Filip Hanik
  * @version 1.0
  */
 

@@ -36,7 +36,6 @@ import org.apache.cometd.bayeux.Channel;
  * Handshake request Bayeux message.
  *
  * @author Guy A. Molinari
- * @author Filip Hanik
  * @version 1.0
  *
  */

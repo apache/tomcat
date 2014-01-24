@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.ha.session;
 
 /**
@@ -23,7 +21,6 @@ package org.apache.catalina.ha.session;
  * a request is executed. These actions will then translate into invocations of methods
  * on the actual session.
  * This class is NOT thread safe. One DeltaRequest per session
- * @author <a href="mailto:fhanik@apache.org">Filip Hanik</a>
  * @version 1.0
  */
 

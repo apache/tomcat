@@ -68,7 +68,6 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * FIXME wrote testcases
  *
- * @author Filip Hanik
  * @author Remy Maucherat
  * @author Peter Rossbach
  * @version $Id$

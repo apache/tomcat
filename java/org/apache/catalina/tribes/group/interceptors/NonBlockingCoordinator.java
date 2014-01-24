@@ -115,7 +115,6 @@ import org.apache.juli.logging.LogFactory;
  * <a href="http://people.apache.org/~fhanik/tribes/docs/leader-election-initiate-election.jpg">Initiate an election</a><br><br>
  * <a href="http://people.apache.org/~fhanik/tribes/docs/leader-election-message-arrives.jpg">Receive an election message</a><br><br>
  *
- * @author Filip Hanik
  * @version 1.0
  *
  *

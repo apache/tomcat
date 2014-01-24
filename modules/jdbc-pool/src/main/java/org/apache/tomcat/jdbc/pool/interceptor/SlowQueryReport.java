@@ -37,7 +37,6 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 /**
  * Slow query report interceptor. Tracks timing of query executions.
- * @author Filip Hanik
  * @version 1.0
  */
 public class SlowQueryReport extends AbstractQueryReport  {

@@ -29,7 +29,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  *
- * @author Filip Hanik
  * @version $Id$
  */
 public class BioReceiver extends ReceiverBase implements Runnable {

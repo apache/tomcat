@@ -17,7 +17,6 @@
 package org.apache.tomcat.bayeux;
 /**
  *
- * @author Filip Hanik
  * @version 1.0
  */
 public class BayeuxException extends Exception {

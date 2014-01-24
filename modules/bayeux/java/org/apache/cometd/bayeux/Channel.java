@@ -26,7 +26,6 @@ import java.util.List;
  * A channel can be created either server side by invoking the getChannel, or client side
  * by using the /meta/subscribe message without a wildcard.
  * @author Greg Wilkins
- * @author Filip Hanik
  */
 public interface Channel
 {

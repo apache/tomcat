@@ -39,7 +39,6 @@ import org.apache.tomcat.bayeux.*;
  * Handshake request Bayeux message.
  *
  * @author Guy A. Molinari
- * @author Filip Hanik
  * @version 1.0
  */
 public class MetaSubscribeRequest extends RequestBase implements BayeuxRequest {

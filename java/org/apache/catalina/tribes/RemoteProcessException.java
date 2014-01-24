@@ -24,7 +24,6 @@ package org.apache.catalina.tribes;
  * This message will be embedded in a ChannelException.FaultyMember
  * </p>
  * @see ChannelException
- * @author Filip Hanik
  * @version 1.0
  */
 public class RemoteProcessException extends RuntimeException {

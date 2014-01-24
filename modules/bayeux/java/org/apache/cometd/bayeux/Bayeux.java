@@ -42,7 +42,6 @@ import java.util.List;
  * When the webapplication shuts down, the Bayeux object will unsubscribe all clients and remove all the active channels.
  *
  * @author Greg Wilkins
- * @author Filip Hanik
  */
 public interface Bayeux {
 

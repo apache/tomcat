@@ -38,7 +38,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * @author Filip Hanik
  * @version 1.0
  */
 public class ReplicatedContext extends StandardContext implements MapOwner {

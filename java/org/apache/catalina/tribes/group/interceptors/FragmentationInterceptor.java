@@ -38,7 +38,6 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  * OrderInteceptor.expire=<milliseconds> - how long do we keep the fragments in memory and wait for the rest to arrive<b>default=60,000ms -> 60seconds</b>
  * This setting is useful to avoid OutOfMemoryErrors<br>
  * OrderInteceptor.maxSize=<max message size> - message size in bytes <b>default=1024*100 (around a tenth of a MB)</b><br>
- * @author Filip Hanik
  * @version 1.0
  */
 public class FragmentationInterceptor extends ChannelInterceptorBase {

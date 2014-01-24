@@ -32,7 +32,6 @@ import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
  * This way, logic for a SSL socket channel remains the same as for
  * a non SSL, making sure we don't need to code for any exception cases.
  *
- * @author Filip Hanik
  * @version 1.0
  */
 public class NioChannel implements ByteChannel {

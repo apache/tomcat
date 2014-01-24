@@ -21,7 +21,6 @@ import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 
 /**
- * @author Filip Hanik
  * @version $Id$
  * @since 5.5.16
  */

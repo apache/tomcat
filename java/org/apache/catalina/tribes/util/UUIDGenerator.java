@@ -24,7 +24,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * simple generation of a UUID
- * @author Filip Hanik
  * @version 1.0
  */
 public class UUIDGenerator {

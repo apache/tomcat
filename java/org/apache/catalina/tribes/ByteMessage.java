@@ -35,7 +35,6 @@ import java.io.ObjectOutput;
  * If you are using multiple applications on top of Tribes you should add some sort of header
  * so that you can decide with the <code>ChannelListener.accept()</code> whether this message was intended
  * for you.
- * @author Filip Hanik
  * @version $Id$
  */
 

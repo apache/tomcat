@@ -38,7 +38,6 @@ import javax.sql.DataSource;
 /**
  * <p>Object factory for resource links for shared data sources.</p>
  *
- * @author Filip Hanik
  */
 public class DataSourceLinkFactory extends ResourceLinkFactory {
 

@@ -36,7 +36,6 @@ import org.apache.catalina.tribes.util.StringManager;
  * supported
  *
  * @author Peter Rossbach
- * @author Filip Hanik
  * @version $Id$
  * @since 5.5.16
  */

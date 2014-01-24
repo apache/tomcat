@@ -25,7 +25,6 @@ import org.apache.catalina.tribes.util.Arrays;
  *
  * <p>Company: </p>
  *
- * @author Filip Hanik
  * @version 1.0
  */
 public final class UniqueId implements Serializable{

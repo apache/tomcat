@@ -38,7 +38,6 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * well as transfer decoding.
  *
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
- * @author Filip Hanik
  */
 public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 

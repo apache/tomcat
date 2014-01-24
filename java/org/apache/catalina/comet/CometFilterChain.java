@@ -29,7 +29,6 @@ import javax.servlet.ServletException;
  * is the last filter in the chain, to invoke the resource at the end of the chain.
  *
  * @author Remy Maucherat
- * @author Filip Hanik
  */
 public interface CometFilterChain {
 

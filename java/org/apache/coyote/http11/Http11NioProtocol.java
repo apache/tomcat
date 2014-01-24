@@ -45,7 +45,6 @@ import org.apache.tomcat.util.net.SocketWrapper;
  *
  * @author Remy Maucherat
  * @author Costin Manolache
- * @author Filip Hanik
  */
 public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
 

@@ -31,7 +31,6 @@ import org.apache.juli.logging.LogFactory;
  * <p>Description: Filters membership based on domain.
  * </p>
  *
- * @author Filip Hanik
  * @version 1.0
  */
 public class DomainFilterInterceptor extends ChannelInterceptorBase {

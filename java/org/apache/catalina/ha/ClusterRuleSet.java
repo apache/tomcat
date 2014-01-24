@@ -27,7 +27,6 @@ import org.apache.tomcat.util.digester.RuleSetBase;
  * <p><strong>RuleSet</strong> for processing the contents of a
  * Cluster definition element.  </p>
  *
- * @author Filip Hanik
  * @author Peter Rossbach
  * @version $Id$
  */

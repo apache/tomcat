@@ -36,7 +36,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * lock per thread basis so that order is guaranteed once the thread goes into a suspended monitor state.
  * <br/>
  * Not all of the methods of the {@link java.util.concurrent.BlockingQueue} are implemented.
- * @author Filip Hanik
  *
  */
 

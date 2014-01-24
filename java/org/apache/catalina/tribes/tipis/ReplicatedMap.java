@@ -40,7 +40,6 @@ import org.apache.catalina.tribes.Member;
  * <br><br><b>REMBER TO CALL <code>breakdown()</code> or <code>finalize()</code> when you are done with the map to
  * avoid memory leaks.<br><br>
  * TODO implement periodic sync/transfer thread
- * @author Filip Hanik
  * @version 1.0
  *
  * TODO memberDisappeared, should do nothing except change map membership

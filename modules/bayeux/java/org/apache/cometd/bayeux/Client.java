@@ -34,7 +34,6 @@ package org.apache.cometd.bayeux;
  * <li>A java client connected to a remote Bayeux server - not implemented</li>
  * </nl>
  * @author Greg Wilkins
- * @author Filip Hanik
  */
 public interface Client
 {

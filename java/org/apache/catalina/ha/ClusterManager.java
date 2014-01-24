@@ -29,7 +29,6 @@ import org.apache.catalina.tribes.io.ReplicationStream;
  * This is so that we can have a more pluggable way
  * of swapping session managers for different algorithms.
  *
- * @author Filip Hanik
  * @author Peter Rossbach
  */
 public interface ClusterManager extends Manager {

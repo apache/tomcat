@@ -43,7 +43,6 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * Processes HTTP requests.
  *
  * @author Remy Maucherat
- * @author Filip Hanik
  */
 public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
