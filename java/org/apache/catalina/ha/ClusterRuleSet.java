@@ -28,9 +28,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
  * Cluster definition element.  </p>
  *
  * @author Peter Rossbach
- * @version $Id$
  */
-
 public class ClusterRuleSet extends RuleSetBase {
 
 

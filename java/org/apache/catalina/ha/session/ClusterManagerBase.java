@@ -27,10 +27,6 @@ import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.tribes.io.ReplicationStream;
 
-/**
- *
- * @version $Id$
- */
 public abstract class ClusterManagerBase extends ManagerBase implements ClusterManager {
 
     /**

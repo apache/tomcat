@@ -29,10 +29,7 @@ import org.apache.catalina.tribes.Member;
 /**
  * A <b>CatalinaCluster</b> interface allows to plug in and out the
  * different cluster implementations
- *
- * @version $Id$
  */
-
 public interface CatalinaCluster extends Cluster {
     // ----------------------------------------------------- Instance Variables
 
