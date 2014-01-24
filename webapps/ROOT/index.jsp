@@ -140,16 +140,16 @@ request.setAttribute("tomcat7ExamplesUrl", "/examples/");
                         <h4><a href="${tomcat7Url}faq/">FAQ</a> and <a href="${tomcat7Url}lists.html">Mailing Lists</a></h4>
                         <p>The following mailing lists are available:</p>
                         <ul>
-                            <li id="list-announce"><strong><a href="mailto:announce-subscribe@tomcat.apache.org">announce@tomcat.apache.org</a><br />
+                            <li id="list-announce"><strong><a href="${tomcat7Url}lists.html#tomcat-announce">tomcat-announce</a><br />
                                 Important announcements, releases, security vulnerability notifications. (Low volume).</strong>
                             </li>
-                            <li><a href="mailto:users-subscribe@tomcat.apache.org">users@tomcat.apache.org</a><br />
+                            <li><a href="${tomcat7Url}lists.html#tomcat-users">tomcat-users</a><br />
                                 User support and discussion
                             </li>
-                            <li><a href="mailto:taglibs-user-subscribe@tomcat.apache.org">taglibs-user@tomcat.apache.org</a><br />
+                            <li><a href="${tomcat7Url}lists.html#taglibs-user">taglibs-user</a><br />
                                 User support and discussion for <a href="${tomcat7Url}taglibs/">Apache Taglibs</a>
                             </li>
-                            <li><a href="mailto:dev-subscribe@tomcat.apache.org">dev@tomcat.apache.org</a><br />
+                            <li><a href="${tomcat7Url}lists.html#tomcat-dev">tomcat-dev</a><br />
                                 Development mailing list, including commit messages
                             </li>
                         </ul>

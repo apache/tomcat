@@ -203,6 +203,10 @@
         address available on the status page of the Manager web application.
         (markt)
       </fix>
+      <fix>
+        Correct links to the Tomcat mailing lists in the ROOT web application.
+        (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Extras">
