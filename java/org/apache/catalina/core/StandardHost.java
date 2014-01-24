@@ -49,9 +49,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class StandardHost extends ContainerBase implements Host {
 
     private static final org.apache.juli.logging.Log log=

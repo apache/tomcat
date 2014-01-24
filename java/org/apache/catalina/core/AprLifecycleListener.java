@@ -38,10 +38,8 @@ import org.apache.tomcat.util.res.StringManager;
  * and destroy APR.
  *
  * @author Remy Maucherat
- * @version $Id$
  * @since 4.1
  */
-
 public class AprLifecycleListener
     implements LifecycleListener {
 

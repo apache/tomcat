@@ -29,9 +29,7 @@ import javax.servlet.ServletContext;
  * Facade for the <b>StandardWrapper</b> object.
  *
  * @author Remy Maucharat
- * @version $Id$
  */
-
 public final class StandardWrapperFacade
     implements ServletConfig {
 
