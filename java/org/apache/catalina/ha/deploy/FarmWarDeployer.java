@@ -56,7 +56,6 @@ import org.apache.tomcat.util.res.StringManager;
  * send across the wire.
  *
  * @author Peter Rossbach
- * @version $Revision$
  */
 public class FarmWarDeployer extends ClusterListener
         implements ClusterDeployer, FileChangeListener {
