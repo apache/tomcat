@@ -34,16 +34,6 @@ import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
 
-/**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
- */
 public class TestTcpFailureDetector {
     private TcpFailureDetector tcpFailureDetector1 = null;
     private TcpFailureDetector tcpFailureDetector2 = null;

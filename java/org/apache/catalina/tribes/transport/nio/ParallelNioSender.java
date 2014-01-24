@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.tribes.transport.nio;
 
-
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.channels.SelectionKey;
@@ -40,16 +39,6 @@ import org.apache.catalina.tribes.util.Logs;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-/**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
- */
 public class ParallelNioSender extends AbstractSender implements MultiPointSender {
 
     private static final Log log = LogFactory.getLog(ParallelNioSender.class);
