@@ -24,12 +24,6 @@
             version="2.0">
   <xsd:annotation>
     <xsd:documentation>
-      @(#)jsp_2_0.xsds  1.17 03/18/03
-    </xsd:documentation>
-  </xsd:annotation>
-
-  <xsd:annotation>
-    <xsd:documentation>
 
       This is the XML Schema for the JSP 2.0 deployment descriptor
       types.  The JSP 2.0 schema contains all the special

@@ -24,12 +24,6 @@
             version="2.4">
   <xsd:annotation>
     <xsd:documentation>
-      %W% %E%
-    </xsd:documentation>
-  </xsd:annotation>
-
-  <xsd:annotation>
-    <xsd:documentation>
       <![CDATA[
 
         This is the XML Schema for the Servlet 2.4 deployment descriptor.
