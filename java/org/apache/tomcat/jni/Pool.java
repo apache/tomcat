@@ -22,9 +22,7 @@ import java.nio.ByteBuffer;
 /** Pool
  *
  * @author Mladen Turk
- * @version $Id$
  */
-
 public class Pool {
 
     /**

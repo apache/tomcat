@@ -20,9 +20,7 @@ package org.apache.tomcat.jni;
 /** Lock
  *
  * @author Mladen Turk
- * @version $Id$
  */
-
 public class Lock {
 
     /**
