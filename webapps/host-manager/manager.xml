@@ -19,11 +19,7 @@
 
     Context configuration file for the Tomcat Manager Web App
 
-    $Id$
-
 -->
-
-
 <Context docBase="${catalina.home}/webapps/manager"
          privileged="true" antiResourceLocking="false" >
 
