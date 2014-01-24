@@ -64,9 +64,7 @@ import org.apache.tools.ant.taskdefs.condition.Condition;
  * </pre>
  *
  * @author Peter Rossbach
- * @version $Id$
  * @since 5.5.10
- *
  */
 public class JMXAccessorEqualsCondition  extends ProjectComponent  implements Condition {
 

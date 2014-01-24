@@ -19,7 +19,6 @@ package org.apache.catalina.ant.jmx;
 /**
  *
  * @author Peter Rossbach
- * @version $Id$
  * @since 5.5.10
  */
 public class Arg {

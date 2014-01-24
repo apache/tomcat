@@ -47,10 +47,8 @@ import org.apache.tools.ant.types.RedirectorElement;
  *
  *
  * @author Gabriele Garuglieri
- * @version $Id$
  * @since 5.5
  */
-
 public abstract class BaseRedirectorHelperTask extends Task {
 
     // ------------------------------------------------------------- Properties
