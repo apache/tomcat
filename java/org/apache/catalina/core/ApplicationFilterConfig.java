@@ -53,9 +53,7 @@ import org.apache.tomcat.util.res.StringManager;
  * is first started.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public final class ApplicationFilterConfig implements FilterConfig, Serializable {
 
     private static final long serialVersionUID = 1L;

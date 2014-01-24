@@ -137,9 +137,7 @@ import org.apache.tomcat.util.scan.StandardJarScanner;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class StandardContext extends ContainerBase
         implements Context, NotificationEmitter {
 

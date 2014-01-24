@@ -50,9 +50,7 @@ import org.apache.juli.logging.LogFactory;
  * You can set the jvmRoute direct or with the System.property <b>jvmRoute</b>.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class StandardEngine extends ContainerBase implements Engine {
 
     private static final Log log = LogFactory.getLog(StandardEngine.class);
