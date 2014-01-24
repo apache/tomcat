@@ -18,7 +18,6 @@ package javax.servlet;
 
 /**
  * @since Servlet 3.0
- * $Id$
  */
 public enum SessionTrackingMode {
     COOKIE,
