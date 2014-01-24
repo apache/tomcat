@@ -29,10 +29,8 @@ package org.apache.catalina.session;
  * <li>Limit the number of active sessions kept in memory by
  *     swapping less active sessions out to disk.</li>
  *
- * @version $Revision$
  * @author Kief Morris (kief@kief.com)
  */
-
 public final class PersistentManager extends PersistentManagerBase {
 
     // ----------------------------------------------------- Instance Variables

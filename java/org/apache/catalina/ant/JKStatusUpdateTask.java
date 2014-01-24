@@ -27,7 +27,6 @@ import org.apache.tools.ant.BuildException;
  * mod_jk status (1.2.9) application.
  *
  * @author Peter Rossbach
- * @version $Revision$
  * @since 5.5.9
  */
 public class JKStatusUpdateTask extends AbstractCatalinaTask {
