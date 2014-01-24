@@ -16,8 +16,6 @@ rem limitations under the License.
 
 rem ---------------------------------------------------------------------------
 rem Append to CLASSPATH
-rem
-rem $Id$
 rem ---------------------------------------------------------------------------
 
 rem Process the first argument

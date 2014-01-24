@@ -38,8 +38,6 @@ rem                   containing some jars in order to allow replacement of APIs
 rem                   created outside of the JCP (i.e. DOM and SAX from W3C).
 rem                   It can also be used to update the XML parser implementation.
 rem                   Defaults to $CATALINA_HOME/endorsed.
-rem
-rem $Id$
 rem ---------------------------------------------------------------------------
 
 rem Guess CATALINA_HOME if not defined

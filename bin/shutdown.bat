@@ -17,8 +17,6 @@ rem limitations under the License.
 if "%OS%" == "Windows_NT" setlocal
 rem ---------------------------------------------------------------------------
 rem Stop script for the CATALINA Server
-rem
-rem $Id$
 rem ---------------------------------------------------------------------------
 
 rem Guess CATALINA_HOME if not defined
