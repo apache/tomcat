@@ -20,9 +20,6 @@ import javax.servlet.ServletConfig;
 
 import org.apache.tomcat.InstanceManager;
 
-/**
- * @version $Id$
- */
 public class InstanceManagerFactory {
 
     private InstanceManagerFactory() {
