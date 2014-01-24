@@ -223,7 +223,6 @@ public class RpcChannel implements ChannelListener{
     /**
      *
      * Class that holds all response.
-     * @author not attributable
      * @version 1.0
      */
     public static class RpcCollector {

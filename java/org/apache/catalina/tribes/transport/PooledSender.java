@@ -24,16 +24,6 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-/**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
- */
 public abstract class PooledSender extends AbstractSender implements MultiPointSender {
 
     private static final Log log = LogFactory.getLog(PooledSender.class);

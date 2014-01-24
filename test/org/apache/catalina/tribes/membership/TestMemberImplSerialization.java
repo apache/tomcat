@@ -26,16 +26,6 @@ import org.junit.Test;
 
 import org.apache.catalina.tribes.Member;
 
-/**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
- */
 public class TestMemberImplSerialization {
     private MemberImpl m1, m2, p1,p2;
     private byte[] payload = null;

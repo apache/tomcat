@@ -27,16 +27,6 @@ import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelInterceptor;
 
-/**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
- */
 public class TestGroupChannelOptionFlag {
     private GroupChannel channel = null;
 

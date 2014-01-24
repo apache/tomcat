@@ -28,16 +28,6 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.catalina.tribes.util.UUIDGenerator;
 
-/**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
- */
 public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
 
     private static final byte[] START_DATA = new byte[] {113, 1, -58, 2, -34, -60, 75, -78, -101, -12, 32, -29, 32, 111, -40, 4};

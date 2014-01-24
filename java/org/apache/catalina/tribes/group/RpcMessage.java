@@ -25,16 +25,6 @@ import java.io.Serializable;
 
 import org.apache.catalina.tribes.util.Arrays;
 
-/**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
- */
 public class RpcMessage implements Externalizable {
 
     protected Serializable message;

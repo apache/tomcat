@@ -34,16 +34,6 @@ import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
 
-/**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
- */
 public class TestDataIntegrity {
     private int msgCount = 500;
     private int threadCount = 20;

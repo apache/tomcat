@@ -14,23 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.tribes.membership;
 
 import java.io.IOException;
 
 import org.apache.catalina.tribes.util.Arrays;
 
-/**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
- */
 public class StaticMember extends MemberImpl {
     public StaticMember() {
         super();
