@@ -35,7 +35,6 @@ import org.apache.catalina.tribes.Member;
  * If a node fails to send out a heartbeat, the node will be dismissed.
  *
  * @author Peter Rossbach
- * @version $Id$
  */
 public class Membership implements Cloneable {
 

@@ -21,10 +21,8 @@ import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 
 /**
- * @version $Id$
  * @since 5.5.16
  */
-
 public interface MultiPointSender extends DataSender
 {
     public void sendMessage(Member[] destination, ChannelMessage data) throws ChannelException;

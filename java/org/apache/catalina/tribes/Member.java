@@ -26,7 +26,6 @@ package org.apache.catalina.tribes;
  * The uniqueId defines the session id for the member. This is an important feature
  * since a member that has crashed and the starts up again on the same port/host is
  * not guaranteed to be the same member, so no state transfers will ever be confused
- * @version $Id$
  */
 public interface Member {
 

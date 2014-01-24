@@ -27,7 +27,6 @@ import org.apache.catalina.tribes.ChannelMessage;
  * The listen callback interface is used by the replication system
  * when data has been received. The interface does not care about
  * objects and marshalling and just passes the bytes straight through.
- * @version $Id$
  */
 public interface ListenCallback
 {

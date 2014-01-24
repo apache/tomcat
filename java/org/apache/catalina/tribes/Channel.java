@@ -65,7 +65,6 @@ import java.io.Serializable;
  * </code></pre>
  *
  * For example usage @see org.apache.catalina.tribes.group.GroupChannel
- * @version $Id$
  */
 public interface Channel {
 

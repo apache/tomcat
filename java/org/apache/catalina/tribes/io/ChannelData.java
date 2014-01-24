@@ -31,8 +31,6 @@ import org.apache.catalina.tribes.util.UUIDGenerator;
  * to another node. While the message is being processed by the different
  * interceptors, the message data can be manipulated as each interceptor seems appropriate.
  * @author Peter Rossbach
- * @version $Id$
- *
  */
 public class ChannelData implements ChannelMessage {
     private static final long serialVersionUID = 1L;
