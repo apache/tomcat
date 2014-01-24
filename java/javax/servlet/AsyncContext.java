@@ -17,7 +17,6 @@
 package javax.servlet;
 
 /**
- * $Id$
  * TODO SERVLET3 - Add comments
  * @since Servlet 3.0
  */

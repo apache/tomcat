@@ -20,9 +20,8 @@ import java.io.IOException;
 import java.util.EventListener;
 
 /**
- * @since Servlet 3.0
- * $Id$
  * TODO SERVLET3 - Add comments
+ * @since Servlet 3.0
  */
 public interface AsyncListener extends EventListener {
     void onComplete(AsyncEvent event) throws IOException;
