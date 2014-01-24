@@ -18,7 +18,6 @@ package org.apache.el.parser;
 
 /**
  * @author Jacob Hookom [jacob@hookom.net]
- * @version $Id$
  */
 public interface NodeVisitor {
     public void visit(Node node) throws Exception;

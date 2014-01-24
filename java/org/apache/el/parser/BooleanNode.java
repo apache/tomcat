@@ -23,7 +23,6 @@ import org.apache.el.lang.EvaluationContext;
 
 /**
  * @author Jacob Hookom [jacob@hookom.net]
- * @version $Id$
  */
 public abstract class BooleanNode extends SimpleNode {
     /**

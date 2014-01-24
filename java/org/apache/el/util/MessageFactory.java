@@ -21,7 +21,6 @@ import java.util.ResourceBundle;
 
 /**
  * @author Jacob Hookom [jacob@hookom.net]
- * @version $Id$
  */
 public final class MessageFactory {
 

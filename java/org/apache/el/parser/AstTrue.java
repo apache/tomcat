@@ -25,7 +25,6 @@ import org.apache.el.lang.EvaluationContext;
 
 /**
  * @author Jacob Hookom [jacob@hookom.net]
- * @version $Id$
  */
 public final class AstTrue extends BooleanNode {
     public AstTrue(int id) {
