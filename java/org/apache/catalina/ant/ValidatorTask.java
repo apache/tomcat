@@ -37,10 +37,8 @@ import org.xml.sax.InputSource;
  * schema validation.
  *
  * @author Remy Maucherat
- * @version $Id$
  * @since 5.0
  */
-
 public class ValidatorTask extends BaseRedirectorHelperTask {
 
 

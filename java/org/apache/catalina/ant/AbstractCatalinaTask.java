@@ -39,10 +39,8 @@ import org.apache.tools.ant.Project;
  * undeploying applications.  These tasks require Ant 1.4 or later.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  * @since 4.1
  */
-
 public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
 
