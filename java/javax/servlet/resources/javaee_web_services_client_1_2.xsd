@@ -8,12 +8,6 @@
             version="1.2">
   <xsd:annotation>
     <xsd:documentation>
-      @(#)javaee_web_services_client_1_2.xsds 1.19 02/13/06
-    </xsd:documentation>
-  </xsd:annotation>
-
-  <xsd:annotation>
-    <xsd:documentation>
 
       DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 

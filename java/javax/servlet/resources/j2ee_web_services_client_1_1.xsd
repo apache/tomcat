@@ -24,12 +24,6 @@
             version="1.1">
   <xsd:annotation>
     <xsd:documentation>
-      @(#)j2ee_web_services_client_1_1.xsds 1.10 02/11/03
-    </xsd:documentation>
-  </xsd:annotation>
-
-  <xsd:annotation>
-    <xsd:documentation>
 
       (C) Copyright International Business Machines Corporation 2002
 

@@ -22,12 +22,6 @@
      elementFormDefault="qualified"
      attributeFormDefault="unqualified"
      version="1.4">
-  <xsd:annotation>
-    <xsd:documentation>
-      @(#)j2ee_1_4.xsds 1.43 03/09/16
-    </xsd:documentation>
-  </xsd:annotation>
-
 <xsd:annotation>
 <xsd:documentation>
 

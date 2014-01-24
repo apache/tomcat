@@ -8,12 +8,6 @@
      version="5">
   <xsd:annotation>
     <xsd:documentation>
-      @(#)javaee_5.xsds 1.65 06/02/17
-    </xsd:documentation>
-  </xsd:annotation>
-
-  <xsd:annotation>
-    <xsd:documentation>
 
       DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
