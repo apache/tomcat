@@ -105,9 +105,7 @@ import org.ietf.jgss.GSSException;
  *
  * @author Remy Maucherat
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class Request
     implements HttpServletRequest {
 

@@ -24,9 +24,7 @@ package org.apache.catalina.security;
  * RuntimePermission does not trigger an AccessControlException.
  *
  * @author Glenn L. Nielsen
- * @version $Id$
  */
-
 public final class SecurityClassLoad {
 
     public static void securityClassLoad(ClassLoader loader) throws Exception {

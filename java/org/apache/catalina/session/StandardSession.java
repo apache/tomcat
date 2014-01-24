@@ -76,9 +76,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  * @author Sean Legassick
  * @author <a href="mailto:jon@latchkey.com">Jon S. Stevens</a>
- * @version $Id$
  */
-
 public class StandardSession implements HttpSession, Session, Serializable {
 
     private static final long serialVersionUID = 1L;

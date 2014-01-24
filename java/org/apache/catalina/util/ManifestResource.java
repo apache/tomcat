@@ -27,8 +27,6 @@ import java.util.jar.Manifest;
  *
  * @author Greg Murray
  * @author Justyna Horwat
- * @version $Id$
- *
  */
 public class ManifestResource {
 

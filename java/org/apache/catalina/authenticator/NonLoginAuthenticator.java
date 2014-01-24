@@ -29,7 +29,6 @@ import org.apache.catalina.connector.Request;
  * only security constraints not involving user authentication.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
 public final class NonLoginAuthenticator extends AuthenticatorBase {
 

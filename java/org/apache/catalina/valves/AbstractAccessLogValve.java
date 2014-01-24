@@ -130,8 +130,6 @@ import org.apache.tomcat.util.collections.SynchronizedStack;
  * @author Remy Maucherat
  * @author Takayuki Kaneko
  * @author Peter Rossbach
- *
- * @version $Id$
  */
 public abstract class AbstractAccessLogValve extends ValveBase implements AccessLog {
 

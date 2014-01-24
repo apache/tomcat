@@ -123,10 +123,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * </p>
  *
  * @author Peter Rossbach
- *
- * @version $Id$
  */
-
 public class ExtendedAccessLogValve extends AccessLogValve {
 
     private static final Log log = LogFactory.getLog(ExtendedAccessLogValve.class);
