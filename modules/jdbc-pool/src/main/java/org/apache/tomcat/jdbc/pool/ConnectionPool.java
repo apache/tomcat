@@ -52,7 +52,6 @@ import org.apache.juli.logging.LogFactory;
  * A custom implementation of a fair {@link FairBlockingQueue} blocking queue is provided with the connection pool itself.
  * @version 1.0
  */
-
 public class ConnectionPool {
 
     /**

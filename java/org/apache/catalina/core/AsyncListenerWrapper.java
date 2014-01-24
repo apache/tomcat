@@ -21,10 +21,6 @@ import java.io.IOException;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 
-/**
- * TODO SERVLET3 - async
- *
- */
 public class AsyncListenerWrapper {
 
     private AsyncListener listener = null;

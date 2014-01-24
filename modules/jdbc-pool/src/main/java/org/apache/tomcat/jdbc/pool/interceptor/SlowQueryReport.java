@@ -215,10 +215,6 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
 
-    /**
-     *
-     *
-     */
     public static class QueryStats {
         static final String[] FIELD_NAMES = new String[] {
             "query",
