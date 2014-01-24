@@ -31,7 +31,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * <em>Synthetic</em> attributes are supported. The <em>Unknown</em>
  * attribute stands for non-standard-attributes.
  *
- * @version $Id$
  * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see ConstantValue
  * @see SourceFile

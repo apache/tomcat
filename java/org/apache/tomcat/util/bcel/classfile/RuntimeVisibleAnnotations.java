@@ -24,7 +24,6 @@ import java.io.IOException;
  * represents an annotation that is represented in the class file and is
  * provided to the JVM.
  *
- * @version $Id: RuntimeVisibleAnnotations
  * @author <A HREF="mailto:dbrosius@qis.net">D. Brosius</A>
  * @since 5.3
  */

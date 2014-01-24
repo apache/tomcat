@@ -32,7 +32,6 @@ import java.io.IOException;
  * is used for debugging purposes and <em>LocalVariableTable</em> which
  * contains information about the local variables.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Attribute
  * @see     LineNumberTable

@@ -22,7 +22,6 @@ import org.apache.tomcat.util.bcel.Constants;
 /**
  * an annotation's element value pair
  *
- * @version $Id: ElementValuePair
  * @author <A HREF="mailto:dbrosius@qis.net">D. Brosius</A>
  * @since 5.3
  */

@@ -28,7 +28,6 @@ import java.io.IOException;
  * attribute using the name <em>Exceptions</em> (which is inconsistent
  * with the other classes).
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Code
  */

@@ -23,7 +23,6 @@ import java.io.IOException;
 /**
  * base class for annotations
  *
- * @version $Id: Annotations
  * @author  <A HREF="mailto:dbrosius@qis.net">D. Brosius</A>
  * @since 5.3
  */

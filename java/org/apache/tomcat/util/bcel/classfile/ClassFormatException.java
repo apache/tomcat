@@ -22,7 +22,6 @@ package org.apache.tomcat.util.bcel.classfile;
  * that the file is malformed or otherwise cannot be interpreted as a
  * class file.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public class ClassFormatException extends RuntimeException {
