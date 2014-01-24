@@ -26,7 +26,6 @@ import java.util.EventListener;
  * attribute from a session, due to a session being invalidated, or due to a
  * session timing out.
  *
- * @author Various
  * @version $Version$
  * @see HttpSession
  * @see HttpSessionBindingEvent

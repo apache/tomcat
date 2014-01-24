@@ -20,7 +20,6 @@ package javax.servlet;
  * Defines a general exception a servlet can throw when it encounters
  * difficulty.
  *
- * @author Various
  * @version $Version$
  */
 public class ServletException extends Exception {

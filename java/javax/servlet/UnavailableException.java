@@ -39,7 +39,6 @@ package javax.servlet;
  * block requests to the servlet or filter for a period of time suggested by the
  * exception, rather than rejecting them until the servlet container restarts.
  *
- * @author Various
  * @version $Version$
  */
 public class UnavailableException extends ServletException {

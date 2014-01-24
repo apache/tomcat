@@ -20,7 +20,6 @@ package javax.servlet.http;
 import java.util.Enumeration;
 
 /**
- * @author Various
  * @version $Version$
  * @deprecated As of Java(tm) Servlet API 2.1 for security reasons, with no
  *             replacement. This interface will be removed in a future version
