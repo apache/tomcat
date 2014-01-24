@@ -47,7 +47,6 @@ import org.apache.catalina.tribes.transport.ReplicationTransmitter;
  *
  * <p>Company: </p>
  *
- * @author fhanik
  * @version 1.0
  */
 public class ChannelCreator {

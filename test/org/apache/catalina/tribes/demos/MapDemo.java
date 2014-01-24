@@ -48,7 +48,6 @@ import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
 /**
  * Example of how the lazy replicated map works, also shows how the BackupManager
  * works in a Tomcat cluster
- * @author fhanik
  * @version 1.1
  */
 public class MapDemo implements ChannelListener, MembershipListener{

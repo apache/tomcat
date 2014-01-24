@@ -40,7 +40,6 @@ import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 /**
  *
- * @author fhanik
  * @author Mladen Turk
  * @author Remy Maucherat
  */

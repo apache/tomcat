@@ -1161,7 +1161,6 @@ public class ConnectionPool {
      * and performs the initialization according to
      * interceptors and validation rules.
      * This class is thread safe and is cancellable
-     * @author fhanik
      *
      */
     protected class ConnectionFuture implements Future<Connection>, Runnable {

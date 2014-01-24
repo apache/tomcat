@@ -34,7 +34,6 @@ import org.apache.tomcat.util.res.StringManager;
  * {@link #getSubmittedCount()} method, to be used to properly handle the work queue.
  * If a RejectedExecutionHandler is not specified a default one will be configured
  * and that one will always throw a RejectedExecutionException
- * @author fhanik
  *
  */
 public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor {

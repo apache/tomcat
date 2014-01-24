@@ -20,7 +20,6 @@ import java.util.Properties;
 
 /**
  *
- * @author fhanik
  *
  */
 public class PoolUtilities {

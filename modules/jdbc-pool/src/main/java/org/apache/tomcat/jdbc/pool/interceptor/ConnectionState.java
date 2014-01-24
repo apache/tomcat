@@ -36,7 +36,6 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  * these settings have been applied.
  * In the cases where the application code doesn't know or want to keep track of the state, this interceptor helps cache the
  * state, and it also avoids roundtrips to the database asking for it.
- * @author fhanik
  *
  */
 
