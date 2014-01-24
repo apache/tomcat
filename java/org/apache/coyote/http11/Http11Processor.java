@@ -36,7 +36,6 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * Processes HTTP requests.
  *
  * @author Remy Maucherat
- * @author fhanik
  */
 public class Http11Processor extends AbstractHttp11Processor<Socket> {
 

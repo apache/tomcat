@@ -51,7 +51,6 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 /**
  * Publishes data to JMX and provides notifications
  * when failures happen.
- * @author fhanik
  *
  */
 public class SlowQueryReportJmx extends SlowQueryReport implements NotificationEmitter, SlowQueryReportJmxMBean{

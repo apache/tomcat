@@ -22,7 +22,6 @@ import org.apache.catalina.tribes.Member;
 /**
  * Extension to the {@link RpcCallback} interface. Allows a RPC messenger to get a confirmation if the reply
  * was sent successfully to the original sender.
- * @author fhanik
  *
  */
 public interface ExtendedRpcCallback extends RpcCallback {

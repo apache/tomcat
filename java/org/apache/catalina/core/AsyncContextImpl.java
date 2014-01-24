@@ -50,11 +50,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
-/**
- *
- * @author fhanik
- *
- */
+
 public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     private static final Log log = LogFactory.getLog(AsyncContextImpl.class);

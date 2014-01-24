@@ -24,7 +24,6 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
  * A list of properties that are configurable for a connection pool.
  * The {@link DataSource} object also implements this interface so that it can be easily configured through
  * an IoC container without having to specify a secondary object with a setter method.
- * @author fhanik
  *
  */
 

@@ -21,7 +21,6 @@ import java.lang.reflect.Method;
 import java.security.SecureRandom;
 
 /**
- * @author fhanik
  *
  */
 public class InduceSlowQuery extends AbstractQueryReport {

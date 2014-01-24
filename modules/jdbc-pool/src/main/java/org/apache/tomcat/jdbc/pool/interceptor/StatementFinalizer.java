@@ -28,7 +28,6 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 /**
  * Keeps track of statements associated with a connection and invokes close upon {@link java.sql.Connection#close()}
  * Useful for applications that dont close the associated statements after being done with a connection.
- * @author fhanik
  *
  */
 public class StatementFinalizer extends AbstractCreateStatementInterceptor {

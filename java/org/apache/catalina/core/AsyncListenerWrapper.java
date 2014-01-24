@@ -23,7 +23,6 @@ import javax.servlet.AsyncListener;
 
 /**
  * TODO SERVLET3 - async
- * @author fhanik
  *
  */
 public class AsyncListenerWrapper {

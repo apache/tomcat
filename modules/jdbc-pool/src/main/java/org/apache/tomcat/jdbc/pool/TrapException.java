@@ -26,7 +26,6 @@ import java.sql.SQLException;
  * called, or throw a SQLException if it is declared.
  * If the caught exception is not declared, and the method doesn't throw SQLException, then this interceptor will
  * throw a RuntimeException
- * @author fhanik
  *
  */
 public class TrapException extends JdbcInterceptor {
