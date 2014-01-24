@@ -27,9 +27,7 @@ import java.util.Enumeration;
  * current server platform.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public interface UserDatabase {
 
 
