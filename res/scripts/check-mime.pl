@@ -18,8 +18,6 @@
 # -----------------------------------------------------------------------------
 # Merge the MIME type definitions contained in the
 # file mime.types from the httpd project into Tomcat web.xml.
-#
-# $Id$
 # -----------------------------------------------------------------------------
 
 # The script uses two mime type lists to describe
