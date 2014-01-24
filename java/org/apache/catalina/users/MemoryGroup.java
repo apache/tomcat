@@ -32,10 +32,8 @@ import org.apache.catalina.UserDatabase;
  * {@link MemoryUserDatabase} implementation of {@link UserDatabase}.</p>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  * @since 4.1
  */
-
 public class MemoryGroup extends AbstractGroup {
 
 

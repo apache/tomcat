@@ -45,9 +45,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author <a href="mailto:nicolaken@supereva.it">Nicola Ken Barozzi</a> Aisa
  * @author <a href="mailto:stefano@apache.org">Stefano Mazzocchi</a>
  * @author Yoav Shapira
- * @version $Id$
  */
-
 public class ErrorReportValve extends ValveBase {
 
     //------------------------------------------------------ Constructor

@@ -34,9 +34,7 @@ import org.apache.tomcat.util.modeler.BaseModelMBean;
  * <code>org.apache.tomcat.util.descriptor.web.ContextEnvironment</code> component.</p>
  *
  * @author Amy Roh
- * @version $Id$
  */
-
 public class ContextEnvironmentMBean extends BaseModelMBean {
 
 

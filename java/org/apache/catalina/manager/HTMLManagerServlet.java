@@ -75,10 +75,8 @@ import org.apache.tomcat.util.res.StringManager;
 * @author Bip Thelin
 * @author Malcolm Edgar
 * @author Glenn L. Nielsen
-* @version $Id$
 * @see ManagerServlet
 */
-
 public final class HTMLManagerServlet extends ManagerServlet {
 
     private static final long serialVersionUID = 1L;

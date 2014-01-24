@@ -59,7 +59,6 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Id$
  */
 public class CoyoteAdapter implements Adapter {
 

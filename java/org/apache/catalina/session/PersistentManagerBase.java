@@ -46,9 +46,7 @@ import org.apache.juli.logging.LogFactory;
  * <code>stop()</code> methods of this class at the correct times.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public abstract class PersistentManagerBase extends ManagerBase
         implements StoreManager {
 

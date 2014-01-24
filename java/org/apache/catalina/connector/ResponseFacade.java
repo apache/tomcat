@@ -38,7 +38,6 @@ import org.apache.tomcat.util.res.StringManager;
  * All methods are delegated to the wrapped response.
  *
  * @author Remy Maucherat
- * @version $Id$
  */
 @SuppressWarnings("deprecation")
 public class ResponseFacade

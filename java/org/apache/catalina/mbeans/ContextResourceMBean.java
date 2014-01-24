@@ -34,9 +34,7 @@ import org.apache.tomcat.util.modeler.BaseModelMBean;
  * <code>org.apache.tomcat.util.descriptor.web.ContextResource</code> component.</p>
  *
  * @author Amy Roh
- * @version $Id$
  */
-
 public class ContextResourceMBean extends BaseModelMBean {
 
 

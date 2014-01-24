@@ -468,7 +468,6 @@ import java.util.Map;
  *  </TR>
  * </TABLE>
  *
- * @version $Id$
  * @author TAMURA Kent &lt;kent@trl.ibm.co.jp&gt;
  */
 public class MIME2Java {

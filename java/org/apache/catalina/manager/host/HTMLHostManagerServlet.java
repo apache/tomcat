@@ -56,10 +56,8 @@ import org.apache.tomcat.util.res.StringManager;
 * @author Malcolm Edgar
 * @author Glenn L. Nielsen
 * @author Peter Rossbach
-* @version $Id$
 * @see org.apache.catalina.manager.ManagerServlet
 */
-
 public final class HTMLHostManagerServlet extends HostManagerServlet {
 
     private static final long serialVersionUID = 1L;

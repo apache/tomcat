@@ -49,9 +49,7 @@ import org.apache.catalina.connector.Response;
  * <p>This Valve should be attached to a Context.</p>
  *
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class CometConnectionManagerValve extends ValveBase
     implements HttpSessionListener, LifecycleListener {
 
