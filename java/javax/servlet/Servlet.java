@@ -51,8 +51,6 @@ import java.io.IOException;
  * the servlet to return basic information about itself, such as author,
  * version, and copyright.
  *
- * @version $Version$
- *
  * @see GenericServlet
  * @see javax.servlet.http.HttpServlet
  */

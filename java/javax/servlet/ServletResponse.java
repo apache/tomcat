@@ -45,7 +45,6 @@ import java.util.Locale;
  * RFC 2045</a> for more information on MIME. Protocols such as SMTP and HTTP
  * define profiles of MIME, and those standards are still evolving.
  *
- * @version $Version$
  * @see ServletOutputStream
  */
 public interface ServletResponse {
