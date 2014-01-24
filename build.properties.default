@@ -20,8 +20,6 @@
 # Tomcat for your local environment.  It defines the location of all external
 # modules that Tomcat depends on.  Copy this file to "build.properties"
 # in the top-level source directory, and customize it as needed.
-#
-# $Id$
 # -----------------------------------------------------------------------------
 
 # ----- Version Control Flags -----
