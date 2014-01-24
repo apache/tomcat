@@ -15,8 +15,6 @@
   limitations under the License.
 ================================================================================
 
-$Id$
-
 Apache Tomcat re-uses code from a number of other Apache projects. There are
 several reasons why depending on the binary releases of those projects is not
 ideal. These include:
