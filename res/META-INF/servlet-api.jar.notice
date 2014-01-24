@@ -11,12 +11,14 @@ The original XML Schemas for Java EE Deployment Descriptors:
  - javaee_6.xsd
  - javaee_web_services_1_3.xsd
  - javaee_web_services_client_1_3.xsd
+ - jsp_2_2.xsd
  - web-app_3_0.xsd
  - web-common_3_0.xsd
  - web-fragment_3_0.xsd
  - javaee_7.xsd
  - javaee_web_services_1_4.xsd
  - javaee_web_services_client_1_4.xsd
+ - jsp_2_3.xsd
  - web-app_3_1.xsd
  - web-common_3_1.xsd
  - web-fragment_3_1.xsd
