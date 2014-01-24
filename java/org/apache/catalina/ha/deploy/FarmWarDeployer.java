@@ -48,8 +48,8 @@ import org.apache.tomcat.util.res.StringManager;
  * </p>
  * Any host can act as the admin, and will have three directories
  * <ul>
- * <li>deployDir - the directory where we watch for changes</li>
- * <li>applicationDir - the directory where we install applications</li>
+ * <li>watchDir - the directory where we watch for changes</li>
+ * <li>deployDir - the directory where we install applications</li>
  * <li>tempDir - a temporaryDirectory to store binary data when downloading a
  * war from the cluster</li>
  * </ul>
