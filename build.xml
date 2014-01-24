@@ -286,6 +286,7 @@
   <patternset id="files.annotations-api">
     <include name="javax/annotation/*" />
     <include name="javax/annotation/security/*" />
+    <include name="javax/annotation/sql/*" />
     <include name="javax/ejb/*" />
     <include name="javax/persistence/*" />
     <include name="javax/xml/ws/*" />
