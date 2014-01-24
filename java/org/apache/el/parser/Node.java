@@ -32,7 +32,6 @@ import org.apache.el.lang.EvaluationContext;
 
 /**
  * @author Jacob Hookom [jacob@hookom.net]
- * $Id$
  */
 public interface Node {
 

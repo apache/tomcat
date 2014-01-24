@@ -34,7 +34,6 @@ import org.apache.el.lang.ELSupport;
  * Utilities for Managing Serialization and Reflection
  *
  * @author Jacob Hookom [jacob@hookom.net]
- * @version $Id$
  */
 public class ReflectionUtil {
 
