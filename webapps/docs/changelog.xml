@@ -240,6 +240,9 @@
         could incorrectly report that Tomcat had not yet completely stopped when
         it had. Based on a patch by jess. (markt) 
       </fix>
+      <fix>
+        Package correct license and notice files with embedded JARs. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

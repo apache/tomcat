@@ -1147,11 +1147,15 @@
          solution will be required. -->
     <jarIt jarfile="${tomcat-embed-core.jar}"
            filesDir="${tomcat.classes}"
-           filesId="files.tomcat-embed-core"/>
+           filesId="files.tomcat-embed-core"
+           notice="${tomcat.manifests}/servlet-api.jar.notice"
+           license="${tomcat.manifests}/servlet-api.jar.jar.license"/>
     <jarIt jarfile="${tomcat-embed-jasper.jar}"
            filesDir="${tomcat.classes}"
            filesId="files.tomcat-embed-jasper"
-           meta-inf="${tomcat.manifests}/jasper.jar"/>
+           meta-inf="${tomcat.manifests}/jasper.jar"
+           notice="${tomcat.manifests}/jsp-api.jar.notice"
+           license="${tomcat.manifests}/jsp-api.jar.jar.license"/>
     <jarIt jarfile="${tomcat-embed-el.jar}"
            filesDir="${tomcat.classes}"
            filesId="files.tomcat-embed-el"/>
@@ -1174,11 +1178,13 @@
     <jarIt jarfile="${tomcat-embed-core-sources.jar}"
            filesDir="java"
            filesId="files.tomcat-embed-core"
-           notice="${tomcat.manifests}/tomcat-embed-core.jar.notice"
-           license="${tomcat.manifests}/tomcat-embed-core.jar.license"/>
+           notice="${tomcat.manifests}/servlet-api.jar.notice"
+           license="${tomcat.manifests}/servlet-api.jar.jar.license"/>
     <jarIt jarfile="${tomcat-embed-jasper-sources.jar}"
            filesDir="java"
-           filesId="files.tomcat-embed-jasper"/>
+           filesId="files.tomcat-embed-jasper"
+           notice="${tomcat.manifests}/jsp-api.jar.notice"
+           license="${tomcat.manifests}/jsp-api.jar.jar.license"/>
     <jarIt jarfile="${tomcat-embed-el-sources.jar}"
            filesDir="java"
            filesId="files.tomcat-embed-el"/>
