@@ -43,10 +43,8 @@ import org.apache.tomcat.util.ExceptionUtils;
  * of <code>UserDatabase</code> that we should consult.</p>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  * @since 4.1
  */
-
 public class UserDatabaseRealm
     extends RealmBase {
 
