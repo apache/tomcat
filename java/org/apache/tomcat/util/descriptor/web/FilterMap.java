@@ -31,9 +31,7 @@ import org.apache.tomcat.util.buf.UDecoder;
  * a URL pattern or a servlet name.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class FilterMap implements Serializable {
 
 

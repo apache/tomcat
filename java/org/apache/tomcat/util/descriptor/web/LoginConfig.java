@@ -26,9 +26,7 @@ import org.apache.tomcat.util.buf.UDecoder;
  * deployment descriptor.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class LoginConfig implements Serializable {
 
 
