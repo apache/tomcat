@@ -30,8 +30,6 @@ import org.apache.tomcat.util.http.fileupload.UploadContext;
  * an HTTP servlet.</p>
  *
  * @since FileUpload 1.1
- *
- * @version $Id$
  */
 public class ServletRequestContext implements UploadContext {
 

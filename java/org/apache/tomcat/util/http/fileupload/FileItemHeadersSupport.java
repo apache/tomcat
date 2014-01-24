@@ -24,8 +24,6 @@ package org.apache.tomcat.util.http.fileupload;
  *
  * @see FileItem
  * @see FileItemStream
- *
- * @version $Id$
  */
 public interface FileItemHeadersSupport {
 

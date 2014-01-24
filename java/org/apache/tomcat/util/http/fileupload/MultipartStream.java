@@ -79,8 +79,6 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  *     // a read or write error occurred
  *   }
  * </pre>
- *
- * @version $Id$
  */
 public class MultipartStream {
 
