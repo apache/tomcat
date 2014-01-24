@@ -44,7 +44,6 @@ package org.apache.catalina.tribes.transport.bio.util;
  * threads must release an owned lock before competing
  * for the lock again!
  *
- * @author Rainer Jung
  * @author Peter Rossbach
  * @version 1.1
  */
