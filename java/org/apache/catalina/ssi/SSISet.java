@@ -24,7 +24,6 @@ import java.io.PrintWriter;
  * @author Paul Speed
  * @author Dan Sandberg
  * @author David Becker
- * @version $Id$
  */
 public class SSISet implements SSICommand {
     /**

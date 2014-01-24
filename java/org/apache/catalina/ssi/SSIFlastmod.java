@@ -30,7 +30,6 @@ import org.apache.catalina.util.Strftime;
  * @author Paul Speed
  * @author Dan Sandberg
  * @author David Becker
- * @version $Id$
  */
 public final class SSIFlastmod implements SSICommand {
     /**
