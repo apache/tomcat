@@ -215,6 +215,12 @@
         <bug>56039</bug>: Enable the JmxRemoteLifecycleListener to work over
         SSL. Patch by esengstrom. (markt)
       </fix>
+      <fix>
+        <bug>56045</bug>: Copy the XML schemas used for validation that are
+        packaged in jsp-api.jar to servlet-api.jar so that an embedded Tomcat
+        instance can start without Jasper being available. This also enables
+        validation to work without Jasper being available. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
