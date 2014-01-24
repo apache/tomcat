@@ -25,7 +25,6 @@
   <properties>
     <author email="craigmcc@apache.org">Craig McClanahan</author>
     <title>JDBCRealm</title>
-    <revision>$Id$</revision>
   </properties>
 
 <body>

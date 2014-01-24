@@ -42,9 +42,7 @@ import javax.servlet.ServletResponse;
  * </ul>
  *
  * @author Craig McClanahan
- * @version $Id$
  */
-
 public final class ExampleFilter implements Filter {
 
 
