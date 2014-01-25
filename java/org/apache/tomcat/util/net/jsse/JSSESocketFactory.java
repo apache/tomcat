@@ -78,7 +78,6 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Stefan Freyr Stefansson
  * @author EKR -- renamed to JSSESocketFactory
  * @author Jan Luehe
- * @author Bill Barker
  */
 public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
 
