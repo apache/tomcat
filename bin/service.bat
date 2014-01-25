@@ -25,8 +25,6 @@ rem remove                 Remove the service from the System.
 rem
 rem name        (optional) If the second argument is present it is considered
 rem                        to be new service name
-rem
-rem $Id$
 rem ---------------------------------------------------------------------------
 
 set "SELF=%~dp0%service.bat"

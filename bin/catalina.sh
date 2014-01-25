@@ -93,8 +93,6 @@
 #   LOGGING_MANAGER (Optional) Override Tomcat's logging manager
 #                   Example (all one line)
 #                   LOGGING_MANAGER="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
-#
-# $Id$
 # -----------------------------------------------------------------------------
 
 # OS specific support.  $var _must_ be set to either true or false.
