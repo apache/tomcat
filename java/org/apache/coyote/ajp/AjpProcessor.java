@@ -35,7 +35,6 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * @author Keith Wannamaker
  * @author Kevin Seguin
  * @author Costin Manolache
- * @author Bill Barker
  */
 public class AjpProcessor extends AbstractAjpProcessor<Socket> {
 
