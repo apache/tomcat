@@ -20,8 +20,6 @@
 # Tomcat JDBC Pool for your local environment.  It defines the location of all external
 # modules that Tomcat JDBC Pool depends on.  Copy this file to "build.properties"
 # in the top-level source directory, and customize it as needed.
-#
-# $Id: build.properties.default 786496 2009-06-19 13:11:00Z markt $
 # -----------------------------------------------------------------------------
 
 # ----- Vesion Control Flags -----
