@@ -15,8 +15,6 @@
   limitations under the License.
 ================================================================================
 
-$Id$
-
 General preparations before any publishing:
 1 - Download Maven Ant Tasks (version 2.1.0 is known to work) and place it in
     this directory
