@@ -28,6 +28,7 @@ mvn.properties
 .fbprefs
 .project
 .settings
+.idea
 *.iml
 *.asc
 *.jj
