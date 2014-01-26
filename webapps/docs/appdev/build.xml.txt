@@ -34,8 +34,6 @@
         web                  Static HTML, JSP, and other content (such as
                              image files), including the WEB-INF subdirectory
                              and its configuration file contents.
-
-     $Id$
 -->
 
 
