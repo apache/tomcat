@@ -34,7 +34,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * is used for debugging purposes and <em>LocalVariableTable</em> which 
  * contains information about the local variables.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Attribute
  * @see     CodeException

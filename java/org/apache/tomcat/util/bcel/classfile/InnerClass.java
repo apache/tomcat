@@ -29,7 +29,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * indices of the inner and outer classes, the name and the attributes
  * of the inner class.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see InnerClasses
  */

@@ -29,7 +29,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * local variables and the the of stack items at a given byte code offset.
  * See CLDC specification &sect;5.3.1.2
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     StackMap
  * @see     StackMapType

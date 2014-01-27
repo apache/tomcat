@@ -28,7 +28,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * and represents a reference to the name and signature
  * of a field or method.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Constant
  */

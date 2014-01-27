@@ -28,7 +28,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * This class represents a local variable within a method. It contains its
  * scope, name, signature and index on the method's frame.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     LocalVariableTable
  */

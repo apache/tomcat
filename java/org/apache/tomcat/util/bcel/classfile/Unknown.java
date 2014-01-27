@@ -35,7 +35,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * org.apache.tomcat.util.bcel.classfile.AttributeReader)">Attribute.addAttributeReader</a>.
 
  *
- * @version $Id$
  * @see org.apache.tomcat.util.bcel.classfile.Attribute
  * @see org.apache.tomcat.util.bcel.classfile.AttributeReader
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>

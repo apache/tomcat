@@ -29,7 +29,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * attribute and is used only there. It contains a range in which a
  * particular exception handler is active.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Code
  */

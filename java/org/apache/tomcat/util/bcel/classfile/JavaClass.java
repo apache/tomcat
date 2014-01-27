@@ -32,7 +32,6 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
  * class file.  Those interested in programatically generating classes
  * should see the <a href="../generic/ClassGen.html">ClassGen</a> class.
 
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public class JavaClass extends AccessFlags

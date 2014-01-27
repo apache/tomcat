@@ -22,7 +22,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * @version $Id: ElementValue
  * @author <A HREF="mailto:dbrosius@qis.net">D. Brosius</A>
  * @since 5.3
  */

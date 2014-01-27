@@ -26,7 +26,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * This class is derived from <em>Attribute</em> and represents a reference
  * to a GJ attribute.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Attribute
  */

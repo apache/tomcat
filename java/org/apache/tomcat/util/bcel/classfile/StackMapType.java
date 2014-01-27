@@ -28,7 +28,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * This class represents the type of a local variable or item on stack
  * used in the StackMap entries.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     StackMapEntry
  * @see     StackMap

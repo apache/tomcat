@@ -23,7 +23,6 @@ package org.apache.tomcat.util.bcel.classfile;
  * method. These factory objects should implement this interface.
 
  * @see Attribute
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public interface AttributeReader {

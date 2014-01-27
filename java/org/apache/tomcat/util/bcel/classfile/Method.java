@@ -28,7 +28,6 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
  * for a method in the class. See JVM specification for details.
  * A method has access flags, a name, a signature and a number of attributes.
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public final class Method extends FieldOrMethod {

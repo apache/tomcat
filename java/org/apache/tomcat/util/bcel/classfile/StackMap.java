@@ -31,7 +31,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * within the Code attribute of a method. See CLDC specification
  * &sect;5.3.1.2
  *
- * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Code
  * @see     StackMapEntry
