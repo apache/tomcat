@@ -27,7 +27,6 @@ import org.apache.el.util.Validation;
 
 /**
  * @author Jacob Hookom [jacob@hookom.net]
- * @version $Id$
  */
 public final class AstDotSuffix extends SimpleNode {
     public AstDotSuffix(int id) {

@@ -26,7 +26,6 @@ import org.apache.el.util.MessageFactory;
 /**
  * A helper class of Arithmetic defined by the EL Specification
  * @author Jacob Hookom [jacob@hookom.net]
- * @version $Id$
  */
 public abstract class ELArithmetic {
 
