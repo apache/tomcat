@@ -27,7 +27,6 @@ import java.util.EventListener;
  * session timing out.
  * 
  * @author Various
- * @version $Version$
  * @see HttpSession
  * @see HttpSessionBindingEvent
  */

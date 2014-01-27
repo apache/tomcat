@@ -28,7 +28,6 @@ import javax.servlet.ServletResponseWrapper;
  * default to calling through to the wrapped response object.
  * 
  * @author Various
- * @version $Version$
  * @since v 2.3
  * @see javax.servlet.http.HttpServletResponse
  */

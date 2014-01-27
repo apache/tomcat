@@ -20,9 +20,8 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * @since Servlet 3.0
- * $Id$
  * TODO SERVLET3 - Add comments
+ * @since Servlet 3.0
  */
 public interface ServletRegistration extends Registration {
     

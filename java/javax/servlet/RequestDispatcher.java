@@ -30,7 +30,6 @@ import java.io.IOException;
  * create <code>RequestDispatcher</code> objects to wrap any type of resource.
  * 
  * @author Various
- * @version $Version$
  * 
  * @see ServletContext#getRequestDispatcher(java.lang.String)
  * @see ServletContext#getNamedDispatcher(java.lang.String)

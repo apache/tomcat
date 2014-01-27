@@ -71,7 +71,6 @@ import javax.servlet.ServletResponse;
  * information on handling multiple threads in a Java program.
  *
  * @author  Various
- * @version $Version$
  */
 public abstract class HttpServlet extends GenericServlet {
 

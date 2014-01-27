@@ -46,7 +46,6 @@ import java.util.Locale;
  * define profiles of MIME, and those standards are still evolving.
  * 
  * @author Various
- * @version $Version$
  * @see ServletOutputStream
  */
 public interface ServletResponse {

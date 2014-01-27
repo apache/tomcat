@@ -33,7 +33,6 @@ import java.io.InputStream;
  * this class must implement the <code>java.io.InputStream.read()</code> method.
  * 
  * @author Various
- * @version $Version$
  * @see ServletRequest
  */
 public abstract class ServletInputStream extends InputStream {

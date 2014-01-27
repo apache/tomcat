@@ -34,7 +34,6 @@ import java.util.Map;
  * {@link javax.servlet.http.HttpServletRequest}.
  * 
  * @author Various
- * @version $Version$
  * @see javax.servlet.http.HttpServletRequest
  */
 public interface ServletRequest {

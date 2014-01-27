@@ -27,7 +27,6 @@ import java.util.Locale;
  * calling through to the wrapped response object.
  * 
  * @author Various
- * @version $Version$
  * @since v 2.3
  * @see javax.servlet.ServletResponse
  */

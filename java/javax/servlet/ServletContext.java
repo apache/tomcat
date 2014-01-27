@@ -47,7 +47,6 @@ import javax.servlet.descriptor.JspConfigDescriptor;
  * the servlet is initialized.
  * 
  * @author Various
- * @version $Version$
  * @see Servlet#getServletConfig
  * @see ServletConfig#getServletContext
  */

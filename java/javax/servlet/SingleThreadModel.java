@@ -36,7 +36,6 @@ package javax.servlet;
  * Servlet API version 2.4.
  * 
  * @author Various
- * @version $Version$
  * @deprecated As of Java Servlet API 2.4, with no direct replacement.
  */
 @SuppressWarnings("dep-ann")

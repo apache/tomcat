@@ -32,7 +32,6 @@ import java.util.ResourceBundle;
  * method.
  * 
  * @author Various
- * @version $Version$
  * @see ServletResponse
  */
 public abstract class ServletOutputStream extends OutputStream {

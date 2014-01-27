@@ -40,7 +40,6 @@ package javax.servlet;
  * exception, rather than rejecting them until the servlet container restarts.
  * 
  * @author Various
- * @version $Version$
  */
 public class UnavailableException extends ServletException {
 
