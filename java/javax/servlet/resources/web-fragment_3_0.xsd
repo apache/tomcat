@@ -9,14 +9,6 @@
   <xsd:annotation>
     <xsd:documentation>
 
-      $Id$
-      
-    </xsd:documentation>
-  </xsd:annotation>
-
-  <xsd:annotation>
-    <xsd:documentation>
-
       DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
       
       Copyright 2003-2009 Sun Microsystems, Inc. All rights reserved.
