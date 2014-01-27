@@ -74,7 +74,6 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Filip Hanik
  * @author Remy Maucherat
  * @author Peter Rossbach
- * @version $Id$
  */
 public class SimpleTcpCluster extends LifecycleMBeanBase
         implements CatalinaCluster, LifecycleListener, IDynamicProperty,

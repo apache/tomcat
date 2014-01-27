@@ -29,9 +29,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
  *
  * @author Filip Hanik
  * @author Peter Rossbach
- * @version $Id$
  */
-
 public class ClusterRuleSet extends RuleSetBase {
 
 

@@ -34,9 +34,7 @@ import org.apache.juli.logging.Log;
  * different cluster implementations
  *
  * @author Filip Hanik
- * @version $Id$
  */
-
 public interface CatalinaCluster extends Cluster {
     // ----------------------------------------------------- Instance Variables
 

@@ -53,9 +53,7 @@ import org.apache.tomcat.util.res.StringManager;
  * track of deltas during a request.
  *
  * @author Filip Hanik
- * @version $Id$
  */
-
 public class DeltaSession extends StandardSession implements Externalizable,ClusterSession,ReplicatedMapEntry {
 
     public static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(DeltaSession.class);

@@ -21,7 +21,6 @@ import org.apache.catalina.tribes.Member;
 
 /**
  * @author Peter Rossbach
- * @version $Id$
  */
 public class SendMessageData {
 

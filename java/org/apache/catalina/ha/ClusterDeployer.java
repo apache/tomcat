@@ -22,7 +22,6 @@ package org.apache.catalina.ha;
  * different deployment implementations
  *
  * @author Filip Hanik
- * @version $Id$
  */
 import java.io.File;
 import java.io.IOException;

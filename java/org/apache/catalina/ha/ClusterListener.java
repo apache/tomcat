@@ -29,7 +29,6 @@ import org.apache.catalina.tribes.Member;
  * 
  * @author Peter Rossbach
  * @author Filip Hanik
- * @version $Id$
  */
 public abstract class ClusterListener implements ChannelListener {
 

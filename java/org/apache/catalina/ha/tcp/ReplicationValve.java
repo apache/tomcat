@@ -60,9 +60,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  * @author Filip Hanik
  * @author Peter Rossbach
- * @version $Id$
  */
-
 public class ReplicationValve
     extends ValveBase implements ClusterValve {
     
