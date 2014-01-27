@@ -29,7 +29,6 @@ import javax.naming.directory.DirContext;
  * Stream handler to a JNDI directory context.
  * 
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
- * @version $Revision$
  */
 public class DirContextURLStreamHandler extends URLStreamHandler {
     

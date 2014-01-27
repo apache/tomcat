@@ -33,9 +33,7 @@ import org.apache.naming.TransactionRef;
  * Object factory for User transactions.
  * 
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class TransactionFactory
     implements ObjectFactory {
 

@@ -47,9 +47,7 @@ import org.apache.tomcat.util.http.RequestUtil;
  * Filesystem Directory Context implementation helper class.
  *
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class FileDirContext extends BaseDirContext {
 
     private static final org.apache.juli.logging.Log log=

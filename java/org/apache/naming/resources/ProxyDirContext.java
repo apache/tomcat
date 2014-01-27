@@ -44,9 +44,7 @@ import org.apache.naming.StringManager;
  * Proxy Directory Context implementation.
  *
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class ProxyDirContext implements DirContext {
 
 

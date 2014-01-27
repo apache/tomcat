@@ -25,7 +25,6 @@ import java.util.Random;
  * Implements a special purpose cache.
  * 
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
- * @version $Revision$
  */
 public class ResourceCache {
     

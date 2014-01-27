@@ -34,7 +34,6 @@ import org.apache.naming.EjbRef;
  * Object factory for EJBs.
  * 
  * @author Remy Maucherat
- * @version $Id$
  */
 
 public class EjbFactory

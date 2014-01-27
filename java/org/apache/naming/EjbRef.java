@@ -26,9 +26,7 @@ import javax.naming.StringRefAddr;
  * Represents a reference address to an EJB.
  *
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class EjbRef extends Reference {
 
     private static final long serialVersionUID = 1L;

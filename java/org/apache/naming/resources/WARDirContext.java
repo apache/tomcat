@@ -49,9 +49,7 @@ import org.apache.naming.NamingEntry;
  * WAR Directory Context implementation.
  *
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class WARDirContext extends BaseDirContext {
 
     private static final org.apache.juli.logging.Log log=

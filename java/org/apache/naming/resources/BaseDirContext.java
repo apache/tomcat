@@ -56,9 +56,7 @@ import org.apache.naming.StringManager;
  * Directory Context implementation helper class.
  *
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public abstract class BaseDirContext implements DirContext {
 
     private static final org.apache.juli.logging.Log log=

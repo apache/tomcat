@@ -27,7 +27,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * users specifying additional stream handler.
  * 
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
- * @version $Revision$
  */
 public class DirContextURLStreamHandlerFactory
         implements URLStreamHandlerFactory {

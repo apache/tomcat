@@ -25,7 +25,6 @@ import java.io.InputStream;
  * Encapsulates the contents of a resource.
  * 
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
- * @version $Revision$
  */
 public class Resource {
     

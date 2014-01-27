@@ -29,9 +29,7 @@ import javax.naming.StringRefAddr;
  * Represents a reference address to a resource.
  *
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class ResourceRef extends Reference {
 
     private static final long serialVersionUID = 1L;

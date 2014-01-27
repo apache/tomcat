@@ -34,7 +34,6 @@ import javax.naming.directory.BasicAttribute;
  * Attributes implementation.
  * 
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
- * @version $Revision$
  */
 public class ResourceAttributes implements Attributes {
     
