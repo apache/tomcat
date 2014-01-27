@@ -33,9 +33,7 @@ import javax.management.NotificationFilter;
  * supplied by the application.</p>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class BaseAttributeFilter implements NotificationFilter {
 
     private static final long serialVersionUID = 1L;
