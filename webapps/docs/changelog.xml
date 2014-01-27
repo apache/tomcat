@@ -186,6 +186,10 @@
         that when EL containing a ternary expression was used in an attribute
         a compilation error would occur for some expressions. (markt)
       </fix>
+      <fix>
+        Correct typo in definition of default value for contentType attribute
+        of jsp:directive.page element in jspxml Schema and DTD. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

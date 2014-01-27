@@ -96,7 +96,7 @@
 <!ATTLIST jsp:directive.page
     language        CDATA           "java"
     extends         %ClassName;     #IMPLIED
-    contentType     %Content;       "text/html; ISO-8859-1"
+    contentType     %Content;       "text/html; charset=ISO-8859-1"
     import          CDATA           #IMPLIED
     session         %Bool;          "true"
     buffer          CDATA           "8kb"
