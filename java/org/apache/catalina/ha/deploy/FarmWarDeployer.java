@@ -58,7 +58,6 @@ import org.apache.tomcat.util.res.StringManager;
  * 
  * @author Filip Hanik
  * @author Peter Rossbach
- * @version $Revision$
  */
 public class FarmWarDeployer extends ClusterListener
         implements ClusterDeployer, FileChangeListener {

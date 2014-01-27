@@ -36,7 +36,6 @@ import org.apache.tomcat.util.ExceptionUtils;
  *
  * @author Greg Murray
  * @author Remy Maucherat
- * @version $Revision: 1.0
  */
 
 public final class ApplicationFilterFactory {

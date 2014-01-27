@@ -25,7 +25,6 @@ import java.util.regex.PatternSyntaxException;
 /**
  * Represents a parsed expression.
  * 
- * @version $Revision$
  * @author Paul Speed
  */
 public class ExpressionParseTree {
