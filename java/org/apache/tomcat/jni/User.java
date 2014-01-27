@@ -20,9 +20,7 @@ package org.apache.tomcat.jni;
 /** User
  *
  * @author Mladen Turk
- * @version $Id$
  */
-
 public class User {
 
     /**

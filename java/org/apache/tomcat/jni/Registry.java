@@ -20,9 +20,7 @@ package org.apache.tomcat.jni;
 /** Windows Registy support
  *
  * @author Mladen Turk
- * @version $Id$
  */
-
 public class Registry {
 
     /* Registry Enums */

@@ -20,9 +20,7 @@ package org.apache.tomcat.jni;
 /** Error
  *
  * @author Mladen Turk
- * @version $Id$
  */
-
 public class Error extends Exception {
 
     private static final long serialVersionUID = 1L;

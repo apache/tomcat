@@ -20,9 +20,7 @@ package org.apache.tomcat.jni;
 /** Directory
  *
  * @author Mladen Turk
- * @version $Id$
  */
-
 public class Directory {
 
     /**

@@ -20,7 +20,6 @@ package org.apache.tomcat.jni;
 /** Poll
  *
  * @author Mladen Turk
- * @version $Id$
  */
 
 public class Poll {
