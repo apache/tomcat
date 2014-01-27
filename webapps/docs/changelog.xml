@@ -252,6 +252,10 @@
       <fix>
         Package correct license and notice files with embedded JARs. (markt)
       </fix>
+      <scode>
+        Remove svn keywords (such as $Id) from source files and documentation.
+        (kkolinko)
+      </scode>
     </changelog>
   </subsection>
 </section>
