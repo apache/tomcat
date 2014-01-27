@@ -28,7 +28,6 @@ import org.apache.tomcat.util.buf.B2CConverter;
  * <p>This class is immutable and thread-safe.</p>
  *
  * @see <a href="http://download.oracle.com/javase/6/docs/api/java/nio/charset/Charset.html">Standard charsets</a>
- * @version $Id$
  * @since 1.4
  */
 public class StringUtils {

@@ -23,8 +23,6 @@ package org.apache.tomcat.util.codec;
  * Allows a user to pass a generic Object to any Decoder implementation in the codec package.
  * <p>
  * One of the two interfaces at the center of the codec package.
- *
- * @version $Id$
  */
 public interface Decoder {
 
