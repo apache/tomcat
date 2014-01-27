@@ -207,7 +207,7 @@
       
     <attribute name="logger"
                description="Associated logger."
-               type="org.apache.commons.logging.Log" />
+               type="org.apache.juli.logging.Log" />
       
     <attribute name="managedResource"
                description="The managed resource this MBean is associated with"

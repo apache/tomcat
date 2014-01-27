@@ -121,6 +121,11 @@
         Add missing <code>javax.annotation.sql.*</code> classes to
         annotations-api.jar. (markt)
       </fix>
+      <fix>
+        The type of logger attribute of Context MBean should be not
+        <code>org.apache.commons.logging.Log</code> but
+        <code>org.apache.juli.logging.Log</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
