@@ -33,8 +33,6 @@ import java.io.OutputStream;
  * NOTE: This implementation may trigger the event <em>before</em> the threshold
  * is actually reached, since it triggers when a pending write operation would
  * cause the threshold to be exceeded.
- *
- * @version $Id$
  */
 public abstract class ThresholdingOutputStream
     extends OutputStream

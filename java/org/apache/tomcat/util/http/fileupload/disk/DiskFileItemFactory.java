@@ -56,8 +56,6 @@ import org.apache.tomcat.util.http.fileupload.FileItemFactory;
  * deleted later on.</p>
  *
  * @since FileUpload 1.1
- *
- * @version $Id$
  */
 public class DiskFileItemFactory implements FileItemFactory {
 

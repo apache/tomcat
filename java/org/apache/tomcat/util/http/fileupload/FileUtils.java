@@ -39,8 +39,6 @@ import java.io.IOException;
  * </ul>
  * <p>
  * Origin of code: Excalibur, Alexandria, Commons-Utils
- *
- * @version $Id$
  */
 public class FileUtils {
 

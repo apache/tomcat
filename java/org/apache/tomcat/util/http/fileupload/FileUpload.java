@@ -29,8 +29,6 @@ package org.apache.tomcat.util.http.fileupload;
  * <p>How the data for individual parts is stored is determined by the factory
  * used to create them; a given part may be in memory, on disk, or somewhere
  * else.</p>
- *
- * @version $Id$
  */
 public class FileUpload
     extends FileUploadBase {

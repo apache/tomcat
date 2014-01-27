@@ -38,8 +38,6 @@ import java.util.List;
  * longer needed. This is done by invoking the method
  * {@link #exitWhenFinished}, typically in
  * {@link javax.servlet.ServletContextListener#contextDestroyed} or similar.
- *
- * @version $Id$
  */
 public class FileCleaningTracker {
     /**

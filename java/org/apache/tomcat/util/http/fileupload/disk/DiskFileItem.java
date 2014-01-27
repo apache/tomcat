@@ -55,8 +55,6 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  * deleted later on.</p>
  *
  * @since FileUpload 1.1
- *
- * @version $Id$
  */
 public class DiskFileItem
     implements FileItem {
