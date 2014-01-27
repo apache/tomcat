@@ -36,9 +36,7 @@ import org.apache.catalina.util.RequestUtil;
  * this class is synchronized.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class SecurityCollection implements Serializable {
 
     private static final long serialVersionUID = 1L;

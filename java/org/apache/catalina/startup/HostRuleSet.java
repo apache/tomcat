@@ -30,9 +30,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
  * <code>ContextRuleSet</code>.</p>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class HostRuleSet extends RuleSetBase {
 
 

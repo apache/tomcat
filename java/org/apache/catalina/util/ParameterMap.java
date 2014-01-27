@@ -29,7 +29,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <code>ParmaeterMap</code> instance is not locked.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
 public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 

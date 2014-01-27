@@ -78,7 +78,6 @@ import org.apache.tomcat.util.modeler.Util;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Id$
  */
 @SuppressWarnings("deprecation") // SingleThreadModel
 public class StandardWrapper extends ContainerBase

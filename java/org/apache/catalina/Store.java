@@ -31,9 +31,7 @@ import java.io.IOException;
  * server or context restarts.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public interface Store {
 
 

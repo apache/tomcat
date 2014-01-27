@@ -32,7 +32,6 @@ import org.apache.catalina.deploy.LoginConfig;
  * provides some sort of authentication service.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
 
 public interface Authenticator {

@@ -30,7 +30,6 @@ import org.apache.tomcat.util.buf.CharChunk;
  * Internet Message Bodies. Reference 1996
  *
  * @author Jeffrey Rodriguez
- * @version $Id$
  *
  * @deprecated  Use {@link org.apache.tomcat.util.codec.binary.Base64}
  *              This class will be removed in Tomcat 8.

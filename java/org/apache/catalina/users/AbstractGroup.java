@@ -31,10 +31,8 @@ import org.apache.catalina.UserDatabase;
  * <p>Convenience base class for {@link Group} implementations.</p>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  * @since 4.1
  */
-
 public abstract class AbstractGroup implements Group {
 
 

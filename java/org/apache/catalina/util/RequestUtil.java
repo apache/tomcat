@@ -31,7 +31,6 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  * @author Tim Tye
- * @version $Id$
  */
 public final class RequestUtil {
 

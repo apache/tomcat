@@ -42,7 +42,6 @@ import org.apache.catalina.Globals;
  * @author Amy Roh
  * @author Dan Sandberg
  * @author David Becker
- * @version $Id$
  */
 public class SSIServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;

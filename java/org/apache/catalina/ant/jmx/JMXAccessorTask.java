@@ -85,10 +85,8 @@ import org.apache.tools.ant.Project;
  * </b>: These tasks require Ant 1.6 or later interface.
  * 
  * @author Peter Rossbach
- * @version $Id$
  * @since 5.5.10
  */
-
 public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
     public static final String JMX_SERVICE_PREFIX = "service:jmx:rmi:///jndi/rmi://";

@@ -44,9 +44,7 @@ import org.xml.sax.Attributes;
  * deployment descriptor (<code>/WEB-INF/web.xml</code>) resource.</p>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class WebRuleSet extends RuleSetBase {
 
     /**

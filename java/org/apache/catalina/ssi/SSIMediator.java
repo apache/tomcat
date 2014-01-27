@@ -38,7 +38,6 @@ import org.apache.tomcat.util.http.HttpMessages;
  * @author Paul Speed
  * @author Dan Sandberg
  * @author David Becker
- * @version $Id$
  */
 public class SSIMediator {
     protected static final String DEFAULT_CONFIG_ERR_MSG = "[an error occurred while processing this directive]";

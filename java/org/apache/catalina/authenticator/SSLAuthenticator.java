@@ -38,7 +38,6 @@ import org.apache.coyote.ActionCode;
  * that utilizes SSL certificates to identify client users.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
 
 public class SSLAuthenticator

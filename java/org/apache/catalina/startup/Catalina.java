@@ -67,7 +67,6 @@ import org.xml.sax.SAXParseException;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Id$
  */
 public class Catalina {
 

@@ -114,9 +114,7 @@ import org.apache.tomcat.util.res.StringManager;
  * </p>
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class DefaultServlet
     extends HttpServlet {
 

@@ -25,9 +25,7 @@ package org.apache.catalina.security;
  *
  * @author Glenn L. Nielsen
  * @author Jean-Francois Arcand
- * @version $Id$
  */
-
 public final class SecurityClassLoad {
 
     public static void securityClassLoad(ClassLoader loader)

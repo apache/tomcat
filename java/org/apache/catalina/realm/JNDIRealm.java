@@ -168,9 +168,7 @@ import org.ietf.jgss.GSSCredential;
  *
  * @author John Holman
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class JNDIRealm extends RealmBase {
 
 

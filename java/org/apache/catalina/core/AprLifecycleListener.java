@@ -39,10 +39,8 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Remy Maucherat
  * @author Filip Hanik
- * @version $Id$
  * @since 4.1
  */
-
 public class AprLifecycleListener
     implements LifecycleListener {
 

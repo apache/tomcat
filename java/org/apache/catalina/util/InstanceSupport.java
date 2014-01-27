@@ -34,9 +34,7 @@ import org.apache.catalina.Wrapper;
  * registered InstanceListeners.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public final class InstanceSupport {
 
 

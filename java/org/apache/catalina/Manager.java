@@ -40,9 +40,7 @@ import java.io.IOException;
  * </ul>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public interface Manager {
 
 

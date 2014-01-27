@@ -43,7 +43,6 @@ import org.xml.sax.Attributes;
  * and uses a specified XML file for its persistent storage.</p>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  * @since 4.1
  */
 public class MemoryUserDatabase implements UserDatabase {

@@ -42,9 +42,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
  * and Digest Access Authentication."
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class BasicAuthenticator
     extends AuthenticatorBase {
     private static final Log log = LogFactory.getLog(BasicAuthenticator.class);

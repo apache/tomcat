@@ -24,9 +24,7 @@ package org.apache.catalina.startup;
  *
  * @author Craig R. McClanahan
  * @author Jean-Francois Arcand
- * @version $Id$
  */
-
 public final class Constants {
 
     public static final String Package = "org.apache.catalina.startup";

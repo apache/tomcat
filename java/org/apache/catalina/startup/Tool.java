@@ -69,9 +69,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * </ul>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public final class Tool {
 
 

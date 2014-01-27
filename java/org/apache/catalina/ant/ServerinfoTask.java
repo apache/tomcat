@@ -27,7 +27,6 @@ import org.apache.tools.ant.BuildException;
  * supported by the Tomcat manager application.
  *
  * @author Vivek Chopra
- * @version $Id$
  */
 public class ServerinfoTask extends AbstractCatalinaTask {
 

@@ -30,9 +30,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * when integrating Tomcat.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class ServerInfo {
 
 

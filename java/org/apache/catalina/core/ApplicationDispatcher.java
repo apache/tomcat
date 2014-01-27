@@ -60,7 +60,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <code>javax.servlet.ServletResponseWrapper</code>.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
 final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher {
 

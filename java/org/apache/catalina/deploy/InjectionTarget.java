@@ -16,9 +16,6 @@
  */
 package org.apache.catalina.deploy;
 
-/**
- * @version $Id$
- */
 public class InjectionTarget {
     private String targetClass;
     private String targetName;

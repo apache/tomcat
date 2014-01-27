@@ -57,9 +57,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  *
  * @author Craig R. McClanahan
  * @author Jean-Francois Arcand
- * @version $Id$
  */
-
 public class StandardManager extends ManagerBase {
 
     private final Log log = LogFactory.getLog(StandardManager.class); // must not be static

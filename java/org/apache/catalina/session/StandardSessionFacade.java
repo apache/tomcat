@@ -29,9 +29,7 @@ import javax.servlet.http.HttpSession;
  * Facade for the StandardSession object.
  *
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class StandardSessionFacade
     implements HttpSession {
 

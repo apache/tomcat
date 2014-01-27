@@ -52,10 +52,8 @@ import org.apache.tools.ant.BuildException;
  * These tasks require Ant 1.6 or later interface.
  *
  * @author Peter Rossbach
- * @version $Id$
  * @since 5.5.10
  */
-
 public class JMXAccessorGetTask extends JMXAccessorTask {
 
 

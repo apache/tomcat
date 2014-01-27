@@ -155,10 +155,7 @@ import org.apache.tomcat.util.buf.B2CConverter;
  * @author Remy Maucherat
  * @author Takayuki Kaneko
  * @author Peter Rossbach
- *
- * @version $Id$
  */
-
 public class AccessLogValve extends ValveBase implements AccessLog {
 
     private static final Log log = LogFactory.getLog(AccessLogValve.class);

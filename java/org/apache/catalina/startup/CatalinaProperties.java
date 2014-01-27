@@ -32,7 +32,6 @@ import org.apache.catalina.Globals;
  * Utility class to read the bootstrap Catalina configuration.
  *
  * @author Remy Maucherat
- * @version $Id$
  */
 
 public class CatalinaProperties {

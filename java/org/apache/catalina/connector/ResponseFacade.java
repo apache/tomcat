@@ -39,7 +39,6 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Remy Maucherat
  * @author Jean-Francois Arcand
- * @version $Id$
  */
 @SuppressWarnings("deprecation")
 public class ResponseFacade

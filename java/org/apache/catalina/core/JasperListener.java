@@ -32,10 +32,8 @@ import org.apache.tomcat.util.res.StringManager;
  * started.
  *
  * @author Remy Maucherat
- * @version $Id$
  * @since 4.1
  */
-
 public class JasperListener
     implements LifecycleListener {
 

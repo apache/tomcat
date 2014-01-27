@@ -30,9 +30,7 @@ import org.apache.catalina.util.RequestUtil;
  * deployment descriptor.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class LoginConfig implements Serializable {
 
 

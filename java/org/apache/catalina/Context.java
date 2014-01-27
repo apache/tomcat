@@ -62,7 +62,6 @@ import org.apache.tomcat.util.http.mapper.Mapper;
  * <p>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
 
 public interface Context extends Container {

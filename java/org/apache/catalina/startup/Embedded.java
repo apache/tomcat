@@ -98,7 +98,6 @@ import org.apache.tomcat.util.res.StringManager;
  * of how Tomcat is set up and launched as an Embedded application.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  * 
  * @deprecated Use {@link Tomcat} instead.
  */

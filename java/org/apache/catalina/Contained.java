@@ -25,9 +25,7 @@ package org.apache.catalina;
  *
  * @author Craig R. McClanahan
  * @author Peter Donald
- * @version $Id$
  */
-
 public interface Contained {
 
 

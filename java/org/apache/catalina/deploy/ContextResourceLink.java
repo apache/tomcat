@@ -24,7 +24,6 @@ package org.apache.catalina.deploy;
  *
  * @author Remy Maucherat
  * @author Peter Rossbach (Peter Rossbach (pero@apache.org))
- * @version $Id$
  */
 public class ContextResourceLink extends ResourceBase {
 

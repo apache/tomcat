@@ -28,7 +28,6 @@ import org.apache.tools.ant.BuildException;
  * Tomcat manager application.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  * @since 4.1
  */
 public class ReloadTask extends AbstractCatalinaCommandTask {

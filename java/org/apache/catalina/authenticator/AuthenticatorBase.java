@@ -69,7 +69,6 @@ import org.apache.tomcat.util.res.StringManager;
  * requests.  Requests of any other type will simply be passed through.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
 
 

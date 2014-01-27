@@ -39,9 +39,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * <code>org.apache.catalina.users.MemoryUserDatabase</code> component.</p>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class MemoryUserDatabaseMBean extends BaseModelMBean {
 
 

@@ -45,10 +45,8 @@ import javax.naming.spi.ObjectFactory;
  * </ul>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  * @since 4.1
  */
-
 public class MemoryUserDatabaseFactory implements ObjectFactory {
 
 

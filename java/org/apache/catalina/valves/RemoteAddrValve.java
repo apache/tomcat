@@ -30,7 +30,6 @@ import org.apache.catalina.connector.Response;
  * based on the string representation of the remote client's IP address.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
 
 public final class RemoteAddrValve

@@ -35,9 +35,7 @@ import org.apache.catalina.util.RequestUtil;
  * a URL pattern or a servlet name.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class FilterMap implements Serializable {
 
 

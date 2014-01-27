@@ -23,7 +23,6 @@ package org.apache.catalina.deploy;
  *
  * @author Craig R. McClanahan
  * @author Peter Rossbach (pero@apache.org)
- * @version $Id$
  */
 public class ContextResourceEnvRef extends ResourceBase {
 

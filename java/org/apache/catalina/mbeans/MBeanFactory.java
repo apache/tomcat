@@ -57,9 +57,7 @@ import org.apache.catalina.valves.ValveBase;
  * <code>org.apache.catalina.core.StandardServer</code> component.</p>
  *
  * @author Amy Roh
- * @version $Id$
  */
-
 public class MBeanFactory {
 
     private static final org.apache.juli.logging.Log log = 

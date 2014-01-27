@@ -25,10 +25,8 @@ package org.apache.catalina.deploy;
  * in the deployment descriptor.</p>
  *
  * @author Mark Thomas
- * @version $Id$
  * @since Tomcat 5.5
  */
-
 public class SecurityRoleRef {
 
 

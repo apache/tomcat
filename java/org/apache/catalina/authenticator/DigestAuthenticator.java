@@ -50,7 +50,6 @@ import org.apache.tomcat.util.http.parser.HttpParser;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Id$
  */
 
 public class DigestAuthenticator extends AuthenticatorBase {

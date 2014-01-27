@@ -27,9 +27,7 @@ package org.apache.catalina;
  * this servlet is put into service.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public interface ContainerServlet {
 
 

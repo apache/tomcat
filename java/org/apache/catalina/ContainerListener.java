@@ -25,9 +25,7 @@ package org.apache.catalina;
  * LifecycleEvents, not ContainerEvents.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public interface ContainerListener {
 
 

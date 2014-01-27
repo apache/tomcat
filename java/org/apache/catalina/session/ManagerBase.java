@@ -55,9 +55,7 @@ import org.apache.tomcat.util.res.StringManager;
  * be subclassed to create more sophisticated Manager implementations.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public abstract class ManagerBase extends LifecycleMBeanBase
         implements Manager, PropertyChangeListener {
 

@@ -55,9 +55,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  *
  * @author Remy Maucherat
  * @author Jean-Francois Arcand
- * @version $Id$
  */
-
 public class ApplicationContextFacade implements ServletContext {
         
     // ---------------------------------------------------------- Attributes

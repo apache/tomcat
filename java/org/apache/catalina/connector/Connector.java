@@ -43,10 +43,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Id$
  */
-
-
 public class Connector extends LifecycleMBeanBase  {
 
     private static final Log log = LogFactory.getLog(Connector.class);

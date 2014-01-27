@@ -108,7 +108,6 @@ import org.xml.sax.SAXParseException;
  *
  * @author Craig R. McClanahan
  * @author Jean-Francois Arcand
- * @version $Id$
  */
 public class ContextConfig implements LifecycleListener {
 

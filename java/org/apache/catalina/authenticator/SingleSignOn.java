@@ -55,9 +55,7 @@ import org.apache.tomcat.util.res.StringManager;
  * </ul>
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class SingleSignOn extends ValveBase implements SessionListener {
 
     //------------------------------------------------------ Constructor

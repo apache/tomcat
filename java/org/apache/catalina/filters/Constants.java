@@ -22,7 +22,6 @@ package org.apache.catalina.filters;
  *
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
 public final class Constants {
 

@@ -41,9 +41,7 @@ import org.apache.catalina.session.PersistentManager;
  *                              per session at any one time.
  *
  * @author Jean-Frederic Clere
- * @version $Id$
  */
-
 public class PersistentValve extends ValveBase {
 
     //------------------------------------------------------ Constructor

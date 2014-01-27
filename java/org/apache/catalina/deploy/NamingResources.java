@@ -49,9 +49,7 @@ import org.apache.tomcat.util.res.StringManager;
  * Naming Context and their associated JNDI context.
  *
  * @author Remy Maucherat
- * @version $Id$
  */
-
 public class NamingResources extends LifecycleMBeanBase implements Serializable {
 
     private static final long serialVersionUID = 1L;

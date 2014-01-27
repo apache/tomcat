@@ -45,9 +45,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  * @author Andrew R. Jaquith
- * @version $Id$
  */
-
 public class JAASCallbackHandler implements CallbackHandler {
 
     // ------------------------------------------------------------ Constructor
