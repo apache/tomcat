@@ -186,5 +186,6 @@
     value           CDATA           #REQUIRED
 >
 
-<!ELEMENT jsp:text #PCDATA>
+<!ELEMENT jsp:text (#PCDATA)>
 
+<!ELEMENT jsp:fallback %Body;>
