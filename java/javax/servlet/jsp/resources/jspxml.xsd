@@ -322,7 +322,7 @@
     <xsd:complexType>
       <xsd:attribute name = "language" default = "java" type = "xsd:string"/>
       <xsd:attribute name = "extends" type = "TypeName"/>
-      <xsd:attribute name = "contentType" default = "text/html; ISO-8859-1" type = "ContentType"/>
+      <xsd:attribute name = "contentType" default = "text/html; charset=ISO-8859-1" type = "ContentType"/>
       <xsd:attribute name = "pageEncoding" use = "optional" type = "PageEncoding"/>
       <xsd:attribute name = "import" type = "ImportList"/>
       <xsd:attribute name = "session" default = "true" type = "Bool"/>
