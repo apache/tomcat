@@ -35,9 +35,7 @@ import java.util.List;
  * synchronized.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
-
 public class TreeNode {
 
 

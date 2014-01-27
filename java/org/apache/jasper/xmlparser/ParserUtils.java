@@ -47,7 +47,6 @@ import org.xml.sax.SAXParseException;
  * use a separate class loader for the parser to be used.
  *
  * @author Craig R. McClanahan
- * @version $Id$
  */
 public class ParserUtils {
 
