@@ -49,8 +49,6 @@ import org.apache.catalina.tribes.util.Logs;
  * thread returns itself to its parent pool.
  *
  * @author Filip Hanik
- *
- * @version $Id$
  */
 public class NioReplicationTask extends AbstractRxTask {
 

@@ -41,10 +41,7 @@ import org.apache.catalina.tribes.util.UUIDGenerator;
  * If a node fails to send out a heartbeat, the node will be dismissed.
  *
  * @author Filip Hanik
- * @version $Id$
  */
-
-
 public class McastService implements MembershipService,MembershipListener,MessageListener {
 
     private static final org.apache.juli.logging.Log log =

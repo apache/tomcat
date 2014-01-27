@@ -36,7 +36,6 @@ import org.apache.catalina.tribes.Member;
  *
  * @author Filip Hanik
  * @author Peter Rossbach
- * @version $Id$
  */
 public class Membership implements Cloneable {
 

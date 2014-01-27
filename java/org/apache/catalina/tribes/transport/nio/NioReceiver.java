@@ -43,7 +43,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * @author Filip Hanik
- * @version $Id$
  */
 public class NioReceiver extends ReceiverBase implements Runnable {
 

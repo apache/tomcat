@@ -24,7 +24,6 @@ package org.apache.catalina.tribes;
  *
  * @author Bip Thelin
  * @author Filip Hanik
- * @version $Id$
  *
  * @deprecated  Unused - will be removed in 8.0.x
  */

@@ -33,8 +33,6 @@ import org.apache.catalina.tribes.transport.MultiPointSender;
 /**
  *
  * @author Filip Hanik
- * @version $Id$
- *
  */
 public class MultipointBioSender extends AbstractSender implements MultiPointSender {
     public MultipointBioSender() {

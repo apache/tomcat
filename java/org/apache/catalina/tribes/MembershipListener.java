@@ -23,10 +23,7 @@ package org.apache.catalina.tribes;
  * when a member has joined the group and when a member has disappeared (crashed)
  *
  * @author Filip Hanik
- * @version $Id$
  */
-
-
 public interface MembershipListener {
     /**
      * A member was added to the group

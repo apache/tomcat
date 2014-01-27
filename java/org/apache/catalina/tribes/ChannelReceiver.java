@@ -24,7 +24,6 @@ package org.apache.catalina.tribes;
  * at the bottom layer, the IO layer (for layers see the javadoc for the {@link Channel} interface).
  * This class may optionally implement a thread pool for parallel processing of incoming messages.
  * @author Filip Hanik
- * @version $Id$
  */
 public interface ChannelReceiver extends Heartbeat {
     public static final int MAX_UDP_SIZE = 65535;

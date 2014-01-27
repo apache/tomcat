@@ -42,8 +42,6 @@ import org.apache.juli.logging.LogFactory;
  * thread returns itself to its parent pool.
  * 
  * @author Filip Hanik
- * 
- * @version $Id$
  */
 public class BioReplicationTask extends AbstractRxTask {
 

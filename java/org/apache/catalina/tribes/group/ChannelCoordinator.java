@@ -38,7 +38,6 @@ import org.apache.catalina.tribes.util.Logs;
  * the sender and the receiver.
  * This is the last interceptor in the chain.
  * @author Filip Hanik
- * @version $Id$
  */
 public class ChannelCoordinator extends ChannelInterceptorBase implements MessageListener {
     private ChannelReceiver clusterReceiver = new NioReceiver();

@@ -43,7 +43,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <li><b>END_DATA</b>  - 7 bytes - <i>TLF2003</i></lI>
  * </ul>
  * @author Filip Hanik
- * @version $Id$
  */
 public class XByteBuffer
 {

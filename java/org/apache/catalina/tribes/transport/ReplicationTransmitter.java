@@ -30,7 +30,6 @@ import org.apache.catalina.tribes.util.StringManager;
  * type 
  * 
  * @author Filip Hanik
- * @version $Id$
  */
 public class ReplicationTransmitter implements ChannelSender {
 

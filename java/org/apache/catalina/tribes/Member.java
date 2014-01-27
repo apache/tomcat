@@ -27,10 +27,7 @@ package org.apache.catalina.tribes;
  * since a member that has crashed and the starts up again on the same port/host is
  * not guaranteed to be the same member, so no state transfers will ever be confused
  * @author Filip Hanik
- * @version $Id$
  */
-
-
 public interface Member {
 
     /**
