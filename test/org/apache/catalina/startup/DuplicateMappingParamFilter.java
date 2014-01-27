@@ -30,7 +30,6 @@ import javax.servlet.annotation.WebFilter;
  * Test Mock with wrong Annotation!
  *
  * @author Peter Rossbach
- * @version $Id$
  *
  */
 @WebFilter(value = "/param", filterName="paramDFilter",

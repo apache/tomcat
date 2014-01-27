@@ -49,7 +49,6 @@ import org.apache.catalina.deploy.WebXml;
  * fragment.
  *
  * @author Peter Rossbach
- * @version $Revision$
  */
 public class TestContextConfigAnnotation {
 

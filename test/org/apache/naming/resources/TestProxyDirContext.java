@@ -29,7 +29,6 @@ import org.apache.catalina.startup.TomcatBaseTest;
 /**
  * Unit test for the {@link ProxyDirContext}.
  * @author Marc Guillemot
- * @version $Revision: $
  */
 public class TestProxyDirContext extends TomcatBaseTest {
 
