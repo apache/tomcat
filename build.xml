@@ -288,8 +288,6 @@
     <include name="javax/servlet/descriptor/*" />
     <include name="javax/servlet/http/*" />
     <include name="javax/servlet/resources/*" />
-    <include name="javax/servlet/jsp/resources/*" />
-    <exclude name="javax/servlet/jsp/resources/jspxml*" />
   </patternset>
 
   <patternset id="files.jsp-api">
@@ -624,6 +622,13 @@
         <include name="**/*.tasks"/>
         <include name="**/*.xsd"/>
         <include name="**/*.xml"/>
+      </fileset>
+    </copy>
+    <!-- Copy JSP Schemas and DTDs to be packed into servlet-api.jar -->
+    <copy todir="${tomcat.classes}/javax/servlet/resources" encoding="ISO-8859-1">
+      <fileset dir="${tomcat.classes}/javax/servlet/jsp/resources">
+        <include name="*" />
+        <exclude name="jspxml*" />
       </fileset>
     </copy>
 
