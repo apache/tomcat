@@ -179,9 +179,6 @@
     <ul>
       <li>The default value for the <strong>deployXML</strong> attribute of the
       <strong>Host</strong> element is changed to <code>false</code>.</li>
-      <li>The default value for the <strong>xmlBlockExternal</strong> attribute
-      of the <strong>Context</strong> element is changed to <code>true</code>.
-      </li>
     </ul>
   </section>
 
