@@ -135,6 +135,7 @@ public class JspC extends Task implements Options {
     protected static final String SWITCH_DUMP_SMAP = "-dumpsmap";
     protected static final String SWITCH_VALIDATE_TLD = "-validateTld";
     protected static final String SWITCH_BLOCK_EXTERNAL = "-blockExternal";
+    protected static final String SWITCH_NO_BLOCK_EXTERNAL = "-no-blockExternal";
     protected static final String SHOW_SUCCESS ="-s";
     protected static final String LIST_ERRORS = "-l";
     protected static final int INC_WEBXML = 10;
@@ -166,7 +167,7 @@ public class JspC extends Task implements Options {
     protected boolean trimSpaces = false;
     protected boolean genStringAsCharArray = false;
     protected boolean validateTld;
-    protected boolean blockExternal;
+    protected boolean blockExternal = true;
     protected boolean xpoweredBy;
     protected boolean mappedFile = false;
     protected boolean poolingEnabled = true;
@@ -377,6 +378,8 @@ public class JspC extends Task implements Options {
                 setValidateTld(true);
             } else if (tok.equals(SWITCH_BLOCK_EXTERNAL)) {
                 setBlockExternal(true);
+            } else if (tok.equals(SWITCH_NO_BLOCK_EXTERNAL)) {
+                setBlockExternal(false);
             } else {
                 if (tok.startsWith("-")) {
                     throw new JasperException("Unrecognized option: " + tok +
@@ -1452,9 +1455,8 @@ public class JspC extends Task implements Options {
         if (isValidateTld()) {
             context.setInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM, "true");
         }
-        if (isBlockExternal()) {
-            context.setInitParameter(Constants.XML_BLOCK_EXTERNAL_INIT_PARAM, "true");
-        }
+        context.setInitParameter(Constants.XML_BLOCK_EXTERNAL_INIT_PARAM,
+                String.valueOf(isBlockExternal()));
 
         TldScanner scanner = new TldScanner(
                 context, true, isValidateTld(), isBlockExternal());

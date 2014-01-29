@@ -45,11 +45,29 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.0.1 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Change default value of <code>xmlBlockExternal</code> attribute of
+        Context. It is <code>true</code> now. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
         Correct regression in the fix for <bug>55996</bug> that meant that
         asynchronous requests might timeout too early. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Change default value of the <code>blockExternal</code> attribute of
+        JspC task. The default value is <code>true</code>. Add support for
+        <code>-no-blockExternal</code> switch when JspC is run as a
+        standalone application. (kkolinko)
       </fix>
     </changelog>
   </subsection>
