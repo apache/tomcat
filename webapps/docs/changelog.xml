@@ -31,8 +31,8 @@
 <body>
 <!--
   Subsection ordering:
-  General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Tribes,
-  Other
+  General, Catalina, Coyote, Jasper, Cluster, WebSocket, Web applications,
+  Extras, Tribes, Other
 
   Item Ordering:
 
@@ -43,11 +43,19 @@
   Other fixed issues are added to the end of the list, chronologically.
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
-
-  Until the first Tomcat 8.0.0 release, only changes not back-ported to 7.0.x
-  should be listed here.
 -->
-<section name="Tomcat 8.0.0">
+<section name="Tomcat 8.0.1 (markt)">
+  <changelog>
+    <subsection name="WebSocket">
+      Do not return an empty string for the <code>Sec-WebSocket-Protocol</code>
+      HTTP header when no sub-protocol has been requested or no sub-protocol
+      could be agreed as RFC6455 requires that no
+      <code>Sec-WebSocket-Protocol</code> header is returned in this case.
+      (markt)
+    </subsection>
+  </changelog>
+</section>
+<section name="Tomcat 8.0.0 (markt)">
   <subsection name="Catalina">
     <changelog>
       <add>
