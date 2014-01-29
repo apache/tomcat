@@ -27,7 +27,7 @@ public class SocketWrapper<E> {
 
     private volatile E socket;
 
-    private volatile long lastAccess = -1;
+    private volatile long lastAccess = System.currentTimeMillis();
     private long timeout = -1;
     private boolean error = false;
     private volatile int keepAliveLeft = 100;

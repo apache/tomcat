@@ -45,13 +45,23 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.0.1 (markt)">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Correct regression in the fix for <bug>55996</bug> that meant that
+        asynchronous requests might timeout too early. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
-      Do not return an empty string for the <code>Sec-WebSocket-Protocol</code>
-      HTTP header when no sub-protocol has been requested or no sub-protocol
-      could be agreed as RFC6455 requires that no
-      <code>Sec-WebSocket-Protocol</code> header is returned in this case.
-      (markt)
+      <fix>
+        Do not return an empty string for the
+        <code>Sec-WebSocket-Protocol</code> HTTP header when no sub-protocol has
+        been requested or no sub-protocol could be agreed as RFC6455 requires
+        that no <code>Sec-WebSocket-Protocol</code> header is returned in this
+        case. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
