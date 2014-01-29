@@ -99,9 +99,8 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
     // now compute some delays - beware of the units!
     private static final int EXTRA_DELAY_SECS = 5;
-    private static final long REASONABLE_MSECS_TO_EXPIRY =
-            (((MANAGER_SCAN_INTERVAL_SECS * MANAGER_EXPIRE_SESSIONS_FAST)
-                    + EXTRA_DELAY_SECS) * 1000);
+    private static final int TIMEOUT_WAIT_SECS =  EXTRA_DELAY_SECS +
+            (MANAGER_SCAN_INTERVAL_SECS * MANAGER_EXPIRE_SESSIONS_FAST) * 5;
 
     private static final String CLIENT_AUTH_HEADER = "authorization";
     private static final String SERVER_AUTH_HEADER = "WWW-Authenticate";
@@ -167,7 +166,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
      * Wait until the SSO session times-out, then try to re-access
      * the resource. This should be rejected with SC_FORBIDDEN 401 status.
      *
-     * Note: this test will run for slightly more than 1 minute.
+     * Note: this test should run for ~10 seconds.
      */
     @Test
     public void testBasicAccessAndSessionTimeout() throws Exception {
@@ -310,7 +309,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
      *
      * (see bugfix https://issues.apache.org/bugzilla/show_bug.cgi?id=52303)
      *
-     * Note: this test will run for slightly more than 3 minutes.
+     * Note: this test should run for ~20 seconds.
      */
     @Test
     public void testBasicExpiredAcceptProtectedWithCookies() throws Exception {
@@ -601,13 +600,27 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
                 // leave it to be expired by the manager
             }
         }
+
+
         try {
-            Thread.sleep(REASONABLE_MSECS_TO_EXPIRY);
+            Thread.sleep(EXTRA_DELAY_SECS * 1000);
         } catch (InterruptedException ie) {
             // ignored
         }
 
-        // paranoid verification that active sessions have now gone
+        // Paranoid verification that active sessions have now gone
+        int count = 0;
+        sessions = manager.findSessions();
+        while (sessions.length != 0 && count < TIMEOUT_WAIT_SECS) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+            sessions = manager.findSessions();
+            count++;
+        }
+
         sessions = manager.findSessions();
         assertTrue(sessions.length == 0);
     }
