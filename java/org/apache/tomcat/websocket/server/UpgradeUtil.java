@@ -128,7 +128,8 @@ public class UpgradeUtil {
                 Constants.CONNECTION_HEADER_VALUE);
         resp.setHeader(HandshakeResponse.SEC_WEBSOCKET_ACCEPT,
                 getWebSocketAccept(key));
-        if (subProtocol != null) {
+        if (subProtocol != null && subProtocol.length() > 0) {
+            // RFC6455 4.2.2 explicitly states "" is not valid here
             resp.setHeader("Sec-WebSocket-Protocol", subProtocol);
         }
         if (!extensions.isEmpty()) {
