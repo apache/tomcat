@@ -176,7 +176,7 @@ nsis.loc=${base-sf.loc}/nsis/nsis-2.46.zip
 
 # ----- Commons Daemon, version 1.0-Alpha or later -----
 commons-daemon.version=1.0.15
-commons-daemon.home=${base.path}/commons-daemon-${commons-daemon.version}-test-signed
+commons-daemon.home=${base.path}/commons-daemon-${commons-daemon.version}
 commons-daemon.jar=${commons-daemon.home}/commons-daemon-${commons-daemon.version}.jar
 commons-daemon.native.win.home=${commons-daemon.home}/windows
 commons-daemon.native.win.mgr.exe=${commons-daemon.native.win.home}/prunmgr.exe
