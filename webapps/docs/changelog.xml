@@ -45,15 +45,15 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.0.1 (markt)">
-  <changelog>
-    <subsection name="WebSocket">
+  <subsection name="WebSocket">
+    <changelog>
       Do not return an empty string for the <code>Sec-WebSocket-Protocol</code>
       HTTP header when no sub-protocol has been requested or no sub-protocol
       could be agreed as RFC6455 requires that no
       <code>Sec-WebSocket-Protocol</code> header is returned in this case.
       (markt)
-    </subsection>
-  </changelog>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.0 (markt)">
   <subsection name="Catalina">
