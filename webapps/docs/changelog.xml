@@ -42,8 +42,8 @@
 <body>
 <!--
   Subsection ordering:
-  General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Tribes,
-  jdbc-pool, Other
+  General, Catalina, Coyote, Jasper, Cluster, WebSocket, Web applications,
+  Extras, Tribes, jdbc-pool, Other
 
   Item Ordering:
 
@@ -189,6 +189,15 @@
       <fix>
         Correct several errors in jspxml Schema and DTD. (kkolinko)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      Do not return an empty string for the <code>Sec-WebSocket-Protocol</code>
+      HTTP header when no sub-protocol has been requested or no sub-protocol
+      could be agreed as RFC6455 requires that no
+      <code>Sec-WebSocket-Protocol</code> header is returned in this case.
+      (markt)
     </changelog>
   </subsection>
   <subsection name="Web applications">
