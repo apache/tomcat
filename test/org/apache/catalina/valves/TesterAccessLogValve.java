@@ -82,9 +82,9 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
         for (int j = 0; j < count; j++) {
             Entry entry = entries.get(j);
             assertEquals(status, entry.getStatus());
-            assertTrue(entry.toString(),
+            assertTrue(entry.toString() + " duration is not >= " + (minTime - ERROR_MARGIN),
                     entry.getTime() >= minTime - ERROR_MARGIN);
-            assertTrue(entry.toString(),
+            assertTrue(entry.toString() + " duration is not < " + (maxTime - ERROR_MARGIN),
                     entry.getTime() < maxTime + ERROR_MARGIN);
         }
     }
