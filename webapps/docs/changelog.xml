@@ -52,6 +52,15 @@
       <code>IllegalArgumentException</code>. (markt)
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <scode>
+        Simplify the code of
+        <code>o.a.c.ha.tcp.SimpleTcpCluster.createManager(String)</code>.
+        Remove unnecessary class cast. (kfujino)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.1 (markt)">
   <subsection name="Catalina">
