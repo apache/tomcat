@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -706,7 +707,7 @@ public class ClassLoaderLogManager extends LogManager {
 
     protected static final class ClassLoaderLogInfo {
         final LogNode rootNode;
-        final Map<String, Logger> loggers = new HashMap<>();
+        final Map<String, Logger> loggers = new ConcurrentHashMap<>();
         final Map<String, Handler> handlers = new HashMap<>();
         final Properties props = new Properties();
 
