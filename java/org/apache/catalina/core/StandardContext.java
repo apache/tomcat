@@ -4418,7 +4418,11 @@ public class StandardContext extends ContainerBase
             path = "/";
         }
         if (resources != null) {
-            return resources.getResource(path).getCanonicalPath();
+            try {
+                return resources.getResource(path).getCanonicalPath();
+            } catch (IllegalArgumentException iae) {
+                // ServletContext.getRealPath() does not allow this to be thrown
+            }
         }
         return null;
     }

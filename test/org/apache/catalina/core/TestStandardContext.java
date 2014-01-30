@@ -876,4 +876,20 @@ public class TestStandardContext extends TomcatBaseTest {
         Assert.assertTrue(log, log.contains("PASS"));
         Assert.assertFalse(log, log.contains("FAIL"));
     }
+
+    @Test
+    public void testBug56085() throws Exception {
+        // Set up a container
+        Tomcat tomcat = getTomcatInstance();
+
+        File docBase = new File("test/webapp");
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        // Start the context
+        tomcat.start();
+
+        String realPath = ctx.getRealPath("\\");
+
+        Assert.assertNull(realPath);
+    }
 }

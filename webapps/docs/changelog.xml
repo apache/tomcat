@@ -44,6 +44,15 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 8.0.2 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <bug>56085</bug>: <code>ServletContext.getRealPath(String)</code> should
+      return <code>null</code> for invalid input rather than throwing an
+      <code>IllegalArgumentException</code>. (markt)
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 8.0.1 (markt)">
   <subsection name="Catalina">
     <changelog>
