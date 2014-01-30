@@ -191,6 +191,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <scode>
+        Simplify the code of
+        <code>o.a.c.ha.tcp.SimpleTcpCluster.createManager(String)</code>.
+        Remove unnecessary class cast. (kfujino)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       Do not return an empty string for the <code>Sec-WebSocket-Protocol</code>
