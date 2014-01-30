@@ -126,6 +126,10 @@
         <code>org.apache.commons.logging.Log</code> but
         <code>org.apache.juli.logging.Log</code>. (kfujino)
       </fix>
+      <fix>
+        <bug>56082</bug>: Fix a concurrency bug in JULI&apos;s LogManager
+        implementation. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
