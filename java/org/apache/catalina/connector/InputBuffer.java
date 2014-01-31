@@ -27,6 +27,7 @@ import javax.servlet.ReadListener;
 
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -273,8 +274,19 @@ public class InputBuffer extends Reader
         if (coyoteRequest.getReadListener() == null) {
             throw new IllegalStateException("not in non blocking mode.");
         }
-        int available = available();
-        boolean result = available > 0;
+        // Need to check is finished before we check available() as BIO always
+        // returns 1 for isAvailable()
+        if (isFinished()) {
+            // If this is a non-container thread, need to trigger a read
+            // which will eventually lead to a call to onAllDataRead() via a
+            // container thread.
+            if (!ContainerThreadMarker.isContainerThread()) {
+                coyoteRequest.action(ActionCode.DISPATCH_READ, null);
+                coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
+            }
+            return false;
+        }
+        boolean result = available() > 0;
         if (!result) {
             coyoteRequest.action(ActionCode.NB_READ_INTEREST, null);
         }

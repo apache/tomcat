@@ -373,7 +373,14 @@ public class CoyoteAdapter implements Adapter {
                     ClassLoader oldCL = null;
                     try {
                         oldCL = request.getContext().bind(false, null);
-                        readListener.onDataAvailable();
+                        // If data is being read on a non-container thread a
+                        // dispatch with status OPEN_READ will be used to get
+                        // execution back on a container thread for the
+                        // onAllDataRead() event. Therefore, make sure
+                        // onDataAvailable() is not called in this case.
+                        if (!request.isFinished()) {
+                            readListener.onDataAvailable();
+                        }
                         if (request.isFinished() && req.sendAllDataReadEvent()) {
                             readListener.onAllDataRead();
                         }
