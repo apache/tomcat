@@ -59,17 +59,20 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
     @Override
     protected void registerForEvent(boolean read, boolean write) {
+        final NioChannel socket = socketWrapper.getSocket();
         final NioEndpoint.KeyAttachment attach =
-                (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(
-                        false);
+                (NioEndpoint.KeyAttachment) socket.getAttachment(false);
         if (attach == null) {
             return;
         }
+        SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
         if (read) {
             attach.interestOps(attach.interestOps() | SelectionKey.OP_READ);
+            key.interestOps(key.interestOps() | SelectionKey.OP_READ);
         }
         if (write) {
             attach.interestOps(attach.interestOps() | SelectionKey.OP_WRITE);
+            key.interestOps(key.interestOps() | SelectionKey.OP_READ);
         }
     }
 
