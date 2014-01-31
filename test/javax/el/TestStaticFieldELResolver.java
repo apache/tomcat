@@ -477,7 +477,6 @@ public class TestStaticFieldELResolver {
         Assert.assertNotNull(exception);
 
         if (checkCause) {
-            @SuppressWarnings("null")
             // Can't be null due to assertion above
             Throwable cause = exception.getCause();
             Assert.assertNotNull(cause);

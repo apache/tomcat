@@ -561,6 +561,7 @@ public class WsWebSocketContainer
      * @throws DeploymentException
      * @throws TimeoutException
      */
+    @SuppressWarnings("null")
     private HandshakeResponse processResponse(ByteBuffer response,
             AsyncChannelWrapper channel, long timeout) throws InterruptedException,
             ExecutionException, DeploymentException, EOFException,
@@ -633,7 +634,6 @@ public class WsWebSocketContainer
         }
         values.add(headerValue);
     }
-
 
     private String readLine(ByteBuffer response) {
         // All ISO-8859-1
