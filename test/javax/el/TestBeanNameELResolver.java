@@ -559,7 +559,6 @@ public class TestBeanNameELResolver {
         Assert.assertFalse(context.isPropertyResolved());
         Assert.assertNotNull(elException);
 
-        @SuppressWarnings("null") // Can't be null due to assertion above
         Throwable cause = elException.getCause();
         Assert.assertNotNull(cause);
     }

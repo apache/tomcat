@@ -1733,7 +1733,6 @@ public class ContextConfig implements LifecycleListener {
      * Identify the application web.xml to be used and obtain an input source
      * for it.
      */
-    @SuppressWarnings("resource") // stream is meant to be left open here
     protected InputSource getContextWebXmlSource() {
         InputStream stream = null;
         InputSource source = null;
@@ -1744,8 +1743,7 @@ public class ContextConfig implements LifecycleListener {
         // Open the application web.xml file, if it exists
         ServletContext servletContext = context.getServletContext();
         if (servletContext != null) {
-            altDDName = (String)servletContext.getAttribute(
-                                                        Globals.ALT_DD_ATTR);
+            altDDName = (String)servletContext.getAttribute(Globals.ALT_DD_ATTR);
             if (altDDName != null) {
                 try {
                     stream = new FileInputStream(altDDName);

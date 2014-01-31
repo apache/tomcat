@@ -917,6 +917,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         }
         if (!resultWar && !resultDir) {
             if (resultXml) {
+                Assert.assertNotNull(ctxt);
                 Assert.assertEquals(LifecycleState.FAILED, ctxt.getState());
             } else {
                 Assert.assertNull(ctxt);
@@ -1191,6 +1192,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         }
         if (!resultWar && !resultDir) {
             if (resultXml) {
+                Assert.assertNotNull(newContext);
                 if (!startExternalWar && !startExternalDir) {
                     Assert.assertEquals(LifecycleState.FAILED,
                             newContext.getState());
@@ -1511,6 +1513,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         }
         if (!resultWar && !resultDir) {
             if (resultXml) {
+                Assert.assertNotNull(newContext);
                 if (!startExternalWar && !startExternalDir) {
                     Assert.assertEquals(LifecycleState.FAILED,
                             newContext.getState());

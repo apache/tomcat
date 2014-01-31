@@ -482,7 +482,6 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
             Assert.assertNotNull(actualMaxAgeInSeconds);
 
-            @SuppressWarnings("null")
             int deltaInSeconds = Math.abs(actualMaxAgeInSeconds.intValue() -
                     expectedMaxAgeInSeconds.intValue());
             Assert.assertTrue("actualMaxAgeInSeconds: " +
