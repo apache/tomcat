@@ -590,6 +590,12 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
+        <bug>55735</bug>: Fix a regression caused by the fix to
+        <bug>55198</bug>. When processing JSP documents, attributes in XML
+        elements that are template content should have their text xml-escaped,
+        but output of EL expressions in them should not be escaped. (markt)
+      </fix>
+      <fix>
         <bug>55807</bug>: The JSP compiler used a last modified time of -1 for
         TLDs in JARs expanded in to WEB-INF/classes (IDEs often do this
         expansion) when creating the dependency list for JSPs that used that
