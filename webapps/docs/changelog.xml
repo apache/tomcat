@@ -281,7 +281,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.50 (violetagg)" rtext="2014-01-08">
+<section name="Tomcat 7.0.50 (violetagg)" rtext="released 2014-01-08">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -726,7 +726,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.47 (violetagg)" rtext="2013-10-24">
+<section name="Tomcat 7.0.47 (violetagg)" rtext="released 2013-10-24">
   <subsection name="Coyote">
     <changelog>
       <fix>
@@ -1245,7 +1245,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.42 (markt)" rtext="2013-07-05">
+<section name="Tomcat 7.0.42 (markt)" rtext="released 2013-07-05">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -1426,7 +1426,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.41 (markt)" rtext="2013-06-10">
+<section name="Tomcat 7.0.41 (markt)" rtext="released 2013-06-10">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -1581,7 +1581,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.40 (markt)" rtext="2013-05-09">
+<section name="Tomcat 7.0.40 (markt)" rtext="released 2013-05-09">
   <subsection name="Catalina">
     <changelog>
       <update>
@@ -1707,7 +1707,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.39 (markt)" rtext="2013-03-26">
+<section name="Tomcat 7.0.39 (markt)" rtext="released 2013-03-26">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -1926,7 +1926,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.37 (markt)" rtext="2013-02-18">
+<section name="Tomcat 7.0.37 (markt)" rtext="released 2013-02-18">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -2138,7 +2138,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.35 (markt)" rtext="2013-01-16">
+<section name="Tomcat 7.0.35 (markt)" rtext="released 2013-01-16">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -2307,7 +2307,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.34 (markt)" rtext="2012-12-12">
+<section name="Tomcat 7.0.34 (markt)" rtext="released 2012-12-12">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -2379,7 +2379,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.33 (markt)" rtext="2012-11-21">
+<section name="Tomcat 7.0.33 (markt)" rtext="released 2012-11-21">
   <subsection name="Catalina">
     <changelog>
       <add>
@@ -2582,7 +2582,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.32 (markt)" rtext="2012-10-09">
+<section name="Tomcat 7.0.32 (markt)" rtext="released 2012-10-09">
   <subsection name="Catalina">
     <changelog>
       <fix>
