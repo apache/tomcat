@@ -316,7 +316,7 @@
       </attribute>
 
       <attribute name="minimumUmask" required="false">
-        <p>The least rectrictive umask that must be configured before Tomcat
+        <p>The least restrictive umask that must be configured before Tomcat
         will start. If not specified, the default value of <b>0007</b> is used.
         To disable this check, set the attribute to the empty string. The check
         is not performed on Windows platforms.</p>
@@ -428,7 +428,7 @@
         <p>The port to be used by the JMX/RMI registry for the Platform MBeans.
         This replaces the use of the
         <code>com.sun.management.jmxremote.port</code> system property that
-        should not be set when using this valve.</p>
+        should not be set when using this listener.</p>
       </attribute>
 
       <attribute name="rmiServerPortPlatform" required="true">
