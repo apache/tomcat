@@ -60,6 +60,9 @@
         Fix WebDAV support that was broken by the refactoring for the new
         resources implementation. (markt)
       </fix>
+      <scode>
+        Simplify Catalina.initDirs(). (kkolinko)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
