@@ -762,8 +762,7 @@ public class Catalina {
 
     protected void initDirs() {
         String temp = System.getProperty("java.io.tmpdir");
-        if (temp == null || (!(new File(temp)).exists())
-                || (!(new File(temp)).isDirectory())) {
+        if (temp == null || (!(new File(temp)).isDirectory())) {
             log.error(sm.getString("embedded.notmp", temp));
         }
     }
