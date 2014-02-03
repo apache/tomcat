@@ -198,6 +198,7 @@ but possibly 7.1.x).
     - Complete.
 
  9. Remove the svn keywords from all the files. (Just Java files?)
+    - Complete.
 
 10. Code to the interfaces in the o.a.catalina package and avoid coding directly
     to implementations in other packages. This is likely to require a lot of
