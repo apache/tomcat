@@ -56,6 +56,10 @@
         return <code>null</code> for invalid input rather than throwing an
         <code>IllegalArgumentException</code>. (markt)
       </fix>
+      <fix>
+        Fix WebDAV support that was broken by the refactoring for the new
+        resources implementation. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
