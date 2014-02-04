@@ -39,11 +39,11 @@ import org.apache.catalina.tribes.Member;
  *
  * <br><br><b>REMBER TO CALL <code>breakdown()</code> or <code>finalize()</code> when you are done with the map to
  * avoid memory leaks.<br><br>
- * TODO implement periodic sync/transfer thread
- * @version 1.0
- *
+ * TODO implement periodic sync/transfer thread<br>
  * TODO memberDisappeared, should do nothing except change map membership
  *       by default it relocates the primary objects
+ *
+ * @version 1.0
  */
 public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
 
