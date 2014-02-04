@@ -130,6 +130,12 @@
         <bug>56082</bug>: Fix a concurrency bug in JULI&apos;s LogManager
         implementation. (markt)
       </fix>
+      <fix>
+        <bug>56096</bug>: When the attribute <code>rmiBindAddress</code> of the
+        JMX Remote Lifecycle Listener is specified it's value will be used when
+        constructing the address of a JMX API connector server. Patch is
+        provided by Jim Talbut. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
