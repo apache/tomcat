@@ -80,9 +80,9 @@ public class XByteBuffer
     protected boolean discard = true;
     
     /**
-     * Constructs a new XByteBuffer
-     * @param size - the initial size of the byte buffer
+     * Constructs a new XByteBuffer.<br>
      * TODO use a pool of byte[] for performance
+     * @param size - the initial size of the byte buffer
      */
     public XByteBuffer(int size, boolean discard) {
         buf = new byte[size];

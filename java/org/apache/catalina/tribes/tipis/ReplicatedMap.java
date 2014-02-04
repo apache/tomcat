@@ -37,14 +37,14 @@ import org.apache.catalina.tribes.Member;
  * each time the object gets replicated the entire object gets serialized, hence a call to <code>replicate(true)</code>
  * will replicate all objects in this map that are using this node as primary.
  *
- * <br><br><b>REMBER TO CALL <code>breakdown()</code> or <code>finalize()</code> when you are done with the map to
- * avoid memory leaks.<br><br>
- * TODO implement periodic sync/transfer thread
- * @author Filip Hanik
- * @version 1.0
- * 
+ * <br><br><b>REMEMBER TO CALL <code>breakdown()</code> or <code>finalize()</code>
+ * when you are done with the map to avoid memory leaks.</b><br><br>
+ * TODO implement periodic sync/transfer thread<br>
  * TODO memberDisappeared, should do nothing except change map membership
  *       by default it relocates the primary objects
+ *
+ * @author Filip Hanik
+ * @version 1.0
  */
 public class ReplicatedMap extends AbstractReplicatedMap {
 
