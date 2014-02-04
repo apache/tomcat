@@ -38,6 +38,11 @@ public class TesterServletWithAnnotations extends HttpServlet {
 
     private int envEntry4;
 
+    @Resource(name = "envEntry5", mappedName = "5")
+    private int envEntry5;
+
+    private int envEntry6;
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -46,6 +51,8 @@ public class TesterServletWithAnnotations extends HttpServlet {
         resp.getWriter().print(" envEntry2: " + envEntry2);
         resp.getWriter().print(" envEntry3: " + envEntry3);
         resp.getWriter().print(" envEntry4: " + envEntry4);
+        resp.getWriter().print(" envEntry5: " + envEntry5);
+        resp.getWriter().print(" envEntry6: " + envEntry6);
     }
 
     public void setEnvEntry2(int envEntry2) {
@@ -60,5 +67,10 @@ public class TesterServletWithAnnotations extends HttpServlet {
     @Resource(mappedName = "4")
     public void setEnvEntry4(int envEntry4) {
         this.envEntry4 = envEntry4;
+    }
+
+    @Resource(name = "envEntry6", mappedName = "6")
+    public void setEnvEntry6(int envEntry6) {
+        this.envEntry6 = envEntry6;
     }
 }
