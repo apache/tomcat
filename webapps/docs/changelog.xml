@@ -82,6 +82,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>56104</bug>: Correct the version number on the welcome page of the
+        Windows installer. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.1 (markt)" rtext="beta, 2014-02-02">
   <subsection name="Catalina">
