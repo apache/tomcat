@@ -645,7 +645,7 @@ public class TesterContext implements Context {
 
     @Override
     public boolean getXmlBlockExternal() {
-        return false;
+        return true;
     }
 
     @Override
