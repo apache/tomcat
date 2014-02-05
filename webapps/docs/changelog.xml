@@ -99,6 +99,9 @@
         <bug>56104</bug>: Correct the version number on the welcome page of the
         Windows installer. (markt)
       </fix>
+      <update>
+        Update Commons DBCP 2 to snapshot 160 dated 04 Feb 2014. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
