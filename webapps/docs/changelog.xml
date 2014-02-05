@@ -74,6 +74,10 @@
         deployment descriptor and with annotation then the one specified in the
         web deployment descriptor is with priority. (violetagg)
       </fix>
+      <fix>
+        Fix passing the value of false for <code>xmlBlockExternal</code> option
+        of Context to Jasper, as the default was changed in 8.0.1. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
