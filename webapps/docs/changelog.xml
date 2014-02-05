@@ -72,7 +72,7 @@
       <fix>
         When environment entry with one and the same name is defined in the web
         deployment descriptor and with annotation then the one specified in the
-        web deployment descriptor is with priority. (violetagg) 
+        web deployment descriptor is with priority. (violetagg)
       </fix>
     </changelog>
   </subsection>
