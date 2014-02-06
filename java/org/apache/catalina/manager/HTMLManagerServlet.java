@@ -234,17 +234,16 @@ public final class HTMLManagerServlet extends ManagerServlet {
         list(request, response, message, smClient);
     }
 
-    protected String upload(HttpServletRequest request, StringManager smClient)
-            throws IOException, ServletException {
+    protected String upload(HttpServletRequest request, StringManager smClient) {
         String message = "";
 
-        Part warPart = null;
-        String filename = null;
-
-        Collection<Part> parts = request.getParts();
-        Iterator<Part> iter = parts.iterator();
-
         try {
+            Part warPart = null;
+            String filename = null;
+
+            Collection<Part> parts = request.getParts();
+            Iterator<Part> iter = parts.iterator();
+
             while (iter.hasNext()) {
                 Part part = iter.next();
                 if (part.getName().equals("deployWar") && warPart == null) {
@@ -312,11 +311,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
             message = smClient.getString
                 ("htmlManagerServlet.deployUploadFail", e.getMessage());
             log(message, e);
-        } finally {
-            if (warPart != null) {
-                warPart.delete();
-            }
-            warPart = null;
         }
         return message;
     }
