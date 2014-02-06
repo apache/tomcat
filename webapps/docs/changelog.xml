@@ -97,6 +97,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        In Manager web application improve handling of file upload errors.
+        Display a message instead of error 500 page. Simplify. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
