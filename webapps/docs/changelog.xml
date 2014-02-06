@@ -262,6 +262,12 @@
         Correct links to the Tomcat mailing lists in the ROOT web application.
         (kkolinko)
       </fix>
+      <fix>
+        In Manager web application improve handling of file upload errors.
+        Display a message instead of error 500 page. Simplify parts handling
+        code, as it is known that Tomcat takes care of them when recycling a
+        request. (kkolinko) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Extras">

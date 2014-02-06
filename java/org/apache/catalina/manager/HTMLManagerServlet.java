@@ -27,11 +27,9 @@ import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -230,33 +228,18 @@ public final class HTMLManagerServlet extends ManagerServlet {
         list(request, response, message, smClient);
     }
 
-    protected String upload(HttpServletRequest request, StringManager smClient)
-            throws IOException, ServletException {
+    protected String upload(HttpServletRequest request, StringManager smClient) {
         String message = "";
 
-        Part warPart = null;
-        String filename = null;
-
-        Collection<Part> parts = request.getParts();
-        Iterator<Part> iter = parts.iterator();
-        
         try {
-            while (iter.hasNext()) {
-                Part part = iter.next();
-                if (part.getName().equals("deployWar") && warPart == null) {
-                    warPart = part;
-                } else {
-                    part.delete();
-                }
-            }
-
             while (true) {
+                Part warPart = request.getPart("deployWar");
                 if (warPart == null) {
                     message = smClient.getString(
                             "htmlManagerServlet.deployUploadNoFile");
                     break;
                 }
-                filename =
+                String filename =
                     extractFilename(warPart.getHeader("Content-Disposition"));
                 if (!filename.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                     message = smClient.getString(
@@ -309,11 +292,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
             message = smClient.getString
                 ("htmlManagerServlet.deployUploadFail", e.getMessage());
             log(message, e);
-        } finally {
-            if (warPart != null) {
-                warPart.delete();
-            }
-            warPart = null;
         }
         return message;
     }
