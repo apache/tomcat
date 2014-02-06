@@ -276,8 +276,7 @@ public class MultipartStream {
      * @param pNotifier The notifier, which is used for calling the
      *                  progress listener, if any.
      *
-     * @see #MultipartStream(InputStream, byte[],
-     *     MultipartStream.ProgressNotifier)
+     * @throws IllegalArgumentException If the buffer size is too small
      */
     public MultipartStream(InputStream input,
             byte[] boundary,
@@ -290,9 +289,14 @@ public class MultipartStream {
 
         // We prepend CR/LF to the boundary to chop trailing CR/LF from
         // body-data tokens.
-        this.boundary = new byte[boundary.length + BOUNDARY_PREFIX.length];
         this.boundaryLength = boundary.length + BOUNDARY_PREFIX.length;
+        if (bufSize < this.boundaryLength + 1) {
+            throw new IllegalArgumentException(
+                    "The buffer size specified for the MultipartStream is too small");
+        }
+        this.boundary = new byte[this.boundaryLength];
         this.keepRegion = this.boundary.length;
+
         System.arraycopy(BOUNDARY_PREFIX, 0, this.boundary, 0,
                 BOUNDARY_PREFIX.length);
         System.arraycopy(boundary, 0, this.boundary, BOUNDARY_PREFIX.length,
@@ -311,8 +315,7 @@ public class MultipartStream {
      * @param pNotifier An object for calling the progress listener, if any.
      *
      *
-     * @see #MultipartStream(InputStream, byte[], int,
-     *     MultipartStream.ProgressNotifier)
+     * @see #MultipartStream(InputStream, byte[], int, ProgressNotifier)
      */
     MultipartStream(InputStream input,
             byte[] boundary,

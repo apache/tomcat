@@ -299,6 +299,11 @@
         Remove svn keywords (such as $Id) from source files and documentation.
         (kkolinko)
       </scode>
+      <fix>
+        Fix CVE-2014-0050, a denial of service with a malicious, malformed
+        Content-Type header and multipart request processing. Fixed by merging
+        latest code (r1565163) from Commons FileUpload. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
