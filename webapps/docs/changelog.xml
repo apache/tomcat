@@ -104,7 +104,7 @@
         Windows installer. (markt)
       </fix>
       <update>
-        Update Commons DBCP 2 to snapshot 164 dated 04 Feb 2014. (markt)
+        Update Commons DBCP 2 to snapshot 168 dated 05 Feb 2014. (markt)
       </update>
       <fix>
         Fix CVE-2014-0050, a denial of service with a malicious, malformed
