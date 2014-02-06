@@ -27,11 +27,9 @@ import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -238,28 +236,14 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String message = "";
 
         try {
-            Part warPart = null;
-            String filename = null;
-
-            Collection<Part> parts = request.getParts();
-            Iterator<Part> iter = parts.iterator();
-
-            while (iter.hasNext()) {
-                Part part = iter.next();
-                if (part.getName().equals("deployWar") && warPart == null) {
-                    warPart = part;
-                } else {
-                    part.delete();
-                }
-            }
-
             while (true) {
+                Part warPart = request.getPart("deployWar");
                 if (warPart == null) {
                     message = smClient.getString(
                             "htmlManagerServlet.deployUploadNoFile");
                     break;
                 }
-                filename = warPart.getSubmittedFileName();
+                String filename = warPart.getSubmittedFileName();
                 if (!filename.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                     message = smClient.getString(
                             "htmlManagerServlet.deployUploadNotWar", filename);
