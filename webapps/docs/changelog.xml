@@ -50,6 +50,12 @@
       <fix>
         Fix build of Apache Commons DBCP2 classes. (kkolinko)
       </fix>
+      <update>
+        Update Commons DBCP 2 to snapshot 170 dated 07 Feb 2014. This enables
+        DBCP to work with a SecurityManager such that only DBCP needs to be
+        granted the necessary permissions to communicate with the database.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
