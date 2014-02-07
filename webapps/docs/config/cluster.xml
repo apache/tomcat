@@ -154,21 +154,6 @@
          Default value is false.
       </p>
     </attribute>
-
-    <attribute name="doClusterLog" required="false">
-      <p><b>Deprecated since 6.0.0</b></p>
-      <p>Possible values are <code>true</code> or <code>false</code><br/>
-         Value is inherited from Tomcat 5.5 and has no official meaning.
-         to configure logging, use the standard tomcat logging configuration.
-      </p>
-    </attribute>
-    <attribute name="clusterLogName" required="false">
-      <p><b>Deprecated since 6.0.0</b></p>
-      <p>
-        Value is inherited from Tomcat 5.5 and has no official meaning.
-         to configure logging, use the standard tomcat logging configuration.
-      </p>
-    </attribute>
   </attributes>
   </subsection>
 </section>
