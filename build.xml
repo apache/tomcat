@@ -2757,7 +2757,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <fileset dir="${tomcat-dbcp.home}/src/java/org/apache/commons" />
     </move>
     <mkdir dir="${tomcat-dbcp.home}/classes"/>
-  	<!-- Make sure the build fails if the DBCP sources haven't been copied -->
+    <!-- Make sure the build fails if the DBCP sources haven't been copied -->
     <!-- correctly. Other problems should be detected by the following     -->
     <!-- compilation step failing.                                         -->
     <fail message="Repackaged DBCP factory is missing">
