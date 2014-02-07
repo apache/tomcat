@@ -17,7 +17,7 @@
 
 <!--
      General purpose build script for web applications and web services,
-     including enhanced support for deploying directly to a Tomcat 6
+     including enhanced support for deploying directly to a Tomcat
      based server.
 
      This build script assumes that the source code of your web application
@@ -103,7 +103,7 @@
                        Defaults to "build".
 
   catalina.home        The directory in which you have installed
-                       a binary distribution of Tomcat 6.  This will
+                       a binary distribution of Tomcat.  This will
                        be used by the "deploy" target.
 
   dist.home            The name of the base directory in which
@@ -148,7 +148,7 @@
   * Being copied into the "/WEB-INF/lib" directory during execution
     of the "deploy" target.
 
-  Because we will automatically include all of the Java classes that Tomcat 6
+  Because we will automatically include all of the Java classes that Tomcat
   exposes to web applications, we will not need to explicitly list any of those
   dependencies.  You only need to worry about external dependencies for JAR
   files that you are going to include inside your "/WEB-INF/lib" directory.
@@ -202,10 +202,10 @@
 <!--
 
   These properties define custom tasks for the Ant build tool that interact
-  with the "/manager" web application installed with Tomcat 6.  Before they
+  with the "/manager" web application installed with Tomcat.  Before they
   can be successfully utilized, you must perform the following steps:
 
-  - Copy the file "lib/catalina-ant.jar" from your Tomcat 6
+  - Copy the file "lib/catalina-ant.jar" from your Tomcat
     installation into the "lib" directory of your Ant installation.
 
   - Create a "build.properties" file in your application's top-level
@@ -346,7 +346,7 @@
 
 <!--
 
-  The "install" target tells the specified Tomcat 6 installation to dynamically
+  The "install" target tells the specified Tomcat installation to dynamically
   install this web application and make it available for execution.  It does
   *not* cause the existence of this web application to be remembered across
   Tomcat restarts; if you restart the server, you will need to re-install all
@@ -404,7 +404,7 @@
 
 <!--
 
-  The "list" target asks the specified Tomcat 6 installation to list the
+  The "list" target asks the specified Tomcat installation to list the
   currently running web applications, either loaded at startup time or
   installed dynamically.  It is useful to determine whether or not the
   application you are currently developing has been installed.
@@ -464,7 +464,7 @@
 
 <!--
 
-  The "reload" signals the specified application Tomcat 6 to shut itself down
+  The "reload" signals the specified application Tomcat to shut itself down
   and reload. This can be useful when the web application context is not
   reloadable and you have updated classes or property files in the
   /WEB-INF/classes directory or when you have added or updated jar files in the
@@ -491,7 +491,7 @@
 
 <!--
 
-  The "remove" target tells the specified Tomcat 6 installation to dynamically
+  The "remove" target tells the specified Tomcat installation to dynamically
   remove this web application from service.
 
   NOTE:  This is the logical opposite of the "install" target.

@@ -985,7 +985,7 @@ valid user, consisting of the following attributes:</p>
 <h5>Introduction</h5>
 
         <p><strong>JAASRealm</strong> is an implementation of the Tomcat
-6 <code>Realm</code> interface that authenticates users through the Java
+<code>Realm</code> interface that authenticates users through the Java
 Authentication &amp; Authorization Service (JAAS) framework which is now
 provided as part of the standard Java SE API.</p>
         <p>Using JAASRealm gives the developer the ability to combine
