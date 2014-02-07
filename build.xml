@@ -2723,7 +2723,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <!-- ================  be built rather than used directly ================ -->
 
   <target name="build-tomcat-dbcp" depends="build-manifests" unless="no.build.dbcp">
-    <!-- Pool2 and DBCP2 currently have slightly different source structures -->
     <copy todir="${tomcat-dbcp.home}/src">
       <fileset dir="${commons-pool.home}/src/main">
         <include name="**/*.java" />
@@ -2731,8 +2730,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <exclude name="**/proxy/**" />
       </fileset>
     </copy>
-    <copy todir="${tomcat-dbcp.home}">
-      <fileset dir="${commons-dbcp.home}">
+    <copy todir="${tomcat-dbcp.home}/src">
+      <fileset dir="${commons-dbcp.home}/src/main">
         <include name="**/*.java" />
         <exclude name="**/test/**" />
         <exclude name="**/managed/**" />
