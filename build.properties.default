@@ -51,7 +51,7 @@ test.jvmarg.egd=-Djava.security.egd=file:/dev/./urandom
 gpg.exec=/path/to/gpg
 
 # ----- Settings to use when downloading files -----
-trydownload.usehttpcaches=true
+trydownload.httpusecaches=true
 
 # ----- Default Base Path for Dependent Packages -----
 # Please note this path must be absolute, not relative,
