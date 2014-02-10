@@ -50,7 +50,7 @@
       <fix>
         Restore the ability to use the <code>addURL()</code> method of the
         web application class loader to add external resources to the web
-        application. (markt) 
+        application. (markt)
       </fix>
     </changelog>
   </subsection>
