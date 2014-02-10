@@ -67,6 +67,11 @@
         <code>tomcat8.exe</code> is called, a UAC dialog is displayed if UAC is
         enabled. (markt)
       </fix>
+      <fix>
+        <bug>56115</bug>: Expose the <code>httpusecaches</code> property of
+        Ant&apos;s <code>get</code> task as some users may need to change the
+        default. Based on a suggestion by Anthony. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
