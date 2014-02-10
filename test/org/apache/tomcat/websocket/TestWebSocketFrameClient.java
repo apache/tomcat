@@ -149,8 +149,7 @@ public class TestWebSocketFrameClient extends TomcatBaseTest {
             Assert.fail("No error reported by Endpoint when timeout was expected");
         }
 
-        // Wait up to another 20 seconds for the connection to be closed -
-        // should be a lot faster.
+        // Wait up to another 20 seconds for the connection to be closed
         System.err.println("Waiting for connection to be closed");
         count = 0;
         limit = (TesterFirehoseServer.SEND_TIME_OUT_MILLIS * 4) / 100;
