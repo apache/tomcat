@@ -50,6 +50,9 @@ test.jvmarg.egd=-Djava.security.egd=file:/dev/./urandom
 # Location of GPG executable (used only for releases)
 gpg.exec=/path/to/gpg
 
+# ----- Settings to use when downloading files -----
+trydownload.usehttpcaches=true
+
 # ----- Default Base Path for Dependent Packages -----
 # Please note this path must be absolute, not relative,
 # as it is referenced with different working directory
