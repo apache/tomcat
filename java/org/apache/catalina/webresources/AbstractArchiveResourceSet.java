@@ -219,7 +219,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
             if (pathInJar.equals("")) {
                 // Special case
                 return new JarResourceRoot(root, new File(getBase()),
-                        pathInJar, path);
+                        baseUrlString, path);
             } else {
                 JarEntry jarEntry = null;
                 if (!(pathInJar.charAt(pathInJar.length() - 1) == '/')) {
