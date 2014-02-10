@@ -52,6 +52,10 @@
         web application class loader to add external resources to the web
         application. (markt)
       </fix>
+      <fix>
+        <bug>56125</bug>: Correctly construct the URL for a resource that
+        represents the root of a JAR file. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
