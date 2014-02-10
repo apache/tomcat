@@ -277,8 +277,6 @@ public class WebappClassLoader extends URLClassLoader
 
     /**
      * Associated web resources for this webapp.
-     * TODO Review the use of resources in this class to see if further
-     *      simplifications can be made.
      */
     protected WebResourceRoot resources = null;
 
@@ -418,6 +416,13 @@ public class WebappClassLoader extends URLClassLoader
      */
     private final List<ClassFileTransformer> transformers = new CopyOnWriteArrayList<>();
 
+
+    /**
+     * Flag that indicates that {@link #addURL(URL)} has been called which
+     * creates a requirement to check the super class when searching for
+     * resources.
+     */
+    private boolean hasExternalRepositories = false;
 
     // ------------------------------------------------------------- Properties
 
@@ -870,9 +875,9 @@ public class WebappClassLoader extends URLClassLoader
             try {
                 clazz = findClassInternal(name);
             } catch(ClassNotFoundException cnfe) {
-                if (log.isDebugEnabled())
-                    log.debug("    --> Returning ClassNotFoundException");
-                throw cnfe;
+                if (!hasExternalRepositories) {
+                    throw cnfe;
+                }
             } catch(AccessControlException ace) {
                 log.warn("WebappClassLoader.findClassInternal(" + name
                         + ") security exception: " + ace.getMessage(), ace);
@@ -881,6 +886,24 @@ public class WebappClassLoader extends URLClassLoader
                 if (log.isTraceEnabled())
                     log.trace("      -->RuntimeException Rethrown", e);
                 throw e;
+            }
+            if ((clazz == null) && hasExternalRepositories) {
+                try {
+                    clazz = super.findClass(name);
+                } catch(AccessControlException ace) {
+                    log.warn("WebappClassLoader.findClassInternal(" + name
+                            + ") security exception: " + ace.getMessage(), ace);
+                    throw new ClassNotFoundException(name, ace);
+                } catch (RuntimeException e) {
+                    if (log.isTraceEnabled())
+                        log.trace("      -->RuntimeException Rethrown", e);
+                    throw e;
+                }
+            }
+            if (clazz == null) {
+                if (log.isDebugEnabled())
+                    log.debug("    --> Returning ClassNotFoundException");
+                throw new ClassNotFoundException(name);
             }
         } catch (ClassNotFoundException e) {
             if (log.isTraceEnabled())
@@ -938,6 +961,10 @@ public class WebappClassLoader extends URLClassLoader
             url = entry.source;
         }
 
+        if ((url == null) && hasExternalRepositories) {
+            url = super.findResource(name);
+        }
+
         if (log.isDebugEnabled()) {
             if (url != null)
                 log.debug("    --> Returning '" + url.toString() + "'");
@@ -972,6 +999,14 @@ public class WebappClassLoader extends URLClassLoader
         for (WebResource webResource : webResources) {
             if (webResource.exists()) {
                 result.add(webResource.getURL());
+            }
+        }
+
+        // Adding the results of a call to the superclass
+        if (hasExternalRepositories) {
+            Enumeration<URL> otherResourcePaths = super.findResources(name);
+            while (otherResourcePaths.hasMoreElements()) {
+                result.add(otherResourcePaths.nextElement());
             }
         }
 
@@ -1092,6 +1127,12 @@ public class WebappClassLoader extends URLClassLoader
             if (log.isDebugEnabled())
                 log.debug("  --> Returning stream from local");
             stream = findLoadedResource(name);
+            try {
+                if (hasExternalRepositories && (stream == null))
+                    stream = url.openStream();
+            } catch (IOException e) {
+                // Ignore
+            }
             if (stream != null)
                 return (stream);
         }
@@ -2722,5 +2763,12 @@ public class WebappClassLoader extends URLClassLoader
         // Assume everything else is OK
         return true;
 
+    }
+
+
+    @Override
+    protected void addURL(URL url) {
+        super.addURL(url);
+        hasExternalRepositories = true;
     }
 }
