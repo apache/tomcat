@@ -2809,7 +2809,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="downloadgz" unless="exist" depends="setproxy,testexist">
     <!-- Download and extract the package -->
-    <get src="${sourcefile}" dest="${base.path}/file.tar.gz" />
+    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${base.path}/file.tar.gz" />
     <gunzip src="${base.path}/file.tar.gz" dest="${base.path}/file.tar"/>
     <untar src="${base.path}/file.tar" dest="${base.path}"/>
     <delete file="${base.path}/file.tar"/>
@@ -2836,7 +2836,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="downloadzip" unless="exist" depends="setproxy,testexist">
     <!-- Download and extract the package -->
-    <get src="${sourcefile}" dest="${base.path}/file.zip" />
+    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${base.path}/file.zip" />
     <mkdir dir="${destdir}" />
     <unzip src="${base.path}/file.zip" dest="${destdir}"/>
     <delete file="${base.path}/file.zip"/>
@@ -2861,7 +2861,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <target name="downloadfile" unless="exist" depends="setproxy,testexist">
     <!-- Download extract the file -->
     <mkdir dir="${destdir}" />
-    <get src="${sourcefile}" dest="${destfile}" />
+    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${destfile}" />
   </target>
 
   <target name="downloadfile-2" unless="exist" depends="testexist">
@@ -2893,7 +2893,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="trydownload" if="trydownload.run" depends="trydownload.check">
     <!-- Downloads a file if not yet downloaded and the source URL is available -->
-    <get src="${sourcefile}" dest="${destfile}" />
+    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${destfile}" />
   </target>
 
   <!-- ============================ IDE Support ============================ -->

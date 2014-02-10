@@ -312,6 +312,11 @@
         Content-Type header and multipart request processing. Fixed by merging
         latest code (r1565163) from Commons FileUpload. (markt)
       </fix>
+      <fix>
+        <bug>56115</bug>: Expose the <code>httpusecaches</code> property of
+        Ant&apos;s <code>get</code> task as some users may need to change the
+        default. Based on a suggestion by Anthony. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
