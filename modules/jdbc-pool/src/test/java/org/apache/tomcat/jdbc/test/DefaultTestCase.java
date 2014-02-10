@@ -100,7 +100,7 @@ public abstract class DefaultTestCase {
                        }
                 }
             }
-            tDatasource = (BasicDataSource) BasicDataSourceFactory.createDataSource(p);
+            tDatasource = BasicDataSourceFactory.createDataSource(p);
         }catch (Exception x) {
             x.printStackTrace();
         }
