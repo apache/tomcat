@@ -24,7 +24,7 @@ public class SocketWrapper<E> {
 
     protected volatile E socket;
 
-    protected volatile long lastAccess = -1;
+    protected volatile long lastAccess = System.currentTimeMillis();
     protected long timeout = -1;
     protected boolean error = false;
     protected long lastRegistered = 0;
