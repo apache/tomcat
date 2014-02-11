@@ -58,7 +58,7 @@
       </fix>
       <fix>
         Generate a valid root element for the effective web.xml for a web
-        application for all supported versions of web.xml. (markt) 
+        application for all supported versions of web.xml. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -76,6 +76,9 @@
         Ant&apos;s <code>get</code> task as some users may need to change the
         default. Based on a suggestion by Anthony. (markt)
       </fix>
+      <update>
+        Update Commons DBCP 2 to snapshot 173 dated 11 Feb 2014. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
