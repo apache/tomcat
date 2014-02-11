@@ -130,32 +130,32 @@ public class TestWebXml {
     }
 
     @Test
-    public void testValidateVerion22() throws IOException, SAXException {
+    public void testValidateVersion22() throws IOException, SAXException {
         doTestValidateVersion("2.2");
     }
 
     @Test
-    public void testValidateVerion23() throws IOException, SAXException {
+    public void testValidateVersion23() throws IOException, SAXException {
         doTestValidateVersion("2.3");
     }
 
     @Test
-    public void testValidateVerion24() throws IOException, SAXException {
+    public void testValidateVersion24() throws IOException, SAXException {
         doTestValidateVersion("2.4");
     }
 
     @Test
-    public void testValidateVerion25() throws IOException, SAXException {
+    public void testValidateVersion25() throws IOException, SAXException {
         doTestValidateVersion("2.5");
     }
 
     @Test
-    public void testValidateVerion30() throws IOException, SAXException {
+    public void testValidateVersion30() throws IOException, SAXException {
         doTestValidateVersion("3.0");
     }
 
     @Test
-    public void testValidateVerion31() throws IOException, SAXException {
+    public void testValidateVersion31() throws IOException, SAXException {
         doTestValidateVersion("3.1");
     }
 
