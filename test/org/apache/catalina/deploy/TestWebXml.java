@@ -176,6 +176,8 @@ public class TestWebXml {
 
         Assert.assertEquals(0, handler.getErrors().size());
         Assert.assertEquals(0, handler.getWarnings().size());
+
+        Assert.assertEquals(version, webxml.getVersion());
     }
 
     // A simplified copy of ContextConfig.getDefaultWebXmlFragment().
