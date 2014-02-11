@@ -598,17 +598,52 @@ public class WebXml {
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 
         // Root element
-        sb.append("<web-app xmlns=\"http://java.sun.com/xml/ns/javaee\"\n");
-        sb.append("         xmlns:xsi=");
-        sb.append("\"http://www.w3.org/2001/XMLSchema-instance\"\n");
-        sb.append("         xsi:schemaLocation=");
-        sb.append("\"http://java.sun.com/xml/ns/javaee" +
-                  " http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd\"\n");
-        sb.append("         version=\"");
-        sb.append(getVersion());
-        sb.append("\"\n");
-        sb.append("         metadata-complete=\"true\">\n\n");
-
+        if (publicId != null) {
+            sb.append("<!DOCTYPE web-app PUBLIC\n");
+            sb.append("  \"");
+            sb.append(publicId);
+            sb.append("\"\n");
+            sb.append("  \"");
+            if (XmlIdentifiers.WEB_22_PUBLIC.equals(publicId)) {
+                sb.append(XmlIdentifiers.WEB_22_SYSTEM);
+            } else {
+                sb.append(XmlIdentifiers.WEB_23_SYSTEM);
+            }
+            sb.append("\">\n");
+            sb.append("<web-app>");
+        } else {
+            String javaeeNamespace = null;
+            String webXmlSchemaLocation = null;
+            String version = getVersion();
+            if ("2.4".equals(version)) {
+                javaeeNamespace = XmlIdentifiers.JAVAEE_1_4_NS;
+                webXmlSchemaLocation = XmlIdentifiers.WEB_24_XSD;
+            } else if ("2.5".equals(version)) {
+                javaeeNamespace = XmlIdentifiers.JAVAEE_5_NS;
+                webXmlSchemaLocation = XmlIdentifiers.WEB_25_XSD;
+            } else if ("3.0".equals(version)) {
+                javaeeNamespace = XmlIdentifiers.JAVAEE_6_NS;
+                webXmlSchemaLocation = XmlIdentifiers.WEB_30_XSD;
+            }
+            sb.append("<web-app xmlns=\"");
+            sb.append(javaeeNamespace);
+            sb.append("\"\n");
+            sb.append("         xmlns:xsi=");
+            sb.append("\"http://www.w3.org/2001/XMLSchema-instance\"\n");
+            sb.append("         xsi:schemaLocation=\"");
+            sb.append(javaeeNamespace);
+            sb.append(" ");
+            sb.append(webXmlSchemaLocation);
+            sb.append("\"\n");
+            sb.append("         version=\"");
+            sb.append(getVersion());
+            sb.append("\"");
+            if ("2.4".equals(version)) {
+                sb.append(">\n\n");
+            } else {
+                sb.append("\n         metadata-complete=\"true\">\n\n");
+            }
+        }
         appendElement(sb, INDENT2, "display-name", displayName);
 
         if (isDistributable()) {
@@ -742,23 +777,25 @@ public class WebXml {
             sb.append("  <session-config>\n");
             appendElement(sb, INDENT4, "session-timeout",
                     sessionConfig.getSessionTimeout());
-            sb.append("    <cookie-config>\n");
-            appendElement(sb, INDENT6, "name", sessionConfig.getCookieName());
-            appendElement(sb, INDENT6, "domain",
-                    sessionConfig.getCookieDomain());
-            appendElement(sb, INDENT6, "path", sessionConfig.getCookiePath());
-            appendElement(sb, INDENT6, "comment",
-                    sessionConfig.getCookieComment());
-            appendElement(sb, INDENT6, "http-only",
-                    sessionConfig.getCookieHttpOnly());
-            appendElement(sb, INDENT6, "secure",
-                    sessionConfig.getCookieSecure());
-            appendElement(sb, INDENT6, "max-age",
-                    sessionConfig.getCookieMaxAge());
-            sb.append("    </cookie-config>\n");
-            for (SessionTrackingMode stm :
-                    sessionConfig.getSessionTrackingModes()) {
-                appendElement(sb, INDENT4, "tracking-mode", stm.name());
+            if (majorVersion >= 3) {
+                sb.append("    <cookie-config>\n");
+                appendElement(sb, INDENT6, "name", sessionConfig.getCookieName());
+                appendElement(sb, INDENT6, "domain",
+                        sessionConfig.getCookieDomain());
+                appendElement(sb, INDENT6, "path", sessionConfig.getCookiePath());
+                appendElement(sb, INDENT6, "comment",
+                        sessionConfig.getCookieComment());
+                appendElement(sb, INDENT6, "http-only",
+                        sessionConfig.getCookieHttpOnly());
+                appendElement(sb, INDENT6, "secure",
+                        sessionConfig.getCookieSecure());
+                appendElement(sb, INDENT6, "max-age",
+                        sessionConfig.getCookieMaxAge());
+                sb.append("    </cookie-config>\n");
+                for (SessionTrackingMode stm :
+                        sessionConfig.getSessionTrackingModes()) {
+                    appendElement(sb, INDENT4, "tracking-mode", stm.name());
+                }
             }
             sb.append("  </session-config>\n\n");
         }

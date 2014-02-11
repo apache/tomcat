@@ -49,28 +49,23 @@ public final class XmlIdentifiers {
             "http://java.sun.com/dtd/web-jsptaglibrary_1_2.dtd";
 
     // from J2EE 1.4
-    public static final String WEB_24_XSD =
-            "http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd";
-    public static final String TLD_20_XSD =
-            "http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd";
+    public static final String JAVAEE_1_4_NS = "http://java.sun.com/xml/ns/j2ee";
+    public static final String WEB_24_XSD = JAVAEE_1_4_NS + "/web-app_2_4.xsd";
+    public static final String TLD_20_XSD = JAVAEE_1_4_NS + "/web-jsptaglibrary_2_0.xsd";
     public static final String WEBSERVICES_11_XSD =
             "http://www.ibm.com/webservices/xsd/j2ee_web_services_1_1.xsd";
 
     // from JavaEE 5
-    public static final String WEB_25_XSD =
-            "http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd";
-    public static final String TLD_21_XSD =
-            "http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd";
-    public static final String WEBSERVICES_12_XSD =
-            "http://java.sun.com/xml/ns/javaee/javaee_web_services_1_2.xsd";
+    public static final String JAVAEE_5_NS = "http://java.sun.com/xml/ns/javaee";
+    public static final String WEB_25_XSD = JAVAEE_5_NS + "/web-app_2_5.xsd";
+    public static final String TLD_21_XSD = JAVAEE_5_NS + "/web-jsptaglibrary_2_1.xsd";
+    public static final String WEBSERVICES_12_XSD = JAVAEE_5_NS + "javaee_web_services_1_2.xsd";
 
     // from JavaEE 6
-    public static final String WEB_30_XSD =
-            "http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd";
-    public static final String WEB_FRAGMENT_30_XSD =
-            "http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd";
-    public static final String WEBSERVICES_13_XSD =
-            "http://java.sun.com/xml/ns/javaee/javaee_web_services_1_3.xsd";
+    public static final String JAVAEE_6_NS = JAVAEE_5_NS;
+    public static final String WEB_30_XSD = JAVAEE_6_NS + "/web-app_3_0.xsd";
+    public static final String WEB_FRAGMENT_30_XSD = JAVAEE_6_NS + "/web-fragment_3_0.xsd";
+    public static final String WEBSERVICES_13_XSD = JAVAEE_6_NS + "/javaee_web_services_1_3.xsd";
 
     private XmlIdentifiers() {
     }

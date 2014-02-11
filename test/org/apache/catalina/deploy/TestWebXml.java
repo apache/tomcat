@@ -14,9 +14,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.catalina.deploy;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -24,8 +25,14 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.startup.WebRuleSet;
+import org.apache.tomcat.util.descriptor.DigesterFactory;
+import org.apache.tomcat.util.descriptor.XmlErrorHandler;
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
+import org.apache.tomcat.util.digester.Digester;
 
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Test case for {@link WebXml}.
@@ -110,6 +117,58 @@ public class TestWebXml {
         Assert.assertEquals(3, webxml.getMajorVersion());
         Assert.assertEquals(0, webxml.getMinorVersion());
         Assert.assertEquals("3.0", webxml.getVersion());
+    }
+
+    @Test
+    public void testValidateVerion22() throws IOException, SAXException {
+        doTestValidateVersion("2.2");
+    }
+
+    @Test
+    public void testValidateVerion23() throws IOException, SAXException {
+        doTestValidateVersion("2.3");
+    }
+
+    @Test
+    public void testValidateVerion24() throws IOException, SAXException {
+        doTestValidateVersion("2.4");
+    }
+
+    @Test
+    public void testValidateVerion25() throws IOException, SAXException {
+        doTestValidateVersion("2.5");
+    }
+
+    @Test
+    public void testValidateVerion30() throws IOException, SAXException {
+        doTestValidateVersion("3.0");
+    }
+
+    private void doTestValidateVersion(String version) throws IOException, SAXException {
+        WebXml webxml = new WebXml();
+
+        // Special cases
+        if ("2.2".equals(version)) {
+            webxml.setPublicId(XmlIdentifiers.WEB_22_PUBLIC);
+        } else if ("2.3".equals(version)) {
+            webxml.setPublicId(XmlIdentifiers.WEB_23_PUBLIC);
+        } else {
+            webxml.setVersion(version);
+        }
+
+        Digester digester = DigesterFactory.newDigester(true, true, new WebRuleSet(), true);
+
+        XmlErrorHandler handler = new XmlErrorHandler();
+        digester.setErrorHandler(handler);
+
+        System.out.print(webxml.toXml() + "\n\n\n");
+
+        InputSource is = new InputSource(new StringReader(webxml.toXml()));
+        digester.push(new WebXml());
+        digester.parse(is);
+
+        Assert.assertEquals(0, handler.getErrors().size());
+        Assert.assertEquals(0, handler.getWarnings().size());
     }
 
     @Test

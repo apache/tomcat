@@ -55,6 +55,16 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.52 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Generate a valid root element for the effective web.xml for a web
+        application for all supported versions of web.xml. (markt) 
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.51 (violetagg)">
   <subsection name="Catalina">
     <changelog>
