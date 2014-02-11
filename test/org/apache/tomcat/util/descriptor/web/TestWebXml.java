@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashSet;
@@ -29,7 +30,6 @@ import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.descriptor.XmlErrorHandler;
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
 import org.apache.tomcat.util.digester.Digester;
-
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -171,12 +171,19 @@ public class TestWebXml {
             webxml.setVersion(version);
         }
 
+        // Merged web.xml that is published as MERGED_WEB_XML context attribute
+        // in the simplest case consists of webapp's web.xml file
+        // plus the default conf/web.xml one.
+        Set<WebXml> defaults = new HashSet<>();
+        defaults.add(getDefaultWebXmlFragment());
+        webxml.merge(defaults);
+
         Digester digester = DigesterFactory.newDigester(true, true, new WebRuleSet(), true);
 
         XmlErrorHandler handler = new XmlErrorHandler();
         digester.setErrorHandler(handler);
 
-        System.out.print(webxml.toXml() + "\n\n\n");
+        // System.out.print(webxml.toXml() + "\n\n\n");
 
         InputSource is = new InputSource(new StringReader(webxml.toXml()));
         digester.push(new WebXml());
@@ -184,6 +191,33 @@ public class TestWebXml {
 
         Assert.assertEquals(0, handler.getErrors().size());
         Assert.assertEquals(0, handler.getWarnings().size());
+    }
+
+    // A simplified copy of ContextConfig.getDefaultWebXmlFragment().
+    // Assuming that global web.xml exists, host-specific web.xml does not exist.
+    private WebXml getDefaultWebXmlFragment() throws IOException, SAXException {
+        InputSource globalWebXml = new InputSource(new File("conf/web.xml")
+                .getAbsoluteFile().toURI().toString());
+
+        WebXml webXmlDefaultFragment = new WebXml();
+        webXmlDefaultFragment.setOverridable(true);
+        webXmlDefaultFragment.setDistributable(true);
+        webXmlDefaultFragment.setAlwaysAddWelcomeFiles(false);
+
+        Digester digester = DigesterFactory.newDigester(true, true, new WebRuleSet(), true);
+        XmlErrorHandler handler = new XmlErrorHandler();
+        digester.setErrorHandler(handler);
+        digester.push(webXmlDefaultFragment);
+        digester.parse(globalWebXml);
+        Assert.assertEquals(0, handler.getErrors().size());
+        Assert.assertEquals(0, handler.getWarnings().size());
+
+        webXmlDefaultFragment.setReplaceWelcomeFiles(true);
+
+        // Assert that web.xml was parsed and is not empty. Default servlet is known to be there.
+        Assert.assertNotNull(webXmlDefaultFragment.getServlets().get("default"));
+
+        return webXmlDefaultFragment;
     }
 
     @Test
