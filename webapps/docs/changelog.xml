@@ -56,6 +56,10 @@
         <bug>56125</bug>: Correctly construct the URL for a resource that
         represents the root of a JAR file. (markt)
       </fix>
+      <fix>
+        Generate a valid root element for the effective web.xml for a web
+        application for all supported versions of web.xml. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
