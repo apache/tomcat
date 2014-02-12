@@ -521,6 +521,8 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         } else if (actionCode == ActionCode.ASYNC_START) {
             asyncStateMachine.asyncStart((AsyncContextCallback) param);
+            // Async time out is based on SocketWrapper access time
+            getSocketWrapper().access();
 
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
             socketWrapper.clearDispatches();
