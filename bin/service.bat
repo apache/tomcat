@@ -38,7 +38,7 @@ cd ..
 set "CATALINA_HOME=%cd%"
 :gotHome
 if exist "%CATALINA_HOME%\bin\tomcat@VERSION_MAJOR@.exe" goto okHome
-echo The tomcat.exe was not found...
+echo The tomcat@VERSION_MAJOR@.exe was not found...
 echo The CATALINA_HOME environment variable is not defined correctly.
 echo This environment variable is needed to run this program
 goto end
