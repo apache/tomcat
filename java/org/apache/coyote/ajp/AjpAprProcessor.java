@@ -74,13 +74,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
     // ----------------------------------------------------- Instance Variables
 
-
-    /**
-     * Socket associated with the current connection.
-     */
-    protected SocketWrapper<Long> socket;
-
-
     /**
      * Direct buffer used for input.
      */
@@ -109,7 +102,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
         // Setting up the socket
-        this.socket = socket;
+        this.socketWrapper = socket;
         long socketRef = socket.getSocket().longValue();
         Socket.setrbb(socketRef, inputBuffer);
         Socket.setsbb(socketRef, outputBuffer);
@@ -260,18 +253,18 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
         if (actionCode == ActionCode.ASYNC_COMPLETE) {
             if (asyncStateMachine.asyncComplete()) {
-                ((AprEndpoint)endpoint).processSocketAsync(this.socket,
+                ((AprEndpoint)endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);
             }
 
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param == null) return;
             long timeout = ((Long)param).longValue();
-            socket.setTimeout(timeout);
+            socketWrapper.setTimeout(timeout);
 
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
-                ((AprEndpoint)endpoint).processSocketAsync(this.socket,
+                ((AprEndpoint)endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);
             }
         }
@@ -290,7 +283,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
             throws IOException {
         outputBuffer.put(src, offset, length);
         
-        long socketRef = socket.getSocket().longValue();
+        long socketRef = socketWrapper.getSocket().longValue();
         
         if (outputBuffer.position() > 0) {
             if ((socketRef != 0) && Socket.sendbb(socketRef, 0, outputBuffer.position()) < 0) {
@@ -320,7 +313,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         int nRead;
         while (inputBuffer.remaining() < n) {
             nRead = Socket.recvbb
-                (socket.getSocket().longValue(), inputBuffer.limit(),
+                (socketWrapper.getSocket().longValue(), inputBuffer.limit(),
                         inputBuffer.capacity() - inputBuffer.limit());
             if (nRead > 0) {
                 inputBuffer.limit(inputBuffer.limit() + nRead);
@@ -353,7 +346,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         int nRead;
         while (inputBuffer.remaining() < n) {
             nRead = Socket.recvbb
-                (socket.getSocket().longValue(), inputBuffer.limit(),
+                (socketWrapper.getSocket().longValue(), inputBuffer.limit(),
                     inputBuffer.capacity() - inputBuffer.limit());
             if (nRead > 0) {
                 inputBuffer.limit(inputBuffer.limit() + nRead);

@@ -64,6 +64,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection>
+    <changelog>
+      <scode>
+        Pull up <code>SocketWrapper</code> to <code>AbstractProcessor</code>.
+        (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.51 (violetagg)" rtext="not released">
   <subsection name="Catalina">

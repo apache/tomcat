@@ -390,11 +390,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     }
 
     @Override
-    protected void setSocketWrapper(SocketWrapper<Socket> socketWrapper) {
-        this.socket = socketWrapper;
-    }
-
-    @Override
     protected AbstractInputBuffer<Socket> getInputBuffer() {
         return inputBuffer;
     }
