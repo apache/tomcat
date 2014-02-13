@@ -79,9 +79,9 @@
             ws.onmessage = function (event) {
                 log('Received: ' + event.data);
             };
-            ws.onclose = function () {
+            ws.onclose = function (event) {
                 setConnected(false);
-                log('Info: WebSocket connection closed.');
+                log('Info: WebSocket connection closed, Code: ' + event.code + (event.reason == "" ? "" : ", Reason: " + event.reason));
             };
         }
 
