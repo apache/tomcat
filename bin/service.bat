@@ -38,7 +38,7 @@ cd ..
 set "CATALINA_HOME=%cd%"
 :gotHome
 if exist "%CATALINA_HOME%\bin\tomcat@VERSION_MAJOR@.exe" goto okHome
-echo The tomcat.exe was not found...
+echo The tomcat@VERSION_MAJOR@.exe was not found...
 echo The CATALINA_HOME environment variable is not defined correctly.
 echo This environment variable is needed to run this program
 goto end
@@ -137,9 +137,20 @@ rem Set the client jvm from JAVA_HOME
 set "PR_JVM=%JRE_HOME%\bin\client\jvm.dll"
 if exist "%PR_JVM%" goto foundJvm
 set PR_JVM=auto
+set PR_STDOUTPUT=auto
+set PR_STDERROR=auto
 :foundJvm
 echo Using JVM:              "%PR_JVM%"
-"%EXECUTABLE%" //IS//%SERVICE_NAME% --StartClass org.apache.catalina.startup.Bootstrap --StopClass org.apache.catalina.startup.Bootstrap --StartParams start --StopParams stop
+"%EXECUTABLE%" //IS//%SERVICE_NAME% ^
+    --StartClass org.apache.catalina.startup.Bootstrap ^
+    --StopClass org.apache.catalina.startup.Bootstrap ^
+    --StartParams start ^
+    --StopParams stop ^
+    --JvmOptions "-Dcatalina.base=%CATALINA_BASE%;-Dcatalina.home=%CATALINA_HOME%;-Djava.endorsed.dirs=%CATALINA_HOME%\endorsed;-Djava.io.tmpdir=%CATALINA_BASE%\temp;-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager;-Djava.util.logging.config.file=%CATALINA_BASE%\conf\logging.properties" ^
+    --StartMode jvm ^
+    --StopMode jvm ^
+    --JvmMs 128 ^
+    --JvmMx 256
 if not errorlevel 1 goto installed
 echo Failed installing '%SERVICE_NAME%' service
 goto end
@@ -151,13 +162,6 @@ set PR_INSTALL=
 set PR_LOGPATH=
 set PR_CLASSPATH=
 set PR_JVM=
-rem Set extra parameters
-"%EXECUTABLE%" //US//%SERVICE_NAME% --JvmOptions "-Dcatalina.base=%CATALINA_BASE%;-Dcatalina.home=%CATALINA_HOME%;-Djava.endorsed.dirs=%CATALINA_HOME%\endorsed" --StartMode jvm --StopMode jvm
-rem More extra parameters
-set "PR_LOGPATH=%CATALINA_BASE%\logs"
-set PR_STDOUTPUT=auto
-set PR_STDERROR=auto
-"%EXECUTABLE%" //US//%SERVICE_NAME% ++JvmOptions "-Djava.io.tmpdir=%CATALINA_BASE%\temp;-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager;-Djava.util.logging.config.file=%CATALINA_BASE%\conf\logging.properties" --JvmMs 128 --JvmMx 256
 echo The service '%SERVICE_NAME%' has been installed.
 
 :end

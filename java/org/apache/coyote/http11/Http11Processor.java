@@ -86,12 +86,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
     
     /**
-     * Socket associated with the current connection.
-     */
-    protected SocketWrapper<Socket> socket;
-
-
-    /**
      * The percentage of threads that have to be in use before keep-alive is
      * disabled to aid scalability.
      */
@@ -151,13 +145,13 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
          * This is a little hacky but better than exposing the socket
          * and the timeout info to the InputBuffer
          */
-        if (inputBuffer.lastValid == 0 && socket.getLastAccess() > -1) {
+        if (inputBuffer.lastValid == 0 && socketWrapper.getLastAccess() > -1) {
             int firstReadTimeout;
             if (keepAliveTimeout == -1) {
                 firstReadTimeout = 0;
             } else {
                 long queueTime =
-                    System.currentTimeMillis() - socket.getLastAccess();
+                    System.currentTimeMillis() - socketWrapper.getLastAccess();
 
                 if (queueTime >= keepAliveTimeout) {
                     // Queued for longer than timeout but there might be
@@ -169,7 +163,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                     firstReadTimeout = keepAliveTimeout - (int) queueTime;
                 }
             }
-            socket.getSocket().setSoTimeout(firstReadTimeout);
+            socketWrapper.getSocket().setSoTimeout(firstReadTimeout);
             if (!inputBuffer.fill()) {
                 throw new EOFException(sm.getString("iib.eof.error"));
             }
@@ -193,7 +187,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
     @Override
     protected void setSocketTimeout(int timeout) throws IOException {
-        socket.getSocket().setSoTimeout(timeout);
+        socketWrapper.getSocket().setSoTimeout(timeout);
     }
     
     
@@ -224,7 +218,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     @Override
     protected void recycleInternal() {
         // Recycle
-        this.socket = null;
+        this.socketWrapper = null;
         // Recycle ssl info
         sslSupport = null;
     }
@@ -277,8 +271,8 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
         } else if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
 
-            if ((remoteAddr == null) && (socket != null)) {
-                InetAddress inetAddr = socket.getSocket().getInetAddress();
+            if ((remoteAddr == null) && (socketWrapper != null)) {
+                InetAddress inetAddr = socketWrapper.getSocket().getInetAddress();
                 if (inetAddr != null) {
                     remoteAddr = inetAddr.getHostAddress();
                 }
@@ -287,8 +281,8 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
         } else if (actionCode == ActionCode.REQ_LOCAL_NAME_ATTRIBUTE) {
 
-            if ((localName == null) && (socket != null)) {
-                InetAddress inetAddr = socket.getSocket().getLocalAddress();
+            if ((localName == null) && (socketWrapper != null)) {
+                InetAddress inetAddr = socketWrapper.getSocket().getLocalAddress();
                 if (inetAddr != null) {
                     localName = inetAddr.getHostName();
                 }
@@ -297,8 +291,8 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
         } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
 
-            if ((remoteHost == null) && (socket != null)) {
-                InetAddress inetAddr = socket.getSocket().getInetAddress();
+            if ((remoteHost == null) && (socketWrapper != null)) {
+                InetAddress inetAddr = socketWrapper.getSocket().getInetAddress();
                 if (inetAddr != null) {
                     remoteHost = inetAddr.getHostName();
                 }
@@ -315,21 +309,21 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
         } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
 
             if (localAddr == null)
-               localAddr = socket.getSocket().getLocalAddress().getHostAddress();
+               localAddr = socketWrapper.getSocket().getLocalAddress().getHostAddress();
 
             request.localAddr().setString(localAddr);
 
         } else if (actionCode == ActionCode.REQ_REMOTEPORT_ATTRIBUTE) {
 
-            if ((remotePort == -1 ) && (socket !=null)) {
-                remotePort = socket.getSocket().getPort();
+            if ((remotePort == -1 ) && (socketWrapper !=null)) {
+                remotePort = socketWrapper.getSocket().getPort();
             }
             request.setRemotePort(remotePort);
 
         } else if (actionCode == ActionCode.REQ_LOCALPORT_ATTRIBUTE) {
 
-            if ((localPort == -1 ) && (socket !=null)) {
-                localPort = socket.getSocket().getLocalPort();
+            if ((localPort == -1 ) && (socketWrapper !=null)) {
+                localPort = socketWrapper.getSocket().getLocalPort();
             }
             request.setLocalPort(localPort);
 
@@ -356,17 +350,17 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             }
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
             if (asyncStateMachine.asyncComplete()) {
-                ((JIoEndpoint) endpoint).processSocketAsync(this.socket,
+                ((JIoEndpoint) endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param == null) return;
             long timeout = ((Long)param).longValue();
             // if we are not piggy backing on a worker thread, set the timeout
-            socket.setTimeout(timeout);
+            socketWrapper.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
-                ((JIoEndpoint) endpoint).processSocketAsync(this.socket,
+                ((JIoEndpoint) endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);
             }
         }
@@ -387,11 +381,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
         Exception e = new Exception();
         log.error(sm.getString("http11processor.neverused"), e);
         return false;
-    }
-
-    @Override
-    protected void setSocketWrapper(SocketWrapper<Socket> socketWrapper) {
-        this.socket = socketWrapper;
     }
 
     @Override

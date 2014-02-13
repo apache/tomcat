@@ -94,12 +94,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
 
     /**
-     * Socket associated with the current connection.
-     */
-    protected SocketWrapper<Long> socket = null;
-
-
-    /**
      * When client certificate information is presented in a form other than
      * instances of {@link java.security.cert.X509Certificate} it needs to be
      * converted before it can be used and this property controls which JSSE
@@ -205,7 +199,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
     @Override
     protected void setSocketTimeout(int timeout) {
-        Socket.timeoutSet(socket.getSocket().longValue(), timeout * 1000);
+        Socket.timeoutSet(socketWrapper.getSocket().longValue(), timeout * 1000);
     }
 
 
@@ -252,7 +246,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
     @Override
     public void recycleInternal() {
-        socket = null;
+        socketWrapper = null;
         sendfileData = null;
     }
 
@@ -274,7 +268,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     @Override
     public void actionInternal(ActionCode actionCode, Object param) {
 
-        long socketRef = socket.getSocket().longValue();
+        long socketRef = socketWrapper.getSocket().longValue();
 
         if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
 
@@ -454,13 +448,13 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         } else if (actionCode == ActionCode.COMET_END) {
             comet = false;
         } else if (actionCode == ActionCode.COMET_CLOSE) {
-            ((AprEndpoint)endpoint).processSocketAsync(this.socket,
+            ((AprEndpoint)endpoint).processSocketAsync(this.socketWrapper,
                     SocketStatus.OPEN_READ);
         } else if (actionCode == ActionCode.COMET_SETTIMEOUT) {
             //no op
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
             if (asyncStateMachine.asyncComplete()) {
-                ((AprEndpoint)endpoint).processSocketAsync(this.socket,
+                ((AprEndpoint)endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
@@ -468,10 +462,10 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 return;
             }
             long timeout = ((Long)param).longValue();
-            socket.setTimeout(timeout);
+            socketWrapper.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
-                ((AprEndpoint)endpoint).processSocketAsync(this.socket,
+                ((AprEndpoint)endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);
             }
         }
@@ -505,11 +499,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             return true;
         }
         return false;
-    }
-
-    @Override
-    protected void setSocketWrapper(SocketWrapper<Long> socketWrapper) {
-        this.socket = socketWrapper;
     }
 
     @Override

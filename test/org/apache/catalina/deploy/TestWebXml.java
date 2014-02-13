@@ -171,13 +171,15 @@ public class TestWebXml {
         // System.out.print(webxml.toXml() + "\n\n\n");
 
         InputSource is = new InputSource(new StringReader(webxml.toXml()));
-        digester.push(new WebXml());
+        WebXml webxmlResult = new WebXml();
+        digester.push(webxmlResult);
         digester.parse(is);
 
         Assert.assertEquals(0, handler.getErrors().size());
         Assert.assertEquals(0, handler.getWarnings().size());
 
         Assert.assertEquals(version, webxml.getVersion());
+        Assert.assertEquals(version, webxmlResult.getVersion());
     }
 
     // A simplified copy of ContextConfig.getDefaultWebXmlFragment().

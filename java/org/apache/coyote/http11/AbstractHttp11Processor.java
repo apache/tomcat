@@ -672,12 +672,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Allows the super class to set the socket wrapper being used.
-     */
-    protected abstract void setSocketWrapper(SocketWrapper<S> socketWrapper);
-
-
-    /**
      * Exposes input buffer to super class to allow better code re-use.
      * @return  The input buffer used by the processor.
      */
@@ -840,6 +834,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             internalBuffer.addActiveFilter(savedBody);
         } else if (actionCode == ActionCode.ASYNC_START) {
             asyncStateMachine.asyncStart((AsyncContextCallback) param);
+            // Async time out is based on SocketWrapper access time
+            getSocketWrapper().access();
         } else if (actionCode == ActionCode.ASYNC_DISPATCHED) {
             asyncStateMachine.asyncDispatched();
         } else if (actionCode == ActionCode.ASYNC_TIMEOUT) {
