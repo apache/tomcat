@@ -333,6 +333,12 @@ If you are on Windows and want to test the APR connector you can put the
 tcnative-1.dll file into ${tomcat.source}/bin/native/ and it will be copied
 into the above directory when the build runs.
 
+* NOTE: If you configured the build to use a Java 7 JDK (if the
+"java.7.home" property has been defined) the tests will be run with Java 7.
+
+The version of Java that was actually used to run the tests is reported by
+"org.apache.catalina.util.TestServerInfo" test class.
+
 
 (7.2) Running a single test
 

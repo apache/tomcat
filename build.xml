@@ -1354,7 +1354,7 @@
             <!-- Exclude the tests known to fail -->
             <exclude name="org/apache/catalina/tribes/test/**" />
             <!-- Exclude both sets of WebSocket tests unless Java 7 is       -->
-            <!-- present as the WebSocket exmaples (used by the tests) won't -->
+            <!-- present as the WebSocket examples (used by the tests) won't -->
             <!-- build without it.                                           -->
             <exclude unless="java.7.home" name="org/apache/catalina/websocket/**" />
             <exclude unless="java.7.home" name="org/apache/tomcat/websocket/**" />
