@@ -42,7 +42,6 @@
                debug="${compile.debug}"
                deprecation="${compile.deprecation}"
                source="${compile.source}"
-               optimize="${compile.optimize}"
                encoding="ISO-8859-1">
             <classpath refid="lite-classpath" />
             <src path="${tomcat.lite.src}/java" />
@@ -63,7 +62,6 @@
                 debug="${compile.debug}"
                 deprecation="${compile.deprecation}"
                 source="${compile.source}"
-                optimize="${compile.optimize}"
                 encoding="ISO-8859-1"
          >
              <classpath refid="lite-classpath" />
@@ -140,7 +138,6 @@
                debug="${compile.debug}"
                deprecation="${compile.deprecation}"
                source="${compile.source}"
-               optimize="${compile.optimize}"
                encoding="ISO-8859-1">
             <classpath refid="lite-classpath" />
             <src path="${tomcat.lite.src}/java" />
@@ -160,7 +157,6 @@
                debug="${compile.debug}"
                deprecation="${compile.deprecation}"
                source="${compile.source}"
-               optimize="${compile.optimize}"
                encoding="ISO-8859-1">
             <classpath refid="lite-classpath" />
             <src path="${tomcat.lite.src}/java" />
@@ -181,7 +177,6 @@
                debug="${compile.debug}"
                deprecation="${compile.deprecation}"
                source="${compile.source}"
-               optimize="${compile.optimize}"
                encoding="ISO-8859-1"
         >
             <classpath refid="lite-classpath" />
@@ -224,7 +219,6 @@
                debug="${compile.debug}"
                deprecation="${compile.deprecation}"
                source="${compile.source}"
-               optimize="${compile.optimize}"
                encoding="ISO-8859-1"
         >
             <classpath refid="lite-classpath" />
