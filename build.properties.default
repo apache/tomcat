@@ -65,6 +65,9 @@ compile.source=1.7
 compile.target=1.7
 compile.debug=true
 
+# Do not pass -deprecation (-Xlint:deprecation) flag to javac
+compile.deprecation=false
+
 base-apache.loc.1=http://www.apache.org/dist
 base-apache.loc.2=http://archive.apache.org/dist
 base-commons.loc.1=${base-apache.loc.1}/commons
