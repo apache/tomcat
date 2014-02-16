@@ -64,6 +64,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <scode>
+        Simplify Windows *.bat files: remove %OS% checks, as java 6 does
+        not run on ancient non-NT operating systems. (kkolinko)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.52 (violetagg)">
   <subsection name="Catalina">
