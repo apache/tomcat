@@ -920,6 +920,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         }
         if (!resultWar && !resultDir) {
             if (resultXml) {
+                Assert.assertNotNull(ctxt);
                 Assert.assertEquals(LifecycleState.FAILED, ctxt.getState());
             } else {
                 Assert.assertNull(ctxt);
@@ -1136,14 +1137,22 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 if (ext == null) {
                     Assert.fail();
                 } else {
-                    ext.setLastModified(System.currentTimeMillis() + 5000);
+                    if (!ext.setLastModified(System.currentTimeMillis() + 5000)){
+                        Assert.fail("Failed to set last modified time for " +
+                                "external WAR file. This is expected (due to " +
+                                "a JVM bug) with Java 6 on Windows.");
+                    }
                 }
                 break;
             case WAR:
                 if (war == null) {
                     Assert.fail();
                 } else {
-                    war.setLastModified(System.currentTimeMillis() + 5000);
+                    if (!war.setLastModified(System.currentTimeMillis() + 5000)) {
+                        Assert.fail("Failed to set last modified time for WAR " +
+                                "file. This is expected (due to a JVM bug) " +
+                                "with Java 6 on Windows.");
+                    }
                 }
                 break;
             case DIR:
@@ -1194,6 +1203,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         }
         if (!resultWar && !resultDir) {
             if (resultXml) {
+                Assert.assertNotNull(newContext);
                 if (!startExternalWar && !startExternalDir) {
                     Assert.assertEquals(LifecycleState.FAILED,
                             newContext.getState());
@@ -1514,6 +1524,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         }
         if (!resultWar && !resultDir) {
             if (resultXml) {
+                Assert.assertNotNull(newContext);
                 if (!startExternalWar && !startExternalDir) {
                     Assert.assertEquals(LifecycleState.FAILED,
                             newContext.getState());
