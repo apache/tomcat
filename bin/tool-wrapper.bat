@@ -14,7 +14,6 @@ rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 rem See the License for the specific language governing permissions and
 rem limitations under the License.
 
-if "%OS%" == "Windows_NT" setlocal
 rem ---------------------------------------------------------------------------
 rem Wrapper script for command line tools
 rem
@@ -39,6 +38,8 @@ rem                   created outside of the JCP (i.e. DOM and SAX from W3C).
 rem                   It can also be used to update the XML parser implementation.
 rem                   Defaults to $CATALINA_HOME/endorsed.
 rem ---------------------------------------------------------------------------
+
+setlocal
 
 rem Guess CATALINA_HOME if not defined
 set "CURRENT_DIR=%cd%"

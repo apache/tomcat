@@ -14,10 +14,11 @@ rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 rem See the License for the specific language governing permissions and
 rem limitations under the License.
 
-if "%OS%" == "Windows_NT" setlocal
 rem ---------------------------------------------------------------------------
 rem Script to digest password using the algorithm specified
 rem ---------------------------------------------------------------------------
+
+setlocal
 
 rem Guess CATALINA_HOME if not defined
 set "CURRENT_DIR=%cd%"

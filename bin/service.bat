@@ -14,7 +14,6 @@ rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 rem See the License for the specific language governing permissions and
 rem limitations under the License.
 
-if "%OS%" == "Windows_NT" setlocal
 rem ---------------------------------------------------------------------------
 rem NT Service Install/Uninstall script
 rem
@@ -26,6 +25,8 @@ rem
 rem name        (optional) If the second argument is present it is considered
 rem                        to be new service name
 rem ---------------------------------------------------------------------------
+
+setlocal
 
 set "SELF=%~dp0%service.bat"
 rem Guess CATALINA_HOME if not defined
