@@ -73,20 +73,29 @@
   <subsection name="Other">
     <changelog>
       <fix>
-        Use a single call to <code>tomcat8.exe</code> to install the Windows
-        service from <code>service.bat</code> rather than three calls. This is
-        preparatory work for fixing <bug>56079</bug> as each time
-        <code>tomcat8.exe</code> is called, a UAC dialog is displayed if UAC is
-        enabled. (markt)
-      </fix>
-      <fix>
         <bug>56115</bug>: Expose the <code>httpusecaches</code> property of
         Ant&apos;s <code>get</code> task as some users may need to change the
         default. Based on a suggestion by Anthony. (markt)
       </fix>
+      <fix>
+        <bug>56143</bug>: Improve <code>service.bat</code> so that it can be
+        launched from a non-UAC console. This includes using a single call to
+        <code>tomcat8.exe</code> to install the Windows service rather than
+        three calls, and using command line arguments instead of environment
+        variables to pass the settings. (markt/kkolinko)
+      </fix>
       <update>
-        Update Commons DBCP 2 to snapshot 173 dated 11 Feb 2014. (markt)
+        Update Commons DBCP 2 to snapshot 182 dated 14 Feb 2014. (markt)
       </update>
+      <scode>
+        Simplify Windows *.bat files: remove %OS% checks, as current java does
+        not run on ancient non-NT operating systems. (kkolinko)
+      </scode>
+      <fix>
+        Pass explicit value for log directory path when uninstalling Windows
+        service with "<code>service.bat remove</code>", avoiding default value
+        for that option. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
