@@ -100,9 +100,13 @@
         not run on ancient non-NT operating systems. (kkolinko)
       </scode>
       <fix>
-        Pass explicit value for log directory path when uninstalling Windows
-        service with "<code>service.bat remove</code>", avoiding default value
-        for that option. (kkolinko)
+        Align options between <code>service.bat</code> and <code>exe</code>
+        Windows installer. For <code>service.bat</code> the changes are in
+        --Classpath, --DisplayName, --StartPath, --StopPath. For
+        <code>exe</code> installer the changes are in --JvmMs, --JvmMx options,
+        which are now 128 Mb and 256 Mb respectively instead of being empty.
+        Explicitly specify --LogPath path when uninstalling Windows service,
+        avoiding default value for that option. (kkolinko)
       </fix>
     </changelog>
   </subsection>
