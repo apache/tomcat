@@ -138,6 +138,9 @@ set JVM=auto
 :foundJvm
 echo Using JVM:              "%JVM%"
 
+set "CLASSPATH=%CATALINA_HOME%\bin\bootstrap.jar;%CATALINA_BASE%\bin\tomcat-juli.jar"
+if not "%CATALINA_HOME%" == "%CATALINA_BASE%" set "CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\bin\tomcat-juli.jar"
+
 "%EXECUTABLE%" //IS//%SERVICE_NAME% ^
     --Description "Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/" ^
     --DisplayName "%DISPLAYNAME%" ^
@@ -145,7 +148,7 @@ echo Using JVM:              "%JVM%"
     --LogPath "%CATALINA_BASE%\logs" ^
     --StdOutput auto ^
     --StdError auto ^
-    --Classpath "%CATALINA_HOME%\bin\bootstrap.jar;%CATALINA_BASE%\bin\tomcat-juli.jar;%CATALINA_HOME%\bin\tomcat-juli.jar" ^
+    --Classpath "%CLASSPATH%" ^
     --Jvm "%JVM%" ^
     --StartMode jvm ^
     --StopMode jvm ^
