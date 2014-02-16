@@ -55,6 +55,16 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.53 (violetagg)">
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Avoid a possible deadlock when one thread is shutting down a connection
+        while another thread is trying to write to it. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.52 (violetagg)">
   <subsection name="Catalina">
     <changelog>
