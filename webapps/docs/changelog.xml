@@ -70,6 +70,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Avoid a possible deadlock when one thread is shutting down a connection
+        while another thread is trying to write to it. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>

@@ -249,6 +249,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         MessagePart mp = new MessagePart(opCode, payload, last, handler, this);
 
+        boolean doWrite = false;
         synchronized (messagePartLock) {
             if (Constants.OPCODE_CLOSE == mp.getOpCode()) {
                 try {
@@ -260,30 +261,38 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             }
             if (messagePartInProgress) {
                 // When a control message is sent while another message is being
-                // the control message is queued. Chances are the subsequent
-                // data message part will end up queued while the control
-                // message is sent. The logic in this class (state machine,
-                // EndMessageHanlder, TextMessageSendHandler) ensures that there
-                // will only ever be one data message part in the queue. There
-                // could be multiple control messages in the queue.
+                // sent, the control message is queued. Chances are the
+                // subsequent data message part will end up queued while the
+                // control message is sent. The logic in this class (state
+                // machine, EndMessageHandler, TextMessageSendHandler) ensures
+                // that there will only ever be one data message part in the
+                // queue. There could be multiple control messages in the queue.
 
                 // Add it to the queue
                 messagePartQueue.add(mp);
             } else {
                 messagePartInProgress = true;
-                writeMessagePart(mp);
+                doWrite = true;
             }
+        }
+        if (doWrite) {
+            // Actual write has to be outside sync block to avoid possible
+            // deadlock between messagePartLock and writeLock in
+            // o.a.coyote.http11.upgrade.AbstractServletOutputStream
+            writeMessagePart(mp);
         }
     }
 
 
     void endMessage(SendHandler handler, SendResult result) {
+        boolean doWrite = false;
+        MessagePart mpNext = null;
         synchronized (messagePartLock) {
 
             fragmented = nextFragmented;
             text = nextText;
 
-            MessagePart mpNext = messagePartQueue.poll();
+            mpNext = messagePartQueue.poll();
             if (mpNext == null) {
                 messagePartInProgress = false;
             } else if (!closed){
@@ -291,8 +300,14 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 // sending a fragmented message closing the endpoint. If this
                 // happens, clearly there is no point trying to send the rest of
                 // the message.
-                writeMessagePart(mpNext);
+                doWrite = true;
             }
+        }
+        if (doWrite) {
+            // Actual write has to be outside sync block to avoid possible
+            // deadlock between messagePartLock and writeLock in
+            // o.a.coyote.http11.upgrade.AbstractServletOutputStream
+            writeMessagePart(mpNext);
         }
 
         wsSession.updateLastActive();
