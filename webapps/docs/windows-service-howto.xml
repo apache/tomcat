@@ -309,14 +309,14 @@ a user to use for the installation of the service.
 </p>
 <p>
 <strong>NOTE:</strong> On Windows Vista or any later operating system with User
-Account Control (UAC) enabled you will be asked for additional priviledges
+Account Control (UAC) enabled you will be asked for additional privileges
 when 'Tomcat<version-major/>.exe' is launched by the script.<br/>
 If you want to pass additional options to service installer as
 <code>PR_*</code> environment variables, you have to either configure them
-globally in OS, or launch the program that sets them with elevated priviledges
-(e.g. right-click on cmd.exe and select "Run as administrator"; on Windows 8 (or later) or
-Windows Server 2012 (or later), you can open an elevated command prompt
-for the current directory from the explorer
+globally in OS, or launch the program that sets them with elevated privileges
+(e.g. right-click on cmd.exe and select "Run as administrator"; on Windows 8
+(or later) or Windows Server 2012 (or later), you can open an elevated command
+prompt for the current directory from the Explorer
 by clicking on the "File" menu bar). See issue <bug>56143</bug> for details.
 </p>
 
