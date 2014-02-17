@@ -175,6 +175,9 @@
   <property name="tomcat.classes.cobertura" value="${tomcat.classes}-cobertura"/>
   <property name="cobertura.report.format" value="html"/>
 
+  <!-- Workaround against http://bugs.sun.com/view_bug.do?bug_id=6202721 -->
+  <available file="/dev/urandom" property="test.jvmarg.egd" value="-Djava.security.egd=file:/dev/./urandom"/>
+  <property name="test.jvmarg.egd" value="" />
 
   <!-- Include .gitignore in src distributions. -->
   <!-- .git and .gitignore are in defaultexcludes since Ant 1.8.2 -->

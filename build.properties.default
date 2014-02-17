@@ -44,9 +44,6 @@ test.accesslog=false
 # Note the Cobertura code coverage tool is GPLv2 licensed
 test.cobertura=false
 
-# Workaround against http://bugs.sun.com/view_bug.do?bug_id=6202721
-test.jvmarg.egd=-Djava.security.egd=file:/dev/./urandom
-
 # Location of Java7 JDK
 #java.7.home=/path/to/java7/jdk
 
