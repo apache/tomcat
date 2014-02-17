@@ -74,6 +74,27 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <fix>
+        <bug>56143</bug>: Improve <code>service.bat</code> so that it can be
+        launched from a non-UAC console. This includes using a single call to
+        <code>tomcat7.exe</code> to install the Windows service rather than
+        three calls, and using command line arguments instead of environment
+        variables to pass the settings. (markt/kkolinko)
+      </fix>
+      <fix>
+        Fix regression in 7.0.52: when using <code>service.bat install</code>
+        to install the service the values for --StdOutput, --StdError options
+        were passed as blank instead of "auto". (kkolinko)
+      </fix>
+      <fix>
+        Align options between <code>service.bat</code> and <code>exe</code>
+        Windows installer. For <code>service.bat</code> the changes are in
+        --Classpath, --DisplayName, --StartPath, --StopPath. For
+        <code>exe</code> installer the changes are in --JvmMs, --JvmMx options,
+        which are now 128 Mb and 256 Mb respectively instead of being empty.
+        Explicitly specify --LogPath path when uninstalling Windows service,
+        avoiding default value for that option. (kkolinko)
+      </fix>
       <scode>
         Simplify Windows *.bat files: remove %OS% checks, as java 6 does
         not run on ancient non-NT operating systems. (kkolinko)
