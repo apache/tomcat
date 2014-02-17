@@ -76,12 +76,13 @@
                redirectPort="8443" />
     -->
     <!-- Define a SSL HTTP/1.1 Connector on port 8443
-         This connector uses the JSSE configuration, when using APR, the
-         connector should be using the OpenSSL style configuration
-         described in the APR documentation -->
+         This connector uses the NIO implementation that requires the JSSE
+         style configuration. When using the APR/native implementation, the
+         OpenSSL style configuration is required as described in the APR/native
+         documentation -->
     <!--
-    <Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true"
-               maxThreads="150" scheme="https" secure="true"
+    <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+               maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
                clientAuth="false" sslProtocol="TLS" />
     -->
 
