@@ -64,6 +64,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <scode>
+        In the documentation: add support for several documentation tags from
+        Tomcat 8. Such as <code>&lt;version-major/&gt;</code>. (kkolinko)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <scode>

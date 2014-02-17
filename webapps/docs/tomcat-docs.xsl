@@ -36,7 +36,8 @@
   <xsl:param    name="subdir"           select="''"/>
   <xsl:param    name="relative-path"    select="'.'"/>
   <xsl:param    name="version"          select="'7.0.x'"/>
-  <xsl:param    name="majorversion"     select="'7.0'"/>
+  <xsl:param    name="majorversion"        select="'7'"/>
+  <xsl:param    name="majorminorversion"   select="'7.0'"/>
   <xsl:param    name="build-date"       select="'MMM d yyyy'"/>
   <xsl:param    name="year"             select="'yyyy'"/>
   <xsl:param    name="void-image"       select="'/images/void.gif'"/>
@@ -44,6 +45,9 @@
   <xsl:param    name="standalone"       select="''"/>
   <xsl:param    name="buglink"          select="'http://issues.apache.org/bugzilla/show_bug.cgi?id='"/>
   <xsl:param    name="revlink"          select="'http://svn.apache.org/viewvc?view=rev&amp;rev='"/>
+  <xsl:param    name="doclink"             select="'http://tomcat.apache.org/tomcat-7.0-doc'"/>
+  <xsl:param    name="sylink"              select="'http://tomcat.apache.org/security-7.html'"/>
+  <xsl:param    name="dllink"              select="'http://tomcat.apache.org/download-70.cgi'"/>
   <xsl:param    name="sitedir"          select="''"/>
   <xsl:param    name="filename"         select="'-'"/>
 
@@ -616,6 +620,32 @@
   <xsl:template match="rev">
       <xsl:variable name="link"><xsl:value-of select="$revlink"/><xsl:value-of select="text()"/></xsl:variable>
       <a href="{$link}">r<xsl:apply-templates/></a>
+  </xsl:template>
+
+  <!-- Link to online docs -->
+  <xsl:template match="doc">
+      <xsl:variable name="link"><xsl:value-of select="$doclink"/><xsl:value-of select="@path"/></xsl:variable>
+      <a href="{$link}"><xsl:apply-templates/></a>
+  </xsl:template>
+
+  <!-- Link to security page -->
+  <xsl:template match="security">
+      <xsl:variable name="link"><xsl:value-of select="$sylink"/></xsl:variable>
+      <a href="{$link}"><xsl:apply-templates/></a>
+  </xsl:template>
+
+  <!-- Link to download page -->
+  <xsl:template match="download">
+      <xsl:variable name="link"><xsl:value-of select="$dllink"/></xsl:variable>
+      <a href="{$link}"><xsl:apply-templates/></a>
+  </xsl:template>
+
+  <!-- Version numbers -->
+  <xsl:template match="version-major-minor">
+    <xsl:value-of select="$majorminorversion"/>
+  </xsl:template>
+  <xsl:template match="version-major">
+    <xsl:value-of select="$majorversion"/>
   </xsl:template>
 
   <!-- specially process td tags ala site.vsl -->
