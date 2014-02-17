@@ -70,6 +70,10 @@
         In the documentation: add support for several documentation tags from
         Tomcat 8. Such as <code>&lt;version-major/&gt;</code>. (kkolinko)
       </scode>
+      <add>
+        <bug>56093</bug>: Add the SSL Valve to the documentation web
+        application. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
