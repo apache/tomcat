@@ -78,6 +78,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <add>
+        <bug>56093</bug>: Add the SSL Valve to the documentation web
+        application. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
