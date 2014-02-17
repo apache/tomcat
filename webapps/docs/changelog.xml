@@ -116,6 +116,10 @@
         Explicitly specify --LogPath path when uninstalling Windows service,
         avoiding default value for that option. (kkolinko)
       </fix>
+      <fix>
+        <bug>56137</bug>: Explicitly use NIO connector in SSL example in
+        server.xml so it doesn't break if APR is enabled. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
