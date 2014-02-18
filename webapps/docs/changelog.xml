@@ -60,6 +60,11 @@
         Generate a valid root element for the effective web.xml for a web
         application for all supported versions of web.xml. (markt)
       </fix>
+      <add>
+        Make it easier for applications embedding and/or extending Tomcat to
+        modify the <code>javaseClassLoader</code> attribute of the
+        <code>WebappClassLoader</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
