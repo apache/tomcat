@@ -339,7 +339,7 @@ public class WebappClassLoader extends URLClassLoader
      * those cases {@link ClassLoader#getParent()} will be called recursively on
      * the system class loader and the last non-null result used.
      */
-    protected final ClassLoader j2seClassLoader;
+    private ClassLoader j2seClassLoader;
 
 
     /**
@@ -1240,9 +1240,10 @@ public class WebappClassLoader extends URLClassLoader
         // (0.2) Try loading the class with the system class loader, to prevent
         //       the webapp from overriding J2SE classes
         String resourceName = binaryNameToPath(name, false);
-        if (j2seClassLoader.getResource(resourceName) != null) {
+        ClassLoader j2seLoader = getJ2seClassLoader();
+        if (j2seLoader.getResource(resourceName) != null) {
             try {
-                clazz = j2seClassLoader.loadClass(name);
+                clazz = j2seLoader.loadClass(name);
                 if (clazz != null) {
                     if (resolve)
                         resolveClass(clazz);
@@ -1504,6 +1505,18 @@ public class WebappClassLoader extends URLClassLoader
 
 
     // ------------------------------------------------------ Protected Methods
+
+    protected ClassLoader getJ2seClassLoader() {
+        return j2seClassLoader;
+    }
+
+    protected void setJ2seClassLoader(ClassLoader classLoader) {
+        if (classLoader == null) {
+            throw new IllegalArgumentException(
+                    sm.getString("webappClassLoader.j2seClassLoaderNull"));
+        }
+        j2seClassLoader = classLoader;
+    }
 
     /**
      * Clear references.
