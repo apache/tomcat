@@ -435,12 +435,12 @@ public class WebappClassLoader
 
 
     /**
-     * The bootstrap class loader used to load the J2SE classes. In some
+     * The bootstrap class loader used to load the JavaSE classes. In some
      * implementations this class loader is always <code>null</null> and in
      * those cases {@link ClassLoader#getParent()} will be called recursively on
      * the system class loader and the last non-null result used.
      */
-    protected final ClassLoader j2seClassLoader;
+    protected ClassLoader j2seClassLoader;
 
 
     /**
@@ -1984,6 +1984,17 @@ public class WebappClassLoader
 
     // ------------------------------------------------------ Protected Methods
 
+    protected ClassLoader getJavaseClassLoader() {
+        return j2seClassLoader;
+    }
+
+    protected void setJavaseClassLoader(ClassLoader classLoader) {
+        if (classLoader == null) {
+            throw new IllegalArgumentException(
+                    sm.getString("webappClassLoader.javaseClassLoaderNull"));
+        }
+        j2seClassLoader = classLoader;
+    }
 
     /**
      * Clear references.

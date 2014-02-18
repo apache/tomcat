@@ -56,6 +56,15 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.53 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Make it easier for applications embedding and/or extending Tomcat to
+        modify the <code>javaseClassLoader</code> attribute of the
+        <code>WebappClassLoader</code>. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
