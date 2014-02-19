@@ -123,7 +123,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.52 (violetagg)">
+<section name="Tomcat 7.0.52 (violetagg)" rtext="released 2014-02-17">
   <subsection name="Catalina">
     <changelog>
       <fix>
