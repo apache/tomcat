@@ -793,10 +793,15 @@ public class WebXml {
             appendElement(sb, INDENT4, "enabled", servletDef.getEnabled());
             appendElement(sb, INDENT4, "async-supported",
                     servletDef.getAsyncSupported());
-            if (servletDef.getRunAs() != null) {
-                sb.append("    <run-as>\n");
-                appendElement(sb, INDENT6, "role-name", servletDef.getRunAs());
-                sb.append("    </run-as>\n");
+            // servlet/run-as was introduced in Servlet 2.3
+            // Note versions are validated and start at 2.2 so this test takes that
+            // into account
+            if (getMajorVersion() > 2 || getMinorVersion() > 2) {
+                if (servletDef.getRunAs() != null) {
+                    sb.append("    <run-as>\n");
+                    appendElement(sb, INDENT6, "role-name", servletDef.getRunAs());
+                    sb.append("    </run-as>\n");
+                }
             }
             for (SecurityRoleRef roleRef : servletDef.getSecurityRoleRefs()) {
                 sb.append("    <security-role-ref>\n");
@@ -960,8 +965,13 @@ public class WebXml {
             appendElement(sb, INDENT4, "res-ref-name", resourceRef.getName());
             appendElement(sb, INDENT4, "res-type", resourceRef.getType());
             appendElement(sb, INDENT4, "res-auth", resourceRef.getAuth());
-            appendElement(sb, INDENT4, "res-sharing-scope",
-                    resourceRef.getScope());
+            // resource-ref/res-sharing-scope was introduced in Servlet 2.3
+            // Note versions are validated and start at 2.2 so this test takes
+            // that into account
+            if (getMajorVersion() > 2 || getMinorVersion() > 2) {
+                appendElement(sb, INDENT4, "res-sharing-scope",
+                        resourceRef.getScope());
+            }
             // TODO mapped-name
             for (InjectionTarget target : resourceRef.getInjectionTargets()) {
                 sb.append("    <injection-target>\n");
@@ -978,8 +988,13 @@ public class WebXml {
 
         for (SecurityConstraint constraint : securityConstraints) {
             sb.append("  <security-constraint>\n");
-            appendElement(sb, INDENT4, "display-name",
-                    constraint.getDisplayName());
+            // security-constraint/display-name was introduced in Servlet 2.3
+            // Note versions are validated and start at 2.2 so this test takes
+            // that into account
+            if (getMajorVersion() > 2 || getMinorVersion() > 2) {
+                appendElement(sb, INDENT4, "display-name",
+                        constraint.getDisplayName());
+            }
             for (SecurityCollection collection : constraint.findCollections()) {
                 sb.append("    <web-resource-collection>\n");
                 appendElement(sb, INDENT6, "web-resource-name",

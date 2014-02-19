@@ -236,7 +236,7 @@ public class TestWebXml {
         webXmlDefaultFragment.addFilterMapping(filterMap);
 
         // Listeners were added in 2.3 so should be excluded in 2.2
-        webXmlDefaultFragment.addListener("org.apache.tomcar.DummyListener");
+        webXmlDefaultFragment.addListener("org.apache.tomcat.DummyListener");
 
         // resource-env-ref was added in 2.3 so should be excluded in 2.2
         ContextResourceEnvRef resourceEnvRef = new ContextResourceEnvRef();
@@ -252,6 +252,35 @@ public class TestWebXml {
         ejbLocalRef.setLocal("dummy");
         ejbLocalRef.setHome("dummy");
         webXmlDefaultFragment.addEjbLocalRef(ejbLocalRef);
+
+        // Servlet/run-as was added in 2.3 so should be excluded in 2.2
+        ServletDef servletDef = new ServletDef();
+        servletDef.setServletName("Dummy");
+        servletDef.setServletClass("org.apache.tomcat.DummyServlet");
+        servletDef.setRunAs("dummy");
+        webXmlDefaultFragment.addServlet(servletDef);
+
+        webXmlDefaultFragment.addServletMapping("/dummy", "Dummy");
+
+        // resource-ref/res-sharing-scope was added in 2.3 so should be excluded
+        // in 2.2
+        ContextResource contextResource = new ContextResource();
+        contextResource.setName("dummy");
+        contextResource.setType("dummy");
+        contextResource.setAuth("Container");
+        contextResource.setScope("Shareable");
+        webXmlDefaultFragment.addResourceRef(contextResource);
+
+        // security-constraint/display-name was added in 2.3 so should be
+        // excluded in 2.2
+        SecurityConstraint sc = new SecurityConstraint();
+        sc.setDisplayName("dummy");
+        SecurityCollection collection = new SecurityCollection();
+        collection.setName("dummy");
+        collection.addPattern("/*");
+        collection.addMethod("DELETE");
+        sc.addCollection(collection);
+        webXmlDefaultFragment.addSecurityConstraint(sc);
 
         return webXmlDefaultFragment;
     }
