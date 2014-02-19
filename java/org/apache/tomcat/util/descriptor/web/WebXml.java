@@ -636,6 +636,11 @@ public class WebXml {
         // NOTE - Elements need to be written in the order defined in the 2.3
         //        DTD else validation of the merged web.xml will fail
 
+        // NOTE - Some elements need to be skipped based on the version of the
+        //        specification being used. Version is validated and starts at
+        //        2.2. The version tests used in this method take advantage of
+        //        this.
+
         // Declaration
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 
@@ -705,8 +710,6 @@ public class WebXml {
         sb.append('\n');
 
         // Filters were introduced in Servlet 2.3
-        // Note versions are validated and start at 2.2 so this test takes that
-        // into account
         if (getMajorVersion() > 2 || getMinorVersion() > 2) {
             for (Map.Entry<String, FilterDef> entry : filters.entrySet()) {
                 FilterDef filterDef = entry.getValue();
@@ -750,8 +753,11 @@ public class WebXml {
                         appendElement(sb, INDENT4, "url-pattern", urlPattern);
                     }
                 }
-                for (String dispatcher : filterMap.getDispatcherNames()) {
-                    appendElement(sb, INDENT4, "dispatcher", dispatcher);
+                // dispatcher was added in Servlet 2.4
+                if (getMajorVersion() > 2 || getMinorVersion() > 3) {
+                    for (String dispatcher : filterMap.getDispatcherNames()) {
+                        appendElement(sb, INDENT4, "dispatcher", dispatcher);
+                    }
                 }
                 sb.append("  </filter-mapping>\n");
             }
@@ -759,8 +765,6 @@ public class WebXml {
         }
 
         // Listeners were introduced in Servlet 2.3
-        // Note versions are validated and start at 2.2 so this test takes that
-        // into account
         if (getMajorVersion() > 2 || getMinorVersion() > 2) {
             for (String listener : listeners) {
                 sb.append("  <listener>\n");
@@ -794,8 +798,6 @@ public class WebXml {
             appendElement(sb, INDENT4, "async-supported",
                     servletDef.getAsyncSupported());
             // servlet/run-as was introduced in Servlet 2.3
-            // Note versions are validated and start at 2.2 so this test takes that
-            // into account
             if (getMajorVersion() > 2 || getMinorVersion() > 2) {
                 if (servletDef.getRunAs() != null) {
                     sb.append("    <run-as>\n");
@@ -937,8 +939,6 @@ public class WebXml {
         }
 
         // resource-env-ref was introduced in Servlet 2.3
-        // Note versions are validated and start at 2.2 so this test takes that
-        // into account
         if (getMajorVersion() > 2 || getMinorVersion() > 2) {
             for (ContextResourceEnvRef resourceEnvRef : resourceEnvRefs.values()) {
                 sb.append("  <resource-env-ref>\n");
@@ -972,8 +972,6 @@ public class WebXml {
             appendElement(sb, INDENT4, "res-type", resourceRef.getType());
             appendElement(sb, INDENT4, "res-auth", resourceRef.getAuth());
             // resource-ref/res-sharing-scope was introduced in Servlet 2.3
-            // Note versions are validated and start at 2.2 so this test takes
-            // that into account
             if (getMajorVersion() > 2 || getMinorVersion() > 2) {
                 appendElement(sb, INDENT4, "res-sharing-scope",
                         resourceRef.getScope());
@@ -995,8 +993,6 @@ public class WebXml {
         for (SecurityConstraint constraint : securityConstraints) {
             sb.append("  <security-constraint>\n");
             // security-constraint/display-name was introduced in Servlet 2.3
-            // Note versions are validated and start at 2.2 so this test takes
-            // that into account
             if (getMajorVersion() > 2 || getMinorVersion() > 2) {
                 appendElement(sb, INDENT4, "display-name",
                         constraint.getDisplayName());
@@ -1103,8 +1099,6 @@ public class WebXml {
         sb.append('\n');
 
         // ejb-local-ref was introduced in Servlet 2.3
-        // Note versions are validated and start at 2.2 so this test takes that
-        // into account
         if (getMajorVersion() > 2 || getMinorVersion() > 2) {
             for (ContextLocalEjb ejbLocalRef : ejbLocalRefs.values()) {
                 sb.append("  <ejb-local-ref>\n");
@@ -1131,8 +1125,6 @@ public class WebXml {
         }
 
         // service-ref was introduced in Servlet 2.4
-        // Note versions are validated and start at 2.2 so this test takes that
-        // into account
         if (getMajorVersion() > 2 || getMinorVersion() > 3) {
             for (ContextService serviceRef : serviceRefs.values()) {
                 sb.append("  <service-ref>\n");
@@ -1219,8 +1211,6 @@ public class WebXml {
 
         // message-destination-ref, message-destination were introduced in
         // Servlet 2.4
-        // Note versions are validated and start at 2.2 so this test takes that
-        // into account
         if (getMajorVersion() > 2 || getMinorVersion() > 3) {
             for (MessageDestinationRef mdr : messageDestinationRefs.values()) {
                 sb.append("  <message-destination-ref>\n");
@@ -1260,8 +1250,6 @@ public class WebXml {
         }
 
         // locale-encoding-mapping-list was introduced in Servlet 2.4
-        // Note versions are validated and start at 2.2 so this test takes that
-        // into account
         if (getMajorVersion() > 2 || getMinorVersion() > 3) {
             if (localeEncodingMappings.size() > 0) {
                 sb.append("  <locale-encoding-mapping-list>\n");

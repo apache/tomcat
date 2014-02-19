@@ -306,8 +306,14 @@ public class TestWebXml {
         // 2.3 and earlier
         webXmlDefaultFragment.addLocaleEncodingMapping("en", "UTF-8");
 
-        // jsp-config
+        // jsp-config was added in Servlet 2.4
         webXmlDefaultFragment.addTaglib("dummy", "dummy");
+
+        // filter-mapping/dispatcher added in Servlet 2.4
+        filterMap.setDispatcher("REQUEST");
+
+        // listener-[description|display-name|icon] added in Servlet 2.4
+        // None of these are supported in WebXml
 
         return webXmlDefaultFragment;
     }
