@@ -633,6 +633,9 @@ public class WebXml {
         // TODO - Various, icon, description etc elements are skipped - mainly
         //        because they are ignored when web.xml is parsed - see above
 
+        // NOTE - Elements need to be written in the order defined in the 2.3
+        //        DTD else validation of the merged web.xml will fail
+
         // Declaration
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 
@@ -701,61 +704,71 @@ public class WebXml {
         }
         sb.append('\n');
 
-        for (Map.Entry<String, FilterDef> entry : filters.entrySet()) {
-            FilterDef filterDef = entry.getValue();
-            sb.append("  <filter>\n");
-            appendElement(sb, INDENT4, "description",
-                    filterDef.getDescription());
-            appendElement(sb, INDENT4, "display-name",
-                    filterDef.getDisplayName());
-            appendElement(sb, INDENT4, "filter-name",
-                    filterDef.getFilterName());
-            appendElement(sb, INDENT4, "filter-class",
-                    filterDef.getFilterClass());
-            appendElement(sb, INDENT4, "async-supported",
-                    filterDef.getAsyncSupported());
-            for (Map.Entry<String, String> param :
-                    filterDef.getParameterMap().entrySet()) {
-                sb.append("    <init-param>\n");
-                appendElement(sb, INDENT6, "param-name", param.getKey());
-                appendElement(sb, INDENT6, "param-value", param.getValue());
-                sb.append("    </init-param>\n");
-            }
-            sb.append("  </filter>\n");
-        }
-        sb.append('\n');
-
-        for (FilterMap filterMap : filterMaps) {
-            sb.append("  <filter-mapping>\n");
-            appendElement(sb, INDENT4, "filter-name",
-                    filterMap.getFilterName());
-            if (filterMap.getMatchAllServletNames()) {
-                sb.append("    <servlet-name>*</servlet-name>\n");
-            } else {
-                for (String servletName : filterMap.getServletNames()) {
-                    appendElement(sb, INDENT4, "servlet-name", servletName);
+        // Filters were introduced in Servlet 2.3
+        // Note versions are validated and start at 2.2 so this test takes that
+        // into account
+        if (getMajorVersion() > 2 || getMinorVersion() > 2) {
+            for (Map.Entry<String, FilterDef> entry : filters.entrySet()) {
+                FilterDef filterDef = entry.getValue();
+                sb.append("  <filter>\n");
+                appendElement(sb, INDENT4, "description",
+                        filterDef.getDescription());
+                appendElement(sb, INDENT4, "display-name",
+                        filterDef.getDisplayName());
+                appendElement(sb, INDENT4, "filter-name",
+                        filterDef.getFilterName());
+                appendElement(sb, INDENT4, "filter-class",
+                        filterDef.getFilterClass());
+                appendElement(sb, INDENT4, "async-supported",
+                        filterDef.getAsyncSupported());
+                for (Map.Entry<String, String> param :
+                        filterDef.getParameterMap().entrySet()) {
+                    sb.append("    <init-param>\n");
+                    appendElement(sb, INDENT6, "param-name", param.getKey());
+                    appendElement(sb, INDENT6, "param-value", param.getValue());
+                    sb.append("    </init-param>\n");
                 }
+                sb.append("  </filter>\n");
             }
-            if (filterMap.getMatchAllUrlPatterns()) {
-                sb.append("    <url-pattern>*</url-pattern>\n");
-            } else {
-                for (String urlPattern : filterMap.getURLPatterns()) {
-                    appendElement(sb, INDENT4, "url-pattern", urlPattern);
-                }
-            }
-            for (String dispatcher : filterMap.getDispatcherNames()) {
-                appendElement(sb, INDENT4, "dispatcher", dispatcher);
-            }
-            sb.append("  </filter-mapping>\n");
-        }
-        sb.append('\n');
+            sb.append('\n');
 
-        for (String listener : listeners) {
-            sb.append("  <listener>\n");
-            appendElement(sb, INDENT4, "listener-class", listener);
-            sb.append("  </listener>\n");
+            for (FilterMap filterMap : filterMaps) {
+                sb.append("  <filter-mapping>\n");
+                appendElement(sb, INDENT4, "filter-name",
+                        filterMap.getFilterName());
+                if (filterMap.getMatchAllServletNames()) {
+                    sb.append("    <servlet-name>*</servlet-name>\n");
+                } else {
+                    for (String servletName : filterMap.getServletNames()) {
+                        appendElement(sb, INDENT4, "servlet-name", servletName);
+                    }
+                }
+                if (filterMap.getMatchAllUrlPatterns()) {
+                    sb.append("    <url-pattern>*</url-pattern>\n");
+                } else {
+                    for (String urlPattern : filterMap.getURLPatterns()) {
+                        appendElement(sb, INDENT4, "url-pattern", urlPattern);
+                    }
+                }
+                for (String dispatcher : filterMap.getDispatcherNames()) {
+                    appendElement(sb, INDENT4, "dispatcher", dispatcher);
+                }
+                sb.append("  </filter-mapping>\n");
+            }
+            sb.append('\n');
         }
-        sb.append('\n');
+
+        // Listeners were introduced in Servlet 2.3
+        // Note versions are validated and start at 2.2 so this test takes that
+        // into account
+        if (getMajorVersion() > 2 || getMinorVersion() > 2) {
+            for (String listener : listeners) {
+                sb.append("  <listener>\n");
+                appendElement(sb, INDENT4, "listener-class", listener);
+                sb.append("  </listener>\n");
+            }
+            sb.append('\n');
+        }
 
         for (Map.Entry<String, ServletDef> entry : servlets.entrySet()) {
             ServletDef servletDef = entry.getValue();
@@ -912,6 +925,57 @@ public class WebXml {
             sb.append("  </jsp-config>\n\n");
         }
 
+        // resource-env-ref was introduced in Servlet 2.3
+        // Note versions are validated and start at 2.2 so this test takes that
+        // into account
+        if (getMajorVersion() > 2 || getMinorVersion() > 2) {
+            for (ContextResourceEnvRef resourceEnvRef : resourceEnvRefs.values()) {
+                sb.append("  <resource-env-ref>\n");
+                appendElement(sb, INDENT4, "description",
+                        resourceEnvRef.getDescription());
+                appendElement(sb, INDENT4, "resource-env-ref-name",
+                        resourceEnvRef.getName());
+                appendElement(sb, INDENT4, "resource-env-ref-type",
+                        resourceEnvRef.getType());
+                // TODO mapped-name
+                for (InjectionTarget target :
+                        resourceEnvRef.getInjectionTargets()) {
+                    sb.append("    <injection-target>\n");
+                    appendElement(sb, INDENT6, "injection-target-class",
+                            target.getTargetClass());
+                    appendElement(sb, INDENT6, "injection-target-name",
+                            target.getTargetName());
+                    sb.append("    </injection-target>\n");
+                }
+                // TODO lookup-name
+                sb.append("  </resource-env-ref>\n");
+            }
+            sb.append('\n');
+        }
+
+        for (ContextResource resourceRef : resourceRefs.values()) {
+            sb.append("  <resource-ref>\n");
+            appendElement(sb, INDENT4, "description",
+                    resourceRef.getDescription());
+            appendElement(sb, INDENT4, "res-ref-name", resourceRef.getName());
+            appendElement(sb, INDENT4, "res-type", resourceRef.getType());
+            appendElement(sb, INDENT4, "res-auth", resourceRef.getAuth());
+            appendElement(sb, INDENT4, "res-sharing-scope",
+                    resourceRef.getScope());
+            // TODO mapped-name
+            for (InjectionTarget target : resourceRef.getInjectionTargets()) {
+                sb.append("    <injection-target>\n");
+                appendElement(sb, INDENT6, "injection-target-class",
+                        target.getTargetClass());
+                appendElement(sb, INDENT6, "injection-target-name",
+                        target.getTargetName());
+                sb.append("    </injection-target>\n");
+            }
+            // TODO lookup-name
+            sb.append("  </resource-ref>\n");
+        }
+        sb.append('\n');
+
         for (SecurityConstraint constraint : securityConstraints) {
             sb.append("  <security-constraint>\n");
             appendElement(sb, INDENT4, "display-name",
@@ -1017,28 +1081,33 @@ public class WebXml {
         }
         sb.append('\n');
 
-        for (ContextLocalEjb ejbLocalRef : ejbLocalRefs.values()) {
-            sb.append("  <ejb-local-ref>\n");
-            appendElement(sb, INDENT4, "description",
-                    ejbLocalRef.getDescription());
-            appendElement(sb, INDENT4, "ejb-ref-name", ejbLocalRef.getName());
-            appendElement(sb, INDENT4, "ejb-ref-type", ejbLocalRef.getType());
-            appendElement(sb, INDENT4, "local-home", ejbLocalRef.getHome());
-            appendElement(sb, INDENT4, "local", ejbLocalRef.getLocal());
-            appendElement(sb, INDENT4, "ejb-link", ejbLocalRef.getLink());
-            // TODO mapped-name
-            for (InjectionTarget target : ejbLocalRef.getInjectionTargets()) {
-                sb.append("    <injection-target>\n");
-                appendElement(sb, INDENT6, "injection-target-class",
-                        target.getTargetClass());
-                appendElement(sb, INDENT6, "injection-target-name",
-                        target.getTargetName());
-                sb.append("    </injection-target>\n");
+        // ejb-local-ref was introduced in Servlet 2.3
+        // Note versions are validated and start at 2.2 so this test takes that
+        // into account
+        if (getMajorVersion() > 2 || getMinorVersion() > 2) {
+            for (ContextLocalEjb ejbLocalRef : ejbLocalRefs.values()) {
+                sb.append("  <ejb-local-ref>\n");
+                appendElement(sb, INDENT4, "description",
+                        ejbLocalRef.getDescription());
+                appendElement(sb, INDENT4, "ejb-ref-name", ejbLocalRef.getName());
+                appendElement(sb, INDENT4, "ejb-ref-type", ejbLocalRef.getType());
+                appendElement(sb, INDENT4, "local-home", ejbLocalRef.getHome());
+                appendElement(sb, INDENT4, "local", ejbLocalRef.getLocal());
+                appendElement(sb, INDENT4, "ejb-link", ejbLocalRef.getLink());
+                // TODO mapped-name
+                for (InjectionTarget target : ejbLocalRef.getInjectionTargets()) {
+                    sb.append("    <injection-target>\n");
+                    appendElement(sb, INDENT6, "injection-target-class",
+                            target.getTargetClass());
+                    appendElement(sb, INDENT6, "injection-target-name",
+                            target.getTargetName());
+                    sb.append("    </injection-target>\n");
+                }
+                // TODO lookup-name
+                sb.append("  </ejb-local-ref>\n");
             }
-            // TODO lookup-name
-            sb.append("  </ejb-local-ref>\n");
+            sb.append('\n');
         }
-        sb.append('\n');
 
         for (ContextService serviceRef : serviceRefs.values()) {
             sb.append("  <service-ref>\n");
@@ -1093,52 +1162,6 @@ public class WebXml {
             }
             // TODO lookup-name
             sb.append("  </service-ref>\n");
-        }
-        sb.append('\n');
-
-        for (ContextResource resourceRef : resourceRefs.values()) {
-            sb.append("  <resource-ref>\n");
-            appendElement(sb, INDENT4, "description",
-                    resourceRef.getDescription());
-            appendElement(sb, INDENT4, "res-ref-name", resourceRef.getName());
-            appendElement(sb, INDENT4, "res-type", resourceRef.getType());
-            appendElement(sb, INDENT4, "res-auth", resourceRef.getAuth());
-            appendElement(sb, INDENT4, "res-sharing-scope",
-                    resourceRef.getScope());
-            // TODO mapped-name
-            for (InjectionTarget target : resourceRef.getInjectionTargets()) {
-                sb.append("    <injection-target>\n");
-                appendElement(sb, INDENT6, "injection-target-class",
-                        target.getTargetClass());
-                appendElement(sb, INDENT6, "injection-target-name",
-                        target.getTargetName());
-                sb.append("    </injection-target>\n");
-            }
-            // TODO lookup-name
-            sb.append("  </resource-ref>\n");
-        }
-        sb.append('\n');
-
-        for (ContextResourceEnvRef resourceEnvRef : resourceEnvRefs.values()) {
-            sb.append("  <resource-env-ref>\n");
-            appendElement(sb, INDENT4, "description",
-                    resourceEnvRef.getDescription());
-            appendElement(sb, INDENT4, "resource-env-ref-name",
-                    resourceEnvRef.getName());
-            appendElement(sb, INDENT4, "resource-env-ref-type",
-                    resourceEnvRef.getType());
-            // TODO mapped-name
-            for (InjectionTarget target :
-                    resourceEnvRef.getInjectionTargets()) {
-                sb.append("    <injection-target>\n");
-                appendElement(sb, INDENT6, "injection-target-class",
-                        target.getTargetClass());
-                appendElement(sb, INDENT6, "injection-target-name",
-                        target.getTargetName());
-                sb.append("    </injection-target>\n");
-            }
-            // TODO lookup-name
-            sb.append("  </resource-env-ref>\n");
         }
         sb.append('\n');
 
