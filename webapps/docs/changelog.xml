@@ -65,6 +65,15 @@
         modify the <code>javaseClassLoader</code> attribute of the
         <code>WebappClassLoader</code>. (markt)
       </add>
+      <fix>
+        Add missing support for <code>&lt;deny-uncovered-http-methods&gt;</code>
+        element when merging web.xml files. (markt)
+      </fix>
+      <fix>
+        Improve merging process for web.xml files to take account of the
+        elements and attributes supported by the Servlet version of the merged
+        file. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
