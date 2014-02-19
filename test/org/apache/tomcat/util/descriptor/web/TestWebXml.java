@@ -221,6 +221,38 @@ public class TestWebXml {
         // Assert that web.xml was parsed and is not empty. Default servlet is known to be there.
         Assert.assertNotNull(webXmlDefaultFragment.getServlets().get("default"));
 
+        // Manually add some version specific features to ensure that these do
+        // not cause problems for the merged web.xml
+
+        // Filters were added in 2.3 so should be excluded in 2.2
+        FilterDef filterDef = new FilterDef();
+        filterDef.setFilterClass("org.apache.tomcat.DummyFilter");
+        filterDef.setFilterName("Dummy");
+        webXmlDefaultFragment.addFilter(filterDef);
+
+        FilterMap filterMap = new FilterMap();
+        filterMap.setFilterName("Dummy");
+        filterMap.addURLPattern("/*");
+        webXmlDefaultFragment.addFilterMapping(filterMap);
+
+        // Listeners were added in 2.3 so should be excluded in 2.2
+        webXmlDefaultFragment.addListener("org.apache.tomcar.DummyListener");
+
+        // resource-env-ref was added in 2.3 so should be excluded in 2.2
+        ContextResourceEnvRef resourceEnvRef = new ContextResourceEnvRef();
+        resourceEnvRef.setName("dummy");
+        resourceEnvRef.setType("dummy");
+
+        webXmlDefaultFragment.addResourceEnvRef(resourceEnvRef);
+
+        // ejb-local-ref was added in 2.3 so should be excluded in 2.2
+        ContextLocalEjb ejbLocalRef = new ContextLocalEjb();
+        ejbLocalRef.setName("dummy");
+        ejbLocalRef.setType("Session");
+        ejbLocalRef.setLocal("dummy");
+        ejbLocalRef.setHome("dummy");
+        webXmlDefaultFragment.addEjbLocalRef(ejbLocalRef);
+
         return webXmlDefaultFragment;
     }
 
