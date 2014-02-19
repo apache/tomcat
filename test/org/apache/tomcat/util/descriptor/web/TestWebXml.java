@@ -338,6 +338,9 @@ public class TestWebXml {
         MultipartDef multiPart = new MultipartDef();
         servletDef.setMultipartDef(multiPart);
 
+        // deny-uncovered-http-methods added in Servlet 3.1
+        webXmlDefaultFragment.setDenyUncoveredHttpMethods(true);
+
         return webXmlDefaultFragment;
     }
 

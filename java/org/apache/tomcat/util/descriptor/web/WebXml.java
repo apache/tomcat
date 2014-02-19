@@ -1284,6 +1284,15 @@ public class WebXml {
             }
         }
 
+        // deny-uncovered-http-methods was introduced in Servlet 3.1
+        if (getMajorVersion() > 3 ||
+                (getMajorVersion() == 3 && getMinorVersion() > 0)) {
+            if (denyUncoveredHttpMethods) {
+                sb.append("\n");
+                sb.append("  <deny-uncovered-http-methods/>");
+            }
+        }
+
         sb.append("</web-app>");
         return sb.toString();
     }
