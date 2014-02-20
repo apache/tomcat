@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
 import javax.servlet.SessionCookieConfig;
@@ -679,8 +680,11 @@ public class WebXml {
                         filterDef.getFilterName());
                 appendElement(sb, INDENT4, "filter-class",
                         filterDef.getFilterClass());
-                appendElement(sb, INDENT4, "async-supported",
-                        filterDef.getAsyncSupported());
+                // Async support was introduced for Servlet 3.0 onwards
+                if (getMajorVersion() != 2) {
+                    appendElement(sb, INDENT4, "async-supported",
+                            filterDef.getAsyncSupported());
+                }
                 for (Map.Entry<String, String> param :
                         filterDef.getParameterMap().entrySet()) {
                     sb.append("    <init-param>\n");
@@ -713,6 +717,10 @@ public class WebXml {
                 // dispatcher was added in Servlet 2.4
                 if (getMajorVersion() > 2 || getMinorVersion() > 3) {
                     for (String dispatcher : filterMap.getDispatcherNames()) {
+                        if (getMajorVersion() == 2 &&
+                                DispatcherType.ASYNC.name().equals(dispatcher)) {
+                            continue;
+                        }
                         appendElement(sb, INDENT4, "dispatcher", dispatcher);
                     }
                 }
@@ -752,8 +760,11 @@ public class WebXml {
             appendElement(sb, INDENT4, "load-on-startup",
                     servletDef.getLoadOnStartup());
             appendElement(sb, INDENT4, "enabled", servletDef.getEnabled());
-            appendElement(sb, INDENT4, "async-supported",
-                    servletDef.getAsyncSupported());
+            // Async support was introduced for Servlet 3.0 onwards
+            if (getMajorVersion() != 2) {
+                appendElement(sb, INDENT4, "async-supported",
+                        servletDef.getAsyncSupported());
+            }
             // servlet/run-as was introduced in Servlet 2.3
             if (getMajorVersion() > 2 || getMinorVersion() > 2) {
                 if (servletDef.getRunAs() != null) {
@@ -768,18 +779,21 @@ public class WebXml {
                 appendElement(sb, INDENT6, "role-link", roleRef.getLink());
                 sb.append("    </security-role-ref>\n");
             }
-            MultipartDef multipartDef = servletDef.getMultipartDef();
-            if (multipartDef != null) {
-                sb.append("    <multipart-config>\n");
-                appendElement(sb, INDENT6, "location",
-                        multipartDef.getLocation());
-                appendElement(sb, INDENT6, "max-file-size",
-                        multipartDef.getMaxFileSize());
-                appendElement(sb, INDENT6, "max-request-size",
-                        multipartDef.getMaxRequestSize());
-                appendElement(sb, INDENT6, "file-size-threshold",
-                        multipartDef.getFileSizeThreshold());
-                sb.append("    </multipart-config>\n");
+            // multipart-config was added in Servlet 3.0
+            if (getMajorVersion() != 2) {
+                MultipartDef multipartDef = servletDef.getMultipartDef();
+                if (multipartDef != null) {
+                    sb.append("    <multipart-config>\n");
+                    appendElement(sb, INDENT6, "location",
+                            multipartDef.getLocation());
+                    appendElement(sb, INDENT6, "max-file-size",
+                            multipartDef.getMaxFileSize());
+                    appendElement(sb, INDENT6, "max-request-size",
+                            multipartDef.getMaxRequestSize());
+                    appendElement(sb, INDENT6, "file-size-threshold",
+                            multipartDef.getFileSizeThreshold());
+                    sb.append("    </multipart-config>\n");
+                }
             }
             sb.append("  </servlet>\n");
         }
@@ -837,13 +851,19 @@ public class WebXml {
         }
 
         for (ErrorPage errorPage : errorPages.values()) {
+            String exeptionType = errorPage.getExceptionType();
+            int errorCode = errorPage.getErrorCode();
+
+            if (exeptionType == null && errorCode == 0 && getMajorVersion() == 2) {
+                // Default error pages are only supported from 3.0 onwards
+                continue;
+            }
             sb.append("  <error-page>\n");
-            if (errorPage.getExceptionType() == null) {
+            if (errorPage.getExceptionType() != null) {
+                appendElement(sb, INDENT4, "exception-type", exeptionType);
+            } else if (errorPage.getErrorCode() > 0) {
                 appendElement(sb, INDENT4, "error-code",
-                        Integer.toString(errorPage.getErrorCode()));
-            } else {
-                appendElement(sb, INDENT4, "exception-type",
-                        errorPage.getExceptionType());
+                        Integer.toString(errorCode));
             }
             appendElement(sb, INDENT4, "location", errorPage.getLocation());
             sb.append("  </error-page>\n");

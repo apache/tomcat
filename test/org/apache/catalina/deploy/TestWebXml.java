@@ -168,8 +168,6 @@ public class TestWebXml {
         XmlErrorHandler handler = new XmlErrorHandler();
         digester.setErrorHandler(handler);
 
-        // System.out.print(webxml.toXml() + "\n\n\n");
-
         InputSource is = new InputSource(new StringReader(webxml.toXml()));
         WebXml webxmlResult = new WebXml();
         digester.push(webxmlResult);
@@ -299,6 +297,31 @@ public class TestWebXml {
 
         // listener-[description|display-name|icon] added in Servlet 2.4
         // None of these are supported in WebXml
+
+        // filter-mapping/dispatcher/ASYNC added in Servlet 3.0
+        filterMap.setDispatcher("ASYNC");
+
+        // error-page with just location allowed in Servlet 3.0+
+        ErrorPage errorPage = new ErrorPage();
+        errorPage.setLocation("/dummy");
+        webXmlDefaultFragment.addErrorPage(errorPage);
+
+        // async-supported added to Servlet and Filter in 3.0
+        filterDef.setAsyncSupported("false");
+        servletDef.setAsyncSupported("false");
+
+        // session-cookie-config added in 3.0
+        SessionConfig sessionConfig = new SessionConfig();
+        sessionConfig.setCookieDomain("dummy");
+        webXmlDefaultFragment.setSessionConfig(sessionConfig);
+
+        // http-method-omission added in Servlet 3.0
+        // Let this trigger a validation error as dropping it silently could
+        // be a security concern
+
+        // multi-part-config added in Servlet 3.0
+        MultipartDef multiPart = new MultipartDef();
+        servletDef.setMultipartDef(multiPart);
 
         return webXmlDefaultFragment;
     }
