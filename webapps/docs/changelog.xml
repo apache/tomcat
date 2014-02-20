@@ -120,6 +120,9 @@
         <bug>56139</bug>: Avoid a web application class loader leak in some unit
         tests when running on Windows. (markt)
       </fix>
+      <fix>
+        Correct build script to avoid building JARs with empty packages. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
