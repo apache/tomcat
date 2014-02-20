@@ -28,5 +28,6 @@
     <c:forEach var="item" items="${listItems}">
       <p>${item.addThing("h")}</p>
     </c:forEach>
+    <p>00-OK</p>
   </body>
 </html>
