@@ -86,12 +86,6 @@ public class TestMethodExpressionImpl {
 
     @Test
     public void testIsParametersProvided() {
-        TesterBeanB beanB = new TesterBeanB();
-        beanB.setName("Tomcat");
-        ValueExpression var =
-            factory.createValueExpression(beanB, TesterBeanB.class);
-        context.getVariableMapper().setVariable("beanB", var);
-
         MethodExpression me1 = factory.createMethodExpression(
                 context, "${beanB.getName}", String.class, new Class<?>[] {});
         MethodExpression me2 = factory.createMethodExpression(
@@ -104,12 +98,6 @@ public class TestMethodExpressionImpl {
 
     @Test
     public void testInvoke() {
-        TesterBeanB beanB = new TesterBeanB();
-        beanB.setName("B");
-
-        context.getVariableMapper().setVariable("beanB",
-                factory.createValueExpression(beanB, TesterBeanB.class));
-
         MethodExpression me1 = factory.createMethodExpression(
                 context, "${beanB.getName}", String.class, new Class<?>[] {});
         MethodExpression me2 = factory.createMethodExpression(
