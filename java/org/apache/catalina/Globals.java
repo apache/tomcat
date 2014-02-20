@@ -334,6 +334,16 @@ public final class Globals {
 
     /**
      * Name of the ServletContext init-param that determines if the JSP engine
+     * should validate web.xml files when parsing them.
+     * <p>
+     * This must be kept in sync with org.apache.jasper.Constants
+     */
+    public static final String JASPER_XML_VALIDATION_INIT_PARAM =
+            "org.apache.jasper.XML_VALIDATE";
+
+
+    /**
+     * Name of the ServletContext init-param that determines if the JSP engine
      * will block external entities from being used in *.tld, *.jspx, *.tagx and
      * tagplugin.xml files.
      * <p>

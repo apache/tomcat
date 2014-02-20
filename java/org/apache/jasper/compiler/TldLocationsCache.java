@@ -288,7 +288,7 @@ public class TldLocationsCache {
 
             boolean validate = Boolean.parseBoolean(
                     ctxt.getInitParameter(
-                            Constants.XML_VALIDATION_TLD_INIT_PARAM));
+                            Constants.XML_VALIDATION_INIT_PARAM));
             String blockExternalString = ctxt.getInitParameter(
                     Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
             boolean blockExternal;

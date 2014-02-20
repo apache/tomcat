@@ -79,7 +79,7 @@ public class JspConfig {
             webXml = new WebXml(ctxt);
             
             boolean validate = Boolean.parseBoolean(
-                    ctxt.getInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM));
+                    ctxt.getInitParameter(Constants.XML_VALIDATION_INIT_PARAM));
             String blockExternalString =
                     ctxt.getInitParameter(Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
             boolean blockExternal;

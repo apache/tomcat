@@ -244,6 +244,15 @@ public class Constants {
 
     /**
      * Name of the ServletContext init-param that determines if the XML parsers
+     * used for web.xml files will be validating or not.
+     * <p>
+     * This must be kept in sync with org.apache.catalina.Globals
+     */
+    public static final String XML_VALIDATION_INIT_PARAM =
+            "org.apache.jasper.XML_VALIDATE";
+
+    /**
+     * Name of the ServletContext init-param that determines if the XML parsers
      * will block the resolution of external entities.
      * <p>
      * This must be kept in sync with org.apache.catalina.Globals
