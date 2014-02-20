@@ -267,6 +267,39 @@ public class TestWebXml {
         sc.addCollection(collection);
         webXmlDefaultFragment.addSecurityConstraint(sc);
 
+        // service-ref was added in 2.4 so should be excluded in 2.3 and earlier
+        ContextService serviceRef = new ContextService();
+        serviceRef.setName("dummy");
+        serviceRef.setInterface("dummy");
+        webXmlDefaultFragment.addServiceRef(serviceRef);
+
+        // message-destination-ref was added in 2.4 so should be excluded in 2.3
+        // and earlier
+        MessageDestinationRef mdRef = new MessageDestinationRef();
+        mdRef.setName("dummy");
+        mdRef.setType("dummy");
+        mdRef.setUsage("Consumes");
+        webXmlDefaultFragment.addMessageDestinationRef(mdRef);
+
+        // message-destination was added in 2.4 so should be excluded in 2.3
+        // and earlier
+        MessageDestination md = new MessageDestination();
+        md.setName("dummy");
+        webXmlDefaultFragment.addMessageDestination(md);
+
+        // local-encoding-mapping-list was added in 2.4 so should be excluded in
+        // 2.3 and earlier
+        webXmlDefaultFragment.addLocaleEncodingMapping("en", "UTF-8");
+
+        // jsp-config was added in Servlet 2.4
+        webXmlDefaultFragment.addTaglib("dummy", "dummy");
+
+        // filter-mapping/dispatcher added in Servlet 2.4
+        filterMap.setDispatcher("REQUEST");
+
+        // listener-[description|display-name|icon] added in Servlet 2.4
+        // None of these are supported in WebXml
+
         return webXmlDefaultFragment;
     }
 
