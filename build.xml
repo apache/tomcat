@@ -295,6 +295,7 @@
 
   <patternset id="files.servlet-api">
     <include name="javax/servlet/*.class" />
+    <include name="javax/servlet/*.properties" />
     <include name="javax/servlet/annotation/**" />
     <include name="javax/servlet/descriptor/**" />
     <include name="javax/servlet/http/**" />
@@ -343,6 +344,7 @@
     <include name="org/apache/tomcat/util/res/**" />
     <include name="org/apache/tomcat/util/threads/**" />
     <include name="org/apache/tomcat/util/*.class" />
+    <include name="org/apache/tomcat/util/*.properties" />
   </patternset>
 
   <patternset id="files.tomcat-util-scan">
@@ -1927,6 +1929,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
           <include name="org/apache/catalina/util/SchemaResolver.class" />
           <include name="org/apache/catalina/util/StringManager.class" />
           <include name="org/apache/tomcat/util/*.class" />
+          <include name="org/apache/tomcat/util/*.properties" />
           <include name="org/apache/tomcat/util/digester/**" />
           <exclude name="**/package.html" />
           <exclude name="**/LocalStrings_*" />
