@@ -476,6 +476,32 @@ public class TestELInJsp extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testBug56147() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        // app dir is relative to server home
+        Context ctx = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        ctx.setResources(new StandardRoot(ctx));
+
+        // Add the JSTL (we need the TLD)
+        File lib = new File("webapps/examples/WEB-INF/lib");
+        ctx.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/lib",
+                lib.getAbsolutePath(), null, "/");
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/bug5nnnn/bug56147.jsp");
+
+        String result = res.toString();
+        assertEcho(result, "00-OK");
+    }
+
+
     // Assertion for text contained with <p></p>, e.g. printed by tags:echo
     private static void assertEcho(String result, String expected) {
         assertTrue(result.indexOf("<p>" + expected + "</p>") > 0);
