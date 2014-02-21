@@ -22,10 +22,8 @@ import java.beans.FeatureDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
@@ -72,6 +70,20 @@ public class BeanELResolver extends ELResolver {
     }
 
     @Override
+    public Class<?> getType(ELContext context, Object base, Object property)
+            throws NullPointerException, PropertyNotFoundException, ELException {
+        if (context == null) {
+            throw new NullPointerException();
+        }
+        if (base == null || property == null) {
+            return null;
+        }
+
+        context.setPropertyResolved(true);
+        return this.property(context, base, property).getPropertyType();
+    }
+
+    @Override
     public Object getValue(ELContext context, Object base, Object property)
             throws NullPointerException, PropertyNotFoundException, ELException {
         if (context == null) {
@@ -101,20 +113,6 @@ public class BeanELResolver extends ELResolver {
         } catch (Exception e) {
             throw new ELException(e);
         }
-    }
-
-    @Override
-    public Class<?> getType(ELContext context, Object base, Object property)
-            throws NullPointerException, PropertyNotFoundException, ELException {
-        if (context == null) {
-            throw new NullPointerException();
-        }
-        if (base == null || property == null) {
-            return null;
-        }
-
-        context.setPropertyResolved(true);
-        return this.property(context, base, property).getPropertyType();
     }
 
     @Override
@@ -156,6 +154,48 @@ public class BeanELResolver extends ELResolver {
         } catch (Exception e) {
             throw new ELException(e);
         }
+    }
+
+    /**
+     * @since EL 2.2
+     */
+    @Override
+    public Object invoke(ELContext context, Object base, Object method,
+            Class<?>[] paramTypes, Object[] params) {
+        if (context == null) {
+            throw new NullPointerException();
+        }
+        if (base == null || method == null) {
+            return null;
+        }
+
+        ExpressionFactory factory = Util.getExpressionFactory();
+
+        String methodName = (String) factory.coerceToType(method, String.class);
+
+        // Find the matching method
+        Method matchingMethod =
+                Util.findMethod(base, methodName, paramTypes, params);
+
+        Object[] parameters = Util.buildParameters(
+                matchingMethod.getParameterTypes(), matchingMethod.isVarArgs(),
+                params);
+
+        Object result = null;
+        try {
+            result = matchingMethod.invoke(base, parameters);
+        } catch (IllegalArgumentException e) {
+            throw new ELException(e);
+        } catch (IllegalAccessException e) {
+            throw new ELException(e);
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            Util.handleThrowable(cause);
+            throw new ELException(cause);
+        }
+
+        context.setPropertyResolved(true);
+        return result;
     }
 
     @Override
@@ -267,7 +307,7 @@ public class BeanELResolver extends ELResolver {
 
         public boolean isReadOnly() {
             return this.write == null
-                && (null == (this.write = getMethod(this.owner, descriptor.getWriteMethod())));
+                && (null == (this.write = Util.getMethod(this.owner, descriptor.getWriteMethod())));
         }
 
         public Method getWriteMethod() {
@@ -280,7 +320,7 @@ public class BeanELResolver extends ELResolver {
 
         private Method write(ELContext ctx) {
             if (this.write == null) {
-                this.write = getMethod(this.owner, descriptor.getWriteMethod());
+                this.write = Util.getMethod(this.owner, descriptor.getWriteMethod());
                 if (this.write == null) {
                     throw new PropertyNotFoundException(Util.message(ctx,
                             "propertyNotWritable", new Object[] {
@@ -292,7 +332,7 @@ public class BeanELResolver extends ELResolver {
 
         private Method read(ELContext ctx) {
             if (this.read == null) {
-                this.read = getMethod(this.owner, descriptor.getReadMethod());
+                this.read = Util.getMethod(this.owner, descriptor.getReadMethod());
                 if (this.read == null) {
                     throw new PropertyNotFoundException(Util.message(ctx,
                             "propertyNotReadable", new Object[] {
@@ -317,38 +357,6 @@ public class BeanELResolver extends ELResolver {
         return props.get(ctx, prop);
     }
 
-    private static final Method getMethod(Class<?> type, Method m) {
-        if (m == null || Modifier.isPublic(type.getModifiers())) {
-            return m;
-        }
-        Class<?>[] inf = type.getInterfaces();
-        Method mp = null;
-        for (int i = 0; i < inf.length; i++) {
-            try {
-                mp = inf[i].getMethod(m.getName(), m.getParameterTypes());
-                mp = getMethod(mp.getDeclaringClass(), mp);
-                if (mp != null) {
-                    return mp;
-                }
-            } catch (NoSuchMethodException e) {
-                // Ignore
-            }
-        }
-        Class<?> sup = type.getSuperclass();
-        if (sup != null) {
-            try {
-                mp = sup.getMethod(m.getName(), m.getParameterTypes());
-                mp = getMethod(mp.getDeclaringClass(), mp);
-                if (mp != null) {
-                    return mp;
-                }
-            } catch (NoSuchMethodException e) {
-                // Ignore
-            }
-        }
-        return null;
-    }
-    
     private static final class ConcurrentCache<K,V> {
 
         private final int size;
@@ -385,112 +393,4 @@ public class BeanELResolver extends ELResolver {
         }
 
     }
-    
-    /**
-     * @since EL 2.2
-     */
-    @Override
-    public Object invoke(ELContext context, Object base, Object method,
-            Class<?>[] paramTypes, Object[] params) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
-        if (base == null || method == null) {
-            return null;
-        }
-
-        ExpressionFactory factory = ExpressionFactory.newInstance();
-        
-        String methodName = (String) factory.coerceToType(method, String.class);
-        
-        // Find the matching method
-        Method matchingMethod = null;
-        Class<?> clazz = base.getClass();
-        if (paramTypes != null) {
-            try {
-                matchingMethod =
-                    getMethod(clazz, clazz.getMethod(methodName, paramTypes));
-            } catch (NoSuchMethodException e) {
-                throw new MethodNotFoundException(e);
-            }
-        } else {
-            int paramCount = 0;
-            if (params != null) {
-                paramCount = params.length;
-            }
-            Method[] methods = clazz.getMethods();
-            for (Method m : methods) {
-                if (methodName.equals(m.getName())) {
-                    if (m.getParameterTypes().length == paramCount) {
-                        // Same number of parameters - use the first match
-                        matchingMethod = getMethod(clazz, m);
-                        break;
-                    }
-                    if (m.isVarArgs()
-                            && paramCount > m.getParameterTypes().length - 2) {
-                        matchingMethod = getMethod(clazz, m);
-                    }
-                }
-            }
-            if (matchingMethod == null) {
-                throw new MethodNotFoundException(
-                        "Unable to find method [" + methodName + "] with ["
-                        + paramCount + "] parameters");
-            }
-        }
-
-        Class<?>[] parameterTypes = matchingMethod.getParameterTypes();
-        Object[] parameters = null;
-        if (parameterTypes.length > 0) {
-            parameters = new Object[parameterTypes.length];
-            @SuppressWarnings("null")  // params.length >= parameterTypes.length
-            int paramCount = params.length;
-            if (matchingMethod.isVarArgs()) {
-                int varArgIndex = parameterTypes.length - 1;
-                // First argCount-1 parameters are standard
-                for (int i = 0; (i < varArgIndex); i++) {
-                    parameters[i] = factory.coerceToType(params[i],
-                            parameterTypes[i]);
-                }
-                // Last parameter is the varargs
-                Class<?> varArgClass =
-                    parameterTypes[varArgIndex].getComponentType();
-                final Object varargs = Array.newInstance(
-                    varArgClass,
-                    (paramCount - varArgIndex));
-                for (int i = (varArgIndex); i < paramCount; i++) {
-                    Array.set(varargs, i - varArgIndex,
-                            factory.coerceToType(params[i], varArgClass));
-                }
-                parameters[varArgIndex] = varargs;
-            } else {
-                parameters = new Object[parameterTypes.length];
-                for (int i = 0; i < parameterTypes.length; i++) {
-                    parameters[i] = factory.coerceToType(params[i],
-                            parameterTypes[i]);
-                }
-            }
-        }
-        Object result = null;
-        try {
-            result = matchingMethod.invoke(base, parameters);
-        } catch (IllegalArgumentException e) {
-            throw new ELException(e);
-        } catch (IllegalAccessException e) {
-            throw new ELException(e);
-        } catch (InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof ThreadDeath) {
-                throw (ThreadDeath) cause;
-            }
-            if (cause instanceof VirtualMachineError) {
-                throw (VirtualMachineError) cause;
-            }
-            throw new ELException(cause);
-        }
-        
-        context.setPropertyResolved(true);
-        return result;
-    }
-
 }

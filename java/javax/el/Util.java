@@ -17,6 +17,10 @@
 package javax.el;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -180,6 +184,83 @@ class Util {
         }
     }
 
+
+    static Method findMethod(Object base, String methodName,
+            Class<?>[] paramTypes, Object[] params) {
+
+        Method matchingMethod = null;
+
+        Class<?> clazz = base.getClass();
+        if (paramTypes != null) {
+            try {
+                matchingMethod =
+                    getMethod(clazz, clazz.getMethod(methodName, paramTypes));
+            } catch (NoSuchMethodException e) {
+                throw new MethodNotFoundException(e);
+            }
+        } else {
+            int paramCount = 0;
+            if (params != null) {
+                paramCount = params.length;
+            }
+            Method[] methods = clazz.getMethods();
+            for (Method m : methods) {
+                if (methodName.equals(m.getName())) {
+                    if (m.getParameterTypes().length == paramCount) {
+                        // Same number of parameters - use the first match
+                        matchingMethod = getMethod(clazz, m);
+                        break;
+                    }
+                    if (m.isVarArgs()
+                            && paramCount > m.getParameterTypes().length - 2) {
+                        matchingMethod = getMethod(clazz, m);
+                    }
+                }
+            }
+            if (matchingMethod == null) {
+                throw new MethodNotFoundException(
+                        "Unable to find method [" + methodName + "] with ["
+                        + paramCount + "] parameters");
+            }
+        }
+
+        return matchingMethod;
+    }
+
+
+    static Method getMethod(Class<?> type, Method m) {
+        if (m == null || Modifier.isPublic(type.getModifiers())) {
+            return m;
+        }
+        Class<?>[] inf = type.getInterfaces();
+        Method mp = null;
+        for (int i = 0; i < inf.length; i++) {
+            try {
+                mp = inf[i].getMethod(m.getName(), m.getParameterTypes());
+                mp = getMethod(mp.getDeclaringClass(), mp);
+                if (mp != null) {
+                    return mp;
+                }
+            } catch (NoSuchMethodException e) {
+                // Ignore
+            }
+        }
+        Class<?> sup = type.getSuperclass();
+        if (sup != null) {
+            try {
+                mp = sup.getMethod(m.getName(), m.getParameterTypes());
+                mp = getMethod(mp.getDeclaringClass(), mp);
+                if (mp != null) {
+                    return mp;
+                }
+            } catch (NoSuchMethodException e) {
+                // Ignore
+            }
+        }
+        return null;
+    }
+    
+    
     /*
      * This method duplicates code in org.apache.el.util.ReflectionUtil. When
      * making changes keep the code in sync.
@@ -215,5 +296,103 @@ class Util {
             targetClass = target;
         }
         return targetClass.isAssignableFrom(src);
+    }
+
+
+    static Constructor<?> findConstructor(Object base, Class<?>[] paramTypes,
+            Object[] params) {
+
+        Constructor<?> match = null;
+
+        Class<?> clazz = base.getClass();
+        if (paramTypes != null) {
+            try {
+                match = getConstructor(clazz, clazz.getConstructor(paramTypes));
+            } catch (NoSuchMethodException e) {
+                throw new MethodNotFoundException(e);
+            }
+        } else {
+            int paramCount = 0;
+            if (params != null) {
+                paramCount = params.length;
+            }
+            Constructor<?>[] constructors = clazz.getConstructors();
+            for (Constructor<?> c : constructors) {
+                if (c.getParameterTypes().length == paramCount) {
+                    // Same number of parameters - use the first match
+                    match = getConstructor(clazz, c);
+                    break;
+                }
+                if (c.isVarArgs()
+                        && paramCount > c.getParameterTypes().length - 2) {
+                    match = getConstructor(clazz, c);
+                }
+            }
+            if (match == null) {
+                throw new MethodNotFoundException(
+                        "Unable to find constructor with [" + paramCount +
+                        "] parameters");
+            }
+        }
+
+        return match;
+    }
+
+
+    static Constructor<?> getConstructor(Class<?> type, Constructor<?> c) {
+        if (c == null || Modifier.isPublic(type.getModifiers())) {
+            return c;
+        }
+        Constructor<?> cp = null;
+        Class<?> sup = type.getSuperclass();
+        if (sup != null) {
+            try {
+                cp = sup.getConstructor(c.getParameterTypes());
+                cp = getConstructor(cp.getDeclaringClass(), cp);
+                if (cp != null) {
+                    return cp;
+                }
+            } catch (NoSuchMethodException e) {
+                // Ignore
+            }
+        }
+        return null;
+    }
+
+
+    static Object[] buildParameters(Class<?>[] parameterTypes,
+            boolean isVarArgs,Object[] params) {
+        ExpressionFactory factory = getExpressionFactory();
+        Object[] parameters = null;
+        if (parameterTypes.length > 0) {
+            parameters = new Object[parameterTypes.length];
+            int paramCount = params.length;
+            if (isVarArgs) {
+                int varArgIndex = parameterTypes.length - 1;
+                // First argCount-1 parameters are standard
+                for (int i = 0; (i < varArgIndex); i++) {
+                    parameters[i] = factory.coerceToType(params[i],
+                            parameterTypes[i]);
+                }
+                // Last parameter is the varargs
+                Class<?> varArgClass =
+                    parameterTypes[varArgIndex].getComponentType();
+                final Object varargs = Array.newInstance(
+                    varArgClass,
+                    (paramCount - varArgIndex));
+                for (int i = (varArgIndex); i < paramCount; i++) {
+                    Array.set(varargs, i - varArgIndex,
+                            factory.coerceToType(params[i], varArgClass));
+                }
+                parameters[varArgIndex] = varargs;
+            } else {
+                parameters = new Object[parameterTypes.length];
+                for (int i = 0; i < parameterTypes.length; i++) {
+                    parameters[i] = factory.coerceToType(params[i],
+                            parameterTypes[i]);
+                }
+            }
+        }
+        return parameters;
     }
 }
