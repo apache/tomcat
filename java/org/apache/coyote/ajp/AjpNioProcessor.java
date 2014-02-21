@@ -155,7 +155,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         boolean block = blockFirstRead;
 
         while (read < n) {
-            res = readSocket(buf, read + pos, n, block);
+            res = readSocket(buf, read + pos, n - read, block);
             if (res > 0) {
                 read += res;
             } else if (res == 0 && !block) {
