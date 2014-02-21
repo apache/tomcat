@@ -82,6 +82,11 @@
         In some circumstances asynchronous requests could time out too soon.
         (markt)
       </fix>
+      <fix>
+        <bug>56172</bug>: Avoid possible request corruption when using the AJP
+        NIO connector and a request is sent using more than one AJP message.
+        Patch provided by Amund Elstad. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
