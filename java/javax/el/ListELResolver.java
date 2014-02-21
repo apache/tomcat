@@ -94,7 +94,7 @@ public class ListELResolver extends ELResolver {
             List<Object> list = (List<Object>) base;
 
             if (this.readOnly) {
-                throw new PropertyNotWritableException(message(context,
+                throw new PropertyNotWritableException(Util.message(context,
                         "resolverNotWriteable", new Object[] { base.getClass()
                                 .getName() }));
             }

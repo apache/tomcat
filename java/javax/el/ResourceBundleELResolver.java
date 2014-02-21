@@ -81,7 +81,7 @@ public class ResourceBundleELResolver extends ELResolver {
         
         if (base instanceof ResourceBundle) {
             context.setPropertyResolved(true);
-            throw new PropertyNotWritableException(message(context,
+            throw new PropertyNotWritableException(Util.message(context,
                     "resolverNotWriteable", new Object[] { base.getClass()
                             .getName() }));
         }

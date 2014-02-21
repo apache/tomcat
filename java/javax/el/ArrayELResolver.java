@@ -86,7 +86,7 @@ public class ArrayELResolver extends ELResolver {
             context.setPropertyResolved(true);
 
             if (this.readOnly) {
-                throw new PropertyNotWritableException(message(context,
+                throw new PropertyNotWritableException(Util.message(context,
                         "resolverNotWriteable", new Object[] { base.getClass()
                                 .getName() }));
             }
@@ -95,7 +95,7 @@ public class ArrayELResolver extends ELResolver {
             checkBounds(base, idx);
             if (value != null && !Util.isAssignableFrom(value.getClass(),
                     base.getClass().getComponentType())) {
-                throw new ClassCastException(message(context,
+                throw new ClassCastException(Util.message(context,
                         "objectNotAssignable",
                         new Object[] {value.getClass().getName(),
                         base.getClass().getComponentType().getName()}));

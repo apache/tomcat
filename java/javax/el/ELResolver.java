@@ -14,42 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package javax.el;
 
-import java.text.MessageFormat;
 import java.util.Iterator;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 /**
  * @author Jacob Hookom [jacob/hookom.net]
  *
  */
 public abstract class ELResolver {
-    
-    static String message(ELContext context, String name, Object[] props) {
-        Locale locale = context.getLocale();
-        if (locale == null) {
-            locale = Locale.getDefault();
-            if (locale == null) {
-                return "";
-            }
-        }
-        ResourceBundle bundle = ResourceBundle.getBundle(
-                "javax.el.LocalStrings", locale);
-        try {
-            String template = bundle.getString(name);
-            if (props != null) {
-                template = MessageFormat.format(template, props);
-            }
-            return template;
-        } catch (MissingResourceException e) {
-            return "Missing Resource: '" + name + "' for Locale "
-                    + locale.getDisplayName();
-        }
-    }
 
     public static final String RESOLVABLE_AT_DESIGN_TIME = "resolvableAtDesignTime";
     
