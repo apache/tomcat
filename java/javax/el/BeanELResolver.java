@@ -108,8 +108,7 @@ public class BeanELResolver extends ELResolver {
                 throw (VirtualMachineError) cause;
             }
             throw new ELException(Util.message(context, "propertyReadError",
-                    new Object[] { base.getClass().getName(),
-                            property.toString() }), cause);
+                    base.getClass().getName(), property.toString()), cause);
         } catch (Exception e) {
             throw new ELException(e);
         }
@@ -131,8 +130,7 @@ public class BeanELResolver extends ELResolver {
 
         if (this.readOnly) {
             throw new PropertyNotWritableException(Util.message(context,
-                    "resolverNotWriteable", new Object[] { base.getClass()
-                            .getName() }));
+                    "resolverNotWriteable", base.getClass().getName()));
         }
 
         Method m = this.property(context, base, property).write(context);
@@ -149,8 +147,7 @@ public class BeanELResolver extends ELResolver {
                 throw (VirtualMachineError) cause;
             }
             throw new ELException(Util.message(context, "propertyWriteError",
-                    new Object[] { base.getClass().getName(),
-                            property.toString() }), cause);
+                    base.getClass().getName(), property.toString()), cause);
         } catch (Exception e) {
             throw new ELException(e);
         }
@@ -267,8 +264,7 @@ public class BeanELResolver extends ELResolver {
             BeanProperty property = this.properties.get(name);
             if (property == null) {
                 throw new PropertyNotFoundException(Util.message(ctx,
-                        "propertyNotFound",
-                        new Object[] { type.getName(), name }));
+                        "propertyNotFound", type.getName(), name));
             }
             return property;
         }
