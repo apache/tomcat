@@ -154,6 +154,10 @@
       <fix>
         Correct build script to avoid building JARs with empty packages. (markt)
       </fix>
+      <add>
+        Allow to limit JUnit test run to a number of selected test case
+        methods. (kkolinko)
+      </add>
     </changelog>
   </subsection>
 </section>
