@@ -1367,7 +1367,12 @@
                    extension="@{extension}${junit.formatter.extension}" />
 
         <!-- If test.entry is defined, run a single test, otherwise run all valid tests -->
-        <test todir="${tomcat.build}/logs" name="${test.entry}" if="test.entry"/>
+        <test todir="${tomcat.build}/logs" name="${test.entry}"
+              if="test.entry" unless="test.entry.methods"
+           />
+        <test todir="${tomcat.build}/logs" name="${test.entry}" methods="${test.entry.methods}"
+              if="test.entry.methods"
+           />
         <batchtest todir="${tomcat.build}/logs" unless="test.entry">
           <fileset dir="test" >
             <!-- Include all by default -->
