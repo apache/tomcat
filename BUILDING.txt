@@ -350,6 +350,16 @@ For example:
 
     test.entry=org.apache.catalina.util.TestServerInfo
 
+It is possible to further limit such run to a number of selected test
+methods by adding "test.entry.methods" property. The property specifies a
+comma-separated list of test case methods. (This feature requires
+Apache Ant 1.8.2 or later).
+
+For example:
+
+    test.entry=org.apache.el.lang.TestELArithmetic
+    test.entry.methods=testMultiply01,testMultiply02
+
 
 (7.3) Other configuration options
 
