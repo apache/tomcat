@@ -112,7 +112,7 @@ void Semicolon() : {}
  */
 void Assignment() : {}
 {
-    LOOKAHEAD(3) LambdaExpression() |
+    LOOKAHEAD(4) LambdaExpression() |
     Choice() ( LOOKAHEAD(2) <ASSIGN> Assignment() #Assign(2) )*
 }
 
@@ -323,7 +323,7 @@ void MethodParameters() #MethodParameters : {}
  */
 void NonLiteral() : {}
 {
-    LOOKAHEAD(3) LambdaExpressionOrInvocation()
+    LOOKAHEAD(5) LambdaExpressionOrInvocation()
     | <LPAREN> Expression() <RPAREN>
     | LOOKAHEAD((<IDENTIFIER> <COLON>)? <IDENTIFIER> <LPAREN>) Function()
     | Identifier()
