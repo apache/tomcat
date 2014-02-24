@@ -104,6 +104,102 @@ public class TestELParser {
     }
 
 
+    @Test
+    public void bug56179a() {
+        doTestBug56179(0, "test == true");
+    }
+
+    @Test
+    public void bug56179b() {
+        doTestBug56179(1, "test == true");
+    }
+
+    @Test
+    public void bug56179c() {
+        doTestBug56179(2, "test == true");
+    }
+
+    @Test
+    public void bug56179d() {
+        doTestBug56179(3, "test == true");
+    }
+
+    @Test
+    public void bug56179e() {
+        doTestBug56179(4, "test == true");
+    }
+
+    @Test
+    public void bug56179f() {
+        doTestBug56179(5, "test == true");
+    }
+
+    @Test
+    public void bug56179g() {
+        doTestBug56179(0, "(test) == true");
+    }
+
+    @Test
+    public void bug56179h() {
+        doTestBug56179(1, "(test) == true");
+    }
+
+    @Test
+    public void bug56179i() {
+        doTestBug56179(2, "(test) == true");
+    }
+
+    @Test
+    public void bug56179j() {
+        doTestBug56179(3, "(test) == true");
+    }
+
+    @Test
+    public void bug56179k() {
+        doTestBug56179(4, "(test) == true");
+    }
+
+    @Test
+    public void bug56179l() {
+        doTestBug56179(5, "(test) == true");
+    }
+
+    @Test
+    public void bug56179m() {
+        doTestBug56179(5, "((test)) == true");
+    }
+
+    @Test
+    public void bug56179n() {
+        doTestBug56179(5, "(((test))) == true");
+    }
+
+    private void doTestBug56179(int parenthesesCount, String innerExpr) {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl(factory);
+
+        ValueExpression var =
+            factory.createValueExpression(Boolean.TRUE, Boolean.class);
+        context.getVariableMapper().setVariable("test", var);
+
+        StringBuilder expr = new StringBuilder();
+        expr.append("${");
+        for (int i = 0; i < parenthesesCount; i++) {
+            expr.append("(");
+        }
+        expr.append(innerExpr);
+        for (int i = 0; i < parenthesesCount; i++) {
+            expr.append(")");
+        }
+        expr.append("}");
+        ValueExpression ve = factory.createValueExpression(
+                context, expr.toString(), String.class);
+
+        String result = (String) ve.getValue(context);
+        assertEquals("true", result);
+    }
+
+
     private void testExpression(String expression, String expected) {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl(factory);

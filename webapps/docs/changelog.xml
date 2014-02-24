@@ -95,6 +95,10 @@
         Change the default compiler source and compiler target versions to 1.7
         since Tomcat 8 requires a minimum of Java 7. (markt)
       </fix>
+      <fix>
+        <bug>56179</bug>: Fix parsing of EL expressions that contain unnecessary
+        parentheses. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
