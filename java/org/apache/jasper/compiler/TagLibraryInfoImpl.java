@@ -22,6 +22,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -133,10 +134,36 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         // Add the dependencies on the TLD to the referencing page
         PageInfo pageInfo = ctxt.createCompiler().getPageInfo();
         if (pageInfo != null) {
+            // If the TLD is in a JAR, that JAR may not be part of the web
+            // application
             String path = tldResourcePath.getWebappPath();
-            // Add TLD (jar==null) / JAR (jar!=null) file to dependency list
-            pageInfo.addDependant(path, ctxt.getLastModified(path));
+            if (path != null) {
+                // Add TLD (jar==null) / JAR (jar!=null) file to dependency list
+                pageInfo.addDependant(path, ctxt.getLastModified(path));
+            }
             if (jar != null) {
+                if (path == null) {
+                    // JAR not in the web application so add it directly
+                    URL jarUrl = jar.getJarFileURL();
+                    long lastMod = -1;
+                    URLConnection urlConn = null;
+                    try {
+                        urlConn = jarUrl.openConnection();
+                        lastMod = urlConn.getLastModified();
+                    } catch (IOException ioe) {
+                        throw new JasperException(ioe);
+                    } finally {
+                        if (urlConn != null) {
+                            try {
+                                urlConn.getInputStream().close();
+                            } catch (IOException e) {
+                                // Ignore
+                            }
+                        }
+                    }
+                    pageInfo.addDependant(jarUrl.toExternalForm(),
+                            Long.valueOf(lastMod));
+                }
                 // Add TLD within the JAR to the dependency list
                 String entryName = tldResourcePath.getEntryName();
                 try {
