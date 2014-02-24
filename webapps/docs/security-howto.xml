@@ -55,11 +55,11 @@
     the Tomcat process and provide that user with the minimum necessary
     permissions for the operating system. For example, it should not be possible
     to log on remotely using the Tomcat user.</p>
-    <p>File permissions should also be suitable restricted. Taking the Tomcat
+    <p>File permissions should also be suitably restricted. Taking the Tomcat
     instances at the ASF as an example (where auto-deployment is disabled and
     web applications are deployed as exploded directories), the standard
     configuration is to have all Tomcat files owned by root with group Tomcat
-    and whilst owner has read/write priviliges, group only has read and world
+    and whilst owner has read/write privileges, group only has read and world
     has no permissions. The exceptions are the logs, temp and work directory
     that are owned by the Tomcat user rather than root. This means that even if
     an attacker compromises the Tomcat process, they can&apos;t change the
