@@ -99,6 +99,11 @@
         <bug>56179</bug>: Fix parsing of EL expressions that contain unnecessary
         parentheses. (markt)
       </fix>
+      <fix>
+        <bug>56177</bug>: Handle dependency tracking for TLDs when using JspC
+        with a tag library JAR that is located outside of the web application.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
