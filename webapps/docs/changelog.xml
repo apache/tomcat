@@ -706,6 +706,7 @@
         with IBM JDKs. Based on a patch by Arunav Sanyal. (markt)
       </fix>
       <add>
+        Fix CVE-2013-4590:
         Add an option to the Context to control the blocking of XML external
         entities when parsing XML configuration files and enable this blocking
         by default when a security manager is used. The block is implemented via
@@ -1204,11 +1205,12 @@
         timeout when using the AJP NIO connector. (markt)
       </fix>
       <fix>
+        Fix CVE-2013-4286:
         Better adherence to RFC2616 for content-length headers. (markt)
       </fix>
       <fix>
-        Add support for limiting the size of chunk extensions when using chunked
-        encoding. (markt)
+        Fix CVE-2013-4322: Add support for limiting the size of chunk extensions
+        when using chunked encoding. (markt)
       </fix>
       <fix>
         Update the APR/native connector to version 1.1.28. Make this the minimum
@@ -1753,9 +1755,9 @@
         (markt)
       </update>
       <fix>
-        <bug>54178</bug>: Protect against <code>AsyncListener</code>
-        implementations that throw <code>RuntimeException</code>s in response to
-        an event. (markt)
+        <bug>54178</bug>, CVE-2013-2071: Protect against
+        <code>AsyncListener</code> implementations that throw
+        <code>RuntimeException</code>s in response to an event. (markt)
       </fix>
       <fix>
         <bug>54791</bug>: Restore <code>tools.jar</code> entry in
@@ -2615,6 +2617,7 @@
         provided by Sean Winterberger. (markt)
       </add>
       <fix>
+        Fix CVE-2013-2067:
         In FormAuthenticator: If it is configured to change Session IDs,
         do the change before displaying the login form. (kkolinko)
       </fix>
