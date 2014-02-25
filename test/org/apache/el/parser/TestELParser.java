@@ -199,6 +199,25 @@ public class TestELParser {
         assertEquals("true", result);
     }
 
+    @Test
+    public void bug56185() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl(factory);
+
+        TesterBeanC beanC = new TesterBeanC();
+        ValueExpression var =
+            factory.createValueExpression(beanC, TesterBeanC.class);
+        context.getVariableMapper().setVariable("myBean", var);
+
+        ValueExpression ve = factory.createValueExpression(context,
+            "${(myBean.int1 > 1 and myBean.myBool) or "+
+            "((myBean.myBool or myBean.myBool1) and myBean.int1 > 1)}",
+            Boolean.class);
+        assertEquals(Boolean.FALSE, ve.getValue(context));
+        beanC.setInt1(2);
+        beanC.setMyBool1(true);
+        assertEquals(Boolean.TRUE, ve.getValue(context));
+    }
 
     private void testExpression(String expression, String expected) {
         ExpressionFactory factory = ExpressionFactory.newInstance();
