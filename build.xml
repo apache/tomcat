@@ -343,7 +343,6 @@
     <include name="org/apache/tomcat/util/res/**" />
     <include name="org/apache/tomcat/util/threads/**" />
     <include name="org/apache/tomcat/util/*" />
-    <include name="org/apache/tomcat/util/*.properties" />
   </patternset>
 
   <patternset id="files.tomcat-util-scan">
