@@ -136,9 +136,6 @@
         three calls, and using command line arguments instead of environment
         variables to pass the settings. (markt/kkolinko)
       </fix>
-      <update>
-        Update Commons DBCP 2 to snapshot 182 dated 14 Feb 2014. (markt)
-      </update>
       <scode>
         Simplify Windows *.bat files: remove %OS% checks, as current java does
         not run on ancient non-NT operating systems. (kkolinko)
@@ -167,6 +164,12 @@
         Allow to limit JUnit test run to a number of selected test case
         methods. (kkolinko)
       </add>
+      <update>
+        Update Commons Pool 2 to 2.2. (markt)
+      </update>
+      <update>
+        Update Commons DBCP 2 to snapshot 187 dated 17 Feb 2014. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
