@@ -16,9 +16,19 @@
  */
 package org.apache.juli.logging;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ServiceLoader;
 import java.util.logging.LogManager;
 
 /**
+ * Modified to use java service discovery, to avoid need to replace LogFactory instance.
+ * If discovery is undesirable in some deployments, then they can replace LogFactory with a
+ * hard coded version
+ * 
+ * ---------------
+ * 
+ * Replaced comment:
  * Modified LogFactory: removed all discovery, hardcode a specific implementation
  * If you like a different logging implementation - use either the discovery-based
  * commons-logging, or better - another implementation hardcoded to your favourite
@@ -64,11 +74,28 @@ public class LogFactory {
 
     private static final LogFactory singleton = new LogFactory();
 
+    private final Constructor<? extends Log> discoveredLogConstructor;
 
     /**
-     * Protected constructor that is not available for public use.
+     * Private constructor that is not available for public use.
      */
-    private LogFactory() {
+    private LogFactory()
+    {
+        // Look via a ServiceLoader for a Log implementation that has 
+        // a constructor taking the String name
+        ServiceLoader<Log> logLoader = ServiceLoader.load(Log.class);
+        Constructor<? extends Log> m=null;
+        for (Log log: logLoader) {
+            Class<? extends Log> c=log.getClass();
+            try {
+                m=c.getConstructor(String.class);
+            }
+            catch (NoSuchMethodException | SecurityException e) {
+                throw new Error(e);
+            }
+        }
+        
+        discoveredLogConstructor=m;        
     }
 
 
@@ -95,7 +122,16 @@ public class LogFactory {
      */
     public Log getInstance(String name)
         throws LogConfigurationException {
-        return DirectJDKLog.getInstance(name);
+        
+        if (discoveredLogConstructor==null)
+            return DirectJDKLog.getInstance(name);
+        
+        try {
+            return discoveredLogConstructor.newInstance(name);
+        }
+        catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

@@ -55,11 +55,11 @@ public class DigesterFactory {
 
         // from J2EE 1.2
         publicIds.put(XmlIdentifiers.WEB_22_PUBLIC, idFor("web-app_2_2.dtd"));
-        publicIds.put(XmlIdentifiers.TLD_11_PUBLIC, idFor("web-jsptaglibrary_1_1.dtd"));
+        publicIds.put(XmlIdentifiers.TLD_11_PUBLIC, idForJSP("web-jsptaglibrary_1_1.dtd"));
 
         // from J2EE 1.3
         publicIds.put(XmlIdentifiers.WEB_23_PUBLIC, idFor("web-app_2_3.dtd"));
-        publicIds.put(XmlIdentifiers.TLD_12_PUBLIC, idFor("web-jsptaglibrary_1_2.dtd"));
+        publicIds.put(XmlIdentifiers.TLD_12_PUBLIC, idForJSP("web-jsptaglibrary_1_2.dtd"));
 
         // from J2EE 1.4
         systemIds.put("http://www.ibm.com/webservices/xsd/j2ee_web_services_1_1.xsd",
@@ -67,15 +67,15 @@ public class DigesterFactory {
         systemIds.put("http://www.ibm.com/webservices/xsd/j2ee_web_services_client_1_1.xsd",
                 idFor("j2ee_web_services_client_1_1.xsd"));
         systemIds.put(XmlIdentifiers.WEB_24_XSD, idFor("web-app_2_4.xsd"));
-        systemIds.put(XmlIdentifiers.TLD_20_XSD, idFor("web-jsptaglibrary_2_0.xsd"));
+        systemIds.put(XmlIdentifiers.TLD_20_XSD, idForJSP("web-jsptaglibrary_2_0.xsd"));
         addSelf(systemIds, "j2ee_1_4.xsd");
-        addSelf(systemIds, "jsp_2_0.xsd");
+        addSelfJSP(systemIds, "jsp_2_0.xsd");
 
         // from JavaEE 5
         systemIds.put(XmlIdentifiers.WEB_25_XSD, idFor("web-app_2_5.xsd"));
-        systemIds.put(XmlIdentifiers.TLD_21_XSD, idFor("web-jsptaglibrary_2_1.xsd"));
+        systemIds.put(XmlIdentifiers.TLD_21_XSD, idForJSP("web-jsptaglibrary_2_1.xsd"));
         addSelf(systemIds, "javaee_5.xsd");
-        addSelf(systemIds, "jsp_2_1.xsd");
+        addSelfJSP(systemIds, "jsp_2_1.xsd");
         addSelf(systemIds, "javaee_web_services_1_2.xsd");
         addSelf(systemIds, "javaee_web_services_client_1_2.xsd");
 
@@ -84,7 +84,7 @@ public class DigesterFactory {
         systemIds.put(XmlIdentifiers.WEB_FRAGMENT_30_XSD, idFor("web-fragment_3_0.xsd"));
         addSelf(systemIds, "web-common_3_0.xsd");
         addSelf(systemIds, "javaee_6.xsd");
-        addSelf(systemIds, "jsp_2_2.xsd");
+        addSelfJSP(systemIds, "jsp_2_2.xsd");
         addSelf(systemIds, "javaee_web_services_1_3.xsd");
         addSelf(systemIds, "javaee_web_services_client_1_3.xsd");
 
@@ -93,7 +93,7 @@ public class DigesterFactory {
         systemIds.put(XmlIdentifiers.WEB_FRAGMENT_31_XSD, idFor("web-fragment_3_1.xsd"));
         addSelf(systemIds, "web-common_3_1.xsd");
         addSelf(systemIds, "javaee_7.xsd");
-        addSelf(systemIds, "jsp_2_3.xsd");
+        addSelfJSP(systemIds, "jsp_2_3.xsd");
         addSelf(systemIds, "javaee_web_services_1_4.xsd");
         addSelf(systemIds, "javaee_web_services_client_1_4.xsd");
 
@@ -106,10 +106,25 @@ public class DigesterFactory {
         ids.put(systemId, systemId);
     }
 
+    private static void addSelfJSP(Map<String, String> ids, String id) {
+        String systemId = idForJSP(id);
+        ids.put(systemId, systemId);
+    }
+
     private static String idFor(String url) {
         return ServletContext.class.getResource("resources/" + url).toExternalForm();
     }
 
+    private static String idForJSP(String url) {
+        // Try the apache resource location
+        java.net.URL resource = ServletContext.class.getResource("resources/" + url);
+        
+        // Try alternate location for JSP resources (which are in different locations in reference jars)
+        if (resource == null)
+            resource = ServletContext.class.getResource("jsp/resources/" + url);
+        
+        return resource.toExternalForm();
+    }
 
     /**
      * Create a <code>Digester</code> parser.
