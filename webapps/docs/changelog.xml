@@ -155,6 +155,10 @@
         Allow to limit JUnit test run to a number of selected test case
         methods. (kkolinko)
       </add>
+      <fix>
+        <bug>56189</bug>: Remove used file cpappend.bat from the distribution.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
