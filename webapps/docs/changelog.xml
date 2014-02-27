@@ -170,6 +170,10 @@
       <update>
         Update Commons DBCP 2 to snapshot 202 dated 26 Feb 2014. (markt)
       </update>
+      <fix>
+        <bug>56189</bug>: Remove used file cpappend.bat from the distribution.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
