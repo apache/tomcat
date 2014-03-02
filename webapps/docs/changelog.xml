@@ -74,6 +74,10 @@
         elements and attributes supported by the Servlet version of the merged
         file. (markt)
       </fix>
+      <fix>
+        Avoid <code>NullPointerException</code> in resource cache when making an
+        invalid request for a resource outside of the web application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
