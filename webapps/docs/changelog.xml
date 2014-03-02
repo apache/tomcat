@@ -74,6 +74,10 @@
         elements and attributes supported by the Servlet version of the merged
         file. (markt)
       </fix>
+      <fix>
+        Avoid internal <code>NullPointerException</code>s if a resource is
+        requested from outside the web application root. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
