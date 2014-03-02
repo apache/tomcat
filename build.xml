@@ -797,7 +797,7 @@
 
     <!-- i18n JARs -->
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-es.jar"
-      manifest="${tomcat.manifests}/default.manifest" filesonly="true">
+      manifest="${tomcat.manifests}/default.manifest">
       <fileset dir="${tomcat.classes}">
         <include name="**/LocalStrings_es.properties" />
       </fileset>
@@ -807,7 +807,7 @@
         fullpath="META-INF/LICENSE" />
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-fr.jar"
-      manifest="${tomcat.manifests}/default.manifest" filesonly="true">
+      manifest="${tomcat.manifests}/default.manifest">
       <fileset dir="${tomcat.classes}">
         <include name="**/LocalStrings_fr.properties" />
       </fileset>
@@ -817,7 +817,7 @@
         fullpath="META-INF/LICENSE" />
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ja.jar"
-      manifest="${tomcat.manifests}/default.manifest" filesonly="true">
+      manifest="${tomcat.manifests}/default.manifest">
       <fileset dir="${tomcat.classes}">
         <include name="**/LocalStrings_ja.properties" />
       </fileset>
@@ -1531,8 +1531,7 @@
          target="compile" />
 
     <jar jarfile="${tomcat-juli-extras.jar}"
-         manifest="${tomcat.manifests}/default.manifest"
-         filesonly="true">
+         manifest="${tomcat.manifests}/default.manifest">
       <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/target/classes">
         <include name="org/apache/juli/logging/*" />
         <include name="org/apache/juli/logging/impl/LogFactoryImpl*.class" />
@@ -1568,8 +1567,7 @@
 
     <!-- Source JARs -->
     <jar jarfile="${tomcat-juli-extras-src.jar}"
-         manifest="${tomcat.manifests}/default.manifest"
-         filesonly="true">
+         manifest="${tomcat.manifests}/default.manifest">
       <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/main/java">
         <include name="org/apache/juli/logging/*.java" />
         <include name="org/apache/juli/logging/impl/LogFactoryImpl*.java" />
@@ -1676,8 +1674,7 @@
           description="Embedded packaging for those extras that can use it">
 
     <jar jarfile="${tomcat-embed-log4j.jar}"
-         manifest="${tomcat.manifests}/default.manifest"
-         filesonly="true">
+         manifest="${tomcat.manifests}/default.manifest">
       <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/target/classes">
         <include name="org/apache/juli/logging/*" />
         <include name="org/apache/juli/logging/impl/*" />
@@ -1698,8 +1695,7 @@
     </jar>
 
     <jar jarfile="${tomcat-embed-log4j-src.jar}"
-         manifest="${tomcat.manifests}/default.manifest"
-         filesonly="true">
+         manifest="${tomcat.manifests}/default.manifest">
       <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/main/java">
         <include name="org/apache/juli/logging/*.java" />
         <include name="org/apache/juli/logging/impl/*.java" />
@@ -1930,8 +1926,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </copy>
 
     <!-- Digester and dependencies -->
-    <jar jarfile="${tomcat.deployer}/lib/catalina-deployer.jar"
-         filesonly="true">
+    <jar jarfile="${tomcat.deployer}/lib/catalina-deployer.jar">
        <fileset dir="${tomcat.classes}">
           <include name="org/apache/catalina/startup/DigesterFactory.class" />
           <include name="org/apache/catalina/util/SchemaResolver.class" />
@@ -2985,7 +2980,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     <attribute name="meta-inf" description="additional contents for META-INF"
                default="${tomcat.manifests}/default" />
     <sequential>
-      <jar jarfile="@{jarfile}" manifest="@{manifest}" filesonly="true">
+      <jar jarfile="@{jarfile}" manifest="@{manifest}">
         <fileset dir="@{filesDir}">
           <patternset refid="@{filesId}"/>
           <!-- Javadoc and i18n exclusions -->
