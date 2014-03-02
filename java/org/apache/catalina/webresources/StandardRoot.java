@@ -117,6 +117,9 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         if (validate) {
             path = validate(path);
         }
+        if (path == null) {
+            return new String[] {};
+        }
 
         // Set because we don't want duplicates
         // LinkedHashSet to retain the order. It is the order of the
@@ -140,6 +143,9 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     @Override
     public Set<String> listWebAppPaths(String path) {
         path = validate(path);
+        if (path == null) {
+            return null;
+        }
 
         // Set because we don't want duplicates
         HashSet<String> result = new HashSet<>();
@@ -159,6 +165,9 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     @Override
     public boolean mkdir(String path) {
         path = validate(path);
+        if (path == null) {
+            return false;
+        }
 
         if (preResourceExists(path)) {
             return false;
@@ -170,6 +179,9 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     @Override
     public boolean write(String path, InputStream is, boolean overwrite) {
         path = validate(path);
+        if (path == null) {
+            return false;
+        }
 
         if (!overwrite && preResourceExists(path)) {
             return false;
@@ -197,6 +209,9 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             boolean useClassLoaderResources) {
         if (validate) {
             path = validate(path);
+        }
+        if (path == null) {
+            return null;
         }
 
         if (isCachingAllowed()) {
@@ -280,6 +295,9 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     private WebResource[] getResources(String path,
             boolean useClassLoaderResources) {
         path = validate(path);
+        if (path == null) {
+            return new WebResource[] {};
+        }
 
         ArrayList<WebResource> result = new ArrayList<>();
         for (ArrayList<WebResourceSet> list : allResources) {
@@ -308,6 +326,9 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     private WebResource[] listResources(String path, boolean validate) {
         if (validate) {
             path = validate(path);
+        }
+        if (path == null) {
+            return new WebResource[] {};
         }
 
         String[] resources = list(path, false);
