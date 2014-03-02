@@ -237,7 +237,14 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             throw new IllegalArgumentException(
                     sm.getString("standardRoot.invalidPath", path));
         }
-        return RequestUtil.normalize(path);
+
+        String result = RequestUtil.normalize(path);
+        if (result == null || result.length() == 0 || !result.startsWith("/")) {
+            throw new IllegalArgumentException(
+                    sm.getString("standardRoot.invalidPathNormal", path, result));
+        }
+
+        return result;
     }
 
     protected final WebResource getResourceInternal(String path,
