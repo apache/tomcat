@@ -299,6 +299,7 @@
     <include name="javax/servlet/descriptor/**" />
     <include name="javax/servlet/http/**" />
     <include name="javax/servlet/resources/**" />
+    <exclude name="javax/servlet/jsp"/>
   </patternset>
 
   <patternset id="files.jsp-api">
@@ -334,6 +335,11 @@
 
   <patternset id="files.tomcat-api">
     <include name="org/apache/tomcat/*" />
+    <exclude name="org/apache/tomcat/buildutil" />
+    <exclude name="org/apache/tomcat/jni" />
+    <exclude name="org/apache/tomcat/spdy" />
+    <exclude name="org/apache/tomcat/util" />
+    <exclude name="org/apache/tomcat/websocket" />
   </patternset>
 
   <patternset id="files.tomcat-util">
@@ -343,6 +349,15 @@
     <include name="org/apache/tomcat/util/res/**" />
     <include name="org/apache/tomcat/util/threads/**" />
     <include name="org/apache/tomcat/util/*" />
+    <exclude name="org/apache/tomcat/util/bcel" />
+    <exclude name="org/apache/tomcat/util/collections" />
+    <exclude name="org/apache/tomcat/util/descriptor" />
+    <exclude name="org/apache/tomcat/util/digester" />
+    <exclude name="org/apache/tomcat/util/http" />
+    <exclude name="org/apache/tomcat/util/log" />
+    <exclude name="org/apache/tomcat/util/modeler" />
+    <exclude name="org/apache/tomcat/util/net" />
+    <exclude name="org/apache/tomcat/util/scan" />
   </patternset>
 
   <patternset id="files.tomcat-util-scan">
@@ -1933,6 +1948,19 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
           <include name="org/apache/catalina/util/StringManager.class" />
           <include name="org/apache/tomcat/util/*" />
           <include name="org/apache/tomcat/util/digester/**" />
+          <exclude name="org/apache/tomcat/util/bcel" />
+          <exclude name="org/apache/tomcat/util/buf" />
+          <exclude name="org/apache/tomcat/util/codec" />
+          <exclude name="org/apache/tomcat/util/collections" />
+          <exclude name="org/apache/tomcat/util/descriptor" />
+          <exclude name="org/apache/tomcat/util/file" />
+          <exclude name="org/apache/tomcat/util/http" />
+          <exclude name="org/apache/tomcat/util/log" />
+          <exclude name="org/apache/tomcat/util/modeler" />
+          <exclude name="org/apache/tomcat/util/net" />
+          <exclude name="org/apache/tomcat/util/res" />
+          <exclude name="org/apache/tomcat/util/scan" />
+          <exclude name="org/apache/tomcat/util/threads" />
           <exclude name="**/package.html" />
           <exclude name="**/LocalStrings_*" />
        </fileset>
