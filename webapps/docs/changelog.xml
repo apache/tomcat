@@ -52,7 +52,7 @@
   There is no ordering by add/update/fix.
 
   Other fixed issues are added to the end of the list, chronologically.
-  They eventually become mixed with the numbered issues. (I.e., numbered
+4  They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.53 (violetagg)">
@@ -82,14 +82,15 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
+        <bug>55483</bug>: Improve handing of overloaded methods and constructors
+        in expression language implementation. (markt)
+      </fix>
+      <fix>
+        <bug>56208</bug>:
         Restore the validateXml option to Jasper that was previously renamed
         validateTld. Both options are now supported. validateXml controls the
         validation of web.xml files when Jasper parses them and validateTld
         controls the validation of *.tld files when Jasper parses them. (markt)
-      </fix>
-      <fix>
-        <bug>55483</bug>: Improve handing of overloaded methods and constructors
-        in expression language implementation. (markt)
       </fix>
     </changelog>
   </subsection>
