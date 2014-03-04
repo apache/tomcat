@@ -172,7 +172,7 @@
         Update Commons Pool 2 to 2.2. (markt)
       </update>
       <update>
-        Update Commons DBCP 2 to snapshot 213 dated 28 Feb 2014. (markt)
+        Update Commons DBCP 2 to the 2.0 release. (markt)
       </update>
       <fix>
         <bug>56189</bug>: Remove used file cpappend.bat from the distribution.
