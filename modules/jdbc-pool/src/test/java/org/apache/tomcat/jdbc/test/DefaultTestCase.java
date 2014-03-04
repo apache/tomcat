@@ -17,11 +17,15 @@
 package org.apache.tomcat.jdbc.test;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Before;
 
+//import org.apache.commons.dbcp2.BasicDataSource;
+//import org.apache.commons.dbcp2.BasicDataSourceFactory;
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
@@ -74,7 +78,11 @@ public abstract class DefaultTestCase {
         try {
             Properties p = new Properties();
             for (int i=0; i< ALL_PROPERTIES.length; i++) {
-                String name = "get" + Character.toUpperCase(ALL_PROPERTIES[i].charAt(0)) + ALL_PROPERTIES[i].substring(1);
+
+                String property = ALL_PROPERTIES[i];
+                String dbcpProperty = handleRenames(property);
+
+                String name = "get" + Character.toUpperCase(property.charAt(0)) + property.substring(1);
                 String bname = "is" + name.substring(3);
                 Method get = null;
                 try {
@@ -96,7 +104,7 @@ public abstract class DefaultTestCase {
                    if (get!=null) {
                        Object value = get.invoke(datasource.getPoolProperties(), new Object[0]);
                        if (value!=null) {
-                           p.setProperty(ALL_PROPERTIES[i], value.toString());
+                           p.setProperty(dbcpProperty, value.toString());
                        }
                 }
             }
@@ -104,6 +112,13 @@ public abstract class DefaultTestCase {
         }catch (Exception x) {
             x.printStackTrace();
         }
+    }
+
+    private String handleRenames(String oldName) {
+        if (RENAMED.containsKey(oldName)) {
+            return RENAMED.get(oldName);
+        }
+        return oldName;
     }
 
     protected void transferPropertiesToC3P0() throws Exception {
@@ -250,6 +265,9 @@ public abstract class DefaultTestCase {
         PROP_CONNECTIONPROPERTIES
     };
 
+    private static final Map<String,String> RENAMED = new HashMap<>();
 
-
+    static {
+        RENAMED.put(PROP_MAXACTIVE, "maxTotal");
+    }
 }
