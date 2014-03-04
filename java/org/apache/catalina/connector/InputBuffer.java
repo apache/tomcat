@@ -295,7 +295,7 @@ public class InputBuffer extends Reader
 
 
     boolean isBlocking() {
-        return coyoteRequest.getReadListener() != null;
+        return coyoteRequest.getReadListener() == null;
     }
 
 
