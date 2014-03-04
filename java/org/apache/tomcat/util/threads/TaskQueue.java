@@ -55,12 +55,12 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> {
     }
 
     public boolean force(Runnable o) {
-        if ( parent.isShutdown() ) throw new RejectedExecutionException("Executor not running, can't force a command into the queue");
+        if ( parent==null || parent.isShutdown() ) throw new RejectedExecutionException("Executor not running, can't force a command into the queue");
         return super.offer(o); //forces the item onto the queue, to be used if the task is rejected
     }
 
     public boolean force(Runnable o, long timeout, TimeUnit unit) throws InterruptedException {
-        if ( parent.isShutdown() ) throw new RejectedExecutionException("Executor not running, can't force a command into the queue");
+        if ( parent==null || parent.isShutdown() ) throw new RejectedExecutionException("Executor not running, can't force a command into the queue");
         return super.offer(o,timeout,unit); //forces the item onto the queue, to be used if the task is rejected
     }
 
