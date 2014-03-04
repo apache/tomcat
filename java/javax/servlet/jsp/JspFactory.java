@@ -102,9 +102,9 @@ public abstract class JspFactory {
      * @param errorPageURL the URL of the error page for the requesting JSP, or
      *                         null
      * @param needsSession true if the JSP participates in a session
-     * @param buffer       size of buffer in bytes, PageContext.NO_BUFFER if no
-     *                         buffer, PageContext.DEFAULT_BUFFER if
-     *                         implementation default.
+     * @param buffer       size of buffer in bytes, {@link JspWriter#NO_BUFFER}
+     *                         if no buffer, {@link JspWriter#DEFAULT_BUFFER}
+     *                         if implementation default.
      * @param autoflush    should the buffer autoflush to the output stream on
      *                         buffer overflow, or throw an IOException?
      *
