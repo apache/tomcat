@@ -426,10 +426,12 @@ public class CoyoteAdapter implements Adapter {
             if (!request.isAsync() && !comet) {
                 request.finishRequest();
                 response.finishResponse();
-                request.getMappingData().context.logAccess(
-                        request, response,
-                        System.currentTimeMillis() - req.getStartTime(),
-                        false);
+                if (request.getMappingData().context != null) {
+                    request.getMappingData().context.logAccess(
+                            request, response,
+                            System.currentTimeMillis() - req.getStartTime(),
+                            false);
+                }
             }
 
         } catch (IOException e) {
