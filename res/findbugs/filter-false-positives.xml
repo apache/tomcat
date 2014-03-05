@@ -520,6 +520,11 @@
 
   <!-- Test code -->
   <Match>
+    <!-- Code is deliberately unused -->
+    <Class name="javax.servlet.http.TestCookie" />
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+  </Match>
+  <Match>
     <!-- Code is intentionally unused -->
     <Class name="org.apache.catalina.authenticator.TestBasicAuthParser"/>
     <Method name="testAuthMethodBadMethod"/>
@@ -634,8 +639,8 @@
   <Match>
     <!-- Code is deliberately unused -->
     <Or>
-      <Class name="org.apache.catalina.webresources.TestDirResourceSet" />
-      <Class name="org.apache.catalina.webresources.TestFileResourceSet" />
+      <Class name="org.apache.catalina.webresources.AbstractTestDirResourceSet" />
+      <Class name="org.apache.catalina.webresources.AbstractTestFileResourceSet" />
       <Class name="org.apache.catalina.webresources.TestJarResourceSet" />
       <Class name="org.apache.catalina.webresources.TestJarResourceSetInternal" />
     </Or>
