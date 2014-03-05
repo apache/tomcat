@@ -2854,7 +2854,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <delete file="${base.path}/file.tar.gz"/>
   </target>
 
-  <target name="downloadgz-2" unless="exist" depends="setproxy,testexist">
+  <target name="downloadgz-2" unless="exist" depends="testexist">
     <!-- Download and extract the package from the two alternative locations -->
     <delete file="${base.path}/file.tar" quiet="true" />
     <delete file="${base.path}/file.tar.gz" quiet="true" />
