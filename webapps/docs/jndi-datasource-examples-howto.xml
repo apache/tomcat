@@ -106,7 +106,7 @@ a <code>ServletContextListener</code>.
 
 </section>
 
-<section name="Database Connection Pool (DBCP) Configurations">
+<section name="Database Connection Pool (DBCP 2) Configurations">
 
 <p>The default database connection pool implementation in Apache Tomcat
 relies on the libraries from the
@@ -251,7 +251,7 @@ resource to your <a href="config/context.html">Context</a>.</p>
 <p>For example:</p>
 <source><![CDATA[<Context>
 
-    <!-- maxActive: Maximum number of database connections in pool. Make sure you
+    <!-- maxTotal: Maximum number of database connections in pool. Make sure you
          configure your mysqld max_connections large enough to handle
          all of your db connections. Set to -1 for no limit.
          -->
@@ -261,7 +261,7 @@ resource to your <a href="config/context.html">Context</a>.</p>
          and the minEvictableIdleTimeMillis configuration parameter.
          -->
 
-    <!-- maxWait: Maximum time to wait for a database connection to become available
+    <!-- maxWaitMillis: Maximum time to wait for a database connection to become available
          in ms, in this example 10 seconds. An Exception is thrown if
          this timeout is exceeded.  Set to -1 to wait indefinitely.
          -->
@@ -277,7 +277,7 @@ resource to your <a href="config/context.html">Context</a>.</p>
          -->
 
   <Resource name="jdbc/TestDB" auth="Container" type="javax.sql.DataSource"
-               maxActive="100" maxIdle="30" maxWait="10000"
+               maxTotal="100" maxIdle="30" maxWaitMillis="10000"
                username="javauser" password="javadude" driverClassName="com.mysql.jdbc.Driver"
                url="jdbc:mysql://localhost:3306/javatest"/>
 
@@ -374,8 +374,8 @@ user scott.</p>
 <source><![CDATA[<Resource name="jdbc/myoracle" auth="Container"
               type="javax.sql.DataSource" driverClassName="oracle.jdbc.OracleDriver"
               url="jdbc:oracle:thin:@127.0.0.1:1521:mysid"
-              username="scott" password="tiger" maxActive="20" maxIdle="10"
-              maxWait="-1"/>]]></source>
+              username="scott" password="tiger" maxTotal="20" maxIdle="10"
+              maxWaitMillis="-1"/>]]></source>
 
 <h5>2.    web.xml configuration</h5>
 <p>You should ensure that you respect the element ordering defined by the DTD when you
@@ -427,7 +427,7 @@ Clarification would be appreciated here.</i></p>
 <source><![CDATA[<Resource name="jdbc/postgres" auth="Container"
           type="javax.sql.DataSource" driverClassName="org.postgresql.Driver"
           url="jdbc:postgresql://127.0.0.1:5432/mydb"
-          username="myuser" password="mypasswd" maxActive="20" maxIdle="10" maxWait="-1"/>]]></source>
+          username="myuser" password="mypasswd" maxTotal="20" maxIdle="10" maxWaitMillis="-1"/>]]></source>
 <h6>2b. Application-specific resource configuration</h6>
 
 <p>
@@ -446,8 +446,8 @@ The Context element should look something like the following.
 <Resource name="jdbc/postgres" auth="Container"
           type="javax.sql.DataSource" driverClassName="org.postgresql.Driver"
           url="jdbc:postgresql://127.0.0.1:5432/mydb"
-          username="myuser" password="mypasswd" maxActive="20" maxIdle="10"
-maxWait="-1"/>
+          username="myuser" password="mypasswd" maxTotal="20" maxIdle="10"
+maxWaitMillis="-1"/>
 </Context>]]></source>
 
 <h5>3. web.xml configuration</h5>
@@ -577,7 +577,7 @@ than one second.  The remainder will only take a few seconds.  Rarely,
 if ever should a GC take more than 10 seconds.</p>
 
 <p>Make sure that the db connection timeout is set to 10-15 seconds.
-For the DBCP you set this using the parameter <code>maxWait</code>.</p>
+For the DBCP you set this using the parameter <code>maxWaitMillis</code>.</p>
 
 </subsection>
 
