@@ -119,6 +119,10 @@
       <fix>
         Remove an unnecessary null check identified by FindBugs. (markt)
       </fix>
+      <fix>
+        <bug>56199</bug>: Restore validateXml option for JspC which determines
+        if web.xml will be parsed with a validating parser. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

@@ -134,6 +134,7 @@ public class JspC extends Task implements Options {
     protected static final String SWITCH_SMAP = "-smap";
     protected static final String SWITCH_DUMP_SMAP = "-dumpsmap";
     protected static final String SWITCH_VALIDATE_TLD = "-validateTld";
+    protected static final String SWITCH_VALIDATE_XML = "-validateXml";
     protected static final String SWITCH_BLOCK_EXTERNAL = "-blockExternal";
     protected static final String SWITCH_NO_BLOCK_EXTERNAL = "-no-blockExternal";
     protected static final String SHOW_SUCCESS ="-s";
@@ -167,6 +168,7 @@ public class JspC extends Task implements Options {
     protected boolean trimSpaces = false;
     protected boolean genStringAsCharArray = false;
     protected boolean validateTld;
+    protected boolean validateXml;
     protected boolean blockExternal = true;
     protected boolean xpoweredBy;
     protected boolean mappedFile = false;
@@ -376,6 +378,8 @@ public class JspC extends Task implements Options {
                 smapDumped = true;
             } else if (tok.equals(SWITCH_VALIDATE_TLD)) {
                 setValidateTld(true);
+            } else if (tok.equals(SWITCH_VALIDATE_XML)) {
+                setValidateXml(true);
             } else if (tok.equals(SWITCH_BLOCK_EXTERNAL)) {
                 setBlockExternal(true);
             } else if (tok.equals(SWITCH_NO_BLOCK_EXTERNAL)) {
@@ -865,6 +869,14 @@ public class JspC extends Task implements Options {
 
     public boolean isValidateTld() {
         return validateTld;
+    }
+
+    public void setValidateXml( boolean b ) {
+        this.validateXml = b;
+    }
+
+    public boolean isValidateXml() {
+        return validateXml;
     }
 
     public void setBlockExternal( boolean b ) {
@@ -1455,8 +1467,13 @@ public class JspC extends Task implements Options {
         if (isValidateTld()) {
             context.setInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM, "true");
         }
+        if (isValidateXml()) {
+            context.setInitParameter(Constants.XML_VALIDATION_INIT_PARAM, "true");
+        }
         context.setInitParameter(Constants.XML_BLOCK_EXTERNAL_INIT_PARAM,
                 String.valueOf(isBlockExternal()));
+
+        context.processWebXml();
 
         TldScanner scanner = new TldScanner(
                 context, true, isValidateTld(), isBlockExternal());
