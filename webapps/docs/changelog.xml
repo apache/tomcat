@@ -78,6 +78,9 @@
         Avoid <code>NullPointerException</code> in resource cache when making an
         invalid request for a resource outside of the web application. (markt)
       </fix>
+      <fix>
+        Remove an unnecessary null check identified by FindBugs. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -107,6 +110,9 @@
         <bug>56177</bug>: Handle dependency tracking for TLDs when using JspC
         with a tag library JAR that is located outside of the web application.
         (markt)
+      </fix>
+      <fix>
+        Remove an unnecessary null check identified by FindBugs. (markt) 
       </fix>
     </changelog>
   </subsection>
