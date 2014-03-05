@@ -124,6 +124,11 @@
         <bug>56093</bug>: Add the SSL Valve to the documentation web
         application. (markt)
       </add>
+      <fix>
+        <bug>56217</bug>: Improve readability by using left alignment for the
+        table cell containing the request information on the Manager application
+        status page. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
