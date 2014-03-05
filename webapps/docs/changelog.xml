@@ -183,6 +183,10 @@
         <bug>56189</bug>: Remove used file cpappend.bat from the distribution.
         (markt)
       </fix>
+      <fix>
+        <bug>56204</bug>: Remove unnecessary dependency between tasks in the
+        build script. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
