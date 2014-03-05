@@ -64,6 +64,7 @@
         <code>WebappClassLoader</code>. (markt)
       </add>
       <fix>
+        <bug>56219</bug>:
         Improve merging process for web.xml files to take account of the
         elements and attributes supported by the Servlet version of the merged
         file. (markt)
