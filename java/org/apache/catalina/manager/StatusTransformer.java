@@ -494,7 +494,7 @@ public class StatusTransformer {
                 writer.write(filter(mBeanServer.getAttribute
                                     (pName, "virtualHost")));
                 writer.write("</td>");
-                writer.write("<td nowrap>");
+                writer.write("<td nowrap class=\"row-left\">");
                 if (showRequest) {
                     writer.write(filter(mBeanServer.getAttribute
                                         (pName, "method")));
