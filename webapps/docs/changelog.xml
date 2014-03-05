@@ -78,6 +78,10 @@
         NIO connector and a request is sent using more than one AJP message.
         Patch provided by Amund Elstad. (markt)
       </fix>
+      <fix>
+        <bug>56213</bug>: Reduce garbage collection when the NIO connector is
+        under heavy load. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

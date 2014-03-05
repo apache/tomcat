@@ -26,6 +26,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +42,9 @@ public class NioBlockingSelector {
     private static final Log log = LogFactory.getLog(NioBlockingSelector.class);
 
     private static int threadCounter = 0;
+
+    private Queue<KeyReference> keyReferenceQueue =
+            new ConcurrentLinkedQueue<KeyReference>();
 
     protected Selector sharedSelector;
 
@@ -82,7 +86,10 @@ public class NioBlockingSelector {
             throws IOException {
         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
         if ( key == null ) throw new IOException("Key no longer registered");
-        KeyReference reference = new KeyReference();
+        KeyReference reference = keyReferenceQueue.poll();
+        if (reference == null) {
+            reference = new KeyReference();
+        }
         KeyAttachment att = (KeyAttachment) key.attachment();
         int written = 0;
         boolean timedout = false;
@@ -131,6 +138,7 @@ public class NioBlockingSelector {
                 poller.cancelKey(reference.key);
             }
             reference.key = null;
+            keyReferenceQueue.add(reference);
         }
         return written;
     }
@@ -150,7 +158,10 @@ public class NioBlockingSelector {
     public int read(ByteBuffer buf, NioChannel socket, long readTimeout) throws IOException {
         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
         if ( key == null ) throw new IOException("Key no longer registered");
-        KeyReference reference = new KeyReference();
+        KeyReference reference = keyReferenceQueue.poll();
+        if (reference == null) {
+            reference = new KeyReference();
+        }
         KeyAttachment att = (KeyAttachment) key.attachment();
         int read = 0;
         boolean timedout = false;
@@ -195,6 +206,7 @@ public class NioBlockingSelector {
                 poller.cancelKey(reference.key);
             }
             reference.key = null;
+            keyReferenceQueue.add(reference);
         }
         return read;
     }
