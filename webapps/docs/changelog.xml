@@ -116,6 +116,9 @@
         Avoid a possible deadlock when one thread is shutting down a connection
         while another thread is trying to write to it. (markt)
       </fix>
+      <fix>
+        Avoid NPE when flushing batched messages. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Applications">
