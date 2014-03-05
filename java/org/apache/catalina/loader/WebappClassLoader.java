@@ -1772,6 +1772,8 @@ public class WebappClassLoader extends URLClassLoader
                         continue;
                     }
 
+                    final String threadName = thread.getName();
+
                     // JVM controlled threads
                     ThreadGroup tg = thread.getThreadGroup();
                     if (tg != null &&
@@ -1779,7 +1781,7 @@ public class WebappClassLoader extends URLClassLoader
 
                         // HttpClient keep-alive threads
                         if (clearReferencesHttpClientKeepAliveThread &&
-                                thread.getName().equals("Keep-Alive-Timer")) {
+                                threadName.equals("Keep-Alive-Timer")) {
                             thread.setContextClassLoader(parent);
                             log.debug(sm.getString(
                                     "webappClassLoader.checkThreadsHttpClient"));
@@ -1805,10 +1807,14 @@ public class WebappClassLoader extends URLClassLoader
 
                     if (isRequestThread(thread)) {
                         log.error(sm.getString("webappClassLoader.warnRequestThread",
-                                getContextName(), thread.getName()));
+                                getContextName(), threadName));
+                        log.error(sm.getString("webappClassLoader.stackTraceRequestThread",
+                                threadName, getStackTrace(thread)));
                     } else {
                         log.error(sm.getString("webappClassLoader.warnThread",
-                                getContextName(), thread.getName()));
+                                getContextName(), threadName));
+                        log.error(sm.getString("webappClassLoader.stackTrace",
+                                threadName, getStackTrace(thread)));
                     }
 
                     // Don't try an stop the threads unless explicitly
@@ -2123,6 +2129,14 @@ public class WebappClassLoader extends URLClassLoader
             name = clazz.getName();
         }
         return name;
+    }
+
+    private String getStackTrace(Thread thread) {
+        StringBuilder builder = new StringBuilder();
+        for (StackTraceElement ste : thread.getStackTrace()) {
+            builder.append("\n ").append(ste);
+        }
+        return builder.toString();
     }
 
     /**

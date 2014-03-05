@@ -79,8 +79,13 @@
         invalid request for a resource outside of the web application. (markt)
       </fix>
       <fix>
-        Remove an unnecessary null check identified by FindBugs. (markt) 
+        Remove an unnecessary null check identified by FindBugs. (markt)
       </fix>
+      <add>
+        In WebappClassLoader, when reporting threads that are still running
+        while web application is being stopped, print their stack traces to
+        the log. (kkolinko)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -112,7 +117,7 @@
         (markt)
       </fix>
       <fix>
-        Remove an unnecessary null check identified by FindBugs. (markt) 
+        Remove an unnecessary null check identified by FindBugs. (markt)
       </fix>
     </changelog>
   </subsection>
