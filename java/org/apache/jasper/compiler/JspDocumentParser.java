@@ -317,55 +317,53 @@ class JspDocumentParser
         startMark = new Mark(ctxt, path, locator.getLineNumber(),
                              locator.getColumnNumber());
 
-        if (attrs != null) {
-            /*
-             * Notice that due to a bug in the underlying SAX parser, the
-             * attributes must be enumerated in descending order.
-             */
-            boolean isTaglib = false;
-            for (int i = attrs.getLength() - 1; i >= 0; i--) {
-                isTaglib = false;
-                String attrQName = attrs.getQName(i);
-                if (!attrQName.startsWith("xmlns")) {
-                    if (nonTaglibAttrs == null) {
-                        nonTaglibAttrs = new AttributesImpl();
+        /*
+         * Notice that due to a bug in the underlying SAX parser, the
+         * attributes must be enumerated in descending order.
+         */
+        boolean isTaglib = false;
+        for (int i = attrs.getLength() - 1; i >= 0; i--) {
+            isTaglib = false;
+            String attrQName = attrs.getQName(i);
+            if (!attrQName.startsWith("xmlns")) {
+                if (nonTaglibAttrs == null) {
+                    nonTaglibAttrs = new AttributesImpl();
+                }
+                nonTaglibAttrs.addAttribute(
+                    attrs.getURI(i),
+                    attrs.getLocalName(i),
+                    attrs.getQName(i),
+                    attrs.getType(i),
+                    attrs.getValue(i));
+            } else {
+                if (attrQName.startsWith("xmlns:jsp")) {
+                    isTaglib = true;
+                } else {
+                    String attrUri = attrs.getValue(i);
+                    // TaglibInfo for this uri already established in
+                    // startPrefixMapping
+                    isTaglib = pageInfo.hasTaglib(attrUri);
+                }
+                if (isTaglib) {
+                    if (taglibAttrs == null) {
+                        taglibAttrs = new AttributesImpl();
                     }
-                    nonTaglibAttrs.addAttribute(
+                    taglibAttrs.addAttribute(
                         attrs.getURI(i),
                         attrs.getLocalName(i),
                         attrs.getQName(i),
                         attrs.getType(i),
                         attrs.getValue(i));
                 } else {
-                    if (attrQName.startsWith("xmlns:jsp")) {
-                        isTaglib = true;
-                    } else {
-                        String attrUri = attrs.getValue(i);
-                        // TaglibInfo for this uri already established in
-                        // startPrefixMapping
-                        isTaglib = pageInfo.hasTaglib(attrUri);
+                    if (nonTaglibXmlnsAttrs == null) {
+                        nonTaglibXmlnsAttrs = new AttributesImpl();
                     }
-                    if (isTaglib) {
-                        if (taglibAttrs == null) {
-                            taglibAttrs = new AttributesImpl();
-                        }
-                        taglibAttrs.addAttribute(
-                            attrs.getURI(i),
-                            attrs.getLocalName(i),
-                            attrs.getQName(i),
-                            attrs.getType(i),
-                            attrs.getValue(i));
-                    } else {
-                        if (nonTaglibXmlnsAttrs == null) {
-                            nonTaglibXmlnsAttrs = new AttributesImpl();
-                        }
-                        nonTaglibXmlnsAttrs.addAttribute(
-                            attrs.getURI(i),
-                            attrs.getLocalName(i),
-                            attrs.getQName(i),
-                            attrs.getType(i),
-                            attrs.getValue(i));
-                    }
+                    nonTaglibXmlnsAttrs.addAttribute(
+                        attrs.getURI(i),
+                        attrs.getLocalName(i),
+                        attrs.getQName(i),
+                        attrs.getType(i),
+                        attrs.getValue(i));
                 }
             }
         }
