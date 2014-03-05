@@ -97,10 +97,10 @@ public class JspCServletContext implements ServletContext {
     /**
      * Merged web.xml for the application.
      */
-    private final WebXml webXml;
+    private WebXml webXml;
 
 
-    private final JspConfigDescriptor jspConfigDescriptor;
+    private JspConfigDescriptor jspConfigDescriptor;
 
     /**
      * Web application class loader.
@@ -125,7 +125,9 @@ public class JspCServletContext implements ServletContext {
         myLogWriter = aLogWriter;
         myResourceBaseURL = aResourceBaseURL;
         this.loader = classLoader;
+    }
 
+    public void processWebXml() throws JasperException {
         this.webXml = buildMergedWebXml();
         jspConfigDescriptor = webXml.getJspConfigDescriptor();
     }
@@ -140,7 +142,9 @@ public class JspCServletContext implements ServletContext {
         } else {
             blockExternal = Boolean.parseBoolean(blockExternalString);
         }
-        WebXmlParser webXmlParser = new WebXmlParser(false, false, blockExternal);
+        boolean validate = Boolean.parseBoolean(
+                getInitParameter(Constants.XML_VALIDATION_INIT_PARAM));
+        WebXmlParser webXmlParser = new WebXmlParser(validate, validate, blockExternal);
         // Use this class's classloader as Ant will have set the TCCL to its own
         webXmlParser.setClassLoader(getClass().getClassLoader());
 
