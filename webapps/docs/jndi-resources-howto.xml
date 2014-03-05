@@ -644,7 +644,7 @@ conn.close();]]></source>
             password="dbpassword"
             driverClassName="org.hsql.jdbcDriver"
             url="jdbc:HypersonicSQL:database"
-            maxActive="8"
+            maxTotal="8"
             maxIdle="4"/>
   ...
 </Context>]]></source>
@@ -673,13 +673,13 @@ conn.close();]]></source>
         is also recognized.)</li>
     <li><strong>initialSize</strong> - The initial number of connections
         that will be created in the pool during pool initialization. Default: 0</li>
-    <li><strong>maxActive</strong> - The maximum number of connections
+    <li><strong>maxTotal</strong> - The maximum number of connections
         that can be allocated from this pool at the same time. Default: 8</li>
     <li><strong>minIdle</strong> - The minimum number of connections that
         will sit idle in this pool at the same time. Default: 0</li>
     <li><strong>maxIdle</strong> - The maximum number of connections that
         can sit idle in this pool at the same time. Default: 8</li>
-    <li><strong>maxWait</strong> - The maximum number of milliseconds that the
+    <li><strong>maxWaitMillis</strong> - The maximum number of milliseconds that the
         pool will wait (when there are no available connections) for a
         connection to be returned before throwing an exception. Default: -1 (infinite)</li>
     </ul>
