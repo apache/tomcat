@@ -86,6 +86,11 @@
         while web application is being stopped, print their stack traces to
         the log. (kkolinko)
       </add>
+      <fix>
+        <bug>56190</bug>: The response should be closed (i.e. no further output
+        is permitted) when a call to <code>AsyncContext.complete()</code> takes
+        effect. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
