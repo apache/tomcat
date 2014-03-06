@@ -45,6 +45,7 @@ import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.util.ExceptionUtils;
@@ -126,6 +127,8 @@ public class JspCServletContext implements ServletContext {
 
         myAttributes = new HashMap<>();
         myParameters = new ConcurrentHashMap<>();
+        myParameters.put(Constants.XML_BLOCK_EXTERNAL_INIT_PARAM,
+                String.valueOf(blockExternal));
         myLogWriter = aLogWriter;
         myResourceBaseURL = aResourceBaseURL;
         this.loader = classLoader;

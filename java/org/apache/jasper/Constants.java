@@ -162,16 +162,6 @@ public class Constants {
             "org.apache.jasper.XML_VALIDATE_TLD";
 
     /**
-     * Name of the ServletContext init-param that determines if the XML parser
-     * used for web.xml files will be validating or not. Note that this is only
-     * used when using JspC. In normal operation, Jasper obtains the JspConfig
-     * information directly from the ServletContext and therefore does not need
-     * to parse web.xml.
-     */
-    public static final String XML_VALIDATION_INIT_PARAM =
-            "org.apache.jasper.XML_VALIDATE";
-
-    /**
      * Name of the ServletContext init-param that determines if the XML parsers
      * will block the resolution of external entities.
      * <p>
