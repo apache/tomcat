@@ -340,7 +340,7 @@ public class JspCServletContext implements ServletContext {
     @Override
     public URL getResource(String path) throws MalformedURLException {
 
-        if (!path.startsWith("/"))
+        if (path == null || !path.startsWith("/"))
             throw new MalformedURLException("Path '" + path +
                                             "' does not start with '/'");
         URL url = new URL(myResourceBaseURL, path.substring(1));
