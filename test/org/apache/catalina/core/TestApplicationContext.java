@@ -127,4 +127,11 @@ public class TestApplicationContext extends TomcatBaseTest {
 
         return standardContext.getServletContext();
     }
+
+
+    @Test(expected = IllegalStateException.class)
+    public void testSetInitParameter() throws Exception {
+        getTomcatInstance().start();
+        getServletContext().setInitParameter("name", "value");
+    }
 }

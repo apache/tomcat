@@ -102,6 +102,11 @@
         validation of web.xml files when Jasper parses them and validateTld
         controls the validation of *.tld files when Jasper parses them. (markt)
       </fix>
+      <fix>
+        <bug>56223</bug>: Throw an <code>IllegalStateException</code> if a call
+        is made to <code>ServletContext.setInitParameter()</code> after the
+        ServletContext has been initialized. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
