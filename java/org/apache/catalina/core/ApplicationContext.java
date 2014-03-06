@@ -1200,6 +1200,12 @@ public class ApplicationContext
 
     @Override
     public boolean setInitParameter(String name, String value) {
+        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
+            throw new IllegalStateException(
+                    sm.getString("applicationContext.setInitParam.ise",
+                            getContextPath()));
+        }
+
         return parameters.putIfAbsent(name, value) == null;
     }
 

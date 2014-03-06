@@ -250,7 +250,7 @@ public class CoyoteInputStream extends ServletInputStream {
 
 
     private void checkNonBlockingRead() {
-        if (ib.isBlocking() && !ib.isReady()) {
+        if (!ib.isBlocking() && !ib.isReady()) {
             throw new IllegalStateException(
                     sm.getString("coyoteInputStream.nbNotready"));
         }

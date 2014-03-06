@@ -74,6 +74,23 @@
         elements and attributes supported by the Servlet version of the merged
         file. (markt)
       </fix>
+      <fix>
+        Avoid <code>NullPointerException</code> in resource cache when making an
+        invalid request for a resource outside of the web application. (markt)
+      </fix>
+      <fix>
+        Remove an unnecessary null check identified by FindBugs. (markt)
+      </fix>
+      <add>
+        In WebappClassLoader, when reporting threads that are still running
+        while web application is being stopped, print their stack traces to
+        the log. (kkolinko)
+      </add>
+      <fix>
+        <bug>56190</bug>: The response should be closed (i.e. no further output
+        is permitted) when a call to <code>AsyncContext.complete()</code> takes
+        effect. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -104,6 +121,18 @@
         with a tag library JAR that is located outside of the web application.
         (markt)
       </fix>
+      <fix>
+        Remove an unnecessary null check identified by FindBugs. (markt)
+      </fix>
+      <fix>
+        <bug>56199</bug>: Restore validateXml option for JspC which determines
+        if web.xml will be parsed with a validating parser. (markt)
+      </fix>
+      <fix>
+        <bug>56223</bug>: Throw an <code>IllegalStateException</code> if a call
+        is made to <code>ServletContext.setInitParameter()</code> after the
+        ServletContext has been initialized. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -111,6 +140,9 @@
       <fix>
         Avoid a possible deadlock when one thread is shutting down a connection
         while another thread is trying to write to it. (markt)
+      </fix>
+      <fix>
+        Avoid NPE when flushing batched messages. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -120,6 +152,11 @@
         <bug>56093</bug>: Add the SSL Valve to the documentation web
         application. (markt)
       </add>
+      <fix>
+        <bug>56217</bug>: Improve readability by using left alignment for the
+        table cell containing the request information on the Manager application
+        status page. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -168,11 +205,15 @@
         Update Commons Pool 2 to 2.2. (markt)
       </update>
       <update>
-        Update Commons DBCP 2 to snapshot 202 dated 26 Feb 2014. (markt)
+        Update Commons DBCP 2 to the 2.0 release. (markt)
       </update>
       <fix>
         <bug>56189</bug>: Remove used file cpappend.bat from the distribution.
         (markt)
+      </fix>
+      <fix>
+        <bug>56204</bug>: Remove unnecessary dependency between tasks in the
+        build script. (markt)
       </fix>
     </changelog>
   </subsection>

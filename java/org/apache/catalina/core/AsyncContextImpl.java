@@ -83,13 +83,14 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             logDebug("complete   ");
         }
         check();
-        request.getCoyoteRequest().action(ActionCode.COMMIT, null);
         request.getCoyoteRequest().action(ActionCode.ASYNC_COMPLETE, null);
         clearServletRequestResponse();
     }
 
     @Override
-    public void fireOnComplete() {
+    public void fireOnComplete() throws IOException {
+        // Before firing the event, close the response
+        request.getResponse().finishResponse();
         List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
         listenersCopy.addAll(listeners);
 

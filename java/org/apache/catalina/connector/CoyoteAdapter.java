@@ -260,10 +260,15 @@ public class CoyoteAdapter implements Adapter {
             req.getRequestProcessor().setWorkerThreadName(null);
             // Recycle the wrapper request and response
             if (error || response.isClosed() || !request.isComet()) {
-                request.getMappingData().context.logAccess(
-                        request, response,
-                        System.currentTimeMillis() - req.getStartTime(),
-                        false);
+                if (request.getMappingData().context != null) {
+                    request.getMappingData().context.logAccess(
+                            request, response,
+                            System.currentTimeMillis() - req.getStartTime(),
+                            false);
+                } else {
+                    // Should normally not happen
+                    log(req, res, System.currentTimeMillis() - req.getStartTime());
+                }
                 request.recycle();
                 request.setFilterChain(null);
                 response.recycle();
@@ -426,10 +431,15 @@ public class CoyoteAdapter implements Adapter {
             if (!request.isAsync() && !comet) {
                 request.finishRequest();
                 response.finishResponse();
-                request.getMappingData().context.logAccess(
-                        request, response,
-                        System.currentTimeMillis() - req.getStartTime(),
-                        false);
+                if (request.getMappingData().context != null) {
+                    request.getMappingData().context.logAccess(
+                            request, response,
+                            System.currentTimeMillis() - req.getStartTime(),
+                            false);
+                } else {
+                    // Should normally not happen
+                    log(req, res, System.currentTimeMillis() - req.getStartTime());
+                }
             }
 
         } catch (IOException e) {
