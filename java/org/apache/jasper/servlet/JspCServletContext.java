@@ -45,7 +45,6 @@ import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
-import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.util.ExceptionUtils;
@@ -115,35 +114,28 @@ public class JspCServletContext implements ServletContext {
      *
      * @param aLogWriter PrintWriter which is used for <code>log()</code> calls
      * @param aResourceBaseURL Resource base URL
+     * @param classLoader   Class loader for this {@link ServletContext}
+     * @param validate      Should a validating parser be used to parse web.xml?
+     * @param blockExternal Should external entities be blocked when parsing
+     *                      web.xml?
      * @throws JasperException
      */
-    public JspCServletContext(PrintWriter aLogWriter, URL aResourceBaseURL, ClassLoader classLoader)
-        throws JasperException {
+    public JspCServletContext(PrintWriter aLogWriter, URL aResourceBaseURL,
+            ClassLoader classLoader, boolean validate, boolean blockExternal)
+            throws JasperException {
 
         myAttributes = new HashMap<>();
         myParameters = new ConcurrentHashMap<>();
         myLogWriter = aLogWriter;
         myResourceBaseURL = aResourceBaseURL;
         this.loader = classLoader;
-    }
-
-    public void processWebXml() throws JasperException {
-        this.webXml = buildMergedWebXml();
+        this.webXml = buildMergedWebXml(validate, blockExternal);
         jspConfigDescriptor = webXml.getJspConfigDescriptor();
     }
 
-    private WebXml buildMergedWebXml() throws JasperException {
+    private WebXml buildMergedWebXml(boolean validate, boolean blockExternal)
+            throws JasperException {
         WebXml webXml = new WebXml();
-        String blockExternalString = getInitParameter(
-                Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
-        boolean blockExternal;
-        if (blockExternalString == null) {
-            blockExternal = true;
-        } else {
-            blockExternal = Boolean.parseBoolean(blockExternalString);
-        }
-        boolean validate = Boolean.parseBoolean(
-                getInitParameter(Constants.XML_VALIDATION_INIT_PARAM));
         WebXmlParser webXmlParser = new WebXmlParser(validate, validate, blockExternal);
         // Use this class's classloader as Ant will have set the TCCL to its own
         webXmlParser.setClassLoader(getClass().getClassLoader());
