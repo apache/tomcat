@@ -1463,17 +1463,11 @@ public class JspC extends Task implements Options {
         PrintWriter log = new PrintWriter(System.out);
         URL resourceBase = new File(uriRoot).getCanonicalFile().toURI().toURL();
 
-        context = new JspCServletContext(log, resourceBase, classLoader);
+        context = new JspCServletContext(log, resourceBase, classLoader,
+                isValidateXml(), isBlockExternal());
         if (isValidateTld()) {
             context.setInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM, "true");
         }
-        if (isValidateXml()) {
-            context.setInitParameter(Constants.XML_VALIDATION_INIT_PARAM, "true");
-        }
-        context.setInitParameter(Constants.XML_BLOCK_EXTERNAL_INIT_PARAM,
-                String.valueOf(isBlockExternal()));
-
-        context.processWebXml();
 
         TldScanner scanner = new TldScanner(
                 context, true, isValidateTld(), isBlockExternal());

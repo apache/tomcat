@@ -31,8 +31,8 @@ public class TestJspCServletContext {
     @Test
     public void testWebapp() throws Exception {
         File appDir = new File("test/webapp");
-        JspCServletContext context =
-                new JspCServletContext(null, appDir.toURI().toURL(), null);
+        JspCServletContext context = new JspCServletContext(
+                null, appDir.toURI().toURL(), null, false, false);
         Assert.assertEquals(3, context.getEffectiveMajorVersion());
         Assert.assertEquals(1, context.getEffectiveMinorVersion());
         JspConfigDescriptor jspConfigDescriptor =
@@ -62,8 +62,8 @@ public class TestJspCServletContext {
     @Test
     public void testWebapp_2_2() throws Exception {
         File appDir = new File("test/webapp-2.2");
-        JspCServletContext context =
-                new JspCServletContext(null, appDir.toURI().toURL(), null);
+        JspCServletContext context = new JspCServletContext(
+                null, appDir.toURI().toURL(), null, false, false);
         Assert.assertEquals(2, context.getEffectiveMajorVersion());
         Assert.assertEquals(2, context.getEffectiveMinorVersion());
     }
@@ -71,8 +71,8 @@ public class TestJspCServletContext {
     @Test
     public void testWebapp_2_3() throws Exception {
         File appDir = new File("test/webapp-2.3");
-        JspCServletContext context =
-                new JspCServletContext(null, appDir.toURI().toURL(), null);
+        JspCServletContext context = new JspCServletContext(
+                null, appDir.toURI().toURL(), null, false, false);
         Assert.assertEquals(2, context.getEffectiveMajorVersion());
         Assert.assertEquals(3, context.getEffectiveMinorVersion());
     }
@@ -80,8 +80,8 @@ public class TestJspCServletContext {
     @Test
     public void testWebapp_2_4() throws Exception {
         File appDir = new File("test/webapp-2.4");
-        JspCServletContext context =
-                new JspCServletContext(null, appDir.toURI().toURL(), null);
+        JspCServletContext context = new JspCServletContext(
+                null, appDir.toURI().toURL(), null, false, false);
         Assert.assertEquals(2, context.getEffectiveMajorVersion());
         Assert.assertEquals(4, context.getEffectiveMinorVersion());
     }
@@ -89,8 +89,8 @@ public class TestJspCServletContext {
     @Test
     public void testWebapp_2_5() throws Exception {
         File appDir = new File("test/webapp-2.5");
-        JspCServletContext context =
-                new JspCServletContext(null, appDir.toURI().toURL(), null);
+        JspCServletContext context = new JspCServletContext(
+                null, appDir.toURI().toURL(), null, false, false);
         Assert.assertEquals(2, context.getEffectiveMajorVersion());
         Assert.assertEquals(5, context.getEffectiveMinorVersion());
     }
@@ -98,8 +98,8 @@ public class TestJspCServletContext {
     @Test
     public void testWebapp_3_0() throws Exception {
         File appDir = new File("test/webapp-3.0");
-        JspCServletContext context =
-                new JspCServletContext(null, appDir.toURI().toURL(), null);
+        JspCServletContext context = new JspCServletContext(
+                null, appDir.toURI().toURL(), null, false, false);
         Assert.assertEquals(3, context.getEffectiveMajorVersion());
         Assert.assertEquals(0, context.getEffectiveMinorVersion());
     }
@@ -107,8 +107,8 @@ public class TestJspCServletContext {
     @Test
     public void testWebapp_3_1() throws Exception {
         File appDir = new File("test/webapp-3.1");
-        JspCServletContext context =
-                new JspCServletContext(null, appDir.toURI().toURL(), null);
+        JspCServletContext context = new JspCServletContext(
+                null, appDir.toURI().toURL(), null, false, false);
         Assert.assertEquals(3, context.getEffectiveMajorVersion());
         Assert.assertEquals(1, context.getEffectiveMinorVersion());
     }
@@ -116,8 +116,8 @@ public class TestJspCServletContext {
     @Test
     public void testWebresources() throws Exception {
         File appDir = new File("test/webresources/dir1");
-        JspCServletContext context =
-                new JspCServletContext(null, appDir.toURI().toURL(), null);
+        JspCServletContext context = new JspCServletContext(
+                null, appDir.toURI().toURL(), null, false, false);
         Assert.assertEquals(3, context.getEffectiveMajorVersion());
         Assert.assertEquals(1, context.getEffectiveMinorVersion());
     }
