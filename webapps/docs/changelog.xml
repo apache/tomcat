@@ -69,6 +69,11 @@
         elements and attributes supported by the Servlet version of the merged
         file. (markt)
       </fix>
+      <fix>
+        <bug>56190</bug>: The response should be closed (i.e. no further output
+        is permitted) when a call to <code>AsyncContext.complete()</code> takes
+        effect. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
