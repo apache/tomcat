@@ -128,6 +128,11 @@
         <bug>56199</bug>: Restore validateXml option for JspC which determines
         if web.xml will be parsed with a validating parser. (markt)
       </fix>
+      <fix>
+        <bug>56223</bug>: Throw an <code>IllegalStateException</code> if a call
+        is made to <code>ServletContext.setInitParameter()</code> after the
+        ServletContext has been initialized. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
