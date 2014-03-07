@@ -200,7 +200,7 @@ public class StandardWrapper extends ContainerBase
     /**
      * Are we unloading our servlet instance at the moment?
      */
-    protected boolean unloading = false;
+    protected volatile boolean unloading = false;
 
 
     /**
@@ -1075,6 +1075,11 @@ public class StandardWrapper extends ContainerBase
      * at server startup time.
      */
     public synchronized Servlet loadServlet() throws ServletException {
+
+        if (unloading) {
+            throw new ServletException(
+                    sm.getString("standardWrapper.unloading", getName()));
+        }
 
         // Nothing to do if we already have an instance or an instance pool
         if (!singleThreadModel && (instance != null))

@@ -53,6 +53,10 @@
         application. (markt)
       </fix>
       <fix>
+        Improve the robustness of web application undeployment based on some
+        code analysis triggered by the report for <bug>54315</bug>. (markt)
+      </fix>
+      <fix>
         <bug>56125</bug>: Correctly construct the URL for a resource that
         represents the root of a JAR file. (markt)
       </fix>
