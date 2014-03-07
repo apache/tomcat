@@ -499,7 +499,7 @@ public class StandardContext extends ContainerBase
     /**
      * The request processing pause flag (while reloading occurs)
      */
-    private boolean paused = false;
+    private volatile boolean paused = false;
 
 
     /**

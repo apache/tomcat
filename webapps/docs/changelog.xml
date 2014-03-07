@@ -64,6 +64,10 @@
         <code>WebappClassLoader</code>. (markt)
       </add>
       <fix>
+        Improve the robustness of web application undeployment based on some
+        code analysis triggered by the report for <bug>54315</bug>. (markt)
+      </fix>
+      <fix>
         <bug>56219</bug>:
         Improve merging process for web.xml files to take account of the
         elements and attributes supported by the Servlet version of the merged
