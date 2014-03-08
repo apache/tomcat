@@ -161,14 +161,7 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
                 }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                Thread thread = Thread.currentThread();
-                ClassLoader originalClassLoader = thread.getContextClassLoader();
-                try {
-                    thread.setContextClassLoader(applicationLoader);
-                    listener.onError(t);
-                } finally {
-                    thread.setContextClassLoader(originalClassLoader);
-                }
+                onError(t);
                 if (t instanceof IOException) {
                     throw t;
                 } else {
@@ -197,6 +190,21 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
                     thread.setContextClassLoader(originalClassLoader);
                 }
             }
+        }
+    }
+
+
+    protected final void onError(Throwable t) {
+        if (listener == null) {
+            return;
+        }
+        Thread thread = Thread.currentThread();
+        ClassLoader originalClassLoader = thread.getContextClassLoader();
+        try {
+            thread.setContextClassLoader(applicationLoader);
+            listener.onError(t);
+        } finally {
+            thread.setContextClassLoader(originalClassLoader);
         }
     }
 
