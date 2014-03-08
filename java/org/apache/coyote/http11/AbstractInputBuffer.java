@@ -388,6 +388,14 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
         }
     }
 
+    /**
+     * Is standard Servlet blocking IO being used for input?
+     */
+    protected final boolean isBlocking() {
+        return request.getReadListener() == null;
+    }
+
+
     // ---------------------------------------------------- InputBuffer Methods
 
     /**
