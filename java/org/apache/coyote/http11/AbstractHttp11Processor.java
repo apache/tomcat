@@ -81,7 +81,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     protected AbstractOutputBuffer<S> outputBuffer;
 
 
-    /*
+    /**
      * Tracks how many internal filters are in the filter library so they
      * are skipped when looking for pluggable filters.
      */
