@@ -108,6 +108,10 @@
         NIO connector and a request is sent using more than one AJP message.
         Patch provided by Amund Elstad. (markt)
       </fix>
+      <add>
+        Adds experimental NIO2 connector. Based on code developed by
+        Nabil Benothman. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
