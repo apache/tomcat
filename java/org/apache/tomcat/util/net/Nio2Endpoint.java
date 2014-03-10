@@ -109,7 +109,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
      * Keep track of OOM warning messages.
      */
     private long lastParachuteCheck = System.currentTimeMillis();
-    
+
     /**
      * Cache for SocketProcessor objects
      */
@@ -265,7 +265,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     }
 
     // --------------------------------------------------------- Public Methods
-    
+
     /**
      * Number of keepalive sockets.
      */
