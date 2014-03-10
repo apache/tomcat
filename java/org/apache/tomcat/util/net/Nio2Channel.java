@@ -199,6 +199,7 @@ public class Nio2Channel implements AsynchronousByteChannel {
         }
     };
 
+    @SuppressWarnings("unused")
     public Future<Boolean> flush()
             throws IOException {
         return DONE;

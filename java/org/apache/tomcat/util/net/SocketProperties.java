@@ -218,24 +218,24 @@ public class SocketProperties {
 
     public void setProperties(AsynchronousSocketChannel socket) throws IOException {
         if (rxBufSize != null)
-            socket.setOption(StandardSocketOptions.SO_RCVBUF, rxBufSize.intValue());
+            socket.setOption(StandardSocketOptions.SO_RCVBUF, rxBufSize);
         if (txBufSize != null)
-            socket.setOption(StandardSocketOptions.SO_SNDBUF, txBufSize.intValue());
+            socket.setOption(StandardSocketOptions.SO_SNDBUF, txBufSize);
         if (soKeepAlive != null)
-            socket.setOption(StandardSocketOptions.SO_KEEPALIVE, soKeepAlive.booleanValue());
+            socket.setOption(StandardSocketOptions.SO_KEEPALIVE, soKeepAlive);
         if (soReuseAddress != null)
-            socket.setOption(StandardSocketOptions.SO_REUSEADDR, soReuseAddress.booleanValue());
+            socket.setOption(StandardSocketOptions.SO_REUSEADDR, soReuseAddress);
         if (soLingerOn != null && soLingerOn.booleanValue() && soLingerTime != null)
-            socket.setOption(StandardSocketOptions.SO_LINGER, soLingerTime.intValue());
+            socket.setOption(StandardSocketOptions.SO_LINGER, soLingerTime);
         if (tcpNoDelay != null)
-            socket.setOption(StandardSocketOptions.TCP_NODELAY, tcpNoDelay.booleanValue());
+            socket.setOption(StandardSocketOptions.TCP_NODELAY, tcpNoDelay);
     }
 
     public void setProperties(AsynchronousServerSocketChannel socket) throws IOException {
         if (rxBufSize != null)
-            socket.setOption(StandardSocketOptions.SO_RCVBUF, rxBufSize.intValue());
+            socket.setOption(StandardSocketOptions.SO_RCVBUF, rxBufSize);
         if (soReuseAddress != null)
-            socket.setOption(StandardSocketOptions.SO_REUSEADDR, soReuseAddress.booleanValue());
+            socket.setOption(StandardSocketOptions.SO_REUSEADDR, soReuseAddress);
     }
 
     public boolean getDirectBuffer() {

@@ -115,7 +115,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
             public void completed(Integer nBytes, SocketWrapper<Nio2Channel> attachment) {
                 boolean notify = false;
                 synchronized (completionHandler) {
-                    if (nBytes < 0) {
+                    if (nBytes.intValue() < 0) {
                         failed(new IOException(sm.getString("iob.failedwrite")), attachment);
                         return;
                     }
@@ -162,7 +162,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
             public void completed(Long nBytes, ByteBuffer[] attachment) {
                 boolean notify = false;
                 synchronized (completionHandler) {
-                    if (nBytes < 0) {
+                    if (nBytes.longValue() < 0) {
                         failed(new IOException(sm.getString("iob.failedwrite")), attachment);
                         return;
                     }
@@ -410,7 +410,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                     Nio2Endpoint.startInline();
                     if (bufferedWrites.size() > 0) {
                         // Gathering write of the main buffer plus all leftovers
-                        ArrayList<ByteBuffer> arrayList = new ArrayList<ByteBuffer>();
+                        ArrayList<ByteBuffer> arrayList = new ArrayList<>();
                         if (byteBuffer.hasRemaining()) {
                             arrayList.add(byteBuffer);
                         }

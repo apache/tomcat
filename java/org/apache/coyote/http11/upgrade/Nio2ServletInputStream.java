@@ -45,13 +45,13 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
             @Override
             public void completed(Integer nBytes, SocketWrapper<Nio2Channel> attachment) {
                 synchronized (completionHandler) {
-                    if (nBytes < 0) {
+                    if (nBytes.intValue() < 0) {
                         failed(new ClosedChannelException(), attachment);
                         return;
                     }
                     readPending = false;
                 }
-                if (nBytes > 0) {
+                if (nBytes.intValue() > 0) {
                     if (!Nio2Endpoint.isInline()) {
                         try {
                             onDataAvailable();
@@ -205,7 +205,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
             flipped = false;
             try {
                 nRead = channel.read(readBuffer)
-                        .get(wrapper.getTimeout(), TimeUnit.MILLISECONDS);
+                        .get(wrapper.getTimeout(), TimeUnit.MILLISECONDS).intValue();
                 readPending = false;
             } catch (InterruptedException | ExecutionException
                     | TimeoutException e) {
