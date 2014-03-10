@@ -34,6 +34,7 @@ version.suffix=-dev
 execute.validate=false
 execute.test.bio=true
 execute.test.nio=true
+execute.test.nio2=true
 # Still requires APR/native library to be present
 execute.test.apr=true
 # Stop testing if a failure occurs
