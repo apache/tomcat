@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
+import java.nio.channels.WritePendingException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -332,7 +333,6 @@ public class SecureNio2Channel extends Nio2Channel  {
 
     /**
      * Performs the WRAP function
-     * @param doWrite boolean
      * @return SSLEngineResult
      * @throws IOException
      */
@@ -351,7 +351,6 @@ public class SecureNio2Channel extends Nio2Channel  {
 
     /**
      * Perform handshake unwrap
-     * @param doread boolean
      * @return SSLEngineResult
      * @throws IOException
      */
@@ -408,6 +407,8 @@ public class SecureNio2Channel extends Nio2Channel  {
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             throw new IOException("Remaining data in the network buffer, can't send SSL close message, force a close with close(true) instead", e);
+        } catch (WritePendingException e) {
+            // Ingore
         }
         //prep the buffer for the close message
         netOutBuffer.clear();
@@ -420,7 +421,15 @@ public class SecureNio2Channel extends Nio2Channel  {
         //prepare the buffer for writing
         netOutBuffer.flip();
         //if there is data to be written
-        flush();
+        try {
+            if (!flush().get(endpoint.getSoTimeout(), TimeUnit.MILLISECONDS).booleanValue()) {
+                throw new IOException("Remaining data in the network buffer, can't send SSL close message, force a close with close(true) instead");
+            }
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new IOException("Remaining data in the network buffer, can't send SSL close message, force a close with close(true) instead", e);
+        } catch (WritePendingException e) {
+            // Ingore
+        }
 
         //is the channel closed?
         closed = (!netOutBuffer.hasRemaining() && (handshake.getHandshakeStatus() != HandshakeStatus.NEED_WRAP));
