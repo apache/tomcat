@@ -383,6 +383,11 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             running = false;
             unlockAccept();
         }
+        try {
+            handler.closeAll();
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+        }
         if (useCaches) {
             socketWrapperCache.clear();
             nioChannels.clear();
@@ -488,9 +493,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             socketWrapper.reset(channel, getSocketProperties().getSoTimeout());
             socketWrapper.setKeepAliveLeft(Nio2Endpoint.this.getMaxKeepAliveRequests());
             socketWrapper.setSecure(isSSLEnabled());
-            if (sslContext != null) {
-                ((SecureNio2Channel) channel).setSocket(socketWrapper);
-            }
+            channel.setSocket(socketWrapper);
             processSocket(socketWrapper, SocketStatus.OPEN_READ, true);
             // FIXME: In theory, awaitBytes is better, but the SSL handshake is done by processSocket
             //awaitBytes(socketWrapper);
@@ -898,6 +901,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         public SocketState process(SocketWrapper<Nio2Channel> socket,
                 SocketStatus status);
         public void release(SocketWrapper<Nio2Channel> socket);
+        public void closeAll();
         public SSLImplementation getSslImplementation();
         public void onCreateSSLEngine(SSLEngine engine);
     }

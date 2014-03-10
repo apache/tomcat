@@ -274,5 +274,12 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
                 proto.npnHandler.onCreateEngine(engine);
             }
         }
+
+        @Override
+        public void closeAll() {
+            for (Nio2Channel channel : connections.keySet()) {
+                ((Nio2Endpoint) proto.endpoint).closeSocket(channel.getSocket(), SocketStatus.STOP);
+            }
+        }
     }
 }
