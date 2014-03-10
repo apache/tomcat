@@ -169,19 +169,19 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
 
 
     protected final void onWritePossible() throws IOException {
-        synchronized (writeLock) {
-            try {
+        try {
+            synchronized (writeLock) {
                 if (buffer != null) {
                     writeInternal(buffer, 0, buffer.length);
                 }
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                onError(t);
-                if (t instanceof IOException) {
-                    throw t;
-                } else {
-                    throw new IOException(t);
-                }
+            }
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            onError(t);
+            if (t instanceof IOException) {
+                throw t;
+            } else {
+                throw new IOException(t);
             }
         }
 
@@ -228,7 +228,7 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
      * Abstract method to be overridden by concrete implementations. The base
      * class will ensure that there are no concurrent calls to this method for
      * the same socket by ensuring that the writeLock is held when making any
-     * calls this method.
+     * calls to this method.
      */
     protected abstract int doWrite(boolean block, byte[] b, int off, int len)
             throws IOException;
