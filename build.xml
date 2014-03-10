@@ -1335,9 +1335,9 @@
   </target>
 
   <target name="test-nio2" description="Runs the JUnit test cases for NIO2. Does not stop on errors."
-	     depends="test-compile,deploy,cobertura-instrument" if="${execute.test.nio2}">
+          depends="test-compile,deploy,cobertura-instrument" if="${execute.test.nio2}">
     <runtests protocol="org.apache.coyote.http11.Http11Nio2Protocol"
-	          extension=".NIO2" />
+              extension=".NIO2" />
   </target>
 
   <target name="test-apr" description="Runs the JUnit test cases for APR. Does not stop on errors."
