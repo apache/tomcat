@@ -33,14 +33,29 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
 
     protected final SocketWrapper<S> socketWrapper;
 
+    // Used to ensure that isReady() and onWritePossible() have a consistent
+    // view of buffer and fireListener when determining if the listener should
+    // fire.
     private final Object fireListenerLock = new Object();
+
+    // Used to ensure that only one thread writes to the socket at a time and
+    // that buffer is consistently updated with any unwritten data after the
+    // write. Note it is not necessary to hold this lock when checking if buffer
+    // contains data but, depending on how the result is used, some form of
+    // synchronization may be required (see fireListenerLock for an example).
     private final Object writeLock = new Object();
 
     private volatile boolean closeRequired = false;
+
     // Start in blocking-mode
     private volatile WriteListener listener = null;
+
+    // Guarded by fireListenerLock
     private volatile boolean fireListener = false;
+
     private volatile ClassLoader applicationLoader = null;
+
+    // Writes guarded by writeLock
     private volatile byte[] buffer;
 
 
@@ -168,27 +183,27 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
                     throw new IOException(t);
                 }
             }
+        }
 
-            // Make sure isReady() and onWritePossible() have a consistent view
-            // of buffer and fireListener when determining if the listener
-            // should fire
-            boolean fire = false;
-
-            synchronized (fireListenerLock) {
-                if (buffer == null && fireListener) {
-                    fireListener = false;
-                    fire = true;
-                }
+        // Make sure isReady() and onWritePossible() have a consistent view
+        // of buffer and fireListener when determining if the listener
+        // should fire
+        boolean fire = false;
+        synchronized (fireListenerLock) {
+            if (buffer == null && fireListener) {
+                fireListener = false;
+                fire = true;
             }
-            if (fire) {
-                Thread thread = Thread.currentThread();
-                ClassLoader originalClassLoader = thread.getContextClassLoader();
-                try {
-                    thread.setContextClassLoader(applicationLoader);
-                    listener.onWritePossible();
-                } finally {
-                    thread.setContextClassLoader(originalClassLoader);
-                }
+        }
+
+        if (fire) {
+            Thread thread = Thread.currentThread();
+            ClassLoader originalClassLoader = thread.getContextClassLoader();
+            try {
+                thread.setContextClassLoader(applicationLoader);
+                listener.onWritePossible();
+            } finally {
+                thread.setContextClassLoader(originalClassLoader);
             }
         }
     }
@@ -212,7 +227,8 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
     /**
      * Abstract method to be overridden by concrete implementations. The base
      * class will ensure that there are no concurrent calls to this method for
-     * the same socket.
+     * the same socket by ensuring that the writeLock is held when making any
+     * calls this method.
      */
     protected abstract int doWrite(boolean block, byte[] b, int off, int len)
             throws IOException;
