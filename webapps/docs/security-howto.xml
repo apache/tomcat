@@ -386,12 +386,6 @@
     <subsection name="Manager">
       <p>The manager component is used to generate session IDs.</p>
 
-      <p>The default <strong>entropy</strong> value has been shown to generate predictable values
-      under certain conditions. For more secure session generation, this should
-      be set to a long string. This is done automatically if the APR/native
-      library is installed; a random value will be obtained from the APR/native
-      library.</p>
-
       <p>The class used to generate random session IDs may be changed with
       the <strong>randomClass</strong> attribute.</p>
 

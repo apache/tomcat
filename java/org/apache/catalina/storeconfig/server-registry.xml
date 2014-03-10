@@ -118,7 +118,6 @@
         default="false"
         tagClass="org.apache.catalina.Manager"
         storeFactoryClass="org.apache.catalina.storeconfig.ManagerSF">
-        <TransientAttribute>entropy</TransientAttribute>
         <TransientAttribute>distributable</TransientAttribute>
     </Description>
     <Description
@@ -128,7 +127,6 @@
         children="true"
         tagClass="org.apache.catalina.session.PersistentManager"
         storeFactoryClass="org.apache.catalina.storeconfig.PersistentManagerSF">
-        <TransientAttribute>entropy</TransientAttribute>
         <TransientAttribute>distributable</TransientAttribute>
      </Description>
      <Description
