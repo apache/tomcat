@@ -46,7 +46,7 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
             @Override
             public void completed(Integer nBytes, SocketWrapper<Nio2Channel> attachment) {
                 synchronized (completionHandler) {
-                    if (nBytes < 0) {
+                    if (nBytes.intValue() < 0) {
                         failed(new ClosedChannelException(), attachment);
                         return;
                     }
@@ -122,7 +122,7 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
             buffer.put(b, off, len);
             buffer.flip();
             try {
-                written = channel.write(buffer).get(writeTimeout, TimeUnit.MILLISECONDS);
+                written = channel.write(buffer).get(writeTimeout, TimeUnit.MILLISECONDS).intValue();
             } catch (InterruptedException | ExecutionException
                     | TimeoutException e) {
                 onError(e);

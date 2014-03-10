@@ -64,7 +64,7 @@ public class AjpNio2Processor extends AbstractAjpProcessor<Nio2Channel> {
             public void completed(Integer nBytes, SocketWrapper<Nio2Channel> attachment) {
                 boolean notify = false;
                 synchronized (writeCompletionHandler) {
-                    if (nBytes < 0) {
+                    if (nBytes.intValue() < 0) {
                         failed(new IOException(sm.getString("ajpprocessor.failedsend")), attachment);
                         return;
                     }
@@ -158,7 +158,8 @@ public class AjpNio2Processor extends AbstractAjpProcessor<Nio2Channel> {
             writeBuffer.put(src, offset, length);
             writeBuffer.flip();
             try {
-                result = socketWrapper.getSocket().write(writeBuffer).get(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS);
+                result = socketWrapper.getSocket().write(writeBuffer)
+                        .get(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS).intValue();
             } catch (InterruptedException | ExecutionException
                     | TimeoutException e) {
                 throw new IOException(sm.getString("ajpprocessor.failedsend"), e);
@@ -228,7 +229,8 @@ public class AjpNio2Processor extends AbstractAjpProcessor<Nio2Channel> {
                 flipped = false;
                 readBuffer.limit(n);
                 try {
-                    nRead = socketWrapper.getSocket().read(readBuffer).get(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS);
+                    nRead = socketWrapper.getSocket().read(readBuffer)
+                            .get(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS).intValue();
                 } catch (InterruptedException | ExecutionException
                         | TimeoutException e) {
                     throw new IOException(sm.getString("ajpprocessor.failedread"), e);

@@ -757,6 +757,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             super(channel);
         }
 
+        @Override
         public void reset(Nio2Channel channel, long soTimeout) {
             super.reset(channel, soTimeout);
             upgradeInit = false;
@@ -794,6 +795,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             long timeout = super.getTimeout();
             return (timeout > 0) ? timeout : Long.MAX_VALUE;
         }
+        @Override
         public void setUpgraded(boolean upgraded) {
             if (upgraded && !isUpgraded()) {
                 upgradeInit = true;
@@ -911,7 +913,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
         @Override
         public synchronized void completed(Integer nBytes, SocketWrapper<Nio2Channel> attachment) {
-            if (nBytes < 0) {
+            if (nBytes.intValue() < 0) {
                 failed(new ClosedChannelException(), attachment);
                 return;
             }
@@ -983,13 +985,18 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             // If not using SSL and direct buffers are not used, the
             // idea of sendfile is to avoid memory copies, so allocate a
             // direct buffer
-            int BUFFER_SIZE;
+            int bufferSize;
             try {
-                BUFFER_SIZE = socket.getSocket().getIOChannel().getOption(StandardSocketOptions.SO_SNDBUF);
+                Integer bufferSizeInteger = socket.getSocket().getIOChannel().getOption(StandardSocketOptions.SO_SNDBUF);
+                if (bufferSizeInteger != null) {
+                    bufferSize = bufferSizeInteger.intValue();
+                } else {
+                    bufferSize = 8192;
+                }
             } catch (IOException e) {
-                BUFFER_SIZE = 8192;
+                bufferSize = 8192;
             }
-            buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
+            buffer = ByteBuffer.allocateDirect(bufferSize);
         } else {
             buffer = socket.getSocket().getBufHandler().getWriteBuffer();
         }
@@ -1008,7 +1015,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
                 @Override
                 public void completed(Integer nw, SendfileData attachment) {
-                    if (nw < 0) { // Reach the end of stream
+                    if (nw.intValue() < 0) { // Reach the end of stream
                         closeSocket(socket, SocketStatus.DISCONNECT);
                         try {
                             attachment.fchannel.close();
@@ -1018,8 +1025,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                         return;
                     }
 
-                    attachment.pos += nw;
-                    attachment.length -= nw;
+                    attachment.pos += nw.intValue();
+                    attachment.length -= nw.intValue();
 
                     if (attachment.length <= 0) {
                         socket.setSendfileData(null);

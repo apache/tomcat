@@ -753,7 +753,7 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
             public void completed(Integer nBytes, SocketWrapper<Nio2Channel> attachment) {
                 boolean notify = false;
                 synchronized (completionHandler) {
-                    if (nBytes < 0) {
+                    if (nBytes.intValue() < 0) {
                         failed(new ClosedChannelException(), attachment);
                         return;
                     }
@@ -817,7 +817,8 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
                 byteBuffer.clear();
                 flipped = false;
                 try {
-                    nRead = socket.getSocket().read(byteBuffer).get(socket.getTimeout(), TimeUnit.MILLISECONDS);
+                    nRead = socket.getSocket().read(byteBuffer)
+                            .get(socket.getTimeout(), TimeUnit.MILLISECONDS).intValue();
                 } catch (InterruptedException | ExecutionException
                         | TimeoutException e) {
                     throw new EOFException(sm.getString("iib.eof.error"));
