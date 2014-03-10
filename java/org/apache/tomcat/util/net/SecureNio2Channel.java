@@ -43,7 +43,6 @@ public class SecureNio2Channel extends Nio2Channel  {
 
     protected SSLEngine sslEngine;
     protected final Nio2Endpoint endpoint;
-    protected SocketWrapper<Nio2Channel> socket;
 
     protected boolean handshakeComplete = false;
     protected HandshakeStatus handshakeStatus; //gets set by handshake
@@ -101,10 +100,6 @@ public class SecureNio2Channel extends Nio2Channel  {
         // FIXME: this does nothing, so it is in the NIO2 endpoint
         bufHandler.expand(bufHandler.getReadBuffer(), appBufSize);
         reset();
-    }
-
-    void setSocket(SocketWrapper<Nio2Channel> socket) {
-        this.socket = socket;
     }
 
     public void reset(SSLEngine engine) throws IOException {
