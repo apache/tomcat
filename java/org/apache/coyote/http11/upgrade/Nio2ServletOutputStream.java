@@ -28,7 +28,6 @@ import java.util.concurrent.TimeoutException;
 
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
-import org.apache.tomcat.util.net.Nio2Endpoint.Nio2SocketWrapper;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Channel> {
@@ -116,13 +115,12 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
             throws IOException {
         ByteBuffer buffer = channel.getBufHandler().getWriteBuffer();
         int written = 0;
-        long writeTimeout = ((Nio2SocketWrapper) socketWrapper).getWriteTimeout();
         if (block) {
             buffer.clear();
             buffer.put(b, off, len);
             buffer.flip();
             try {
-                written = channel.write(buffer).get(writeTimeout, TimeUnit.MILLISECONDS).intValue();
+                written = channel.write(buffer).get(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS).intValue();
             } catch (InterruptedException | ExecutionException
                     | TimeoutException e) {
                 onError(e);
@@ -136,7 +134,7 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
                     buffer.flip();
                     writePending = true;
                     Nio2Endpoint.startInline();
-                    channel.write(buffer, writeTimeout, TimeUnit.MILLISECONDS, socketWrapper, completionHandler);
+                    channel.write(buffer, socketWrapper.getTimeout(), TimeUnit.MILLISECONDS, socketWrapper, completionHandler);
                     Nio2Endpoint.endInline();
                     written = len;
                 }
@@ -147,10 +145,9 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
 
     @Override
     protected void doFlush() throws IOException {
-        long writeTimeout = ((Nio2SocketWrapper) socketWrapper).getWriteTimeout();
         try {
             if (!writePending) {
-                channel.flush().get(writeTimeout, TimeUnit.MILLISECONDS);
+                channel.flush().get(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS);
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             onError(e);
