@@ -18,7 +18,6 @@ package org.apache.tomcat.util.net;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.ClosedChannelException;
@@ -295,7 +294,7 @@ public class SecureNio2Channel extends Nio2Channel  {
      * This requires that both network and application buffers have been emptied out prior to this call taking place, or a
      * IOException will be thrown.
      * @throws IOException - if an IO exception occurs or if application or network buffers contain data
-     * @throws SocketTimeoutException - if a socket operation timed out
+     * @throws java.net.SocketTimeoutException - if a socket operation timed out
      */
     public void rehandshake() throws IOException {
         //validate the network buffers are empty
