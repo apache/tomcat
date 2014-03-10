@@ -553,8 +553,7 @@ public class SecureNio2Channel extends Nio2Channel  {
      *
      * @param dst The buffer into which bytes are to be transferred
      * @return The number of bytes read, possibly zero, or <tt>-1</tt> if the channel has reached end-of-stream
-     * @throws IOException If some other I/O error occurs
-     * @throws IllegalArgumentException if the destination buffer is different than bufHandler.getReadBuffer()
+     * @throws IllegalStateException if the handshake was not completed
      */
     @Override
     public Future<Integer> read(ByteBuffer dst) {
@@ -632,7 +631,6 @@ public class SecureNio2Channel extends Nio2Channel  {
      *
      * @param src The buffer from which bytes are to be retrieved
      * @return The number of bytes written, possibly zero
-     * @throws IOException If some other I/O error occurs
      */
     @Override
     public Future<Integer> write(ByteBuffer src) {
