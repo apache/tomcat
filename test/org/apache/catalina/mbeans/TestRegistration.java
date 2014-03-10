@@ -193,7 +193,9 @@ public class TestRegistration extends TomcatBaseTest {
 
         // Create the list of expected MBean names
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
-        if (protocol.indexOf("Nio") > 0) {
+        if (protocol.indexOf("Nio2") > 0) {
+            protocol = "nio2";
+        } else if (protocol.indexOf("Nio") > 0) {
             protocol = "nio";
         } else if (protocol.indexOf("Apr") > 0) {
             protocol = "apr";
