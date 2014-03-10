@@ -397,10 +397,6 @@ Operations</a> that can be performed when the administrative application is
   <li><code>checkInterval</code> - Number of seconds between checks for
       expired sessions.  [60]</li>
   <li><code>debug</code> - Debugging detail level.  [0]</li>
-  <li><code>entropy</code> - String initialization parameter used to increase
-      the entropy (initial randomness) of the random number generator used to
-      create session identifiers.  [Inferred from engine, host, and context]
-      </li>
   <li><code>maxActiveSessions</code> - The maximum number of active sessions
       that are allowed, or -1 for no limit.  [-1]</li>
   </ul>
