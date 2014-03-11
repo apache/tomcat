@@ -95,6 +95,10 @@
         is permitted) when a call to <code>AsyncContext.complete()</code> takes
         effect. (markt)
       </fix>
+      <fix>
+        <bug>56244</bug>: Fix MBeans descriptor for WebappClassLoader MBean.
+        (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
