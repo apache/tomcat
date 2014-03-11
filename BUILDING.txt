@@ -297,16 +297,17 @@ directory:
 
     output/build/logs
 
-By default the testsuite is run three times to test 3 different
-implementations of Tomcat connectors: BIO, NIO and APR. (If you are not
+By default the testsuite is run four times to test 4 different
+implementations of Tomcat connectors: BIO, NIO, NIO2 and APR. (If you are not
 familiar with Tomcat connectors, see config/http.html in documentation for
 details).
 
-The 3 runs are enabled and disabled individually by the following
+The 4 runs are enabled and disabled individually by the following
 properties, which all are "true" by default:
 
     execute.test.bio=true
     execute.test.nio=true
+    execute.test.nio2=true
     execute.test.apr=true
 
 The APR connector can be tested only if Tomcat-Native library binaries are
