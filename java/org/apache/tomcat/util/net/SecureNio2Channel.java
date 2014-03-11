@@ -408,7 +408,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             throw new IOException("Remaining data in the network buffer, can't send SSL close message, force a close with close(true) instead", e);
         } catch (WritePendingException e) {
-            // Ingore
+            throw new IOException("Pending write, so remaining data in the network buffer, can't send SSL close message, force a close with close(true) instead", e);
         }
         //prep the buffer for the close message
         netOutBuffer.clear();
@@ -428,7 +428,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             throw new IOException("Remaining data in the network buffer, can't send SSL close message, force a close with close(true) instead", e);
         } catch (WritePendingException e) {
-            // Ingore
+            throw new IOException("Pending write, so remaining data in the network buffer, can't send SSL close message, force a close with close(true) instead", e);
         }
 
         //is the channel closed?
