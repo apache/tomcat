@@ -1146,15 +1146,18 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 return;
             }
             int maxCount = 60;
+            int histoInterval = 1;
             int maxInactiveInterval = manager.getMaxInactiveInterval()/60;
-            int histoInterval = maxInactiveInterval / maxCount;
-            if ( histoInterval * maxCount < maxInactiveInterval )
-                histoInterval++;
-            if (0==histoInterval)
-                histoInterval=1;
-            maxCount = maxInactiveInterval / histoInterval;
-            if ( histoInterval * maxCount < maxInactiveInterval )
-                maxCount++;
+            if (maxInactiveInterval > 0) {
+                histoInterval = maxInactiveInterval / maxCount;
+                if (histoInterval * maxCount < maxInactiveInterval)
+                    histoInterval++;
+                if (0 == histoInterval)
+                    histoInterval = 1;
+                maxCount = maxInactiveInterval / histoInterval;
+                if (histoInterval * maxCount < maxInactiveInterval)
+                    maxCount++;
+            }
 
             writer.println(smClient.getString("managerServlet.sessions",
                     displayPath));
