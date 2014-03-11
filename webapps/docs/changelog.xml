@@ -113,7 +113,7 @@
         Patch provided by Amund Elstad. (markt)
       </fix>
       <add>
-        Adds experimental NIO2 connector. Based on code developed by
+        Add experimental NIO2 connector. Based on code developed by
         Nabil Benothman. (remm)
       </add>
     </changelog>
