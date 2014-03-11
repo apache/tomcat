@@ -165,6 +165,11 @@
         table cell containing the request information on the Manager application
         status page. (markt)
       </fix>
+      <fix>
+        Fixed <code>java.lang.NegativeArraySizeException</code> when execute the
+        command of Expire sessions of manager web application to context in
+        which the session timeout is disabled. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
