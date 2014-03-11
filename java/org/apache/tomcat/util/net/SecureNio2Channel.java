@@ -581,6 +581,48 @@ public class SecureNio2Channel extends Nio2Channel  {
                 t = new IOException("Channel is in closing state.");
                 return;
             }
+        }
+        @Override
+        public boolean cancel(boolean mayInterruptIfRunning) {
+            return integer.cancel(mayInterruptIfRunning);
+        }
+        @Override
+        public boolean isCancelled() {
+            return integer.isCancelled();
+        }
+        @Override
+        public boolean isDone() {
+            return integer.isDone();
+        }
+        @Override
+        public Integer get() throws InterruptedException, ExecutionException {
+            wrap();
+            if (t != null) {
+                throw new ExecutionException(t);
+            }
+            integer.get();
+            if (written == 0) {
+                return get();
+            } else {
+                return Integer.valueOf(written);
+            }
+        }
+        @Override
+        public Integer get(long timeout, TimeUnit unit)
+                throws InterruptedException, ExecutionException,
+                TimeoutException {
+            wrap();
+            if (t != null) {
+                throw new ExecutionException(t);
+            }
+            integer.get(timeout, unit);
+            if (written == 0) {
+                return get(timeout, unit);
+            } else {
+                return Integer.valueOf(written);
+            }
+        }
+        protected void wrap() {
             //The data buffer should be empty, we can reuse the entire buffer.
             netOutBuffer.clear();
             try {
@@ -597,36 +639,6 @@ public class SecureNio2Channel extends Nio2Channel  {
             } catch (SSLException e) {
                 t = e;
             }
-        }
-        @Override
-        public boolean cancel(boolean mayInterruptIfRunning) {
-            return integer.cancel(mayInterruptIfRunning);
-        }
-        @Override
-        public boolean isCancelled() {
-            return integer.isCancelled();
-        }
-        @Override
-        public boolean isDone() {
-            return integer.isDone();
-        }
-        @Override
-        public Integer get() throws InterruptedException, ExecutionException {
-            if (t != null) {
-                throw new ExecutionException(t);
-            }
-            integer.get();
-            return Integer.valueOf(written);
-        }
-        @Override
-        public Integer get(long timeout, TimeUnit unit)
-                throws InterruptedException, ExecutionException,
-                TimeoutException {
-            if (t != null) {
-                throw new ExecutionException(t);
-            }
-            integer.get(timeout, unit);
-            return Integer.valueOf(written);
         }
     }
 
