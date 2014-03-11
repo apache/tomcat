@@ -99,6 +99,11 @@
         <bug>56244</bug>: Fix MBeans descriptor for WebappClassLoader MBean.
         (kkolinko)
       </fix>
+      <add>
+        Add a work around for validating XML documents (often TLDs) that use
+        just the file name to refer to refer to the JavaEE schema on which they
+        are based. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
