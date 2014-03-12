@@ -106,92 +106,115 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-public class DefaultServlet
-    extends HttpServlet {
+public class DefaultServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    // ----------------------------------------------------- Instance Variables
-
-
     /**
-     * The debugging detail level for this servlet.
+     * The string manager for this package.
      */
-    protected int debug = 0;
-
-
-    /**
-     * The input buffer size to use when serving resources.
-     */
-    protected int input = 2048;
-
-
-    /**
-     * Should we generate directory listings?
-     */
-    protected boolean listings = false;
-
-
-    /**
-     * Read only flag. By default, it's set to true.
-     */
-    protected boolean readOnly = true;
-
-
-    /**
-     * Should be serve gzip versions of files. By default, it's set to false.
-     */
-    protected boolean gzip = false;
-
-
-    /**
-     * The output buffer size to use when serving resources.
-     */
-    protected int output = 2048;
-
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     /**
      * Array containing the safe characters set.
      */
     protected static final URLEncoder urlEncoder;
 
+    /**
+     * Full range marker.
+     */
+    protected static final ArrayList<Range> FULL = new ArrayList<>();
+
+    /**
+     * MIME multipart separation string
+     */
+    protected static final String mimeSeparation = "CATALINA_MIME_BOUNDARY";
+
+    /**
+     * JNDI resources name.
+     */
+    protected static final String RESOURCES_JNDI_NAME = "java:/comp/Resources";
+
+    /**
+     * Size of file transfer buffer in bytes.
+     */
+    protected static final int BUFFER_SIZE = 4096;
+
+
+    // ----------------------------------------------------- Static Initializer
+
+    static {
+        urlEncoder = new URLEncoder();
+        urlEncoder.addSafeCharacter('-');
+        urlEncoder.addSafeCharacter('_');
+        urlEncoder.addSafeCharacter('.');
+        urlEncoder.addSafeCharacter('*');
+        urlEncoder.addSafeCharacter('/');
+    }
+
+
+    // ----------------------------------------------------- Instance Variables
+
+    /**
+     * The debugging detail level for this servlet.
+     */
+    protected int debug = 0;
+
+    /**
+     * The input buffer size to use when serving resources.
+     */
+    protected int input = 2048;
+
+    /**
+     * Should we generate directory listings?
+     */
+    protected boolean listings = false;
+
+    /**
+     * Read only flag. By default, it's set to true.
+     */
+    protected boolean readOnly = true;
+
+    /**
+     * Should be serve gzip versions of files. By default, it's set to false.
+     */
+    protected boolean gzip = false;
+
+    /**
+     * The output buffer size to use when serving resources.
+     */
+    protected int output = 2048;
 
     /**
      * Allow customized directory listing per directory.
      */
     protected String localXsltFile = null;
 
-
     /**
      * Allow customized directory listing per context.
      */
     protected String contextXsltFile = null;
-
 
     /**
      * Allow customized directory listing per instance.
      */
     protected String globalXsltFile = null;
 
-
     /**
      * Allow a readme file to be included.
      */
     protected String readmeFile = null;
-
 
     /**
      * The complete set of web application resources
      */
     protected transient WebResourceRoot resources = null;
 
-
     /**
      * File encoding to be used when reading static files. If none is specified
      * the platform default is used.
      */
     protected String fileEncoding = null;
-
 
     /**
      * Minimum size for sendfile usage in bytes.
@@ -203,55 +226,8 @@ public class DefaultServlet
      */
     protected boolean useAcceptRanges = true;
 
-    /**
-     * Full range marker.
-     */
-    protected static final ArrayList<Range> FULL = new ArrayList<>();
-
-
-    // ----------------------------------------------------- Static Initializer
-
-
-    /**
-     * GMT timezone - all HTTP dates are on GMT
-     */
-    static {
-        urlEncoder = new URLEncoder();
-        urlEncoder.addSafeCharacter('-');
-        urlEncoder.addSafeCharacter('_');
-        urlEncoder.addSafeCharacter('.');
-        urlEncoder.addSafeCharacter('*');
-        urlEncoder.addSafeCharacter('/');
-    }
-
-
-    /**
-     * MIME multipart separation string
-     */
-    protected static final String mimeSeparation = "CATALINA_MIME_BOUNDARY";
-
-
-    /**
-     * JNDI resources name.
-     */
-    protected static final String RESOURCES_JNDI_NAME = "java:/comp/Resources";
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-
-    /**
-     * Size of file transfer buffer in bytes.
-     */
-    protected static final int BUFFER_SIZE = 4096;
-
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Finalize this servlet.
