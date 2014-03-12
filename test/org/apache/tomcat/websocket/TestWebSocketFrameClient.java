@@ -43,6 +43,51 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEn
 public class TestWebSocketFrameClient extends TomcatBaseTest {
 
     @Test
+    public void testConnectToServerEndpoint() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(new ApplicationListener(
+                TesterFirehoseServer.Config.class.getName(), false));
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
+
+        tomcat.start();
+
+        WebSocketContainer wsContainer =
+                ContainerProvider.getWebSocketContainer();
+        ClientEndpointConfig clientEndpointConfig =
+                ClientEndpointConfig.Builder.create().build();
+        Session wsSession = wsContainer.connectToServer(
+                TesterProgrammaticEndpoint.class,
+                clientEndpointConfig,
+                new URI("ws://localhost:" + getPort() +
+                        TesterFirehoseServer.Config.PATH));
+        CountDownLatch latch =
+                new CountDownLatch(TesterFirehoseServer.MESSAGE_COUNT);
+        BasicText handler = new BasicText(latch);
+        wsSession.addMessageHandler(handler);
+        wsSession.getBasicRemote().sendText("Hello");
+
+        System.out.println("Sent Hello message, waiting for data");
+
+        // Ignore the latch result as the message count test below will tell us
+        // if the right number of messages arrived
+        handler.getLatch().await(TesterFirehoseServer.WAIT_TIME_MILLIS,
+                TimeUnit.MILLISECONDS);
+
+        Queue<String> messages = handler.getMessages();
+        Assert.assertEquals(
+                TesterFirehoseServer.MESSAGE_COUNT, messages.size());
+        for (String message : messages) {
+            Assert.assertEquals(TesterFirehoseServer.MESSAGE, message);
+        }
+    }
+
+
+    @Test
     public void testConnectToServerEndpointSSL() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
