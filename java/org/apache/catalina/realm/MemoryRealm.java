@@ -113,7 +113,12 @@ public class MemoryRealm  extends RealmBase {
 
         GenericPrincipal principal = principals.get(username);
 
-        boolean validated = compareCredentials(credentials, principal.getPassword());
+        boolean validated;
+        if (principal == null) {
+            validated = false;
+        } else {
+            validated = compareCredentials(credentials, principal.getPassword());
+        }
 
         if (validated) {
             if (log.isDebugEnabled())
