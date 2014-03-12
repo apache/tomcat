@@ -71,6 +71,10 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
             public void failed(Throwable exc, SocketWrapper<Nio2Channel> attachment) {
                 attachment.setError(true);
                 readPending = false;
+                if (exc instanceof AsynchronousCloseException) {
+                    // If already closed, don't call onError and close again 
+                    return;
+                }
                 onError(exc);
                 try {
                     close();
@@ -189,11 +193,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
 
     @Override
     protected void doClose() throws IOException {
-        try {
-            channel.close();
-        } catch (AsynchronousCloseException e) {
-            // Ignore
-        }
+        channel.close();
     }
 
     private int fillReadBuffer(boolean block) throws IOException {

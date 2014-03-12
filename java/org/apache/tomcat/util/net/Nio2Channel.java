@@ -84,12 +84,15 @@ public class Nio2Channel implements AsynchronousByteChannel {
      */
     @Override
     public void close() throws IOException {
-        getIOChannel().close();
+        sc.close();
     }
 
     public void close(boolean force) throws IOException {
-        if (isOpen() || force ) close();
+        if (isOpen() || force) {
+            close();
+        }
     }
+
     /**
      * Tells whether or not this channel is open.
      *

@@ -63,6 +63,10 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
             public void failed(Throwable exc, SocketWrapper<Nio2Channel> attachment) {
                 attachment.setError(true);
                 writePending = false;
+                if (exc instanceof AsynchronousCloseException) {
+                    // If already closed, don't call onError and close again 
+                    return;
+                }
                 onError(exc);
                 try {
                     close();
@@ -157,10 +161,6 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
 
     @Override
     protected void doClose() throws IOException {
-        try {
-            channel.close();
-        } catch (AsynchronousCloseException e) {
-            // Ignore
-        }
+        channel.close(true);
     }
 }
