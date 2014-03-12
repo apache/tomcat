@@ -78,6 +78,10 @@
         is permitted) when a call to <code>AsyncContext.complete()</code> takes
         effect. (markt)
       </fix>
+      <fix>
+        <bug>56246</bug>: Fix NullPointerException in MemoryRealm when
+        authenticating an unknown user. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
