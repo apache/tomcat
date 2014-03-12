@@ -889,7 +889,6 @@ public abstract class PersistentManagerBase extends ManagerBase
             return;
 
         Session sessions[] = findSessions();
-        long timeNow = System.currentTimeMillis();
 
         // Swap out all sessions idle longer than maxIdleSwap
         if (maxIdleSwap >= 0) {
@@ -898,12 +897,7 @@ public abstract class PersistentManagerBase extends ManagerBase
                 synchronized (session) {
                     if (!session.isValid())
                         continue;
-                    int timeIdle;
-                    if (StandardSession.LAST_ACCESS_AT_START) {
-                        timeIdle = (int) ((timeNow - session.getLastAccessedTime()) / 1000L);
-                    } else {
-                        timeIdle = (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
-                    }
+                    int timeIdle = (int) (session.getIdleTime() / 1000L);
                     if (timeIdle > maxIdleSwap && timeIdle > minIdleSwap) {
                         if (session.accessCount != null &&
                                 session.accessCount.get() > 0) {
@@ -948,17 +942,11 @@ public abstract class PersistentManagerBase extends ManagerBase
                  Integer.valueOf(sessions.length)));
 
         int toswap = sessions.length - getMaxActiveSessions();
-        long timeNow = System.currentTimeMillis();
 
         for (int i = 0; i < sessions.length && toswap > 0; i++) {
             StandardSession session =  (StandardSession) sessions[i];
             synchronized (session) {
-                int timeIdle;
-                if (StandardSession.LAST_ACCESS_AT_START) {
-                    timeIdle = (int) ((timeNow - session.getLastAccessedTime()) / 1000L);
-                } else {
-                    timeIdle = (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
-                }
+                int timeIdle = (int) (session.getIdleTime() / 1000L);
                 if (timeIdle > minIdleSwap) {
                     if (session.accessCount != null &&
                             session.accessCount.get() > 0) {
@@ -992,7 +980,6 @@ public abstract class PersistentManagerBase extends ManagerBase
             return;
 
         Session sessions[] = findSessions();
-        long timeNow = System.currentTimeMillis();
 
         // Back up all sessions idle longer than maxIdleBackup
         if (maxIdleBackup >= 0) {
@@ -1001,12 +988,7 @@ public abstract class PersistentManagerBase extends ManagerBase
                 synchronized (session) {
                     if (!session.isValid())
                         continue;
-                    int timeIdle;
-                    if (StandardSession.LAST_ACCESS_AT_START) {
-                        timeIdle = (int) ((timeNow - session.getLastAccessedTime()) / 1000L);
-                    } else {
-                        timeIdle = (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
-                    }
+                    int timeIdle = (int) (session.getIdleTime() / 1000L);
                     if (timeIdle > maxIdleBackup) {
                         if (log.isDebugEnabled())
                             log.debug(sm.getString

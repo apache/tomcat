@@ -529,6 +529,36 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
     /**
+     * Return the idle time (in milliseconds) from last client access time.
+     */
+    @Override
+    public long getIdleTime() {
+
+        if (!isValidInternal()) {
+            throw new IllegalStateException
+                (sm.getString("standardSession.getIdleTime.ise"));
+        }
+
+        return getIdleTimeInternal();
+    }
+
+    /**
+     * Return the idle time from last client access time without invalidation check
+     * @see #getIdleTime()
+     */
+    @Override
+    public long getIdleTimeInternal() {
+        long timeNow = System.currentTimeMillis();
+        long timeIdle;
+        if (LAST_ACCESS_AT_START) {
+            timeIdle = timeNow - lastAccessedTime;
+        } else {
+            timeIdle = timeNow - thisAccessedTime;
+        }
+        return timeIdle;
+    }
+
+    /**
      * Return the Manager within which this Session is valid.
      */
     @Override
@@ -669,13 +699,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
         }
 
         if (maxInactiveInterval > 0) {
-            long timeNow = System.currentTimeMillis();
-            int timeIdle;
-            if (LAST_ACCESS_AT_START) {
-                timeIdle = (int) ((timeNow - lastAccessedTime) / 1000L);
-            } else {
-                timeIdle = (int) ((timeNow - thisAccessedTime) / 1000L);
-            }
+            int timeIdle = (int) (getIdleTimeInternal() / 1000L);
             if (timeIdle >= maxInactiveInterval) {
                 expire(true);
             }
