@@ -23,6 +23,7 @@ import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -35,7 +36,7 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
     private final Nio2Channel channel;
     private final int maxWrite;
     private final CompletionHandler<Integer, SocketWrapper<Nio2Channel>> completionHandler;
-    private volatile boolean writePending = false;
+    private final Semaphore writePending = new Semaphore(1);
 
     public Nio2ServletOutputStream(SocketWrapper<Nio2Channel> socketWrapper) {
         super(socketWrapper);
@@ -49,20 +50,26 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
                         failed(new ClosedChannelException(), attachment);
                         return;
                     }
-                    writePending = false;
+                    writePending.release();
                 }
                 if (!Nio2Endpoint.isInline()) {
                     try {
                         onWritePossible();
                     } catch (IOException e) {
-                        failed(e, attachment);
+                        attachment.setError(true);
+                        onError(e);
+                        try {
+                            close();
+                        } catch (IOException ioe) {
+                            // Ignore
+                        }
                     }
                 }
             }
             @Override
             public void failed(Throwable exc, SocketWrapper<Nio2Channel> attachment) {
                 attachment.setError(true);
-                writePending = false;
+                writePending.release();
                 if (exc instanceof AsynchronousCloseException) {
                     // If already closed, don't call onError and close again
                     return;
@@ -99,7 +106,7 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
                 throw new EOFException();
             }
             count += writtenThisLoop;
-            if (!block && writePending) {
+            if (!block && writePending.availablePermits() == 0) {
                 // Prevent concurrent writes in non blocking mode,
                 // leftover data has to be buffered
                 return count;
@@ -131,12 +138,11 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
                 throw new IOException(e);
             }
         } else {
-            synchronized (completionHandler) {
-                if (!writePending) {
+            if (writePending.tryAcquire()) {
+                synchronized (completionHandler) {
                     buffer.clear();
                     buffer.put(b, off, len);
                     buffer.flip();
-                    writePending = true;
                     Nio2Endpoint.startInline();
                     channel.write(buffer, socketWrapper.getTimeout(), TimeUnit.MILLISECONDS, socketWrapper, completionHandler);
                     Nio2Endpoint.endInline();
@@ -150,7 +156,9 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
     @Override
     protected void doFlush() throws IOException {
         try {
-            if (!writePending) {
+            // Block until a possible non blocking write is done
+            if (writePending.tryAcquire(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS)) {
+                writePending.release();
                 channel.flush().get(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS);
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
