@@ -64,7 +64,7 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
                 attachment.setError(true);
                 writePending = false;
                 if (exc instanceof AsynchronousCloseException) {
-                    // If already closed, don't call onError and close again 
+                    // If already closed, don't call onError and close again
                     return;
                 }
                 onError(exc);
