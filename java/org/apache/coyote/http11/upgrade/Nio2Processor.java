@@ -20,6 +20,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.SocketWrapper;
 
@@ -31,11 +32,12 @@ public class Nio2Processor extends AbstractProcessor<Nio2Channel> {
 
     private static final int INFINITE_TIMEOUT = -1;
 
-    public Nio2Processor(SocketWrapper<Nio2Channel> wrapper,
+    public Nio2Processor(AbstractEndpoint<Nio2Channel> endpoint,
+            SocketWrapper<Nio2Channel> wrapper,
             HttpUpgradeHandler httpUpgradeProcessor) {
         super(httpUpgradeProcessor,
-                new Nio2ServletInputStream(wrapper),
-                new Nio2ServletOutputStream(wrapper));
+                new Nio2ServletInputStream(endpoint, wrapper),
+                new Nio2ServletOutputStream(endpoint, wrapper));
 
         wrapper.setTimeout(INFINITE_TIMEOUT);
     }

@@ -27,19 +27,23 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
+import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Channel> {
 
+    private final AbstractEndpoint<Nio2Channel> endpoint;
     private final Nio2Channel channel;
     private final int maxWrite;
     private final CompletionHandler<Integer, SocketWrapper<Nio2Channel>> completionHandler;
     private final Semaphore writePending = new Semaphore(1);
 
-    public Nio2ServletOutputStream(SocketWrapper<Nio2Channel> socketWrapper) {
+    public Nio2ServletOutputStream(AbstractEndpoint<Nio2Channel> endpoint0, SocketWrapper<Nio2Channel> socketWrapper) {
         super(socketWrapper);
+        this.endpoint = endpoint0;
         channel = socketWrapper.getSocket();
         maxWrite = channel.getBufHandler().getWriteBuffer().capacity();
         this.completionHandler = new CompletionHandler<Integer, SocketWrapper<Nio2Channel>>() {
@@ -58,11 +62,7 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
                     } catch (IOException e) {
                         attachment.setError(true);
                         onError(e);
-                        try {
-                            close();
-                        } catch (IOException ioe) {
-                            // Ignore
-                        }
+                        endpoint.processSocket(attachment, SocketStatus.ERROR, true);
                     }
                 }
             }
@@ -75,11 +75,7 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
                     return;
                 }
                 onError(exc);
-                try {
-                    close();
-                } catch (IOException e) {
-                    // Ignore
-                }
+                endpoint.processSocket(attachment, SocketStatus.ERROR, true);
             }
         };
     }
