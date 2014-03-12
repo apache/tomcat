@@ -629,10 +629,13 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * Deploy a web application archive (included in the current request)
      * at the specified context path.
      *
-     * @param writer Writer to render results to
-     * @param cn Name of the application to be installed
-     * @param tag Tag to be associated with the webapp
-     * @param request Servlet request we are processing
+     * @param writer   Writer to render results to
+     * @param cn       Name of the application to be installed
+     * @param tag      Tag to be associated with the webapp
+     * @param update   Flag that indicates that any existing app should be
+     *                   replaced
+     * @param request  Servlet request we are processing
+     * @param smClient i18n messages using the locale of the client
      */
     protected synchronized void deploy
         (PrintWriter writer, ContextName cn,
@@ -727,9 +730,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * Install an application for the specified path from the specified
      * web application archive.
      *
-     * @param writer Writer to render results to
-     * @param tag Revision tag to deploy from
-     * @param cn Name of the application to be installed
+     * @param writer    Writer to render results to
+     * @param tag       Revision tag to deploy from
+     * @param cn        Name of the application to be installed
+     * @param smClient  i18n messages using the locale of the client
      */
     protected void deploy(PrintWriter writer, ContextName cn, String tag,
             StringManager smClient) {
@@ -794,14 +798,15 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * Install an application for the specified path from the specified
      * web application archive.
      *
-     * @param writer Writer to render results to
-     * @param config URL of the context configuration file to be installed
-     * @param cn Name of the application to be installed
-     * @param war URL of the web application archive to be installed
-     * @param update true to override any existing webapp on the path
+     * @param writer    Writer to render results to
+     * @param config    URL of the context configuration file to be installed
+     * @param cn        Name of the application to be installed
+     * @param war       URL of the web application archive to be installed
+     * @param update    true to override any existing webapp on the path
+     * @param smClient  i18n messages using the locale of the client
      */
     protected void deploy(PrintWriter writer, String config, ContextName cn,
-            String war, boolean update,  StringManager smClient) {
+            String war, boolean update, StringManager smClient) {
 
         if (config != null && config.length() == 0) {
             config = null;
