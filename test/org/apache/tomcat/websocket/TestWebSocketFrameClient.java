@@ -76,6 +76,8 @@ public class TestWebSocketFrameClient extends TomcatBaseTest {
         wsSession.addMessageHandler(handler);
         wsSession.getBasicRemote().sendText("Hello");
 
+        System.out.println("Sent Hello message, waiting for data");
+
         // Ignore the latch result as the message count test below will tell us
         // if the right number of messages arrived
         handler.getLatch().await(TesterFirehoseServer.WAIT_TIME_MILLIS,
