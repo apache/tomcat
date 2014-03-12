@@ -179,6 +179,10 @@
         "Expire sessions" command in the manager web application on a
         context where the session timeout is disabled. (kfujino)
       </fix>
+      <fix>
+         Add support for <code>LAST_ACCESS_AT_START</code> system property to
+         Manager web application. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
