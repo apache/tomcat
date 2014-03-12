@@ -334,7 +334,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         response.setContentType("text/plain; charset=" + Constants.CHARSET);
         PrintWriter writer = response.getWriter();
 
-        // Process the requested command (note - "/deploy" is not listed here)
+        // Process the requested command
         if (command == null) {
             writer.println(smClient.getString("managerServlet.noCommand"));
         } else if (command.equals("/deploy")) {
