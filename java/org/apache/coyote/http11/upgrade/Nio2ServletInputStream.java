@@ -26,19 +26,23 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
+import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 public class Nio2ServletInputStream extends AbstractServletInputStream {
 
+    private final AbstractEndpoint<Nio2Channel> endpoint;
     private final SocketWrapper<Nio2Channel> wrapper;
     private final Nio2Channel channel;
     private final CompletionHandler<Integer, SocketWrapper<Nio2Channel>> completionHandler;
     private boolean flipped = false;
     private volatile boolean readPending = false;
 
-    public Nio2ServletInputStream(SocketWrapper<Nio2Channel> wrapper) {
+    public Nio2ServletInputStream(AbstractEndpoint<Nio2Channel> endpoint0, SocketWrapper<Nio2Channel> wrapper) {
+        this.endpoint = endpoint0;
         this.wrapper = wrapper;
         this.channel = wrapper.getSocket();
         this.completionHandler = new CompletionHandler<Integer, SocketWrapper<Nio2Channel>>() {
@@ -76,11 +80,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
                     return;
                 }
                 onError(exc);
-                try {
-                    close();
-                } catch (IOException e) {
-                    // Ignore
-                }
+                endpoint.processSocket(attachment, SocketStatus.ERROR, true);
             }
         };
     }
