@@ -153,6 +153,18 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     private static final long serialVersionUID = 1L;
 
+    protected static final boolean LAST_ACCESS_AT_START;
+
+    static {
+        String lastAccessAtStart = System.getProperty(
+                "org.apache.catalina.session.StandardSession.LAST_ACCESS_AT_START");
+        if (lastAccessAtStart == null) {
+            LAST_ACCESS_AT_START = Globals.STRICT_SERVLET_COMPLIANCE;
+        } else {
+            LAST_ACCESS_AT_START =
+                Boolean.valueOf(lastAccessAtStart).booleanValue();
+        }
+    }
 
     // ----------------------------------------------------- Instance Variables
 
@@ -1144,7 +1156,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             int expired = 0;
             long now = System.currentTimeMillis();
             for (int i = 0; i < sessions.length; i++) {
-                int time = (int)((now-sessions[i].getThisAccessedTimeInternal())/1000);
+                int time;
+                if (LAST_ACCESS_AT_START) {
+                    time = (int) ((now - sessions[i].getLastAccessedTimeInternal()) / 1000L);
+                } else {
+                    time = (int) ((now - sessions[i].getThisAccessedTimeInternal()) / 1000L);
+                }
                 if (idle >= 0 && time >= idle*60) {
                     sessions[i].expire();
                     expired++;
