@@ -166,6 +166,17 @@ public interface Session {
     public long getLastAccessedTimeInternal();
 
     /**
+     * Return the idle time (in milliseconds) from last client access time.
+     */
+    public long getIdleTime();
+
+    /**
+     * Return the idle time from last client access time without invalidation check
+     * @see #getIdleTime()
+     */
+    public long getIdleTimeInternal();
+
+    /**
      * Return the Manager within which this Session is valid.
      */
     public Manager getManager();

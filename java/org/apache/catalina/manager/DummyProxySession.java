@@ -89,6 +89,16 @@ public class DummyProxySession implements Session {
     }
 
     @Override
+    public long getIdleTime() {
+        return 0;
+    }
+
+    @Override
+    public long getIdleTimeInternal() {
+        return 0;
+    }
+
+    @Override
     public Manager getManager() {
         return null;
     }
