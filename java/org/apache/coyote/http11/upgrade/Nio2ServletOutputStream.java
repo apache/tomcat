@@ -49,13 +49,11 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
         this.completionHandler = new CompletionHandler<Integer, SocketWrapper<Nio2Channel>>() {
             @Override
             public void completed(Integer nBytes, SocketWrapper<Nio2Channel> attachment) {
-                synchronized (completionHandler) {
-                    if (nBytes.intValue() < 0) {
-                        failed(new ClosedChannelException(), attachment);
-                        return;
-                    }
-                    writePending.release();
+                if (nBytes.intValue() < 0) {
+                    failed(new ClosedChannelException(), attachment);
+                    return;
                 }
+                writePending.release();
                 if (!Nio2Endpoint.isInline()) {
                     try {
                         onWritePossible();
@@ -135,15 +133,13 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
             }
         } else {
             if (writePending.tryAcquire()) {
-                synchronized (completionHandler) {
-                    buffer.clear();
-                    buffer.put(b, off, len);
-                    buffer.flip();
-                    Nio2Endpoint.startInline();
-                    channel.write(buffer, socketWrapper.getTimeout(), TimeUnit.MILLISECONDS, socketWrapper, completionHandler);
-                    Nio2Endpoint.endInline();
-                    written = len;
-                }
+                buffer.clear();
+                buffer.put(b, off, len);
+                buffer.flip();
+                Nio2Endpoint.startInline();
+                channel.write(buffer, socketWrapper.getTimeout(), TimeUnit.MILLISECONDS, socketWrapper, completionHandler);
+                Nio2Endpoint.endInline();
+                written = len;
             }
         }
         return written;
