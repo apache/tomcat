@@ -1648,12 +1648,13 @@ public class StandardContext extends ContainerBase
                                    this.distributable);
 
         // Bugzilla 32866
-        if(getManager() != null) {
+        Manager manager = getManager();
+        if(manager != null) {
             if(log.isDebugEnabled()) {
                 log.debug("Propagating distributable=" + distributable
                           + " to manager");
             }
-            getManager().setDistributable(distributable);
+            manager.setDistributable(distributable);
         }
     }
 
@@ -5172,7 +5173,7 @@ public class StandardContext extends ContainerBase
                 // Start manager
                 Manager manager = getManager();
                 if ((manager != null) && (manager instanceof Lifecycle)) {
-                    ((Lifecycle) getManager()).start();
+                    ((Lifecycle) manager).start();
                 }
             } catch(Exception e) {
                 log.error("Error manager.start()", e);
