@@ -666,41 +666,41 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             return;
         }
 
-        // Determine directory where WAR will be uploaded to
-        File deployedPath = deployed;
-        if (tag != null) {
-            deployedPath = new File(versioned, tag);
-            if (!deployedPath.mkdirs() && !deployedPath.isDirectory()) {
-                writer.println(smClient.getString("managerServlet.mkdirFail",
-                        deployedPath));
-                return;
-            }
-        }
+        File deployedWar = new File(deployed, baseName + ".war");
 
         // Determine full path for uploaded WAR
-        File localWar = new File(deployedPath, baseName + ".war");
+        File uploadedWar;
+        if (tag == null) {
+            uploadedWar = deployedWar;
+        } else {
+            File uploadPath = new File(versioned, tag);
+            if (!uploadPath.mkdirs() && !uploadPath.isDirectory()) {
+                writer.println(smClient.getString("managerServlet.mkdirFail",
+                        uploadPath));
+                return;
+            }
+            uploadedWar = new File(uploadPath, baseName + ".war");
+        }
         if (debug >= 2) {
-            log("Uploading WAR file to " + localWar);
+            log("Uploading WAR file to " + uploadedWar);
         }
 
         try {
             if (!isServiced(name)) {
                 addServiced(name);
                 try {
-                    if (update && tag == null && localWar.isFile()) {
-                        if (!localWar.delete()) {
+                    if (update && tag == null && deployedWar.isFile()) {
+                        if (!deployedWar.delete()) {
                             writer.println(smClient.getString("managerServlet.deleteFail",
-                                    localWar));
+                                    deployedWar));
                             return;
                         }
                     }
                     // Upload WAR
-                    uploadWar(writer, request, localWar, smClient);
+                    uploadWar(writer, request, uploadedWar, smClient);
                     if (tag != null) {
                         // Copy WAR to the host's appBase
-                        deployedPath = deployed;
-                        File localWarCopy = new File(deployedPath, baseName + ".war");
-                        copy(localWar, localWarCopy);
+                        copy(uploadedWar, deployedWar);
                     }
                     // Perform new deployment
                     check(name);
@@ -753,17 +753,19 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         // Find the local WAR file
         File localWar = new File(versioned, baseName + ".war");
 
+        File deployedWar = new File(host.getAppBaseFile(), baseName + ".war");
+
         // Copy WAR to appBase
         try {
             if (!isServiced(name)) {
                 addServiced(name);
                 try {
-                    if (!localWar.delete()) {
+                    if (!deployedWar.delete()) {
                         writer.println(smClient.getString("managerServlet.deleteFail",
-                                localWar));
+                                deployedWar));
                         return;
                     }
-                    copy(localWar, new File(host.getAppBaseFile(), baseName + ".war"));
+                    copy(localWar, deployedWar);
                     // Perform new deployment
                     check(name);
                 } finally {
