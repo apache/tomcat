@@ -112,6 +112,12 @@
         <bug>56246</bug>: Fix NullPointerException in MemoryRealm when
         authenticating an unknown user. (markt)
       </fix>
+      <fix>
+        <bug>56253</bug>: When listing resources that are provided by a JAR, fix
+        possible <code>StringIndexOutOfBoundsException</code>s. Add some unit
+        tests for this and similar scenarios and fix the additional issues those
+        unit tests identified. Based on a patch by Larry Isaacs. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
