@@ -75,7 +75,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
             String pathInJar =
                     getInternalPath() + path.substring(webAppMount.length());
             // Always strip off the leading '/' to get the JAR path
-            if (pathInJar.charAt(0) == '/') {
+            if (pathInJar.length() > 0 && pathInJar.charAt(0) == '/') {
                 pathInJar = pathInJar.substring(1);
             }
             Iterator<String> entries = jarFileEntries.keySet().iterator();
@@ -128,11 +128,13 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                     getInternalPath() + path.substring(webAppMount.length());
             // Always strip off the leading '/' to get the JAR path and make
             // sure it ends in '/'
-            if (pathInJar.charAt(pathInJar.length() - 1) != '/') {
-                pathInJar = pathInJar.substring(1) + '/';
-            }
-            if (pathInJar.charAt(0) == '/') {
-                pathInJar = pathInJar.substring(1);
+            if (pathInJar.length() > 0) {
+                if (pathInJar.charAt(pathInJar.length() - 1) != '/') {
+                    pathInJar = pathInJar.substring(1) + '/';
+                }
+                if (pathInJar.charAt(0) == '/') {
+                    pathInJar = pathInJar.substring(1);
+                }
             }
 
             Iterator<String> entries = jarFileEntries.keySet().iterator();
@@ -218,6 +220,10 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
             }
             if (pathInJar.equals("")) {
                 // Special case
+                // This is a directory resource so the path must end with /
+                if (!path.endsWith("/")) {
+                    path = path + "/";
+                }
                 return new JarResourceRoot(root, new File(getBase()),
                         baseUrlString, path);
             } else {

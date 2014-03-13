@@ -38,16 +38,16 @@ public class JarResourceRoot extends AbstractResource {
     public JarResourceRoot(WebResourceRoot root, File base, String baseUrl,
             String webAppPath) {
         super(root, webAppPath);
+        // Validate the webAppPath before going any further
+        if (!webAppPath.endsWith("/")) {
+            throw new IllegalArgumentException(sm.getString(
+                    "jarResourceRoot.invalidWebAppPath", webAppPath));
+        }
         this.base = base;
         this.baseUrl = "jar:" + baseUrl;
         // Extract the name from the webAppPath
-        // Strip any trailing '/' character
-        String resourceName;
-        if (webAppPath.endsWith("/")) {
-            resourceName = webAppPath.substring(0, webAppPath.length() - 1);
-        } else {
-            resourceName = webAppPath;
-        }
+        // Strip the trailing '/' character
+        String resourceName = webAppPath.substring(0, webAppPath.length() - 1);
         int i = resourceName.lastIndexOf('/');
         if (i > -1) {
             resourceName = resourceName.substring(i + 1);
