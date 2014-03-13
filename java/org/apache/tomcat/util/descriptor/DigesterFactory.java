@@ -16,14 +16,18 @@
  */
 package org.apache.tomcat.util.descriptor;
 
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
+import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.ext.EntityResolver2;
 
 /**
@@ -31,6 +35,25 @@ import org.xml.sax.ext.EntityResolver2;
  * details.
  */
 public class DigesterFactory {
+
+    private static final Log log = LogFactory.getLog(DigesterFactory.class);
+    private static final StringManager sm =
+            StringManager.getManager(Constants.PACKAGE_NAME);
+
+    private static final Class<ServletContext> CLASS_SERVLET_CONTEXT;
+    private static final Class<?> CLASS_JSP_CONTEXT;
+
+    static {
+        CLASS_SERVLET_CONTEXT = ServletContext.class;
+        Class<?> jspContext = null;
+        try {
+            jspContext = Class.forName("javax.servlet.jsp.JspContext");
+        } catch (ClassNotFoundException e) {
+            // Ignore - JSP API is not present.
+        }
+        CLASS_JSP_CONTEXT = jspContext;
+    }
+
 
     /**
      * Mapping of well-known public IDs used by the Servlet API to the matching
@@ -49,39 +72,39 @@ public class DigesterFactory {
         Map<String, String> systemIds = new HashMap<>();
 
         // W3C
-        publicIds.put(XmlIdentifiers.XSD_10_PUBLIC, idFor("XMLSchema.dtd"));
-        publicIds.put(XmlIdentifiers.DATATYPES_PUBLIC, idFor("datatypes.dtd"));
-        systemIds.put(XmlIdentifiers.XML_2001_XSD, idFor("xml.xsd"));
+        add(publicIds, XmlIdentifiers.XSD_10_PUBLIC, locationFor("XMLSchema.dtd"));
+        add(publicIds, XmlIdentifiers.DATATYPES_PUBLIC, locationFor("datatypes.dtd"));
+        add(systemIds, XmlIdentifiers.XML_2001_XSD, locationFor("xml.xsd"));
 
         // from J2EE 1.2
-        publicIds.put(XmlIdentifiers.WEB_22_PUBLIC, idFor("web-app_2_2.dtd"));
-        publicIds.put(XmlIdentifiers.TLD_11_PUBLIC, idFor("web-jsptaglibrary_1_1.dtd"));
+        add(publicIds, XmlIdentifiers.WEB_22_PUBLIC, locationFor("web-app_2_2.dtd"));
+        add(publicIds, XmlIdentifiers.TLD_11_PUBLIC, locationFor("web-jsptaglibrary_1_1.dtd"));
 
         // from J2EE 1.3
-        publicIds.put(XmlIdentifiers.WEB_23_PUBLIC, idFor("web-app_2_3.dtd"));
-        publicIds.put(XmlIdentifiers.TLD_12_PUBLIC, idFor("web-jsptaglibrary_1_2.dtd"));
+        add(publicIds, XmlIdentifiers.WEB_23_PUBLIC, locationFor("web-app_2_3.dtd"));
+        add(publicIds, XmlIdentifiers.TLD_12_PUBLIC, locationFor("web-jsptaglibrary_1_2.dtd"));
 
         // from J2EE 1.4
-        systemIds.put("http://www.ibm.com/webservices/xsd/j2ee_web_services_1_1.xsd",
-                idFor("j2ee_web_services_1_1.xsd"));
-        systemIds.put("http://www.ibm.com/webservices/xsd/j2ee_web_services_client_1_1.xsd",
-                idFor("j2ee_web_services_client_1_1.xsd"));
-        systemIds.put(XmlIdentifiers.WEB_24_XSD, idFor("web-app_2_4.xsd"));
-        systemIds.put(XmlIdentifiers.TLD_20_XSD, idFor("web-jsptaglibrary_2_0.xsd"));
+        add(systemIds, "http://www.ibm.com/webservices/xsd/j2ee_web_services_1_1.xsd",
+                locationFor("j2ee_web_services_1_1.xsd"));
+        add(systemIds, "http://www.ibm.com/webservices/xsd/j2ee_web_services_client_1_1.xsd",
+                locationFor("j2ee_web_services_client_1_1.xsd"));
+        add(systemIds, XmlIdentifiers.WEB_24_XSD, locationFor("web-app_2_4.xsd"));
+        add(systemIds, XmlIdentifiers.TLD_20_XSD, locationFor("web-jsptaglibrary_2_0.xsd"));
         addSelf(systemIds, "j2ee_1_4.xsd");
         addSelf(systemIds, "jsp_2_0.xsd");
 
         // from JavaEE 5
-        systemIds.put(XmlIdentifiers.WEB_25_XSD, idFor("web-app_2_5.xsd"));
-        systemIds.put(XmlIdentifiers.TLD_21_XSD, idFor("web-jsptaglibrary_2_1.xsd"));
+        add(systemIds, XmlIdentifiers.WEB_25_XSD, locationFor("web-app_2_5.xsd"));
+        add(systemIds, XmlIdentifiers.TLD_21_XSD, locationFor("web-jsptaglibrary_2_1.xsd"));
         addSelf(systemIds, "javaee_5.xsd");
         addSelf(systemIds, "jsp_2_1.xsd");
         addSelf(systemIds, "javaee_web_services_1_2.xsd");
         addSelf(systemIds, "javaee_web_services_client_1_2.xsd");
 
         // from JavaEE 6
-        systemIds.put(XmlIdentifiers.WEB_30_XSD, idFor("web-app_3_0.xsd"));
-        systemIds.put(XmlIdentifiers.WEB_FRAGMENT_30_XSD, idFor("web-fragment_3_0.xsd"));
+        add(systemIds, XmlIdentifiers.WEB_30_XSD, locationFor("web-app_3_0.xsd"));
+        add(systemIds, XmlIdentifiers.WEB_FRAGMENT_30_XSD, locationFor("web-fragment_3_0.xsd"));
         addSelf(systemIds, "web-common_3_0.xsd");
         addSelf(systemIds, "javaee_6.xsd");
         addSelf(systemIds, "jsp_2_2.xsd");
@@ -89,8 +112,8 @@ public class DigesterFactory {
         addSelf(systemIds, "javaee_web_services_client_1_3.xsd");
 
         // from JavaEE 7
-        systemIds.put(XmlIdentifiers.WEB_31_XSD, idFor("web-app_3_1.xsd"));
-        systemIds.put(XmlIdentifiers.WEB_FRAGMENT_31_XSD, idFor("web-fragment_3_1.xsd"));
+        add(systemIds, XmlIdentifiers.WEB_31_XSD, locationFor("web-app_3_1.xsd"));
+        add(systemIds, XmlIdentifiers.WEB_FRAGMENT_31_XSD, locationFor("web-fragment_3_1.xsd"));
         addSelf(systemIds, "web-common_3_1.xsd");
         addSelf(systemIds, "javaee_7.xsd");
         addSelf(systemIds, "jsp_2_3.xsd");
@@ -102,12 +125,30 @@ public class DigesterFactory {
     }
 
     private static void addSelf(Map<String, String> ids, String id) {
-        String systemId = idFor(id);
+        String systemId = locationFor(id);
+        ids.put(id, systemId);
         ids.put(systemId, systemId);
     }
 
-    private static String idFor(String url) {
-        return ServletContext.class.getResource("resources/" + url).toExternalForm();
+    private static void add(Map<String,String> ids, String id, String location) {
+        if (location == null) {
+            log.warn(sm.getString("digesterFactory.missingSchema", id));
+        } else {
+            ids.put(id, location);
+        }
+    }
+
+    private static String locationFor(String name) {
+        URL location = CLASS_SERVLET_CONTEXT.getResource("resources/" + name);
+        if (location == null) {
+            if (CLASS_JSP_CONTEXT != null) {
+                location = CLASS_JSP_CONTEXT.getResource("resources/" + name);
+            }
+        }
+        if (location == null) {
+            return null;
+        }
+        return location.toExternalForm();
     }
 
 
