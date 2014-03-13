@@ -140,10 +140,8 @@ public class DigesterFactory {
 
     private static String locationFor(String name) {
         URL location = CLASS_SERVLET_CONTEXT.getResource("resources/" + name);
-        if (location == null) {
-            if (CLASS_JSP_CONTEXT != null) {
-                location = CLASS_JSP_CONTEXT.getResource("resources/" + name);
-            }
+        if (location == null && CLASS_JSP_CONTEXT != null) {
+            location = CLASS_JSP_CONTEXT.getResource("resources/" + name);
         }
         if (location == null) {
             return null;
