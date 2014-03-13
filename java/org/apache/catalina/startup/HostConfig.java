@@ -445,7 +445,7 @@ public class HostConfig
         ContextName cn = new ContextName(name, false);
         String baseName = cn.getBaseName();
 
-        if (deploymentExists(baseName)) {
+        if (deploymentExists(cn.getName())) {
             return;
         }
 

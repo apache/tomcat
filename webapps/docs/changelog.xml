@@ -113,6 +113,14 @@
         authenticating an unknown user. (markt)
       </fix>
       <fix>
+        <bug>56248</bug>: Allow the deployer to update an existing WAR file
+        without undeploying the existing application if the update flag is set.
+        This allows any existing custom context.xml for the application to be
+        retained. To update an application and remove any existing context.xml
+        simply undeploy the old version of the application before deploying the
+        new version. (markt)
+      </fix>
+      <fix>
         <bug>56253</bug>: When listing resources that are provided by a JAR, fix
         possible <code>StringIndexOutOfBoundsException</code>s. Add some unit
         tests for this and similar scenarios and fix the additional issues those
