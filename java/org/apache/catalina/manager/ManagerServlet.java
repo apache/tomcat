@@ -179,13 +179,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
 
     /**
-     * File object representing the directory into which the deploy() command
-     * will deploy uploaded WAR files (normally the appBase).
-     */
-    protected File deployed = null;
-
-
-    /**
      * Path used to store revisions of webapps.
      */
     protected File versioned = null;
@@ -470,9 +463,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         versioned = (File) getServletContext().getAttribute
             (ServletContext.TEMPDIR);
 
-        // Identify the appBase of the owning Host of this Context
-        // (if any)
-        deployed = ((Host) context.getParent()).getAppBaseFile();
         configBase = new File(context.getCatalinaBase(), "conf");
         Container container = context;
         Container host = null;
@@ -666,7 +656,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             return;
         }
 
-        File deployedWar = new File(deployed, baseName + ".war");
+        File deployedWar = new File(host.getAppBaseFile(), baseName + ".war");
 
         // Determine full path for uploaded WAR
         File uploadedWar;
