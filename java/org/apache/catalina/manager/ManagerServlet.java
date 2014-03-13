@@ -52,6 +52,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
@@ -189,8 +190,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     /**
      * File object representing the directory into which the deploy() command
-     * will store the WAR and context configuration files that have been
-     * uploaded.
+     * will deploy uploaded WAR files (normally the appBase).
      */
     protected File deployed = null;
 
@@ -366,8 +366,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         } else if (command.equals("/deploy")) {
             if (war != null || config != null) {
                 deploy(writer, config, cn, war, update, smClient);
-            } else {
+            } else if (tag != null) {
                 deploy(writer, cn, tag, smClient);
+            } else {
+                writer.println(smClient.getString(
+                        "managerServlet.invalidCommand", command));
             }
         } else if (command.equals("/list")) {
             list(writer, smClient);
@@ -639,51 +642,50 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String baseName = cn.getBaseName();
         String displayPath = cn.getDisplayName();
 
-        // Check if app already exists, or undeploy it if updating
+        // If app exists deployment can only proceed if update is true
+        // Note existing WAR will be deleted and then replaced
         Context context = (Context) host.findChild(name);
-        if (update) {
-            if (context != null) {
-                undeploy(writer, cn, smClient);
-            }
-            context = (Context) host.findChild(name);
-        }
-        if (context != null) {
+        if (context != null && !update) {
             writer.println(smClient.getString("managerServlet.alreadyContext",
                     displayPath));
             return;
         }
 
-        // Calculate the base path
-        File deployedPath = deployed;
-        if (tag != null) {
-            deployedPath = new File(versioned, tag);
-            if (!deployedPath.mkdirs() && !deployedPath.isDirectory()) {
+        File deployedWar = new File(deployed, baseName + ".war");
+
+        // Determine full path for uploaded WAR
+        File uploadedWar;
+        if (tag == null) {
+            uploadedWar = deployedWar;
+        } else {
+            File uploadPath = new File(versioned, tag);
+            if (!uploadPath.mkdirs() && !uploadPath.isDirectory()) {
                 writer.println(smClient.getString("managerServlet.mkdirFail",
-                        deployedPath));
+                        uploadPath));
                 return;
             }
+            uploadedWar = new File(uploadPath, baseName + ".war");
         }
-
-        // Upload the web application archive to a local WAR file
-        File localWar = new File(deployedPath, baseName + ".war");
         if (debug >= 2) {
-            log("Uploading WAR file to " + localWar);
+            log("Uploading WAR file to " + uploadedWar);
         }
 
-        // Copy WAR to appBase
         try {
             if (!isServiced(name)) {
                 addServiced(name);
                 try {
+                    if (update && tag == null && deployedWar.isFile()) {
+                        if (!deployedWar.delete()) {
+                            writer.println(smClient.getString("managerServlet.deleteFail",
+                                    deployedWar));
+                            return;
+                        }
+                    }
                     // Upload WAR
-                    uploadWar(writer, request, localWar, smClient);
-                    // Copy WAR and XML to the host app base if needed
+                    uploadWar(writer, request, uploadedWar, smClient);
                     if (tag != null) {
-                        deployedPath = deployed;
-                        File localWarCopy = new File(deployedPath, baseName + ".war");
-                        copy(localWar, localWarCopy);
-                        localWar = localWarCopy;
-                        copy(localWar, new File(getAppBase(), baseName + ".war"));
+                        // Copy WAR to the host's appBase
+                        copy(uploadedWar, deployedWar);
                     }
                     // Perform new deployment
                     check(name);
@@ -707,7 +709,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             writer.println(smClient.getString(
                     "managerServlet.deployFailed", displayPath));
         }
-        
     }
 
 
@@ -722,6 +723,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected void deploy(PrintWriter writer, ContextName cn, String tag,
             StringManager smClient) {
 
+        // NOTE: It is assumed that update is always true in this method.
+
         // Validate the requested context path
         if (!validateContextName(cn, writer, smClient)) {
             return;
@@ -731,27 +734,22 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String name = cn.getName();
         String displayPath = cn.getDisplayName();
         
-        // Calculate the base path
-        File deployedPath = versioned;
-        if (tag != null) {
-            deployedPath = new File(deployedPath, tag);
-        }
-
         // Find the local WAR file
-        File localWar = new File(deployedPath, baseName + ".war");
+        File localWar = new File(versioned, baseName + ".war");
 
-        // Check if app already exists, or undeploy it if updating
-        Context context = (Context) host.findChild(name);
-        if (context != null) {
-            undeploy(writer, cn, smClient);
-        }
+        File deployedWar = new File(host.getAppBase(), baseName + ".war");
 
         // Copy WAR to appBase
         try {
             if (!isServiced(name)) {
                 addServiced(name);
                 try {
-                    copy(localWar, new File(getAppBase(), baseName + ".war"));
+                    if (!deployedWar.delete()) {
+                        writer.println(smClient.getString("managerServlet.deleteFail",
+                                deployedWar));
+                        return;
+                    }
+                    copy(localWar, deployedWar);
                     // Perform new deployment
                     check(name);
                 } finally {
@@ -825,15 +823,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String baseName = cn.getBaseName();
         String displayPath = cn.getDisplayName();
         
-        // Check if app already exists, or undeploy it if updating
+        // If app exists deployment can only proceed if update is true
+        // Note existing files will be deleted and then replaced
         Context context = (Context) host.findChild(name);
-        if (update) {
-            if (context != null) {
-                undeploy(writer, cn, smClient);
-            }
-            context = (Context) host.findChild(name);
-        }
-        if (context != null) {
+        if (context != null && !update) {
             writer.println(smClient.getString("managerServlet.alreadyContext",
                     displayPath));
             return;
@@ -856,17 +849,27 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                     "managerServlet.mkdirFail",configBase));
                             return;
                         }
-                        copy(new File(config), 
-                                new File(configBase, baseName + ".xml"));
+                        File localConfig = new File(configBase, baseName + ".xml");
+                        if (localConfig.isFile() && !localConfig.delete()) {
+                            writer.println(smClient.getString(
+                                    "managerServlet.deleteFail", localConfig));
+                            return;
+                        }
+                        copy(new File(config), localConfig);
                     }
                     if (war != null) {
+                        File localWar;
                         if (war.endsWith(".war")) {
-                            copy(new File(war), 
-                                    new File(getAppBase(), baseName + ".war"));
+                            localWar = new File(getAppBase(), baseName + ".war");
                         } else {
-                            copy(new File(war), 
-                                    new File(getAppBase(), baseName));
+                            localWar = new File(getAppBase(), baseName);
                         }
+                        if (localWar.exists() && !ExpandWar.delete(localWar)) {
+                            writer.println(smClient.getString(
+                                    "managerServlet.deleteFail", localWar));
+                            return;
+                        }
+                        copy(new File(war), localWar);
                     }
                     // Perform new deployment
                     check(name);
