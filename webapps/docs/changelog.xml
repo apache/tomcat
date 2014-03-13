@@ -124,7 +124,7 @@
         <bug>56253</bug>: When listing resources that are provided by a JAR, fix
         possible <code>StringIndexOutOfBoundsException</code>s. Add some unit
         tests for this and similar scenarios and fix the additional issues those
-        unit tests identified. Based on a patch by Larry Isaacs. (markt) 
+        unit tests identified. Based on a patch by Larry Isaacs. (markt)
       </fix>
     </changelog>
   </subsection>
