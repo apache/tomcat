@@ -20,6 +20,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
@@ -35,9 +36,8 @@ public class TestClientCert extends TomcatBaseTest {
 
     @Test
     public void testClientCertGet() throws Exception {
-        if (!TesterSupport.isRenegotiationSupported(getTomcatInstance())) {
-            return;
-        }
+        Assume.assumeTrue("SSL renegotiation have to be supported",
+                TesterSupport.isRenegotiationSupported(getTomcatInstance()));
 
         // Unprotected resource
         ByteChunk res =
@@ -72,9 +72,8 @@ public class TestClientCert extends TomcatBaseTest {
 
     private void doTestClientCertPost(int bodySize, boolean expectProtectedFail)
             throws Exception {
-        if (!TesterSupport.isRenegotiationSupported(getTomcatInstance())) {
-            return;
-        }
+        Assume.assumeTrue("SSL renegotiation have to be supported",
+                TesterSupport.isRenegotiationSupported(getTomcatInstance()));
 
         byte[] body = new byte[bodySize];
         Arrays.fill(body, TesterSupport.DATA);
