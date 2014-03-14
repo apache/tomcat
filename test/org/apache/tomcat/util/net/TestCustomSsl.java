@@ -105,7 +105,7 @@ public class TestCustomSsl extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Assume.assumeTrue("SSL renegotiation have to be supported",
+        Assume.assumeTrue("SSL renegotiation has to be supported for this test",
                 TesterSupport.isRenegotiationSupported(getTomcatInstance()));
 
         TesterSupport.configureClientCertContext(tomcat);
