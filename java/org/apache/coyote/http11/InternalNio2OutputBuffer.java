@@ -17,6 +17,7 @@
 
 package org.apache.coyote.http11;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
@@ -116,7 +117,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                 boolean notify = false;
                 synchronized (completionHandler) {
                     if (nBytes.intValue() < 0) {
-                        failed(new IOException(sm.getString("iob.failedwrite")), attachment);
+                        failed(new EOFException(sm.getString("iob.failedwrite")), attachment);
                         return;
                     }
                     if (bufferedWrites.size() > 0) {
@@ -163,7 +164,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                 boolean notify = false;
                 synchronized (completionHandler) {
                     if (nBytes.longValue() < 0) {
-                        failed(new IOException(sm.getString("iob.failedwrite")), attachment);
+                        failed(new EOFException(sm.getString("iob.failedwrite")), attachment);
                         return;
                     }
                     if (bufferedWrites.size() > 0 || arrayHasData(attachment)) {
@@ -381,9 +382,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                         flipped = true;
                     }
                     socket.getSocket().write(byteBuffer).get(socket.getTimeout(), TimeUnit.MILLISECONDS);
-                } catch (InterruptedException e) {
-                    throw new IOException(e);
-                } catch (ExecutionException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     throw new IOException(e);
                 } catch (TimeoutException e) {
                     throw new SocketTimeoutException();

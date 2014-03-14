@@ -18,9 +18,9 @@ package org.apache.coyote.http11.upgrade;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousCloseException;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -50,7 +50,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
             public void completed(Integer nBytes, SocketWrapper<Nio2Channel> attachment) {
                 synchronized (completionHandler) {
                     if (nBytes.intValue() < 0) {
-                        failed(new ClosedChannelException(), attachment);
+                        failed(new EOFException(), attachment);
                         return;
                     }
                     readPending = false;
@@ -207,10 +207,13 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
                 nRead = channel.read(readBuffer)
                         .get(wrapper.getTimeout(), TimeUnit.MILLISECONDS).intValue();
                 readPending = false;
-            } catch (InterruptedException | ExecutionException
-                    | TimeoutException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 onError(e);
                 throw new IOException(e);
+            } catch (TimeoutException e) {
+                SocketTimeoutException ex = new SocketTimeoutException();
+                onError(ex);
+                throw ex;
             }
         } else {
             readPending = true;
