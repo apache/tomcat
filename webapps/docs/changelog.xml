@@ -79,6 +79,12 @@
         effect. (markt)
       </fix>
       <fix>
+        <bug>56236</bug>: Enable Tomcat to work with alternative Servlet and
+        JSP API JARs that package the XML schemas in such as way as to require
+        a dependency on the JSP API before enabling validation for web.xml.
+        Tomcat has no such dependency. (markt)
+      </fix>
+      <fix>
         <bug>56246</bug>: Fix NullPointerException in MemoryRealm when
         authenticating an unknown user. (markt)
       </fix>
@@ -89,12 +95,6 @@
         retained. To update an application and remove any existing context.xml
         simply undeploy the old version of the application before deploying the
         new version. (markt)
-      </fix>
-      <fix>
-        Enable Tomcat to work with alternative Servlet and JSP API JARs that
-        package the XML schemas in such as way as to require a dependency on the
-        JSP API before enabling validation for web.xml. Tomcat has no such
-        dependency. (markt)
       </fix>
     </changelog>
   </subsection>
