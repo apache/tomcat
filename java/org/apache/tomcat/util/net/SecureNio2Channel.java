@@ -452,6 +452,10 @@ public class SecureNio2Channel extends Nio2Channel  {
     }
 
     private class FutureRead implements Future<Integer> {
+        private ByteBuffer dst;
+        public FutureRead(ByteBuffer dst) {
+            this.dst = dst;
+        }
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
             return false;
@@ -490,7 +494,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                 netInBuffer.flip();
                 //unwrap the data
                 try {
-                    unwrap = sslEngine.unwrap(netInBuffer, bufHandler.getReadBuffer());
+                    unwrap = sslEngine.unwrap(netInBuffer, dst);
                 } catch (SSLException e) {
                     throw new ExecutionException(e);
                 }
@@ -522,7 +526,8 @@ public class SecureNio2Channel extends Nio2Channel  {
 
     private class FutureNetRead extends FutureRead {
         private Future<Integer> integer;
-        protected FutureNetRead() {
+        protected FutureNetRead(ByteBuffer dst) {
+            super(dst);
             this.integer = sc.read(netInBuffer);
         }
         @Override
@@ -564,22 +569,24 @@ public class SecureNio2Channel extends Nio2Channel  {
         if (!handshakeComplete)
             throw new IllegalStateException("Handshake incomplete, you must complete handshake before reading data.");
         if (netInBuffer.position() > 0) {
-            return new FutureRead();
+            return new FutureRead(dst);
         } else {
-            return new FutureNetRead();
+            return new FutureNetRead(dst);
         }
     }
 
     private class FutureWrite implements Future<Integer> {
+        private ByteBuffer src;
         private Future<Integer> integer = null;
         private int written = 0;
         private Throwable t = null;
-        protected FutureWrite() {
+        protected FutureWrite(ByteBuffer src) {
             //are we closing or closed?
             if (closing || closed) {
                 t = new IOException("Channel is in closing state.");
                 return;
             }
+            this.src = src;
             wrap();
         }
         @Override
@@ -626,7 +633,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             //The data buffer should be empty, we can reuse the entire buffer.
             netOutBuffer.clear();
             try {
-                SSLEngineResult result = sslEngine.wrap(bufHandler.getWriteBuffer(), netOutBuffer);
+                SSLEngineResult result = sslEngine.wrap(src, netOutBuffer);
                 written = result.bytesConsumed();
                 netOutBuffer.flip();
                 if (result.getStatus() == Status.OK) {
@@ -650,7 +657,7 @@ public class SecureNio2Channel extends Nio2Channel  {
      */
     @Override
     public Future<Integer> write(ByteBuffer src) {
-        return new FutureWrite();
+        return new FutureWrite(src);
     }
 
     private class ReadCompletionHandler<A> implements CompletionHandler<Integer, A> {
