@@ -18,9 +18,9 @@ package org.apache.coyote.http11.upgrade;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousCloseException;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
@@ -50,7 +50,7 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
             @Override
             public void completed(Integer nBytes, SocketWrapper<Nio2Channel> attachment) {
                 if (nBytes.intValue() < 0) {
-                    failed(new ClosedChannelException(), attachment);
+                    failed(new EOFException(), attachment);
                     return;
                 }
                 writePending.release();
@@ -126,10 +126,13 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
             buffer.flip();
             try {
                 written = channel.write(buffer).get(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS).intValue();
-            } catch (InterruptedException | ExecutionException
-                    | TimeoutException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 onError(e);
                 throw new IOException(e);
+            } catch (TimeoutException e) {
+                SocketTimeoutException ex = new SocketTimeoutException();
+                onError(ex);
+                throw ex;
             }
         } else {
             if (writePending.tryAcquire()) {
@@ -152,10 +155,16 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
             if (writePending.tryAcquire(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS)) {
                 writePending.release();
                 channel.flush().get(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS);
+            } else {
+                throw new TimeoutException();
             }
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+        } catch (InterruptedException | ExecutionException e) {
             onError(e);
             throw new IOException(e);
+        } catch (TimeoutException e) {
+            SocketTimeoutException ex = new SocketTimeoutException();
+            onError(ex);
+            throw ex;
         }
     }
 

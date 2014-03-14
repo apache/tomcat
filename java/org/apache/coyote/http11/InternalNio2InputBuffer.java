@@ -18,8 +18,8 @@ package org.apache.coyote.http11;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.ReadPendingException;
 import java.nio.charset.StandardCharsets;
@@ -754,7 +754,7 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
                 boolean notify = false;
                 synchronized (completionHandler) {
                     if (nBytes.intValue() < 0) {
-                        failed(new ClosedChannelException(), attachment);
+                        failed(new EOFException(sm.getString("iib.eof.error")), attachment);
                         return;
                     }
                     readPending = false;
@@ -819,9 +819,10 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
                 try {
                     nRead = socket.getSocket().read(byteBuffer)
                             .get(socket.getTimeout(), TimeUnit.MILLISECONDS).intValue();
-                } catch (InterruptedException | ExecutionException
-                        | TimeoutException e) {
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new IOException(e);
+                } catch (TimeoutException e) {
+                    throw new SocketTimeoutException();
                 }
                 if (nRead > 0) {
                     if (!flipped) {
