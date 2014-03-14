@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.connector.Connector;
@@ -49,10 +50,9 @@ public class TestCustomSsl extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         Connector connector = tomcat.getConnector();
-        if (connector.getProtocolHandlerClassName().contains("Apr")) {
-            // This test is only for JSSE based SSL connectors
-            return;
-        }
+
+        Assume.assumeFalse("This test is only for JSSE based SSL connectors",
+                connector.getProtocolHandlerClassName().contains("Apr"));
 
         connector.setProperty("sslImplementationName",
                 "org.apache.tomcat.util.net.jsse.TesterBug50640SslImpl");
@@ -99,9 +99,8 @@ public class TestCustomSsl extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
 
-        if (!TesterSupport.isRenegotiationSupported(getTomcatInstance())) {
-            return;
-        }
+        Assume.assumeTrue("SSL renegotiation has to be supported for this test",
+                TesterSupport.isRenegotiationSupported(getTomcatInstance()));
 
         TesterSupport.configureClientCertContext(tomcat);
 

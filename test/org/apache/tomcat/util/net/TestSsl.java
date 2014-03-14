@@ -33,6 +33,7 @@ import javax.net.ssl.SSLSocketFactory;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
@@ -156,9 +157,8 @@ public class TestSsl extends TomcatBaseTest {
     public void testRenegotiateWorks() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        if (!TesterSupport.isRenegotiationSupported(tomcat)) {
-            return;
-        }
+        Assume.assumeTrue("SSL renegotiation has to be supported for this test",
+                TesterSupport.isRenegotiationSupported(getTomcatInstance()));
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
