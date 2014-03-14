@@ -116,15 +116,15 @@ public class DigesterFactory {
     }
 
     private static void addSelf(Map<String, String> ids, String id) {
-        String systemId = locationFor(id);
-        ids.put(id, systemId);
-        ids.put(systemId, systemId);
+        String location = locationFor(id);
+        if (location != null) {
+            ids.put(id, location);
+            ids.put(location, location);
+        }
     }
 
     private static void add(Map<String,String> ids, String id, String location) {
-        if (location == null) {
-            log.warn(sm.getString("digesterFactory.missingSchema", id));
-        } else {
+        if (location != null) {
             ids.put(id, location);
         }
     }
@@ -135,6 +135,7 @@ public class DigesterFactory {
             location = CLASS_JSP_CONTEXT.getResource("resources/" + name);
         }
         if (location == null) {
+            log.warn(sm.getString("digesterFactory.missingSchema", name));
             return null;
         }
         return location.toExternalForm();
