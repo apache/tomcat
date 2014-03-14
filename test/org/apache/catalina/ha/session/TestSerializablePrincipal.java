@@ -44,14 +44,10 @@ public class TestSerializablePrincipal  {
     @SuppressWarnings("null")
     @Test
     public void testWriteReadPrincipal() {
-        // Get a temporary file to use for the serialization test
-        File file = null;
-        try {
-            file = File.createTempFile("ser", null);
-            file.deleteOnExit();
-        } catch (IOException e) {
-            e.printStackTrace();
-            fail("ioe creating temporary file");
+
+        File tempDir = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
+        if (!tempDir.mkdirs() && !tempDir.isDirectory()) {
+            fail("Unable to create temporary directory for test");
         }
 
         // Create the Principal to serialize
@@ -62,36 +58,68 @@ public class TestSerializablePrincipal  {
         GenericPrincipal gpOriginal =
             new GenericPrincipal("usr", "pwd", roles, tpOriginal);
 
-        // Do the serialization
+        // Get a temporary file to use for the serialization test
+        File file = null;
         try {
-            FileOutputStream fos = new FileOutputStream(file);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            SerializablePrincipal.writePrincipal(gpOriginal, oos);
-            oos.close();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            fail("fnfe creating object output stream");
+            file = File.createTempFile("ser", null, tempDir);
         } catch (IOException e) {
             e.printStackTrace();
-            fail("ioe serializing principal");
+            fail("ioe creating temporary file");
         }
 
-        // De-serialize the Principal
         GenericPrincipal gpNew = null;
         try {
-            FileInputStream fis = new FileInputStream(file);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            gpNew = SerializablePrincipal.readPrincipal(ois);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            fail("fnfe reading object output stream");
-        } catch (IOException e) {
-            e.printStackTrace();
-            fail("ioe de-serializing principal");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            fail("cnfe de-serializing principal");
+            // Do the serialization
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(file);
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+                SerializablePrincipal.writePrincipal(gpOriginal, oos);
+                oos.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                fail("fnfe creating object output stream");
+            } catch (IOException e) {
+                e.printStackTrace();
+                fail("ioe serializing principal");
+            } finally {
+                if (fos != null) {
+                    try {
+                        fos.close();
+                    } catch (IOException ignored) {
+                        // NO OP
+                    }
+                }
+            }
+
+            // De-serialize the Principal
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(file);
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                gpNew = SerializablePrincipal.readPrincipal(ois);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                fail("fnfe reading object output stream");
+            } catch (IOException e) {
+                e.printStackTrace();
+                fail("ioe de-serializing principal");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                fail("cnfe de-serializing principal");
+            } finally {
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (IOException ignored) {
+                        // NO OP
+                    }
+                }
+            }
+        } finally {
+            if (!file.delete()) {
+                System.out.println("Failed to delete " + file);
+            }
         }
 
         // Now test how similar original and de-serialized versions are
