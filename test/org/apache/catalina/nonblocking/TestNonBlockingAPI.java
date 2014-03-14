@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.core.StandardContext;
@@ -91,11 +92,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     public void testNonBlockingReadIgnoreIsReady() throws Exception {
         // TODO Investigate options to get this test to pass with the HTTP BIO
         //      connector.
-        if (getTomcatInstance().getConnector().getProtocol().equals(
-                "org.apache.coyote.http11.Http11Protocol")) {
-            throw new IOException(
-                    "Forced failure as this test requires true non-blocking IO");
-        }
+        Assume.assumeFalse(
+                "Skipping as this test requires true non-blocking IO",
+                getTomcatInstance().getConnector().getProtocol()
+                        .equals("org.apache.coyote.http11.Http11Protocol"));
         doTestNonBlockingRead(true);
     }
 
