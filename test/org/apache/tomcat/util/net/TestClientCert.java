@@ -36,7 +36,7 @@ public class TestClientCert extends TomcatBaseTest {
 
     @Test
     public void testClientCertGet() throws Exception {
-        Assume.assumeTrue("SSL renegotiation have to be supported",
+        Assume.assumeTrue("SSL renegotiation has to be supported for this test",
                 TesterSupport.isRenegotiationSupported(getTomcatInstance()));
 
         // Unprotected resource
@@ -72,7 +72,7 @@ public class TestClientCert extends TomcatBaseTest {
 
     private void doTestClientCertPost(int bodySize, boolean expectProtectedFail)
             throws Exception {
-        Assume.assumeTrue("SSL renegotiation have to be supported",
+        Assume.assumeTrue("SSL renegotiation has to be supported for this test",
                 TesterSupport.isRenegotiationSupported(getTomcatInstance()));
 
         byte[] body = new byte[bodySize];
