@@ -119,7 +119,6 @@ public class DigesterFactory {
         String systemId = locationFor(id);
         ids.put(id, systemId);
         ids.put(systemId, systemId);
-        ids.put(id, systemId);
     }
 
     private static void add(Map<String,String> ids, String id, String location) {
