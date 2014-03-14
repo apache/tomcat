@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.nio.channels.ReadPendingException;
 import java.nio.channels.WritePendingException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -49,8 +50,8 @@ public class SecureNio2Channel extends Nio2Channel  {
 
     protected boolean closed = false;
     protected boolean closing = false;
-    protected boolean readPending = false;
-    protected boolean writePending = false;
+    protected volatile boolean readPending = false;
+    protected volatile boolean writePending = false;
 
     private CompletionHandler<Integer, SocketWrapper<Nio2Channel>> handshakeReadCompletionHandler;
     private CompletionHandler<Integer, SocketWrapper<Nio2Channel>> handshakeWriteCompletionHandler;
@@ -102,9 +103,8 @@ public class SecureNio2Channel extends Nio2Channel  {
         reset();
     }
 
-    public void reset(SSLEngine engine) throws IOException {
+    public void setSSLEngine(SSLEngine engine) throws IOException {
         this.sslEngine = engine;
-        reset();
     }
 
     @Override
@@ -152,15 +152,23 @@ public class SecureNio2Channel extends Nio2Channel  {
         @Override
         public Boolean get() throws InterruptedException,
                 ExecutionException {
-            int result = integer.get().intValue();
-            return Boolean.valueOf(result >= 0);
+            try {
+                int result = integer.get().intValue();
+                return Boolean.valueOf(result >= 0);
+            } finally {
+                writePending = false;
+            }
         }
         @Override
         public Boolean get(long timeout, TimeUnit unit)
                 throws InterruptedException, ExecutionException,
                 TimeoutException {
-            int result = integer.get(timeout, unit).intValue();
-            return Boolean.valueOf(result >= 0);
+            try {
+                int result = integer.get(timeout, unit).intValue();
+                return Boolean.valueOf(result >= 0);
+            } finally {
+                writePending = false;
+            }
         }
     }
 
@@ -174,6 +182,11 @@ public class SecureNio2Channel extends Nio2Channel  {
     @Override
     public Future<Boolean> flush()
             throws IOException {
+        if (writePending) {
+            throw new WritePendingException();
+        } else {
+            writePending = true;
+        }
         return new FutureFlush(sc.write(netOutBuffer));
     }
 
@@ -470,13 +483,21 @@ public class SecureNio2Channel extends Nio2Channel  {
         }
         @Override
         public Integer get() throws InterruptedException, ExecutionException {
-            return unwrap(netInBuffer.position());
+            try {
+                return unwrap(netInBuffer.position());
+            } finally {
+                readPending = false;
+            }
         }
         @Override
         public Integer get(long timeout, TimeUnit unit)
                 throws InterruptedException, ExecutionException,
                 TimeoutException {
-            return unwrap(netInBuffer.position());
+            try {
+                return unwrap(netInBuffer.position());
+            } finally {
+                readPending = false;
+            }
         }
         protected Integer unwrap(int netread) throws ExecutionException {
             //are we in the middle of closing or closed?
@@ -544,15 +565,23 @@ public class SecureNio2Channel extends Nio2Channel  {
         }
         @Override
         public Integer get() throws InterruptedException, ExecutionException {
-            int netread = integer.get().intValue();
-            return unwrap(netread);
+            try {
+                int netread = integer.get().intValue();
+                return unwrap(netread);
+            } finally {
+                readPending = false;
+            }
         }
         @Override
         public Integer get(long timeout, TimeUnit unit)
                 throws InterruptedException, ExecutionException,
                 TimeoutException {
-            int netread = integer.get(timeout, unit).intValue();
-            return unwrap(netread);
+            try {
+                int netread = integer.get(timeout, unit).intValue();
+                return unwrap(netread);
+            } finally {
+                readPending = false;
+            }
         }
     }
 
@@ -565,6 +594,11 @@ public class SecureNio2Channel extends Nio2Channel  {
      */
     @Override
     public Future<Integer> read(ByteBuffer dst) {
+        if (readPending) {
+            throw new ReadPendingException();
+        } else {
+            readPending = true;
+        }
         //did we finish our handshake?
         if (!handshakeComplete)
             throw new IllegalStateException("Handshake incomplete, you must complete handshake before reading data.");
@@ -604,6 +638,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         @Override
         public Integer get() throws InterruptedException, ExecutionException {
             if (t != null) {
+                writePending = false;
                 throw new ExecutionException(t);
             }
             integer.get();
@@ -611,6 +646,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                 wrap();
                 return get();
             } else {
+                writePending = false;
                 return Integer.valueOf(written);
             }
         }
@@ -619,6 +655,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                 throws InterruptedException, ExecutionException,
                 TimeoutException {
             if (t != null) {
+                writePending = false;
                 throw new ExecutionException(t);
             }
             integer.get(timeout, unit);
@@ -626,6 +663,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                 wrap();
                 return get(timeout, unit);
             } else {
+                writePending = false;
                 return Integer.valueOf(written);
             }
         }
@@ -657,6 +695,11 @@ public class SecureNio2Channel extends Nio2Channel  {
      */
     @Override
     public Future<Integer> write(ByteBuffer src) {
+        if (writePending) {
+            throw new WritePendingException();
+        } else {
+            writePending = true;
+        }
         return new FutureWrite(src);
     }
 
@@ -671,6 +714,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         @Override
         public void completed(Integer nBytes, A attach) {
             if (nBytes.intValue() < 0) {
+                readPending = false;
                 handler.failed(new EOFException(), attach);
                 return;
             }
@@ -707,14 +751,17 @@ public class SecureNio2Channel extends Nio2Channel  {
                     }
                 } while ((netInBuffer.position() != 0)); //continue to unwrapping as long as the input buffer has stuff
                 // If everything is OK, so complete
+                readPending = false;
                 handler.completed(Integer.valueOf(read), attach);
             } catch (Exception e) {
                 // The operation must fails
+                readPending = false;
                 handler.failed(e, attach);
             }
         }
         @Override
         public void failed(Throwable exc, A attach) {
+            readPending = false;
             handler.failed(exc, attach);
         }
     }
@@ -727,6 +774,11 @@ public class SecureNio2Channel extends Nio2Channel  {
         if (closing || closed) {
             handler.completed(Integer.valueOf(-1), attachment);
             return;
+        }
+        if (readPending) {
+            throw new ReadPendingException();
+        } else {
+            readPending = true;
         }
         //did we finish our handshake?
         if (!handshakeComplete)
@@ -747,6 +799,11 @@ public class SecureNio2Channel extends Nio2Channel  {
             handler.failed(new IOException("Channel is in closing state."), attachment);
             return;
         }
+        if (writePending) {
+            throw new WritePendingException();
+        } else {
+            writePending = true;
+        }
 
         try {
             // Prepare the output buffer
@@ -759,6 +816,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                 if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK)
                     tasks();
             } else {
+                writePending = false;
                 handler.failed(new IOException("Unable to wrap data, invalid engine state: " +result.getStatus()), attachment);
                 return;
             }
@@ -768,21 +826,25 @@ public class SecureNio2Channel extends Nio2Channel  {
                 @Override
                 public void completed(Integer nBytes, A attach) {
                     if (nBytes.intValue() < 0) {
+                        writePending = false;
                         handler.failed(new EOFException(), attach);
                     } else if (written == 0) {
                         write(src, timeout, unit, attachment, handler);
                     } else {
                         // Call the handler completed method with the
                         // consumed bytes number
+                        writePending = false;
                         handler.completed(Integer.valueOf(written), attach);
                     }
                 }
                 @Override
                 public void failed(Throwable exc, A attach) {
+                    writePending = false;
                     handler.failed(exc, attach);
                 }
             });
         } catch (Throwable exp) {
+            writePending = false;
             handler.failed(exp, attachment);
         }
     }
@@ -819,9 +881,11 @@ public class SecureNio2Channel extends Nio2Channel  {
         @Override
         public void completed(Integer nBytes, GatherState<A> attachment) {
             if (nBytes.intValue() < 0) {
+                writePending = false;
                 state.handler.failed(new EOFException(), state.attachment);
             } else {
                 if (state.pos == state.offset + state.length) {
+                    writePending = false;
                     state.handler.completed(Long.valueOf(state.writeCount), state.attachment);
                     return;
                 }
@@ -852,6 +916,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         }
         @Override
         public void failed(Throwable exc, GatherState<A> attachment) {
+            writePending = false;
             state.handler.failed(exc, state.attachment);
         }
     }
@@ -868,6 +933,11 @@ public class SecureNio2Channel extends Nio2Channel  {
             handler.failed(new IOException("Channel is in closing state."), attachment);
             return;
         }
+        if (writePending) {
+            throw new WritePendingException();
+        } else {
+            writePending = true;
+        }
         try {
             GatherState<A> state = new GatherState<>(srcs, offset, length,
                     timeout, unit, attachment, handler);
@@ -881,12 +951,14 @@ public class SecureNio2Channel extends Nio2Channel  {
                 if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK)
                     tasks();
             } else {
+                writePending = false;
                 handler.failed(new IOException("Unable to wrap data, invalid engine state: " +result.getStatus()), attachment);
                 return;
             }
             // Write data to the channel
             sc.write(netOutBuffer, timeout, unit, state, new GatherCompletionHandler<>(state));
         } catch (Throwable exp) {
+            writePending = false;
             handler.failed(exp, attachment);
         }
    }
