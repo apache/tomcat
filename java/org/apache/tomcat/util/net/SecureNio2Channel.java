@@ -20,7 +20,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.WritePendingException;
 import java.util.concurrent.ExecutionException;
@@ -665,7 +664,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         @Override
         public void completed(Integer nBytes, A attach) {
             if (nBytes.intValue() < 0) {
-                handler.failed(new ClosedChannelException(), attach);
+                handler.failed(new EOFException(), attach);
                 return;
             }
             try {
@@ -734,8 +733,8 @@ public class SecureNio2Channel extends Nio2Channel  {
     }
 
     @Override
-    public <A> void write(final ByteBuffer src, long timeout, TimeUnit unit, final A attachment,
-            final CompletionHandler<Integer, ? super A> handler) {
+    public <A> void write(final ByteBuffer src, final long timeout, final TimeUnit unit,
+            final A attachment, final CompletionHandler<Integer, ? super A> handler) {
         //are we closing or closed?
         if (closing || closed) {
             handler.failed(new IOException("Channel is in closing state."), attachment);
@@ -746,7 +745,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             // Prepare the output buffer
             this.netOutBuffer.clear();
             // Wrap the source data into the internal buffer
-            SSLEngineResult result = sslEngine.wrap(bufHandler.getWriteBuffer(), netOutBuffer);
+            SSLEngineResult result = sslEngine.wrap(src, netOutBuffer);
             final int written = result.bytesConsumed();
             netOutBuffer.flip();
             if (result.getStatus() == Status.OK) {
@@ -762,7 +761,9 @@ public class SecureNio2Channel extends Nio2Channel  {
                 @Override
                 public void completed(Integer nBytes, A attach) {
                     if (nBytes.intValue() < 0) {
-                        handler.failed(new ClosedChannelException(), attach);
+                        handler.failed(new EOFException(), attach);
+                    } else if (written == 0) {
+                        write(src, timeout, unit, attachment, handler);
                     } else {
                         // Call the handler completed method with the
                         // consumed bytes number
@@ -811,7 +812,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         @Override
         public void completed(Integer nBytes, GatherState<A> attachment) {
             if (nBytes.intValue() < 0) {
-                state.handler.failed(new ClosedChannelException(), state.attachment);
+                state.handler.failed(new EOFException(), state.attachment);
             } else {
                 if (state.pos == state.offset + state.length) {
                     state.handler.completed(Long.valueOf(state.writeCount), state.attachment);
@@ -822,7 +823,8 @@ public class SecureNio2Channel extends Nio2Channel  {
                     netOutBuffer.clear();
                     // Wrap the source data into the internal buffer
                     SSLEngineResult result = sslEngine.wrap(state.srcs[state.offset], netOutBuffer);
-                    state.writeCount += result.bytesConsumed();
+                    int written = result.bytesConsumed();
+                    state.writeCount += written;
                     netOutBuffer.flip();
                     if (result.getStatus() == Status.OK) {
                         if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK)
@@ -831,7 +833,9 @@ public class SecureNio2Channel extends Nio2Channel  {
                         failed(new IOException("Unable to wrap data, invalid engine state: " +result.getStatus()), attachment);
                         return;
                     }
-                    state.offset++;
+                    if (written > 0) {
+                        state.offset++;
+                    }
                     // Write data to the channel
                     sc.write(netOutBuffer, state.timeout, state.unit, state, this);
                 } catch (Throwable exp) {
