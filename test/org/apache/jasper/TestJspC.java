@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,8 +36,15 @@ public class TestJspC {
 
     @Before
     public void init() {
+        File tempDir = new File(System.getProperty("tomcat.test.temp",
+                "output/tmp"));
+        outputDir = new File(tempDir, "jspc");
         jspc = new JspC();
-        outputDir = new File("output/jspc");
+    }
+
+    @After
+    public void cleanup() throws IOException {
+        remove(outputDir);
     }
 
     @Test
