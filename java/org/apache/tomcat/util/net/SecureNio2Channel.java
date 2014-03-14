@@ -581,6 +581,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                 t = new IOException("Channel is in closing state.");
                 return;
             }
+            wrap();
         }
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
@@ -596,12 +597,12 @@ public class SecureNio2Channel extends Nio2Channel  {
         }
         @Override
         public Integer get() throws InterruptedException, ExecutionException {
-            wrap();
             if (t != null) {
                 throw new ExecutionException(t);
             }
             integer.get();
             if (written == 0) {
+                wrap();
                 return get();
             } else {
                 return Integer.valueOf(written);
@@ -611,12 +612,12 @@ public class SecureNio2Channel extends Nio2Channel  {
         public Integer get(long timeout, TimeUnit unit)
                 throws InterruptedException, ExecutionException,
                 TimeoutException {
-            wrap();
             if (t != null) {
                 throw new ExecutionException(t);
             }
             integer.get(timeout, unit);
             if (written == 0) {
+                wrap();
                 return get(timeout, unit);
             } else {
                 return Integer.valueOf(written);
