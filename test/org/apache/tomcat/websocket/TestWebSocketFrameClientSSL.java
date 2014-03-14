@@ -50,11 +50,11 @@ public class TestWebSocketFrameClientSSL extends TomcatBaseTest {
         //      the websockets writes, which deadlock until timedout.
         //      Can be reproduced in NIO by adding a Thread.sleep in
         //      writes. Reenable later when investigated and fixed.
-        if (getTomcatInstance().getConnector().getProtocol().equals(
+/*        if (getTomcatInstance().getConnector().getProtocol().equals(
                 "org.apache.coyote.http11.Http11Nio2Protocol")) {
             return;
         }
-
+*/
         Tomcat tomcat = getTomcatInstance();
         // Must have a real docBase - just use temp
         Context ctx =
@@ -90,7 +90,7 @@ public class TestWebSocketFrameClientSSL extends TomcatBaseTest {
 
         // Ignore the latch result as the message count test below will tell us
         // if the right number of messages arrived
-        handler.getLatch().await(TesterFirehoseServer.WAIT_TIME_MILLIS,
+        handler.getLatch().await(TesterFirehoseServer.WAIT_TIME_MILLIS * 4,
                 TimeUnit.MILLISECONDS);
 
         Queue<String> messages = handler.getMessages();
