@@ -479,12 +479,11 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 }
             } else {
                 channel.setIOChannel(socket);
-                if ( channel instanceof SecureNio2Channel ) {
+                if (channel instanceof SecureNio2Channel) {
                     SSLEngine engine = createSSLEngine();
-                    ((SecureNio2Channel)channel).reset(engine);
-                } else {
-                    channel.reset();
+                    ((SecureNio2Channel) channel).setSSLEngine(engine);
                 }
+                channel.reset();
             }
             Nio2SocketWrapper socketWrapper = (useCaches) ? socketWrapperCache.pop() : null;
             if (socketWrapper == null) {
