@@ -45,16 +45,15 @@ public class TestWebSocketFrameClientSSL extends TomcatBaseTest {
 
     @Test
     public void testConnectToServerEndpoint() throws Exception {
-        // TODO Skip NIO2 since its CPU use on non blocking writes to
-        //      do the encryption inline apparently messes up
-        //      the websockets writes, which deadlock until timedout.
-        //      Can be reproduced in NIO by adding a Thread.sleep in
-        //      writes. Reenable later when investigated and fixed.
-/*        if (getTomcatInstance().getConnector().getProtocol().equals(
+        // FIXME Skip NIO2 since its CPU use on non blocking writes to
+        //       do the encryption inline apparently messes up
+        //       the websockets writes, which deadlock until timedout.
+        //       Reenable later when investigated and fixed.
+        if (getTomcatInstance().getConnector().getProtocol().equals(
                 "org.apache.coyote.http11.Http11Nio2Protocol")) {
             return;
         }
-*/
+
         Tomcat tomcat = getTomcatInstance();
         // Must have a real docBase - just use temp
         Context ctx =
@@ -90,7 +89,7 @@ public class TestWebSocketFrameClientSSL extends TomcatBaseTest {
 
         // Ignore the latch result as the message count test below will tell us
         // if the right number of messages arrived
-        handler.getLatch().await(TesterFirehoseServer.WAIT_TIME_MILLIS * 4,
+        handler.getLatch().await(TesterFirehoseServer.WAIT_TIME_MILLIS,
                 TimeUnit.MILLISECONDS);
 
         Queue<String> messages = handler.getMessages();
