@@ -100,7 +100,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         reset();
     }
 
-    public void setSSLEngine(SSLEngine engine) throws IOException {
+    public void setSSLEngine(SSLEngine engine) {
         this.sslEngine = engine;
     }
 
