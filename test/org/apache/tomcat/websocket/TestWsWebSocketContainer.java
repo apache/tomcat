@@ -42,6 +42,7 @@ import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -388,6 +389,11 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
     private void doTestWriteTimeoutServer(boolean setTimeoutOnContainer)
             throws Exception {
 
+        // This will never work for BIO
+        Assume.assumeFalse(
+                "Skipping test. This feature will never work for BIO connector.",
+                getProtocol().equals(Http11Protocol.class.getName()));
+
         /*
          * Note: There are all sorts of horrible uses of statics in this test
          *       because the API uses classes and the tests really need access
@@ -396,11 +402,6 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         timoutOnContainer = setTimeoutOnContainer;
 
         Tomcat tomcat = getTomcatInstance();
-
-        if (getProtocol().equals(Http11Protocol.class.getName())) {
-            // This will never work for BIO
-            return;
-        }
 
         // Must have a real docBase - just use temp
         Context ctx =
