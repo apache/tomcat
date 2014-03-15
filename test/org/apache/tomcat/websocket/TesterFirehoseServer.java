@@ -108,7 +108,7 @@ public class TesterFirehoseServer {
                 }
             }
 
-            System.out.println("Recieved " + msg + ", now sending data");
+            System.out.println("Received " + msg + ", now sending data");
 
             session.getUserProperties().put(
                     "org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT",
