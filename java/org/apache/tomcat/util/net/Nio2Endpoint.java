@@ -270,8 +270,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
      * Number of keepalive sockets.
      */
     public int getKeepAliveCount() {
-        return 0;
-        // FIXME: would need some specific statistics gathering
+        // For this connector, only the overall connection count is relevant
+        return -1;
     }
 
 
@@ -464,9 +464,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 // SSL setup
                 if (sslContext != null) {
                     SSLEngine engine = createSSLEngine();
-                    int appbufsize = engine.getSession().getApplicationBufferSize();
-                    NioBufferHandler bufhandler = new NioBufferHandler(Math.max(appbufsize,socketProperties.getAppReadBufSize()),
-                            socketProperties.getAppWriteBufSize(),
+                    int appBufferSize = engine.getSession().getApplicationBufferSize();
+                    NioBufferHandler bufhandler = new NioBufferHandler(Math.max(appBufferSize, socketProperties.getAppReadBufSize()),
+                            Math.max(appBufferSize, socketProperties.getAppWriteBufSize()),
                             socketProperties.getDirectBuffer());
                     channel = new SecureNio2Channel(socket, engine, bufhandler, this);
                 } else {
@@ -493,9 +493,13 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             socketWrapper.setKeepAliveLeft(Nio2Endpoint.this.getMaxKeepAliveRequests());
             socketWrapper.setSecure(isSSLEnabled());
             channel.setSocket(socketWrapper);
-            processSocket(socketWrapper, SocketStatus.OPEN_READ, true);
-            // FIXME: In theory, awaitBytes is better, but the SSL handshake is done by processSocket
-            //awaitBytes(socketWrapper);
+            if (sslContext != null) {
+                // Use the regular processing, as the first handshake needs to be done there
+                processSocket(socketWrapper, SocketStatus.OPEN_READ, true);
+            } else {
+                // Wait until some bytes are available to start the real processing
+                awaitBytes(socketWrapper);
+            }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             try {

@@ -65,6 +65,12 @@ public class SocketProperties {
     protected boolean directBuffer = false;
 
     /**
+     * Enable/disable direct buffers for the network buffers for SSL
+     * Default value is enabled
+     */
+    protected boolean directSslBuffer = false;
+
+    /**
      * Socket receive buffer size in bytes (SO_RCVBUF).
      * JVM default used if not set.
      */
@@ -242,6 +248,10 @@ public class SocketProperties {
         return directBuffer;
     }
 
+    public boolean getDirectSslBuffer() {
+        return directSslBuffer;
+    }
+
     public boolean getOoBInline() {
         return ooBInline.booleanValue();
     }
@@ -377,6 +387,10 @@ public class SocketProperties {
 
     public void setDirectBuffer(boolean directBuffer) {
         this.directBuffer = directBuffer;
+    }
+
+    public void setDirectSslBuffer(boolean directSslBuffer) {
+        this.directSslBuffer = directSslBuffer;
     }
 
     public void setSoLingerOn(boolean soLingerOn) {

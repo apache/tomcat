@@ -753,7 +753,7 @@
         <th />
         <th>Java Blocking Connector<br />BIO</th>
         <th>Java Nio Blocking Connector<br />NIO</th>
-        <th>Java Nio2 Blocking Connector<br />NIO</th>
+        <th>Java Nio2 Blocking Connector<br />NIO2</th>
         <th>APR/native Connector<br />APR</th>
       </tr>
       <tr>

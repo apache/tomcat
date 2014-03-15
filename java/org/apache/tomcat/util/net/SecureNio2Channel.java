@@ -59,19 +59,21 @@ public class SecureNio2Channel extends Nio2Channel  {
     public SecureNio2Channel(AsynchronousSocketChannel channel, SSLEngine engine,
             ApplicationBufferHandler bufHandler, Nio2Endpoint endpoint0) throws IOException {
         super(channel, bufHandler);
-        this.sslEngine = engine;
-        this.endpoint = endpoint0;
-        int appBufSize = sslEngine.getSession().getApplicationBufferSize();
+        sslEngine = engine;
+        endpoint = endpoint0;
         int netBufSize = sslEngine.getSession().getPacketBufferSize();
-        //allocate network buffers - TODO, add in optional direct non-direct buffers
-        netInBuffer = ByteBuffer.allocateDirect(netBufSize);
-        netOutBuffer = ByteBuffer.allocateDirect(netBufSize);
-
+        if (endpoint.getSocketProperties().getDirectSslBuffer()) {
+            netInBuffer = ByteBuffer.allocateDirect(netBufSize);
+            netOutBuffer = ByteBuffer.allocateDirect(netBufSize);
+        } else {
+            netInBuffer = ByteBuffer.allocate(netBufSize);
+            netOutBuffer = ByteBuffer.allocate(netBufSize);
+        }
         handshakeReadCompletionHandler = new CompletionHandler<Integer, SocketWrapper<Nio2Channel>>() {
             @Override
             public void completed(Integer result, SocketWrapper<Nio2Channel> attachment) {
                 if (result.intValue() < 0) {
-                    failed(new IOException("Error"), attachment);
+                    failed(new EOFException(), attachment);
                     return;
                 }
                 endpoint.processSocket(attachment, SocketStatus.OPEN_READ, false);
@@ -85,7 +87,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             @Override
             public void completed(Integer result, SocketWrapper<Nio2Channel> attachment) {
                 if (result.intValue() < 0) {
-                    failed(new IOException("Error"), attachment);
+                    failed(new EOFException(), attachment);
                     return;
                 }
                 endpoint.processSocket(attachment, SocketStatus.OPEN_WRITE, false);
@@ -95,11 +97,6 @@ public class SecureNio2Channel extends Nio2Channel  {
                 endpoint.closeSocket(attachment, SocketStatus.ERROR);
             }
         };
-
-        //ensure that the application has a large enough read/write buffers
-        //by doing this, we should not encounter any buffer overflow errors
-        // FIXME: this does nothing, so it is in the NIO2 endpoint
-        bufHandler.expand(bufHandler.getReadBuffer(), appBufSize);
         reset();
     }
 
