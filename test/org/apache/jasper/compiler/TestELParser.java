@@ -152,6 +152,24 @@ public class TestELParser {
     }
 
 
+    @Test
+    public void testQuotes01() throws JasperException {
+        doTestParser("'");
+    }
+
+
+    @Test
+    public void testQuotes02() throws JasperException {
+        doTestParser("'${foo}'");
+    }
+
+
+    @Test
+    public void testQuotes03() throws JasperException {
+        doTestParser("'${'foo'}'");
+    }
+
+
     private void doTestParser(String input) throws JasperException {
         Nodes nodes = ELParser.parse(input, false);
 
