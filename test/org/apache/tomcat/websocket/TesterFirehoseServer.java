@@ -95,8 +95,7 @@ public class TesterFirehoseServer {
         }
 
         @OnMessage
-        public void onMessage(Session session,
-                @SuppressWarnings("unused") String msg) throws IOException {
+        public void onMessage(Session session, String msg) throws IOException {
 
             if (started) {
                 return;
