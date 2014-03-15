@@ -30,6 +30,7 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -103,9 +104,9 @@ public class TestWebSocketFrameClientSSL extends TomcatBaseTest {
     public void testBug56032() throws Exception {
         // TODO Investigate options to get this test to pass with the HTTP BIO
         //      connector.
-        if (getTomcatInstance().getConnector().getProtocol().equals("HTTP/1.1")) {
-            return;
-        }
+        Assume.assumeFalse(
+                "Skip this test on BIO. TODO: investigate options to make it pass with HTTP BIO connector",
+                getTomcatInstance().getConnector().getProtocol().equals("HTTP/1.1"));
 
         Tomcat tomcat = getTomcatInstance();
         // Must have a real docBase - just use temp
