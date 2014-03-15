@@ -28,6 +28,7 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -49,10 +50,10 @@ public class TestWebSocketFrameClientSSL extends TomcatBaseTest {
         //       do the encryption inline apparently messes up
         //       the websockets writes, which deadlock until timedout.
         //       Reenable later when investigated and fixed.
-        if (getTomcatInstance().getConnector().getProtocol().equals(
-                "org.apache.coyote.http11.Http11Nio2Protocol")) {
-            return;
-        }
+        Assume.assumeFalse(
+                "Skip this test on NIO2. FIXME: investigate.",
+                getTomcatInstance().getConnector().getProtocol()
+                        .equals("org.apache.coyote.http11.Http11Nio2Protocol"));
 
         Tomcat tomcat = getTomcatInstance();
         // Must have a real docBase - just use temp
@@ -105,10 +106,10 @@ public class TestWebSocketFrameClientSSL extends TomcatBaseTest {
     public void testBug56032() throws Exception {
         // TODO Investigate options to get this test to pass with the HTTP BIO
         //      connector.
-        if (getTomcatInstance().getConnector().getProtocol().equals(
-                "org.apache.coyote.http11.Http11Protocol")) {
-            return;
-        }
+        Assume.assumeFalse(
+                "Skip this test on BIO. TODO: investigate options to make it pass with HTTP BIO connector",
+                getTomcatInstance().getConnector().getProtocol()
+                        .equals("org.apache.coyote.http11.Http11Protocol"));
 
         Tomcat tomcat = getTomcatInstance();
         // Must have a real docBase - just use temp
