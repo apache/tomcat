@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.servlets;
 
 
@@ -36,6 +34,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.naming.InitialContext;
@@ -1606,25 +1605,73 @@ public class DefaultServlet
         /*  Open and read in file in one fell swoop to reduce chance
          *  chance of leaving handle open.
          */
-        if (globalXsltFile!=null) {
-            FileInputStream fis = null;
-
-            try {
-                File f = new File(globalXsltFile);
-                if (f.exists()){
-                    fis =new FileInputStream(f);
+        if (globalXsltFile != null) {
+            File f = validateGlobalXsltFile();
+            if (f != null && f.exists()){
+                FileInputStream fis = null;
+                try {
+                    fis = new FileInputStream(f);
                     byte b[] = new byte[(int)f.length()]; /* danger! */
                     fis.read(b);
                     return new ByteArrayInputStream(b);
+                } finally {
+                    if (fis != null) {
+                        try {
+                            fis.close();
+                        } catch (IOException ioe) {
+                            // Ignore
+                        }
+                    }
                 }
-            } finally {
-                if (fis!=null)
-                    fis.close();
             }
         }
 
         return null;
 
+    }
+
+
+    private File validateGlobalXsltFile() {
+        
+        File result = null;
+        String base = System.getProperty(Globals.CATALINA_BASE_PROP);
+        
+        if (base != null) {
+            File baseConf = new File(base, "conf");
+            result = validateGlobalXsltFile(baseConf);
+        }
+        
+        if (result == null) {
+            String home = System.getProperty(Globals.CATALINA_HOME_PROP);
+            if (home != null) {
+                File homeConf = new File(home, "conf");
+                result = validateGlobalXsltFile(homeConf);
+            }
+        }
+
+        return result;
+    }
+
+
+    private File validateGlobalXsltFile(File base) {
+        File candidate = new File(base, globalXsltFile);
+
+        // First check that the resulting path is under the provided base
+        try {
+            if (!candidate.getCanonicalPath().startsWith(base.getCanonicalPath())) {
+                return null;
+            }
+        } catch (IOException ioe) {
+            return null;
+        }
+
+        // Next check that an .xlt or .xslt file has been specified
+        String nameLower = candidate.getName().toLowerCase(Locale.ENGLISH);
+        if (!nameLower.endsWith(".xslt") && !nameLower.endsWith(".xlt")) {
+            return null;
+        }
+
+        return candidate;
     }
 
 
