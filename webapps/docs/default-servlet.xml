@@ -120,20 +120,22 @@ directory listings are disabled and debugging is turned off.
   </property>
   <property name="contextXsltFile">
         You may also customize your directory listing by context by
-        configuring <code>contextXsltFile</code>. This should be a context
-        relative path (e.g.: <code>/path/to/context.xslt</code>). This
-        overrides <code>globalXsltFile</code>. If this value is present but a
-        file does not exist, then <code>globalXsltFile</code> will be used. If
+        configuring <code>contextXsltFile</code>. This must be a context
+        relative path (e.g.: <code>/path/to/context.xslt</code>) to a file with
+        a <code>.xsl</code> or <code>.xslt</code> extension. This overrides
+        <code>globalXsltFile</code>. If this value is present but a file does
+        not exist, then <code>globalXsltFile</code> will be used. If
         <code>globalXsltFile</code> does not exist, then the default
         directory listing will be shown.
   </property>
   <property name="localXsltFile">
         You may also customize your directory listing by directory by
-        configuring <code>localXsltFile</code>. This should be a relative
-        file name in the directory where the listing will take place.
-        This overrides <code>globalXsltFile</code> and
-        <code>contextXsltFile</code>. If this value is present but a file
-        does not exist, then <code>contextXsltFile</code> will be used. If
+        configuring <code>localXsltFile</code>. This must be a file in the
+        directory where the listing will take place to with a
+        <code>.xsl</code> or <code>.xslt</code> extension. This overrides
+        <code>globalXsltFile</code> and <code>contextXsltFile</code>. If this
+        value is present but a file does not exist, then
+        <code>contextXsltFile</code> will be used. If
         <code>contextXsltFile</code> does not exist, then
         <code>globalXsltFile</code> will be used. If
         <code>globalXsltFile</code> does not exist, then the default
