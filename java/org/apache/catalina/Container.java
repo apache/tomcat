@@ -414,7 +414,13 @@ public interface Container extends Lifecycle {
 
 
     /**
-     *
+     * Obtain the location of CATALINA_BASE.
      */
     public File getCatalinaBase();
+
+
+    /**
+     * Obtain the location of CATALINA_HOME.
+     */
+    public File getCatalinaHome();
 }

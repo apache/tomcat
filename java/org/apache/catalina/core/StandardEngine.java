@@ -374,6 +374,22 @@ public class StandardEngine extends ContainerBase implements Engine {
     }
 
 
+    @Override
+    public File getCatalinaHome() {
+        if (service != null) {
+            Server s = service.getServer();
+            if (s != null) {
+                File base = s.getCatalinaHome();
+                if (base != null) {
+                    return base;
+                }
+            }
+        }
+        // Fall-back
+        return super.getCatalinaHome();
+    }
+
+
     // -------------------- JMX registration  --------------------
 
     @Override
