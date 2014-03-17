@@ -211,6 +211,10 @@
          Add support for <code>LAST_ACCESS_AT_START</code> system property to
          Manager web application. (kfujino)
       </fix>
+      <fix>
+         Add definition of <code>org.apache.catalina.ant.FindLeaksTask</code>.
+         (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
