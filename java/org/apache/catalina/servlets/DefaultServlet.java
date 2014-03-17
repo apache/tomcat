@@ -47,10 +47,14 @@ import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -64,6 +68,10 @@ import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.res.StringManager;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.ext.EntityResolver2;
 
 
 /**
@@ -122,6 +130,11 @@ public class DefaultServlet extends HttpServlet {
      */
     protected static final URLEncoder urlEncoder;
 
+    private static final DocumentBuilderFactory factory;
+
+    private static final SecureEntityResolver secureEntityResolver =
+            new SecureEntityResolver();
+
     /**
      * Full range marker.
      */
@@ -152,6 +165,10 @@ public class DefaultServlet extends HttpServlet {
         urlEncoder.addSafeCharacter('.');
         urlEncoder.addSafeCharacter('*');
         urlEncoder.addSafeCharacter('/');
+
+        factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        factory.setValidating(false);
     }
 
 
@@ -1192,13 +1209,12 @@ public class DefaultServlet extends HttpServlet {
     protected InputStream render(String contextPath, WebResource resource)
         throws IOException, ServletException {
 
-        InputStream xsltInputStream =
-            findXsltInputStream(resource);
+        Source xsltSource = findXsltSource(resource);
 
-        if (xsltInputStream==null) {
+        if (xsltSource == null) {
             return renderHtml(contextPath, resource);
         }
-        return renderXml(contextPath, resource, xsltInputStream);
+        return renderXml(contextPath, resource, xsltSource);
 
     }
 
@@ -1211,7 +1227,7 @@ public class DefaultServlet extends HttpServlet {
      */
     protected InputStream renderXml(String contextPath,
                                     WebResource resource,
-                                    InputStream xsltInputStream)
+                                    Source xsltSource)
         throws IOException, ServletException {
 
         StringBuilder sb = new StringBuilder();
@@ -1292,8 +1308,7 @@ public class DefaultServlet extends HttpServlet {
         try {
             TransformerFactory tFactory = TransformerFactory.newInstance();
             Source xmlSource = new StreamSource(new StringReader(sb.toString()));
-            Source xslSource = new StreamSource(xsltInputStream);
-            Transformer transformer = tFactory.newTransformer(xslSource);
+            Transformer transformer = tFactory.newTransformer(xsltSource);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             OutputStreamWriter osWriter = new OutputStreamWriter(stream, "UTF8");
@@ -1496,9 +1511,9 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Return the xsl template inputstream (if possible)
+     * Return a Source for the xsl template (if possible)
      */
-    protected InputStream findXsltInputStream(WebResource directory)
+    protected Source findXsltSource(WebResource directory)
         throws IOException {
 
         if (localXsltFile != null) {
@@ -1507,7 +1522,11 @@ public class DefaultServlet extends HttpServlet {
             if (resource.isFile()) {
                 InputStream is = resource.getInputStream();
                 if (is != null) {
-                    return is;
+                    if (Globals.IS_SECURITY_ENABLED) {
+                        return secureXslt(is);
+                    } else {
+                        return new StreamSource(is);
+                    }
                 }
             }
             if (debug > 10) {
@@ -1518,8 +1537,13 @@ public class DefaultServlet extends HttpServlet {
         if (contextXsltFile != null) {
             InputStream is =
                 getServletContext().getResourceAsStream(contextXsltFile);
-            if (is != null)
-                return is;
+            if (is != null) {
+                if (Globals.IS_SECURITY_ENABLED) {
+                    return secureXslt(is);
+                } else {
+                    return new StreamSource(is);
+                }
+            }
 
             if (debug > 10)
                 log("contextXsltFile '" + contextXsltFile + "' not found");
@@ -1530,11 +1554,11 @@ public class DefaultServlet extends HttpServlet {
          */
         if (globalXsltFile != null) {
             File f = validateGlobalXsltFile();
-            if (f != null && f.exists()){
+            if (f != null){
                 try (FileInputStream fis = new FileInputStream(f)){
                     byte b[] = new byte[(int)f.length()]; /* danger! */
                     fis.read(b);
-                    return new ByteArrayInputStream(b);
+                    return new StreamSource(new ByteArrayInputStream(b));
                 }
             }
         }
@@ -1550,7 +1574,9 @@ public class DefaultServlet extends HttpServlet {
         File result = validateGlobalXsltFile(baseConf);
         if (result == null) {
             File homeConf = new File(context.getCatalinaHome(), "conf");
-            result = validateGlobalXsltFile(homeConf);
+            if (!baseConf.equals(homeConf)) {
+                result = validateGlobalXsltFile(homeConf);
+            }
         }
 
         return result;
@@ -1558,7 +1584,14 @@ public class DefaultServlet extends HttpServlet {
 
 
     private File validateGlobalXsltFile(File base) {
-        File candidate = new File(base, globalXsltFile);
+        File candidate = new File(globalXsltFile);
+        if (!candidate.isAbsolute()) {
+            candidate = new File(base, globalXsltFile);
+        }
+
+        if (!candidate.isFile()) {
+            return null;
+        }
 
         // First check that the resulting path is under the provided base
         try {
@@ -1569,9 +1602,9 @@ public class DefaultServlet extends HttpServlet {
             return null;
         }
 
-        // Next check that an .xlt or .xslt file has been specified
+        // Next check that an .xsl or .xslt file has been specified
         String nameLower = candidate.getName().toLowerCase(Locale.ENGLISH);
-        if (!nameLower.endsWith(".xslt") && !nameLower.endsWith(".xlt")) {
+        if (!nameLower.endsWith(".xslt") && !nameLower.endsWith(".xsl")) {
             return null;
         }
 
@@ -1579,8 +1612,32 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-    // -------------------------------------------------------- protected Methods
+    private Source secureXslt(InputStream is) {
+        // Need to filter out any external entities
+        Source result = null;
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            builder.setEntityResolver(secureEntityResolver);
+            Document document = builder.parse(is);
+            result = new DOMSource(document);
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            if (debug > 0) {
+                log(e.getMessage(), e);
+            }
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
+        }
+        return result;
+    }
 
+
+    // -------------------------------------------------------- protected Methods
 
     /**
      * Check if sendfile can be used.
@@ -2074,9 +2131,6 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-    // ------------------------------------------------------ Range Inner Class
-
-
     protected static class Range {
 
         public long start;
@@ -2090,6 +2144,36 @@ public class DefaultServlet extends HttpServlet {
             if (end >= length)
                 end = length - 1;
             return (start >= 0) && (end >= 0) && (start <= end) && (length > 0);
+        }
+    }
+
+
+    /**
+     * This is secure in the sense that any attempt to use an external entity
+     * will trigger an exception.
+     */
+    private static class SecureEntityResolver implements EntityResolver2  {
+
+        @Override
+        public InputSource resolveEntity(String publicId, String systemId)
+                throws SAXException, IOException {
+            throw new SAXException(sm.getString("defaultServlet.blockExternalEntity",
+                    publicId, systemId));
+        }
+
+        @Override
+        public InputSource getExternalSubset(String name, String baseURI)
+                throws SAXException, IOException {
+            throw new SAXException(sm.getString("defaultServlet.blockExternalSubset",
+                    name, baseURI));
+        }
+
+        @Override
+        public InputSource resolveEntity(String name, String publicId,
+                String baseURI, String systemId) throws SAXException,
+                IOException {
+            throw new SAXException(sm.getString("defaultServlet.blockExternalEntity2",
+                    name, publicId, baseURI, systemId));
         }
     }
 }
