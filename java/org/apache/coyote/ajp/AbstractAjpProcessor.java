@@ -242,13 +242,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Is a body present for the current request? This is determined by the
-     * presence of the content-length header with a non-zero value.
-     */
-    private boolean bodyPresent = false;
-
-
-    /**
      * Indicates that a 'get body chunk' message has been sent but the body
      * chunk has not yet been received.
      */
@@ -902,7 +895,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         // Recycle Request object
         first = true;
         endOfStream = false;
-        bodyPresent = false;
         waitingForBodyMessage = false;
         empty = true;
         replay = false;
@@ -975,12 +967,10 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         }
 
         waitingForBodyMessage = false;
-        first = false;
 
         // No data received.
         if (bodyMessage.getLen() == 0) {
             // just the header
-            // Don't mark 'end of stream' for the first chunk.
             return false;
         }
         int blen = bodyMessage.peekInt();
@@ -1061,9 +1051,8 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      * @return true if there is more data, false if not.
      */
     protected boolean refillReadBuffer(boolean block) throws IOException {
-        // If the server returns an empty packet, assume that that end of
-        // the stream has been reached (yuck -- fix protocol??).
-        // FORM support
+        // When using replay (e.g. after FORM auth) all the data to read has
+        // been buffered so there is no opportunity to refill the buffer.
         if (replay) {
             endOfStream = true; // we've read everything there is
         }
@@ -1071,14 +1060,30 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             return false;
         }
 
+        if (first) {
+            first = false;
+            long contentLength = request.getContentLengthLong();
+            // - When content length > 0, AJP sends the first body message
+            //   automatically.
+            // - When content length == 0, AJP does not send a body message.
+            // - When content length is unknown, AJP does not send the first
+            //   body message automatically.
+            if (contentLength > 0) {
+                waitingForBodyMessage = true;
+            } else if (contentLength == 0) {
+                endOfStream = true;
+                return false;
+            }
+        }
+
         // Request more data immediately
-        if (!first && !waitingForBodyMessage) {
+        if (!waitingForBodyMessage) {
             output(getBodyMessageArray, 0, getBodyMessageArray.length, true);
             waitingForBodyMessage = true;
         }
 
         boolean moreData = receive(block);
-        if (!moreData && ((first && !bodyPresent) || (!first && !waitingForBodyMessage))) {
+        if (!moreData && !waitingForBodyMessage) {
             endOfStream = true;
         }
         return moreData;
@@ -1159,9 +1164,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     contentLengthSet = true;
                     // Set the content-length header for the request
                     request.setContentLength(cl);
-                }
-                if (cl != 0) {
-                    bodyPresent = true;
                 }
             } else if (hId == Constants.SC_REQ_CONTENT_TYPE ||
                     (hId == -1 && tmpMB.equalsIgnoreCase("Content-Type"))) {
@@ -1519,8 +1521,8 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         finished = true;
 
         // Swallow the unread body packet if present
-        if (first && request.getContentLengthLong() > 0 || waitingForBodyMessage) {
-            receive(true);
+        if (waitingForBodyMessage || first && request.getContentLengthLong() > 0) {
+            refillReadBuffer(true);
         }
 
         // Add the end message
@@ -1539,7 +1541,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         if (empty) {
             try {
                 refillReadBuffer(false);
-            } catch (IOException e) {
+            } catch (IOException timeout) {
                 // Not ideal. This will indicate that data is available
                 // which should trigger a read which in turn will trigger
                 // another IOException and that one can be thrown.
@@ -1682,12 +1684,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             if (endOfStream) {
                 return -1;
             }
-            if (first && req.getContentLengthLong() > 0) {
-                // Handle special first-body-chunk
-                if (!receive(true)) {
-                    return 0;
-                }
-            } else if (empty) {
+            if (empty) {
                 if (!refillReadBuffer(true)) {
                     return -1;
                 }
