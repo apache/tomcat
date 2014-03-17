@@ -111,11 +111,12 @@ directory listings are disabled and debugging is turned off.
   </property>
   <property name="globalXsltFile">
         If you wish to customize your directory listing, you
-        can use an XSL transformation. This value is an absolute
-        file name which be used for all directory listings.
-        This can be overridden per context and/or per directory. See
-        <strong>contextXsltFile</strong> and <strong>localXsltFile</strong>
-        below. The format of the xml is shown below.
+        can use an XSL transformation. This value is a relative file name (to
+        either $CATALINA_BASE/conf/ or $CATALINA_HOME/conf/) which will be used
+        for all directory listings. This can be overridden per context and/or
+        per directory. See <strong>contextXsltFile</strong> and
+        <strong>localXsltFile</strong> below. The format of the xml is shown
+        below.
   </property>
   <property name="contextXsltFile">
         You may also customize your directory listing by context by

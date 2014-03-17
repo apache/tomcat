@@ -1155,6 +1155,17 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     }
 
 
+    @Override
+    public File getCatalinaHome() {
+
+        if (parent == null) {
+            return null;
+        }
+
+        return parent.getCatalinaHome();
+    }
+
+
     // ------------------------------------------------------ Protected Methods
 
     /**

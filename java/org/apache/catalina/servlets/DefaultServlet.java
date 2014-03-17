@@ -34,6 +34,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.servlet.RequestDispatcher;
@@ -53,6 +54,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
@@ -1526,24 +1528,54 @@ public class DefaultServlet extends HttpServlet {
         /*  Open and read in file in one fell swoop to reduce chance
          *  chance of leaving handle open.
          */
-        if (globalXsltFile!=null) {
-            FileInputStream fis = null;
-
-            try {
-                File f = new File(globalXsltFile);
-                if (f.exists()){
-                    fis =new FileInputStream(f);
+        if (globalXsltFile != null) {
+            File f = validateGlobalXsltFile();
+            if (f != null && f.exists()){
+                try (FileInputStream fis = new FileInputStream(f)){
                     byte b[] = new byte[(int)f.length()]; /* danger! */
                     fis.read(b);
                     return new ByteArrayInputStream(b);
                 }
-            } finally {
-                if (fis!=null)
-                    fis.close();
             }
         }
 
         return null;
+    }
+
+
+    private File validateGlobalXsltFile() {
+        Context context = resources.getContext();
+
+        File baseConf = new File(context.getCatalinaBase(), "conf");
+        File result = validateGlobalXsltFile(baseConf);
+        if (result == null) {
+            File homeConf = new File(context.getCatalinaHome(), "conf");
+            result = validateGlobalXsltFile(homeConf);
+        }
+
+        return result;
+    }
+
+
+    private File validateGlobalXsltFile(File base) {
+        File candidate = new File(base, globalXsltFile);
+
+        // First check that the resulting path is under the provided base
+        try {
+            if (!candidate.getCanonicalPath().startsWith(base.getCanonicalPath())) {
+                return null;
+            }
+        } catch (IOException ioe) {
+            return null;
+        }
+
+        // Next check that an .xlt or .xslt file has been specified
+        String nameLower = candidate.getName().toLowerCase(Locale.ENGLISH);
+        if (!nameLower.endsWith(".xslt") && !nameLower.endsWith(".xlt")) {
+            return null;
+        }
+
+        return candidate;
     }
 
 

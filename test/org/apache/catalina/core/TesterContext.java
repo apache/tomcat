@@ -277,6 +277,11 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public File getCatalinaHome() {
+        return null;
+    }
+
+    @Override
     public void addLifecycleListener(LifecycleListener listener) {
         // NO-OP
     }
