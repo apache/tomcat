@@ -220,6 +220,10 @@
          <code>org.apache.catalina.ant.ThreaddumpTask</code> and
          <code>org.apache.catalina.ant.SslConnectorCiphersTask</code>. (kfujino)
       </fix>
+      <add>
+         Add the option to ignore the constraint of the first line of the
+        response message that must be "OK -". Default is false. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">

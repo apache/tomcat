@@ -111,6 +111,20 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
         this.username = username;
     }
 
+    /**
+     * If set to true - ignore the constraint of the first line of the response
+     * message that must be "OK -".
+     */
+    protected boolean ignoreResponseConstraint = false;
+
+    public boolean isIgnoreResponseConstraint() {
+        return ignoreResponseConstraint;
+    }
+
+    public void setIgnoreResponseConstraint(boolean ignoreResponseConstraint) {
+        this.ignoreResponseConstraint = ignoreResponseConstraint;
+    }
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -241,7 +255,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                     if (buff.length() > 0) {
                         String line = buff.toString();
                         buff.setLength(0);
-                        if (first) {
+                        if (!ignoreResponseConstraint && first) {
                             if (!line.startsWith("OK -")) {
                                 error = line;
                                 msgPriority = Project.MSG_ERR;
