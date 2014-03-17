@@ -23,6 +23,7 @@ start=org.apache.catalina.ant.StartTask
 stop=org.apache.catalina.ant.StopTask
 undeploy=org.apache.catalina.ant.UndeployTask
 validator=org.apache.catalina.ant.ValidatorTask
+findleaks=org.apache.catalina.ant.FindLeaksTask
 
 #Jk Task
 jkstatus=org.apache.catalina.ant.JKStatusUpdateTask
