@@ -52,10 +52,14 @@ import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -70,6 +74,10 @@ import org.apache.naming.resources.ProxyDirContext;
 import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.ResourceAttributes;
 import org.apache.tomcat.util.res.StringManager;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.ext.EntityResolver2;
 
 
 /**
@@ -119,8 +127,13 @@ public class DefaultServlet
 
     private static final long serialVersionUID = 1L;
 
-    // ----------------------------------------------------- Instance Variables
+    private static final DocumentBuilderFactory factory;
 
+    private static final SecureEntityResolver secureEntityResolver =
+            new SecureEntityResolver();
+
+
+    // ----------------------------------------------------- Instance Variables
 
     /**
      * The debugging detail level for this servlet.
@@ -224,6 +237,10 @@ public class DefaultServlet
         urlEncoder.addSafeCharacter('.');
         urlEncoder.addSafeCharacter('*');
         urlEncoder.addSafeCharacter('/');
+        
+        factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        factory.setValidating(false);
     }
 
 
@@ -1233,23 +1250,22 @@ public class DefaultServlet
     }
 
 
-
     /**
      *  Decide which way to render. HTML or XML.
      */
     protected InputStream render(String contextPath, CacheEntry cacheEntry)
         throws IOException, ServletException {
 
-        InputStream xsltInputStream =
-            findXsltInputStream(cacheEntry.context);
+        Source xsltSource = findXsltInputStream(cacheEntry.context);
 
-        if (xsltInputStream==null) {
+        if (xsltSource == null) {
             return renderHtml(contextPath, cacheEntry);
         }
-        return renderXml(contextPath, cacheEntry, xsltInputStream);
+        return renderXml(contextPath, cacheEntry, xsltSource);
 
     }
 
+    
     /**
      * Return an InputStream to an HTML representation of the contents
      * of this directory.
@@ -1259,7 +1275,7 @@ public class DefaultServlet
      */
     protected InputStream renderXml(String contextPath,
                                     CacheEntry cacheEntry,
-                                    InputStream xsltInputStream)
+                                    Source xsltSource)
         throws IOException, ServletException {
 
         StringBuilder sb = new StringBuilder();
@@ -1353,8 +1369,7 @@ public class DefaultServlet
         try {
             TransformerFactory tFactory = TransformerFactory.newInstance();
             Source xmlSource = new StreamSource(new StringReader(sb.toString()));
-            Source xslSource = new StreamSource(xsltInputStream);
-            Transformer transformer = tFactory.newTransformer(xslSource);
+            Transformer transformer = tFactory.newTransformer(xsltSource);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             OutputStreamWriter osWriter = new OutputStreamWriter(stream, "UTF8");
@@ -1573,9 +1588,9 @@ public class DefaultServlet
 
 
     /**
-     * Return the xsl template inputstream (if possible)
+     * Return a Source for the xsl template (if possible)
      */
-    protected InputStream findXsltInputStream(DirContext directory)
+    protected Source findXsltInputStream(DirContext directory)
         throws IOException {
 
         if (localXsltFile != null) {
@@ -1583,8 +1598,13 @@ public class DefaultServlet
                 Object obj = directory.lookup(localXsltFile);
                 if ((obj != null) && (obj instanceof Resource)) {
                     InputStream is = ((Resource) obj).streamContent();
-                    if (is != null)
-                        return is;
+                    if (is != null) {
+                        if (Globals.IS_SECURITY_ENABLED) {
+                            return secureXslt(is);
+                        } else {
+                            return new StreamSource(is);
+                        }
+                    }
                 }
             } catch (NamingException e) {
                 if (debug > 10)
@@ -1595,8 +1615,13 @@ public class DefaultServlet
         if (contextXsltFile != null) {
             InputStream is =
                 getServletContext().getResourceAsStream(contextXsltFile);
-            if (is != null)
-                return is;
+            if (is != null) {
+                if (Globals.IS_SECURITY_ENABLED) {
+                    return secureXslt(is);
+                } else {
+                    return new StreamSource(is);
+                }
+            }
 
             if (debug > 10)
                 log("contextXsltFile '" + contextXsltFile + "' not found");
@@ -1607,13 +1632,13 @@ public class DefaultServlet
          */
         if (globalXsltFile != null) {
             File f = validateGlobalXsltFile();
-            if (f != null && f.exists()){
+            if (f != null){
                 FileInputStream fis = null;
                 try {
                     fis = new FileInputStream(f);
                     byte b[] = new byte[(int)f.length()]; /* danger! */
                     fis.read(b);
-                    return new ByteArrayInputStream(b);
+                    return new StreamSource(new ByteArrayInputStream(b));
                 } finally {
                     if (fis != null) {
                         try {
@@ -1643,7 +1668,7 @@ public class DefaultServlet
         
         if (result == null) {
             String home = System.getProperty(Globals.CATALINA_HOME_PROP);
-            if (home != null) {
+            if (home != null && !home.equals(base)) {
                 File homeConf = new File(home, "conf");
                 result = validateGlobalXsltFile(homeConf);
             }
@@ -1654,7 +1679,14 @@ public class DefaultServlet
 
 
     private File validateGlobalXsltFile(File base) {
-        File candidate = new File(base, globalXsltFile);
+        File candidate = new File(globalXsltFile);
+        if (!candidate.isAbsolute()) {
+            candidate = new File(base, globalXsltFile);
+        }
+
+        if (!candidate.isFile()) {
+            return null;
+        }
 
         // First check that the resulting path is under the provided base
         try {
@@ -1665,9 +1697,9 @@ public class DefaultServlet
             return null;
         }
 
-        // Next check that an .xlt or .xslt file has been specified
+        // Next check that an .xsl or .xslt file has been specified
         String nameLower = candidate.getName().toLowerCase(Locale.ENGLISH);
-        if (!nameLower.endsWith(".xslt") && !nameLower.endsWith(".xlt")) {
+        if (!nameLower.endsWith(".xslt") && !nameLower.endsWith(".xsl")) {
             return null;
         }
 
@@ -1675,8 +1707,40 @@ public class DefaultServlet
     }
 
 
-    // -------------------------------------------------------- protected Methods
+    private Source secureXslt(InputStream is) {
+        // Need to filter out any external entities
+        Source result = null;
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            builder.setEntityResolver(secureEntityResolver);
+            Document document = builder.parse(is);
+            result = new DOMSource(document);
+        } catch (ParserConfigurationException e) {
+            if (debug > 0) {
+                log(e.getMessage(), e);
+            }
+        } catch (SAXException e) {
+            if (debug > 0) {
+                log(e.getMessage(), e);
+            }
+        } catch (IOException e) {
+            if (debug > 0) {
+                log(e.getMessage(), e);
+            }
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
+        }
+        return result;
+    }
 
+
+    // -------------------------------------------------------- protected Methods
 
     /**
      * Check if sendfile can be used.
@@ -2177,9 +2241,6 @@ public class DefaultServlet
     }
 
 
-    // ------------------------------------------------------ Range Inner Class
-
-
     protected static class Range {
 
         public long start;
@@ -2193,6 +2254,36 @@ public class DefaultServlet
             if (end >= length)
                 end = length - 1;
             return (start >= 0) && (end >= 0) && (start <= end) && (length > 0);
+        }
+    }
+
+
+    /**
+     * This is secure in the sense that any attempt to use an external entity
+     * will trigger an exception.
+     */
+    private static class SecureEntityResolver implements EntityResolver2  {
+
+        @Override
+        public InputSource resolveEntity(String publicId, String systemId)
+                throws SAXException, IOException {
+            throw new SAXException(sm.getString("defaultServlet.blockExternalEntity",
+                    publicId, systemId));
+        }
+
+        @Override
+        public InputSource getExternalSubset(String name, String baseURI)
+                throws SAXException, IOException {
+            throw new SAXException(sm.getString("defaultServlet.blockExternalSubset",
+                    name, baseURI));
+        }
+
+        @Override
+        public InputSource resolveEntity(String name, String publicId,
+                String baseURI, String systemId) throws SAXException,
+                IOException {
+            throw new SAXException(sm.getString("defaultServlet.blockExternalEntity2",
+                    name, publicId, baseURI, systemId));
         }
     }
 }

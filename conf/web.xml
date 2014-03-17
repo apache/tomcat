@@ -88,10 +88,12 @@
   <!--                       globalXsltFile[null]                           -->
   <!--                                                                      -->
   <!--   globalXsltFile      Site wide configuration version of             -->
-  <!--                       localXsltFile. This argument must be a         -->
-  <!--                       relative path that points to a location below  -->
-  <!--                       either $CATALINA_BASE/conf (checked first)     -->
-  <!--                       or $CATALINA_BASE/conf (checked second).[null] -->
+  <!--                       localXsltFile. This argument must either be an -->
+  <!--                       absolute or relative (to either                -->
+  <!--                       $CATALINA_BASE/conf or $CATALINA_HOME/conf)    -->
+  <!--                       path that points to a location below either    -->
+  <!--                       $CATALINA_BASE/conf (checked first) or         -->
+  <!--                       $CATALINA_HOME/conf (checked second).[null]    -->
 
     <servlet>
         <servlet-name>default</servlet-name>
