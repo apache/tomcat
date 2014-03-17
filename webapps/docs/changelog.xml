@@ -157,7 +157,7 @@
       <fix>
         Correct regression introduced in 8.0.0-RC2 as part of the Servlet 3.1
         non-blocking IO support that broke handling of requests with an explicit
-        content length of zero. (markt/kkolinko)  
+        content length of zero. (markt/kkolinko)
       </fix>
     </changelog>
   </subsection>
