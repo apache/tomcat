@@ -215,6 +215,11 @@
          Add definition of <code>org.apache.catalina.ant.FindLeaksTask</code>.
          (kfujino)
       </fix>
+      <fix>
+         Implement <code>org.apache.catalina.ant.VminfoTask</code>,
+         <code>org.apache.catalina.ant.ThreaddumpTask</code> and
+         <code>org.apache.catalina.ant.SslConnectorCiphersTask</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

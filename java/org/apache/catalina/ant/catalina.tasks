@@ -24,6 +24,9 @@ resources=org.apache.catalina.ant.ResourcesTask
 sessions=org.apache.catalina.ant.SessionsTask
 validator=org.apache.catalina.ant.ValidatorTask
 findleaks=org.apache.catalina.ant.FindLeaksTask
+vminfo=org.apache.catalina.ant.VminfoTask
+threaddump=org.apache.catalina.ant.ThreaddumpTask
+sslConnectorCiphers=org.apache.catalina.ant.SslConnectorCiphersTask
 
 #Jk Task
 jkupdate=org.apache.catalina.ant.JKStatusUpdateTask
