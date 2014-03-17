@@ -661,7 +661,18 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         // Determine full path for uploaded WAR
         File uploadedWar;
         if (tag == null) {
-            uploadedWar = deployedWar;
+            if (update) {
+                // Append ".tmp" to the file name so it won't get deployed if auto
+                // deployment is enabled. It also means the old war won't get
+                // deleted if the upload fails
+                uploadedWar = new File(deployedWar.getAbsolutePath() + ".tmp");
+                if (uploadedWar.exists() && !uploadedWar.delete()) {
+                    writer.println(smClient.getString("managerServlet.deleteFail",
+                            uploadedWar));
+                }
+            } else {
+                uploadedWar = deployedWar;
+            }
         } else {
             File uploadPath = new File(versioned, tag);
             if (!uploadPath.mkdirs() && !uploadPath.isDirectory()) {
@@ -679,15 +690,17 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             if (!isServiced(name)) {
                 addServiced(name);
                 try {
-                    if (update && tag == null && deployedWar.isFile()) {
-                        if (!deployedWar.delete()) {
+                    // Upload WAR
+                    uploadWar(writer, request, uploadedWar, smClient);
+                    if (update && tag == null) {
+                        if (deployedWar.exists() && !deployedWar.delete()) {
                             writer.println(smClient.getString("managerServlet.deleteFail",
                                     deployedWar));
                             return;
                         }
+                        // Rename uploaded WAR file
+                        uploadedWar.renameTo(deployedWar);
                     }
-                    // Upload WAR
-                    uploadWar(writer, request, uploadedWar, smClient);
                     if (tag != null) {
                         // Copy WAR to the host's appBase
                         copy(uploadedWar, deployedWar);
