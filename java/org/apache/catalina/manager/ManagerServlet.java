@@ -741,7 +741,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String displayPath = cn.getDisplayName();
 
         // Find the local WAR file
-        File localWar = new File(versioned, baseName + ".war");
+        File localWar = new File(new File(versioned, tag), baseName + ".war");
 
         File deployedWar = new File(host.getAppBaseFile(), baseName + ".war");
 
