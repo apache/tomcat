@@ -132,6 +132,12 @@
         tests for this and similar scenarios and fix the additional issues those
         unit tests identified. Based on a patch by Larry Isaacs. (markt)
       </fix>
+      <fix>
+        Redefine the <code>globalXsltFile</code> initialisation parameter of the
+        DefaultServlet as relative to CATALINA_BASE/conf or CATALINA_HOME/conf.
+        Prevent user supplied XSLTs used by the DefaultServlet from defining
+        external entities. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
