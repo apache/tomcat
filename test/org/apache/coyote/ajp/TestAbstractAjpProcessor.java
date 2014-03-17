@@ -18,6 +18,11 @@ package org.apache.coyote.ajp;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -201,6 +206,78 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testZeroLengthRequestBodyGetA() throws Exception {
+        doTestZeroLengthRequestBody(2, true);
+    }
+
+    @Test
+    public void testZeroLengthRequestBodyGetB() throws Exception {
+        doTestZeroLengthRequestBody(2, false);
+    }
+
+    @Test
+    public void testZeroLengthRequestBodyPostA() throws Exception {
+        doTestZeroLengthRequestBody(4, true);
+    }
+
+    @Test
+    public void testZeroLengthRequestBodyPostB() throws Exception {
+        doTestZeroLengthRequestBody(4, false);
+    }
+
+    private void doTestZeroLengthRequestBody(int method, boolean callAvailable)
+            throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ReadBodyServlet servlet = new ReadBodyServlet(callAvailable);
+        Tomcat.addServlet(ctx, "ReadBody", servlet);
+        ctx.addServletMapping("/", "ReadBody");
+
+        tomcat.start();
+
+        SimpleAjpClient ajpClient = new SimpleAjpClient();
+        ajpClient.setPort(getPort());
+        ajpClient.connect();
+
+        validateCpong(ajpClient.cping());
+
+        TesterAjpMessage forwardMessage = ajpClient.createForwardMessage("/", method);
+        forwardMessage.addHeader(0xA008, "0");
+        forwardMessage.end();
+
+        TesterAjpMessage responseHeaders =
+                ajpClient.sendMessage(forwardMessage, null);
+
+        // Expect 3 messages: headers, body, end
+        validateResponseHeaders(responseHeaders, 200);
+        validateResponseBody(ajpClient.readMessage(),
+                "Request Body length in bytes: 0");
+        validateResponseEnd(ajpClient.readMessage(), true);
+
+        // Double check the connection is still open
+        validateCpong(ajpClient.cping());
+
+        ajpClient.disconnect();
+
+        if (callAvailable) {
+            boolean success = true;
+            Iterator<Integer> itAvailable = servlet.availableList.iterator();
+            Iterator<Integer> itRead = servlet.readList.iterator();
+            while (success && itAvailable.hasNext()) {
+                success = ((itRead.next().intValue() > 0) == (itAvailable.next().intValue() > 0));
+            }
+            if (!success) {
+                Assert.fail("available() and read() results do not match.\nAvailable: "
+                        + servlet.availableList + "\nRead: " + servlet.readList);
+            }
+        }
+    }
+
+
     /**
      * Process response header packet and checks the status. Any other data is
      * ignored.
@@ -303,6 +380,66 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
             resp.setStatus(304);
             resp.getWriter().print("Body not permitted for 304 response");
+        }
+    }
+
+
+    private static class ReadBodyServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final boolean callAvailable;
+        final List<Integer> availableList;
+        final List<Integer> readList;
+
+        public ReadBodyServlet(boolean callAvailable) {
+            this.callAvailable = callAvailable;
+            this.availableList = callAvailable ? new ArrayList<Integer>() : null;
+            this.readList = callAvailable ? new ArrayList<Integer>() : null;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            doRequest(req, resp, false);
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            doRequest(req, resp, true);
+        }
+
+        private void doRequest(HttpServletRequest request, HttpServletResponse response,
+                boolean isPost) throws IOException {
+
+            long readCount = 0;
+
+            try (InputStream s = request.getInputStream()) {
+                byte[] buf = new byte[4096];
+                int read;
+                do {
+                    if (callAvailable) {
+                        int available = s.available();
+                        read = s.read(buf);
+                        availableList.add(Integer.valueOf(available));
+                        readList.add(Integer.valueOf(read));
+                    } else {
+                        read = s.read(buf);
+                    }
+                    if (read > 0) {
+                        readCount += read;
+                    }
+                } while (read > 0);
+            }
+
+            response.setContentType("text/plain");
+            response.setCharacterEncoding("UTF-8");
+
+            try (PrintWriter w = response.getWriter()) {
+                w.println("Method: " + (isPost ? "POST" : "GET") + ". Reading request body...");
+                w.println("Request Body length in bytes: " + readCount);
+            }
         }
     }
 }
