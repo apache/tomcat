@@ -96,6 +96,12 @@
         simply undeploy the old version of the application before deploying the
         new version. (markt)
       </fix>
+      <fix>
+        Redefine the <code>globalXsltFile</code> initialisation parameter of the
+        DefaultServlet as relative to CATALINA_BASE/conf or CATALINA_HOME/conf.
+        Prevent user supplied XSLTs used by the DefaultServlet from defining
+        external entities. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
