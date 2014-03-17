@@ -320,7 +320,7 @@ public class ChunkedInputFilter implements InputFilter {
 
         int result = 0;
         boolean eol = false;
-        boolean readDigit = false;
+        int readDigit = 0;
         boolean extension = false;
 
         while (!eol) {
@@ -342,10 +342,9 @@ public class ChunkedInputFilter implements InputFilter {
             } else if (!extension) {
                 //don't read data after the trailer
                 int charValue = HexUtils.getDec(buf[pos]);
-                if (charValue != -1) {
-                    readDigit = true;
-                    result *= 16;
-                    result += charValue;
+                if (charValue != -1 && readDigit < 8) {
+                    readDigit++;
+                    result = (result << 4) | charValue;
                 } else {
                     //we shouldn't allow invalid, non hex characters
                     //in the chunked header
@@ -368,7 +367,7 @@ public class ChunkedInputFilter implements InputFilter {
 
         }
 
-        if (!readDigit)
+        if (readDigit == 0 || result < 0)
             return false;
 
         if (result == 0)
