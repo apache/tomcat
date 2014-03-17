@@ -741,7 +741,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         // Find the local WAR file
         File localWar = new File(new File(versioned, tag), baseName + ".war");
 
-        File deployedWar = new File(host.getAppBase(), baseName + ".war");
+        File deployedWar = new File(deployed, baseName + ".war");
 
         // Copy WAR to appBase
         try {
@@ -865,9 +865,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     if (war != null) {
                         File localWar;
                         if (war.endsWith(".war")) {
-                            localWar = new File(getAppBase(), baseName + ".war");
+                            localWar = new File(deployed, baseName + ".war");
                         } else {
-                            localWar = new File(getAppBase(), baseName);
+                            localWar = new File(deployed, baseName);
                         }
                         if (localWar.exists() && !ExpandWar.delete(localWar)) {
                             writer.println(smClient.getString(
@@ -1388,8 +1388,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     ExceptionUtils.handleThrowable(t);
                 }
                 try {
-                    File war = new File(getAppBase(), baseName + ".war");
-                    File dir = new File(getAppBase(), baseName);
+                    File war = new File(deployed, baseName + ".war");
+                    File dir = new File(deployed, baseName);
                     File xml = new File(configBase, baseName + ".xml");
                     if (war.exists() && !war.delete()) {
                         writer.println(smClient.getString(
@@ -1428,7 +1428,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     /**
      * Return a File object representing the "application root" directory
      * for our associated Host.
+     * 
+     * @deprecated  Unused
      */
+    @Deprecated
     protected File getAppBase() {
 
         if (appBase != null) {
