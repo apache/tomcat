@@ -41,6 +41,9 @@
   <typedef
         name="sessions"
         classname="org.apache.catalina.ant.SessionsTask" />
+  <typedef
+        name="findleaks"
+        classname="org.apache.catalina.ant.FindLeaksTask" />
   <!-- Jk Task -->
   <typedef
         name="jkupdate"

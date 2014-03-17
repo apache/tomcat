@@ -23,6 +23,7 @@ undeploy=org.apache.catalina.ant.UndeployTask
 resources=org.apache.catalina.ant.ResourcesTask
 sessions=org.apache.catalina.ant.SessionsTask
 validator=org.apache.catalina.ant.ValidatorTask
+findleaks=org.apache.catalina.ant.FindLeaksTask
 
 #Jk Task
 jkupdate=org.apache.catalina.ant.JKStatusUpdateTask
