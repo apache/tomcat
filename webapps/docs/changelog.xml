@@ -231,19 +231,6 @@
          Add support for <code>LAST_ACCESS_AT_START</code> system property to
          Manager web application. (kfujino)
       </fix>
-      <fix>
-         Add definition of <code>org.apache.catalina.ant.FindLeaksTask</code>.
-         (kfujino)
-      </fix>
-      <fix>
-         Implement <code>org.apache.catalina.ant.VminfoTask</code>,
-         <code>org.apache.catalina.ant.ThreaddumpTask</code> and
-         <code>org.apache.catalina.ant.SslConnectorCiphersTask</code>. (kfujino)
-      </fix>
-      <add>
-         Add the option to ignore the constraint of the first line of the
-        response message that must be "OK -". Default is false. (kfujino)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -302,6 +289,21 @@
         <bug>56204</bug>: Remove unnecessary dependency between tasks in the
         build script. (markt)
       </fix>
+      <fix>
+         Add definition of <code>org.apache.catalina.ant.FindLeaksTask</code>.
+         (kfujino)
+      </fix>
+      <fix>
+         Implement <code>org.apache.catalina.ant.VminfoTask</code>,
+         <code>org.apache.catalina.ant.ThreaddumpTask</code> and
+         <code>org.apache.catalina.ant.SslConnectorCiphersTask</code>. (kfujino)
+      </fix>
+      <add>
+         Add the option to the Apache Ant tasks to ignore the constraint of the
+         first line of the response message that must be "OK -"
+         (<code>ignoreResponseConstraint</code> in <code>AbstractCatalinaTask</code>).
+         Default is false. (kfujino)
+      </add>
     </changelog>
   </subsection>
 </section>

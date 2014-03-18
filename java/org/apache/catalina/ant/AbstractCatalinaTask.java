@@ -114,6 +114,14 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
     /**
      * If set to true - ignore the constraint of the first line of the response
      * message that must be "OK -".
+     * <p>
+     * When this attribute is set to {@code false} (the default), the first line
+     * of server response is expected to start with "OK -". If it does not
+     * then the task is considered as failed and the first line is treated
+     * as an error message.
+     * <p>
+     * When this attribute is set to {@code true}, the first line of the
+     * response is treated like any other, regardless of its text.
      */
     protected boolean ignoreResponseConstraint = false;
 
