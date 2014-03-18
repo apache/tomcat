@@ -165,6 +165,10 @@
         non-blocking IO support that broke handling of requests with an explicit
         content length of zero. (markt/kkolinko)
       </fix>
+      <fix>
+        Fix possible overflow when parsing long values from a byte array.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
