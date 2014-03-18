@@ -33,10 +33,11 @@ public final class Ascii {
      */
     private static final boolean[] isDigit = new boolean[256];
 
+    private static final long OVERFLOW_LIMIT = Long.MAX_VALUE / 10;
+
     /*
      * Initialize character translation and type tables.
      */
-
     static {
         for (int i = 0; i < 256; i++) {
             toLower[i] = (byte)i;
@@ -85,19 +86,12 @@ public final class Ascii {
         }
 
         long n = c - '0';
-        long m;
-
         while (--len > 0) {
-            if (!isDigit(c = b[off++])) {
-                throw new NumberFormatException();
-            }
-            m = n * 10 + c - '0';
-
-            if (m < n) {
-                // Overflow
-                throw new NumberFormatException();
+            if (isDigit(c = b[off++]) &&
+                    (n < OVERFLOW_LIMIT || (n == OVERFLOW_LIMIT && (c - '0') < 8))) {
+                n = n * 10 + c - '0';
             } else {
-                n = m;
+                throw new NumberFormatException();
             }
         }
 
