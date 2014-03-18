@@ -318,9 +318,11 @@
         <ul>
             <li>
                 <code>build</code>: The build folder used will be, by default,
-                <code>${build}/webapp/${path}</code>. After the end of the execution
-                of the <code>compile</code> target, the web application .WAR will be
-                located at <code>${build}/webapp/${path}.war</code>.
+                <code>${build}/webapp/${path}</code> (<code>${build}</code>, by
+                default, points to <code>${basedir}/build</code>). After the end
+                of the execution of the <code>compile</code> target, the web
+                application .WAR will be located at
+                <code>${build}/webapp/${path}.war</code>.
             </li>
             <li>
                 <code>webapp</code>: The directory containing the exploded web application
