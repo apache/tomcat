@@ -204,7 +204,7 @@
       </fix>
       <fix>
         Make the default compiler source and target versions for JSPs Java 7
-        since Tomcat 8 requires Java 7 as a minimum. (markt) 
+        since Tomcat 8 requires Java 7 as a minimum. (markt)
       </fix>
       <update>
         <bug>56283</bug>: Update to the Eclipse JDT Compiler P20140317-1600
