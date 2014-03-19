@@ -1839,7 +1839,7 @@ class Generator {
                         out.print(" + \"\\\"");
                     } else {
                         out.print(DOUBLE_QUOTE);
-                        out.print(attrs.getValue(i).replace("\"", "&quot;"));
+                        out.print(jspAttrs[i].getValue().replace("\"", "&quot;"));
                         out.print(DOUBLE_QUOTE);
                     }
                 }
