@@ -198,6 +198,10 @@
         is made to <code>ServletContext.setInitParameter()</code> after the
         ServletContext has been initialized. (markt)
       </fix>
+      <fix>
+        Make the default compiler source and target versions for JSPs Java 7
+        since Tomcat 8 requires Java 7 as a minimum. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

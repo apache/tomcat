@@ -335,12 +335,12 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             } else {
                 log.warn("Unknown source VM " + opt + " ignored.");
                 settings.put(CompilerOptions.OPTION_Source,
-                        CompilerOptions.VERSION_1_5);
+                        CompilerOptions.VERSION_1_7);
             }
         } else {
-            // Default to 1.5
+            // Default to 1.7
             settings.put(CompilerOptions.OPTION_Source,
-                    CompilerOptions.VERSION_1_5);
+                    CompilerOptions.VERSION_1_7);
         }
 
         // Target JVM
@@ -376,14 +376,14 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             } else {
                 log.warn("Unknown target VM " + opt + " ignored.");
                 settings.put(CompilerOptions.OPTION_TargetPlatform,
-                        CompilerOptions.VERSION_1_5);
+                        CompilerOptions.VERSION_1_7);
             }
         } else {
-            // Default to 1.5
+            // Default to 1.7
             settings.put(CompilerOptions.OPTION_TargetPlatform,
-                    CompilerOptions.VERSION_1_5);
+                    CompilerOptions.VERSION_1_7);
             settings.put(CompilerOptions.OPTION_Compliance,
-                    CompilerOptions.VERSION_1_5);
+                    CompilerOptions.VERSION_1_7);
         }
 
         final IProblemFactory problemFactory =
