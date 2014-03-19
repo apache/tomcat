@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!--
+<%--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
   this work for additional information regarding copyright ownership.
@@ -14,13 +13,18 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
-<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
-<jsp:directive.tag body-content="scriptless" />
-<a href="#" onclick="window.alert(&quot;1${'foo'}1&lt;&amp;&gt;&quot;)">foo</a>
-<a href="#" onclick="window.alert(&quot;2bar2&lt;&amp;&gt;&quot;)">bar</a>
-<a href="#" onclick="window.alert(&quot;3${text}3&quot;)">foo</a>
-<a href="#" onclick="window.alert(&quot;4${'&amp;'}4&quot;)">foo</a>
-<a href="#" onclick="window.alert(&quot;5${'&amp;apos;'}5&quot;)">foo</a>
-<jsp:doBody />
-</jsp:root>
+--%>
+<%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
+<%
+request.setAttribute("text", "World <&>");
+request.setAttribute("textQuote", "'World <&>'");
+%>
+<html>
+  <head><title>Bug 56265 test case</title></head>
+  <body>
+    <p>[1: <tags:bug56265 data-test="window.alert('Hello World <&>!')"/>]</p>
+    <p>[2: <tags:bug56265 data-test="window.alert('Hello ${text}!')"/>]</p>
+    <p>[3: <tags:bug56265 data-test="window.alert('Hello &apos;World <&>&apos;!')"/>]</p>
+    <p>[4: <tags:bug56265 data-test="window.alert('Hello ${textQuote}!')"/>]</p>
+  </body>
+</html>
