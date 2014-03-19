@@ -206,6 +206,10 @@
         Update to the Eclipse JDT Compiler P20140317-1600 which adds support for
         Java 8 syntax to JSPs. (markt)
       </update>
+      <fix>
+        <bug>56265</bug>: Do not escape values of dynamic tag attributes
+        containing EL expressions. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import java.io.File;
@@ -27,8 +26,11 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.WebResourceRoot;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.webresources.StandardRoot;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -328,16 +330,54 @@ public class TestParser extends TomcatBaseTest {
 
         String result = res.toString();
 
-        Assert.assertTrue(result.contains("&quot;1foo1&quot;") ||
-                result.contains("&#034;1foo1&#034;"));
-        Assert.assertTrue(result.contains("&quot;2bar2&quot;") ||
-                result.contains("&#034;2bar2&#034;"));
-        Assert.assertTrue(result.contains("&quot;3a&amp;b3&quot;") ||
-                result.contains("&#034;3a&amp;b3&#034;"));
-        Assert.assertTrue(result.contains("&quot;4&4&quot;") ||
-                result.contains("&#034;4&4&#034;"));
-        Assert.assertTrue(result.contains("&quot;5&apos;5&quot;") ||
-                result.contains("&#034;5&apos;5&#034;"));
+        Assert.assertTrue(result,
+                result.contains("&quot;1foo1&lt;&amp;&gt;&quot;")
+             || result.contains("&#034;1foo1&lt;&amp;&gt;&#034;"));
+        Assert.assertTrue(result,
+                result.contains("&quot;2bar2&lt;&amp;&gt;&quot;")
+             || result.contains("&#034;2bar2&lt;&amp;&gt;&#034;"));
+        Assert.assertTrue(result,
+                result.contains("&quot;3a&amp;b3&quot;")
+             || result.contains("&#034;3a&amp;b3&#034;"));
+        Assert.assertTrue(result,
+                result.contains("&quot;4&4&quot;")
+             || result.contains("&#034;4&4&#034;"));
+        Assert.assertTrue(result,
+                result.contains("&quot;5&apos;5&quot;")
+             || result.contains("&#034;5&apos;5&#034;"));
+    }
+
+    @Test
+    public void testBug56265() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        // app dir is relative to server home
+        StandardContext ctxt = (StandardContext) tomcat.addWebapp(null,
+                "/test", appDir.getAbsolutePath());
+
+        // This test needs the JSTL libraries
+        File lib = new File("webapps/examples/WEB-INF/lib");
+        ctxt.setResources(new StandardRoot(ctxt));
+        ctxt.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/lib",
+                lib.getAbsolutePath(), null, "/");
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/bug5nnnn/bug56265.jsp");
+
+        String result = res.toString();
+
+        Assert.assertTrue(result,
+                result.contains("[1: [data-test]: [window.alert('Hello World <&>!')]]"));
+        Assert.assertTrue(result,
+                result.contains("[2: [data-test]: [window.alert('Hello World <&>!')]]"));
+        Assert.assertTrue(result,
+                result.contains("[3: [data-test]: [window.alert('Hello 'World <&>'!')]]"));
+        Assert.assertTrue(result,
+                result.contains("[4: [data-test]: [window.alert('Hello 'World <&>'!')]]"));
     }
 
     /** Assertion for text printed by tags:echo */

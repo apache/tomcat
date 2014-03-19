@@ -1359,34 +1359,46 @@ class Validator {
                     result = new Node.JspAttribute(tai, qName, uri, localName,
                             value.substring(3, value.length() - 2), true, null,
                             dynamic);
-                } else if (pageInfo.isELIgnored()) {
-                    result = new Node.JspAttribute(tai, qName, uri, localName,
-                            value, false, null, dynamic);
                 } else {
-                    // The attribute can contain expressions but is not a
-                    // scriptlet expression; thus, we want to run it through
-                    // the expression interpreter
+                    ELNode.Nodes el = null;
+                    if (!pageInfo.isELIgnored()) {
+                        // The attribute can contain expressions but is not a
+                        // scriptlet expression; thus, we want to run it through
+                        // the expression interpreter
 
-                    // validate expression syntax if string contains
-                    // expression(s)
-                    ELNode.Nodes el = ELParser.parse(value, pageInfo
-                            .isDeferredSyntaxAllowedAsLiteral());
+                        // validate expression syntax if string contains
+                        // expression(s)
+                        el = ELParser.parse(value,
+                                pageInfo.isDeferredSyntaxAllowedAsLiteral());
 
-                    if (el.containsEL()) {
+                        if (el.containsEL()) {
+                            validateFunctions(el, n);
+                        } else {
+                            el = null;
+                        }
+                    }
 
-                        validateFunctions(el, n);
-
-                        if (n.getRoot().isXmlSyntax()) {
-                            // The non-EL elements need to be XML escaped
+                    if (n instanceof Node.UninterpretedTag &&
+                            n.getRoot().isXmlSyntax()) {
+                        // Attribute values of uninterpreted tags will have been
+                        // XML un-escaped during parsing. Since these attributes
+                        // are part of an uninterpreted tag the value needs to
+                        // be re-escaped before being included in the output.
+                        // The wrinkle is that the output of any EL must not be
+                        // re-escaped as that must be output as is.
+                        if (el != null) {
                             XmlEscapeNonELVisitor v = new XmlEscapeNonELVisitor();
                             el.visit(v);
-                            result = new Node.JspAttribute(tai, qName, uri,
-                                    localName, v.getText(), false, el, dynamic);
+                            value = v.getText();
                         } else {
-                            result = new Node.JspAttribute(tai, qName, uri,
-                                    localName, value, false, el, dynamic);
+                            value = xmlEscape(value);
                         }
+                    }
 
+                    result = new Node.JspAttribute(tai, qName, uri, localName,
+                            value, false, el, dynamic);
+
+                    if (el != null) {
                         ELContextImpl ctx =
                                 new ELContextImpl(expressionFactory);
                         ctx.setFunctionMapper(getFunctionMapper(el));
@@ -1399,10 +1411,6 @@ class Validator {
                                     "jsp.error.invalid.expression", value, e
                                             .toString());
                         }
-
-                    } else {
-                        result = new Node.JspAttribute(tai, qName, uri,
-                                localName, value, false, null, dynamic);
                     }
                 }
             } else {
