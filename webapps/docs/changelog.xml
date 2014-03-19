@@ -202,6 +202,10 @@
         Make the default compiler source and target versions for JSPs Java 7
         since Tomcat 8 requires Java 7 as a minimum. (markt) 
       </fix>
+      <update>
+        Update to the Eclipse JDT Compiler P20140317-1600 which adds support for
+        Java 8 syntax to JSPs. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
