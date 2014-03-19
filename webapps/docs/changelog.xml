@@ -199,17 +199,19 @@
         ServletContext has been initialized. (markt)
       </fix>
       <fix>
+        <bug>56265</bug>: Do not escape values of dynamic tag attributes
+        containing EL expressions. (kkolinko)
+      </fix>
+      <fix>
         Make the default compiler source and target versions for JSPs Java 7
         since Tomcat 8 requires Java 7 as a minimum. (markt) 
       </fix>
       <update>
-        Update to the Eclipse JDT Compiler P20140317-1600 which adds support for
-        Java 8 syntax to JSPs. (markt)
+        <bug>56283</bug>: Update to the Eclipse JDT Compiler P20140317-1600
+        which adds support for Java 8 syntax to JSPs. Add support for value
+        "1.8" for the <code>compilerSourceVM</code> and
+        <code>compilerTargetVM</code> options. (markt)
       </update>
-      <fix>
-        <bug>56265</bug>: Do not escape values of dynamic tag attributes
-        containing EL expressions. (kkolinko)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
