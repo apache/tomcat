@@ -144,6 +144,10 @@
         is made to <code>ServletContext.setInitParameter()</code> after the
         ServletContext has been initialized. (markt)
       </fix>
+      <fix>
+        Make the default compiler source and target versions for JSPs Java 6
+        since Tomcat 7 requires Java 6 as a minimum. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
