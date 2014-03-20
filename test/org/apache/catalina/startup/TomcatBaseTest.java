@@ -400,6 +400,14 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         return rc;
     }
 
+    protected static String getStatusCode(String statusLine) {
+        if (statusLine == null || statusLine.length() < 12) {
+            return statusLine;
+        } else {
+            return statusLine.substring(9, 12);
+        }
+    }
+
     private static class TomcatWithFastSessionIDs extends Tomcat {
 
         @Override
