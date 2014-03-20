@@ -340,7 +340,7 @@ public class TestCometProcessor extends TomcatBaseTest {
             // Failure at any later stage and the response headers (including
             // the 200 response code will already have been sent to the client
             if (SimpleCometServlet.FAIL_ON_BEGIN.equals(initParam)) {
-                assertEquals("HTTP/1.1 500 Internal Server Error", response[0]);
+                assertEquals("500", getStatusCode(response[0]));
                 alv.validateAccessLog(1, 500, 0, 1000);
             } else {
                 assertEquals("HTTP/1.1 200 OK", response[0]);

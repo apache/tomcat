@@ -180,8 +180,7 @@ public class TestUpgrade extends TomcatBaseTest {
         String status = reader.readLine();
 
         Assert.assertNotNull(status);
-        Assert.assertEquals("HTTP/1.1 101 Switching Protocols",
-                status.substring(0, 32));
+        Assert.assertEquals("101", getStatusCode(status));
 
         // Skip the remaining response headers
         String line = reader.readLine();
