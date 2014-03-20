@@ -55,7 +55,6 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
-<<<<<<< .working
 <section name="Tomcat 7.0.53 (violetagg)">
   <subsection name="Catalina">
     <changelog>
