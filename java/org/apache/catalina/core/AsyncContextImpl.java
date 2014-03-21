@@ -92,9 +92,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
     @Override
-    public void fireOnComplete() throws IOException {
-        // Before firing the event, close the response
-        request.getResponse().finishResponse();
+    public void fireOnComplete() {
         List<AsyncListenerWrapper> listenersCopy =
             new ArrayList<AsyncListenerWrapper>();
         listenersCopy.addAll(listeners);
@@ -131,6 +129,18 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             } else {
                 Thread.currentThread().setContextClassLoader(oldCL);
             }
+        }
+
+        // The application doesn't know it has to stop writing until it receives
+        // the complete event so the response has to be closed after firing the
+        // event.
+        try {
+            request.getResponse().finishResponse();
+        } catch (IOException ioe) {
+            // Catch this here and allow async context complete to continue
+            // normally so a dispatch takes place which ensures that  the
+            // request and response objects are correctly recycled.
+            log.debug(sm.getString("asyncContextImpl.finishResponseError"), ioe);
         }
     }
 
