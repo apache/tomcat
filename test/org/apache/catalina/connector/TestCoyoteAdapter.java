@@ -304,6 +304,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         while (servlet.getThread().isAlive()) {
             Thread.sleep(250);
         }
+        Assert.assertTrue(servlet.isCompleted());
     }
 
     private static class AsyncServlet extends HttpServlet {
@@ -313,9 +314,14 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         // This is a hack that won't work generally as servlets are expected to
         // handle more than one request.
         private Thread t;
+        private boolean completed = false;
 
         public Thread getThread() {
             return t;
+        }
+
+        public boolean isCompleted() {
+            return completed;
         }
 
         @Override
@@ -334,13 +340,14 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
 
                 @Override
                 public void run() {
-                    while (true) {
+                    for (int i = 0; i < 20; i++) {
                         try {
                             os.write("TEST".getBytes(StandardCharsets.UTF_8));
                             os.flush();
                             Thread.sleep(1000);
                         } catch (Exception e) {
                             asyncCtxt.complete();
+                            completed = true;
                             break;
                         }
                     }
