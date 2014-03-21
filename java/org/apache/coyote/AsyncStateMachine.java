@@ -16,7 +16,6 @@
  */
 package org.apache.coyote;
 
-import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -204,21 +203,11 @@ public class AsyncStateMachine<S> {
             state = AsyncState.STARTED;
             return SocketState.LONG;
         } else if (state == AsyncState.MUST_COMPLETE) {
-            try {
-                asyncCtxt.fireOnComplete();
-            } catch (IOException e) {
-                // Socket is in unknown state. Close it.
-                return SocketState.CLOSED;
-            }
+            asyncCtxt.fireOnComplete();
             state = AsyncState.DISPATCHED;
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.COMPLETING) {
-            try {
-                asyncCtxt.fireOnComplete();
-            } catch (IOException e) {
-                // Socket is in unknown state. Close it.
-                return SocketState.CLOSED;
-            }
+            asyncCtxt.fireOnComplete();
             state = AsyncState.DISPATCHED;
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.MUST_DISPATCH) {

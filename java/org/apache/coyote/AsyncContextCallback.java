@@ -16,8 +16,6 @@
  */
 package org.apache.coyote;
 
-import java.io.IOException;
-
 /**
  * Provides a mechanism for the Coyote connectors to signal to a
  * {@link javax.servlet.AsyncContext} implementation that an action, such as
@@ -26,5 +24,5 @@ import java.io.IOException;
  * org.apache.coyote package.
  */
 public interface AsyncContextCallback {
-    public void fireOnComplete() throws IOException;
+    public void fireOnComplete();
 }

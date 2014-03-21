@@ -45,6 +45,12 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.0.5 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      Rework the fix for <bug>56190</bug> as the previous fix did not recycle
+      the request in all cases leading to mis-routing of requests. (markt)
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
