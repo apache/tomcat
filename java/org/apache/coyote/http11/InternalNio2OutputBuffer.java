@@ -384,12 +384,16 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                     if (bufferedWrites.size() > 0) {
                         for (ByteBuffer buffer : bufferedWrites) {
                             buffer.flip();
-                            socket.getSocket().write(buffer).get(socket.getTimeout(), TimeUnit.MILLISECONDS);
+                            if (socket.getSocket().write(buffer).get(socket.getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
+                                throw new EOFException(sm.getString("iob.failedwrite"));
+                            }
                         }
                         bufferedWrites.clear();
                     }
                     if (byteBuffer.hasRemaining()) {
-                        socket.getSocket().write(byteBuffer).get(socket.getTimeout(), TimeUnit.MILLISECONDS);
+                        if (socket.getSocket().write(byteBuffer).get(socket.getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
+                            throw new EOFException(sm.getString("iob.failedwrite"));
+                        }
                     }
                 } catch (InterruptedException | ExecutionException e) {
                     throw new IOException(e);
