@@ -51,6 +51,13 @@
         Fix possibly incomplete final flush with NIO2 when using non blocking
         mode. (remm)
       </fix>
+      <fix>
+        Cleanup NIO2 endpoint shutdown. (remm)
+      </fix>
+      <fix>
+        Fix rare race condition notifying onWritePossible in the NIO2
+        HTTP/1.1 connector. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
