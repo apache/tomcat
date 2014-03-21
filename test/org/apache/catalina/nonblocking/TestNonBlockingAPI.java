@@ -627,7 +627,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         @Override
         public void onWritePossible() throws IOException {
             long start = System.currentTimeMillis();
-            long end = System.currentTimeMillis();
             int before = written;
             while (written < WRITE_SIZE &&
                     ctx.getResponse().getOutputStream().isReady()) {
@@ -640,7 +639,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 // calling complete
                 ctx.getResponse().flushBuffer();
             }
-            log.info("Write took:" + (end - start) +
+            log.info("Write took: " + (System.currentTimeMillis() - start) +
                     " ms. Bytes before=" + before + " after=" + written);
             // only call complete if we have emptied the buffer
             if (ctx.getResponse().getOutputStream().isReady() &&
