@@ -45,6 +45,14 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.0.5 (markt)">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix possibly incomplete final flush with NIO2 when using non blocking
+        mode. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>

@@ -386,6 +386,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                             buffer.flip();
                             socket.getSocket().write(buffer).get(socket.getTimeout(), TimeUnit.MILLISECONDS);
                         }
+                        bufferedWrites.clear();
                     }
                     if (byteBuffer.hasRemaining()) {
                         socket.getSocket().write(byteBuffer).get(socket.getTimeout(), TimeUnit.MILLISECONDS);
