@@ -93,6 +93,11 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     private static ThreadLocal<Boolean> inlineCompletion = new ThreadLocal<>();
 
     /**
+     * Thread group associated with the server socket.
+     */
+    private AsynchronousChannelGroup threadGroup = null;
+
+    /**
      * The oom parachute, when an OOM error happens,
      * will release the data, giving the JVM instantly
      * a chunk of data to be able to recover with.
@@ -288,9 +293,12 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         if ( getExecutor() == null ) {
             createExecutor();
         }
-        AsynchronousChannelGroup threadGroup = null;
         if (getExecutor() instanceof ExecutorService) {
             threadGroup = AsynchronousChannelGroup.withThreadPool((ExecutorService) getExecutor());
+        }
+        // AsynchronousChannelGroup currently needs exclusive access to its executor service
+        if (!internalExecutor) {
+            log.warn(sm.getString("endpoint.nio2.exclusiveExecutor"));
         }
 
         serverSock = AsynchronousServerSocketChannel.open(threadGroup);
@@ -417,6 +425,32 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         if (log.isDebugEnabled()) {
             log.debug("Destroy completed for "+new InetSocketAddress(getAddress(),getPort()));
         }
+    }
+
+
+    @Override
+    public void shutdownExecutor() {
+        if (threadGroup != null && internalExecutor) {
+            try {
+                threadGroup.shutdownNow();
+            } catch (IOException e) {
+                getLog().warn(sm.getString("endpoint.warn.executorShutdown", getName()), e);
+            }
+            long timeout = getExecutorTerminationTimeoutMillis();
+            if (timeout > 0) {
+                try {
+                    threadGroup.awaitTermination(timeout, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException e) {
+                    // Ignore
+                }
+                if (!threadGroup.isTerminated()) {
+                    getLog().warn(sm.getString("endpoint.warn.executorShutdown", getName()));
+                }
+            }
+            threadGroup = null;
+        }
+        // Mostly to cleanup references
+        super.shutdownExecutor();
     }
 
 
