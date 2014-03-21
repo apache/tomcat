@@ -563,7 +563,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 sc.run();
             }
         } catch (RejectedExecutionException ree) {
-            log.warn(sm.getString("endpoint.executor.fail", socket), ree);
+            log.debug(sm.getString("endpoint.executor.fail", socket), ree);
             return false;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
