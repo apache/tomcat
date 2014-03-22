@@ -112,11 +112,12 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         // event.
         try {
             request.getResponse().finishResponse();
-        } catch (IOException ioe) {
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             // Catch this here and allow async context complete to continue
             // normally so a dispatch takes place which ensures that  the
             // request and response objects are correctly recycled.
-            log.debug(sm.getString("asyncContextImpl.finishResponseError"), ioe);
+            log.debug(sm.getString("asyncContextImpl.finishResponseError"), t);
         }
     }
 
