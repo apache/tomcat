@@ -117,6 +117,12 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        <bug>53119</bug>: Make sure the NIO AJP output buffer is cleared on any
+        error to prevent any possible overflow if it is written to again before
+        the connection is closed. This extends the original fix for the
+        APR/native output buffer to the NIO connector. (kkolinko)
+      </fix>
+      <fix>
         <bug>56172</bug>: Avoid possible request corruption when using the AJP
         NIO connector and a request is sent using more than one AJP message.
         Patch provided by Amund Elstad. (markt)
