@@ -55,6 +55,11 @@
         Allow web applications to package tomcat-jdbc.jar and their JDBC driver
         of choice in the web application. (markt)
       </fix>
+      <fix>
+        <bug>56293</bug>: Cache resources loaded by the class loader from
+        <code>/META-INF/services/</code> for better performance for repeated
+        look ups. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

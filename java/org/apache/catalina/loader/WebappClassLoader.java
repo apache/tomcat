@@ -136,6 +136,7 @@ public class WebappClassLoader extends URLClassLoader
     private static final String JVN_THREAD_GROUP_SYSTEM = "system";
 
     private static final String CLASS_FILE_SUFFIX = ".class";
+    private static final String SERVIVES_PREFIX = "/META-INF/services/";
 
     static {
         JVM_THREAD_GROUP_NAMES.add(JVN_THREAD_GROUP_SYSTEM);
@@ -2537,6 +2538,10 @@ public class WebappClassLoader extends URLClassLoader
         }
 
         boolean isClassResource = path.endsWith(CLASS_FILE_SUFFIX);
+        boolean isCacheable = isClassResource;
+        if (!isCacheable) {
+             isCacheable = path.startsWith(SERVIVES_PREFIX);
+        }
 
         WebResource resource = null;
 
@@ -2558,18 +2563,21 @@ public class WebappClassLoader extends URLClassLoader
         }
 
         /* Only cache the binary content if there is some content
-         * available and either:
+         * available one of the following is true:
          * a) It is a class file since the binary content is only cached
          *    until the class has been loaded
          *    or
          * b) The file needs conversion to address encoding issues (see
          *    below)
+         *    or
+         * c) The resource is a service provider configuration file located
+         *    under META=INF/services
          *
          * In all other cases do not cache the content to prevent
          * excessive memory usage if large resources are present (see
          * https://issues.apache.org/bugzilla/show_bug.cgi?id=53081).
          */
-        if (isClassResource || fileNeedConvert) {
+        if (isCacheable || fileNeedConvert) {
             byte[] binaryContent = resource.getContent();
             if (binaryContent != null) {
                  if (fileNeedConvert) {
