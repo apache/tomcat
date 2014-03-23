@@ -137,12 +137,12 @@ public class WebappClassLoader
     private static final List<String> JVM_THREAD_GROUP_NAMES =
         new ArrayList<String>();
 
-    private static final String JVN_THREAD_GROUP_SYSTEM = "system";
+    private static final String JVM_THREAD_GROUP_SYSTEM = "system";
 
-    private static final String SERVIVES_PREFIX = "META-INF/services/";
+    private static final String SERVICES_PREFIX = "META-INF/services/";
 
     static {
-        JVM_THREAD_GROUP_NAMES.add(JVN_THREAD_GROUP_SYSTEM);
+        JVM_THREAD_GROUP_NAMES.add(JVM_THREAD_GROUP_SYSTEM);
         JVM_THREAD_GROUP_NAMES.add("RMI Runtime");
     }
 
@@ -3016,7 +3016,7 @@ public class WebappClassLoader
         boolean isClassResource = path.endsWith(".class");
         boolean isCacheable = isClassResource;
         if (!isCacheable) {
-             isCacheable = path.startsWith(SERVIVES_PREFIX);
+             isCacheable = path.startsWith(SERVICES_PREFIX);
         }
 
         int jarFilesLength = jarFiles.length;
