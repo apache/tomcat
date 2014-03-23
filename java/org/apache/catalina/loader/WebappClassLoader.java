@@ -196,7 +196,8 @@ public class WebappClassLoader extends URLClassLoader
      * {@link #packageTriggersDeny}.
      */
     protected final Matcher packageTriggersPermit =
-            Pattern.compile("^javax\\.servlet\\.jsp\\.jstl\\.").matcher("");
+            Pattern.compile("^javax\\.servlet\\.jsp\\.jstl\\.|" +
+                    "^org\\.apache\\.tomcat\\.jdbc\\.").matcher("");
 
 
     /**

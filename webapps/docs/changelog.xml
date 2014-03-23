@@ -51,6 +51,10 @@
         Rework the fix for <bug>56190</bug> as the previous fix did not recycle
         the request in all cases leading to mis-routing of requests. (markt)
       </fix>
+      <fix>
+        Allow web applications to package tomcat-jdbc.jar and their JDBC driver
+        of choice in the web application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
