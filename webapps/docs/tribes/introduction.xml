@@ -70,7 +70,7 @@
         Member[] group = myChannel.getMembers();
 
         //send the message
-        channel.send(group,myMsg,Channel.SEND_OPTIONS_DEFAULT);
+        myChannel.send(group,myMsg,Channel.SEND_OPTIONS_DEFAULT);
       </source>
     </li>
   </ul>
