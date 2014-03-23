@@ -76,6 +76,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        If the Manager web application does not perform an operation because the
+        web application is already being serviced, report an error rather than
+        reporting success. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.4 (markt)">
   <subsection name="Catalina">
