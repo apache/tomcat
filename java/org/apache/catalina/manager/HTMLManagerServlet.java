@@ -279,7 +279,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     break;
                 }
 
-                if (!isServiced(name)) {
+                if (isServiced(name)) {
+                    message = smClient.getString("managerServlet.inService", name);
+                } else {
                     addServiced(name);
                     try {
                         warPart.write(file.getAbsolutePath());

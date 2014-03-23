@@ -687,7 +687,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         try {
-            if (!isServiced(name)) {
+            if (isServiced(name)) {
+                writer.println(smClient.getString("managerServlet.inService", displayPath));
+            } else {
                 addServiced(name);
                 try {
                     // Upload WAR
@@ -760,7 +762,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
         // Copy WAR to appBase
         try {
-            if (!isServiced(name)) {
+            if (isServiced(name)) {
+                writer.println(smClient.getString("managerServlet.inService", displayPath));
+            } else {
                 addServiced(name);
                 try {
                     if (!deployedWar.delete()) {
@@ -860,7 +864,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         try {
-            if (!isServiced(name)) {
+            if (isServiced(name)) {
+                writer.println(smClient.getString("managerServlet.inService", displayPath));
+            } else {
                 addServiced(name);
                 try {
                     if (config != null) {
@@ -1371,7 +1377,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 return;
             }
 
-            if (!isServiced(name)) {
+            if (isServiced(name)) {
+                writer.println(smClient.getString("managerServlet.inService", displayPath));
+            } else {
                 addServiced(name);
                 try {
                     // Try to stop the context first to be nicer
