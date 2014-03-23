@@ -2527,12 +2527,14 @@ public class WebappClassLoader extends URLClassLoader
             return null;
         }
 
-        if ((name == null) || (path == null))
+        if (name == null || path == null) {
             return null;
+        }
 
         ResourceEntry entry = resourceEntries.get(path);
-        if (entry != null)
+        if (entry != null) {
             return entry;
+        }
 
         boolean isClassResource = path.endsWith(CLASS_FILE_SUFFIX);
 
@@ -2551,10 +2553,8 @@ public class WebappClassLoader extends URLClassLoader
         entry.codeBase = entry.source;
         entry.lastModified = resource.getLastModified();
 
-        if (needConvert) {
-            if (path.endsWith(".properties")) {
-                fileNeedConvert = true;
-            }
+        if (needConvert && path.endsWith(".properties")) {
+            fileNeedConvert = true;
         }
 
         /* Only cache the binary content if there is some content
@@ -2629,7 +2629,6 @@ public class WebappClassLoader extends URLClassLoader
         }
 
         return entry;
-
     }
 
 
