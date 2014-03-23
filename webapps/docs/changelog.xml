@@ -79,9 +79,9 @@
   <subsection name="Web applications">
     <changelog>
       <fix>
-        If the Manager web application does not perform an operation because the
-        web application is already being serviced, report an error rather than
-        reporting success. (markt)
+        <bug>56273</bug>: If the Manager web application does not perform an
+        operation because the web application is already being serviced, report
+        an error rather than reporting success. (markt)
       </fix>
     </changelog>
   </subsection>
