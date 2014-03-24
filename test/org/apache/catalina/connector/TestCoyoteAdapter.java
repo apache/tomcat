@@ -348,9 +348,17 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
                             os.flush();
                             Thread.sleep(1000);
                         } catch (Exception e) {
-                            asyncCtxt.complete();
-                            completed = true;
-                            break;
+                            try {
+                                // Note if request times out before this
+                                // exception is thrown and the complete call
+                                // below is made, the complete call below will
+                                // fail since the timeout will have completed
+                                // the request.
+                                asyncCtxt.complete();
+                                break;
+                            } finally {
+                                completed = true;
+                            }
                         }
                     }
                 }
