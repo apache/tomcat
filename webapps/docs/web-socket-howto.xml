@@ -49,7 +49,26 @@
    code</a>.</p>
 </section>
 
+<section name="Production usage">
+<p>Although the WebSocket implementation does work with any of the HTTP
+connectors, it is not recommended to the WebSocket with the BIO HTTP connector
+as the typical uses of WebSocket (large numbers of mostly idle connections) is
+not a good fit for the HTTP BIO connector which requires that one thread is
+allocated per connection regardless of whether or not the connection is idle.
+</p>
+
+<p>It has been reported (<bug>56304</bug>) that Linux can take large numbers of
+minutes to report dropped connections. When using WebSocket with the BIO HTTP
+connector this can result in threads blocking on writes for this period. This is
+likely to be undesirable. The time taken for the connection to be reported as
+dropped can be reduced by using the kernel network parameter
+<code>/proc/sys/net/ipv4/tcp_retries2</code>. Alternatively, one of the other
+HTTP connectors may be used as they utilise non-blocking IO enabling Tomcat to
+implement its own timeout mechanism to handle these cases.</p>
+</section>
+
 <section name="Tomcat WebSocket specific configuration">
+
 <p>Tomcat provides a number of Tomcat specific configuration options for
    WebSocket. It is anticipated that these will be absorbed into the WebSocket
    specification over time.</p>
