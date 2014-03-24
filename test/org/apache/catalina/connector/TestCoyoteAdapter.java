@@ -301,8 +301,10 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         client.disconnect();
 
         // Wait for server thread to stop
-        while (servlet.getThread().isAlive()) {
+        int count = 0;
+        while (servlet.getThread().isAlive() && count < 10) {
             Thread.sleep(250);
+            count ++;
         }
         Assert.assertTrue(servlet.isCompleted());
     }
@@ -314,7 +316,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         // This is a hack that won't work generally as servlets are expected to
         // handle more than one request.
         private Thread t;
-        private boolean completed = false;
+        private volatile boolean completed = false;
 
         public Thread getThread() {
             return t;
