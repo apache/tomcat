@@ -92,6 +92,10 @@
         operation because the web application is already being serviced, report
         an error rather than reporting success. (markt)
       </fix>
+      <fix>
+        <bug>56304</bug>: Add a note to the documentation about not using
+        WebSocket with BIO HTTP in production. (markt) 
+      </fix>
     </changelog>
   </subsection>
 </section>
