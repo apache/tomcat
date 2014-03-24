@@ -94,7 +94,7 @@
       </fix>
       <fix>
         <bug>56304</bug>: Add a note to the documentation about not using
-        WebSocket with BIO HTTP in production. (markt) 
+        WebSocket with BIO HTTP in production. (markt)
       </fix>
     </changelog>
   </subsection>
