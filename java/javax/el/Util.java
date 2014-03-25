@@ -118,8 +118,8 @@ class Util {
 
         if (factory == null) {
             final Lock writeLock = cacheValue.getLock().writeLock();
+            writeLock.lock();
             try {
-                writeLock.lock();
                 factory = cacheValue.getExpressionFactory();
                 if (factory == null) {
                     factory = ExpressionFactory.newInstance();
