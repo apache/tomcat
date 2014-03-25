@@ -188,26 +188,13 @@ public abstract class ExpressionFactory {
                     (ExpressionFactory) constructor.newInstance(properties);
             }
 
-        } catch (InstantiationException e) {
-            throw new ELException(
-                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
-                    e);
-        } catch (IllegalAccessException e) {
-            throw new ELException(
-                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
-                    e);
-        } catch (IllegalArgumentException e) {
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException e) {
             throw new ELException(
                     "Unable to create ExpressionFactory of type: " + clazz.getName(),
                     e);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof ThreadDeath) {
-                throw (ThreadDeath) cause;
-            }
-            if (cause instanceof VirtualMachineError) {
-                throw (VirtualMachineError) cause;
-            }
+            Util.handleThrowable(cause);
             throw new ELException(
                     "Unable to create ExpressionFactory of type: " + clazz.getName(),
                     e);

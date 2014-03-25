@@ -95,16 +95,9 @@ public class BeanELResolver extends ELResolver {
         Method m = this.property(context, base, property).read(context);
         try {
             return m.invoke(base, (Object[]) null);
-        } catch (IllegalAccessException e) {
-            throw new ELException(e);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof ThreadDeath) {
-                throw (ThreadDeath) cause;
-            }
-            if (cause instanceof VirtualMachineError) {
-                throw (VirtualMachineError) cause;
-            }
+            Util.handleThrowable(cause);
             throw new ELException(Util.message(context, "propertyReadError",
                     base.getClass().getName(), property.toString()), cause);
         } catch (Exception e) {
@@ -132,16 +125,9 @@ public class BeanELResolver extends ELResolver {
         Method m = this.property(context, base, property).write(context);
         try {
             m.invoke(base, value);
-        } catch (IllegalAccessException e) {
-            throw new ELException(e);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof ThreadDeath) {
-                throw (ThreadDeath) cause;
-            }
-            if (cause instanceof VirtualMachineError) {
-                throw (VirtualMachineError) cause;
-            }
+            Util.handleThrowable(cause);
             throw new ELException(Util.message(context, "propertyWriteError",
                     base.getClass().getName(), property.toString()), cause);
         } catch (Exception e) {
