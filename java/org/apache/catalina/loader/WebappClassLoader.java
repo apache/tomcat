@@ -1585,13 +1585,13 @@ public class WebappClassLoader extends URLClassLoader
      * If only apps cleaned up after themselves...
      */
     private final void clearReferencesJdbc() {
-        InputStream is = getResourceAsStream(
-                "org/apache/catalina/loader/JdbcLeakPrevention.class");
+
         // We know roughly how big the class will be (~ 1K) so allow 2k as a
         // starting point
         byte[] classBytes = new byte[2048];
         int offset = 0;
-        try {
+        try (InputStream is = getResourceAsStream(
+                "org/apache/catalina/loader/JdbcLeakPrevention.class")) {
             int read = is.read(classBytes, offset, classBytes.length-offset);
             while (read > -1) {
                 offset += read;
@@ -1620,16 +1620,6 @@ public class WebappClassLoader extends URLClassLoader
             ExceptionUtils.handleThrowable(t);
             log.warn(sm.getString(
                     "webappClassLoader.jdbcRemoveFailed", getContextName()), t);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException ioe) {
-                    log.warn(sm.getString(
-                            "webappClassLoader.jdbcRemoveStreamError",
-                            getContextName()), ioe);
-                }
-            }
         }
     }
 
