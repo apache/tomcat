@@ -214,7 +214,7 @@ but possibly 7.1.x).
     - Use of try with resources
       - Started.
         - javax.* complete
-        - o.a.catalina.[ant to realm] complete
+        - o.a.catalina.[ant to security] complete
         - remainder TODO
     - Catching multiple exceptions
       - Not started
