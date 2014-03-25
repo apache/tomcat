@@ -379,11 +379,9 @@ public class HostManagerServlet
                         "hostManagerServlet.configBaseCreateFail", name));
                 return;
             }
-            InputStream is = null;
-            OutputStream os = null;
-            try {
-                is = getServletContext().getResourceAsStream("/manager.xml");
-                os = new FileOutputStream(new File(configBaseFile, "manager.xml"));
+            try (InputStream is = getServletContext().getResourceAsStream("/manager.xml");
+                    OutputStream os = new FileOutputStream(
+                            new File(configBaseFile, "manager.xml"))) {
                 byte buffer[] = new byte[512];
                 int len = buffer.length;
                 while (true) {
@@ -396,21 +394,6 @@ public class HostManagerServlet
                 writer.println(smClient.getString(
                         "hostManagerServlet.managerXml"));
                 return;
-            } finally {
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
-                if (os != null) {
-                    try {
-                        os.close();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
             }
         }
 
