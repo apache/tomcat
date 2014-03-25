@@ -507,8 +507,6 @@ public class JDBCRealm
 
         // Look up the user's credentials
         String dbCredentials = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
 
         // Number of tries is the number of attempts to connect to the database
         // during this login attempt (if we need to open the database)
@@ -524,32 +522,23 @@ public class JDBCRealm
                 // Ensure that we have an open database connection
                 open();
 
-                stmt = credentials(dbConnection, username);
-                rs = stmt.executeQuery();
-                if (rs.next()) {
-                    dbCredentials = rs.getString(1);
+                try (PreparedStatement stmt = credentials(dbConnection, username);
+                        ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        dbCredentials = rs.getString(1);
+                    }
+
+                    dbConnection.commit();
+
+                    if (dbCredentials != null) {
+                        dbCredentials = dbCredentials.trim();
+                    }
+
+                    return dbCredentials;
                 }
-
-                dbConnection.commit();
-
-                if (dbCredentials != null) {
-                    dbCredentials = dbCredentials.trim();
-                }
-
-                return dbCredentials;
-
             } catch (SQLException e) {
                 // Log the problem for posterity
                 containerLog.error(sm.getString("jdbcRealm.exception"), e);
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch(SQLException e) {
-                        containerLog.warn(sm.getString(
-                                "jdbcRealm.abnormalCloseResultSet"));
-                    }
-                }
             }
 
             // Close the connection so that it gets reopened next time
@@ -560,7 +549,7 @@ public class JDBCRealm
             numberOfTries--;
         }
 
-        return (null);
+        return null;
     }
 
 
@@ -588,9 +577,6 @@ public class JDBCRealm
             return null;
         }
 
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-
         // Number of tries is the number of attempts to connect to the database
         // during this login attempt (if we need to open the database)
         // This needs rewritten wuth better pooling support, the existing code
@@ -602,46 +588,32 @@ public class JDBCRealm
         int numberOfTries = 2;
         while (numberOfTries>0) {
             try {
-
                 // Ensure that we have an open database connection
                 open();
 
-                try {
+                try (PreparedStatement stmt = roles(dbConnection, username);
+                        ResultSet rs = stmt.executeQuery()) {
                     // Accumulate the user's roles
                     ArrayList<String> roleList = new ArrayList<>();
-                    stmt = roles(dbConnection, username);
-                    rs = stmt.executeQuery();
+
                     while (rs.next()) {
                         String role = rs.getString(1);
                         if (null!=role) {
                             roleList.add(role.trim());
                         }
                     }
-                    rs.close();
-                    rs = null;
 
-                    return (roleList);
-
+                    return roleList;
                 } finally {
-                    if (rs!=null) {
-                        try {
-                            rs.close();
-                        } catch(SQLException e) {
-                            containerLog.warn(sm.getString("jdbcRealm.abnormalCloseResultSet"));
-                        }
-                    }
                     dbConnection.commit();
                 }
-
             } catch (SQLException e) {
-
                 // Log the problem for posterity
                 containerLog.error(sm.getString("jdbcRealm.exception"), e);
 
                 // Close the connection so that it gets reopened next time
                 if (dbConnection != null)
                     close(dbConnection);
-
             }
 
             numberOfTries--;
