@@ -129,44 +129,33 @@ public final class ExtensionValidator {
 
         String appName = context.getName();
         ArrayList<ManifestResource> appManifestResources = new ArrayList<>();
-        // If the application context is null it does not exist and
-        // therefore is not valid
-        if (resources == null) return false;
-        // Find the Manifest for the Web Application
-        InputStream inputStream = null;
-        try {
-            WebResource resource =
-                    resources.getResource("/META-INF/MANIFEST.MF");
-            if (resource.isFile()) {
-                inputStream = resource.getInputStream();
+
+        // Web application manifest
+        WebResource resource = resources.getResource("/META-INF/MANIFEST.MF");
+        if (resource.isFile()) {
+            try (InputStream inputStream = resource.getInputStream()) {
                 Manifest manifest = new Manifest(inputStream);
-                inputStream.close();
-                inputStream = null;
                 ManifestResource mre = new ManifestResource
                     (sm.getString("extensionValidator.web-application-manifest"),
                     manifest, ManifestResource.WAR);
                 appManifestResources.add(mre);
             }
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                }
-            }
         }
 
+        // Web application library manifests
         WebResource[] manifestResources =
                 resources.getClassLoaderResources("/META-INF/MANIFEST.MF");
         for (WebResource manifestResource : manifestResources) {
             if (manifestResource.isFile()) {
                 // Primarily used for error reporting
                 String jarName = manifestResource.getURL().toExternalForm();
-                Manifest jmanifest = new Manifest(manifestResource.getInputStream());
-                ManifestResource mre = new ManifestResource(jarName,
-                        jmanifest, ManifestResource.APPLICATION);
-                appManifestResources.add(mre);
+                Manifest jmanifest = null;
+                try (InputStream is = manifestResource.getInputStream()) {
+                    jmanifest = new Manifest(is);
+                    ManifestResource mre = new ManifestResource(jarName,
+                            jmanifest, ManifestResource.APPLICATION);
+                    appManifestResources.add(mre);
+                }
             }
         }
 
