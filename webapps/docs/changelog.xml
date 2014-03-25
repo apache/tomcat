@@ -44,6 +44,16 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 8.0.6 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix extension validation which was broken by refactoring for new
+        resources implementation. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 8.0.5 (markt)">
   <subsection name="Catalina">
     <changelog>
