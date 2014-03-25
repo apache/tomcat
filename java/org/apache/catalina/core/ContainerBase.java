@@ -599,8 +599,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     public Realm getRealm() {
 
         Lock l = realmLock.readLock();
+        l.lock();
         try {
-            l.lock();
             if (realm != null)
                 return (realm);
             if (parent != null)
@@ -614,8 +614,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     protected Realm getRealmInternal() {
         Lock l = realmLock.readLock();
+        l.lock();
         try {
-            l.lock();
             return realm;
         } finally {
             l.unlock();
@@ -631,10 +631,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     public void setRealm(Realm realm) {
 
         Lock l = realmLock.writeLock();
-
+        l.lock();
         try {
-            l.lock();
-
             // Change components if necessary
             Realm oldRealm = this.realm;
             if (oldRealm == realm)
