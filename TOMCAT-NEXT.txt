@@ -212,7 +212,10 @@ but possibly 7.1.x).
     - Use of <> operator where possible
       - Complete
     - Use of try with resources
-      - Not started
+      - Started.
+        - javax.* complete
+        - o.a.catalina.[ant to realm] complete
+        - remainder TODO
     - Catching multiple exceptions
       - Not started
 
