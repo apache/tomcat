@@ -382,11 +382,8 @@ public abstract class ExpressionFactory {
 
         if (is != null) {
             String line = null;
-            BufferedReader br = null;
-            InputStreamReader isr = null;
-            try {
-                isr = new InputStreamReader(is, "UTF-8");
-                br = new BufferedReader(isr);
+            try (InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+                    BufferedReader br = new BufferedReader(isr)) {
                 line = br.readLine();
                 if (line != null && line.trim().length() > 0) {
                     return line.trim();
@@ -399,16 +396,6 @@ public abstract class ExpressionFactory {
                         e);
             } finally {
                 try {
-                    if (br != null) {
-                        br.close();
-                    }
-                } catch (IOException ioe) {/*Ignore*/}
-                try {
-                    if (isr != null) {
-                        isr.close();
-                    }
-                } catch (IOException ioe) {/*Ignore*/}
-                try {
                     is.close();
                 } catch (IOException ioe) {/*Ignore*/}
             }
@@ -420,9 +407,7 @@ public abstract class ExpressionFactory {
     private static String getClassNameJreDir() {
         File file = new File(PROPERTY_FILE);
         if (file.canRead()) {
-            InputStream is = null;
-            try {
-                is = new FileInputStream(file);
+            try (InputStream is = new FileInputStream(file)){
                 Properties props = new Properties();
                 props.load(is);
                 String value = props.getProperty(PROPERTY_NAME);
@@ -433,14 +418,6 @@ public abstract class ExpressionFactory {
                 // Should not happen - ignore it if it does
             } catch (IOException e) {
                 throw new ELException("Failed to read " + PROPERTY_FILE, e);
-            } finally {
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
             }
         }
         return null;
