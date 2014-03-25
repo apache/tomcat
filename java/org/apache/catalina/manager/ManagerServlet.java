@@ -1543,7 +1543,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 }
                 ostream.write(buffer, 0, n);
             }
-            ostream.flush();
         } catch (IOException e) {
             if (war.exists() && !war.delete()) {
                 writer.println(
