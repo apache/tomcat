@@ -602,13 +602,13 @@ public class DeltaManager extends ClusterManagerBase{
      */
     protected DeltaRequest deserializeDeltaRequest(DeltaSession session, byte[] data)
             throws ClassNotFoundException, IOException {
+        session.lock();
         try {
-            session.lock();
             ReplicationStream ois = getReplicationStream(data);
             session.getDeltaRequest().readExternal(ois);
             ois.close();
             return session.getDeltaRequest();
-        }finally {
+        } finally {
             session.unlock();
         }
     }
@@ -623,10 +623,10 @@ public class DeltaManager extends ClusterManagerBase{
      */
     protected byte[] serializeDeltaRequest(DeltaSession session, DeltaRequest deltaRequest)
             throws IOException {
+        session.lock();
         try {
-            session.lock();
             return deltaRequest.serialize();
-        }finally {
+        } finally {
             session.unlock();
         }
     }
@@ -1116,7 +1116,7 @@ public class DeltaManager extends ClusterManagerBase{
             log.error(sm.getString("deltaManager.createMessage.unableCreateDeltaRequest",
                     sessionId), x);
             return null;
-        }finally {
+        } finally {
             if (session!=null) session.unlock();
         }
 
@@ -1354,12 +1354,12 @@ public class DeltaManager extends ClusterManagerBase{
                 log.debug(sm.getString("deltaManager.receiveMessage.delta",
                         getName(), msg.getSessionID()));
             }
+            session.lock();
             try {
-                session.lock();
                 DeltaRequest dreq = deserializeDeltaRequest(session, delta);
                 dreq.execute(session, isNotifyListenersOnReplication());
                 session.setPrimarySession(false);
-            }finally {
+            } finally {
                 session.unlock();
             }
         }
