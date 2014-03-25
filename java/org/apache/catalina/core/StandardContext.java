@@ -6174,9 +6174,7 @@ public class StandardContext extends ContainerBase
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(stream));
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String strRead = "";
             while (strRead != null) {
                 sb.append(strRead);
@@ -6184,12 +6182,6 @@ public class StandardContext extends ContainerBase
             }
         } catch (IOException e) {
             return "";
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ioe) {/*Ignore*/}
-            }
         }
 
         return sb.toString();
