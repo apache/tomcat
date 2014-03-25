@@ -132,10 +132,10 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      */
     @Override
     public byte[] getDiff() throws IOException {
-        try{
-            lock();
+        lock();
+        try {
             return getDeltaRequest().serialize();
-        }finally{
+        } finally{
             unlock();
         }
     }
@@ -159,8 +159,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      */
     @Override
     public void applyDiff(byte[] diff, int offset, int length) throws IOException, ClassNotFoundException {
+        lock();
         try {
-            lock();
             ReplicationStream stream = ( (ClusterManager) getManager()).getReplicationStream(diff, offset, length);
             ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
             try {
@@ -172,7 +172,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             } finally {
                 Thread.currentThread().setContextClassLoader(contextLoader);
             }
-        }finally {
+        } finally {
             unlock();
         }
     }
@@ -292,10 +292,10 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     public void setMaxInactiveInterval(int interval, boolean addDeltaRequest) {
         super.maxInactiveInterval = interval;
         if (addDeltaRequest && (deltaRequest != null)) {
+            lock();
             try {
-                lock();
                 deltaRequest.setMaxInactiveInterval(interval);
-            }finally{
+            } finally{
                 unlock();
             }
         }
@@ -315,10 +315,10 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     public void setNew(boolean isNew, boolean addDeltaRequest) {
         super.setNew(isNew);
         if (addDeltaRequest && (deltaRequest != null)){
+            lock();
             try {
-                lock();
                 deltaRequest.setNew(isNew);
-            }finally{
+            } finally{
                 unlock();
             }
         }
@@ -339,8 +339,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     }
 
     public void setPrincipal(Principal principal, boolean addDeltaRequest) {
+        lock();
         try {
-            lock();
             super.setPrincipal(principal);
             if (addDeltaRequest && (deltaRequest != null))
                 deltaRequest.setPrincipal(principal);
@@ -361,8 +361,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     }
 
     public void setAuthType(String authType, boolean addDeltaRequest) {
+        lock();
         try {
-            lock();
             super.setAuthType(authType);
             if (addDeltaRequest && (deltaRequest != null))
                 deltaRequest.setAuthType(authType);
@@ -483,11 +483,11 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      */
     @Override
     public void recycle() {
+        lock();
         try {
-            lock();
             super.recycle();
             deltaRequest.clear();
-        }finally{
+        } finally{
             unlock();
         }
     }
@@ -509,10 +509,10 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
     @Override
     public void readExternal(ObjectInput in) throws IOException,ClassNotFoundException {
+        lock();
         try {
-            lock();
             readObjectData(in);
-        }finally{
+        } finally{
             unlock();
         }
     }
@@ -559,15 +559,15 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     }
 
     public void resetDeltaRequest() {
+        lock();
         try {
-            lock();
             if (deltaRequest == null) {
                 deltaRequest = new DeltaRequest(getIdInternal(), false);
             } else {
                 deltaRequest.reset();
                 deltaRequest.setSessionId(getIdInternal());
             }
-        }finally{
+        } finally{
             unlock();
         }
     }
@@ -677,8 +677,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             return;
         }
 
+        lock();
         try {
-            lock();
             super.setAttribute(name,value, notify);
             if (addDeltaRequest && deltaRequest != null && !exclude(name)) {
                 deltaRequest.setAttribute(name, value);
@@ -759,10 +759,10 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
     @Override
     public void writeExternal(ObjectOutput out ) throws java.io.IOException {
+        lock();
         try {
-            lock();
             doWriteObject(out);
-        }finally {
+        } finally {
             unlock();
         }
     }
@@ -847,8 +847,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
     protected void removeAttributeInternal(String name, boolean notify,
                                            boolean addDeltaRequest) {
+        lock();
         try {
-            lock();
             // Remove this attribute from our collection
             Object value = attributes.get(name);
             if (value == null) return;
@@ -858,7 +858,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
                 deltaRequest.removeAttribute(name);
             }
 
-        }finally {
+        } finally {
             unlock();
         }
     }
