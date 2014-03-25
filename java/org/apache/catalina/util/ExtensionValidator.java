@@ -157,20 +157,16 @@ public final class ExtensionValidator {
             }
         }
 
-        // Primarily used for error reporting
-        String jarName = null;
-        WebResource[] jars = resources.listResources("/WEB-INF/lib");
-        for (WebResource jar : jars) {
-            jarName = jar.getName();
-            if (jarName.toLowerCase(Locale.ENGLISH).endsWith(".jar") &&
-                    jar.isFile()) {
-
-                Manifest jmanifest = jar.getManifest();
-                if (jmanifest != null) {
-                    ManifestResource mre = new ManifestResource(jarName,
-                            jmanifest, ManifestResource.APPLICATION);
-                    appManifestResources.add(mre);
-                }
+        WebResource[] manifestResources =
+                resources.getClassLoaderResources("/META-INF/MANIFEST.MF");
+        for (WebResource manifestResource : manifestResources) {
+            if (manifestResource.isFile()) {
+                // Primarily used for error reporting
+                String jarName = manifestResource.getURL().toExternalForm();
+                Manifest jmanifest = new Manifest(manifestResource.getInputStream());
+                ManifestResource mre = new ManifestResource(jarName,
+                        jmanifest, ManifestResource.APPLICATION);
+                appManifestResources.add(mre);
             }
         }
 
