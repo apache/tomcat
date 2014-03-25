@@ -1585,7 +1585,6 @@ public class WebappClassLoader extends URLClassLoader
      * If only apps cleaned up after themselves...
      */
     private final void clearReferencesJdbc() {
-
         // We know roughly how big the class will be (~ 1K) so allow 2k as a
         // starting point
         byte[] classBytes = new byte[2048];
