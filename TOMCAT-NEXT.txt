@@ -217,7 +217,9 @@ but possibly 7.1.x).
         - o.a.catalina.[ant to security] complete
         - remainder TODO
     - Catching multiple exceptions
-      - Not started
+      - Started
+        - javax.[annotation to el] complete
+        - remainder TODO
 
 13. Fix all FindBugs warnings
     - Complete
