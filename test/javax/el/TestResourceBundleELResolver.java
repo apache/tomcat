@@ -57,10 +57,18 @@ public class TestResourceBundleELResolver {
         Enumeration<String> e = (Enumeration<String>) result2;
 
         Assert.assertTrue(e.hasMoreElements());
-        Assert.assertEquals("key2", e.nextElement());
-        Assert.assertTrue(e.hasMoreElements());
-        Assert.assertEquals("key1", e.nextElement());
-        Assert.assertFalse(e.hasMoreElements());
+        String element = e.nextElement();
+        if ("key1".equals(element)) {
+            Assert.assertEquals("key1", element);
+            Assert.assertTrue(e.hasMoreElements());
+            Assert.assertEquals("key2", e.nextElement());
+            Assert.assertFalse(e.hasMoreElements());
+        } else {
+            Assert.assertEquals("key2", element);
+            Assert.assertTrue(e.hasMoreElements());
+            Assert.assertEquals("key1", e.nextElement());
+            Assert.assertFalse(e.hasMoreElements());
+        }
     }
 
     /**
