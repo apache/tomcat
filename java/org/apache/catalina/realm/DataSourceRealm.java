@@ -408,37 +408,20 @@ public class DataSourceRealm extends RealmBase {
     protected String getPassword(Connection dbConnection,
                                  String username) {
 
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
         String dbCredentials = null;
 
-        try {
-            stmt = credentials(dbConnection, username);
-            rs = stmt.executeQuery();
+        try (PreparedStatement stmt = credentials(dbConnection, username);
+                ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
                 dbCredentials = rs.getString(1);
             }
 
             return (dbCredentials != null) ? dbCredentials.trim() : null;
 
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             containerLog.error(
                     sm.getString("dataSourceRealm.getPassword.exception",
                                  username), e);
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException e) {
-                    containerLog.error(
-                        sm.getString("dataSourceRealm.getPassword.exception",
-                             username), e);
-
-            }
         }
 
         return null;
@@ -499,13 +482,10 @@ public class DataSourceRealm extends RealmBase {
             return null;
         }
 
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
         ArrayList<String> list = null;
 
-        try {
-            stmt = roles(dbConnection, username);
-            rs = stmt.executeQuery();
+        try (PreparedStatement stmt = roles(dbConnection, username);
+                ResultSet rs = stmt.executeQuery()) {
             list = new ArrayList<>();
 
             while (rs.next()) {
@@ -518,20 +498,6 @@ public class DataSourceRealm extends RealmBase {
         } catch(SQLException e) {
             containerLog.error(
                 sm.getString("dataSourceRealm.getRoles.exception", username), e);
-        }
-        finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException e) {
-                    containerLog.error(
-                        sm.getString("dataSourceRealm.getRoles.exception",
-                                     username), e);
-            }
         }
 
         return null;
