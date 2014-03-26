@@ -212,11 +212,7 @@ but possibly 7.1.x).
     - Use of <> operator where possible
       - Complete
     - Use of try with resources
-      - Started.
-        - javax.* complete
-        - o.a.[catalina to jasper ] complete
-        - o.a.juli in progress
-        - remainder TODO
+      - Complete
     - Catching multiple exceptions
       - Started
         - javax.[annotation to el] complete

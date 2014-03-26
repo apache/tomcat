@@ -103,8 +103,8 @@ public class StandardJarScanFilter implements JarScanFilter {
     public void setTldSkip(String tldSkip) {
         this.tldSkip = tldSkip;
         Lock writeLock = configurationLock.writeLock();
+        writeLock.lock();
         try {
-            writeLock.lock();
             populateSetFromAttribute(tldSkip, tldSkipSet);
         } finally {
             writeLock.unlock();
@@ -120,8 +120,8 @@ public class StandardJarScanFilter implements JarScanFilter {
     public void setTldScan(String tldScan) {
         this.tldScan = tldScan;
         Lock writeLock = configurationLock.writeLock();
+        writeLock.lock();
         try {
-            writeLock.lock();
             populateSetFromAttribute(tldScan, tldScanSet);
         } finally {
             writeLock.unlock();
@@ -147,8 +147,8 @@ public class StandardJarScanFilter implements JarScanFilter {
     public void setPluggabilitySkip(String pluggabilitySkip) {
         this.pluggabilitySkip = pluggabilitySkip;
         Lock writeLock = configurationLock.writeLock();
+        writeLock.lock();
         try {
-            writeLock.lock();
             populateSetFromAttribute(pluggabilitySkip, pluggabilitySkipSet);
         } finally {
             writeLock.unlock();
@@ -164,8 +164,8 @@ public class StandardJarScanFilter implements JarScanFilter {
     public void setPluggabilityScan(String pluggabilityScan) {
         this.pluggabilityScan = pluggabilityScan;
         Lock writeLock = configurationLock.writeLock();
+        writeLock.lock();
         try {
-            writeLock.lock();
             populateSetFromAttribute(pluggabilityScan, pluggabilityScanSet);
         } finally {
             writeLock.unlock();
@@ -190,8 +190,8 @@ public class StandardJarScanFilter implements JarScanFilter {
         Set<String[]> toScan = new HashSet<>();
 
         Lock readLock = configurationLock.readLock();
+        readLock.lock();
         try  {
-            readLock.lock();
             switch (jarScanType) {
                 case TLD: {
                     defaultScan = defaultTldScan;

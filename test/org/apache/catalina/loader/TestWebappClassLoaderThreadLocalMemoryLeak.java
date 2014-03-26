@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.loader;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Filter;
@@ -160,14 +159,12 @@ public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
      * This method assumes that all classes are in the current package.
      */
     private void loadClass(String name, WebappClassLoader cl) throws Exception {
-
-        InputStream is = cl.getResourceAsStream(
-                "org/apache/tomcat/unittest/" + name + ".class");
-        // We know roughly how big the class will be (~ 1K) so allow 2k as a
-        // starting point
-        byte[] classBytes = new byte[2048];
-        int offset = 0;
-        try {
+        try (InputStream is = cl.getResourceAsStream(
+                "org/apache/tomcat/unittest/" + name + ".class")) {
+            // We know roughly how big the class will be (~ 1K) so allow 2k as a
+            // starting point
+            byte[] classBytes = new byte[2048];
+            int offset = 0;
             int read = is.read(classBytes, offset, classBytes.length-offset);
             while (read > -1) {
                 offset += read;
@@ -185,14 +182,6 @@ public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
             // Make sure we can create an instance
             Object obj = lpClass.newInstance();
             obj.toString();
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException ioe) {
-                    // Ignore
-                }
-            }
         }
     }
 

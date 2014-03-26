@@ -554,7 +554,6 @@ public abstract class AbstractEndpoint<S> {
             return;
         }
 
-        java.net.Socket s = null;
         InetSocketAddress saddr = null;
         try {
             // Need to create a connection to unlock the accept();
@@ -563,57 +562,50 @@ public abstract class AbstractEndpoint<S> {
             } else {
                 saddr = new InetSocketAddress(address, getLocalPort());
             }
-            s = new java.net.Socket();
-            int stmo = 2 * 1000;
-            int utmo = 2 * 1000;
-            if (getSocketProperties().getSoTimeout() > stmo)
-                stmo = getSocketProperties().getSoTimeout();
-            if (getSocketProperties().getUnlockTimeout() > utmo)
-                utmo = getSocketProperties().getUnlockTimeout();
-            s.setSoTimeout(stmo);
-            // TODO Consider hard-coding to s.setSoLinger(true,0)
-            s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
-            if (getLog().isDebugEnabled()) {
-                getLog().debug("About to unlock socket for:"+saddr);
-            }
-            s.connect(saddr,utmo);
-            if (getDeferAccept()) {
-                /*
-                 * In the case of a deferred accept / accept filters we need to
-                 * send data to wake up the accept. Send OPTIONS * to bypass
-                 * even BSD accept filters. The Acceptor will discard it.
-                 */
-                OutputStreamWriter sw;
+            try (java.net.Socket s = new java.net.Socket()) {
+                int stmo = 2 * 1000;
+                int utmo = 2 * 1000;
+                if (getSocketProperties().getSoTimeout() > stmo)
+                    stmo = getSocketProperties().getSoTimeout();
+                if (getSocketProperties().getUnlockTimeout() > utmo)
+                    utmo = getSocketProperties().getUnlockTimeout();
+                s.setSoTimeout(stmo);
+                // TODO Consider hard-coding to s.setSoLinger(true,0)
+                s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("About to unlock socket for:"+saddr);
+                }
+                s.connect(saddr,utmo);
+                if (getDeferAccept()) {
+                    /*
+                     * In the case of a deferred accept / accept filters we need to
+                     * send data to wake up the accept. Send OPTIONS * to bypass
+                     * even BSD accept filters. The Acceptor will discard it.
+                     */
+                    OutputStreamWriter sw;
 
-                sw = new OutputStreamWriter(s.getOutputStream(), "ISO-8859-1");
-                sw.write("OPTIONS * HTTP/1.0\r\n" +
-                         "User-Agent: Tomcat wakeup connection\r\n\r\n");
-                sw.flush();
-            }
-            if (getLog().isDebugEnabled()) {
-                getLog().debug("Socket unlock completed for:"+saddr);
-            }
+                    sw = new OutputStreamWriter(s.getOutputStream(), "ISO-8859-1");
+                    sw.write("OPTIONS * HTTP/1.0\r\n" +
+                             "User-Agent: Tomcat wakeup connection\r\n\r\n");
+                    sw.flush();
+                }
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Socket unlock completed for:"+saddr);
+                }
 
-            // Wait for upto 1000ms acceptor threads to unlock
-            long waitLeft = 1000;
-            for (Acceptor acceptor : acceptors) {
-                while (waitLeft > 0 &&
-                        acceptor.getState() == AcceptorState.RUNNING) {
-                    Thread.sleep(50);
-                    waitLeft -= 50;
+                // Wait for upto 1000ms acceptor threads to unlock
+                long waitLeft = 1000;
+                for (Acceptor acceptor : acceptors) {
+                    while (waitLeft > 0 &&
+                            acceptor.getState() == AcceptorState.RUNNING) {
+                        Thread.sleep(50);
+                        waitLeft -= 50;
+                    }
                 }
             }
         } catch(Exception e) {
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("endpoint.debug.unlock", "" + getPort()), e);
-            }
-        } finally {
-            if (s != null) {
-                try {
-                    s.close();
-                } catch (Exception e) {
-                    // Ignore
-                }
             }
         }
     }

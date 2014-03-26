@@ -745,22 +745,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         connection.connect();
 
         // Write the request body
-        OutputStream os = null;
-        try {
-            os = connection.getOutputStream();
+        try (OutputStream os = connection.getOutputStream()) {
             while (streamer != null && streamer.available() > 0) {
                 byte[] next = streamer.next();
                 os.write(next);
                 os.flush();
-            }
-
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException ioe) {
-                    // Ignore
-                }
             }
         }
 
@@ -776,10 +765,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
         if (rc == HttpServletResponse.SC_OK) {
             connection.getInputStream().close();
-            // Should never be null here but just to be safe
-            if (os != null) {
-                os.close();
-            }
             connection.disconnect();
         }
         return rc;

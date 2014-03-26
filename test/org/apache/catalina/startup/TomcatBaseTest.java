@@ -256,21 +256,11 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             is = connection.getErrorStream();
         }
         if (is != null) {
-            BufferedInputStream bis = null;
-            try {
-                bis = new BufferedInputStream(is);
+            try (BufferedInputStream bis = new BufferedInputStream(is)) {
                 byte[] buf = new byte[2048];
                 int rd = 0;
                 while((rd = bis.read(buf)) > 0) {
                     out.append(buf, 0, rd);
-                }
-            } finally {
-                if (bis != null) {
-                    try {
-                        bis.close();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
                 }
             }
         }
@@ -349,22 +339,11 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         connection.connect();
 
         // Write the request body
-        OutputStream os = null;
-        try {
-            os = connection.getOutputStream();
-            while (streamer!=null && streamer.available()>0) {
+        try (OutputStream os = connection.getOutputStream()) {
+            while (streamer != null && streamer.available() > 0) {
                 byte[] next = streamer.next();
                 os.write(next);
                 os.flush();
-            }
-
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException ioe) {
-                    // Ignore
-                }
             }
         }
 
@@ -380,21 +359,11 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             is = connection.getErrorStream();
         }
 
-        BufferedInputStream bis = null;
-        try {
-            bis = new BufferedInputStream(is);
+        try (BufferedInputStream bis = new BufferedInputStream(is)) {
             byte[] buf = new byte[2048];
             int rd = 0;
             while((rd = bis.read(buf)) > 0) {
                 out.append(buf, 0, rd);
-            }
-        } finally {
-            if (bis != null) {
-                try {
-                    bis.close();
-                } catch (IOException e) {
-                    // Ignore
-                }
             }
         }
         return rc;

@@ -285,23 +285,18 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
     }
 
     private static void copyResource(String name, File file) throws Exception {
-
-        InputStream is = TestWebappClassLoaderWeaving.class.getClassLoader()
-                .getResourceAsStream(name);
-        if (is == null) {
-            throw new IOException("Resource " + name + " not found on classpath.");
-        }
-
-        FileOutputStream os = new FileOutputStream(file);
-        try {
-            for (int b = is.read(); b >= 0; b = is.read()) {
-                os.write(b);
+        ClassLoader cl = TestWebappClassLoaderWeaving.class.getClassLoader();
+        try (InputStream is = cl.getResourceAsStream(name)) {
+            if (is == null) {
+                throw new IOException("Resource " + name + " not found on classpath.");
             }
-        } finally {
-            is.close();
-            os.close();
-        }
 
+            try (FileOutputStream os = new FileOutputStream(file)) {
+                for (int b = is.read(); b >= 0; b = is.read()) {
+                    os.write(b);
+                }
+            }
+        }
     }
 
     private static String invokeDoMethodOnClass(WebappClassLoader loader, String className)
@@ -393,14 +388,14 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
      * and run this main method.
      */
     public static void main(String... arguments) throws Exception {
-        InputStream input = TestWebappClassLoaderWeaving.class.getClassLoader()
-                .getResourceAsStream("org/apache/catalina/loader/TesterUnweavedClass.class");
+        ClassLoader cl = TestWebappClassLoaderWeaving.class.getClassLoader();
+        try (InputStream input = cl.getResourceAsStream(
+                "org/apache/catalina/loader/TesterUnweavedClass.class")) {
 
-        StringBuilder builder = new StringBuilder();
-        builder.append("            ");
+            StringBuilder builder = new StringBuilder();
+            builder.append("            ");
 
-        System.out.println("    private static final byte[] WEAVED_REPLACEMENT_1 = new byte[] {");
-        try {
+            System.out.println("    private static final byte[] WEAVED_REPLACEMENT_1 = new byte[] {");
             for (int i = 0, b = input.read(); b >= 0; i++, b = input.read()) {
                 String value = "" + ((byte)b);
                 if (builder.length() + value.length() > 97) {
@@ -416,8 +411,6 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
                 }
             }
             System.out.println(builder.toString());
-        } finally {
-            input.close();
         }
         System.out.println("    }");
     }

@@ -70,10 +70,8 @@ public class TestSerializablePrincipal  {
         GenericPrincipal gpNew = null;
         try {
             // Do the serialization
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(file);
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
+            try (FileOutputStream fos = new FileOutputStream(file);
+                    ObjectOutputStream oos = new ObjectOutputStream(fos)) {
                 SerializablePrincipal.writePrincipal(gpOriginal, oos);
                 oos.close();
             } catch (FileNotFoundException e) {
@@ -82,21 +80,11 @@ public class TestSerializablePrincipal  {
             } catch (IOException e) {
                 e.printStackTrace();
                 fail("ioe serializing principal");
-            } finally {
-                if (fos != null) {
-                    try {
-                        fos.close();
-                    } catch (IOException ignored) {
-                        // NO OP
-                    }
-                }
             }
 
             // De-serialize the Principal
-            FileInputStream fis = null;
-            try {
-                fis = new FileInputStream(file);
-                ObjectInputStream ois = new ObjectInputStream(fis);
+            try (FileInputStream fis = new FileInputStream(file);
+                    ObjectInputStream ois = new ObjectInputStream(fis)) {
                 gpNew = SerializablePrincipal.readPrincipal(ois);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -107,14 +95,6 @@ public class TestSerializablePrincipal  {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
                 fail("cnfe de-serializing principal");
-            } finally {
-                if (fis != null) {
-                    try {
-                        fis.close();
-                    } catch (IOException ignored) {
-                        // NO OP
-                    }
-                }
             }
         } finally {
             if (!file.delete()) {

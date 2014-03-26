@@ -652,10 +652,8 @@ public class TestRequest extends TomcatBaseTest {
         conn.setRequestProperty("Content-Type",
                 "multipart/form-data; boundary=" + boundary);
 
-        PrintWriter writer = null;
-        try {
-            writer = new PrintWriter(new OutputStreamWriter(
-                    conn.getOutputStream(), "UTF-8"), true);
+        try (OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream(), "UTF-8");
+                PrintWriter writer = new PrintWriter(osw, true)) {
             writer.append("--" + boundary).append("\r\n");
             writer.append("Content-Disposition: form-data; name=\"part\"\r\n");
             writer.append("Content-Type: text/plain; charset=UTF-8\r\n");
@@ -667,10 +665,6 @@ public class TestRequest extends TomcatBaseTest {
             writer.flush();
 
             writer.append("--" + boundary + "--").append("\r\n");
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
         }
     }
 
@@ -679,19 +673,13 @@ public class TestRequest extends TomcatBaseTest {
         List<String> response = new ArrayList<>();
         int status = conn.getResponseCode();
         if (status == HttpURLConnection.HTTP_OK) {
-            BufferedReader reader = null;
-            try {
-                reader = new BufferedReader(new InputStreamReader(
-                        conn.getInputStream(), "UTF-8"));
+            try (InputStreamReader isr = new InputStreamReader(conn.getInputStream(), "UTF-8");
+                    BufferedReader reader = new BufferedReader(isr)) {
                 String line = null;
                 while ((line = reader.readLine()) != null) {
                     response.add(line);
                 }
                 assertTrue(response.contains("Part ��"));
-            } finally {
-                if (reader != null) {
-                    reader.close();
-                }
             }
         } else {
             fail("OK status was expected: " + status);

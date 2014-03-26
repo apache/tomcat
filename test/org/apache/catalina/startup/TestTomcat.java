@@ -129,31 +129,17 @@ public class TestTomcat extends TomcatBaseTest {
                 // Read some content from the resource
                 URLConnection conn = url.openConnection();
 
-                InputStream is = null;
-                Reader reader = null;
                 char cbuf[] = new char[20];
                 int read = 0;
-                try {
-                    is = conn.getInputStream();
-                    reader = new InputStreamReader(is);
+                try (InputStream is = conn.getInputStream();
+                        Reader reader = new InputStreamReader(is)) {
                     while (read < 20) {
                         int len = reader.read(cbuf, read, cbuf.length - read);
                         res.getWriter().write(cbuf, read, len);
                         read = read + len;
                     }
-                } finally {
-                    if (reader != null) {
-                        try { reader.close(); } catch(IOException ioe) {/*Ignore*/}
-                    }
-                    if (is != null) {
-                        try { is.close(); } catch(IOException ioe) {/*Ignore*/}
-                    }
                 }
-
-
             }
-
-
         }
     }
 
