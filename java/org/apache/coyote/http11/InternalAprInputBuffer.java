@@ -623,8 +623,8 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
         boolean readDone = false;
         int result = 0;
+        readLock.lock();
         try {
-            readLock.lock();
             if (wrapper.getBlockingStatus() == block) {
                 result = Socket.recvbb(socket, 0, buf.length - lastValid);
                 readDone = true;
@@ -634,8 +634,8 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
         }
 
         if (!readDone) {
+            writeLock.lock();
             try {
-                writeLock.lock();
                 wrapper.setBlockingStatus(block);
                 // Set the current settings for this socket
                 if (block) {
@@ -645,8 +645,8 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                     Socket.timeoutSet(socket, 0);
                 }
                 // Downgrade the lock
+                readLock.lock();
                 try {
-                    readLock.lock();
                     writeLock.unlock();
                     result = Socket.recvbb(socket, 0, buf.length - lastValid);
                 } finally {

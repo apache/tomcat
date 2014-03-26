@@ -57,8 +57,8 @@ public class AprServletInputStream extends AbstractServletInputStream {
 
         boolean readDone = false;
         int result = 0;
+        readLock.lock();
         try {
-            readLock.lock();
             if (wrapper.getBlockingStatus() == block) {
                 result = Socket.recv(socket, b, off, len);
                 readDone = true;
@@ -68,14 +68,14 @@ public class AprServletInputStream extends AbstractServletInputStream {
         }
 
         if (!readDone) {
+            writeLock.lock();
             try {
-                writeLock.lock();
                 wrapper.setBlockingStatus(block);
                 // Set the current settings for this socket
                 Socket.optSet(socket, Socket.APR_SO_NONBLOCK, (block ? 0 : 1));
                 // Downgrade the lock
+                readLock.lock();
                 try {
-                    readLock.lock();
                     writeLock.unlock();
                     result = Socket.recv(socket, b, off, len);
                 } finally {
