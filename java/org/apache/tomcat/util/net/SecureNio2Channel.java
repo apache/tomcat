@@ -174,7 +174,6 @@ public class SecureNio2Channel extends Nio2Channel  {
      *
      * @return <code>true</code> if the network buffer has been flushed out and
      *         is empty else <code>false</code> (as a future)
-     * @throws IOException
      */
     @Override
     public Future<Boolean> flush() {
