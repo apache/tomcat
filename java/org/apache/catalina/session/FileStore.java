@@ -243,15 +243,12 @@ public final class FileStore extends StoreBase {
                              id, file.getAbsolutePath()));
         }
 
-        FileInputStream fis = null;
-        BufferedInputStream bis = null;
         ObjectInputStream ois = null;
         Loader loader = null;
         ClassLoader classLoader = null;
         ClassLoader oldThreadContextCL = Thread.currentThread().getContextClassLoader();
-        try {
-            fis = new FileInputStream(file.getAbsolutePath());
-            bis = new BufferedInputStream(fis);
+        try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+                BufferedInputStream bis = new BufferedInputStream(fis)) {
             Context context = manager.getContext();
             if (context != null)
                 loader = context.getLoader();
@@ -273,22 +270,6 @@ public final class FileStore extends StoreBase {
             if (manager.getContext().getLogger().isDebugEnabled())
                 manager.getContext().getLogger().debug("No persisted data file found");
             return (null);
-        } catch (IOException e) {
-            if (bis != null) {
-                try {
-                    bis.close();
-                } catch (IOException f) {
-                    // Ignore
-                }
-            }
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException f) {
-                    // Ignore
-                }
-            }
-            throw e;
         } finally {
             if (ois != null) {
                 // Close the input stream
@@ -348,28 +329,11 @@ public final class FileStore extends StoreBase {
             manager.getContext().getLogger().debug(sm.getString(getStoreName()+".saving",
                              session.getIdInternal(), file.getAbsolutePath()));
         }
-        FileOutputStream fos = null;
-        ObjectOutputStream oos = null;
-        try {
-            fos = new FileOutputStream(file.getAbsolutePath());
-            oos = new ObjectOutputStream(new BufferedOutputStream(fos));
-        } catch (IOException e) {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException f) {
-                    // Ignore
-                }
-            }
-            throw e;
-        }
 
-        try {
+        try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
+                ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos))) {
             ((StandardSession)session).writeObjectData(oos);
-        } finally {
-            oos.close();
         }
-
     }
 
 
