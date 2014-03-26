@@ -220,22 +220,13 @@ class ParserController implements TagConstants {
                     isEncodingSpecifiedInProlog, isBomPresent);
         } else {
             // Standard syntax
-            InputStreamReader inStreamReader = null;
-            try {
-                inStreamReader = JspUtil.getReader(absFileName, sourceEnc,
-                        jar, ctxt, err, skip);
+            try (InputStreamReader inStreamReader = JspUtil.getReader(
+                    absFileName, sourceEnc, jar, ctxt, err, skip);) {
                 JspReader jspReader = new JspReader(ctxt, absFileName,
                         inStreamReader, err);
                 parsedPage = Parser.parse(this, jspReader, parent, isTagFile,
                         directiveOnly, jar, sourceEnc, jspConfigPageEnc,
                         isDefaultPageEncoding, isBomPresent);
-            } finally {
-                if (inStreamReader != null) {
-                    try {
-                        inStreamReader.close();
-                    } catch (Exception any) {
-                    }
-                }
             }
         }
 

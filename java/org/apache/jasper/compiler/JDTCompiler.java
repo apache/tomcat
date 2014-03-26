@@ -105,14 +105,10 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             @Override
             public char[] getContents() {
                 char[] result = null;
-                FileInputStream is = null;
-                InputStreamReader isr = null;
-                Reader reader = null;
-                try {
-                    is = new FileInputStream(sourceFile);
-                    isr = new InputStreamReader(is,
-                            ctxt.getOptions().getJavaEncoding());
-                    reader = new BufferedReader(isr);
+                try (FileInputStream is = new FileInputStream(sourceFile);
+                        InputStreamReader isr = new InputStreamReader(
+                                is, ctxt.getOptions().getJavaEncoding());
+                        Reader reader = new BufferedReader(isr)) {
                     char[] chars = new char[8192];
                     StringBuilder buf = new StringBuilder();
                     int count;
@@ -124,22 +120,6 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                     buf.getChars(0, result.length, result, 0);
                 } catch (IOException e) {
                     log.error("Compilation error", e);
-                } finally {
-                    if (reader != null) {
-                        try {
-                            reader.close();
-                        } catch (IOException ioe) {/*Ignore*/}
-                    }
-                    if (isr != null) {
-                        try {
-                            isr.close();
-                        } catch (IOException ioe) {/*Ignore*/}
-                    }
-                    if (is != null) {
-                        try {
-                            is.close();
-                        } catch (IOException exc) {/*Ignore*/}
-                    }
                 }
                 return result;
             }
@@ -204,17 +184,17 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
 
                 private NameEnvironmentAnswer findType(String className) {
 
-                    InputStream is = null;
-                    try {
-                        if (className.equals(targetClassName)) {
-                            ICompilationUnit compilationUnit =
-                                new CompilationUnit(sourceFile, className);
-                            return
-                                new NameEnvironmentAnswer(compilationUnit, null);
-                        }
-                        String resourceName =
+                    if (className.equals(targetClassName)) {
+                        ICompilationUnit compilationUnit =
+                            new CompilationUnit(sourceFile, className);
+                        return
+                            new NameEnvironmentAnswer(compilationUnit, null);
+                    }
+
+                    String resourceName =
                             className.replace('.', '/') + ".class";
-                        is = classLoader.getResourceAsStream(resourceName);
+
+                    try (InputStream is = classLoader.getResourceAsStream(resourceName)) {
                         if (is != null) {
                             byte[] classBytes;
                             byte[] buf = new byte[8192];
@@ -237,14 +217,6 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                         log.error("Compilation error", exc);
                     } catch (org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException exc) {
                         log.error("Compilation error", exc);
-                    } finally {
-                        if (is != null) {
-                            try {
-                                is.close();
-                            } catch (IOException exc) {
-                                // Ignore
-                            }
-                        }
                     }
                     return null;
                 }

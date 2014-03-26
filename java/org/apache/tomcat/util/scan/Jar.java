@@ -29,7 +29,7 @@ import java.net.URL;
  * based {@link java.net.URL}s, {@link java.util.jar.JarFile} creates a copy of the JAR in the
  * temporary directory so {@link java.util.jar.JarInputStream} is faster.
  */
-public interface Jar {
+public interface Jar extends AutoCloseable {
 
     /**
      * Obtain the URL for accessing the JAR file.
@@ -70,6 +70,7 @@ public interface Jar {
     /**
      * Close any resources associated with this JAR.
      */
+    @Override
     void close();
 
     /**
