@@ -61,6 +61,12 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <scode>
+      Review source code and take advantage of Java 7&apos;s
+      try-with-resources syntax where possible. (markt)  
+    </scode>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.5 (markt)">
   <subsection name="Catalina">
