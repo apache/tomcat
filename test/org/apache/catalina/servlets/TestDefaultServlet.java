@@ -229,9 +229,10 @@ public class TestDefaultServlet extends TomcatBaseTest {
         if (!webInf.mkdirs() && !webInf.isDirectory()) {
             fail("Unable to create directory [" + webInf + "]");
         }
-        Writer w = new OutputStreamWriter(new FileOutputStream(new File(appDir,
-                "WEB-INF/web.xml")), "UTF-8");
-        try {
+
+        File webxml = new File(appDir, "WEB-INF/web.xml");
+        try (FileOutputStream fos = new FileOutputStream(webxml);
+                Writer w = new OutputStreamWriter(fos, "UTF-8");) {
             w.write("<?xml version='1.0' encoding='UTF-8'?>\n"
                     + "<web-app xmlns='http://java.sun.com/xml/ns/j2ee' "
                     + " xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'"
@@ -241,17 +242,12 @@ public class TestDefaultServlet extends TomcatBaseTest {
                     + "<error-page>\n<error-code>404</error-code>\n"
                     + "<location>/404.html</location>\n</error-page>\n"
                     + "</web-app>\n");
-            w.flush();
-        } finally {
-            w.close();
         }
-        w = new OutputStreamWriter(new FileOutputStream(new File(appDir,
-                "404.html")), "ISO-8859-1");
-        try {
+
+        File error404 = new File(appDir, "404.html");
+        try (FileOutputStream fos = new FileOutputStream(error404);
+                Writer w = new OutputStreamWriter(fos, "ISO-8859-1")) {
             w.write("It is 404.html");
-            w.flush();
-        } finally {
-            w.close();
         }
 
         Tomcat tomcat = getTomcatInstance();
@@ -315,9 +311,10 @@ public class TestDefaultServlet extends TomcatBaseTest {
         if (!webInf.mkdirs() && !webInf.isDirectory()) {
             fail("Unable to create directory [" + webInf + "]");
         }
-        Writer w = new OutputStreamWriter(new FileOutputStream(new File(appDir,
-                "WEB-INF/web.xml")), "UTF-8");
-        try {
+
+        File webxml = new File(appDir, "WEB-INF/web.xml");
+        try (FileOutputStream fos = new FileOutputStream(webxml);
+                Writer w = new OutputStreamWriter(fos, "UTF-8");) {
             w.write("<?xml version='1.0' encoding='UTF-8'?>\n"
                     + "<web-app xmlns='http://java.sun.com/xml/ns/j2ee' "
                     + " xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'"
@@ -327,9 +324,6 @@ public class TestDefaultServlet extends TomcatBaseTest {
                     + "<error-page>\n<error-code>404</error-code>\n"
                     + "<location>/404-absent.html</location>\n</error-page>\n"
                     + "</web-app>\n");
-            w.flush();
-        } finally {
-            w.close();
         }
 
         Tomcat tomcat = getTomcatInstance();

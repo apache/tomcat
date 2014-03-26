@@ -103,8 +103,8 @@ public class OperationInfo extends FeatureInfo {
      */
     public ParameterInfo[] getSignature() {
         Lock readLock = parametersLock.readLock();
+        readLock.lock();
         try {
-            readLock.lock();
             return this.parameters;
         } finally {
             readLock.unlock();
@@ -122,8 +122,8 @@ public class OperationInfo extends FeatureInfo {
     public void addParameter(ParameterInfo parameter) {
 
         Lock writeLock = parametersLock.writeLock();
+        writeLock.lock();
         try {
-            writeLock.lock();
             ParameterInfo results[] = new ParameterInfo[parameters.length + 1];
             System.arraycopy(parameters, 0, results, 0, parameters.length);
             results[parameters.length] = parameter;

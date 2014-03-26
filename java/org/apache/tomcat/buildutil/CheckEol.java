@@ -136,11 +136,9 @@ public class CheckEol extends Task {
         }
     }
 
-    private void check(File file, List<CheckFailure> errors, Mode mode)
-            throws IOException {
-        BufferedInputStream is = new BufferedInputStream(new FileInputStream(
-                file));
-        try {
+    private void check(File file, List<CheckFailure> errors, Mode mode) throws IOException {
+        try (FileInputStream fis = new FileInputStream(file);
+                BufferedInputStream is = new BufferedInputStream(fis)) {
             int line = 1;
             int prev = -1;
             int ch;
@@ -160,8 +158,6 @@ public class CheckEol extends Task {
                 }
                 prev = ch;
             }
-        } finally {
-            is.close();
         }
     }
 }

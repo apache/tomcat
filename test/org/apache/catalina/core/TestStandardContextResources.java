@@ -249,16 +249,12 @@ public class TestStandardContextResources extends TomcatBaseTest {
                 return;
             }
 
-            InputStream input = url.openStream();
-            OutputStream output = resp.getOutputStream();
-            try {
+            try (InputStream input = url.openStream();
+                    OutputStream output = resp.getOutputStream()) {
                 byte[] buffer = new byte[4000];
                 for (int len; (len = input.read(buffer)) > 0;) {
                     output.write(buffer, 0, len);
                 }
-            } finally {
-                input.close();
-                output.close();
             }
         }
     }

@@ -673,25 +673,17 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
                     System.getProperty(Constants.CATALINA_BASE_PROP), crlf);
         }
         Collection<? extends CRL> crls = null;
-        InputStream is = null;
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            is = new FileInputStream(crlFile);
-            crls = cf.generateCRLs(is);
+            try (InputStream is = new FileInputStream(crlFile)) {
+                crls = cf.generateCRLs(is);
+            }
         } catch(IOException iex) {
             throw iex;
         } catch(CRLException crle) {
             throw crle;
         } catch(CertificateException ce) {
             throw ce;
-        } finally {
-            if(is != null) {
-                try{
-                    is.close();
-                } catch(Exception ex) {
-                    // Ignore
-                }
-            }
         }
         return crls;
     }
