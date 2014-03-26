@@ -140,8 +140,8 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
         boolean writeDone = false;
         int result = 0;
+        readLock.lock();
         try {
-            readLock.lock();
             if (socketWrapper.getBlockingStatus() == block) {
                 result = Socket.sendbb(socket, pos, len);
                 writeDone = true;
@@ -151,14 +151,14 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         }
 
         if (!writeDone) {
+            writeLock.lock();
             try {
-                writeLock.lock();
                 socketWrapper.setBlockingStatus(block);
                 // Set the current settings for this socket
                 Socket.optSet(socket, Socket.APR_SO_NONBLOCK, (block ? 0 : 1));
                 // Downgrade the lock
+                readLock.lock();
                 try {
-                    readLock.lock();
                     writeLock.unlock();
                     result = Socket.sendbb(socket, pos, len);
                 } finally {
@@ -237,8 +237,8 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
         boolean readDone = false;
         int result = 0;
+        readLock.lock();
         try {
-            readLock.lock();
             if (socketWrapper.getBlockingStatus() == block) {
                 result = Socket.recvbb(socket, pos, len);
                 readDone = true;
@@ -248,14 +248,14 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         }
 
         if (!readDone) {
+            writeLock.lock();
             try {
-                writeLock.lock();
                 socketWrapper.setBlockingStatus(block);
                 // Set the current settings for this socket
                 Socket.optSet(socket, Socket.APR_SO_NONBLOCK, (block ? 0 : 1));
                 // Downgrade the lock
+                readLock.lock();
                 try {
-                    readLock.lock();
                     writeLock.unlock();
                     result = Socket.recvbb(socket, pos, len);
                 } finally {
