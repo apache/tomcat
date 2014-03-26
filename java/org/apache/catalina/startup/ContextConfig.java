@@ -1899,9 +1899,7 @@ public class ContextConfig implements LifecycleListener {
             }
         } else if (webResource.isFile() &&
                 webResource.getName().endsWith(".class")) {
-            InputStream is = null;
-            try {
-                is = webResource.getInputStream();
+            try (InputStream is = webResource.getInputStream()) {
                 processAnnotationsStream(is, fragment, handlesTypesOnly);
             } catch (IOException e) {
                 log.error(sm.getString("contextConfig.inputStreamWebResource",
@@ -1909,14 +1907,6 @@ public class ContextConfig implements LifecycleListener {
             } catch (ClassFormatException e) {
                 log.error(sm.getString("contextConfig.inputStreamWebResource",
                         webResource.getWebappPath()),e);
-            } finally {
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (Throwable t) {
-                        ExceptionUtils.handleThrowable(t);
-                    }
-                }
             }
         }
     }
@@ -1948,7 +1938,6 @@ public class ContextConfig implements LifecycleListener {
             boolean handlesTypesOnly) {
 
         Jar jar = null;
-        InputStream is;
 
         try {
             jar = JarFactory.newInstance(url);
@@ -1957,9 +1946,7 @@ public class ContextConfig implements LifecycleListener {
             String entryName = jar.getEntryName();
             while (entryName != null) {
                 if (entryName.endsWith(".class")) {
-                    is = null;
-                    try {
-                        is = jar.getEntryInputStream();
+                    try (InputStream is = jar.getEntryInputStream()) {
                         processAnnotationsStream(
                                 is, fragment, handlesTypesOnly);
                     } catch (IOException e) {
@@ -1968,14 +1955,6 @@ public class ContextConfig implements LifecycleListener {
                     } catch (ClassFormatException e) {
                         log.error(sm.getString("contextConfig.inputStreamJar",
                                 entryName, url),e);
-                    } finally {
-                        if (is != null) {
-                            try {
-                                is.close();
-                            } catch (IOException ioe) {
-                                // Ignore
-                            }
-                        }
                     }
                 }
                 jar.nextEntry();
@@ -2001,9 +1980,7 @@ public class ContextConfig implements LifecycleListener {
                         new File(file,dir), fragment, handlesTypesOnly);
             }
         } else if (file.canRead() && file.getName().endsWith(".class")) {
-            FileInputStream fis = null;
-            try {
-                fis = new FileInputStream(file);
+            try (FileInputStream fis = new FileInputStream(file)) {
                 processAnnotationsStream(fis, fragment, handlesTypesOnly);
             } catch (IOException e) {
                 log.error(sm.getString("contextConfig.inputStreamFile",
@@ -2011,14 +1988,6 @@ public class ContextConfig implements LifecycleListener {
             } catch (ClassFormatException e) {
                 log.error(sm.getString("contextConfig.inputStreamFile",
                         file.getAbsolutePath()),e);
-            } finally {
-                if (fis != null) {
-                    try {
-                        fis.close();
-                    } catch (Throwable t) {
-                        ExceptionUtils.handleThrowable(t);
-                    }
-                }
             }
         }
     }
@@ -2182,13 +2151,11 @@ public class ContextConfig implements LifecycleListener {
     private void populateJavaClassCache(String className) {
         if (!javaClassCache.containsKey(className)) {
             String name = className.replace('.', '/') + ".class";
-            InputStream is =
-                    context.getLoader().getClassLoader().getResourceAsStream(name);
-            if (is == null) {
-                return;
-            }
-            ClassParser parser = new ClassParser(is, null);
-            try {
+            try (InputStream is = context.getLoader().getClassLoader().getResourceAsStream(name)) {
+                if (is == null) {
+                    return;
+                }
+                ClassParser parser = new ClassParser(is, null);
                 JavaClass clazz = parser.parse();
                 populateJavaClassCache(clazz.getClassName(), clazz);
             } catch (ClassFormatException e) {
@@ -2197,12 +2164,6 @@ public class ContextConfig implements LifecycleListener {
             } catch (IOException e) {
                 log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
                         className), e);
-            } finally {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    // ignore
-                }
             }
         }
     }

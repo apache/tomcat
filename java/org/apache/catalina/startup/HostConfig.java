@@ -761,19 +761,12 @@ public class HostConfig
      */
     protected void deployWAR(ContextName cn, File war) {
 
-        // Checking for a nested /META-INF/context.xml
-        JarFile jar = null;
-        InputStream istream = null;
-        FileOutputStream fos = null;
-        BufferedOutputStream ostream = null;
-
         File xml = new File(host.getAppBaseFile(),
                 cn.getBaseName() + "/META-INF/context.xml");
 
         boolean xmlInWar = false;
         JarEntry entry = null;
-        try {
-            jar = new JarFile(war);
+        try (JarFile jar = new JarFile(war)) {
             entry = jar.getJarEntry(Constants.ApplicationContextXml);
             if (entry != null) {
                 xmlInWar = true;
@@ -782,14 +775,6 @@ public class HostConfig
             /* Ignore */
         } finally {
             entry = null;
-            if (jar != null) {
-                try {
-                    jar.close();
-                } catch (IOException ioe) {
-                    // Ignore;
-                }
-                jar = null;
-            }
         }
 
         Context context = null;
@@ -812,12 +797,11 @@ public class HostConfig
                 context.setConfigFile(xml.toURI().toURL());
             } else if (deployXML && xmlInWar) {
                 synchronized (digesterLock) {
-                    try {
-                        jar = new JarFile(war);
-                        entry =
-                            jar.getJarEntry(Constants.ApplicationContextXml);
-                        istream = jar.getInputStream(entry);
-                        context = (Context) digester.parse(istream);
+                    try (JarFile jar = new JarFile(war)) {
+                        entry = jar.getJarEntry(Constants.ApplicationContextXml);
+                        try (InputStream istream = jar.getInputStream(entry)) {
+                            context = (Context) digester.parse(istream);
+                        }
                     } catch (Exception e) {
                         log.error(sm.getString(
                                 "hostConfig.deployDescriptor.error",
@@ -829,23 +813,7 @@ public class HostConfig
                         context.setConfigFile(new URL("jar:" +
                                 war.toURI().toString() + "!/" +
                                 Constants.ApplicationContextXml));
-                        if (istream != null) {
-                            try {
-                                istream.close();
-                            } catch (IOException e) {
-                                /* Ignore */
-                            }
-                            istream = null;
-                        }
                         entry = null;
-                        if (jar != null) {
-                            try {
-                                jar.close();
-                            } catch (IOException e) {
-                                /* Ignore */
-                            }
-                            jar = null;
-                        }
                         digester.reset();
                     }
                 }
@@ -884,58 +852,23 @@ public class HostConfig
                 xml = new File(host.getConfigBaseFile(),
                         cn.getBaseName() + ".xml");
                 entry = null;
-                try {
-                    jar = new JarFile(war);
-                    entry =
-                        jar.getJarEntry(Constants.ApplicationContextXml);
-                    istream = jar.getInputStream(entry);
-
-                    fos = new FileOutputStream(xml);
-                    ostream = new BufferedOutputStream(fos, 1024);
-                    byte buffer[] = new byte[1024];
-                    while (true) {
-                        int n = istream.read(buffer);
-                        if (n < 0) {
-                            break;
+                try (JarFile jar = new JarFile(war)) {
+                    entry = jar.getJarEntry(Constants.ApplicationContextXml);
+                    try (InputStream istream = jar.getInputStream(entry);
+                            FileOutputStream fos = new FileOutputStream(xml);
+                            BufferedOutputStream ostream = new BufferedOutputStream(fos, 1024)) {
+                        byte buffer[] = new byte[1024];
+                        while (true) {
+                            int n = istream.read(buffer);
+                            if (n < 0) {
+                                break;
+                            }
+                            ostream.write(buffer, 0, n);
                         }
-                        ostream.write(buffer, 0, n);
+                        ostream.flush();
                     }
-                    ostream.flush();
                 } catch (IOException e) {
                     /* Ignore */
-                } finally {
-                    if (ostream != null) {
-                        try {
-                            ostream.close();
-                        } catch (IOException ioe) {
-                            // Ignore
-                        }
-                        ostream = null;
-                    }
-                    if (fos != null) {
-                        try {
-                            fos.close();
-                        } catch (IOException ioe) {
-                            // Ignore
-                        }
-                        fos = null;
-                    }
-                    if (istream != null) {
-                        try {
-                            istream.close();
-                        } catch (IOException ioe) {
-                            // Ignore
-                        }
-                        istream = null;
-                    }
-                    if (jar != null) {
-                        try {
-                            jar.close();
-                        } catch (IOException ioe) {
-                            // Ignore;
-                        }
-                        jar = null;
-                    }
                 }
             }
         }
@@ -1089,24 +1022,10 @@ public class HostConfig
                 }
 
                 if (copyThisXml) {
-                    InputStream is = null;
-                    OutputStream os = null;
-                    try {
-                        is = new FileInputStream(xml);
-                        os = new FileOutputStream(xmlCopy);
+                    try (InputStream is = new FileInputStream(xml);
+                            OutputStream os = new FileOutputStream(xmlCopy)) {
                         IOTools.flow(is, os);
                         // Don't catch IOE - let the outer try/catch handle it
-                    } finally {
-                        try {
-                            if (is != null) is.close();
-                        } catch (IOException e){
-                            // Ignore
-                        }
-                        try {
-                            if (os != null) os.close();
-                        } catch (IOException e){
-                            // Ignore
-                        }
                     }
                     context.setConfigFile(xmlCopy.toURI().toURL());
                 } else {
