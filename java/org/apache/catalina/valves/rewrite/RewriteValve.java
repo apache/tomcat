@@ -169,17 +169,12 @@ public class RewriteValve extends ValveBase {
             return;
         }
 
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(is, StandardCharsets.UTF_8));
-
-        try {
+        try (InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
+                BufferedReader reader = new BufferedReader(isr)) {
             parse(reader);
+        } catch (IOException ioe) {
+            container.getLogger().error("Error closing configuration", ioe);
         } finally {
-            try {
-                reader.close();
-            } catch (IOException e) {
-                container.getLogger().error("Error closing configuration", e);
-            }
             try {
                 is.close();
             } catch (IOException e) {

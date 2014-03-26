@@ -214,7 +214,8 @@ but possibly 7.1.x).
     - Use of try with resources
       - Started.
         - javax.* complete
-        - o.a.catalina.[ant to util] complete
+        - o.a.[catalina to el ] complete
+        - o.a.jasper in progress
         - remainder TODO
     - Catching multiple exceptions
       - Started
