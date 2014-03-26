@@ -239,8 +239,8 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         Lock readLock = wrapper.getBlockingStatusReadLock();
         WriteLock writeLock = wrapper.getBlockingStatusWriteLock();
 
+        readLock.lock();
         try {
-            readLock.lock();
             if (wrapper.getBlockingStatus() == block) {
                 writeToSocket();
                 return;
@@ -249,8 +249,8 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
             readLock.unlock();
         }
 
+        writeLock.lock();
         try {
-            writeLock.lock();
             // Set the current settings for this socket
             wrapper.setBlockingStatus(block);
             if (block) {
@@ -260,8 +260,8 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
             }
 
             // Downgrade the lock
+            readLock.lock();
             try {
-                readLock.lock();
                 writeLock.unlock();
                 writeToSocket();
             } finally {

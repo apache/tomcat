@@ -141,7 +141,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             do {
                 if (socket.flush(true,selector,writeTimeout)) break;
             }while ( true );
-        }finally {
+        } finally {
             if ( selector != null ) pool.put(selector);
         }
         if ( block || bytebuffer.remaining()==0) {
