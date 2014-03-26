@@ -144,17 +144,8 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
     @Override
     protected void registerForEvent(boolean read, boolean write) {
-        final Nio2Endpoint.Nio2SocketWrapper attach =
-                (Nio2Endpoint.Nio2SocketWrapper) socketWrapper;
-        if (attach == null) {
-            return;
-        }
-        if (read) {
-            attach.interestOps(attach.interestOps() | Nio2Endpoint.OP_READ);
-        }
-        if (write) {
-            attach.interestOps(attach.interestOps() | Nio2Endpoint.OP_WRITE);
-        }
+        // Nothing to do here, the appropriate operations should
+        // already be pending
     }
 
 

@@ -33,7 +33,6 @@ import java.nio.channels.ReadPendingException;
 import java.nio.file.StandardOpenOption;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
@@ -64,11 +63,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
     private static final Log log = LogFactory.getLog(Nio2Endpoint.class);
 
-
-    public static final int OP_REGISTER = 0x100; //register interest op
-    public static final int OP_CALLBACK = 0x200; //callback interest op
-    public static final int OP_READ = 0x400; //read interest op
-    public static final int OP_WRITE = 0x800; //write interest op
 
     // ----------------------------------------------------------------- Fields
 
@@ -583,7 +577,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
     protected boolean processSocket0(SocketWrapper<Nio2Channel> socket, SocketStatus status, boolean dispatch) {
         try {
-            ((Nio2SocketWrapper) socket).setCometNotify(false); //will get reset upon next reg
             SocketProcessor sc = (useCaches) ? processorCache.pop() : null;
             if (sc == null) {
                 sc = new SocketProcessor(socket, status);
@@ -611,10 +604,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
     public void closeSocket(SocketWrapper<Nio2Channel> socket, SocketStatus status) {
         try {
-            Nio2SocketWrapper ka = (Nio2SocketWrapper) socket;
             if (socket != null && socket.isComet() && status != null) {
                 socket.setComet(false);//to avoid a loop
-                if (status == SocketStatus.TIMEOUT ) {
+                if (status == SocketStatus.TIMEOUT) {
                     if (processSocket0(socket, status, true)) {
                         return; // don't close on comet timeout
                     }
@@ -634,16 +626,17 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                             "endpoint.debug.socketCloseFail"), e);
                 }
             }
+            Nio2SocketWrapper nio2Socket = (Nio2SocketWrapper) socket;
             try {
-                if (ka != null && ka.getSendfileData() != null
-                        && ka.getSendfileData().fchannel != null
-                        && ka.getSendfileData().fchannel.isOpen()) {
-                    ka.getSendfileData().fchannel.close();
+                if (nio2Socket != null && nio2Socket.getSendfileData() != null
+                        && nio2Socket.getSendfileData().fchannel != null
+                        && nio2Socket.getSendfileData().fchannel.isOpen()) {
+                    nio2Socket.getSendfileData().fchannel.close();
                 }
             } catch (Exception ignore) {
             }
-            if (ka!=null) {
-                ka.reset();
+            if (nio2Socket != null) {
+                nio2Socket.reset(null, -1);
                 countDownConnection();
             }
         } catch (Throwable e) {
@@ -793,6 +786,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
     public static class Nio2SocketWrapper extends SocketWrapper<Nio2Channel> {
 
+        private SendfileData sendfileData = null;
+        private boolean upgradeInit = false;
+
         public Nio2SocketWrapper(Nio2Channel channel) {
             super(channel);
         }
@@ -801,33 +797,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         public void reset(Nio2Channel channel, long soTimeout) {
             super.reset(channel, soTimeout);
             upgradeInit = false;
-            cometNotify = false;
-            interestOps = 0;
             sendfileData = null;
-            if (readLatch != null) {
-                try {
-                    for (int i = 0; i < (int) readLatch.getCount(); i++) {
-                        readLatch.countDown();
-                    }
-                } catch (Exception ignore) {
-                }
-            }
-            readLatch = null;
-            sendfileData = null;
-            if (writeLatch != null) {
-                try {
-                    for (int i = 0; i < (int) writeLatch.getCount(); i++) {
-                        writeLatch.countDown();
-                    }
-                } catch (Exception ignore) {
-                }
-            }
-            writeLatch = null;
-            setWriteTimeout(soTimeout);
-        }
-
-        public void reset() {
-            reset(null, -1);
         }
 
         @Override
@@ -835,6 +805,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             long timeout = super.getTimeout();
             return (timeout > 0) ? timeout : Long.MAX_VALUE;
         }
+
         @Override
         public void setUpgraded(boolean upgraded) {
             if (upgraded && !isUpgraded()) {
@@ -842,63 +813,15 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             }
             super.setUpgraded(upgraded);
         }
+
         public boolean isUpgradeInit() {
             boolean value = upgradeInit;
             upgradeInit = false;
             return value;
         }
-        public void setCometNotify(boolean notify) { this.cometNotify = notify; }
-        public boolean getCometNotify() { return cometNotify; }
-        public Nio2Channel getChannel() { return getSocket();}
-        public int interestOps() { return interestOps;}
-        public int interestOps(int ops) { this.interestOps  = ops; return ops; }
-        public CountDownLatch getReadLatch() { return readLatch; }
-        public CountDownLatch getWriteLatch() { return writeLatch; }
-        protected CountDownLatch resetLatch(CountDownLatch latch) {
-            if ( latch==null || latch.getCount() == 0 ) return null;
-            else throw new IllegalStateException("Latch must be at count 0");
-        }
-        public void resetReadLatch() { readLatch = resetLatch(readLatch); }
-        public void resetWriteLatch() { writeLatch = resetLatch(writeLatch); }
 
-        protected CountDownLatch startLatch(CountDownLatch latch, int cnt) {
-            if ( latch == null || latch.getCount() == 0 ) {
-                return new CountDownLatch(cnt);
-            }
-            else throw new IllegalStateException("Latch must be at count 0 or null.");
-        }
-        public void startReadLatch(int cnt) { readLatch = startLatch(readLatch,cnt);}
-        public void startWriteLatch(int cnt) { writeLatch = startLatch(writeLatch,cnt);}
-
-        protected void awaitLatch(CountDownLatch latch, long timeout, TimeUnit unit) throws InterruptedException {
-            if ( latch == null ) throw new IllegalStateException("Latch cannot be null");
-            // Note: While the return value is ignored if the latch does time
-            //       out, logic further up the call stack will trigger a
-            //       SocketTimeoutException
-            latch.await(timeout,unit);
-        }
-        public void awaitReadLatch(long timeout, TimeUnit unit) throws InterruptedException { awaitLatch(readLatch,timeout,unit);}
-        public void awaitWriteLatch(long timeout, TimeUnit unit) throws InterruptedException { awaitLatch(writeLatch,timeout,unit);}
-
-        public void setSendfileData(SendfileData sf) { this.sendfileData = sf;}
-        public SendfileData getSendfileData() { return this.sendfileData;}
-
-        public void setWriteTimeout(long writeTimeout) {
-            if (writeTimeout <= 0) {
-                this.writeTimeout = Long.MAX_VALUE;
-            } else {
-                this.writeTimeout = writeTimeout;
-            }
-        }
-        public long getWriteTimeout() {return this.writeTimeout;}
-
-        private int interestOps = 0;
-        private boolean cometNotify = false;
-        private CountDownLatch readLatch = null;
-        private CountDownLatch writeLatch = null;
-        private SendfileData sendfileData = null;
-        private long writeTimeout = -1;
-        private boolean upgradeInit = false;
+        public void setSendfileData(SendfileData sf) { this.sendfileData = sf; }
+        public SendfileData getSendfileData() { return this.sendfileData; }
 
     }
 
