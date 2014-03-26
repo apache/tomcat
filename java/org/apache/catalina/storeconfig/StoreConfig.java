@@ -230,24 +230,8 @@ public class StoreConfig implements IStoreConfig {
                 getRegistry().getEncoding());
         // Open an output writer for the new configuration file
         try {
-            PrintWriter writer = null;
-            try {
-                writer = mover.getWriter();
+            try (PrintWriter writer = mover.getWriter()) {
                 store(writer, -2, aServer);
-            } finally {
-                if (writer != null) {
-                    // Flush and close the output file
-                    try {
-                        writer.flush();
-                    } catch (Exception e) {
-                        log.error(e);
-                    }
-                    try {
-                        writer.close();
-                    } catch (Exception e) {
-                        throw (e);
-                    }
-                }
             }
             mover.move();
         } catch (Exception e) {

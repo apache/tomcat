@@ -116,7 +116,6 @@ public class StandardContextSF extends StoreFactoryBase {
     protected void storeContextSeparate(PrintWriter aWriter, int indent,
             StandardContext aContext) throws Exception {
         URL configFile = aContext.getConfigFile();
-        PrintWriter writer = null;
         if (configFile != null) {
             File config = new File(configFile.toURI());
             if (!config.isAbsolute()) {
@@ -133,25 +132,11 @@ public class StandardContextSF extends StoreFactoryBase {
             if (log.isInfoEnabled())
                 log.info("Store Context " + aContext.getPath()
                         + " separate at file " + config);
-            try {
-                writer = new PrintWriter(new OutputStreamWriter(
-                        new FileOutputStream(config), getRegistry()
-                                .getEncoding()));
+            try (FileOutputStream fos = new FileOutputStream(config);
+                    PrintWriter writer = new PrintWriter(new OutputStreamWriter(
+                            fos , getRegistry().getEncoding()))) {
                 storeXMLHead(writer);
                 super.store(writer, -2, aContext);
-            } finally {
-                if (writer != null) {
-                    try {
-                        writer.flush();
-                    } catch (Exception e) {
-                        // Ignore
-                    }
-                    try {
-                        writer.close();
-                    } catch (Throwable t) {
-                        // Ignore
-                    }
-                }
             }
         } else {
             super.store(aWriter, indent, aContext);
@@ -190,25 +175,9 @@ public class StandardContextSF extends StoreFactoryBase {
                         + " separate with backup (at file "
                         + mover.getConfigSave() + " )");
 
-            PrintWriter writer = null;
-            try {
-                writer = mover.getWriter();
+            try (PrintWriter writer = mover.getWriter()) {
                 storeXMLHead(writer);
                 super.store(writer, -2, aContext);
-            } finally {
-                if (writer != null) {
-                    // Flush and close the output file
-                    try {
-                        writer.flush();
-                    } catch (Exception e) {
-                        log.error(e);
-                    }
-                    try {
-                        writer.close();
-                    } catch (Exception e) {
-                        throw (e);
-                    }
-                }
             }
             mover.move();
         }
