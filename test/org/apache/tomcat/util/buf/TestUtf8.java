@@ -56,7 +56,21 @@ public class TestUtf8 {
 
     public static final List<Utf8TestCase> TEST_CASES = new ArrayList<>();
 
+    private static int workAroundCount = 0;
+
     static {
+        // Future proof test and assume some UTF-8 bugs won't get fixed until
+        // Java 9 or later
+        // Base assumption in Java 7
+        int javaVersion = 7;
+        try {
+            Class.forName("java.util.stream.Collector");
+            javaVersion = 8;
+        } catch (Exception e) {
+            // Ignore
+        }
+        Utf8TestCase testCase = null;
+
         TEST_CASES.add(new Utf8TestCase(
                 "Zero length input",
                 new int[] {},
@@ -88,18 +102,29 @@ public class TestUtf8 {
                 new int[] {0x41, 0xF4, 0x90, 0x80, 0x80, 0x41},
                 2,
                 "A\uFFFD\uFFFD\uFFFD\uFFFDA").addForJvm(ERROR_POS_PLUS2));
-        // JVM decoder does not report error until all 2 bytes are available
-        TEST_CASES.add(new Utf8TestCase(
+
+        // Java 7 JVM decoder does not report error until all 2 bytes are available
+        testCase = new Utf8TestCase(
                 "Valid sequence padded from one byte to two",
                 new int[] {0x41, 0xC0, 0xC1, 0x41},
                 1,
-                "A\uFFFD\uFFFDA").addForJvm(ERROR_POS_PLUS1));
-        // JVM decoder does not report error until all 3 bytes are available
-        TEST_CASES.add(new Utf8TestCase(
+                "A\uFFFD\uFFFDA");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS1);
+        }
+        TEST_CASES.add(testCase);
+
+        // Java 7 JVM decoder does not report error until all 3 bytes are available
+        testCase = new Utf8TestCase(
                 "Valid sequence padded from one byte to three",
                 new int[] {0x41, 0xE0, 0x80, 0xC1, 0x41},
                 2,
-                "A\uFFFD\uFFFD\uFFFDA").addForJvm(ERROR_POS_PLUS1));
+                "A\uFFFD\uFFFD\uFFFDA");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS1);
+        }
+        TEST_CASES.add(testCase);
+
         // JVM decoder does not report error until all 4 bytes are available
         TEST_CASES.add(new Utf8TestCase(
                 "Valid sequence padded from one byte to four",
@@ -111,21 +136,37 @@ public class TestUtf8 {
                 new int[] {0x41, 0xFF, 0x41},
                 1,
                 "A\uFFFDA"));
-        TEST_CASES.add(new Utf8TestCase(
+
+        testCase = new Utf8TestCase(
                 "Invalid one byte 1111 0000",
                 new int[] {0x41, 0xF0, 0x41},
                 2,
-                "A\uFFFDA").addForJvm(REPLACE_SWALLOWS_TRAILER));
-        TEST_CASES.add(new Utf8TestCase(
+                "A\uFFFDA");
+        if (javaVersion < 8) {
+            testCase.addForJvm(REPLACE_SWALLOWS_TRAILER);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Invalid one byte 1110 0000",
                 new int[] {0x41, 0xE0, 0x41},
                 2,
-                "A\uFFFDA").addForJvm(REPLACE_SWALLOWS_TRAILER));
-        TEST_CASES.add(new Utf8TestCase(
+                "A\uFFFDA");
+        if (javaVersion < 8) {
+            testCase.addForJvm(REPLACE_SWALLOWS_TRAILER);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Invalid one byte 1100 0000",
                 new int[] {0x41, 0xC0, 0x41},
                 1,
-                "A\uFFFDA").addForJvm(ERROR_POS_PLUS1));
+                "A\uFFFDA");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS1);
+        }
+        TEST_CASES.add(testCase);
+
         TEST_CASES.add(new Utf8TestCase(
                 "Invalid one byte 1000 000",
                 new int[] {0x41, 0x80, 0x41},
@@ -157,36 +198,63 @@ public class TestUtf8 {
                 new int[] {0x61, 0xF0, 0x90, 0x90, 0x61},
                 4,
                 "a\uFFFDa"));
-        TEST_CASES.add(new Utf8TestCase(
+
+        testCase = new Utf8TestCase(
                 "Valid 4-byte sequence truncated to 2 bytes with trailer",
                 new int[] {0x61, 0xF0, 0x90, 0x61},
                 3,
-                "a\uFFFDa").addForJvm(REPLACE_SWALLOWS_TRAILER));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(REPLACE_SWALLOWS_TRAILER);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Valid 4-byte sequence truncated to 1 byte with trailer",
                 new int[] {0x61, 0xF0, 0x61},
                 2,
-                "a\uFFFDa").addForJvm(REPLACE_SWALLOWS_TRAILER));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(REPLACE_SWALLOWS_TRAILER);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "U+0000 zero-padded to two bytes",
                 new int[] {0x61, 0xC0, 0x80, 0x61},
                 1,
-                "a\uFFFD\uFFFDa").addForJvm(ERROR_POS_PLUS1));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS1);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "U+007F zero-padded to two bytes",
                 new int[] {0x61, 0xC1, 0xBF, 0x61},
-                2,
-                "a\uFFFD\uFFFDa"));
+                1,
+                "a\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS1);
+        }
+        TEST_CASES.add(testCase);
+
         TEST_CASES.add(new Utf8TestCase(
                 "Two bytes, all 1's",
                 new int[] {0x61, 0xFF, 0xFF, 0x61},
                 1,
                 "a\uFFFD\uFFFDa"));
-        TEST_CASES.add(new Utf8TestCase(
+
+        testCase = new Utf8TestCase(
                 "Two bytes, 1110 first byte first nibble",
                 new int[] {0x61, 0xE0, 0x80, 0x61},
                 2,
-                "a\uFFFD\uFFFDa").addForJvm(ERROR_POS_PLUS1));
+                "a\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS1);
+        }
+        TEST_CASES.add(testCase);
+
         TEST_CASES.add(new Utf8TestCase(
                 "Two bytes, 101x first byte first nibble",
                 new int[] {0x61, 0xA0, 0x80, 0x61},
@@ -202,37 +270,64 @@ public class TestUtf8 {
                 new int[] {0x61, 0xC2, 0xC0, 0x61},
                 2,
                 "a\uFFFD\uFFFDa"));
-        TEST_CASES.add(new Utf8TestCase(
+
+        testCase = new Utf8TestCase(
                 "Three bytes, U+0000 zero-padded",
                 new int[] {0x61, 0xE0, 0x80, 0x80, 0x61},
                 2,
-                "a\uFFFD\uFFFD\uFFFDa").addForJvm(ERROR_POS_PLUS1));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS1);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Three bytes, U+007F zero-padded",
                 new int[] {0x61, 0xE0, 0x81, 0xBF, 0x61},
                 2,
-                "a\uFFFD\uFFFD\uFFFDa").addForJvm(ERROR_POS_PLUS1));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS1);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Three bytes, U+07FF zero-padded",
                 new int[] {0x61, 0xE0, 0x9F, 0xBF, 0x61},
                 2,
-                "a\uFFFD\uFFFD\uFFFDa").addForJvm(ERROR_POS_PLUS1));
+                "a\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS1);
+        }
+        TEST_CASES.add(testCase);
+
         TEST_CASES.add(new Utf8TestCase(
                 "Three bytes, all 1's",
                 new int[] {0x61, 0xFF, 0xFF, 0xFF, 0x61},
                 1,
                 "a\uFFFD\uFFFD\uFFFDa"));
-        TEST_CASES.add(new Utf8TestCase(
+
+        testCase = new Utf8TestCase(
                 "Three bytes, invalid first byte",
                 new int[] {0x61, 0xF8, 0x80, 0x80, 0x61},
                 1,
-                "a\uFFFD\uFFFD\uFFFDa").addForJvm(
-                        REPLACE_SWALLOWS_TRAILER).addForJvm(REPLACE_MISSING2));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(REPLACE_MISSING2).addForJvm(
+                    REPLACE_SWALLOWS_TRAILER);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Three bytes, invalid second byte",
                 new int[] {0x61, 0xE0, 0xC0, 0x80, 0x61},
                 2,
-                "a\uFFFD\uFFFD\uFFFDa").addForJvm(ERROR_POS_PLUS1));
+                "a\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS1);
+        }
+        TEST_CASES.add(testCase);
+
         TEST_CASES.add(new Utf8TestCase(
                 "Three bytes, invalid third byte",
                 new int[] {0x61, 0xE1, 0x80, 0xC0, 0x61},
@@ -263,92 +358,143 @@ public class TestUtf8 {
                 new int[] {0x61, 0xFF, 0xFF, 0xFF, 0xFF, 0x61},
                 1,
                 "a\uFFFD\uFFFD\uFFFD\uFFFDa"));
-        TEST_CASES.add(new Utf8TestCase(
+
+        testCase = new Utf8TestCase(
                 "Four bytes, invalid first byte",
                 new int[] {0x61, 0xF8, 0x80, 0x80, 0x80, 0x61},
                 1,
-                "a\uFFFD\uFFFD\uFFFD\uFFFDa").addForJvm(
-                        ERROR_POS_PLUS4).addForJvm(
-                        REPLACE_MISSING2).addForJvm(REPLACE_MISSING1));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFD\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS4).addForJvm(
+                    REPLACE_MISSING2).addForJvm(REPLACE_MISSING1);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Four bytes, invalid second byte",
                 new int[] {0x61, 0xF1, 0xC0, 0x80, 0x80, 0x61},
                 2,
-                "a\uFFFD\uFFFD\uFFFD\uFFFDa").addForJvm(ERROR_POS_PLUS2));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFD\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS2);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Four bytes, invalid third byte",
                 new int[] {0x61, 0xF1, 0x80, 0xC0, 0x80, 0x61},
                 3,
-                "a\uFFFD\uFFFD\uFFFDa").addForJvm(ERROR_POS_PLUS1));
+                "a\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS1);
+        }
+        TEST_CASES.add(testCase);
+
         TEST_CASES.add(new Utf8TestCase(
                 "Four bytes, invalid fourth byte",
                 new int[] {0x61, 0xF1, 0x80, 0x80, 0xC0, 0x61},
                 4,
                 "a\uFFFD\uFFFDa"));
-        TEST_CASES.add(new Utf8TestCase(
+
+        testCase = new Utf8TestCase(
                 "Five bytes, U+0000 zero padded",
                 new int[] {0x61, 0xF8, 0x80, 0x80, 0x80, 0x80, 0x61},
                 1,
-                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa").addForJvm(
-                        ERROR_POS_PLUS4).addForJvm(REPLACE_MISSING4));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS4).addForJvm(REPLACE_MISSING4);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Five bytes, U+007F zero padded",
                 new int[] {0x61, 0xF8, 0x80, 0x80, 0x81, 0xBF, 0x61},
                 1,
-                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa").addForJvm(
-                        ERROR_POS_PLUS4).addForJvm(REPLACE_MISSING4));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS4).addForJvm(REPLACE_MISSING4);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Five bytes, U+07FF zero padded",
                 new int[] {0x61, 0xF8, 0x80, 0x80, 0x9F, 0xBF, 0x61},
                 1,
-                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa").addForJvm(
-                        ERROR_POS_PLUS4).addForJvm(REPLACE_MISSING4));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS4).addForJvm(REPLACE_MISSING4);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Five bytes, U+FFFF zero padded",
                 new int[] {0x61, 0xF8, 0x80, 0x8F, 0xBF, 0xBF, 0x61},
                 1,
-                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa").addForJvm(
-                        ERROR_POS_PLUS4).addForJvm(REPLACE_MISSING4));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS4).addForJvm(REPLACE_MISSING4);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Six bytes, U+0000 zero padded",
                 new int[] {0x61, 0xFC, 0x80, 0x80, 0x80, 0x80, 0x80, 0x61},
                 1,
-                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa").addForJvm(
-                        ERROR_POS_PLUS4).addForJvm(
-                        ERROR_POS_PLUS1).addForJvm(
-                        REPLACE_MISSING4).addForJvm(REPLACE_MISSING1));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS4).addForJvm(
+                    ERROR_POS_PLUS1).addForJvm(REPLACE_MISSING4).addForJvm(
+                            REPLACE_MISSING1);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Six bytes, U+007F zero padded",
                 new int[] {0x61, 0xFC, 0x80, 0x80, 0x80, 0x81, 0xBF, 0x61},
                 1,
-                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa").addForJvm(
-                        ERROR_POS_PLUS4).addForJvm(
-                        ERROR_POS_PLUS1).addForJvm(
-                        REPLACE_MISSING4).addForJvm(REPLACE_MISSING1));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS4).addForJvm(
+                    ERROR_POS_PLUS1).addForJvm(REPLACE_MISSING4).addForJvm(
+                            REPLACE_MISSING1);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Six bytes, U+07FF zero padded",
                 new int[] {0x61, 0xFC, 0x80, 0x80, 0x80, 0x9F, 0xBF, 0x61},
                 1,
-                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa").addForJvm(
-                        ERROR_POS_PLUS4).addForJvm(
-                        ERROR_POS_PLUS1).addForJvm(
-                        REPLACE_MISSING4).addForJvm(REPLACE_MISSING1));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS4).addForJvm(
+                    ERROR_POS_PLUS1).addForJvm(REPLACE_MISSING4).addForJvm(
+                            REPLACE_MISSING1);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Six bytes, U+FFFF zero padded",
                 new int[] {0x61, 0xFC, 0x80, 0x80, 0x8F, 0xBF, 0xBF, 0x61},
                 1,
-                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa").addForJvm(
-                        ERROR_POS_PLUS4).addForJvm(
-                        ERROR_POS_PLUS1).addForJvm(
-                        REPLACE_MISSING4).addForJvm(REPLACE_MISSING1));
-        TEST_CASES.add(new Utf8TestCase(
+                "a\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFDa");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS4).addForJvm(
+                    ERROR_POS_PLUS1).addForJvm(REPLACE_MISSING4).addForJvm(
+                            REPLACE_MISSING1);
+        }
+        TEST_CASES.add(testCase);
+
+        testCase = new Utf8TestCase(
                 "Original test case - derived from Autobahn?",
                 new int[] {0xCE, 0xBA, 0xE1, 0xDB, 0xB9, 0xCF, 0x83, 0xCE,
                            0xBC, 0xCE, 0xB5, 0xED, 0x80, 0x65, 0x64, 0x69,
                            0x74, 0x65, 0x64},
                 3,
-                "\u03BA\uFFFD\u06F9\u03C3\u03BC\u03B5\uFFFDedited").addForJvm(
-                        ERROR_POS_PLUS1));
+                "\u03BA\uFFFD\u06F9\u03C3\u03BC\u03B5\uFFFDedited");
+        if (javaVersion < 8) {
+            testCase.addForJvm(ERROR_POS_PLUS1);
+        }
+        TEST_CASES.add(testCase);
     }
 
     @Test
@@ -363,8 +509,20 @@ public class TestUtf8 {
     @Test
     public void testJvmDecoder() {
         CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
-        for (Utf8TestCase testCase : TEST_CASES) {
-            doTest(decoder, testCase, testCase.flagsJvm);
+        int testCount = 0;
+        try {
+            for (Utf8TestCase testCase : TEST_CASES) {
+                doTest(decoder, testCase, testCase.flagsJvm);
+                testCount++;
+            }
+        } finally {
+            System.err.println("Workarounds added to " + workAroundCount +
+                    " tests to account for known JVM bugs");
+            if (testCount < TEST_CASES.size()) {
+                System.err.println("Executed " + testCount + " of " +
+                        TEST_CASES.size() + " UTF-8 tests before " +
+                        "encountering a failure");
+            }
         }
     }
 
@@ -474,6 +632,9 @@ public class TestUtf8 {
         }
 
         public Utf8TestCase addForJvm(int flag) {
+            if (this.flagsJvm == 0) {
+                TestUtf8.workAroundCount++;
+            }
             this.flagsJvm = this.flagsJvm | flag;
             return this;
         }
