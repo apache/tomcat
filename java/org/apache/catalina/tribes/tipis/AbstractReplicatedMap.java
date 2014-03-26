@@ -416,10 +416,9 @@ public abstract class AbstractReplicatedMap<K,V>
             }
             //check to see if the message is diffable
             MapMessage msg = null;
-            if (rentry != null && rentry.isDiffable() &&
-                    (isDirty || complete)) {
+            if (rentry != null && rentry.isDiffable() && (isDirty || complete)) {
+                rentry.lock();
                 try {
-                    rentry.lock();
                     //construct a diff message
                     msg = new MapMessage(mapContextName, MapMessage.MSG_BACKUP,
                                          true, (Serializable) entry.getKey(), null,
@@ -432,7 +431,6 @@ public abstract class AbstractReplicatedMap<K,V>
                 } finally {
                     rentry.unlock();
                 }
-
             }
             if (msg == null && complete) {
                 //construct a complete
@@ -440,7 +438,6 @@ public abstract class AbstractReplicatedMap<K,V>
                                      false, (Serializable) entry.getKey(),
                                      (Serializable) entry.getValue(),
                                      null, entry.getPrimary(),entry.getBackupNodes());
-
             }
             if (msg == null) {
                 //construct a access message
@@ -656,8 +653,8 @@ public abstract class AbstractReplicatedMap<K,V>
                 if (entry.getValue() instanceof ReplicatedMapEntry) {
                     ReplicatedMapEntry diff = (ReplicatedMapEntry) entry.getValue();
                     if (mapmsg.isDiff()) {
+                        diff.lock();
                         try {
-                            diff.lock();
                             diff.applyDiff(mapmsg.getDiffValue(), 0, mapmsg.getDiffValue().length);
                         } catch (Exception x) {
                             log.error("Unable to apply diff to key:" + entry.getKey(), x);
@@ -1259,8 +1256,8 @@ public abstract class AbstractReplicatedMap<K,V>
         public void apply(byte[] data, int offset, int length, boolean diff) throws IOException, ClassNotFoundException {
             if (isDiffable() && diff) {
                 ReplicatedMapEntry rentry = (ReplicatedMapEntry) value;
+                rentry.lock();
                 try {
-                    rentry.lock();
                     rentry.applyDiff(data, offset, length);
                 } finally {
                     rentry.unlock();
