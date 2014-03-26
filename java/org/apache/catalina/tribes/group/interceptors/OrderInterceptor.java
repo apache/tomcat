@@ -73,8 +73,8 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         for (int i=0; i<destination.length; i++ ) {
             try {
                 int nr = 0;
+                outLock.writeLock().lock();
                 try {
-                    outLock.writeLock().lock();
                     nr = incCounter(destination[i]);
                 } finally {
                     outLock.writeLock().unlock();
@@ -103,10 +103,10 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         int msgnr = XByteBuffer.toInt(msg.getMessage().getBytesDirect(),msg.getMessage().getLength()-4);
         msg.getMessage().trim(4);
         MessageOrder order = new MessageOrder(msgnr,(ChannelMessage)msg.deepclone());
+        inLock.writeLock().lock();
         try {
-            inLock.writeLock().lock();
             if ( processIncoming(order) ) processLeftOvers(msg.getAddress(),false);
-        }finally {
+        } finally {
             inLock.writeLock().unlock();
         }
     }
