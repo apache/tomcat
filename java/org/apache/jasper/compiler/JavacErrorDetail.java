@@ -86,71 +86,52 @@ public class JavacErrorDetail {
         //       be modified (corrected) during the execution of this method
 
         if (jspBeginLineNum > 0 && ctxt != null) {
-            InputStream is = null;
-            FileInputStream  fis = null;
-
-            try {
+            try (InputStream is = ctxt.getResourceAsStream(jspFileName)) {
                 // Read both files in, so we can inspect them
-                is = ctxt.getResourceAsStream(jspFileName);
                 String[] jspLines = readFile(is);
 
-                fis = new FileInputStream(ctxt.getServletJavaFileName());
-                String[] javaLines = readFile(fis);
+                try (FileInputStream fis = new FileInputStream(ctxt.getServletJavaFileName())) {
+                    String[] javaLines = readFile(fis);
 
-                if (jspLines.length < jspBeginLineNum) {
-                    // Avoid ArrayIndexOutOfBoundsException
-                    // Probably bug 48498 but could be some other cause
-                    jspExtract = Localizer.getMessage("jsp.error.bug48498");
-                    return;
-                }
+                    if (jspLines.length < jspBeginLineNum) {
+                        // Avoid ArrayIndexOutOfBoundsException
+                        // Probably bug 48498 but could be some other cause
+                        jspExtract = Localizer.getMessage("jsp.error.bug48498");
+                        return;
+                    }
 
-                // If the line contains the opening of a multi-line scriptlet
-                // block, then the JSP line number we got back is probably
-                // faulty.  Scan forward to match the java line...
-                if (jspLines[jspBeginLineNum-1].lastIndexOf("<%") >
-                    jspLines[jspBeginLineNum-1].lastIndexOf("%>")) {
-                    String javaLine = javaLines[javaLineNum-1].trim();
+                    // If the line contains the opening of a multi-line scriptlet
+                    // block, then the JSP line number we got back is probably
+                    // faulty.  Scan forward to match the java line...
+                    if (jspLines[jspBeginLineNum-1].lastIndexOf("<%") >
+                        jspLines[jspBeginLineNum-1].lastIndexOf("%>")) {
+                        String javaLine = javaLines[javaLineNum-1].trim();
 
-                    for (int i=jspBeginLineNum-1; i<jspLines.length; i++) {
-                        if (jspLines[i].indexOf(javaLine) != -1) {
-                            // Update jsp line number
-                            jspBeginLineNum = i+1;
-                            break;
+                        for (int i=jspBeginLineNum-1; i<jspLines.length; i++) {
+                            if (jspLines[i].indexOf(javaLine) != -1) {
+                                // Update jsp line number
+                                jspBeginLineNum = i+1;
+                                break;
+                            }
                         }
                     }
+
+                    // copy out a fragment of JSP to display to the user
+                    StringBuilder fragment = new StringBuilder(1024);
+                    int startIndex = Math.max(0, jspBeginLineNum-1-3);
+                    int endIndex = Math.min(
+                            jspLines.length-1, jspBeginLineNum-1+3);
+
+                    for (int i=startIndex;i<=endIndex; ++i) {
+                        fragment.append(i+1);
+                        fragment.append(": ");
+                        fragment.append(jspLines[i]);
+                        fragment.append(Constants.NEWLINE);
+                    }
+                    jspExtract = fragment.toString();
                 }
-
-                // copy out a fragment of JSP to display to the user
-                StringBuilder fragment = new StringBuilder(1024);
-                int startIndex = Math.max(0, jspBeginLineNum-1-3);
-                int endIndex = Math.min(
-                        jspLines.length-1, jspBeginLineNum-1+3);
-
-                for (int i=startIndex;i<=endIndex; ++i) {
-                    fragment.append(i+1);
-                    fragment.append(": ");
-                    fragment.append(jspLines[i]);
-                    fragment.append(Constants.NEWLINE);
-                }
-                jspExtract = fragment.toString();
-
             } catch (IOException ioe) {
                 // Can't read files - ignore
-            } finally {
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException ioe) {
-                        // Ignore
-                    }
-                }
-                if (fis != null) {
-                    try {
-                        fis.close();
-                    } catch (IOException ioe) {
-                        // Ignore
-                    }
-                }
             }
         }
         this.jspBeginLineNum = jspBeginLineNum;

@@ -173,7 +173,6 @@ public abstract class Compiler {
         ctxt.checkOutputDir();
         String javaFileName = ctxt.getServletJavaFileName();
 
-        ServletWriter writer = null;
         try {
             /*
              * The setting of isELIgnored changes the behaviour of the parser
@@ -207,11 +206,10 @@ public abstract class Compiler {
 
             if (ctxt.isPrototypeMode()) {
                 // generate prototype .java file for the tag file
-                writer = setupContextWriter(javaFileName);
-                Generator.generate(writer, this, pageNodes);
-                writer.close();
-                writer = null;
-                return null;
+                try (ServletWriter writer = setupContextWriter(javaFileName)) {
+                    Generator.generate(writer, this, pageNodes);
+                    return null;
+                }
             }
 
             // Validate and process attributes - don't re-validate the
@@ -248,10 +246,9 @@ public abstract class Compiler {
             ELFunctionMapper.map(pageNodes);
 
             // generate servlet .java file
-            writer = setupContextWriter(javaFileName);
-            Generator.generate(writer, this, pageNodes);
-            writer.close();
-            writer = null;
+            try (ServletWriter writer = setupContextWriter(javaFileName)) {
+                Generator.generate(writer, this, pageNodes);
+            }
 
             // The writer is only used during the compile, dereference
             // it in the JspCompilationContext when done to allow it
@@ -265,14 +262,6 @@ public abstract class Compiler {
             }
 
         } catch (Exception e) {
-            if (writer != null) {
-                try {
-                    writer.close();
-                    writer = null;
-                } catch (Exception e1) {
-                    // do nothing
-                }
-            }
             // Remove the generated .java file
             File file = new File(javaFileName);
             if (file.exists()) {
@@ -283,14 +272,6 @@ public abstract class Compiler {
                 }
             }
             throw e;
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (Exception e2) {
-                    // do nothing
-                }
-            }
         }
 
         // JSR45 Support

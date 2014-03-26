@@ -278,9 +278,9 @@ public class TldScanner {
                 jarFound = true;
             }
             boolean found = false;
-            Jar jar = JarFactory.newInstance(urlConn.getURL());
-            URL jarURL = jar.getJarFileURL();
-            try {
+            URL jarURL = null;
+            try (Jar jar = JarFactory.newInstance(urlConn.getURL())) {
+                jarURL = jar.getJarFileURL();
                 jar.nextEntry();
                 for (String entryName = jar.getEntryName();
                     entryName != null;
@@ -298,8 +298,6 @@ public class TldScanner {
                         throw new IOException(e);
                     }
                 }
-            } finally {
-                jar.close();
             }
             if (found) {
                 tldFound = true;

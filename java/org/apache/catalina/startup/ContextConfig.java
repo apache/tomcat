@@ -1655,21 +1655,21 @@ public class ContextConfig implements LifecycleListener {
     protected void processResourceJARs(Set<WebXml> fragments) {
         for (WebXml fragment : fragments) {
             URL url = fragment.getURL();
-            Jar jar = null;
             try {
                 if ("jar".equals(url.getProtocol())) {
-                    jar = JarFactory.newInstance(url);
-                    jar.nextEntry();
-                    String entryName = jar.getEntryName();
-                    while (entryName != null) {
-                        if (entryName.startsWith("META-INF/resources/")) {
-                            context.getResources().createWebResourceSet(
-                                    WebResourceRoot.ResourceSetType.RESOURCE_JAR,
-                                    "/", url, "/META-INF/resources");
-                            break;
-                        }
+                    try (Jar jar = JarFactory.newInstance(url)) {
                         jar.nextEntry();
-                        entryName = jar.getEntryName();
+                        String entryName = jar.getEntryName();
+                        while (entryName != null) {
+                            if (entryName.startsWith("META-INF/resources/")) {
+                                context.getResources().createWebResourceSet(
+                                        WebResourceRoot.ResourceSetType.RESOURCE_JAR,
+                                        "/", url, "/META-INF/resources");
+                                break;
+                            }
+                            jar.nextEntry();
+                            entryName = jar.getEntryName();
+                        }
                     }
                 } else if ("file".equals(url.getProtocol())) {
                     File file = new File(url.toURI());
@@ -1686,10 +1686,6 @@ public class ContextConfig implements LifecycleListener {
             } catch (URISyntaxException e) {
                 log.error(sm.getString("contextConfig.resourceJarFail", url,
                     context.getName()));
-            } finally {
-                if (jar != null) {
-                    jar.close();
-                }
             }
         }
     }
@@ -1937,11 +1933,7 @@ public class ContextConfig implements LifecycleListener {
     protected void processAnnotationsJar(URL url, WebXml fragment,
             boolean handlesTypesOnly) {
 
-        Jar jar = null;
-
-        try {
-            jar = JarFactory.newInstance(url);
-
+        try (Jar jar = JarFactory.newInstance(url)) {
             jar.nextEntry();
             String entryName = jar.getEntryName();
             while (entryName != null) {
@@ -1962,10 +1954,6 @@ public class ContextConfig implements LifecycleListener {
             }
         } catch (IOException e) {
             log.error(sm.getString("contextConfig.jarFile", url), e);
-        } finally {
-            if (jar != null) {
-                jar.close();
-            }
         }
     }
 

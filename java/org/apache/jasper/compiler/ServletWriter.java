@@ -24,7 +24,8 @@ import java.io.PrintWriter;
  * @author Anil K. Vijendran
  * @author Kin-man Chung
  */
-public class ServletWriter {
+public class ServletWriter implements AutoCloseable {
+
     private static final int TAB_WIDTH = 2;
     private static final String SPACES = "                              ";
 
@@ -43,6 +44,7 @@ public class ServletWriter {
         this.writer = writer;
     }
 
+    @Override
     public void close() {
         writer.close();
     }
