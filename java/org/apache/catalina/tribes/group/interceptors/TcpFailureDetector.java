@@ -204,18 +204,16 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         super.heartbeat();
         checkMembers(false);
     }
-    public void checkMembers(boolean checkAll) {
 
+    public void checkMembers(boolean checkAll) {
         try {
             if (membership == null) setupMembership();
             synchronized (membership) {
-                if ( !checkAll ) performBasicCheck();
+                if (!checkAll) performBasicCheck();
                 else performForcedCheck();
             }
-        }catch ( Exception x ) {
+        } catch (Exception x) {
             log.warn("Unable to perform heartbeat on the TcpFailureDetector.",x);
-        } finally {
-
         }
     }
 
@@ -314,8 +312,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         //could be a shutdown notification
         if ( Arrays.equals(mbr.getCommand(),Member.SHUTDOWN_PAYLOAD) ) return false;
 
-        Socket socket = new Socket();
-        try {
+        try (Socket socket = new Socket()) {
             InetAddress ia = InetAddress.getByAddress(mbr.getHost());
             InetSocketAddress addr = new InetSocketAddress(ia, mbr.getPort());
             socket.setSoTimeout((int)readTimeout);
@@ -337,14 +334,12 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
                 }
             }//end if
             return true;
-        } catch ( SocketTimeoutException sx) {
+        } catch (SocketTimeoutException sx) {
             //do nothing, we couldn't connect
-        } catch ( ConnectException cx) {
+        } catch (ConnectException cx) {
             //do nothing, we couldn't connect
-        }catch (Exception x ) {
+        } catch (Exception x) {
             log.error("Unable to perform failure detection check, assuming member down.",x);
-        } finally {
-            try {socket.close(); } catch ( Exception ignore ){}
         }
         return false;
     }

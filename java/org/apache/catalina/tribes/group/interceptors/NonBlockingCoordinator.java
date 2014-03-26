@@ -507,34 +507,26 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     public void memberAdded(Member member,boolean elect) {
+        if (membership == null) setupMembership();
+        if (membership.memberAlive(member)) super.memberAdded(member);
         try {
-            if ( membership == null ) setupMembership();
-            if ( membership.memberAlive(member) ) super.memberAdded(member);
-            try {
-                fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_MBR_ADD,this,"Member add("+member.getName()+")"));
-                if (started && elect) startElection(false);
-            }catch ( ChannelException x ) {
-                log.error("Unable to start election when member was added.",x);
-            }
-        }finally {
+            fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_MBR_ADD,this,"Member add("+member.getName()+")"));
+            if (started && elect) startElection(false);
+        } catch (ChannelException x) {
+            log.error("Unable to start election when member was added.",x);
         }
-
     }
 
     @Override
     public void memberDisappeared(Member member) {
+        membership.removeMember(member);
+        super.memberDisappeared(member);
         try {
-
-            membership.removeMember(member);
-            super.memberDisappeared(member);
-            try {
-                fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_MBR_DEL,this,"Member remove("+member.getName()+")"));
-                if ( started && (isCoordinator() || isHighest()) )
-                    startElection(true); //to do, if a member disappears, only the coordinator can start
-            }catch ( ChannelException x ) {
-                log.error("Unable to start election when member was removed.",x);
-            }
-        }finally {
+            fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_MBR_DEL,this,"Member remove("+member.getName()+")"));
+            if (started && (isCoordinator() || isHighest()))
+                startElection(true); //to do, if a member disappears, only the coordinator can start
+        } catch (ChannelException x) {
+            log.error("Unable to start election when member was removed.",x);
         }
     }
 

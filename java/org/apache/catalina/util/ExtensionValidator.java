@@ -30,7 +30,6 @@ import java.util.jar.Manifest;
 import org.apache.catalina.Context;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -329,27 +328,11 @@ public final class ExtensionValidator {
      * @param inStream Input stream to a WAR or JAR file
      * @return The WAR's or JAR's manifest
      */
-    private static Manifest getManifest(InputStream inStream)
-            throws IOException {
-
+    private static Manifest getManifest(InputStream inStream) throws IOException {
         Manifest manifest = null;
-        JarInputStream jin = null;
-
-        try {
-            jin = new JarInputStream(inStream);
+        try (JarInputStream jin = new JarInputStream(inStream)) {
             manifest = jin.getManifest();
-            jin.close();
-            jin = null;
-        } finally {
-            if (jin != null) {
-                try {
-                    jin.close();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                }
-            }
         }
-
         return manifest;
     }
 

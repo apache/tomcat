@@ -426,23 +426,11 @@ public class MemoryUserDatabase implements UserDatabase {
                      new MemoryUserCreationFactory(this), true);
 
                 // Parse the XML input file to load this database
-                FileInputStream fis = null;
-                try {
-                    fis =  new FileInputStream(file);
+                try (FileInputStream fis =  new FileInputStream(file)) {
                     digester.parse(fis);
-                } finally {
-                    if (fis != null) {
-                        try {
-                            fis.close();
-                        } catch (IOException ioe) {
-                            // Ignore
-                        }
-                    }
                 }
-
             }
         }
-
     }
 
 
@@ -462,7 +450,6 @@ public class MemoryUserDatabase implements UserDatabase {
             }
             groups.remove(group.getGroupname());
         }
-
     }
 
 
