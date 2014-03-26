@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.startup;
 
 import java.io.BufferedOutputStream;
@@ -35,7 +33,6 @@ import java.util.zip.ZipException;
 import org.apache.catalina.Host;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -92,11 +89,9 @@ public class ExpandWar {
         }
         JarURLConnection juc = (JarURLConnection) war.openConnection();
         juc.setUseCaches(false);
-        JarFile jarFile = null;
-        InputStream input = null;
+
         boolean success = false;
-        try {
-            jarFile = juc.getJarFile();
+        try (JarFile jarFile = juc.getJarFile()) {
             Enumeration<JarEntry> jarEntries = jarFile.entries();
             while (jarEntries.hasMoreElements()) {
                 JarEntry jarEntry = jarEntries.nextElement();
@@ -123,20 +118,20 @@ public class ExpandWar {
                 if (name.endsWith("/")) {
                     continue;
                 }
-                input = jarFile.getInputStream(jarEntry);
 
-                if(null == input)
-                    throw new ZipException(sm.getString("expandWar.missingJarEntry", jarEntry.getName()));
 
-                // Bugzilla 33636
-                expand(input, expandedFile);
-                long lastModified = jarEntry.getTime();
-                if ((lastModified != -1) && (lastModified != 0)) {
-                    expandedFile.setLastModified(lastModified);
+                try (InputStream input = jarFile.getInputStream(jarEntry)) {
+                    if (null == input)
+                        throw new ZipException(sm.getString("expandWar.missingJarEntry",
+                                jarEntry.getName()));
+
+                    // Bugzilla 33636
+                    expand(input, expandedFile);
+                    long lastModified = jarEntry.getTime();
+                    if ((lastModified != -1) && (lastModified != 0)) {
+                        expandedFile.setLastModified(lastModified);
+                    }
                 }
-
-                input.close();
-                input = null;
             }
             success = true;
         } catch (IOException e) {
@@ -147,27 +142,10 @@ public class ExpandWar {
                 // clean
                 deleteDir(docBase);
             }
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException ioe) {
-                    // Ignore
-                }
-                input = null;
-            }
-            if (jarFile != null) {
-                try {
-                    jarFile.close();
-                } catch (IOException ioe) {
-                    // Ignore
-                }
-                jarFile = null;
-            }
         }
 
         // Return the absolute path to our new document base directory
-        return (docBase.getAbsolutePath());
-
+        return docBase.getAbsolutePath();
     }
 
 
@@ -184,8 +162,7 @@ public class ExpandWar {
      * @exception IOException if an input/output error was encountered
      *            during validation
      */
-    public static void validate(Host host, URL war, String pathname)
-        throws IOException {
+    public static void validate(Host host, URL war, String pathname) throws IOException {
 
         File docBase = new File(host.getAppBaseFile(), pathname);
 
@@ -196,9 +173,7 @@ public class ExpandWar {
         }
         JarURLConnection juc = (JarURLConnection) war.openConnection();
         juc.setUseCaches(false);
-        JarFile jarFile = null;
-        try {
-            jarFile = juc.getJarFile();
+        try (JarFile jarFile = juc.getJarFile()) {
             Enumeration<JarEntry> jarEntries = jarFile.entries();
             while (jarEntries.hasMoreElements()) {
                 JarEntry jarEntry = jarEntries.nextElement();
@@ -216,15 +191,6 @@ public class ExpandWar {
             }
         } catch (IOException e) {
             throw e;
-        } finally {
-            if (jarFile != null) {
-                try {
-                    jarFile.close();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                }
-                jarFile = null;
-            }
         }
     }
 
@@ -256,34 +222,16 @@ public class ExpandWar {
             if (fileSrc.isDirectory()) {
                 result = copy(fileSrc, fileDest);
             } else {
-                FileChannel ic = null;
-                FileChannel oc = null;
-                try {
-                    ic = (new FileInputStream(fileSrc)).getChannel();
-                    oc = (new FileOutputStream(fileDest)).getChannel();
+                try (FileChannel ic = (new FileInputStream(fileSrc)).getChannel();
+                        FileChannel oc = (new FileOutputStream(fileDest)).getChannel()) {
                     ic.transferTo(0, ic.size(), oc);
                 } catch (IOException e) {
-                    log.error(sm.getString
-                            ("expandWar.copy", fileSrc, fileDest), e);
+                    log.error(sm.getString("expandWar.copy", fileSrc, fileDest), e);
                     result = false;
-                } finally {
-                    if (ic != null) {
-                        try {
-                            ic.close();
-                        } catch (IOException e) {
-                        }
-                    }
-                    if (oc != null) {
-                        try {
-                            oc.close();
-                        } catch (IOException e) {
-                        }
-                    }
                 }
             }
         }
         return result;
-
     }
 
 
@@ -297,6 +245,7 @@ public class ExpandWar {
         // Log failure by default
         return delete(dir, true);
     }
+
 
     /**
      * Delete the specified directory, including all of its contents and
@@ -335,6 +284,7 @@ public class ExpandWar {
         return deleteDir(dir, true);
     }
 
+
     /**
      * Delete the specified directory, including all of its contents and
      * sub-directories recursively.
@@ -371,7 +321,6 @@ public class ExpandWar {
         }
 
         return result;
-
     }
 
 
@@ -383,12 +332,9 @@ public class ExpandWar {
      *
      * @exception IOException if an input/output error occurs
      */
-    private static void expand(InputStream input, File file)
-        throws IOException {
-        BufferedOutputStream output = null;
-        try {
-            output =
-                new BufferedOutputStream(new FileOutputStream(file));
+    private static void expand(InputStream input, File file) throws IOException {
+        try (BufferedOutputStream output =
+                new BufferedOutputStream(new FileOutputStream(file))) {
             byte buffer[] = new byte[2048];
             while (true) {
                 int n = input.read(buffer);
@@ -396,16 +342,6 @@ public class ExpandWar {
                     break;
                 output.write(buffer, 0, n);
             }
-        } finally {
-            if (output != null) {
-                try {
-                    output.close();
-                } catch (IOException e) {
-                    // Ignore
-                }
-            }
         }
     }
-
-
 }

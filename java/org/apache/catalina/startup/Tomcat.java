@@ -1094,9 +1094,7 @@ public class Tomcat {
 
     private URL getWebappConfigFileFromJar(File docBase, String url) {
         URL result = null;
-        JarFile jar = null;
-        try {
-            jar = new JarFile(docBase);
+        try (JarFile jar = new JarFile(docBase)) {
             JarEntry entry = jar.getJarEntry(Constants.ApplicationContextXml);
             if (entry != null) {
                 result = new URL("jar:" + docBase.toURI().toString() + "!/"
@@ -1105,14 +1103,6 @@ public class Tomcat {
         } catch (IOException e) {
             Logger.getLogger(getLoggerName(getHost(), url)).log(Level.WARNING,
                     "Unable to determine web application context.xml " + docBase, e);
-        } finally {
-            if (jar != null) {
-                try {
-                    jar.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
         }
         return result;
     }

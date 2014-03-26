@@ -420,29 +420,19 @@ public class Catalina {
         }
 
         Server s = getServer();
-        if( s == null ) {
+        if (s == null) {
             // Create and execute our Digester
             Digester digester = createStopDigester();
             File file = configFile();
-            FileInputStream fis = null;
-            try {
+            try (FileInputStream fis = new FileInputStream(file)) {
                 InputSource is =
                     new InputSource(file.toURI().toURL().toString());
-                fis = new FileInputStream(file);
                 is.setByteStream(fis);
                 digester.push(this);
                 digester.parse(is);
             } catch (Exception e) {
                 log.error("Catalina.stop: ", e);
                 System.exit(1);
-            } finally {
-                if (fis != null) {
-                    try {
-                        fis.close();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
             }
         } else {
             // Server object already present. Must be running as a service
@@ -457,11 +447,8 @@ public class Catalina {
         // Stop the existing server
         s = getServer();
         if (s.getPort()>0) {
-            Socket socket = null;
-            OutputStream stream = null;
-            try {
-                socket = new Socket(s.getAddress(), s.getPort());
-                stream = socket.getOutputStream();
+            try (Socket socket = new Socket(s.getAddress(), s.getPort());
+                    OutputStream stream = socket.getOutputStream()) {
                 String shutdown = s.getShutdown();
                 for (int i = 0; i < shutdown.length(); i++) {
                     stream.write(shutdown.charAt(i));
@@ -476,21 +463,6 @@ public class Catalina {
             } catch (IOException e) {
                 log.error("Catalina.stop: ", e);
                 System.exit(1);
-            } finally {
-                if (stream != null) {
-                    try {
-                        stream.close();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
-                if (socket != null) {
-                    try {
-                        socket.close();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
             }
         } else {
             log.error(sm.getString("catalina.stopServer"));
@@ -509,7 +481,6 @@ public class Catalina {
         initDirs();
 
         // Before digester - it may be needed
-
         initNaming();
 
         // Create and execute our Digester
@@ -544,7 +515,7 @@ public class Catalina {
 
         // This should be included in catalina.jar
         // Alternative: don't bother with xml, just create it manually.
-        if( inputStream==null ) {
+        if (inputStream == null) {
             try {
                 inputStream = getClass().getClassLoader()
                         .getResourceAsStream("server-embed.xml");
@@ -609,14 +580,12 @@ public class Catalina {
             } else {
                 log.error("Catalina.start", e);
             }
-
         }
 
         long t2 = System.nanoTime();
         if(log.isInfoEnabled()) {
             log.info("Initialization processed in " + ((t2 - t1) / 1000000) + " ms");
         }
-
     }
 
 
