@@ -177,8 +177,7 @@ public class SecureNio2Channel extends Nio2Channel  {
      * @throws IOException
      */
     @Override
-    public Future<Boolean> flush()
-            throws IOException {
+    public Future<Boolean> flush() {
         if (writePending) {
             throw new WritePendingException();
         } else {
@@ -230,7 +229,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 throw new IOException("Handshake error");
                             }
                         }
-                        return Nio2Endpoint.OP_WRITE;
+                        return 1;
                     }
                 }
                 case NEED_WRAP: {
@@ -254,7 +253,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 throw new IOException("Handshake error");
                             }
                         }
-                        return Nio2Endpoint.OP_WRITE;
+                        return 1;
                     }
                     //fall down to NEED_UNWRAP on the same call, will result in a
                     //BUFFER_UNDERFLOW if it needs data
@@ -277,7 +276,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 throw new IOException("Handshake error");
                             }
                         }
-                        return Nio2Endpoint.OP_READ;
+                        return 1;
                     } else {
                         throw new IOException("Invalid handshake status:"+handshakeStatus+" during handshake UNWRAP.");
                     }
