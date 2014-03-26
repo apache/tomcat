@@ -51,6 +51,14 @@
         Fix extension validation which was broken by refactoring for new
         resources implementation. (markt)
       </fix>
+      <fix>
+        Fix custom UTF-8 decoder so that a byte of value 0xC1 is always rejected
+        immediately as it is never valid in a UTF-8 byte sequence. Update UTF-8
+        decoder tests to account for UTF-8 decoding improvements in Java 8.
+        The custom UTF-8 decoder is still required due to bugs in the UTF-8
+        decoder provided by Java. Java 8&apos;s decoder is better than Java
+        7&apos;s but it is still buggy. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
