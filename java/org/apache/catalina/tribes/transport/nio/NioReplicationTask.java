@@ -110,8 +110,6 @@ public class NioReplicationTask extends AbstractRxTask {
                 log.error("Exception caught in TcpReplicationThread.drainChannel.",e);
             }
             cancelKey(key);
-        } finally {
-
         }
         key = null;
         // done, ready for more, return to pool

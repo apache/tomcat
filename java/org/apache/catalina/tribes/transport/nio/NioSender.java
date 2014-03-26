@@ -308,9 +308,7 @@ public class NioSender extends AbstractSender {
         } catch ( Exception x ) {
             log.error("Unable to disconnect NioSender. msg="+x.getMessage());
             if ( log.isDebugEnabled() ) log.debug("Unable to disconnect NioSender. msg="+x.getMessage(),x);
-        } finally {
         }
-
     }
 
     public void reset() {

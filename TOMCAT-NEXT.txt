@@ -214,7 +214,7 @@ but possibly 7.1.x).
     - Use of try with resources
       - Started.
         - javax.* complete
-        - o.a.catalina.[ant to storeconfig] complete
+        - o.a.catalina.[ant to util] complete
         - remainder TODO
     - Catching multiple exceptions
       - Started

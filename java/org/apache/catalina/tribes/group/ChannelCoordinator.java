@@ -232,12 +232,9 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
 
             startLevel = (startLevel & (~svc));
 
-        }catch ( Exception x ) {
+        } catch (Exception x) {
             throw new ChannelException(x);
-        } finally {
-
         }
-
     }
 
     @Override
