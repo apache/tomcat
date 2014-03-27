@@ -898,34 +898,48 @@ public class DefaultServlet extends HttpServlet {
                 }
             }
 
-            InputStream renderResult = null;
             if (serveContent) {
-                if (resource.isDirectory()) {
-                    // Serve the directory browser
-                    renderResult = render(getPathPrefix(request), resource);
-                } else {
-                    renderResult = resource.getInputStream();
-                }
-
-                // Copy the input stream to our output stream
                 try {
                     response.setBufferSize(output);
                 } catch (IllegalStateException e) {
                     // Silent catch
                 }
-                if (ostream != null) {
-                    if (checkSendfile(request, response, resource,
-                            contentLength, null)) {
-                        try {
-                            renderResult.close();
-                        } catch (IOException ioe) {
-                            // Ignore
-                        }
+                InputStream renderResult = null;
+                if (ostream == null) {
+                    // Output via a writer so can't use sendfile or write
+                    // content directly.
+                    if (resource.isDirectory()) {
+                        renderResult = render(getPathPrefix(request), resource);
                     } else {
-                        copy(resource, renderResult, ostream);
+                        renderResult = resource.getInputStream();
                     }
-                } else {
                     copy(resource, renderResult, writer, encoding);
+                } else {
+                    // Output is via an InputStream
+                    if (resource.isDirectory()) {
+                        renderResult = render(getPathPrefix(request), resource);
+                    } else {
+                        // Output is content of resource
+                        if (!checkSendfile(request, response, resource,
+                                contentLength, null)) {
+                            // sendfile not possible so check if resource
+                            // content is available directly
+                            byte[] resourceBody = resource.getContent();
+                            if (resourceBody == null) {
+                                // Resource content not available, use
+                                // inputstream
+                                renderResult = resource.getInputStream();
+                            } else {
+                                // Use the resource content directly
+                                ostream.write(resourceBody);
+                            }
+                        }
+                        // If a stream was configured, it needs to be copied to
+                        // the output (this method closes the stream)
+                        if (renderResult != null) {
+                            copy(resource, renderResult, ostream);
+                        }
+                    }
                 }
             }
 
