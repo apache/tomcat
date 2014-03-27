@@ -1227,8 +1227,8 @@ public class HostConfig
                     } else {
                         // Everything else triggers a redeploy
                         // (just need to undeploy here, deploy will follow)
-                        deleteRedeployResources(app, resources, i, false);
                         undeploy(app);
+                        deleteRedeployResources(app, resources, i, false);
                         return;
                     }
                 }

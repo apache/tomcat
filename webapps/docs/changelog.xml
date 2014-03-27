@@ -63,6 +63,13 @@
         <bug>56320</bug>: Fix a file descriptor leak in the default servlet when
         sendfile is used. (markt)
       </fix>
+      <fix>
+        <bug>56321</bug>: When a WAR is modified, undeploy the web application
+        before deleting any expanded directory as the undeploy process may
+        refer to classes that need to be loaded from the expanded directory. If
+        the expanded directory is deleted first, any attempt to load a new class
+        during undeploy will fail. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
