@@ -707,13 +707,11 @@ public class DefaultServlet extends HttpServlet {
             } else {
                 // We're included
                 // SRV.9.3 says we must throw a FNFE
-                throw new FileNotFoundException(
-                        sm.getString("defaultServlet.missingResource",
-                    requestUri));
+                throw new FileNotFoundException(sm.getString(
+                        "defaultServlet.missingResource", requestUri));
             }
 
-            response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                               requestUri);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, requestUri);
             return;
         }
 
@@ -728,35 +726,29 @@ public class DefaultServlet extends HttpServlet {
                 // We're included
                 // Spec doesn't say what to do in this case but a FNFE seems
                 // reasonable
-                throw new FileNotFoundException(
-                        sm.getString("defaultServlet.missingResource",
-                    requestUri));
+                throw new FileNotFoundException(sm.getString(
+                        "defaultServlet.missingResource", requestUri));
             }
 
-            response.sendError(HttpServletResponse.SC_FORBIDDEN,
-                               requestUri);
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, requestUri);
             return;
         }
 
         // If the resource is not a collection, and the resource path
         // ends with "/" or "\", return NOT FOUND
-        if (resource.isFile()) {
-            if (path.endsWith("/") || (path.endsWith("\\"))) {
-                // Check if we're included so we can return the appropriate
-                // missing resource name in the error
-                String requestUri = (String) request.getAttribute(
-                        RequestDispatcher.INCLUDE_REQUEST_URI);
-                if (requestUri == null) {
-                    requestUri = request.getRequestURI();
-                }
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                                   requestUri);
-                return;
+        if (resource.isFile() && (path.endsWith("/") || path.endsWith("\\"))) {
+            // Check if we're included so we can return the appropriate
+            // missing resource name in the error
+            String requestUri = (String) request.getAttribute(
+                    RequestDispatcher.INCLUDE_REQUEST_URI);
+            if (requestUri == null) {
+                requestUri = request.getRequestURI();
             }
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, requestUri);
+            return;
         }
 
-        boolean isError =
-            response.getStatus() >= HttpServletResponse.SC_BAD_REQUEST;
+        boolean isError = response.getStatus() >= HttpServletResponse.SC_BAD_REQUEST;
 
         boolean included = false;
         // Check if the conditions specified in the optional If headers are
@@ -765,11 +757,9 @@ public class DefaultServlet extends HttpServlet {
             // Checking If headers
             included = (request.getAttribute(
                     RequestDispatcher.INCLUDE_CONTEXT_PATH) != null);
-            if (!included && !isError &&
-                    !checkIfHeaders(request, response, resource)) {
+            if (!included && !isError && !checkIfHeaders(request, response, resource)) {
                 return;
             }
-
         }
 
         // Find content type.
@@ -841,16 +831,13 @@ public class DefaultServlet extends HttpServlet {
             if (contentLength == 0L) {
                 serveContent = false;
             }
-
         }
 
         ServletOutputStream ostream = null;
         PrintWriter writer = null;
 
         if (serveContent) {
-
             // Trying to retrieve the servlet output stream
-
             try {
                 ostream = response.getOutputStream();
             } catch (IllegalStateException e) {
@@ -869,7 +856,6 @@ public class DefaultServlet extends HttpServlet {
                     throw e;
                 }
             }
-
         }
 
         // Check to see if a Filter, Valve of wrapper has written some content.
@@ -984,12 +970,9 @@ public class DefaultServlet extends HttpServlet {
                         throw new IllegalStateException();
                     }
                 }
-
             } else {
-
                 response.setContentType("multipart/byteranges; boundary="
                                         + mimeSeparation);
-
                 if (serveContent) {
                     try {
                         response.setBufferSize(output);
@@ -997,8 +980,7 @@ public class DefaultServlet extends HttpServlet {
                         // Silent catch
                     }
                     if (ostream != null) {
-                        copy(resource, ostream, ranges.iterator(),
-                             contentType);
+                        copy(resource, ostream, ranges.iterator(), contentType);
                     } else {
                         // we should not get here
                         throw new IllegalStateException();
