@@ -265,11 +265,13 @@ public class HostManagerServlet
         boolean deployOnStartup = booleanParameter(request, "deployOnStartup", true, htmlMode);
         boolean deployXML = booleanParameter(request, "deployXML", true, htmlMode);
         boolean unpackWARs = booleanParameter(request, "unpackWARs", true, htmlMode);
+        boolean copyXML = booleanParameter(request, "copyXML", false, htmlMode);
         add(writer, name, aliases, appBase, manager,
             autoDeploy,
             deployOnStartup,
             deployXML,                                       
             unpackWARs,
+            copyXML,
             smClient);
     }
 
@@ -346,6 +348,7 @@ public class HostManagerServlet
          boolean deployOnStartup,
          boolean deployXML,                                       
          boolean unpackWARs,
+         boolean copyXML,
          StringManager smClient) {
         if (debug >= 1) {
             log(sm.getString("hostManagerServlet.add", name));
@@ -449,6 +452,7 @@ public class HostManagerServlet
         host.setDeployOnStartup(deployOnStartup);
         host.setDeployXML(deployXML);
         host.setUnpackWARs(unpackWARs);
+        host.setCopyXML(copyXML);
         
         // Add new host
         try {

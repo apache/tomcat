@@ -68,6 +68,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Add Support for <code>copyXML</code> attribute of Host to Host Manager.
+        (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.53 (violetagg)">
   <subsection name="Catalina">
