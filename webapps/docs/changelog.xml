@@ -61,6 +61,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Add Support for <code>copyXML</code> attribute of Host to Host Manager.
+        (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <scode>
       Review source code and take advantage of Java 7&apos;s
