@@ -928,9 +928,16 @@ public class DefaultServlet extends HttpServlet {
                     // Silent catch
                 }
                 if (ostream != null) {
-                    if (!checkSendfile(request, response, resource,
-                            contentLength, null))
+                    if (checkSendfile(request, response, resource,
+                            contentLength, null)) {
+                        try {
+                            renderResult.close();
+                        } catch (IOException ioe) {
+                            // Ignore
+                        }
+                    } else {
                         copy(resource, renderResult, ostream);
+                    }
                 } else {
                     copy(resource, renderResult, writer, encoding);
                 }

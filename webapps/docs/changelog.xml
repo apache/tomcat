@@ -59,6 +59,10 @@
         decoder provided by Java. Java 8&apos;s decoder is better than Java
         7&apos;s but it is still buggy. (markt)
       </fix>
+      <fix>
+        <bug>56320</bug>: Fix a file descriptor leak in the default servlet when
+        sendfile is used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
