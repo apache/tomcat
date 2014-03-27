@@ -393,6 +393,11 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         args[2] = "checked";
         writer.print(MessageFormat.format(ADD_SECTION_BOOLEAN, args));
 
+        args[0] = smClient.getString("htmlHostManagerServlet.addCopyXML");
+        args[1] = "copyXML";
+        args[2] = "";
+        writer.print(MessageFormat.format(ADD_SECTION_BOOLEAN, args));
+
         args = new Object[1];
         args[0] = smClient.getString("htmlHostManagerServlet.addButton");
         writer.print(MessageFormat.format(ADD_SECTION_END, args));
