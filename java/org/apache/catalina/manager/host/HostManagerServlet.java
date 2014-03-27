@@ -353,11 +353,11 @@ public class HostManagerServlet
         // Validate and create appBase
         File appBaseFile = null;
         File file = null;
-        if (appBase == null || appBase.length() == 0) {
-            file = new File(name);
-        } else {
-            file = new File(appBase);
+        String applicationBase = appBase;
+        if (applicationBase == null || applicationBase.length() == 0) {
+            applicationBase = name;
         }
+        file = new File(applicationBase);
         if (!file.isAbsolute())
             file = new File(engine.getCatalinaBase(), file.getPath());
         try {
@@ -401,7 +401,7 @@ public class HostManagerServlet
         }
 
         StandardHost host = new StandardHost();
-        host.setAppBase(appBase);
+        host.setAppBase(applicationBase);
         host.setName(name);
 
         host.addLifecycleListener(new HostConfig());

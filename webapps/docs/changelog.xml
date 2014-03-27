@@ -67,6 +67,11 @@
         Add Support for <code>copyXML</code> attribute of Host to Host Manager.
         (kfujino)
       </fix>
+      <fix>
+        Ensure that "name" request parameter is used as a application base of
+        host if "webapps" request parameter is not set when adding host in
+        HostManager Application. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
