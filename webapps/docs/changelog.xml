@@ -72,6 +72,18 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <scode>
+        Remove the implementation of
+        <code>org.apache.catalina.LifecycleListener</code> from
+        <code>org.apache.catalina.ha.tcp.SimpleTcpCluster</code>.
+        <code>SimpleTcpCluster</code> does not work as
+        <code>LifecycleListener</code>, it works as nested components of Host or
+        Engine. (kfujino)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

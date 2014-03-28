@@ -33,9 +33,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
-import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Valve;
@@ -72,8 +70,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Peter Rossbach
  */
 public class SimpleTcpCluster extends LifecycleMBeanBase
-        implements CatalinaCluster, LifecycleListener, MembershipListener,
-        ChannelListener{
+        implements CatalinaCluster, MembershipListener, ChannelListener{
 
     public static final Log log = LogFactory.getLog(SimpleTcpCluster.class);
 
@@ -508,19 +505,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
         // periodic event
         fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, null);
-    }
-
-
-    /**
-     * Use as base to handle start/stop/periodic Events from host. Currently
-     * only log the messages as trace level.
-     *
-     * @see org.apache.catalina.LifecycleListener#lifecycleEvent(org.apache.catalina.LifecycleEvent)
-     */
-    @Override
-    public void lifecycleEvent(LifecycleEvent lifecycleEvent) {
-        if (log.isTraceEnabled())
-            log.trace(sm.getString("SimpleTcpCluster.event.log", lifecycleEvent.getType(), lifecycleEvent.getData()));
     }
 
 
