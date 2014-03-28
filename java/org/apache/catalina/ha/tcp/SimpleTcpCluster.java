@@ -644,8 +644,10 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
      * only log the messages as trace level.
      * 
      * @see org.apache.catalina.LifecycleListener#lifecycleEvent(org.apache.catalina.LifecycleEvent)
+     * @deprecated  Unused - will be removed in Tomcat 8.0.x
      */
     @Override
+    @Deprecated
     public void lifecycleEvent(LifecycleEvent lifecycleEvent) {
         if (log.isTraceEnabled())
             log.trace(sm.getString("SimpleTcpCluster.event.log", lifecycleEvent.getType(), lifecycleEvent.getData()));
