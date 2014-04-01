@@ -853,8 +853,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
 
         @Override
-        public ByteBuffer expand(ByteBuffer buffer, int remaining) {return buffer;}
-        @Override
         public ByteBuffer getReadBuffer() {return readbuf;}
         @Override
         public ByteBuffer getWriteBuffer() {return writebuf;}

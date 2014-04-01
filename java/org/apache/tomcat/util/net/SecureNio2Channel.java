@@ -963,7 +963,6 @@ public class SecureNio2Channel extends Nio2Channel  {
      * when buffer overflow exceptions happen
      */
     public static interface ApplicationBufferHandler {
-        public ByteBuffer expand(ByteBuffer buffer, int remaining);
         public ByteBuffer getReadBuffer();
         public ByteBuffer getWriteBuffer();
     }
