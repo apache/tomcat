@@ -89,7 +89,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.53 (violetagg)">
+<section name="Tomcat 7.0.53 (violetagg)" rtext="released 2014-03-30">
   <subsection name="Catalina">
     <changelog>
       <add>
