@@ -385,11 +385,23 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             running = false;
             unlockAccept();
         }
-        try {
-            handler.closeAll();
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-        }
+        // Use the executor to avoid binding the main thread if something bad
+        // occurs and unbind will also wait for a bit for it to complete
+        getExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                // Timeout any pending async request
+                for (SocketWrapper<Nio2Channel> socket : waitingRequests.keySet()) {
+                    processSocket(socket, SocketStatus.TIMEOUT, false);
+                }
+                // Then close all active connections if any remains
+                try {
+                    handler.closeAll();
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                }
+            }
+        });
         if (useCaches) {
             socketWrapperCache.clear();
             nioChannels.clear();
