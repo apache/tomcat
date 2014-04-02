@@ -46,14 +46,6 @@ public class TestWebSocketFrameClientSSL extends TomcatBaseTest {
 
     @Test
     public void testConnectToServerEndpoint() throws Exception {
-        // FIXME Skip NIO2 since its CPU use on non blocking writes to
-        //       do the encryption inline apparently messes up
-        //       the websockets writes, which deadlock until timedout.
-        //       Reenable later when investigated and fixed.
-        Assume.assumeFalse(
-                "Skip this test on NIO2. FIXME: investigate.",
-                getTomcatInstance().getConnector().getProtocol()
-                        .equals("org.apache.coyote.http11.Http11Nio2Protocol"));
 
         Tomcat tomcat = getTomcatInstance();
         // Must have a real docBase - just use temp
