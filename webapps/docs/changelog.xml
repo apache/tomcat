@@ -80,6 +80,9 @@
       <fix>
         <bug>56336</bug>: AJP output corruption and errors. (remm)
       </fix>
+      <fix>
+        Handle incomplete writes in NIO2, just in case. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
