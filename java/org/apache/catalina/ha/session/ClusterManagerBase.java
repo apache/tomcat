@@ -178,7 +178,6 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
 
     protected void clone(ClusterManagerBase copy) {
         copy.setName("Clone-from-" + getName());
-        copy.setCluster(getCluster());
         copy.setMaxActiveSessions(getMaxActiveSessions());
         copy.setMaxInactiveInterval(getMaxInactiveInterval());
         copy.setSessionIdLength(getSessionIdLength());

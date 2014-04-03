@@ -1560,7 +1560,6 @@ public class DeltaManager extends ClusterManagerBase{
     public ClusterManager cloneFromTemplate() {
         DeltaManager result = new DeltaManager();
         clone(result);
-        result.replicationValve = replicationValve;
         result.expireSessionsOnShutdown = expireSessionsOnShutdown;
         result.notifySessionListenersOnReplication = notifySessionListenersOnReplication;
         result.notifyContainerListenersOnReplication = notifyContainerListenersOnReplication;
