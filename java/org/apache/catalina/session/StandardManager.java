@@ -272,19 +272,9 @@ public class StandardManager extends ManagerBase {
                 }
             } catch (ClassNotFoundException e) {
                 log.error(sm.getString("standardManager.loading.cnfe", e), e);
-                try {
-                    ois.close();
-                } catch (IOException f) {
-                    // Ignore
-                }
                 throw e;
             } catch (IOException e) {
                 log.error(sm.getString("standardManager.loading.ioe", e), e);
-                try {
-                    ois.close();
-                } catch (IOException f) {
-                    // Ignore
-                }
                 throw e;
             } finally {
                 // Close the input stream
