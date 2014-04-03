@@ -410,8 +410,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     @Override
     public void endAccess() {
         super.endAccess() ;
-        if(manager instanceof DeltaManager) {
-            ((DeltaManager)manager).registerSessionAtReplicationValve(this);
+        if(manager instanceof ClusterManagerBase) {
+            ((ClusterManagerBase)manager).registerSessionAtReplicationValve(this);
         }
     }
 
