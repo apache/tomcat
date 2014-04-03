@@ -20,12 +20,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.catalina.Cluster;
 import org.apache.catalina.DistributedManager;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
-import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.tribes.Channel;
@@ -141,16 +139,7 @@ public class BackupManager extends ClusterManagerBase
         super.startInternal();
 
         try {
-            if (getCluster() == null) {
-                Cluster cluster = getContext().getCluster();
-                if (cluster instanceof CatalinaCluster) {
-                    setCluster((CatalinaCluster)cluster);
-                } else {
-                    throw new LifecycleException(
-                            sm.getString("backupManager.noCluster", getName()));
-                }
-            }
-            cluster.registerManager(this);
+            if (cluster == null) throw new LifecycleException(sm.getString("backupManager.noCluster", getName()));
             LazyReplicatedMap<String,Session> map = new LazyReplicatedMap<>(
                     this, cluster.getChannel(), rpcTimeout, getMapName(),
                     getClassLoaders(), terminateOnStartFailure);
@@ -194,7 +183,6 @@ public class BackupManager extends ClusterManagerBase
             map.breakdown();
         }
 
-        cluster.removeManager(this);
         super.stopInternal();
     }
 

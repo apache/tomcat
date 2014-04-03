@@ -109,6 +109,12 @@
         <code>crossContext</code>=true. The context that refers to the different
         context must be set to <code>crossContext</code>=true. (kfujino)
       </fix>
+      <scode>
+        Move to <code>org.apache.catalina.ha.session.ClusterManagerBase</code>
+        common logics of
+        <code>org.apache.catalina.ha.session.BackupManager</code> and
+        <code>org.apache.catalina.ha.session.DeltaManager</code>. (kfujino)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Web applications">

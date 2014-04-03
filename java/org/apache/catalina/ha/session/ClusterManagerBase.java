@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+import org.apache.catalina.Cluster;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
@@ -228,7 +229,20 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
     }
 
     @Override
+    protected void startInternal() throws LifecycleException {
+        super.startInternal();
+        if (getCluster() == null) {
+            Cluster cluster = getContext().getCluster();
+            if (cluster instanceof CatalinaCluster) {
+                setCluster((CatalinaCluster)cluster);
+            }
+        }
+        if (cluster != null) cluster.registerManager(this);
+    }
+
+    @Override
     protected void stopInternal() throws LifecycleException {
+        if (cluster != null) cluster.removeManager(this);
         replicationValve = null;
         super.stopInternal();
     }
