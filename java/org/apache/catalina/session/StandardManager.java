@@ -204,11 +204,14 @@ public class StandardManager extends ManagerBase {
             return;
         if (log.isDebugEnabled())
             log.debug(sm.getString("standardManager.loading", pathname));
+        FileInputStream fis = null;
+        BufferedInputStream bis = null;
         ObjectInputStream ois = null;
         Loader loader = null;
         ClassLoader classLoader = null;
-        try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
-                BufferedInputStream bis = new BufferedInputStream(fis)) {
+        try {
+            fis = new FileInputStream(file.getAbsolutePath());
+            bis = new BufferedInputStream(fis);
             Context c = getContext();
             if (c != null)
                 loader = c.getLoader();
@@ -229,6 +232,20 @@ public class StandardManager extends ManagerBase {
             return;
         } catch (IOException e) {
             log.error(sm.getString("standardManager.loading.ioe", e), e);
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException f) {
+                    // Ignore
+                }
+            }
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException f) {
+                    // Ignore
+                }
+            }
             throw e;
         }
 
@@ -253,8 +270,21 @@ public class StandardManager extends ManagerBase {
                     }
                     sessionCounter++;
                 }
-            } catch (ClassNotFoundException | IOException e) {
-                log.error(sm.getString("standardManager.loading.exception"), e);
+            } catch (ClassNotFoundException e) {
+                log.error(sm.getString("standardManager.loading.cnfe", e), e);
+                try {
+                    ois.close();
+                } catch (IOException f) {
+                    // Ignore
+                }
+                throw e;
+            } catch (IOException e) {
+                log.error(sm.getString("standardManager.loading.ioe", e), e);
+                try {
+                    ois.close();
+                } catch (IOException f) {
+                    // Ignore
+                }
                 throw e;
             } finally {
                 // Close the input stream
@@ -309,6 +339,7 @@ public class StandardManager extends ManagerBase {
      *
      * @exception IOException if an input/output error occurs
      */
+    @SuppressWarnings("null")
     protected void doUnload() throws IOException {
 
         if (log.isDebugEnabled())
@@ -325,16 +356,51 @@ public class StandardManager extends ManagerBase {
             return;
         if (log.isDebugEnabled())
             log.debug(sm.getString("standardManager.unloading", pathname));
+        FileOutputStream fos = null;
+        BufferedOutputStream bos = null;
+        ObjectOutputStream oos = null;
+        boolean error = false;
+        try {
+            fos = new FileOutputStream(file.getAbsolutePath());
+            bos = new BufferedOutputStream(fos);
+            oos = new ObjectOutputStream(bos);
+        } catch (IOException e) {
+            error = true;
+            log.error(sm.getString("standardManager.unloading.ioe", e), e);
+            throw e;
+        } finally {
+            if (error) {
+                if (oos != null) {
+                    try {
+                        oos.close();
+                    } catch (IOException ioe) {
+                        // Ignore
+                    }
+                }
+                if (bos != null) {
+                    try {
+                        bos.close();
+                    } catch (IOException ioe) {
+                        // Ignore
+                    }
+                }
+                if (fos != null) {
+                    try {
+                        fos.close();
+                    } catch (IOException ioe) {
+                        // Ignore
+                    }
+                }
+            }
+        }
+
+        // Write the number of active sessions, followed by the details
         ArrayList<StandardSession> list = new ArrayList<>();
-        try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
-                BufferedOutputStream bos = new BufferedOutputStream(fos);
-                ObjectOutputStream oos =  new ObjectOutputStream(bos)) {
-
-            // Write the number of active sessions, followed by the details
-            synchronized (sessions) {
-                if (log.isDebugEnabled())
-                    log.debug("Unloading " + sessions.size() + " sessions");
-
+        synchronized (sessions) {
+            if (log.isDebugEnabled())
+                log.debug("Unloading " + sessions.size() + " sessions");
+            try {
+                // oos can't be null here
                 oos.writeObject(new Integer(sessions.size()));
                 Iterator<Session> elements = sessions.values().iterator();
                 while (elements.hasNext()) {
@@ -344,10 +410,26 @@ public class StandardManager extends ManagerBase {
                     session.passivate();
                     session.writeObjectData(oos);
                 }
+            } catch (IOException e) {
+                log.error(sm.getString("standardManager.unloading.ioe", e), e);
+                try {
+                    oos.close();
+                } catch (IOException f) {
+                    // Ignore
+                }
+                throw e;
             }
-        } catch (IOException e) {
-            log.error(sm.getString("standardManager.unloading.ioe", e), e);
-            throw e;
+        }
+
+        // Flush and close the output stream
+        try {
+            oos.flush();
+        } finally {
+            try {
+                oos.close();
+            } catch (IOException f) {
+                // Ignore
+            }
         }
 
         // Expire all the sessions we just wrote
@@ -367,6 +449,7 @@ public class StandardManager extends ManagerBase {
 
         if (log.isDebugEnabled())
             log.debug("Unloading complete");
+
     }
 
 
