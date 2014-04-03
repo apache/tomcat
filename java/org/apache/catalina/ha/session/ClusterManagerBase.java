@@ -24,7 +24,6 @@ import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Valve;
-import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.tcp.ReplicationValve;
@@ -208,24 +207,20 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
      */
     protected void registerSessionAtReplicationValve(DeltaSession session) {
         if(replicationValve == null) {
-            Context context = getContext();
-            if(context instanceof StandardContext &&
-                    ((StandardContext)context).getCrossContext()) {
-                CatalinaCluster cluster = getCluster() ;
-                if(cluster != null) {
-                    Valve[] valves = cluster.getValves();
-                    if(valves != null && valves.length > 0) {
-                        for(int i=0; replicationValve == null && i < valves.length ; i++ ){
-                            if(valves[i] instanceof ReplicationValve) replicationValve =
-                                    (ReplicationValve)valves[i] ;
-                        }//for
+            CatalinaCluster cluster = getCluster() ;
+            if(cluster != null) {
+                Valve[] valves = cluster.getValves();
+                if(valves != null && valves.length > 0) {
+                    for(int i=0; replicationValve == null && i < valves.length ; i++ ){
+                        if(valves[i] instanceof ReplicationValve) replicationValve =
+                                (ReplicationValve)valves[i] ;
+                    }//for
 
-                        if(replicationValve == null && log.isDebugEnabled()) {
-                            log.debug("no ReplicationValve found for CrossContext Support");
-                        }//endif
-                    }//end if
-                }//endif
-            }//end if
+                    if(replicationValve == null && log.isDebugEnabled()) {
+                        log.debug("no ReplicationValve found for CrossContext Support");
+                    }//endif
+                }//end if
+            }//endif
         }//end if
         if(replicationValve != null) {
             replicationValve.registerReplicationSession(session);

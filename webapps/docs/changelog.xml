@@ -103,6 +103,12 @@
         Add support for cross context session replication to
         <code>org.apache.catalina.ha.session.BackupManager</code>. (kfujino)
       </fix>
+      <fix>
+        Remove the unnecessary cross context check. It does not matter whether
+        the context that is referenced by other context is set to
+        <code>crossContext</code>=true. The context that refers to the different
+        context must be set to <code>crossContext</code>=true. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
