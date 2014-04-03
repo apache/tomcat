@@ -75,6 +75,30 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Remove cluster and replicationValve from cluster manager template. These
+        instance are not necessary to template. (kfujino)
+      </fix>
+      <fix>
+        Add support for cross context session replication to
+        <code>org.apache.catalina.ha.session.BackupManager</code>. (kfujino)
+      </fix>
+      <fix>
+        Remove the unnecessary cross context check. It does not matter whether
+        the context that is referenced by other context is set to
+        <code>crossContext</code>=true. The context that refers to the different
+        context must be set to <code>crossContext</code>=true. (kfujino)
+      </fix>
+      <scode>
+        Move to <code>org.apache.catalina.ha.session.ClusterManagerBase</code>
+        common logics of
+        <code>org.apache.catalina.ha.session.BackupManager</code> and
+        <code>org.apache.catalina.ha.session.DeltaManager</code>. (kfujino)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

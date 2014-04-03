@@ -21,12 +21,18 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+import org.apache.catalina.Cluster;
 import org.apache.catalina.Container;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
+import org.apache.catalina.Valve;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
+import org.apache.catalina.ha.tcp.ReplicationValve;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.tribes.io.ReplicationStream;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * 
@@ -34,6 +40,8 @@ import org.apache.catalina.tribes.io.ReplicationStream;
  */
 public abstract class ClusterManagerBase extends ManagerBase
         implements ClusterManager {
+
+    private final Log log = LogFactory.getLog(ClusterManagerBase.class);
 
     /**
      * A reference to the cluster
@@ -58,6 +66,11 @@ public abstract class ClusterManagerBase extends ManagerBase
      * If not set, all session attributes will be eligible for replication.
      */
     private Pattern sessionAttributePattern = null;
+
+    /**
+     * cached replication valve cluster container!
+     */
+    private volatile ReplicationValve replicationValve = null ;
 
     /* 
      * @see org.apache.catalina.ha.ClusterManager#getCluster()
@@ -180,7 +193,6 @@ public abstract class ClusterManagerBase extends ManagerBase
 
     protected void clone(ClusterManagerBase copy) {
         copy.setName("Clone-from-" + getName());
-        copy.setCluster(getCluster());
         copy.setMaxActiveSessions(getMaxActiveSessions());
         copy.setMaxInactiveInterval(getMaxInactiveInterval());
         copy.setSessionIdLength(getSessionIdLength());
@@ -192,4 +204,47 @@ public abstract class ClusterManagerBase extends ManagerBase
         copy.setSecureRandomAlgorithm(getSecureRandomAlgorithm());
     }
 
+    /**
+     * Register cross context session at replication valve thread local
+     * @param session cross context session
+     */
+    protected void registerSessionAtReplicationValve(DeltaSession session) {
+        if(replicationValve == null) {
+            CatalinaCluster cluster = getCluster() ;
+            if(cluster != null) {
+                Valve[] valves = cluster.getValves();
+                if(valves != null && valves.length > 0) {
+                    for(int i=0; replicationValve == null && i < valves.length ; i++ ){
+                        if(valves[i] instanceof ReplicationValve) replicationValve = (ReplicationValve)valves[i] ;
+                    }//for
+
+                    if(replicationValve == null && log.isDebugEnabled()) {
+                        log.debug("no ReplicationValve found for CrossContext Support");
+                    }//endif 
+                }//end if
+            }//endif
+        }//end if
+        if(replicationValve != null) {
+            replicationValve.registerReplicationSession(session);
+        }
+    }
+
+    @Override
+    protected void startInternal() throws LifecycleException {
+        super.startInternal();
+        if (getCluster() == null) {
+            Cluster cluster = getContainer().getCluster();
+            if (cluster instanceof CatalinaCluster) {
+                setCluster((CatalinaCluster)cluster);
+            }
+        }
+        if (cluster != null) cluster.registerManager(this);
+    }
+
+    @Override
+    protected void stopInternal() throws LifecycleException {
+        if (cluster != null) cluster.removeManager(this);
+        replicationValve = null;
+        super.stopInternal();
+    }
 }
