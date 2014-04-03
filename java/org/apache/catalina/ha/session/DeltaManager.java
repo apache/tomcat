@@ -33,12 +33,9 @@ import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
-import org.apache.catalina.Valve;
-import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
-import org.apache.catalina.ha.tcp.ReplicationValve;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.io.ReplicationStream;
@@ -78,11 +75,6 @@ public class DeltaManager extends ClusterManagerBase{
      */
     protected static final String managerName = "DeltaManager";
     protected String name = null;
-
-    /**
-     * cached replication valve cluster container!
-     */
-    private volatile ReplicationValve replicationValve = null ;
 
     private boolean expireSessionsOnShutdown = false;
     private boolean notifySessionListenersOnReplication = true;
@@ -845,36 +837,6 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     /**
-     * Register cross context session at replication valve thread local
-     * @param session cross context session
-     */
-    protected void registerSessionAtReplicationValve(DeltaSession session) {
-        if(replicationValve == null) {
-            Context context = getContext();
-            if(context instanceof StandardContext &&
-                    ((StandardContext)context).getCrossContext()) {
-                CatalinaCluster cluster = getCluster() ;
-                if(cluster != null) {
-                    Valve[] valves = cluster.getValves();
-                    if(valves != null && valves.length > 0) {
-                        for(int i=0; replicationValve == null && i < valves.length ; i++ ){
-                            if(valves[i] instanceof ReplicationValve) replicationValve =
-                                    (ReplicationValve)valves[i] ;
-                        }//for
-
-                        if(replicationValve == null && log.isDebugEnabled()) {
-                            log.debug("no ReplicationValve found for CrossContext Support");
-                        }//endif
-                    }//end if
-                }//endif
-            }//end if
-        }//end if
-        if(replicationValve != null) {
-            replicationValve.registerReplicationSession(session);
-        }
-    }
-
-    /**
      * Find the master of the session state
      * @return master member of sessions
      */
@@ -969,7 +931,6 @@ public class DeltaManager extends ClusterManagerBase{
         // Require a new random number generator if we are restarted
         getCluster().removeManager(this);
         super.stopInternal();
-        replicationValve = null;
     }
 
     // -------------------------------------------------------- Replication
