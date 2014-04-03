@@ -95,6 +95,10 @@
         <code>LifecycleListener</code>, it works as nested components of Host or
         Engine. (kfujino)
       </scode>
+      <fix>
+        Remove cluster and replicationValve from cluster manager template. These
+        instance are not necessary to template. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
