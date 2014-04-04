@@ -59,14 +59,12 @@ public class ServiceMBean extends BaseModelMBean {
         } catch (InvalidTargetObjectTypeException e) {
             throw new MBeanException(e);
         }
-
-        Connector connector = new Connector();
+        String protocol = isAjp ? "AJP/1.3" : "HTTP/1.1";
+        Connector connector = new Connector(protocol);
         if ((address!=null) && (address.length()>0)) {
             connector.setProperty("address", address);
         }
-
         connector.setPort(port);
-        connector.setProtocol(isAjp ? "AJP/1.3" : "HTTP/1.1");
         connector.setSecure(isSSL);
         connector.setScheme(isSSL ? "https" : "http");
 
