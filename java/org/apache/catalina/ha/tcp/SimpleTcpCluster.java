@@ -597,7 +597,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
                         + " with class=" + valve.getClass().getName());
             if (valve != null) {
                 container.getPipeline().removeValve(valve);
-                valve.setCluster(this);
+                valve.setCluster(null);
             }
         }
     }
