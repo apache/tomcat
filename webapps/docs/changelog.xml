@@ -115,6 +115,11 @@
         <code>org.apache.catalina.ha.session.BackupManager</code> and
         <code>org.apache.catalina.ha.session.DeltaManager</code>. (kfujino)
       </scode>
+      <scode>
+        Simplify the code of <code>o.a.c.ha.tcp.SimpleTcpCluster</code>. In
+        order to add or remove cluster valve to Container, use pipeline instead
+        of <code>IntrospectionUtils</code>. (kfujino)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Web applications">
