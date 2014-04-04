@@ -70,6 +70,11 @@
         the expanded directory is deleted first, any attempt to load a new class
         during undeploy will fail. (markt)
       </fix>
+      <fix>
+        <bug>56339</bug>: Avoid an infinite loop if an application calls
+        <code>session.invalidate()</code> from the session destroyed event for
+        that session. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
