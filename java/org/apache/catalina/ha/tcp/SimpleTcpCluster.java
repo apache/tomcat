@@ -717,10 +717,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     /**
      * register all cluster valve to host or engine
-     * @throws Exception
-     * @throws ClassNotFoundException
      */
-    protected void registerClusterValve() throws Exception {
+    protected void registerClusterValve() {
         if(container != null ) {
             for (Iterator<Valve> iter = valves.iterator(); iter.hasNext();) {
                 ClusterValve valve = (ClusterValve) iter.next();
@@ -728,10 +726,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
                     log.debug("Invoking addValve on " + getContainer()
                             + " with class=" + valve.getClass().getName());
                 if (valve != null) {
-                    IntrospectionUtils.callMethodN(getContainer(), "addValve",
-                            new Object[] { valve },
-                            new Class[] { org.apache.catalina.Valve.class });
-
+                	container.getPipeline().addValve(valve);
                     valve.setCluster(this);
                 }
             }
@@ -740,20 +735,16 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     /**
      * unregister all cluster valve to host or engine
-     * @throws Exception
-     * @throws ClassNotFoundException
      */
-    protected void unregisterClusterValve() throws Exception {
+    protected void unregisterClusterValve() {
         for (Iterator<Valve> iter = valves.iterator(); iter.hasNext();) {
             ClusterValve valve = (ClusterValve) iter.next();
             if (log.isDebugEnabled())
                 log.debug("Invoking removeValve on " + getContainer()
                         + " with class=" + valve.getClass().getName());
             if (valve != null) {
-                IntrospectionUtils.callMethodN(getContainer(), "removeValve",
-                    new Object[] { valve },
-                    new Class[] { org.apache.catalina.Valve.class });
-                valve.setCluster(this);
+            	container.getPipeline().removeValve(valve);
+                valve.setCluster(null);
             }
         }
     }
