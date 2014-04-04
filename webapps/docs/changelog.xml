@@ -138,6 +138,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>56343</bug>: Avoid a NPE if Tomcat&apos;s Java WebSocket 1.0
+        implementation is used with the Java WebSocket 1.0 API JAR from the
+        reference implementation. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

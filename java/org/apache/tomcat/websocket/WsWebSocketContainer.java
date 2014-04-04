@@ -190,8 +190,12 @@ public class WsWebSocketContainer
             }
         }
 
-        ClientEndpointConfig config = ClientEndpointConfig.Builder.create().
-                configurator(configurator).
+        ClientEndpointConfig.Builder builder = ClientEndpointConfig.Builder.create();
+        // Avoid NPE when using RI API JAR - see BZ 56343
+        if (configurator != null) {
+            builder.configurator(configurator);
+        }
+        ClientEndpointConfig config = builder.
                 decoders(Arrays.asList(annotation.decoders())).
                 encoders(Arrays.asList(annotation.encoders())).
                 build();
