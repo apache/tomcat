@@ -755,11 +755,11 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
                 synchronized (completionHandler) {
                     if (nBytes.intValue() < 0) {
                         failed(new EOFException(sm.getString("iib.eof.error")), attachment);
-                        return;
-                    }
-                    readPending = false;
-                    if (!Nio2Endpoint.isInline()) {
-                        notify = true;
+                    } else {
+                        readPending = false;
+                        if (!Nio2Endpoint.isInline()) {
+                            notify = true;
+                        }
                     }
                 }
                 if (notify) {

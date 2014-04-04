@@ -83,6 +83,9 @@
       <fix>
         Handle incomplete writes in NIO2, just in case. (remm)
       </fix>
+      <fix>
+        Code cleanups and i18n in NIO2. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
