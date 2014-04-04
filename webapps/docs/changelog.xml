@@ -71,6 +71,10 @@
         during undeploy will fail. (markt)
       </fix>
       <fix>
+        <bug>56327</bug>: Enable AJP as well as HTTP connectors to be created
+        via JMX. Patch by kiran. (markt)
+      </fix>
+      <fix>
         <bug>56339</bug>: Avoid an infinite loop if an application calls
         <code>session.invalidate()</code> from the session destroyed event for
         that session. (markt)
