@@ -120,6 +120,11 @@
         order to add or remove cluster valve to Container, use pipeline instead
         of <code>IntrospectionUtils</code>. (kfujino)
       </scode>
+      <fix>
+        There is no need to set cluster instance when
+        <code>SimpleTcpCluster.unregisterClusterValve</code> is called.
+        Set null than cluster instance for cleanup. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
