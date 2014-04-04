@@ -455,7 +455,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                                 .getSslImplementation().getSSLSupport(
                                         engine.getSession());
                     } catch (IOException ioe) {
-                        log.warn(sm.getString("http11processor.socket.sslreneg",ioe));
+                        log.warn(sm.getString("http11processor.socket.sslreneg"), ioe);
                     }
                 }
 

@@ -39,13 +39,9 @@ public class Nio2Channel implements AsynchronousByteChannel {
 
     protected AsynchronousSocketChannel sc = null;
     protected SocketWrapper<Nio2Channel> socket = null;
-
     protected ApplicationBufferHandler bufHandler;
 
-    protected boolean sendFile = false;
-
-    public Nio2Channel(AsynchronousSocketChannel channel, ApplicationBufferHandler bufHandler) {
-        this.sc = channel;
+    public Nio2Channel(ApplicationBufferHandler bufHandler) {
         this.bufHandler = bufHandler;
     }
 
@@ -54,15 +50,12 @@ public class Nio2Channel implements AsynchronousByteChannel {
      *
      * @throws IOException If a problem was encountered resetting the channel
      */
-    public void reset() throws IOException {
+    public void reset(AsynchronousSocketChannel channel, SocketWrapper<Nio2Channel> socket)
+            throws IOException {
+        this.sc = channel;
+        this.socket = socket;
         bufHandler.getReadBuffer().clear();
         bufHandler.getWriteBuffer().clear();
-        sendFile = false;
-        socket = null;
-    }
-
-    void setSocket(SocketWrapper<Nio2Channel> socket) {
-        this.socket = socket;
     }
 
     public SocketWrapper<Nio2Channel> getSocket() {
@@ -130,21 +123,9 @@ public class Nio2Channel implements AsynchronousByteChannel {
         return 0;
     }
 
-    public void setIOChannel(AsynchronousSocketChannel IOChannel) {
-        this.sc = IOChannel;
-    }
-
     @Override
     public String toString() {
         return super.toString()+":"+this.sc.toString();
-    }
-
-    public boolean isSendFile() {
-        return sendFile;
-    }
-
-    public void setSendFile(boolean s) {
-        this.sendFile = s;
     }
 
     @Override

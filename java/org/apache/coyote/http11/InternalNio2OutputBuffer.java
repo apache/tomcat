@@ -118,7 +118,6 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                 synchronized (completionHandler) {
                     if (nBytes.intValue() < 0) {
                         failed(new EOFException(sm.getString("iob.failedwrite")), attachment);
-                        return;
                     } else if (bufferedWrites.size() > 0) {
                         // Continue writing data using a gathering write
                         ArrayList<ByteBuffer> arrayList = new ArrayList<>();
@@ -172,7 +171,6 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                 synchronized (completionHandler) {
                     if (nBytes.longValue() < 0) {
                         failed(new EOFException(sm.getString("iob.failedwrite")), attachment);
-                        return;
                     } else if (bufferedWrites.size() > 0 || arrayHasData(attachment)) {
                         // Continue writing data
                         ArrayList<ByteBuffer> arrayList = new ArrayList<>();

@@ -415,9 +415,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
      */
     @Override
     public void unbind() throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("Destroy initiated for "+new InetSocketAddress(getAddress(),getPort()));
-        }
         if (running) {
             stop();
         }
@@ -428,9 +425,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         // Unlike other connectors, the thread pool is tied to the server socket
         shutdownExecutor();
         releaseCaches();
-        if (log.isDebugEnabled()) {
-            log.debug("Destroy completed for "+new InetSocketAddress(getAddress(),getPort()));
-        }
     }
 
 
@@ -505,34 +499,32 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 if (sslContext != null) {
                     SSLEngine engine = createSSLEngine();
                     int appBufferSize = engine.getSession().getApplicationBufferSize();
-                    NioBufferHandler bufhandler = new NioBufferHandler(Math.max(appBufferSize, socketProperties.getAppReadBufSize()),
+                    NioBufferHandler bufhandler = new NioBufferHandler(
+                            Math.max(appBufferSize, socketProperties.getAppReadBufSize()),
                             Math.max(appBufferSize, socketProperties.getAppWriteBufSize()),
                             socketProperties.getDirectBuffer());
-                    channel = new SecureNio2Channel(socket, engine, bufhandler, this);
+                    channel = new SecureNio2Channel(engine, bufhandler, this);
                 } else {
-                    // normal tcp setup
-                    NioBufferHandler bufhandler = new NioBufferHandler(socketProperties.getAppReadBufSize(),
-                                                                       socketProperties.getAppWriteBufSize(),
-                                                                       socketProperties.getDirectBuffer());
-
-                    channel = new Nio2Channel(socket, bufhandler);
+                    NioBufferHandler bufhandler = new NioBufferHandler(
+                            socketProperties.getAppReadBufSize(),
+                            socketProperties.getAppWriteBufSize(),
+                            socketProperties.getDirectBuffer());
+                    channel = new Nio2Channel(bufhandler);
                 }
             } else {
-                channel.setIOChannel(socket);
-                if (channel instanceof SecureNio2Channel) {
+                if (sslContext != null) {
                     SSLEngine engine = createSSLEngine();
                     ((SecureNio2Channel) channel).setSSLEngine(engine);
                 }
-                channel.reset();
             }
             Nio2SocketWrapper socketWrapper = (useCaches) ? socketWrapperCache.pop() : null;
             if (socketWrapper == null) {
                 socketWrapper = new Nio2SocketWrapper(channel);
             }
+            channel.reset(socket, socketWrapper);
             socketWrapper.reset(channel, getSocketProperties().getSoTimeout());
             socketWrapper.setKeepAliveLeft(Nio2Endpoint.this.getMaxKeepAliveRequests());
             socketWrapper.setSecure(isSSLEnabled());
-            channel.setSocket(socketWrapper);
             if (sslContext != null) {
                 // Use the regular processing, as the first handshake needs to be done there
                 processSocket(socketWrapper, SocketStatus.OPEN_READ, true);
@@ -983,7 +975,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
 
         if (nr >= 0) {
-            socket.getSocket().setSendFile(true);
             buffer.flip();
             socket.getSocket().write(buffer, data, new CompletionHandler<Integer, SendfileData>() {
 
@@ -1010,7 +1001,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                             // Ignore
                         }
                         if (attachment.keepAlive) {
-                            socket.getSocket().setSendFile(false);
                             awaitBytes(socket);
                         } else {
                             closeSocket(socket, SocketStatus.DISCONNECT);
@@ -1036,7 +1026,10 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                                 ok = false;
                             }
                         } catch (Throwable th) {
-                            if ( log.isDebugEnabled() ) log.debug("Unable to complete sendfile request:", th);
+                            ExceptionUtils.handleThrowable(th);
+                            if (log.isDebugEnabled()) {
+                                log.debug(sm.getString("endpoint.sendfile.error"), th);
+                            }
                             ok = false;
                         }
                     }
@@ -1132,7 +1125,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     }
                 } catch (IOException x) {
                     handshake = -1;
-                    if (log.isDebugEnabled()) log.debug("Error during SSL handshake",x);
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("endpoint.err.handshake"), x);
+                    }
                 }
                 if (handshake == 0) {
                     SocketState state = SocketState.OPEN;
@@ -1144,17 +1139,13 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     }
                     if (state == SocketState.CLOSED) {
                         // Close socket and pool
-                        try {
-                            socket.setComet(false);
-                            closeSocket(socket, SocketStatus.ERROR);
-                            if (useCaches && running && !paused) {
-                                nioChannels.push(socket.getSocket());
-                            }
-                            if (useCaches && running && !paused && socket != null) {
-                                socketWrapperCache.push((Nio2SocketWrapper) socket);
-                            }
-                        } catch (Exception x) {
-                            log.error("",x);
+                        socket.setComet(false);
+                        closeSocket(socket, SocketStatus.ERROR);
+                        if (useCaches && running && !paused) {
+                            nioChannels.push(socket.getSocket());
+                        }
+                        if (useCaches && running && !paused && socket != null) {
+                            socketWrapperCache.push((Nio2SocketWrapper) socket);
                         }
                     } else if (state == SocketState.UPGRADING) {
                         socket.setKeptAlive(true);
@@ -1191,7 +1182,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             } catch (VirtualMachineError vme) {
                 ExceptionUtils.handleThrowable(vme);
             } catch (Throwable t) {
-                log.error("", t);
+                log.error(sm.getString("endpoint.processing.fail"), t);
                 if (socket != null) {
                     closeSocket(socket, SocketStatus.ERROR);
                 }
