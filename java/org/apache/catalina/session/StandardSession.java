@@ -808,7 +808,9 @@ public class StandardSession implements HttpSession, Session, Serializable {
         synchronized (this) {
             // Check again, now we are inside the sync so this code only runs once
             // Double check locking - isValid needs to be volatile
-            if (!isValid)
+            // The check of expiring is to ensure that an infinite loop is not
+            // entered as per bug 56339
+            if (expiring || !isValid)
                 return;
 
             if (manager == null)
