@@ -474,7 +474,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
 
 
     @Override
-    protected void registerWriteInterest() throws IOException {
+    public void registerWriteInterest() {
         synchronized (completionHandler) {
             if (writePending.availablePermits() == 0) {
                 interest = true;

@@ -86,6 +86,9 @@
       <fix>
         Code cleanups and i18n in NIO2. (remm)
       </fix>
+      <fix>
+        Fix extra onDataAvailable calls. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
