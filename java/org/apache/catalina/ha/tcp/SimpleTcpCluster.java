@@ -726,7 +726,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
                     log.debug("Invoking addValve on " + getContainer()
                             + " with class=" + valve.getClass().getName());
                 if (valve != null) {
-                	container.getPipeline().addValve(valve);
+                    container.getPipeline().addValve(valve);
                     valve.setCluster(this);
                 }
             }
@@ -743,7 +743,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
                 log.debug("Invoking removeValve on " + getContainer()
                         + " with class=" + valve.getClass().getName());
             if (valve != null) {
-            	container.getPipeline().removeValve(valve);
+                container.getPipeline().removeValve(valve);
                 valve.setCluster(null);
             }
         }
