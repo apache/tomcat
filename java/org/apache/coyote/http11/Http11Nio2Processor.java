@@ -144,8 +144,12 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
     @Override
     protected void registerForEvent(boolean read, boolean write) {
-        // Nothing to do here, the appropriate operations should
-        // already be pending
+        if (read) {
+            ((InternalNio2InputBuffer) inputBuffer).registerReadInterest();
+        }
+        if (write) {
+            ((InternalNio2OutputBuffer) outputBuffer).registerWriteInterest();
+        }
     }
 
 

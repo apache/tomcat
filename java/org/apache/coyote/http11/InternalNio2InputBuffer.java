@@ -153,6 +153,11 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
     private int socketReadBufferSize;
 
     /**
+     * Track write interest
+     */
+    protected volatile boolean interest = false;
+
+    /**
      * The completion handler used for asynchronous read operations
      */
     private CompletionHandler<Integer, SocketWrapper<Nio2Channel>> completionHandler;
@@ -202,6 +207,7 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
         headerData.recycle();
         readPending = false;
         flipped = false;
+        interest = false;
         e = null;
     }
 
@@ -222,6 +228,7 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
         parsingRequestLineStart = 0;
         parsingRequestLineQPos = -1;
         headerData.recycle();
+        interest = false;
     }
 
     /**
@@ -757,7 +764,8 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
                         failed(new EOFException(sm.getString("iib.eof.error")), attachment);
                     } else {
                         readPending = false;
-                        if (!Nio2Endpoint.isInline()) {
+                        if ((request.getReadListener() == null || interest) && !Nio2Endpoint.isInline()) {
+                            interest = false;
                             notify = true;
                         }
                     }
@@ -887,6 +895,18 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
                 } else {
                     return false;
                 }
+            }
+        }
+    }
+
+
+    public void registerReadInterest() {
+        synchronized (completionHandler) {
+            if (readPending) {
+                interest = true;
+            } else {
+                // If no write is pending, notify
+                endpoint.processSocket(socket, SocketStatus.OPEN_READ, true);
             }
         }
     }
