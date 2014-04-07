@@ -183,7 +183,6 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
                     }
                 }
             } else if (nRead == -1) {
-                // TODO i18n
                 throw new EOFException();
             }
 
