@@ -433,19 +433,17 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         if (threadGroup != null && internalExecutor) {
             try {
                 threadGroup.shutdownNow();
+                long timeout = getExecutorTerminationTimeoutMillis();
+                if (timeout > 0) {
+                    threadGroup.awaitTermination(timeout, TimeUnit.MILLISECONDS);
+                }
             } catch (IOException e) {
                 getLog().warn(sm.getString("endpoint.warn.executorShutdown", getName()), e);
+            } catch (InterruptedException e) {
+                // Ignore
             }
-            long timeout = getExecutorTerminationTimeoutMillis();
-            if (timeout > 0) {
-                try {
-                    threadGroup.awaitTermination(timeout, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException e) {
-                    // Ignore
-                }
-                if (!threadGroup.isTerminated()) {
-                    getLog().warn(sm.getString("endpoint.warn.executorShutdown", getName()));
-                }
+            if (!threadGroup.isTerminated()) {
+                getLog().warn(sm.getString("endpoint.warn.executorShutdown", getName()));
             }
             threadGroup = null;
         }
