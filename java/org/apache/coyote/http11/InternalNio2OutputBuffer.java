@@ -50,9 +50,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
      * Default constructor.
      */
     public InternalNio2OutputBuffer(Response response, int headerBufferSize) {
-
         super(response, headerBufferSize);
-
         outputStreamOutputBuffer = new SocketOutputBuffer();
     }
 

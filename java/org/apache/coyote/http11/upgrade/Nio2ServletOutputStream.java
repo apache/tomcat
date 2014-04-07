@@ -51,7 +51,6 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
             public void completed(Integer nBytes, ByteBuffer attachment) {
                 if (nBytes.intValue() < 0) {
                     failed(new EOFException(), attachment);
-                    return;
                 } else if (attachment.hasRemaining()) {
                     channel.write(attachment, socketWrapper.getTimeout(),
                             TimeUnit.MILLISECONDS, attachment, completionHandler);
