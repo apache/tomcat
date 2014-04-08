@@ -79,6 +79,10 @@
         <code>session.invalidate()</code> from the session destroyed event for
         that session. (markt)
       </fix>
+      <scode>
+        <bug>56365</bug>: Simplify filename pattern matching code in
+        <scode>StandardJarScanner</scode>. (kkolinko)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

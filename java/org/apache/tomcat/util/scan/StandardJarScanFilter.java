@@ -34,19 +34,19 @@ public class StandardJarScanFilter implements JarScanFilter {
 
     private String defaultSkip;
     private String defaultScan;
-    private Set<String[]> defaultSkipSet = new HashSet<>();
-    private Set<String[]> defaultScanSet = new HashSet<>();
+    private Set<String> defaultSkipSet = new HashSet<>();
+    private Set<String> defaultScanSet = new HashSet<>();
 
     private String tldSkip;
     private String tldScan;
-    private Set<String[]> tldSkipSet = new HashSet<>();
-    private Set<String[]> tldScanSet = new HashSet<>();
+    private Set<String> tldSkipSet = new HashSet<>();
+    private Set<String> tldScanSet = new HashSet<>();
     private boolean defaultTldScan = true;
 
     private String pluggabilitySkip;
     private String pluggabilityScan;
-    private Set<String[]> pluggabilitySkipSet = new HashSet<>();
-    private Set<String[]> pluggabilityScanSet = new HashSet<>();
+    private Set<String> pluggabilitySkipSet = new HashSet<>();
+    private Set<String> pluggabilityScanSet = new HashSet<>();
     private boolean defaultPluggabilityScan = true;
 
     /**
@@ -186,8 +186,8 @@ public class StandardJarScanFilter implements JarScanFilter {
     @Override
     public boolean check(JarScanType jarScanType, String jarName) {
         boolean defaultScan;
-        Set<String[]> toSkip = new HashSet<>();
-        Set<String[]> toScan = new HashSet<>();
+        Set<String> toSkip = new HashSet<>();
+        Set<String> toScan = new HashSet<>();
 
         Lock readLock = configurationLock.readLock();
         readLock.lock();
@@ -217,8 +217,8 @@ public class StandardJarScanFilter implements JarScanFilter {
         }
 
         if (defaultScan) {
-            if (Matcher.matchPath(toSkip, jarName)) {
-                if (Matcher.matchPath(toScan, jarName)) {
+            if (Matcher.matchName(toSkip, jarName)) {
+                if (Matcher.matchName(toScan, jarName)) {
                     return true;
                 } else {
                     return false;
@@ -226,8 +226,8 @@ public class StandardJarScanFilter implements JarScanFilter {
             }
             return true;
         } else {
-            if (Matcher.matchPath(toScan, jarName)) {
-                if (Matcher.matchPath(toSkip, jarName)) {
+            if (Matcher.matchName(toScan, jarName)) {
+                if (Matcher.matchName(toSkip, jarName)) {
                     return false;
                 } else {
                     return true;
@@ -237,13 +237,15 @@ public class StandardJarScanFilter implements JarScanFilter {
         }
     }
 
-    private void populateSetFromAttribute(String attribute, Set<String[]> set) {
+    private void populateSetFromAttribute(String attribute, Set<String> set) {
         set.clear();
         if (attribute != null) {
             StringTokenizer tokenizer = new StringTokenizer(attribute, ",");
             while (tokenizer.hasMoreElements()) {
                 String token = tokenizer.nextToken().trim();
-                set.add(Matcher.tokenizePathAsArray(token));
+                if (token.length() > 0) {
+                    set.add(token);
+                }
             }
         }
     }
