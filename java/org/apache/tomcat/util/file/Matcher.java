@@ -37,7 +37,7 @@ public final class Matcher {
      *
      * @param patternSet The pattern set to match against. Must not be
      *                <code>null</code>.
-     * @param str     The file name to match, as a String. Must not be
+     * @param fileName The file name to match, as a String. Must not be
      *                <code>null</code>. It must be just a file name, without
      *                a path.
      *
