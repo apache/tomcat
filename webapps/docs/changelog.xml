@@ -80,8 +80,8 @@
         that session. (markt)
       </fix>
       <scode>
-        <bug>56365</bug>: Simplify filename pattern matching code in
-        <scode>StandardJarScanner</scode>. (kkolinko)
+        <bug>56365</bug>: Simplify file name pattern matching code in
+        <code>StandardJarScanner</code>. (kkolinko)
       </scode>
     </changelog>
   </subsection>
