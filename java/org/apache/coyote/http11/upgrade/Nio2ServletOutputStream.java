@@ -176,14 +176,4 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
         channel.close(true);
     }
 
-    @Override
-    protected void registerWriteInterest() {
-        synchronized (completionHandler) {
-            if (writePending.availablePermits() > 0) {
-                // If no write is pending, notify
-                endpoint.processSocket(socketWrapper, SocketStatus.OPEN_WRITE, true);
-            }
-        }
-    }
-
 }
