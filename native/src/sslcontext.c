@@ -154,10 +154,12 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
                (unsigned long)((sizeof SSL_DEFAULT_VHOST_NAME) - 1),
                &(c->context_id[0]), NULL, EVP_sha1(), NULL);
     if (mode) {
+#ifdef HAVE_ECC
         /* Set default (nistp256) elliptic curve for ephemeral ECDH keys */
         EC_KEY *ecdh = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
         SSL_CTX_set_tmp_ecdh(c->ctx, ecdh);
         EC_KEY_free(ecdh);
+#endif
         SSL_CTX_set_tmp_rsa_callback(c->ctx, SSL_callback_tmp_RSA);
         SSL_CTX_set_tmp_dh_callback(c->ctx,  SSL_callback_tmp_DH);
     }
