@@ -905,7 +905,7 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
             if (readPending) {
                 interest = true;
             } else {
-                // If no write is pending, notify
+                // If no read is pending, notify
                 endpoint.processSocket(socket, SocketStatus.OPEN_READ, true);
             }
         }

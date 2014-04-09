@@ -76,6 +76,9 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
         synchronized (fireListenerLock) {
             boolean result = (buffer == null);
             fireListener = !result;
+            if (fireListener) {
+                registerWriteInterest();
+            }
             return result;
         }
     }
@@ -236,4 +239,8 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
     protected abstract void doFlush() throws IOException;
 
     protected abstract void doClose() throws IOException;
+
+    protected void registerWriteInterest() {
+    }
+
 }
