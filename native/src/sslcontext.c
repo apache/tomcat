@@ -137,6 +137,9 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
      * Configure additional context ingredients
      */
     SSL_CTX_set_options(c->ctx, SSL_OP_SINGLE_DH_USE);
+#ifdef HAVE_ECC
+    SSL_CTX_set_options(c->ctx, SSL_OP_SINGLE_ECDH_USE);
+#endif
 
 #ifdef SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION
     /*

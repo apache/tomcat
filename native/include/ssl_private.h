@@ -40,6 +40,12 @@
 #endif
 
 /* OpenSSL headers */
+/* OpenSSL headers */
+#include <openssl/opensslv.h>
+#if (OPENSSL_VERSION_NUMBER >= 0x10001000)
+/* must be defined before including ssl.h */
+#define OPENSSL_NO_SSL_INTERN
+#endif
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/x509.h>
@@ -207,6 +213,11 @@
 #define OCSP_STATUS_REVOKED   1
 #define OCSP_STATUS_UNKNOWN   2
 
+
+/* ECC: make sure we have at least 1.0.0 */
+#if !defined(OPENSSL_NO_EC) && defined(TLSEXT_ECPOINTFORMAT_uncompressed)
+#define HAVE_ECC              1
+#endif
 
 extern void *SSL_temp_keys[SSL_TMP_KEY_MAX];
 
