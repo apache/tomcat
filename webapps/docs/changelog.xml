@@ -83,6 +83,11 @@
         <bug>56365</bug>: Simplify file name pattern matching code in
         <code>StandardJarScanner</code>. (kkolinko)
       </scode>
+      <fix>
+        Ensure that the static resource cache is able to detect when a cache
+        entry is invalidated by being overridden by a new resource in a
+        different <code>WebResourceSet</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
