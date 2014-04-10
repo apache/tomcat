@@ -89,8 +89,9 @@ public class CachedResource implements WebResource {
             return true;
         }
 
-        if (!webResource.exists() && root.getResourceInternal(
-                webAppPath, useClassLoaderResources).exists()) {
+        WebResource webResourceInternal = root.getResourceInternal(
+                webAppPath, useClassLoaderResources);
+        if (!webResource.exists() && webResourceInternal.exists()) {
             return false;
         }
 
@@ -100,6 +101,13 @@ public class CachedResource implements WebResource {
                 webResource.getContentLength() != getContentLength()) {
             return false;
         }
+
+        // Has a resource been inserted / removed in a different resource set
+        if (webResource.getLastModified() != webResourceInternal.getLastModified() ||
+                webResource.getContentLength() != webResourceInternal.getContentLength()) {
+            return false;
+        }
+
 
         nextCheck = ttl + now;
         return true;
