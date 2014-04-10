@@ -21,7 +21,7 @@
 #        native/include/tcn_version.h
 #        native/os/win32/libtcnative.rc
 
-# Default place to look for apr source.  Can be overridden with 
+# Default place to look for apr source.  Can be overridden with
 #   --with-apr=[directory]
 apr_src_dir=`pwd`/srclib/apr
 JKJNIEXT=""
@@ -62,7 +62,7 @@ else
     echo ""
     echo "Problem finding apr source in: \`$apr_src_dir'"
     echo "Use:"
-    echo "  --with-apr=<directory>" 
+    echo "  --with-apr=<directory>"
     echo ""
     exit 1
 fi
@@ -182,13 +182,17 @@ fi
 top="`pwd`"
 cd ${JKJNIDIST}/jni/xdocs
 ant
-$EXPTOOL $EXPOPTS ../build/docs/miscellaneous/printer/changelog.html > ../../CHANGELOG.txt 2>/dev/null
+$EXPTOOL $EXPOPTS ../build/docs/miscellaneous/changelog.html > ../../CHANGELOG.txt 2>/dev/null
 if [ $? -ne 0 ]; then
     echo ""
-    echo "$EXPTOOL $EXPOPTS ../build/docs/miscellaneous/printer/changelog.html failed"
+    echo "$EXPTOOL $EXPOPTS ../build/docs/miscellaneous/changelog.html failed"
     echo ""
     exit 1
 fi
+# Remove first 25 lines from converted file which contains
+# page navagation data.
+# Remember to increase the lines when new file is added to news.
+sed -i '1,25d' ../../CHANGELOG.txt
 cd "$top"
 mv ${JKJNIDIST}/jni/build/docs ${JKJNIDIST}/jni/docs
 rm -rf ${JKJNIDIST}/jni/build
@@ -233,14 +237,8 @@ if [ $? -ne 0 ]; then
     echo ""
     exit 1
 fi
-$EXPTOOL $EXPOPTS ../build/docs/miscellaneous/printer/changelog.html > ../../CHANGELOG.txt 2>/dev/null
-if [ $? -ne 0 ]; then
-    echo ""
-    echo "$EXPTOOL $EXPOPTS ../build/docs/miscellaneous/printer/changelog.html failed"
-    echo ""
-    exit 1
-fi
 cd "$top"
+cp ${JKJNIDIST}/CHANGELOG.txt ${JKWINDIST}
 
 mv ${JKWINDIST}/jni/build/docs ${JKWINDIST}/jni/docs
 rm -rf ${JKWINDIST}/jni/build
