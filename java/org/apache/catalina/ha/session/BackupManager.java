@@ -115,7 +115,8 @@ public class BackupManager extends ClusterManagerBase
     @Override
     public ClusterMessage requestCompleted(String sessionId) {
         if (!getState().isAvailable()) return null;
-        LazyReplicatedMap map = (LazyReplicatedMap)sessions;
+        LazyReplicatedMap<String,Session> map =
+                (LazyReplicatedMap<String,Session>)sessions;
         map.replicate(sessionId,false);
         return null;
     }
@@ -159,7 +160,6 @@ public class BackupManager extends ClusterManagerBase
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
@@ -167,12 +167,10 @@ public class BackupManager extends ClusterManagerBase
 
         try {
             if (cluster == null) throw new LifecycleException(sm.getString("backupManager.noCluster", getName()));
-            LazyReplicatedMap map = new LazyReplicatedMap(this,
-                                                          cluster.getChannel(),
-                                                          rpcTimeout,
-                                                          getMapName(),
-                                                          getClassLoaders(),
-                                                          terminateOnStartFailure);
+            LazyReplicatedMap<String,Session> map =
+                    new LazyReplicatedMap<String,Session>(this,
+                            cluster.getChannel(), rpcTimeout, getMapName(),
+                            getClassLoaders(), terminateOnStartFailure);
             map.setChannelSendOptions(mapSendOptions);
             this.sessions = map;
         }  catch ( Exception x ) {
@@ -208,7 +206,8 @@ public class BackupManager extends ClusterManagerBase
         setState(LifecycleState.STOPPING);
 
         if (sessions instanceof LazyReplicatedMap) {
-            LazyReplicatedMap map = (LazyReplicatedMap)sessions;
+            LazyReplicatedMap<String,Session> map =
+                    (LazyReplicatedMap<String,Session>)sessions;
             map.breakdown();
         }
 
@@ -267,15 +266,16 @@ public class BackupManager extends ClusterManagerBase
 
     @Override
     public int getActiveSessionsFull() {
-        LazyReplicatedMap map = (LazyReplicatedMap)sessions;
+        LazyReplicatedMap<String,Session> map =
+                (LazyReplicatedMap<String,Session>)sessions;
         return map.sizeFull();
     }
 
     @Override
     public Set<String> getSessionIdsFull() {
         Set<String> sessionIds = new HashSet<String>();
-        LazyReplicatedMap map = (LazyReplicatedMap)sessions;
-        @SuppressWarnings("unchecked") // sessions is of type Map<String, Session>
+        LazyReplicatedMap<String,Session> map =
+                (LazyReplicatedMap<String,Session>)sessions;
         Iterator<String> keys = map.keySetFull().iterator();
         while (keys.hasNext()) {
             sessionIds.add(keys.next());

@@ -112,6 +112,11 @@
         <code>SimpleTcpCluster.unregisterClusterValve</code> is called.
         Set null than cluster instance for cleanup. (kfujino)
       </fix>
+      <scode>
+        Backport refactoring of <code>AbstractReplicatedMap</code> to implement
+        <code>Map</code> rather than extend <code>ConcurrentHashMap</code> to
+        enable Tomcat 7 to be built with Java 8. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

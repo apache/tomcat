@@ -46,7 +46,7 @@ import org.apache.catalina.tribes.Member;
  * @author Filip Hanik
  * @version 1.0
  */
-public class ReplicatedMap extends AbstractReplicatedMap {
+public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
 
     private static final long serialVersionUID = 1L;
 
