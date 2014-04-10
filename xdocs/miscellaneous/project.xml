@@ -34,6 +34,7 @@
     </menu>
 
     <menu name="News">
+        <item name="2014"                       href="../news/2014.html"/>
         <item name="2013"                       href="../news/2013.html"/>
         <item name="2012"                       href="../news/2012.html"/>
         <item name="2011"                       href="../news/2011.html"/>
