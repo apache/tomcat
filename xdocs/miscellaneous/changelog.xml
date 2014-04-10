@@ -39,6 +39,9 @@
 <section name="Changes between 1.1.29 and 1.1.30">
   <changelog>
     <fix>
+      <bug>56363</bug>: Use OpenSSL 1.0.1g with Windows binaries. (mturk)
+    </fix>      
+    <fix>
       <bug>55915</bug>: Apply Mike Noordermeer's patch for ECDHE support. (mturk)
     </fix>
     <fix>
