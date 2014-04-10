@@ -40,12 +40,7 @@
 #endif
 
 /* OpenSSL headers */
-/* OpenSSL headers */
 #include <openssl/opensslv.h>
-#if (OPENSSL_VERSION_NUMBER >= 0x10001000)
-/* must be defined before including ssl.h */
-#define OPENSSL_NO_SSL_INTERN
-#endif
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/x509.h>
