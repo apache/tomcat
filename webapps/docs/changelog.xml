@@ -171,6 +171,10 @@
         host if "webapps" request parameter is not set when adding host in
         HostManager Application. (kfujino)
       </fix>
+      <fix>
+        Correct documentation on Windows service options, aligning it with
+        Apache Commons Daemon documentation. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

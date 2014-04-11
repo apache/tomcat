@@ -136,13 +136,13 @@
     <td>Service startup mode can be either <b>auto</b> or <b>manual</b></td>
     </tr>
     <tr>
-    <td>--DependsOn</td>
+    <td>++DependsOn</td>
     <td></td>
     <td>List of services that this service depend on. Dependent services
         are separated using either <b>#</b> or <b>;</b> characters</td>
     </tr>
     <tr>
-    <td>--Environment</td>
+    <td>++Environment</td>
     <td></td>
     <td>List of environment variables that will be provided to the service
         in the form <b>key=value</b>. They are separated using either
@@ -171,40 +171,56 @@
     <tr>
     <td>--Jvm</td>
     <td>auto</td>
-    <td>Use either <b>auto</b> or specify the full path to the <b>jvm.dll</b>.
+    <td>Use either <b>auto</b> (i.e. find the JVM from the Windows registry)
+        or specify the full path to the <b>jvm.dll</b>.
         You can use the environment variable expansion here.</td>
     </tr>
     <tr>
-    <td>--JvmOptions</td>
+    <td>++JvmOptions</td>
     <td>-Xrs</td>
     <td>List of options in the form of <b>-D</b> or <b>-X</b> that will be
         passed to the JVM. The options are separated using either
-        <b>#</b> or <b>;</b> characters.</td>
+        <b>#</b> or <b>;</b> characters. (Not used in <b>exe</b> mode.)</td>
     </tr>
     <tr>
     <td>--Classpath</td>
     <td></td>
-    <td>Set the Java classpath</td>
+    <td>Set the Java classpath. (Not used in <b>exe</b> mode.)</td>
     </tr>
     <tr>
     <td>--JvmMs</td>
     <td></td>
-    <td>Initial memory pool size in MB</td>
+    <td>Initial memory pool size in MB. (Not used in <b>exe</b> mode.)</td>
     </tr>
     <tr>
     <td>--JvmMx</td>
     <td></td>
-    <td>Maximum memory pool size in MB</td>
+    <td>Maximum memory pool size in MB. (Not used in <b>exe</b> mode.)</td>
     </tr>
     <tr>
     <td>--JvmSs</td>
     <td></td>
-    <td>Thread stack size in KB</td>
+    <td>Thread stack size in KB. (Not used in <b>exe</b> mode.)</td>
+    </tr>
+    <tr>
+    <td>--StartMode</td>
+    <td></td>
+    <td>One of <b>jvm</b>, <b>Java</b> or <b>exe</b>. The modes are:
+      <ul>
+        <li>jvm - start Java in-process. Depends on jvm.dll, see <b>--Jvm</b>.</li>
+        <li>Java - same as exe, but automatically uses the default Java
+         executable, i.e. %JAVA_HOME%\bin\java.exe. Make sure JAVA_HOME is set
+         correctly, or use --JavaHome to provide the correct location.
+         If neither is set, procrun will try to find the default JDK (not JRE)
+         from the Windows registry.</li>
+        <li>exe - run the image as a separate process</li>
+      </ul>
+    </td>
     </tr>
     <tr>
     <td>--StartImage</td>
     <td></td>
-    <td>Executable that will be run.</td>
+    <td>Executable that will be run. Only applies to <b>exe</b> mode.</td>
     </tr>
     <tr>
     <td>--StartPath</td>
@@ -213,57 +229,57 @@
     </tr>
     <tr>
     <td>--StartClass</td>
-    <td></td>
-    <td>Class that will be used for startup.</td>
+    <td>Main</td>
+    <td>Class that contains the startup method. Applies to the <b>jvm</b> and
+        <b>Java</b> modes. (Not used in <b>exe</b> mode.) </td>
     </tr>
     <tr>
-    <td>--StartParams</td>
+    <td>--StartMethod</td>
+    <td>main</td>
+    <td>Method name if differs then main</td>
+    </tr>
+    <tr>
+    <td>++StartParams</td>
     <td></td>
     <td>List of parameters that will be passed to either StartImage or
         StartClass. Parameters are separated using either <b>#</b> or
         <b>;</b> character.</td>
     </tr>
     <tr>
-    <td>--StartMethod</td>
-    <td>Main</td>
-    <td>Method name if differs then main</td>
-    </tr>
-    <tr>
-    <td>--StartMode</td>
-    <td>executable</td>
-    <td>Can one of <b>jvm</b> <b>java</b> or <b>exe</b></td>
+    <td>--StopMode</td>
+    <td></td>
+    <td>One of <b>jvm</b>, <b>Java</b> or <b>exe</b>. See <b>--StartMode</b>
+        for further details. </td>
     </tr>
     <tr>
     <td>--StopImage</td>
     <td></td>
-    <td>Executable that will be run on Stop service signal.</td>
+    <td>Executable that will be run on Stop service signal. Only applies to
+        <b>exe</b> mode.</td>
     </tr>
     <tr>
     <td>--StopPath</td>
     <td></td>
-    <td>Working path for the stop image executable.</td>
+    <td>Working path for the stop image executable. Does not apply to <b>jvm</b>
+        mode.</td>
     </tr>
     <tr>
     <td>--StopClass</td>
-    <td></td>
-    <td>Class that will be used on Stop service signal.</td>
+    <td>Main</td>
+    <td>Class that will be used on Stop service signal. Applies to the
+        <b>jvm</b> and <b>Java</b> modes. </td>
     </tr>
     <tr>
-    <td>--StopParams</td>
+    <td>--StopMethod</td>
+    <td>main</td>
+    <td>Method name if differs then main</td>
+    </tr>
+    <tr>
+    <td>++StopParams</td>
     <td></td>
     <td>List of parameters that will be passed to either StopImage or
         StopClass. Parameters are separated using either <b>#</b> or
         <b>;</b> character.</td>
-    </tr>
-    <tr>
-    <td>--StopMethod</td>
-    <td>Main</td>
-    <td>Method name if differs then main</td>
-    </tr>
-    <tr>
-    <td>--StopMode</td>
-    <td>executable</td>
-    <td>Can one of <b>jvm</b> <b>java</b> or <b>exe</b></td>
     </tr>
     <tr>
     <td>--StopTimeout</td>
@@ -273,29 +289,40 @@
     </tr>
     <tr>
     <td>--LogPath</td>
-    <td>working path</td>
-    <td>Defines the path for logging</td>
+    <td>%SystemRoot%\System32\LogFiles\Apache</td>
+    <td>Defines the path for logging. Creates the directory if necessary.</td>
     </tr>
     <tr>
     <td>--LogPrefix</td>
-    <td>jakarta_service</td>
-    <td>Defines the service log filename</td>
+    <td>commons-daemon</td>
+    <td>Defines the service log filename prefix. The log file is created in the
+        LogPath directory with <code>.YEAR-MONTH-DAY.log</code> suffix</td>
     </tr>
     <tr>
     <td>--LogLevel</td>
-    <td>INFO</td>
-    <td>Defines the logging level and can be either <b>error</b>,
-        <b>info</b>, <b>warn</b> or <b>debug</b></td>
+    <td>Info</td>
+    <td>Defines the logging level and can be either <b>Error</b>,
+        <b>Info</b>, <b>Warn</b> or <b>Debug</b>. (Case insensitive).</td>
     </tr>
     <tr>
     <td>--StdOutput</td>
     <td></td>
-    <td>Redirected stdout filename</td>
+    <td>Redirected stdout filename.
+        If named <b>auto</b> then file is created inside <b>LogPath</b> with the
+        name <b>service-stdout.YEAR-MONTH-DAY.log</b>.</td>
     </tr>
     <tr>
     <td>--StdError</td>
     <td></td>
-    <td>Redirected stderr filename</td>
+    <td>Redirected stderr filename.
+        If named <b>auto</b> then file is created inside <b>LogPath</b> with the
+        name <b>service-stderr.YEAR-MONTH-DAY.log</b>.</td>
+    </tr>
+    <tr>
+    <td>--PidFile</td>
+    <td></td>
+    <td>Defines the file name for storing the running process id. Actual file is
+        created in the <b>LogPath</b> directory</td>
     </tr>
     </table>
 
