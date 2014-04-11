@@ -817,7 +817,7 @@ public class SecureNio2Channel extends Nio2Channel  {
 
         try {
             // Prepare the output buffer
-            this.netOutBuffer.clear();
+            netOutBuffer.clear();
             // Wrap the source data into the internal buffer
             SSLEngineResult result = sslEngine.wrap(src, netOutBuffer);
             final int written = result.bytesConsumed();
@@ -827,13 +827,17 @@ public class SecureNio2Channel extends Nio2Channel  {
                     tasks();
                 }
                 // Write data to the channel
-                sc.write(this.netOutBuffer, timeout, unit, attachment,
+                sc.write(netOutBuffer, timeout, unit, attachment,
                         new CompletionHandler<Integer, A>() {
                     @Override
                     public void completed(Integer nBytes, A attach) {
                         if (nBytes.intValue() < 0) {
                             failed(new EOFException(), attach);
+                        } else if (netOutBuffer.hasRemaining()) {
+                            sc.write(netOutBuffer, timeout, unit, attachment, this);
                         } else if (written == 0) {
+                            // Special case, start over to avoid code duplication
+                            writePending = false;
                             write(src, timeout, unit, attachment, handler);
                         } else {
                             // Call the handler completed method with the
@@ -875,7 +879,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             this.unit = unit;
             this.attachment = attachment;
             this.handler = handler;
-            this.pos = offset + 1;
+            this.pos = offset;
         }
         public long writeCount = 0;
         public int pos;
@@ -894,12 +898,14 @@ public class SecureNio2Channel extends Nio2Channel  {
                 if (state.pos == state.offset + state.length) {
                     writePending = false;
                     state.handler.completed(Long.valueOf(state.writeCount), state.attachment);
+                } else if (netOutBuffer.hasRemaining()) {
+                    sc.write(netOutBuffer, state.timeout, state.unit, state, this);
                 } else {
                     try {
                         // Prepare the output buffer
                         netOutBuffer.clear();
                         // Wrap the source data into the internal buffer
-                        SSLEngineResult result = sslEngine.wrap(state.srcs[state.offset], netOutBuffer);
+                        SSLEngineResult result = sslEngine.wrap(state.srcs[state.pos], netOutBuffer);
                         int written = result.bytesConsumed();
                         state.writeCount += written;
                         netOutBuffer.flip();
@@ -907,8 +913,8 @@ public class SecureNio2Channel extends Nio2Channel  {
                             if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
                                 tasks();
                             }
-                            if (written > 0) {
-                                state.offset++;
+                            if (!state.srcs[state.pos].hasRemaining()) {
+                                state.pos++;
                             }
                             // Write data to the channel
                             sc.write(netOutBuffer, state.timeout, state.unit, state, this);
@@ -957,6 +963,9 @@ public class SecureNio2Channel extends Nio2Channel  {
             if (result.getStatus() == Status.OK) {
                 if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
                     tasks();
+                }
+                if (!srcs[offset].hasRemaining()) {
+                    state.pos++;
                 }
                 // Write data to the channel
                 sc.write(netOutBuffer, timeout, unit, state, new GatherCompletionHandler<>(state));
