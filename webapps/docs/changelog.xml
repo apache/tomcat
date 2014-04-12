@@ -88,6 +88,11 @@
         entry is invalidated by being overridden by a new resource in a
         different <code>WebResourceSet</code>. (markt)
       </fix>
+      <fix>
+        <bug>56369</bug>: Ensure that removing an MBean notification listener
+        reverts all the operations performed when adding an MBean notification
+        listener. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
