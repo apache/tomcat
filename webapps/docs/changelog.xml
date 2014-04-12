@@ -115,6 +115,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>56334</bug>: Fix a regression in the handling of back-slash
+        escaping introduced by the fix for <bug>55735</bug>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <scode>
