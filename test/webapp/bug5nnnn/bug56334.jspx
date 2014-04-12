@@ -1,0 +1,26 @@
+<jsp:root version="2.3"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:jsp="http://java.sun.com/JSP/Page"
+    xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <jsp:directive.page contentType="text/plain; charset=ISO-8859-1"/>
+
+    <!-- Test 1: Use \\ in EL in tag attribute -->
+    <c:set var="asd" value="${'\\?resize01'}" />
+    <c:out value="${asd}"/>
+
+    <!-- Test 2a: Use \\\\ in template text -->
+    <set data-value="${'\\\\?resize02a'}" />
+
+    <!-- Test 2b: Use \\\\ in template text -->
+    <set data-value="\\\\x${'\\\\?resize02b'}" />
+
+    <!-- Test 3a: Use \\ in template text -->
+    <set data-value="${'\\?resize03a'}" />
+
+    <!-- Test 3b: Use \\ in template text -->
+    <set data-value="\\x${'\\?resize03b'}" />
+
+    <!-- Test 4: Use \\ in jsp:element -->
+    <jsp:element name="${'\\?resize04'}"></jsp:element>
+</jsp:root>

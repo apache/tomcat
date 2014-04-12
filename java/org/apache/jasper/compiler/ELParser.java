@@ -209,7 +209,7 @@ public class ELParser {
                 prev = 0;
                 if (ch == '\\') {
                     buf.append('\\');
-                    prev = '\\';
+                    continue;
                 } else if (ch == '$'
                         || (!isDeferredSyntaxAllowedAsLiteral && ch == '#')) {
                     buf.append(ch);
@@ -468,18 +468,18 @@ public class ELParser {
 
         @Override
         public void visit(Function n) throws JasperException {
-            output.append(n.getOriginalText());
+            output.append(Generator.escape(n.getOriginalText()));
             output.append('(');
         }
 
         @Override
         public void visit(Text n) throws JasperException {
-            output.append(n.getText());
+            output.append(Generator.escape(n.getText()));
         }
 
         @Override
         public void visit(ELText n) throws JasperException {
-            output.append(n.getText());
+            output.append(Generator.escape(n.getText()));
         }
     }
 }
