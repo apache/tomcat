@@ -53,7 +53,6 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
