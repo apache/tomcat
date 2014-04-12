@@ -934,11 +934,11 @@ public class DefaultServlet extends HttpServlet {
                                 ostream.write(resourceBody);
                             }
                         }
-                        // If a stream was configured, it needs to be copied to
-                        // the output (this method closes the stream)
-                        if (renderResult != null) {
-                            copy(resource, renderResult, ostream);
-                        }
+                    }
+                    // If a stream was configured, it needs to be copied to
+                    // the output (this method closes the stream)
+                    if (renderResult != null) {
+                        copy(resource, renderResult, ostream);
                     }
                 }
             }
