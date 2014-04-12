@@ -205,7 +205,7 @@ public class ReflectionUtil {
             // If a method is found where every parameter matches exactly,
             // return it
             if (exactMatch == paramCount) {
-                getMethod(base.getClass(), m);
+                return getMethod(base.getClass(), m);
             }
 
             candidates.put(m, Integer.valueOf(exactMatch));
