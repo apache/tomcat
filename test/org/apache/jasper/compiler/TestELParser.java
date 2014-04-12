@@ -170,6 +170,18 @@ public class TestELParser {
     }
 
 
+    @Test
+    public void testEscape01() throws JasperException {
+        doTestParser("${'\\\\'}");
+    }
+
+
+    @Test
+    public void testEscape02() throws JasperException {
+        doTestParser("\\\\x${'\\\\'}");
+    }
+
+
     private void doTestParser(String input) throws JasperException {
         Nodes nodes = ELParser.parse(input, false);
 
