@@ -50,7 +50,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  *
- * @author Filip Hanik
  * @version 1.0
  */
 public abstract class AbstractReplicatedMap<K,V>
@@ -110,11 +109,11 @@ public abstract class AbstractReplicatedMap<K,V>
     /**
      * Simple lock object for transfers
      */
-    protected transient Object stateMutex = new Object();
+    protected final transient Object stateMutex = new Object();
     /**
      * A list of members in our map
      */
-    protected transient HashMap<Member, Long> mapMembers = new HashMap<Member, Long>();
+    protected final transient HashMap<Member, Long> mapMembers = new HashMap<Member, Long>();
     /**
      * Our default send options
      */
@@ -206,7 +205,7 @@ public abstract class AbstractReplicatedMap<K,V>
     protected void init(MapOwner owner, Channel channel, String mapContextName,
             long timeout, int channelSendOptions,ClassLoader[] cls, boolean terminate) {
         long start = System.currentTimeMillis();
-        log.info("Initializing AbstractReplicatedMap with context name:"+mapContextName);
+        if (log.isInfoEnabled()) log.info("Initializing AbstractReplicatedMap with context name:"+mapContextName);
         this.mapOwner = owner;
         this.externalLoaders = cls;
         this.channelSendOptions = channelSendOptions;
@@ -427,8 +426,8 @@ public abstract class AbstractReplicatedMap<K,V>
             //check to see if the message is diffable
             MapMessage msg = null;
             if (rentry != null && rentry.isDiffable() && (isDirty || complete)) {
+                rentry.lock();
                 try {
-                    rentry.lock();
                     //construct a diff message
                     msg = new MapMessage(mapContextName, MapMessage.MSG_BACKUP,
                                          true, (Serializable) entry.getKey(), null,
@@ -441,7 +440,6 @@ public abstract class AbstractReplicatedMap<K,V>
                 } finally {
                     rentry.unlock();
                 }
-
             }
             if (msg == null && complete) {
                 //construct a complete
@@ -630,17 +628,15 @@ public abstract class AbstractReplicatedMap<K,V>
             MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
             if ( entry==null ) {
                 entry = new MapEntry<K,V>((K) mapmsg.getKey(), (V) mapmsg.getValue());
-                entry.setBackup(false);
-                entry.setProxy(true);
-                entry.setBackupNodes(mapmsg.getBackupNodes());
-                entry.setPrimary(mapmsg.getPrimary());
-                innerMap.put(entry.getKey(), entry);
-            } else {
-                entry.setProxy(true);
-                entry.setBackup(false);
-                entry.setBackupNodes(mapmsg.getBackupNodes());
-                entry.setPrimary(mapmsg.getPrimary());
+                MapEntry<K,V> old = innerMap.putIfAbsent(entry.getKey(), entry);
+                if (old != null) {
+                    entry = old;
+                }
             }
+            entry.setProxy(true);
+            entry.setBackup(false);
+            entry.setBackupNodes(mapmsg.getBackupNodes());
+            entry.setPrimary(mapmsg.getPrimary());
         }
 
         if (mapmsg.getMsgType() == MapMessage.MSG_REMOVE) {
@@ -666,8 +662,8 @@ public abstract class AbstractReplicatedMap<K,V>
                 if (entry.getValue() instanceof ReplicatedMapEntry) {
                     ReplicatedMapEntry diff = (ReplicatedMapEntry) entry.getValue();
                     if (mapmsg.isDiff()) {
+                        diff.lock();
                         try {
-                            diff.lock();
                             diff.applyDiff(mapmsg.getDiffValue(), 0, mapmsg.getDiffValue().length);
                         } catch (Exception x) {
                             log.error("Unable to apply diff to key:" + entry.getKey(), x);
@@ -777,7 +773,6 @@ public abstract class AbstractReplicatedMap<K,V>
                 return; //the member was not part of our map.
             }
         }
-
         if (log.isInfoEnabled())
             log.info("Member["+member+"] disappeared. Related map entries will be relocated to the new node.");
         long start = System.currentTimeMillis();
@@ -1049,17 +1044,16 @@ public abstract class AbstractReplicatedMap<K,V>
 
     @Override
     public boolean containsValue(Object value) {
-        if ( value == null ) {
-            return innerMap.containsValue(value);
-        } else {
-            Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
-            while (i.hasNext()) {
-                Map.Entry<K,MapEntry<K,V>> e = i.next();
-                MapEntry<K,V> entry = innerMap.get(e.getKey());
-                if (entry!=null && entry.isActive() && value.equals(entry.getValue())) return true;
-            }//while
-            return false;
-        }//end if
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
+        while (i.hasNext()) {
+            Map.Entry<K,MapEntry<K,V>> e = i.next();
+            MapEntry<K,V> entry = innerMap.get(e.getKey());
+            if (entry!=null && entry.isActive() && value.equals(entry.getValue())) return true;
+        }
+        return false;
     }
 
     @Override
@@ -1271,8 +1265,8 @@ public abstract class AbstractReplicatedMap<K,V>
         public void apply(byte[] data, int offset, int length, boolean diff) throws IOException, ClassNotFoundException {
             if (isDiffable() && diff) {
                 ReplicatedMapEntry rentry = (ReplicatedMapEntry) value;
+                rentry.lock();
                 try {
-                    rentry.lock();
                     rentry.applyDiff(data, offset, length);
                 } finally {
                     rentry.unlock();
