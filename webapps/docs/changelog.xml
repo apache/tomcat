@@ -99,13 +99,19 @@
         <bug>56336</bug>: AJP output corruption and errors. (remm)
       </fix>
       <fix>
-        Handle incomplete writes in NIO2, just in case. (remm)
+        Handle incomplete writes in NIO2. (remm)
       </fix>
       <fix>
         Code cleanups and i18n in NIO2. (remm)
       </fix>
       <fix>
         Fix extra onDataAvailable calls. (remm)
+      </fix>
+      <fix>
+        Fix gather writes in NIO2 SSL. (remm)
+      </fix>
+      <fix>
+        Upgrade the NIO2 connectors to beta, but still not ready for production. (remm)
       </fix>
     </changelog>
   </subsection>
