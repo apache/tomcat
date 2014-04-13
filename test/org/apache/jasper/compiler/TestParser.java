@@ -379,7 +379,7 @@ public class TestParser extends TomcatBaseTest {
     public void testBug56334() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp");
+        File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         StandardContext ctxt = (StandardContext) tomcat.addWebapp(null,
                 "/test", appDir.getAbsolutePath());
@@ -394,8 +394,6 @@ public class TestParser extends TomcatBaseTest {
                 "/test/bug5nnnn/bug56334.jspx");
 
         String result = res.toString();
-
-        System.out.println(result);
 
         // NOTE: The expected values must themselves be \ escaped below
         Assert.assertTrue(result, result.contains("\\?resize01"));
