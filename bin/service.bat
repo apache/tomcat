@@ -75,7 +75,7 @@ set "EXECUTABLE=%CATALINA_HOME%\bin\tomcat@VERSION_MAJOR@.exe"
 
 rem Set default Service name
 set SERVICE_NAME=Tomcat@VERSION_MAJOR@
-set DISPLAYNAME=Apache Tomcat @VERSION_MAJOR@ %SERVICE_NAME%
+set DISPLAYNAME=Apache Tomcat @VERSION_MAJOR_MINOR@ %SERVICE_NAME%
 
 if "x%1x" == "xx" goto displayUsage
 set SERVICE_CMD=%1
@@ -85,7 +85,7 @@ if "x%1x" == "xx" goto checkServiceCmd
 if "x%1x" == "x/userx" goto runAsUser
 if "x%1x" == "x--userx" goto runAsUser
 set SERVICE_NAME=%1
-set DISPLAYNAME=Apache Tomcat @VERSION_MAJOR@ %1
+set DISPLAYNAME=Apache Tomcat @VERSION_MAJOR_MINOR@ %1
 shift
 if "x%1x" == "xx" goto checkServiceCmd
 goto checkUser
