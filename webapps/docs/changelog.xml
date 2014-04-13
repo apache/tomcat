@@ -8570,6 +8570,10 @@
         <bug>49955</bug>: Improvement and correction of Building Tomcat guide.
         Based on a patch from Wesley Acheson. (timw)
       </update>
+      <update>
+        <bug>49993</bug>: Improve check for <code>JAVA_HOME</code> and add
+        support for <code>JRE_HOME</code> in <code>service.bat</code>. (mturk)
+      </update>
     </changelog>
   </subsection>
 </section>
