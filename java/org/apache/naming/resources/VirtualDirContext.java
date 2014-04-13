@@ -69,7 +69,7 @@ public class VirtualDirContext extends FileDirContext {
      * must be separated by a comma.
      * </p>
      * Example: <code>
-     * /=/Users/slaurent/mywebapp/src/main/webapp;/pictures=/Users/slaurent/sharedpictures
+     * /=/Users/slaurent/mywebapp/src/main/webapp,/pictures=/Users/slaurent/sharedpictures
      * </code>
      * <p>
      * The path to the docBase must not be added here, otherwise resources would
