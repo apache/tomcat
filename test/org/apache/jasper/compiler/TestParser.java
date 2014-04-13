@@ -403,8 +403,6 @@ public class TestParser extends TomcatBaseTest {
 
         String result = res.toString();
 
-        System.out.println(result);
-
         // NOTE: The expected values must themselves be \ escaped below
         Assert.assertTrue(result, result.contains("\\?resize01"));
         Assert.assertTrue(result, result.contains("<set data-value=\"\\\\?resize02a\"/>"));
