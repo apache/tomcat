@@ -204,7 +204,8 @@
       </scode>
       <fix>
         Align DisplayName of Tomcat installed by <code>service.bat</code> with
-        one installed by the *.exe installer. (kkolinko)
+        one installed by the *.exe installer. Print a warning in case if neither
+        server nor client jvm is found by <code>service.bat</code>. (kkolinko)
       </fix>
     </changelog>
   </subsection>
