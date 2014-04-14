@@ -128,12 +128,13 @@ echo Using CATALINA_BASE:    "%CATALINA_BASE%"
 echo Using JAVA_HOME:        "%JAVA_HOME%"
 echo Using JRE_HOME:         "%JRE_HOME%"
 
-rem Set the server jvm from JAVA_HOME
+rem Try to use the server jvm
 set "JVM=%JRE_HOME%\bin\server\jvm.dll"
 if exist "%JVM%" goto foundJvm
-rem Set the client jvm from JAVA_HOME
+rem Try to use the client jvm
 set "JVM=%JRE_HOME%\bin\client\jvm.dll"
 if exist "%JVM%" goto foundJvm
+echo Warning: Neither 'server' nor 'client' jvm.dll was found at JRE_HOME.
 set JVM=auto
 :foundJvm
 echo Using JVM:              "%JVM%"
