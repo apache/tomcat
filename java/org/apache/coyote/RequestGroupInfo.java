@@ -26,6 +26,7 @@ import java.util.ArrayList;
 public class RequestGroupInfo {
     private final ArrayList<RequestInfo> processors = new ArrayList<>();
     private long deadMaxTime = 0;
+    private long deadMaxStartTime = 0;
     private long deadProcessingTime = 0;
     private int deadRequestCount = 0;
     private int deadErrorCount = 0;
@@ -38,8 +39,10 @@ public class RequestGroupInfo {
 
     public synchronized void removeRequestProcessor( RequestInfo rp ) {
         if( rp != null ) {
-            if( deadMaxTime < rp.getMaxTime() )
+            if( deadMaxTime < rp.getMaxTime() ) {
                 deadMaxTime = rp.getMaxTime();
+                deadMaxStartTime = rp.getMaxStartTime();
+            }
             deadProcessingTime += rp.getProcessingTime();
             deadRequestCount += rp.getRequestCount();
             deadErrorCount += rp.getErrorCount();
@@ -65,6 +68,27 @@ public class RequestGroupInfo {
         for( int i=0; i<processors.size(); i++ ) {
             RequestInfo rp=processors.get( i );
             rp.setMaxTime(maxTime);
+        }
+    }
+    
+    public synchronized long getMaxStartTime() {
+        long maxStartTime=deadMaxStartTime;
+        long maxTime = deadMaxTime;
+        for( int i=0; i<processors.size(); i++ ) {
+            RequestInfo rp=processors.get( i );
+            if( maxTime < rp.getMaxTime() ) {
+            	maxTime=rp.getMaxTime();
+            	maxStartTime=rp.getMaxStartTime();
+            }
+        }
+        return maxStartTime;
+    }
+    
+    public synchronized void setMaxStartTime(long maxStartTime) {
+        deadMaxStartTime = maxStartTime;
+        for( int i=0; i<processors.size(); i++ ) {
+            RequestInfo rp=processors.get( i );
+            rp.setMaxStartTime(maxStartTime);
         }
     }
 
@@ -159,6 +183,7 @@ public class RequestGroupInfo {
         this.setRequestCount(0);
         this.setProcessingTime(0);
         this.setMaxTime(0);
+        this.setMaxStartTime(0);
         this.setErrorCount(0);
     }
 }
