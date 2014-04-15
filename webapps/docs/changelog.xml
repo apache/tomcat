@@ -67,6 +67,10 @@
         7&apos;s but it is still buggy. (markt)
       </fix>
       <fix>
+        <bug>56027</bug>: Add more nuanced options for managing FIPS mode in the
+        AprLifecycleListener. (schultz)
+      </fix>
+      <fix>
         <bug>56321</bug>: When a WAR is modified, undeploy the web application
         before deleting any expanded directory as the undeploy process may
         refer to classes that need to be loaded from the expanded directory. If
