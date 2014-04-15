@@ -60,6 +60,10 @@
         7&apos;s but it is still buggy. (markt)
       </fix>
       <fix>
+        <bug>56027</bug>: Add more nuanced options for managing FIPS mode in the
+        AprLifecycleListener. (schultz)
+      </fix>
+      <fix>
         <bug>56320</bug>: Fix a file descriptor leak in the default servlet when
         sendfile is used. (markt)
       </fix>
