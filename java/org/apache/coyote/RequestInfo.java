@@ -136,8 +136,6 @@ public class RequestInfo  {
     private long processingTime;
     // The longest response time for a request
     private long maxTime;
-    // The longest response start time for a request
-    private long maxStartTime;
     // URI of the request that took maxTime
     private String maxRequestUri;
 
@@ -166,7 +164,6 @@ public class RequestInfo  {
         processingTime+=time;
         if( maxTime < time ) {
             maxTime=time;
-            maxStartTime=t0;
             maxRequestUri=req.requestURI().toString();
         }
     }
@@ -206,17 +203,9 @@ public class RequestInfo  {
     public long getMaxTime() {
         return maxTime;
     }
-    
+
     public void setMaxTime(long maxTime) {
         this.maxTime = maxTime;
-    }
-    
-    public long getMaxStartTime() {
-    	return maxStartTime;
-    }
-    
-    public void setMaxStartTime(long maxStartTime) {
-    	this.maxStartTime = maxStartTime;
     }
 
     public String getMaxRequestUri() {
