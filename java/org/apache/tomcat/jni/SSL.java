@@ -230,6 +230,14 @@ public final class SSL {
     public static native int initialize(String engine);
 
     /**
+     * Get the status of FIPS Mode.
+     *
+     * @return 0 If OpenSSL is not in FIPS mode, 1 if OpenSSL is in FIPS Mode.
+     * @throws Exception If tcnative was not compiled with FIPS Mode available.
+     */
+    public static native int fipsModeGet();
+
+    /**
      * Enable/Disable FIPS Mode.
      *
      * @param mode 1 - enable, 0 - disable

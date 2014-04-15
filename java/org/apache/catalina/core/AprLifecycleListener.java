@@ -70,6 +70,18 @@ public class AprLifecycleListener
     protected static boolean aprInitialized = false;
     protected static boolean aprAvailable = false;
     protected static boolean fipsModeActive = false;
+    /**
+     * FIPS_mode documentation states that the return value will be
+     * whatever value was originally passed-in to FIPS_mode_set().
+     * FIPS_mode_set docs say the argument should be non-zero to enter
+     * FIPS mode, and that upon success, the return value will be the
+     * same as the argument passed-in. Docs also highly recommend
+     * that the value "1" be used "to avoid compatibility issues".
+     * In order to avoid the argument and check-value from getting out
+     * of sync for some reason, we are using the class constant
+     * FIPS_ON here.
+     */
+    private static final int FIPS_ON = 1;
 
     protected static final Object lock = new Object();
 
@@ -110,7 +122,7 @@ public class AprLifecycleListener
                     }
                 }
                 // Failure to initialize FIPS mode is fatal
-                if ("on".equalsIgnoreCase(FIPSMode) && !isFIPSModeActive()) {
+                if (!(null == FIPSMode || "off".equalsIgnoreCase(FIPSMode)) && !isFIPSModeActive()) {
                     Error e = new Error(
                             sm.getString("aprListener.initializeFIPSFailed"));
                     // Log here, because thrown error might be not logged
@@ -252,13 +264,59 @@ public class AprLifecycleListener
         method = clazz.getMethod(methodName, paramTypes);
         method.invoke(null, paramValues);
 
-        if("on".equalsIgnoreCase(FIPSMode)) {
+        final boolean enterFipsMode;
+
+        if("on".equalsIgnoreCase(FIPSMode)
+           || "require".equalsIgnoreCase(FIPSMode)) {
+            // FIPS_mode documentation states that the return value will be
+            // whatever value was originally passed-in to FIPS_mode_set().
+            // FIPS_mode_set docs say the argument should be non-zero to enter
+            // FIPS mode, and that upon success, the return value will be the
+            // same as the argument passed-in. Docs also highly recommend
+            // that the value "1" be used "to avoid compatibility issues".
+            // In order to avoid the argument and check-value from getting out
+            // of sync for some reason, we are using the class constant
+            // FIPS_ON here.
+            final int fipsModeState = SSL.fipsModeGet();
+
+            if(log.isDebugEnabled())
+                log.debug(sm.getString("aprListener.currentFIPSMode",
+                                       Integer.valueOf(fipsModeState)));
+
+            // Return values: 0=Not in FIPS mode, 1=In FIPS mode,
+            // exception if FIPS totally unavailable
+            enterFipsMode = 1 != fipsModeState;
+
+            if("on".equalsIgnoreCase(FIPSMode)) {
+                if(!enterFipsMode)
+                    log.info(sm.getString("aprListener.skipFIPSInitialization"));
+            } else if("require".equalsIgnoreCase(FIPSMode)) {
+                if(enterFipsMode) {
+                    String message = sm.getString("aprListener.alreadyInFIPSMode");
+                    log.error(message);
+                    throw new IllegalStateException(message);
+                }
+            }
+        }
+        else if("enter".equalsIgnoreCase(FIPSMode)) {
+            enterFipsMode = true;
+        } else
+            enterFipsMode = false;
+
+        if(enterFipsMode) {
             log.info(sm.getString("aprListener.initializingFIPS"));
 
-            int result = SSL.fipsModeSet(1);
+            // FIPS_mode_set docs say the argument should be non-zero to enter
+            // FIPS mode, and that upon success, the return value will be the
+            // same as the argument passed-in. Docs also highly recommend
+            // that the value "1" be used "to avoid compatibility issues".
+            // In order to avoid the argument and check-value from getting out
+            // of sync for some reason, we are using the class constant
+            // FIPS_ON here.
+            final int result = SSL.fipsModeSet(FIPS_ON);
 
-            // success is defined as return value = 1
-            if(1 == result) {
+            // success is defined as return value = last argument to FIPS_mode_set()
+            if(FIPS_ON == result) {
                 fipsModeActive = true;
 
                 log.info(sm.getString("aprListener.initializeFIPSSuccess"));
