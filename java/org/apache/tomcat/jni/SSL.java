@@ -235,7 +235,7 @@ public final class SSL {
      * @return 0 If OpenSSL is not in FIPS mode, 1 if OpenSSL is in FIPS Mode.
      * @throws Exception If tcnative was not compiled with FIPS Mode available.
      */
-    public static native int fipsModeGet();
+    public static native int fipsModeGet() throws Exception;
 
     /**
      * Enable/Disable FIPS Mode.

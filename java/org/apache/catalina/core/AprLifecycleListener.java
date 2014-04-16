@@ -277,7 +277,12 @@ public class AprLifecycleListener
             // In order to avoid the argument and check-value from getting out
             // of sync for some reason, we are using the class constant
             // FIPS_ON here.
-            final int fipsModeState = SSL.fipsModeGet();
+            int fipsModeState;
+            try {
+                fipsModeState = SSL.fipsModeGet();
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
 
             if(log.isDebugEnabled())
                 log.debug(sm.getString("aprListener.currentFIPSMode",
