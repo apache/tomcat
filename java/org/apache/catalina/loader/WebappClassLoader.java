@@ -345,12 +345,6 @@ public class WebappClassLoader extends URLClassLoader
 
 
     /**
-     * Has this component been started?
-     */
-    protected boolean started = false;
-
-
-    /**
      * need conversion for properties files
      */
     protected boolean needConvert = false;
@@ -425,6 +419,9 @@ public class WebappClassLoader extends URLClassLoader
      * resources.
      */
     private boolean hasExternalRepositories = false;
+
+    private volatile LifecycleState state = LifecycleState.NEW;
+
 
     // ------------------------------------------------------------- Properties
 
@@ -714,7 +711,7 @@ public class WebappClassLoader extends URLClassLoader
 
         result.resources = this.resources;
         result.delegate = this.delegate;
-        result.started = this.started;
+        result.state = this.state;
         result.needConvert = this.needConvert;
         result.clearReferencesStatic = this.clearReferencesStatic;
         result.clearReferencesStopThreads = this.clearReferencesStopThreads;
@@ -848,7 +845,7 @@ public class WebappClassLoader extends URLClassLoader
             log.debug("    findClass(" + name + ")");
 
         // Cannot load anything from local repositories if class loader is stopped
-        if (!started) {
+        if (!state.isAvailable()) {
             throw new ClassNotFoundException(name);
         }
 
@@ -1211,7 +1208,7 @@ public class WebappClassLoader extends URLClassLoader
         Class<?> clazz = null;
 
         // Log access to stopped classloader
-        if (!started) {
+        if (!state.isAvailable()) {
             try {
                 throw new IllegalStateException();
             } catch (IllegalStateException e) {
@@ -1419,7 +1416,7 @@ public class WebappClassLoader extends URLClassLoader
      */
     @Override
     public LifecycleState getState() {
-        return LifecycleState.NEW;
+        return state;
     }
 
 
@@ -1434,7 +1431,7 @@ public class WebappClassLoader extends URLClassLoader
 
     @Override
     public void init() {
-        // NOOP
+        state = LifecycleState.INITIALIZED;
     }
 
 
@@ -1445,6 +1442,8 @@ public class WebappClassLoader extends URLClassLoader
      */
     @Override
     public void start() throws LifecycleException {
+
+        state = LifecycleState.STARTING_PREP;
 
         WebResource classes = resources.getResource("/WEB-INF/classes");
         if (classes.isDirectory() && classes.canRead()) {
@@ -1459,7 +1458,8 @@ public class WebappClassLoader extends URLClassLoader
             }
         }
 
-        started = true;
+        state = LifecycleState.STARTING;
+
         String encoding = null;
         try {
             encoding = System.getProperty("file.encoding");
@@ -1470,12 +1470,9 @@ public class WebappClassLoader extends URLClassLoader
             needConvert = true;
         }
 
+        state = LifecycleState.STARTED;
     }
 
-
-    public boolean isStarted() {
-        return started;
-    }
 
     /**
      * Stop the class loader.
@@ -1485,11 +1482,13 @@ public class WebappClassLoader extends URLClassLoader
     @Override
     public void stop() throws LifecycleException {
 
+        state = LifecycleState.STOPPING_PREP;
+
         // Clearing references should be done before setting started to
         // false, due to possible side effects
         clearReferences();
 
-        started = false;
+        state = LifecycleState.STOPPING;
 
         resourceEntries.clear();
         jarModificationTimes.clear();
@@ -1497,12 +1496,14 @@ public class WebappClassLoader extends URLClassLoader
 
         permissionList.clear();
         loaderPC.clear();
+
+        state = LifecycleState.STOPPED;
     }
 
 
     @Override
     public void destroy() {
-        // NOOP
+        state = LifecycleState.DESTROYED;
     }
 
 
@@ -2512,7 +2513,7 @@ public class WebappClassLoader extends URLClassLoader
      */
     protected ResourceEntry findResourceInternal(final String name, final String path) {
 
-        if (!started) {
+        if (!state.isAvailable()) {
             log.info(sm.getString("webappClassLoader.stopped", name));
             return null;
         }

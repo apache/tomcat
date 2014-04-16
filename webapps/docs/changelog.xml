@@ -97,6 +97,11 @@
         reverts all the operations performed when adding an MBean notification
         listener. (markt)
       </fix>
+      <scode>
+        Improve implementation of <code>Lifecycle</code> for
+        <code>WebappClassLoader</code>. State is now correctly reported rather
+        than always reporting as <code>NEW</code>. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
