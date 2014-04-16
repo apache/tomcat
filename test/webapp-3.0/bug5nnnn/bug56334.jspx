@@ -1,4 +1,4 @@
-<jsp:root version="2.3"
+<jsp:root version="2.2"
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:jsp="http://java.sun.com/JSP/Page"
     xmlns:c="http://java.sun.com/jsp/jstl/core">
