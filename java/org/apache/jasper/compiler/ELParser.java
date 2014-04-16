@@ -290,29 +290,31 @@ public class ELParser {
      *
      * @return The escaped version of the input
      */
-    private static String escapeStringLiteral(String input) {
+    private static String escapeELText(String input) {
         int len = input.length();
-        if (len < 2) {
-            // Can't possibly be quoted
-            return input;
-        }
-        char quote = input.charAt(0);
-        if (quote != '\'' && quote != '\"') {
-            throw new IllegalArgumentException(Localizer.getMessage(
-                    "org.apache.jasper.compiler.ELParser.invalidQuotesForStringLiteral",
-                    input));
+        char quote = 0;
+        int lastAppend = 0;
+
+        if (len > 1) {
+            // Might be quoted
+            quote = input.charAt(0);
+            if (quote == '\'' || quote == '\"') {
+                if (input.charAt(len - 1) != quote) {
+                    throw new IllegalArgumentException(Localizer.getMessage(
+                            "org.apache.jasper.compiler.ELParser.invalidQuotesForStringLiteral",
+                            input));
+                }
+                lastAppend = 1;
+                len--;
+            } else {
+                quote = 0;
+            }
         }
 
-        int lastAppend = 1;
         StringBuilder output = null;
-        if (input.charAt(len - 1) != quote) {
-            throw new IllegalArgumentException(Localizer.getMessage(
-                    "org.apache.jasper.compiler.ELParser.invalidQuotesForStringLiteral",
-                    input));
-        }
-        for (int i = 1; i < len - 1; i++) {
+        for (int i = lastAppend; i < len; i++) {
             char ch = input.charAt(i);
-            if (ch == '\\' || ch == '\'' || ch == '\"') {
+            if (ch == '\\' || ch == quote) {
                 if (output == null) {
                     output = new StringBuilder(len + 20);
                     output.append(quote);
@@ -326,8 +328,10 @@ public class ELParser {
         if (output == null) {
             return input;
         } else {
-            // 'len' rather than 'len - 1' to add final quote
             output.append(input.substring(lastAppend, len));
+            if (quote != 0) {
+                output.append(quote);
+            }
             return output.toString();
         }
     }
@@ -582,7 +586,7 @@ public class ELParser {
 
         @Override
         public void visit(ELText n) throws JasperException {
-            output.append(escapeStringLiteral(n.getText()));
+            output.append(escapeELText(n.getText()));
         }
     }
 }
