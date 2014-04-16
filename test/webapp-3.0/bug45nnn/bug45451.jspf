@@ -23,11 +23,6 @@
 <tags:echo echo="06-\\${1+1}" />
 <tags:echo echo="07-\\\${1+1}" />
 <tags:echo echo="08-\\\\${1+1}" />
-<tags:echo echo="04-${1+1}" />
-<tags:echo echo="05-\${1+1}" />
-<tags:echo echo="06-\\${1+1}" />
-<tags:echo echo="07-\\\${1+1}" />
-<tags:echo echo="08-\\\\${1+1}" />
 <tags:echo-deferred echo="09-#{1+1}" />
 <tags:echo-deferred echo="10-\#{1+1}" />
 <tags:echo-deferred echo="11-\\#{1+1}" />
