@@ -18,9 +18,8 @@ package org.apache.catalina.tribes.group;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -74,13 +73,25 @@ public class TestGroupChannelMemberArrival {
         Thread.sleep(5000);
         System.out.println(System.currentTimeMillis()
                 + " All channels started.");
+        StringBuilder arrivalLengthErrors = new StringBuilder();
         for (int i = listeners.length - 1; i >= 0; i--) {
             TestMbrListener listener = listeners[i];
             synchronized (listener.members) {
-                assertEquals("Checking member arrival length (" + listener.name
-                        + ")", channels.length - 1, listener.members.size());
+                if (channels.length - 1 != listener.members.size()) {
+                    arrivalLengthErrors.append("Checking member arrival length for [");
+                    arrivalLengthErrors.append(listener.name);
+                    arrivalLengthErrors.append("]. Was [");
+                    arrivalLengthErrors.append(listener.members.size());
+                    arrivalLengthErrors.append("] but should have been [");
+                    arrivalLengthErrors.append(channels.length - 1);
+                    arrivalLengthErrors.append("]");
+                    arrivalLengthErrors.append('\n');
+                }
             }
         }
+        // Note if this fails for all listeners check multicast is working with
+        // org.apache.catalina.tribes.TesterMulticast
+        Assert.assertTrue(arrivalLengthErrors.toString(), arrivalLengthErrors.length() == 0);
         System.out.println(System.currentTimeMillis()
                 + " Members arrival counts checked.");
     }
