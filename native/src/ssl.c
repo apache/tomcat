@@ -221,6 +221,14 @@ static const jint supported_ssl_opts = 0
 
 static int ssl_tmp_key_init_rsa(int bits, int idx)
 {
+#ifdef OPENSSL_FIPS
+    /**
+     * With FIPS mode short RSA keys cannot be
+     * generated.
+     */
+    if (bits < 1024)
+        return 0;
+#endif
     if (!(SSL_temp_keys[idx] =
           RSA_generate_key(bits, RSA_F4, NULL, NULL)))
         return 1;

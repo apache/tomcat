@@ -36,6 +36,14 @@
   new documentation project for Tomcat Native was started.
   </p>
 </section>
+<section name="Changes between 1.1.30 and 1.1.31">
+  <changelog>
+    <fix>
+      <bug>56396</bug>: Do not create RSA keys shorter the 1024 bits
+      if inside FIPS mode. (mturk)
+    </fix>      
+  </changelog>
+</section>
 <section name="Changes between 1.1.29 and 1.1.30">
   <changelog>
     <fix>
