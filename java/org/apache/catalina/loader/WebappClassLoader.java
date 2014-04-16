@@ -1503,6 +1503,13 @@ public class WebappClassLoader extends URLClassLoader
 
     @Override
     public void destroy() {
+        state = LifecycleState.DESTROYING;
+
+        try {
+            super.close();
+        } catch (IOException ioe) {
+            log.warn(sm.getString("webappClassLoader.superCloseFail"), ioe);
+        }
         state = LifecycleState.DESTROYED;
     }
 
