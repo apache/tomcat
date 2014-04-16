@@ -135,9 +135,10 @@ public class TldCache {
                     conn.getInputStream().close();
                 }
             }
-            Jar jar = tldResourcePath.getJar();
-            if (jar != null) {
-                result[1] = jar.getLastModified(tldResourcePath.getEntryName());
+            try (Jar jar = tldResourcePath.getJar()) {
+                if (jar != null) {
+                    result[1] = jar.getLastModified(tldResourcePath.getEntryName());
+                }
             }
         } catch (IOException e) {
             // Ignore (shouldn't happen)
