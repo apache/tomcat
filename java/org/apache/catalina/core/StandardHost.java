@@ -733,7 +733,7 @@ public class StandardHost extends ContainerBase implements Host {
                 childClassLoaders.entrySet()) {
             ClassLoader cl = entry.getKey();
             if (cl instanceof WebappClassLoader) {
-                if (!((WebappClassLoader) cl).isStarted()) {
+                if (!((WebappClassLoader) cl).getState().isAvailable()) {
                     result.add(entry.getValue());
                 }
             }
