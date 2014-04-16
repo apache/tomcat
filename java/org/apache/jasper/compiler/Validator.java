@@ -1091,6 +1091,7 @@ class Validator {
                     pageInfo.isDeferredSyntaxAllowedAsLiteral() ||
                     libraryVersion < 2.1;
 
+                String attributeValue;
                 ELNode.Nodes el = null;
                 if (!runtimeExpression && !pageInfo.isELIgnored()) {
                     el = ELParser.parse(attrs.getValue(i),
@@ -1115,6 +1116,14 @@ class Validator {
                             }
                         }
                     }
+                    if (elExpression) {
+                        attributeValue = attrs.getValue(i);
+                    } else {
+                        // Should be a single Text node
+                        attributeValue = ((ELNode.Text) el.iterator().next()).getText();
+                    }
+                } else {
+                    attributeValue = attrs.getValue(i);
                 }
 
                 boolean expression = runtimeExpression || elExpression;
@@ -1183,7 +1192,7 @@ class Validator {
                                             Boolean.TYPE == expectedClass ||
                                             expectedClass.isEnum()) {
                                         try {
-                                            expressionFactory.coerceToType(attrs.getValue(i), expectedClass);
+                                            expressionFactory.coerceToType(attributeValue, expectedClass);
                                         } catch (Exception e) {
                                             err.jspError
                                                 (n, "jsp.error.coerce_to_type",
@@ -1193,9 +1202,9 @@ class Validator {
                                 }
 
                                 jspAttrs[i] = new Node.JspAttribute(tldAttr,
-                                        attrs.getQName(i), attrs.getURI(i), attrs
-                                                .getLocalName(i),
-                                        attrs.getValue(i), false, null, false);
+                                        attrs.getQName(i), attrs.getURI(i),
+                                        attrs.getLocalName(i),
+                                        attributeValue, false, null, false);
                             } else {
 
                                 if (deferred && !tldAttr.isDeferredMethod() && !tldAttr.isDeferredValue()) {
@@ -1215,7 +1224,7 @@ class Validator {
                                     jspAttrs[i] = new Node.JspAttribute(tldAttr,
                                             attrs.getQName(i), attrs.getURI(i),
                                             attrs.getLocalName(i),
-                                            attrs.getValue(i), false, el, false);
+                                            attributeValue, false, el, false);
                                     ELContextImpl ctx = new ELContextImpl(
                                             expressionFactory);
                                     ctx.setFunctionMapper(getFunctionMapper(el));
@@ -1230,8 +1239,8 @@ class Validator {
                                     // Runtime expression
                                     jspAttrs[i] = getJspAttribute(tldAttr,
                                             attrs.getQName(i), attrs.getURI(i),
-                                            attrs.getLocalName(i), attrs
-                                            .getValue(i), n, false);
+                                            attrs.getLocalName(i),
+                                            attributeValue, n, false);
                                 }
                             }
 
@@ -1243,16 +1252,15 @@ class Validator {
                                                 tldAttr.getName());
                             }
                             jspAttrs[i] = new Node.JspAttribute(tldAttr,
-                                    attrs.getQName(i), attrs.getURI(i), attrs
-                                            .getLocalName(i),
-                                    attrs.getValue(i), false, null, false);
+                                    attrs.getQName(i), attrs.getURI(i),
+                                    attrs.getLocalName(i),
+                                    attributeValue, false, null, false);
                         }
                         if (expression) {
                             tagDataAttrs.put(attrs.getQName(i),
                                     TagData.REQUEST_TIME_VALUE);
                         } else {
-                            tagDataAttrs.put(attrs.getQName(i), attrs
-                                    .getValue(i));
+                            tagDataAttrs.put(attrs.getQName(i), attributeValue);
                         }
                         found = true;
                         break;
@@ -1261,8 +1269,8 @@ class Validator {
                 if (!found) {
                     if (tagInfo.hasDynamicAttributes()) {
                         jspAttrs[i] = getJspAttribute(null, attrs.getQName(i),
-                                attrs.getURI(i), attrs.getLocalName(i), attrs
-                                        .getValue(i), n, true);
+                                attrs.getURI(i), attrs.getLocalName(i),
+                                attributeValue, n, true);
                     } else {
                         err.jspError(n, "jsp.error.bad_attribute", attrs
                                 .getQName(i), n.getLocalName());
@@ -1387,7 +1395,8 @@ class Validator {
                         // The wrinkle is that the output of any EL must not be
                         // re-escaped as that must be output as is.
                         if (el != null) {
-                            XmlEscapeNonELVisitor v = new XmlEscapeNonELVisitor();
+                            XmlEscapeNonELVisitor v = new XmlEscapeNonELVisitor(
+                                    pageInfo.isDeferredSyntaxAllowedAsLiteral());
                             el.visit(v);
                             value = v.getText();
                         } else {
@@ -1431,6 +1440,11 @@ class Validator {
 
 
         private static class XmlEscapeNonELVisitor extends ELParser.TextBuilder {
+
+            protected XmlEscapeNonELVisitor(
+                    boolean isDeferredSyntaxAllowedAsLiteral) {
+                super(isDeferredSyntaxAllowedAsLiteral);
+            }
 
             @Override
             public void visit(Text n) throws JasperException {

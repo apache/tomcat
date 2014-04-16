@@ -504,6 +504,6 @@ public class TestELInJsp extends TomcatBaseTest {
 
     // Assertion for text contained with <p></p>, e.g. printed by tags:echo
     private static void assertEcho(String result, String expected) {
-        assertTrue(result.indexOf("<p>" + expected + "</p>") > 0);
+        assertTrue(result, result.indexOf("<p>" + expected + "</p>") > 0);
     }
 }

@@ -44,6 +44,15 @@ public class TestELProcessor {
 
 
     @Test
+    public void testEval03() {
+        ELProcessor elp = new ELProcessor();
+        // Note \ is escaped as \\ in Java source code
+        String result = (String) elp.eval("'\\\\'");
+        Assert.assertEquals("\\", result);
+    }
+
+
+    @Test
     public void testDefineFunctionMethod01() throws Exception {
         ELProcessor elp = new ELProcessor();
         elp.defineFunction("fn", "toBoolean",

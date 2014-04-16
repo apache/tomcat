@@ -206,15 +206,22 @@ public class ELParser {
         while (hasNextChar()) {
             char ch = nextChar();
             if (prev == '\\') {
-                prev = 0;
-                if (ch == '\\') {
+                if (ch == '$' || (!isDeferredSyntaxAllowedAsLiteral && ch == '#')) {
+                    prev = 0;
+                    buf.append(ch);
+                    continue;
+                } else if (ch == '\\') {
+                    // Not an escape (this time).
+                    // Optimisation - no need to set prev as it is unchanged
                     buf.append('\\');
                     continue;
-                } else if (ch == '$'
-                        || (!isDeferredSyntaxAllowedAsLiteral && ch == '#')) {
+                } else {
+                    // Not an escape
+                    prev = 0;
+                    buf.append('\\');
                     buf.append(ch);
+                    continue;
                 }
-                // else error!
             } else if (prev == '$'
                     || (!isDeferredSyntaxAllowedAsLiteral && prev == '#')) {
                 if (ch == '{') {
@@ -237,6 +244,90 @@ public class ELParser {
         }
         return buf.toString();
     }
+
+
+    /**
+     * Escape '\\', '$' and '#', inverting the unescaping performed in
+     * {@link #skipUntilEL()}.
+     *
+     * @param input Non-EL input to be escaped
+     * @param isDeferredSyntaxAllowedAsLiteral
+     *
+     * @return The escaped version of the input
+     */
+    private static String escapeLiteralExpression(String input,
+            boolean isDeferredSyntaxAllowedAsLiteral) {
+        int len = input.length();
+        int lastAppend = 0;
+        StringBuilder output = null;
+        for (int i = 0; i < len; i++) {
+            char ch = input.charAt(i);
+            if (ch =='$' || (!isDeferredSyntaxAllowedAsLiteral && ch == '#')) {
+                if (output == null) {
+                    output = new StringBuilder(len + 20);
+                }
+                output.append(input.subSequence(lastAppend, i));
+                lastAppend = i + 1;
+                output.append('\\');
+                output.append(ch);
+            }
+        }
+        if (output == null) {
+            return input;
+        } else {
+            output.append(input.substring(lastAppend, len));
+            return output.toString();
+        }
+    }
+
+
+    /**
+     * Escape '\\', '\'' and '\"', inverting the unescaping performed in
+     * {@link #skipUntilEL()}.
+     *
+     * @param input Non-EL input to be escaped
+     * @param isDeferredSyntaxAllowedAsLiteral
+     *
+     * @return The escaped version of the input
+     */
+    private static String escapeStringLiteral(String input) {
+        int len = input.length();
+        if (len < 2) {
+            // Can't possibly be quoted
+            return input;
+        }
+        char quote = input.charAt(0);
+        if (quote != '\'' && quote != '\"') {
+            throw new IllegalArgumentException();
+        }
+
+        int lastAppend = 1;
+        StringBuilder output = null;
+        if (input.charAt(len - 1) != quote) {
+            throw new IllegalArgumentException();
+        }
+        for (int i = 1; i < len - 1; i++) {
+            char ch = input.charAt(i);
+            if (ch == '\\' || ch == '\'' || ch == '\"') {
+                if (output == null) {
+                    output = new StringBuilder(len + 20);
+                    output.append(quote);
+                }
+                output.append(input.subSequence(lastAppend, i));
+                lastAppend = i + 1;
+                output.append('\\');
+                output.append(ch);
+            }
+        }
+        if (output == null) {
+            return input;
+        } else {
+            // 'len' rather than 'len - 1' to add final quote
+            output.append(input.substring(lastAppend, len));
+            return output.toString();
+        }
+    }
+
 
     /*
      * @return true if there is something left in EL expression buffer other
@@ -285,7 +376,7 @@ public class ELParser {
 
     /*
      * Parse a string in single or double quotes, allowing for escape sequences
-     * '\\', and ('\"', or "\'")
+     * '\\', '\"' and "\'"
      */
     private Token parseQuotedChars(char quote) {
         StringBuilder buf = new StringBuilder();
@@ -294,10 +385,11 @@ public class ELParser {
             char ch = nextChar();
             if (ch == '\\') {
                 ch = nextChar();
-                if (ch == '\\' || ch == quote) {
+                if (ch == '\\' || ch == '\'' || ch == '\"') {
                     buf.append(ch);
+                } else {
+                    throw new IllegalArgumentException();
                 }
-                // else error!
             } else if (ch == quote) {
                 buf.append(ch);
                 break;
@@ -452,7 +544,12 @@ public class ELParser {
 
     protected static class TextBuilder extends ELNode.Visitor {
 
+        private final boolean isDeferredSyntaxAllowedAsLiteral;
         protected StringBuilder output = new StringBuilder();
+
+        protected TextBuilder(boolean isDeferredSyntaxAllowedAsLiteral) {
+            this.isDeferredSyntaxAllowedAsLiteral = isDeferredSyntaxAllowedAsLiteral;
+        }
 
         public String getText() {
             return output.toString();
@@ -468,18 +565,18 @@ public class ELParser {
 
         @Override
         public void visit(Function n) throws JasperException {
-            output.append(Generator.escape(n.getOriginalText()));
+            output.append(escapeLiteralExpression(n.getOriginalText(), isDeferredSyntaxAllowedAsLiteral));
             output.append('(');
         }
 
         @Override
         public void visit(Text n) throws JasperException {
-            output.append(Generator.escape(n.getText()));
+            output.append(escapeLiteralExpression(n.getText(),isDeferredSyntaxAllowedAsLiteral));
         }
 
         @Override
         public void visit(ELText n) throws JasperException {
-            output.append(Generator.escape(n.getText()));
+            output.append(escapeStringLiteral(n.getText()));
         }
     }
 }

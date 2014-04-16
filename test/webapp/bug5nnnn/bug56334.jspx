@@ -5,22 +5,28 @@
 
     <jsp:directive.page contentType="text/plain; charset=ISO-8859-1"/>
 
-    <!-- Test 1: Use \\ in EL in tag attribute -->
-    <c:set var="asd" value="${'\\?resize01'}" />
-    <c:out value="${asd}"/>
+    <!-- Test 1a: Use \\ in EL in tag attribute -->
+    <c:set var="asd1" value="${'01a\\?resize01a'}" />
+    <c:out value="${asd1}"/>
+
+    <c:set var="asd2" value="01b\\x${'\\?resize01b'}" />
+    <c:out value="${asd2}"/>
 
     <!-- Test 2a: Use \\\\ in template text -->
-    <set data-value="${'\\\\?resize02a'}" />
+    <set data-value="${'02a\\\\?resize02a'}" />
 
     <!-- Test 2b: Use \\\\ in template text -->
-    <set data-value="\\\\x${'\\\\?resize02b'}" />
+    <set data-value="02b\\\\x${'\\\\?resize02b'}" />
 
     <!-- Test 3a: Use \\ in template text -->
-    <set data-value="${'\\?resize03a'}" />
+    <set data-value="${'03a\\?resize03a'}" />
 
     <!-- Test 3b: Use \\ in template text -->
-    <set data-value="\\x${'\\?resize03b'}" />
+    <set data-value="03b\\x${'\\?resize03b'}" />
 
-    <!-- Test 4: Use \\ in jsp:element -->
-    <jsp:element name="${'\\?resize04'}"></jsp:element>
+    <!-- Test 4a: Use \\ in jsp:element -->
+    <jsp:element name="${'04a\\?resize04a'}"></jsp:element>
+
+    <jsp:element name="04b\\x${'\\?resize04b'}"></jsp:element>
+
 </jsp:root>

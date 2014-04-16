@@ -404,12 +404,14 @@ public class TestParser extends TomcatBaseTest {
         String result = res.toString();
 
         // NOTE: The expected values must themselves be \ escaped below
-        Assert.assertTrue(result, result.contains("\\?resize01"));
-        Assert.assertTrue(result, result.contains("<set data-value=\"\\\\?resize02a\"/>"));
-        Assert.assertTrue(result, result.contains("<set data-value=\"\\\\x\\\\?resize02b\"/>"));
-        Assert.assertTrue(result, result.contains("<set data-value=\"\\?resize03a\"/>"));
-        Assert.assertTrue(result, result.contains("<set data-value=\"\\x\\?resize03b\"/>"));
-        Assert.assertTrue(result, result.contains("<\\?resize04/>"));
+        Assert.assertTrue(result, result.contains("01a\\?resize01a"));
+        Assert.assertTrue(result, result.contains("01b\\\\x\\?resize01b"));
+        Assert.assertTrue(result, result.contains("<set data-value=\"02a\\\\?resize02a\"/>"));
+        Assert.assertTrue(result, result.contains("<set data-value=\"02b\\\\\\\\x\\\\?resize02b\"/>"));
+        Assert.assertTrue(result, result.contains("<set data-value=\"03a\\?resize03a\"/>"));
+        Assert.assertTrue(result, result.contains("<set data-value=\"03b\\\\x\\?resize03b\"/>"));
+        Assert.assertTrue(result, result.contains("<04a\\?resize04a/>"));
+        Assert.assertTrue(result, result.contains("<04b\\\\x\\?resize04b/>"));
     }
 
     /** Assertion for text printed by tags:echo */
