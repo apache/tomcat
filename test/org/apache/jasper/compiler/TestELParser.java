@@ -16,6 +16,12 @@
  */
 package org.apache.jasper.compiler;
 
+import javax.el.ELContext;
+import javax.el.ELException;
+import javax.el.ELManager;
+import javax.el.ExpressionFactory;
+import javax.el.ValueExpression;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,169 +29,274 @@ import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.ELNode.Nodes;
 import org.apache.jasper.compiler.ELParser.TextBuilder;
 
+/**
+ * You will need to keep your wits about you when working with this class. Keep
+ * in mind the following:
+ * <ul>
+ * <li>If in doubt, read the EL and JSP specifications. Twice.</li>
+ * <li>The escaping rules are complex and subtle. The explanation below (as well
+ *     as the tests and the implementation) may have missed an edge case despite
+ *     trying hard not to.
+ * <li>The strings passed to {@link #doTestParser(String,String)} are Java
+ *     escaped in the source code and will be unescaped before being used.</li>
+ * <li>LiteralExpressions always occur outside of "${...}" and "#{...}". Literal
+ *     expressions escape '$' and '#' with '\\' if '$' or '#' is followed by '{'
+ *     but neither '\\' nor '{' is escaped.</li>
+ * <li>LiteralStrings always occur inside "${...}" or "#{...}". Literal strings
+ *     escape '\'', '\"' and '\\' with '\\'. Escaping '\"' is optional if the
+ *     literal string is delimited by '\''. Escaping '\'' is optional if the
+ *     literal string is delimited by '\"'.</li>
+ * </ul>
+ */
 public class TestELParser {
 
     @Test
     public void testText() throws JasperException {
-        doTestParser("foo");
+        doTestParser("foo", "foo");
     }
 
 
     @Test
     public void testLiteral() throws JasperException {
-        doTestParser("${'foo'}");
+        doTestParser("${'foo'}", "foo");
     }
 
 
     @Test
     public void testVariable() throws JasperException {
-        doTestParser("${test}");
+        doTestParser("${test}", null);
     }
 
 
     @Test
     public void testFunction01() throws JasperException {
-        doTestParser("${do(x)}");
+        doTestParser("${do(x)}", null);
     }
 
 
     @Test
     public void testFunction02() throws JasperException {
-        doTestParser("${do:it(x)}");
+        doTestParser("${do:it(x)}", null);
     }
 
 
     @Test
     public void testFunction03() throws JasperException {
-        doTestParser("${do:it(x,y)}");
+        doTestParser("${do:it(x,y)}", null);
     }
 
 
     @Test
     public void testFunction04() throws JasperException {
-        doTestParser("${do:it(x,y,z)}");
+        doTestParser("${do:it(x,y,z)}", null);
     }
 
 
     @Test
     public void testCompound01() throws JasperException {
-        doTestParser("1${'foo'}1");
+        doTestParser("1${'foo'}1", "1foo1");
     }
 
 
     @Test
     public void testCompound02() throws JasperException {
-        doTestParser("1${test}1");
+        doTestParser("1${test}1", null);
     }
 
 
     @Test
     public void testCompound03() throws JasperException {
-        doTestParser("${foo}${bar}");
+        doTestParser("${foo}${bar}", null);
     }
 
 
     @Test
     public void testTernary01() throws JasperException {
-        doTestParser("${true?true:false}");
+        doTestParser("${true?true:false}", "true");
     }
 
 
     @Test
     public void testTernary02() throws JasperException {
-        doTestParser("${a==1?true:false}");
+        doTestParser("${a==1?true:false}", null);
     }
 
 
     @Test
     public void testTernary03() throws JasperException {
-        doTestParser("${a eq1?true:false}");
+        doTestParser("${a eq1?true:false}", null);
     }
 
 
     @Test
     public void testTernary04() throws JasperException {
-        doTestParser(" ${ a eq 1 ? true : false } ");
+        doTestParser(" ${ a eq 1 ? true : false } ", null);
     }
 
 
     @Test
     public void testTernary05() throws JasperException {
         // Note this is invalid EL
-        doTestParser("${aeq1?true:false}");
+        doTestParser("${aeq1?true:false}", null);
     }
 
 
     @Test
     public void testTernary06() throws JasperException {
-        doTestParser("${do:it(a eq1?true:false,y)}");
+        doTestParser("${do:it(a eq1?true:false,y)}", null);
     }
 
 
     @Test
     public void testTernary07() throws JasperException {
-        doTestParser(" ${ do:it( a eq 1 ? true : false, y ) } ");
+        doTestParser(" ${ do:it( a eq 1 ? true : false, y ) } ", null);
     }
 
 
     @Test
     public void testTernary08() throws JasperException {
-        doTestParser(" ${ do:it ( a eq 1 ? true : false, y ) } ");
+        doTestParser(" ${ do:it ( a eq 1 ? true : false, y ) } ", null);
     }
 
 
     @Test
     public void testTernary09() throws JasperException {
-        doTestParser(" ${ do : it ( a eq 1 ? true : false, y ) } ");
+        doTestParser(" ${ do : it ( a eq 1 ? true : false, y ) } ", null);
     }
 
 
     @Test
     public void testTernary10() throws JasperException {
-        doTestParser(" ${!empty my:link(foo)} ");
+        doTestParser(" ${!empty my:link(foo)} ", null);
+    }
+
+
+    @Test
+    public void testTernary11() throws JasperException {
+        doTestParser("${true?'true':'false'}", "true");
+    }
+
+
+    @Test
+    public void testTernary12() throws JasperException {
+        doTestParser("${true?'tr\"ue':'false'}", "tr\"ue");
+    }
+
+
+    @Test
+    public void testTernary13() throws JasperException {
+        doTestParser("${true?'tr\\'ue':'false'}", "tr'ue");
     }
 
 
     @Test
     public void testTernaryBug56031() throws JasperException {
-        doTestParser("${my:link(!empty registration ? registration : '/test/registration')}");
+        doTestParser("${my:link(!empty registration ? registration : '/test/registration')}", null);
     }
 
 
     @Test
     public void testQuotes01() throws JasperException {
-        doTestParser("'");
+        doTestParser("'", "'");
     }
 
 
     @Test
     public void testQuotes02() throws JasperException {
-        doTestParser("'${foo}'");
+        doTestParser("'${foo}'", null);
     }
 
 
     @Test
     public void testQuotes03() throws JasperException {
-        doTestParser("'${'foo'}'");
+        doTestParser("'${'foo'}'", "'foo'");
     }
 
 
     @Test
     public void testEscape01() throws JasperException {
-        doTestParser("${'\\\\'}");
+        doTestParser("${'\\\\'}", "\\");
     }
 
 
     @Test
     public void testEscape02() throws JasperException {
-        doTestParser("\\\\x${'\\\\'}");
+        doTestParser("\\\\x${'\\\\'}", "\\\\x\\");
     }
 
 
-    private void doTestParser(String input) throws JasperException {
-        Nodes nodes = ELParser.parse(input, false);
+    @Test
+    public void testEscape03() throws JasperException {
+        doTestParser("\\\\", "\\\\");
+    }
 
-        TextBuilder textBuilder = new TextBuilder();
+
+    @Test
+    public void testEscape04() throws JasperException {
+        doTestParser("\\$", "\\$");
+    }
+
+
+    @Test
+    public void testEscape05() throws JasperException {
+        doTestParser("\\#", "\\#");
+    }
+
+
+    @Test
+    public void testEscape07() throws JasperException {
+        doTestParser("${'\\\\$'}", "\\$");
+    }
+
+
+    @Test
+    public void testEscape08() throws JasperException {
+        doTestParser("${'\\\\#'}", "\\#");
+    }
+
+
+    @Test
+    public void testEscape09() throws JasperException {
+        doTestParser("\\${", "${");
+    }
+
+
+    @Test
+    public void testEscape10() throws JasperException {
+        doTestParser("\\#{", "#{");
+    }
+
+
+    private void doTestParser(String input, String expected) throws JasperException {
+        ELException elException = null;
+        String elResult = null;
+
+        // Don't try and evaluate expressions that depend on variables or functions
+        if (expected != null) {
+            try {
+                ELManager manager = new ELManager();
+                ELContext context = manager.getELContext();
+                ExpressionFactory factory = ELManager.getExpressionFactory();
+                ValueExpression ve = factory.createValueExpression(context, input, String.class);
+                elResult = ve.getValue(context).toString();
+                Assert.assertEquals(expected, elResult);
+            } catch (ELException ele) {
+                elException = ele;
+            }
+        }
+
+        Nodes nodes = null;
+        try {
+            nodes = ELParser.parse(input, false);
+            Assert.assertNull(elException);
+        } catch (IllegalArgumentException iae) {
+            Assert.assertNotNull(elResult, elException);
+            // Not strictly true but enables us to report both
+            iae.initCause(elException);
+            throw iae;
+        }
+
+        TextBuilder textBuilder = new TextBuilder(false);
 
         nodes.visit(textBuilder);
 
