@@ -102,6 +102,11 @@
         <code>WebappClassLoader</code>. State is now correctly reported rather
         than always reporting as <code>NEW</code>. (markt)
       </scode>
+      <fix>
+        <bug>56390</bug>: Fix JAR locking issue with JARs containing TLDs and
+        the TLD cache that prevented the undeployment of web applications when
+        the WAR was deleted. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
