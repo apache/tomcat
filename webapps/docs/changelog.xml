@@ -87,6 +87,10 @@
         reverts all the operations performed when adding an MBean notification
         listener. (markt)
       </fix>
+      <fix>
+        Only create XML parsing objects if required and fix associated potential
+        memory leak in the default Servlet. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
