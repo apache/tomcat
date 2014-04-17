@@ -43,6 +43,7 @@ public final class SecurityClassLoad {
         loadCoyotePackage(loader);
         loadLoaderPackage(loader);
         loadRealmPackage(loader);
+        loadServletsPackage(loader);
         loadSessionPackage(loader);
         loadUtilPackage(loader);
         loadValvesPackage(loader);
@@ -123,6 +124,18 @@ public final class SecurityClassLoad {
         final String basePackage = "org.apache.catalina.realm.";
         loader.loadClass
             (basePackage + "LockOutRealm$LockRecord");
+    }
+
+
+    private static final void loadServletsPackage(ClassLoader loader)
+            throws Exception {
+        final String basePackage = "org.apache.catalina.servlets.";
+        // Avoid a possible memory leak in the DefaultServlet when running with
+        // a security manager. The DefaultServlet needs to load an XML parser
+        // when running under a security manager. We want this to be loaded by
+        // the container rather than a web application to prevent a memory leak
+        // via web application class loader.
+        loader.loadClass(basePackage + "DefaultServlet");
     }
 
 

@@ -132,8 +132,7 @@ public class DefaultServlet extends HttpServlet {
 
     private static final DocumentBuilderFactory factory;
 
-    private static final SecureEntityResolver secureEntityResolver =
-            new SecureEntityResolver();
+    private static final SecureEntityResolver secureEntityResolver;
 
     /**
      * Full range marker.
@@ -166,9 +165,15 @@ public class DefaultServlet extends HttpServlet {
         urlEncoder.addSafeCharacter('*');
         urlEncoder.addSafeCharacter('/');
 
-        factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-        factory.setValidating(false);
+        if (Globals.IS_SECURITY_ENABLED) {
+            factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            factory.setValidating(false);
+            secureEntityResolver = new SecureEntityResolver();
+        } else {
+            factory = null;
+            secureEntityResolver = null;
+        }
     }
 
 
