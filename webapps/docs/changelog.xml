@@ -107,6 +107,10 @@
         the TLD cache that prevented the undeployment of web applications when
         the WAR was deleted. (markt)
       </fix>
+      <fix>
+        Only create XML parsing objects if required and fix associated potential
+        memory leak in the default Servlet. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
