@@ -146,6 +146,9 @@
       <scode>
         Upgrade the NIO2 connectors to beta, but still not ready for production. (remm)
       </scode>
+      <scode>
+        Fix code duplication between NIO and NIO2. (remm)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
