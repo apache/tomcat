@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.core;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -638,7 +639,16 @@ public class ApplicationContext
                 (sm.getString("applicationContext.resourcePaths.iae", path));
         }
 
-        String normalizedPath = RequestUtil.normalize(path);
+        String normalizedPath;
+        if (File.separatorChar == '\\') {
+            // On Windows '\\' is a separator so in case a Windows style
+            // separator has managed to make it into the path, replace it.
+            normalizedPath = RequestUtil.normalize(path, true);
+        } else {
+            // On UNIX and similar systems, '\\' is a valid file name so do not
+            // convert it to '/'
+            normalizedPath = RequestUtil.normalize(path, false);
+        }
         if (normalizedPath == null)
             return (null);
 
