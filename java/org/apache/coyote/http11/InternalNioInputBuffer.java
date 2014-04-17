@@ -18,6 +18,7 @@ package org.apache.coyote.http11;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.Selector;
 
 import org.apache.coyote.InputBuffer;
@@ -34,8 +35,6 @@ import org.apache.tomcat.util.net.SocketWrapper;
 /**
  * Implementation of InputBuffer which provides HTTP request header parsing as
  * well as transfer decoding.
- *
- * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  */
 public class InternalNioInputBuffer extends AbstractNioInputBuffer<NioChannel> {
 
@@ -82,57 +81,6 @@ public class InternalNioInputBuffer extends AbstractNioInputBuffer<NioChannel> {
         socket = null;
     }
 
-
-    /**
-     * Perform blocking read with a timeout if desired
-     * @param timeout boolean - if we want to use the timeout data
-     * @param block - true if the system should perform a blocking read, false otherwise
-     * @return boolean - true if data was read, false is no data read, EOFException if EOF is reached
-     * @throws IOException if a socket exception occurs
-     * @throws EOFException if end of stream is reached
-     */
-    private int readSocket(boolean timeout, boolean block) throws IOException {
-        int nRead = 0;
-        socket.getBufHandler().getReadBuffer().clear();
-        if ( block ) {
-            Selector selector = null;
-            try {
-                selector = pool.get();
-            } catch ( IOException x ) {
-                // Ignore
-            }
-            try {
-                NioEndpoint.KeyAttachment att =
-                        (NioEndpoint.KeyAttachment) socket.getAttachment(false);
-                if (att == null) {
-                    throw new IOException("Key must be cancelled.");
-                }
-                nRead = pool.read(socket.getBufHandler().getReadBuffer(),
-                        socket, selector,
-                        socket.getIOChannel().socket().getSoTimeout());
-            } catch ( EOFException eof ) {
-                nRead = -1;
-            } finally {
-                if ( selector != null ) pool.put(selector);
-            }
-        } else {
-            nRead = socket.read(socket.getBufHandler().getReadBuffer());
-        }
-        if (nRead > 0) {
-            socket.getBufHandler().getReadBuffer().flip();
-            socket.getBufHandler().getReadBuffer().limit(nRead);
-            expand(nRead + pos);
-            socket.getBufHandler().getReadBuffer().get(buf, pos, nRead);
-            lastValid = pos + nRead;
-            return nRead;
-        } else if (nRead == -1) {
-            //return false;
-            throw new EOFException(sm.getString("iib.eof.error"));
-        } else {
-            return 0;
-        }
-    }
-
     // ------------------------------------------------------ Protected Methods
 
     @Override
@@ -158,30 +106,52 @@ public class InternalNioInputBuffer extends AbstractNioInputBuffer<NioChannel> {
 
     @Override
     protected boolean fill(boolean block) throws IOException, EOFException {
-        return fill(true,block);
-    }
-
-
-    protected boolean fill(boolean timeout, boolean block)
-            throws IOException, EOFException {
-
-        boolean read = false;
-
         if (parsingHeader) {
-
             if (lastValid > headerBufferSize) {
                 throw new IllegalArgumentException
                     (sm.getString("iib.requestheadertoolarge.error"));
             }
-
-            // Do a simple read with a short timeout
-            read = readSocket(timeout,block)>0;
         } else {
             lastValid = pos = end;
-            // Do a simple read with a short timeout
-            read = readSocket(timeout, block)>0;
         }
-        return read;
+        int nRead = 0;
+        ByteBuffer readBuffer = socket.getBufHandler().getReadBuffer();
+        readBuffer.clear();
+        if ( block ) {
+            Selector selector = null;
+            try {
+                selector = pool.get();
+            } catch ( IOException x ) {
+                // Ignore
+            }
+            try {
+                NioEndpoint.KeyAttachment att =
+                        (NioEndpoint.KeyAttachment) socket.getAttachment(false);
+                if (att == null) {
+                    throw new IOException("Key must be cancelled.");
+                }
+                nRead = pool.read(readBuffer,
+                        socket, selector,
+                        socket.getIOChannel().socket().getSoTimeout());
+            } catch ( EOFException eof ) {
+                nRead = -1;
+            } finally {
+                if ( selector != null ) pool.put(selector);
+            }
+        } else {
+            nRead = socket.read(readBuffer);
+        }
+        if (nRead > 0) {
+            readBuffer.flip();
+            readBuffer.limit(nRead);
+            expand(nRead + pos);
+            readBuffer.get(buf, pos, nRead);
+            lastValid = pos + nRead;
+        } else if (nRead == -1) {
+            //return false;
+            throw new EOFException(sm.getString("iib.eof.error"));
+        }
+        return nRead > 0;
     }
 
 
@@ -204,7 +174,7 @@ public class InternalNioInputBuffer extends AbstractNioInputBuffer<NioChannel> {
             throws IOException {
 
             if (pos >= lastValid) {
-                if (!fill(true,true)) //read body, must be blocking, as the thread is inside the app
+                if (!fill(true)) //read body, must be blocking, as the thread is inside the app
                     return -1;
             }
 
