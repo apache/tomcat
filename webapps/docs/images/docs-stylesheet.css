@@ -51,6 +51,10 @@ table *:not(table) {
   border-collapse: separate;
 }
 
+th {
+  text-align: left;
+}
+
 main {
   /* Remove this once all IEs support <main> element */
   display: block;
