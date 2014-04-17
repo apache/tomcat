@@ -238,7 +238,16 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                     sm.getString("standardRoot.invalidPath", path));
         }
 
-        String result = RequestUtil.normalize(path);
+        String result;
+        if (File.separatorChar == '\\') {
+            // On Windows '\\' is a separator so in case a Windows style
+            // separator has managed to make it into the path, replace it.
+            result = RequestUtil.normalize(path, true);
+        } else {
+            // On UNIX and similar systems, '\\' is a valid file name so do not
+            // convert it to '/'
+            result = RequestUtil.normalize(path, false);
+        }
         if (result == null || result.length() == 0 || !result.startsWith("/")) {
             throw new IllegalArgumentException(
                     sm.getString("standardRoot.invalidPathNormal", path, result));

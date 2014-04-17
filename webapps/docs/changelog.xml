@@ -116,6 +116,11 @@
         <code>StackOverflowError</code> is not treated as a fatal error and can
         handled and/or logged as required. (markt)
       </fix>
+      <fix>
+        <bug>56409</bug>: Avoid <code>StackOverflowError</code> on non-Windows
+        systems if a file named <code>\</code> is encountered when scanning for
+        TLDs. (mark)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
