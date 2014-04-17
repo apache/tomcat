@@ -111,6 +111,11 @@
         Only create XML parsing objects if required and fix associated potential
         memory leak in the default Servlet. (markt)
       </fix>
+      <fix>
+        Modify generic exception handling so that
+        <code>StackOverflowError</code> is not treated as a fatal error and can
+        handled and/or logged as required. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
