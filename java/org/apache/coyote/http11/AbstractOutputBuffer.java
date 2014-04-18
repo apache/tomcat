@@ -656,12 +656,12 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     }
 
 
-    public final boolean hasDataToWrite() {
+    public boolean hasDataToWrite() {
         return hasMoreDataToFlush() || hasBufferedData();
     }
 
 
-    private boolean hasBufferedData() {
+    protected boolean hasBufferedData() {
         boolean result = false;
         if (bufferedWrites!=null) {
             Iterator<ByteBufferHolder> iter = bufferedWrites.iterator();
