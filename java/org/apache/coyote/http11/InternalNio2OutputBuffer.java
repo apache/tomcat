@@ -378,43 +378,35 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                     // Ignore timeout
                 }
             }
-            if (hasMoreDataToFlush()) {
-                try {
-                    if (!flipped) {
-                        byteBuffer.flip();
-                        flipped = true;
-                    }
-                    if (bufferedWrites.size() > 0) {
-                        for (ByteBuffer buffer : bufferedWrites) {
-                            buffer.flip();
-                            while (buffer.hasRemaining()) {
-                                if (socket.getSocket().write(buffer).get(socket.getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
-                                    throw new EOFException(sm.getString("iob.failedwrite"));
-                                }
+            try {
+                if (bufferedWrites.size() > 0) {
+                    for (ByteBuffer buffer : bufferedWrites) {
+                        buffer.flip();
+                        while (buffer.hasRemaining()) {
+                            if (socket.getSocket().write(buffer).get(socket.getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
+                                throw new EOFException(sm.getString("iob.failedwrite"));
                             }
                         }
-                        bufferedWrites.clear();
                     }
-                    while (byteBuffer.hasRemaining()) {
-                        if (socket.getSocket().write(byteBuffer).get(socket.getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
-                            throw new EOFException(sm.getString("iob.failedwrite"));
-                        }
+                    bufferedWrites.clear();
+                }
+                if (!flipped) {
+                    byteBuffer.flip();
+                    flipped = true;
+                }
+                while (byteBuffer.hasRemaining()) {
+                    if (socket.getSocket().write(byteBuffer).get(socket.getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
+                        throw new EOFException(sm.getString("iob.failedwrite"));
                     }
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new IOException(e);
-                } catch (TimeoutException e) {
-                    throw new SocketTimeoutException();
                 }
-                if (byteBuffer.remaining() == 0) {
-                    //blocking writes must empty the buffer
-                    //and if remaining==0 then we did empty it
-                    byteBuffer.clear();
-                    flipped = false;
-                }
-            } else {
-                byteBuffer.clear();
-                flipped = false;
+            } catch (InterruptedException | ExecutionException e) {
+                throw new IOException(e);
+            } catch (TimeoutException e) {
+                throw new SocketTimeoutException();
             }
+            byteBuffer.clear();
+            flipped = false;
+            return false;
         } else {
             synchronized (completionHandler) {
                 if (hasPermit || writePending.tryAcquire()) {
@@ -455,9 +447,9 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                         }
                     }
                 }
+                return hasMoreDataToFlush() || hasBufferedData() || e != null;
             }
         }
-        return hasMoreDataToFlush();
     }
 
 
