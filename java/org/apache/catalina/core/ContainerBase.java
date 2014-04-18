@@ -95,7 +95,7 @@ import org.apache.tomcat.util.res.StringManager;
  *     <td>Child container added to this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>addValve</code></td>
+ *     <td align=center><code>{@link #getPipeline() pipeline}.addValve</code></td>
  *     <td align=center><code>Valve</code></td>
  *     <td>Valve added to this Container.</td>
  *   </tr>
@@ -105,7 +105,7 @@ import org.apache.tomcat.util.res.StringManager;
  *     <td>Child container removed from this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>removeValve</code></td>
+ *     <td align=center><code>{@link #getPipeline() pipeline}.removeValve</code></td>
  *     <td align=center><code>Valve</code></td>
  *     <td>Valve removed from this Container.</td>
  *   </tr>
