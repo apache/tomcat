@@ -221,19 +221,22 @@ static const jint supported_ssl_opts = 0
 
 static int ssl_tmp_key_init_rsa(int bits, int idx)
 {
-#ifdef OPENSSL_FIPS
-    /**
-     * With FIPS mode short RSA keys cannot be
-     * generated.
-     */
-    if (bits < 1024)
-        return 0;
-#endif
     if (!(SSL_temp_keys[idx] =
-          RSA_generate_key(bits, RSA_F4, NULL, NULL)))
+          RSA_generate_key(bits, RSA_F4, NULL, NULL))) {
+#ifdef OPENSSL_FIPS
+        /**
+         * With FIPS mode short RSA keys cannot be
+         * generated.
+         */
+        if (bits < 1024)
+            return 0;
+        else
+#endif
         return 1;
-    else
+    }
+    else {
         return 0;
+    }
 }
 
 static int ssl_tmp_key_init_dh(int bits, int idx)
