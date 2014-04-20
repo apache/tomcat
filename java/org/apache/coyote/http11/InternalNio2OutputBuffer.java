@@ -145,7 +145,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                     }
                 }
                 if (notify) {
-                    endpoint.processSocket(socket, SocketStatus.OPEN_WRITE, true);
+                    endpoint.processSocket(socket, SocketStatus.OPEN_WRITE, false);
                 }
             }
 
@@ -196,7 +196,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                     }
                 }
                 if (notify) {
-                    endpoint.processSocket(socket, SocketStatus.OPEN_WRITE, true);
+                    endpoint.processSocket(socket, SocketStatus.OPEN_WRITE, false);
                 }
             }
 
