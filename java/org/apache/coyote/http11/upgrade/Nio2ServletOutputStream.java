@@ -62,7 +62,7 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
                         } catch (IOException e) {
                             socketWrapper.setError(true);
                             onError(e);
-                            endpoint.processSocket(socketWrapper, SocketStatus.ERROR, true);
+                            endpoint.processSocket(socketWrapper, SocketStatus.ERROR, false);
                         }
                     }
                 }
