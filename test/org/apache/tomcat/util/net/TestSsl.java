@@ -24,8 +24,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 
-import javax.net.ssl.HandshakeCompletedEvent;
-import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -34,7 +32,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -92,82 +89,13 @@ public class TestSsl extends TomcatBaseTest {
         assertTrue(res.toString().indexOf("<h1>Hello World!</h1>") > 0);
     }
 
-    boolean handshakeDone = false;
-
-    @Test
-    public void testRenegotiateFail() throws Exception {
-
-        // If RFC5746 is supported, renegotiation will always work (and will
-        // always be secure)
-        if (TesterSupport.RFC_5746_SUPPORTED) {
-            return;
-        }
-
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir = new File(getBuildDirectory(), "webapps/examples");
-        // app dir is relative to server home
-        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
-
-        TesterSupport.initSsl(tomcat);
-
-        // Default - MITM attack prevented
-
-        tomcat.start();
-        SSLContext sslCtx = SSLContext.getInstance("TLS");
-        sslCtx.init(null, TesterSupport.getTrustManagers(), null);
-        SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
-        SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", getPort());
-
-        socket.addHandshakeCompletedListener(new HandshakeCompletedListener() {
-            @Override
-            public void handshakeCompleted(HandshakeCompletedEvent event) {
-                handshakeDone = true;
-            }
-        });
-
-        OutputStream os = socket.getOutputStream();
-        os.write("GET /examples/servlets/servlet/HelloWorldExample HTTP/1.0\n".getBytes());
-        os.flush();
-
-
-        InputStream is = socket.getInputStream();
-
-        // Make sure the NIO connector has read the request before the handshake
-        Thread.sleep(100);
-
-        socket.startHandshake();
-
-        os = socket.getOutputStream();
-
-        try {
-            os.write("Host: localhost\n\n".getBytes());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            fail("Re-negotiation failed");
-        }
-        Reader r = new InputStreamReader(is);
-        BufferedReader br = new BufferedReader(r);
-        String line = br.readLine();
-        while (line != null) {
-            // For testing System.out.println(line);
-            line = br.readLine();
-        }
-
-        if (!handshakeDone) {
-            // success - we timed-out without handshake
-            return;
-        }
-
-        fail("Re-negotiation worked");
-    }
 
     @Test
     public void testRenegotiateWorks() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Assume.assumeTrue("SSL renegotiation has to be supported for this test",
-                TesterSupport.isRenegotiationSupported(getTomcatInstance()));
+        //Assume.assumeTrue("SSL renegotiation has to be supported for this test",
+        //        TesterSupport.isRenegotiationSupported(getTomcatInstance()));
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
@@ -215,14 +143,5 @@ public class TestSsl extends TomcatBaseTest {
                 line = null;
             }
         }
-    }
-
-    @Override
-    public void setUp() throws Exception {
-        if (!TesterSupport.RFC_5746_SUPPORTED) {
-            // Make sure SSL renegotiation is not disabled in the JVM
-            System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");
-        }
-        super.setUp();
     }
 }
