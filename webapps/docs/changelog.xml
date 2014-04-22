@@ -121,11 +121,6 @@
         systems if a file named <code>\</code> is encountered when scanning for
         TLDs. (mark)
       </fix>
-      <fix>
-        Increase the default maximum size of the executor used by the WebSocket
-        implementation for call backs associated with asynchronous writes from
-        10 to 200. (markt) 
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -212,6 +207,11 @@
         <bug>56343</bug>: Avoid a NPE if Tomcat&apos;s Java WebSocket 1.0
         implementation is used with the Java WebSocket 1.0 API JAR from the
         reference implementation. (markt)
+      </fix>
+      <fix>
+        Increase the default maximum size of the executor used by the WebSocket
+        implementation for call backs associated with asynchronous writes from
+        10 to 200. (markt) 
       </fix>
     </changelog>
   </subsection>
