@@ -211,7 +211,7 @@
       <fix>
         Increase the default maximum size of the executor used by the WebSocket
         implementation for call backs associated with asynchronous writes from
-        10 to 200. (markt) 
+        10 to 200. (markt)
       </fix>
       <add>
         Add a warning if the thread group created for WebSocket asynchronous
