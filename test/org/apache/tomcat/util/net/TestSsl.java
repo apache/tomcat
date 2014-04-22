@@ -129,9 +129,15 @@ public class TestSsl extends TomcatBaseTest {
 
         // One request should be sufficient
         int requestCount = 0;
-        while (!listener.isComplete() && requestCount < 5) {
-            doRequest(os, r);
-            requestCount++;
+        try {
+            while (!listener.isComplete() && requestCount < 5) {
+                requestCount++;
+                doRequest(os, r);
+            }
+        } catch (IOException ioe) {
+            Assert.fail("Failed on request number " + requestCount +
+                    " after startHandshake()");
+            throw ioe;
         }
 
         Assert.assertTrue(listener.isComplete());
