@@ -23,15 +23,12 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.security.KeyManagementException;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
@@ -52,30 +49,6 @@ import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
 public final class TesterSupport {
-
-    protected static final boolean RFC_5746_SUPPORTED;
-
-    static {
-        boolean result = false;
-        SSLContext context;
-        try {
-            context = SSLContext.getInstance("TLS");
-            context.init(null, null, null);
-            SSLServerSocketFactory ssf = context.getServerSocketFactory();
-            String ciphers[] = ssf.getSupportedCipherSuites();
-            for (String cipher : ciphers) {
-                if ("TLS_EMPTY_RENEGOTIATION_INFO_SCSV".equals(cipher)) {
-                    result = true;
-                    break;
-                }
-            }
-        } catch (NoSuchAlgorithmException e) {
-            // Assume no RFC 5746 support
-        } catch (KeyManagementException e) {
-            // Assume no RFC 5746 support
-        }
-        RFC_5746_SUPPORTED = result;
-    }
 
     public static void initSsl(Tomcat tomcat) {
         initSsl(tomcat, "localhost.jks", null, null);

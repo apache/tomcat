@@ -96,11 +96,6 @@ public class TestClientCert extends TomcatBaseTest {
 
     @Override
     public void setUp() throws Exception {
-        if (!TesterSupport.RFC_5746_SUPPORTED) {
-            // Make sure SSL renegotiation is not disabled in the JVM
-            System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");
-        }
-
         super.setUp();
 
         Tomcat tomcat = getTomcatInstance();

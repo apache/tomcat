@@ -97,12 +97,6 @@ public class TestCustomSsl extends TomcatBaseTest {
     private void doTestCustomTrustManager(boolean serverTrustAll)
             throws Exception {
 
-        if (!TesterSupport.RFC_5746_SUPPORTED) {
-            // Make sure SSL renegotiation is not disabled in the JVM
-            System.setProperty("sun.security.ssl.allowUnsafeRenegotiation",
-                    "true");
-        }
-
         Tomcat tomcat = getTomcatInstance();
 
         Assume.assumeTrue("SSL renegotiation has to be supported for this test",
