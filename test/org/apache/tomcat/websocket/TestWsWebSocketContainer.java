@@ -110,6 +110,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Queue<String> messages = handler.getMessages();
         Assert.assertEquals(1, messages.size());
         Assert.assertEquals(MESSAGE_STRING_1, messages.peek());
+
+        ((WsWebSocketContainer) wsContainer).destroy();
     }
 
 
