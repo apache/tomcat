@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.net;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,18 +23,21 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 
+import javax.net.ssl.HandshakeCompletedEvent;
+import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
+import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -98,12 +100,11 @@ public class TestSsl extends TomcatBaseTest {
         Assume.assumeTrue("SSL renegotiation has to be supported for this test",
                 TesterSupport.isRenegotiationSupported(getTomcatInstance()));
 
-        File appDir = new File(getBuildDirectory(), "webapps/examples");
-        // app dir is relative to server home
-        Context ctxt = tomcat.addWebapp(null, "/examples",
-                appDir.getAbsolutePath());
-        ctxt.addApplicationListener(new ApplicationListener(
-                WsContextListener.class.getName(), false));
+        Context root = tomcat.addContext("", TEMP_DIR);
+        Wrapper w =
+            Tomcat.addServlet(root, "tester", new TesterServlet());
+        w.setAsyncSupported(true);
+        root.addServletMapping("/", "tester");
 
         TesterSupport.initSsl(tomcat);
 
@@ -116,33 +117,71 @@ public class TestSsl extends TomcatBaseTest {
                 getPort());
 
         OutputStream os = socket.getOutputStream();
+        InputStream is = socket.getInputStream();
+        Reader r = new InputStreamReader(is);
 
-        os.write("GET /examples/servlets/servlet/HelloWorldExample HTTP/1.1\n".getBytes());
-        os.flush();
+        doRequest(os, r);
+
+        TesterHandshakeListener listener = new TesterHandshakeListener();
+        socket.addHandshakeCompletedListener(listener);
 
         socket.startHandshake();
 
-        try {
-            os.write("Host: localhost\n\n".getBytes());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            fail("Re-negotiation failed");
+        // One request should be sufficient
+        int requestCount = 0;
+        while (!listener.isComplete() && requestCount < 5) {
+            doRequest(os, r);
+            requestCount++;
         }
 
-        InputStream is = socket.getInputStream();
-        Reader r = new InputStreamReader(is);
-        BufferedReader br = new BufferedReader(r);
-        String line = br.readLine();
-        Assert.assertEquals("HTTP/1.1 200 OK", line);
-        while (line != null) {
-            // For debugging System.out.println(line);
-            // Linux clients see a Connection Reset in some circumstances and a
-            // clean close in others.
-            try {
-                line = br.readLine();
-            } catch (IOException ioe) {
-                line = null;
+        Assert.assertTrue(listener.isComplete());
+        System.out.println("Renegotiation completed after " + requestCount + " requests");
+    }
+
+    private void doRequest(OutputStream os, Reader r) throws IOException {
+        char[] expectedResponseLine = "HTTP/1.1 200 OK\r\n".toCharArray();
+
+        os.write("GET /tester HTTP/1.1\r\n".getBytes());
+        os.write("Host: localhost\r\n".getBytes());
+        os.write("Connection: Keep-Alive\r\n\r\n".getBytes());
+        os.flush();
+
+        // First check we get the expected response line
+        for (char c : expectedResponseLine) {
+            int read = r.read();
+            Assert.assertEquals(c, read);
+        }
+
+        // Skip to the end of the headers
+        char[] endOfHeaders ="\r\n\r\n".toCharArray();
+        int found = 0;
+        while (found != endOfHeaders.length) {
+            if (r.read() == endOfHeaders[found]) {
+                found++;
+            } else {
+                found = 0;
             }
+        }
+
+        // Read the body
+        char[] expectedBody = "OK".toCharArray();
+        for (char c : expectedBody) {
+            int read = r.read();
+            Assert.assertEquals(c, read);
+        }
+    }
+
+    private static class TesterHandshakeListener implements HandshakeCompletedListener {
+
+        private volatile boolean complete = false;
+
+        @Override
+        public void handshakeCompleted(HandshakeCompletedEvent event) {
+            complete = true;
+        }
+
+        public boolean isComplete() {
+            return complete;
         }
     }
 }
