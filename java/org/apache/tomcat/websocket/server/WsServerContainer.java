@@ -49,6 +49,8 @@ import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 import javax.websocket.server.ServerEndpointConfig.Configurator;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsSession;
 import org.apache.tomcat.websocket.WsWebSocketContainer;
@@ -70,6 +72,8 @@ public class WsServerContainer extends WsWebSocketContainer
 
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final Log log = LogFactory.getLog(WsServerContainer.class);
+
     private static final CloseReason AUTHENTICATED_HTTP_SESSION_CLOSED =
             new CloseReason(CloseCodes.VIOLATED_POLICY,
                     "This connection was established under an authenticated " +
@@ -88,6 +92,7 @@ public class WsServerContainer extends WsWebSocketContainer
     private final ConcurrentHashMap<String,Set<WsSession>> authenticatedSessions =
             new ConcurrentHashMap<String, Set<WsSession>>();
     private final ExecutorService executorService;
+    private final ThreadGroup threadGroup;
     private volatile boolean endpointsRegistered = false;
 
     WsServerContainer(ServletContext servletContext) {
@@ -150,7 +155,7 @@ public class WsServerContainer extends WsWebSocketContainer
         } else {
             threadGroupName.append(servletContext.getContextPath());
         }
-        ThreadGroup threadGroup = new ThreadGroup(threadGroupName.toString());
+        threadGroup = new ThreadGroup(threadGroupName.toString());
         WsThreadFactory wsThreadFactory = new WsThreadFactory(threadGroup);
 
         executorService = new ThreadPoolExecutor(executorCoreSize,
@@ -270,6 +275,21 @@ public class WsServerContainer extends WsWebSocketContainer
                 methodMapping);
 
         addEndpoint(sec);
+    }
+
+
+    @Override
+    public void destroy() {
+        shutdownExecutor();
+        super.destroy();
+        try {
+            threadGroup.destroy();
+        } catch (IllegalThreadStateException itse) {
+            // If the executor hasn't fully shutdown it won't be possible to
+            // destroy this thread group as there will still be threads running
+            log.warn(sm.getString("serverContainer.threadGroupNotDestroyed",
+                    threadGroup.getName()));
+        }
     }
 
 
@@ -442,7 +462,7 @@ public class WsServerContainer extends WsWebSocketContainer
     }
 
 
-    void shutdownExecutor() {
+    private void shutdownExecutor() {
         if (executorService == null) {
             return;
         }
