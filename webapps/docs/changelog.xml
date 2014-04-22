@@ -218,6 +218,12 @@
         write call backs can not be destroyed when the web application is
         stopped. (markt)
       </add>
+      <fix>
+        Ensure that threads created to support WebSocket clients are stopped
+        when no longer required. This will happen automatically for WebSocket
+        client connections initiated by web applications but stand alone clients
+        must call <code>WsWebSocketContainer.destroy()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
