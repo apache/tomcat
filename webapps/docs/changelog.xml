@@ -119,7 +119,7 @@
       <fix>
         <bug>56409</bug>: Avoid <code>StackOverflowError</code> on non-Windows
         systems if a file named <code>\</code> is encountered when scanning for
-        TLDs. (mark)
+        TLDs. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -254,6 +254,10 @@
         one installed by the *.exe installer. Print a warning in case if neither
         server nor client jvm is found by <code>service.bat</code>. (kkolinko)
       </fix>
+      <update>
+        <bug>56363</bug>: Update to version 1.1.30 of Tomcat Native library.
+        (schultz)
+      </update>
     </changelog>
   </subsection>
 </section>
