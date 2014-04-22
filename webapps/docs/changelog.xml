@@ -213,6 +213,11 @@
         implementation for call backs associated with asynchronous writes from
         10 to 200. (markt) 
       </fix>
+      <add>
+        Add a warning if the thread group created for WebSocket asynchronous
+        write call backs can not be destroyed when the web application is
+        stopped. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
