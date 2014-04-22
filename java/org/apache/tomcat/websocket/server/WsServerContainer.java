@@ -114,7 +114,7 @@ public class WsServerContainer extends WsWebSocketContainer
         }
         // Executor config
         int executorCoreSize = 0;
-        int executorMaxSize = 10;
+        int executorMaxSize = 200;
         long executorKeepAliveTimeSeconds = 60;
         value = servletContext.getInitParameter(
                 Constants.EXECUTOR_CORE_SIZE_INIT_PARAM);
