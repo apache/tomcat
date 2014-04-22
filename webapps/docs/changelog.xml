@@ -121,6 +121,11 @@
         systems if a file named <code>\</code> is encountered when scanning for
         TLDs. (mark)
       </fix>
+      <fix>
+        Increase the default maximum size of the executor used by the WebSocket
+        implementation for call backs associated with asynchronous writes from
+        10 to 200. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
