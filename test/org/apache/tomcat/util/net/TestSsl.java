@@ -134,10 +134,11 @@ public class TestSsl extends TomcatBaseTest {
                 requestCount++;
                 doRequest(os, r);
             }
-        } catch (IOException ioe) {
-            Assert.fail("Failed on request number " + requestCount +
-                    " after startHandshake()");
-            throw ioe;
+        } catch (AssertionError | IOException e) {
+            String message = "Failed on request number " + requestCount
+                    + " after startHandshake(). " + e.getMessage();
+            log.error(message, e);
+            Assert.fail(message);
         }
 
         Assert.assertTrue(listener.isComplete());
