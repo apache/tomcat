@@ -155,20 +155,15 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     @Override
     protected void registerForEvent(boolean read, boolean write) {
         final NioChannel socket = socketWrapper.getSocket();
-        final NioEndpoint.KeyAttachment attach =
-                (NioEndpoint.KeyAttachment) socket.getAttachment(false);
-        if (attach == null) {
-            return;
-        }
-        SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
+
+        int interestOps = 0;
         if (read) {
-            attach.interestOps(attach.interestOps() | SelectionKey.OP_READ);
-            key.interestOps(key.interestOps() | SelectionKey.OP_READ);
+            interestOps = SelectionKey.OP_READ;
         }
         if (write) {
-            attach.interestOps(attach.interestOps() | SelectionKey.OP_WRITE);
-            key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+            interestOps = interestOps | SelectionKey.OP_WRITE;
         }
+        socket.getPoller().add(socket, interestOps);
     }
 
 
