@@ -149,6 +149,10 @@
       <scode>
         Fix code duplication between NIO and NIO2. (remm)
       </scode>
+      <fix>
+        <bug>56348</bug>: Fix slow asynchronous read when read was performed on
+        a non-container thread. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
