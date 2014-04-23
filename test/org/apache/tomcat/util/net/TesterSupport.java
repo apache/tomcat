@@ -133,6 +133,11 @@ public final class TesterSupport {
             // Disabled by default in 1.1.20 windows binary (2010-07-27)
             return false;
         }
+        if (protocol.contains("NioProtocol")) {
+            // Doesn't work on all platforms - see BZ 56448.
+            return false;
+        }
+
         return true;
     }
 
