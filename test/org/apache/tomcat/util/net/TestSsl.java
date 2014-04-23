@@ -129,10 +129,14 @@ public class TestSsl extends TomcatBaseTest {
 
         // One request should be sufficient
         int requestCount = 0;
+        int listenerComplete = 0;
         try {
-            while (!listener.isComplete() && requestCount < 5) {
+            while (requestCount < 10) {
                 requestCount++;
                 doRequest(os, r);
+                if (listener.isComplete() && listenerComplete == 0) {
+                    listenerComplete = requestCount;
+                }
             }
         } catch (AssertionError | IOException e) {
             String message = "Failed on request number " + requestCount
@@ -142,7 +146,7 @@ public class TestSsl extends TomcatBaseTest {
         }
 
         Assert.assertTrue(listener.isComplete());
-        System.out.println("Renegotiation completed after " + requestCount + " requests");
+        System.out.println("Renegotiation completed after " + listenerComplete + " requests");
     }
 
     private void doRequest(OutputStream os, Reader r) throws IOException {
