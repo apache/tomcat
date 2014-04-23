@@ -649,7 +649,7 @@ public class WsSession implements Session {
 
     private void checkState() {
         if (state == State.CLOSED) {
-            throw new IllegalStateException(sm.getString("wsSession.closed"));
+            throw new IllegalStateException(sm.getString("wsSession.closed", id));
         }
     }
 
