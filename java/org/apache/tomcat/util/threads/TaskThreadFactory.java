@@ -22,6 +22,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.tomcat.util.net.Constants;
+import org.apache.tomcat.util.security.PrivilegedSetTccl;
 /**
  * Simple task thread factory to use to create threads for an executor
  * implementation.
@@ -66,22 +67,6 @@ public class TaskThreadFactory implements ThreadFactory {
             } else {
                 Thread.currentThread().setContextClassLoader(loader);
             }
-        }
-    }
-
-
-    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
-
-        private ClassLoader cl;
-
-        PrivilegedSetTccl(ClassLoader cl) {
-            this.cl = cl;
-        }
-
-        @Override
-        public Void run() {
-            Thread.currentThread().setContextClassLoader(cl);
-            return null;
         }
     }
 }

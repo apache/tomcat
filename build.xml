@@ -347,6 +347,7 @@
     <include name="org/apache/tomcat/util/codec/**" />
     <include name="org/apache/tomcat/util/file/**" />
     <include name="org/apache/tomcat/util/res/**" />
+    <include name="org/apache/tomcat/util/security/**" />
     <include name="org/apache/tomcat/util/threads/**" />
     <include name="org/apache/tomcat/util/*" />
     <exclude name="org/apache/tomcat/util/bcel" />
@@ -1966,6 +1967,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
           <exclude name="org/apache/tomcat/util/net" />
           <exclude name="org/apache/tomcat/util/res" />
           <exclude name="org/apache/tomcat/util/scan" />
+          <exclude name="org/apache/tomcat/util/security" />
           <exclude name="org/apache/tomcat/util/threads" />
           <exclude name="**/package.html" />
           <exclude name="**/LocalStrings_*" />
