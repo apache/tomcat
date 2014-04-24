@@ -163,10 +163,6 @@
         <bug>56348</bug>: Fix slow asynchronous read when read was performed on
         a non-container thread. (markt)
       </fix>
-      <fix>
-        <bug>56416</bug>: Align the AJP and HTTP connector implementations with
-        the documented behaviour and use JVM defaults for socket linger. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
