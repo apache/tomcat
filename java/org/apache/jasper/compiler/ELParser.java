@@ -266,7 +266,7 @@ public class ELParser {
                 if (output == null) {
                     output = new StringBuilder(len + 20);
                 }
-                output.append(input.subSequence(lastAppend, i));
+                output.append(input.substring(lastAppend, i));
                 lastAppend = i + 1;
                 output.append('\\');
                 output.append(ch);
@@ -319,7 +319,7 @@ public class ELParser {
                     output = new StringBuilder(len + 20);
                     output.append(quote);
                 }
-                output.append(input.subSequence(lastAppend, i));
+                output.append(input.substring(lastAppend, i));
                 lastAppend = i + 1;
                 output.append('\\');
                 output.append(ch);
