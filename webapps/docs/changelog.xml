@@ -151,7 +151,7 @@
       </scode>
       <fix>
         <bug>56348</bug>: Fix slow asynchronous read when read was performed on
-        a non-container thread. (markt) 
+        a non-container thread. (markt)
       </fix>
     </changelog>
   </subsection>
