@@ -322,8 +322,8 @@
 
     <attribute name="connectionLinger" required="false">
       <p>The number of seconds during which the sockets used by this
-      <strong>Connector</strong> will linger when they are closed.
-      If not specified, the JVM default will be used.</p>
+      <strong>Connector</strong> will linger when they are closed. The default
+      value is <code>-1</code> which disables socket linger.</p>
     </attribute>
 
     <attribute name="connectionTimeout" required="false">
