@@ -102,6 +102,11 @@
         <code>WebappClassLoader</code>. State is now correctly reported rather
         than always reporting as <code>NEW</code>. (markt)
       </scode>
+      <add>
+        <bug>56382</bug>: Information about finished deployment and its execution
+        time is added to the log files. Patch is provided by Danila Galimov.
+        (violetagg)
+      </add>
       <fix>
         <bug>56390</bug>: Fix JAR locking issue with JARs containing TLDs and
         the TLD cache that prevented the undeployment of web applications when
