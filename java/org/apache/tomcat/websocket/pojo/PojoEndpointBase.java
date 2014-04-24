@@ -53,6 +53,14 @@ public abstract class PojoEndpointBase extends Endpoint {
         Object pojo = getPojo();
         Map<String,String> pathParameters = getPathParameters();
 
+        // Add message handlers before calling onOpen since that may trigger a
+        // message which in turn could trigger a response and/or close the
+        // session
+        for (MessageHandler mh : methodMapping.getMessageHandlers(pojo,
+                pathParameters, session, config)) {
+            session.addMessageHandler(mh);
+        }
+
         if (methodMapping.getOnOpen() != null) {
             try {
                 methodMapping.getOnOpen().invoke(pojo,
@@ -74,11 +82,6 @@ public abstract class PojoEndpointBase extends Endpoint {
                 handleOnOpenOrCloseError(session, t);
                 return;
             }
-        }
-
-        for (MessageHandler mh : methodMapping.getMessageHandlers(pojo,
-                pathParameters, session, config)) {
-            session.addMessageHandler(mh);
         }
     }
 
