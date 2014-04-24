@@ -26,6 +26,7 @@ import javax.servlet.jsp.tagext.FunctionInfo;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
+import org.apache.tomcat.util.security.PrivilegedGetTccl;
 
 /**
  * This class generates functions mappers for the EL expressions in the page.
@@ -319,15 +320,6 @@ public class ELFunctionMapper {
                 throw new JasperException(e);
             }
             return clazz.getCanonicalName();
-        }
-    }
-
-    private static class PrivilegedGetTccl
-            implements PrivilegedAction<ClassLoader> {
-
-        @Override
-        public ClassLoader run() {
-            return Thread.currentThread().getContextClassLoader();
         }
     }
 }
