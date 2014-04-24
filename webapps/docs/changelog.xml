@@ -131,6 +131,11 @@
         patterns of the form <code>*.a.b</code> which are not valid patterns for
         extension mappings. (markt)
       </add>
+      <add>
+        Extend XML factory, parser etc. memory leak protection to cover some
+        additional locations where, theoretically, a memory leak could occur.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
