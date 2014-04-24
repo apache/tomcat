@@ -108,6 +108,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>56416</bug>: Align the AJP and HTTP connector implementations with
+        the documented behaviour and use JVM defaults for socket linger. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
