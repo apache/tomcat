@@ -86,12 +86,12 @@
     <p>The implementation of this functionality depends on the following
     external specifications:</p>
     <ul>
-    <li><a href="http://java.sun.com/products/jdk/idl/index.html">Java
-        IDL</a> (for CORBA, included in the JDK)</li>
-    <li><a href="http://java.sun.com/products/JavaManagement/index.html">
+    <li><a href="http://docs.oracle.com/javase/7/docs/technotes/guides/idl">
+        Java IDL</a> (for CORBA, included in the JDK)</li>
+    <li><a href="http://www.oracle.com/technetwork/java/javase/tech/javamanagement-140525.html">
         Java Management Extensions</a></li>
-    <li><a href="http://java.sun.com/products/rmi/index.html">Remote
-        Method Invocation</a> (Included in the JDK)</li>
+    <li><a href="http://docs.oracle.com/javase/7/docs/technotes/guides/rmi">
+        Remote Method Invocation</a> (Included in the JDK)</li>
     </ul>
 
   </subsection>
@@ -178,8 +178,8 @@
     cares about the administrative app anymore. It is removed and unsupported
     since Tomcat 6.0.</p>
     <ul>
-    <li><a href="http://java.sun.com/j2se/">Java 2 Standard Edition</a>
-        (Version 1.2 or later)</li>
+    <li><a href="http://www.oracle.com/technetwork/java/javase/overview/index.html">
+        Java Standard Edition</a> (Version 1.2 or later)</li>
     <li><a href="http://www.jcp.org/jsr/detail/154.jsp">Servlet 2.4</a>
         (supported natively by Tomcat 5)</li>
     <li><a href="http://www.jcp.org/jsr/detail/152.jsp">JavaServer Pages 2.0</a>
