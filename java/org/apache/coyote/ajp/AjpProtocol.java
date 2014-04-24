@@ -59,7 +59,6 @@ public class AjpProtocol extends AbstractAjpProtocol<Socket> {
         endpoint = new JIoEndpoint();
         cHandler = new AjpConnectionHandler(this);
         ((JIoEndpoint) endpoint).setHandler(cHandler);
-        setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
     }

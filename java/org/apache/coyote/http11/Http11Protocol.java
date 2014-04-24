@@ -64,7 +64,6 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
         endpoint = new JIoEndpoint();
         cHandler = new Http11ConnectionHandler(this);
         ((JIoEndpoint) endpoint).setHandler(cHandler);
-        setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
     }
