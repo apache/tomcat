@@ -30,6 +30,7 @@ public final class Constants {
      */
     public static final String Package = "org.apache.coyote.ajp";
 
+    public static final int DEFAULT_CONNECTION_LINGER = -1;
     public static final int DEFAULT_CONNECTION_TIMEOUT = -1;
     public static final boolean DEFAULT_TCP_NO_DELAY = true;
 

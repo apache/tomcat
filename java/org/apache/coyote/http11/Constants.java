@@ -36,6 +36,7 @@ public final class Constants {
      */
     public static final String Package = "org.apache.coyote.http11";
 
+    public static final int DEFAULT_CONNECTION_LINGER = -1;
     public static final int DEFAULT_CONNECTION_TIMEOUT = 60000;
     public static final boolean DEFAULT_TCP_NO_DELAY = true;
 
