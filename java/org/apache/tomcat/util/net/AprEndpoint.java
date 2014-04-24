@@ -47,6 +47,7 @@ import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.security.PrivilegedSetTccl;
 
 
 /**
@@ -2465,22 +2466,6 @@ public class AprEndpoint extends AbstractEndpoint {
 
         public AprSocketWrapper(Long socket) {
             super(socket);
-        }
-    }
-
-
-    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
-
-        private ClassLoader cl;
-
-        PrivilegedSetTccl(ClassLoader cl) {
-            this.cl = cl;
-        }
-
-        @Override
-        public Void run() {
-            Thread.currentThread().setContextClassLoader(cl);
-            return null;
         }
     }
 }

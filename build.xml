@@ -334,6 +334,7 @@
     <include name="org/apache/tomcat/util/file/**" />
     <include name="org/apache/tomcat/util/res/**" />
     <include name="org/apache/tomcat/util/scan/**" />
+    <include name="org/apache/tomcat/util/security/**" />
   </patternset>
 
   <patternset id="files.catalina">
@@ -370,6 +371,7 @@
     <exclude name="org/apache/tomcat/util/file/**" />
     <exclude name="org/apache/tomcat/util/res/**" />
     <exclude name="org/apache/tomcat/util/scan/**" />
+    <exclude name="org/apache/tomcat/util/security/**" />
   </patternset>
 
   <patternset id="files.jasper">

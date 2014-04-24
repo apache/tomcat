@@ -32,6 +32,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.security.PrivilegedSetTccl;
 
 
 /**
@@ -605,20 +606,4 @@ public class JIoEndpoint extends AbstractEndpoint {
     protected Log getLog() {
         return log;
     }
-
-    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
-
-        private ClassLoader cl;
-
-        PrivilegedSetTccl(ClassLoader cl) {
-            this.cl = cl;
-        }
-
-        @Override
-        public Void run() {
-            Thread.currentThread().setContextClassLoader(cl);
-            return null;
-        }
-    }
-
 }

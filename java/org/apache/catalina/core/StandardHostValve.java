@@ -42,6 +42,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.PrivilegedSetTccl;
 
 
 /**
@@ -509,21 +510,5 @@ final class StandardHostValve extends ValveBase {
         }
         return (null);
 
-    }
-
-
-    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
-
-        private ClassLoader cl;
-
-        PrivilegedSetTccl(ClassLoader cl) {
-            this.cl = cl;
-        }
-
-        @Override
-        public Void run() {
-            Thread.currentThread().setContextClassLoader(cl);
-            return null;
-        }
     }
 }

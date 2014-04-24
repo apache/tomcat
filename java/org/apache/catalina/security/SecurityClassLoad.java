@@ -75,12 +75,6 @@ public final class SecurityClassLoad {
             "AsyncContextImpl$1");
         loader.loadClass
             (basePackage +
-            "AsyncContextImpl$PrivilegedGetTccl");
-        loader.loadClass
-            (basePackage +
-            "AsyncContextImpl$PrivilegedSetTccl");
-        loader.loadClass
-            (basePackage +
             "AsyncListenerWrapper");
         loader.loadClass
             (basePackage +
@@ -140,8 +134,6 @@ public final class SecurityClassLoad {
         final String basePackage = "org.apache.catalina.session.";
         loader.loadClass
             (basePackage + "StandardSession");
-        loader.loadClass
-            (basePackage + "StandardSession$PrivilegedSetTccl");
         loader.loadClass
             (basePackage + "StandardSession$1");
         loader.loadClass
@@ -291,10 +283,9 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage +
                 "util.net.NioBlockingSelector$BlockPoller$3");
         loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
-        loader.loadClass
-            (basePackage + "util.net.JIoEndpoint$PrivilegedSetTccl");
-        loader.loadClass
-            (basePackage + "util.net.AprEndpoint$PrivilegedSetTccl");
+        // security
+        loader.loadClass(basePackage + "util.security.PrivilegedGetTccl");
+        loader.loadClass(basePackage + "util.security.PrivilegedSetTccl");
     }
 }
 

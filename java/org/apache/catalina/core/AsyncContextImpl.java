@@ -52,6 +52,8 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.PrivilegedGetTccl;
+import org.apache.tomcat.util.security.PrivilegedSetTccl;
 /**
  *
  * @author fhanik
@@ -566,7 +568,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 } else {
                     Thread.currentThread().setContextClassLoader
                             (context.getLoader().getClassLoader());
-                }                wrapped.run();
+                }
+                wrapped.run();
             } finally {
                 if (Globals.IS_SECURITY_ENABLED) {
                     PrivilegedAction<Void> pa = new PrivilegedSetTccl(
@@ -579,30 +582,4 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
 
     }
-
-
-    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
-
-        private ClassLoader cl;
-
-        PrivilegedSetTccl(ClassLoader cl) {
-            this.cl = cl;
-        }
-
-        @Override
-        public Void run() {
-            Thread.currentThread().setContextClassLoader(cl);
-            return null;
-        }
-    }
-
-    private static class PrivilegedGetTccl
-            implements PrivilegedAction<ClassLoader> {
-
-        @Override
-        public ClassLoader run() {
-            return Thread.currentThread().getContextClassLoader();
-        }
-    }
-
 }

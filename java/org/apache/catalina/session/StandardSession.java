@@ -57,6 +57,7 @@ import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.PrivilegedSetTccl;
 
 /**
  * Standard implementation of the <b>Session</b> interface.  This object is
@@ -1834,28 +1835,8 @@ public class StandardSession implements HttpSession, Session, Serializable {
                     (sm.getString("standardSession.attributeEvent"), t);
             }
         }
-
     }
-
-
-    private static class PrivilegedSetTccl
-    implements PrivilegedAction<Void> {
-
-        private ClassLoader cl;
-
-        PrivilegedSetTccl(ClassLoader cl) {
-            this.cl = cl;
-        }
-
-        @Override
-        public Void run() {
-            Thread.currentThread().setContextClassLoader(cl);
-            return null;
-        }
-    }
-
 }
-
 
 // ------------------------------------------------------------ Protected Class
 
