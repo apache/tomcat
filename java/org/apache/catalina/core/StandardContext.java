@@ -6144,11 +6144,15 @@ public class StandardContext extends ContainerBase
      */
     private void checkUnusualURLPattern(String urlPattern) {
         if (log.isInfoEnabled()) {
-            if(urlPattern.endsWith("*") && (urlPattern.length() < 2 ||
-                    urlPattern.charAt(urlPattern.length()-2) != '/')) {
+            // First group checks for '*' or '/foo*' style patterns
+            // Second group checks for *.foo.bar style patterns
+            if((urlPattern.endsWith("*") && (urlPattern.length() < 2 ||
+                        urlPattern.charAt(urlPattern.length()-2) != '/')) ||
+                    urlPattern.startsWith("*.") && urlPattern.length() > 2 &&
+                        urlPattern.lastIndexOf('.') > 1) {
                 log.info("Suspicious url pattern: \"" + urlPattern + "\"" +
                         " in context [" + getName() + "] - see" +
-                        " section SRV.11.2 of the Servlet specification" );
+                        " sections 12.1 and 12.2 of the Servlet specification");
             }
         }
     }

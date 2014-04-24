@@ -121,6 +121,11 @@
         systems if a file named <code>\</code> is encountered when scanning for
         TLDs. (markt)
       </fix>
+      <add>
+        <bug>56430</bug>: Extend checks for suspicious URL patterns to include
+        patterns of the form <code>*.a.b</code> which are not valid patterns for
+        extension mappings. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
