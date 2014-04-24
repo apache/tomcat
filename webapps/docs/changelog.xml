@@ -87,6 +87,11 @@
         reverts all the operations performed when adding an MBean notification
         listener. (markt)
       </fix>
+      <add>
+        <bug>56382</bug>: Information about finished deployment and its execution
+        time is added to the log files. Patch is provided by Danila Galimov.
+        (violetagg)
+      </add>
       <fix>
         Only create XML parsing objects if required and fix associated potential
         memory leak in the default Servlet. (markt)

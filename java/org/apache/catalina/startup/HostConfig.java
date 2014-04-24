@@ -606,9 +606,11 @@ public class HostConfig
         DeployedApplication deployedApp =
                 new DeployedApplication(cn.getName(), true);
 
+        long startTime = 0;
         // Assume this is a configuration descriptor and deploy it
         if(log.isInfoEnabled()) {
-            log.info(sm.getString("hostConfig.deployDescriptor",
+           startTime = System.currentTimeMillis();
+           log.info(sm.getString("hostConfig.deployDescriptor",
                     contextXml.getAbsolutePath()));
         }
 
@@ -743,6 +745,11 @@ public class HostConfig
 
         if (host.findChild(context.getName()) != null) {
             deployed.put(context.getName(), deployedApp);
+        }
+
+        if (log.isInfoEnabled()) {
+            log.info(sm.getString("hostConfig.deployDescriptor.finished",
+                contextXml.getAbsolutePath(), Long.valueOf(System.currentTimeMillis() - startTime)));
         }
     }
 
@@ -1040,10 +1047,13 @@ public class HostConfig
         DeployedApplication deployedApp = new DeployedApplication(cn.getName(),
                 xml.exists() && deployXML && copyThisXml);
 
+        long startTime = 0;
         // Deploy the application in this WAR file
-        if(log.isInfoEnabled())
+        if(log.isInfoEnabled()) {
+            startTime = System.currentTimeMillis();
             log.info(sm.getString("hostConfig.deployWar",
                     war.getAbsolutePath()));
+        }
 
         try {
             // Populate redeploy resources with the WAR file
@@ -1099,6 +1109,11 @@ public class HostConfig
         }
 
         deployed.put(cn.getName(), deployedApp);
+
+        if (log.isInfoEnabled()) {
+            log.info(sm.getString("hostConfig.deployWar.finished",
+                war.getAbsolutePath(), Long.valueOf(System.currentTimeMillis() - startTime)));
+        }
     }
 
 
@@ -1148,10 +1163,13 @@ public class HostConfig
     protected void deployDirectory(ContextName cn, File dir) {
 
 
+        long startTime = 0;
         // Deploy the application in this directory
-        if( log.isInfoEnabled() )
+        if( log.isInfoEnabled() ) {
+            startTime = System.currentTimeMillis();
             log.info(sm.getString("hostConfig.deployDir",
                     dir.getAbsolutePath()));
+        }
 
         Context context = null;
         File xml = new File(dir, Constants.ApplicationContextXml);
@@ -1275,6 +1293,11 @@ public class HostConfig
         }
 
         deployed.put(cn.getName(), deployedApp);
+
+        if( log.isInfoEnabled() ) {
+            log.info(sm.getString("hostConfig.deployDir.finished",
+                    dir.getAbsolutePath(), Long.valueOf(System.currentTimeMillis() - startTime)));
+        }
     }
 
 
