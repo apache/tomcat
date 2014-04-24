@@ -63,10 +63,10 @@
     <p>The implementation of this functionality depends on the following
     external specifications:</p>
     <ul>
-    <li><a href="http://java.sun.com/products/jdbc/">Java Database
-        Connectivity</a> (version 2.0 or later)</li>
-    <li><a href="http://java.sun.com/products/jdbc/">Java Database
-        Connectivity Optional Package</a> (version 2.0 or later)</li>
+    <li><a href="http://www.oracle.com/technetwork/java/javase/jdbc/index.html">
+        Java Database Connectivity</a> (version 2.0 or later)</li>
+    <li><a href="http://www.oracle.com/technetwork/java/javase/jdbc/index.html">
+        Java Database Connectivity Optional Package</a> (version 2.0 or later)</li>
     </ul>
 
   </subsection>
