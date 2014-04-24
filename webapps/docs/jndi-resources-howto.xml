@@ -39,18 +39,19 @@
 <p>Tomcat provides a JNDI <strong>InitialContext</strong> implementation
 instance for each web application running under it, in a manner that is
 compatible with those provided by a
-<a href="http://java.sun.com/j2ee">Java Enterprise Edition</a> application
-server. The Java EE standard provides a standard set of elements in the
-<code>/WEB-INF/web.xml</code> file to reference/define resources.</p>
+<a href="http://www.oracle.com/technetwork/java/javaee/overview/index.html">
+Java Enterprise Edition</a> application server. The Java EE standard provides
+a standard set of elements in the <code>/WEB-INF/web.xml</code> file to
+reference/define resources.</p>
 
 <p>See the following Specifications for more information about programming APIs
 for JNDI, and for the features supported by Java Enterprise Edition (Java EE)
 servers, which Tomcat emulates for the services that it provides:</p>
 <ul>
-<li><a href="http://java.sun.com/products/jndi">Java Naming and Directory
-    Interface</a> (included in JDK 1.4 onwards)</li>
-<li><a href="http://java.sun.com/j2ee/download.html">Java EE Platform
-    Specification</a> (in particular, see Chapter 5 on <em>Naming</em>)</li>
+<li><a href="http://docs.oracle.com/javase/7/docs/technotes/guides/jndi/index.html">
+    Java Naming and Directory Interface</a> (included in JDK 1.4 onwards)</li>
+<li><a href="http://www.oracle.com/technetwork/java/javaee/documentation/index.html">
+    Java EE Platform Specification</a> (in particular, see Chapter 5 on <em>Naming</em>)</li>
 </ul>
 
 </section>
@@ -397,7 +398,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
 
     <p>In many web applications, sending electronic mail messages is a
     required part of the system's functionality.  The
-    <a href="http://java.sun.com/products/javamail">Java Mail</a> API
+    <a href="http://www.oracle.com/technetwork/java/javamail/index.html">Java Mail</a> API
     makes this process relatively straightforward, but requires many
     configuration details that the client application must be aware of
     (including the name of the SMTP host to be used for message sending).</p>
@@ -548,7 +549,8 @@ Transport.send(message);]]></source>
 
     <p>For information about JDBC, you should consult the following:</p>
     <ul>
-    <li><a href="http://java.sun.com/products/jdbc/">http://java.sun.com/products/jdbc/</a> -
+    <li><a href="http://www.oracle.com/technetwork/java/javase/jdbc/index.html">
+        http://www.oracle.com/technetwork/java/javase/jdbc/index.html</a> -
         Home page for information about Java Database Connectivity.</li>
     <li><a href="http://java.sun.com/j2se/1.3/docs/guide/jdbc/spec2/jdbc2.1.frame.html">http://java.sun.com/j2se/1.3/docs/guide/jdbc/spec2/jdbc2.1.frame.html</a> -
         The JDBC 2.1 API Specification.</li>
@@ -556,7 +558,8 @@ Transport.send(message);]]></source>
         The JDBC 2.0 Standard Extension API (including the
         <code>javax.sql.DataSource</code> API).  This package is now known
         as the "JDBC Optional Package".</li>
-    <li><a href="http://java.sun.com/j2ee/download.html">http://java.sun.com/j2ee/download.html</a> -
+    <li><a href="http://www.oracle.com/technetwork/java/javaee/overview/index.htm">
+        http://www.oracle.com/technetwork/java/javaee/overview/index.htm</a> -
         The Java EE Platform Specification (covers the JDBC facilities that
         all Java EE platforms must provide to applications).</li>
     </ul>
@@ -871,8 +874,8 @@ public class MyBeanFactory implements ObjectFactory {
   bean being configured.</p>
 
   <p>For more information about <code>ObjectFactory</code>, see the
-  <a href="http://java.sun.com/products/jndi/docs.html">JNDI 1.2 Service
-  Provider Interface (SPI) Specification</a>.</p>
+  <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/jndi/index.html">
+  JNDI Service Provider Interface (SPI) Specification</a>.</p>
 
   <p>You will need to compile this class against a class path that includes
   all of the JAR files in the <code>$CATALINA_HOME/lib</code> directory.  When you are through,

@@ -78,7 +78,8 @@
 
     <p>This is just a short summary of the standard system SecurityManager
     Permission classes applicable to Tomcat.  See
-    <a href="http://java.sun.com/security/">http://java.sun.com/security/</a>
+    <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/">
+    http://docs.oracle.com/javase/7/docs/technotes/guides/security/</a>
     for more information.</p>
 
     <ul>
@@ -190,9 +191,9 @@ grant [signedBy <signer>,] [codeBase <code source>] {
 </section>
 <section name="Configuring Package Protection in Tomcat">
   <p>Starting with Tomcat 5, it is now possible to configure which Tomcat
-  internal package are protected againts package definition and access. See
-  <a href="http://java.sun.com/security/seccodeguide.html">
-    http://java.sun.com/security/seccodeguide.html</a>
+  internal package are protected against package definition and access. See
+  <a href="http://www.oracle.com/technetwork/java/seccodeguide-139067.html">
+    http://www.oracle.com/technetwork/java/seccodeguide-139067.html</a>
     for more information.</p>
 
 
