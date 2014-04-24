@@ -228,6 +228,12 @@
         client connections initiated by web applications but stand alone clients
         must call <code>WsWebSocketContainer.destroy()</code>. (markt)
       </fix>
+      <fix>
+        <bug>56449</bug>: When creating a new session, add the message handlers
+        to the session before calling <code>Endpoint.onOpen()</code> so the
+        message handlers are in place should the <code>onOpen()</code> method
+        trigger the sending of any messages. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
