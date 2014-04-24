@@ -697,10 +697,14 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                         socket = serverSock.accept().get();
                     } catch (Exception e) {
                         countDownConnection();
-                        // Introduce delay if necessary
-                        errorDelay = handleExceptionWithDelay(errorDelay);
-                        // re-throw
-                        throw e;
+                        if (running) {
+                            // Introduce delay if necessary
+                            errorDelay = handleExceptionWithDelay(errorDelay);
+                            // re-throw
+                            throw e;
+                        } else {
+                            break;
+                        }
                     }
                     // Successful accept, reset the error delay
                     errorDelay = 0;
@@ -716,10 +720,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                         countDownConnection();
                         // Close socket right away
                         closeSocket(socket);
-                    }
-                } catch (NullPointerException npe) {
-                    if (running) {
-                        log.error(sm.getString("endpoint.accept.fail"), npe);
                     }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
