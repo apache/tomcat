@@ -101,12 +101,6 @@ public final class SecurityClassLoad {
         loader.loadClass
             (basePackage +
              "ApplicationHttpRequest$AttributeNamesEnumerator");
-        loader.loadClass
-            (basePackage +
-             "StandardContext$PrivilegedGetTccl");
-        loader.loadClass
-            (basePackage +
-             "StandardContext$PrivilegedSetTccl");
     }
 
 
@@ -293,9 +287,9 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage +
                 "util.net.NioBlockingSelector$BlockPoller$3");
         loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
-        // threads
-        loader.loadClass
-            (basePackage + "util.threads.TaskThreadFactory$PrivilegedSetTccl");
+        // security
+        loader.loadClass(basePackage + "util.security.PrivilegedGetTccl");
+        loader.loadClass(basePackage + "util.security.PrivilegedSetTccl");
     }
 }
 
