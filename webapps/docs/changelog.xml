@@ -258,6 +258,10 @@
         message handlers are in place should the <code>onOpen()</code> method
         trigger the sending of any messages. (markt)
       </fix>
+      <fix>
+        <bug>56458</bug>: Report WebSocket sessions that are created over secure
+        connections as secure rather than as not secure. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
