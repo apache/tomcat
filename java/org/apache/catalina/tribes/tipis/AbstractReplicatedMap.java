@@ -158,6 +158,7 @@ public abstract class AbstractReplicatedMap<K,V>
      * @param initialCapacity int - the size of this map, see HashMap
      * @param loadFactor float - load factor, see HashMap
      * @param cls - a list of classloaders to be used for deserialization of objects.
+     * @param terminate - Flag for whether to terminate this map that failed to start.
      */
     public AbstractReplicatedMap(MapOwner owner,
                                  Channel channel,
@@ -192,6 +193,7 @@ public abstract class AbstractReplicatedMap<K,V>
      * @param timeout long
      * @param channelSendOptions int
      * @param cls ClassLoader[]
+     * @param terminate - Flag for whether to terminate this map that failed to start.
      */
     protected void init(MapOwner owner, Channel channel, String mapContextName,
             long timeout, int channelSendOptions,ClassLoader[] cls, boolean terminate) {
