@@ -85,38 +85,23 @@ public final class TldConfig  implements LifecycleListener {
      * Create (if necessary) and return a Digester configured to process the
      * tld.
      */
-    private static Digester createTldDigester(boolean validation,
+    private synchronized static Digester createTldDigester(boolean validation,
             boolean blockExternal) {
-        
-        Digester digester = null;
-        if (!validation && !blockExternal) {
-            if (tldDigesters[0] == null) {
-                tldDigesters[0] = DigesterFactory.newDigester(validation,
-                        true, new TldRuleSet(), blockExternal);
-                tldDigesters[0].getParser();
-            }
-            digester = tldDigesters[0];
-        } else if (!validation && blockExternal) {
-            if (tldDigesters[1] == null) {
-                tldDigesters[1] = DigesterFactory.newDigester(validation,
-                        true, new TldRuleSet(), blockExternal);
-                tldDigesters[1].getParser();
-            }
-            digester = tldDigesters[1];
-        } else if (validation && !blockExternal) {
-            if (tldDigesters[2] == null) {
-                tldDigesters[2] = DigesterFactory.newDigester(validation,
-                        true, new TldRuleSet(), blockExternal);
-                tldDigesters[2].getParser();
-            }
-            digester = tldDigesters[2];
-        } else {
-            if (tldDigesters[3] == null) {
-                tldDigesters[3] = DigesterFactory.newDigester(validation,
-                        true, new TldRuleSet(), blockExternal);
-                tldDigesters[3].getParser();
-            }
-            digester = tldDigesters[3];
+
+        Digester digester;
+        int cacheIndex = 0;
+        if (validation) {
+            cacheIndex += 1;
+        }
+        if (blockExternal) {
+            cacheIndex += 2;
+        }
+        digester = tldDigesters[cacheIndex];
+        if (digester == null) {
+            digester = DigesterFactory.newDigester(validation,
+                    true, new TldRuleSet(), blockExternal);
+            digester.getParser();
+            tldDigesters[cacheIndex] = digester;
         }
         return digester;
     }
