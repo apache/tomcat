@@ -107,6 +107,11 @@
         time is added to the log files. Patch is provided by Danila Galimov.
         (violetagg)
       </add>
+      <add>
+        <bug>56383</bug>: Properties for disabling server information and error
+        report are added to the <code>org.apache.catalina.valves.ErrorReportValve</code>.
+        Based on the patch provided by Nick Bunn. (violetagg)
+      </add>
       <fix>
         <bug>56390</bug>: Fix JAR locking issue with JARs containing TLDs and
         the TLD cache that prevented the undeployment of web applications when

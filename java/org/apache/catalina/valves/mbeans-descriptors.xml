@@ -179,6 +179,16 @@
                type="java.lang.String"
                writeable="false"/>
 
+    <attribute name="showReport"
+               description="Enables/Disables full error reports"
+               is="true"
+               type="boolean"/>
+
+    <attribute name="showServerInfo"
+               description="Enables/Disables server info on error pages"
+               is="true"
+               type="boolean"/>
+
   </mbean>
 
   <mbean name="ExtendedAccessLogValve"
