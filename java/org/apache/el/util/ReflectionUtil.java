@@ -138,7 +138,7 @@ public class ReflectionUtil {
         }
 
         Method[] methods = base.getClass().getMethods();
-        Map<Method,Integer> candidates = new HashMap<>();
+        Map<Method,MatchResult> candidates = new HashMap<>();
 
         for (Method m : methods) {
             if (!m.getName().equals(methodName)) {
@@ -163,6 +163,8 @@ public class ReflectionUtil {
 
             // Check the parameters match
             int exactMatch = 0;
+            int assignableMatch = 0;
+            int coercibleMatch = 0;
             boolean noMatch = false;
             for (int i = 0; i < mParamCount; i++) {
                 // Can't be null
@@ -171,12 +173,16 @@ public class ReflectionUtil {
                 } else if (i == (mParamCount - 1) && m.isVarArgs()) {
                     Class<?> varType = mParamTypes[i].getComponentType();
                     for (int j = i; j < paramCount; j++) {
-                        if (!isAssignableFrom(paramTypes[j], varType)) {
+                        if (isAssignableFrom(paramTypes[j], varType)) {
+                            assignableMatch++;
+                        } else {
                             if (paramValues == null) {
                                 noMatch = true;
                                 break;
                             } else {
-                                if (!isCoercibleFrom(paramValues[j], varType)) {
+                                if (isCoercibleFrom(paramValues[j], varType)) {
+                                    coercibleMatch++;
+                                } else {
                                     noMatch = true;
                                     break;
                                 }
@@ -186,12 +192,16 @@ public class ReflectionUtil {
                         // lead to a varArgs method matching when the result
                         // should be ambiguous
                     }
-                } else if (!isAssignableFrom(paramTypes[i], mParamTypes[i])) {
+                } else if (isAssignableFrom(paramTypes[i], mParamTypes[i])) {
+                    assignableMatch++;
+                } else {
                     if (paramValues == null) {
                         noMatch = true;
                         break;
                     } else {
-                        if (!isCoercibleFrom(paramValues[i], mParamTypes[i])) {
+                        if (isCoercibleFrom(paramValues[i], mParamTypes[i])) {
+                            coercibleMatch++;
+                        } else {
                             noMatch = true;
                             break;
                         }
@@ -208,26 +218,26 @@ public class ReflectionUtil {
                 return getMethod(base.getClass(), m);
             }
 
-            candidates.put(m, Integer.valueOf(exactMatch));
+            candidates.put(m, new MatchResult(exactMatch, assignableMatch, coercibleMatch));
         }
 
         // Look for the method that has the highest number of parameters where
         // the type matches exactly
-        int bestMatch = 0;
+        MatchResult bestMatch = new MatchResult(0, 0, 0);
         Method match = null;
         boolean multiple = false;
-        for (Map.Entry<Method, Integer> entry : candidates.entrySet()) {
-            if (entry.getValue().intValue() > bestMatch ||
-                    match == null) {
-                bestMatch = entry.getValue().intValue();
+        for (Map.Entry<Method, MatchResult> entry : candidates.entrySet()) {
+            int cmp = entry.getValue().compareTo(bestMatch);
+            if (cmp > 0 || match == null) {
+                bestMatch = entry.getValue();
                 match = entry.getKey();
                 multiple = false;
-            } else if (entry.getValue().intValue() == bestMatch) {
+            } else if (cmp == 0) {
                 multiple = true;
             }
         }
         if (multiple) {
-            if (bestMatch == paramCount - 1) {
+            if (bestMatch.getExact() == paramCount - 1) {
                 // Only one parameter is not an exact match - try using the
                 // super class
                 match = resolveAmbiguousMethod(candidates.keySet(), paramTypes);
@@ -430,4 +440,57 @@ public class ReflectionUtil {
         }
         return null;
     }
+
+    /*
+     * This class duplicates code in javax.el.Util. When making changes keep
+     * the code in sync.
+     */
+    private static class MatchResult implements Comparable<MatchResult> {
+
+        private final int exact;
+        private final int assignable;
+        private final int coercible;
+
+        public MatchResult(int exact, int assignable, int coercible) {
+            this.exact = exact;
+            this.assignable = assignable;
+            this.coercible = coercible;
+        }
+
+        public int getExact() {
+            return exact;
+        }
+
+        public int getAssignable() {
+            return assignable;
+        }
+
+        public int getCoercible() {
+            return coercible;
+        }
+
+        @Override
+        public int compareTo(MatchResult o) {
+            if (this.getExact() < o.getExact()) {
+                return -1;
+            } else if (this.getExact() > o.getExact()) {
+                return 1;
+            } else {
+                if (this.getAssignable() < o.getAssignable()) {
+                    return -1;
+                } else if (this.getAssignable() > o.getAssignable()) {
+                    return 1;
+                } else {
+                    if (this.getCoercible() < o.getCoercible()) {
+                        return -1;
+                    } else if (this.getCoercible() > o.getCoercible()) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }
+            }
+        }
+    }
+
 }
