@@ -48,6 +48,10 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ErrorReportValve extends ValveBase {
 
+    protected boolean showReport = true;
+
+    protected boolean showServerInfo = true;
+
     //------------------------------------------------------ Constructor
     public ErrorReportValve() {
         super(true);
@@ -199,69 +203,74 @@ public class ErrorReportValve extends ValveBase {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("<html><head><title>");
-        sb.append(ServerInfo.getServerInfo()).append(" - ");
-        sb.append(smClient.getString("errorReportValve.errorReport"));
-        sb.append("</title>");
-        sb.append("<style><!--");
-        sb.append(org.apache.catalina.util.TomcatCSS.TOMCAT_CSS);
-        sb.append("--></style> ");
+        sb.append("<html><head>");
+        if(showServerInfo || showReport){
+            sb.append("<title>");
+            if(showServerInfo) {
+                sb.append(ServerInfo.getServerInfo()).append(" - ");
+            }
+            sb.append(smClient.getString("errorReportValve.errorReport"));
+            sb.append("</title>");
+            sb.append("<style><!--");
+            sb.append(org.apache.catalina.util.TomcatCSS.TOMCAT_CSS);
+            sb.append("--></style> ");
+        }
         sb.append("</head><body>");
         sb.append("<h1>");
         sb.append(smClient.getString("errorReportValve.statusHeader",
                                "" + statusCode, message)).append("</h1>");
-        sb.append("<HR size=\"1\" noshade=\"noshade\">");
-        sb.append("<p><b>type</b> ");
-        if (throwable != null) {
-            sb.append(smClient.getString("errorReportValve.exceptionReport"));
-        } else {
-            sb.append(smClient.getString("errorReportValve.statusReport"));
-        }
-        sb.append("</p>");
-        sb.append("<p><b>");
-        sb.append(smClient.getString("errorReportValve.message"));
-        sb.append("</b> <u>");
-        sb.append(message).append("</u></p>");
-        sb.append("<p><b>");
-        sb.append(smClient.getString("errorReportValve.description"));
-        sb.append("</b> <u>");
-        sb.append(report);
-        sb.append("</u></p>");
-
-        if (throwable != null) {
-
-            String stackTrace = getPartialServletStackTrace(throwable);
+        if (showReport) {
+            sb.append("<HR size=\"1\" noshade=\"noshade\">");
+            sb.append("<p><b>type</b> ");
+            if (throwable != null) {
+                sb.append(smClient.getString("errorReportValve.exceptionReport"));
+            } else {
+                sb.append(smClient.getString("errorReportValve.statusReport"));
+            }
+            sb.append("</p>");
             sb.append("<p><b>");
-            sb.append(smClient.getString("errorReportValve.exception"));
-            sb.append("</b> <pre>");
-            sb.append(RequestUtil.filter(stackTrace));
-            sb.append("</pre></p>");
+            sb.append(smClient.getString("errorReportValve.message"));
+            sb.append("</b> <u>");
+            sb.append(message).append("</u></p>");
+            sb.append("<p><b>");
+            sb.append(smClient.getString("errorReportValve.description"));
+            sb.append("</b> <u>");
+            sb.append(report);
+            sb.append("</u></p>");
+            if (throwable != null) {
 
-            int loops = 0;
-            Throwable rootCause = throwable.getCause();
-            while (rootCause != null && (loops < 10)) {
-                stackTrace = getPartialServletStackTrace(rootCause);
+                String stackTrace = getPartialServletStackTrace(throwable);
                 sb.append("<p><b>");
-                sb.append(smClient.getString("errorReportValve.rootCause"));
+                sb.append(smClient.getString("errorReportValve.exception"));
                 sb.append("</b> <pre>");
                 sb.append(RequestUtil.filter(stackTrace));
                 sb.append("</pre></p>");
-                // In case root cause is somehow heavily nested
-                rootCause = rootCause.getCause();
-                loops++;
+
+                int loops = 0;
+                Throwable rootCause = throwable.getCause();
+                while (rootCause != null && (loops < 10)) {
+                    stackTrace = getPartialServletStackTrace(rootCause);
+                    sb.append("<p><b>");
+                    sb.append(smClient.getString("errorReportValve.rootCause"));
+                    sb.append("</b> <pre>");
+                    sb.append(RequestUtil.filter(stackTrace));
+                    sb.append("</pre></p>");
+                    // In case root cause is somehow heavily nested
+                    rootCause = rootCause.getCause();
+                    loops++;
+                }
+
+                sb.append("<p><b>");
+                sb.append(smClient.getString("errorReportValve.note"));
+                sb.append("</b> <u>");
+                sb.append(smClient.getString("errorReportValve.rootCauseInLogs",
+                        showServerInfo?ServerInfo.getServerInfo():""));
+                sb.append("</u></p>");
+
             }
-
-            sb.append("<p><b>");
-            sb.append(smClient.getString("errorReportValve.note"));
-            sb.append("</b> <u>");
-            sb.append(smClient.getString("errorReportValve.rootCauseInLogs",
-                                   ServerInfo.getServerInfo()));
-            sb.append("</u></p>");
-
+            sb.append("<HR size=\"1\" noshade=\"noshade\">");
         }
-
-        sb.append("<HR size=\"1\" noshade=\"noshade\">");
-        sb.append("<h3>").append(ServerInfo.getServerInfo()).append("</h3>");
+        sb.append("<h3>").append(showServerInfo?ServerInfo.getServerInfo():"").append("</h3>");
         sb.append("</body></html>");
 
         try {
@@ -313,5 +322,31 @@ public class ErrorReportValve extends ValveBase {
             }
         }
         return trace.toString();
+    }
+
+    /**
+     * Enables/Disables full error reports
+     *
+     * @param showReport
+     */
+    public void setShowReport(boolean showReport) {
+        this.showReport = showReport;
+    }
+
+    public boolean isShowReport() {
+        return showReport;
+    }
+
+    /**
+     * Enables/Disables server info on error pages
+     *
+     * @param showServerInfo
+     */
+    public void setShowServerInfo(boolean showServerInfo) {
+        this.showServerInfo = showServerInfo;
+    }
+
+    public boolean isShowServerInfo() {
+        return showServerInfo;
     }
 }
