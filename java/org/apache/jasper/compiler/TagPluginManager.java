@@ -94,16 +94,6 @@ public class TagPluginManager {
 
             parser = new TagPluginParser(ctxt, blockExternal);
 
-        } finally {
-            if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
-                AccessController.doPrivileged(pa);
-            } else {
-                Thread.currentThread().setContextClassLoader(original);
-            }
-        }
-
-        try {
             Enumeration<URL> urls =
                     ctxt.getClassLoader().getResources(META_INF_JASPER_TAG_PLUGINS_XML);
             if (urls != null) {
@@ -119,6 +109,13 @@ public class TagPluginManager {
             }
         } catch (IOException | SAXException e) {
             throw new JasperException(e);
+        } finally {
+            if (Constants.IS_SECURITY_ENABLED) {
+                PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
+                AccessController.doPrivileged(pa);
+            } else {
+                Thread.currentThread().setContextClassLoader(original);
+            }
         }
 
         Map<String, String> plugins = parser.getPlugins();
