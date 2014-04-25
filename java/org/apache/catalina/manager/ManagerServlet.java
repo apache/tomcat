@@ -718,15 +718,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             return;
         }
         
-        context = (Context) host.findChild(name);
-        if (context != null && context.getConfigured()) {
-            writer.println(smClient.getString(
-                    "managerServlet.deployed", displayPath));
-        } else {
-            // Something failed
-            writer.println(smClient.getString(
-                    "managerServlet.deployFailed", displayPath));
-        }
+        writeDeployResult(writer, smClient, name, displayPath);
     }
 
 
@@ -784,16 +776,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             return;
         }
         
-        context = (Context) host.findChild(name);
-        if (context != null && context.getConfigured()) {
-            writer.println(smClient.getString("managerServlet.deployed",
-                    displayPath));
-        } else {
-            // Something failed
-            writer.println(smClient.getString("managerServlet.deployFailed",
-                    displayPath));
-        }
-        
+        writeDeployResult(writer, smClient, name, displayPath);
     }
 
 
@@ -901,19 +884,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     removeServiced(name);
                 }
             }
-            context = (Context) host.findChild(name);
-            if (context != null && context.getConfigured() &&
-                    context.getState().isAvailable()) {
-                writer.println(smClient.getString(
-                        "managerServlet.deployed", displayPath));
-            } else if (context!=null && !context.getState().isAvailable()) {
-                writer.println(smClient.getString(
-                        "managerServlet.deployedButNotStarted", displayPath));
-            } else {
-                // Something failed
-                writer.println(smClient.getString(
-                        "managerServlet.deployFailed", displayPath));
-            }
+            writeDeployResult(writer, smClient, name, displayPath);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.install[" + displayPath + "]", t);
@@ -921,6 +892,24 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     t.toString()));
         }
         
+    }
+
+
+    private void writeDeployResult(PrintWriter writer, StringManager smClient,
+            String name, String displayPath) {
+        Context deployed = (Context) host.findChild(name);
+        if (deployed != null && deployed.getConfigured() &&
+                deployed.getState().isAvailable()) {
+            writer.println(smClient.getString(
+                    "managerServlet.deployed", displayPath));
+        } else if (deployed!=null && !deployed.getState().isAvailable()) {
+            writer.println(smClient.getString(
+                    "managerServlet.deployedButNotStarted", displayPath));
+        } else {
+            // Something failed
+            writer.println(smClient.getString(
+                    "managerServlet.deployFailed", displayPath));
+        }
     }
 
 
