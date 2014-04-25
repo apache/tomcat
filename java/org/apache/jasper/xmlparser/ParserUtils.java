@@ -18,6 +18,7 @@ package org.apache.jasper.xmlparser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.AccessController;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,6 +30,8 @@ import org.apache.jasper.compiler.Localizer;
 import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.descriptor.LocalResolver;
 import org.apache.tomcat.util.descriptor.XmlErrorHandler;
+import org.apache.tomcat.util.security.PrivilegedGetTccl;
+import org.apache.tomcat.util.security.PrivilegedSetTccl;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -92,7 +95,23 @@ public class ParserUtils {
         Document document = null;
 
         // Perform an XML parse of this document, via JAXP
+        ClassLoader original;
+        if (Constants.IS_SECURITY_ENABLED) {
+            PrivilegedGetTccl pa = new PrivilegedGetTccl();
+            original = AccessController.doPrivileged(pa);
+        } else {
+            original = Thread.currentThread().getContextClassLoader();
+        }
         try {
+            if (Constants.IS_SECURITY_ENABLED) {
+                PrivilegedSetTccl pa =
+                        new PrivilegedSetTccl(ParserUtils.class.getClassLoader());
+                AccessController.doPrivileged(pa);
+            } else {
+                Thread.currentThread().setContextClassLoader(
+                        ParserUtils.class.getClassLoader());
+            }
+            
             DocumentBuilderFactory factory =
                 DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
@@ -132,6 +151,13 @@ public class ParserUtils {
         } catch (IOException io) {
             throw new JasperException
                 (Localizer.getMessage("jsp.error.parse.xml", location), io);
+        } finally {
+            if (Constants.IS_SECURITY_ENABLED) {
+                PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
+                AccessController.doPrivileged(pa);
+            } else {
+                Thread.currentThread().setContextClassLoader(original);
+            }
         }
 
         // Convert the resulting document to a graph of TreeNodes
