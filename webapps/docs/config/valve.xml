@@ -343,7 +343,7 @@
 
   <subsection name="Introduction">
 
-    <p>The <strong>Error Report Valve</strong> is a simple error handler 
+    <p>The <strong>Error Report Valve</strong> is a simple error handler
     for HTTP status codes that will generate and return HTML error pages.</p>
 
     <p><strong>NOTE:</strong> Disabling both showServerInfo and showReport will
@@ -366,7 +366,7 @@
 
       <attribute name="showReport" required="false">
         <p>Flag to determine if the error report is presented when an error occurs.
-           If set to <code>false</code>, then the error report is not in 
+           If set to <code>false</code>, then the error report is not in
            the HTML response.
            Default value: <code>true</code>
         </p>
@@ -374,7 +374,7 @@
 
       <attribute name="showServerInfo" required="false">
         <p>Flag to determine if server information is presented when an error occurs.
-           If set to <code>false</code>, then the server version is not returned in 
+           If set to <code>false</code>, then the server version is not returned in
            the HTML response.
            Default value: <code>true</code>
         </p>
