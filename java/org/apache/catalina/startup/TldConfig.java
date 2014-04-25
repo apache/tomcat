@@ -85,7 +85,7 @@ public final class TldConfig  implements LifecycleListener {
      * Create (if necessary) and return a Digester configured to process the
      * tld.
      */
-    private synchronized static Digester createTldDigester(boolean validation,
+    private static synchronized Digester createTldDigester(boolean validation,
             boolean blockExternal) {
 
         Digester digester;
