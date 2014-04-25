@@ -79,17 +79,17 @@ public class TagPluginManager {
         if (Constants.IS_SECURITY_ENABLED) {
             PrivilegedGetTccl pa = new PrivilegedGetTccl();
             original = AccessController.doPrivileged(pa);
-            } else {
-                original = Thread.currentThread().getContextClassLoader();
-            }
+        } else {
+            original = Thread.currentThread().getContextClassLoader();
+        }
         try {
             if (Constants.IS_SECURITY_ENABLED) {
                 PrivilegedSetTccl pa =
-                        new PrivilegedSetTccl(JspDocumentParser.class.getClassLoader());
+                        new PrivilegedSetTccl(TagPluginManager.class.getClassLoader());
                 AccessController.doPrivileged(pa);
             } else {
                 Thread.currentThread().setContextClassLoader(
-                        JspDocumentParser.class.getClassLoader());
+                        TagPluginManager.class.getClassLoader());
             }
 
             parser = new TagPluginParser(ctxt, blockExternal);
