@@ -279,6 +279,10 @@
         Correct documentation on Windows service options, aligning it with
         Apache Commons Daemon documentation. (kkolinko)
       </fix>
+      <fix>
+        <bug>56418</bug>: Ensure that the Manager web application does not
+        report success for a web application deployment that fails. (slaurent)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
