@@ -26,9 +26,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
@@ -57,7 +59,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
     private final ByteBuffer socketReadBuffer;
     private final ByteBuffer socketWriteBuffer;
     // One thread for read, one for write
-    private final ExecutorService executor = Executors.newFixedThreadPool(2);
+    private final ExecutorService executor =
+            Executors.newFixedThreadPool(2, new SecureIOThreadFactory());
     private AtomicBoolean writing = new AtomicBoolean(false);
     private AtomicBoolean reading = new AtomicBoolean(false);
 
@@ -148,6 +151,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         } catch (IOException e) {
             log.info(sm.getString("asyncChannelWrapperSecure.closeFail"));
         }
+        executor.shutdownNow();
     }
 
     @Override
@@ -550,6 +554,21 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                         "asyncChannelWrapperSecure.tooBig", result), null);
             }
             return new Integer(result.intValue());
+        }
+    }
+
+
+    private static class SecureIOThreadFactory implements ThreadFactory {
+
+        private AtomicInteger count = new AtomicInteger(0);
+
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(r);
+            t.setName("WebSocketClient-SecureIO-" + count.incrementAndGet());
+            t.setContextClassLoader(this.getClass().getClassLoader());
+            t.setDaemon(true);
+            return t;
         }
     }
 }
