@@ -471,25 +471,14 @@ public class ReflectionUtil {
 
         @Override
         public int compareTo(MatchResult o) {
-            if (this.getExact() < o.getExact()) {
-                return -1;
-            } else if (this.getExact() > o.getExact()) {
-                return 1;
-            } else {
-                if (this.getAssignable() < o.getAssignable()) {
-                    return -1;
-                } else if (this.getAssignable() > o.getAssignable()) {
-                    return 1;
-                } else {
-                    if (this.getCoercible() < o.getCoercible()) {
-                        return -1;
-                    } else if (this.getCoercible() > o.getCoercible()) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
+            int cmp = Integer.compare(this.getExact(), o.getExact());
+            if (cmp == 0) {
+                cmp = Integer.compare(this.getAssignable(), o.getAssignable());
+                if (cmp == 0) {
+                    cmp = Integer.compare(this.getCoercible(), o.getCoercible());
                 }
             }
+            return cmp;
         }
     }
 
