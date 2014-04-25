@@ -187,7 +187,7 @@ public class ErrorReportValve extends ValveBase {
             }
             sb.append(smClient.getString("errorReportValve.errorReport"));
             sb.append("</title>");
-            sb.append("<style type=\"text/css\>");
+            sb.append("<style type=\"text/css\">");
             sb.append(org.apache.catalina.util.TomcatCSS.TOMCAT_CSS);
             sb.append("</style> ");
         }
