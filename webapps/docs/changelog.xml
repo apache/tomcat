@@ -268,6 +268,11 @@
         <bug>56458</bug>: Report WebSocket sessions that are created over secure
         connections as secure rather than as not secure. (markt)
       </fix>
+      <fix>
+        Stop threads used for secure WebSocket client connections when they are
+        no longer required and give them better names for easier debugging while
+        they are running. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
