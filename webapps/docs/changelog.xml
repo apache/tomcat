@@ -121,6 +121,10 @@
         additional locations where, theoretically, a memory leak could occur.
         (markt)
       </add>
+      <fix>
+        Ensure that a TLD parser obtained from the cache has the correct value
+        of <code>blockExternal</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

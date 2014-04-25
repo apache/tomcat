@@ -79,7 +79,7 @@ public final class TldConfig  implements LifecycleListener {
     /**
      * The <code>Digester</code>s available to process tld files.
      */
-    private static Digester[] tldDigesters = new Digester[2];
+    private static Digester[] tldDigesters = new Digester[4];
 
     /**
      * Create (if necessary) and return a Digester configured to process the
@@ -89,20 +89,34 @@ public final class TldConfig  implements LifecycleListener {
             boolean blockExternal) {
         
         Digester digester = null;
-        if (!validation) {
+        if (!validation && !blockExternal) {
             if (tldDigesters[0] == null) {
                 tldDigesters[0] = DigesterFactory.newDigester(validation,
                         true, new TldRuleSet(), blockExternal);
                 tldDigesters[0].getParser();
             }
             digester = tldDigesters[0];
-        } else {
+        } else if (!validation && blockExternal) {
             if (tldDigesters[1] == null) {
                 tldDigesters[1] = DigesterFactory.newDigester(validation,
                         true, new TldRuleSet(), blockExternal);
                 tldDigesters[1].getParser();
             }
             digester = tldDigesters[1];
+        } else if (validation && !blockExternal) {
+            if (tldDigesters[2] == null) {
+                tldDigesters[2] = DigesterFactory.newDigester(validation,
+                        true, new TldRuleSet(), blockExternal);
+                tldDigesters[2].getParser();
+            }
+            digester = tldDigesters[2];
+        } else {
+            if (tldDigesters[3] == null) {
+                tldDigesters[3] = DigesterFactory.newDigester(validation,
+                        true, new TldRuleSet(), blockExternal);
+                tldDigesters[3].getParser();
+            }
+            digester = tldDigesters[3];
         }
         return digester;
     }
