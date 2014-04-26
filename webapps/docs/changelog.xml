@@ -141,6 +141,11 @@
         additional locations where, theoretically, a memory leak could occur.
         (markt)
       </add>
+      <fix>
+        <bug>56441</bug>: Raise the visibility of exceptions thrown when a
+        problem is encountered calling a getter or setter on a component
+        attribute from debug to warning. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

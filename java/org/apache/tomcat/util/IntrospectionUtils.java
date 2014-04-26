@@ -162,18 +162,15 @@ public final class IntrospectionUtils {
         } catch (IllegalArgumentException ex2) {
             log.warn("IAE " + o + " " + name + " " + value, ex2);
         } catch (SecurityException ex1) {
-            if (log.isDebugEnabled())
-                log.debug("IntrospectionUtils: SecurityException for " +
-                        o.getClass() + " " + name + "=" + value + ")", ex1);
+            log.warn("IntrospectionUtils: SecurityException for " +
+                    o.getClass() + " " + name + "=" + value + ")", ex1);
         } catch (IllegalAccessException iae) {
-            if (log.isDebugEnabled())
-                log.debug("IntrospectionUtils: IllegalAccessException for " +
-                        o.getClass() + " " + name + "=" + value + ")", iae);
+            log.warn("IntrospectionUtils: IllegalAccessException for " +
+                    o.getClass() + " " + name + "=" + value + ")", iae);
         } catch (InvocationTargetException ie) {
             ExceptionUtils.handleThrowable(ie.getCause());
-            if (log.isDebugEnabled())
-                log.debug("IntrospectionUtils: InvocationTargetException for " +
-                        o.getClass() + " " + name + "=" + value + ")", ie);
+            log.warn("IntrospectionUtils: InvocationTargetException for " +
+                    o.getClass() + " " + name + "=" + value + ")", ie);
         }
         return false;
     }
@@ -211,18 +208,15 @@ public final class IntrospectionUtils {
         } catch (IllegalArgumentException ex2) {
             log.warn("IAE " + o + " " + name, ex2);
         } catch (SecurityException ex1) {
-            if (log.isDebugEnabled())
-                log.debug("IntrospectionUtils: SecurityException for " +
-                        o.getClass() + " " + name + ")", ex1);
+            log.warn("IntrospectionUtils: SecurityException for " +
+                    o.getClass() + " " + name + ")", ex1);
         } catch (IllegalAccessException iae) {
-            if (log.isDebugEnabled())
-                log.debug("IntrospectionUtils: IllegalAccessException for " +
-                        o.getClass() + " " + name + ")", iae);
+            log.warn("IntrospectionUtils: IllegalAccessException for " +
+                    o.getClass() + " " + name + ")", iae);
         } catch (InvocationTargetException ie) {
             ExceptionUtils.handleThrowable(ie.getCause());
-            if (log.isDebugEnabled())
-                log.debug("IntrospectionUtils: InvocationTargetException for " +
-                        o.getClass() + " " + name + ")");
+            log.warn("IntrospectionUtils: InvocationTargetException for " +
+                    o.getClass() + " " + name + ")");
         }
         return null;
     }
