@@ -544,22 +544,23 @@
 <section name="JAR Scanning">
 
   <properties>
-    <property name="tomcat.util.scan. DefaultJarScanner.jarsToSkip">
-      <p>The comma-separated list of filenames of JARs that Tomcat will not scan
-         for configuration information when using the
-         <a href="jar-scanner.html">JarScanner</a> functionality. Note that
-         there are additional system properties that enable JARs to be excluded
-         from specific scans rather than all scans.</p>
-      <p>The coded default is that no JARs are skipped however the system
-         property is set in a default Tomcat installation via the
+    <property name="tomcat.util.scan. StandardJarScanFilter.jarsToSkip">
+      <p>A list of comma-separated file name patters that is used as the default
+         value for <code>pluggabilitySkip</code> and <code>tldSkip</code>
+         attributes of the standard
+         <a href="jar-scan-filter.html">JarScanFilter</a> implementation.</p>
+      <p>The coded default empty, however the system property is set in
+         a default Tomcat installation via the
          <code>$CATALINA_BASE/conf/catalina.properties</code> file.</p>
     </property>
 
-    <property name="org.apache.catalina.startup. ContextConfig.jarsToSkip">
-      <p>The comma-separated list of additional filenames of JARs that Tomcat
-         will not scan for Servlet 3.0 pluggability features.</p>
-      <p>The coded default is that no JARs are skipped however the system
-         property is set in a default Tomcat installation via the
+    <property name="tomcat.util.scan. StandardJarScanFilter.jarsToScan">
+      <p>A list of comma-separated file name patters that is used as the default
+         value for <code>pluggabilityScan</code> and <code>tldScan</code>
+         attributes of the standard
+         <a href="jar-scan-filter.html">JarScanFilter</a> implementation.</p>
+      <p>The coded default empty, however the system property is set in
+         a default Tomcat installation via the
          <code>$CATALINA_BASE/conf/catalina.properties</code> file.</p>
     </property>
 
