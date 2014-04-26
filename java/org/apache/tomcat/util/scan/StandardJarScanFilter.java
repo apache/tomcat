@@ -32,21 +32,29 @@ public class StandardJarScanFilter implements JarScanFilter {
     private final ReadWriteLock configurationLock =
             new ReentrantReadWriteLock();
 
-    private String defaultSkip;
-    private String defaultScan;
-    private Set<String> defaultSkipSet = new HashSet<>();
-    private Set<String> defaultScanSet = new HashSet<>();
+    private static final String defaultSkip;
+    private static final String defaultScan;
+    private static final Set<String> defaultSkipSet = new HashSet<>();
+    private static final Set<String> defaultScanSet = new HashSet<>();
+
+    static {
+        // Initialize defaults. There are no setter methods for them.
+        defaultSkip = System.getProperty(Constants.SKIP_JARS_PROPERTY);
+        populateSetFromAttribute(defaultSkip, defaultSkipSet);
+        defaultScan = System.getProperty(Constants.SCAN_JARS_PROPERTY);
+        populateSetFromAttribute(defaultScan, defaultScanSet);
+    }
 
     private String tldSkip;
     private String tldScan;
-    private Set<String> tldSkipSet = new HashSet<>();
-    private Set<String> tldScanSet = new HashSet<>();
+    private final Set<String> tldSkipSet;
+    private final Set<String> tldScanSet;
     private boolean defaultTldScan = true;
 
     private String pluggabilitySkip;
     private String pluggabilityScan;
-    private Set<String> pluggabilitySkipSet = new HashSet<>();
-    private Set<String> pluggabilityScanSet = new HashSet<>();
+    private final Set<String> pluggabilitySkipSet;
+    private final Set<String> pluggabilityScanSet;
     private boolean defaultPluggabilityScan = true;
 
     /**
@@ -79,19 +87,14 @@ public class StandardJarScanFilter implements JarScanFilter {
      * </ul>
      */
     public StandardJarScanFilter() {
-        // Set the defaults from the system properties
-        defaultSkip = System.getProperty(Constants.SKIP_JARS_PROPERTY);
-        populateSetFromAttribute(defaultSkip, defaultSkipSet);
-        defaultScan = System.getProperty(Constants.SCAN_JARS_PROPERTY);
-        populateSetFromAttribute(defaultScan, defaultScanSet);
-        tldSkip = System.getProperty(Constants.SKIP_JARS_PROPERTY);
-        populateSetFromAttribute(tldSkip, tldSkipSet);
-        tldScan = System.getProperty(Constants.SCAN_JARS_PROPERTY);
-        populateSetFromAttribute(tldScan, tldScanSet);
-        pluggabilitySkip = System.getProperty(Constants.SKIP_JARS_PROPERTY);
-        populateSetFromAttribute(pluggabilitySkip, pluggabilitySkipSet);
-        pluggabilityScan = System.getProperty(Constants.SCAN_JARS_PROPERTY);
-        populateSetFromAttribute(pluggabilityScan, pluggabilityScanSet);
+        tldSkip = defaultSkip;
+        tldSkipSet = new HashSet<>(defaultSkipSet);
+        tldScan = defaultScan;
+        tldScanSet = new HashSet<>(defaultScanSet);
+        pluggabilitySkip = defaultSkip;
+        pluggabilitySkipSet = new HashSet<>(defaultSkipSet);
+        pluggabilityScan = defaultScan;
+        pluggabilityScanSet = new HashSet<>(defaultScanSet);
     }
 
 
@@ -185,59 +188,57 @@ public class StandardJarScanFilter implements JarScanFilter {
 
     @Override
     public boolean check(JarScanType jarScanType, String jarName) {
-        boolean defaultScan;
-        Set<String> toSkip = new HashSet<>();
-        Set<String> toScan = new HashSet<>();
-
         Lock readLock = configurationLock.readLock();
         readLock.lock();
-        try  {
+        try {
+            final boolean defaultScan;
+            final Set<String> toSkip;
+            final Set<String> toScan;
             switch (jarScanType) {
                 case TLD: {
                     defaultScan = defaultTldScan;
-                    toSkip.addAll(tldSkipSet);
-                    toScan.addAll(tldScanSet);
+                    toSkip = tldSkipSet;
+                    toScan = tldScanSet;
                     break;
                 }
                 case PLUGGABILITY: {
                     defaultScan = defaultPluggabilityScan;
-                    toSkip.addAll(pluggabilitySkipSet);
-                    toScan.addAll(pluggabilityScanSet);
+                    toSkip = pluggabilitySkipSet;
+                    toScan = pluggabilityScanSet;
                     break;
                 }
                 case OTHER:
                 default: {
                     defaultScan = true;
-                    toSkip.addAll(defaultSkipSet);
-                    toScan.addAll(defaultScanSet);
+                    toSkip = defaultSkipSet;
+                    toScan = defaultScanSet;
                 }
+            }
+            if (defaultScan) {
+                if (Matcher.matchName(toSkip, jarName)) {
+                    if (Matcher.matchName(toScan, jarName)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                if (Matcher.matchName(toScan, jarName)) {
+                    if (Matcher.matchName(toSkip, jarName)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+                return false;
             }
         } finally {
             readLock.unlock();
         }
-
-        if (defaultScan) {
-            if (Matcher.matchName(toSkip, jarName)) {
-                if (Matcher.matchName(toScan, jarName)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            if (Matcher.matchName(toScan, jarName)) {
-                if (Matcher.matchName(toSkip, jarName)) {
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-            return false;
-        }
     }
 
-    private void populateSetFromAttribute(String attribute, Set<String> set) {
+    private static void populateSetFromAttribute(String attribute, Set<String> set) {
         set.clear();
         if (attribute != null) {
             StringTokenizer tokenizer = new StringTokenizer(attribute, ",");
