@@ -87,33 +87,34 @@
     <attributes>
 
       <attribute name="scanAllDirectories" required="false">
-       <p>If true, any directories found on the classpath will be checked to see
-       if are expanded JAR files. The default is <code>false</code>. Tomcat
-       determines if directory is an expanded JAR file by looking for a META-INF
-       sub-directory. Only if the META-INF sub-directory exists, is the
-       directory assumed to be an expanded JAR file. Note that for scans for
-       matches to <code>@HandlesTypes</code> annotations, all directories will
-       be scanned irrespective of the presence or not of a META-INF
+       <p>If <code>true</code>, any directories found on the classpath will be
+       checked to see if they are expanded JAR files.
+       The default is <code>false</code>.</p>
+       <p>Tomcat determines if a directory is an expanded JAR file by looking
+       for a META-INF sub-directory. Only if the META-INF sub-directory exists,
+       the directory assumed to be an expanded JAR file. Note that for scans
+       for matches to <code>@HandlesTypes</code> annotations, all directories
+       will be scanned irrespective of the presence or not of a META-INF
        sub-directory.</p>
       </attribute>
 
       <attribute name="scanAllFiles" required="false">
-       <p>If true, any files found on the classpath will be checked to see if
-       they are Jar files rather than relying on the file extension being
-       <code>.jar</code>. The default is <code>false</code></p>
+       <p>If <code>true</code>, any files found on the classpath will be checked
+       to see if they are Jar files rather than relying on the file extension
+       being <code>.jar</code>. The default is <code>false</code>.</p>
       </attribute>
 
       <attribute name="scanClassPath" required="false">
-       <p>If true, the full web application classpath, including the shared and
-       common classloaders and the system classpath (but not the bootstrap
-       classpath) will be scanned for Jar files in addition to the web
-       application. The default is <code>true</code>. </p>
+       <p>If <code>true</code>, the full web application classpath, including
+       the shared and common classloaders and the system classpath (but not the
+       bootstrap classpath) will be scanned for Jar files in addition to the web
+       application. The default is <code>true</code>.</p>
       </attribute>
 
       <attribute name="scanBootstrapClassPath" required="false">
-       <p>If <code>scanClassPath</code> is true and this is true the bootstrap
-       classpath will also be scanned for Jar files. The default is
-       <code>false</code>.</p>
+       <p>If <strong>scanClassPath</strong> is <code>true</code> and this is
+       <code>true</code> the bootstrap classpath will also be scanned for Jar
+       files. The default is <code>false</code>.</p>
       </attribute>
 
     </attributes>
