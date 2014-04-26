@@ -80,8 +80,11 @@
         <item name="ClusterListener"       href="cluster-listener.html"/>
     </menu>
 
-    <menu name="Other">
+    <menu name="web.xml">
         <item name="Filter"                href="filter.html"/>
+    </menu>
+
+    <menu name="Other">
         <item name="System properties"     href="systemprops.html"/>
     </menu>
   </body>
