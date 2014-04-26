@@ -86,67 +86,88 @@
 
     <p>The standard implementation of <strong>Jar Scan Filter</strong> is
     <strong>org.apache.tomcat.util.scan.StandardJarScanFilter</strong>.
-    It supports the following additional attributes (in addition to the
-    common attributes listed above):</p>
+    Additional attributes that it supports (in addition to the common attributes
+    listed above) are listed in the table.</p>
+
+    <p>The values for <strong>pluggabilitySkip</strong>,
+    <strong>pluggabilityScan</strong>, <strong>tldSkip</strong>,
+    <strong>tldScan</strong> attributes are lists of file name pattern. The
+    patterns are separated by comma (','). The leading and trailing whitespace
+    characters in a pattern are ignored. The patterns are matched
+    case-sensitively. The following two special characters are supported:</p>
+
+    <ul>
+      <li>'*' &#151; means zero or more characters,</li>
+      <li>'?' &#151; means one and only one character.</li>
+    </ul>
+
+    <p>Note that excluding a JAR from the pluggability scan will prevent a
+    ServletContainerInitializer from being loaded from a web application JAR
+    (i.e. one located in <code>/WEB-INF/lib</code>) but it will not prevent
+    a ServletContainerInitializer from being loaded from the container (Tomcat).
+    To prevent a ServletContainerInitializer provided by container from being
+    loaded, use the <code>containerSciFilter</code> property of the
+    <a href="context.html">Context</a>.</p>
 
     <attributes>
 
-      <attribute name="tldSkip" required="false">
-       <p>The comma separated list of JAR file name patterns
-       to skip when scanning for TLDs. If not specified, the default is obtained
-       from the <code>tomcat.util.scan.StandardJarScanFilter.jarsToSkip</code>
-       system property.</p>
-      </attribute>
-
-      <attribute name="tldScan" required="false">
-       <p>The comma separated list of JAR file name patterns
-       to scan when scanning for TLDs. If not specified, the default is obtained
-       from the <code>tomcat.util.scan.StandardJarScanFilter.jarsToScan</code>
-       system property.</p>
-      </attribute>
-
-      <attribute name="defaultTldScan" required="false">
-       <p>Controls if JARs are scanned or skipped by default. If
-       <code>true</code>, JARs are scanned unless they match one or more TLD
-       skip patterns and don't match any TLD scan patterns. If
-       <code>false</code>, JARs are skipped unless they match one or more TLD
-       scan patterns and don't match any TLD skip patterns. If not specified,
-       the default value is <code>true</code>.</p>
-      </attribute>
-
       <attribute name="pluggabilitySkip" required="false">
        <p>The comma separated list of JAR file name patterns
-       to skip when scanning for pluggable features. If not specified, the
-       default is obtained from the
+       to skip when scanning for pluggable features introduced by Servlet 3.0
+       specification. If not specified, the default is obtained from the
        <code>tomcat.util.scan.StandardJarScanFilter.jarsToSkip</code> system
        property.</p>
       </attribute>
 
       <attribute name="pluggabilityScan" required="false">
        <p>The comma separated list of JAR file name patterns
-       to scan when scanning for pluggable features. If not specified, the
-       default is obtained from the
+       to skip when scanning for pluggable features introduced by Servlet 3.0
+       specification. If not specified, the default is obtained from the
        <code>tomcat.util.scan.StandardJarScanFilter.jarsToScan</code> system
        property.</p>
       </attribute>
 
       <attribute name="defaultPluggabilityScan" required="false">
-       <p>Controls if JARs are scanned or skipped by default. If
-       <code>true</code>, JARs are scanned unless they match one or more
-       pluggable skip patterns and don't match any pluggable scan patterns. If
-       <code>false</code>, JARs are skipped unless they match one or more
-       pluggable scan patterns and don't match any pluggable skip patterns. If
-       not specified, the default value is <code>true</code>.</p>
+       <p>Controls if JARs are scanned or skipped by default when scanning
+       for the pluggable features.
+       If <code>true</code>, a JAR is scanned when its name either matches
+       none of <strong>pluggabilitySkip</strong> patterns or
+       any of <strong>pluggabilityScan</strong> patterns.
+       If <code>false</code>, a JAR is scanned when its name matches
+       any of <strong>pluggabilityScan</strong> patterns and
+       none of <strong>pluggabilitySkip</strong> patterns.
+       If not specified, the default value is <code>true</code>.</p>
+      </attribute>
+
+      <attribute name="tldSkip" required="false">
+       <p>The comma separated list of JAR file name patterns
+       to skip when scanning for tag libraries (TLDs).
+       If not specified, the default is obtained
+       from the <code>tomcat.util.scan.StandardJarScanFilter.jarsToSkip</code>
+       system property.</p>
+      </attribute>
+
+      <attribute name="tldScan" required="false">
+       <p>The comma separated list of JAR file name patterns
+       to scan when scanning for tag libraries (TLDs).
+       If not specified, the default is obtained
+       from the <code>tomcat.util.scan.StandardJarScanFilter.jarsToScan</code>
+       system property.</p>
+      </attribute>
+
+      <attribute name="defaultTldScan" required="false">
+       <p>Controls if JARs are scanned or skipped by default when scanning
+       for TLDs.
+       If <code>true</code>, a JAR is scanned when its name either matches
+       none of <strong>tldSkip</strong> patterns or
+       any of <strong>tldScan</strong> patterns.
+       If <code>false</code>, a JAR is scanned when its name matches
+       any of <strong>tldScan</strong> patterns and
+       none of <strong>tldSkip</strong> patterns.
+       If not specified, the default value is <code>true</code>.</p>
       </attribute>
 
     </attributes>
-
-    <p>Note that excluding a JAR from the pluggability scan will prevent a
-    ServletContainerInitializer from being loaded from a web application JAR
-    (i.e. one located in <code>/WEB-INF/lib</code>) but it will not prevent
-    a ServletContainerInitializer from being loaded from the container. To
-    prevent a ServletContainerInitializer from being loaded from the container,
-    use the <code>containerSciFilter</code> property of the Context.</p>
 
   </subsection>
 
