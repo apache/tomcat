@@ -85,7 +85,7 @@
       </fix>
       <scode>
         <bug>56365</bug>: Simplify file name pattern matching code in
-        <code>StandardJarScanner</code>. (kkolinko)
+        <code>StandardJarScanner</code>. Improve documentation. (kkolinko)
       </scode>
       <fix>
         Ensure that the static resource cache is able to detect when a cache
