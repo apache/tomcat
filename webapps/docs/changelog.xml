@@ -125,6 +125,11 @@
         Ensure that a TLD parser obtained from the cache has the correct value
         of <code>blockExternal</code>. (markt)
       </fix>
+      <fix>
+        <bug>56441</bug>: Raise the visibility of exceptions thrown when a
+        problem is encountered calling a getter or setter on a component
+        attribute from debug to warning. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
