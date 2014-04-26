@@ -232,8 +232,10 @@ public final class SSL {
     /**
      * Get the status of FIPS Mode.
      *
-     * @return 0 If OpenSSL is not in FIPS mode, 1 if OpenSSL is in FIPS Mode.
+     * @return FIPS_mode return code. It is <code>0</code> if OpenSSL is not
+     *  in FIPS mode, <code>1</code> if OpenSSL is in FIPS Mode.
      * @throws Exception If tcnative was not compiled with FIPS Mode available.
+     * @see "OpenSSL method <a href="http://wiki.openssl.org/index.php/FIPS_mode%28%29">FIPS_mode()</a>"
      */
     public static native int fipsModeGet() throws Exception;
 
@@ -243,8 +245,11 @@ public final class SSL {
      * @param mode 1 - enable, 0 - disable
      *
      * @return FIPS_mode_set return code
+     * @throws Exception If tcnative was not compiled with FIPS Mode available,
+     *  or if {@code FIPS_mode_set()} call returned an error value.
+     * @see "OpenSSL method <a href="http://wiki.openssl.org/index.php/FIPS_mode_set%28%29">FIPS_mode_set()</a>"
      */
-    public static native int fipsModeSet(int mode);
+    public static native int fipsModeSet(int mode) throws Exception;
 
     /**
      * Add content of the file to the PRNG

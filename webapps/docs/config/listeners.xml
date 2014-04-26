@@ -121,9 +121,9 @@
         mode).
         FIPS mode <em>requires you to have a FIPS-capable OpenSSL library which
         you must build yourself</em>.
-        If this attribute is set to any of the above values, <b>SSLEngine</b>
-        must be enabled as well for any effect.
-        The default value is <code>off</code>.</p>
+        If this attribute is set to any of the above values, the <b>SSLEngine</b>
+        must be enabled as well.</p>
+        <p>The default value is <code>off</code>.</p>
       </attribute>
 
     </attributes>
