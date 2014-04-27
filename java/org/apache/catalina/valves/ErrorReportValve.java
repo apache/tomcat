@@ -48,9 +48,9 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ErrorReportValve extends ValveBase {
 
-    protected boolean showReport = true;
+    private boolean showReport = true;
 
-    protected boolean showServerInfo = true;
+    private boolean showServerInfo = true;
 
     //------------------------------------------------------ Constructor
     public ErrorReportValve() {
@@ -194,7 +194,7 @@ public class ErrorReportValve extends ValveBase {
         sb.append("</head><body>");
         sb.append("<h1>");
         sb.append(smClient.getString("errorReportValve.statusHeader",
-                               "" + statusCode, message)).append("</h1>");
+                String.valueOf(statusCode), message)).append("</h1>");
         if (showReport) {
             sb.append("<div class=\"line\"></div>");
             sb.append("<p><b>type</b> ");
@@ -246,7 +246,9 @@ public class ErrorReportValve extends ValveBase {
             }
             sb.append("<hr class=\"line\">");
         }
-        sb.append("<h3>").append(showServerInfo?ServerInfo.getServerInfo():"").append("</h3>");
+        if (showServerInfo) {
+            sb.append("<h3>").append(ServerInfo.getServerInfo()).append("</h3>");
+        }
         sb.append("</body></html>");
 
         try {
