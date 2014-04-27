@@ -161,12 +161,11 @@
     described above:
   </p>
 
-  <source>
-public class ChatServlet
+  <source><![CDATA[public class ChatServlet
     extends HttpServlet implements CometProcessor {
 
-    protected ArrayList&lt;HttpServletResponse> connections =
-        new ArrayList&lt;HttpServletResponse>();
+    protected ArrayList<HttpServletResponse> connections =
+        new ArrayList<HttpServletResponse>();
     protected MessageSender messageSender = null;
 
     public void init() throws ServletException {
@@ -197,8 +196,8 @@ public class ChatServlet
         if (event.getEventType() == CometEvent.EventType.BEGIN) {
             log("Begin for session: " + request.getSession(true).getId());
             PrintWriter writer = response.getWriter();
-            writer.println("&lt;!doctype html public \"-//w3c//dtd html 4.0 transitional//en\">");
-            writer.println("&lt;head>&lt;title>JSP Chat&lt;/title>&lt;/head>&lt;body bgcolor=\"#FFFFFF\">");
+            writer.println("<!DOCTYPE html>");
+            writer.println("<head><title>JSP Chat</title></head><body>");
             writer.flush();
             synchronized(connections) {
                 connections.add(response);
@@ -215,17 +214,17 @@ public class ChatServlet
                 connections.remove(response);
             }
             PrintWriter writer = response.getWriter();
-            writer.println("&lt;/body>&lt;/html>");
+            writer.println("</body></html>");
             event.close();
         } else if (event.getEventType() == CometEvent.EventType.READ) {
             InputStream is = request.getInputStream();
             byte[] buf = new byte[512];
             do {
                 int n = is.read(buf); //can throw an IOException
-                if (n &gt; 0) {
+                if (n > 0) {
                     log("Read " + n + " bytes: " + new String(buf, 0, n)
                             + " for session: " + request.getSession(true).getId());
-                } else if (n &lt; 0) {
+                } else if (n < 0) {
                     error(event, request, response);
                     return;
                 }
@@ -236,7 +235,7 @@ public class ChatServlet
     public class MessageSender implements Runnable {
 
         protected boolean running = true;
-        protected ArrayList&lt;String> messages = new ArrayList&lt;String>();
+        protected ArrayList<String> messages = new ArrayList<String>();
 
         public MessageSender() {
         }
@@ -276,11 +275,11 @@ public class ChatServlet
                         messages.clear();
                     }
                     // Send any pending message on all the open connections
-                    for (int i = 0; i &lt; connections.size(); i++) {
+                    for (int i = 0; i < connections.size(); i++) {
                         try {
                             PrintWriter writer = connections.get(i).getWriter();
-                            for (int j = 0; j &lt; pendingMessages.length; j++) {
-                                writer.println(pendingMessages[j] + "&lt;br>");
+                            for (int j = 0; j < pendingMessages.length; j++) {
+                                writer.println(pendingMessages[j] + "<br>");
                             }
                             writer.flush();
                         } catch (IOException e) {
@@ -295,15 +294,16 @@ public class ChatServlet
 
     }
 
-}
-  </source>
+}]]></source>
 
   </subsection>
   <subsection name="Comet timeouts">
     <p>If you are using the NIO connector, you can set individual timeouts for your different comet connections.
-       To set a timeout, simply set a request attribute like the following code shows:
-       <source>CometEvent event.... event.setTimeout(30*1000);</source> or
-       <source>event.getHttpServletRequest().setAttribute("org.apache.tomcat.comet.timeout", new Integer(30 * 1000));</source>
+       To set a timeout, simply set a request attribute like the following code shows:</p>
+    <source>CometEvent event.... event.setTimeout(30*1000);</source>
+    <p>or</p>
+    <source>event.getHttpServletRequest().setAttribute("org.apache.tomcat.comet.timeout", new Integer(30 * 1000));</source>
+    <p>
        This sets the timeout to 30 seconds.
        Important note: in order to set this timeout, it has to be done on the <code>BEGIN</code> event.
        The default value is <code>soTimeout</code>

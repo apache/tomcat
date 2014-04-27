@@ -56,15 +56,13 @@ as discussed below, but the main principles are the same.</p>
 organized into the following parent-child relationships, where the parent
 class loader is above the child class loader:</p>
 
-<source>
-      Bootstrap
+<source>      Bootstrap
           |
        System
           |
        Common
        /     \
-  Webapp1   Webapp2 ...
-</source>
+  Webapp1   Webapp2 ...</source>
 
 <p>The characteristics of each of these class loaders, including the source
 of classes and resources that they make visible, are discussed in detail in

@@ -72,7 +72,7 @@ privileged property of the Context element).</p>
 <section name="Configuration">
 
 <p>There are several servlet init parameters which can be used to
-configure the behaviour of the CGI servlet.
+configure the behaviour of the CGI servlet.</p>
 <ul>
 <li><strong>cgiPathPrefix</strong> - The CGI search path will start at
 the web application root directory + File.separator + this prefix.
@@ -96,7 +96,7 @@ variables (if any) be passed to the CGI script? Default is
 the reading of stderr to complete before terminating the CGI process. Default
 is 2000.</li>
 </ul>
-</p>
+
 
 </section>
 
