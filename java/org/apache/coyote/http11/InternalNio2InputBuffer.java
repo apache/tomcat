@@ -219,7 +219,13 @@ public class InternalNio2InputBuffer extends AbstractNioInputBuffer<Nio2Channel>
                 try {
                     nRead = socket.getSocket().read(byteBuffer)
                             .get(socket.getTimeout(), TimeUnit.MILLISECONDS).intValue();
-                } catch (InterruptedException | ExecutionException e) {
+                } catch (ExecutionException e) {
+                    if (e.getCause() != null && e.getCause() instanceof IOException) {
+                        throw (IOException) e.getCause();
+                    } else {
+                        throw new IOException(e);
+                    }
+                } catch (InterruptedException e) {
                     throw new IOException(e);
                 } catch (TimeoutException e) {
                     throw new SocketTimeoutException();

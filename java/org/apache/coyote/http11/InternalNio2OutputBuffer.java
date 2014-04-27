@@ -399,7 +399,13 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                         throw new EOFException(sm.getString("iob.failedwrite"));
                     }
                 }
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (ExecutionException e) {
+                if (e.getCause() != null && e.getCause() instanceof IOException) {
+                    throw (IOException) e.getCause();
+                } else {
+                    throw new IOException(e);
+                }
+            } catch (InterruptedException e) {
                 throw new IOException(e);
             } catch (TimeoutException e) {
                 throw new SocketTimeoutException();

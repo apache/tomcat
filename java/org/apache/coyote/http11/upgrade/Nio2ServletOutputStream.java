@@ -129,7 +129,15 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
             buffer.flip();
             try {
                 written = channel.write(buffer).get(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS).intValue();
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (ExecutionException e) {
+                if (e.getCause() != null && e.getCause() instanceof IOException) {
+                    onError(e.getCause());
+                    throw (IOException) e.getCause();
+                } else {
+                    onError(e);
+                    throw new IOException(e);
+                }
+            } catch (InterruptedException e) {
                 onError(e);
                 throw new IOException(e);
             } catch (TimeoutException e) {
@@ -161,7 +169,15 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
             } else {
                 throw new TimeoutException();
             }
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (ExecutionException e) {
+            if (e.getCause() != null && e.getCause() instanceof IOException) {
+                onError(e.getCause());
+                throw (IOException) e.getCause();
+            } else {
+                onError(e);
+                throw new IOException(e);
+            }
+        } catch (InterruptedException e) {
             onError(e);
             throw new IOException(e);
         } catch (TimeoutException e) {
