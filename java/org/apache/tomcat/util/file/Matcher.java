@@ -36,6 +36,30 @@ import org.apache.tomcat.util.res.StringManager;
 public final class Matcher {
 
     /**
+     * Tests whether or not a given file name matches any file name pattern in
+     * the given set. The match is performed case-sensitively.
+     *
+     * @see #match(String, String, boolean)
+     *
+     * @param patternSet The pattern set to match against. Must not be
+     *                <code>null</code>.
+     * @param fileName The file name to match, as a String. Must not be
+     *                <code>null</code>. It must be just a file name, without
+     *                a path.
+     *
+     * @return <code>true</code> if any pattern in the set matches against the
+     *         file name, or <code>false</code> otherwise.
+     */
+    public static boolean matchName(Set<String> patternSet, String fileName) {
+        for (String pattern: patternSet) {
+            if (match(pattern, fileName, true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * The pattern that matches an arbitrary number of directories.
      */
     public static final String DEEP_TREE_MATCH = "**";

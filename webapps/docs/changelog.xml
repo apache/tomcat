@@ -82,6 +82,10 @@
         <code>session.invalidate()</code> from the session destroyed event for
         that session. (markt)
       </fix>
+      <scode>
+        <bug>56365</bug>: Simplify file name pattern matching code in
+        <code>StandardJarScanner</code>. Improve documentation. (kkolinko)
+      </scode>
       <fix>
         <bug>56369</bug>: Ensure that removing an MBean notification listener
         reverts all the operations performed when adding an MBean notification

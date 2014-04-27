@@ -141,15 +141,11 @@ public class StandardJarScanner implements JarScanner {
             log.trace(sm.getString("jarScan.webinflibStart"));
         }
 
-        Set<String> ignoredJars;
+        final Set<String> ignoredJars;
         if (jarsToSkip == null) {
             ignoredJars = defaultJarsToSkip;
         } else {
             ignoredJars = jarsToSkip;
-        }
-        Set<String[]> ignoredJarsTokens = new HashSet<String[]>();
-        for (String pattern: ignoredJars) {
-            ignoredJarsTokens.add(Matcher.tokenizePathAsArray(pattern));
         }
 
         // Scan WEB-INF/lib
@@ -159,7 +155,7 @@ public class StandardJarScanner implements JarScanner {
             while (it.hasNext()) {
                 String path = it.next();
                 if (path.endsWith(Constants.JAR_EXT) &&
-                    !Matcher.matchPath(ignoredJarsTokens,
+                    !Matcher.matchName(ignoredJars,
                         path.substring(path.lastIndexOf('/')+1))) {
                     // Need to scan this JAR
                     if (log.isDebugEnabled()) {
@@ -211,7 +207,7 @@ public class StandardJarScanner implements JarScanner {
                         // Skip JARs known not to be interesting and JARs
                         // in WEB-INF/lib we have already scanned
                         if (jarName != null &&
-                            !(Matcher.matchPath(ignoredJarsTokens, jarName) ||
+                            !(Matcher.matchName(ignoredJars, jarName) ||
                                 urls[i].toString().contains(
                                         Constants.WEB_INF_LIB + jarName))) {
                             if (log.isDebugEnabled()) {
