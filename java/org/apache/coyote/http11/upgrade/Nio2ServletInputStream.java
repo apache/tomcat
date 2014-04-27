@@ -207,7 +207,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
                         .get(wrapper.getTimeout(), TimeUnit.MILLISECONDS).intValue();
                 readPending = false;
             } catch (ExecutionException e) {
-                if (e.getCause() != null && e.getCause() instanceof IOException) {
+                if (e.getCause() instanceof IOException) {
                     onError(e.getCause());
                     throw (IOException) e.getCause();
                 } else {

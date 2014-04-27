@@ -130,7 +130,7 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
             try {
                 written = channel.write(buffer).get(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS).intValue();
             } catch (ExecutionException e) {
-                if (e.getCause() != null && e.getCause() instanceof IOException) {
+                if (e.getCause() instanceof IOException) {
                     onError(e.getCause());
                     throw (IOException) e.getCause();
                 } else {
@@ -170,7 +170,7 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
                 throw new TimeoutException();
             }
         } catch (ExecutionException e) {
-            if (e.getCause() != null && e.getCause() instanceof IOException) {
+            if (e.getCause() instanceof IOException) {
                 onError(e.getCause());
                 throw (IOException) e.getCause();
             } else {
