@@ -254,6 +254,10 @@
         Correct documentation on Windows service options, aligning it with
         Apache Commons Daemon documentation. (kkolinko)
       </fix>
+      <update>
+        <bug>55383</bug>: Backport improved HTML markup for tables and code
+        fragments from Tomcat 8 documentation. (kkolinko)
+      </update>
       <fix>
         <bug>56418</bug>: Ensure that the Manager web application does not
         report success for a web application deployment that fails. (slaurent)

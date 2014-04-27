@@ -85,28 +85,86 @@
       <meta name="email" content="{$email}"/>
        -->
     </xsl:for-each>
-        <style type="text/css" media="print">
-            .noPrint {display: none;}
-            td#mainBody {width: 100%;}
-        </style>
-        <style type="text/css">
-            code {background-color:rgb(224,255,255);padding:0 0.1em;}
-            code.attributeName, code.propertyName {background-color:transparent;}
-        </style>
-        <style type="text/css">
-            .wrapped-source code { display: block; background-color: transparent; }
-            .wrapped-source div { margin: 0 0 0 1.25em; }
-            .wrapped-source p { margin: 0 0 0 1.25em; text-indent: -1.25em; }
-        </style>
-        <style type="text/css">
-            p.notice {
-                border: 1px solid rgb(255, 0, 0);
-                background-color: rgb(238, 238, 238);
-                color: rgb(0, 51, 102);
-                padding: 0.5em;
-                margin: 1em 2em 1em 1em;
-            }
-        </style>
+<style type="text/css" media="print">
+    .noPrint {display: none;}
+    td#mainBody {width: 100%;}
+</style>
+<style type="text/css"><![CDATA[
+code {background-color:rgb(224,255,255);padding:0 0.1em;}
+code.attributeName, code.propertyName {background-color:transparent;}
+
+
+table {
+  border-collapse: collapse;
+  text-align: left;
+}
+table *:not(table) {
+  /* Prevent border-collapsing for table child elements like <div> */
+  border-collapse: separate;
+}
+
+th {
+  text-align: left;
+}
+
+
+div.codeBox pre code, code.attributeName, code.propertyName, code.noHighlight, .noHighlight code {
+  background-color: transparent;
+}
+div.codeBox {
+  overflow: auto;
+  margin: 1em 0;
+}
+div.codeBox pre {
+  margin: 0;
+  padding: 4px;
+  border: 1px solid #999;
+  border-radius: 5px;
+  background-color: #eff8ff;
+  display: table; /* To prevent <pre>s from taking the complete available width. */
+  /*
+  When it is officially supported, use the following CSS instead of display: table
+  to prevent big <pre>s from exceeding the browser window:
+  max-width: available;
+  width: min-content;
+  */
+}
+
+div.codeBox pre.wrap {
+  white-space: pre-wrap;
+}
+
+
+table.defaultTable tr, table.detail-table tr {
+    border: 1px solid #CCC;
+}
+
+table.defaultTable tr:nth-child(even), table.detail-table tr:nth-child(even) {
+    background-color: #FAFBFF;
+}
+
+table.defaultTable tr:nth-child(odd), table.detail-table tr:nth-child(odd) {
+    background-color: #EEEFFF;
+}
+
+table.defaultTable th, table.detail-table th {
+  background-color: #88b;
+  color: #fff;
+}
+
+table.defaultTable th, table.defaultTable td, table.detail-table th, table.detail-table td {
+  padding: 5px 8px;
+}
+
+
+p.notice {
+    border: 1px solid rgb(255, 0, 0);
+    background-color: rgb(238, 238, 238);
+    color: rgb(0, 51, 102);
+    padding: 0.5em;
+    margin: 1em 2em 1em 1em;
+}
+]]></style>
     </head>
 
     <body bgcolor="{$body-bg}" text="{$body-fg}" link="{$body-link}"
@@ -377,59 +435,14 @@
 
   <!-- Process a source code example -->
   <xsl:template match="source">
-    <xsl:variable name="void">
-      <xsl:value-of select="$relative-path"/><xsl:value-of select="$void-image"/>
-    </xsl:variable>
-    <div align="left">
-      <table cellspacing="4" cellpadding="0" border="0">
-        <tr>
-          <td bgcolor="{$source-color}" width="1" height="1">
-            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
-          </td>
-          <td bgcolor="{$source-color}" height="1">
-            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
-          </td>
-          <td bgcolor="{$source-color}" width="1" height="1">
-            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
-          </td>
-        </tr>
-        <tr>
-          <td bgcolor="{$source-color}" width="1">
-            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
-          </td>
-    <xsl:choose>
-      <xsl:when test="@wrapped='true'">
-          <td bgcolor="#ffffff" height="1">
-            <div class="wrapped-source">
-            <code>
-              <xsl:apply-templates />
-            </code>
-            </div>
-          </td>
-      </xsl:when>
-      <xsl:otherwise>
-          <td bgcolor="#ffffff" height="1"><pre>
-            <xsl:value-of select="."/>
-          </pre></td>
-      </xsl:otherwise>
-    </xsl:choose>
-          <td bgcolor="{$source-color}" width="1">
-            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
-          </td>
-        </tr>
-        <tr>
-          <td bgcolor="{$source-color}" width="1" height="1">
-            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
-          </td>
-          <td bgcolor="{$source-color}" height="1">
-            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
-          </td>
-          <td bgcolor="{$source-color}" width="1" height="1">
-            <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
-          </td>
-        </tr>
-      </table>
-    </div>
+  <div class="codeBox">
+    <pre>
+      <xsl:if test="@wrapped='true'">
+        <xsl:attribute name="class">wrap</xsl:attribute>
+      </xsl:if>
+      <code><xsl:apply-templates/></code>
+    </pre>
+  </div>
   </xsl:template>
 
 
