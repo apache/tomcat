@@ -348,8 +348,10 @@
 
       <p>The default ErrorReportValve includes the Tomcat version number in the
       response sent to clients. To avoid this, custom error handling can be
-      configured within each web application. Alternatively, the version number
-      can be changed by creating the file
+      configured within each web application. Alternatively, you can explicitly
+      configure an <a href="config/valve.html">ErrorReportValve</a> and set its
+      <strong>showServerInfo</strong> attribute to <code>false</code>.
+      Alternatively, the version number can be changed by creating the file
       CATALINA_BASE/lib/org/apache/catalina/util/ServerInfo.properties with
       content as follows:</p>
       <source>server.info=Apache Tomcat/<version-major-minor/>.x</source>

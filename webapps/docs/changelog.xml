@@ -110,7 +110,7 @@
       <add>
         <bug>56383</bug>: Properties for disabling server information and error
         report are added to the <code>org.apache.catalina.valves.ErrorReportValve</code>.
-        Based on the patch provided by Nick Bunn. (violetagg)
+        Based on the patch provided by Nick Bunn. (violetagg/kkolinko)
       </add>
       <fix>
         <bug>56390</bug>: Fix JAR locking issue with JARs containing TLDs and
