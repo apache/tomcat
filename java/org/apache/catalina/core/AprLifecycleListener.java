@@ -85,6 +85,8 @@ public class AprLifecycleListener
      */
     private static final int FIPS_ON = 1;
 
+    private static final int FIPS_OFF = 0;
+
     protected static final Object lock = new Object();
 
     public static boolean isAprAvailable() {
@@ -292,7 +294,7 @@ public class AprLifecycleListener
                             sm.getString("aprListener.requireNotInFIPSMode"));
                 }
             } else if ("enter".equalsIgnoreCase(FIPSMode)) {
-                if (fipsModeState == 0) {
+                if (fipsModeState == FIPS_OFF) {
                     enterFipsMode = true;
                 } else {
                     throw new IllegalStateException(sm.getString(
