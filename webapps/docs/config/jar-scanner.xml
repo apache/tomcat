@@ -92,7 +92,7 @@
        The default is <code>false</code>.</p>
        <p>Tomcat determines if a directory is an expanded JAR file by looking
        for a META-INF sub-directory. Only if the META-INF sub-directory exists,
-       the directory assumed to be an expanded JAR file. Note that for scans
+       the directory is assumed to be an expanded JAR file. Note that for scans
        for matches to <code>@HandlesTypes</code> annotations, all directories
        will be scanned irrespective of the presence or not of a META-INF
        sub-directory.</p>
