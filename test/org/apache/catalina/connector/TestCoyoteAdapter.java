@@ -306,7 +306,8 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
             Thread.sleep(250);
             count ++;
         }
-        System.err.println("Wait for " + (count * 250) + "ms");
+        System.err.println("Waited for servlet thread to stop for "
+                + (count * 250) + " ms");
 
         Assert.assertTrue(servlet.isCompleted());
     }
