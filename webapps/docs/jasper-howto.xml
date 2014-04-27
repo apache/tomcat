@@ -42,7 +42,7 @@ specification.</p>
 
 <p>Jasper 2 has been redesigned to significantly improve performance over
 the original Jasper.  In addition to general code improvements the following
-changes were made:
+changes were made:</p>
 <ul>
 <li><strong>JSP Custom Tag Pooling</strong> - The java objects instantiated
 for JSP Custom Tags can now be pooled and reused.  This significantly boosts
@@ -61,7 +61,7 @@ Eclipse JDT Java compiler is now used to perform JSP java source code
 compilation. This compiler loads source dependencies from the container
 classloader. Ant and javac can still be used.</li>
 </ul>
-</p>
+
 
 <p>Jasper is implemented using the servlet class
 <code>org.apache.jasper.servlet.JspServlet</code>.</p>
@@ -71,13 +71,13 @@ classloader. Ant and javac can still be used.</li>
 <section name="Configuration">
 
 <p>By default Jasper is configured for use when doing web application
-development.  See the section <a href="#Production Configuration">
+development.  See the section <a href="#Production_Configuration">
 Production Configuration</a> for information on configuring Jasper
 for use on a production Tomcat server.</p>
 
 <p>The servlet which implements Jasper is configured using init parameters
 in your global <code>$CATALINA_BASE/conf/web.xml</code>.
-
+</p>
 <ul>
 <li><strong>checkInterval</strong> - If development is false and checkInterval
 is greater than zero, background compiles are enabled. checkInterval is the time
@@ -198,7 +198,7 @@ actions or directives be trimmed ?, default <code>false</code>.</li>
 header is added by generated servlet. <code>true</code> or <code>false</code>,
 default <code>false</code>.</li>
 </ul>
-</p>
+
 
 <p>The Java compiler from Eclipse JDT in included as the default compiler. It is
 an advanced Java compiler which will load all dependencies from the Tomcat class
@@ -222,12 +222,12 @@ bug 6294277</a>, may cause a
 <code>java.lang.InternalError: name is too long to represent</code> exception
 when compiling very large JSPs. If this is observed then it may be worked around
 by using one of the following:
+</p>
 <ul>
 <li>reduce the size of the JSP</li>
 <li>disable SMAP generation and JSR-045 support by setting
 <code>suppressSmap</code> to <code>true</code>.</li>
 </ul>
-</p>
 
 </section>
 
@@ -239,7 +239,7 @@ jsp-property-group feature) or practical, in which case the configuration of the
 Jasper servlet becomes critical.</p>
 
 <p>When using Jasper 2 in a production Tomcat server you should consider making
-the following changes from the default configuration.
+the following changes from the default configuration.</p>
 <ul>
 <li><strong>development</strong> - To disable on access checks for JSP
 pages compilation set this to <code>false</code>.</li>
@@ -251,7 +251,6 @@ this to a high value will improve performance a lot.</li>
 <li><strong>trimSpaces</strong> - To remove useless bytes from the response,
 set this to <code>true</code>.</li>
 </ul>
-</p>
 
 </section>
 
@@ -264,73 +263,68 @@ Use the script given below (a similar script is included in the "deployer"
 download) to precompile a webapp:
 </p>
 
-<p>
-<source>
-&lt;project name="Webapp Precompilation" default="all" basedir="."&gt;
+<source><![CDATA[<project name="Webapp Precompilation" default="all" basedir=".">
 
-   &lt;import file="${tomcat.home}/bin/catalina-tasks.xml"/&gt;
+   <import file="${tomcat.home}/bin/catalina-tasks.xml"/>
 
-   &lt;target name="jspc"&gt;
+   <target name="jspc">
 
-    &lt;jasper
+    <jasper
              validateXml="false"
              uriroot="${webapp.path}"
              webXmlFragment="${webapp.path}/WEB-INF/generated_web.xml"
-             outputDir="${webapp.path}/WEB-INF/src" /&gt;
+             outputDir="${webapp.path}/WEB-INF/src" />
 
-  &lt;/target&gt;
+  </target>
 
-  &lt;target name="compile"&gt;
+  <target name="compile">
 
-    &lt;mkdir dir="${webapp.path}/WEB-INF/classes"/&gt;
-    &lt;mkdir dir="${webapp.path}/WEB-INF/lib"/&gt;
+    <mkdir dir="${webapp.path}/WEB-INF/classes"/>
+    <mkdir dir="${webapp.path}/WEB-INF/lib"/>
 
-    &lt;javac destdir="${webapp.path}/WEB-INF/classes"
+    <javac destdir="${webapp.path}/WEB-INF/classes"
            optimize="off"
            debug="on" failonerror="false"
            srcdir="${webapp.path}/WEB-INF/src"
-           excludes="**/*.smap"&gt;
-      &lt;classpath&gt;
-        &lt;pathelement location="${webapp.path}/WEB-INF/classes"/&gt;
-        &lt;fileset dir="${webapp.path}/WEB-INF/lib"&gt;
-          &lt;include name="*.jar"/&gt;
-        &lt;/fileset&gt;
-        &lt;pathelement location="${tomcat.home}/lib"/&gt;
-        &lt;fileset dir="${tomcat.home}/lib"&gt;
-          &lt;include name="*.jar"/&gt;
-        &lt;/fileset&gt;
-        &lt;fileset dir="${tomcat.home}/bin"&gt;
-          &lt;include name="*.jar"/&gt;
-        &lt;/fileset&gt;
-      &lt;/classpath&gt;
-      &lt;include name="**" /&gt;
-      &lt;exclude name="tags/**" /&gt;
-    &lt;/javac&gt;
+           excludes="**/*.smap">
+      <classpath>
+        <pathelement location="${webapp.path}/WEB-INF/classes"/>
+        <fileset dir="${webapp.path}/WEB-INF/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <pathelement location="${tomcat.home}/lib"/>
+        <fileset dir="${tomcat.home}/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${tomcat.home}/bin">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+      <include name="**" />
+      <exclude name="tags/**" />
+    </javac>
 
-  &lt;/target&gt;
+  </target>
 
-  &lt;target name="all" depends="jspc,compile"&gt;
-  &lt;/target&gt;
+  <target name="all" depends="jspc,compile">
+  </target>
 
-  &lt;target name="cleanup"&gt;
-    &lt;delete&gt;
-        &lt;fileset dir="${webapp.path}/WEB-INF/src"/&gt;
-        &lt;fileset dir="${webapp.path}/WEB-INF/classes/org/apache/jsp"/&gt;
-    &lt;/delete&gt;
-  &lt;/target&gt;
+  <target name="cleanup">
+    <delete>
+        <fileset dir="${webapp.path}/WEB-INF/src"/>
+        <fileset dir="${webapp.path}/WEB-INF/classes/org/apache/jsp"/>
+    </delete>
+  </target>
 
-&lt;/project&gt;
-</source>
-</p>
+</project>]]></source>
 
 <p>
 The following command line can be used to run the script
 (replacing the tokens with the Tomcat base path and the path to the webapp
-which should be precompiled):<br/>
-<source>
-$ANT_HOME/bin/ant -Dtomcat.home=&lt;$TOMCAT_HOME&gt; -Dwebapp.path=&lt;$WEBAPP_PATH&gt;
-</source>
+which should be precompiled):
 </p>
+<source>$ANT_HOME/bin/ant -Dtomcat.home=&lt;$TOMCAT_HOME&gt; -Dwebapp.path=&lt;$WEBAPP_PATH&gt;</source>
+
 
 <p>
 Then, the declarations and mappings for the servlets which were generated
@@ -366,7 +360,7 @@ and the compile jsp servlet classes at
 <code>${webapp.path}/WEB-INF/classes/org/apache/jsp</code>.
 </p>
 
-<p><strong>Hints:</strong>
+<p><strong>Hints:</strong></p>
 <ul>
 <li> When you switch to another Tomcat release, then regenerate and recompile
 your jsp's with the new Tomcat version.</li>
@@ -377,7 +371,6 @@ and limit the buffering with
 that changing from the defaults may affect performance, but it will vary
 depending on the application.</li>
 </ul>
-</p>
 </section>
 
 <section name="Optimisation">

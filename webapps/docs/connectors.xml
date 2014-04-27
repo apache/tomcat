@@ -64,13 +64,12 @@ needed for any reason, an AJP connector will provide faster performance than
 proxied HTTP. AJP clustering is the most efficient from the Tomcat perspective.
 It is otherwise functionally equivalent to HTTP clustering.</p>
 
-<p>The native connectors supported with this Tomcat release are:
+<p>The native connectors supported with this Tomcat release are:</p>
 <ul>
 <li>JK 1.2.x with any of the supported servers</li>
 <li>mod_proxy on Apache HTTP Server 2.x (included by default in Apache HTTP Server 2.2),
 with AJP enabled</li>
 </ul>
-</p>
 
 <p><b>Other native connectors supporting AJP may work, but are no longer supported.</b></p>
 
