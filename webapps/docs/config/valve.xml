@@ -605,6 +605,200 @@
 </section>
 
 
+<section name="Proxies Support">
+
+<subsection name="Remote IP Valve">
+
+  <subsection name="Introduction">
+
+    <p>Tomcat port of
+    <a href="http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>,
+    this valve replaces the apparent client remote IP address and hostname for
+    the request with the IP address list presented by a proxy or a load balancer
+    via a request headers (e.g. &quot;X-Forwarded-For&quot;).</p>
+
+    <p>Another feature of this valve is to replace the apparent scheme
+    (http/https), server port and <code>request.secure</code> with the scheme presented
+    by a proxy or a load balancer via a request header
+    (e.g. &quot;X-Forwarded-Proto&quot;).</p>
+
+    <p>This Valve may be used at the <code>Engine</code>, <code>Host</code> or
+    <code>Context</code> level as required. Normally, this Valve would be used
+    at the <code>Engine</code> level.</p>
+
+    <p>If used in conjunction with Remote Address/Host valves then this valve
+    should be defined first to ensure that the correct client IP address is
+    presented to the Remote Address/Host valves.</p>
+
+    <p><strong>Note:</strong> By default this valve has no effect on the
+    values that are written into access log. The original values are restored
+    when request processing leaves the valve and that always happens earlier
+    than access logging. To pass the remote address, remote host, server port
+    and protocol values set by this valve to the access log,
+    they are put into request attributes. Publishing these values here
+    is enabled by default, but <code>AccessLogValve</code> should be explicitly
+    configured to use them. See documentation for
+    <code>requestAttributesEnabled</code> attribute of
+    <code>AccessLogValve</code>.</p>
+
+    <p>The names of request attributes that are set by this valve
+    and can be used by access logging are the following:</p>
+
+    <ul>
+      <li><code>org.apache.catalina.AccessLog.RemoteAddr</code></li>
+      <li><code>org.apache.catalina.AccessLog.RemoteHost</code></li>
+      <li><code>org.apache.catalina.AccessLog.Protocol</code></li>
+      <li><code>org.apache.catalina.AccessLog.ServerPort</code></li>
+      <li><code>org.apache.tomcat.remoteAddr</code></li>
+    </ul>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Remote IP Valve</strong> supports the
+    following configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.RemoteIpValve</strong>.</p>
+      </attribute>
+
+      <attribute name="remoteIpHeader" required="false">
+        <p>Name of the HTTP Header read by this valve that holds the list of
+        traversed IP addresses starting from the requesting client. If not
+        specified, the default of <code>x-forwarded-for</code> is used.</p>
+      </attribute>
+
+      <attribute name="internalProxies" required="false">
+        <p>Regular expression (using <code>java.util.regex</code>) that a
+        proxy&apos;s IP address must match to be considered an internal proxy.
+        Internal proxies that appear in the <strong>remoteIpHeader</strong> will
+        be trusted and will not appear in the <strong>proxiesHeader</strong>
+        value. If not specified the default value of <code>
+        10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}|172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}
+        </code> will be used.</p>
+      </attribute>
+
+      <attribute name="proxiesHeader" required="false">
+        <p>Name of the HTTP header created by this valve to hold the list of
+        proxies that have been processed in the incoming
+        <strong>remoteIpHeader</strong>. If not specified, the default of
+        <code>x-forwarded-by</code> is used.</p>
+      </attribute>
+
+      <attribute name="requestAttributesEnabled" required="false">
+        <p>Set to <code>true</code> to set the request attributes used by
+        AccessLog implementations to override the values returned by the
+        request for remote address, remote host, server port and protocol.
+        Request attributes are also used to enable the forwarded remote address
+        to be displayed on the status page of the Manager web application.
+        If not set, the default value of <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="trustedProxies" required="false">
+        <p>Regular expression (using <code>java.util.regex</code>) that a
+        proxy&apos;s IP address must match to be considered an trusted proxy.
+        Trusted proxies that appear in the <strong>remoteIpHeader</strong> will
+        be trusted and will appear in the <strong>proxiesHeader</strong> value.
+        If not specified, no proxies will be trusted.</p>
+      </attribute>
+
+      <attribute name="protocolHeader" required="false">
+        <p>Name of the HTTP Header read by this valve that holds the protocol
+        used by the client to connect to the proxy. If not specified, the
+        default of <code>null</code> is used.</p>
+      </attribute>
+
+      <attribute name="portHeader" required="false">
+        <p>Name of the HTTP Header read by this valve that holds the port
+        used by the client to connect to the proxy. If not specified, the
+        default of <code>null</code> is used.</p>
+      </attribute>
+
+      <attribute name="protocolHeaderHttpsValue" required="false">
+        <p>Value of the <strong>protocolHeader</strong> to indicate that it is
+        an HTTPS request. If not specified, the default of <code>https</code> is
+        used.</p>
+      </attribute>
+
+      <attribute name="httpServerPort" required="false">
+         <p>Value returned by <code>ServletRequest.getServerPort()</code>
+         when the <strong>protocolHeader</strong> indicates <code>http</code>
+         protocol and no <strong>portHeader</strong> is present. If not
+         specified, the default of <code>80</code> is used.</p>
+      </attribute>
+
+      <attribute name="httpsServerPort" required="false">
+         <p>Value returned by <code>ServletRequest.getServerPort()</code>
+         when the <strong>protocolHeader</strong> indicates <code>https</code>
+         protocol and no <strong>portHeader</strong> is present. If not
+         specified, the default of <code>443</code> is used.</p>
+      </attribute>
+
+      <attribute name="changeLocalPort" required="false">
+        <p>If <code>true</code>, the value returned by
+        <code>ServletRequest.getLocalPort()</code> and
+        <code>ServletRequest.getServerPort()</code> is modified by the this
+        valve. If not specified, the default of <code>false</code> is used.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</subsection>
+
+
+<subsection name="SSL Valve">
+
+  <subsection name="Introduction">
+
+    <p>When using mod_proxy_http, the client SSL information is not included in
+    the protocol (unlike mod_jk and mod_proxy_ajp). To make the client SSL
+    information available to Tomcat, some additional configuration is required.
+    In httpd, mod_headers is used to add the SSL information as HTTP headers. In
+    Tomcat, this valve is used to read the information from the HTTP headers and
+    insert it into the request.</p>
+
+    <p>Note: Ensure that the headers are always set by httpd for all requests to
+    prevent a client spoofing SSL information by sending fake headers.</p>
+
+    <p>To configure httpd to set the necessary headers, add the following:</p>
+<source>&lt;IfModule ssl_module&gt;
+  RequestHeader set SSL_CLIENT_CERT "%{SSL_CLIENT_CERT}s"
+  RequestHeader set SSL_CIPHER "%{SSL_CIPHER}s"
+  RequestHeader set SSL_SESSION_ID "%{SSL_SESSION_ID}s"
+  RequestHeader set SSL_CIPHER_USEKEYSIZE "%{SSL_CIPHER_USEKEYSIZE}s"
+&lt;/IfModule&gt;</source>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>SSL Valve</strong> supports the following configuration
+    attribute:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.SSLValve</strong>.
+        </p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</subsection>
+
+
+</section>
+
+
 <section name="Error Report Valve">
 
   <subsection name="Introduction">
@@ -1287,151 +1481,6 @@
 </section>
 
 
-<section name="Remote IP Valve">
-
-  <subsection name="Introduction">
-
-    <p>Tomcat port of
-    <a href="http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>,
-    this valve replaces the apparent client remote IP address and hostname for
-    the request with the IP address list presented by a proxy or a load balancer
-    via a request headers (e.g. &quot;X-Forwarded-For&quot;).</p>
-
-    <p>Another feature of this valve is to replace the apparent scheme
-    (http/https), server port and <code>request.secure</code> with the scheme presented
-    by a proxy or a load balancer via a request header
-    (e.g. &quot;X-Forwarded-Proto&quot;).</p>
-
-    <p>This Valve may be used at the <code>Engine</code>, <code>Host</code> or
-    <code>Context</code> level as required. Normally, this Valve would be used
-    at the <code>Engine</code> level.</p>
-
-    <p>If used in conjunction with Remote Address/Host valves then this valve
-    should be defined first to ensure that the correct client IP address is
-    presented to the Remote Address/Host valves.</p>
-
-    <p><strong>Note:</strong> By default this valve has no effect on the
-    values that are written into access log. The original values are restored
-    when request processing leaves the valve and that always happens earlier
-    than access logging. To pass the remote address, remote host, server port
-    and protocol values set by this valve to the access log,
-    they are put into request attributes. Publishing these values here
-    is enabled by default, but <code>AccessLogValve</code> should be explicitly
-    configured to use them. See documentation for
-    <code>requestAttributesEnabled</code> attribute of
-    <code>AccessLogValve</code>.</p>
-
-    <p>The names of request attributes that are set by this valve
-    and can be used by access logging are the following:</p>
-
-    <ul>
-      <li><code>org.apache.catalina.AccessLog.RemoteAddr</code></li>
-      <li><code>org.apache.catalina.AccessLog.RemoteHost</code></li>
-      <li><code>org.apache.catalina.AccessLog.Protocol</code></li>
-      <li><code>org.apache.catalina.AccessLog.ServerPort</code></li>
-      <li><code>org.apache.tomcat.remoteAddr</code></li>
-    </ul>
-
-  </subsection>
-
-  <subsection name="Attributes">
-
-    <p>The <strong>Remote IP Valve</strong> supports the
-    following configuration attributes:</p>
-
-    <attributes>
-
-      <attribute name="className" required="true">
-        <p>Java class name of the implementation to use.  This MUST be set to
-        <strong>org.apache.catalina.valves.RemoteIpValve</strong>.</p>
-      </attribute>
-
-      <attribute name="remoteIpHeader" required="false">
-        <p>Name of the HTTP Header read by this valve that holds the list of
-        traversed IP addresses starting from the requesting client. If not
-        specified, the default of <code>x-forwarded-for</code> is used.</p>
-      </attribute>
-
-      <attribute name="internalProxies" required="false">
-        <p>Regular expression (using <code>java.util.regex</code>) that a
-        proxy&apos;s IP address must match to be considered an internal proxy.
-        Internal proxies that appear in the <strong>remoteIpHeader</strong> will
-        be trusted and will not appear in the <strong>proxiesHeader</strong>
-        value. If not specified the default value of <code>
-        10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}|172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}
-        </code> will be used.</p>
-      </attribute>
-
-      <attribute name="proxiesHeader" required="false">
-        <p>Name of the HTTP header created by this valve to hold the list of
-        proxies that have been processed in the incoming
-        <strong>remoteIpHeader</strong>. If not specified, the default of
-        <code>x-forwarded-by</code> is used.</p>
-      </attribute>
-
-      <attribute name="requestAttributesEnabled" required="false">
-        <p>Set to <code>true</code> to set the request attributes used by
-        AccessLog implementations to override the values returned by the
-        request for remote address, remote host, server port and protocol.
-        Request attributes are also used to enable the forwarded remote address
-        to be displayed on the status page of the Manager web application.
-        If not set, the default value of <code>true</code> will be used.</p>
-      </attribute>
-
-      <attribute name="trustedProxies" required="false">
-        <p>Regular expression (using <code>java.util.regex</code>) that a
-        proxy&apos;s IP address must match to be considered an trusted proxy.
-        Trusted proxies that appear in the <strong>remoteIpHeader</strong> will
-        be trusted and will appear in the <strong>proxiesHeader</strong> value.
-        If not specified, no proxies will be trusted.</p>
-      </attribute>
-
-      <attribute name="protocolHeader" required="false">
-        <p>Name of the HTTP Header read by this valve that holds the protocol
-        used by the client to connect to the proxy. If not specified, the
-        default of <code>null</code> is used.</p>
-      </attribute>
-
-      <attribute name="portHeader" required="false">
-        <p>Name of the HTTP Header read by this valve that holds the port
-        used by the client to connect to the proxy. If not specified, the
-        default of <code>null</code> is used.</p>
-      </attribute>
-
-      <attribute name="protocolHeaderHttpsValue" required="false">
-        <p>Value of the <strong>protocolHeader</strong> to indicate that it is
-        an HTTPS request. If not specified, the default of <code>https</code> is
-        used.</p>
-      </attribute>
-
-      <attribute name="httpServerPort" required="false">
-         <p>Value returned by <code>ServletRequest.getServerPort()</code>
-         when the <strong>protocolHeader</strong> indicates <code>http</code>
-         protocol and no <strong>portHeader</strong> is present. If not
-         specified, the default of <code>80</code> is used.</p>
-      </attribute>
-
-      <attribute name="httpsServerPort" required="false">
-         <p>Value returned by <code>ServletRequest.getServerPort()</code>
-         when the <strong>protocolHeader</strong> indicates <code>https</code>
-         protocol and no <strong>portHeader</strong> is present. If not
-         specified, the default of <code>443</code> is used.</p>
-      </attribute>
-
-      <attribute name="changeLocalPort" required="false">
-        <p>If <code>true</code>, the value returned by
-        <code>ServletRequest.getLocalPort()</code> and
-        <code>ServletRequest.getServerPort()</code> is modified by the this
-        valve. If not specified, the default of <code>false</code> is used.</p>
-      </attribute>
-
-    </attributes>
-
-  </subsection>
-
-</section>
-
-
 <section name="Crawler Session Manager Valve">
 
   <subsection name="Introduction">
@@ -1530,48 +1579,6 @@
 
 </section>
 
-<section name="SSL Valve">
-
-  <subsection name="Introduction">
-
-    <p>When using mod_proxy_http, the client SSL information is not included in
-    the protocol (unlike mod_jk and mod_proxy_ajp). To make the client SSL
-    information available to Tomcat, some additional configuration is required.
-    In httpd, mod_headers is used to add the SSL information as HTTP headers. In
-    Tomcat, this valve is used to read the information from the HTTP headers and
-    insert it into the request.</p>
-
-    <p>Note: Ensure that the headers are always set by httpd for all requests to
-    prevent a client spoofing SSL information by sending fake headers.</p>
-
-    <p>To configure httpd to set the necessary headers, add the following:</p>
-<source>&lt;IfModule ssl_module&gt;
-  RequestHeader set SSL_CLIENT_CERT "%{SSL_CLIENT_CERT}s"
-  RequestHeader set SSL_CIPHER "%{SSL_CIPHER}s"
-  RequestHeader set SSL_SESSION_ID "%{SSL_SESSION_ID}s"
-  RequestHeader set SSL_CIPHER_USEKEYSIZE "%{SSL_CIPHER_USEKEYSIZE}s"
-&lt;/IfModule&gt;</source>
-
-  </subsection>
-
-  <subsection name="Attributes">
-
-    <p>The <strong>SSL Valve</strong> supports the following configuration
-    attribute:</p>
-
-    <attributes>
-
-      <attribute name="className" required="true">
-        <p>Java class name of the implementation to use.  This MUST be set to
-        <strong>org.apache.catalina.valves.SSLValve</strong>.
-        </p>
-      </attribute>
-
-    </attributes>
-
-  </subsection>
-
-</section>
 </body>
 
 
