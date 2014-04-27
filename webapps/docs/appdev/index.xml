@@ -65,7 +65,7 @@ developer community.  The following authors have provided significant content:
 <li><a href="processes.html"><strong>Development Processes</strong></a> -
     Provides brief descriptions of typical development processes
     utilizing the recommended deployment and source organizations.</li>
-<li><a href="sample/" target="_new"><strong>Example Application</strong></a> -
+<li><a href="sample/" target="_blank"><strong>Example Application</strong></a> -
     This directory contains a very simple, but functionally complete,
     "Hello, World" application built according to the principles
     described in this manual.  You can use this application to

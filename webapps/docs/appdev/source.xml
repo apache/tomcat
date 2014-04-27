@@ -35,13 +35,11 @@
 
 <section name="Directory Structure">
 
-    <blockquote><em>
-    <p>The description below uses the variable name $CATALINA_BASE to refer the
+    <p><em>The description below uses the variable name $CATALINA_BASE to refer the
     base directory against which most relative paths are resolved. If you have
     not configured Tomcat for multiple instances by setting a CATALINA_BASE
     directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
-    the directory into which you have installed Tomcat.</p>
-    </em></blockquote>
+    the directory into which you have installed Tomcat.</em></p>
 
 <p>A key recommendation of this manual is to separate the directory
 hierarchy containing your source code (described in this section) from
@@ -49,16 +47,16 @@ the directory hierarchy containing your deployable application
 (described in the preceding section).  Maintaining this separation has
 the following advantages:</p>
 <ul>
-<li>The contents of the source directories can be more easily administered,
+<li><p>The contents of the source directories can be more easily administered,
     moved, and backed up if the "executable" version of the application
     is not intermixed.
-    <br/><br/></li>
-<li>Source code control is easier to manage on directories that contain
+    </p></li>
+<li><p>Source code control is easier to manage on directories that contain
     only source files.
-    <br/><br/></li>
-<li>The files that make up an installable distribution of your
+    </p></li>
+<li><p>The files that make up an installable distribution of your
     application are much easier to select when the deployment
-    hierarchy is separate.</li>
+    hierarchy is separate.</p></li>
 </ul>
 
 <p>As we will see, the <code>ant</code> development tool makes the creation
@@ -181,11 +179,9 @@ created by your development process in the source code control system.  An
 easy way to tell CVS to ignore these directories is to create a file named
 <code>.cvsignore</code> (note the leading period) in your top-level source
 directory, with the following contents:</p>
-<source>
-build
+<source>build
 dist
-build.properties
-</source>
+build.properties</source>
 
 <p>The reason for mentioning <code>build.properties</code> here will be
 explained in the <a href="processes.html">Processes</a> section.</p>
@@ -244,9 +240,7 @@ archive file so you can distribute your application.  A well-constructed
 the targets that are designed for use by the developer, versus those targets
 used internally.  To ask Ant to display the project documentation, change to
 the directory containing the <code>build.xml</code> file and type:</p>
-<source>
-ant -projecthelp
-</source>
+<source>ant -projecthelp</source>
 
 <p>To give you a head start, a <a href="build.xml.txt">basic build.xml file</a>
 is provided that you can customize and install in the project source directory
