@@ -295,17 +295,19 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         client.sendRequest();
 
         for (int i = 0; i < 10; i++) {
-            System.out.println(client.readLine());
+            System.err.println(client.readLine());
         }
 
         client.disconnect();
 
         // Wait for server thread to stop
         int count = 0;
-        while (servlet.getThread().isAlive() && count < 10) {
+        while (servlet.getThread().isAlive() && count < 20) {
             Thread.sleep(250);
             count ++;
         }
+        System.err.println("Wait for " + (count * 250) + "ms");
+
         Assert.assertTrue(servlet.isCompleted());
     }
 
@@ -348,6 +350,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
                             os.flush();
                             Thread.sleep(1000);
                         } catch (Exception e) {
+                            System.err.println("Exception caught " + e.getMessage());
                             try {
                                 // Note if request times out before this
                                 // exception is thrown and the complete call
