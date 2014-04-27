@@ -133,7 +133,7 @@
     to be returned for JNDI lookups of <code>&lt;resource-ref&gt;</code> and
     <code>&lt;resource-env-ref&gt;</code> elements in the web application
     deployment descriptor by defining them in this element and then linking
-    them with <a href="context.html#_Links">&lt;ResourceLink&gt;</a>
+    them with <a href="context.html#Resource_Links">&lt;ResourceLink&gt;</a>
     elements
     in the <code><strong>&lt;Context&gt;</strong></code> element.
 
