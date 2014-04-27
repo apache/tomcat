@@ -445,7 +445,10 @@
 </section>
 
 
-<section name="Remote Address Filter">
+<section name="Access Control">
+
+
+<subsection name="Remote Address Filter">
 
   <subsection name="Introduction">
 
@@ -520,10 +523,10 @@
    allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1"/>]]></source>
   </subsection>
 
-</section>
+</subsection>
 
 
-<section name="Remote Host Filter">
+<subsection name="Remote Host Filter">
 
   <subsection name="Introduction">
 
@@ -588,6 +591,9 @@
     </attributes>
 
   </subsection>
+
+</subsection>
+
 
 </section>
 
