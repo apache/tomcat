@@ -299,6 +299,9 @@
         <bug>56418</bug>: Ensure that the Manager web application does not
         report success for a web application deployment that fails. (slaurent)
       </fix>
+      <update>
+        Improve valves documentation. Split valves into groups. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">

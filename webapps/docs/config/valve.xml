@@ -51,7 +51,12 @@
 </section>
 
 
-<section name="Access Log Valve">
+<section name="Access Logging">
+
+<p>Access logging is performed by valves that implement
+<strong>org.apache.catalina.AccessLog</strong> interface.</p>
+
+<subsection name="Access Log Valve">
 
   <subsection name="Introduction">
 
@@ -336,10 +341,10 @@
 
   </subsection>
 
-</section>
+</subsection>
 
 
-<section name="Extended Access Log Valve">
+<subsection name="Extended Access Log Valve">
 
   <subsection name="Introduction">
 
@@ -441,6 +446,8 @@
     </ul>
 
   </subsection>
+
+</subsection>
 
 </section>
 
