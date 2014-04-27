@@ -42,7 +42,6 @@
   <xsl:param    name="year"             select="'yyyy'"/>
   <xsl:param    name="void-image"       select="'/images/void.gif'"/>
   <xsl:param    name="project-menu"     select="'menu'"/>
-  <xsl:param    name="standalone"       select="''"/>
   <xsl:param    name="buglink"          select="'http://issues.apache.org/bugzilla/show_bug.cgi?id='"/>
   <xsl:param    name="revlink"          select="'http://svn.apache.org/viewvc?view=rev&amp;rev='"/>
   <xsl:param    name="doclink"             select="'http://tomcat.apache.org/tomcat-7.0-doc'"/>
@@ -497,32 +496,6 @@
         </tr>
       </xsl:for-each>
     </table>
-  </xsl:template>
-
-  <!-- Fix relative links in printer friendly versions of the docs -->
-  <xsl:template match="a">
-    <xsl:variable name="href" select="@href"/>
-    <xsl:choose>
-      <xsl:when test="$standalone = 'standalone'">
-        <xsl:apply-templates/>
-      </xsl:when>
-      <xsl:when test="$project-menu != 'menu' and starts-with(@href,'../')">
-        <a href="../{$href}"><xsl:apply-templates/></a>
-      </xsl:when>
-      <xsl:when test="$project-menu != 'menu' and starts-with(@href,'./') and contains(substring(@href,3),'/')">
-        <a href=".{$href}"><xsl:apply-templates/></a>
-      </xsl:when>
-      <xsl:when test="$project-menu != 'menu' and not(contains(@href,'//')) and not(starts-with(@href,'/')) and not(starts-with(@href,'#')) and contains(@href,'/')">
-        <a href="../{$href}"><xsl:apply-templates/></a>
-      </xsl:when>
-      <xsl:when test="$href != ''">
-        <a href="{$href}"><xsl:apply-templates/></a>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:variable name="name" select="@name"/>
-        <a name="{$name}"><xsl:apply-templates/></a>
-      </xsl:otherwise>
-    </xsl:choose>
   </xsl:template>
 
   <!-- Changelog related tags -->

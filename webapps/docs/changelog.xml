@@ -258,6 +258,10 @@
         <bug>56418</bug>: Ensure that the Manager web application does not
         report success for a web application deployment that fails. (slaurent)
       </fix>
+      <fix>
+        Fix target and rel attributes on links in documentation. They were
+        lost during XSLT transformation. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
