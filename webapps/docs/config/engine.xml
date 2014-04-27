@@ -186,17 +186,15 @@
     <a href="host.html">Host</a>, or <a href="context.html">Context</a>
     by nesting a <a href="valve.html">Valve</a> element like this:</p>
 
-<source>
-&lt;Engine name="Standalone" ...&gt;
+<source><![CDATA[<Engine name="Standalone" ...>
   ...
-  &lt;Valve className="org.apache.catalina.valves.AccessLogValve"
+  <Valve className="org.apache.catalina.valves.AccessLogValve"
          prefix="catalina_access_log." suffix=".txt"
-         pattern="common"/&gt;
+         pattern="common"/>
   ...
-&lt;/Engine&gt;
-</source>
+</Engine>]]></source>
 
-    <p>See <a href="valve.html#Access Log Valve">Access Log Valve</a>
+    <p>See <a href="valve.html#Access_Log_Valve">Access Log Valve</a>
     for more information on the configuration attributes that are
     supported.</p>
 
@@ -213,13 +211,11 @@
     it will be notified about the occurrence of the corresponding
     lifecycle events.  Configuration of such a listener looks like this:</p>
 
-<source>
-&lt;Engine name="Standalone" ...&gt;
+<source><![CDATA[<Engine name="Standalone" ...>
   ...
-  &lt;Listener className="com.mycompany.mypackage.MyListener" ... &gt;
+  <Listener className="com.mycompany.mypackage.MyListener" ... >
   ...
-&lt;/Engine&gt;
-</source>
+</Engine>]]></source>
 
     <p>Note that a Listener can have any number of additional properties
     that may be configured from this element.  Attribute names are matched
@@ -241,19 +237,17 @@
     not accepted will be rejected with an HTTP "Forbidden" error.
     Example filter declarations:</p>
 
-<source>
-&lt;Engine name="Standalone" ...&gt;
+<source><![CDATA[<Engine name="Standalone" ...>
   ...
-  &lt;Valve className="org.apache.catalina.valves.RemoteHostValve"
-         allow=".*\.mycompany\.com|www\.yourcompany\.com"/&gt;
-  &lt;Valve className="org.apache.catalina.valves.RemoteAddrValve"
-         deny="192\.168\.1\.\d+"/&gt;
+  <Valve className="org.apache.catalina.valves.RemoteHostValve"
+         allow=".*\.mycompany\.com|www\.yourcompany\.com"/>
+  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         deny="192\.168\.1\.\d+"/>
   ...
-&lt;/Engine&gt;
-</source>
+</Engine>]]></source>
 
-  <p>See <a href="valve.html#Remote Address Filter">Remote Address Filter</a>
-  and <a href="valve.html#Remote Host Filter">Remote Host Filter</a> for
+  <p>See <a href="valve.html#Remote_Address_Filter">Remote Address Filter</a>
+  and <a href="valve.html#Remote_Host_Filter">Remote Host Filter</a> for
   more information about the configuration options that are supported.</p>
 
   </subsection>
