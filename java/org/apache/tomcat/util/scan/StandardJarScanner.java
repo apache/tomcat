@@ -69,7 +69,10 @@ public class StandardJarScanner implements JarScanner {
         if (jarList != null) {
             StringTokenizer tokenizer = new StringTokenizer(jarList, ",");
             while (tokenizer.hasMoreElements()) {
-                defaultJarsToSkip.add(tokenizer.nextToken());
+                String token = tokenizer.nextToken().trim();
+                if (token.length() > 0) {
+                    defaultJarsToSkip.add(token);
+                }
             }
         }
     }

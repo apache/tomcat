@@ -167,7 +167,10 @@ public class ContextConfig implements LifecycleListener {
         if (jarList != null) {
             StringTokenizer tokenizer = new StringTokenizer(jarList, ",");
             while (tokenizer.hasMoreElements()) {
-                pluggabilityJarsToSkip.add(tokenizer.nextToken());
+                String token = tokenizer.nextToken().trim();
+                if (token.length() > 0) {
+                    pluggabilityJarsToSkip.add(token);
+                }
             }
         }
 

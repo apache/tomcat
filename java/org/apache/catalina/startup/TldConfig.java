@@ -142,7 +142,10 @@ public final class TldConfig  implements LifecycleListener {
             }
             StringTokenizer tokenizer = new StringTokenizer(jarNames, ",");
             while (tokenizer.hasMoreElements()) {
-                noTldJars.add(tokenizer.nextToken());
+                String token = tokenizer.nextToken().trim();
+                if (token.length() > 0) {
+                    noTldJars.add(token);
+                }
             }
         }
     }

@@ -72,8 +72,21 @@
 
     <p>The standard implementation of <strong>Jar Scanner</strong> is
     <strong>org.apache.tomcat.util.scan.StandardJarScanner</strong>.
-    It supports the following additional attributes (in addition to the
-    common attributes listed above):</p>
+    Additional attributes that it supports (in addition to the common attributes
+    listed above) are listed in the table.</p>
+
+    <p>There are several
+    <a href="systemprops.html#JAR_Scanning">system properties</a>
+    that control what JAR files are skipped by JarScanner.
+    Those properties are lists of file name pattern. The
+    patterns are separated by comma (','). The leading and trailing whitespace
+    characters in a pattern are ignored. The patterns are matched
+    case-sensitively. The following two special characters are supported:</p>
+
+    <ul>
+      <li>'*' &#151; means zero or more characters,</li>
+      <li>'?' &#151; means one and only one character.</li>
+    </ul>
 
     <attributes>
 
