@@ -255,6 +255,10 @@
         Apache Commons Daemon documentation. (kkolinko)
       </fix>
       <update>
+        <bug>55215</bug>: Clarify access logging documentation. Based on patch
+        provided by Brian Burch. (kkolinko)
+      </update>
+      <update>
         <bug>55383</bug>: Backport improved HTML markup for tables and code
         fragments from Tomcat 8 documentation. (kkolinko)
       </update>
