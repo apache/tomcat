@@ -144,7 +144,7 @@
       <fix>
         <bug>56441</bug>: Raise the visibility of exceptions thrown when a
         problem is encountered calling a getter or setter on a component
-        attribute from debug to warning. (markt)
+        attribute. The logging level is raised from debug to warning. (markt)
       </fix>
     </changelog>
   </subsection>
