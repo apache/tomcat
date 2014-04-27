@@ -101,7 +101,7 @@
       <add>
         <bug>56383</bug>: Properties for disabling server information and error
         report are added to the <code>org.apache.catalina.valves.ErrorReportValve</code>.
-        Based on the patch provided by Nick Bunn. (violetagg)
+        Based on the patch provided by Nick Bunn. (violetagg/kkolinko)
       </add>
       <fix>
         Only create XML parsing objects if required and fix associated potential
