@@ -216,7 +216,7 @@ public final class IntrospectionUtils {
         } catch (InvocationTargetException ie) {
             ExceptionUtils.handleThrowable(ie.getCause());
             log.warn("IntrospectionUtils: InvocationTargetException for " +
-                    o.getClass() + " " + name + ")");
+                    o.getClass() + " " + name + ")", ie);
         }
         return null;
     }
