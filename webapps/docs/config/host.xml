@@ -348,7 +348,7 @@
   ...
 </Host>]]></source>
 
-    <p>See <a href="valve.html#Access_Log_Valve">Access Log Valve</a>
+    <p>See <a href="valve.html#Access_Logging">Access Logging Valves</a>
     for more information on the configuration attributes that are
     supported.</p>
 
