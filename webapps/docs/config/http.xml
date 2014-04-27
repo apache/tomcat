@@ -173,7 +173,7 @@
         <code>org.apache.coyote.http11.Http11AprProtocol</code> -
               the APR/native connector.<br/>
         Custom implementations may also be used.<br/>
-        Take a look at our <a href="#Connector Comparison">Connector
+        Take a look at our <a href="#Connector_Comparison">Connector
         Comparison</a> chart. The configuration for both Java connectors is
         identical, for http and https.<br/>
         For more information on the APR connector and APR specific SSL settings
@@ -185,7 +185,7 @@
       <p>If this <strong>Connector</strong> is being used in a proxy
       configuration, configure this attribute to specify the server name
       to be returned for calls to <code>request.getServerName()</code>.
-      See <a href="#Proxy Support">Proxy Support</a> for more
+      See <a href="#Proxy_Support">Proxy Support</a> for more
       information.</p>
     </attribute>
 
@@ -193,7 +193,7 @@
       <p>If this <strong>Connector</strong> is being used in a proxy
       configuration, configure this attribute to specify the server port
       to be returned for calls to <code>request.getServerPort()</code>.
-      See <a href="#Proxy Support">Proxy Support</a> for more
+      See <a href="#Proxy_Support">Proxy Support</a> for more
       information.</p>
     </attribute>
 
@@ -504,7 +504,7 @@
       <code>scheme</code> and the <code>secure</code> attributes as well
       to pass the correct <code>request.getScheme()</code> and
       <code>request.isSecure()</code> values to the servlets
-      See <a href="#SSL Support">SSL Support</a> for more information.
+      See <a href="#SSL_Support">SSL Support</a> for more information.
       </p>
     </attribute>
 
