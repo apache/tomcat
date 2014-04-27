@@ -200,7 +200,7 @@
       with low overhead, so it only uses Apache Commons Logging for
       its own debug messages. This implementation approach avoids
       additional overhead and potentially complex configuration.
-      Please refer to the <a href="config/valve.html">Valves</a>
+      Please refer to the <a href="config/valve.html#Access_Logging">Valves</a>
       documentation for more details on its configuration, including
       the various report formats.
     </p>
@@ -395,8 +395,8 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter]]
         <li><p>The handlers by default use the system default encoding to write
         the log files. It can be configured with <code>encoding</code> property.
         See Javadoc for details.</p></li>
-        <li><p>Consider configuring an <a href="config/valve.html">Access
-        log</a>.</p></li>
+        <li><p>Consider configuring an
+        <a href="config/valve.html#Access_Logging">Access log</a>.</p></li>
       </ul>
     </subsection>
 
@@ -597,7 +597,7 @@ log4j.logger.org.apache.catalina.session=DEBUG]]></source>
         <strong>ExtendedAccessLogValve</strong> use their own self-contained
         logging implementation, so they
         <strong><i>cannot be configured to use log4j</i></strong>.
-        Refer to <a href="config/valve.html#Access_Log_Valve">Valves</a>
+        Refer to <a href="config/valve.html#Access_Logging">Valves</a>
         for specific configuration details.</p></li>
     </ul>
   </section>
