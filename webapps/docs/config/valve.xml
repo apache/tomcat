@@ -792,54 +792,6 @@
 </section>
 
 
-<section name="Error Report Valve">
-
-  <subsection name="Introduction">
-
-    <p>The <strong>Error Report Valve</strong> is a simple error handler
-    for HTTP status codes that will generate and return HTML error pages.</p>
-
-    <p><strong>NOTE:</strong> Disabling both showServerInfo and showReport will
-    only return the HTTP status code and remove all CSS.</p>
-
-  </subsection>
-
-  <subsection name="Attributes">
-
-    <p>The <strong>Error Report Valve</strong> supports the following
-    configuration attributes:</p>
-
-    <attributes>
-
-      <attribute name="className" required="true">
-        <p>Java class name of the implementation to use.  This MUST be set to
-        <strong>org.apache.catalina.valves.ErrorReportValve</strong> to use the
-        default error report valve.</p>
-      </attribute>
-
-      <attribute name="showReport" required="false">
-        <p>Flag to determine if the error report is presented when an error
-           occurs. If set to <code>false</code>, then the error report is not in
-           the HTML response.
-           Default value: <code>true</code>
-        </p>
-      </attribute>
-
-      <attribute name="showServerInfo" required="false">
-        <p>Flag to determine if server information is presented when an error
-           occurs. If set to <code>false</code>, then the server version is not
-           returned in the HTML response.
-           Default value: <code>true</code>
-        </p>
-      </attribute>
-
-    </attributes>
-
-  </subsection>
-
-</section>
-
-
 <section name="Single Sign On Valve">
 
   <subsection name="Introduction">
@@ -889,7 +841,12 @@
 </section>
 
 
-<section name="Basic Authenticator Valve">
+<section name="Authentication">
+
+<p>The valves in this section implement
+<strong>org.apache.catalina.Authenticator</strong> interface.</p>
+
+<subsection name="Basic Authenticator Valve">
 
   <subsection name="Introduction">
 
@@ -989,10 +946,10 @@
 
   </subsection>
 
-</section>
+</subsection>
 
 
-<section name="Digest Authenticator Valve">
+<subsection name="Digest Authenticator Valve">
 
   <subsection name="Introduction">
 
@@ -1135,10 +1092,10 @@
 
   </subsection>
 
-</section>
+</subsection>
 
 
-<section name="Form Authenticator Valve">
+<subsection name="Form Authenticator Valve">
 
   <subsection name="Introduction">
 
@@ -1240,10 +1197,10 @@
 
   </subsection>
 
-</section>
+</subsection>
 
 
-<section name="SSL Authenticator Valve">
+<subsection name="SSL Authenticator Valve">
 
   <subsection name="Introduction">
 
@@ -1332,10 +1289,10 @@
 
   </subsection>
 
-</section>
+</subsection>
 
 
-<section name="SPNEGO Valve">
+<subsection name="SPNEGO Valve">
 
   <subsection name="Introduction">
 
@@ -1465,6 +1422,57 @@
         services) via the <code>org.apache.catalina.realm.GSS_CREDENTIAL</code>
         request attribute. If not set, the default value of <code>true</code>
         will be used.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</subsection>
+
+
+</section>
+
+
+<section name="Error Report Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Error Report Valve</strong> is a simple error handler
+    for HTTP status codes that will generate and return HTML error pages.</p>
+
+    <p><strong>NOTE:</strong> Disabling both showServerInfo and showReport will
+    only return the HTTP status code and remove all CSS.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Error Report Valve</strong> supports the following
+    configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.ErrorReportValve</strong> to use the
+        default error report valve.</p>
+      </attribute>
+
+      <attribute name="showReport" required="false">
+        <p>Flag to determine if the error report is presented when an error
+           occurs. If set to <code>false</code>, then the error report is not in
+           the HTML response.
+           Default value: <code>true</code>
+        </p>
+      </attribute>
+
+      <attribute name="showServerInfo" required="false">
+        <p>Flag to determine if server information is presented when an error
+           occurs. If set to <code>false</code>, then the server version is not
+           returned in the HTML response.
+           Default value: <code>true</code>
+        </p>
       </attribute>
 
     </attributes>
