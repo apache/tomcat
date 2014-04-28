@@ -40,16 +40,16 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestCoyoteAdapter extends TomcatBaseTest {
 
-    public static final String TEXT_1K;
-    public static final byte[] BYTES_1K;
+    public static final String TEXT_8K;
+    public static final byte[] BYTES_8K;
 
     static {
-        StringBuilder sb = new StringBuilder(1024);
-        for (int i = 0; i < 64; i++) {
+        StringBuilder sb = new StringBuilder(8192);
+        for (int i = 0; i < 512; i++) {
             sb.append("0123456789ABCDEF");
         }
-        TEXT_1K = sb.toString();
-        BYTES_1K = TEXT_1K.getBytes(StandardCharsets.UTF_8);
+        TEXT_8K = sb.toString();
+        BYTES_8K = TEXT_8K.getBytes(StandardCharsets.UTF_8);
     }
     @Test
     public void testPathParmsRootNone() throws Exception {
@@ -360,7 +360,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
                 public void run() {
                     for (int i = 0; i < 20; i++) {
                         try {
-                            os.write(BYTES_1K);
+                            os.write(BYTES_8K);
                             os.flush();
                             Thread.sleep(1000);
                         } catch (Exception e) {
