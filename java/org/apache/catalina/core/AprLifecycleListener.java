@@ -80,8 +80,8 @@ public class AprLifecycleListener
      * non-zero "FIPS" modes that specify different allowed subsets of ciphers
      * or whatever, but nowadays only "1" is the supported value.
      * </p>
-     * @see "OpenSSL method <a href="http://wiki.openssl.org/index.php/FIPS_mode_set%28%29">FIPS_mode_set()</a>"
-     * @see "OpenSSL method <a href="http://wiki.openssl.org/index.php/FIPS_mode%28%29">FIPS_mode()</a>"
+     * @see <a href="http://wiki.openssl.org/index.php/FIPS_mode_set%28%29">OpenSSL method FIPS_mode_set()</a>
+     * @see <a href="http://wiki.openssl.org/index.php/FIPS_mode%28%29">OpenSSL method FIPS_mode()</a>
      */
     private static final int FIPS_ON = 1;
 

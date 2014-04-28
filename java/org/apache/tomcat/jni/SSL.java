@@ -235,7 +235,7 @@ public final class SSL {
      * @return FIPS_mode return code. It is <code>0</code> if OpenSSL is not
      *  in FIPS mode, <code>1</code> if OpenSSL is in FIPS Mode.
      * @throws Exception If tcnative was not compiled with FIPS Mode available.
-     * @see "OpenSSL method <a href="http://wiki.openssl.org/index.php/FIPS_mode%28%29">FIPS_mode()</a>"
+     * @see <a href="http://wiki.openssl.org/index.php/FIPS_mode%28%29">OpenSSL method FIPS_mode()</a>
      */
     public static native int fipsModeGet() throws Exception;
 
@@ -247,7 +247,7 @@ public final class SSL {
      * @return FIPS_mode_set return code
      * @throws Exception If tcnative was not compiled with FIPS Mode available,
      *  or if {@code FIPS_mode_set()} call returned an error value.
-     * @see "OpenSSL method <a href="http://wiki.openssl.org/index.php/FIPS_mode_set%28%29">FIPS_mode_set()</a>"
+     * @see <a href="http://wiki.openssl.org/index.php/FIPS_mode_set%28%29">OpenSSL method FIPS_mode_set()</a>
      */
     public static native int fipsModeSet(int mode) throws Exception;
 
