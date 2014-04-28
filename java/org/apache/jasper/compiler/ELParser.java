@@ -255,7 +255,7 @@ public class ELParser {
      *
      * @return The escaped version of the input
      */
-    private static String escapeLiteralExpression(String input,
+    static String escapeLiteralExpression(String input,
             boolean isDeferredSyntaxAllowedAsLiteral) {
         int len = input.length();
         int lastAppend = 0;
@@ -552,10 +552,10 @@ public class ELParser {
     }
 
 
-    protected static class TextBuilder extends ELNode.Visitor {
+    static class TextBuilder extends ELNode.Visitor {
 
-        private final boolean isDeferredSyntaxAllowedAsLiteral;
-        protected StringBuilder output = new StringBuilder();
+        protected final boolean isDeferredSyntaxAllowedAsLiteral;
+        protected final StringBuilder output = new StringBuilder();
 
         protected TextBuilder(boolean isDeferredSyntaxAllowedAsLiteral) {
             this.isDeferredSyntaxAllowedAsLiteral = isDeferredSyntaxAllowedAsLiteral;
