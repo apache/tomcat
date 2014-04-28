@@ -196,6 +196,12 @@
         preferred followed by an assignable match followed by a coercible match.
         (markt)
       </fix>
+      <fix>
+        Correct the handling of back-slash escaping in the EL parser and no
+        longer require that <code>\$</code> or <code>\#</code> must be followed
+        by <code>{</code> in order for the back-slash escaping to take effect.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
