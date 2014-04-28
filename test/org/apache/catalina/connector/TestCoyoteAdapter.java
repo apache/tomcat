@@ -40,6 +40,17 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestCoyoteAdapter extends TomcatBaseTest {
 
+    public static final String TEXT_1K;
+    public static final byte[] BYTES_1K;
+
+    static {
+        StringBuilder sb = new StringBuilder(1024);
+        for (int i = 0; i < 64; i++) {
+            sb.append("0123456789ABCDEF");
+        }
+        TEXT_1K = sb.toString();
+        BYTES_1K = TEXT_1K.getBytes(StandardCharsets.UTF_8);
+    }
     @Test
     public void testPathParmsRootNone() throws Exception {
         pathParamTest("/", "none");
@@ -295,7 +306,9 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         client.sendRequest();
 
         for (int i = 0; i < 10; i++) {
-            System.err.println(client.readLine());
+            String line = client.readLine();
+            if (line != null && line.length() > 20)
+            System.err.println(line.subSequence(0, 20) + "...");
         }
 
         client.disconnect();
@@ -347,7 +360,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
                 public void run() {
                     for (int i = 0; i < 20; i++) {
                         try {
-                            os.write("TEST".getBytes(StandardCharsets.UTF_8));
+                            os.write(BYTES_1K);
                             os.flush();
                             Thread.sleep(1000);
                         } catch (Exception e) {
