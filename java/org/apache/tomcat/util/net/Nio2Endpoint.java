@@ -605,8 +605,11 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     }
 
     public void closeSocket(SocketWrapper<Nio2Channel> socket, SocketStatus status) {
+        if (socket == null) {
+            return;
+        }
         try {
-            if (socket != null && socket.isComet() && status != null) {
+            if (socket.isComet() && status != null) {
                 socket.setComet(false);//to avoid a loop
                 if (status == SocketStatus.TIMEOUT) {
                     if (processSocket0(socket, status, true)) {
@@ -617,9 +620,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     processSocket0(socket, status, false);
                 }
             }
-            if (socket!=null) handler.release(socket);
+            handler.release(socket);
             try {
-                if (socket!=null) {
+                if (socket.getSocket() != null) {
                     socket.getSocket().close(true);
                 }
             } catch (Exception e){
@@ -630,17 +633,15 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             }
             Nio2SocketWrapper nio2Socket = (Nio2SocketWrapper) socket;
             try {
-                if (nio2Socket != null && nio2Socket.getSendfileData() != null
+                if (nio2Socket.getSendfileData() != null
                         && nio2Socket.getSendfileData().fchannel != null
                         && nio2Socket.getSendfileData().fchannel.isOpen()) {
                     nio2Socket.getSendfileData().fchannel.close();
                 }
             } catch (Exception ignore) {
             }
-            if (nio2Socket != null) {
-                nio2Socket.reset(null, -1);
-                countDownConnection();
-            }
+            nio2Socket.reset(null, -1);
+            countDownConnection();
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
             if (log.isDebugEnabled()) log.error("",e);
@@ -756,7 +757,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     SocketWrapper<Nio2Channel> socket = sockets.next();
                     long access = socket.getLastAccess();
                     if (socket.getTimeout() > 0 &&
-                            (now-access)>socket.getTimeout()) {
+                            (now-access) > socket.getTimeout()) {
                         processSocket(socket, SocketStatus.TIMEOUT, true);
                     }
                 }
@@ -1085,7 +1086,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             // Upgraded connections need to allow multiple threads to access the
             // connection at the same time to enable blocking IO to be used when
             // NIO has been configured
-            if (socket != null && socket.isUpgraded() &&
+            if (socket.isUpgraded() &&
                     SocketStatus.OPEN_WRITE == status) {
                 synchronized (socket.getWriteThreadLock()) {
                     doRun();
@@ -1103,7 +1104,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 int handshake = -1;
 
                 try {
-                    if (socket != null && socket.getSocket() != null) {
+                    if (socket.getSocket() != null) {
                         // For STOP there is no point trying to handshake as the
                         // Poller has been stopped.
                         if (socket.getSocket().isHandshakeComplete() ||
@@ -1151,9 +1152,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                         launch = true;
                     }
                 } else if (handshake == -1 ) {
-                    if (socket != null) {
-                        closeSocket(socket, SocketStatus.DISCONNECT);
-                    }
+                    closeSocket(socket, SocketStatus.DISCONNECT);
                     if (useCaches && running && !paused) {
                         nioChannels.push(socket.getSocket());
                     }
@@ -1165,9 +1164,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 try {
                     oomParachuteData = null;
                     log.error("", oom);
-                    if (socket != null) {
-                        closeSocket(socket, SocketStatus.ERROR);
-                    }
+                    closeSocket(socket, SocketStatus.ERROR);
                     releaseCaches();
                 } catch (Throwable oomt) {
                     try {
