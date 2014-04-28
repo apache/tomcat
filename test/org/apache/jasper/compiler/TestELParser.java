@@ -40,8 +40,7 @@ import org.apache.jasper.compiler.ELParser.TextBuilder;
  * <li>The strings passed to {@link #doTestParser(String,String)} are Java
  *     escaped in the source code and will be unescaped before being used.</li>
  * <li>LiteralExpressions always occur outside of "${...}" and "#{...}". Literal
- *     expressions escape '$' and '#' with '\\' if '$' or '#' is followed by '{'
- *     but neither '\\' nor '{' is escaped.</li>
+ *     expressions escape '$' and '#' with '\\'</li>
  * <li>LiteralStrings always occur inside "${...}" or "#{...}". Literal strings
  *     escape '\'', '\"' and '\\' with '\\'. Escaping '\"' is optional if the
  *     literal string is delimited by '\''. Escaping '\'' is optional if the
