@@ -1196,7 +1196,7 @@ class Validator {
                                         } catch (Exception e) {
                                             err.jspError
                                                 (n, "jsp.error.coerce_to_type",
-                                                 tldAttr.getName(), expectedType, attrs.getValue(i));
+                                                 tldAttr.getName(), expectedType, attributeValue);
                                         }
                                     }
                                 }
@@ -1233,7 +1233,7 @@ class Validator {
                                     } catch (ELException e) {
                                         this.err.jspError(n.getStart(),
                                                 "jsp.error.invalid.expression",
-                                                attrs.getValue(i), e.toString());
+                                                attributeValue, e.toString());
                                     }
                                 } else {
                                     // Runtime expression
