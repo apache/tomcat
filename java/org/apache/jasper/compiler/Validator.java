@@ -694,7 +694,7 @@ class Validator {
         public void visit(Node.NamedAttribute n) throws JasperException {
             JspUtil.checkAttributes("Attribute", n, attributeAttrs, err);
             n.setOmit(getJspAttribute(null, "omit", null, null, n
-                    .getAttributeValue("omit"), n, true));
+                    .getAttributeValue("omit"), n, false));
             visitBody(n);
         }
 
