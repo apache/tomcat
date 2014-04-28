@@ -29,4 +29,12 @@
 
     <jsp:element name="04b\\x${'\\?resize04b'}"></jsp:element>
 
+    <!-- Test 5: Use \$, \# in template text -->
+    <set data-value="05a\$\${&amp;" />
+    <set data-value="05b\$\${&amp;${1+1}" />
+    <set data-value="05c\#\#{&gt;${'hello'}&lt;" />
+
+    <!-- Test 6: nonTaglibXmlnsAttributes on a Node.UninterpretedTag -->
+    <set xmlns:foo="urn:06a\bar\baz" />
+
 </jsp:root>
