@@ -1831,7 +1831,7 @@ class Generator {
                     out.print(attrs.getQName(i));
                     out.print("=");
                     out.print(DOUBLE_QUOTE);
-                    out.print(attrs.getValue(i).replace("\"", "&quot;"));
+                    out.print(escape(attrs.getValue(i).replace("\"", "&quot;")));
                     out.print(DOUBLE_QUOTE);
                 }
             }
@@ -1851,7 +1851,7 @@ class Generator {
                         out.print(" + \"\\\"");
                     } else {
                         out.print(DOUBLE_QUOTE);
-                        out.print(jspAttrs[i].getValue().replace("\"", "&quot;"));
+                        out.print(escape(jspAttrs[i].getValue().replace("\"", "&quot;")));
                         out.print(DOUBLE_QUOTE);
                     }
                 }
