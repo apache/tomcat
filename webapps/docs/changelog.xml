@@ -136,6 +136,10 @@
         problem is encountered calling a getter or setter on a component
         attribute. The logging level is raised from debug to warning. (markt)
       </fix>
+      <fix>
+        <bug>56451</bug>: Make resources accessed via a context alias accessible
+        via JNDI in the same way standard resources are available. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

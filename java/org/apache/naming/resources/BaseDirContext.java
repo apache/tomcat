@@ -181,11 +181,7 @@ public abstract class BaseDirContext implements DirContext {
      * Add an alias.
      */
     public void addAlias(String path, BaseDirContext dirContext) {
-        if (!path.startsWith("/")) {
-            throw new IllegalArgumentException(
-                    sm.getString("resources.invalidAliasPath", path));
-        }
-        aliases.put(path, dirContext);
+        aliases.put(convertPathToName(path), dirContext);
     }
 
     
@@ -193,13 +189,20 @@ public abstract class BaseDirContext implements DirContext {
      * Remove an alias.
      */
     public void removeAlias(String path) {
+        aliases.remove(convertPathToName(path));
+    }
+    
+    
+    private String convertPathToName(String path) {
+        // Path should have a leading /
         if (!path.startsWith("/")) {
             throw new IllegalArgumentException(
                     sm.getString("resources.invalidAliasPath", path));
         }
-        aliases.remove(path);
+        
+        // Name should not have a leading /
+        return path.substring(1);
     }
-    
     
     /**
      * Get the current alias configuration in String form. If no aliases are
@@ -217,6 +220,7 @@ public abstract class BaseDirContext implements DirContext {
                 result.append(',');
             }
             Entry<String,BaseDirContext> entry = iter.next();
+            result.append('/');
             result.append(entry.getKey());
             result.append('=');
             result.append(entry.getValue().getDocBase());
