@@ -150,6 +150,10 @@
         <bug>56481</bug>: Work around case insensitivity issue in
         <code>URLClassLoader</code> exposed by some recent refactoring. (markt)
       </fix>
+      <add>
+        <bug>56492</bug>: Avoid eclipse debugger pausing on uncaught exceptions
+        when tomcat renews its threads. (slaurent)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
