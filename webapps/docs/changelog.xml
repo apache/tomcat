@@ -146,6 +146,10 @@
         problem is encountered calling a getter or setter on a component
         attribute. The logging level is raised from debug to warning. (markt)
       </fix>
+      <fix>
+        <bug>56481</bug>: Work around case insensitivity issue in
+        <code>URLClassLoader</code> exposed by some recent refactoring. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
