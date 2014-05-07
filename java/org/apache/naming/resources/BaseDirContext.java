@@ -181,7 +181,11 @@ public abstract class BaseDirContext implements DirContext {
      * Add an alias.
      */
     public void addAlias(String path, BaseDirContext dirContext) {
-        aliases.put(convertPathToName(path), dirContext);
+        if (!path.startsWith("/")) {
+            throw new IllegalArgumentException(
+                    sm.getString("resources.invalidAliasPath", path));
+        }
+        aliases.put(path, dirContext);
     }
 
     
@@ -189,20 +193,13 @@ public abstract class BaseDirContext implements DirContext {
      * Remove an alias.
      */
     public void removeAlias(String path) {
-        aliases.remove(convertPathToName(path));
-    }
-    
-    
-    private String convertPathToName(String path) {
-        // Path should have a leading /
         if (!path.startsWith("/")) {
             throw new IllegalArgumentException(
                     sm.getString("resources.invalidAliasPath", path));
         }
-        
-        // Name should not have a leading /
-        return path.substring(1);
+        aliases.remove(path);
     }
+    
     
     /**
      * Get the current alias configuration in String form. If no aliases are
@@ -220,7 +217,6 @@ public abstract class BaseDirContext implements DirContext {
                 result.append(',');
             }
             Entry<String,BaseDirContext> entry = iter.next();
-            result.append('/');
             result.append(entry.getKey());
             result.append('=');
             result.append(entry.getValue().getDocBase());
@@ -1656,7 +1652,23 @@ public abstract class BaseDirContext implements DirContext {
     private AliasResult findAlias(String name) {
         AliasResult result = new AliasResult();
         
-        String searchName = name;
+        // The JNDI resources code mixes names (that don't have leading '/') and
+        // paths (which do have leading '/'). This code is a little messy but
+        // the alternative is reviewing the entire o.a.n.resources package for
+        // the correct use of name vs path and that is very likely to break
+        // clients (including Tomcat internals and user applications).
+        String searchName;
+        boolean slashAppended;
+        if (name.length() == 0) {
+            searchName = "/";
+            slashAppended = true;
+        } else if (name.charAt(0) == '/') {
+            searchName = name;
+            slashAppended = false;
+        } else {
+            searchName = "/" + name;
+            slashAppended = true;
+        }
         
         result.dirContext = aliases.get(searchName);
         while (result.dirContext == null) {
@@ -1667,8 +1679,13 @@ public abstract class BaseDirContext implements DirContext {
             result.dirContext = aliases.get(searchName);
         }
         
-        if (result.dirContext != null)
-            result.aliasName = name.substring(searchName.length());
+        if (result.dirContext != null) {
+            if (slashAppended) {
+                result.aliasName = name.substring(searchName.length() - 1);
+            } else {
+                result.aliasName = name.substring(searchName.length());
+            }
+        }
         
         return result;
     }

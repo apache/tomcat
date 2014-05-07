@@ -148,7 +148,7 @@ public class TestNamingContext extends TomcatBaseTest {
                        +",/a2=" + alternate2.getCanonicalPath());
 
         // Check first alias
-        Object file = ctx.lookup("a1/test1.txt");
+        Object file = ctx.lookup("/a1/test1.txt");
 
         Assert.assertNotNull(file);
         Assert.assertTrue(file instanceof Resource);
@@ -168,7 +168,7 @@ public class TestNamingContext extends TomcatBaseTest {
         assertEquals(foxText, contents);
 
         // Check second alias
-        file = ctx.lookup("a2/test2.txt");
+        file = ctx.lookup("/a2/test2.txt");
 
         Assert.assertNotNull(file);
         Assert.assertTrue(file instanceof Resource);
@@ -191,7 +191,7 @@ public class TestNamingContext extends TomcatBaseTest {
                        + ",");
 
         // Check first alias
-        file = ctx.lookup("a1/test1.txt");
+        file = ctx.lookup("/a1/test1.txt");
 
         Assert.assertNotNull(file);
         Assert.assertTrue(file instanceof Resource);
@@ -208,7 +208,7 @@ public class TestNamingContext extends TomcatBaseTest {
         assertEquals(foxText, contents);
 
         // Check second alias
-        file = ctx.lookup("a2/test2.txt");
+        file = ctx.lookup("/a2/test2.txt");
 
         Assert.assertNotNull(file);
         Assert.assertTrue(file instanceof Resource);
