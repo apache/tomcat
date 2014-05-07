@@ -90,25 +90,24 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
         long soTimeout = endpoint.getSoTimeout();
 
         RequestInfo rp = request.getRequestProcessor();
-        final SocketWrapper<Nio2Channel> attach = socketWrapper;
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             error = !getAdapter().event(request, response, status);
-            if ( !error ) {
-                if (attach != null) {
-                    attach.setComet(comet);
+            if (!error) {
+                if (socketWrapper != null) {
+                    socketWrapper.setComet(comet);
                     if (comet) {
                         Integer comettimeout = (Integer) request.getAttribute(
                                 org.apache.coyote.Constants.COMET_TIMEOUT_ATTR);
                         if (comettimeout != null) {
-                            attach.setTimeout(comettimeout.longValue());
+                            socketWrapper.setTimeout(comettimeout.longValue());
                         }
                     } else {
                         //reset the timeout
                         if (keepAlive) {
-                            attach.setTimeout(keepAliveTimeout);
+                            socketWrapper.setTimeout(keepAliveTimeout);
                         } else {
-                            attach.setTimeout(soTimeout);
+                            socketWrapper.setTimeout(soTimeout);
                         }
                     }
 
@@ -230,21 +229,19 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
     @Override
     protected void setSocketTimeout(int timeout) throws IOException {
-        // Not relevant for NIO2
+        socketWrapper.setTimeout(timeout);
     }
 
 
     @Override
     protected void setCometTimeouts(SocketWrapper<Nio2Channel> socketWrapper) {
-        final Nio2Endpoint.Nio2SocketWrapper attach =
-                (Nio2Endpoint.Nio2SocketWrapper)socketWrapper;
-        if (attach != null)  {
-            attach.setComet(comet);
+        if (socketWrapper != null)  {
+            socketWrapper.setComet(comet);
             if (comet) {
                 Integer comettimeout = (Integer) request.getAttribute(
                         org.apache.coyote.Constants.COMET_TIMEOUT_ATTR);
                 if (comettimeout != null) {
-                    attach.setTimeout(comettimeout.longValue());
+                    socketWrapper.setTimeout(comettimeout.longValue());
                 }
             }
         }
