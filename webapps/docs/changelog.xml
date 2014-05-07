@@ -182,6 +182,9 @@
         <bug>56416</bug>: Correct documentation for default value of socket
         linger for the AJP and HTTP connectors. (markt)
       </fix>
+      <fix>
+        Fix possible corruption if doing keepalive after a comet request. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

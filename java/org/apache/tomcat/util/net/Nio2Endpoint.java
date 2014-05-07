@@ -29,7 +29,6 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
-import java.nio.channels.ReadPendingException;
 import java.nio.file.StandardOpenOption;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
@@ -922,12 +921,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
         ByteBuffer byteBuffer = socket.getSocket().getBufHandler().getReadBuffer();
         byteBuffer.clear();
-        try {
-            socket.getSocket().read(byteBuffer, socket.getTimeout(),
-                    TimeUnit.MILLISECONDS, socket, awaitBytes);
-        } catch (ReadPendingException e) {
-            // Ignore
-        }
+        socket.getSocket().read(byteBuffer, socket.getTimeout(),
+               TimeUnit.MILLISECONDS, socket, awaitBytes);
     }
 
     public boolean processSendfile(final Nio2SocketWrapper socket) {

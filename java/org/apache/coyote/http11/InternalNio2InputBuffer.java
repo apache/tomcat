@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
-import java.nio.channels.ReadPendingException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -265,12 +264,8 @@ public class InternalNio2InputBuffer extends AbstractNioInputBuffer<Nio2Channel>
                         flipped = false;
                         readPending = true;
                         Nio2Endpoint.startInline();
-                        try {
-                            socket.getSocket().read(byteBuffer, socket.getTimeout(),
+                        socket.getSocket().read(byteBuffer, socket.getTimeout(),
                                     TimeUnit.MILLISECONDS, socket, completionHandler);
-                        } catch (ReadPendingException e) {
-                            // Ignore ?
-                        }
                         Nio2Endpoint.endInline();
                         // Return the number of bytes that have been placed into the buffer
                         if (!readPending) {
