@@ -42,12 +42,14 @@ import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -419,6 +421,13 @@ public class WebappClassLoader extends URLClassLoader
      * resources.
      */
     private boolean hasExternalRepositories = false;
+
+
+    /**
+     * Repositories managed by this class rather than the super class.
+     */
+    private Set<URL> localRepositories = new HashSet<>();
+
 
     private volatile LifecycleState state = LifecycleState.NEW;
 
@@ -1370,7 +1379,10 @@ public class WebappClassLoader extends URLClassLoader
      */
     @Override
     public URL[] getURLs() {
-        return super.getURLs();
+        ArrayList<URL> result = new ArrayList<>();
+        result.addAll(localRepositories);
+        result.addAll(Arrays.asList(super.getURLs()));
+        return result.toArray(new URL[result.size()]);
     }
 
 
@@ -1447,12 +1459,12 @@ public class WebappClassLoader extends URLClassLoader
 
         WebResource classes = resources.getResource("/WEB-INF/classes");
         if (classes.isDirectory() && classes.canRead()) {
-            addURL(classes.getURL());
+            localRepositories.add(classes.getURL());
         }
         WebResource[] jars = resources.listResources("/WEB-INF/lib");
         for (WebResource jar : jars) {
             if (jar.getName().endsWith(".jar") && jar.isFile() && jar.canRead()) {
-                addURL(jar.getURL());
+                localRepositories.add(jar.getURL());
                 jarModificationTimes.put(
                         jar.getName(), Long.valueOf(jar.getLastModified()));
             }
