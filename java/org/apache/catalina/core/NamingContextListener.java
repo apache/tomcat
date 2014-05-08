@@ -318,9 +318,12 @@ public class NamingContextListener
                 ContextAccessController.unsetSecurityToken(container, token);
 
                 // unregister mbeans.
-                Collection<ObjectName> names = objectNames.values();
-                for (ObjectName objectName : names) {
-                    Registry.getRegistry(null, null).unregisterComponent(objectName);
+                if (!objectNames.isEmpty()) {
+                    Collection<ObjectName> names = objectNames.values();
+                    Registry registry = Registry.getRegistry(null, null);
+                    for (ObjectName objectName : names) {
+                        registry.unregisterComponent(objectName);
+                    }
                 }
             } finally {
                 objectNames.clear();
