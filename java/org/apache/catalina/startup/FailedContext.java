@@ -752,4 +752,9 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
         // NO-OP
     }
+
+    @Override
+    public Object getNamingToken() {
+        return null;
+    }
 }

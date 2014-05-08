@@ -168,8 +168,16 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
     private File catalinaBase = null;
 
+    private final Object namingToken = new Object();
+
 
     // ------------------------------------------------------------- Properties
+
+    @Override
+    public Object getNamingToken() {
+        return namingToken;
+    }
+
 
     /**
      * Return the global naming resources context.

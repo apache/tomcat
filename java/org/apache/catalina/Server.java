@@ -206,4 +206,11 @@ public interface Server extends Lifecycle {
      * @param service The Service to be removed
      */
     public void removeService(Service service);
+
+
+    /**
+     * Obtain the token necessary for operations on the associated JNDI naming
+     * context.
+     */
+    public Object getNamingToken();
 }

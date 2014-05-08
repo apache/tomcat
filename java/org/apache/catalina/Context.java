@@ -1632,4 +1632,10 @@ public interface Context extends Container {
      *          The class loader to restore as the thread context class loader
      */
     public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader);
+
+    /**
+     * Obtain the token necessary for operations on the associated JNDI naming
+     * context.
+     */
+    public Object getNamingToken();
 }
