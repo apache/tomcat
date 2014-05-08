@@ -253,6 +253,7 @@ public class NamingContextListener
                 // Never happens
             }
             ContextAccessController.setSecurityToken(getName(), container);
+            ContextAccessController.setSecurityToken(container, container);
             ContextBindings.bindContext(container, namingContext, container);
             if( log.isDebugEnabled() ) {
                 log.debug("Bound " + container );
