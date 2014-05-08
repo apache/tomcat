@@ -1600,7 +1600,7 @@ public class ProxyDirContext implements DirContext {
      */
     protected void cacheLoad(CacheEntry entry) {
 
-        String name = entry.name;
+        final String name = entry.name;
 
         // Retrieve missing info
         boolean exists = true;
@@ -1608,7 +1608,7 @@ public class ProxyDirContext implements DirContext {
         // Retrieving attributes
         if (entry.attributes == null) {
             try {
-                Attributes attributes = dirContext.getAttributes(entry.name);
+                Attributes attributes = dirContext.getAttributes(name);
                 if (!(attributes instanceof ResourceAttributes)) {
                     entry.attributes = 
                         new ResourceAttributes(attributes);
