@@ -49,7 +49,6 @@ import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -426,7 +425,7 @@ public class WebappClassLoader extends URLClassLoader
     /**
      * Repositories managed by this class rather than the super class.
      */
-    private Set<URL> localRepositories = new HashSet<>();
+    private List<URL> localRepositories = new ArrayList<>();
 
 
     private volatile LifecycleState state = LifecycleState.NEW;
