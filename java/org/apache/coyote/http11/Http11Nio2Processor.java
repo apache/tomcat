@@ -132,14 +132,30 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
             if (keepAlive) {
                 inputBuffer.nextRequest();
                 outputBuffer.nextRequest();
-                // Following Comet processing, a read is still pending, so
-                // keep the processor associated
-                return SocketState.LONG;
+                if (((InternalNio2InputBuffer) inputBuffer).isPending()) {
+                    // Following comet processing, a read is still pending, so
+                    // keep the processor associated
+                    return SocketState.LONG;
+                } else {
+                    return SocketState.OPEN;
+                }
             } else {
                 return SocketState.CLOSED;
             }
         } else {
             return SocketState.LONG;
+        }
+    }
+
+    @Override
+    public SocketState asyncDispatch(SocketStatus status) {
+        SocketState state = super.asyncDispatch(status);
+        if (state == SocketState.OPEN && ((InternalNio2InputBuffer) inputBuffer).isPending()) {
+            // Following async processing, a read is still pending, so
+            // keep the processor associated
+            return SocketState.LONG;
+        } else {
+            return state;
         }
     }
 
