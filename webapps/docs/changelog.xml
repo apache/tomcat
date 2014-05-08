@@ -153,6 +153,10 @@
         (violetagg)
       </add>
       <fix>
+        <bug>56472</bug>: Allow NamingContextListener to clean up on stop if its
+        start failed. (kkolinko)
+      </fix>
+      <fix>
         <bug>56481</bug>: Work around case insensitivity issue in
         <code>URLClassLoader</code> exposed by some recent refactoring. (markt)
       </fix>
@@ -167,7 +171,7 @@
       </add>
       <fix>
         Make the naming context tokens for containers more robust by using a
-        separate object. (markt)
+        separate object. (markt/kkolinko)
       </fix>
     </changelog>
   </subsection>
