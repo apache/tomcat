@@ -164,6 +164,10 @@
         <bug>56472</bug>: Allow NamingContextListener to clean up on stop if its
         start failed. (kkolinko)
       </fix>
+      <add>
+        <bug>56492</bug>: Avoid eclipse debugger pausing on uncaught exceptions
+        when tomcat renews its threads. (slaurent)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
