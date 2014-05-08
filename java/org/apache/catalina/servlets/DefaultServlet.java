@@ -253,6 +253,11 @@ public class DefaultServlet extends HttpServlet {
      */
     protected boolean useAcceptRanges = true;
 
+    /**
+     * Flag to determine if server information is presented.
+     */
+    protected boolean showServerInfo = true;
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -319,6 +324,10 @@ public class DefaultServlet extends HttpServlet {
 
         if (resources == null) {
             throw new UnavailableException("No resources");
+        }
+
+        if (getServletConfig().getInitParameter("showServerInfo") != null) {
+            showServerInfo = Boolean.parseBoolean(getServletConfig().getInitParameter("showServerInfo"));
         }
     }
 
@@ -1489,7 +1498,9 @@ public class DefaultServlet extends HttpServlet {
             sb.append("<HR size=\"1\" noshade=\"noshade\">");
         }
 
-        sb.append("<h3>").append(ServerInfo.getServerInfo()).append("</h3>");
+        if (showServerInfo) {
+            sb.append("<h3>").append(ServerInfo.getServerInfo()).append("</h3>");
+        }
         sb.append("</body>\r\n");
         sb.append("</html>\r\n");
 
