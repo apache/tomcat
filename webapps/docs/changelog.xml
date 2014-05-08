@@ -160,6 +160,11 @@
         <bug>56492</bug>: Avoid eclipse debugger pausing on uncaught exceptions
         when tomcat renews its threads. (slaurent)
       </add>
+      <add>
+        Add the <code>org.apache.naming</code> package to the packages requiring
+        code to have the <code>defineClassInPackage</code> permission when
+        running under a security manager. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
