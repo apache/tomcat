@@ -225,6 +225,11 @@ public class DefaultServlet
      */
     protected static final ArrayList<Range> FULL = new ArrayList<Range>();
 
+    /**
+     * Flag to determine if server information is presented.
+     */
+    protected boolean showServerInfo = true;
+
 
     // ----------------------------------------------------- Static Initializer
 
@@ -275,6 +280,7 @@ public class DefaultServlet
      * Size of file transfer buffer in bytes.
      */
     protected static final int BUFFER_SIZE = 4096;
+
 
 
     // --------------------------------------------------------- Public Methods
@@ -352,6 +358,9 @@ public class DefaultServlet
             throw new UnavailableException("No resources");
         }
 
+        if (getServletConfig().getInitParameter("showServerInfo") != null) {
+            showServerInfo = Boolean.parseBoolean(getServletConfig().getInitParameter("showServerInfo"));
+        }
     }
 
 
@@ -1561,7 +1570,9 @@ public class DefaultServlet
             sb.append("<HR size=\"1\" noshade=\"noshade\">");
         }
 
-        sb.append("<h3>").append(ServerInfo.getServerInfo()).append("</h3>");
+        if (showServerInfo) {
+            sb.append("<h3>").append(ServerInfo.getServerInfo()).append("</h3>");
+        }
         sb.append("</body>\r\n");
         sb.append("</html>\r\n");
 

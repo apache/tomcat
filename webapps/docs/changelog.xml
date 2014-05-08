@@ -140,6 +140,12 @@
         <bug>56451</bug>: Make resources accessed via a context alias accessible
         via JNDI in the same way standard resources are available. (markt)
       </fix>
+      <add>
+        <bug>56463</bug>: Property for disabling server information is added to
+        the <code>DefaultServlet</code>. Server information is presented in the
+        response sent to the client when directory listings is enabled.
+        (violetagg)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
