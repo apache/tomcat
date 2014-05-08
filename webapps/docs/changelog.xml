@@ -160,6 +160,10 @@
         Make the naming context tokens for containers more robust by using a
         separate object. (markt/kkolinko)
       </fix>
+      <fix>
+        <bug>56472</bug>: Allow NamingContextListener to clean up on stop if its
+        start failed. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
