@@ -329,7 +329,8 @@ public class NamingContextListener
             }
 
             ContextAccessController.unsetSecurityToken(getName(), container);
-            
+            ContextAccessController.unsetSecurityToken(container, container);
+
             // unregister mbeans.
             Collection<ObjectName> names = objectNames.values();
             for (ObjectName objectName : names) {

@@ -156,6 +156,10 @@
         requiring code to have the <code>accessClassInPackage</code> permission
         when running under a security manager. (markt)
       </add>
+      <fix>
+        Make the naming context tokens for containers more robust by using a
+        separate object. (markt/kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
