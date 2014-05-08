@@ -18,6 +18,7 @@ package org.apache.coyote.http11;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.nio.channels.ReadPendingException;
 import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -954,7 +955,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                         setSocketTimeout(connectionUploadTimeout);
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException | ReadPendingException e) {
                 if (getLog().isDebugEnabled()) {
                     getLog().debug(
                             sm.getString("http11processor.header.parse"), e);
