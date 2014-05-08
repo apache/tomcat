@@ -100,6 +100,10 @@ public class NamingContextListener
      */
     protected Object container = null;
 
+    /**
+     * Token for configuring associated JNDI context.
+     */
+    private Object token = null;
 
     /**
      * Initialized flag.
@@ -214,8 +218,10 @@ public class NamingContextListener
         if (container instanceof Context) {
             namingResources = ((Context) container).getNamingResources();
             logger = log;
+            token = ((Context) container).getNamingToken();
         } else if (container instanceof Server) {
             namingResources = ((Server) container).getGlobalNamingResources();
+            token = ((Server) container).getNamingToken();
         } else {
             return;
         }
@@ -231,8 +237,9 @@ public class NamingContextListener
             } catch (NamingException e) {
                 // Never happens
             }
-            ContextAccessController.setSecurityToken(getName(), container);
-            ContextBindings.bindContext(container, namingContext, container);
+            ContextAccessController.setSecurityToken(getName(), token);
+            ContextAccessController.setSecurityToken(container, token);
+            ContextBindings.bindContext(container, namingContext, token);
             if( log.isDebugEnabled() ) {
                 log.debug("Bound " + container );
             }
@@ -242,7 +249,7 @@ public class NamingContextListener
                     getExceptionOnFailedWrite());
 
             // Setting the context in read/write mode
-            ContextAccessController.setWritable(getName(), container);
+            ContextAccessController.setWritable(getName(), token);
 
             try {
                 createNamingContext();
@@ -258,9 +265,8 @@ public class NamingContextListener
                 // Setting the context in read only mode
                 ContextAccessController.setReadOnly(getName());
                 try {
-                    ContextBindings.bindClassLoader
-                        (container, container,
-                         ((Context) container).getLoader().getClassLoader());
+                    ContextBindings.bindClassLoader(container, token,
+                            ((Context) container).getLoader().getClassLoader());
                 } catch (NamingException e) {
                     logger.error(sm.getString("naming.bindFailed", e));
                 }
@@ -270,9 +276,8 @@ public class NamingContextListener
                 org.apache.naming.factory.ResourceLinkFactory.setGlobalContext
                     (namingContext);
                 try {
-                    ContextBindings.bindClassLoader
-                        (container, container,
-                         this.getClass().getClassLoader());
+                    ContextBindings.bindClassLoader(container, token,
+                            this.getClass().getClassLoader());
                 } catch (NamingException e) {
                     logger.error(sm.getString("naming.bindFailed", e));
                 }
@@ -290,23 +295,21 @@ public class NamingContextListener
                 return;
 
             // Setting the context in read/write mode
-            ContextAccessController.setWritable(getName(), container);
-            ContextBindings.unbindContext(container, container);
+            ContextAccessController.setWritable(getName(), token);
+            ContextBindings.unbindContext(container, token);
 
             if (container instanceof Context) {
-                ContextBindings.unbindClassLoader
-                    (container, container,
-                     ((Context) container).getLoader().getClassLoader());
+                ContextBindings.unbindClassLoader(container, token,
+                        ((Context) container).getLoader().getClassLoader());
             }
 
             if (container instanceof Server) {
                 namingResources.removePropertyChangeListener(this);
-                ContextBindings.unbindClassLoader
-                    (container, container,
-                     this.getClass().getClassLoader());
+                ContextBindings.unbindClassLoader(container, token,
+                        this.getClass().getClassLoader());
             }
 
-            ContextAccessController.unsetSecurityToken(getName(), container);
+            ContextAccessController.unsetSecurityToken(getName(), token);
 
             // unregister mbeans.
             Collection<ObjectName> names = objectNames.values();
@@ -342,7 +345,7 @@ public class NamingContextListener
             return;
 
         // Setting the context in read/write mode
-        ContextAccessController.setWritable(getName(), container);
+        ContextAccessController.setWritable(getName(), token);
 
         String type = event.getType();
 
@@ -483,7 +486,7 @@ public class NamingContextListener
         if (source == namingResources) {
 
             // Setting the context in read/write mode
-            ContextAccessController.setWritable(getName(), container);
+            ContextAccessController.setWritable(getName(), token);
 
             processGlobalResourcesChange(event.getPropertyName(),
                                          event.getOldValue(),

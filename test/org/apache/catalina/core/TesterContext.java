@@ -1218,4 +1218,8 @@ public class TesterContext implements Context {
         // NO-OP
     }
 
+    @Override
+    public Object getNamingToken() {
+        return null;
+    }
 }

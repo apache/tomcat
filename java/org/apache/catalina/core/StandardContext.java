@@ -818,7 +818,16 @@ public class StandardContext extends ContainerBase
     });
     protected ThreadBindingListener threadBindingListener = DEFAULT_NAMING_LISTENER;
 
+    private final Object namingToken = new Object();
+
+
     // ----------------------------------------------------- Context Properties
+
+    @Override
+    public Object getNamingToken() {
+        return namingToken;
+    }
+
 
     @Override
     public void setContainerSciFilter(String containerSciFilter) {
@@ -5718,7 +5727,7 @@ public class StandardContext extends ContainerBase
 
         if (isUseNaming()) {
             try {
-                ContextBindings.bindThread(this, this);
+                ContextBindings.bindThread(this, getNamingToken());
             } catch (NamingException e) {
                 // Silent catch, as this is a normal case during the early
                 // startup stages
@@ -5735,7 +5744,7 @@ public class StandardContext extends ContainerBase
     protected void unbindThread(ClassLoader oldContextClassLoader) {
 
         if (isUseNaming()) {
-            ContextBindings.unbindThread(this, this);
+            ContextBindings.unbindThread(this, getNamingToken());
         }
 
         unbind(false, oldContextClassLoader);
