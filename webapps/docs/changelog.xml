@@ -146,6 +146,16 @@
         response sent to the client when directory listings is enabled.
         (violetagg)
       </add>
+      <add>
+        Add the <code>org.apache.naming</code> package to the packages requiring
+        code to have the <code>defineClassInPackage</code> permission when
+        running under a security manager. (markt)
+      </add>
+      <add>
+        Add the <code>org.apache.naming.resources</code> package to the packages
+        requiring code to have the <code>accessClassInPackage</code> permission
+        when running under a security manager. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
