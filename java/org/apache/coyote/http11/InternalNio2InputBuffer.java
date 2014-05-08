@@ -124,6 +124,10 @@ public class InternalNio2InputBuffer extends AbstractNioInputBuffer<Nio2Channel>
         interest = false;
     }
 
+    public boolean isPending() {
+        return readPending;
+    }
+
     // ------------------------------------------------------ Protected Methods
 
     @Override
