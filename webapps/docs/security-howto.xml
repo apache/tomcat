@@ -362,7 +362,9 @@
 
       <p>The default ErrorReportValve can display stack traces and/or JSP
       source code to clients when an error occurs. To avoid this, custom error
-      handling can be configured within each web application.</p>
+      handling can be configured within each web application. Alternatively, you
+      can explicitly configure an <a href="config/valve.html">ErrorReportValve</a>
+      and set its <strong>showReport</strong> attribute to <code>false</code>.</p>
     </subsection>
 
     <subsection name="Realms">
