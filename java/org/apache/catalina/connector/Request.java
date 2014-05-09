@@ -1894,7 +1894,17 @@ public class Request
      */
     @Override
     public String getContextPath() {
-        return mappingData.contextPath.toString();
+        String uri = getRequestURI();
+        int lastSlash = mappingData.contextSlashCount;
+        int pos = 0;
+        while (lastSlash > 0) {
+            pos = uri.indexOf('/', pos + 1);
+            if (pos == -1) {
+                return uri;
+            }
+            lastSlash--;
+        }
+        return uri.substring(0, pos);
     }
 
 

@@ -173,6 +173,10 @@
         Make the naming context tokens for containers more robust by using a
         separate object. (markt/kkolinko)
       </fix>
+      <fix>
+        <bug>56501</bug>: <code>HttpServletRequest.getContextPath()</code>
+        should return the undecoded context path used by the user agent. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
