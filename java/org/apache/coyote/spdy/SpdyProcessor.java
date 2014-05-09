@@ -541,7 +541,6 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
                     throw new IOException("Name too long");
                 }
 
-                request.unparsedURI().setBytes(frame.data, frame.off, valueLen);
                 int questionPos = -1;
                 int end = frame.off + valueLen;
                 for(int k = frame.off; k < end; k ++) {

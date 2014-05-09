@@ -278,7 +278,6 @@ public abstract class AbstractNioInputBuffer<S> extends AbstractInputBuffer<S> {
                 }
                 pos++;
             }
-            request.unparsedURI().setBytes(buf, parsingRequestLineStart, end - parsingRequestLineStart);
             if (parsingRequestLineQPos >= 0) {
                 request.queryString().setBytes(buf, parsingRequestLineQPos + 1,
                                                end - parsingRequestLineQPos - 1);
