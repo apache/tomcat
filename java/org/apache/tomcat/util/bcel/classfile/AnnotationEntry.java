@@ -28,7 +28,7 @@ import org.apache.tomcat.util.bcel.Constants;
  * represents one annotation in the annotation table
  *
  * @author  <A HREF="mailto:dbrosius@mebigfatguy.com">D. Brosius</A>
- * @since 5.3
+ * @since 6.0
  */
 public class AnnotationEntry implements Constants {
 

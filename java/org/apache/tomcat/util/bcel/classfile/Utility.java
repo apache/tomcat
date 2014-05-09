@@ -169,4 +169,23 @@ final class Utility {
             throw new ClassFormatException("Synthetic attribute with length > 0");
         }
     }
+
+    static void swallowBootstrapMethods(DataInput file) throws IOException {
+        int num_bootstrap_methods = file.readUnsignedShort();
+        for (int i = 0; i < num_bootstrap_methods; i++) {
+            file.readUnsignedShort();   // Unused bootstrap_method_ref
+            int num_bootstrap_args = file.readUnsignedShort();
+            for (int j = 0; j < num_bootstrap_args; j++) {
+                file.readUnsignedShort(); // Unused bootstrap method argument
+            }
+        }
+    }
+
+    static void swallowMethodParameters(DataInput file) throws IOException {
+        int parameters_count = file.readUnsignedShort();
+        for (int i = 0; i < parameters_count; i++) {
+            file.readUnsignedShort();   // Unused name_index
+            file.readUnsignedShort();   // Unused access_flags
+        }
+    }
 }

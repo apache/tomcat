@@ -25,7 +25,7 @@ import java.io.IOException;
  * provided to the JVM.
  *
  * @author <A HREF="mailto:dbrosius@qis.net">D. Brosius</A>
- * @since 5.3
+ * @since 6.0
  */
 public class RuntimeInvisibleAnnotations extends Annotations
 {
