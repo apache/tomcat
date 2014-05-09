@@ -167,7 +167,7 @@ public final class ClassParser {
      * @throws  IOException
      * @throws  ClassFormatException
      */
-    private final void readAttributes() throws IOException, ClassFormatException {
+    private void readAttributes() throws IOException, ClassFormatException {
         int attributes_count;
         attributes_count = file.readUnsignedShort();
         attributes = new Attribute[attributes_count];
@@ -182,7 +182,7 @@ public final class ClassParser {
      * @throws  IOException
      * @throws  ClassFormatException
      */
-    private final void readClassInfo() throws IOException, ClassFormatException {
+    private void readClassInfo() throws IOException, ClassFormatException {
         access_flags = file.readUnsignedShort();
         /* Interfaces are implicitely abstract, the flag should be set
          * according to the JVM specification.
@@ -204,7 +204,7 @@ public final class ClassParser {
      * @throws  IOException
      * @throws  ClassFormatException
      */
-    private final void readConstantPool() throws IOException, ClassFormatException {
+    private void readConstantPool() throws IOException, ClassFormatException {
         constant_pool = new ConstantPool(file);
     }
 
@@ -214,7 +214,7 @@ public final class ClassParser {
      * @throws  IOException
      * @throws  ClassFormatException
      */
-    private final void readFields() throws IOException, ClassFormatException {
+    private void readFields() throws IOException, ClassFormatException {
         int fields_count;
         fields_count = file.readUnsignedShort();
         fields = new Field[fields_count];
@@ -231,7 +231,7 @@ public final class ClassParser {
      * @throws  IOException
      * @throws  ClassFormatException
      */
-    private final void readID() throws IOException, ClassFormatException {
+    private void readID() throws IOException, ClassFormatException {
         int magic = 0xCAFEBABE;
         if (file.readInt() != magic) {
             throw new ClassFormatException(file_name + " is not a Java .class file");
@@ -244,7 +244,7 @@ public final class ClassParser {
      * @throws  IOException
      * @throws  ClassFormatException
      */
-    private final void readInterfaces() throws IOException, ClassFormatException {
+    private void readInterfaces() throws IOException, ClassFormatException {
         int interfaces_count;
         interfaces_count = file.readUnsignedShort();
         interfaces = new int[interfaces_count];
@@ -259,7 +259,7 @@ public final class ClassParser {
      * @throws  IOException
      * @throws  ClassFormatException
      */
-    private final void readMethods() throws IOException, ClassFormatException {
+    private void readMethods() throws IOException, ClassFormatException {
         int methods_count;
         methods_count = file.readUnsignedShort();
         methods = new Method[methods_count];
@@ -274,7 +274,7 @@ public final class ClassParser {
      * @throws  IOException
      * @throws  ClassFormatException
      */
-    private final void readVersion() throws IOException, ClassFormatException {
+    private void readVersion() throws IOException, ClassFormatException {
         minor = file.readUnsignedShort();
         major = file.readUnsignedShort();
     }
