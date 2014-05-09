@@ -359,6 +359,11 @@
         Update package renamed Apache Commons BCEL to r1593495 to pick up some
         additional changes for Java 7 support and some code clean up. (markt)
       </update>
+      <update>
+        Update package renamed Apache Commons FileUpload to r1569132 to pick up
+        some small improvements (e.g. better <code>null</code> protection) and
+        some code clean up. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

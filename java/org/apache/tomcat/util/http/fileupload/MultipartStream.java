@@ -218,12 +218,12 @@ public class MultipartStream {
      * The amount of data, in bytes, that must be kept in the buffer in order
      * to detect delimiters reliably.
      */
-    private int keepRegion;
+    private final int keepRegion;
 
     /**
      * The byte sequence that partitions the stream.
      */
-    private byte[] boundary;
+    private final byte[] boundary;
 
     /**
      * The length of the buffer used for processing the request.
@@ -277,11 +277,18 @@ public class MultipartStream {
      *                  progress listener, if any.
      *
      * @throws IllegalArgumentException If the buffer size is too small
+     *
+     * @since 1.3.1
      */
     public MultipartStream(InputStream input,
             byte[] boundary,
             int bufSize,
             ProgressNotifier pNotifier) {
+
+        if (boundary == null) {
+            throw new IllegalArgumentException("boundary may not be null");
+        }
+
         this.input = input;
         this.bufSize = bufSize;
         this.buffer = new byte[bufSize];
@@ -529,8 +536,7 @@ public class MultipartStream {
      */
     public int readBodyData(OutputStream output)
             throws MalformedStreamException, IOException {
-        final InputStream istream = newInputStream();
-        return (int) Streams.copy(istream, output, false);
+        return (int) Streams.copy(newInputStream(), output, false); // N.B. Streams.copy closes the input stream
     }
 
     /**
@@ -642,11 +648,9 @@ public class MultipartStream {
         int first;
         int match = 0;
         int maxpos = tail - boundaryLength;
-        for (first = head;
-        (first <= maxpos) && (match != boundaryLength);
-        first++) {
+        for (first = head; first <= maxpos && match != boundaryLength; first++) {
             first = findByte(boundary[0], first);
-            if (first == -1 || (first > maxpos)) {
+            if (first == -1 || first > maxpos) {
                 return -1;
             }
             for (match = 1; match < boundaryLength; match++) {
