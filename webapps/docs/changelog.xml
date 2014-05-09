@@ -368,11 +368,15 @@
         Update package renamed Apache Commons Codec to r1586336 to pick up some
         Javadoc fixes and some code clean up. (markt)
       </update>
-      <update>
+      <scode>
         Switch to including Apache Commons DBCP via a package renamed  svn copy
         rather than building from a source release for consistency with other
         Commons packages and to allow faster releases to fix DBCP related
         issues. (markt)
+      </scode>
+      <update>
+        Update package renamed Apache Commons Pool2 and DBCP2 to r1593563 to
+        pick various bug fixes. (markt)
       </update>
     </changelog>
   </subsection>
