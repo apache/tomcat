@@ -82,7 +82,6 @@ public final class Request {
     private final MessageBytes schemeMB = MessageBytes.newInstance();
 
     private final MessageBytes methodMB = MessageBytes.newInstance();
-    private final MessageBytes unparsedURIMB = MessageBytes.newInstance();
     private final MessageBytes uriMB = MessageBytes.newInstance();
     private final MessageBytes decodedUriMB = MessageBytes.newInstance();
     private final MessageBytes queryMB = MessageBytes.newInstance();
@@ -206,10 +205,6 @@ public final class Request {
 
     public MessageBytes method() {
         return methodMB;
-    }
-
-    public MessageBytes unparsedURI() {
-        return unparsedURIMB;
     }
 
     public MessageBytes requestURI() {
@@ -536,7 +531,6 @@ public final class Request {
         cookies.recycle();
         parameters.recycle();
 
-        unparsedURIMB.recycle();
         uriMB.recycle();
         decodedUriMB.recycle();
         queryMB.recycle();

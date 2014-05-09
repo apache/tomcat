@@ -202,7 +202,6 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
         }
 
-        request.unparsedURI().setBytes(buf, start, end - start);
         if (questionPos >= 0) {
             request.queryString().setBytes(buf, questionPos + 1,
                                            end - questionPos - 1);
