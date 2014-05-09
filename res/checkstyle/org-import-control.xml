@@ -125,6 +125,18 @@
     <subpackage name="buildutil">
       <allow pkg="org.apache.tools.ant"/>
     </subpackage>
+    <subpackage name="dbcp">
+      <allow pkg="org.apache.juli"/>
+      <subpackage name="dbcp2">
+        <allow pkg="org.apache.tomcat.dbcp.dbcp2"/>
+        <allow pkg="org.apache.tomcat.dbcp.pool2"/>
+      </subpackage>
+      <subpackage name="pool2">
+        <subpackage name="impl">
+          <allow pkg="org.apache.tomcat.dbcp.pool2"/>
+        </subpackage>
+      </subpackage>
+    </subpackage>
     <subpackage name="jni">
       <subpackage name="socket">
         <allow pkg="org.apache.tomcat.jni"/>
