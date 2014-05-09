@@ -364,6 +364,10 @@
         some small improvements (e.g. better <code>null</code> protection) and
         some code clean up. (markt)
       </update>
+      <update>
+        Update package renamed Apache Commons Codec to r1586336 to pick up some
+        Javadoc fixes and some code clean up. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
