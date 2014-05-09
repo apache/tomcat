@@ -44,12 +44,12 @@ public abstract class LimitedInputStream extends FilterInputStream implements Cl
     /**
      * Creates a new instance.
      *
-     * @param pIn The input stream, which shall be limited.
+     * @param inputStream The input stream, which shall be limited.
      * @param pSizeMax The limit; no more than this number of bytes
      *   shall be returned by the source stream.
      */
-    public LimitedInputStream(InputStream pIn, long pSizeMax) {
-        super(pIn);
+    public LimitedInputStream(InputStream inputStream, long pSizeMax) {
+        super(inputStream);
         sizeMax = pSizeMax;
     }
 

@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.http.fileupload;
 
+import java.io.Closeable;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -71,6 +73,52 @@ public class IOUtils {
      */
     public IOUtils() {
         super();
+    }
+
+    /**
+     * Closes a <code>Closeable</code> unconditionally.
+     * <p>
+     * Equivalent to {@link Closeable#close()}, except any exceptions will be ignored. This is typically used in
+     * finally blocks.
+     * <p>
+     * Example code:
+     *
+     * <pre>
+     * Closeable closeable = null;
+     * try {
+     *     closeable = new FileReader(&quot;foo.txt&quot;);
+     *     // process closeable
+     *     closeable.close();
+     * } catch (Exception e) {
+     *     // error handling
+     * } finally {
+     *     IOUtils.closeQuietly(closeable);
+     * }
+     * </pre>
+     *
+     * Closing all streams:
+     *
+     * <pre>
+     * try {
+     *     return IOUtils.copy(inputStream, outputStream);
+     * } finally {
+     *     IOUtils.closeQuietly(inputStream);
+     *     IOUtils.closeQuietly(outputStream);
+     * }
+     * </pre>
+     *
+     * @param closeable
+     *            the objects to close, may be null or already closed
+     * @since 2.0
+     */
+    public static void closeQuietly(final Closeable closeable) {
+        try {
+            if (closeable != null) {
+                closeable.close();
+            }
+        } catch (final IOException ioe) {
+            // ignore
+        }
     }
 
     // copy from InputStream
@@ -129,5 +177,76 @@ public class IOUtils {
             count += n;
         }
         return count;
+    }
+
+    /**
+     * Reads bytes from an input stream.
+     * This implementation guarantees that it will read as many bytes
+     * as possible before giving up; this may not always be the case for
+     * subclasses of {@link InputStream}.
+     *
+     * @param input where to read input from
+     * @param buffer destination
+     * @param offset initial offset into buffer
+     * @param length length to read, must be &gt;= 0
+     * @return actual length read; may be less than requested if EOF was reached
+     * @throws IOException if a read error occurs
+     * @since 2.2
+     */
+    public static int read(final InputStream input, final byte[] buffer, final int offset, final int length) throws IOException {
+        if (length < 0) {
+            throw new IllegalArgumentException("Length must not be negative: " + length);
+        }
+        int remaining = length;
+        while (remaining > 0) {
+            final int location = length - remaining;
+            final int count = input.read(buffer, offset + location, remaining);
+            if (EOF == count) { // EOF
+                break;
+            }
+            remaining -= count;
+        }
+        return length - remaining;
+    }
+
+    /**
+     * Reads the requested number of bytes or fail if there are not enough left.
+     * <p>
+     * This allows for the possibility that {@link InputStream#read(byte[], int, int)} may
+     * not read as many bytes as requested (most likely because of reaching EOF).
+     *
+     * @param input where to read input from
+     * @param buffer destination
+     * @param offset initial offset into buffer
+     * @param length length to read, must be &gt;= 0
+     *
+     * @throws IOException if there is a problem reading the file
+     * @throws IllegalArgumentException if length is negative
+     * @throws EOFException if the number of bytes read was incorrect
+     * @since 2.2
+     */
+    public static void readFully(final InputStream input, final byte[] buffer, final int offset, final int length) throws IOException {
+        final int actual = read(input, buffer, offset, length);
+        if (actual != length) {
+            throw new EOFException("Length to read: " + length + " actual: " + actual);
+        }
+    }
+
+    /**
+     * Reads the requested number of bytes or fail if there are not enough left.
+     * <p>
+     * This allows for the possibility that {@link InputStream#read(byte[], int, int)} may
+     * not read as many bytes as requested (most likely because of reaching EOF).
+     *
+     * @param input where to read input from
+     * @param buffer destination
+     *
+     * @throws IOException if there is a problem reading the file
+     * @throws IllegalArgumentException if length is negative
+     * @throws EOFException if the number of bytes read was incorrect
+     * @since 2.2
+     */
+    public static void readFully(final InputStream input, final byte[] buffer) throws IOException {
+        readFully(input, buffer, 0, buffer.length);
     }
 }
