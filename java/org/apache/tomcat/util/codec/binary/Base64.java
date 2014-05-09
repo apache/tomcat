@@ -27,13 +27,13 @@ import java.math.BigInteger;
  * </p>
  * <p>
  * The class can be parameterized in the following manner with various constructors:
+ * </p>
  * <ul>
  * <li>URL-safe mode: Default off.</li>
  * <li>Line length: Default 76. Line length that aren't multiples of 4 will still essentially end up being multiples of
  * 4 in the encoded data.
  * <li>Line separator: Default is CRLF ("\r\n")</li>
  * </ul>
- * </p>
  * <p>
  * Since this class operates directly on byte streams, and not character streams, it is hard-coded to only
  * encode/decode character encodings which are compatible with the lower 127 ASCII chart (ISO-8859-1, Windows-1252,
@@ -138,7 +138,7 @@ public class Base64 extends BaseNCodec {
     private final byte[] decodeTable = DECODE_TABLE;
 
     /**
-     * Line separator for encoding. Not used when decoding. Only used if lineLength > 0.
+     * Line separator for encoding. Not used when decoding. Only used if lineLength &gt; 0.
      */
     private final byte[] lineSeparator;
 
@@ -202,7 +202,7 @@ public class Base64 extends BaseNCodec {
      *
      * @param lineLength
      *            Each line of encoded data will be at most of the given length (rounded down to nearest multiple of
-     *            4). If lineLength <= 0, then the output will not be divided into lines (chunks). Ignored when
+     *            4). If lineLength &lt;= 0, then the output will not be divided into lines (chunks). Ignored when
      *            decoding.
      * @since 1.4
      */
@@ -225,7 +225,7 @@ public class Base64 extends BaseNCodec {
      *
      * @param lineLength
      *            Each line of encoded data will be at most of the given length (rounded down to nearest multiple of
-     *            4). If lineLength <= 0, then the output will not be divided into lines (chunks). Ignored when
+     *            4). If lineLength &lt;= 0, then the output will not be divided into lines (chunks). Ignored when
      *            decoding.
      * @param lineSeparator
      *            Each line of encoded data will end with this sequence of bytes.
@@ -252,7 +252,7 @@ public class Base64 extends BaseNCodec {
      *
      * @param lineLength
      *            Each line of encoded data will be at most of the given length (rounded down to nearest multiple of
-     *            4). If lineLength <= 0, then the output will not be divided into lines (chunks). Ignored when
+     *            4). If lineLength &lt;= 0, then the output will not be divided into lines (chunks). Ignored when
      *            decoding.
      * @param lineSeparator
      *            Each line of encoded data will end with this sequence of bytes.
@@ -346,8 +346,8 @@ public class Base64 extends BaseNCodec {
                     buffer[context.pos++] = encodeTable[(context.ibitWorkArea << 4) & MASK_6BITS];
                     // URL-SAFE skips the padding to further reduce size.
                     if (encodeTable == STANDARD_ENCODE_TABLE) {
-                        buffer[context.pos++] = PAD;
-                        buffer[context.pos++] = PAD;
+                        buffer[context.pos++] = pad;
+                        buffer[context.pos++] = pad;
                     }
                     break;
 
@@ -357,7 +357,7 @@ public class Base64 extends BaseNCodec {
                     buffer[context.pos++] = encodeTable[(context.ibitWorkArea << 2) & MASK_6BITS];
                     // URL-SAFE skips the padding to further reduce size.
                     if (encodeTable == STANDARD_ENCODE_TABLE) {
-                        buffer[context.pos++] = PAD;
+                        buffer[context.pos++] = pad;
                     }
                     break;
                 default:
@@ -430,7 +430,7 @@ public class Base64 extends BaseNCodec {
         for (int i = 0; i < inAvail; i++) {
             final byte[] buffer = ensureBufferSize(decodeSize, context);
             final byte b = in[inPos++];
-            if (b == PAD) {
+            if (b == pad) {
                 // We're done.
                 context.eof = true;
                 break;
@@ -476,21 +476,6 @@ public class Base64 extends BaseNCodec {
                     throw new IllegalStateException("Impossible modulus "+context.modulus);
             }
         }
-    }
-
-    /**
-     * Tests a given byte array to see if it contains only valid characters within the Base64 alphabet. Currently the
-     * method treats whitespace as valid.
-     *
-     * @param arrayOctet
-     *            byte array to test
-     * @return {@code true} if all bytes are valid characters in the Base64 alphabet or if the byte array is empty;
-     *         {@code false}, otherwise
-     * @deprecated 1.5 Use {@link #isBase64(byte[])}, will be removed in 2.0.
-     */
-    @Deprecated
-    public static boolean isArrayByteBase64(final byte[] arrayOctet) {
-        return isBase64(arrayOctet);
     }
 
     /**
