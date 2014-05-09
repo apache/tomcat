@@ -56,7 +56,8 @@ public class LocalVariableTypeTable extends Attribute {
 
         int local_variable_type_table_length = (dis.readUnsignedShort());
 
-        for(int i=0; i < local_variable_type_table_length; i++)
+        for(int i=0; i < local_variable_type_table_length; i++) {
             Utility.swallowLocalVariable(dis);
+        }
     }
 }

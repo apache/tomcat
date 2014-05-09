@@ -132,13 +132,13 @@ public abstract class Attribute implements Cloneable, Serializable
         case Constants.ATTR_RUNTIME_VISIBLE_ANNOTATIONS:
             return new RuntimeVisibleAnnotations(name_index, length, file,
                     constant_pool);
-        case Constants.ATTR_RUNTIMEIN_VISIBLE_ANNOTATIONS:
+        case Constants.ATTR_RUNTIME_INVISIBLE_ANNOTATIONS:
             return new RuntimeInvisibleAnnotations(name_index, length, file,
                     constant_pool);
         case Constants.ATTR_RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS:
             return new RuntimeVisibleParameterAnnotations(name_index, length,
                     file, constant_pool);
-        case Constants.ATTR_RUNTIMEIN_VISIBLE_PARAMETER_ANNOTATIONS:
+        case Constants.ATTR_RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS:
             return new RuntimeInvisibleParameterAnnotations(name_index, length,
                     file, constant_pool);
         case Constants.ATTR_ANNOTATION_DEFAULT:
@@ -151,6 +151,12 @@ public abstract class Attribute implements Cloneable, Serializable
             return new EnclosingMethod(name_index, length, file, constant_pool);
         case Constants.ATTR_STACK_MAP_TABLE:
             Utility.swallowStackMapTable(file);
+            return null;
+        case Constants.ATTR_BOOTSTRAP_METHODS:
+            Utility.swallowBootstrapMethods(file);
+            return null;
+        case Constants.ATTR_METHOD_PARAMETERS:
+            Utility.swallowMethodParameters(file);
             return null;
         default: // Never reached
             throw new IllegalStateException("Unrecognized attribute type tag parsed: " + tag);

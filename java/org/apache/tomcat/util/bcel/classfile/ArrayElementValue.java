@@ -25,9 +25,10 @@ public class ArrayElementValue extends ElementValue
     public ArrayElementValue(int type, ElementValue[] datums, ConstantPool cpool)
     {
         super(type, cpool);
-        if (type != ARRAY)
+        if (type != ARRAY) {
             throw new RuntimeException(
                     "Only element values of type array can be built with this ctor - type specified: " + type);
+        }
         this.evalues = datums;
     }
 
@@ -39,8 +40,9 @@ public class ArrayElementValue extends ElementValue
         for (int i = 0; i < evalues.length; i++)
         {
             sb.append(evalues[i].stringifyValue());
-            if ((i + 1) < evalues.length)
+            if ((i + 1) < evalues.length) {
                 sb.append(",");
+            }
         }
         sb.append("]");
         return sb.toString();

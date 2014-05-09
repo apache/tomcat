@@ -355,6 +355,10 @@
         <bug>56363</bug>: Update to version 1.1.30 of Tomcat Native library.
         (schultz)
       </update>
+      <update>
+        Update package renamed Apache Commons BCEL to r1593495 to pick up some
+        additional changes for Java 7 support and some code clean up. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
