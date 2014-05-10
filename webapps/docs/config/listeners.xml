@@ -118,8 +118,8 @@
         will occur if OpenSSL is already in FIPS mode).
         Set to <code>require</code> to require that OpenSSL <i>already</i> be
         in FIPS mode (an error will occur if OpenSSL is not already in FIPS
-        mode).
-        FIPS mode <em>requires you to have a FIPS-capable OpenSSL library which
+        mode).</p>
+        <p>FIPS mode <em>requires you to have a FIPS-capable OpenSSL library which
         you must build yourself</em>.
         If this attribute is set to any of the above values, the <b>SSLEngine</b>
         must be enabled as well.</p>
