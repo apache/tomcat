@@ -51,7 +51,6 @@ import java.util.Map;
  * @author Glenn L. Nielsen
  * @author James House
  * @author Dirk Verbeeck
- * @version $Revision$ $Date$
  * @since 2.0
  */
 public class DelegatingCallableStatement extends DelegatingPreparedStatement

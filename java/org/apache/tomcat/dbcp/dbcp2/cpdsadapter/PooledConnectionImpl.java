@@ -39,7 +39,6 @@ import org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject;
  * PooledConnectionDataSource.
  *
  * @author John D. McNally
- * @version $Revision$ $Date$
  * @since 2.0
  */
 class PooledConnectionImpl implements PooledConnection,

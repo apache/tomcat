@@ -46,7 +46,6 @@ import org.apache.tomcat.dbcp.pool2.impl.GenericKeyedObjectPoolConfig;
  * using the new password.</p>
  *
  * @author John D. McNally
- * @version $Revision$ $Date$
  * @since 2.0
  */
 public class SharedPoolDataSource extends InstanceKeyDataSource {

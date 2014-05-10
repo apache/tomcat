@@ -81,7 +81,6 @@ import org.apache.tomcat.dbcp.pool2.impl.GenericKeyedObjectPoolConfig;
  * </p>
  *
  * @author John D. McNally
- * @version $Revision$ $Date$
  * @since 2.0
  */
 public abstract class InstanceKeyDataSource

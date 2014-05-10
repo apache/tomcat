@@ -47,7 +47,6 @@ import javax.naming.spi.ObjectFactory;
  *
  * @author Craig R. McClanahan
  * @author Dirk Verbeeck
- * @version $Revision$ $Date$
  * @since 2.0
  */
 public class BasicDataSourceFactory implements ObjectFactory {

@@ -41,7 +41,6 @@ import org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject;
  * {@link org.apache.tomcat.dbcp.dbcp2.PoolableConnection PoolableConnection}s.
  *
  * @author John D. McNally
- * @version $Revision$ $Date$
  * @since 2.0
  */
 class CPDSConnectionFactory

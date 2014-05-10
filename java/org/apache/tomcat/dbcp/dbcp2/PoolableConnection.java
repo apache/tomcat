@@ -39,7 +39,6 @@ import org.apache.tomcat.dbcp.pool2.ObjectPool;
  * @author Rodney Waldhoff
  * @author Glenn L. Nielsen
  * @author James House
- * @version $Revision$ $Date$
  * @since 2.0
  */
 public class PoolableConnection extends DelegatingConnection<Connection>

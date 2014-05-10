@@ -54,7 +54,6 @@ import org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool;
  * new password.</p>
  *
  * @author John D. McNally
- * @version $Revision$ $Date$
  * @since 2.0
  */
 public class PerUserPoolDataSource extends InstanceKeyDataSource {

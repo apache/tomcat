@@ -52,8 +52,6 @@ import java.util.NoSuchElementException;
  * @see KeyedObjectPool
  * @see BaseObjectPool
  *
- * @version $Revision$
- *
  * @since 2.0
  */
 public interface ObjectPool<T> {

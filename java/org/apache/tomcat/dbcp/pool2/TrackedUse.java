@@ -23,8 +23,6 @@ package org.apache.tomcat.dbcp.pool2;
  * determining the state of a pooled object - for instance whether or not the
  * object has been abandoned.
  *
- * @version $Revision:$
- *
  * @since 2.0
  */
 public interface TrackedUse {

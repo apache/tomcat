@@ -32,7 +32,6 @@ import org.apache.tomcat.dbcp.pool2.TrackedUse;
  * extend this class.
  *
  * @author Glenn L. Nielsen
- * @version $Revision$ $Date$
  * @since 2.0
  */
 public class AbandonedTrace implements TrackedUse {

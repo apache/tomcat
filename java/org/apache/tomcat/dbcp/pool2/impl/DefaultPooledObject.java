@@ -33,8 +33,6 @@ import org.apache.tomcat.dbcp.pool2.TrackedUse;
  *
  * @param <T> the type of object in the pool
  *
- * @version $Revision: $
- *
  * @since 2.0
  */
 public class DefaultPooledObject<T> implements PooledObject<T> {
