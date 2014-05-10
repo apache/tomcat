@@ -23,8 +23,6 @@ package org.apache.tomcat.dbcp.pool2.impl;
  * <p>
  * This class is not thread-safe.
  *
- * @version $Revision: $
- *
  * @since 2.0
  */
 public abstract class BaseObjectPoolConfig implements Cloneable {

@@ -32,7 +32,6 @@ import org.apache.tomcat.dbcp.pool2.KeyedObjectPool;
  * The {@link #close} method returns this statement to its containing pool. (See {@link PoolingConnection}.)
  *
  * @see PoolingConnection
- * @version $Revision$ $Date$
  * @since 2.0
  */
 public class PoolableCallableStatement extends DelegatingCallableStatement {

@@ -23,8 +23,6 @@ package org.apache.tomcat.dbcp.pool2.impl;
  * <p>
  * This class is immutable and thread-safe.
  *
- * @version $Revision: $
- *
  * @since 2.0
  */
 public class EvictionConfig {

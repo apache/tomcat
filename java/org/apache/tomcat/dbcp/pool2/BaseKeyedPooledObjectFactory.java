@@ -28,8 +28,6 @@ package org.apache.tomcat.dbcp.pool2;
  * @param <K> The type of keys managed by this factory.
  * @param <V> Type of element managed by this factory.
  *
- * @version $Revision: 1333925 $
- *
  * @since 2.0
  */
 public abstract class BaseKeyedPooledObjectFactory<K,V>

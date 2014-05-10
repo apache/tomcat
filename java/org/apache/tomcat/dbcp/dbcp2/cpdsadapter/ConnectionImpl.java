@@ -37,7 +37,6 @@ import org.apache.tomcat.dbcp.dbcp2.DelegatingPreparedStatement;
  * underlying connection.
  *
  * @author John D. McNally
- * @version $Revision$ $Date$
  * @since 2.0
  */
 class ConnectionImpl extends DelegatingConnection<Connection> {

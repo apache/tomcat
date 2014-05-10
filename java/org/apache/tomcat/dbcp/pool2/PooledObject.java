@@ -27,8 +27,6 @@ import java.util.Deque;
  *
  * @param <T> the type of object in the pool
  *
- * @version $Revision: $
- *
  * @since 2.0
  */
 public interface PooledObject<T> extends Comparable<PooledObject<T>> {

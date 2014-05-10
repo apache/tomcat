@@ -28,8 +28,6 @@ import java.util.Set;
  *       not, therefore, be able to upgrade to a new minor or patch release
  *       without requiring code changes.
  *
- * @version $Revision: $
- *
  * @since 2.0
  */
 public interface GenericObjectPoolMXBean {

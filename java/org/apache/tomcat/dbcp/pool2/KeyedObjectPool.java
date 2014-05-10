@@ -58,8 +58,6 @@ import java.util.NoSuchElementException;
  * @see ObjectPool
  * @see org.apache.tomcat.dbcp.pool2.impl.GenericKeyedObjectPool GenericKeyedObjectPool
  *
- * @version $Revision$
- *
  * @since 2.0
  */
 public interface KeyedObjectPool<K,V> {

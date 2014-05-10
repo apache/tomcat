@@ -20,7 +20,6 @@ package org.apache.tomcat.dbcp.dbcp2.datasources;
 import java.io.Serializable;
 
 /**
- * @version $Revision$ $Date$
  * @since 2.0
  */
 class PoolKey implements Serializable {

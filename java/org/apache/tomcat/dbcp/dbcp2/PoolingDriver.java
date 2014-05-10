@@ -38,7 +38,6 @@ import org.apache.tomcat.dbcp.pool2.ObjectPool;
  *
  * @author Rodney Waldhoff
  * @author Dirk Verbeeck
- * @version $Revision$ $Date$
  * @since 2.0
  */
 public class PoolingDriver implements Driver {

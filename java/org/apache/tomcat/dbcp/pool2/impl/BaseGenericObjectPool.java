@@ -44,8 +44,6 @@ import org.apache.tomcat.dbcp.pool2.SwallowedExceptionListener;
  *
  * This class is intended to be thread-safe.
  *
- * @version $Revision: $
- *
  * @since 2.0
  */
 public abstract class BaseGenericObjectPool<T> {

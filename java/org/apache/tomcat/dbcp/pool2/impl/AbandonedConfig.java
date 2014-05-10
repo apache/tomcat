@@ -22,8 +22,6 @@ import java.io.PrintWriter;
 /**
  * Configuration settings for abandoned object removal.
  *
- * @version $Revision:$
- *
  * @since 2.0
  */
 public class AbandonedConfig {

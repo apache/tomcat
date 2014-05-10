@@ -26,8 +26,6 @@ import java.lang.ref.SoftReference;
  * @param <T> the type of the underlying object that the wrapped SoftReference
  * refers to.
  *
- * @version $Revision: $
- *
  * @since 2.0
  */
 public class PooledSoftReference<T> extends DefaultPooledObject<T> {
