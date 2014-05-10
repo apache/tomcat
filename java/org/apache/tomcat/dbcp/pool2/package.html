@@ -17,14 +17,14 @@
 <!-- $Id$ -->
 <html>
    <head>
-      <title>Package Documentation for org.apache.commons.pool2</title>
+      <title>Package Documentation for org.apache.tomcat.dbcp.pool2</title>
    </head>
    <body>
       <p>
          Object pooling API.
       </p>
       <p>
-         The <code>org.apache.commons.pool2</code> package defines a simple
+         The <code>org.apache.tomcat.dbcp.pool2</code> package defines a simple
          interface for a pool of object instances, and a handful of base
          classes that may be useful when creating pool implementations.
       </p>
@@ -39,12 +39,12 @@
          interfaces:
       </p>
       <dl>
-        <dt>{@link org.apache.commons.pool2.ObjectPool ObjectPool}</dt>
+        <dt>{@link org.apache.tomcat.dbcp.pool2.ObjectPool ObjectPool}</dt>
         <dd>
           defines a simple object pooling interface, with methods for
           borrowing instances from and returning them to the pool.
         </dd>
-        <dt>{@link org.apache.commons.pool2.PooledObjectFactory PooledObjectFactory}</dt>
+        <dt>{@link org.apache.tomcat.dbcp.pool2.PooledObjectFactory PooledObjectFactory}</dt>
         <dd>
           defines lifecycle methods for object instances contained within a pool.
           By associating a factory with a pool, the pool can create new object
@@ -55,8 +55,8 @@
          The <code>pool</code> package also provides a keyed pool interface,
          which pools instances of multiple types, accessed according to an
          arbitrary key. See
-         {@link org.apache.commons.pool2.KeyedObjectPool KeyedObjectPool} and
-         {@link org.apache.commons.pool2.KeyedPooledObjectFactory
+         {@link org.apache.tomcat.dbcp.pool2.KeyedObjectPool KeyedObjectPool} and
+         {@link org.apache.tomcat.dbcp.pool2.KeyedPooledObjectFactory
          KeyedPooledObjectFactory}.
       </p>
    </body>
