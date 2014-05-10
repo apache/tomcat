@@ -24,8 +24,8 @@ import java.util.Properties;
 import org.junit.After;
 import org.junit.Before;
 
-//import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
-//import org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory;
+//import org.apache.commons.dbcp2.BasicDataSource;
+//import org.apache.commons.dbcp2.BasicDataSourceFactory;
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
