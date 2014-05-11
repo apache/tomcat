@@ -126,8 +126,14 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         accessLogEnabled = Boolean.parseBoolean(
             System.getProperty("tomcat.test.accesslog", "false"));
         if (accessLogEnabled) {
+            String accessLogDirectory = System
+                    .getProperty("tomcat.test.reports");
+            if (accessLogDirectory == null) {
+                accessLogDirectory = new File(getBuildDirectory(), "logs")
+                        .toString();
+            }
             AccessLogValve alv = new AccessLogValve();
-            alv.setDirectory(getBuildDirectory() + "/logs");
+            alv.setDirectory(accessLogDirectory);
             alv.setPattern("%h %l %u %t \"%r\" %s %b %I %D");
             tomcat.getHost().getPipeline().addValve(alv);
         }
