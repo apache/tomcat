@@ -1357,6 +1357,7 @@
                description="The extension to use to distinguish the output"/>
 
     <sequential>
+      <mkdir dir="${test.reports}" />
       <junit printsummary="yes" fork="yes" dir="." showoutput="yes"
         errorproperty="test.result.error"
         failureproperty="test.result.failure"
