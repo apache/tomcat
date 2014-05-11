@@ -329,6 +329,10 @@
         Update package renamed Apache Commons BCEL to r1593495 to pick up some
         additional changes for Java 7 support and some code clean up. (markt)
       </update>
+      <add>
+        In tests: allow to configure directory where JUnit reports and access
+        log are written to. (kkolinko)
+      </add>
     </changelog>
   </subsection>
 </section>
