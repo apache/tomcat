@@ -352,7 +352,13 @@ For example:
 
 (7.3) Other configuration options
 
- 1. It is possible to enable generation of access log file when the tests
+ 1. It is possible to configure the directory where JUnit reports are
+ written to. It is configured by "test.reports" property. The default
+ value is
+
+        output/build/logs
+
+ 2. It is possible to enable generation of access log file when the tests
  are run. This is off by default and can be enabled by the following
  property:
 
@@ -363,7 +369,7 @@ For example:
 
         output/build/logs
 
- 2. The testsuite respects logging configuration as configured by
+ 3. The testsuite respects logging configuration as configured by
  ${tomcat.source}/conf/logging.properties
 
  The log files will be written to the temporary directory used by the
@@ -371,16 +377,23 @@ For example:
 
         output/test-tmp/logs
 
- 3. It is possible to configure formatter used by JUnit reports. For
- example the following property disables generation of separate report
+ 4. It is possible to configure formatter used by JUnit reports.
+ Configuration properties are "junit.formatter.type",
+ "junit.formatter.extension" and "junit.formatter.usefile".
+
+ For example the following property disables generation of separate report
  files:
 
         junit.formatter.usefile=false
 
- 4. Optional support is provided for the Cobertura code coverage tool. It
+ 5. Optional support is provided for the Cobertura code coverage tool. It
  can be enabled using the following property:
 
         test.cobertura=true
+
+ The report files by default are written to
+
+        output/coverage
 
 * NOTE: Cobertura is licensed under GPL v2 with parts of it being under
   Apache License v1.1. See http://cobertura.sf.net for details. Using it

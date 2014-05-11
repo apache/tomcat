@@ -70,6 +70,7 @@
   <property name="tomcat.src.jars"       value="${tomcat.output}/src-jars"/>
   <property name="test.classes"          value="${tomcat.output}/testclasses"/>
   <property name="test.temp"             value="${tomcat.output}/test-tmp"/>
+  <property name="test.reports"          value="${tomcat.build}/logs"/>
   <property name="test.apr.loc"          value="${tomcat.build}/bin/native"/>
   <!-- base directory for jdbc-pool -->
   <property name="tomcat.jdbc.dir"       value="${basedir}/modules/jdbc-pool"/>
@@ -1373,6 +1374,7 @@
         <sysproperty key="tomcat.test.tomcatbuild" value="${tomcat.build}" />
         <sysproperty key="tomcat.test.protocol" value="@{protocol}" />
         <sysproperty key="tomcat.test.accesslog" value="${test.accesslog}" />
+        <sysproperty key="tomcat.test.reports" value="${test.reports}" />
         <!-- File for Cobertura to write coverage results to -->
         <sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.datafile}" />
 
@@ -1381,13 +1383,13 @@
                    extension="@{extension}${junit.formatter.extension}" />
 
         <!-- If test.entry is defined, run a single test, otherwise run all valid tests -->
-        <test todir="${tomcat.build}/logs" name="${test.entry}"
+        <test todir="${test.reports}" name="${test.entry}"
               if="test.entry" unless="test.entry.methods"
            />
-        <test todir="${tomcat.build}/logs" name="${test.entry}" methods="${test.entry.methods}"
+        <test todir="${test.reports}" name="${test.entry}" methods="${test.entry.methods}"
               if="test.entry.methods"
            />
-        <batchtest todir="${tomcat.build}/logs" unless="test.entry">
+        <batchtest todir="${test.reports}" unless="test.entry">
           <fileset dir="test" >
             <!-- Include all by default -->
             <include name="${test.name}" />
