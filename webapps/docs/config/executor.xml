@@ -112,9 +112,11 @@
           the default is <code>false</code></p>
     </attribute>
     <attribute name="threadRenewalDelay" required="false">
-      <p>After a context is stopped, threads in the pool are renewed. To avoid renewing all threads at the same time,
-        this delay is observed between 2 threads being renewed. Value is in ms, default value is 1000ms.
-        If negative, threads are not renewed.</p>
+      <p>(long) If a <a href="listeners.html">ThreadLocalLeakPreventionListener</a> is configured,
+        it will notify this executor about stopped contexts.
+        After a context is stopped, threads in the pool are renewed. To avoid renewing all threads at the same time,
+        this option sets a delay between renewal of any 2 threads. The value is in ms,
+        default value is <code>1000</code> ms. If value is negative, threads are not renewed.</p>
     </attribute>
   </attributes>
 
