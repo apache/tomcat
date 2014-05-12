@@ -318,10 +318,12 @@
   <subsection name="ThreadLocal Leak Prevention Listener - org.apache.catalina.core.ThreadLocalLeakPreventionListener">
 
     <p>The <strong>ThreadLocal Leak Prevention Listener</strong> triggers the
-    renewal of threads in Executor pools when a
+    renewal of threads in <a href="executor.html">Executor</a> pools when a
     <a href="context.html">Context</a> is being stopped to avoid thread-local
     related memory leaks. Active threads will be renewed one by one when they
-    come back to the pool after executing their task.</p>
+    come back to the pool after executing their task. The renewal happens
+    only for contexts that have their <code>renewThreadsWhenStoppingContext</code>
+    attribute set to <code>true</code>.</p>
 
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements.</p>

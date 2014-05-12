@@ -177,6 +177,11 @@
         <bug>56501</bug>: <code>HttpServletRequest.getContextPath()</code>
         should return the undecoded context path used by the user agent. (markt)
       </fix>
+      <fix>
+        Minor fixes to <code>ThreadLocalLeakPreventionListener</code>. Do not
+        trigger threads renewal for failed contexts. Do not ignore
+        <code>threadRenewalDelay</code> setting. Improve documentation. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
