@@ -185,12 +185,12 @@
       <fix>
         Correct regression introduced in <rev>1239520</rev> that broke loading
         of users from <code>tomcat-users.xml</code> when using the
-        <code>JASSMemoryLoginModule</code>. (markt)
+        <code>JAASMemoryLoginModule</code>. (markt)
       </fix>
       <fix>
         Correct regression introduced in <rev>797162</rev> that broke
         authentication of users when using the
-        <code>JASSMemoryLoginModule</code>. (markt)
+        <code>JAASMemoryLoginModule</code>. (markt)
       </fix>
     </changelog>
   </subsection>
