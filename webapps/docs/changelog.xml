@@ -173,6 +173,11 @@
         trigger threads renewal for failed contexts. Do not ignore
         <code>threadRenewalDelay</code> setting. Improve documentation. (kkolinko)
       </fix>
+      <fix>
+        Correct regression introduced in <rev>797162</rev> that broke
+        authentication of users when using the
+        <code>JASSMemoryLoginModule</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
