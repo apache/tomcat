@@ -105,7 +105,7 @@ public class WsWebSocketContainer
     private static final Random random = new Random();
     private static final byte[] crlf = new byte[] {13, 10};
 
-    private AsynchronousChannelGroup asynchronousChannelGroup = null;
+    private volatile AsynchronousChannelGroup asynchronousChannelGroup = null;
     private final Object asynchronousChannelGroupLock = new Object();
 
     private final Log log = LogFactory.getLog(WsWebSocketContainer.class);
