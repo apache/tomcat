@@ -45,23 +45,18 @@ source distribution, do the following:
     Note regarding later versions of Java:
 
       As documented elsewhere, one of components in Apache Tomcat includes
-      a private copy of the Apache Commons DBCP library. The source code
-      for this library is downloaded, processed by the build script
-      (renaming the packages) and compiled.
+      a private copy of the Apache Commons DBCP library.
 
-      Due to changes in JDBC interfaces implemented by the library between
-      versions of Java SE specification, the library has to target specific
-      version of Java and can be compiled only with the JDK version
-      implementing this version of specification.
+      The JDBC interfaces implemented by DBCP frequently change in non-backwards
+      compatible ways between versions of the Java SE specification. Therefore,
+      it is likely that DBCP will only compile with the specific version of Java
+      listed above and that compilation will fail if a later version of Java is
+      used.
 
       See Apache Commons DBCP project web site for more details on
       available versions of the library and its requirements,
 
         http://commons.apache.org/dbcp/
-
-      If you really want to use a later version of JDK to build Tomcat,
-      several workarounds are possible. One of them is to skip building
-      the component (tomcat-dbcp.jar).
 
  3. Install the JDK according to the instructions included with the release.
 
