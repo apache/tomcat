@@ -295,7 +295,7 @@
          thread sees latest value.  -->
     <Class name="org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject" />
     <Method name="allocate" />
-    <Bug pattern="VO_VOLATILE_INCREMENT" /> 
+    <Bug pattern="VO_VOLATILE_INCREMENT" />
   </Match>
   <Match>
     <!-- Return value is ignored but a null result will trigger an exception -->
