@@ -348,6 +348,11 @@
     Tomcat will not do that for you, since you may have already written data to the output stream.
   </p>
 
+  <p>
+    Note that the use of sendfile will disable any compression that Tomcat may
+    otherwise have performed on the response.
+  </p>
+
   </section>
 
 </body>

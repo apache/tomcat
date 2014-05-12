@@ -357,6 +357,11 @@
       <update>
         Improve valves documentation. Split valves into groups. (kkolinko)
       </update>
+      <fix>
+        <bug>56513</bug>: Make the documentation crystal clear that using
+        sendfile will disable any compression that Tomcat may otherwise have
+        applied to the response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

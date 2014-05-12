@@ -668,7 +668,9 @@
 
       <attribute name="useSendfile" required="false">
         <p>(bool)Use this attribute to enable or disable sendfile capability.
-        The default value is <code>true</code>.</p>
+        The default value is <code>true</code>. Note that the use of sendfile
+        will disable any compression that Tomcat may otherwise have performed on
+        the response.</p>
       </attribute>
 
       <attribute name="socket.directBuffer" required="false">
@@ -801,7 +803,9 @@
 
       <attribute name="useSendfile" required="false">
         <p>(bool)Use this attribute to enable or disable sendfile capability.
-        The default value is <code>true</code>.</p>
+        The default value is <code>true</code>. Note that the use of sendfile
+        will disable any compression that Tomcat may otherwise have performed on
+        the response.</p>
       </attribute>
 
       <attribute name="socket.directBuffer" required="false">
@@ -951,7 +955,9 @@
 
       <attribute name="useSendfile" required="false">
         <p>(bool)Use this attribute to enable or disable sendfile capability.
-        The default value is <code>true</code>.</p>
+        The default value is <code>true</code>. Note that the use of sendfile
+        will disable any compression that Tomcat may otherwise have performed on
+        the response.</p>
       </attribute>
 
     </attributes>
