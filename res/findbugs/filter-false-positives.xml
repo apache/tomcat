@@ -668,8 +668,11 @@
   </Match>
   <Match>
     <!-- Return value of latch is intentionally ignored -->
-    <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClient"/>
-    <Method name="testConnectToServerEndpointSSL"/>
+    <Or>
+      <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClient"/>
+      <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClientSSL"/>
+    </Or>
+    <Method name="testConnectToServerEndpoint"/>
     <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
   </Match>
   <Match>
