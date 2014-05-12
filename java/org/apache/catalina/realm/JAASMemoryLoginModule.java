@@ -338,8 +338,15 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
 
         // Validate the existence of our configuration file
         File file = new File(pathname);
-        if (!file.isAbsolute())
-            file = new File(getContainer().getCatalinaBase(), pathname);
+        if (!file.isAbsolute()) {
+            String catalinaBase = getCatalinaBase();
+            if (catalinaBase == null) {
+                log.warn("Unable to determine Catalina base to load file " + pathname);
+                return;
+            } else {
+                file = new File(catalinaBase, pathname);
+            }
+        }
         if (!file.exists() || !file.canRead()) {
             log.warn("Cannot load configuration file " + file.getAbsolutePath());
             return;
@@ -359,6 +366,29 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         } finally {
             digester.reset();
         }
+    }
 
+    private String getCatalinaBase() {
+        // Have to get this via a callback as that is the only link we have back
+        // to the defining Realm. Can't use the system property as that may not
+        // be set/correct in an embedded scenario
+
+        if (callbackHandler == null) {
+            return null;
+        }
+
+        Callback callbacks[] = new Callback[1];
+        callbacks[0] = new TextInputCallback("catalinaBase");
+
+        String result = null;
+
+        try {
+            callbackHandler.handle(callbacks);
+            result = ((TextInputCallback) callbacks[0]).getText();
+        } catch (IOException | UnsupportedCallbackException e) {
+            return null;
+        }
+
+        return result;
     }
 }

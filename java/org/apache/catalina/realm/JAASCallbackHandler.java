@@ -215,6 +215,8 @@ public class JAASCallbackHandler implements CallbackHandler {
                     cb.setText(md5a2);
                 } else if (cb.getPrompt().equals("authMethod")) {
                     cb.setText(authMethod);
+                } else if (cb.getPrompt().equals("catalinaBase")) {
+                    cb.setText(realm.getContainer().getCatalinaBase().getAbsolutePath());
                 } else {
                     throw new UnsupportedCallbackException(callbacks[i]);
                 }
