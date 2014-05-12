@@ -178,6 +178,10 @@
         authentication of users when using the
         <code>JAASMemoryLoginModule</code>. (markt)
       </fix>
+      <fix>
+        <bug>56501</bug>: <code>HttpServletRequest.getContextPath()</code>
+        should return the undecoded context path used by the user agent. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
