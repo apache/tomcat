@@ -175,8 +175,15 @@ public abstract class AbstractTestResourceSet {
         expected.add("f1.txt");
         expected.add("f2.txt");
 
+        // Directories created by Subversion 1.6 and earlier clients
+        Set<String> optional = new HashSet<>();
+        optional.add(".svn");
+        // Files visible in some tests only
+        optional.add(getMount() + ".ignore-me.txt");
+
         for (String result : results) {
-            Assert.assertTrue(result, expected.remove(result));
+            Assert.assertTrue(result,
+                    expected.remove(result) || optional.remove(result));
         }
         Assert.assertEquals(0, expected.size());
     }
@@ -188,8 +195,15 @@ public abstract class AbstractTestResourceSet {
         Set<String> expected = new HashSet<>();
         expected.add("d1-f1.txt");
 
+        // Directories created by Subversion 1.6 and earlier clients
+        Set<String> optional = new HashSet<>();
+        optional.add(".svn");
+        // Files visible in some tests only
+        optional.add(".ignore-me.txt");
+
         for (String result : results) {
-            Assert.assertTrue(result, expected.remove(result));
+            Assert.assertTrue(result,
+                    expected.remove(result) || optional.remove(result));
         }
         Assert.assertEquals(0, expected.size());
     }
@@ -201,8 +215,15 @@ public abstract class AbstractTestResourceSet {
         Set<String> expected = new HashSet<>();
         expected.add("d1-f1.txt");
 
+        // Directories created by Subversion 1.6 and earlier clients
+        Set<String> optional = new HashSet<>();
+        optional.add(".svn");
+        // Files visible in some tests only
+        optional.add(".ignore-me.txt");
+
         for (String result : results) {
-            Assert.assertTrue(result, expected.remove(result));
+            Assert.assertTrue(result,
+                    expected.remove(result) || optional.remove(result));
         }
         Assert.assertEquals(0, expected.size());
     }
@@ -247,8 +268,15 @@ public abstract class AbstractTestResourceSet {
         expected.add(getMount() + "/f1.txt");
         expected.add(getMount() + "/f2.txt");
 
+        // Directories created by Subversion 1.6 and earlier clients
+        Set<String> optional = new HashSet<>();
+        optional.add(getMount() + "/.svn/");
+        // Files visible in some tests only
+        optional.add(getMount() + "/.ignore-me.txt");
+
         for (String result : results) {
-            Assert.assertTrue(result, expected.remove(result));
+            Assert.assertTrue(result,
+                    expected.remove(result) || optional.remove(result));
         }
         Assert.assertEquals(0, expected.size());
     }
@@ -260,8 +288,15 @@ public abstract class AbstractTestResourceSet {
         Set<String> expected = new HashSet<>();
         expected.add(getMount() + "/d1/d1-f1.txt");
 
+        // Directories created by Subversion 1.6 and earlier clients
+        Set<String> optional = new HashSet<>();
+        optional.add(getMount() + "/d1/.svn/");
+        // Files visible in some tests only
+        optional.add(getMount() + "/d1/.ignore-me.txt");
+
         for (String result : results) {
-            Assert.assertTrue(result, expected.remove(result));
+            Assert.assertTrue(result,
+                    expected.remove(result) || optional.remove(result));
         }
         Assert.assertEquals(0, expected.size());
     }
@@ -273,8 +308,15 @@ public abstract class AbstractTestResourceSet {
         Set<String> expected = new HashSet<>();
         expected.add(getMount() + "/d1/d1-f1.txt");
 
+        // Directories created by Subversion 1.6 and earlier clients
+        Set<String> optional = new HashSet<>();
+        optional.add(getMount() + "/d1/.svn/");
+        // Files visible in some tests only
+        optional.add(getMount() + "/d1/.ignore-me.txt");
+
         for (String result : results) {
-            Assert.assertTrue(result, expected.remove(result));
+            Assert.assertTrue(result,
+                    expected.remove(result) || optional.remove(result));
         }
         Assert.assertEquals(0, expected.size());
     }
