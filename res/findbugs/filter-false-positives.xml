@@ -291,6 +291,13 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <!-- Increment is in sync block so it is safe. Volatile is used so reading
+         thread sees latest value.  -->
+    <Class name="org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject" />
+    <Method name="allocate" />
+    <Bug pattern="VO_VOLATILE_INCREMENT" /> 
+  </Match>
+  <Match>
     <!-- Return value is ignored but a null result will trigger an exception -->
     <Class name="org.apache.tomcat.jdbc.pool.ConnectionPool$ConnectionFuture" />
     <Method name="get" />
