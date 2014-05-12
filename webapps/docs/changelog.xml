@@ -182,6 +182,11 @@
         trigger threads renewal for failed contexts. Do not ignore
         <code>threadRenewalDelay</code> setting. Improve documentation. (kkolinko)
       </fix>
+      <fix>
+        Fix regression introduced in <rev>1239520</rev> that broke loading of
+        users from <code>tomcat-users.xml</code> when using the
+        <code>JASSMemoryLoginModule</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
