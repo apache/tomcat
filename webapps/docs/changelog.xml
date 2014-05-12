@@ -168,6 +168,11 @@
         <bug>56492</bug>: Avoid eclipse debugger pausing on uncaught exceptions
         when tomcat renews its threads. (slaurent)
       </add>
+      <fix>
+        Minor fixes to <code>ThreadLocalLeakPreventionListener</code>. Do not
+        trigger threads renewal for failed contexts. Do not ignore
+        <code>threadRenewalDelay</code> setting. Improve documentation. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
