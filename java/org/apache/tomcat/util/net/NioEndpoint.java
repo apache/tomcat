@@ -607,13 +607,12 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         dispatchForEvent(socketWrapper.getSocket(), socketStatus, dispatch);
     }
 
-    public boolean dispatchForEvent(NioChannel socket, SocketStatus status, boolean dispatch) {
+    public void dispatchForEvent(NioChannel socket, SocketStatus status, boolean dispatch) {
         if (dispatch && status == SocketStatus.OPEN_READ) {
             socket.getPoller().add(socket, OP_CALLBACK);
         } else {
             processSocket(socket,status,dispatch);
         }
-        return true;
     }
 
     protected boolean processSocket(NioChannel socket, SocketStatus status, boolean dispatch) {
