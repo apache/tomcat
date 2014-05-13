@@ -90,6 +90,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
      */
     private AsynchronousChannelGroup threadGroup = null;
 
+    private volatile boolean allClosed;
+
     /**
      * The oom parachute, when an OOM error happens,
      * will release the data, giving the JVM instantly
@@ -347,6 +349,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     public void startInternal() throws Exception {
 
         if (!running) {
+            allClosed = false;
             running = true;
             paused = false;
 
@@ -398,6 +401,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     handler.closeAll();
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
+                } finally {
+                    allClosed = true;
                 }
             }
         });
@@ -431,8 +436,12 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     public void shutdownExecutor() {
         if (threadGroup != null && internalExecutor) {
             try {
-                threadGroup.shutdownNow();
                 long timeout = getExecutorTerminationTimeoutMillis();
+                while (timeout > 0 && !allClosed) {
+                    timeout -= 100;
+                    Thread.sleep(100);
+                }
+                threadGroup.shutdownNow();
                 if (timeout > 0) {
                     threadGroup.awaitTermination(timeout, TimeUnit.MILLISECONDS);
                 }
