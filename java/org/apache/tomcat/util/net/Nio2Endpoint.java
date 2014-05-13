@@ -585,13 +585,13 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         processSocket0(socketWrapper, socketStatus, dispatch);
     }
 
-    protected boolean processSocket0(SocketWrapper<Nio2Channel> socket, SocketStatus status, boolean dispatch) {
+    protected boolean processSocket0(SocketWrapper<Nio2Channel> socketWrapper, SocketStatus status, boolean dispatch) {
         try {
             SocketProcessor sc = (useCaches) ? processorCache.pop() : null;
             if (sc == null) {
-                sc = new SocketProcessor(socket, status);
+                sc = new SocketProcessor(socketWrapper, status);
             } else {
-                sc.reset(socket, status);
+                sc.reset(socketWrapper, status);
             }
             Executor executor = getExecutor();
             if (dispatch && executor != null) {
@@ -600,7 +600,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 sc.run();
             }
         } catch (RejectedExecutionException ree) {
-            log.debug(sm.getString("endpoint.executor.fail", socket), ree);
+            log.debug(sm.getString("endpoint.executor.fail", socketWrapper), ree);
             return false;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
