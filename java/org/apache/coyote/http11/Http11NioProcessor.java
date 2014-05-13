@@ -501,22 +501,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {
                 attach.setTimeout(timeout);
             }
-        } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
-            socketWrapper.clearDispatches();
-            if (asyncStateMachine.asyncComplete()) {
-                endpoint.processSocket(this.socketWrapper, SocketStatus.OPEN_READ, true);
-            }
-        } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
-            if (param == null || socketWrapper == null) {
-                return;
-            }
-            long timeout = ((Long)param).longValue();
-            // If we are not piggy backing on a worker thread, set the timeout
-            socketWrapper.setTimeout(timeout);
-        } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
-            if (asyncStateMachine.asyncDispatch()) {
-                endpoint.processSocket(this.socketWrapper, SocketStatus.OPEN_READ, true);
-            }
         }
     }
 
