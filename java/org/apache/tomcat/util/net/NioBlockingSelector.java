@@ -245,7 +245,7 @@ public class NioBlockingSelector {
 
         public void add(final KeyAttachment key, final int ops, final KeyReference ref) {
             if ( key == null ) return;
-            NioChannel nch = key.getChannel();
+            NioChannel nch = key.getSocket();
             if ( nch == null ) return;
             final SocketChannel ch = nch.getIOChannel();
             if ( ch == null ) return;
@@ -276,7 +276,7 @@ public class NioBlockingSelector {
 
         public void remove(final KeyAttachment key, final int ops) {
             if ( key == null ) return;
-            NioChannel nch = key.getChannel();
+            NioChannel nch = key.getSocket();
             if ( nch == null ) return;
             final SocketChannel ch = nch.getIOChannel();
             if ( ch == null ) return;

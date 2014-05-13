@@ -956,12 +956,12 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 if (ka != null && ka.isComet() && status != null) {
                     ka.setComet(false);//to avoid a loop
                     if (status == SocketStatus.TIMEOUT ) {
-                        if (processSocket(ka.getChannel(), status, true)) {
+                        if (processSocket(ka.getSocket(), status, true)) {
                             return; // don't close on comet timeout
                         }
                     } else {
                         // Don't dispatch if the lines below are canceling the key
-                        processSocket(ka.getChannel(), status, false);
+                        processSocket(ka.getSocket(), status, false);
                     }
                 }
                 key.attach(null);
@@ -1126,7 +1126,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     cancelledKey(sk, SocketStatus.STOP);
                 } else if ( sk.isValid() && attachment != null ) {
                     attachment.access();//make sure we don't time out valid sockets
-                    NioChannel channel = attachment.getChannel();
+                    NioChannel channel = attachment.getSocket();
                     if (sk.isReadable() || sk.isWritable() ) {
                         if ( attachment.getSendfileData() != null ) {
                             processSendfile(sk,attachment, false);
@@ -1189,7 +1189,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 }
 
                 //configure output channel
-                sc = attachment.getChannel();
+                sc = attachment.getSocket();
                 sc.setSendFile(true);
                 //ssl channel is slightly different
                 WritableByteChannel wc = ((sc instanceof SecureNioChannel)?sc:sc.getIOChannel());
@@ -1228,7 +1228,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                                 log.debug("Connection is keep alive, registering back for OP_READ");
                             }
                             if (event) {
-                                this.add(attachment.getChannel(),SelectionKey.OP_READ);
+                                this.add(attachment.getSocket(),SelectionKey.OP_READ);
                             } else {
                                 reg(sk,attachment,SelectionKey.OP_READ);
                             }
@@ -1244,7 +1244,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                         log.debug("OP_WRITE for sendfile: " + sd.fileName);
                     }
                     if (event) {
-                        add(attachment.getChannel(),SelectionKey.OP_WRITE);
+                        add(attachment.getSocket(),SelectionKey.OP_WRITE);
                     } else {
                         reg(sk,attachment,SelectionKey.OP_WRITE);
                     }
@@ -1302,7 +1302,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                         int ops = ka.interestOps() & ~OP_CALLBACK;
                         reg(key,ka,0);//avoid multiple calls, this gets re-registered after invocation
                         ka.interestOps(ops);
-                        if (!processSocket(ka.getChannel(), SocketStatus.OPEN_READ, true)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT, true);
+                        if (!processSocket(ka.getSocket(), SocketStatus.OPEN_READ, true)) processSocket(ka.getSocket(), SocketStatus.DISCONNECT, true);
                     } else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ ||
                               (ka.interestOps()&SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
                         //only timeout sockets that we are waiting for a read from
@@ -1331,7 +1331,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                             if (isTimedout) {
                                 // Prevent subsequent timeouts if the timeout event takes a while to process
                                 ka.access(Long.MAX_VALUE);
-                                processSocket(ka.getChannel(), SocketStatus.TIMEOUT, true);
+                                processSocket(ka.getSocket(), SocketStatus.TIMEOUT, true);
                             }
                         }
                     }//end if
@@ -1396,7 +1396,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         public void setPoller(Poller poller){this.poller = poller;}
         public void setCometNotify(boolean notify) { this.cometNotify = notify; }
         public boolean getCometNotify() { return cometNotify; }
-        public NioChannel getChannel() { return getSocket();}
         public int interestOps() { return interestOps;}
         public int interestOps(int ops) { this.interestOps  = ops; return ops; }
         public CountDownLatch getReadLatch() { return readLatch; }
