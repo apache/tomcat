@@ -473,18 +473,17 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 endpoint.processSocket(this.socketWrapper, SocketStatus.OPEN_READ, true);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
-            if (param==null) {
+            if (param == null || socketWrapper == null) {
                 return;
             }
             long timeout = ((Long)param).longValue();
+            // If we are not piggy backing on a worker thread, set the timeout
             socketWrapper.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
                 endpoint.processSocket(this.socketWrapper, SocketStatus.OPEN_READ, true);
             }
         }
-
-
     }
 
 
