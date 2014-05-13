@@ -370,8 +370,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
             socketWrapper.clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
-                ((JIoEndpoint) endpoint).processSocket(this.socketWrapper,
-                        SocketStatus.OPEN_READ, true);
+                endpoint.processSocket(this.socketWrapper, SocketStatus.OPEN_READ, true);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param == null) return;
@@ -380,8 +379,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             socketWrapper.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
-                ((JIoEndpoint) endpoint).processSocket(this.socketWrapper,
-                        SocketStatus.OPEN_READ, true);
+                endpoint.processSocket(this.socketWrapper, SocketStatus.OPEN_READ, true);
             }
         }
     }
