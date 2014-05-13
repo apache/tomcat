@@ -171,7 +171,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                              char[][] packageName) {
                         StringBuilder result = new StringBuilder();
                         int i=0;
-                        for ( ; i < packageName.length; i++) {
+                        for (; i < packageName.length; i++) {
                             if(i > 0)
                                 result.append('.');
                             result.append(packageName[i]);
