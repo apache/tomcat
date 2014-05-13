@@ -232,6 +232,10 @@
       <fix>
         Fix possible corruption if doing keepalive after a comet request. (remm)
       </fix>
+      <fix>
+        <bug>56518</bug>: Fix connection limit latch leak when a non-container
+        thread is interrupted during asynchronous processing. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
