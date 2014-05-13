@@ -1532,7 +1532,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         }
 
         private void doRun(SelectionKey key, KeyAttachment ka) {
-            boolean launch = false;
             try {
                 int handshake = -1;
 
@@ -1631,16 +1630,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     socket.getPoller().cancelledKey(key,SocketStatus.ERROR);
                 }
             } finally {
-                if (launch) {
-                    try {
-                        getExecutor().execute(new SocketProcessor(socket, SocketStatus.OPEN_READ));
-                    } catch (NullPointerException npe) {
-                        if (running) {
-                            log.error(sm.getString("endpoint.launch.fail"),
-                                    npe);
-                        }
-                    }
-                }
                 socket = null;
                 status = null;
                 //return to cache
