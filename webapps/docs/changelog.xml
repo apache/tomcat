@@ -157,8 +157,8 @@
         when running under a security manager. (markt)
       </add>
       <fix>
-        Make the naming context tokens for containers more robust by using a
-        separate object. (markt/kkolinko)
+        Make the naming context tokens for containers more robust. Require
+        RuntimePermission when introducing a new token. (markt/kkolinko)
       </fix>
       <fix>
         <bug>56472</bug>: Allow NamingContextListener to clean up on stop if its
