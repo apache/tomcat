@@ -373,9 +373,11 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                 endpoint.processSocket(this.socketWrapper, SocketStatus.OPEN_READ, true);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
-            if (param == null) return;
+            if (param == null || socketWrapper == null) {
+                return;
+            }
             long timeout = ((Long)param).longValue();
-            // if we are not piggy backing on a worker thread, set the timeout
+            // If we are not piggy backing on a worker thread, set the timeout
             socketWrapper.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {

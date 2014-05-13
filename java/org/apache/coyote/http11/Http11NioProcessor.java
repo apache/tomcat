@@ -507,16 +507,12 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 endpoint.processSocket(this.socketWrapper, SocketStatus.OPEN_READ, true);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
-            if (param==null) {
+            if (param == null || socketWrapper == null) {
                 return;
             }
-            if (socketWrapper==null || socketWrapper.getSocket().getAttachment(false)==null) {
-                return;
-            }
-            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(false);
             long timeout = ((Long)param).longValue();
-            //if we are not piggy backing on a worker thread, set the timeout
-            attach.setTimeout(timeout);
+            // If we are not piggy backing on a worker thread, set the timeout
+            socketWrapper.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
                 endpoint.processSocket(this.socketWrapper, SocketStatus.OPEN_READ, true);
