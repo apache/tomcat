@@ -604,14 +604,11 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
     @Override
     public void processSocket(SocketWrapper<NioChannel> socketWrapper,
             SocketStatus socketStatus, boolean dispatch) {
-        dispatchForEvent(socketWrapper.getSocket(), socketStatus, dispatch);
-    }
-
-    public void dispatchForEvent(NioChannel socket, SocketStatus status, boolean dispatch) {
-        if (dispatch && status == SocketStatus.OPEN_READ) {
+        NioChannel socket = socketWrapper.getSocket();
+        if (dispatch && socketStatus == SocketStatus.OPEN_READ) {
             socket.getPoller().add(socket, OP_CALLBACK);
         } else {
-            processSocket(socket,status,dispatch);
+            processSocket(socket, socketStatus, dispatch);
         }
     }
 
