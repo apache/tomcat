@@ -280,7 +280,9 @@ public class AsyncStateMachine<S> {
                 state == AsyncState.TIMING_OUT ||
                 state == AsyncState.ERROR) {
             state = AsyncState.DISPATCHING;
-            doDispatch = true;
+            if (!ContainerThreadMarker.isContainerThread()) {
+                doDispatch = true;
+            }
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
