@@ -44,6 +44,18 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 8.0.7 (markt)">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>56522</bug>: When setting a value for a
+        <code>ValueExpression</code>, ensure that the expected coercions take
+        place such as a <code>null</code> string being coerced to an empty
+        string. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 8.0.6 (markt)">
   <subsection name="Catalina">
     <changelog>
