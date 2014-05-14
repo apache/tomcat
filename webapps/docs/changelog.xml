@@ -225,6 +225,10 @@
         <bug>56348</bug>: Fix slow asynchronous read when read was performed on
         a non-container thread. (markt)
       </fix>
+      <add>
+        <bug>56399</bug>: Assert that both Coyote and Catalina request objects
+        have been properly recycled. (kkolinko)
+      </add>
       <fix>
         <bug>56416</bug>: Correct documentation for default value of socket
         linger for the AJP and HTTP connectors. (markt)
