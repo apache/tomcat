@@ -45,6 +45,15 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.0.7 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>56523</bug>: When using SPNEGO authentication, log the exceptions
+        associated with failed user logins at debug level rather than error
+        level. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
