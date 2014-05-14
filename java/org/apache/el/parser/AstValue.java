@@ -197,29 +197,13 @@ public final class AstValue extends SimpleNode {
 
         // coerce to the expected type
         Class<?> targetClass = resolver.getType(ctx, t.base, t.property);
-        if (!isAssignable(value, targetClass)) {
-            resolver.setValue(ctx, t.base, t.property,
-                    ELSupport.coerceToType(value, targetClass));
-        } else {
-            resolver.setValue(ctx, t.base, t.property, value);
-        }
+        resolver.setValue(ctx, t.base, t.property,
+                ELSupport.coerceToType(value, targetClass));
         if (!ctx.isPropertyResolved()) {
             throw new PropertyNotFoundException(MessageFactory.get(
                     "error.resolver.unhandled", t.base, t.property));
         }
     }
-
-    private boolean isAssignable(Object value, Class<?> targetClass) {
-        if (targetClass == null) {
-            return false;
-        } else if (value != null && targetClass.isPrimitive()) {
-            return false;
-        } else if (value != null && !targetClass.isInstance(value)) {
-            return false;
-        }
-        return true;
-    }
-
 
     @Override
     // Interface el.parser.Node uses raw types (and is auto-generated)
