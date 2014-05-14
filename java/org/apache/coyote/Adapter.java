@@ -56,6 +56,19 @@ public interface Adapter {
     public void log(Request req, Response res, long time);
 
     /**
+     * Assert that request and response have been recycled. If they have not
+     * then log a warning and force a recycle. This method is called as a safety
+     * check when a processor is being recycled and may be returned to a pool
+     * for reuse.
+     *
+     * @param req
+     *            Request
+     * @param res
+     *            Response
+     */
+    public void checkRecycled(Request req, Response res);
+
+    /**
      * Provide the name of the domain to use to register MBeans for conponents
      * associated with the connector.
      *
