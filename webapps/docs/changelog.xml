@@ -182,6 +182,11 @@
         <bug>56501</bug>: <code>HttpServletRequest.getContextPath()</code>
         should return the undecoded context path used by the user agent. (markt)
       </fix>
+      <fix>
+        <bug>56523</bug>: When using SPNEGO authentication, log the exceptions
+        associated with failed user logins at debug level rather than error
+        level. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
