@@ -665,18 +665,16 @@ public class CoyoteAdapter implements Adapter {
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
         try {
-            if (request != null) {
-                if (request.getContext() != null || request.getHost() != null)
-                    throw new RecycleRequiredException();
+            if (request != null && request.getHost() != null) {
+                throw new RecycleRequiredException();
             }
-            if (response != null) {
-                if (response.getContentWritten() != 0)
-                    throw new RecycleRequiredException();
+            if (response != null && response.getContentWritten() != 0) {
+                throw new RecycleRequiredException();
             }
         } catch (RecycleRequiredException e) {
             String message = sm.getString("coyoteAdapter.checkRecycled");
             if (connector.getState().isAvailable()) {
-                log.warn(message, e);
+                log.info(message, e);
             } else {
                 // There may be some aborted requests.
                 // When connector shuts down, the request and response will not
