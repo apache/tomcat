@@ -351,7 +351,7 @@ class Generator {
         page.visit(new TagHandlerPoolVisitor(tagHandlerPoolNames));
     }
 
-    private void declareScriptingVars(Node.Nodes page)
+    private void declareTemporaryScriptingVars(Node.Nodes page)
             throws JasperException {
 
         class ScriptingVarVisitor extends Node.Visitor {
@@ -364,13 +364,6 @@ class Generator {
 
             @Override
             public void visit(Node.CustomTag n) throws JasperException {
-                // Declare scripting variables so they are visible to the entire
-                // page.
-                declareScriptingVars(n, VariableInfo.AT_BEGIN);
-                declareScriptingVars(n, VariableInfo.AT_END);
-                declareScriptingVars(n, VariableInfo.NESTED);
-
-                // Declare temporary scripting variables
                 // XXX - Actually there is no need to declare those
                 // "_jspx_" + varName + "_" + nestingLevel variables when we are
                 // inside a JspFragment.
@@ -421,42 +414,6 @@ class Generator {
 
                 visitBody(n);
             }
-
-            private void declareScriptingVars(Node.CustomTag n, int scope) {
-
-                List<Object> vec = n.getScriptingVars(scope);
-                if (vec != null) {
-                    for (int i = 0; i < vec.size(); i++) {
-                        Object elem = vec.get(i);
-                        if (elem instanceof VariableInfo) {
-                            VariableInfo varInfo = (VariableInfo) elem;
-                            if (varInfo.getDeclare()) {
-                                out.printin(varInfo.getClassName());
-                                out.print(" ");
-                                out.print(varInfo.getVarName());
-                                out.println(" = null;");
-                            }
-                        } else {
-                            TagVariableInfo tagVarInfo = (TagVariableInfo) elem;
-                            if (tagVarInfo.getDeclare()) {
-                                String varName = tagVarInfo.getNameGiven();
-                                if (varName == null) {
-                                    varName = n.getTagData().getAttributeString(
-                                            tagVarInfo.getNameFromAttribute());
-                                } else if (tagVarInfo.getNameFromAttribute() != null) {
-                                    // alias
-                                    continue;
-                                }
-                                out.printin(tagVarInfo.getClassName());
-                                out.print(" ");
-                                out.print(varName);
-                                out.println(" = null;");
-                            }
-                        }
-                    }
-                }
-            }
-
         }
 
         page.visit(new ScriptingVarVisitor());
@@ -710,7 +667,7 @@ class Generator {
         out.printil("javax.servlet.jsp.PageContext _jspx_page_context = null;");
         out.println();
 
-        declareScriptingVars(page);
+        declareTemporaryScriptingVars(page);
         out.println();
 
         out.printil("try {");
@@ -2278,7 +2235,8 @@ class Generator {
             out.println(n.getQName());
             n.setBeginJavaLine(out.getJavaLine());
 
-            // Save AT_BEGIN scripting variables
+            // Declare AT_BEGIN scripting variables
+            declareScriptingVars(n, VariableInfo.AT_BEGIN);
             saveScriptingVars(n, VariableInfo.AT_BEGIN);
 
             String tagHandlerClassName = tagHandlerClass.getCanonicalName();
@@ -2333,7 +2291,8 @@ class Generator {
                 out.println(" != javax.servlet.jsp.tagext.Tag.SKIP_BODY) {");
                 out.pushIndent();
 
-                // Save NESTED scripting variables
+                // Declare NESTED scripting variables
+                declareScriptingVars(n, VariableInfo.NESTED);
                 saveScriptingVars(n, VariableInfo.NESTED);
 
                 if (n.implementsBodyTag()) {
@@ -2520,8 +2479,9 @@ class Generator {
                 out.printil("}");
             }
 
-            // synchronize AT_END scripting variables (must do this
+            // Declare and synchronize AT_END scripting variables (must do this
             // outside the try/catch/finally block)
+            declareScriptingVars(n, VariableInfo.AT_END);
             syncScriptingVars(n, VariableInfo.AT_END);
 
             restoreScriptingVars(n, VariableInfo.AT_BEGIN);
@@ -2538,7 +2498,8 @@ class Generator {
             out.printin("//  ");
             out.println(n.getQName());
 
-            // Save AT_BEGIN scripting variables
+            // Declare AT_BEGIN scripting variables
+            declareScriptingVars(n, VariableInfo.AT_BEGIN);
             saveScriptingVars(n, VariableInfo.AT_BEGIN);
 
             String tagHandlerClassName = tagHandlerClass.getCanonicalName();
@@ -2591,13 +2552,54 @@ class Generator {
             // Synchronize AT_BEGIN scripting variables
             syncScriptingVars(n, VariableInfo.AT_BEGIN);
 
-            // synchronize AT_END scripting variables
+            // Declare and synchronize AT_END scripting variables
+            declareScriptingVars(n, VariableInfo.AT_END);
             syncScriptingVars(n, VariableInfo.AT_END);
 
             // Resource injection
             writeDestroyInstance(tagHandlerVar);
 
             n.setEndJavaLine(out.getJavaLine());
+        }
+
+        private void declareScriptingVars(Node.CustomTag n, int scope) {
+            if (isFragment) {
+                // No need to declare Java variables, if we inside a
+                // JspFragment, because a fragment is always scriptless.
+                return;
+            }
+
+            List<Object> vec = n.getScriptingVars(scope);
+            if (vec != null) {
+                for (int i = 0; i < vec.size(); i++) {
+                    Object elem = vec.get(i);
+                    if (elem instanceof VariableInfo) {
+                        VariableInfo varInfo = (VariableInfo) elem;
+                        if (varInfo.getDeclare()) {
+                            out.printin(varInfo.getClassName());
+                            out.print(" ");
+                            out.print(varInfo.getVarName());
+                            out.println(" = null;");
+                        }
+                    } else {
+                        TagVariableInfo tagVarInfo = (TagVariableInfo) elem;
+                        if (tagVarInfo.getDeclare()) {
+                            String varName = tagVarInfo.getNameGiven();
+                            if (varName == null) {
+                                varName = n.getTagData().getAttributeString(
+                                        tagVarInfo.getNameFromAttribute());
+                            } else if (tagVarInfo.getNameFromAttribute() != null) {
+                                // alias
+                                continue;
+                            }
+                            out.printin(tagVarInfo.getClassName());
+                            out.print(" ");
+                            out.print(varName);
+                            out.println(" = null;");
+                        }
+                    }
+                }
+            }
         }
 
         /*
@@ -3607,7 +3609,7 @@ class Generator {
 
         generatePageScopedVariables(tagInfo);
 
-        declareScriptingVars(tag);
+        declareTemporaryScriptingVars(tag);
         out.println();
 
         out.printil("try {");

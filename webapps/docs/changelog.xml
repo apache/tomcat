@@ -57,11 +57,6 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
-        <bug>56516</bug>: When tags require scripting variables to be declared,
-        declare them at the start of the page so that they are always available
-        to the entire page. (markt)
-      </fix>
-      <fix>
         <bug>56522</bug>: When setting a value for a
         <code>ValueExpression</code>, ensure that the expected coercions take
         place such as a <code>null</code> string being coerced to an empty
