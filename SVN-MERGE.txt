@@ -34,6 +34,8 @@ org.apache.tomcat.util.bcel is copied from:
 DBCP
 org.apache.tomcat.dbcp.dbcp2 is copied from:
 /commons/proper/dbcp/trunk/src/main/java/org/apache/commons/dbcp2
+and
+/commons/proper/dbcp/trunk/src/main/resources/org/apache/commons/dbcp2
 org.apache.tomcat.dbcp.pool2 is copied from:
 /commons/proper/pool/trunk/src/main/java/org/apache/commons/pool2
 
