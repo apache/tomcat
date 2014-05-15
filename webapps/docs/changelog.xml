@@ -72,6 +72,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Copy missing resources file from Apache Commons DBCP 2 to packaged
+        renamed copy of DBCP 2. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.6 (markt)">
   <subsection name="Catalina">
@@ -427,7 +435,7 @@
         Javadoc fixes and some code clean up. (markt)
       </update>
       <scode>
-        Switch to including Apache Commons DBCP via a package renamed  svn copy
+        Switch to including Apache Commons DBCP via a package renamed svn copy
         rather than building from a source release for consistency with other
         Commons packages and to allow faster releases to fix DBCP related
         issues. (markt)
