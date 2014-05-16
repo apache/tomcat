@@ -70,6 +70,11 @@
         place such as a <code>null</code> string being coerced to an empty
         string. (markt)
       </fix>
+      <fix>
+        <bug>56529</bug>: Avoid <code>NoSuchElementException</code> while handling
+        attributes with empty string value in custom tags. Patch provided by
+        Hariprasad Manchi. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
