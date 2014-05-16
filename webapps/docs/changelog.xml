@@ -45,24 +45,29 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.0.8 (markt)">
- <subsection name="Catalina">
-   <changelog>
-     <fix>
-       <bug>56536</bug>: Ensure that
-       <code>HttpSessionBindingListener.valueUnbound()</code> uses the correct
-       class loader when the <code>SingleSignOn</code> valve is used. (markt)
-     </fix>
-   </changelog>
- </subsection>
- <subsection name="Jasper">
-   <changelog>
+  <subsection name="Catalina">
+    <changelog>
       <fix>
-        <bug>56529</bug>: Avoid <code>NoSuchElementException</code> while handling
-        attributes with empty string value in custom tags. Patch provided by
-        Hariprasad Manchi. (violetagg)
+        <bug>56536</bug>: Ensure that
+        <code>HttpSessionBindingListener.valueUnbound()</code> uses the correct
+        class loader when the <code>SingleSignOn</code> valve is used. (markt)
       </fix>
-   </changelog>
- </subsection>
+      <add>
+        <bug>56526</bug>: Improved the <code>StuckThreadDetectionValve</code> to
+        optionally interrupt stuck threads to attempt to unblock them.
+        (slaurent)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+       <fix>
+         <bug>56529</bug>: Avoid <code>NoSuchElementException</code> while handling
+         attributes with empty string value in custom tags. Patch provided by
+         Hariprasad Manchi. (violetagg)
+       </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.7 (markt)" rtext="not released">
   <subsection name="Catalina">
