@@ -215,6 +215,11 @@
         by <code>{</code> in order for the back-slash escaping to take effect.
         (markt)
       </fix>
+      <fix>
+        <bug>56529</bug>: Avoid <code>NoSuchElementException</code> while handling
+        attributes with empty string value in custom tags. Patch provided by
+        Hariprasad Manchi. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
