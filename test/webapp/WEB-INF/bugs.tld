@@ -65,6 +65,20 @@
       <scope>AT_END</scope>
     </variable>
   </tag>
+  <tag>
+    <name>Bug56529</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$Bug56529</tag-class>
+    <body-content>JSP</body-content>
+    <attribute>
+      <name>attribute1</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>attribute2</name>
+      <required>true</required>
+    </attribute>
+  </tag>
   <function>
     <name>bug49555</name>
     <function-class>org.apache.el.TesterFunctions$Inner$Class</function-class>
