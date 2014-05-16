@@ -44,7 +44,18 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
-<section name="Tomcat 8.0.7 (markt)">
+<section name="Tomcat 8.0.8 (markt)">
+ <subsection name="Jasper">
+   <changelog>
+      <fix>
+        <bug>56529</bug>: Avoid <code>NoSuchElementException</code> while handling
+        attributes with empty string value in custom tags. Patch provided by
+        Hariprasad Manchi. (violetagg)
+      </fix>
+   </changelog>
+ </subsection>
+</section>
+<section name="Tomcat 8.0.7 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -70,11 +81,6 @@
         place such as a <code>null</code> string being coerced to an empty
         string. (markt)
       </fix>
-      <fix>
-        <bug>56529</bug>: Avoid <code>NoSuchElementException</code> while handling
-        attributes with empty string value in custom tags. Patch provided by
-        Hariprasad Manchi. (violetagg)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -86,7 +92,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 8.0.6 (markt)">
+<section name="Tomcat 8.0.6 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
