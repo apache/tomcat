@@ -18,6 +18,7 @@
 package org.apache.jasper.compiler;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ import javax.servlet.jsp.tagext.VariableInfo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.core.StandardContext;
@@ -250,5 +252,64 @@ public class TestGenerator extends TomcatBaseTest {
     /** Assertion for text printed by tags:echo */
     private static void assertEcho(String result, String expected) {
         assertTrue(result.indexOf("<p>" + expected + "</p>") > 0);
+    }
+
+    @Test
+    public void testBug56529() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug5nnnn/bug56529.jsp", bc, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        String response = bc.toStringInternal();
+        Assert.assertTrue(response,
+                response.contains("[1:attribute1: '', attribute2: '']"));
+        Assert.assertTrue(response,
+                response.contains("[2:attribute1: '', attribute2: '']"));
+   }
+
+    public static class Bug56529 extends TagSupport {
+
+        private static final long serialVersionUID = 1L;
+
+        private String attribute1 = null;
+
+        private String attribute2 = null;
+
+        public void setAttribute1(String attribute1) {
+            this.attribute1 = attribute1;
+        }
+
+        public String getAttribute1() {
+            return attribute1;
+        }
+
+        public void setAttribute2(String attribute2) {
+            this.attribute2 = attribute2;
+        }
+
+        public String getAttribute2() {
+            return attribute2;
+        }
+
+        @Override
+        public int doEndTag() throws JspException {
+            try {
+                pageContext.getOut().print(
+                        "attribute1: '" + attribute1 + "', " + "attribute2: '"
+                                + attribute2 + "'");
+            } catch (IOException e) {
+                throw new JspException(e);
+            }
+            return EVAL_PAGE;
+        }
+
     }
 }
