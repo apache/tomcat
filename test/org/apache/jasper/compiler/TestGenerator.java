@@ -273,6 +273,11 @@ public class TestGenerator extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug5nnnn/bug56529.jsp", bc, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        String response = bc.toStringInternal();
+        Assert.assertTrue(response,
+                response.contains("[1:attribute1: '', attribute2: '']"));
+        Assert.assertTrue(response,
+                response.contains("[2:attribute1: '', attribute2: '']"));
    }
 
     public static class Bug56529 extends TagSupport {
@@ -302,8 +307,9 @@ public class TestGenerator extends TomcatBaseTest {
         @Override
         public int doEndTag() throws JspException {
             try {
-                pageContext.getOut().println("attribute1: " + attribute1);
-                pageContext.getOut().println("attribute2: " + attribute2);
+                pageContext.getOut().print(
+                        "attribute1: '" + attribute1 + "', " + "attribute2: '"
+                                + attribute2 + "'");
             } catch (IOException e) {
                 throw new JspException(e);
             }
