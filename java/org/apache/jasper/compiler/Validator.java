@@ -1124,12 +1124,16 @@ class Validator {
 
                 // When attribute is not an expression,
                 // contains its textual value with \$ and \# escaping removed.
-                String textAttributeValue = "";
+                String textAttributeValue;
                 if (!elExpression && el != null) {
                     // Should be a single Text node
-                   if(el.iterator().hasNext()) {
-                      textAttributeValue = ((ELNode.Text) el.iterator().next()).getText();
-                   }
+                    Iterator<ELNode> it = el.iterator();
+                    if (it.hasNext()) {
+                        textAttributeValue = ((ELNode.Text) it.next())
+                                .getText();
+                    } else {
+                        textAttributeValue = "";
+                    }
                 } else {
                     textAttributeValue = xmlAttributeValue;
                 }
