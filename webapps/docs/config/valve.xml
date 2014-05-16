@@ -1548,10 +1548,12 @@
 
   <subsection name="Introduction">
 
-    <p>This valve allows to detect requests that take a long time to process, which might
-    indicate that the thread that is processing it is stuck.</p>
-    <p>When such a request is detected, the current stack trace of its thread is written
-    to Tomcat log with a WARN level.</p>
+    <p>This valve allows to detect requests that take a long time to process,
+    which might indicate that the thread that is processing it is stuck.
+    Additionally it can optionally interrupt such threads to try and unblock
+    them.</p>
+    <p>When such a request is detected, the current stack trace of its thread is
+    written to Tomcat log with a WARN level.</p>
     <p>The IDs and names of the stuck threads are available through JMX in the
     <code>stuckThreadIds</code> and <code>stuckThreadNames</code> attributes.
     The IDs can be used with the standard Threading JVM MBean
@@ -1576,9 +1578,20 @@
       <attribute name="threshold" required="false">
         <p>Minimum duration in seconds after which a thread is considered stuck.
         Default is 600 seconds. If set to 0, the detection is disabled.</p>
-        <p>Note: since the detection is done in the background thread of the Container
-        (Engine, Host or Context) declaring this Valve, the threshold should be higher
-        than the <code>backgroundProcessorDelay</code> of this Container.</p>
+        <p>Note: since the detection (and optional interruption) is done in the
+        background thread of the Container (Engine, Host or Context) declaring
+        this Valve, the threshold should be higher than the
+        <code>backgroundProcessorDelay</code> of this Container.</p>
+      </attribute>
+
+      <attribute name="interruptThreadThreshold" required="false">
+        <p>Minimum duration in seconds after which a stuck thread should be
+        interrupted to attempt to "free" it.</p>
+        <p>Note that there's no guarantee that the thread will get unstuck.
+        This usually works well for threads stuck on I/O or locks, but is
+        probably useless in case of infinite loops.</p>
+        <p>Default is -1 which disables the feature. To enable it, the value
+        must be greater or equal to <code>threshold</code>.</p>
       </attribute>
 
     </attributes>
