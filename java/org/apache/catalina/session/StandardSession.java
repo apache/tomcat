@@ -864,11 +864,32 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
             // Unbind any objects associated with this session
             String keys[] = keys();
-            for (int i = 0; i < keys.length; i++)
-                removeAttributeInternal(keys[i], notify);
-
+            if (oldTccl != null) {
+                if (Globals.IS_SECURITY_ENABLED) {
+                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                            context.getLoader().getClassLoader());
+                    AccessController.doPrivileged(pa);
+                } else {
+                    Thread.currentThread().setContextClassLoader(
+                            context.getLoader().getClassLoader());
+                }
+            }
+            try {
+                for (int i = 0; i < keys.length; i++) {
+                    removeAttributeInternal(keys[i], notify);
+                }
+            } finally {
+                if (oldTccl != null) {
+                    if (Globals.IS_SECURITY_ENABLED) {
+                        PrivilegedAction<Void> pa =
+                            new PrivilegedSetTccl(oldTccl);
+                        AccessController.doPrivileged(pa);
+                    } else {
+                        Thread.currentThread().setContextClassLoader(oldTccl);
+                    }
+                }
+            }
         }
-
     }
 
 

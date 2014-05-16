@@ -187,6 +187,11 @@
         associated with failed user logins at debug level rather than error
         level. (markt)
       </fix>
+     <fix>
+       <bug>56536</bug>: Ensure that
+       <code>HttpSessionBindingListener.valueUnbound()</code> uses the correct
+       class loader when the <code>SingleSignOn</code> valve is used. (markt) 
+     </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
