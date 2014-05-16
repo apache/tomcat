@@ -44,6 +44,17 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 8.0.9 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        <bug>56526</bug>: Improved the <code>StuckThreadDetectionValve</code> to
+        optionally interrupt stuck threads to attempt to unblock them.
+        (slaurent)
+      </add>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 8.0.8 (markt)">
   <subsection name="Catalina">
     <changelog>
@@ -52,11 +63,6 @@
         <code>HttpSessionBindingListener.valueUnbound()</code> uses the correct
         class loader when the <code>SingleSignOn</code> valve is used. (markt)
       </fix>
-      <add>
-        <bug>56526</bug>: Improved the <code>StuckThreadDetectionValve</code> to
-        optionally interrupt stuck threads to attempt to unblock them.
-        (slaurent)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
