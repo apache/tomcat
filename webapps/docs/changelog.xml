@@ -50,7 +50,7 @@
      <fix>
        <bug>56536</bug>: Ensure that
        <code>HttpSessionBindingListener.valueUnbound()</code> uses the correct
-       class loader when the <code>SingleSignOn</code> valve is used. (markt) 
+       class loader when the <code>SingleSignOn</code> valve is used. (markt)
      </fix>
    </changelog>
  </subsection>
