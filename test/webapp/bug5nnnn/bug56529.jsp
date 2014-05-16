@@ -15,10 +15,10 @@
   limitations under the License.
 --%>
 <%@ taglib uri="http://tomcat.apache.org/bugs" prefix="bugs" %>
-<bugs:Bug56529 attribute2="">
+[1:<bugs:Bug56529 attribute2="">
     <jsp:attribute name="attribute1"></jsp:attribute>
-</bugs:Bug56529>
+</bugs:Bug56529>]
 
-<bugs:Bug56529 attribute2="">
+[2:<bugs:Bug56529 attribute2="">
     <jsp:attribute name="attribute1" />
-</bugs:Bug56529>
+</bugs:Bug56529>]
