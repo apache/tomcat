@@ -52,6 +52,11 @@
         optionally interrupt stuck threads to attempt to unblock them.
         (slaurent)
       </add>
+      <add>
+        <bug>56461</bug>: New <code>failCtxIfServletStartFails</code> attribute
+        on Context and Host configuration to force the context startup to fail
+        if a load-on-startup servlet fails its startup. (slaurent)
+      </add>
     </changelog>
   </subsection>
 </section>

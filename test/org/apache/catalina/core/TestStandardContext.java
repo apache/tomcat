@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -875,6 +876,58 @@ public class TestStandardContext extends TomcatBaseTest {
         String log = TesterTldListener.getLog();
         Assert.assertTrue(log, log.contains("PASS"));
         Assert.assertFalse(log, log.contains("FAIL"));
+    }
+
+    @Test
+    public void testFlagFailCtxIfServletStartFails() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        StandardContext context = (StandardContext) tomcat.addContext("",
+                docBase.getAbsolutePath());
+
+        // first we test the flag itself, which can be set on the Host and
+        // Context
+        assertFalse(context.getComputedFailCtxIfServletStartFails());
+
+        StandardHost host = (StandardHost) tomcat.getHost();
+        host.setFailCtxIfServletStartFails(true);
+        assertTrue(context.getComputedFailCtxIfServletStartFails());
+        context.setFailCtxIfServletStartFails(Boolean.FALSE);
+        assertFalse("flag on Context should override Host config",
+                context.getComputedFailCtxIfServletStartFails());
+
+        // second, we test the actual effect of the flag on the startup
+        Wrapper servlet = Tomcat.addServlet(context, "myservlet",
+                new FailingStartupServlet());
+        servlet.setLoadOnStartup(1);
+
+        tomcat.start();
+        assertTrue("flag false should not fail deployment", context.getState()
+                .isAvailable());
+
+        tomcat.stop();
+        assertFalse(context.getState().isAvailable());
+
+        host.removeChild(context);
+        context = (StandardContext) tomcat.addContext("",
+                docBase.getAbsolutePath());
+        servlet = Tomcat.addServlet(context, "myservlet",
+                new FailingStartupServlet());
+        servlet.setLoadOnStartup(1);
+        tomcat.start();
+        assertFalse("flag true should fail deployment", context.getState()
+                .isAvailable());
+    }
+
+    private class FailingStartupServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void init() throws ServletException {
+            throw new ServletException("failing on purpose");
+        }
+
     }
 
     @Test
