@@ -182,6 +182,8 @@ public class StandardHost extends ContainerBase implements Host {
 
     private boolean undeployOldVersions = false;
 
+    private boolean failCtxIfServletStartFails = false;
+
 
     // ------------------------------------------------------------- Properties
 
@@ -645,6 +647,21 @@ public class StandardHost extends ContainerBase implements Host {
         support.firePropertyChange("deployIgnore",
                                    oldDeployIgnore,
                                    deployIgnore);
+    }
+
+
+    public boolean isFailCtxIfServletStartFails() {
+        return failCtxIfServletStartFails;
+    }
+
+
+    public void setFailCtxIfServletStartFails(
+            boolean failCtxIfServletStartFails) {
+        boolean oldFailCtxIfServletStartFails = this.failCtxIfServletStartFails;
+        this.failCtxIfServletStartFails = failCtxIfServletStartFails;
+        support.firePropertyChange("failCtxIfServletStartFails",
+                oldFailCtxIfServletStartFails,
+                failCtxIfServletStartFails);
     }
 
 

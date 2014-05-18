@@ -175,6 +175,15 @@
         Deployment</a> for more information.</p>
       </attribute>
 
+      <attribute name="failCtxIfServletStartFails" required="false">
+        <p>Set to <code>true</code> to have each child contexts fail its startup
+        if any of its servlet that has load-on-startup &gt;=0 fails its own
+        startup.</p>
+        <p>Each child context may override this attribute.</p>
+        <p>If not specified, the default value of <code>false</code> is
+        used.</p>
+      </attribute>
+
       <attribute name="name" required="true">
         <p>Usually the network name of this virtual host, as registered in your
         <em>Domain Name Service</em> server. Regardless of the case used to
