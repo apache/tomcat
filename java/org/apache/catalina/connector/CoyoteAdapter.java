@@ -664,26 +664,31 @@ public class CoyoteAdapter implements Adapter {
             org.apache.coyote.Response res) {
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
-        try {
-            if (request != null && request.getHost() != null) {
-                throw new RecycleRequiredException();
-            }
-            if (response != null && response.getContentWritten() != 0) {
-                throw new RecycleRequiredException();
-            }
-        } catch (RecycleRequiredException e) {
-            String message = sm.getString("coyoteAdapter.checkRecycled");
+        String messageKey = null;
+        if (request != null && request.getHost() != null) {
+            messageKey = "coyoteAdapter.checkRecycled.request";
+        } else if (response != null && response.getContentWritten() != 0) {
+            messageKey = "coyoteAdapter.checkRecycled.response";
+        }
+        if (messageKey != null) {
+            // Log this request, as it has probably skipped the access log.
+            // The log() method will take care of recycling.
+            log(req, res, 0L);
+
             if (connector.getState().isAvailable()) {
-                log.info(message, e);
+                if (log.isInfoEnabled()) {
+                    log.info(sm.getString(messageKey),
+                            new RecycleRequiredException());
+                }
             } else {
                 // There may be some aborted requests.
                 // When connector shuts down, the request and response will not
                 // be reused, so there is no issue to warn about here.
-                log.debug(message, e);
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString(messageKey),
+                            new RecycleRequiredException());
+                }
             }
-            // Log this request, as it has probably skipped the access log.
-            // The log() method will take care of recycling.
-            log(req, res, 0L);
         }
     }
 

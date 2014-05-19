@@ -47,15 +47,19 @@
 <section name="Tomcat 8.0.9 (markt)">
   <subsection name="Catalina">
     <changelog>
-      <add>
-        <bug>56526</bug>: Improved the <code>StuckThreadDetectionValve</code> to
-        optionally interrupt stuck threads to attempt to unblock them.
-        (slaurent)
-      </add>
+      <scode>
+        <bug>56399</bug>: Improve implementation of CoyoteAdapter.checkRecycled()
+        to do not use an exception for flow control. (kkolinko)
+      </scode>
       <add>
         <bug>56461</bug>: New <code>failCtxIfServletStartFails</code> attribute
         on Context and Host configuration to force the context startup to fail
         if a load-on-startup servlet fails its startup. (slaurent)
+      </add>
+      <add>
+        <bug>56526</bug>: Improved the <code>StuckThreadDetectionValve</code> to
+        optionally interrupt stuck threads to attempt to unblock them.
+        (slaurent)
       </add>
     </changelog>
   </subsection>
