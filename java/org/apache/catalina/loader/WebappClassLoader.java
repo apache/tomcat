@@ -1325,7 +1325,7 @@ public class WebappClassLoader extends URLClassLoader
     }
 
 
-    protected void checkStateForClassLoading(String className) {
+    protected void checkStateForClassLoading(String className) throws ClassNotFoundException {
         // It is not permitted to load new classes once the web application has
         // been stopped.
         if (!state.isAvailable()) {
@@ -1334,6 +1334,7 @@ public class WebappClassLoader extends URLClassLoader
             ClassNotFoundException cnfe = new ClassNotFoundException();
             cnfe.initCause(cause);
             log.info(msg, cnfe);
+            throw cnfe;
         }
     }
 
