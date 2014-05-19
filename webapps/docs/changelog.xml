@@ -47,12 +47,12 @@
 <section name="Tomcat 8.0.9 (markt)">
   <subsection name="Catalina">
     <changelog>
-     <scode>
-       <bug>56387</bug>: Improve the code that handles an attempt to load a
-       class after a web application has been stopped. Use common code to handle
-       this case regardless of the access path and don't throw an exception
-       purely to log a stack trace. (markt)
-     </scode>
+      <scode>
+        <bug>56387</bug>: Improve the code that handles an attempt to load a
+        class after a web application has been stopped. Use common code to handle
+        this case regardless of the access path and don't throw an exception
+        purely to log a stack trace. (markt)
+      </scode>
       <scode>
         <bug>56399</bug>: Improve implementation of CoyoteAdapter.checkRecycled()
         to do not use an exception for flow control. (kkolinko)
