@@ -67,6 +67,11 @@
         optionally interrupt stuck threads to attempt to unblock them.
         (slaurent)
       </add>
+      <update>
+        <bug>56546</bug>: Reduce logging level for stack traces of stuck web
+        application threads printed by WebappClassLoader.clearReferencesThreads()
+        from error to info. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <section name="WebSocket">

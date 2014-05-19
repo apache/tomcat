@@ -1822,12 +1822,12 @@ public class WebappClassLoader extends URLClassLoader
                     if (isRequestThread(thread)) {
                         log.error(sm.getString("webappClassLoader.warnRequestThread",
                                 getContextName(), threadName));
-                        log.error(sm.getString("webappClassLoader.stackTraceRequestThread",
+                        log.info(sm.getString("webappClassLoader.stackTraceRequestThread",
                                 threadName, getStackTrace(thread)));
                     } else {
                         log.error(sm.getString("webappClassLoader.warnThread",
                                 getContextName(), threadName));
-                        log.error(sm.getString("webappClassLoader.stackTrace",
+                        log.info(sm.getString("webappClassLoader.stackTrace",
                                 threadName, getStackTrace(thread)));
                     }
 
