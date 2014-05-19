@@ -893,6 +893,8 @@ public class StandardContext extends ContainerBase
 
     private String containerSciFilter;
 
+    private Boolean failCtxIfServletStartFails;
+
 
     // ----------------------------------------------------- Context Properties
     
@@ -2816,8 +2818,32 @@ public class StandardContext extends ContainerBase
                 this.renewThreadsWhenStoppingContext);
     }
 
-    // -------------------------------------------------------- Context Methods
+    public Boolean getFailCtxIfServletStartFails() {
+        return failCtxIfServletStartFails;
+    }
 
+    public void setFailCtxIfServletStartFails(
+            Boolean failCtxIfServletStartFails) {
+        Boolean oldFailCtxIfServletStartFails = this.failCtxIfServletStartFails;
+        this.failCtxIfServletStartFails = failCtxIfServletStartFails;
+        support.firePropertyChange("failCtxIfServletStartFails",
+                oldFailCtxIfServletStartFails,
+                failCtxIfServletStartFails);
+    }
+
+    protected boolean getComputedFailCtxIfServletStartFails() {
+        if(failCtxIfServletStartFails != null) {
+            return failCtxIfServletStartFails.booleanValue();
+        }
+        //else look at Host config
+        if(getParent() instanceof StandardHost) {
+            return ((StandardHost)getParent()).isFailCtxIfServletStartFails();
+        }
+        //else
+        return false;
+    }
+
+    // -------------------------------------------------------- Context Methods
 
     @Override
     public void addApplicationListener(String listener) {
@@ -5184,7 +5210,7 @@ public class StandardContext extends ContainerBase
      * @param children Array of wrappers for all currently defined
      *  servlets (including those not declared load on startup)
      */
-    public void loadOnStartup(Container children[]) {
+    public boolean loadOnStartup(Container children[]) {
 
         // Collect "load on startup" servlets that need to be initialized
         TreeMap<Integer, ArrayList<Wrapper>> map =
@@ -5213,10 +5239,14 @@ public class StandardContext extends ContainerBase
                                       getName()), StandardWrapper.getRootCause(e));
                     // NOTE: load errors (including a servlet that throws
                     // UnavailableException from tht init() method) are NOT
-                    // fatal to application startup
+                    // fatal to application startup, excepted if failDeploymentIfServletLoadedOnStartupFails is specified
+                    if(getComputedFailCtxIfServletStartFails()) {
+                        return false;
+                    }
                 }
             }
         }
+        return true;
 
     }
 
@@ -5490,7 +5520,10 @@ public class StandardContext extends ContainerBase
             
             // Load and initialize all "load on startup" servlets
             if (ok) {
-                loadOnStartup(findChildren());
+                if (!loadOnStartup(findChildren())){
+                    log.error("Error loadOnStartup");
+                    ok = false;
+                }
             }
             
             // Start ContainerBackgroundProcessor thread

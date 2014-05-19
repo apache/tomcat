@@ -334,6 +334,14 @@
         sufficient.</p>
       </attribute>
 
+      <attribute name="failCtxIfServletStartFails" required="false">
+        <p>Set to <code>true</code> to have the context fail its startup if any
+        servlet that has load-on-startup &gt;=0 fails its own startup.</p>
+        <p>If not specified, the attribute of the same name in the parent Host
+        configuration is used if specified. Otherwise the default value of
+        <code>false</code> is used.</p>
+      </attribute>
+
       <attribute name="fireRequestListenersOnForwards" required="false">
         <p>Set to <code>true</code> to fire any configured
         ServletRequestListeners  when Tomcat forwards a request. This is
