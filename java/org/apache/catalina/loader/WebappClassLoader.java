@@ -852,10 +852,7 @@ public class WebappClassLoader extends URLClassLoader
         if (log.isDebugEnabled())
             log.debug("    findClass(" + name + ")");
 
-        // Cannot load anything from local repositories if class loader is stopped
-        if (!state.isAvailable()) {
-            throw new ClassNotFoundException(name);
-        }
+        checkStateForClassLoading(name);
 
         // (1) Permission to define this class when using a SecurityManager
         if (securityManager != null) {
@@ -1215,14 +1212,8 @@ public class WebappClassLoader extends URLClassLoader
             log.debug("loadClass(" + name + ", " + resolve + ")");
         Class<?> clazz = null;
 
-        // Log access to stopped classloader
-        if (!state.isAvailable()) {
-            try {
-                throw new IllegalStateException();
-            } catch (IllegalStateException e) {
-                log.info(sm.getString("webappClassLoader.stopped", name), e);
-            }
-        }
+        // Log access to stopped class loader
+        checkStateForClassLoading(name);
 
         // (0) Check our previously loaded local class cache
         clazz = findLoadedClass0(name);
@@ -1331,7 +1322,19 @@ public class WebappClassLoader extends URLClassLoader
         }
 
         throw new ClassNotFoundException(name);
+    }
 
+
+    protected void checkStateForClassLoading(String className) {
+        // It is not permitted to load new classes once the web application has
+        // been stopped.
+        if (!state.isAvailable()) {
+            String msg = sm.getString("webappClassLoader.stopped", className);
+            IllegalStateException cause = new IllegalStateException(msg);
+            ClassNotFoundException cnfe = new ClassNotFoundException();
+            cnfe.initCause(cause);
+            log.info(msg, cnfe);
+        }
     }
 
 
