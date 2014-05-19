@@ -241,17 +241,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
 
                 support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
                                           filter, request, response);
-            } catch (IOException e) {
-                if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                                              filter, request, response, e);
-                throw e;
-            } catch (ServletException e) {
-                if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                                              filter, request, response, e);
-                throw e;
-            } catch (RuntimeException e) {
+            } catch (IOException | ServletException | RuntimeException e) {
                 if (filter != null)
                     support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
                                               filter, request, response, e);

@@ -1043,10 +1043,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
         if (m != null) {
             try {
                 m.invoke(resource, (Object[]) null);
-            } catch (IllegalArgumentException e) {
-                log.warn(sm.getString("namingResources.cleanupCloseFailed",
-                        closeMethod, name, container), e);
-            } catch (IllegalAccessException e) {
+            } catch (IllegalArgumentException | IllegalAccessException e) {
                 log.warn(sm.getString("namingResources.cleanupCloseFailed",
                         closeMethod, name, container), e);
             } catch (InvocationTargetException e) {
