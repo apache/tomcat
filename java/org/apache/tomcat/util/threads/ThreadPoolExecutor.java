@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.threads;
 
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -25,8 +24,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -43,8 +40,6 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      */
     protected static final StringManager sm = StringManager
             .getManager("org.apache.tomcat.util.threads.res");
-
-    private static final Log log = LogFactory.getLog(ThreadPoolExecutor.class);
 
     /**
      * The number of tasks submitted but not yet finished. This includes tasks
@@ -117,16 +112,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
                                     "threadPoolExecutor.threadStoppedToAvoidPotentialLeak",
                                     Thread.currentThread().getName());
 
-                    Thread.currentThread().setUncaughtExceptionHandler(
-                            new UncaughtExceptionHandler() {
-                                @Override
-                                public void uncaughtException(Thread t,
-                                        Throwable e) {
-                                    // yes, swallow the exception
-                                    log.debug(msg);
-                                }
-                            });
-                    throw new RuntimeException(msg);
+                    throw new StopPooledThreadException(msg);
                 }
             }
         }

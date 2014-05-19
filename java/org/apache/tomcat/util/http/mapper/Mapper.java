@@ -237,6 +237,7 @@ public final class Mapper {
                     new ContextVersion[contextVersions.length + 1];
                 ContextVersion newContextVersion = new ContextVersion();
                 newContextVersion.path = path;
+                newContextVersion.slashCount = slashCount;
                 newContextVersion.name = version;
                 newContextVersion.object = context;
                 newContextVersion.welcomeResources = welcomeResources;
@@ -814,6 +815,7 @@ public final class Mapper {
                 }
             }
             mappingData.context = contextVersion.object;
+            mappingData.contextSlashCount = contextVersion.slashCount;
         }
 
         // Wrapper mapping
@@ -1503,6 +1505,7 @@ public final class Mapper {
 
     protected static final class ContextVersion extends MapElement {
         public String path = null;
+        public int slashCount;
         public String[] welcomeResources = new String[0];
         public javax.naming.Context resources = null;
         public Wrapper defaultWrapper = null;

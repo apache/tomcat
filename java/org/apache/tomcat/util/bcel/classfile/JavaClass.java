@@ -156,8 +156,7 @@ public class JavaClass extends AccessFlags
             // Find attributes that contain annotation data
             Attribute[] attrs = getAttributes();
             List<AnnotationEntry> accumulatedAnnotations = new ArrayList<AnnotationEntry>();
-            for (int i = 0; i < attrs.length; i++) {
-                Attribute attribute = attrs[i];
+            for (Attribute attribute : attrs) {
                 if (attribute instanceof Annotations) {
                     Annotations runtimeAnnotations = (Annotations)attribute;
                     for(int j = 0; j < runtimeAnnotations.getAnnotationEntries().length; j++)

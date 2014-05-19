@@ -28,6 +28,7 @@ public class MappingData {
 
     public Object host = null;
     public Object context = null;
+    public int contextSlashCount = 0;
     public Object[] contexts = null;
     public Object wrapper = null;
     public boolean jspWildCard = false;
@@ -42,6 +43,7 @@ public class MappingData {
     public void recycle() {
         host = null;
         context = null;
+        contextSlashCount = 0;
         contexts = null;
         wrapper = null;
         jspWildCard = false;

@@ -2308,7 +2308,9 @@ abstract class Node implements TagConstants {
         }
 
         /**
-         * XXX
+         * <code>true</code> if the attribute is a "dynamic" attribute of a
+         * custom tag that implements DynamicAttributes interface. That is,
+         * a random extra attribute that is not declared by the tag.
          */
         public boolean isDynamic() {
             return dynamic;

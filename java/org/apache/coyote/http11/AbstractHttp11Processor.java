@@ -1764,6 +1764,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     @Override
     public final void recycle(boolean isSocketClosing) {
+        getAdapter().checkRecycled(request, response);
+
         if (getInputBuffer() != null) {
             getInputBuffer().recycle();
         }

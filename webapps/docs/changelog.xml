@@ -136,10 +136,70 @@
         problem is encountered calling a getter or setter on a component
         attribute. The logging level is raised from debug to warning. (markt)
       </fix>
+      <fix>
+        <bug>56451</bug>: Make resources accessed via a context alias accessible
+        via JNDI in the same way standard resources are available. (markt)
+      </fix>
+      <add>
+        <bug>56463</bug>: Property for disabling server information is added to
+        the <code>DefaultServlet</code>. Server information is presented in the
+        response sent to the client when directory listings is enabled.
+        (violetagg)
+      </add>
+      <add>
+        Add the <code>org.apache.naming</code> package to the packages requiring
+        code to have the <code>defineClassInPackage</code> permission when
+        running under a security manager. (markt)
+      </add>
+      <add>
+        Add the <code>org.apache.naming.resources</code> package to the packages
+        requiring code to have the <code>accessClassInPackage</code> permission
+        when running under a security manager. (markt)
+      </add>
+      <fix>
+        Make the naming context tokens for containers more robust. Require
+        RuntimePermission when introducing a new token. (markt/kkolinko)
+      </fix>
+      <fix>
+        <bug>56472</bug>: Allow NamingContextListener to clean up on stop if its
+        start failed. (kkolinko)
+      </fix>
+      <add>
+        <bug>56492</bug>: Avoid eclipse debugger pausing on uncaught exceptions
+        when tomcat renews its threads. (slaurent)
+      </add>
+      <fix>
+        Minor fixes to <code>ThreadLocalLeakPreventionListener</code>. Do not
+        trigger threads renewal for failed contexts. Do not ignore
+        <code>threadRenewalDelay</code> setting. Improve documentation. (kkolinko)
+      </fix>
+      <fix>
+        Correct regression introduced in <rev>797162</rev> that broke
+        authentication of users when using the
+        <code>JAASMemoryLoginModule</code>. (markt)
+      </fix>
+      <fix>
+        <bug>56501</bug>: <code>HttpServletRequest.getContextPath()</code>
+        should return the undecoded context path used by the user agent. (markt)
+      </fix>
+      <fix>
+        <bug>56523</bug>: When using SPNEGO authentication, log the exceptions
+        associated with failed user logins at debug level rather than error
+        level. (markt)
+      </fix>
+     <fix>
+       <bug>56536</bug>: Ensure that
+       <code>HttpSessionBindingListener.valueUnbound()</code> uses the correct
+       class loader when the <code>SingleSignOn</code> valve is used. (markt) 
+     </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <add>
+        <bug>56399</bug>: Assert that both Coyote and Catalina request objects
+        have been properly recycled. (kkolinko)
+      </add>
       <fix>
         <bug>56416</bug>: Correct documentation for default value of socket
         linger for the AJP and HTTP connectors. (markt)
@@ -150,13 +210,24 @@
     <changelog>
       <fix>
         <bug>56334</bug>: Fix a regression in the handling of back-slash
-        escaping introduced by the fix for <bug>55735</bug>. (markt)
+        escaping introduced by the fix for <bug>55735</bug>. (markt/kkolinko)
       </fix>
       <fix>
         <bug>56425</bug>: Improve method matching for EL expressions. When
         looking for matching methods, an exact match between parameter types is
         preferred followed by an assignable match followed by a coercible match.
         (markt)
+      </fix>
+      <fix>
+        Correct the handling of back-slash escaping in the EL parser and no
+        longer require that <code>\$</code> or <code>\#</code> must be followed
+        by <code>{</code> in order for the back-slash escaping to take effect.
+        (markt)
+      </fix>
+      <fix>
+        <bug>56529</bug>: Avoid <code>NoSuchElementException</code> while handling
+        attributes with empty string value in custom tags. Patch provided by
+        Hariprasad Manchi. (violetagg)
       </fix>
     </changelog>
   </subsection>
@@ -287,6 +358,14 @@
         <bug>56363</bug>: Update to version 1.1.30 of Tomcat Native library.
         (schultz)
       </update>
+      <update>
+        Update package renamed Apache Commons BCEL to r1593495 to pick up some
+        additional changes for Java 7 support and some code clean up. (markt)
+      </update>
+      <add>
+        In tests: allow to configure directory where JUnit reports and access
+        log are written to. (kkolinko)
+      </add>
     </changelog>
   </subsection>
 </section>

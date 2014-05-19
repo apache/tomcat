@@ -585,6 +585,8 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      */
     @Override
     public void recycle(boolean socketClosing) {
+        getAdapter().checkRecycled(request, response);
+
         asyncStateMachine.recycle();
 
         // Recycle Request object

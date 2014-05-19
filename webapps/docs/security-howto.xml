@@ -365,7 +365,9 @@ server.info=Apache Tomcat/7.0.x
 
       <p>The default ErrorReportValve can display stack traces and/or JSP
       source code to clients when an error occurs. To avoid this, custom error
-      handling can be configured within each web application.</p>
+      handling can be configured within each web application. Alternatively, you
+      can explicitly configure an <a href="config/valve.html">ErrorReportValve</a>
+      and set its <strong>showReport</strong> attribute to <code>false</code>.</p>
     </subsection>
 
     <subsection name="Realms">
@@ -438,6 +440,21 @@ server.info=Apache Tomcat/7.0.x
     <code>false</code>. This isn't because allowing directory listings is
     considered unsafe but because generating listings of directories with
     thousands of files can consume significant CPU leading to a DOS attack.
+    </p>
+
+    <p>The DefaultServlet is configured with <strong>showServerInfo</strong>
+    set to <code>true</code>. When the directory listings is enabled the Tomcat
+    version number is included in the response sent to clients. To avoid this,
+    you can explicitly configure a DefaultServlet and set its
+    <strong>showServerInfo</strong> attribute to false.
+    Alternatively, the version number can be changed by creating the file
+    CATALINA_BASE/lib/org/apache/catalina/util/ServerInfo.properties with
+    content as follows:</p>
+    <source>server.info=Apache Tomcat/<version-major-minor/>.x</source>
+    <p>Modify the values as required. Note that this will also change the version
+    number reported in some of the management tools and may make it harder to
+    determine the real version installed. The CATALINA_HOME/bin/version.bat|sh
+    script will still report the version number.
     </p>
 
     <p><a href="config/filter.html">FailedRequestFilter</a>

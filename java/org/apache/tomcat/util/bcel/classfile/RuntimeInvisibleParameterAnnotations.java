@@ -27,7 +27,7 @@ import org.apache.tomcat.util.bcel.Constants;
  * but is not provided to the JVM.
  * 
  * @author  <A HREF="mailto:dbrosius@qis.net">D. Brosius</A>
- * @since 5.3
+ * @since 6.0
  */
 public class RuntimeInvisibleParameterAnnotations extends ParameterAnnotations {
 
@@ -42,7 +42,7 @@ public class RuntimeInvisibleParameterAnnotations extends ParameterAnnotations {
      */
     RuntimeInvisibleParameterAnnotations(int name_index, int length, DataInputStream file,
             ConstantPool constant_pool) throws IOException {
-        super(Constants.ATTR_RUNTIMEIN_VISIBLE_PARAMETER_ANNOTATIONS, name_index, length, file,
+        super(Constants.ATTR_RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS, name_index, length, file,
                 constant_pool);
     }
 

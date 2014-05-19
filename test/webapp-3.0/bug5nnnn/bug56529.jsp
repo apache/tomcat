@@ -1,5 +1,5 @@
-<!--
-  Licensed to the Apache Software Foundation (ASF) under one or more
+<%--
+ Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
   this work for additional information regarding copyright ownership.
   The ASF licenses this file to You under the Apache License, Version 2.0
@@ -13,18 +13,12 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<html>
-<head>
-</head>
-<body bgcolor="white">
-<p>
-This package contains basic classes for the
-<a href="http://commons.apache.org/bcel/">Byte Code Engineering Library</a>
- and constants defined by the
-<a href="http://java.sun.com/docs/books/vmspec/html/VMSpecTOC.doc.html">
- JVM specification</a>.
-</p>
-</body>
-</html>
+--%>
+<%@ taglib uri="http://tomcat.apache.org/bugs" prefix="bugs" %>
+[1:<bugs:Bug56529 attribute2="">
+    <jsp:attribute name="attribute1"></jsp:attribute>
+</bugs:Bug56529>]
+
+[2:<bugs:Bug56529 attribute2="">
+    <jsp:attribute name="attribute1" />
+</bugs:Bug56529>]
