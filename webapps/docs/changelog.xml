@@ -63,6 +63,15 @@
       </add>
     </changelog>
   </subsection>
+  <section name="WebSocket">
+    <changelog>
+      <scode>
+        <bug>56446</bug>: Clearer handling of exceptions when calling a method
+        on a POJO based WebSocket endpoint. Based on a suggestion by Eugene
+        Chung. (markt)
+      </scode>
+    </changelog>
+  </section>
 </section>
 <section name="Tomcat 8.0.8 (markt)">
   <subsection name="Catalina">
