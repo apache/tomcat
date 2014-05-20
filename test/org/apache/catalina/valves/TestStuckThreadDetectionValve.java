@@ -51,7 +51,7 @@ public class TestStuckThreadDetectionValve extends TomcatBaseTest {
     @Test
     public void testDetection() throws Exception {
         // second, we test the actual effect of the flag on the startup
-        StuckingServlet stuckingServlet = new StuckingServlet(5000L);
+        StuckingServlet stuckingServlet = new StuckingServlet(6000L);
         Wrapper servlet = Tomcat.addServlet(context, "myservlet",
                 stuckingServlet);
         servlet.addMapping("/myservlet");
@@ -78,14 +78,15 @@ public class TestStuckThreadDetectionValve extends TomcatBaseTest {
 
         };
         asyncThread.start();
+        try {
+            Thread.sleep(500L);
+            Assert.assertEquals(0, valve.getStuckThreadIds().length);
 
-        Thread.sleep(1000L);
-        Assert.assertEquals(0, valve.getStuckThreadIds().length);
-
-        Thread.sleep(2000L);
-        Assert.assertEquals(1, valve.getStuckThreadIds().length);
-
-        asyncThread.join();
+            Thread.sleep(3000L);
+            Assert.assertEquals(1, valve.getStuckThreadIds().length);
+        } finally {
+            asyncThread.join();
+        }
         Assert.assertFalse(stuckingServlet.wasInterrupted);
         Assert.assertTrue(result.toString().startsWith("OK"));
     }
@@ -101,7 +102,7 @@ public class TestStuckThreadDetectionValve extends TomcatBaseTest {
 
         StuckThreadDetectionValve valve = new StuckThreadDetectionValve();
         valve.setThreshold(2);
-        valve.setInterruptThreadThreshold(4);
+        valve.setInterruptThreadThreshold(5);
         context.addValve(valve);
         context.setBackgroundProcessorDelay(1);
         tomcat.start();
@@ -122,18 +123,16 @@ public class TestStuckThreadDetectionValve extends TomcatBaseTest {
 
         };
         asyncThread.start();
+        try {
+            Thread.sleep(4000L);
+            Assert.assertEquals(1, valve.getStuckThreadIds().length);
 
-        Thread.sleep(1000L);
-        Assert.assertEquals(0, valve.getStuckThreadIds().length);
-
-        Thread.sleep(3000L);
-        Assert.assertEquals(1, valve.getStuckThreadIds().length);
-
-        Thread.sleep(3000L);
-        Assert.assertTrue(stuckingServlet.wasInterrupted);
-        Assert.assertEquals(0, valve.getStuckThreadIds().length);
-
-        asyncThread.join();
+            Thread.sleep(4000L);
+            Assert.assertTrue(stuckingServlet.wasInterrupted);
+            Assert.assertEquals(0, valve.getStuckThreadIds().length);
+        } finally {
+            asyncThread.join();
+        }
         Assert.assertTrue(result.toString().startsWith("OK"));
     }
 
