@@ -56,37 +56,28 @@ public abstract class FactoryBase implements ObjectFactory {
                 // Loading factory
                 ClassLoader tcl = Thread.currentThread().getContextClassLoader();
                 Class<?> factoryClass = null;
-                if (tcl != null) {
-                    try {
+                try {
+                    if (tcl != null) {
                         factoryClass = tcl.loadClass(factoryClassName);
-                    } catch(ClassNotFoundException e) {
-                        NamingException ex = new NamingException(
-                                "Could not load resource factory class");
-                        ex.initCause(e);
-                        throw ex;
-                    }
-                } else {
-                    try {
+                    } else {
                         factoryClass = Class.forName(factoryClassName);
-                    } catch(ClassNotFoundException e) {
-                        NamingException ex = new NamingException(
-                                "Could not load resource factory class");
-                        ex.initCause(e);
-                        throw ex;
                     }
+                } catch(ClassNotFoundException e) {
+                    NamingException ex = new NamingException(
+                            "Could not load resource factory class");
+                    ex.initCause(e);
+                    throw ex;
                 }
-                if (factoryClass != null) {
-                    try {
-                        factory = (ObjectFactory) factoryClass.newInstance();
-                    } catch(Throwable t) {
-                        if (t instanceof NamingException) {
-                            throw (NamingException) t;
-                        }
-                        NamingException ex = new NamingException(
-                                "Could not create resource factory instance");
-                        ex.initCause(t);
-                        throw ex;
+                try {
+                    factory = (ObjectFactory) factoryClass.newInstance();
+                } catch(Throwable t) {
+                    if (t instanceof NamingException) {
+                        throw (NamingException) t;
                     }
+                    NamingException ex = new NamingException(
+                            "Could not create resource factory instance");
+                    ex.initCause(t);
+                    throw ex;
                 }
             } else {
                 // Check for a default factory
