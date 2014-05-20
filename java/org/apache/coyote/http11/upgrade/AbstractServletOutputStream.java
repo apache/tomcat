@@ -98,8 +98,7 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
                     sm.getString("upgrade.sos.writeListener.set"));
         }
         // Container is responsible for first call to onWritePossible() but only
-        // need to do this if setting the listener for the first time rather
-        // than changing it.
+        // need to do this if setting the listener for the first time.
         synchronized (fireListenerLock) {
             fireListener = true;
         }
