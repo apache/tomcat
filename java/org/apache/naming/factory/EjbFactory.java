@@ -46,8 +46,15 @@ public class EjbFactory extends FactoryBase {
             factory = (ObjectFactory)
                 Class.forName(javaxEjbFactoryClassName).newInstance();
         } catch(Throwable t) {
-            if (t instanceof NamingException)
+            if (t instanceof NamingException) {
                 throw (NamingException) t;
+            }
+            if (t instanceof ThreadDeath) {
+                throw (ThreadDeath) t;
+            }
+            if (t instanceof VirtualMachineError) {
+                throw (VirtualMachineError) t;
+            }
             NamingException ex = new NamingException
                 ("Could not create resource factory instance");
             ex.initCause(t);
