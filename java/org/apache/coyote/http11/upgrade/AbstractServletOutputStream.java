@@ -157,7 +157,9 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
     protected final void onWritePossible() throws IOException {
         try {
             synchronized (writeLock) {
-                writeInternal(buffer, 0, buffer.length);
+                if (buffer != null) {
+                    writeInternal(buffer, 0, buffer.length);
+                }
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
