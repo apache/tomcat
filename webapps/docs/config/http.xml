@@ -530,6 +530,14 @@
       </p>
     </attribute>
 
+    <attribute name="upgradeAsyncWriteBufferSize" required="false">
+      <p>The default size of the buffer to allocate to for asynchronous writes
+      that can not be completed in a single operation. Data that can't be
+      written immediately will be stored in this buffer until it can be written.
+      If more data needs to be stored than space is available in the buffer than
+      the size of the buffer will be increased for the duration of the write. If
+      not specified the default value of 8192 will be used.</p>
+    </attribute>
   </attributes>
 
   </subsection>
