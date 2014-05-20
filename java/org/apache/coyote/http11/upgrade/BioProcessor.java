@@ -34,9 +34,10 @@ public class BioProcessor extends AbstractProcessor<Socket> {
     private static final int INFINITE_TIMEOUT = 0;
 
     public BioProcessor(SocketWrapper<Socket> wrapper,
-            HttpUpgradeHandler httpUpgradeProcessor) throws IOException {
+            HttpUpgradeHandler httpUpgradeProcessor,
+            int asyncWriteBufferSize) throws IOException {
         super(httpUpgradeProcessor, new BioServletInputStream(wrapper),
-                new BioServletOutputStream(wrapper));
+                new BioServletOutputStream(wrapper, asyncWriteBufferSize));
 
         wrapper.getSocket().setSoTimeout(INFINITE_TIMEOUT);
     }

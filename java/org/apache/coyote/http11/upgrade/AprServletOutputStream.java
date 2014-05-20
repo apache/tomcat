@@ -38,8 +38,8 @@ public class AprServletOutputStream extends AbstractServletOutputStream<Long> {
     private final ByteBuffer sslOutputBuffer;
 
     public AprServletOutputStream(SocketWrapper<Long> socketWrapper,
-            AprEndpoint endpoint) {
-        super(socketWrapper);
+            int asyncWriteBufferSize, AprEndpoint endpoint) {
+        super(socketWrapper, asyncWriteBufferSize);
         this.endpoint = endpoint;
         this.socket = socketWrapper.getSocket().longValue();
         if (endpoint.isSSLEnabled()) {

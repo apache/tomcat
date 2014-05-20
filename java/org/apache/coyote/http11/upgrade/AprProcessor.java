@@ -33,10 +33,11 @@ public class AprProcessor extends AbstractProcessor<Long> {
     private static final int INFINITE_TIMEOUT = -1;
 
     public AprProcessor(SocketWrapper<Long> wrapper,
-            HttpUpgradeHandler httpUpgradeProcessor, AprEndpoint endpoint) {
+            HttpUpgradeHandler httpUpgradeProcessor, AprEndpoint endpoint,
+            int asyncWriteBufferSize) {
         super(httpUpgradeProcessor,
                 new AprServletInputStream(wrapper),
-                new AprServletOutputStream(wrapper, endpoint));
+                new AprServletOutputStream(wrapper, asyncWriteBufferSize, endpoint));
 
         Socket.timeoutSet(wrapper.getSocket().longValue(), INFINITE_TIMEOUT);
     }

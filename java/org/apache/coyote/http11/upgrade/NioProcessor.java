@@ -33,10 +33,11 @@ public class NioProcessor extends AbstractProcessor<NioChannel> {
     private static final int INFINITE_TIMEOUT = -1;
 
     public NioProcessor(SocketWrapper<NioChannel> wrapper,
-            HttpUpgradeHandler httpUpgradeProcessor, NioSelectorPool pool) {
+            HttpUpgradeHandler httpUpgradeProcessor, NioSelectorPool pool,
+            int asyncWriteBufferSize) {
         super(httpUpgradeProcessor,
                 new NioServletInputStream(wrapper, pool),
-                new NioServletOutputStream(wrapper, pool));
+                new NioServletOutputStream(wrapper, asyncWriteBufferSize, pool));
 
         wrapper.setTimeout(INFINITE_TIMEOUT);
     }

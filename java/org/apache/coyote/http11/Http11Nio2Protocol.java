@@ -265,7 +265,8 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
                 SocketWrapper<Nio2Channel> socket,
                 HttpUpgradeHandler httpUpgradeProcessor)
                 throws IOException {
-            return new Nio2Processor(proto.endpoint, socket, httpUpgradeProcessor);
+            return new Nio2Processor(proto.endpoint, socket, httpUpgradeProcessor,
+                    proto.getUpgradeAsyncWriteBufferSize());
         }
 
         @Override

@@ -26,9 +26,9 @@ public class BioServletOutputStream extends AbstractServletOutputStream<Socket> 
 
     private final OutputStream os;
 
-    public BioServletOutputStream(SocketWrapper<Socket> socketWrapper)
-            throws IOException {
-        super(socketWrapper);
+    public BioServletOutputStream(SocketWrapper<Socket> socketWrapper,
+            int asyncWriteBufferSize) throws IOException {
+        super(socketWrapper, asyncWriteBufferSize);
         os = socketWrapper.getSocket().getOutputStream();
     }
 

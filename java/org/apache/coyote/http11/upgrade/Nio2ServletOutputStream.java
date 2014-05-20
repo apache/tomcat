@@ -41,8 +41,9 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
     private final CompletionHandler<Integer, ByteBuffer> completionHandler;
     private final Semaphore writePending = new Semaphore(1);
 
-    public Nio2ServletOutputStream(AbstractEndpoint<Nio2Channel> endpoint0, SocketWrapper<Nio2Channel> socketWrapper0) {
-        super(socketWrapper0);
+    public Nio2ServletOutputStream(SocketWrapper<Nio2Channel> socketWrapper0,
+            int asyncWriteBufferSize, AbstractEndpoint<Nio2Channel> endpoint0) {
+        super(socketWrapper0, asyncWriteBufferSize);
         this.endpoint = endpoint0;
         channel = socketWrapper0.getSocket();
         maxWrite = channel.getBufHandler().getWriteBuffer().capacity();
