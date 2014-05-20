@@ -203,7 +203,8 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 SocketWrapper<Socket> socket,
                 HttpUpgradeHandler httpUpgradeProcessor)
                 throws IOException {
-            return new BioProcessor(socket, httpUpgradeProcessor);
+            return new BioProcessor(socket, httpUpgradeProcessor,
+                    proto.getUpgradeAsyncWriteBufferSize());
         }
     }
 }

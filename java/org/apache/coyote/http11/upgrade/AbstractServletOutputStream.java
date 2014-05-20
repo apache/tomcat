@@ -56,6 +56,16 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
 
     // Writes guarded by writeLock
     private volatile byte[] buffer;
+    private volatile int bufferPos;
+    private volatile int bufferLimit;
+    private final int asyncWriteBufferSize;
+
+
+    public AbstractServletOutputStream(int asyncWriteBufferSize) {
+        this.asyncWriteBufferSize = asyncWriteBufferSize;
+        buffer = new byte[asyncWriteBufferSize];
+    }
+
 
     /**
      * New Servlet 3.1 method.
@@ -69,7 +79,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
         // Make sure isReady() and onWritePossible() have a consistent view of
         // buffer and fireListener when determining if the listener should fire
         synchronized (fireListenerLock) {
-            boolean result = (buffer == null);
+            boolean result = (bufferLimit == 0);
             fireListener = !result;
             return result;
         }
@@ -120,9 +130,8 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
     }
 
     private void preWriteChecks() {
-        if (buffer != null) {
-            throw new IllegalStateException(
-                    sm.getString("upgrade.sis.write.ise"));
+        if (bufferLimit != 0) {
+            throw new IllegalStateException(sm.getString("upgrade.sis.write.ise"));
         }
     }
 
@@ -143,12 +152,25 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
             // write executes.
             int written = doWrite(false, b, off, len);
             if (written < len) {
-                // TODO: - Reuse the buffer
-                //       - Only reallocate if it gets too big (>8k?)
-                buffer = new byte[len - written];
-                System.arraycopy(b, off + written, buffer, 0, len - written);
+                if (b == buffer) {
+                    // This is a partial write of the existing buffer. Just
+                    // increment the current position
+                    bufferPos += written;
+                } else {
+                    // This is a new partial write
+                    int bytesLeft = len - written;
+                    if (bytesLeft > buffer.length) {
+                        buffer = new byte[bytesLeft];
+                    } else if (bytesLeft < asyncWriteBufferSize &&
+                            buffer.length > asyncWriteBufferSize) {
+                        buffer = new byte[asyncWriteBufferSize];
+                    }
+                    bufferPos = 0;
+                    bufferLimit = bytesLeft;
+                    System.arraycopy(b, off + written, buffer, bufferPos, bufferLimit);
+                }
             } else {
-                buffer = null;
+                bufferLimit = 0;
             }
         }
     }
@@ -157,8 +179,8 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
     protected final void onWritePossible() throws IOException {
         try {
             synchronized (writeLock) {
-                if (buffer != null) {
-                    writeInternal(buffer, 0, buffer.length);
+                if (bufferLimit > 0) {
+                    writeInternal(buffer, bufferPos, bufferLimit - bufferPos);
                 }
             }
         } catch (Throwable t) {
@@ -176,7 +198,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
         boolean fire = false;
 
         synchronized (fireListenerLock) {
-            if (buffer == null && fireListener) {
+            if (bufferLimit == 0 && fireListener) {
                 fireListener = false;
                 fire = true;
             }

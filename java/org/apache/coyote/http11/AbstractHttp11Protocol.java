@@ -174,6 +174,17 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocol {
     }
     
 
+    /**
+     * The size of the buffer used by the ServletOutputStream when performing
+     * delayed asynchronous writes using HTTP upgraded connections.
+     */
+    private int upgradeAsyncWriteBufferSize = 8192;
+    public int getUpgradeAsyncWriteBufferSize() { return upgradeAsyncWriteBufferSize; }
+    public void setUpgradeAsyncWriteBufferSize(int upgradeAsyncWriteBufferSize) {
+        this.upgradeAsyncWriteBufferSize = upgradeAsyncWriteBufferSize;
+    }
+
+
     // ------------------------------------------------ HTTP specific properties
     // ------------------------------------------ passed through to the EndPoint
     

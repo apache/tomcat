@@ -59,15 +59,26 @@
   <subsection name="Catalina">
     <changelog>
       <add>
-        <bug>56526</bug>: Improved the <code>StuckThreadDetectionValve</code> to
-        optionally interrupt stuck threads to attempt to unblock them.
-        (slaurent)
-      </add>
-      <add>
         <bug>56461</bug>: New <code>failCtxIfServletStartFails</code> attribute
         on Context and Host configuration to force the context startup to fail
         if a load-on-startup servlet fails its startup. (slaurent)
       </add>
+      <add>
+        <bug>56526</bug>: Improved the <code>StuckThreadDetectionValve</code> to
+        optionally interrupt stuck threads to attempt to unblock them.
+        (slaurent)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>56521</bug>: Re-use the asynchronous write buffer between writes to
+        reduce allocation and GC overhead. Based on a patch by leonzhx. Also
+        make the buffer size configurable and remove copying of data within
+        buffer when the buffer is only partially written on a subsequent write.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

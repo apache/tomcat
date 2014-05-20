@@ -32,9 +32,10 @@ public class NioServletOutputStream extends AbstractServletOutputStream {
     private final int maxWrite;
 
 
-    public NioServletOutputStream(
-            SocketWrapper<NioChannel> wrapper, NioSelectorPool pool) {
-        channel = wrapper.getSocket();
+    public NioServletOutputStream(SocketWrapper<NioChannel> socketWrapper,
+            int asyncWriteBufferSize, NioSelectorPool pool) {
+        super(asyncWriteBufferSize);
+        channel = socketWrapper.getSocket();
         this.pool = pool;
         maxWrite = channel.getBufHandler().getWriteBuffer().capacity();
     }

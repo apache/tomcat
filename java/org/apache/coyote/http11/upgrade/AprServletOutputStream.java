@@ -39,7 +39,8 @@ public class AprServletOutputStream extends AbstractServletOutputStream {
     private final ByteBuffer sslOutputBuffer;
 
     public AprServletOutputStream(SocketWrapper<Long> wrapper,
-            AprEndpoint endpoint) {
+            int asyncWriteBufferSize, AprEndpoint endpoint) {
+        super(asyncWriteBufferSize);
         this.endpoint = endpoint;
         this.wrapper = wrapper;
         this.socket = wrapper.getSocket().longValue();
