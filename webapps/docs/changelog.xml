@@ -85,7 +85,15 @@
       </scode>
     </changelog>
   </subsection>
-  <section name="WebSocket">
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        <bug>56543</bug>: Update to the Eclipse JDT Compiler 4.4RC1 to pick up
+        some fixes for Java 8 support. (markt)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="WebSocket">
     <changelog>
       <scode>
         <bug>56446</bug>: Clearer handling of exceptions when calling a method
@@ -93,7 +101,7 @@
         Chung. (markt)
       </scode>
     </changelog>
-  </section>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.8 (markt)">
   <subsection name="Catalina">
