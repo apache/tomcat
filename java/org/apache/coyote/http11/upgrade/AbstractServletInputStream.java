@@ -68,15 +68,7 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
         try {
             ready = Boolean.valueOf(doIsReady());
         } catch (IOException e) {
-            Thread thread = Thread.currentThread();
-            ClassLoader originalClassLoader = thread.getContextClassLoader();
-            try {
-                thread.setContextClassLoader(applicationLoader);
-                listener.onError(e);
-            } finally {
-                thread.setContextClassLoader(originalClassLoader);
-            }
-            ready = Boolean.FALSE;
+            onError(e);
         }
         return ready.booleanValue();
     }
@@ -184,7 +176,25 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
     }
 
 
+    protected final void onAllDataRead() throws IOException {
+        if (listener == null) {
+            return;
+        }
+        Thread thread = Thread.currentThread();
+        ClassLoader originalClassLoader = thread.getContextClassLoader();
+        try {
+            thread.setContextClassLoader(applicationLoader);
+            listener.onAllDataRead();
+        } finally {
+            thread.setContextClassLoader(originalClassLoader);
+        }
+    }
+
+
     protected final void onDataAvailable() throws IOException {
+        if (listener == null) {
+            return;
+        }
         ready = Boolean.TRUE;
         Thread thread = Thread.currentThread();
         ClassLoader originalClassLoader = thread.getContextClassLoader();
@@ -194,6 +204,22 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
         } finally {
             thread.setContextClassLoader(originalClassLoader);
         }
+    }
+
+
+    protected final void onError(Throwable t) {
+        if (listener == null) {
+            return;
+        }
+        Thread thread = Thread.currentThread();
+        ClassLoader originalClassLoader = thread.getContextClassLoader();
+        try {
+            thread.setContextClassLoader(applicationLoader);
+            listener.onError(t);
+        } finally {
+            thread.setContextClassLoader(originalClassLoader);
+        }
+        ready = Boolean.FALSE;
     }
 
 

@@ -145,14 +145,7 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
                 writeInternal(buffer, 0, buffer.length);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                Thread thread = Thread.currentThread();
-                ClassLoader originalClassLoader = thread.getContextClassLoader();
-                try {
-                    thread.setContextClassLoader(applicationLoader);
-                    listener.onError(t);
-                } finally {
-                    thread.setContextClassLoader(originalClassLoader);
-                }
+                onError(t);
                 if (t instanceof IOException) {
                     throw (IOException) t;
                 } else {
@@ -182,6 +175,21 @@ public abstract class AbstractServletOutputStream extends ServletOutputStream {
             }
         }
     }
+
+    protected final void onError(Throwable t) {
+        if (listener == null) {
+            return;
+        }
+        Thread thread = Thread.currentThread();
+        ClassLoader originalClassLoader = thread.getContextClassLoader();
+        try {
+            thread.setContextClassLoader(applicationLoader);
+            listener.onError(t);
+        } finally {
+            thread.setContextClassLoader(originalClassLoader);
+        }
+    }
+
 
     /**
      * Abstract method to be overridden by concrete implementations. The base
