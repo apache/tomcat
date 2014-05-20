@@ -38,8 +38,10 @@ public class TestStuckThreadDetectionValve extends TomcatBaseTest {
     private StandardContext context;
     private Tomcat tomcat;
 
+    @Override
     @Before
-    public void setup() {
+    public void setUp() throws Exception {
+        super.setUp();
         tomcat = getTomcatInstance();
         File docBase = new File(System.getProperty("java.io.tmpdir"));
         context = (StandardContext) tomcat.addContext("",
