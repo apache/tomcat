@@ -1513,8 +1513,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             // Upgraded connections need to allow multiple threads to access the
             // connection at the same time to enable blocking IO to be used when
             // NIO has been configured
-            if (ka != null && ka.isUpgraded() &&
-                    SocketStatus.OPEN_WRITE == status) {
+            if (ka.isUpgraded() && SocketStatus.OPEN_WRITE == status) {
                 synchronized (ka.getWriteThreadLock()) {
                     doRun(key, ka);
                 }
