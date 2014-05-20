@@ -88,10 +88,8 @@ public abstract class FactoryBase implements ObjectFactory {
                         throw ex;
                     }
                 }
-            }
-
-            // Check for a default factory
-            if (factory == null) {
+            } else {
+                // Check for a default factory
                 factory = getDefaultFactory(ref);
             }
 
