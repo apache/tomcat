@@ -91,7 +91,9 @@ public abstract class FactoryBase implements ObjectFactory {
             }
 
             // Check for a default factory
-            factory = getDefaultFactory(ref);
+            if (factory == null) {
+                factory = getDefaultFactory(ref);
+            }
 
             if (factory != null) {
                 return factory.getObjectInstance(obj, name, nameCtx, environment);
