@@ -149,6 +149,7 @@ public final class SecurityClassLoad {
             throws Exception {
         final String basePackage = "org.apache.catalina.util.";
         loader.loadClass(basePackage + "ParameterMap");
+        loader.loadClass(basePackage + "RequestUtil");
     }
 
 

@@ -67,6 +67,11 @@
         optionally interrupt stuck threads to attempt to unblock them.
         (slaurent)
       </add>
+      <fix>
+        <bug>56545</bug>: Pre-load two additional classes, the loading of which
+        may otherwise be triggered by a web application which in turn would
+        trigger an exception when running under a security manager. (markt)
+      </fix>
       <update>
         <bug>56546</bug>: Reduce logging level for stack traces of stuck web
         application threads printed by WebappClassLoader.clearReferencesThreads()
