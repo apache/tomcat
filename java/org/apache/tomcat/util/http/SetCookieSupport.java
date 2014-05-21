@@ -29,6 +29,22 @@ import javax.servlet.http.Cookie;
  * Support class for generating Set-Cookie header values.
  */
 public class SetCookieSupport {
+    /**
+     * If set to false, we don't use the IE6/7 Max-Age/Expires work around.
+     * Default is usually true. If STRICT_SERVLET_COMPLIANCE==true then default
+     * is false. Explicitly setting always takes priority.
+     */
+    private static final boolean ALWAYS_ADD_EXPIRES;
+    static {
+        String alwaysAddExpires =
+                System.getProperty("org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES");
+        if (alwaysAddExpires != null) {
+            ALWAYS_ADD_EXPIRES = Boolean.valueOf(alwaysAddExpires).booleanValue();
+        } else {
+            ALWAYS_ADD_EXPIRES = !Boolean.getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
+        }
+    }
+
     // Other fields
     private static final String OLD_COOKIE_PATTERN = "EEE, dd-MMM-yyyy HH:mm:ss z";
     private static final ThreadLocal<DateFormat> OLD_COOKIE_FORMAT =
@@ -107,7 +123,7 @@ public class SetCookieSupport {
             }
             // IE6, IE7 and possibly other browsers don't understand Max-Age.
             // They do understand Expires, even with V1 cookies!
-            if (version == 0 || CookieSupport.ALWAYS_ADD_EXPIRES) {
+            if (version == 0 || ALWAYS_ADD_EXPIRES) {
                 // Wdy, DD-Mon-YY HH:MM:SS GMT ( Expires Netscape format )
                 buf.append ("; Expires=");
                 // To expire immediately we need to set the time in past
