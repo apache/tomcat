@@ -19,6 +19,7 @@ package org.apache.tomcat.util.http;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
+import java.util.BitSet;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -36,12 +37,56 @@ public class SetCookieSupport {
      */
     private static final boolean ALWAYS_ADD_EXPIRES;
     static {
-        String alwaysAddExpires =
-                System.getProperty("org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES");
+        String alwaysAddExpires = System.getProperty(
+                "org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES");
         if (alwaysAddExpires != null) {
             ALWAYS_ADD_EXPIRES = Boolean.valueOf(alwaysAddExpires).booleanValue();
         } else {
             ALWAYS_ADD_EXPIRES = !Boolean.getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
+        }
+    }
+
+    private static final BitSet ALLOWED_WITHOUT_QUOTES;
+    static {
+        boolean allowSeparatorsInV0 =
+                Boolean.getBoolean("org.apache.tomcat.util.http.ServerCookie.ALLOW_HTTP_SEPARATORS_IN_V0");
+        String separators;
+        if (allowSeparatorsInV0) {
+            // comma, semi-colon and space as defined by netscape
+            separators = ",; ";
+        } else {
+            // separators as defined by RFC2616
+            separators = "()<>@,;:\\\"/[]?={} \t";
+        }
+
+        // all CHARs except CTLs or separators are allowed without quoting
+        ALLOWED_WITHOUT_QUOTES = new BitSet(128);
+        ALLOWED_WITHOUT_QUOTES.set(0x20, 0x7f);
+        for (char ch : separators.toCharArray()) {
+            ALLOWED_WITHOUT_QUOTES.clear(ch);
+        }
+
+        /**
+         * Some browsers (e.g. IE6 and IE7) do not handle quoted Path values even
+         * when Version is set to 1. To allow for this, we support a property
+         * FWD_SLASH_IS_SEPARATOR which, when false, means a '/' character will not
+         * be treated as a separator, potentially avoiding quoting and the ensuing
+         * side effect of having the cookie upgraded to version 1.
+         *
+         * For now, we apply this rule globally rather than just to the Path attribute.
+         */
+        if (!allowSeparatorsInV0) {
+            boolean allowSlash;
+            String prop = System.getProperty(
+                    "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
+            if (prop != null) {
+                allowSlash = !Boolean.parseBoolean(prop);
+            } else {
+                allowSlash = !Boolean.getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
+            }
+            if (allowSlash) {
+                ALLOWED_WITHOUT_QUOTES.set('/');
+            }
         }
     }
 
@@ -221,15 +266,11 @@ public class SetCookieSupport {
 
         for (; i < len; i++) {
             char c = value.charAt(i);
-
-            if (CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0) {
-                if (CookieSupport.isV0Separator(c)) {
-                    return true;
-                }
-            } else {
-                if (CookieSupport.isHttpSeparator(c)) {
-                    return true;
-                }
+            if ((c < 0x20 && c != '\t') || c >= 0x7f) {
+                throw new IllegalArgumentException("Control character in cookie value or attribute.");
+            }
+            if (!ALLOWED_WITHOUT_QUOTES.get(c)) {
+                return true;
             }
         }
         return false;
