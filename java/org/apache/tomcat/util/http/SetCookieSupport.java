@@ -206,32 +206,24 @@ public class SetCookieSupport {
             buf.append("\"\"");
         } else if (alreadyQuoted(value)) {
             buf.append('"');
-            buf.append(escapeDoubleQuotes(value,1,value.length()-1));
+            escapeDoubleQuotes(buf, value,1,value.length()-1);
             buf.append('"');
         } else if (needsQuotes(value)) {
             buf.append('"');
-            buf.append(escapeDoubleQuotes(value,0,value.length()));
+            escapeDoubleQuotes(buf, value,0,value.length());
             buf.append('"');
         } else {
             buf.append(value);
         }
     }
 
-    /**
-     * Escapes any double quotes in the given string.
-     *
-     * @param s the input string
-     * @param beginIndex start index inclusive
-     * @param endIndex exclusive
-     * @return The (possibly) escaped string
-     */
-    private static String escapeDoubleQuotes(String s, int beginIndex, int endIndex) {
-
-        if (s == null || s.length() == 0 || s.indexOf('"') == -1) {
-            return s;
+    private static void escapeDoubleQuotes(StringBuffer b, String s, int beginIndex, int endIndex) {
+        // TODO: bug55975: this checks for '"' but not for '\' which also needs escaping
+        if (s.indexOf('"') == -1) {
+            b.append(s);
+            return;
         }
 
-        StringBuilder b = new StringBuilder();
         for (int i = beginIndex; i < endIndex; i++) {
             char c = s.charAt(i);
             if (c == '\\' ) {
@@ -247,8 +239,6 @@ public class SetCookieSupport {
                 b.append(c);
             }
         }
-
-        return b.toString();
     }
 
     private static boolean needsQuotes(String value) {
