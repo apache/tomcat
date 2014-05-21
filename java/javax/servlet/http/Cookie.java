@@ -421,7 +421,10 @@ class CookieNameValidator {
 }
 
 class NetscapeValidator extends CookieNameValidator {
-    private static final String NETSCAPE_SEPARATORS = ",; ";
+    // the Netscape specification describes NAME=VALUE as
+    // "a sequence of characters excluding semi-colon, comma and white space"
+    // we also exclude the '=' character that separates NAME from VALUE
+    private static final String NETSCAPE_SEPARATORS = ",; " + "=";
 
     NetscapeValidator() {
         super(NETSCAPE_SEPARATORS);

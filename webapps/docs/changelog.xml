@@ -87,12 +87,19 @@
         Relax cookie naming restrictions. Cookie attribute names used in the
         <code>Set-Cookie</code> header may be used unambiguously as cookie
         names. The restriction that prevented such usage has been removed.
-        (jboynes/markt) 
+        (jboynes/markt)
       </fix>
       <fix>
         Further relax cookie naming restrictions. Version 0 (a.k.a Netscape
         format) cookies may now use names that start with the <code>$</code>
-        character. (jboynes/markt) 
+        character. (jboynes/markt)
+      </fix>
+      <fix>
+        Restrict cookie naming so that the <code>=</code> character is no longer
+        permitted in a version 0 (a.k.a. Netscape format) cookie name. While
+        Tomcat allowed this, browsers always truncated the name at the
+        <code>=</code> character leading to a mis-match between the cookie the
+        server set and the cookie returned by the browser. (jboynes/markt)
       </fix>
     </changelog>
   </subsection>
