@@ -114,7 +114,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 8.0.8 (markt)" rtext="21 May 2014">
+<section name="Tomcat 8.0.8 (markt)" rtext="beta, 2014-05-21">
   <subsection name="Catalina">
     <changelog>
       <fix>
