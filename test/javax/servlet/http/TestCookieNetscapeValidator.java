@@ -30,12 +30,14 @@ public class TestCookieNetscapeValidator {
     @Test
     public void actualCharactersAllowedInName() {
         // "any character except comma, semicolon and whitespace"
+        // also disallow '=' as that is interpreted as a delimiter by browsers
         BitSet allowed = new BitSet(256);
         allowed.or(TestCookie.CHAR);
         allowed.andNot(TestCookie.CTL);
         allowed.clear(';');
         allowed.clear(',');
         allowed.clear(' ');
+        allowed.clear('=');
         TestCookie.checkCharInName(validator, allowed);
     }
 }
