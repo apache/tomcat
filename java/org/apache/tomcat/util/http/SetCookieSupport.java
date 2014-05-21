@@ -75,12 +75,8 @@ public class SetCookieSupport {
         int newVersion = cookie.getVersion();
 
         // If it is v0, check if we need to switch
-        if (newVersion == 0 &&
-                (!CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
-                 isHttpToken(value) ||
-                 CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
-                 isV0Token(value))) {
-            // HTTP token in value - need to use v1
+        if (newVersion == 0 && needsQuotes(value)) {
+            // non-HTTP token in value - need to use v1
             newVersion = 1;
         }
 
@@ -89,21 +85,13 @@ public class SetCookieSupport {
            newVersion = 1;
         }
 
-        if (newVersion == 0 &&
-                (!CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
-                 isHttpToken(path) ||
-                 CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
-                 isV0Token(path))) {
-            // HTTP token in path - need to use v1
+        if (newVersion == 0 && needsQuotes(path)) {
+            // non-HTTP token in path - need to use v1
             newVersion = 1;
         }
 
-        if (newVersion == 0 &&
-                (!CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
-                 isHttpToken(domain) ||
-                 CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
-                 isV0Token(domain))) {
-            // HTTP token in domain - need to use v1
+        if (newVersion == 0 && needsQuotes(domain)) {
+            // non-HTTP token in domain - need to use v1
             newVersion = 1;
         }
 
@@ -116,14 +104,14 @@ public class SetCookieSupport {
             buf.append ("; Version=1");
 
             // Comment=comment
-            if ( comment!=null ) {
+            if (comment != null) {
                 buf.append ("; Comment=");
                 maybeQuote(buf, comment);
             }
         }
 
         // Add domain information, if present
-        if (domain!=null) {
+        if (domain != null) {
             buf.append("; Domain=");
             maybeQuote(buf, domain);
         }
@@ -170,22 +158,14 @@ public class SetCookieSupport {
         return buf.toString();
     }
 
-    /**
-     * Quotes values if required.
-     * @param buf
-     * @param value
-     */
-    private static void maybeQuote (StringBuffer buf, String value) {
-        if (value==null || value.length()==0) {
+    private static void maybeQuote(StringBuffer buf, String value) {
+        if (value == null || value.length() == 0) {
             buf.append("\"\"");
         } else if (alreadyQuoted(value)) {
             buf.append('"');
             buf.append(escapeDoubleQuotes(value,1,value.length()-1));
             buf.append('"');
-        } else if (isHttpToken(value) &&
-                !CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 ||
-                isV0Token(value) &&
-                CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0) {
+        } else if (needsQuotes(value)) {
             buf.append('"');
             buf.append(escapeDoubleQuotes(value,0,value.length()));
             buf.append('"');
@@ -208,7 +188,7 @@ public class SetCookieSupport {
             return s;
         }
 
-        StringBuffer b = new StringBuffer();
+        StringBuilder b = new StringBuilder();
         for (int i = beginIndex; i < endIndex; i++) {
             char c = s.charAt(i);
             if (c == '\\' ) {
@@ -228,8 +208,16 @@ public class SetCookieSupport {
         return b.toString();
     }
 
-    private static boolean isV0Token(String value) {
-        if( value==null) {
+    private static boolean needsQuotes(String value) {
+        if (CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0) {
+            return isNotV0Token(value);
+        } else {
+            return isNotHttpToken(value);
+        }
+    }
+
+    private static boolean isNotV0Token(String value) {
+        if (value==null) {
             return false;
         }
 
@@ -251,8 +239,8 @@ public class SetCookieSupport {
         return false;
     }
 
-    private static boolean isHttpToken(String value) {
-        if( value==null) {
+    private static boolean isNotHttpToken(String value) {
+        if (value == null) {
             return false;
         }
 
@@ -275,9 +263,8 @@ public class SetCookieSupport {
     }
 
     private static boolean alreadyQuoted (String value) {
-        if (value==null || value.length() < 2) {
-            return false;
-        }
-        return (value.charAt(0)=='\"' && value.charAt(value.length()-1)=='\"');
+        return value.length() >= 2 &&
+                value.charAt(0) == '\"' &&
+                value.charAt(value.length() - 1) == '\"';
     }
 }
