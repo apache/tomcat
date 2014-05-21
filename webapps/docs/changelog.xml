@@ -89,6 +89,11 @@
         names. The restriction that prevented such usage has been removed.
         (jboynes/markt) 
       </fix>
+      <fix>
+        Further relax cookie naming restrictions. Version 0 (a.k.a Netscape
+        format) cookies may now use names that start with the <code>$</code>
+        character. (jboynes/markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

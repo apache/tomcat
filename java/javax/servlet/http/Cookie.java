@@ -384,7 +384,7 @@ public class Cookie implements Cloneable, Serializable {
 
 class CookieNameValidator {
     private static final String LSTRING_FILE = "javax.servlet.http.LocalStrings";
-    private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
+    protected static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
     protected final BitSet allowed;
 
@@ -401,7 +401,7 @@ class CookieNameValidator {
         if (name == null || name.length() == 0) {
             throw new IllegalArgumentException(lStrings.getString("err.cookie_name_blank"));
         }
-        if (!isToken(name) || name.startsWith("$")) {
+        if (!isToken(name)) {
             String errMsg = lStrings.getString("err.cookie_name_is_token");
             throw new IllegalArgumentException(MessageFormat.format(errMsg, name));
         }
@@ -428,10 +428,10 @@ class NetscapeValidator extends CookieNameValidator {
     }
 }
 
-class RFC2109Validator extends CookieNameValidator {
+class RFC6265Validator extends CookieNameValidator {
     private static final String RFC2616_SEPARATORS = "()<>@,;:\\\"/[]?={} \t";
 
-    RFC2109Validator() {
+    RFC6265Validator() {
         super(RFC2616_SEPARATORS);
 
         // special treatment to allow for FWD_SLASH_IS_SEPARATOR property
@@ -444,6 +444,20 @@ class RFC2109Validator extends CookieNameValidator {
         }
         if (allowSlash) {
             allowed.set('/');
+        }
+    }
+}
+
+class RFC2109Validator extends RFC6265Validator {
+    RFC2109Validator() {
+    }
+
+    @Override
+    void validate(String name) {
+        super.validate(name);
+        if (name.charAt(0) == '$') {
+            String errMsg = lStrings.getString("err.cookie_name_is_token");
+            throw new IllegalArgumentException(MessageFormat.format(errMsg, name));
         }
     }
 }
