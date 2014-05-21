@@ -30,8 +30,6 @@ public class TestCookie {
     public static final BitSet SEPARATORS;
     public static final BitSet TOKEN; // 1*<any CHAR except CTLs or separators>
 
-    public static final BitSet NETSCAPE_NAME; // "any character except comma, semicolon and whitespace"
-
     static {
         CHAR = new BitSet(256);
         CHAR.set(0, 128);
@@ -49,13 +47,6 @@ public class TestCookie {
         TOKEN.or(CHAR); // any CHAR
         TOKEN.andNot(CTL); // except CTLs
         TOKEN.andNot(SEPARATORS); // or separators
-
-        NETSCAPE_NAME = new BitSet(256);
-        NETSCAPE_NAME.or(CHAR);
-        NETSCAPE_NAME.andNot(CTL);
-        NETSCAPE_NAME.clear(';');
-        NETSCAPE_NAME.clear(',');
-        NETSCAPE_NAME.clear(' ');
     }
 
     @Test
@@ -75,10 +66,6 @@ public class TestCookie {
         Assert.assertEquals(0, cookie.getVersion());
     }
 
-    @Test
-    public void actualCharactersAllowedInName() {
-        checkCharInName(NETSCAPE_NAME);
-    }
 
     @Test(expected = IllegalArgumentException.class)
     public void leadingDollar() {
@@ -140,20 +127,27 @@ public class TestCookie {
         Assert.assertEquals("HttpOnly", cookie.getName());
     }
 
-    public static void checkCharInName(BitSet allowed) {
+    @Test
+    public void strictNamingImpliesRFC2109() {
+        // Not using strict naming here so this should be OK
+        @SuppressWarnings("unused")
+        Cookie cookie = new Cookie("@Foo", null);
+    }
+
+    public static void checkCharInName(CookieNameValidator validator, BitSet allowed) {
         for (char ch = 0; ch < allowed.size(); ch++) {
-            Boolean expected = Boolean.valueOf(allowed.get(ch));
+            boolean expected = allowed.get(ch);
             String name = "X" + ch + "X";
-            Boolean actual;
             try {
-                @SuppressWarnings("unused")
-                Cookie c = new Cookie(name, null);
-                actual = Boolean.TRUE;
+                validator.validate(name);
+                if (!expected) {
+                    Assert.fail(String.format("Char %d should not be allowed", Integer.valueOf(ch)));
+                }
             } catch (IllegalArgumentException e) {
-                actual = Boolean.FALSE;
+                if (expected) {
+                    Assert.fail(String.format("Char %d should be allowed", Integer.valueOf(ch)));
+                }
             }
-            String msg = String.format("Check for char %d in name", Integer.valueOf(ch));
-            Assert.assertEquals(msg, expected, actual);
         }
     }
 }
