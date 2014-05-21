@@ -209,37 +209,6 @@ public class SetCookieSupport {
     }
 
     private static boolean needsQuotes(String value) {
-        if (CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0) {
-            return isNotV0Token(value);
-        } else {
-            return isNotHttpToken(value);
-        }
-    }
-
-    private static boolean isNotV0Token(String value) {
-        if (value==null) {
-            return false;
-        }
-
-        int i = 0;
-        int len = value.length();
-
-        if (alreadyQuoted(value)) {
-            i++;
-            len--;
-        }
-
-        for (; i < len; i++) {
-            char c = value.charAt(i);
-
-            if (CookieSupport.isV0Separator(c)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isNotHttpToken(String value) {
         if (value == null) {
             return false;
         }
@@ -255,12 +224,19 @@ public class SetCookieSupport {
         for (; i < len; i++) {
             char c = value.charAt(i);
 
-            if (CookieSupport.isHttpSeparator(c)) {
-                return true;
+            if (CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0) {
+                if (CookieSupport.isV0Separator(c)) {
+                    return true;
+                }
+            } else {
+                if (CookieSupport.isHttpSeparator(c)) {
+                    return true;
+                }
             }
         }
         return false;
     }
+
 
     private static boolean alreadyQuoted (String value) {
         return value.length() >= 2 &&
