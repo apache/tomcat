@@ -19,7 +19,6 @@ package javax.servlet.http;
 import java.util.BitSet;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -87,59 +86,58 @@ public class TestCookie {
         Cookie c = new Cookie("$Version", null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void tokenVersion() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Version", null);
+        Cookie cookie = new Cookie("Version", null);
+        Assert.assertEquals("Version", cookie.getName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributeVersion() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Comment", null);
+        Cookie cookie = new Cookie("Comment", null);
+        Assert.assertEquals("Comment", cookie.getName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributeDiscard() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Discard", null);
+        Cookie cookie = new Cookie("Discard", null);
+        Assert.assertEquals("Discard", cookie.getName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributeExpires() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Expires", null);
+        Cookie cookie = new Cookie("Expires", null);
+        Assert.assertEquals("Expires", cookie.getName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributeMaxAge() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Max-Age", null);
+        Cookie cookie = new Cookie("Max-Age", null);
+        Assert.assertEquals("Max-Age", cookie.getName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributeDomain() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Domain", null);
+        Cookie cookie = new Cookie("Domain", null);
+        Assert.assertEquals("Domain", cookie.getName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributePath() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Path", null);
+        Cookie cookie = new Cookie("Path", null);
+        Assert.assertEquals("Path", cookie.getName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributeSecure() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Secure", null);
+        Cookie cookie = new Cookie("Secure", null);
+        Assert.assertEquals("Secure", cookie.getName());
     }
 
-    @Ignore("HttpOnly is not checked for")
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributeHttpOnly() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("HttpOnly", null);
+        Cookie cookie = new Cookie("HttpOnly", null);
+        Assert.assertEquals("HttpOnly", cookie.getName());
     }
 
     public static void checkCharInName(BitSet allowed) {

@@ -401,16 +401,7 @@ class CookieNameValidator {
         if (name == null || name.length() == 0) {
             throw new IllegalArgumentException(lStrings.getString("err.cookie_name_blank"));
         }
-        if (!isToken(name) ||
-                name.equalsIgnoreCase("Comment") ||
-                name.equalsIgnoreCase("Discard") ||
-                name.equalsIgnoreCase("Domain") ||
-                name.equalsIgnoreCase("Expires") ||
-                name.equalsIgnoreCase("Max-Age") ||
-                name.equalsIgnoreCase("Path") ||
-                name.equalsIgnoreCase("Secure") ||
-                name.equalsIgnoreCase("Version") ||
-                name.startsWith("$")) {
+        if (!isToken(name) || name.startsWith("$")) {
             String errMsg = lStrings.getString("err.cookie_name_is_token");
             throw new IllegalArgumentException(MessageFormat.format(errMsg, name));
         }

@@ -83,6 +83,12 @@
         (Similarity Analyser) tool. Improve handling of Throwable.
         (markt/kkolinko)
       </scode>
+      <fix>
+        Relax cookie naming restrictions. Cookie attribute names used in the
+        <code>Set-Cookie</code> header may be used unambiguously as cookie
+        names. The restriction that prevented such usage has been removed.
+        (jboynes/markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
