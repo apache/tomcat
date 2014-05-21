@@ -48,14 +48,6 @@ public class SetCookieSupport {
     }
 
     public static String generateHeader(Cookie cookie) {
-
-        StringBuffer buf = new StringBuffer(); // can't use StringBuilder due to DateFormat
-
-        // Servlet implementation checks name
-        buf.append(cookie.getName());
-        buf.append("=");
-        // Servlet implementation does not check anything else
-
         /*
          * The spec allows some latitude on when to send the version attribute
          * with a Set-Cookie header. To be nice to clients, we'll make sure the
@@ -65,41 +57,31 @@ public class SetCookieSupport {
          * Note that by checking for tokens we will also throw an exception if a
          * control character is encountered.
          */
-
+        int version = cookie.getVersion();
         String value = cookie.getValue();
         String path = cookie.getPath();
         String domain = cookie.getDomain();
         String comment = cookie.getComment();
 
-        // Start by using the version we were asked for
-        int newVersion = cookie.getVersion();
-
-        // If it is v0, check if we need to switch
-        if (newVersion == 0 && needsQuotes(value)) {
-            // non-HTTP token in value - need to use v1
-            newVersion = 1;
-        }
-
-        if (newVersion == 0 && comment != null) {
-            // Using a comment makes it a v1 cookie
-           newVersion = 1;
-        }
-
-        if (newVersion == 0 && needsQuotes(path)) {
-            // non-HTTP token in path - need to use v1
-            newVersion = 1;
-        }
-
-        if (newVersion == 0 && needsQuotes(domain)) {
-            // non-HTTP token in domain - need to use v1
-            newVersion = 1;
+        if (version == 0) {
+            // Check for the things that require a v1 cookie
+            if (needsQuotes(value) || comment != null || needsQuotes(path) || needsQuotes(domain)) {
+                version = 1;
+            }
         }
 
         // Now build the cookie header
+        StringBuffer buf = new StringBuffer(); // can't use StringBuilder due to DateFormat
+
+        // Just use the name supplied in the Cookie
+        buf.append(cookie.getName());
+        buf.append("=");
+
         // Value
         maybeQuote(buf, value);
+
         // Add version 1 specific information
-        if (newVersion == 1) {
+        if (version == 1) {
             // Version=1 ... required
             buf.append ("; Version=1");
 
@@ -119,13 +101,13 @@ public class SetCookieSupport {
         // Max-Age=secs ... or use old "Expires" format
         int maxAge = cookie.getMaxAge();
         if (maxAge >= 0) {
-            if (newVersion > 0) {
+            if (version > 0) {
                 buf.append ("; Max-Age=");
                 buf.append (maxAge);
             }
             // IE6, IE7 and possibly other browsers don't understand Max-Age.
             // They do understand Expires, even with V1 cookies!
-            if (newVersion == 0 || CookieSupport.ALWAYS_ADD_EXPIRES) {
+            if (version == 0 || CookieSupport.ALWAYS_ADD_EXPIRES) {
                 // Wdy, DD-Mon-YY HH:MM:SS GMT ( Expires Netscape format )
                 buf.append ("; Expires=");
                 // To expire immediately we need to set the time in past
