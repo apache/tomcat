@@ -131,11 +131,11 @@ public final class CookieSupport {
             V0_SEPARATOR_FLAGS[i] = false;
             HTTP_SEPARATOR_FLAGS[i] = false;
         }
-        for (int i = 0; i < V0_SEPARATORS.length; i++) {
-            V0_SEPARATOR_FLAGS[V0_SEPARATORS[i]] = true;
+        for (char V0_SEPARATOR : V0_SEPARATORS) {
+            V0_SEPARATOR_FLAGS[V0_SEPARATOR] = true;
         }
-        for (int i = 0; i < HTTP_SEPARATORS.length; i++) {
-            HTTP_SEPARATOR_FLAGS[HTTP_SEPARATORS[i]] = true;
+        for (char HTTP_SEPARATOR : HTTP_SEPARATORS) {
+            HTTP_SEPARATOR_FLAGS[HTTP_SEPARATOR] = true;
         }
 
     }
