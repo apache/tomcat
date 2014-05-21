@@ -528,7 +528,10 @@
   <!-- Test code -->
   <Match>
     <!-- Code is deliberately unused -->
-    <Class name="javax.servlet.http.TestCookie" />
+    <Or>
+      <Class name="javax.servlet.http.TestCookie" />
+      <Class name="javax.servlet.http.TestCookieStrict" />
+    </Or>
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
   <Match>
