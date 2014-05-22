@@ -51,7 +51,7 @@ public class TestStuckThreadDetectionValve extends TomcatBaseTest {
     @Test
     public void testDetection() throws Exception {
         // second, we test the actual effect of the flag on the startup
-        StuckingServlet stuckingServlet = new StuckingServlet(6000L);
+        StuckingServlet stuckingServlet = new StuckingServlet(8000L);
         Wrapper servlet = Tomcat.addServlet(context, "myservlet",
                 stuckingServlet);
         servlet.addMapping("/myservlet");
@@ -82,10 +82,12 @@ public class TestStuckThreadDetectionValve extends TomcatBaseTest {
             Thread.sleep(500L);
             Assert.assertEquals(0, valve.getStuckThreadIds().length);
 
-            Thread.sleep(3000L);
+            Thread.sleep(5000L);
             Assert.assertEquals(1, valve.getStuckThreadIds().length);
         } finally {
-            asyncThread.join();
+            asyncThread.join(20000);
+            // check that we did not reach the join timeout
+            Assert.assertFalse(asyncThread.isAlive());
         }
         Assert.assertFalse(stuckingServlet.wasInterrupted);
         Assert.assertTrue(result.toString().startsWith("OK"));
@@ -127,12 +129,13 @@ public class TestStuckThreadDetectionValve extends TomcatBaseTest {
             Thread.sleep(4000L);
             Assert.assertEquals(1, valve.getStuckThreadIds().length);
 
-            Thread.sleep(4000L);
-            Assert.assertTrue(stuckingServlet.wasInterrupted);
-            Assert.assertEquals(0, valve.getStuckThreadIds().length);
         } finally {
-            asyncThread.join();
+            asyncThread.join(20000);
+            // check that we did not reach the join timeout
+            Assert.assertFalse(asyncThread.isAlive());
         }
+        Assert.assertTrue(stuckingServlet.wasInterrupted);
+        Assert.assertEquals(0, valve.getStuckThreadIds().length);
         Assert.assertTrue(result.toString().startsWith("OK"));
     }
 
