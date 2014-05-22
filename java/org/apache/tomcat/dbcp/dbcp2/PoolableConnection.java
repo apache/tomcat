@@ -44,7 +44,7 @@ import org.apache.tomcat.dbcp.pool2.ObjectPool;
 public class PoolableConnection extends DelegatingConnection<Connection>
         implements PoolableConnectionMXBean {
 
-    private static MBeanServer MBEAN_SERVER = null; 
+    private static MBeanServer MBEAN_SERVER = null;
 
     static {
         try {
