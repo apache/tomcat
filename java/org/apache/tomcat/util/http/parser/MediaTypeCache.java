@@ -51,7 +51,7 @@ public class MediaTypeCache {
 
         MediaType m = null;
         try {
-            m = HttpParser.parseMediaType(new StringReader(input));
+            m = MediaType.parseMediaType(new StringReader(input));
         } catch (IOException e) {
             // Ignore - return null
         }

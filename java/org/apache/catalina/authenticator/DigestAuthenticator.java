@@ -35,7 +35,7 @@ import org.apache.catalina.util.ConcurrentMessageDigest;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.http.parser.HttpParser;
+import org.apache.tomcat.util.http.parser.Authorization;
 
 
 /**
@@ -493,7 +493,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
             Map<String,String> directives;
             try {
-                directives = HttpParser.parseAuthorizationDigest(
+                directives = Authorization.parseAuthorizationDigest(
                         new StringReader(authorization));
             } catch (IOException e) {
                 return false;
