@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.catalina.Context;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -70,7 +70,8 @@ public class TestMaxConnections extends TomcatBaseTest {
 
     private synchronized void init() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        Context root = tomcat.addContext("", SimpleHttpClient.TEMP_DIR);
+        StandardContext root = (StandardContext) tomcat.addContext("", SimpleHttpClient.TEMP_DIR);
+        root.setUnloadDelay(soTimeout);
         Tomcat.addServlet(root, "Simple", new SimpleServlet());
         root.addServletMapping("/test", "Simple");
         tomcat.getConnector().setProperty("maxKeepAliveRequests", "1");
@@ -128,9 +129,10 @@ public class TestMaxConnections extends TomcatBaseTest {
 
             increment();
 
+            System.out.println("Processing thread: " + Thread.currentThread().getName());
             try {
                 Thread.sleep(TestMaxConnections.soTimeout*4/5);
-            }catch (InterruptedException x) {
+            } catch (InterruptedException x) {
 
             }
             resp.setContentLength(0);
