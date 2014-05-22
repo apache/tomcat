@@ -25,7 +25,6 @@ import javax.servlet.WriteListener;
 
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -451,7 +450,7 @@ public final class Response {
 
         MediaType m = null;
         try {
-             m = HttpParser.parseMediaType(new StringReader(type));
+             m = MediaType.parseMediaType(new StringReader(type));
         } catch (IOException e) {
             // Ignore - null test below handles this
         }
