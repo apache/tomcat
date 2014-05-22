@@ -131,6 +131,13 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update package renamed Apache Commons DBCP2 to r1596858. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.8 (markt)" rtext="beta, 2014-05-21">
   <subsection name="Catalina">
