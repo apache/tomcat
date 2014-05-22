@@ -44,7 +44,15 @@ import org.apache.tomcat.dbcp.pool2.ObjectPool;
 public class PoolableConnection extends DelegatingConnection<Connection>
         implements PoolableConnectionMXBean {
 
-    private static MBeanServer MBEAN_SERVER = ManagementFactory.getPlatformMBeanServer();
+    private static MBeanServer MBEAN_SERVER = null; 
+
+    static {
+        try {
+            MBEAN_SERVER = ManagementFactory.getPlatformMBeanServer();
+        } catch (Exception ex) {
+            // ignore - JMX not available
+        }
+    }
 
     /** The pool to which I should return. */
     private ObjectPool<PoolableConnection> _pool = null;
