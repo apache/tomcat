@@ -47,6 +47,10 @@
 <section name="Tomcat 8.0.9 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>55975</bug>: Apply consistent escaping for double quote and
+        backslash characters when escaping cookie values. (markt)
+      </fix>
       <scode>
         <bug>56387</bug>: Improve the code that handles an attempt to load a
         class after a web application has been stopped. Use common code to handle
