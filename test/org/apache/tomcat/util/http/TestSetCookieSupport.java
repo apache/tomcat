@@ -19,7 +19,6 @@ package org.apache.tomcat.util.http;
 import javax.servlet.http.Cookie;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestSetCookieSupport {
@@ -78,15 +77,13 @@ public class TestSetCookieSupport {
         Assert.assertEquals("foo=\"a\\\"b\"; Version=1", SetCookieSupport.generateHeader(cookie));
     }
 
-    @Ignore("bug 55975")
     @Test
     public void v0ValueContainsNonV0Separator() {
         Cookie cookie = new Cookie("foo", "a()<>@:\\\"/[]?={}b");
         // Assert.assertEquals("foo=a()<>@:\\\"/[]?{}=b", SetCookieSupport.generateHeader(cookie));
-        Assert.assertEquals("foo=\"a()<>@,;:\\\\\\\"/[]?={}b\"; Version=1", SetCookieSupport.generateHeader(cookie));
+        Assert.assertEquals("foo=\"a()<>@:\\\\\\\"/[]?={}b\"; Version=1", SetCookieSupport.generateHeader(cookie));
     }
 
-    @Ignore("bug 55975")
     @Test
     public void v0ValueContainsBackslash() {
         Cookie cookie = new Cookie("foo", "a\\b");
@@ -95,7 +92,6 @@ public class TestSetCookieSupport {
     }
 
 
-    @Ignore("bug 55975")
     @Test
     public void v0ValueContainsBackslashAtEnd() {
         Cookie cookie = new Cookie("foo", "a\\");
@@ -103,7 +99,6 @@ public class TestSetCookieSupport {
         Assert.assertEquals("foo=\"a\\\\\"; Version=1", SetCookieSupport.generateHeader(cookie));
     }
 
-    @Ignore("bug 55975")
     @Test
     public void v0ValueContainsBackslashAndQuote() {
         Cookie cookie = new Cookie("foo", "a\"b\\c");
@@ -174,7 +169,6 @@ public class TestSetCookieSupport {
         Assert.assertEquals("foo=\"a\\\"b\"; Version=1", SetCookieSupport.generateHeader(cookie));
     }
 
-    @Ignore("bug 55975")
     @Test
     public void v1ValueContainsNonV0Separator() {
         Cookie cookie = new Cookie("foo", "a()<>@,;:\\\"/[]?={}b");
@@ -183,7 +177,6 @@ public class TestSetCookieSupport {
         Assert.assertEquals("foo=\"a()<>@,;:\\\\\\\"/[]?={}b\"; Version=1", SetCookieSupport.generateHeader(cookie));
     }
 
-    @Ignore("bug 55975")
     @Test
     public void v1ValueContainsBackslash() {
         Cookie cookie = new Cookie("foo", "a\\b");
@@ -193,7 +186,6 @@ public class TestSetCookieSupport {
     }
 
 
-    @Ignore("bug 55975")
     @Test
     public void v1ValueContainsBackslashAndQuote() {
         Cookie cookie = new Cookie("foo", "a\"b\\c");

@@ -48,8 +48,8 @@ public class SetCookieSupport {
 
     private static final BitSet ALLOWED_WITHOUT_QUOTES;
     static {
-        boolean allowSeparatorsInV0 =
-                Boolean.getBoolean("org.apache.tomcat.util.http.ServerCookie.ALLOW_HTTP_SEPARATORS_IN_V0");
+        boolean allowSeparatorsInV0 = Boolean.getBoolean(
+                "org.apache.tomcat.util.http.ServerCookie.ALLOW_HTTP_SEPARATORS_IN_V0");
         String separators;
         if (allowSeparatorsInV0) {
             // comma, semi-colon and space as defined by netscape
@@ -218,8 +218,7 @@ public class SetCookieSupport {
     }
 
     private static void escapeDoubleQuotes(StringBuffer b, String s, int beginIndex, int endIndex) {
-        // TODO: bug55975: this checks for '"' but not for '\' which also needs escaping
-        if (s.indexOf('"') == -1) {
+        if (s.indexOf('"') == -1 && s.indexOf('\\') == -1) {
             b.append(s);
             return;
         }
@@ -227,12 +226,7 @@ public class SetCookieSupport {
         for (int i = beginIndex; i < endIndex; i++) {
             char c = s.charAt(i);
             if (c == '\\' ) {
-                b.append(c);
-                //ignore the character after an escape, just append it
-                if (++i>=endIndex) {
-                    throw new IllegalArgumentException("Invalid escape character in cookie value.");
-                }
-                b.append(s.charAt(i));
+                b.append('\\').append('\\');
             } else if (c == '"') {
                 b.append('\\').append('"');
             } else {
@@ -257,7 +251,8 @@ public class SetCookieSupport {
         for (; i < len; i++) {
             char c = value.charAt(i);
             if ((c < 0x20 && c != '\t') || c >= 0x7f) {
-                throw new IllegalArgumentException("Control character in cookie value or attribute.");
+                throw new IllegalArgumentException(
+                        "Control character in cookie value or attribute.");
             }
             if (!ALLOWED_WITHOUT_QUOTES.get(c)) {
                 return true;
