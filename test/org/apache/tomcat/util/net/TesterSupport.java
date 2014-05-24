@@ -127,13 +127,17 @@ public final class TesterSupport {
         return ks;
     }
 
+    protected static boolean isMacOs() {
+        return System.getProperty("os.name").toLowerCase().startsWith("mac os x");
+    }
+
     protected static boolean isRenegotiationSupported(Tomcat tomcat) {
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
         if (protocol.contains("Apr")) {
             // Disabled by default in 1.1.20 windows binary (2010-07-27)
             return false;
         }
-        if (protocol.contains("NioProtocol") || protocol.contains("Nio2Protocol")) {
+        if (protocol.contains("NioProtocol") || (protocol.contains("Nio2Protocol") && isMacOs())) {
             // Doesn't work on all platforms - see BZ 56448.
             return false;
         }
