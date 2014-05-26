@@ -122,6 +122,10 @@
         buffer when the buffer is only partially written on a subsequent write.
         (markt)
       </fix>
+      <fix>
+        Ensure that a request without a body is correctly handled during Comet
+        processing. This fixes the Comet chat example. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
