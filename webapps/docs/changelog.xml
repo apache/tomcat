@@ -125,8 +125,8 @@
         some fixes for Java 8 support. (markt/kkolinko)
       </update>
       <fix>
-        <bug>56561</bug>: Avoid <code>NoSuchElementException</code> while handling
-        attributes with empty string value. (violetagg)
+        <bug>56561</bug>: Avoid <code>NoSuchElementException</code> while
+        handling attributes with empty string value. (violetagg)
       </fix>
       <scode>
         Do not configure a <code>JspFactory</code> in the
