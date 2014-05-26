@@ -81,6 +81,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>56561</bug>: Avoid <code>NoSuchElementException</code> while handling
+        attributes with empty string value. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.54 (violetagg)" rtext="released 2014-05-22">
   <subsection name="Catalina">
