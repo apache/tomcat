@@ -1379,8 +1379,12 @@ class Validator {
                         } else {
                             // Get text with \$ and \# escaping removed.
                             // Should be a single Text node
-                            value = ((ELNode.Text) el.iterator().next())
-                                    .getText();
+                            Iterator<ELNode> it = el.iterator();
+                            if (it.hasNext()) {
+                                value = ((ELNode.Text) it.next()).getText();
+                            } else {
+                                value = "";
+                            }
                             el = null;
                         }
                     }
