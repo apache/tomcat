@@ -128,6 +128,11 @@
         <bug>56561</bug>: Avoid <code>NoSuchElementException</code> while handling
         attributes with empty string value. (violetagg)
       </fix>
+      <scode>
+        Do not configure a <code>JspFactory</code> in the
+        <code>JasperInitializer</code> if one has already been set as might be
+        the case in some embedding scenarios. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

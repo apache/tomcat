@@ -68,8 +68,9 @@ public class JasperInitializer implements ServletContainerInitializer {
             }
         }
 
-        // TODO we should play nice and only set this if it's null
-        JspFactory.setDefaultFactory(factory);
+        if (JspFactory.getDefaultFactory() == null) {
+            JspFactory.setDefaultFactory(factory);
+        }
     }
 
     @Override
