@@ -133,6 +133,12 @@
         <code>JasperInitializer</code> if one has already been set as might be
         the case in some embedding scenarios. (markt)
       </scode>
+      <add>
+        Add a simple implementation of <code>InstanceManager</code> and have
+        Jasper use it if no other <code>InstanceManager</code> is provided. This
+        makes it easier to use Jasper independently from Tomcat. Patch provided
+        by Greg Wilkins. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

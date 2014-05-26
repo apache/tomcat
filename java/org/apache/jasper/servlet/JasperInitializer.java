@@ -31,6 +31,8 @@ import org.apache.jasper.runtime.JspFactoryImpl;
 import org.apache.jasper.security.SecurityClassLoad;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.SimpleInstanceManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -77,6 +79,11 @@ public class JasperInitializer implements ServletContainerInitializer {
     public void onStartup(Set<Class<?>> types, ServletContext context) throws ServletException {
         if (log.isDebugEnabled()) {
             log.debug(Localizer.getMessage(MSG + ".onStartup", context.getServletContextName()));
+        }
+
+        // Setup a simple default Instance Manager
+        if (context.getAttribute(InstanceManager.class.getName())==null) {
+            context.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
         }
 
         boolean validate = Boolean.parseBoolean(
