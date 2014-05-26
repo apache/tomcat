@@ -105,6 +105,12 @@
         <code>=</code> character leading to a mis-match between the cookie the
         server set and the cookie returned by the browser. (jboynes/markt)
       </fix>
+      <add>
+        Add a simple <code>ServiceLoader</code> based discovery mechanism to the
+        JULI <code>LogFactory</code> to make it easier to use JULI and Tomcat
+        components that depend on JULI (such as Jasper) independently from
+        Tomcat. Patch provided by Greg Wilkins. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
