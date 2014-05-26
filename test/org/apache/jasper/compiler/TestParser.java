@@ -381,7 +381,7 @@ public class TestParser extends TomcatBaseTest {
     }
 
     @Test
-    public void testBug56334() throws Exception {
+    public void testBug56334And56561() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File("test/webapp");
@@ -399,7 +399,7 @@ public class TestParser extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug56334.jspx");
+                "/test/bug5nnnn/bug56334and56561.jspx");
 
         String result = res.toString();
 
