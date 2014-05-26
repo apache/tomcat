@@ -158,6 +158,11 @@
         on a POJO based WebSocket endpoint. Based on a suggestion by Eugene
         Chung. (markt)
       </scode>
+      <fix>
+        When a WebSocket client attempts to write to a closed connection, handle
+        the resulting <code>IllegalStateException</code> in a manner consistent
+        with the handling of an <code>IOException</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
