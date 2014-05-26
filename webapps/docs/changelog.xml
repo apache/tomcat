@@ -68,6 +68,11 @@
         optionally interrupt stuck threads to attempt to unblock them.
         (slaurent)
       </add>
+      <fix>
+        <bug>56545</bug>: Pre-load an additional class, the loading of which
+        may otherwise be triggered by a web application which in turn would
+        trigger an exception when running under a security manager. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
