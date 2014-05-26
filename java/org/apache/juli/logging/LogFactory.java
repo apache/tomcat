@@ -16,33 +16,34 @@
  */
 package org.apache.juli.logging;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ServiceLoader;
 import java.util.logging.LogManager;
 
 /**
- * Modified LogFactory: removed all discovery, hardcode a specific implementation
- * If you like a different logging implementation - use either the discovery-based
- * commons-logging, or better - another implementation hardcoded to your favourite
- * logging impl.
+ * This is a modified LogFactory that uses a simple {@link ServiceLoader} based
+ * discovery mechanism with a default of using JDK based logging. An
+ * implementation that uses the full Commons Logging discovery mechanism is
+ * available as part of the Tomcat extras download.
  *
- * Why ? Each application and deployment can choose a logging implementation -
- * that involves configuration, installing the logger jar and optional plugins, etc.
- * As part of this process - they can as well install the commons-logging implementation
- * that corresponds to their logger of choice. This completely avoids any discovery
- * problem, while still allowing the user to switch.
+ * Why? It is an attempt to strike a balance between simpler code (no discovery)
+ * and providing flexibility - particularly for those projects that embed Tomcat
+ * or some of Tomcat&apos;s components - is an alternative logging
+ * implementationnis desired.
  *
- * Note that this implementation is not just a wrapper around JDK logging ( like
- * the original commons-logging impl ). It adds 2 features - a simpler configuration
- * ( which is in fact a subset of log4j.properties ) and a formatter that is
- * less ugly.
+ * Note that this implementation is not just a wrapper around JDK logging (like
+ * the original commons-logging impl). It adds 2 features - a simpler
+ * configuration  (which is in fact a subset of log4j.properties) and a
+ * formatter that is less ugly.
  *
- * The removal of 'abstract' preserves binary backward compatibility. It is possible
- * to preserve the abstract - and introduce another ( hardcoded ) factory - but I
- * see no benefit.
+ * The removal of 'abstract' preserves binary backward compatibility. It is
+ * possible to preserve the abstract - and introduce another (hardcoded) factory
+ * - but I see no benefit.
  *
- * Since this class is not intended to be extended - and provides
- * no plugin for other LogFactory implementation - all protected methods are removed.
- * This can be changed - but again, there is little value in keeping dead code.
- * Just take a quick look at the removed code ( and it's complexity)
+ * Since this class is not intended to be extended - all protected methods are
+ * removed. This can be changed - but again, there is little value in keeping
+ * dead code. Just take a quick look at the removed code ( and it's complexity).
  *
  * --------------
  *
@@ -64,11 +65,26 @@ public class LogFactory {
 
     private static final LogFactory singleton = new LogFactory();
 
+    private final Constructor<? extends Log> discoveredLogConstructor;
 
     /**
-     * Protected constructor that is not available for public use.
+     * Private constructor that is not available for public use.
      */
     private LogFactory() {
+        // Look via a ServiceLoader for a Log implementation that has a
+        // constructor taking the String name.
+        ServiceLoader<Log> logLoader = ServiceLoader.load(Log.class);
+        Constructor<? extends Log> m=null;
+        for (Log log: logLoader) {
+            Class<? extends Log> c=log.getClass();
+            try {
+                m=c.getConstructor(String.class);
+            }
+            catch (NoSuchMethodException | SecurityException e) {
+                throw new Error(e);
+            }
+        }
+        discoveredLogConstructor=m;
     }
 
 
@@ -93,9 +109,17 @@ public class LogFactory {
      * @exception LogConfigurationException if a suitable <code>Log</code>
      *  instance cannot be returned
      */
-    public Log getInstance(String name)
-        throws LogConfigurationException {
-        return DirectJDKLog.getInstance(name);
+    public Log getInstance(String name) throws LogConfigurationException {
+        if (discoveredLogConstructor == null) {
+            return DirectJDKLog.getInstance(name);
+        }
+
+        try {
+            return discoveredLogConstructor.newInstance(name);
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException |
+                InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -108,8 +132,7 @@ public class LogFactory {
      * @exception LogConfigurationException if a suitable <code>Log</code>
      *  instance cannot be returned
      */
-    public Log getInstance(Class<?> clazz)
-        throws LogConfigurationException {
+    public Log getInstance(Class<?> clazz) throws LogConfigurationException {
         return getInstance( clazz.getName());
     }
 
