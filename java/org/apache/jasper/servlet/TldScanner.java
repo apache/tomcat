@@ -243,13 +243,13 @@ public class TldScanner {
         }
     }
 
-    private void parseTld(String resourcePath) throws IOException, SAXException {
+    protected void parseTld(String resourcePath) throws IOException, SAXException {
         TldResourcePath tldResourcePath =
                 new TldResourcePath(context.getResource(resourcePath), resourcePath);
         parseTld(tldResourcePath);
     }
 
-    private void parseTld(TldResourcePath path) throws IOException, SAXException {
+    protected void parseTld(TldResourcePath path) throws IOException, SAXException {
         if (tldResourcePathTaglibXmlMap.containsKey(path)) {
             // TLD has already been parsed as a result of processing web.xml
             return;

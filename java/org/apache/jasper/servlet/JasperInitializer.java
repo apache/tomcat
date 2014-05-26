@@ -98,7 +98,7 @@ public class JasperInitializer implements ServletContainerInitializer {
         }
 
         // scan the application for TLDs
-        TldScanner scanner = new TldScanner(context, true, validate, blockExternal);
+        TldScanner scanner = newTldScanner(context, true, validate, blockExternal);
         try {
             scanner.scan();
         } catch (IOException | SAXException e) {
@@ -113,5 +113,10 @@ public class JasperInitializer implements ServletContainerInitializer {
         context.setAttribute(TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME,
                 new TldCache(context, scanner.getUriTldResourcePathMap(),
                         scanner.getTldResourcePathTaglibXmlMap()));
+    }
+
+    protected TldScanner newTldScanner(ServletContext context, boolean namespaceAware,
+            boolean validate, boolean blockExternal) {
+        return new TldScanner(context, namespaceAware, validate, blockExternal);
     }
 }
