@@ -33,7 +33,8 @@
     <set data-value="05a\$\${&amp;" />
     <set data-value="05b\$\${&amp;${1+1}" />
     <set data-value="05c\#\#{&gt;${'hello'}&lt;" />
-    <set data-value="" />
+    <!-- Test for BZ 56561 -->
+    05x:<set data-value="" />
 
     <!-- Test 6: nonTaglibXmlnsAttributes on a Node.UninterpretedTag -->
     <set xmlns:foo="urn:06a\bar\baz" />
