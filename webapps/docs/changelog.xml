@@ -48,6 +48,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>55282</bug>: Ensure that one and the same application listener is
+        added only once when starting the web application. (violetagg)
+      </fix>
+      <fix>
         <bug>55975</bug>: Apply consistent escaping for double quote and
         backslash characters when escaping cookie values. (markt)
       </fix>
