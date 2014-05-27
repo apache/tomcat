@@ -58,6 +58,10 @@
 <section name="Tomcat 7.0.55 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>55282</bug>: Ensure that one and the same application listener is
+        added only once when starting the web application. (violetagg)
+      </fix>
       <add>
         <bug>56461</bug>: New <code>failCtxIfServletStartFails</code> attribute
         on Context and Host configuration to force the context startup to fail
