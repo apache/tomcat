@@ -427,7 +427,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request1 = "GET /async HTTP/1.1\r\n" +
+        String request1 = "GET /async?1 HTTP/1.1\r\n" +
                 "Host: localhost:" + getPort() + "\r\n" +
                 "Connection: keep-alive\r\n" +
                 "Cache-Control: max-age=0\r\n" +
@@ -438,7 +438,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
                 "Cookie: something.that.should.not.leak=true\r\n" +
                 "\r\n";
 
-        String request2 = "GET /async HTTP/1.1\r\n" +
+        String request2 = "GET /async?2 HTTP/1.1\r\n" +
                 "Host: localhost:" + getPort() + "\r\n" +
                 "Connection: keep-alive\r\n" +
                 "Cache-Control: max-age=0\r\n" +
