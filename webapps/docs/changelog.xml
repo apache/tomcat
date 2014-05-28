@@ -153,6 +153,10 @@
         makes it easier to use Jasper independently from Tomcat. Patch provided
         by Greg Wilkins. (markt)
       </add>
+      <fix>
+        Correct a copy/paste error and return a 500 response rather than a 400
+        response when an internal server error occurs. (mark)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

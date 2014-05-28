@@ -772,8 +772,8 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     getLog().debug(sm.getString("ajpprocessor.request.prepare"), t);
-                    // 400 - Internal Server Error
-                    response.setStatus(400);
+                    // 500 - Internal Server Error
+                    response.setStatus(500);
                     getAdapter().log(request, response, 0);
                     error = true;
                 }
