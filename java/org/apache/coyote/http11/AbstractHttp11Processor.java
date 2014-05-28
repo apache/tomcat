@@ -1073,18 +1073,16 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     // input. This way uploading a 100GB file doesn't tie up the
                     // thread if the servlet has rejected it.
                     getInputBuffer().setSwallowInput(false);
-                }
-                if (response.getStatus() < 200 || response.getStatus() > 299) {
-                    if (expectation) {
-                        // Client sent Expect: 100-continue but received a
-                        // non-2xx response. Disable keep-alive (if enabled) to
-                        // ensure the connection is closed. Some clients may
-                        // still send the body, some may send the next request.
-                        // No way to differentiate, so close the connection to
-                        // force the client to send the next request.
-                        getInputBuffer().setSwallowInput(false);
-                        keepAlive = false;
-                    }
+                } else if (expectation &&
+                        (response.getStatus() < 200 || response.getStatus() > 299)) {
+                    // Client sent Expect: 100-continue but received a
+                    // non-2xx response. Disable keep-alive (if enabled) to
+                    // ensure the connection is closed. Some clients may
+                    // still send the body, some may send the next request.
+                    // No way to differentiate, so close the connection to
+                    // force the client to send the next request.
+                    getInputBuffer().setSwallowInput(false);
+                    keepAlive = false;
                 }
                 endRequest();
             }
