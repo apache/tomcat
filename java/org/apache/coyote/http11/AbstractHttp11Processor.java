@@ -1485,11 +1485,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         // Connection: close header.
         keepAlive = keepAlive && !statusDropsConnection(statusCode);
         if (!keepAlive) {
-            // Avoid adding the close header twice
-            if (!connectionClosePresent) {
-                headers.addValue(Constants.CONNECTION).setString(
-                        Constants.CLOSE);
-            }
+            headers.setValue(Constants.CONNECTION).setString(
+                    Constants.CLOSE);
         } else if (!http11 && !error) {
             headers.addValue(Constants.CONNECTION).setString(Constants.KEEPALIVE);
         }
