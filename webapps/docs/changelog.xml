@@ -88,6 +88,11 @@
         buffer when the buffer is only partially written on a subsequent write.
         (markt)
       </fix>
+      <fix>
+        <bug>56555</bug>: When Tomcat closes the connection based on the HTTP
+        status code of the response, ensure that only one connection header is
+        sent to the client. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
