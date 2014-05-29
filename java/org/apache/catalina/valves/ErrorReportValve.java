@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.valves;
 
-
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Scanner;
@@ -62,7 +61,9 @@ public class ErrorReportValve extends ValveBase {
 
     /**
      * Invoke the next Valve in the sequence. When the invoke returns, check
-     * the response state, and output an error report is necessary.
+     * the response state. If the status code is greater than or equal to 400
+     * or an uncaught exception was thrown then the error handling will be
+     * triggered.
      *
      * @param request The servlet request to be processed
      * @param response The servlet response to be created
@@ -71,8 +72,7 @@ public class ErrorReportValve extends ValveBase {
      * @exception ServletException if a servlet error occurs
      */
     @Override
-    public void invoke(Request request, Response response)
-        throws IOException, ServletException {
+    public void invoke(Request request, Response response) throws IOException, ServletException {
 
         // Perform the request
         getNext().invoke(request, response);
@@ -81,8 +81,7 @@ public class ErrorReportValve extends ValveBase {
             return;
         }
 
-        Throwable throwable =
-                (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+        Throwable throwable = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 
         if (request.isAsyncStarted() && ((response.getStatus() < 400 &&
                 throwable == null) || request.isAsyncDispatching())) {
@@ -90,7 +89,6 @@ public class ErrorReportValve extends ValveBase {
         }
 
         if (throwable != null) {
-
             // The response is an error
             response.setError();
 
@@ -101,9 +99,7 @@ public class ErrorReportValve extends ValveBase {
                 // Ignore
             }
 
-            response.sendError
-                (HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
         response.setSuspended(false);
@@ -131,16 +127,14 @@ public class ErrorReportValve extends ValveBase {
      * @param throwable The exception that occurred (which possibly wraps
      *  a root cause exception
      */
-    protected void report(Request request, Response response,
-                          Throwable throwable) {
+    protected void report(Request request, Response response, Throwable throwable) {
 
         // Do nothing on non-HTTP responses
         int statusCode = response.getStatus();
 
         // Do nothing on a 1xx, 2xx and 3xx status
         // Do nothing if anything has been written already
-        if (statusCode < 400 || response.getContentWritten() > 0 ||
-                !response.isError()) {
+        if (statusCode < 400 || response.getContentWritten() > 0 || !response.isError()) {
             return;
         }
 
@@ -149,8 +143,7 @@ public class ErrorReportValve extends ValveBase {
             if (throwable != null) {
                 String exceptionMessage = throwable.getMessage();
                 if (exceptionMessage != null && exceptionMessage.length() > 0) {
-                    message = RequestUtil.filter(
-                            (new Scanner(exceptionMessage)).nextLine());
+                    message = RequestUtil.filter((new Scanner(exceptionMessage)).nextLine());
                 }
             }
             if (message == null) {
