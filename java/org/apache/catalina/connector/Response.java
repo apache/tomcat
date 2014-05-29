@@ -404,8 +404,7 @@ public class Response
      *
      * @exception IOException if an input/output error occurs
      */
-    public void finishResponse()
-        throws IOException {
+    public void finishResponse() throws IOException {
         // Writing leftover bytes
         outputBuffer.close();
     }
@@ -415,7 +414,7 @@ public class Response
      * Return the content length that was set or calculated for this Response.
      */
     public int getContentLength() {
-        return (coyoteResponse.getContentLength());
+        return coyoteResponse.getContentLength();
     }
 
 
@@ -425,7 +424,7 @@ public class Response
      */
     @Override
     public String getContentType() {
-        return (coyoteResponse.getContentType());
+        return coyoteResponse.getContentType();
     }
 
 
@@ -559,7 +558,6 @@ public class Response
             writer = new CoyoteWriter(outputBuffer);
         }
         return writer;
-
     }
 
 
@@ -568,7 +566,7 @@ public class Response
      */
     @Override
     public boolean isCommitted() {
-        return (coyoteResponse.isCommitted());
+        return coyoteResponse.isCommitted();
     }
 
 
@@ -580,10 +578,9 @@ public class Response
      */
     @Override
     public void reset() {
-
-        if (included)
-         {
-            return;     // Ignore any call from an included servlet
+        // Ignore any call from an included servlet
+        if (included) {
+            return;
         }
 
         coyoteResponse.reset();
@@ -1169,8 +1166,7 @@ public class Response
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public void sendError(int status)
-        throws IOException {
+    public void sendError(int status) throws IOException {
         sendError(status, null);
     }
 
@@ -1186,8 +1182,7 @@ public class Response
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public void sendError(int status, String message)
-        throws IOException {
+    public void sendError(int status, String message) throws IOException {
 
         if (isCommitted()) {
             throw new IllegalStateException
@@ -1214,7 +1209,6 @@ public class Response
 
         // Cause the response to be finished (from the application perspective)
         setSuspended(true);
-
     }
 
 
@@ -1228,8 +1222,7 @@ public class Response
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public void sendRedirect(String location)
-        throws IOException {
+    public void sendRedirect(String location) throws IOException {
         sendRedirect(location, SC_FOUND);
     }
 
@@ -1269,7 +1262,6 @@ public class Response
 
         // Cause the response to be finished (from the application perspective)
         setSuspended(true);
-
     }
 
 
@@ -1302,7 +1294,6 @@ public class Response
         }
 
         setHeader(name, FastHttpDateFormat.formatDate(value, format));
-
     }
 
 
