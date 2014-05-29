@@ -292,16 +292,6 @@ public final class Response {
     }
 
 
-    public void finish() {
-        action(ActionCode.CLOSE, this);
-    }
-
-
-    public void acknowledge() {
-        action(ActionCode.ACK, this);
-    }
-
-
     // -------------------- Headers --------------------
     /**
      * Warning: This method always returns <code>false<code> for Content-Type

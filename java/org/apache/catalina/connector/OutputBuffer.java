@@ -300,8 +300,7 @@ public class OutputBuffer extends Writer
                 CoyoteAdapter.ADAPTER_NOTES);
         req.inputBuffer.close();
 
-        coyoteResponse.finish();
-
+        coyoteResponse.action(ActionCode.CLOSE, null);
     }
 
 

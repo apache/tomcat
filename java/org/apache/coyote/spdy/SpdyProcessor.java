@@ -200,7 +200,7 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
 
         finished = true;
 
-        response.finish();
+        response.action(ActionCode.CLOSE, null);
     }
 
     private static final byte[] EMPTY = new byte[0];
