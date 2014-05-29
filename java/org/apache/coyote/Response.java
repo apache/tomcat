@@ -265,8 +265,10 @@ public final class Response {
 
     public void reset() throws IllegalStateException {
 
-        // Reset the headers only if this is the main request,
-        // not for included
+        if (commited) {
+            throw new IllegalStateException();
+        }
+
         contentType = null;
         locale = DEFAULT_LOCALE;
         contentLanguage = null;
@@ -278,15 +280,7 @@ public final class Response {
         message = null;
         headers.clear();
 
-        // Force the PrintWriter to flush its data to the output
-        // stream before resetting the output stream
-        //
         // Reset the stream
-        if (commited) {
-            //String msg = sm.getString("servletOutputStreamImpl.reset.ise");
-            throw new IllegalStateException();
-        }
-
         action(ActionCode.RESET, this);
     }
 
