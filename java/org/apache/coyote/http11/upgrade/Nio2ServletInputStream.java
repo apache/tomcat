@@ -40,6 +40,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
     private final CompletionHandler<Integer, SocketWrapper<Nio2Channel>> completionHandler;
     private boolean flipped = false;
     private volatile boolean readPending = false;
+    private volatile boolean fireListener = false;
 
     public Nio2ServletInputStream(SocketWrapper<Nio2Channel> wrapper, AbstractEndpoint<Nio2Channel> endpoint0) {
         this.endpoint = endpoint0;
@@ -48,15 +49,18 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
         this.completionHandler = new CompletionHandler<Integer, SocketWrapper<Nio2Channel>>() {
             @Override
             public void completed(Integer nBytes, SocketWrapper<Nio2Channel> attachment) {
+                boolean fire = false;
                 synchronized (completionHandler) {
                     if (nBytes.intValue() < 0) {
                         failed(new EOFException(), attachment);
                         return;
                     }
                     readPending = false;
+                    fire = fireListener;
+                    fireListener = false;
                 }
                 if (nBytes.intValue() > 0) {
-                    if (!Nio2Endpoint.isInline()) {
+                    if (!Nio2Endpoint.isInline() && fire) {
                         try {
                             onDataAvailable();
                         } catch (IOException e) {
@@ -89,6 +93,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
     protected boolean doIsReady() throws IOException {
         synchronized (completionHandler) {
             if (readPending) {
+                fireListener = true;
                 return false;
             }
             ByteBuffer readBuffer = channel.getBufHandler().getReadBuffer();
@@ -110,16 +115,8 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
                     readBuffer.flip();
                     flipped = true;
                 }
-                try {
-                    onDataAvailable();
-                } catch (IOException e) {
-                    onError(e);
-                    try {
-                        close();
-                    } catch (IOException ioe) {
-                        // Ignore
-                    }
-                }
+            } else {
+                fireListener = true;
             }
             return isReady;
         }
