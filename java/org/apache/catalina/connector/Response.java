@@ -45,6 +45,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.SessionConfig;
+import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
@@ -1137,7 +1138,7 @@ public class Response
 
 
     /**
-     * Send an acknowledgment of a request.
+     * Send an acknowledgement of a request.
      *
      * @exception IOException if an input/output error occurs
      */
@@ -1153,8 +1154,7 @@ public class Response
             return;
         }
 
-        coyoteResponse.acknowledge();
-
+        coyoteResponse.action(ActionCode.ACK, null);
     }
 
 
