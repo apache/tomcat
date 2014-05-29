@@ -242,7 +242,7 @@ public final class Response {
      * request processing.
      */
     public void setErrorException(Exception ex) {
-    errorException = ex;
+        errorException = ex;
     }
 
 
