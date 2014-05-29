@@ -481,10 +481,6 @@ public final class Response {
         return ret;
     }
 
-    public void setContentLength(int contentLength) {
-        this.contentLength = contentLength;
-    }
-
     public void setContentLength(long contentLength) {
         this.contentLength = contentLength;
     }
