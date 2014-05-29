@@ -718,7 +718,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
         if (actionCode == ActionCode.CLOSE) {
             // End the processing of the current request
-
             try {
                 getOutputBuffer().endRequest();
             } catch (IOException e) {
@@ -728,7 +727,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
         } else if (actionCode == ActionCode.COMMIT) {
             // Commit current response
-
             if (response.isCommitted()) {
                 return;
             }
@@ -746,7 +744,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             // Acknowledge request
             // Send a 100 status back if it makes sense (response not committed
             // yet, and client specified an expectation for 100-continue)
-
             if ((response.isCommitted()) || !expectation) {
                 return;
             }
@@ -758,8 +755,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 // Set error flag
                 error = true;
             }
-        } else if (actionCode == ActionCode.CLIENT_FLUSH) {
 
+        } else if (actionCode == ActionCode.CLIENT_FLUSH) {
             try {
                 getOutputBuffer().flush();
             } catch (IOException e) {
@@ -772,13 +769,12 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             ((AtomicBoolean) param).set(error);
 
         } else if (actionCode == ActionCode.DISABLE_SWALLOW_INPUT) {
-            // Do not swallow request input but
-            // make sure we are closing the connection
+            // Do not swallow request input and make sure we are closing the
+            // connection
             error = true;
             getInputBuffer().setSwallowInput(false);
 
         } else if (actionCode == ActionCode.RESET) {
-            // Reset response
             // Note: This must be called before the response is committed
             getOutputBuffer().reset();
 
