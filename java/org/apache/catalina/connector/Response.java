@@ -462,8 +462,7 @@ public class Response
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public void flushBuffer()
-        throws IOException {
+    public void flushBuffer() throws IOException {
         outputBuffer.flush();
     }
 
