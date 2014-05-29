@@ -263,8 +263,7 @@ public final class Response {
     // -------------------- Methods --------------------
 
 
-    public void reset()
-        throws IllegalStateException {
+    public void reset() throws IllegalStateException {
 
         // Reset the headers only if this is the main request,
         // not for included
