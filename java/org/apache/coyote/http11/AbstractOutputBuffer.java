@@ -318,8 +318,6 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
             throw new IllegalStateException(sm.getString("iob.illegalreset"));
         }
 
-        // Recycle Request object
-        response.recycle();
         // These will need to be reset if the reset was triggered by the error
         // handling if the headers were too large
         pos = 0;
