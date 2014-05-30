@@ -16,10 +16,8 @@
  */
 package websocket.echo;
 
-import java.io.IOException;
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.io.Writer;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import javax.websocket.OnMessage;
