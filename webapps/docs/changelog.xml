@@ -135,6 +135,9 @@
         status code of the response, ensure that only one connection header is
         sent to the client. (markt)
       </fix>
+      <fix>
+        Fix input concurrency issue in NIO2 upgrade. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -175,6 +178,9 @@
         When a WebSocket client attempts to write to a closed connection, handle
         the resulting <code>IllegalStateException</code> in a manner consistent
         with the handling of an <code>IOException</code>. (markt)
+      </fix>
+      <fix>
+        Add more varied endpoints for echo testing. (remm)
       </fix>
     </changelog>
   </subsection>
