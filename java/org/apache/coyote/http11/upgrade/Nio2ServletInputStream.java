@@ -40,7 +40,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
     private final CompletionHandler<Integer, SocketWrapper<Nio2Channel>> completionHandler;
     private boolean flipped = false;
     private volatile boolean readPending = false;
-    private volatile boolean fireListener = false;
+    private volatile boolean interest = false;
 
     public Nio2ServletInputStream(SocketWrapper<Nio2Channel> wrapper, AbstractEndpoint<Nio2Channel> endpoint0) {
         this.endpoint = endpoint0;
@@ -49,31 +49,21 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
         this.completionHandler = new CompletionHandler<Integer, SocketWrapper<Nio2Channel>>() {
             @Override
             public void completed(Integer nBytes, SocketWrapper<Nio2Channel> attachment) {
-                boolean fire = false;
+                boolean notify = false;
                 synchronized (completionHandler) {
                     if (nBytes.intValue() < 0) {
                         failed(new EOFException(), attachment);
-                        return;
-                    }
-                    readPending = false;
-                    fire = fireListener;
-                    fireListener = false;
-                }
-                if (nBytes.intValue() > 0) {
-                    if (!Nio2Endpoint.isInline() && fire) {
-                        try {
-                            onDataAvailable();
-                        } catch (IOException e) {
-                            failed(e, attachment);
+                    } else {
+                        readPending = false;
+                        if (interest && !Nio2Endpoint.isInline()) {
+                            interest = false;
+                            notify = true;
                         }
                     }
-                } else {
-                    try {
-                        onAllDataRead();
-                    } catch (IOException e) {
-                        failed(e, attachment);
-                    }
                 }
+                if (notify) {
+                    endpoint.processSocket(attachment, SocketStatus.OPEN_READ, false);
+                } 
             }
             @Override
             public void failed(Throwable exc, SocketWrapper<Nio2Channel> attachment) {
@@ -93,7 +83,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
     protected boolean doIsReady() throws IOException {
         synchronized (completionHandler) {
             if (readPending) {
-                fireListener = true;
+                interest = true;
                 return false;
             }
             ByteBuffer readBuffer = channel.getBufHandler().getReadBuffer();
@@ -116,7 +106,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
                     flipped = true;
                 }
             } else {
-                fireListener = true;
+                interest = true;
             }
             return isReady;
         }

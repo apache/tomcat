@@ -58,13 +58,7 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
                 } else {
                     writePending.release();
                     if (!Nio2Endpoint.isInline()) {
-                        try {
-                            onWritePossible();
-                        } catch (IOException e) {
-                            socketWrapper.setError(true);
-                            onError(e);
-                            endpoint.processSocket(socketWrapper, SocketStatus.ERROR, false);
-                        }
+                        endpoint.processSocket(socketWrapper, SocketStatus.OPEN_WRITE, false);
                     }
                 }
             }
