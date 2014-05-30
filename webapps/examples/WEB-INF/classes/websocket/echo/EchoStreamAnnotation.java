@@ -19,7 +19,6 @@ package websocket.echo;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.nio.ByteBuffer;
 
 import javax.websocket.OnMessage;
 import javax.websocket.PongMessage;

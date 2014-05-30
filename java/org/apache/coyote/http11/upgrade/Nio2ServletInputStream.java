@@ -63,7 +63,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
                 }
                 if (notify) {
                     endpoint.processSocket(attachment, SocketStatus.OPEN_READ, false);
-                } 
+                }
             }
             @Override
             public void failed(Throwable exc, SocketWrapper<Nio2Channel> attachment) {
