@@ -20,11 +20,17 @@
   The following files are excluded:
 
   - *.html files in documentation are generated from XML sources
+
   - *.md5 files are generated and cannot contain license
+
   - *.manifest JAR manifest files cannot contain license
+
   - package-list files in API documentation (javadoc) are generated
+
   - other trivial test files, such as textual files containing only "OK' string,
   are also excluded.
+
+  - JSON files (RFC7159) are data and cannot contain comments
 
 output/build/webapps/docs/*.html
 output/build/webapps/docs/appdev/*.html
@@ -39,19 +45,27 @@ output/dist/webapps/docs/architecture/*.html
 output/dist/webapps/docs/config/*.html
 output/dist/webapps/docs/funcspecs/*.html
 output/dist/webapps/docs/tribes/*.html
+
 output/embed/*.md5
 output/extras/*.md5
+
 modules/jdbc-pool/resources/MANIFEST.MF
 output/dist/src/modules/jdbc-pool/resources/MANIFEST.MF
 output/dist/src/res/META-INF/*.manifest
 output/jdbc-pool/resources/MANIFEST.MF
 output/manifests/*.manifest
 res/META-INF/*.manifest
+
 output/dist/webapps/docs/api/package-list
 output/dist/webapps/docs/elapi/package-list
 output/dist/webapps/docs/jspapi/package-list
 output/dist/webapps/docs/servletapi/package-list
+
 output/dist/src/test/webapp/bug53257/*.txt
 output/dist/src/test/webapp-fragments/WEB-INF/classes/*.txt
 test/webapp/bug53257/*.txt
 test/webapp-fragments/WEB-INF/classes/*.txt
+
+webapps/examples/WEB-INF/classes/websocket/echo/servers.json
+output/build/webapps/examples/WEB-INF/classes/websocket/echo/servers.json
+output/dist/webapps/examples/WEB-INF/classes/websocket/echo/servers.json

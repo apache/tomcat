@@ -253,6 +253,7 @@
     <include name="**/*.ini"/>
     <include name="**/*.java"/>
     <include name="**/*.jjt"/>
+    <include name="**/*.json"/>
     <include name="**/*.jsp"/>
     <include name="**/*.jspf"/>
     <include name="**/*.jspx"/>
