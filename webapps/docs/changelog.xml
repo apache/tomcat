@@ -163,7 +163,7 @@
       </add>
       <fix>
         Correct a copy/paste error and return a 500 response rather than a 400
-        response when an internal server error occurs. (mark)
+        response when an internal server error occurs. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -323,8 +323,12 @@
         the WAR was deleted. (markt)
       </fix>
       <fix>
+        Fix CVE-2014-0119:
         Only create XML parsing objects if required and fix associated potential
-        memory leak in the default Servlet. (markt)
+        memory leak in the default Servlet.
+        Extend XML factory, parser etc. memory leak protection to cover some
+        additional locations where, theoretically, a memory leak could occur.
+        (markt)
       </fix>
       <fix>
         Modify generic exception handling so that
@@ -340,11 +344,6 @@
         <bug>56430</bug>: Extend checks for suspicious URL patterns to include
         patterns of the form <code>*.a.b</code> which are not valid patterns for
         extension mappings. (markt)
-      </add>
-      <add>
-        Extend XML factory, parser etc. memory leak protection to cover some
-        additional locations where, theoretically, a memory leak could occur.
-        (markt)
       </add>
       <fix>
         <bug>56441</bug>: Raise the visibility of exceptions thrown when a
@@ -763,6 +762,7 @@
         unit tests identified. Based on a patch by Larry Isaacs. (markt)
       </fix>
       <fix>
+        Fix CVE-2014-0096:
         Redefine the <code>globalXsltFile</code> initialisation parameter of the
         DefaultServlet as relative to CATALINA_BASE/conf or CATALINA_HOME/conf.
         Prevent user supplied XSLTs used by the DefaultServlet from defining
@@ -786,16 +786,19 @@
         Nabil Benothman. (remm)
       </add>
       <fix>
+        Fix CVE-2014-0075:
         Improve processing of chuck size from chunked headers. Avoid overflow
         and use a bit shift instead of a multiplication as it is marginally
         faster. (markt/kkolinko)
       </fix>
       <fix>
+        Fix CVE-2014-0095:
         Correct regression introduced in 8.0.0-RC2 as part of the Servlet 3.1
         non-blocking IO support that broke handling of requests with an explicit
         content length of zero. (markt/kkolinko)
       </fix>
       <fix>
+        Fix CVE-2014-0099:
         Fix possible overflow when parsing long values from a byte array.
         (markt)
       </fix>
