@@ -40,7 +40,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
     private final CompletionHandler<Integer, SocketWrapper<Nio2Channel>> completionHandler;
     private boolean flipped = false;
     private volatile boolean readPending = false;
-    private volatile boolean interest = false;
+    private volatile boolean interest = true;
 
     public Nio2ServletInputStream(SocketWrapper<Nio2Channel> wrapper, AbstractEndpoint<Nio2Channel> endpoint0) {
         this.endpoint = endpoint0;
