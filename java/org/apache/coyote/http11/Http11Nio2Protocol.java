@@ -17,6 +17,7 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
+import java.nio.channels.ReadPendingException;
 
 import javax.net.ssl.SSLEngine;
 import javax.servlet.http.HttpUpgradeHandler;
@@ -224,7 +225,13 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
                 ((Nio2Endpoint) proto.endpoint).addTimeout(socket);
             } else if (processor.isUpgrade()) {
                 if (((Nio2SocketWrapper) socket).isUpgradeInit()) {
-                    ((Nio2Endpoint) proto.endpoint).awaitBytes(socket);
+                    try {
+                        ((Nio2Endpoint) proto.endpoint).awaitBytes(socket);
+                    } catch (ReadPendingException e) {
+                        // Ignore, the initial state after upgrade is
+                        // impossible to predict, and a read must be pending
+                        // to get a first notification
+                    }
                 }
             } else {
                 // Either:
