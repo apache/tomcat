@@ -131,11 +131,6 @@
         processing. This fixes the Comet chat example. (markt)
       </fix>
       <fix>
-        <bug>56555</bug>: When Tomcat closes the connection based on the HTTP
-        status code of the response, ensure that only one connection header is
-        sent to the client. (markt)
-      </fix>
-      <fix>
         Fix input concurrency issue in NIO2 upgrade. (remm)
       </fix>
     </changelog>
