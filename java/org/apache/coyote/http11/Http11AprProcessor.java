@@ -260,12 +260,13 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
      * @param param Action parameter
      */
     @Override
+    @SuppressWarnings("incomplete-switch") // Other cases are handled by action()
     public void actionInternal(ActionCode actionCode, Object param) {
 
         long socketRef = socketWrapper.getSocket().longValue();
 
-        if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
-
+        switch (actionCode) {
+        case REQ_HOST_ADDR_ATTRIBUTE: {
             if (socketRef == 0) {
                 request.remoteAddr().recycle();
             } else {
@@ -279,9 +280,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 }
                 request.remoteAddr().setString(socketWrapper.getRemoteAddr());
             }
-
-        } else if (actionCode == ActionCode.REQ_LOCAL_NAME_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_LOCAL_NAME_ATTRIBUTE: {
             if (socketRef == 0) {
                 request.localName().recycle();
             } else {
@@ -295,9 +296,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 }
                 request.localName().setString(socketWrapper.getLocalName());
             }
-
-        } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_HOST_ATTRIBUTE: {
             if (socketRef == 0) {
                 request.remoteHost().recycle();
             } else {
@@ -320,9 +321,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                     request.remoteHost().setString(socketWrapper.getRemoteHost());
                 }
             }
-
-        } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_LOCAL_ADDR_ATTRIBUTE: {
             if (socketRef == 0) {
                 request.localAddr().recycle();
             } else {
@@ -336,9 +337,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 }
                 request.localAddr().setString(socketWrapper.getLocalAddr());
             }
-
-        } else if (actionCode == ActionCode.REQ_REMOTEPORT_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_REMOTEPORT_ATTRIBUTE: {
             if (socketRef == 0) {
                 request.setRemotePort(0);
             } else {
@@ -353,9 +354,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 }
                 request.setRemotePort(socketWrapper.getRemotePort());
             }
-
-        } else if (actionCode == ActionCode.REQ_LOCALPORT_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_LOCALPORT_ATTRIBUTE: {
             if (socketRef == 0) {
                 request.setLocalPort(0);
             } else {
@@ -370,9 +371,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 }
                 request.setLocalPort(socketWrapper.getLocalPort());
             }
-
-        } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
-
+            break;
+        }
+        case REQ_SSL_ATTRIBUTE: {
             if (endpoint.isSSLEnabled() && (socketRef != 0)) {
                 try {
                     // Cipher suite
@@ -419,9 +420,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                     log.warn(sm.getString("http11processor.socket.ssl"), e);
                 }
             }
-
-        } else if (actionCode == ActionCode.REQ_SSL_CERTIFICATE) {
-
+            break;
+        }
+        case REQ_SSL_CERTIFICATE: {
             if (endpoint.isSSLEnabled() && (socketRef != 0)) {
                 // Consume and buffer the request body, so that it does not
                 // interfere with the client's handshake messages
@@ -457,16 +458,25 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                     log.warn(sm.getString("http11processor.socket.ssl"), e);
                 }
             }
-
-        } else if (actionCode == ActionCode.COMET_BEGIN) {
+            break;
+        }
+        case COMET_BEGIN: {
             comet = true;
-        } else if (actionCode == ActionCode.COMET_END) {
+            break;
+        }
+        case COMET_END: {
             comet = false;
-        } else if (actionCode == ActionCode.COMET_CLOSE) {
+            break;
+        }
+        case COMET_CLOSE: {
             ((AprEndpoint)endpoint).processSocket(this.socketWrapper,
                     SocketStatus.OPEN_READ, true);
-        } else if (actionCode == ActionCode.COMET_SETTIMEOUT) {
+            break;
+        }
+        case COMET_SETTIMEOUT: {
             //no op
+            break;
+        }
         }
     }
 
