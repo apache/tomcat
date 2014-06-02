@@ -133,6 +133,10 @@
       <fix>
         Fix input concurrency issue in NIO2 upgrade. (remm)
       </fix>
+      <scode>
+        <bug>56582</bug>: Use switch(actionCode) in processors instead of a
+        chain of "elseif"s. (kkolinko)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">

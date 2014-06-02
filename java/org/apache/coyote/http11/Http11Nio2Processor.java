@@ -307,10 +307,11 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
      * @param param Action parameter
      */
     @Override
+    @SuppressWarnings("incomplete-switch") // Other cases are handled by action()
     public void actionInternal(ActionCode actionCode, Object param) {
 
-        if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
-
+        switch (actionCode) {
+        case REQ_HOST_ADDR_ATTRIBUTE: {
             if (socketWrapper == null || socketWrapper.getSocket() == null) {
                 request.remoteAddr().recycle();
             } else {
@@ -327,9 +328,9 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                 }
                 request.remoteAddr().setString(socketWrapper.getRemoteAddr());
             }
-
-        } else if (actionCode == ActionCode.REQ_LOCAL_NAME_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_LOCAL_NAME_ATTRIBUTE: {
             if (socketWrapper == null || socketWrapper.getSocket() == null) {
                 request.localName().recycle();
             } else {
@@ -346,9 +347,9 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                 }
                 request.localName().setString(socketWrapper.getLocalName());
             }
-
-        } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_HOST_ATTRIBUTE: {
             if (socketWrapper == null || socketWrapper.getSocket() == null) {
                 request.remoteHost().recycle();
             } else {
@@ -374,9 +375,9 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                 }
                 request.remoteHost().setString(socketWrapper.getRemoteHost());
             }
-
-        } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_LOCAL_ADDR_ATTRIBUTE: {
             if (socketWrapper == null || socketWrapper.getSocket() == null) {
                 request.localAddr().recycle();
             } else {
@@ -390,9 +391,9 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                 }
                 request.localAddr().setString(socketWrapper.getLocalAddr());
             }
-
-        } else if (actionCode == ActionCode.REQ_REMOTEPORT_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_REMOTEPORT_ATTRIBUTE: {
             if (socketWrapper == null || socketWrapper.getSocket() == null) {
                 request.setRemotePort(0);
             } else {
@@ -405,9 +406,9 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                 }
                 request.setRemotePort(socketWrapper.getRemotePort());
             }
-
-        } else if (actionCode == ActionCode.REQ_LOCALPORT_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_LOCALPORT_ATTRIBUTE: {
             if (socketWrapper == null || socketWrapper.getSocket() == null) {
                 request.setLocalPort(0);
             } else {
@@ -420,9 +421,9 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                 }
                 request.setLocalPort(socketWrapper.getLocalPort());
             }
-
-        } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
-
+            break;
+        }
+        case REQ_SSL_ATTRIBUTE: {
             try {
                 if (sslSupport != null) {
                     Object sslO = sslSupport.getCipherSuite();
@@ -450,9 +451,9 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
             } catch (Exception e) {
                 log.warn(sm.getString("http11processor.socket.ssl"), e);
             }
-
-        } else if (actionCode == ActionCode.REQ_SSL_CERTIFICATE) {
-
+            break;
+        }
+        case REQ_SSL_CERTIFICATE: {
             if (sslSupport != null && socketWrapper.getSocket() != null) {
                 /*
                  * Consume and buffer the request body, so that it does not
@@ -490,11 +491,17 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                     log.warn(sm.getString("http11processor.socket.ssl"), e);
                 }
             }
-        } else if (actionCode == ActionCode.COMET_BEGIN) {
+            break;
+        }
+        case COMET_BEGIN: {
             comet = true;
-        } else if (actionCode == ActionCode.COMET_END) {
+            break;
+        }
+        case COMET_END: {
             comet = false;
-        } else if (actionCode == ActionCode.COMET_CLOSE) {
+            break;
+        }
+        case COMET_CLOSE: {
             if (socketWrapper == null || socketWrapper.getSocket() == null) {
                 return;
             }
@@ -505,7 +512,9 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                 // an application controlled thread) or similar.
                 endpoint.processSocket(this.socketWrapper, SocketStatus.OPEN_READ, true);
             }
-        } else if (actionCode == ActionCode.COMET_SETTIMEOUT) {
+            break;
+        }
+        case COMET_SETTIMEOUT: {
             if (param == null) {
                 return;
             }
@@ -518,6 +527,8 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {
                 socketWrapper.setTimeout(timeout);
             }
+            break;
+        }
         }
     }
 
