@@ -25,7 +25,6 @@ import java.net.Socket;
 import java.nio.CharBuffer;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -52,45 +51,6 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestAbstractHttp11Processor extends TomcatBaseTest {
-
-    @Test
-    public void testStatusForcesClose() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        // Must have a real docBase - just use temp
-        Context ctxt = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-
-        // Add protected servlet
-        Tomcat.addServlet(ctxt, "StatusForcesCloseServlet", new StatusForcesCloseServlet());
-        ctxt.addServletMapping("/*", "StatusForcesCloseServlet");
-
-        tomcat.start();
-
-        ByteChunk bc = new ByteChunk();
-        Map<String,List<String>> responseHeaders = new HashMap<>();
-        getUrl("http://localhost:" + getPort() + "/anything", bc, responseHeaders);
-
-        // Assumes header name uses standard case
-        List<String> values = responseHeaders.get("Connection");
-        Assert.assertEquals(1, values.size());
-        Assert.assertEquals("close", values.get(0).toLowerCase(Locale.ENGLISH));
-    }
-
-    private static class StatusForcesCloseServlet extends HttpServlet {
-
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-
-            // Set the Connection header
-            resp.setHeader("Connection", "keep-alive");
-
-            // Set a status code that should force the connection to close
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        }
-    }
 
     @Test
     public void testWithTEVoid() throws Exception {
