@@ -219,15 +219,18 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
 
     @Override
     public void action(ActionCode actionCode, Object param) {
-        if (SpdyContext.debug) {
-            // System.err.println(actionCode);
-        }
+        // if (SpdyContext.debug) {
+        // System.err.println(actionCode);
+        // }
 
         // TODO: async
 
-        if (actionCode == ActionCode.COMMIT) {
+        switch (actionCode) {
+        case COMMIT: {
             maybeCommit();
-        } else if (actionCode == ActionCode.CLIENT_FLUSH) {
+            break;
+        }
+        case CLIENT_FLUSH: {
             maybeCommit();
 
             // try {
@@ -236,16 +239,19 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
             // // Set error flag
             // error = true;
             // }
-
-        } else if (actionCode == ActionCode.IS_ERROR) {
+            break;
+        }
+        case IS_ERROR: {
             ((AtomicBoolean) param).set(error);
-
-        } else if (actionCode == ActionCode.DISABLE_SWALLOW_INPUT) {
+            break;
+        }
+        case DISABLE_SWALLOW_INPUT: {
             // TODO: Do not swallow request input but
             // make sure we are closing the connection
             error = true;
-
-        } else if (actionCode == ActionCode.CLOSE) {
+            break;
+        }
+        case CLOSE: {
             if (outClosed) {
                 return;
             }
@@ -256,9 +262,9 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
             maybeCommit();
 
             spdyStream.sendDataFrame(EMPTY, 0, 0, true);
-
-        } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_SSL_ATTRIBUTE: {
             // if (!certificates.isNull()) {
             // ByteChunk certData = certificates.getByteChunk();
             // X509Certificate jsseCerts[] = null;
@@ -298,9 +304,9 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
             // }
             // request.setAttribute(SSLSupport.CERTIFICATE_KEY, jsseCerts);
             // }
-
-        } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_HOST_ATTRIBUTE: {
             // Get remote host name using a DNS resolution
             if (request.remoteHost().isNull()) {
                 try {
@@ -312,7 +318,9 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
                     // Ignore
                 }
             }
-        } else if (actionCode == ActionCode.REQ_LOCALPORT_ATTRIBUTE) {
+            break;
+        }
+        case REQ_LOCALPORT_ATTRIBUTE: {
             String configured = (String) endpoint.getAttribute("proxyPort");
             int localPort = 0;
             if (configured != null) {
@@ -321,8 +329,9 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
                 localPort = endpoint.getPort();
             }
             request.setLocalPort(localPort);
-
-        } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
+            break;
+        }
+        case REQ_LOCAL_ADDR_ATTRIBUTE: {
             InetAddress localAddress = endpoint.getAddress();
             String localIp = localAddress == null ? null : localAddress
                     .getHostAddress();
@@ -333,8 +342,9 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
                 localIp = "127.0.0.1";
             }
             request.localAddr().setString(localIp);
-
-        } else if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
+            break;
+        }
+        case REQ_HOST_ADDR_ATTRIBUTE: {
             InetAddress localAddress = endpoint.getAddress();
             String localH = localAddress == null ? null : localAddress
                     .getCanonicalHostName();
@@ -346,9 +356,9 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
             }
 
             request.localAddr().setString(localH);
-
-        } else if (actionCode == ActionCode.REQ_SET_BODY_REPLAY) {
-
+            break;
+        }
+        case REQ_SET_BODY_REPLAY: {
             // // Set the given bytes as the content
             // ByteChunk bc = (ByteChunk) param;
             // int length = bc.getLength();
@@ -357,33 +367,55 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
             // first = false;
             // empty = false;
             // replay = true;
-
-        } else if (actionCode == ActionCode.ASYNC_START) {
+            break;
+        }
+        case ASYNC_START: {
             asyncStateMachine.asyncStart((AsyncContextCallback) param);
-        } else if (actionCode == ActionCode.ASYNC_DISPATCHED) {
+            break;
+        }
+        case ASYNC_DISPATCHED: {
             asyncStateMachine.asyncDispatched();
-        } else if (actionCode == ActionCode.ASYNC_TIMEOUT) {
+            break;
+        }
+        case ASYNC_TIMEOUT: {
             AtomicBoolean result = (AtomicBoolean) param;
             result.set(asyncStateMachine.asyncTimeout());
-        } else if (actionCode == ActionCode.ASYNC_RUN) {
+            break;
+        }
+        case ASYNC_RUN: {
             asyncStateMachine.asyncRun((Runnable) param);
-        } else if (actionCode == ActionCode.ASYNC_ERROR) {
+            break;
+        }
+        case ASYNC_ERROR: {
             asyncStateMachine.asyncError();
-        } else if (actionCode == ActionCode.ASYNC_IS_STARTED) {
+            break;
+        }
+        case ASYNC_IS_STARTED: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarted());
-        } else if (actionCode == ActionCode.ASYNC_IS_DISPATCHING) {
+            break;
+        }
+        case ASYNC_IS_DISPATCHING: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncDispatching());
-        } else if (actionCode == ActionCode.ASYNC_IS_ASYNC) {
+            break;
+        }
+        case ASYNC_IS_ASYNC: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsync());
-        } else if (actionCode == ActionCode.ASYNC_IS_TIMINGOUT) {
+            break;
+        }
+        case ASYNC_IS_TIMINGOUT: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
-        } else if (actionCode == ActionCode.ASYNC_IS_ERROR) {
+            break;
+        }
+        case ASYNC_IS_ERROR: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
-        } else {
+            break;
+        }
+        default: {
             // TODO:
             // actionInternal(actionCode, param);
+            break;
         }
-
+        }
     }
 
 
