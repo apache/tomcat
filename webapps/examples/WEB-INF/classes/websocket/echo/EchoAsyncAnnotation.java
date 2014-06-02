@@ -39,8 +39,7 @@ public class EchoAsyncAnnotation {
     ByteArrayOutputStream bytes = null;
 
     @OnMessage
-    public void echoTextMessage(Session session, String msg, boolean last)
-            throws IOException {
+    public void echoTextMessage(Session session, String msg, boolean last) {
         if (sb == null) {
             sb = new StringBuilder();
         }
