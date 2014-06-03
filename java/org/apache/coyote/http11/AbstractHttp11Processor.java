@@ -1055,8 +1055,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                         getLog().debug(sm.getString(
                                 "http11processor.request.prepare"), t);
                     }
-                    // 400 - Internal Server Error
-                    response.setStatus(400);
+                    // 500 - Internal Server Error
+                    response.setStatus(500);
                     getAdapter().log(request, response, 0);
                     error = true;
                 }
