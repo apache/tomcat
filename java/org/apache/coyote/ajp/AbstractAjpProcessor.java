@@ -644,7 +644,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             break;
         }
         case DISPATCH_EXECUTE: {
-            // FIXME: Why this ActionCode is not implemented for AJP?
+            getEndpoint().executeNonBlockingDispatches(socketWrapper);
             break;
         }
         }
