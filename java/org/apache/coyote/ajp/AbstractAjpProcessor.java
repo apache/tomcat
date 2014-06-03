@@ -360,7 +360,8 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     @Override
     public final void action(ActionCode actionCode, Object param) {
 
-        if (actionCode == ActionCode.CLOSE) {
+        switch (actionCode) {
+        case CLOSE: {
             // End the processing of the current request, and stop any further
             // transactions with the client
 
@@ -370,9 +371,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 // Set error flag
                 error = true;
             }
-
-        } else if (actionCode == ActionCode.COMMIT) {
-
+            break;
+        }
+        case COMMIT: {
             if (response.isCommitted())
                 return;
 
@@ -390,12 +391,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 // Set error flag
                 error = true;
             }
-
-        } else if (actionCode == ActionCode.ACK) {
+            break;
+        }
+        case ACK: {
             // NO_OP for AJP
-
-        } else if (actionCode == ActionCode.CLIENT_FLUSH) {
-
+            break;
+        }
+        case CLIENT_FLUSH: {
             if (!response.isCommitted()) {
                 // Validate and write response headers
                 try {
@@ -413,20 +415,23 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 // Set error flag
                 error = true;
             }
-
-        } else if (actionCode == ActionCode.IS_ERROR) {
+            break;
+        }
+        case IS_ERROR: {
             ((AtomicBoolean) param).set(error);
-
-        } else if (actionCode == ActionCode.DISABLE_SWALLOW_INPUT) {
+            break;
+        }
+        case DISABLE_SWALLOW_INPUT: {
             // TODO: Do not swallow request input but
             // make sure we are closing the connection
             error = true;
-
-        } else if (actionCode == ActionCode.RESET) {
+            break;
+        }
+        case RESET: {
             // NO-OP
-
-        } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
-
+            break;
+        }
+        case REQ_SSL_ATTRIBUTE: {
             if (!certificates.isNull()) {
                 ByteChunk certData = certificates.getByteChunk();
                 X509Certificate jsseCerts[] = null;
@@ -465,12 +470,14 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 }
                 request.setAttribute(SSLSupport.CERTIFICATE_KEY, jsseCerts);
             }
-
-        } else if (actionCode == ActionCode.REQ_SSL_CERTIFICATE) {
+            break;
+        }
+        case REQ_SSL_CERTIFICATE: {
             // NO-OP. Can't force a new SSL handshake with the client when using
             // AJP as the reverse proxy controls that connection.
-
-        } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
+            break;
+        }
+        case REQ_HOST_ATTRIBUTE: {
             // Get remote host name using a DNS resolution
             if (request.remoteHost().isNull()) {
                 try {
@@ -480,28 +487,34 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     // Ignore
                 }
             }
-
-        } else if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
+            break;
+        }
+        case REQ_HOST_ADDR_ATTRIBUTE: {
             // NO-OP
             // Automatically populated during prepareRequest()
-
-        } else if (actionCode == ActionCode.REQ_LOCAL_NAME_ATTRIBUTE) {
+            break;
+        }
+        case REQ_LOCAL_NAME_ATTRIBUTE: {
             // NO-OP
             // Automatically populated during prepareRequest()
-
-        } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
+            break;
+        }
+        case REQ_LOCAL_ADDR_ATTRIBUTE: {
             // Copy from local name for now, which should simply be an address
             request.localAddr().setString(request.localName().toString());
-
-        } else if (actionCode == ActionCode.REQ_REMOTEPORT_ATTRIBUTE) {
+            break;
+        }
+        case REQ_REMOTEPORT_ATTRIBUTE: {
             // NO-OP
             // This information is not available when using the AJP protocol
-
-        } else if (actionCode == ActionCode.REQ_LOCALPORT_ATTRIBUTE) {
+            break;
+        }
+        case REQ_LOCALPORT_ATTRIBUTE: {
             // NO-OP
             // Automatically populated during prepareRequest()
-
-        } else if (actionCode == ActionCode.REQ_SET_BODY_REPLAY) {
+            break;
+        }
+        case REQ_SET_BODY_REPLAY: {
             // Set the given bytes as the content
             ByteChunk bc = (ByteChunk) param;
             int length = bc.getLength();
@@ -511,110 +524,135 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             empty = false;
             replay = true;
             endOfStream = false;
-
-        } else if (actionCode == ActionCode.ASYNC_START) {
+            break;
+        }
+        case ASYNC_START: {
             asyncStateMachine.asyncStart((AsyncContextCallback) param);
             // Async time out is based on SocketWrapper access time
             getSocketWrapper().access();
-
-        } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
+            break;
+        }
+        case ASYNC_COMPLETE: {
             socketWrapper.clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
                 endpoint.processSocket(socketWrapper, SocketStatus.OPEN_READ, true);
             }
-
-        } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
+            break;
+        }
+        case ASYNC_DISPATCH: {
             if (asyncStateMachine.asyncDispatch()) {
                 endpoint.processSocket(socketWrapper, SocketStatus.OPEN_READ, true);
             }
-
-        } else if (actionCode == ActionCode.ASYNC_DISPATCHED) {
+            break;
+        }
+        case ASYNC_DISPATCHED: {
             asyncStateMachine.asyncDispatched();
-
-        } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
+            break;
+        }
+        case ASYNC_SETTIMEOUT: {
             if (param == null) return;
             long timeout = ((Long)param).longValue();
             socketWrapper.setTimeout(timeout);
-
-        } else if (actionCode == ActionCode.ASYNC_TIMEOUT) {
+            break;
+        }
+        case ASYNC_TIMEOUT: {
             AtomicBoolean result = (AtomicBoolean) param;
             result.set(asyncStateMachine.asyncTimeout());
-
-        } else if (actionCode == ActionCode.ASYNC_RUN) {
+            break;
+        }
+        case ASYNC_RUN: {
             asyncStateMachine.asyncRun((Runnable) param);
-
-        } else if (actionCode == ActionCode.ASYNC_ERROR) {
+            break;
+        }
+        case ASYNC_ERROR: {
             asyncStateMachine.asyncError();
-
-        } else if (actionCode == ActionCode.ASYNC_IS_STARTED) {
+            break;
+        }
+        case ASYNC_IS_STARTED: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarted());
-
-        } else if (actionCode == ActionCode.ASYNC_IS_DISPATCHING) {
+            break;
+        }
+        case ASYNC_IS_DISPATCHING: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncDispatching());
-
-        } else if (actionCode == ActionCode.ASYNC_IS_ASYNC) {
+            break;
+        }
+        case ASYNC_IS_ASYNC: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsync());
-
-        } else if (actionCode == ActionCode.ASYNC_IS_TIMINGOUT) {
+            break;
+        }
+        case ASYNC_IS_TIMINGOUT: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
-
-        } else if (actionCode == ActionCode.ASYNC_IS_ERROR) {
+            break;
+        }
+        case ASYNC_IS_ERROR: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
-
-        } else if (actionCode == ActionCode.UPGRADE) {
+            break;
+        }
+        case UPGRADE: {
             // HTTP connections only. Unsupported for AJP.
             throw new UnsupportedOperationException(
                     sm.getString("ajpprocessor.httpupgrade.notsupported"));
-
-        } else if (actionCode == ActionCode.COMET_BEGIN) {
+        }
+        case COMET_BEGIN: {
             // HTTP connections only. Unsupported for AJP.
             throw new UnsupportedOperationException(
                     sm.getString("ajpprocessor.comet.notsupported"));
-
-        } else if (actionCode == ActionCode.COMET_END) {
+        }
+        case COMET_END: {
             // HTTP connections only. Unsupported for AJP.
             throw new UnsupportedOperationException(
                     sm.getString("ajpprocessor.comet.notsupported"));
-
-        } else if (actionCode == ActionCode.COMET_CLOSE) {
+        }
+        case COMET_CLOSE: {
             // HTTP connections only. Unsupported for AJP.
             throw new UnsupportedOperationException(
                     sm.getString("ajpprocessor.comet.notsupported"));
-
-        } else if (actionCode == ActionCode.COMET_SETTIMEOUT) {
+        }
+        case COMET_SETTIMEOUT: {
             // HTTP connections only. Unsupported for AJP.
             throw new UnsupportedOperationException(
                     sm.getString("ajpprocessor.comet.notsupported"));
-
-        } else if (actionCode == ActionCode.AVAILABLE) {
+        }
+        case AVAILABLE: {
             if (available()) {
                 request.setAvailable(1);
             } else {
                 request.setAvailable(0);
             }
-
-        } else if (actionCode == ActionCode.NB_READ_INTEREST) {
+            break;
+        }
+        case NB_READ_INTEREST: {
             if (!endOfStream) {
                 registerForEvent(true, false);
             }
-
-        } else if (actionCode == ActionCode.NB_WRITE_INTEREST) {
+            break;
+        }
+        case NB_WRITE_INTEREST: {
             AtomicBoolean isReady = (AtomicBoolean)param;
             boolean result = bufferedWrites.size() == 0 && responseMsgPos == -1;
             isReady.set(result);
             if (!result) {
                 registerForEvent(false, true);
             }
-
-        } else if (actionCode == ActionCode.REQUEST_BODY_FULLY_READ) {
+            break;
+        }
+        case REQUEST_BODY_FULLY_READ: {
             AtomicBoolean result = (AtomicBoolean) param;
             result.set(endOfStream);
-
-        } else if (actionCode == ActionCode.DISPATCH_READ) {
+            break;
+        }
+        case DISPATCH_READ: {
             socketWrapper.addDispatch(DispatchType.NON_BLOCKING_READ);
-
-        } else if (actionCode == ActionCode.DISPATCH_WRITE) {
+            break;
+        }
+        case DISPATCH_WRITE: {
             socketWrapper.addDispatch(DispatchType.NON_BLOCKING_WRITE);
+            break;
+        }
+        case DISPATCH_EXECUTE: {
+            // FIXME: Why this ActionCode is not implemented for AJP?
+            break;
+        }
         }
     }
 
