@@ -88,6 +88,10 @@
         buffer when the buffer is only partially written on a subsequent write.
         (markt)
       </fix>
+      <scode>
+        <bug>56582</bug>: Use switch(actionCode) in processors instead of a
+        chain of "elseif"s. (kkolinko)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -240,11 +240,12 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
      * @param actionCode Type of the action
      * @param param Action parameter
      */
+    @SuppressWarnings("incomplete-switch") // Other cases are handled by action()
     @Override
     public void actionInternal(ActionCode actionCode, Object param) {
 
-        if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
-
+        switch (actionCode) {
+        case REQ_SSL_ATTRIBUTE: {
             try {
                 if (sslSupport != null) {
                     Object sslO = sslSupport.getCipherSuite();
@@ -268,9 +269,9 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             } catch (Exception e) {
                 log.warn(sm.getString("http11processor.socket.ssl"), e);
             }
-
-        } else if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_HOST_ADDR_ATTRIBUTE: {
             if ((remoteAddr == null) && (socketWrapper != null)) {
                 InetAddress inetAddr = socketWrapper.getSocket().getInetAddress();
                 if (inetAddr != null) {
@@ -278,9 +279,9 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                 }
             }
             request.remoteAddr().setString(remoteAddr);
-
-        } else if (actionCode == ActionCode.REQ_LOCAL_NAME_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_LOCAL_NAME_ATTRIBUTE: {
             if ((localName == null) && (socketWrapper != null)) {
                 InetAddress inetAddr = socketWrapper.getSocket().getLocalAddress();
                 if (inetAddr != null) {
@@ -288,9 +289,9 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                 }
             }
             request.localName().setString(localName);
-
-        } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_HOST_ATTRIBUTE: {
             if ((remoteHost == null) && (socketWrapper != null)) {
                 InetAddress inetAddr = socketWrapper.getSocket().getInetAddress();
                 if (inetAddr != null) {
@@ -305,30 +306,31 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                 }
             }
             request.remoteHost().setString(remoteHost);
-
-        } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_LOCAL_ADDR_ATTRIBUTE: {
             if (localAddr == null)
                localAddr = socketWrapper.getSocket().getLocalAddress().getHostAddress();
 
             request.localAddr().setString(localAddr);
-
-        } else if (actionCode == ActionCode.REQ_REMOTEPORT_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_REMOTEPORT_ATTRIBUTE: {
             if ((remotePort == -1 ) && (socketWrapper !=null)) {
                 remotePort = socketWrapper.getSocket().getPort();
             }
             request.setRemotePort(remotePort);
-
-        } else if (actionCode == ActionCode.REQ_LOCALPORT_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_LOCALPORT_ATTRIBUTE: {
             if ((localPort == -1 ) && (socketWrapper !=null)) {
                 localPort = socketWrapper.getSocket().getLocalPort();
             }
             request.setLocalPort(localPort);
-
-        } else if (actionCode == ActionCode.REQ_SSL_CERTIFICATE) {
-            if( sslSupport != null) {
+            break;
+        }
+        case REQ_SSL_CERTIFICATE: {
+            if (sslSupport != null) {
                 /*
                  * Consume and buffer the request body, so that it does not
                  * interfere with the client's handshake messages
@@ -348,21 +350,29 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                     log.warn(sm.getString("http11processor.socket.ssl"), e);
                 }
             }
-        } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
+            break;
+        }
+        case ASYNC_COMPLETE: {
             if (asyncStateMachine.asyncComplete()) {
                 ((JIoEndpoint) endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);
             }
-        } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
+            break;
+        }
+        case ASYNC_SETTIMEOUT: {
             if (param == null) return;
             long timeout = ((Long)param).longValue();
             // if we are not piggy backing on a worker thread, set the timeout
             socketWrapper.setTimeout(timeout);
-        } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
+            break;
+        }
+        case ASYNC_DISPATCH: {
             if (asyncStateMachine.asyncDispatch()) {
                 ((JIoEndpoint) endpoint).processSocketAsync(this.socketWrapper,
                         SocketStatus.OPEN_READ);
             }
+            break;
+        }
         }
     }
 

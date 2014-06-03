@@ -751,7 +751,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     @SuppressWarnings("deprecation") // Inbound/Outbound based upgrade mechanism
     public final void action(ActionCode actionCode, Object param) {
 
-        if (actionCode == ActionCode.CLOSE) {
+        switch (actionCode) {
+        case CLOSE: {
             // End the processing of the current request
 
             try {
@@ -760,8 +761,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 // Set error flag
                 error = true;
             }
-
-        } else if (actionCode == ActionCode.COMMIT) {
+            break;
+        }
+        case COMMIT: {
             // Commit current response
 
             if (response.isCommitted()) {
@@ -776,8 +778,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 // Set error flag
                 error = true;
             }
-
-        } else if (actionCode == ActionCode.ACK) {
+            break;
+        }
+        case ACK: {
             // Acknowledge request
             // Send a 100 status back if it makes sense (response not committed
             // yet, and client specified an expectation for 100-continue)
@@ -793,8 +796,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 // Set error flag
                 error = true;
             }
-        } else if (actionCode == ActionCode.CLIENT_FLUSH) {
-
+            break;
+        }
+        case CLIENT_FLUSH: {
             try {
                 getOutputBuffer().flush();
             } catch (IOException e) {
@@ -802,27 +806,32 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 error = true;
                 response.setErrorException(e);
             }
-
-        } else if (actionCode == ActionCode.IS_ERROR) {
+            break;
+        }
+        case IS_ERROR: {
             ((AtomicBoolean) param).set(error);
-
-        } else if (actionCode == ActionCode.DISABLE_SWALLOW_INPUT) {
+            break;
+        }
+        case DISABLE_SWALLOW_INPUT: {
             // Do not swallow request input but
             // make sure we are closing the connection
             error = true;
             getInputBuffer().setSwallowInput(false);
-
-        } else if (actionCode == ActionCode.RESET) {
+            break;
+        }
+        case RESET: {
             // Reset response
             // Note: This must be called before the response is committed
 
             getOutputBuffer().reset();
-
-        } else if (actionCode == ActionCode.CUSTOM) {
+            break;
+        }
+        case CUSTOM: {
             // Do nothing
             // TODO Remove this action
-
-        } else if (actionCode == ActionCode.REQ_SET_BODY_REPLAY) {
+            break;
+        }
+        case REQ_SET_BODY_REPLAY: {
             ByteChunk body = (ByteChunk) param;
 
             InputFilter savedBody = new SavedRequestInputFilter(body);
@@ -832,39 +841,67 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             AbstractInputBuffer<S> internalBuffer = (AbstractInputBuffer<S>)
                 request.getInputBuffer();
             internalBuffer.addActiveFilter(savedBody);
-        } else if (actionCode == ActionCode.ASYNC_START) {
+            break;
+        }
+        case ASYNC_START: {
             asyncStateMachine.asyncStart((AsyncContextCallback) param);
             // Async time out is based on SocketWrapper access time
             getSocketWrapper().access();
-        } else if (actionCode == ActionCode.ASYNC_DISPATCHED) {
+            break;
+        }
+        case ASYNC_DISPATCHED: {
             asyncStateMachine.asyncDispatched();
-        } else if (actionCode == ActionCode.ASYNC_TIMEOUT) {
+            break;
+        }
+        case ASYNC_TIMEOUT: {
             AtomicBoolean result = (AtomicBoolean) param;
             result.set(asyncStateMachine.asyncTimeout());
-        } else if (actionCode == ActionCode.ASYNC_RUN) {
+            break;
+        }
+        case ASYNC_RUN: {
             asyncStateMachine.asyncRun((Runnable) param);
-        } else if (actionCode == ActionCode.ASYNC_ERROR) {
+            break;
+        }
+        case ASYNC_ERROR: {
             asyncStateMachine.asyncError();
-        } else if (actionCode == ActionCode.ASYNC_IS_STARTED) {
+            break;
+        }
+        case ASYNC_IS_STARTED: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarted());
-        } else if (actionCode == ActionCode.ASYNC_IS_DISPATCHING) {
+            break;
+        }
+        case ASYNC_IS_DISPATCHING: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncDispatching());
-        } else if (actionCode == ActionCode.ASYNC_IS_ASYNC) {
+            break;
+        }
+        case ASYNC_IS_ASYNC: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsync());
-        } else if (actionCode == ActionCode.ASYNC_IS_TIMINGOUT) {
+            break;
+        }
+        case ASYNC_IS_TIMINGOUT: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
-        } else if (actionCode == ActionCode.ASYNC_IS_ERROR) {
+            break;
+        }
+        case ASYNC_IS_ERROR: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
-        } else if (actionCode == ActionCode.UPGRADE_TOMCAT) {
+            break;
+        }
+        case UPGRADE_TOMCAT: {
             upgradeInbound = (org.apache.coyote.http11.upgrade.UpgradeInbound) param;
             // Stop further HTTP output
             getOutputBuffer().finished = true;
-        } else if (actionCode == ActionCode.UPGRADE) {
+            break;
+        }
+        case UPGRADE: {
             httpUpgradeHandler = (HttpUpgradeHandler) param;
             // Stop further HTTP output
             getOutputBuffer().finished = true;
-        } else {
+            break;
+        }
+        default: {
             actionInternal(actionCode, param);
+            break;
+        }
         }
     }
 
