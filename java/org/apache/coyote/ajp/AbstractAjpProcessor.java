@@ -319,8 +319,8 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     @Override
     public final void action(ActionCode actionCode, Object param) {
 
-        if (actionCode == ActionCode.COMMIT) {
-
+        switch (actionCode) {
+        case COMMIT: {
             if (response.isCommitted())
                 return;
 
@@ -338,9 +338,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 // Set error flag
                 error = true;
             }
-
-        } else if (actionCode == ActionCode.CLIENT_FLUSH) {
-
+            break;
+        }
+        case CLIENT_FLUSH: {
             if (!response.isCommitted()) {
                 // Validate and write response headers
                 try {
@@ -358,16 +358,19 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 // Set error flag
                 error = true;
             }
-
-        } else if (actionCode == ActionCode.IS_ERROR) {
+            break;
+        }
+        case IS_ERROR: {
             ((AtomicBoolean) param).set(error);
-
-        } else if (actionCode == ActionCode.DISABLE_SWALLOW_INPUT) {
+            break;
+        }
+        case DISABLE_SWALLOW_INPUT: {
             // TODO: Do not swallow request input but
             // make sure we are closing the connection
             error = true;
-
-        } else if (actionCode == ActionCode.CLOSE) {
+            break;
+        }
+        case CLOSE: {
             // Close
             // End the processing of the current request, and stop any further
             // transactions with the client
@@ -378,9 +381,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 // Set error flag
                 error = true;
             }
-
-        } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
-
+            break;
+        }
+        case REQ_SSL_ATTRIBUTE: {
             if (!certificates.isNull()) {
                 ByteChunk certData = certificates.getByteChunk();
                 X509Certificate jsseCerts[] = null;
@@ -419,9 +422,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 }
                 request.setAttribute(SSLSupport.CERTIFICATE_KEY, jsseCerts);
             }
-
-        } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_HOST_ATTRIBUTE: {
             // Get remote host name using a DNS resolution
             if (request.remoteHost().isNull()) {
                 try {
@@ -431,14 +434,14 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     // Ignore
                 }
             }
-
-        } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
-
+            break;
+        }
+        case REQ_LOCAL_ADDR_ATTRIBUTE: {
             // Copy from local name for now, which should simply be an address
             request.localAddr().setString(request.localName().toString());
-
-        } else if (actionCode == ActionCode.REQ_SET_BODY_REPLAY) {
-
+            break;
+        }
+        case REQ_SET_BODY_REPLAY: {
             // Set the given bytes as the content
             ByteChunk bc = (ByteChunk) param;
             int length = bc.getLength();
@@ -448,35 +451,60 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             empty = false;
             replay = true;
             endOfStream = false;
-
-        } else if (actionCode == ActionCode.ASYNC_START) {
+            break;
+        }
+        case ASYNC_START: {
             asyncStateMachine.asyncStart((AsyncContextCallback) param);
             // Async time out is based on SocketWrapper access time
             getSocketWrapper().access();
-        } else if (actionCode == ActionCode.ASYNC_DISPATCHED) {
+            break;
+        }
+        case ASYNC_DISPATCHED: {
             asyncStateMachine.asyncDispatched();
-        } else if (actionCode == ActionCode.ASYNC_TIMEOUT) {
+            break;
+        }
+        case ASYNC_TIMEOUT: {
             AtomicBoolean result = (AtomicBoolean) param;
             result.set(asyncStateMachine.asyncTimeout());
-        } else if (actionCode == ActionCode.ASYNC_RUN) {
+            break;
+        }
+        case ASYNC_RUN: {
             asyncStateMachine.asyncRun((Runnable) param);
-        } else if (actionCode == ActionCode.ASYNC_ERROR) {
+            break;
+        }
+        case ASYNC_ERROR: {
             asyncStateMachine.asyncError();
-        } else if (actionCode == ActionCode.ASYNC_IS_STARTED) {
+            break;
+        }
+        case ASYNC_IS_STARTED: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarted());
-        } else if (actionCode == ActionCode.ASYNC_IS_DISPATCHING) {
+            break;
+        }
+        case ASYNC_IS_DISPATCHING: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncDispatching());
-        } else if (actionCode == ActionCode.ASYNC_IS_ASYNC) {
+            break;
+        }
+        case ASYNC_IS_ASYNC: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsync());
-        } else if (actionCode == ActionCode.ASYNC_IS_TIMINGOUT) {
+            break;
+        }
+        case ASYNC_IS_TIMINGOUT: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
-        } else if (actionCode == ActionCode.ASYNC_IS_ERROR) {
+            break;
+        }
+        case ASYNC_IS_ERROR: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
-        } else if (actionCode == ActionCode.UPGRADE_TOMCAT) {
+            break;
+        }
+        case UPGRADE_TOMCAT: {
             // HTTP connections only. Unsupported for AJP.
             // NOOP
-        }  else {
+            break;
+        }
+        default: {
             actionInternal(actionCode, param);
+            break;
+        }
         }
     }
 

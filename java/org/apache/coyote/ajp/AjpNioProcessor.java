@@ -241,26 +241,32 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
      * @param param Action parameter
      */
     @Override
+    @SuppressWarnings("incomplete-switch") // Other cases are handled by action()
     protected void actionInternal(ActionCode actionCode, Object param) {
 
-        if (actionCode == ActionCode.ASYNC_COMPLETE) {
+        switch (actionCode) {
+        case ASYNC_COMPLETE: {
             if (asyncStateMachine.asyncComplete()) {
                 ((NioEndpoint)endpoint).processSocket(this.socketWrapper.getSocket(),
                         SocketStatus.OPEN_READ, false);
             }
-
-        } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
+            break;
+        }
+        case ASYNC_SETTIMEOUT: {
             if (param == null) return;
             long timeout = ((Long)param).longValue();
             final KeyAttachment ka =
                     (KeyAttachment)socketWrapper.getSocket().getAttachment(false);
             ka.setTimeout(timeout);
-
-        } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
+            break;
+        }
+        case ASYNC_DISPATCH: {
             if (asyncStateMachine.asyncDispatch()) {
                 ((NioEndpoint)endpoint).processSocket(this.socketWrapper.getSocket(),
                         SocketStatus.OPEN_READ, true);
             }
+            break;
+        }
         }
     }
 
