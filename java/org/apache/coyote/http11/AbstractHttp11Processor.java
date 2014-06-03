@@ -674,12 +674,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Add an input filter to the current request.
-     *
-     * @return false if the encoding was not found (which would mean it is
-     * unsupported)
+     * Add an input filter to the current request. If the encoding is not
+     * supported, a 501 response will be returned to the client.
      */
-    protected boolean addInputFilter(InputFilter[] inputFilters,
+    private void addInputFilter(InputFilter[] inputFilters,
                                      String encodingName) {
         if (encodingName.equals("identity")) {
             // Skip
@@ -689,15 +687,20 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             contentDelimitation = true;
         } else {
             for (int i = pluggableFilterIndex; i < inputFilters.length; i++) {
-                if (inputFilters[i].getEncodingName()
-                    .toString().equals(encodingName)) {
+                if (inputFilters[i].getEncodingName().toString().equals(encodingName)) {
                     getInputBuffer().addActiveFilter(inputFilters[i]);
-                    return true;
+                    return;
                 }
             }
-            return false;
+            // Unsupported transfer encoding
+            // 501 - Unimplemented
+            response.setStatus(501);
+            error = true;
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("http11processor.request.prepare") +
+                          " Unsupported transfer encoding [" + encodingName + "]");
+            }
         }
-        return true;
     }
 
 
@@ -1317,29 +1320,15 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             int commaPos = transferEncodingValue.indexOf(',');
             String encodingName = null;
             while (commaPos != -1) {
-                encodingName = transferEncodingValue.substring
-                    (startPos, commaPos).toLowerCase(Locale.ENGLISH).trim();
-                if (!addInputFilter(inputFilters, encodingName)) {
-                    // Unsupported transfer encoding
-                    error = true;
-                    // 501 - Unimplemented
-                    response.setStatus(501);
-                }
+                encodingName = transferEncodingValue.substring(
+                        startPos, commaPos).toLowerCase(Locale.ENGLISH).trim();
+                addInputFilter(inputFilters, encodingName);
                 startPos = commaPos + 1;
                 commaPos = transferEncodingValue.indexOf(',', startPos);
             }
-            encodingName = transferEncodingValue.substring(startPos)
-                .toLowerCase(Locale.ENGLISH).trim();
-            if (!addInputFilter(inputFilters, encodingName)) {
-                // Unsupported transfer encoding
-                error = true;
-                // 501 - Unimplemented
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug(sm.getString("http11processor.request.prepare")+
-                              " Unsupported transfer encoding \""+encodingName+"\"");
-                }
-                response.setStatus(501);
-            }
+            encodingName = transferEncodingValue.substring(
+                    startPos).toLowerCase(Locale.ENGLISH).trim();
+            addInputFilter(inputFilters, encodingName);
         }
 
         // Parse content-length header
