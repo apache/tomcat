@@ -70,8 +70,6 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
 
     private final ByteChunk keyBuffer = new ByteChunk();
 
-    private boolean error = false;
-
     private boolean finished;
 
     private SpdyFrame inFrame = null;

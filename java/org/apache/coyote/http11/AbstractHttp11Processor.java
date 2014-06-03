@@ -89,12 +89,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Error flag.
-     */
-    protected boolean error = false;
-
-
-    /**
      * Keep-alive.
      */
     protected boolean keepAlive = true;
