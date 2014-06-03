@@ -54,6 +54,7 @@ public abstract class SimpleHttpClient {
     public static final String FAIL_404 = "HTTP/1.1 404";
     public static final String TIMEOUT_408 = "HTTP/1.1 408";
     public static final String FAIL_413 = "HTTP/1.1 413";
+    public static final String FAIL_417 = "HTTP/1.1 417";
     public static final String FAIL_50X = "HTTP/1.1 50";
     public static final String FAIL_500 = "HTTP/1.1 500";
     public static final String FAIL_501 = "HTTP/1.1 501";
@@ -419,6 +420,10 @@ public abstract class SimpleHttpClient {
 
     public boolean isResponse413() {
         return getResponseLine().startsWith(FAIL_413);
+    }
+
+    public boolean isResponse417() {
+        return getResponseLine().startsWith(FAIL_417);
     }
 
     public boolean isResponse50x() {
