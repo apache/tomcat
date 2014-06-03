@@ -677,8 +677,12 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * Add an input filter to the current request. If the encoding is not
      * supported, a 501 response will be returned to the client.
      */
-    private void addInputFilter(InputFilter[] inputFilters,
-                                     String encodingName) {
+    private void addInputFilter(InputFilter[] inputFilters, String encodingName) {
+
+        // Trim provided encoding name and convert to lower case since transfer
+        // encoding names are case insensitive. (RFC2616, section 3.6)
+        encodingName = encodingName.trim().toLowerCase(Locale.ENGLISH);
+
         if (encodingName.equals("identity")) {
             // Skip
         } else if (encodingName.equals("chunked")) {
@@ -1320,14 +1324,12 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             int commaPos = transferEncodingValue.indexOf(',');
             String encodingName = null;
             while (commaPos != -1) {
-                encodingName = transferEncodingValue.substring(
-                        startPos, commaPos).toLowerCase(Locale.ENGLISH).trim();
+                encodingName = transferEncodingValue.substring(startPos, commaPos);
                 addInputFilter(inputFilters, encodingName);
                 startPos = commaPos + 1;
                 commaPos = transferEncodingValue.indexOf(',', startPos);
             }
-            encodingName = transferEncodingValue.substring(
-                    startPos).toLowerCase(Locale.ENGLISH).trim();
+            encodingName = transferEncodingValue.substring(startPos);
             addInputFilter(inputFilters, encodingName);
         }
 
