@@ -1250,10 +1250,14 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         if (http11) {
             expectMB = headers.getValue("expect");
         }
-        if ((expectMB != null)
-            && (expectMB.indexOfIgnoreCase("100-continue", 0) != -1)) {
-            getInputBuffer().setSwallowInput(false);
-            expectation = true;
+        if (expectMB != null) {
+            if (expectMB.indexOfIgnoreCase("100-continue", 0) != -1) {
+                getInputBuffer().setSwallowInput(false);
+                expectation = true;
+            } else {
+                error = true;
+                response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
+            }
         }
 
         // Check user-agent header
