@@ -137,6 +137,10 @@
         <bug>56582</bug>: Use switch(actionCode) in processors instead of a
         chain of "elseif"s. (kkolinko)
       </scode>
+      <fix>
+        <bug>56582#c1</bug>: Implement DISPATCH_EXECUTE action for AJP
+        connectors. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
