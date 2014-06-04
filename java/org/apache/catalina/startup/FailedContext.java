@@ -55,7 +55,6 @@ import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
-import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
@@ -480,9 +479,9 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public boolean getLogEffectiveWebXml() { return false; }
 
     @Override
-    public void addApplicationListener(ApplicationListener listener) { /* NO-OP */ }
+    public void addApplicationListener(String listener) { /* NO-OP */ }
     @Override
-    public ApplicationListener[] findApplicationListeners() { return null; }
+    public String[] findApplicationListeners() { return null; }
     @Override
     public void removeApplicationListener(String listener) { /* NO-OP */ }
 

@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 
 public class TestNamingContextListener extends TomcatBaseTest {
@@ -62,8 +61,7 @@ public class TestNamingContextListener extends TomcatBaseTest {
         environment.setValue(BUG49132_VALUE);
         ctx.getNamingResources().addEnvironment(environment);
 
-        ctx.addApplicationListener(new ApplicationListener(
-                Bug49132Listener.class.getName(), false));
+        ctx.addApplicationListener(Bug49132Listener.class.getName());
 
         tomcat.start();
 
@@ -117,8 +115,7 @@ public class TestNamingContextListener extends TomcatBaseTest {
         environmentB.setValue(BUG54096_ValueB);
         ctx.getNamingResources().addEnvironment(environmentB);
 
-        ctx.addApplicationListener(new ApplicationListener(
-                Bug54096Listener.class.getName(), false));
+        ctx.addApplicationListener(Bug54096Listener.class.getName());
 
         tomcat.start();
 
