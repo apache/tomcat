@@ -972,7 +972,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         } else {
             keptAlive = socketWrapper.isKeptAlive();
         }
-        resetErrorState();
 
         if (disableKeepAlive()) {
             socketWrapper.setKeepAliveLeft(0);

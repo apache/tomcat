@@ -739,9 +739,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         int soTimeout = endpoint.getSoTimeout();
         boolean cping = false;
 
-        // Error flag
-        resetErrorState();
-
         boolean keptAlive = false;
 
         while (!getErrorState().isError() && !endpoint.isPaused()) {
@@ -936,6 +933,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         certificates.recycle();
         swallowResponse = false;
         bytesWritten = 0;
+        resetErrorState();
     }
 
 

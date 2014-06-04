@@ -42,7 +42,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     /**
      * Error state for the request/response currently being processed.
      */
-    private ErrorState errorState;
+    private ErrorState errorState = ErrorState.NONE;
 
 
     /**
