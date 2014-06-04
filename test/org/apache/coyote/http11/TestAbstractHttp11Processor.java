@@ -40,6 +40,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -51,6 +52,75 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestAbstractHttp11Processor extends TomcatBaseTest {
+
+    @Test
+    @Ignore
+    public void testResponseWithErrorChunked() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        Context ctxt = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+
+        // Add protected servlet
+        Tomcat.addServlet(ctxt, "ChunkedResponseWithErrorServlet",
+                new ResponseWithErrorServlet(true));
+        ctxt.addServletMapping("/*", "ChunkedResponseWithErrorServlet");
+
+        tomcat.start();
+
+        String request =
+                "GET /anything HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: any" + SimpleHttpClient.CRLF +
+                 SimpleHttpClient.CRLF;
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] {request});
+
+        client.connect();
+        client.processRequest();
+
+        // Expected response is a 200 response followed by an incomplete chunked
+        // body.
+        assertTrue(client.isResponse200());
+        // There should not be an end chunk
+        assertFalse(client.getResponseBody().endsWith("0"));
+    }
+
+    private static class ResponseWithErrorServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final boolean useChunks;
+
+        public ResponseWithErrorServlet(boolean useChunks) {
+            this.useChunks = useChunks;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+            if (!useChunks) {
+                // Longer than it needs to be because response will fail before
+                // it is complete
+                resp.setContentLength(100);
+            }
+            PrintWriter pw = resp.getWriter();
+            pw.print("line01");
+            pw.flush();
+            resp.flushBuffer();
+            pw.print("line02");
+            pw.flush();
+            resp.flushBuffer();
+            pw.print("line03");
+
+            // Now throw a RuntimeException to end this request
+            throw new ServletException("Deliberate failure");
+        }
+    }
+
 
     @Test
     public void testWithUnknownExpectation() throws Exception {
