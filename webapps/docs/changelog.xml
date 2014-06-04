@@ -141,6 +141,12 @@
         <bug>56582#c1</bug>: Implement DISPATCH_EXECUTE action for AJP
         connectors. (kkolinko)
       </fix>
+      <fix>
+        When an error occurs after the response has been committed close the
+        connection immediately rather than attempting to finish the response to
+        make it easier for the client to differentiate between a complete
+        response and one that failed part way though. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
