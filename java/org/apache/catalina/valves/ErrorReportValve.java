@@ -28,6 +28,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -77,10 +78,7 @@ public class ErrorReportValve extends ValveBase {
         // Perform the request
         getNext().invoke(request, response);
 
-        if (response.isCommitted()) {
-            return;
-        }
-
+        // Check the response for an error
         Throwable throwable = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 
         if (request.isAsyncStarted() && ((response.getStatus() < 400 &&
@@ -88,20 +86,33 @@ public class ErrorReportValve extends ValveBase {
             return;
         }
 
-        if (throwable != null) {
-            // The response is an error
+        // If we get this far then there has been an error
+
+        if (response.isCommitted()) {
+            // Flush any data that is still to be written to the client
+            response.flushBuffer();
+            // Mark the response as in error
             response.setError();
+            response.getCoyoteResponse().setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            // Close immediately to signal to the client that something went
+            // wrong
+            response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
+            return;
+        }
 
-            // Reset the response (if possible)
-            try {
-                response.reset();
-            } catch (IllegalStateException e) {
-                // Ignore
-            }
-
+        if (throwable != null) {
+            // Make sure that the necessary methods have been called on the
+            // response. (It is possible a component may just have set the
+            // Throwable. Tomcat won't do that but other components might.)
+            // These are safe to call at this point as we know that the response
+            // has not been committed.
+            response.reset();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
+        // One way or another, response.sendError() will have been called before
+        // execution reaches this point and suspended the response. Need to
+        // reverse that so this valve can write to the response.
         response.setSuspended(false);
 
         try {

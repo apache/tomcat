@@ -643,6 +643,12 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             getEndpoint().executeNonBlockingDispatches(socketWrapper);
             break;
         }
+        case CLOSE_NOW: {
+            // Prevent further writes to the response
+            swallowResponse = true;
+            setErrorState(ErrorState.CLOSE_NOW);
+            break;
+        }
         }
     }
 
@@ -836,7 +842,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             }
 
             // Finish the response if not done yet
-            if (!finished) {
+            if (!finished && getErrorState().isIoAllowed()) {
                 try {
                     finish();
                 } catch (Throwable t) {
@@ -1541,6 +1547,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 prepareResponse();
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_NOW);
+                return;
             }
         }
 
