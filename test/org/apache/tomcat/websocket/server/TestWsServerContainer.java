@@ -30,7 +30,6 @@ import org.apache.catalina.filters.TesterServletContext;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.websocket.TesterEchoServer;
 
 
@@ -42,8 +41,7 @@ public class TestWsServerContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                Bug54807Config.class.getName(), false));
+        ctx.addApplicationListener(Bug54807Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 

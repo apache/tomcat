@@ -30,7 +30,6 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.compiler.ELInterpreterFactory.DefaultELInterpreter;
-import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 
 public class TestELInterpreterFactory extends TomcatBaseTest {
 
@@ -79,8 +78,7 @@ public class TestELInterpreterFactory extends TomcatBaseTest {
         context.removeAttribute(ELInterpreter.class.getName());
 
         ctx.stop();
-        ctx.addApplicationListener((new ApplicationListener(
-                Bug54239Listener.class.getName(), false)));
+        ctx.addApplicationListener(Bug54239Listener.class.getName());
         ctx.start();
 
         interpreter = ELInterpreterFactory.getELInterpreter(ctx.getServletContext());

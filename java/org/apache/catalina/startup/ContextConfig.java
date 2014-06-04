@@ -79,7 +79,6 @@ import org.apache.tomcat.util.bcel.classfile.ElementValue;
 import org.apache.tomcat.util.bcel.classfile.ElementValuePair;
 import org.apache.tomcat.util.bcel.classfile.JavaClass;
 import org.apache.tomcat.util.descriptor.XmlErrorHandler;
-import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.util.descriptor.web.ContextEjb;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.descriptor.web.ContextLocalEjb;
@@ -1269,8 +1268,7 @@ public class ContextConfig implements LifecycleListener {
         }
         context.setJspConfigDescriptor(webxml.getJspConfigDescriptor());
         for (String listener : webxml.getListeners()) {
-            context.addApplicationListener(
-                    new ApplicationListener(listener, false));
+            context.addApplicationListener(listener);
         }
         for (Entry<String, String> entry :
                 webxml.getLocaleEncodingMappings().entrySet()) {

@@ -28,7 +28,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.util.Introspection;
-import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.descriptor.web.ContextResource;
 import org.apache.tomcat.util.descriptor.web.ContextResourceEnvRef;
@@ -77,11 +76,9 @@ public class WebAnnotationSet {
      */
     protected static void loadApplicationListenerAnnotations(Context context) {
         Class<?> classClass = null;
-        ApplicationListener[] applicationListeners =
-                context.findApplicationListeners();
+        String[] applicationListeners = context.findApplicationListeners();
         for (int i = 0; i < applicationListeners.length; i++) {
-            classClass = Introspection.loadClass(context,
-                    applicationListeners[i].getClassName());
+            classClass = Introspection.loadClass(context, applicationListeners[i]);
             if (classClass == null) {
                 continue;
             }

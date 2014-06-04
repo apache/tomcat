@@ -116,7 +116,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
-import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
@@ -228,8 +227,7 @@ public class StandardContext extends ContainerBase
      * application, in the order they were encountered in the resulting merged
      * web.xml file.
      */
-    private ApplicationListener applicationListeners[] =
-            new ApplicationListener[0];
+    private String applicationListeners[] = new String[0];
 
     private final Object applicationListenersLock = new Object();
 
@@ -2663,15 +2661,13 @@ public class StandardContext extends ContainerBase
      * @param listener Java class name of a listener class
      */
     @Override
-    public void addApplicationListener(ApplicationListener listener) {
+    public void addApplicationListener(String listener) {
 
         synchronized (applicationListenersLock) {
-            ApplicationListener results[] =
-                    new ApplicationListener[applicationListeners.length + 1];
+            String results[] = new String[applicationListeners.length + 1];
             for (int i = 0; i < applicationListeners.length; i++) {
                 if (listener.equals(applicationListeners[i])) {
-                    log.info(sm.getString(
-                            "standardContext.duplicateListener",listener));
+                    log.info(sm.getString("standardContext.duplicateListener",listener));
                     return;
                 }
                 results[i] = applicationListeners[i];
@@ -2682,7 +2678,6 @@ public class StandardContext extends ContainerBase
         fireContainerEvent("addApplicationListener", listener);
 
         // FIXME - add instance if already started?
-
     }
 
 
@@ -3289,10 +3284,8 @@ public class StandardContext extends ContainerBase
      * for this application.
      */
     @Override
-    public ApplicationListener[] findApplicationListeners() {
-
-        return (applicationListeners);
-
+    public String[] findApplicationListeners() {
+        return applicationListeners;
     }
 
 
@@ -3813,7 +3806,7 @@ public class StandardContext extends ContainerBase
             // Make sure this welcome file is currently present
             int n = -1;
             for (int i = 0; i < applicationListeners.length; i++) {
-                if (applicationListeners[i].getClassName().equals(listener)) {
+                if (applicationListeners.equals(listener)) {
                     n = i;
                     break;
                 }
@@ -3823,8 +3816,7 @@ public class StandardContext extends ContainerBase
 
             // Remove the specified constraint
             int j = 0;
-            ApplicationListener results[] =
-                    new ApplicationListener[applicationListeners.length - 1];
+            String results[] = new String[applicationListeners.length - 1];
             for (int i = 0; i < applicationListeners.length; i++) {
                 if (i != n)
                     results[j++] = applicationListeners[i];
@@ -3837,7 +3829,6 @@ public class StandardContext extends ContainerBase
         fireContainerEvent("removeApplicationListener", listener);
 
         // FIXME - behavior if already started?
-
     }
 
 
@@ -4677,7 +4668,7 @@ public class StandardContext extends ContainerBase
             log.debug("Configuring application event listeners");
 
         // Instantiate the required listeners
-        ApplicationListener listeners[] = findApplicationListeners();
+        String listeners[] = findApplicationListeners();
         Object results[] = new Object[listeners.length];
         boolean ok = true;
         Set<Object> noPluggabilityListeners = new HashSet<>();
@@ -4686,18 +4677,13 @@ public class StandardContext extends ContainerBase
                 getLogger().debug(" Configuring event listener class '" +
                     listeners[i] + "'");
             try {
-                ApplicationListener listener = listeners[i];
-                results[i] = instanceManager.newInstance(
-                        listener.getClassName());
-                if (listener.isPluggabilityBlocked()) {
-                    noPluggabilityListeners.add(results[i]);
-                }
+                String listener = listeners[i];
+                results[i] = instanceManager.newInstance(listener);
             } catch (Throwable t) {
                 t = ExceptionUtils.unwrapInvocationTargetException(t);
                 ExceptionUtils.handleThrowable(t);
-                getLogger().error
-                    (sm.getString("standardContext.applicationListener",
-                                  listeners[i].getClassName()), t);
+                getLogger().error(sm.getString(
+                        "standardContext.applicationListener", listeners[i]), t);
                 ok = false;
             }
         }
@@ -5599,7 +5585,7 @@ public class StandardContext extends ContainerBase
         // Bugzilla 32867
         distributable = false;
 
-        applicationListeners = new ApplicationListener[0];
+        applicationListeners = new String[0];
         applicationEventListenersObjects = new Object[0];
         applicationLifecycleListenersObjects = new Object[0];
         jspConfigDescriptor = null;

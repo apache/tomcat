@@ -39,7 +39,6 @@ import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
@@ -648,8 +647,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
                     appDir.getAbsolutePath());
             setUseCookies(clientShouldUseCookies);
             ctx.setCookies(serverShouldUseCookies);
-            ctx.addApplicationListener(new ApplicationListener(
-                    WsContextListener.class.getName(), false));
+            ctx.addApplicationListener(WsContextListener.class.getName());
 
             TesterMapRealm realm = new TesterMapRealm();
             realm.addUser("tomcat", "tomcat");

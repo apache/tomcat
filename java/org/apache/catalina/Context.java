@@ -31,7 +31,6 @@ import javax.servlet.descriptor.JspConfigDescriptor;
 import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
-import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
@@ -727,7 +726,7 @@ public interface Context extends Container {
      *
      * @param listener Java class name of a listener class
      */
-    public void addApplicationListener(ApplicationListener listener);
+    public void addApplicationListener(String listener);
 
 
     /**
@@ -905,7 +904,7 @@ public interface Context extends Container {
      * Return the set of application listener class names configured
      * for this application.
      */
-    public ApplicationListener[] findApplicationListeners();
+    public String[] findApplicationListeners();
 
 
     /**

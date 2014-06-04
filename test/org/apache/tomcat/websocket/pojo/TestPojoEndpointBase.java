@@ -37,7 +37,6 @@ import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.websocket.TestUtil;
 import org.apache.tomcat.websocket.pojo.TesterUtil.ServerConfigListener;
 import org.apache.tomcat.websocket.pojo.TesterUtil.SingletonConfigurator;
@@ -56,8 +55,7 @@ public class TestPojoEndpointBase extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                ServerConfigListener.class.getName(), false));
+        ctx.addApplicationListener(ServerConfigListener.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 
@@ -89,8 +87,7 @@ public class TestPojoEndpointBase extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                ServerConfigListener.class.getName(), false));
+        ctx.addApplicationListener(ServerConfigListener.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 

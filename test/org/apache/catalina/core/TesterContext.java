@@ -56,7 +56,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
-import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
@@ -699,7 +698,7 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public void addApplicationListener(ApplicationListener listener) {
+    public void addApplicationListener(String listener) {
         // NO-OP
     }
 
@@ -790,7 +789,7 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public ApplicationListener[] findApplicationListeners() {
+    public String[] findApplicationListeners() {
         return null;
     }
 

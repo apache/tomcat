@@ -39,7 +39,6 @@ import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.descriptor.web.ApplicationListener;
 import org.apache.tomcat.websocket.TesterMessageCountClient.AsyncBinary;
 import org.apache.tomcat.websocket.TesterMessageCountClient.AsyncHandler;
 import org.apache.tomcat.websocket.TesterMessageCountClient.AsyncText;
@@ -86,8 +85,7 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                TesterEchoServer.Config.class.getName(), false));
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 
