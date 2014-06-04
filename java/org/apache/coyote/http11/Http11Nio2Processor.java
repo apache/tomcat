@@ -24,6 +24,7 @@ import java.net.InetSocketAddress;
 import javax.net.ssl.SSLEngine;
 
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.ErrorState;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
@@ -92,8 +93,10 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
         RequestInfo rp = request.getRequestProcessor();
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            error = !getAdapter().event(request, response, status);
-            if (!error) {
+            if (!getAdapter().event(request, response, status)) {
+                setErrorState(ErrorState.CLOSE_NOW);
+            }
+            if (!getErrorState().isError()) {
                 if (socketWrapper != null) {
                     socketWrapper.setComet(comet);
                     if (comet) {
@@ -114,19 +117,19 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                 }
             }
         } catch (InterruptedIOException e) {
-            error = true;
+            setErrorState(ErrorState.CLOSE_NOW);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("http11processor.request.process"), t);
             // 500 - Internal Server Error
             response.setStatus(500);
+            setErrorState(ErrorState.CLOSE_NOW);
             getAdapter().log(request, response, 0);
-            error = true;
+            log.error(sm.getString("http11processor.request.process"), t);
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (error || status==SocketStatus.STOP) {
+        if (getErrorState().isError() || status==SocketStatus.STOP) {
             return SocketState.CLOSED;
         } else if (!comet) {
             if (keepAlive) {
@@ -172,7 +175,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
     @Override
     protected void resetTimeouts() {
-        if (!error && socketWrapper != null &&
+        if (!getErrorState().isError() && socketWrapper != null &&
                 asyncStateMachine.isAsyncDispatching()) {
             long soTimeout = endpoint.getSoTimeout();
 
@@ -236,8 +239,8 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
         if (endpoint.isPaused()) {
             // 503 - Service unavailable
             response.setStatus(503);
+            setErrorState(ErrorState.CLOSE_CLEAN);
             getAdapter().log(request, response, 0);
-            error = true;
         } else {
             return true;
         }
@@ -271,7 +274,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
             SocketWrapper<Nio2Channel> socketWrapper) {
         openSocket = keepAlive;
         // Do sendfile as needed: add socket to sendfile and end
-        if (sendfileData != null && !error) {
+        if (sendfileData != null && !getErrorState().isError()) {
             ((Nio2Endpoint.Nio2SocketWrapper) socketWrapper).setSendfileData(sendfileData);
             sendfileData.keepAlive = keepAlive;
             if (((Nio2Endpoint) endpoint).processSendfile(
@@ -282,7 +285,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("http11processor.sendfile.error"));
                 }
-                error = true;
+                setErrorState(ErrorState.CLOSE_NOW);
             }
             return true;
         }

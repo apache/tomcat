@@ -27,6 +27,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
+import org.apache.coyote.ErrorState;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
@@ -156,15 +157,16 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             getAdapter().service(request, response);
         } catch (InterruptedIOException e) {
-            error = true;
+            setErrorState(ErrorState.CLOSE_NOW);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             // log.error(sm.getString("ajpprocessor.request.process"), t);
             // 500 - Internal Server Error
+            // TODO Log this properly
             t.printStackTrace();
             response.setStatus(500);
             getAdapter().log(request, response, 0);
-            error = true;
+            setErrorState(ErrorState.CLOSE_NOW);
         }
 
         // TODO: async, etc ( detached mode - use a special light protocol)
@@ -175,11 +177,11 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
                 finish();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                error = true;
+                setErrorState(ErrorState.CLOSE_NOW);
             }
         }
 
-        if (error) {
+        if (getErrorState().isError()) {
             response.setStatus(500);
         }
 
@@ -240,13 +242,13 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements
             break;
         }
         case IS_ERROR: {
-            ((AtomicBoolean) param).set(error);
+            ((AtomicBoolean) param).set(getErrorState().isError());
             break;
         }
         case DISABLE_SWALLOW_INPUT: {
             // TODO: Do not swallow request input but
             // make sure we are closing the connection
-            error = true;
+            setErrorState(ErrorState.CLOSE_CLEAN);
             break;
         }
         case CLOSE: {
