@@ -40,9 +40,9 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     protected SocketWrapper<S> socketWrapper = null;
 
     /**
-     * Error flag.
+     * Error state for the request/response currently being processed.
      */
-    protected boolean error;
+    private ErrorState errorState;
 
 
     /**
@@ -67,6 +67,24 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
         request.setResponse(response);
     }
 
+
+    /**
+     * Update the current error state to the new error state if the new error
+     * state is more severe than the current error state.
+     */
+    protected void setErrorState(ErrorState errorState) {
+        this.errorState = this.errorState.getMostSevere(errorState);
+    }
+
+
+    protected void resetErrorState() {
+        errorState = ErrorState.NONE;
+    }
+
+
+    protected ErrorState getErrorState() {
+        return errorState;
+    }
 
     /**
      * The endpoint receiving connections that are handled by this processor.

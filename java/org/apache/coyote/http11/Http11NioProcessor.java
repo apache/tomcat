@@ -24,6 +24,7 @@ import java.nio.channels.SelectionKey;
 import javax.net.ssl.SSLEngine;
 
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.ErrorState;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
@@ -93,8 +94,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
      * @throws IOException error during an I/O operation
      */
     @Override
-    public SocketState event(SocketStatus status)
-        throws IOException {
+    public SocketState event(SocketStatus status) throws IOException {
 
         long soTimeout = endpoint.getSoTimeout();
 
@@ -102,8 +102,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(false);
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            error = !getAdapter().event(request, response, status);
-            if ( !error ) {
+            if (!getAdapter().event(request, response, status)) {
+                setErrorState(ErrorState.CLOSE_NOW);
+            }
+            if (!getErrorState().isError()) {
                 if (attach != null) {
                     attach.setComet(comet);
                     if (comet) {
@@ -124,19 +126,19 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 }
             }
         } catch (InterruptedIOException e) {
-            error = true;
+            setErrorState(ErrorState.CLOSE_NOW);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("http11processor.request.process"), t);
             // 500 - Internal Server Error
             response.setStatus(500);
+            setErrorState(ErrorState.CLOSE_NOW);
+            log.error(sm.getString("http11processor.request.process"), t);
             getAdapter().log(request, response, 0);
-            error = true;
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (error || status==SocketStatus.STOP) {
+        if (getErrorState().isError() || status==SocketStatus.STOP) {
             return SocketState.CLOSED;
         } else if (!comet) {
             if (keepAlive) {
@@ -170,7 +172,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     @Override
     protected void resetTimeouts() {
         final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(false);
-        if (!error && attach != null &&
+        if (!getErrorState().isError() && attach != null &&
                 asyncStateMachine.isAsyncDispatching()) {
             long soTimeout = endpoint.getSoTimeout();
 
@@ -234,8 +236,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         if (endpoint.isPaused()) {
             // 503 - Service unavailable
             response.setStatus(503);
+            setErrorState(ErrorState.CLOSE_CLEAN);
             getAdapter().log(request, response, 0);
-            error = true;
         } else {
             return true;
         }
@@ -271,11 +273,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
 
     @Override
-    protected boolean breakKeepAliveLoop(
-            SocketWrapper<NioChannel> socketWrapper) {
+    protected boolean breakKeepAliveLoop(SocketWrapper<NioChannel> socketWrapper) {
         openSocket = keepAlive;
         // Do sendfile as needed: add socket to sendfile and end
-        if (sendfileData != null && !error) {
+        if (sendfileData != null && !getErrorState().isError()) {
             ((KeyAttachment) socketWrapper).setSendfileData(sendfileData);
             sendfileData.keepAlive = keepAlive;
             SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
@@ -289,14 +290,12 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("http11processor.sendfile.error"));
                 }
-                error = true;
+                setErrorState(ErrorState.CLOSE_NOW);
             }
             return true;
         }
         return false;
     }
-
-
 
 
     @Override
@@ -307,7 +306,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
 
     // ----------------------------------------------------- ActionHook Methods
-
 
     /**
      * Send an action to the connector.
