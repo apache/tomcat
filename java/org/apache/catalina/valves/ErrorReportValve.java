@@ -81,8 +81,8 @@ public class ErrorReportValve extends ValveBase {
         // Check the response for an error
         Throwable throwable = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 
-        if (request.isAsyncStarted() && ((response.getStatus() < 400 &&
-                throwable == null) || request.isAsyncDispatching())) {
+        if (response.getStatus() < 400 && throwable == null && !response.isError() ||
+                request.isAsyncDispatching()) {
             return;
         }
 
@@ -140,14 +140,7 @@ public class ErrorReportValve extends ValveBase {
      */
     protected void report(Request request, Response response, Throwable throwable) {
 
-        // Do nothing on non-HTTP responses
         int statusCode = response.getStatus();
-
-        // Do nothing on a 1xx, 2xx and 3xx status
-        // Do nothing if anything has been written already
-        if (statusCode < 400 || response.getContentWritten() > 0 || !response.isError()) {
-            return;
-        }
 
         String message = RequestUtil.filter(response.getMessage());
         if (message == null) {
