@@ -409,6 +409,10 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
             break;
         }
+        case CLOSE_NOW: {
+            setErrorState(ErrorState.CLOSE_NOW);
+            break;
+        }
         default: {
             // TODO:
             // actionInternal(actionCode, param);

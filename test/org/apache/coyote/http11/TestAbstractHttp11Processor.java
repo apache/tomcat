@@ -40,7 +40,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -54,7 +53,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
     @Test
-    @Ignore
     public void testResponseWithErrorChunked() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 

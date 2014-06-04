@@ -902,6 +902,12 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             getEndpoint().executeNonBlockingDispatches(socketWrapper);
             break;
         }
+        case CLOSE_NOW: {
+            // Block further output
+            getOutputBuffer().finished = true;
+            setErrorState(ErrorState.CLOSE_NOW);
+            break;
+        }
         default: {
             actionInternal(actionCode, param);
             break;
@@ -1146,8 +1152,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             request.updateCounters();
 
             if (!isAsync() && !comet || getErrorState().isError()) {
-                getInputBuffer().nextRequest();
-                getOutputBuffer().nextRequest();
+                if (getErrorState().isIoAllowed()) {
+                    getInputBuffer().nextRequest();
+                    getOutputBuffer().nextRequest();
+                }
             }
 
             if (!disableUploadTimeout) {
@@ -1668,7 +1676,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         RequestInfo rp = request.getRequestProcessor();
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            if(!getAdapter().asyncDispatch(request, response, status)) {
+            if (!getAdapter().asyncDispatch(request, response, status)) {
                 setErrorState(ErrorState.CLOSE_NOW);
             }
             resetTimeouts();
@@ -1742,27 +1750,31 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     public void endRequest() {
 
         // Finish the handling of the request
-        try {
-            getInputBuffer().endRequest();
-        } catch (IOException e) {
-            setErrorState(ErrorState.CLOSE_NOW);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            // 500 - Internal Server Error
-            // Can't add a 500 to the access log since that has already been
-            // written in the Adapter.service method.
-            response.setStatus(500);
-            setErrorState(ErrorState.CLOSE_NOW);
-            getLog().error(sm.getString("http11processor.request.finish"), t);
+        if (getErrorState().isIoAllowed()) {
+            try {
+                getInputBuffer().endRequest();
+            } catch (IOException e) {
+                setErrorState(ErrorState.CLOSE_NOW);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                // 500 - Internal Server Error
+                // Can't add a 500 to the access log since that has already been
+                // written in the Adapter.service method.
+                response.setStatus(500);
+                setErrorState(ErrorState.CLOSE_NOW);
+                getLog().error(sm.getString("http11processor.request.finish"), t);
+            }
         }
-        try {
-            getOutputBuffer().endRequest();
-        } catch (IOException e) {
-            setErrorState(ErrorState.CLOSE_NOW);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            setErrorState(ErrorState.CLOSE_NOW);
-            getLog().error(sm.getString("http11processor.response.finish"), t);
+        if (getErrorState().isIoAllowed()) {
+            try {
+                getOutputBuffer().endRequest();
+            } catch (IOException e) {
+                setErrorState(ErrorState.CLOSE_NOW);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                setErrorState(ErrorState.CLOSE_NOW);
+                getLog().error(sm.getString("http11processor.response.finish"), t);
+            }
         }
     }
 
