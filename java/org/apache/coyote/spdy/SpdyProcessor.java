@@ -55,8 +55,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  *
  * Based on the AJP processor.
  */
-public class SpdyProcessor<S> extends AbstractProcessor<S> implements
-        Runnable {
+public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
 
     // TODO: handle input
     // TODO: recycle
