@@ -118,10 +118,9 @@ implement its own timeout mechanism to handle these cases.</p>
    <ul>
      <li><code>org.apache.tomcat.websocket.executorCoreSize</code>: The core
          size of the executor thread pool. If not set, the default of 0 (zero)
-         is used.</li>
-     <li><code>org.apache.tomcat.websocket.executorMaxSize</code>: The maximum
-         permitted size of the executor thread pool. If not set, the default of
-         200 is used.</li>
+         is used. Note that the maximum permitted size of the executor thread
+         pool is hard coded to <code>Integer.MAX_VALUE</code> which effectively
+         means it is unlimited.</li>
      <li><code>org.apache.tomcat.websocket.executorKeepAliveTimeSeconds</code>:
          The maximum time an idle thread will remain in the executor thread pool
          until it is terminated. If not specified, the default of 60 seconds is

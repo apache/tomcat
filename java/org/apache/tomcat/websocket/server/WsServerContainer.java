@@ -27,7 +27,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -119,17 +119,11 @@ public class WsServerContainer extends WsWebSocketContainer
         }
         // Executor config
         int executorCoreSize = 0;
-        int executorMaxSize = 200;
         long executorKeepAliveTimeSeconds = 60;
         value = servletContext.getInitParameter(
                 Constants.EXECUTOR_CORE_SIZE_INIT_PARAM);
         if (value != null) {
             executorCoreSize = Integer.parseInt(value);
-        }
-        value = servletContext.getInitParameter(
-                Constants.EXECUTOR_MAX_SIZE_INIT_PARAM);
-        if (value != null) {
-            executorMaxSize = Integer.parseInt(value);
         }
         value = servletContext.getInitParameter(
                 Constants.EXECUTOR_KEEPALIVETIME_SECONDS_INIT_PARAM);
@@ -161,8 +155,8 @@ public class WsServerContainer extends WsWebSocketContainer
         WsThreadFactory wsThreadFactory = new WsThreadFactory(threadGroup);
 
         executorService = new ThreadPoolExecutor(executorCoreSize,
-                executorMaxSize, executorKeepAliveTimeSeconds, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<Runnable>(), wsThreadFactory);
+                Integer.MAX_VALUE, executorKeepAliveTimeSeconds, TimeUnit.SECONDS,
+                new SynchronousQueue<Runnable>(), wsThreadFactory);
     }
 
 
