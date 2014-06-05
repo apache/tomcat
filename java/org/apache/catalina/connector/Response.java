@@ -386,7 +386,13 @@ public class Response
      * Set the error flag.
      */
     public void setError() {
-        error = true;
+        if (!error) {
+            error = true;
+            Wrapper wrapper = getRequest().getWrapper();
+            if (wrapper != null) {
+                wrapper.incrementErrorCount();
+            }
+        }
     }
 
 
@@ -1191,11 +1197,6 @@ public class Response
         // Ignore any call from an included servlet
         if (included) {
             return;
-        }
-
-        Wrapper wrapper = getRequest().getWrapper();
-        if (wrapper != null) {
-            wrapper.incrementErrorCount();
         }
 
         setError();
