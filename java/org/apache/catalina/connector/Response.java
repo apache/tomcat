@@ -198,6 +198,7 @@ public class Response
      * The error flag.
      */
     protected boolean error = false;
+    private boolean errorAfterCommit = false;
 
 
     /**
@@ -239,6 +240,7 @@ public class Response
         appCommitted = false;
         included = false;
         error = false;
+        errorAfterCommit = false;
         isCharacterEncodingSet = false;
 
         if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
@@ -388,6 +390,7 @@ public class Response
     public void setError() {
         if (!error) {
             error = true;
+            errorAfterCommit = coyoteResponse.isCommitted();
             Wrapper wrapper = getRequest().getWrapper();
             if (wrapper != null) {
                 wrapper.incrementErrorCount();
@@ -401,6 +404,11 @@ public class Response
      */
     public boolean isError() {
         return error;
+    }
+
+
+    public boolean isErrorAfterCommit() {
+        return errorAfterCommit;
     }
 
 
@@ -1775,7 +1783,4 @@ public class Response
         return (sb.toString());
 
     }
-
-
 }
-

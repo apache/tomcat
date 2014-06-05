@@ -78,25 +78,21 @@ public class ErrorReportValve extends ValveBase {
         // Perform the request
         getNext().invoke(request, response);
 
-        // Check the response for an error
-        Throwable throwable = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
-
-        if (response.getStatus() < 400 && throwable == null && !response.isError() ||
-                request.isAsyncDispatching()) {
+        if (response.isCommitted()) {
+            if (response.isErrorAfterCommit()) {
+                // Flush any data that is still to be written to the client
+                response.flushBuffer();
+                // Close immediately to signal to the client that something went
+                // wrong
+                response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
+            }
             return;
         }
 
-        // If we get this far then there has been an error
+        Throwable throwable = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 
-        if (response.isCommitted()) {
-            // Flush any data that is still to be written to the client
-            response.flushBuffer();
-            // Mark the response as in error
-            response.setError();
-            response.getCoyoteResponse().setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            // Close immediately to signal to the client that something went
-            // wrong
-            response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
+        if (request.isAsyncStarted() && ((response.getStatus() < 400 &&
+                throwable == null) || request.isAsyncDispatching())) {
             return;
         }
 
@@ -142,6 +138,12 @@ public class ErrorReportValve extends ValveBase {
 
         int statusCode = response.getStatus();
 
+        // Do nothing on a 1xx, 2xx and 3xx status
+        // Do nothing if anything has been written already
+        // Do nothing if the response hasn't been explicitly marked as in error
+        if (statusCode < 400 || response.getContentWritten() > 0 || !response.isError()) {
+            return;
+        }
         String message = RequestUtil.filter(response.getMessage());
         if (message == null) {
             if (throwable != null) {
