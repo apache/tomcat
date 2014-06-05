@@ -181,6 +181,10 @@
         Correct a copy/paste error and return a 500 response rather than a 400
         response when an internal server error occurs. (markt)
       </fix>
+      <fix>
+        <bug>56568</bug>: Allow any HTTP method when a JSP is being used as an
+        error page. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
