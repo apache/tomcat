@@ -2865,8 +2865,8 @@ public class StandardContext extends ContainerBase
                     new ApplicationListener[applicationListeners.length + 1];
             for (int i = 0; i < applicationListeners.length; i++) {
                 if (listener.equals(applicationListeners[i])) {
-                    log.info(sm.getString(
-                            "standardContext.duplicateListener",listener));
+                    log.info(sm.getString("standardContext.duplicateListener",
+                            listener.getClassName()));
                     return;
                 }
                 results[i] = applicationListeners[i];
