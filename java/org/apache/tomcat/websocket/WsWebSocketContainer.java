@@ -547,6 +547,7 @@ public class WsWebSocketContainer
      * @throws DeploymentException
      * @throws TimeoutException
      */
+    @SuppressWarnings("null") // line is not null in line.endsWith() call
     private HandshakeResponse processResponse(ByteBuffer response,
             AsyncChannelWrapper channel, long timeout) throws InterruptedException,
             ExecutionException, DeploymentException, EOFException,
