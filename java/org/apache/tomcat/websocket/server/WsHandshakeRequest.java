@@ -81,6 +81,11 @@ public class WsHandshakeRequest implements HandshakeRequest {
             sb.append(port);
         }
         sb.append(request.getRequestURI());
+        if (queryString != null) {
+            sb.append('?');
+            sb.append(queryString);
+        }
+
         try {
             requestUri = new URI(sb.toString());
         } catch (URISyntaxException e) {
