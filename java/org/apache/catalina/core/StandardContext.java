@@ -2849,14 +2849,7 @@ public class StandardContext extends ContainerBase
     public void addApplicationListener(String listener) {
         addApplicationListener(new ApplicationListener(listener, false));
     }
-    
-    
-    /**
-     * Add a new Listener class name to the set of Listeners
-     * configured for this application.
-     *
-     * @param listener Java class name of a listener class
-     */
+
     @Override
     public void addApplicationListener(ApplicationListener listener) {
 

@@ -30,7 +30,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.deploy.ApplicationListener;
 
 public class TestListener extends TomcatBaseTest {
 
@@ -65,8 +64,7 @@ public class TestListener extends TomcatBaseTest {
 
         // SCL2 pretends to be in web.xml, and tries to install a
         // ServletContainerInitializer.
-        context.addApplicationListener(new ApplicationListener(
-                SCL2.class.getName(), false));
+        context.addApplicationListener(SCL2.class.getName());
         tomcat.start();
 
         //check that the ServletContainerInitializer wasn't initialized.

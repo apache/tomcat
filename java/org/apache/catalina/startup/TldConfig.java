@@ -244,6 +244,7 @@ public final class TldConfig  implements LifecycleListener {
      * the <tt>noTldJars</tt> class variable, which contains the names of JARs
      * that are known not to contain any TLDs.
      */
+    @SuppressWarnings("deprecation") // Context.addApplicationListener(ApplicationListener) is deprecated.
     public void execute() {
         long t1=System.currentTimeMillis();
 

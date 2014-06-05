@@ -1340,8 +1340,7 @@ public class WebXml {
                     descriptor);
         }
         for (String listener : listeners) {
-            context.addApplicationListener(
-                    new ApplicationListener(listener, false));
+            context.addApplicationListener(listener);
         }
         for (Entry<String, String> entry : localeEncodingMappings.entrySet()) {
             context.addLocaleEncodingMappingParameter(entry.getKey(),

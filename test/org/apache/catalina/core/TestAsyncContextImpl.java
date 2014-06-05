@@ -52,7 +52,6 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -493,8 +492,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             }
          }
 
-        ctx.addApplicationListener(new ApplicationListener(
-                TrackingRequestListener.class.getName(), false));
+        ctx.addApplicationListener(TrackingRequestListener.class.getName());
 
         TesterAccessLogValve alv = new TesterAccessLogValve();
         ctx.getPipeline().addValve(alv);
@@ -641,8 +639,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         wrapper2.setAsyncSupported(true);
         ctx.addServletMapping("/stage2", "nonasync");
 
-        ctx.addApplicationListener(new ApplicationListener(
-                TrackingRequestListener.class.getName(), false));
+        ctx.addApplicationListener(TrackingRequestListener.class.getName());
 
         TesterAccessLogValve alv = new TesterAccessLogValve();
         ctx.getPipeline().addValve(alv);
@@ -972,8 +969,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "error", error);
         ctx.addServletMapping("/stage2", "error");
 
-        ctx.addApplicationListener(new ApplicationListener(
-                TrackingRequestListener.class.getName(), false));
+        ctx.addApplicationListener(TrackingRequestListener.class.getName());
 
         TesterAccessLogValve alv = new TesterAccessLogValve();
         ctx.getPipeline().addValve(alv);
@@ -1599,8 +1595,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             ctx.addErrorPage(ep);
         }
 
-        ctx.addApplicationListener(new ApplicationListener(
-                TrackingRequestListener.class.getName(), false));
+        ctx.addApplicationListener(TrackingRequestListener.class.getName());
 
         TesterAccessLogValve alv = new TesterAccessLogValve();
         ctx.getPipeline().addValve(alv);

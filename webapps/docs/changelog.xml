@@ -77,6 +77,10 @@
         may otherwise be triggered by a web application which in turn would
         trigger an exception when running under a security manager. (kkolinko)
       </fix>
+      <scode>
+        <bug>56588</bug>: Update deprecation of Context.addApplicationListener()
+        methods according to changes in Tomcat 8. (kkolinko)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

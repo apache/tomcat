@@ -780,11 +780,29 @@ public interface Context extends Container {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Add a new Listener class name to the set of Listeners
-     * configured for this application.
+     * Add a new Listener class name to the set of Listeners configured for this
+     * application.
      *
-     * @param listener Java class name of a listener class
+     * <p>
+     * The {@link ApplicationListener} class is used to pass an additional
+     * parameter that allows to differentiate listeners to Web Application added
+     * via configuration (web.xml or annotations) vs. ones added by frameworks,
+     * such as listeners declared in JSP tag libraries (TLD files) that are
+     * added by Jasper JSP Engine.
+     *
+     * <p>
+     * The recommended method to call for the first use case is
+     * {@link #addApplicationListener(String)}. The recommended replacement for
+     * the second use case is to use {@code addListener(...)} methods in
+     * {@link javax.servlet.ServletContext}.
+     *
+     * @param listener
+     *            Definition of a listener, including its java class name.
+     * @deprecated This method is removed from Tomcat 8.0.9 onwards. Use
+     *             {@link #addApplicationListener(String)} or
+     *             {@link javax.servlet.ServletContext#addListener(String)}.
      */
+    @Deprecated
     public void addApplicationListener(ApplicationListener listener);
 
 
@@ -793,10 +811,7 @@ public interface Context extends Container {
      * configured for this application.
      *
      * @param listener Java class name of a listener class
-     * 
-     * @deprecated Use {@link #addApplicationListener(ApplicationListener)}
      */
-    @Deprecated
     public void addApplicationListener(String listener);
 
 

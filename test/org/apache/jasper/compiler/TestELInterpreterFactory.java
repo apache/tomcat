@@ -26,7 +26,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.jasper.JspCompilationContext;
@@ -79,8 +78,7 @@ public class TestELInterpreterFactory extends TomcatBaseTest {
         context.removeAttribute(ELInterpreter.class.getName());
 
         ctx.stop();
-        ctx.addApplicationListener((new ApplicationListener(
-                Bug54239Listener.class.getName(), false)));
+        ctx.addApplicationListener(Bug54239Listener.class.getName());
         ctx.start();
 
         interpreter = ELInterpreterFactory.getELInterpreter(ctx.getServletContext());
