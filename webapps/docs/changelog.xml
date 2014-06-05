@@ -106,6 +106,20 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>56573</bug>: Change the value returned by
+        <code>Session.getRequestURI()</code> from the value obtained from
+        <code>HttpServletRequest.getRequestURI()</code> to the value obtained
+        from <code>HttpServletRequest.getRequestURI()</code> with the scheme
+        changed to ws or wss as appropriate. Note that the WebSocket Expert
+        Group is expected to clarify the expected behaviour for
+        <code>Session.getRequestURI()</code> which may result in further
+        changes. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.54 (violetagg)" rtext="released 2014-05-22">
   <subsection name="Catalina">
