@@ -212,6 +212,10 @@
         behaviour for <code>Session.getRequestURI()</code> which may result in
         further changes. (markt)
       </fix>
+      <fix>
+        <bug>56577</bug>: Improve the executor configuration used for the
+        callbacks associated with asynchronous writes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
