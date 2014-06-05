@@ -466,23 +466,16 @@ public class TestWebSocket extends TomcatBaseTest {
          */
         private class CustomReader {
             private InputStream is;
-            private String encoding;
             private boolean markSupported;
             private B2CConverter b2c;
 
             public CustomReader(InputStream is, String encoding) throws IOException {
                 this.is = new BufferedInputStream(is);
-                this.encoding = encoding;
                 markSupported = is.markSupported();
                 b2c = new B2CConverter(encoding);
             }
 
-            public String getEncoding() {
-                return encoding;
-            }
-
             public void setEncoding(String encoding) throws IOException {
-                this.encoding = encoding;
                 b2c = new B2CConverter(encoding);
             }
 
@@ -506,7 +499,6 @@ public class TestWebSocket extends TomcatBaseTest {
             public String readLine() throws IOException {
                 ByteChunk bc = new ByteChunk(125);
                 CharChunk cc = new CharChunk(125);
-                char c;
                 int i = is.read();
                 int read = 0;
                 while (i != -1) {
