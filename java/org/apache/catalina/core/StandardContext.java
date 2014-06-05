@@ -4748,8 +4748,6 @@ public class StandardContext extends ContainerBase
                     getServletContext()));
         }
         for (int i = 0; i < instances.length; i++) {
-            if (instances[i] == null)
-                continue;
             if (!(instances[i] instanceof ServletContextListener))
                 continue;
             ServletContextListener listener =
