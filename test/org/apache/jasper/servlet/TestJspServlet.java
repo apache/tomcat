@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -37,7 +36,6 @@ import org.apache.tomcat.util.descriptor.web.ErrorPage;
 public class TestJspServlet  extends TomcatBaseTest {
 
     @Test
-    @Ignore
     public void testBug56568() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 

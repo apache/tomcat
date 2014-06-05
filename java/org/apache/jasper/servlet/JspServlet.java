@@ -25,6 +25,7 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -283,8 +284,8 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
         String method = request.getMethod();
 
-        if (!"GET".equals(method) && !"POST".equals(method) &&
-                !"HEAD".equals(method)) {
+        if (!"GET".equals(method) && !"POST".equals(method) && !"HEAD".equals(method) &&
+                !DispatcherType.ERROR.equals(request.getDispatcherType())) {
             // Specification states behaviour is undefined
             // Jasper opts to reject any other verbs, partly as they are
             // unlikely to make sense in a JSP context and partly to protect
